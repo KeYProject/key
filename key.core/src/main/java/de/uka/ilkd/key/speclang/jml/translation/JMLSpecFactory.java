@@ -1596,6 +1596,30 @@ public class JMLSpecFactory {
             new SpecificationRepository.JmlStatementSpec(pv, ImmutableList.of(assignee, value)));
     }
 
+
+    public void translateUseLemmaStatement(final UseLemmaStatement statement,
+            final IProgramMethod pm)
+            throws SLTranslationException {
+        final var pv = createProgramVariablesForStatement(statement, pm);
+        JmlParser.PostfixexprContext context = statement.getParserContext();
+        var io = new JmlIO(services).context(Context.inMethod(pm, tb)).selfVar(pv.selfVar)
+                .parameters(pv.paramVars)
+                .resultVariable(pv.resultVar).exceptionVariable(pv.excVar).atPres(pv.atPres)
+                .atBefore(pv.atBefores);
+        JTerm lemmaCall = io.translateTerm(context);
+
+        if (lemmaCall.op() instanceof ProgramMethod lpm && !lpm.isLemma()) {
+            throw new SLTranslationException(
+                "Invalid lemma call for use_lemma statement (only lemma invocations allowed): "
+                    + lemmaCall,
+                Location.fromToken(context.getStart()));
+        }
+
+        services.getSpecificationRepository().addStatementSpec(
+            statement,
+            new SpecificationRepository.JmlStatementSpec(pv, ImmutableList.of(lemmaCall)));
+    }
+
     /**
      * If the LHS of a set statement has been translated into a final term, this method undoes this
      * encoding since LHS need to be encoded as select terms for KeY's mechanisms to works.

@@ -2369,6 +2369,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             return new SLExpression(tb.tt());
         }
 
+        // TODO Is the following bit until `Object a = ...` really needed?
         String paramsString;
         List<JmlParser.Param_declContext> paramDecls = ctx.param_list().param_decl();
         if (!paramDecls.isEmpty()) {
@@ -2395,6 +2396,15 @@ class Translator extends JmlParserBaseVisitor<Object> {
             raiseError(ctx, "Heap used in a `no_state` method.");
         }
 
+        return termFactory.eq(apply, body);
+    }
+
+    @Override
+    public SLExpression visitLemma_declaration(JmlParser.Lemma_declarationContext ctx) {
+        SLParameters params = visitParameters(ctx.param_list());
+        SLExpression apply = lookupIdentifier(ctx.IDENT().getText(), null, params, ctx);
+
+        SLExpression body = new SLExpression(termFactory.tb.TRUE());
         return termFactory.eq(apply, body);
     }
 

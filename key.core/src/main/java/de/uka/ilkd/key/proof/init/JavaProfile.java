@@ -189,6 +189,7 @@ public class JavaProfile extends AbstractProfile {
                 .prepend(LoopApplyHeadRule.INSTANCE).prepend(JmlAssertRule.ASSERT_INSTANCE)
                 .prepend(JmlAssertRule.ASSUME_INSTANCE)
                 .prepend(SetStatementRule.INSTANCE)
+                .prepend(UseLemmaStatementRule.INSTANCE)
                 .prepend(ObserverToUpdateRule.INSTANCE);
 
         // contract insertion rule, ATTENTION: ProofMgt relies on the fact

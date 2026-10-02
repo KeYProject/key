@@ -88,7 +88,7 @@ public class NodeInfo {
     private String notes;
 
     /** Information about changes respective to the parent of this node. */
-    private SequentChangeInfo sequentChangeInfo;
+    private @Nullable SequentChangeInfo sequentChangeInfo;
 
     public NodeInfo(Node node) {
         this.node = node;

@@ -40,6 +40,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLUseLemmaStatement;
 
 import org.key_project.logic.MetaSpace;
 import org.key_project.logic.Namespace;
@@ -774,6 +775,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             case MarkerStatementHelper.KIND_SET -> {
                 KeyAst.SetStatementContext context = n.getData(MarkerStatementHelper.KEY_ASSIGN);
                 yield new SetStatement(context, pi);
+            }
+            case MarkerStatementHelper.KIND_USE_LEMMA -> {
+                TextualJMLUseLemmaStatement stm = n.getData(MarkerStatementHelper.KEY_USE_LEMMA);
+                yield new UseLemmaStatement(stm.getExpression(), pi);
             }
 
 

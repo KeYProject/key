@@ -41,6 +41,10 @@ public class OneStepSimplifierCommand extends AbstractCommand {
 
         if (Boolean.TRUE.equals(arguments.recentOnly)) {
             SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();
+            if(sci == null) {
+                // sci is null for the root node ...
+                return;
+            }
             var ante = sci.addedFormulas(true)
                     .prepend(sci.modifiedFormulas(true).map(FormulaChangeInfo::newFormula));
             applyOSS(ante, goal, true);

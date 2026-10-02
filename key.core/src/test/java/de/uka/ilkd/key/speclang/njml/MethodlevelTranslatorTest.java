@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodOrLemmaDecl;
 
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.DynamicTest;
@@ -87,7 +88,7 @@ public class MethodlevelTranslatorTest {
 
         assertTrue(translationOpt.isPresent(), "No model method declaration found");
         final var methodDecl =
-            ((TextualJMLMethodDecl) translationOpt.get()).getParsableDeclaration();
+            ((TextualJMLMethodOrLemmaDecl) translationOpt.get()).getParsableDeclaration();
         assertTrue(methodDecl.contains("/*@ nullable @*/ Object"), "Return value is not nullable");
         assertTrue(methodDecl.contains("/*@ nullable @*/ Nullable n"), "Parameter is not nullable");
     }
@@ -136,7 +137,7 @@ public class MethodlevelTranslatorTest {
 
         assertTrue(translationOpt.isPresent(), "No model method declaration found");
         final var methodDecl =
-            ((TextualJMLMethodDecl) translationOpt.get()).getParsableDeclaration();
+            ((TextualJMLMethodOrLemmaDecl) translationOpt.get()).getParsableDeclaration();
         assertTrue(methodDecl.contains("/*@ non_null @*/ Object"), "Return value is not non_null");
         assertTrue(methodDecl.contains("/*@ non_null @*/ Nullable n"), "Parameter is not non_null");
 

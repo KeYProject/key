@@ -63,6 +63,8 @@ public class EngineState {
 
     private final PLookup userData = new PLookup();
 
+    private final Map<Integer, String> labelMap = new HashMap<>();
+
     /**
      * If set to true, outputs all commands to observers and console. Otherwise, only shows explicit
      * echo messages.
@@ -376,5 +378,18 @@ public class EngineState {
 
     public PLookup getUserData() {
         return userData;
+    }
+
+    public void labelGoals(ImmutableList<Goal> goals, String... labels) {
+        if (goals.size() != labels.length) {
+            throw new IllegalStateException("The produced goals and their labels must habe same cardinality.");
+        }
+        for(int i = 0; i < labels.length; i++) {
+            labelMap.put(goals.get(i).node().serialNr(), labels[i]);
+        }
+    }
+
+    public @Nullable String getLabel(Node node) {
+        return labelMap.getOrDefault(node.serialNr(), node.getNodeInfo().getBranchLabel());
     }
 }

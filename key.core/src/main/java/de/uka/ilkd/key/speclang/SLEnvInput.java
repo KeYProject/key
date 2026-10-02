@@ -246,6 +246,8 @@ public final class SLEnvInput extends AbstractEnvInput {
                         jsf.translateJmlAssertCondition((JmlAssert) node, pm);
                     } else if (node instanceof SetStatement) {
                         jsf.translateSetStatement((SetStatement) node, pm);
+                    } else if (node instanceof UseLemmaStatement useLemmaStatement) {
+                        jsf.translateUseLemmaStatement(useLemmaStatement, pm);
                     }
                 } catch (ProofInputException e) {
                     // Store the first exception that occurred

@@ -94,7 +94,8 @@ public class SpecialJavaPrinter extends DefaultPrettyPrinterVisitor {
                 }
                 case TextualJMLInitially c -> print(c.getModifiers(), c.getInv().first);
                 case TextualJMLMergePointDecl c -> print(c.getModifiers(), c.getMergeProc());
-                case TextualJMLMethodDecl c -> print(c.getModifiers(), c.getDecl());
+                case TextualJMLMethodOrLemmaDecl c ->
+                    print(c.getModifiers(), c.getMethodDefinition());
                 case TextualJMLModifierList c -> print(c.getModifiers());
                 case TextualJMLRepresents c -> print(c.getModifiers(), c.getRepresents().first);
                 case TextualJMLSetStatement c -> print(c.getAssignment());

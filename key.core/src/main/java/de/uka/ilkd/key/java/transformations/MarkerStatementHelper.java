@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java.transformations;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLUseLemmaStatement;
 
 import com.github.javaparser.ast.DataKey;
 
@@ -20,11 +21,14 @@ public class MarkerStatementHelper {
     public static final int KIND_ASSUME = 2;
     public static final int KIND_SET = 3;
     public static final int KIND_MERGE_POINT = 4;
+    public static final int KIND_USE_LEMMA = 5;
 
     public static final DataKey<KeyAst.SetStatementContext> KEY_ASSIGN = new DataKey<>() {
     };
     public static final DataKey<TextualJMLMergePointDecl> KEY_MERGE_POINT = new DataKey<>() {
     };
     public static final DataKey<TextualJMLAssertStatement> KEY_ASSERT = new DataKey<>() {
+    };
+    public static final DataKey<TextualJMLUseLemmaStatement> KEY_USE_LEMMA = new DataKey<>() {
     };
 }

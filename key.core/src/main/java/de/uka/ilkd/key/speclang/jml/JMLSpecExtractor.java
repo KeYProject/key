@@ -295,7 +295,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         ParserRuleContext modelMethodDefinition = null;
         for (var c : constructs) {
-            if (c instanceof TextualJMLMethodDecl m) {
+            if (c instanceof TextualJMLMethodOrLemmaDecl m) {
                 if (pm.getMethodDeclaration().containsModifier(ModifierKind.JML_MODEL)) {
                     modelMethodDefinition = m.getMethodDefinition();
                     break;

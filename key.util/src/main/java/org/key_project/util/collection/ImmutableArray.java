@@ -77,6 +77,21 @@ public class ImmutableArray<S extends @Nullable Object>
     }
 
     /**
+     * <p>
+     * creates a new immutable array with the contents of the given list.
+     * </p>
+     * <p>
+     * The order of elements is defined by the collection.
+     * </p>
+     *
+     * @param list a non-null collection (order is preserved)
+     */
+    @SuppressWarnings("unchecked")
+    public ImmutableArray(@NonNull ImmutableList<? extends S> list) {
+        content = (S[]) list.toArray(Object.class);
+    }
+
+    /**
      * gets the element at the specified position
      *
      * @param pos an int describing the position
@@ -211,11 +226,7 @@ public class ImmutableArray<S extends @Nullable Object>
      * @return This element converted to an {@link ImmutableList}.
      */
     public ImmutableList<S> toImmutableList() {
-        ImmutableList<S> ret = ImmutableList.nil();
-        for (S s : this) {
-            ret = ret.prepend(s);
-        }
-        return ret.reverse();
+        return ImmutableList.fromArray(content);
     }
 
     /**

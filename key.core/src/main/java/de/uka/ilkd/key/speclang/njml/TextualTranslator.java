@@ -497,8 +497,25 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
+    public Object visitLemma_declaration(JmlParser.Lemma_declarationContext ctx) {
+        TextualJMLLemmaDecl decl = new TextualJMLLemmaDecl(mods, ctx);
+        finishConstruct(decl);
+        return null;
+    }
+
+    @Override
     public Object visitSet_statement(JmlParser.Set_statementContext ctx) {
         TextualJMLSetStatement inv = new TextualJMLSetStatement(mods, ctx);
+        finishConstruct(inv);
+        return null;
+    }
+
+    public Object visitUse_lemma_statement(JmlParser.Use_lemma_statementContext ctx) {
+        TextualJMLUseLemmaStatement inv = new TextualJMLUseLemmaStatement(mods, ctx);
+        if (!inv.isSuitableExpression()) {
+            // TODO make sure this is amended by a position in the sources
+            throw new RuntimeException("use_lemma must go with a lemma invocation.");
+        }
         finishConstruct(inv);
         return null;
     }

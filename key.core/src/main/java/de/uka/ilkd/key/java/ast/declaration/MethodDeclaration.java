@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLemmaDecl;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 
 import org.key_project.util.ExtList;
@@ -423,6 +424,11 @@ public class MethodDeclaration extends JavaDeclaration
     public boolean isModel() {
         return super.isModel();
     }
+
+    public boolean isLemma() {
+        return attachedJml.stream().anyMatch(TextualJMLLemmaDecl.class::isInstance);
+    }
+
 
     @Override
     public int getStateCount() {

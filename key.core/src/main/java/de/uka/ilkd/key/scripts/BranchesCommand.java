@@ -136,7 +136,7 @@ public class BranchesCommand extends AbstractCommand {
         int number = 1;
         while (it.hasNext()) {
             Node node = it.next();
-            String label = node.getNodeInfo().getBranchLabel();
+            String label = state.getLabel(node);
             if (label == null) {
                 label = "Case " + number;
             }
