@@ -504,7 +504,7 @@ public class Configuration {
         }
 
         public ConfigurationWriter printComment(@Nullable String comment) {
-            if (comment == null) {
+            if (comment == null || comment.isBlank()) {
                 return this;
             }
             if (comment.contains("\n")) {
