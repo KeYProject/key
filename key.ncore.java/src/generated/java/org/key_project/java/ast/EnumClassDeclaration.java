@@ -8,6 +8,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.key_project.logic.op.sv.*;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import java.util.*;
 import org.jspecify.annotations.NullMarked;
 
@@ -16,7 +17,6 @@ public final class EnumClassDeclaration extends JavaSourceElement implements Cla
 
     private final Extends extending;
 
-    @java.lang.Override()
     private final ProgramElementName fullName;
 
     private final Implements implementing;
@@ -25,26 +25,20 @@ public final class EnumClassDeclaration extends JavaSourceElement implements Cla
 
     private final boolean isInnerClass;
 
-    @java.lang.Override()
     private final boolean isLibrary;
 
     private final boolean isLocalClass;
 
-    @java.lang.Override()
     private final JMLModifiers jmlModifiers;
 
-    @java.lang.Override()
     private final ImmutableList<MemberDeclaration> members;
 
-    @java.lang.Override()
     private final ProgramElementName name;
 
-    @java.lang.Override()
     private final boolean parentIsInterfaceDeclaration;
 
     @EqEx
     @Nullable
-    @java.lang.Override()
     private final PositionInfo positionInfo;
 
     @java.lang.Override()
@@ -108,7 +102,7 @@ public final class EnumClassDeclaration extends JavaSourceElement implements Cla
         return positionInfo;
     }
 
-    public EnumClassDeclaration(Extends extending, @java.lang.Override() ProgramElementName fullName, Implements implementing, boolean isAnonymousClass, boolean isInnerClass, @java.lang.Override() boolean isLibrary, boolean isLocalClass, @java.lang.Override() JMLModifiers jmlModifiers, @java.lang.Override() ImmutableList<MemberDeclaration> members, @java.lang.Override() ProgramElementName name, @java.lang.Override() boolean parentIsInterfaceDeclaration, @EqEx @Nullable @java.lang.Override() PositionInfo positionInfo) {
+    public EnumClassDeclaration(Extends extending, ProgramElementName fullName, Implements implementing, boolean isAnonymousClass, boolean isInnerClass, boolean isLibrary, boolean isLocalClass, JMLModifiers jmlModifiers, ImmutableList<MemberDeclaration> members, ProgramElementName name, boolean parentIsInterfaceDeclaration, @EqEx @Nullable PositionInfo positionInfo) {
         this.extending = Objects.requireNonNull(extending);
         this.fullName = Objects.requireNonNull(fullName);
         this.implementing = Objects.requireNonNull(implementing);
@@ -123,7 +117,7 @@ public final class EnumClassDeclaration extends JavaSourceElement implements Cla
         this.positionInfo = positionInfo;
     }
 
-    public EnumClassDeclaration(Extends extending, @java.lang.Override() ProgramElementName fullName, Implements implementing, boolean isAnonymousClass, boolean isInnerClass, @java.lang.Override() boolean isLibrary, boolean isLocalClass, @java.lang.Override() JMLModifiers jmlModifiers, @java.lang.Override() ImmutableList<MemberDeclaration> members, @java.lang.Override() ProgramElementName name, @java.lang.Override() boolean parentIsInterfaceDeclaration) {
+    public EnumClassDeclaration(Extends extending, ProgramElementName fullName, Implements implementing, boolean isAnonymousClass, boolean isInnerClass, boolean isLibrary, boolean isLocalClass, JMLModifiers jmlModifiers, ImmutableList<MemberDeclaration> members, ProgramElementName name, boolean parentIsInterfaceDeclaration) {
         this.extending = Objects.requireNonNull(extending);
         this.fullName = Objects.requireNonNull(fullName);
         this.implementing = Objects.requireNonNull(implementing);

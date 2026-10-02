@@ -8,6 +8,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.key_project.logic.op.sv.*;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import java.util.*;
 import org.jspecify.annotations.NullMarked;
 
@@ -18,7 +19,7 @@ public final class MethodReference extends JavaSourceElement implements JavaProg
 
     private final MethodName name;
 
-    private final ImmutableList<? extends Expression> arguments;
+    private final ImmutableList<Expression> arguments;
 
     @EqEx
     @Nullable
@@ -32,7 +33,7 @@ public final class MethodReference extends JavaSourceElement implements JavaProg
         return name;
     }
 
-    public ImmutableList<? extends Expression> arguments() {
+    public ImmutableList<Expression> arguments() {
         return arguments;
     }
 
@@ -42,14 +43,14 @@ public final class MethodReference extends JavaSourceElement implements JavaProg
         return positionInfo;
     }
 
-    public MethodReference(ReferencePrefix prefix, MethodName name, ImmutableList<? extends Expression> arguments, @EqEx @Nullable PositionInfo positionInfo) {
+    public MethodReference(ReferencePrefix prefix, MethodName name, ImmutableList<Expression> arguments, @EqEx @Nullable PositionInfo positionInfo) {
         this.prefix = Objects.requireNonNull(prefix);
         this.name = Objects.requireNonNull(name);
         this.arguments = Objects.requireNonNull(arguments);
         this.positionInfo = positionInfo;
     }
 
-    public MethodReference(ReferencePrefix prefix, MethodName name, ImmutableList<? extends Expression> arguments) {
+    public MethodReference(ReferencePrefix prefix, MethodName name, ImmutableList<Expression> arguments) {
         this.prefix = Objects.requireNonNull(prefix);
         this.name = Objects.requireNonNull(name);
         this.arguments = Objects.requireNonNull(arguments);
@@ -88,7 +89,7 @@ public final class MethodReference extends JavaSourceElement implements JavaProg
         return new MethodReference(prefix(), name, arguments(), positionInfo());
     }
 
-    public MethodReference withArguments(ImmutableList<? extends Expression> arguments) {
+    public MethodReference withArguments(ImmutableList<Expression> arguments) {
         return new MethodReference(prefix(), name(), arguments, positionInfo());
     }
 
@@ -105,7 +106,7 @@ public final class MethodReference extends JavaSourceElement implements JavaProg
         public MethodName name;
 
         @Nullable()
-        public ImmutableList<? extends Expression> arguments;
+        public ImmutableList<Expression> arguments;
 
         @Nullable()
         public PositionInfo positionInfo;
@@ -124,7 +125,7 @@ public final class MethodReference extends JavaSourceElement implements JavaProg
             return this;
         }
 
-        public Builder arguments(ImmutableList<? extends Expression> arguments) {
+        public Builder arguments(ImmutableList<Expression> arguments) {
             this.arguments = arguments;
             return this;
         }
@@ -134,7 +135,7 @@ public final class MethodReference extends JavaSourceElement implements JavaProg
             return this;
         }
 
-        public Builder arguments(? extends Expression arguments) {
+        public Builder arguments(Expression arguments) {
             if (this.arguments == null) {
                 this.arguments = ImmutableList.of(arguments);
                 return this;

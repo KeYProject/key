@@ -8,6 +8,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.key_project.logic.op.sv.*;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import java.util.*;
 import org.jspecify.annotations.NullMarked;
 
@@ -18,22 +19,31 @@ public final class LongLiteral extends JavaSourceElement implements AbstractInte
     @Nullable
     private final PositionInfo positionInfo;
 
+    private final String value;
+
     @Nullable()
     @java.lang.Override()
     public PositionInfo positionInfo() {
         return positionInfo;
     }
 
-    public LongLiteral(@EqEx @Nullable PositionInfo positionInfo) {
-        this.positionInfo = positionInfo;
+    @java.lang.Override()
+    public String value() {
+        return value;
     }
 
-    public LongLiteral() {
+    public LongLiteral(@EqEx @Nullable PositionInfo positionInfo, String value) {
+        this.positionInfo = positionInfo;
+        this.value = Objects.requireNonNull(value);
+    }
+
+    public LongLiteral(String value) {
         this.positionInfo = null;
+        this.value = Objects.requireNonNull(value);
     }
 
     public LongLiteral(LongLiteral other) {
-        this(other.positionInfo);
+        this(other.positionInfo, other.value);
     }
 
     @Override()
@@ -41,11 +51,19 @@ public final class LongLiteral extends JavaSourceElement implements AbstractInte
     public MatchConditions match(java.lang.Object o, MatchConditions cond) {
         if (!(o instanceof LongLiteral other))
             return null;
+        cond = MatchHelper.match(value, other.value, cond);
+        if (cond == null) {
+            return null;
+        }
         return cond;
     }
 
     public LongLiteral withPositionInfo(PositionInfo positionInfo) {
-        return new LongLiteral(positionInfo);
+        return new LongLiteral(positionInfo, value());
+    }
+
+    public LongLiteral withValue(String value) {
+        return new LongLiteral(positionInfo(), value);
     }
 
     public final static class Builder {
@@ -53,12 +71,20 @@ public final class LongLiteral extends JavaSourceElement implements AbstractInte
         @Nullable()
         public PositionInfo positionInfo;
 
+        @Nullable()
+        public String value;
+
         public LongLiteral build() {
-            return new LongLiteral(positionInfo);
+            return new LongLiteral(positionInfo, value);
         }
 
         public Builder positionInfo(PositionInfo positionInfo) {
             this.positionInfo = positionInfo;
+            return this;
+        }
+
+        public Builder value(String value) {
+            this.value = value;
             return this;
         }
     }
@@ -66,6 +92,7 @@ public final class LongLiteral extends JavaSourceElement implements AbstractInte
     public Builder builder() {
         Builder b = new Builder();
         b.positionInfo = positionInfo;
+        b.value = value;
         return b;
     }
 
@@ -75,12 +102,12 @@ public final class LongLiteral extends JavaSourceElement implements AbstractInte
             return true;
         if (!(o instanceof LongLiteral that))
             return false;
-        return true;
+        return Objects.equals(value, that.value);
     }
 
     @Override()
     public String toString() {
-        return "LongLiteral[positionInfo=%s]".formatted(positionInfo);
+        return "LongLiteral[positionInfo=%s, value=%s]".formatted(positionInfo, value);
     }
 
     @EqEx()
@@ -90,6 +117,9 @@ public final class LongLiteral extends JavaSourceElement implements AbstractInte
 
     @Override()
     public int hashCode() {
+        if (hashCode == null)
+            hashCode = Objects.hash(value);
+        return hashCode;
     }
 
     public <R> R accept(org.key_project.java.ast.visitor.Visitor<R> visitor) {

@@ -8,11 +8,12 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.key_project.logic.op.sv.*;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import java.util.*;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked()
-public sealed interface ProgramTransformer extends JavaProgramElement, Matchable, Visitable permits ArrayLength, ArrayPostDecl, ConstructorCall, CreateObject, DoBreak, EnhancedForElimination, EvaluateArgs, ExpandMethodBody, ForInitUnfoldTransformer, ForToWhile, InitArray, IsStatic, MethodCall, MultipleVarDecl, PostWork, ReattachLoopInvariant, SpecialConstructorCall, StaticInitialisation, SwitchToIf, TypeOf, Unpack, UnwindLoop {
+public sealed interface ProgramTransformer extends JavaProgramElement, AbstractProgramElement, Matchable, Visitable permits ArrayLength, ArrayPostDecl, ConstructorCall, CreateObject, DoBreak, EnhancedForElimination, EvaluateArgs, ExpandMethodBody, ForInitUnfoldTransformer, ForToWhile, InitArray, IsStatic, MethodCall, MultipleVarDecl, PostWork, ReattachLoopInvariant, SpecialConstructorCall, StaticInitialisation, SwitchToIf, TypeOf, Unpack, UnwindLoop {
 
     String name();
 

@@ -17,6 +17,7 @@ import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.ast.type.WildcardType;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -40,6 +41,7 @@ public class NodeSteps {
                     var args =
                             target.getFields().stream()
                                     .flatMap(f -> f.getVariables().stream())
+                                    .filter(v -> v.getInitializer().isEmpty())
                                     .map(v -> {
                                         if (v == it) {
                                             return (Expression) v.getNameAsExpression();
@@ -152,9 +154,11 @@ public class NodeSteps {
                 .map(it -> (Expression) it)
                 .toArray(Expression[]::new);
 
-        if (args.length == 0)
-            assert false : "No defined fields";
-        else {
+        if (args.length == 0) {
+            // Classes without any (non-@EqEx) fields — e.g. DLEmbeddedExpression whose only own
+            // field is the @EqEx positionInfo — must still return a value.
+            hashCode.getBody().get().addStatement(new ReturnStmt(new IntegerLiteralExpr("0")));
+        } else {
             final Expression compute = callObjects("hash", args);
             final Expression hashCodeIsNull = new BinaryExpr(variable.getNameAsExpression(),
                     new NullLiteralExpr(), BinaryExpr.Operator.EQUALS);
@@ -430,6 +434,15 @@ public class NodeSteps {
             target.addModifier(SEALED);
             target.removeModifier(ABSTRACT);
 
+            // JavaParser prints "implements" clauses on interfaces as-is, which is invalid Java
+            // ("interface X extends A implements B"). Merge declared interfaces into the extends
+            // clause. The @Root class is excluded: it is converted back to a class by handleRoot
+            // and must keep its "implements Visitable, Matchable".
+            if (!isRoot(target)) {
+                target.getImplementedTypes().forEach(it -> target.addExtendedType(it.clone()));
+                target.getImplementedTypes().clear();
+            }
+
             target.addExtendedType("Matchable");
             target.addExtendedType("Visitable");
 
@@ -567,6 +580,13 @@ public class NodeSteps {
                     var m = builder.addMethod(it.getNameAsString(), PUBLIC);
                     var t =
                             it.getType().asClassOrInterfaceType().getTypeArguments().get().getFirst();
+                    if (t instanceof WildcardType wildcard) {
+                        // "List<? extends Expression>" must become "arguments(Expression)",
+                        // not "arguments(? extends Expression ...)".
+                        t = wildcard.getExtendedType()
+                                .or(() -> wildcard.getSuperType())
+                                .orElseGet(() -> parseClassOrInterfaceType("Object"));
+                    }
                     m.addParameter(new Parameter(t.clone(), it.getNameAsString()));
                     m.setType(new ClassOrInterfaceType(null, "Builder"));
                     m.getBody().get().addStatement("if(this.%s==null) { this.%s = ImmutableList.of(%s); return this;}"

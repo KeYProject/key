@@ -12,11 +12,9 @@ public interface VoidVisitor {
 
     void visit(Import n);
 
-    void visit(StatementBlock n);
+    void visit(CcatchNonstandardParameterDeclaration n);
 
     void visit(ArrayDeclaration n);
-
-    void visit(ClassDeclaration n);
 
     void visit(ClassInitializer n);
 
@@ -36,15 +34,15 @@ public interface VoidVisitor {
 
     void visit(LocalVariableDeclaration n);
 
-    void visit(MethodDeclaration n);
+    void visit(JMLModifiers n);
+
+    void visit(Comment n);
 
     void visit(ParameterDeclaration n);
 
     void visit(SuperArrayDeclaration n);
 
     void visit(Throws n);
-
-    void visit(VariableSpecification n);
 
     void visit(AnnotationUseSpecification n);
 
@@ -98,8 +96,6 @@ public interface VoidVisitor {
 
     void visit(ExecutionContext n);
 
-    void visit(FieldReference n);
-
     void visit(MetaClassReference n);
 
     void visit(MethodReference n);
@@ -120,8 +116,6 @@ public interface VoidVisitor {
 
     void visit(TypeRef n);
 
-    void visit(VariableReference n);
-
     void visit(Assert n);
 
     void visit(Break n);
@@ -129,6 +123,8 @@ public interface VoidVisitor {
     void visit(Case n);
 
     void visit(Default n);
+
+    void visit(Catch n);
 
     void visit(SingleCatch n);
 
@@ -183,8 +179,6 @@ public interface VoidVisitor {
     void visit(Try n);
 
     void visit(While n);
-
-    void visit(ProgramElementName n);
 
     void visit(PermIndProgramElementName n);
 
