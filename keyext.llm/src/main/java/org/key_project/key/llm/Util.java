@@ -15,23 +15,25 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 
 /**
+ * Small HTTP helpers used by the settings UI (e.g. fetching the available models).
  *
  * @author Alexander Weigl
- * @version 1 (28.06.26)
  */
-public class Util {
+public final class Util {
+    private Util() {
+    }
+
     public static Object post(String url, String authToken, Map<String, Object> data) {
         var request = new HttpPost(url);
         request.addHeader("Authorization", "Bearer " + authToken);
         request.addHeader("Content-Type", "application/json");
         request.addHeader("Accept", "application/json");
-        // Build request payload
         var gson = new GsonBuilder().create();
         var stringBody = gson.toJson(data);
         request.setEntity(new StringEntity(stringBody));
 
         try (var client = HttpClients.createDefault()) {
-            return client.execute(request, new LlmClientExtended.GsonHttpClientResponseHandler());
+            return client.execute(request, new DefaultChatCompletionsClient.ResponseHandler());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -44,7 +46,7 @@ public class Util {
         request.addHeader("Accept", "application/json");
         try (var client = HttpClients.createDefault()) {
             return client.execute(request,
-                new LlmClientExtended.GsonHttpClientResponseHandlerObj());
+                new DefaultChatCompletionsClient.ResponseHandlerObj());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
