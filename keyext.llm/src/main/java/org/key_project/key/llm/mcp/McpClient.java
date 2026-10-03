@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.key.llm.mcp;
 
 import java.util.List;
@@ -19,7 +22,7 @@ public interface McpClient {
     /**
      * Calls a tool with the given arguments.
      *
-     * @param toolName  The name of the tool to call
+     * @param toolName The name of the tool to call
      * @param arguments JSON string of arguments
      * @return The tool result
      * @throws Exception If the tool call fails

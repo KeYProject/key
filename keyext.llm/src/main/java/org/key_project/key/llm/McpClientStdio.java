@@ -14,12 +14,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.key_project.key.llm.mcp.FunctionDefinition;
+import org.key_project.key.llm.mcp.JsonSchema;
+import org.key_project.key.llm.mcp.McpClient;
+import org.key_project.key.llm.mcp.Tool;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.key_project.key.llm.mcp.McpClient;
-import org.key_project.key.llm.mcp.Tool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,10 +32,10 @@ import org.slf4j.LoggerFactory;
  * This client communicates with MCP servers via stdin/stdout using JSON-RPC 2.0 protocol.
  * It supports:
  * <ul>
- *   <li>Tool discovery via {@code tools/list}</li>
- *   <li>Tool invocation via {@code tools/call}</li>
- *   <li>Resource access via {@code resources/read}</li>
- *   <li>Resource listing via {@code resources/list}</li>
+ * <li>Tool discovery via {@code tools/list}</li>
+ * <li>Tool invocation via {@code tools/call}</li>
+ * <li>Resource access via {@code resources/read}</li>
+ * <li>Resource listing via {@code resources/list}</li>
  * </ul>
  * <p>
  * <b>Usage Example:</b>
@@ -40,15 +43,14 @@ import org.slf4j.LoggerFactory;
  * // Start an MCP server process (e.g., a filesystem server)
  * ProcessBuilder pb = new ProcessBuilder("npx", "-y", "@modelcontextprotocol/server-filesystem", "/home/user/docs");
  * Process process = pb.start();
- * 
+ *
  * // Create the MCP client
  * McpClientStdio mcpClient = new McpClientStdio(process);
  * mcpClient.initialize();
- * 
- * // Use with LlmClientExtended
- * LlmClientExtended client = new LlmClientExtended(session, context, "Hello", mcpClient);
- * Map<String, Object> response = client.call();
- * 
+ *
+ * // Use with the agent loop
+ * AgentLoop loop = new AgentLoop(session, new DefaultChatCompletionsClient());
+ *
  * // Cleanup
  * mcpClient.close();
  * }</pre>
@@ -105,9 +107,7 @@ public class McpClientStdio implements McpClient {
             "capabilities", Map.of(),
             "clientInfo", Map.of(
                 "name", "KeY-MCP-Client",
-                "version", "1.0.0"
-            )
-        ));
+                "version", "1.0.0")));
 
         sendRequest(initRequest);
         JsonObject initResponse = readResponse();
@@ -184,9 +184,51 @@ public class McpClientStdio implements McpClient {
         return openAiTool;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<Tool> getTools() {
-        return new ArrayList<>();
+        // convert the cached (OpenAI-format) tool maps back into Tool value objects
+        var result = new ArrayList<Tool>(cachedTools.size());
+        for (Map<String, Object> tool : cachedTools) {
+            try {
+                var function = (Map<String, Object>) tool.get("function");
+                var parameters = function.get("parameters");
+                JsonSchema schema = parseSchema(parameters);
+                result.add(new Tool(new FunctionDefinition((String) function.get("name"),
+                    (String) function.getOrDefault("description", ""), schema)));
+            } catch (Exception e) {
+                logger.warn("Could not convert discovered MCP tool", e);
+            }
+        }
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static JsonSchema parseSchema(Object parameters) {
+        if (!(parameters instanceof Map<?, ?> map)) {
+            return new JsonSchema("object");
+        }
+        var builder = JsonSchema.builder();
+        Object type = map.get("type");
+        builder.withType(type == null ? "object" : String.valueOf(type));
+        Object properties = map.get("properties");
+        if (properties instanceof Map<?, ?> props) {
+            for (Map.Entry<?, ?> entry : props.entrySet()) {
+                builder.addProperty(String.valueOf(entry.getKey()),
+                    parseSchema(entry.getValue()));
+            }
+        }
+        Object required = map.get("required");
+        if (required instanceof List<?> list) {
+            for (Object item : list) {
+                builder.addRequired(String.valueOf(item));
+            }
+        }
+        Object description = map.get("description");
+        if (description != null) {
+            builder.withDescription(String.valueOf(description));
+        }
+        return builder.build();
     }
 
     @Override
@@ -206,8 +248,7 @@ public class McpClientStdio implements McpClient {
 
         JsonObject callRequest = createJsonRpcRequest("tools/call", Map.of(
             "name", toolName,
-            "arguments", args
-        ));
+            "arguments", args));
 
         sendRequest(callRequest);
         JsonObject response = readResponse();
@@ -218,7 +259,8 @@ public class McpClientStdio implements McpClient {
 
         if (response.has("error")) {
             JsonObject error = response.getAsJsonObject("error");
-            String errorMessage = error.has("message") ? error.get("message").getAsString() : "Unknown error";
+            String errorMessage =
+                error.has("message") ? error.get("message").getAsString() : "Unknown error";
             throw new RuntimeException("MCP tool call failed: " + errorMessage);
         }
 
@@ -272,7 +314,8 @@ public class McpClientStdio implements McpClient {
         try {
             // Try to send a graceful shutdown notification
             try {
-                JsonObject shutdownNotification = createJsonRpcNotification("notifications/cancelled");
+                JsonObject shutdownNotification =
+                    createJsonRpcNotification("notifications/cancelled");
                 sendRequest(shutdownNotification);
             } catch (Exception e) {
                 // Ignore errors during shutdown
@@ -281,7 +324,7 @@ public class McpClientStdio implements McpClient {
             outputStream.close();
             inputReader.close();
             process.destroy();
-            
+
             // Wait briefly for clean termination
             try {
                 if (!process.waitFor(2, java.util.concurrent.TimeUnit.SECONDS)) {
@@ -336,11 +379,11 @@ public class McpClientStdio implements McpClient {
                     }
                 }
             }
-            
+
             if (!process.isAlive()) {
                 throw new IOException("MCP server process terminated unexpectedly");
             }
-            
+
             Thread.sleep(100);
         }
 
@@ -359,11 +402,11 @@ public class McpClientStdio implements McpClient {
         request.addProperty("jsonrpc", "2.0");
         request.addProperty("id", requestIdGenerator.incrementAndGet());
         request.addProperty("method", method);
-        
+
         if (params != null) {
             request.add("params", GSON.toJsonTree(params));
         }
-        
+
         return request;
     }
 

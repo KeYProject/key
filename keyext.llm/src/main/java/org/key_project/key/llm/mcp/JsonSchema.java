@@ -1,10 +1,13 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.key.llm.mcp;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Represents a JSON Schema object for function parameters in OpenAI tool specification.
@@ -13,8 +16,8 @@ import java.util.Map;
  *
  * @param schemaType The type of the value (e.g., "object", "string", "number", "array")
  * @param properties Map of property names to their schema definitions (for type "object")
- * @param required   List of required property names (for type "object")
- * @param items      Schema for array items (for type "array")
+ * @param required List of required property names (for type "object")
+ * @param items Schema for array items (for type "array")
  * @param enumValues List of allowed values (for enum constraints)
  * @param description Optional description of the parameter
  * @author Alexander Weigl
@@ -26,8 +29,7 @@ public record JsonSchema(
         @JsonProperty("required") List<String> required,
         @JsonProperty("items") JsonSchema items,
         @JsonProperty("enum") List<String> enumValues,
-        @JsonProperty("description") String description
-) {
+        @JsonProperty("description") String description) {
     /**
      * Creates an empty JSON Schema (defaults to an object type).
      */
@@ -48,7 +50,7 @@ public record JsonSchema(
      * Creates a JSON Schema for an object type with properties.
      *
      * @param properties Map of property names to their schema definitions
-     * @param required   List of required property names
+     * @param required List of required property names
      */
     public JsonSchema(Map<String, JsonSchema> properties, List<String> required) {
         this("object", properties, required, null, null, null);
@@ -131,7 +133,7 @@ public record JsonSchema(
         /**
          * Adds a property to the schema.
          *
-         * @param name   The property name
+         * @param name The property name
          * @param schema The property schema
          * @return this builder
          */

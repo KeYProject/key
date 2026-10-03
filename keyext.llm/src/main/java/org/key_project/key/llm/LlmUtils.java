@@ -64,13 +64,16 @@ public class LlmUtils {
         }
 
         var javaSrc = javaModel.getModelDir();
+        if (javaSrc == null) {
+            return List.of();
+        }
 
         if (Files.isRegularFile(javaSrc)) {
             return List.of(javaSrc.toUri());
         }
 
-        try (var walker = Files.walk(javaSrc)) {
-            return walker.filter(Files::isRegularFile).map(Path::toUri).toList();
-        }
+        // bounded listing; the unbounded Files.walk was replaced by FileAccess.listFiles
+        return FileAccess.listFiles(selectedProof, LlmSettings.INSTANCE.getMaxModelListingEntries())
+                .stream().map(Path::toUri).toList();
     }
 }
