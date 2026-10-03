@@ -1,23 +1,25 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.key.llm.mcp;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Represents a function definition in OpenAI tool specification.
  *
- * @param name        The name of the function
+ * @param name The name of the function
  * @param description Optional description of what the function does
- * @param parameters  JSON Schema object defining the function's parameters
+ * @param parameters JSON Schema object defining the function's parameters
  * @author Alexander Weigl
  * @version 1 (28.06.26)
  */
 public record FunctionDefinition(
         @JsonProperty("name") String name,
         @JsonProperty("description") String description,
-        @JsonProperty("parameters") JsonSchema parameters
-) {
+        @JsonProperty("parameters") JsonSchema parameters) {
     /**
      * Creates a new FunctionDefinition with minimal required fields.
      *
@@ -30,7 +32,7 @@ public record FunctionDefinition(
     /**
      * Creates a new FunctionDefinition with name and description.
      *
-     * @param name        The name of the function
+     * @param name The name of the function
      * @param description Description of what the function does
      */
     public FunctionDefinition(String name, String description) {

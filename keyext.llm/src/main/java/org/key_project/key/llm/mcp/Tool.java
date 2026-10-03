@@ -1,37 +1,37 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.key.llm.mcp;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Map;
 
 /**
- * Represents a tool definition in OpenAI API format.
+ * A tool definition in the OpenAI tool format plus KeY-side metadata.
  *
- * @param type     The type of the tool (e.g., "function")
- * @param function The function definition
- * @author Alexander Weigl
- * @version 1 (28.06.26)
+ * @param type the tool type, always {@code "function"}
+ * @param function the function definition
+ * @param defaultApproval whether this tool is safe to run without asking the user by default
  */
-public record Tool(
-        @JsonProperty("type") String type,
-        @JsonProperty("function") FunctionDefinition function
-) {
-    /**
-     * Creates a new Tool with type "function".
-     *
-     * @param function The function definition
-     */
+public record Tool(String type, FunctionDefinition function,
+        ApprovalRequirement defaultApproval) {
+
     public Tool(FunctionDefinition function) {
-        this("function", function);
+        this("function", function, ApprovalRequirement.AUTO);
     }
 
-    /**
-     * Converts this Tool to a Map representation.
-     *
-     * @return Map containing the tool definition
-     */
-    public java.util.Map<String, Object> toMap() {
-        return java.util.Map.of(
-                "type", type,
-                "function", function.toMap()
-        );
+    public Tool(FunctionDefinition function, ApprovalRequirement defaultApproval) {
+        this("function", function, defaultApproval);
+    }
+
+    /** Converts this tool to the OpenAI-format map (approval metadata is not serialized). */
+    public Map<String, Object> toMap() {
+        return Map.of("type", type, "function", function.toMap());
+    }
+
+    public enum ApprovalRequirement {
+        /** Run without asking the user (unless the user configured approval explicitly). */
+        AUTO,
+        /** Ask the user before the first execution in a turn, by default. */
+        ASK
     }
 }

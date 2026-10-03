@@ -1,3 +1,6 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.key.llm.mcp;
 
 import java.util.List;
@@ -18,34 +21,33 @@ public class DemoMcpTool implements McpToolProvider, McpClient {
     public List<Tool> getTools() {
         // Using the new type-safe record classes
         var echoTool = new Tool(new FunctionDefinition(
-                "echo",
-                "returns the given string",
-                new JsonSchema("object")
-        ));
+            "echo",
+            "returns the given string",
+            new JsonSchema("object")));
 
         // Example with parameters
         var calculatorTool = new Tool(new FunctionDefinition(
-                "calculate",
-                "performs basic arithmetic operations",
-                JsonSchema.builder()
-                        .withType("object")
-                        .addProperty("operation", JsonSchema.builder()
-                                .withType("string")
-                                .withDescription("The operation to perform (add, subtract, multiply, divide)")
-                                .build())
-                        .addProperty("a", JsonSchema.builder()
-                                .withType("number")
-                                .withDescription("First operand")
-                                .build())
-                        .addProperty("b", JsonSchema.builder()
-                                .withType("number")
-                                .withDescription("Second operand")
-                                .build())
-                        .addRequired("operation")
-                        .addRequired("a")
-                        .addRequired("b")
-                        .build()
-        ));
+            "calculate",
+            "performs basic arithmetic operations",
+            JsonSchema.builder()
+                    .withType("object")
+                    .addProperty("operation", JsonSchema.builder()
+                            .withType("string")
+                            .withDescription(
+                                "The operation to perform (add, subtract, multiply, divide)")
+                            .build())
+                    .addProperty("a", JsonSchema.builder()
+                            .withType("number")
+                            .withDescription("First operand")
+                            .build())
+                    .addProperty("b", JsonSchema.builder()
+                            .withType("number")
+                            .withDescription("Second operand")
+                            .build())
+                    .addRequired("operation")
+                    .addRequired("a")
+                    .addRequired("b")
+                    .build()));
         return List.of(echoTool, calculatorTool);
     }
 

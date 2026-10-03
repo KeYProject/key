@@ -12,6 +12,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
@@ -24,9 +25,9 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
+ * KeY GUI extension that provides the KeY-Agent chat panel and its settings.
  *
  * @author Alexander Weigl
- * @version 1 (11/18/25)
  */
 @KeYGuiExtension.Info(experimental = false, description = "LLM support for KeY")
 public class LlmExtension implements KeYGuiExtension, KeYGuiExtension.ContextMenu,
@@ -80,20 +81,48 @@ public class LlmExtension implements KeYGuiExtension, KeYGuiExtension.ContextMen
 
         @Override
         public void applySettings(MainWindow window) throws InvalidSettingsInputException {
-            LlmSettings.INSTANCE.setApiEndpoint(ui.getModel().getApiEndpoint());
-            LlmSettings.INSTANCE.setDefaultModel(ui.getModel().getDefaultModel());
-            LlmSettings.INSTANCE.setAuthToken(ui.getModel().getAuthToken());
-            LlmSettings.INSTANCE.setAvailableModels(ui.getModel().getAvailableModels());
+            var source = ui.getModel();
+            var target = LlmSettings.INSTANCE;
+            target.setApiEndpoint(source.getApiEndpoint());
+            target.setAuthToken(source.getAuthToken());
+            target.setDefaultModel(source.getDefaultModel());
+            target.setAvailableModels(new java.util.ArrayList<>(source.getAvailableModels()));
+            target.setSystemPrompt(source.getSystemPrompt());
+            target.setMaxToolRounds(source.getMaxToolRounds());
+            target.setAllowAgentQuestions(source.getAllowAgentQuestions());
+            target.setSendTemperature(source.getSendTemperature());
+            target.setTemperature(source.getTemperature());
+            target.setSendMaxOutputTokens(source.getSendMaxOutputTokens());
+            target.setMaxOutputTokens(source.getMaxOutputTokens());
+            target.setAgentCanUseSkills(source.getAgentCanUseSkills());
+            target.setAttachProofContext(source.getAttachProofContext());
+            target.setProofContextMaxSequents(source.getProofContextMaxSequents());
+            target.setProofContextMaxChars(source.getProofContextMaxChars());
+            target.setMaxHistoryMessages(source.getMaxHistoryMessages());
+            target.setMaxHistoryChars(source.getMaxHistoryChars());
+            target.setMaxFileAttachments(source.getMaxFileAttachments());
+            target.setMaxFileSizeKB(source.getMaxFileSizeKB());
+            target.setMaxFileContentChars(source.getMaxFileContentChars());
+            target.setMaxModelListingEntries(source.getMaxModelListingEntries());
+            target.setShellEnabled(source.getShellEnabled());
+            target.setShellTimeoutSeconds(source.getShellTimeoutSeconds());
+            target.setShellMaxOutputChars(source.getShellMaxOutputChars());
+            target.setShellBlockedPatterns(
+                new java.util.ArrayList<>(source.getShellBlockedPatterns()));
+            target.setToolsDisabled(new java.util.TreeSet<>(source.getToolsDisabled()));
+            target.setAllowedToolsWithApproval(
+                new java.util.TreeSet<>(source.getAllowedToolsWithApproval()));
+            target.setAllowedToolsWithoutApproval(
+                new java.util.TreeSet<>(source.getAllowedToolsWithoutApproval()));
+            target.setAutoScrollOutput(source.getAutoScrollOutput());
+            target.setShowToolActivity(source.getShowToolActivity());
         }
     }
-
 }
 
 
 /**
- *
- * @author Alexander Weigl
- * @version 1 (11/18/25)
+ * Menu action that opens (and focuses) the KeY-Agent panel.
  */
 class StartLlmPromptForCurrentProofAction extends MainWindowAction {
     protected StartLlmPromptForCurrentProofAction(MainWindow mainWindow) {
@@ -102,13 +131,11 @@ class StartLlmPromptForCurrentProofAction extends MainWindowAction {
         setName("Open LLM prompt");
         setMenuPath("Proof.LLM");
         KeyStrokeManager.get(this, "ctrl P");
-        setAcceleratorLetter('L');
+        setAcceleratorLetter('K');
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        var proof = mainWindow.getMediator().getSelectedProof();
-
-
+        DockingHelper.focus(mainWindow, LlmPrompt.class);
     }
 }
