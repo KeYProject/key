@@ -7,10 +7,12 @@ package org.key_project.key.llm.mcp;
 import java.util.List;
 
 /**
+ * Bootstraps a set of {@link McpClient} instances from the service loader. Registered under
+ * {@code META-INF/services/org.key_project.key.llm.mcp.McpToolProvider}.
  *
  * @author Alexander Weigl
  * @version 1 (28.06.26)
  */
-interface McpToolProvider {
+public interface McpToolProvider {
     List<McpClient> get();
 }

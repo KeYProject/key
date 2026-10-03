@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.key_project.key.llm.mcp.FunctionDefinition;
+import org.key_project.key.llm.mcp.JsonSchema;
 import org.key_project.key.llm.mcp.McpClient;
 import org.key_project.key.llm.mcp.Tool;
 
@@ -47,9 +49,8 @@ import org.slf4j.LoggerFactory;
  * McpClientStdio mcpClient = new McpClientStdio(process);
  * mcpClient.initialize();
  *
- * // Use with LlmClientExtended
- * LlmClientExtended client = new LlmClientExtended(session, context, "Hello", mcpClient);
- * Map<String, Object> response = client.call();
+ * // Use with the agent loop
+ * AgentLoop loop = new AgentLoop(session, new DefaultChatCompletionsClient());
  *
  * // Cleanup
  * mcpClient.close();
@@ -184,9 +185,51 @@ public class McpClientStdio implements McpClient {
         return openAiTool;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<Tool> getTools() {
-        return new ArrayList<>();
+        // convert the cached (OpenAI-format) tool maps back into Tool value objects
+        var result = new ArrayList<Tool>(cachedTools.size());
+        for (Map<String, Object> tool : cachedTools) {
+            try {
+                var function = (Map<String, Object>) tool.get("function");
+                var parameters = function.get("parameters");
+                JsonSchema schema = parseSchema(parameters);
+                result.add(new Tool(new FunctionDefinition((String) function.get("name"),
+                    (String) function.getOrDefault("description", ""), schema)));
+            } catch (Exception e) {
+                logger.warn("Could not convert discovered MCP tool", e);
+            }
+        }
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static JsonSchema parseSchema(Object parameters) {
+        if (!(parameters instanceof Map<?, ?> map)) {
+            return new JsonSchema("object");
+        }
+        var builder = JsonSchema.builder();
+        Object type = map.get("type");
+        builder.withType(type == null ? "object" : String.valueOf(type));
+        Object properties = map.get("properties");
+        if (properties instanceof Map<?, ?> props) {
+            for (Map.Entry<?, ?> entry : props.entrySet()) {
+                builder.addProperty(String.valueOf(entry.getKey()),
+                    parseSchema(entry.getValue()));
+            }
+        }
+        Object required = map.get("required");
+        if (required instanceof List<?> list) {
+            for (Object item : list) {
+                builder.addRequired(String.valueOf(item));
+            }
+        }
+        Object description = map.get("description");
+        if (description != null) {
+            builder.withDescription(String.valueOf(description));
+        }
+        return builder.build();
     }
 
     @Override
