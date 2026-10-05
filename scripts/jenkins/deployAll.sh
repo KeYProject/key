@@ -1,5 +1,5 @@
 #!/bin/sh
-./gradlew --parallel clean compileTest :key.ui:shadowJar :key.ui:distZip
+./gradlew --parallel clean compileTest :key.ui:shadowJar :key.ui:slimJar :key.ui:distZip
 
 if [ $? -gt 0 ]; then
   exit $?
