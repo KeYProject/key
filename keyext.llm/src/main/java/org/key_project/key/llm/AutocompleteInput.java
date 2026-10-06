@@ -4,6 +4,7 @@
 package org.key_project.key.llm;
 
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -106,6 +107,15 @@ public class AutocompleteInput extends JTextArea {
                     return;
                 }
                 int code = e.getKeyCode();
+                // Ctrl/Cmd+Enter is the chat's send shortcut. It must never be consumed by the
+                // completion popup, otherwise "/skills" (which always shows a suggestion) could
+                // never actually be sent.
+                final int modifiers =
+                    InputEvent.CTRL_DOWN_MASK | InputEvent.META_DOWN_MASK
+                            | InputEvent.ALT_DOWN_MASK;
+                if (code == KeyEvent.VK_ENTER && (e.getModifiersEx() & modifiers) != 0) {
+                    return;
+                }
                 if (code == KeyEvent.VK_UP) {
                     moveSelection(-1);
                     e.consume();

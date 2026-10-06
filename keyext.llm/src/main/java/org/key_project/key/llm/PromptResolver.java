@@ -52,6 +52,23 @@ public final class PromptResolver {
     }
 
     /**
+     * Whether {@code raw} consists only of the library listing directives {@code /skills} and
+     * {@code /prompts} (leading/trailing whitespace allowed). Such messages are answered locally
+     * in the chat and never go to the LLM.
+     */
+    public static boolean isPureLibraryDirective(String raw) {
+        if (raw.isBlank()) {
+            return false;
+        }
+        for (var token : raw.strip().split("\\s+")) {
+            if (!token.equals("/skills") && !token.equals("/prompts")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Resolves the markup in {@code raw} using the given session (for files/selectedFiles) and
      * current proof state.
      */

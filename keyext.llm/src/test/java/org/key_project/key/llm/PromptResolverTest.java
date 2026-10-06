@@ -98,6 +98,28 @@ class PromptResolverTest {
     }
 
     @Test
+    void pureLibraryDirectivesAreDetected() {
+        assertTrue(PromptResolver.isPureLibraryDirective("/skills"));
+        assertTrue(PromptResolver.isPureLibraryDirective("/prompts"));
+        assertTrue(PromptResolver.isPureLibraryDirective("/skills /prompts /skills"));
+        assertTrue(PromptResolver.isPureLibraryDirective("  /skills  \n"));
+        assertFalse(PromptResolver.isPureLibraryDirective("/skill:optics"));
+        assertFalse(PromptResolver.isPureLibraryDirective("list /skills please"));
+        assertFalse(PromptResolver.isPureLibraryDirective("/skills and more"));
+        assertFalse(PromptResolver.isPureLibraryDirective(""));
+        assertFalse(PromptResolver.isPureLibraryDirective("   "));
+    }
+
+    @Test
+    void pureListingDirectiveResolvesToRenderedListing() {
+        Result r = PromptResolver.resolve("/skills", session, noProof());
+        assertTrue(r.text().contains("(none defined)") || r.text().contains("- "),
+            "unexpected listing: " + r.text());
+        assertNull(r.skillName());
+        assertTrue(r.warnings().isEmpty());
+    }
+
+    @Test
     void provableTokensArePlaceholdersWithoutProof() {
         // $computePath works without a proof (falls back to "no selected node")
         Result r = PromptResolver.resolve("path: $computePath", session, noProof());
