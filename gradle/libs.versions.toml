@@ -32,6 +32,11 @@ miglayout = "11.4.3"
 picocli = "4.7.7"
 docking-frames = "1.1.3p1"
 
+# JavaFX user interface (key.ui.fx)
+javafx = "25.0.4"
+richtextfx = "0.11.5"
+openjfx-plugin = "0.1.0"
+
 # External tools
 scala-isabelle = "0.4.5"
 
@@ -80,6 +85,13 @@ miglayout-swing = { module = "com.miglayout:miglayout-swing", version.ref = "mig
 docking-frames-common = { module = "org.key-project:docking-frames-common", version.ref = "docking-frames" }
 docking-frames-core = { module = "org.key-project:docking-frames-core", version.ref = "docking-frames" }
 
+# JavaFX UI components (key.ui.fx)
+richtextfx = { module = "org.fxmisc.richtext:richtextfx", version.ref = "richtextfx" }
+javafx-base = { module = "org.openjfx:javafx-base", version.ref = "javafx" }
+javafx-controls = { module = "org.openjfx:javafx-controls", version.ref = "javafx" }
+javafx-graphics = { module = "org.openjfx:javafx-graphics", version.ref = "javafx" }
+javafx-web = { module = "org.openjfx:javafx-web", version.ref = "javafx" }
+
 # CLI
 picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
 
@@ -99,3 +111,4 @@ checkerframework = { id = "org.checkerframework", version.ref = "checkerframewor
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 license-report = { id = "com.github.jk1.dependency-license-report", version = "3.1.4" }
+openjfx = { id = "org.openjfx.javafxplugin", version.ref = "openjfx-plugin" }

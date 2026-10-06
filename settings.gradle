@@ -24,6 +24,7 @@ include "key.core.testgen"
 include "key.core.example"
 
 include "key.ui"
+include "key.ui.fx"
 
 include "keyext.ui.testgen"
 include "keyext.proofmanagement"

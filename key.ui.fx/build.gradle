@@ -1,0 +1,75 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2,
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
+
+plugins {
+    id 'application'
+
+    // JavaFX is not bundled with the JDK; this plugin resolves the matching
+    // platform-specific runtime artifacts (see gradle/libs.versions.toml).
+    alias(libs.plugins.openjfx)
+
+    // Used to create a single executable jar file with all dependencies
+    // see task "shadowJar" below
+    // https://github.com/GradleUp/shadow
+    alias(libs.plugins.shadow)
+}
+
+description = "JavaFX user interface for the deductive verification of Java programs"
+
+javafx {
+    version = libs.versions.javafx.get()
+    // key.ui.fx intentionally avoids javafx-fxml and javafx-swing:
+    // all UIs are built in code (no FXML) and no Swing components are used.
+    modules = ['javafx.base', 'javafx.controls', 'javafx.graphics']
+}
+
+dependencies {
+    implementation project(":key.core")
+
+    // Java/JML source editor with syntax highlighting (Milestone M2).
+    implementation(libs.richtextfx)
+
+    implementation(libs.picocli)
+
+    // logging implementation used by the slf4j facade
+    implementation(libs.logback.classic)
+}
+
+application {
+    mainClass.set("de.uka.ilkd.key.core.fx.MainEx")
+}
+
+run {
+    systemProperties["key.examples.dir"] = "$rootDir/key.ui/examples"
+    systemProperties["KeyDebugFlag"] = "on"
+
+    // enable assertions
+    jvmArgs += "-ea"
+
+    // JavaFX 25 loads its native libraries (glass, prism) via restricted methods;
+    // allow native access to silence the JDK warning (mandatory on future JDKs).
+    jvmArgs += "--enable-native-access=javafx.graphics"
+}
+
+tasks.register('runExperimental', JavaExec) {
+    group = "application"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass.set("de.uka.ilkd.key.core.fx.MainEx")
+    args("--experimental")
+}
+
+tasks.register('runDebug', JavaExec) {
+    systemProperties["key.examples.dir"] = "$rootDir/key.ui/examples"
+    systemProperties["KeyDebugFlag"] = "on"
+}
+
+/*
+ * Packaging note (M0):
+ * A JavaFX application does not assemble into a plain "fat jar" simply by
+ * shading the Java bytecode: the platform-specific native runtime
+ * (libglass, libprism, ...) comes from classifier jars and must be bundled
+ * with jlink/jpackage. Shadow/jlink packaging for key.ui.fx is therefore a
+ * later milestone; until then run via `./gradlew :key.ui.fx:run`.
+ */
