@@ -21,7 +21,7 @@ public class OuterClass {
           @*/
         @javax.annotation.processing.Generated("RecordClassBuilder")
         public MyRecord(String test) {
-            //Created by RecordClassBuilder.java:131
+            //Created by RecordClassBuilder.java:132
             this.test = test;
         }
 
@@ -78,7 +78,7 @@ public class OuterClass {
         public void $init(String test, OuterClass $ENCLOSING_THIS) {
             super.$init();
             this.$enclosingThis = $ENCLOSING_THIS;
-            //Created by RecordClassBuilder.java:131
+            //Created by RecordClassBuilder.java:132
             this.test = test;
         }
 

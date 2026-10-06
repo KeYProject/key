@@ -33,11 +33,11 @@ final class Point3d extends Record {
       @*/
     @javax.annotation.processing.Generated("RecordClassBuilder")
     public Point3d(int x, int y, int z) {
-        //Created by RecordClassBuilder.java:131
+        //Created by RecordClassBuilder.java:132
         this.x = x;
-        //Created by RecordClassBuilder.java:131
+        //Created by RecordClassBuilder.java:132
         this.y = y;
-        //Created by RecordClassBuilder.java:131
+        //Created by RecordClassBuilder.java:132
         this.z = z;
     }
 
