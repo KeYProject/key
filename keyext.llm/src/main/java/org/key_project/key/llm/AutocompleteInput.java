@@ -9,6 +9,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import org.jspecify.annotations.Nullable;
  * <li>{@code /} - skills and prompts from the user libraries</li>
  * </ul>
  * The popup follows the caret; Enter/Tab accept the selected entry, Up/Down navigate, Esc closes.
+ * It can be resized by dragging the handle in its bottom-right corner.
  *
  * @author Alexander Weigl
  */
@@ -53,14 +55,23 @@ public class AutocompleteInput extends JTextArea {
     private final Map<Character, CompletionProvider> providers = new HashMap<>();
     private final JWindow popup = new JWindow();
     private final JList<Suggestion> list = new JList<>();
+    private final ResizeGrip resizeGrip = new ResizeGrip();
     private int completionStart = -1;
     private char activeTrigger;
+
+    /** Smallest allowed popup size when the user resizes it with the grip. */
+    private static final int MIN_POPUP_WIDTH = 120;
+    private static final int MIN_POPUP_HEIGHT = 80;
 
     public AutocompleteInput() {
         setLineWrap(true);
         setWrapStyleWord(true);
         popup.setLayout(new BorderLayout());
-        popup.add(new JScrollPane(list));
+        popup.add(new JScrollPane(list), BorderLayout.CENTER);
+        var bottom = new JPanel(new BorderLayout());
+        bottom.setOpaque(false);
+        bottom.add(resizeGrip, BorderLayout.EAST);
+        popup.add(bottom, BorderLayout.SOUTH);
         popup.setSize(320, 150);
         // Clicks in the popup must not steal the keyboard focus: the user may select an entry and
         // then continue typing or press Enter to confirm the completion.
@@ -342,5 +353,58 @@ public class AutocompleteInput extends JTextArea {
             }
         }
         popup.setVisible(false);
+    }
+
+    /**
+     * Small drag handle in the bottom-right corner of the completion popup. Dragging it (SE cursor)
+     * resizes the popup; the chosen size is kept while the popup is re-shown during typing.
+     */
+    private final class ResizeGrip extends JComponent {
+        private @Nullable Point pressPoint;
+        private @Nullable Dimension sizeAtPress;
+
+        ResizeGrip() {
+            setPreferredSize(new Dimension(16, 12));
+            setCursor(Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR));
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    pressPoint = e.getLocationOnScreen();
+                    sizeAtPress = popup.getSize();
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    pressPoint = null;
+                }
+            });
+            addMouseMotionListener(new MouseMotionAdapter() {
+                @Override
+                public void mouseDragged(MouseEvent e) {
+                    if (pressPoint == null || sizeAtPress == null) {
+                        return;
+                    }
+                    int dx = e.getLocationOnScreen().x - pressPoint.x;
+                    int dy = e.getLocationOnScreen().y - pressPoint.y;
+                    popup.setSize(Math.max(MIN_POPUP_WIDTH, sizeAtPress.width + dx),
+                        Math.max(MIN_POPUP_HEIGHT, sizeAtPress.height + dy));
+                }
+            });
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            var g2 = (Graphics2D) g.create();
+            g2.setColor(Color.GRAY);
+            for (int i = 0; i < 3; i++) {
+                int x1 = getWidth() - 6 - i * 4 - 2;
+                int y1 = getHeight() - 2;
+                int x2 = getWidth() - 2;
+                int y2 = getHeight() - 6 - i * 4 - 2;
+                g2.drawLine(x1, y1, x2, y2);
+            }
+            g2.dispose();
+        }
     }
 }
