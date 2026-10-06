@@ -6,7 +6,6 @@ package org.key_project.key.llm;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.gui.docking.DynamicCMenu;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.help.HelpFacade;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
 import bibliothek.gui.dock.common.action.CAction;
@@ -75,10 +75,8 @@ public class LlmPrompt extends JPanel implements TabPanel {
     private final JScrollPane scrpOutput = new JScrollPane(pOutput);
 
     private final KeyAction actionSwitchOrientation = new SwitchOrientationAction();
-    private final JButton btnSend = new JButton(new SendPromptAction());
     private final JButton btnStop = new JButton("Stop");
     private final JCheckBox chkProofContext = new JCheckBox("attach proof context");
-    private final JComboBox<String> cboSkills = new JComboBox<>();
     private final JPanel tblFiles = new JPanel(new MigLayout(new LC().fillX().wrapAfter(1)));
 
     private final MainWindow mainWindow;
@@ -102,15 +100,14 @@ public class LlmPrompt extends JPanel implements TabPanel {
         txtInput.addProvider(AutocompleteProviders.files());
         txtInput.addProvider(AutocompleteProviders.commands(
             () -> LlmLibraryDialogs.showPromptDialog(mainWindow, null, null),
-            () -> {
-                LlmLibraryDialogs.showSkillDialog(mainWindow, null);
-                refreshSkills();
-            }));
+            () -> LlmLibraryDialogs.showSkillDialog(mainWindow, null)));
 
         var inputPane = new JPanel(new BorderLayout());
         inputPane.add(new JScrollPane(txtInput), BorderLayout.CENTER);
-        btnSend.setPreferredSize(new Dimension(80, 28));
-        inputPane.add(btnSend, BorderLayout.EAST);
+        var hint = new JLabel("Ctrl+Enter to send");
+        hint.setForeground(Color.GRAY);
+        hint.setBorder(BorderFactory.createEmptyBorder(0, 4, 2, 4));
+        inputPane.add(hint, BorderLayout.SOUTH);
 
         var tabInputPanes = new JTabbedPane();
         tabInputPanes.addTab("Prompt", inputPane);
@@ -123,13 +120,11 @@ public class LlmPrompt extends JPanel implements TabPanel {
             InputEvent.CTRL_DOWN_MASK), "sendPrompt");
         txtInput.getActionMap().put("sendPrompt", new SendPromptAction());
 
-        refreshSkills();
         populateFiles();
 
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-                cboSkills.setSelectedItem(activeSkillOfCurrentSession());
                 populateFilesIfWritable();
             }
         });
@@ -145,17 +140,10 @@ public class LlmPrompt extends JPanel implements TabPanel {
             }
             setRunning(false);
         });
-        cboSkills.addActionListener(e -> {
-            var session = LlmUtils.getSession(mediator.getSelectedProof());
-            session.setActiveSkill(sel(cboSkills));
-        });
         chkProofContext.addActionListener(e -> {
             var session = LlmUtils.getSession(mediator.getSelectedProof());
             session.setAttachProofContext(chkProofContext.isSelected());
         });
-        toolbar.add(new JLabel("Skill: "));
-        toolbar.add(cboSkills);
-        toolbar.addSeparator();
         toolbar.add(chkProofContext);
         toolbar.add(new JButton(new PromptsMenuAction()));
         toolbar.add(Box.createHorizontalGlue());
@@ -164,24 +152,8 @@ public class LlmPrompt extends JPanel implements TabPanel {
         return toolbar;
     }
 
-    private static @Nullable String sel(JComboBox<String> cbo) {
-        return cbo.getSelectedItem() == null ? null : cbo.getSelectedItem().toString();
-    }
-
     private @Nullable String activeSkillOfCurrentSession() {
         return LlmUtils.getSession(mediator.getSelectedProof()).getActiveSkill();
-    }
-
-    private void refreshSkills() {
-        var selection = activeSkillOfCurrentSession();
-        cboSkills.removeAllItems();
-        cboSkills.addItem("");
-        for (var skill : SkillLibrary.INSTANCE.all()) {
-            if (skill.enabled()) {
-                cboSkills.addItem(skill.name());
-            }
-        }
-        cboSkills.setSelectedItem(selection == null ? "" : selection);
     }
 
     /** (Re)builds the Files tab from the bounded model file listing. */
@@ -322,6 +294,27 @@ public class LlmPrompt extends JPanel implements TabPanel {
         var proof = mediator.getSelectedProof();
         var node = mediator.getSelectedNode();
         var session = LlmUtils.getSession(proof);
+
+        // Pure /skills and /prompts messages are answered locally: the listing is rendered in the
+        // chat without involving the LLM, so the command also works without a configured model.
+        if (PromptResolver.isPureLibraryDirective(text)) {
+            addInput(text);
+            txtInput.setText("");
+            var resolver = new PromptResolver.Context() {
+                @Override
+                public @Nullable Proof proof() {
+                    return proof;
+                }
+
+                @Override
+                public @Nullable Node node() {
+                    return node;
+                }
+            };
+            addOutput(PromptResolver.resolve(text, session, resolver).text());
+            return;
+        }
+
         var skillName = activeSkillOfCurrentSession();
         var skill = skillName == null ? null : SkillLibrary.INSTANCE.get(skillName);
 
@@ -378,7 +371,6 @@ public class LlmPrompt extends JPanel implements TabPanel {
 
     private void setRunning(boolean value) {
         running = value;
-        btnSend.setEnabled(!value);
         btnStop.setEnabled(value);
         btnStop.setToolTipText(value ? "Stop the running agent turn" : null);
     }
