@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.transformations.pipeline;
 
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
@@ -17,11 +21,6 @@ import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.declarations.ResolvedAnnotationDeclaration;
-
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,18 +41,22 @@ public class AnnotationMover extends JavaTransformerAbstract {
 
     @Override
     public void apply(CompilationUnit cu) {
-        cu.walk(MethodDeclaration.class, 
+        cu.walk(MethodDeclaration.class,
             it -> move(it.annotations(), it.getType()));
-        cu.walk(Parameter.class, 
+        cu.walk(Parameter.class,
             it -> move(it.annotations(), it.getType()));
         cu.walk(VariableDeclarator.class, it -> {
-            var d = (VariableDeclarator)it;
+            var d = (VariableDeclarator) it;
             Node parent = d.getParentNode().get();
             NodeList<AnnotationExpr> annots = null;
             switch (parent) {
-                case FieldDeclaration f: annots = f.getAnnotations(); break;
-                case VariableDeclarationExpr v: annots = v.getAnnotations(); break;
-                default: 
+                case FieldDeclaration f:
+                    annots = f.getAnnotations();
+                    break;
+                case VariableDeclarationExpr v:
+                    annots = v.getAnnotations();
+                    break;
+                default:
                     LOGGER.error("unexpected class: {}", parent.getClass());
                     break;
             }
@@ -63,12 +66,15 @@ public class AnnotationMover extends JavaTransformerAbstract {
     }
 
     private void move(NodeList<AnnotationExpr> declList, Type type) {
-        if (declList == null) return;
+        if (declList == null)
+            return;
 
         Iterator<AnnotationExpr> iter = declList.iterator();
         while (iter.hasNext()) {
             AnnotationExpr annot = iter.next();
-            if (!isTypeAnnotation(annot)) continue;
+            if (!isTypeAnnotation(annot))
+                continue;
+
             iter.remove();
             annot.setParentNode(type);
             type.annotations().add(annot);
@@ -94,15 +100,21 @@ public class AnnotationMover extends JavaTransformerAbstract {
             return false;
         }
 
-        var decl = (AnnotationDeclaration)resolved.toAst().get();
+        var decl = (AnnotationDeclaration) resolved.toAst().get();
         for (AnnotationExpr subAnnot : decl.annotations()) {
-            if (!subAnnot.getNameAsString().equals("Target")) continue;
-            if (!(subAnnot instanceof SingleMemberAnnotationExpr)) return false;
-            var array = ((SingleMemberAnnotationExpr)subAnnot).getMemberValue();
-            if (!(array instanceof ArrayInitializerExpr)) return false;
-            
-            for (var value : ((ArrayInitializerExpr)array).getValues()) {
-                if (value.toString().equals("ElementType.TYPE_USE")) return true;
+            if (!subAnnot.getNameAsString().equals("Target"))
+                continue;
+
+            if (!(subAnnot instanceof SingleMemberAnnotationExpr))
+                return false;
+
+            var array = ((SingleMemberAnnotationExpr) subAnnot).getMemberValue();
+            if (!(array instanceof ArrayInitializerExpr))
+                return false;
+
+            for (var value : ((ArrayInitializerExpr) array).getValues()) {
+                if (value.toString().equals("ElementType.TYPE_USE"))
+                    return true;
             }
 
             break;
