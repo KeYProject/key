@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package org.key_project.key.llm;
 
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -62,17 +63,31 @@ public class LlmSettingsUI extends SettingsPanel {
         addCheckBox("Allow the agent to ask questions", "The agent may ask you a question "
             + "(ask_user). Questioning pauses the turn until you answer.",
             model.getAllowAgentQuestions(), model::setAllowAgentQuestions);
+        addCheckBox("Agent may use skills", "Give the agent a use_skill tool (default off).",
+            model.getAgentCanUseSkills(), model::setAgentCanUseSkills);
         addIntField("Max tool rounds",
             "Maximum number of tool-calling rounds in one agent turn.", model::getMaxToolRounds,
             model::setMaxToolRounds);
-        addCheckBox("Send temperature", "Include a temperature value in requests.",
-            model.getSendTemperature(), model::setSendTemperature);
-        addDoubleField("Temperature", "", model::getTemperature, model::setTemperature);
+        // Send temperature: checkbox and value share one row, the value is only editable while the
+        // checkbox is on.
+        var cbSendTemperature =
+            createCheckBox("Send temperature", model.getSendTemperature(),
+                model::setSendTemperature);
+        var spTemperature =
+            new JSpinner(new SpinnerNumberModel(model.getTemperature(), 0.0, 2.0, 0.05));
+        spTemperature.setEnabled(model.getSendTemperature());
+        spTemperature.addChangeListener(
+            e -> model.setTemperature(((Number) spTemperature.getValue()).doubleValue()));
+        cbSendTemperature
+                .addItemListener(e -> spTemperature.setEnabled(cbSendTemperature.isSelected()));
+        var temperatureRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+        temperatureRow.add(cbSendTemperature);
+        temperatureRow.add(spTemperature);
+        addRowWithHelp("Include a temperature value in requests.",
+            new JLabel(), temperatureRow);
         addCheckBox("Send max output tokens", "Cap the number of generated tokens per response.",
             model.getSendMaxOutputTokens(), model::setSendMaxOutputTokens);
         addIntField("Max output tokens", "", model::getMaxOutputTokens, model::setMaxOutputTokens);
-        addCheckBox("Agent may use skills", "Give the agent a use_skill tool (default off).",
-            model.getAgentCanUseSkills(), model::setAgentCanUseSkills);
 
         addSeparator("Context and history");
         addCheckBox("Attach proof context by default",
@@ -124,16 +139,6 @@ public class LlmSettingsUI extends SettingsPanel {
         addTitledComponent(title, spinner, info);
         spinner.addChangeListener(
             e -> set.accept(((Number) spinner.getValue()).intValue()));
-    }
-
-    /** Adds a double spinner bound immediately to the settings model. */
-    private void addDoubleField(String title, String info, java.util.function.DoubleSupplier get,
-            java.util.function.DoubleConsumer set) {
-        var spinner = new JSpinner(new SpinnerNumberModel(Math.max(0, get.getAsDouble()), 0.0,
-            2.0, 0.05));
-        addTitledComponent(title, spinner, info);
-        spinner.addChangeListener(
-            e -> set.accept(((Number) spinner.getValue()).doubleValue()));
     }
 
     /** Smallest/largest number of rows of the auto-growing system prompt text area. */
