@@ -28,6 +28,7 @@ import de.uka.ilkd.key.gui.docking.DynamicCMenu;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.help.HelpFacade;
+import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -97,9 +98,8 @@ public class LlmPrompt extends JPanel implements TabPanel {
 
         txtInput.addProvider(AutocompleteProviders.contextTokens());
         txtInput.addProvider(AutocompleteProviders.files());
-        txtInput.addProvider(AutocompleteProviders.commands(
-            () -> LlmLibraryDialogs.showPromptDialog(mainWindow, null, null),
-            () -> LlmLibraryDialogs.showSkillDialog(mainWindow, null)));
+        txtInput.addProvider(AutocompleteProviders.commands(this::openLibrarySettings,
+            this::openLibrarySettings));
 
         var inputPane = new JPanel(new BorderLayout());
         inputPane.add(new JScrollPane(txtInput), BorderLayout.CENTER);
@@ -118,6 +118,16 @@ public class LlmPrompt extends JPanel implements TabPanel {
         txtInput.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,
             InputEvent.CTRL_DOWN_MASK), "sendPrompt");
         txtInput.getActionMap().put("sendPrompt", new SendPromptAction());
+        // Ctrl+Space expands the $token / @file / /directive at the caret in place.
+        txtInput.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,
+            InputEvent.CTRL_DOWN_MASK), "expandAtCaret");
+        txtInput.getActionMap().put("expandAtCaret",
+            new KeyAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    expandAtCaret();
+                }
+            });
 
         populateFiles();
 
@@ -153,6 +163,43 @@ public class LlmPrompt extends JPanel implements TabPanel {
 
     private @Nullable String activeSkillOfCurrentSession() {
         return LlmUtils.getSession(mediator.getSelectedProof()).getActiveSkill();
+    }
+
+    /**
+     * Opens the settings dialog at the LLM node, where the prompt and skill libraries are managed.
+     */
+    private void openLibrarySettings() {
+        SettingsManager.getInstance().showSettingsDialog(mainWindow,
+            LlmExtension.LlmSettingsProvider.INSTANCE);
+    }
+
+    /**
+     * Replaces the {@code $token}/{@code @file}/{@code /directive} before the caret with its
+     * currently resolved content (Ctrl+Space). Unknown {@code $tokens} and bare activation
+     * directives stay untouched.
+     */
+    private void expandAtCaret() {
+        var session = LlmUtils.getSession(mediator.getSelectedProof());
+        var context = new PromptResolver.Context() {
+            @Override
+            public @Nullable Proof proof() {
+                return mediator.getSelectedProof();
+            }
+
+            @Override
+            public @Nullable Node node() {
+                return mediator.getSelectedNode();
+            }
+        };
+        txtInput.expandAtCaret(fragment -> fragment.startsWith("$")
+                ? PromptResolver.token(fragment.substring(1), session, context)
+                : resolveDirective(fragment, session, context));
+    }
+
+    private static @Nullable String resolveDirective(String fragment, LlmSession session,
+            PromptResolver.Context context) {
+        var resolved = PromptResolver.resolve(fragment, session, context);
+        return resolved.text().isBlank() ? null : resolved.text();
     }
 
     /** (Re)builds the Files tab from the bounded model file listing. */
@@ -479,8 +526,7 @@ public class LlmPrompt extends JPanel implements TabPanel {
             }
             menu.addSeparator();
             var newItem = new JMenuItem("+ new prompt\u2026");
-            newItem.addActionListener(
-                ev -> LlmLibraryDialogs.showPromptDialog(mainWindow, null, txtInput.getText()));
+            newItem.addActionListener(ev -> openLibrarySettings());
             menu.add(newItem);
             menu.show(LlmPrompt.this, 0, 30);
         }

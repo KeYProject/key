@@ -89,10 +89,11 @@ public final class AutocompleteProviders {
     }
 
     /**
-     * Completions for {@code /}: skills, prompts and entries that open the library dialogs.
+     * Completions for {@code /}: skills, prompts and entries that open the library management in
+     * the settings dialog.
      *
-     * @param openPromptDialog callback to create a new prompt
-     * @param openSkillDialog callback to create a new skill
+     * @param openPromptDialog callback to open the prompt library in the settings
+     * @param openSkillDialog callback to open the skill library in the settings
      */
     public static AutocompleteInput.CompletionProvider commands(Runnable openPromptDialog,
             Runnable openSkillDialog) {

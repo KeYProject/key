@@ -45,7 +45,7 @@ public class LlmExtension implements KeYGuiExtension, KeYGuiExtension.ContextMen
 
     @Override
     public LlmSettingsProvider getSettings() {
-        return new LlmSettingsProvider();
+        return LlmSettingsProvider.INSTANCE;
     }
 
     @Override
@@ -67,6 +67,13 @@ public class LlmExtension implements KeYGuiExtension, KeYGuiExtension.ContextMen
     }
 
     public static class LlmSettingsProvider implements SettingsProvider {
+        /**
+         * The singleton registered in the settings manager. Node selection in the settings tree
+         * matches providers by object identity, so the chat panel must open the dialog with this
+         * exact instance.
+         */
+        public static final LlmSettingsProvider INSTANCE = new LlmSettingsProvider();
+
         public static @Nullable LlmSettingsUI ui;
 
         @Override

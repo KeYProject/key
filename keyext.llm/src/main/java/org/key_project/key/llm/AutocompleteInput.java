@@ -12,6 +12,8 @@ import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.regex.Pattern;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -60,6 +62,10 @@ public class AutocompleteInput extends JTextArea {
         popup.setLayout(new BorderLayout());
         popup.add(new JScrollPane(list));
         popup.setSize(320, 150);
+        // Clicks in the popup must not steal the keyboard focus: the user may select an entry and
+        // then continue typing or press Enter to confirm the completion.
+        popup.setFocusableWindowState(false);
+        list.setFocusable(false);
 
         list.setCellRenderer(new DefaultListCellRenderer() {
             @Override
@@ -77,9 +83,18 @@ public class AutocompleteInput extends JTextArea {
         list.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    accept();
+                if (e.getButton() != MouseEvent.BUTTON1) {
+                    return;
                 }
+                int idx = list.locationToIndex(e.getPoint());
+                Rectangle cell = idx < 0 ? null : list.getCellBounds(idx, idx);
+                if (cell == null || !cell.contains(e.getPoint())) {
+                    // click on empty area closes the popup
+                    popup.setVisible(false);
+                    return;
+                }
+                list.setSelectedIndex(idx);
+                accept();
             }
         });
 
@@ -140,6 +155,64 @@ public class AutocompleteInput extends JTextArea {
     public List<Suggestion> suggestionsFor(char trigger, String prefix) {
         var provider = providers.get(trigger);
         return provider == null ? List.of() : provider.apply(prefix);
+    }
+
+    /**
+     * The {@code $token}, {@code @file} or {@code /directive} fragment directly before the caret
+     * (e.g. {@code $seq}, {@code @src/Main.java}, {@code /skills}), or {@code null} if the caret is
+     * not immediately after such a fragment.
+     */
+    public @Nullable String tokenAtCaret() {
+        return tokenFragmentAtCaret(getText(), getCaretPosition());
+    }
+
+    private static final Pattern EXPANDABLE = Pattern
+            .compile("(\\$[\\p{Alnum}_]+|@[\\p{Alnum}_.\\-/]+|/(?:skills|prompts"
+                + "|skill:[\\p{Alnum}_-]+|prompt:[\\p{Alnum}_-]+))$");
+
+    static @Nullable String tokenFragmentAtCaret(String text, int caret) {
+        if (text == null || caret <= 0 || caret > text.length()) {
+            return null;
+        }
+        var head = text.substring(0, caret);
+        var matcher = EXPANDABLE.matcher(head);
+        if (!matcher.find()) {
+            return null;
+        }
+        int start = matcher.start();
+        // the fragment must not be the tail of a larger word
+        if (start > 0 && Character.isLetterOrDigit(head.charAt(start - 1))) {
+            return null;
+        }
+        return matcher.group();
+    }
+
+    /**
+     * Replaces the {@code $token}/{@code @file}/{@code /directive} fragment before the caret by
+     * its expanded content and moves the caret to the end of the inserted text. A fragment that
+     * cannot be resolved (resolver returns {@code null} or blank text) is left untouched and the
+     * toolkit beeps.
+     */
+    public void expandAtCaret(Function<String, @Nullable String> resolver) {
+        String fragment = tokenAtCaret();
+        if (fragment == null) {
+            getToolkit().beep();
+            return;
+        }
+        String expanded = resolver == null ? null : resolver.apply(fragment);
+        if (expanded == null || expanded.isBlank()) {
+            getToolkit().beep();
+            return;
+        }
+        try {
+            int caret = getCaretPosition();
+            int start = caret - fragment.length();
+            getDocument().remove(start, fragment.length());
+            getDocument().insertString(start, expanded, null);
+            setCaretPosition(start + expanded.length());
+        } catch (BadLocationException e) {
+            getToolkit().beep();
+        }
     }
 
     private void updatePopup() {

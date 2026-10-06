@@ -16,6 +16,8 @@ import de.uka.ilkd.key.gui.settings.SettingsPanel;
 
 import org.key_project.key.llm.mcp.BuiltInMCPClient;
 
+import net.miginfocom.layout.CC;
+
 /**
  * Settings UI of the KeY LLM integration: connection, agent behavior, prompt/context budgets,
  * file handling, shell security and tool approval.
@@ -173,6 +175,10 @@ public class LlmSettingsUI extends SettingsPanel {
             model.getAutoScrollOutput(), model::setAutoScrollOutput);
         addCheckBox("Show tool activity", "Show a summary of tool calls in the conversation.",
             model.getShowToolActivity(), model::setShowToolActivity);
+
+        addSeparator("Prompts & Skills");
+        pCenter.add(new PromptLibraryEditor(), new CC().span(3).growX().wrap());
+        pCenter.add(new SkillLibraryEditor(), new CC().span(3).growX().wrap());
     }
 
     /** Adds an integer spinner bound immediately to the settings model. */
