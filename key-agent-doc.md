@@ -147,8 +147,8 @@ optionally restricting the tool set:
 }
 ```
 
-- Skills are managed in **Settings → LLM Settings → Prompts & Skills** (table + edit form with
-  `New`/`Save`/`Delete`).
+- Skills are managed in **Settings → LLM Settings → Skills** (table + edit form with
+  `New`/`Save`/`Delete`; see [section 9](#9-settings-reference-settings--llm-settings)).
 - If a skill restricts `allowedTools`, only those tools are offered to the model while the skill
   is active.
 - The agent itself can activate a skill through the `use_skill` tool — this is **off by default**
@@ -170,7 +170,8 @@ A **prompt** is a named, reusable message template:
 ```
 
 Templates are inserted from the *Prompts* toolbar button or via `/prompt:name`; markup inside the
-template is resolved like normal input.
+template is resolved like normal input. Prompts are managed in **Settings → LLM Settings →
+Prompts** (table + edit form with `New`/`Save`/`Delete`).
 
 ---
 
@@ -205,8 +206,9 @@ turn until you answer. Turn this off with *Allow the agent to ask questions*.
 - `run_command` *always* requires per-call approval, and commands matching the configured
   **blocklist** (e.g. `rm -rf /`, `sudo`, `chmod -R` on system directories, `curl … | sh`) are
   refused regardless of approval.
-- Each tool call's approval/disabled behavior can be customized in the *Tools* settings section:
-  tools can be disabled entirely, or moved to *with approval* / *without approval (always)*.
+- Each tool call's approval/disabled behavior can be customized in the *Tools* panel
+  (**Settings → LLM Settings → Tools**): tools can be disabled entirely, or moved to *with
+  approval* / *without approval (always)*.
 - The tools exposed to the model never include the ones you disabled.
 
 ---
@@ -227,7 +229,18 @@ chars*.
 
 ## 9. Settings reference (Settings → LLM Settings)
 
-All values are **optional**; the defaults work out of the box.
+All values are **optional**; the defaults work out of the box. The settings dialog shows
+*LLM Settings* as a tree node in the left-hand navigation with three dedicated sub-panels:
+
+```
+LLM Settings
+├── Tools      tool approval / disablement
+├── Prompts    prompt template library editor
+└── Skills     skill library editor
+```
+
+The main *LLM Settings* panel holds the sections below; **Tools**, **Prompts** and **Skills**
+are edited in their own panels.
 
 ### Connection
 | Setting | Default |
@@ -267,14 +280,14 @@ max model listing entries `1000`.
 | Shell max output chars | `65536` |
 | Blocked shell patterns | built-in blocklist, one regex per line |
 
-### Tools
+### Tools (sub-panel: LLM Settings → Tools)
 One row per tool with three checkboxes: **Disabled**, **With approval**, **Without approval
 (always)**. Read tools are auto-approved by default; `run_command` asks by default.
 
 ### User interface
 Auto-scroll output (`true`) and show tool activity (`true`).
 
-### Prompts & Skills
+### Prompts / Skills (sub-panels)
 Embedded editors for the user libraries described in [section 5](#5-skills) and
 [section 6](#6-prompts). Changes are saved immediately.
 
@@ -301,6 +314,6 @@ persisted as files.
 | Built-in tools      | `org.key_project.key.llm.mcp.KeYAgentTools`        |
 | Shell safety        | `org.key_project.key.llm.ShellSafetyPolicy`        |
 | Proof context       | `org.key_project.key.llm.ProofContextCollector`    |
-| Settings            | `org.key_project.key.llm.LlmSettings` / `LlmSettingsUI` |
+| Settings            | `org.key_project.key.llm.LlmSettings` / `LlmSettingsUI` / `LlmToolsPanel` |
 | Skill library       | `org.key_project.key.llm.SkillLibrary` + `Skill`   |
 | Prompt library      | `org.key_project.key.llm.PromptLibrary` + `Prompt` |
