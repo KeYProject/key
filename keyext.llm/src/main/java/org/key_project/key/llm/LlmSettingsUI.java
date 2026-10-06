@@ -4,12 +4,16 @@
 package org.key_project.key.llm;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
@@ -54,9 +58,7 @@ public class LlmSettingsUI extends SettingsPanel {
             "Fetches the available models from the API base URL.");
 
         addSeparator("Agent behavior");
-        addTextArea("System prompt", model.getSystemPrompt(),
-            "The system prompt of the KeY-Agent (skills are appended while active).",
-            model::setSystemPrompt);
+        addSystemPromptField();
         addCheckBox("Allow the agent to ask questions", "The agent may ask you a question "
             + "(ask_user). Questioning pauses the turn until you answer.",
             model.getAllowAgentQuestions(), model::setAllowAgentQuestions);
@@ -132,6 +134,71 @@ public class LlmSettingsUI extends SettingsPanel {
         addTitledComponent(title, spinner, info);
         spinner.addChangeListener(
             e -> set.accept(((Number) spinner.getValue()).doubleValue()));
+    }
+
+    /** Smallest/largest number of rows of the auto-growing system prompt text area. */
+    private static final int MIN_PROMPT_ROWS = 4;
+    private static final int MAX_PROMPT_ROWS = 24;
+
+    /**
+     * Adds the system prompt field. Unlike the ordinary {@link #addTextArea} fields it grows with
+     * its (line-wrapped) content so the whole prompt stays visible while editing; beyond
+     * {@link #MAX_PROMPT_ROWS} the text area scrolls again.
+     */
+    private void addSystemPromptField() {
+        var area = new JTextArea(model.getSystemPrompt());
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+        DocumentListener grow = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                model.setSystemPrompt(area.getText());
+                autoGrowToContent(area);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                model.setSystemPrompt(area.getText());
+                autoGrowToContent(area);
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                model.setSystemPrompt(area.getText());
+                autoGrowToContent(area);
+            }
+        };
+        area.getDocument().addDocumentListener(grow);
+        area.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                // re-count wrapped lines when the dialog is resized
+                autoGrowToContent(area);
+            }
+        });
+        autoGrowToContent(area);
+        addTitledComponent("System prompt", new JScrollPane(area),
+            "The system prompt of the KeY-Agent (skills are appended while active).");
+    }
+
+    /**
+     * Sets the row count of {@code area} to the number of lines the current text occupies when
+     * wrapped to the area's current width, clamped to {@link #MIN_PROMPT_ROWS}..{@link
+     * #MAX_PROMPT_ROWS}.
+     */
+    private static void autoGrowToContent(JTextArea area) {
+        int width = area.getWidth() - area.getInsets().left - area.getInsets().right;
+        int rows = 1;
+        if (width > 0) {
+            var fontMetrics = area.getFontMetrics(area.getFont());
+            for (String line : area.getText().split("\n", -1)) {
+                rows += Math.max(0, (fontMetrics.stringWidth(line) + width - 1) / width - 1);
+            }
+        } else {
+            // not laid out yet: at least show every logical line
+            rows = Math.max(rows, area.getLineCount());
+        }
+        area.setRows(Math.max(MIN_PROMPT_ROWS, Math.min(MAX_PROMPT_ROWS, rows)));
     }
 
     public LlmSettings getModel() {
