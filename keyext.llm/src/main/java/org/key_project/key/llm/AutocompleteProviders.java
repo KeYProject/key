@@ -126,7 +126,10 @@ public final class AutocompleteProviders {
 
             private void addCommands(List<AutocompleteInput.Suggestion> result, String prefix,
                     String text, String detail, Runnable action) {
-                if (prefix.isEmpty() || text.startsWith(prefix)) {
+                // The prefix handed to providers is the word *behind* the '/' trigger character,
+                // without the leading slash, so the '/' must not participate in the match.
+                String key = text.startsWith("/") ? text.substring(1) : text;
+                if (prefix.isEmpty() || key.startsWith(prefix)) {
                     result.add(
                         new AutocompleteInput.Suggestion(text + (action == null ? " " : null),
                             text, detail, action));
