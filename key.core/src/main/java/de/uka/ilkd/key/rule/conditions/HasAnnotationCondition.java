@@ -104,7 +104,6 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
                     .orElse(null);
         }
 
-
         return null;
     }
 
