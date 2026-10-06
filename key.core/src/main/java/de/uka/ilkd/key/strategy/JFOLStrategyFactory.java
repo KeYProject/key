@@ -36,13 +36,13 @@ public class JFOLStrategyFactory implements StrategyFactory {
             might cause proof splitting.</html>""";
 
     public static final String TOOL_TIP_TRIGGERS_BEST =
-        "<html>Instantiate quantified formulas using knowledge about arrays and the heap, with the"
-            + " most informative ordering of the instances to try. Recommended.<br>"
-            + "Adds a small per-step cost on very large proof states.</html>";
+        "<html>"
+            + "Uses advanced knowledge about heap theory (in particular arrays) to find good instantiations."
+            + "Can deal with reads over different heaps (e.g., anon)<br>"
+            + "Slightly slower per proof step on very large proofs.</html>";
     public static final String TOOL_TIP_TRIGGERS_GOOD =
-        "<html>Instantiate quantified formulas using knowledge about arrays and the heap, with a"
-            + " lighter-weight ordering of the instances.<br>"
-            + "Close to <i>Best</i>, with less per-step overhead on large proof states.</html>";
+        "<html>Similar to Best but does not consider different heaps.<br>"
+            + "Slightly faster per proof step on very large proofs.</html>";
     public static final String TOOL_TIP_TRIGGERS_CLASSIC =
         "<html>Instantiate quantified formulas without the knowledge about arrays and the heap, and"
             + " without ordering the instances.<br>"

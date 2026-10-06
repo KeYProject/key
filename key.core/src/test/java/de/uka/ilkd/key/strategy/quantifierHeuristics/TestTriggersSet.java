@@ -3,16 +3,24 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.JFunction;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.Metavariable;
+import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -378,6 +386,95 @@ public class TestTriggersSet {
             TriggersSet.create(all, proof.getServices()).getAllTriggers();
         assertEquals(1, triggers.size());
         assertEquals(all.sub(0).sub(0).sub(0), triggers.iterator().next().getTriggerTerm()); // f2rr(x)
+    }
+
+    @Test
+    public void sequenceReadWithCompoundIndexIsRegisteredWithItsIndex() {
+        // forall int t. seqGet<int>(b, k + t) = seqGet<int>(a, m + t): the triggers are the two
+        // sums and the two reads around them, see SequenceTheorySupport.
+        final Services services = proof.getServices();
+        final TermBuilder tb = services.getTermBuilder();
+        final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+        final Sort seqSort = services.getTypeConverter().getSeqLDT().targetSort();
+        final JTerm a = tb.func(new JFunction(new Name("seq_a"), seqSort, new Sort[0]));
+        final JTerm b = tb.func(new JFunction(new Name("seq_b"), seqSort, new Sort[0]));
+        final JTerm k = tb.func(new JFunction(new Name("int_k"), intSort, new Sort[0]));
+        final JTerm m = tb.func(new JFunction(new Name("int_m"), intSort, new Sort[0]));
+        final LogicVariable t = new LogicVariable(new Name("t"), intSort);
+        final JTerm readB = tb.seqGet(intSort, b, tb.add(k, tb.var(t)));
+        final JTerm readA = tb.seqGet(intSort, a, tb.add(m, tb.var(t)));
+        final JTerm all = tb.all(t, tb.equals(readB, readA));
+        final Set<Term> expected = Set.of(readB.sub(1), readB, readA.sub(1), readA);
+        final Set<Term> actual = new HashSet<>();
+        for (final Trigger trigger : TriggersSet.create(all, services).getAllTriggers()) {
+            actual.add(trigger.getTriggerTerm());
+        }
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void heapOfAReadBelowATriggerIsGeneralized() {
+        // forall int t. seqGet<int>(s, idx[t]) = seqGet<int>(u, t): the array read idx[t] is a
+        // trigger and, in the index position of seqGet, keeps the search going, so the sequence
+        // read is a trigger too. The heap support frees the heap of idx[t] in both: as the
+        // read's own variant and inside the sequence read, without the sequence support knowing
+        // about heaps. The taclet test services declare no arr function, so the services of a
+        // loaded problem are used.
+        final Services services = HelperClassForTests.createServices();
+        final TermBuilder tb = services.getTermBuilder();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+        final Sort seqSort = services.getTypeConverter().getSeqLDT().targetSort();
+        final Sort intArray = ArraySort.getArraySort(intSort, services.getJavaInfo().objectSort(),
+            services.getJavaInfo().cloneableSort(), services.getJavaInfo().serializableSort());
+        final JTerm idx = tb.func(new JFunction(new Name("arr_idx"), intArray, new Sort[0]));
+        final JTerm heap =
+            tb.func(new JFunction(new Name("heap_h"), heapLDT.targetSort(), new Sort[0]));
+        final JTerm s = tb.func(new JFunction(new Name("seq_s"), seqSort, new Sort[0]));
+        final JTerm u = tb.func(new JFunction(new Name("seq_u"), seqSort, new Sort[0]));
+        final LogicVariable t = new LogicVariable(new Name("t"), intSort);
+        final JTerm indexRead = tb.select(intSort, heap, idx, tb.arr(tb.var(t)));
+        final JTerm read = tb.seqGet(intSort, s, indexRead);
+        final JTerm all = tb.all(t, tb.equals(read, tb.seqGet(intSort, u, tb.var(t))));
+        final List<Term> derived = new ArrayList<>();
+        for (final Trigger trigger : TriggersSet.create(all, services).getAllTriggers()) {
+            if (trigger.isTheoryProvided()) {
+                derived.add(trigger.getTriggerTerm());
+            }
+        }
+        assertEquals(2, derived.size(), "the index read and the sequence read get a variant");
+        for (final Term variant : derived) {
+            final JTerm freedRead = (JTerm) (variant.op() == read.op() ? variant.sub(1) : variant);
+            assertEquals(indexRead.op(), freedRead.op());
+            assertTrue(freedRead.sub(0).op() instanceof Metavariable, "its heap is free");
+            assertEquals(indexRead.sub(1), freedRead.sub(1));
+            assertEquals(indexRead.sub(2), freedRead.sub(2));
+        }
+    }
+
+    @Test
+    public void heapOfAGroundReadStaysInTheTrigger() {
+        // forall int t. seqGet<int>(select(heap, o, f), t) = seqGet<int>(s, t): the field read
+        // carries no quantified variable; it names a value of the trigger and keeps its heap, so
+        // no theory-provided trigger is derived.
+        final Services services = proof.getServices();
+        final TermBuilder tb = services.getTermBuilder();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+        final Sort seqSort = services.getTypeConverter().getSeqLDT().targetSort();
+        final JTerm o = tb.func(
+            new JFunction(new Name("obj_o"), services.getJavaInfo().objectSort(), new Sort[0]));
+        final JTerm f =
+            tb.func(new JFunction(new Name("field_f"), heapLDT.getFieldSort(), new Sort[0]));
+        final JTerm heap =
+            tb.func(new JFunction(new Name("heap_h"), heapLDT.targetSort(), new Sort[0]));
+        final JTerm s = tb.func(new JFunction(new Name("seq_s"), seqSort, new Sort[0]));
+        final LogicVariable t = new LogicVariable(new Name("t"), intSort);
+        final JTerm read = tb.seqGet(intSort, tb.select(seqSort, heap, o, f), tb.var(t));
+        final JTerm all = tb.all(t, tb.equals(read, tb.seqGet(intSort, s, tb.var(t))));
+        for (final Trigger trigger : TriggersSet.create(all, services).getAllTriggers()) {
+            assertFalse(trigger.isTheoryProvided(), "no variant for a ground read");
+        }
     }
 
     @Test

@@ -125,4 +125,10 @@ final class HeapSelectCost {
 
     /** {@code hide_auxiliary_eq_const}: same, for the constant-valued case. */
     static final long HIDE_AUXILIARY_EQ_CONST = -500;
+
+    /**
+     * {@code derive_inequality}: two objects whose reads of one field differ are different; the
+     * disequality feeds the assumes clauses of the select simplification rules.
+     */
+    static final long DERIVE_INEQUALITY = -2000;
 }

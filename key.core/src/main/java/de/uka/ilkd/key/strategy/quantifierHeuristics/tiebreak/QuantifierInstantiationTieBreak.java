@@ -1,7 +1,7 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy.quantifierHeuristics;
+package de.uka.ilkd.key.strategy.quantifierHeuristics.tiebreak;
 
 import java.util.Collection;
 
@@ -28,7 +28,7 @@ import org.key_project.prover.sequent.Sequent;
  * {@link de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCostScalerFeature}), so the
  * prediction itself is never overridden.
  */
-interface QuantifierInstantiationTieBreak {
+public interface QuantifierInstantiationTieBreak {
 
     /**
      * The read-only view of a quantified formula's instantiation the tie-break reads: the candidate

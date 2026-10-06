@@ -5662,6 +5662,14 @@ diamond_split_termination {
 
 Choices: programRules:Java}
 -----------------------------------------------------
+== differentValuesForSameHeapAndFieldImplyDifferentObjects (differentValuesForSameHeapAndFieldImplyDifferentObjects) =========================================
+differentValuesForSameHeapAndFieldImplyDifferentObjects {
+\assumes ([equals(select<beta>(h,o,f),x)]==>[]) 
+\find(==>equals(select<beta>(h,o2,f),x))
+\add []==>[equals(o,o2)] 
+\heuristics(derive_inequality)
+Choices: programRules:Java}
+-----------------------------------------------------
 == disjointAllFields (disjointAllFields) =========================================
 disjointAllFields {
 \assumes ([equals(intersect<Pair<java.lang.Object,Field>>(allFields(o),s),empty<Pair<java.lang.Object,Field>>)]==>[]) 

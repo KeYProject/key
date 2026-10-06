@@ -146,43 +146,42 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             }
         }
 
+        Set<PosInOccurrence> declared = inputsOfRuleApp(ruleApp, n);
         // record sequent formula inputs
-        for (PosInOccurrence in : inputsOfRuleApp(ruleApp, n)) {
-            // Need to find the graph node corresponding to the used sequent formula in the graph.
-            // Requires knowing the branch it was produced in.
-            // Try the branch location of this proof step first, then check the previous branches.
-            BranchLocation loc = n.getBranchLocation();
-            int size = loc.size();
-            boolean added = false;
-            for (int i = 0; i <= size; i++) {
-                TrackedFormula formula =
-                    new TrackedFormula(in.sequentFormula(), loc, in.isInAntec(),
-                        proof.getServices());
-                if (graph.containsNode(formula)) {
-                    input.add(new Pair<>(formula, removed.contains(in)));
-                    added = true;
-                    break;
-                }
-                if (loc.size() > 0) {
-                    loc = loc.removeLast();
-                }
-            }
-            if (!added) {
-                // Normally only the initial proof obligation reaches here. A formula that is
-                // neither
-                // produced by a tracked rule nor part of the root sequent means the tracker missed
-                // some rule applications -- e.g. it was suspended for the duration of a multi-core
-                // prover run. Degrade gracefully (treat it as an external input) instead of
-                // throwing,
-                // so slicing stays usable on a proof that was partly built without tracking.
-                TrackedFormula formula =
-                    new TrackedFormula(in.sequentFormula(), loc, in.isInAntec(),
-                        proof.getServices());
-                input.add(new Pair<>(formula, removed.contains(in)));
+        for (PosInOccurrence in : declared) {
+            input.add(new Pair<>(getTrackedFormulaFor(in, n), removed.contains(in)));
+        }
+        // take care of formulas that have been removed (actually modified) due to renaming of
+        // program variables like v#0 by this step even if not part of the declared formulas
+        // these implicit changes should be attached as effects of the current rule application
+        // and the formulas as inputs
+        for (PosInOccurrence removedPio : removed) {
+            if (!declared.contains(removedPio)) {
+                input.add(new Pair<>(getTrackedFormulaFor(removedPio, n), true));
             }
         }
-
         return input;
+    }
+
+    /**
+     * Determine the tracked formula for the given occurrence position and node. A formula might
+     * not be tracked by the graph if it was an initial one. In that case a new node is created and
+     * returned
+     *
+     * @param pio PosInOccurrence of the formula to look for
+     * @param n the Node of the branch introducing the formula
+     * @return the TrackedFormula
+     */
+    private TrackedFormula getTrackedFormulaFor(PosInOccurrence pio, Node n) {
+        // Need to find the graph node corresponding to the used sequent formula in the graph.
+        // Requires knowing the branch it was produced in.
+        // Try the branch location of this proof step first, then check the previous branches.
+        GraphNode gnode = graph.getGraphNode(proof, n.getBranchLocation(), pio);
+        if (gnode instanceof TrackedFormula trackedFormula) {
+            return trackedFormula;
+        }
+        return new TrackedFormula(pio.sequentFormula(), BranchLocation.ROOT, pio.isInAntec(),
+            proof.getServices());
     }
 
     /**
@@ -208,19 +207,21 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     private Set<PosInOccurrence> formulasRemovedBy(Node node) {
         Set<PosInOccurrence> removed = new HashSet<>();
         // compare parent sequent to new sequent
-        Node parent = node.parent();
-        if (parent == null) {
+        if (node.children().isEmpty()) {
             return removed;
         }
-        Sequent seqParent = parent.sequent();
-        var seqNew = new IdentityHashSet<>(node.sequent().asList());
-        int i = 1;
-        for (final var parentFormula : seqParent) {
-            if (!seqNew.contains(parentFormula)) {
-                removed.add(new PosInOccurrence(parentFormula, PosInTerm.getTopLevel(),
-                    seqParent.numberInAntecedent(i)));
+
+        final Sequent nodeSequent = node.sequent();
+        for (final Node child : node.children()) {
+            final var childSequent = new IdentityHashSet<>(child.sequent().asList());
+            int i = 1;
+            for (final var nodeFormula : nodeSequent) {
+                boolean inAntec = nodeSequent.numberInAntecedent(i);
+                if (!childSequent.contains(nodeFormula)) {
+                    removed.add(new PosInOccurrence(nodeFormula, PosInTerm.getTopLevel(), inAntec));
+                }
+                i++;
             }
-            i++;
         }
         return removed;
     }
@@ -406,6 +407,9 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
 
         // record removed (replaced) input formulas
         // (these are the same for each new branch)
+        // at the moment yes as renaming (\addprogvars) only used
+        // by taclets with one goal, below method over-approximates
+        // in other use cases
         Set<PosInOccurrence> removed = formulasRemovedBy(n);
 
         // inputs: (graph node, whether that graph node was replaced)

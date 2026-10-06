@@ -89,11 +89,11 @@ public final class StrategyProperties extends Properties {
 
     /**
      * The quantifier instantiation treatment. {@link #TRIGGERS_BEST} and {@link #TRIGGERS_GOOD}
-     * both use the theory-aware trigger selection (heap and array reads); they differ in how tied
-     * candidates are ordered, {@code BEST} by the proving-polarity connection to the sequent,
-     * {@code GOOD} by generation with a lighter ordering. {@link #TRIGGERS_CLASSIC} uses the plain
-     * equality-and-integer trigger selection with no candidate ordering, matching the previous
-     * behaviour.
+     * both select triggers with knowledge of the heap and of array reads, and order tied
+     * candidates, {@code BEST} by their connection to the sequent, {@code GOOD} more cheaply. Only
+     * {@code BEST} matches a trigger against reads over another heap, which is how a property
+     * established before a method call is used after it. {@link #TRIGGERS_CLASSIC} selects with
+     * equality and integer knowledge only and does not order candidates.
      */
     public static final String TRIGGERS_OPTIONS_KEY = "TRIGGERS_OPTIONS_KEY";
     public static final String TRIGGERS_BEST = "TRIGGERS_BEST";

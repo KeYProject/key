@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 
@@ -34,10 +35,20 @@ public abstract class FilterStrategy implements Strategy<@NonNull Goal> {
     public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pio,
             G goal, MutableState mState) {
-        if (!isApprovedApp(app, pio, (de.uka.ilkd.key.proof.Goal) goal)) {
+        if (assumesMatched(app) && !isApprovedApp(app, pio, (de.uka.ilkd.key.proof.Goal) goal)) {
             return TopRuleAppCost.INSTANCE;
         }
         return delegate.computeCost(app, pio, goal, mState);
+    }
+
+    /**
+     * Checks that the assumes clause of a taclet is empty or instantiated
+     *
+     * @param app the rule application being costed
+     * @return whether a taclet application has its assumes clause matched
+     */
+    private static boolean assumesMatched(RuleApp app) {
+        return !(app instanceof TacletApp tacletApp) || tacletApp.assumesInstantionsComplete();
     }
 
     @Override

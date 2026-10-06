@@ -1,32 +1,26 @@
 /* This file is part of KeY - https://key-project.org
  * KeY is licensed under the GNU General Public License Version 2
  * SPDX-License-Identifier: GPL-2.0-only */
-package de.uka.ilkd.key.strategy.quantifierHeuristics;
-
-import java.util.List;
+package de.uka.ilkd.key.strategy.quantifierHeuristics.theory;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Junctor;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.ImmutableMap;
 
 /**
- * A theory's contribution to quantifier instantiation.
+ * A theory's own reasoning about terms and literals, as the heuristic needs it: solving an
+ * equation for a variable while matching, deciding a literal when a cost is predicted, and
+ * permitting a rewrite of the equality reasoning.
  *
- * The instantiation heuristic needs knowledge that is specific to each theory at two points. When
- * choosing triggers: what counts as coordinate or connective material rather than a meaningful
- * observation (an array index, an integer comparison), and which derived triggers make an
- * observation matchable against the terms a proof actually produces (a read generalized over the
- * heaps of a symbolic execution). And when predicting the cost of an instantiation: whether a
- * literal is proved true or false, from itself or from an assumed literal, by the theory's own
- * reasoning (arithmetic comparisons, equality up to renaming). This interface isolates that
- * knowledge. Registering a new support in {@link TriggersSet#THEORY_SUPPORTS} is the only change
- * needed to teach the heuristic about a further theory; {@link TriggersSet} and
- * {@link PredictCostProver} stay untouched.
+ * These questions are about terms alone. A front end whose terms are built from the same theory
+ * reuses an implementation unchanged, whatever the programs behind the terms are, which is not so
+ * for {@link TriggerSupport}.
  */
-interface QuantifierTheorySupport {
+public interface TheoryReasoning {
 
     /** The outcome of judging a literal for cost prediction. */
     enum LiteralDecision {
@@ -35,7 +29,7 @@ interface QuantifierTheorySupport {
         /**
          * @return the decision for the negation of the judged literal
          */
-        LiteralDecision negate() {
+        public LiteralDecision negate() {
             return switch (this) {
                 case PROVED -> REFUTED;
                 case REFUTED -> PROVED;
@@ -63,26 +57,28 @@ interface QuantifierTheorySupport {
     }
 
     /**
-     * Whether {@code candidate} must not be used as a standalone trigger, because for this theory
-     * it is coordinate or connective material rather than a meaningful observation.
+     * Solves a trigger subterm against a ground instance when syntactic matching has failed.
      *
-     * @param candidate a subterm that contains the quantified variables and is a trigger candidate
-     * @param services access to the theory operators
-     */
-    boolean rejectsAsTrigger(JTerm candidate, Services services);
-
-    /**
-     * Additional triggers derived from the accepted trigger {@code term}, for example a read
-     * generalized so it matches across the many heaps of a proof. The returned triggers are matched
-     * by unification (they may contain metavariables).
+     * Basic matching compares the two structures, so a trigger whose array index is written
+     * against an offset never matches an instance written absolutely: a read of
+     * {@code base + t} does not match one of {@code x}, since {@code x - base} occurs nowhere in
+     * the proof. A theory that can invert its own index expressions solves the equation for the
+     * variable instead.
      *
-     * @param term an accepted trigger term
-     * @param clauseVariables the quantified variables of the clause the trigger belongs to
-     * @param services access to the theory operators
-     * @return derived triggers, possibly empty
+     * Instantiating a universally quantified formula with any term is sound, so a solution that
+     * turns out not to reproduce the instance costs an instantiation and nothing else.
+     *
+     * @param pattern a trigger subterm, containing at least one variable not yet bound in
+     *        {@code varMap}
+     * @param instance the ground term it should match
+     * @param varMap the bindings established so far
+     * @param services access to the theory's operators
+     * @return the extended bindings, or null when this theory cannot solve the equation
      */
-    List<JTerm> provideTriggers(JTerm term,
-            ImmutableSet<QuantifiableVariable> clauseVariables, Services services);
+    default ImmutableMap<QuantifiableVariable, Term> solveForVariable(JTerm pattern, JTerm instance,
+            ImmutableMap<QuantifiableVariable, Term> varMap, Services services) {
+        return null;
+    }
 
     /**
      * Checks whether the literal holds on its own, for cost prediction. The literal is passed
@@ -111,7 +107,7 @@ interface QuantifierTheorySupport {
     }
 
     /**
-     * Whether the equality-based normalisation of the cost prediction (see {@link Congruence}) may
+     * Whether the equality-based normalisation of the cost prediction (see {@code Congruence}) may
      * rewrite occurrences of {@code from} to {@code to}, justified by an assumed equality between
      * the two. The proof search keeps the terms of a theory in a normal form of the theory's own
      * rules, integer terms in polynomial form for example. A theory vetoes here when the rewrite

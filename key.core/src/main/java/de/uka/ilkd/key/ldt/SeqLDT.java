@@ -72,6 +72,16 @@ public final class SeqLDT extends LDT {
             ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
     }
 
+    /**
+     * Whether the operator is an instance of {@code seqGet}, for any element sort.
+     *
+     * @param op an operator
+     * @return whether {@code op} reads a sequence element
+     */
+    public boolean isSeqGetOp(org.key_project.logic.op.Operator op) {
+        return op instanceof ParametricFunctionInstance pfi && pfi.getBase() == seqGet;
+    }
+
 
     public Function getSeqLen() {
         return seqLen;

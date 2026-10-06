@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.TheoryReasoning;
 
 import org.key_project.util.collection.ImmutableSet;
 
@@ -23,8 +24,8 @@ import org.key_project.util.collection.ImmutableSet;
  * Each merge is oriented the way the equality is written on the sequent: occurrences of the left
  * side rewrite to the right side. The proof search normalises sequent equalities by the rules of
  * the owning theory, so this direction is the theory-established one. A
- * {@link QuantifierTheorySupport} can veto a rewrite that would disturb the normal forms its
- * decisions depend on ({@link QuantifierTheorySupport#allowsEqualityRewrite}); then the opposite
+ * {@link TheoryReasoning} can veto a rewrite that would disturb the normal forms its
+ * decisions depend on ({@link TheoryReasoning#allowsEqualityRewrite}); then the opposite
  * direction is tried, and a doubly vetoed equality is left out of the congruence.
  *
  * One congruence is built per sequent in {@link Instantiation} and shared across the cost
@@ -122,7 +123,7 @@ final class Congruence {
         if (to.sort() != from.sort() && !to.sort().extendsTrans(from.sort())) {
             return false;
         }
-        for (final QuantifierTheorySupport support : TriggersSet.THEORY_SUPPORTS) {
+        for (final TheoryReasoning support : services.getProfile().getTheorySupports(false)) {
             if (!support.allowsEqualityRewrite(from, to, services)) {
                 return false;
             }

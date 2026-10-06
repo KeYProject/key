@@ -31,8 +31,26 @@ public class Substitution {
 
     private final ImmutableMap<QuantifiableVariable, Term> varMap;
 
+    /**
+     * Whether a theory solved a position where the two terms disagreed to obtain this
+     * substitution. The instance is then a term the matched term does not contain.
+     */
+    private final boolean solvedByTheory;
+
     public Substitution(ImmutableMap<QuantifiableVariable, Term> map) {
-        varMap = map;
+        this(map, false);
+    }
+
+    public Substitution(ImmutableMap<QuantifiableVariable, Term> map, boolean solvedByTheory) {
+        this.varMap = map;
+        this.solvedByTheory = solvedByTheory;
+    }
+
+    /**
+     * @return whether a theory solved a disagreeing position to obtain this substitution
+     */
+    public boolean isSolvedByTheory() {
+        return solvedByTheory;
     }
 
     public ImmutableMap<QuantifiableVariable, Term> getVarMap() {

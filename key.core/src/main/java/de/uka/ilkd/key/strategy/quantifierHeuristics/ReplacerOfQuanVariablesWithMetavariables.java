@@ -5,6 +5,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.Metavariable;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
@@ -19,8 +20,7 @@ import org.key_project.util.collection.ImmutableMap;
  * <code>allTerm</code> and create constant functions for all existential variables. The variables
  * with new created metavariables or constant functions are store to a map <code>mapQM</code>.
  */
-@Deprecated
-class ReplacerOfQuanVariablesWithMetavariables {
+public class ReplacerOfQuanVariablesWithMetavariables {
 
     private ReplacerOfQuanVariablesWithMetavariables() {}
 

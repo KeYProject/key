@@ -22,8 +22,9 @@ class Matching {
      * @param targetTerm a gound term
      * @return all substitution found from this matching
      */
-    public static ImmutableSet<Substitution> basicMatching(Trigger trigger, Term targetTerm) {
-        return BasicMatching.getSubstitutions(trigger.getTriggerTerm(), targetTerm);
+    public static ImmutableSet<Substitution> basicMatching(Trigger trigger, Term targetTerm,
+            Services services) {
+        return BasicMatching.getSubstitutions(trigger.getTriggerTerm(), targetTerm, services);
     }
 
     public static ImmutableSet<Substitution> twoSidedMatching(UniTrigger trigger, Term targetTerm,

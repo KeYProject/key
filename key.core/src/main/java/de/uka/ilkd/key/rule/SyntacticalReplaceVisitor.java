@@ -234,7 +234,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
 
     /**
      * the method is only still invoked to allow the
-     * {@link de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor}
+     * {@link de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.ConstraintAwareSyntacticalReplaceVisitor}
      * to recursively
      * replace meta variables
      */

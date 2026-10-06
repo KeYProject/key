@@ -3,7 +3,10 @@
  * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Collections;
+import java.util.EnumMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -22,14 +25,22 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 public class HeuristicInstantiation implements TermGenerator<Goal> {
 
-    private static final HeuristicInstantiation THEORY = new HeuristicInstantiation(false);
-    private static final HeuristicInstantiation CLASSIC = new HeuristicInstantiation(true);
+    /** One generator per treatment, so the option costs no allocation per instantiation. */
+    private static final Map<TriggerTreatment, TermGenerator<Goal>> GENERATORS;
+    static {
+        final EnumMap<TriggerTreatment, TermGenerator<Goal>> generators =
+            new EnumMap<>(TriggerTreatment.class);
+        for (final TriggerTreatment t : TriggerTreatment.values()) {
+            generators.put(t, new HeuristicInstantiation(t));
+        }
+        GENERATORS = Collections.unmodifiableMap(generators);
+    }
 
-    /** whether instances are computed with the classic trigger selection */
-    private final boolean classicTriggers;
+    /** how much the instance computation is told about the theories */
+    private final TriggerTreatment treatment;
 
-    private HeuristicInstantiation(boolean classicTriggers) {
-        this.classicTriggers = classicTriggers;
+    private HeuristicInstantiation(TriggerTreatment treatment) {
+        this.treatment = treatment;
     }
 
     /**
@@ -37,11 +48,11 @@ public class HeuristicInstantiation implements TermGenerator<Goal> {
      * strategy construction, like every other strategy option; reading it per generated
      * instance would take a synchronized settings lookup in the middle of proof search.
      *
-     * @param classicTriggers whether the classic trigger selection is in effect
+     * @param treatment how much the heuristic is told about the theories
      * @return the generator
      */
-    public static TermGenerator<Goal> forOption(boolean classicTriggers) {
-        return classicTriggers ? CLASSIC : THEORY;
+    public static TermGenerator<Goal> forOption(TriggerTreatment treatment) {
+        return GENERATORS.get(treatment);
     }
 
     @Override
@@ -51,7 +62,7 @@ public class HeuristicInstantiation implements TermGenerator<Goal> {
 
         final Term qf = pos.sequentFormula().formula();
         final Instantiation ia =
-            Instantiation.create(qf, goal.sequent(), goal.proof().getServices(), classicTriggers);
+            Instantiation.create(qf, goal.sequent(), goal.proof().getServices(), treatment);
         final QuantifiableVariable var = qf.varsBoundHere(0).last();
         assert var != null;
         return new HIIterator(ia.getSubstitution().iterator(), var, goal.proof().getServices());
