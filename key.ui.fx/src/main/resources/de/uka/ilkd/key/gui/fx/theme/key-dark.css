@@ -64,3 +64,8 @@
 .key-dock-tab-pane > .tab-header-area {
     -fx-padding: 2 4 0 4;
 }
+
+/* icon text nodes (see IconFactoryF) follow the theme text color */
+.key-icon {
+    -fx-fill: -key-text;
+}
