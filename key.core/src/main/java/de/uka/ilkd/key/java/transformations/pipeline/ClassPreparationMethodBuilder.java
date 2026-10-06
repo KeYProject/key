@@ -158,6 +158,8 @@ public class ClassPreparationMethodBuilder extends JavaTransformerAbstract {
      *        the TypeDeclaration
      */
     public void apply(TypeDeclaration<?> td) {
+        if (td.isAnnotationDeclaration())
+            return;
         td.addMember(createPrepareMethod(td));
     }
 }

@@ -54,6 +54,7 @@ public class KeYJavaPipeline {
         p.add(new CreateBuilder(pipelineServices));
         p.add(new CreateObjectBuilder(pipelineServices));
         p.add(new LocalClassTransformation(pipelineServices));
+        p.add(new AnnotationMover(pipelineServices));
         // Below is an expensive transformation as it has to traverse down
         // to an expression level.
         p.add(new ConstantStringExpressionEvaluator(pipelineServices));

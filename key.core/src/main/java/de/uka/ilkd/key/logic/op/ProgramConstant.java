@@ -5,6 +5,7 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
@@ -19,9 +20,9 @@ public final class ProgramConstant extends ProgramVariable {
     // a compile-time constant, <code>null</code> otherwise
     private final Literal compileTimeConstant;
 
-    public ProgramConstant(ProgramElementName name, KeYJavaType t, KeYJavaType containingType,
+    public ProgramConstant(ProgramElementName name, TypeReference t, KeYJavaType containingType,
             boolean isStatic, Literal compileTimeConstant) {
-        super(name, t.getSort(), t, containingType, isStatic, false, false);
+        super(name, t.getKeYJavaType().getSort(), t, containingType, isStatic, false, false);
         this.compileTimeConstant = compileTimeConstant;
     }
 

@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
@@ -68,20 +69,20 @@ public class TestJMLTranslator {
 
     protected LocationVariable buildSelfVarAsProgVar() {
         ProgramElementName classPEN = new ProgramElementName("self");
-        return new LocationVariable(classPEN, testClassType);
+        return new LocationVariable(classPEN, new TypeRef(testClassType));
     }
 
 
     protected LocationVariable buildExcVar() {
         KeYJavaType excType = javaInfo.getTypeByClassName("java.lang.Throwable");
         ProgramElementName excPEN = new ProgramElementName("exc");
-        return new LocationVariable(excPEN, excType);
+        return new LocationVariable(excPEN, new TypeRef(excType));
     }
 
 
     protected LocationVariable buildResultVar(IProgramMethod pm) {
         ProgramElementName resPEN = new ProgramElementName("result");
-        return new LocationVariable(resPEN, pm.getReturnType());
+        return new LocationVariable(resPEN, new TypeRef(pm.getReturnType()));
     }
 
 
@@ -151,7 +152,7 @@ public class TestJMLTranslator {
     @Test
     public void testParenExpression() {
         ProgramElementName classPEN = new ProgramElementName("o");
-        LocationVariable var = new LocationVariable(classPEN, testClassType);
+        LocationVariable var = new LocationVariable(classPEN, new TypeRef(testClassType));
         jmlIO.parameters(ImmutableList.singleton(var)).parseExpression("(o.i)");
     }
 

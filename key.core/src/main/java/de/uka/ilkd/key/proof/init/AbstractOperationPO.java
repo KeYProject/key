@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.expression.BinaryAssignment;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.ast.statement.Try;
@@ -400,7 +401,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // prepare variables, program method
         boolean makeNamesUnique = isMakeNamesUnique();
         final ImmutableList<LocationVariable> paramVars = tb.paramVars(pm, makeNamesUnique);
-        final LocationVariable selfVar = tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
+        final LocationVariable selfVar =
+            tb.selfVar(pm, new TypeRef(getCalleeKeYJavaType()), makeNamesUnique);
         final LocationVariable resultVar = tb.resultVar(pm, makeNamesUnique);
         final LocationVariable exceptionVar = tb.excVar(pm, makeNamesUnique);
 
@@ -901,7 +903,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         final KeYJavaType eType = javaInfo.getTypeByClassName(JAVA_LANG_THROWABLE);
         final TypeReference excTypeRef = javaInfo.createTypeReference(eType);
         final ProgramElementName ePEN = new ProgramElementName("e");
-        final ProgramVariable eVar = new LocationVariable(ePEN, eType);
+        final ProgramVariable eVar = new LocationVariable(ePEN, new TypeRef(eType));
 
         final StatementBlock sb2;
         if (exceptionVar == null) {
@@ -1012,7 +1014,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
             if (isCopyOfMethodArgumentsUsed()) {
                 ProgramElementName pen = new ProgramElementName("_" + paramVar.name());
                 LocationVariable formalParamVar =
-                    new LocationVariable(pen, paramVar.getKeYJavaType());
+                    new LocationVariable(pen, paramVar.getTypeReference());
                 formalParamVars = formalParamVars.append(formalParamVar);
                 register(formalParamVar, proofServices);
             } else {
