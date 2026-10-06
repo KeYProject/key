@@ -14,10 +14,11 @@ import javax.swing.table.DefaultTableModel;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Embedded editor for a file-backed user library (prompts or skills) that lives inside the LLM
- * settings panel: a table lists the entries, the form below edits a selection and
- * {@code New}/{@code Save}/{@code Delete} manage the library. Persistence is immediate (the
- * library is written on {@code Save}), it is not deferred to the settings {@code Apply} button.
+ * Embedded editor for a file-backed user library (prompts or skills) that is shown as its own
+ * settings-tree node below "LLM Settings" (see {@code LlmExtension.LlmSettingsProvider}: a table
+ * lists the entries, the form below edits a selection and {@code New}/{@code Save}/{@code Delete}
+ * manage the library. Persistence is immediate (the library is written on {@code Save}), it is
+ * not deferred to the settings {@code Apply} button.
  *
  * @param <E> the library element type
  * @author Alexander Weigl

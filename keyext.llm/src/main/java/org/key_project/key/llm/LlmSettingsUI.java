@@ -14,13 +14,10 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 
-import org.key_project.key.llm.mcp.BuiltInMCPClient;
-
-import net.miginfocom.layout.CC;
-
 /**
  * Settings UI of the KeY LLM integration: connection, agent behavior, prompt/context budgets,
- * file handling, shell security and tool approval.
+ * file handling and shell security. The tool approval table and the prompt/skill libraries live
+ * in their own panels ("Tools", "Prompts", "Skills") below "LLM Settings" in the settings tree.
  *
  * @author Alexander Weigl
  */
@@ -31,7 +28,6 @@ public class LlmSettingsUI extends SettingsPanel {
     private final JComboBox<String> cboDefaultModel;
     private final JList<String> selAvailableModels;
     private final JButton btnFetchModels;
-    private final JTable selAvailableTools;
 
     public LlmSettingsUI(LlmSettings settings) {
         model = new LlmSettings(settings);
@@ -112,73 +108,11 @@ public class LlmSettingsUI extends SettingsPanel {
                 Arrays.stream(s.split("\n")).map(String::strip).filter(x -> !x.isBlank())
                         .toList()));
 
-        addSeparator("Tools");
-        var mcpClient = new BuiltInMCPClient().getAllToolNames().stream().toList();
-        var name = new Column<String, String>("Name", String.class, s -> s);
-        var disabled = new Column<String, Boolean>("Disabled", Boolean.class,
-            model.getToolsDisabled()::contains,
-            (s, value) -> {
-                if (value == Boolean.TRUE) {
-                    model.getToolsDisabled().add(s);
-                } else {
-                    model.getToolsDisabled().remove(s);
-                }
-            });
-        var withApproval = new Column<String, Boolean>("With approval", Boolean.class,
-            model.getAllowedToolsWithApproval()::contains,
-            (s, value) -> {
-                if (value == Boolean.TRUE) {
-                    model.getAllowedToolsWithApproval().add(s);
-                } else {
-                    model.getAllowedToolsWithApproval().remove(s);
-                }
-            });
-        var withoutApproval =
-            new Column<String, Boolean>("Without approval (always)", Boolean.class,
-                model.getAllowedToolsWithoutApproval()::contains,
-                (s, value) -> {
-                    if (value == Boolean.TRUE) {
-                        model.getAllowedToolsWithoutApproval().add(s);
-                    } else {
-                        model.getAllowedToolsWithoutApproval().remove(s);
-                    }
-                });
-        selAvailableTools = addTableBox("Tools", "Disable tools, or change their approval"
-            + " behavior. Disabled tools are not sent to the model at all.", mcpClient, name,
-            disabled, withApproval, withoutApproval);
-
-        // Set checkbox editor and renderer for boolean columns
-        selAvailableTools.setDefaultEditor(Boolean.class, new DefaultCellEditor(new JCheckBox()));
-        selAvailableTools.setDefaultRenderer(Boolean.class,
-            new javax.swing.table.DefaultTableCellRenderer() {
-                @Override
-                public java.awt.Component getTableCellRendererComponent(JTable table, Object value,
-                        boolean isSelected, boolean hasFocus, int row, int column) {
-                    JCheckBox checkBox = new JCheckBox();
-                    if (value instanceof Boolean bool) {
-                        checkBox.setSelected(bool);
-                    }
-                    checkBox.setHorizontalAlignment(JLabel.CENTER);
-                    if (isSelected) {
-                        checkBox.setBackground(table.getSelectionBackground());
-                        checkBox.setForeground(table.getSelectionForeground());
-                    } else {
-                        checkBox.setBackground(table.getBackground());
-                        checkBox.setForeground(table.getForeground());
-                    }
-                    return checkBox;
-                }
-            });
-
         addSeparator("User interface");
         addCheckBox("Auto-scroll output", "Automatically scroll to the newest messages.",
             model.getAutoScrollOutput(), model::setAutoScrollOutput);
         addCheckBox("Show tool activity", "Show a summary of tool calls in the conversation.",
             model.getShowToolActivity(), model::setShowToolActivity);
-
-        addSeparator("Prompts & Skills");
-        pCenter.add(new PromptLibraryEditor(), new CC().span(3).growX().wrap());
-        pCenter.add(new SkillLibraryEditor(), new CC().span(3).growX().wrap());
     }
 
     /** Adds an integer spinner bound immediately to the settings model. */

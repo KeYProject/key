@@ -29,6 +29,7 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.help.HelpFacade;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -98,8 +99,8 @@ public class LlmPrompt extends JPanel implements TabPanel {
 
         txtInput.addProvider(AutocompleteProviders.contextTokens());
         txtInput.addProvider(AutocompleteProviders.files());
-        txtInput.addProvider(AutocompleteProviders.commands(this::openLibrarySettings,
-            this::openLibrarySettings));
+        txtInput.addProvider(AutocompleteProviders.commands(this::openPromptSettings,
+            this::openSkillSettings));
 
         var inputPane = new JPanel(new BorderLayout());
         inputPane.add(new JScrollPane(txtInput), BorderLayout.CENTER);
@@ -166,11 +167,20 @@ public class LlmPrompt extends JPanel implements TabPanel {
     }
 
     /**
-     * Opens the settings dialog at the LLM node, where the prompt and skill libraries are managed.
+     * Opens the settings dialog at the given settings-tree node (a child of "LLM Settings").
      */
-    private void openLibrarySettings() {
-        SettingsManager.getInstance().showSettingsDialog(mainWindow,
-            LlmExtension.LlmSettingsProvider.INSTANCE);
+    private void openLibrarySettings(SettingsProvider provider) {
+        SettingsManager.getInstance().showSettingsDialog(mainWindow, provider);
+    }
+
+    /** Opens the settings dialog at the prompt library editor ("LLM Settings → Prompts"). */
+    private void openPromptSettings() {
+        openLibrarySettings(LlmExtension.LlmSettingsProvider.PROMPT_LIBRARY);
+    }
+
+    /** Opens the settings dialog at the skill library editor ("LLM Settings → Skills"). */
+    private void openSkillSettings() {
+        openLibrarySettings(LlmExtension.LlmSettingsProvider.SKILL_LIBRARY);
     }
 
     /**
@@ -526,7 +536,7 @@ public class LlmPrompt extends JPanel implements TabPanel {
             }
             menu.addSeparator();
             var newItem = new JMenuItem("+ new prompt\u2026");
-            newItem.addActionListener(ev -> openLibrarySettings());
+            newItem.addActionListener(ev -> openPromptSettings());
             menu.add(newItem);
             menu.show(LlmPrompt.this, 0, 30);
         }

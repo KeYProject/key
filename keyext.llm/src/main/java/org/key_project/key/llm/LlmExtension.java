@@ -69,16 +69,32 @@ public class LlmExtension implements KeYGuiExtension, KeYGuiExtension.ContextMen
     public static class LlmSettingsProvider implements SettingsProvider {
         /**
          * The singleton registered in the settings manager. Node selection in the settings tree
-         * matches providers by object identity, so the chat panel must open the dialog with this
-         * exact instance.
+         * matches providers by object identity, so the chat panel must open the dialog with these
+         * exact instances.
          */
         public static final LlmSettingsProvider INSTANCE = new LlmSettingsProvider();
+
+        /** Settings-tree node for the tool approval/disablement table. */
+        public static final ToolsSettingsProvider TOOLS = new ToolsSettingsProvider();
+
+        /** Settings-tree node for the prompt library editor. */
+        public static final LibrarySettingsProvider PROMPT_LIBRARY =
+            new LibrarySettingsProvider("Prompts", new PromptLibraryEditor());
+
+        /** Settings-tree node for the skill library editor. */
+        public static final LibrarySettingsProvider SKILL_LIBRARY =
+            new LibrarySettingsProvider("Skills", new SkillLibraryEditor());
 
         public static @Nullable LlmSettingsUI ui;
 
         @Override
         public String getDescription() {
             return "LLM Settings";
+        }
+
+        @Override
+        public List<SettingsProvider> getChildren() {
+            return List.of(TOOLS, PROMPT_LIBRARY, SKILL_LIBRARY);
         }
 
         @Override
@@ -116,13 +132,69 @@ public class LlmExtension implements KeYGuiExtension, KeYGuiExtension.ContextMen
             target.setShellMaxOutputChars(source.getShellMaxOutputChars());
             target.setShellBlockedPatterns(
                 new java.util.ArrayList<>(source.getShellBlockedPatterns()));
-            target.setToolsDisabled(new java.util.TreeSet<>(source.getToolsDisabled()));
-            target.setAllowedToolsWithApproval(
-                new java.util.TreeSet<>(source.getAllowedToolsWithApproval()));
-            target.setAllowedToolsWithoutApproval(
-                new java.util.TreeSet<>(source.getAllowedToolsWithoutApproval()));
             target.setAutoScrollOutput(source.getAutoScrollOutput());
             target.setShowToolActivity(source.getShowToolActivity());
+        }
+
+        /**
+         * Tree-leaf provider for a dedicated library editor ("Prompts" and "Skills" nodes). The
+         * embedded editors persist to the file-backed libraries immediately on Save, so
+         * {@link #applySettings(MainWindow)} is a no-op.
+         */
+        public static final class LibrarySettingsProvider implements SettingsProvider {
+            private final String description;
+            private final LibraryEditorPanel<?> editor;
+
+            private LibrarySettingsProvider(String description, LibraryEditorPanel<?> editor) {
+                this.description = description;
+                this.editor = editor;
+            }
+
+            @Override
+            public String getDescription() {
+                return description;
+            }
+
+            @Override
+            public JPanel getPanel(MainWindow window) {
+                return editor;
+            }
+
+            @Override
+            public void applySettings(MainWindow window) {
+                // the editors persist immediately; nothing to apply here
+            }
+        }
+
+        /**
+         * Tree-leaf provider for the "Tools" node: the tool approval/disablement table. The panel
+         * edits its own working copy of {@link LlmSettings}; applying writes only the tool sets,
+         * the main "LLM Settings" panel owns the remaining fields.
+         */
+        public static final class ToolsSettingsProvider implements SettingsProvider {
+            private final LlmToolsPanel ui =
+                new LlmToolsPanel(new LlmSettings(LlmSettings.INSTANCE));
+
+            @Override
+            public String getDescription() {
+                return "Tools";
+            }
+
+            @Override
+            public JPanel getPanel(MainWindow window) {
+                return ui;
+            }
+
+            @Override
+            public void applySettings(MainWindow window) {
+                var source = ui.getModel();
+                var target = LlmSettings.INSTANCE;
+                target.setToolsDisabled(new java.util.TreeSet<>(source.getToolsDisabled()));
+                target.setAllowedToolsWithApproval(
+                    new java.util.TreeSet<>(source.getAllowedToolsWithApproval()));
+                target.setAllowedToolsWithoutApproval(
+                    new java.util.TreeSet<>(source.getAllowedToolsWithoutApproval()));
+            }
         }
     }
 }
