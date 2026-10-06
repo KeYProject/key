@@ -9,7 +9,6 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.engine.TaskStartedInfo;
-import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 
 /**
  * Listener for the application of proof macros (which may be run in a separate worker thread). They
@@ -36,7 +35,7 @@ public class ProofMacroListener implements ProverTaskListener {
     public void taskStarted(TaskStartedInfo info) {
         numOfInvokedMacros++;
         if (superordinateListener != null) {
-            superordinateListener.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro,
+            superordinateListener.taskStarted(new DefaultTaskStartedInfo(info.kind(),
                 macroName + (macroName.length() == 0 ? "" : " -- ") + info.message(),
                 info.size()));
         }

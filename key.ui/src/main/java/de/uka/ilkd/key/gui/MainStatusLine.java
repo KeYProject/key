@@ -88,11 +88,13 @@ class MainStatusLine extends JPanel {
     public void setProgressBarMaximum(int value) {
         if (value < 0) {
             progressBar.setIndeterminate(true);
-        } else if (value == 0) {
-            progressBar.setIndeterminate(false);
+            progressBar.setStringPainted(false);
         } else {
             progressBar.setIndeterminate(false);
-            progressBar.setMaximum(value);
+            progressBar.setStringPainted(true);
+            if (value > 0) {
+                progressBar.setMaximum(value);
+            }
         }
         progressBar.setEnabled(value != 0);
     }
