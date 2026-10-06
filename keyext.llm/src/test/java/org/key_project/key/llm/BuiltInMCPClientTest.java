@@ -46,6 +46,8 @@ class BuiltInMCPClientTest {
         assertTrue(names.contains(KeYAgentTools.TOOL_RUN_COMMAND));
         assertTrue(names.contains(KeYAgentTools.TOOL_ASK_USER));
         assertTrue(names.contains(KeYAgentTools.TOOL_GET_PROOF_CONTEXT));
+        assertTrue(names.contains(KeYAgentTools.TOOL_TRYCLOSE));
+        assertTrue(names.contains(KeYAgentTools.TOOL_AUTO));
         assertTrue(names.contains(TestMcpToolProvider.ECHO));
         assertTrue(names.contains(TestMcpToolProvider.NEEDS_APPROVAL));
     }
@@ -87,6 +89,8 @@ class BuiltInMCPClientTest {
         assertFalse(client.requiresApproval(KeYAgentTools.TOOL_LIST_FILES));
         assertFalse(client.requiresApproval(KeYAgentTools.TOOL_GET_PROOF_CONTEXT));
         assertFalse(client.requiresApproval(KeYAgentTools.TOOL_ASK_USER));
+        assertFalse(client.requiresApproval(KeYAgentTools.TOOL_TRYCLOSE));
+        assertFalse(client.requiresApproval(KeYAgentTools.TOOL_AUTO));
         assertFalse(client.requiresApproval(TestMcpToolProvider.ECHO));
         // shell execution and aimless test tools are ASK by default
         assertTrue(client.requiresApproval(KeYAgentTools.TOOL_RUN_COMMAND));

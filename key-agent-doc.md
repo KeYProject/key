@@ -193,6 +193,8 @@ The built-in tool set (`KeYAgentTools`):
 | `run_command`       | ask      | run a shell command in the model directory (blocklist + approval)   |
 | `ask_user`          | auto     | ask the user a question; the turn pauses until it is answered       |
 | `use_skill`         | auto     | activate a user-defined skill by name (only if enabled in settings) |
+| `tryclose`          | auto     | apply the `tryclose` proof-script command (TryClose macro) to the current branch, all open goals, or a goal by index |
+| `auto`              | auto     | apply KeY's automatic proof strategy ('Auto' button) with an arbitrary step limit |
 
 ### 7.1 Questions
 
@@ -203,6 +205,10 @@ turn until you answer. Turn this off with *Allow the agent to ask questions*.
 
 - File access tools are **read-only**, restricted to the current Java model directory, and run
   without approval.
+- `tryclose` and `auto` are the first tools that **modify the current proof** (they run the
+  corresponding proof-script commands, i.e. the same actions as *Apply Script* / the *Auto*
+  button). They are approved by default so the agent can actually prove, but you can move them
+  to *with approval* in the Tools panel if you want to review each invocation.
 - `run_command` *always* requires per-call approval, and commands matching the configured
   **blocklist** (e.g. `rm -rf /`, `sudo`, `chmod -R` on system directories, `curl … | sh`) are
   refused regardless of approval.

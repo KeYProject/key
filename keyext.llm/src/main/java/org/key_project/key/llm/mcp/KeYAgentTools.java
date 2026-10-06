@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -15,6 +16,9 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.scripts.ScriptCommandAst;
+import de.uka.ilkd.key.scripts.ScriptException;
 
 import org.key_project.key.llm.FileAccess;
 import org.key_project.key.llm.LlmSettings;
@@ -36,6 +40,10 @@ import static org.key_project.key.llm.mcp.Tool.ApprovalRequirement.AUTO;
  * <li>{@code run_command} - executes a shell command in the model directory (blocklist + user
  * approval required)</li>
  * <li>{@code ask_user} - asks the user a question (intercepted by the agent loop)</li>
+ * <li>{@code tryclose} - applies the {@code tryclose} proof-script command (TryClose macro) to a
+ * goal, a branch or all open goals</li>
+ * <li>{@code auto} - applies KeY's automatic proof strategy with a given step limit
+ * (the {@code auto} proof-script command)</li>
  * </ul>
  *
  * @author Alexander Weigl
@@ -49,6 +57,8 @@ public final class KeYAgentTools implements McpClient {
     public static final String TOOL_RUN_COMMAND = "run_command";
     public static final String TOOL_ASK_USER = "ask_user";
     public static final String TOOL_USE_SKILL = "use_skill";
+    public static final String TOOL_TRYCLOSE = "tryclose";
+    public static final String TOOL_AUTO = "auto";
 
     private final ShellSafetyPolicy safetyPolicy = new ShellSafetyPolicy();
 
@@ -105,7 +115,41 @@ public final class KeYAgentTools implements McpClient {
                 + " when the 'agent can use skills' setting is on.", AUTO,
                 schema("name",
                     JsonSchema.builder().withType("string")
-                            .withDescription("the name of the skill to activate").build())));
+                            .withDescription("the name of the skill to activate").build())),
+            tool(TOOL_TRYCLOSE, "Applies the KeY proof-script command 'tryclose' to the current"
+                + " proof: it automatically tries to close goals with the TryClose strategy."
+                + " Targets either the first open goal of the current branch (default), all open"
+                + " goals, or a single goal by index.", AUTO,
+                schema(
+                    "branch",
+                    JsonSchema.builder().withType("string")
+                            .withDescription("the target: \"branch\" (first open goal, default),"
+                                + " \"all\" (all open goals), or the 0-based index of one open"
+                                + " goal")
+                            .build(),
+                    "steps",
+                    JsonSchema.builder().withType("integer")
+                            .withDescription("maximum number of proof steps")
+                            .build(),
+                    "assertClosed",
+                    JsonSchema.builder().withType("boolean")
+                            .withDescription("report an error if the target cannot be closed")
+                            .build())),
+            tool(TOOL_AUTO, "Applies KeY's automatic proof strategy (the 'Auto' button / the"
+                + " 'auto' proof-script command) to the current branch, with an arbitrary maximum"
+                + " number of proof steps. Use it to try to discharge the current goal by"
+                + " automatic proof search.", AUTO,
+                schema(
+                    "steps",
+                    JsonSchema.builder().withType("integer")
+                            .withDescription("maximum number of proof steps (the configured"
+                                + " strategy limit applies if omitted)")
+                            .build(),
+                    "all",
+                    JsonSchema.builder().withType("boolean")
+                            .withDescription("apply the strategy to all open goals instead of the"
+                                + " first one")
+                            .build())));
     }
 
     private static Tool tool(String name, String description, Tool.ApprovalRequirement approval,
@@ -136,6 +180,8 @@ public final class KeYAgentTools implements McpClient {
                     + "directly]";
             case TOOL_USE_SKILL ->
                 "[use_skill is handled by the agent loop; it cannot be called directly]";
+            case TOOL_TRYCLOSE -> tryClose(args);
+            case TOOL_AUTO -> runAuto(args);
             default -> throw new IllegalArgumentException("unknown tool: " + toolName);
         };
     }
@@ -160,6 +206,108 @@ public final class KeYAgentTools implements McpClient {
     private static boolean boolArg(Map<String, Object> args, String key) {
         Object v = args.get(key);
         return v instanceof Boolean b && b || "true".equals(v);
+    }
+
+    private static @Nullable Integer intArg(Map<String, Object> args, String key) {
+        Object v = args.get(key);
+        if (v instanceof Number n) {
+            return n.intValue();
+        }
+        if (v != null) {
+            try {
+                return Integer.parseInt(String.valueOf(v).trim());
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    // ----------------------------------------------------------------- proof-manipulation tools
+
+    /**
+     * Runs the {@code tryclose} proof-script command. The default target is the first open goal
+     * (mirroring {@code tryclose branch;}); {@code "all"} or a goal index select the other
+     * targets.
+     */
+    private static String tryClose(Map<String, Object> args) {
+        return runScript(tryCloseCommand(stringArg(args, "branch"), intArg(args, "steps"),
+            boolArg(args, "assertClosed")));
+    }
+
+    /** Runs the {@code auto} proof-script command with the given step limit. */
+    private static String runAuto(Map<String, Object> args) {
+        return runScript(autoCommand(intArg(args, "steps"), boolArg(args, "all")));
+    }
+
+    /**
+     * Builds the {@code tryclose} script command from the tool parameters. {@code null}/{@code
+     * blank}/{@code "branch"} targets the first open goal, {@code "all"} all open goals, and a
+     * decimal string the goal with that index.
+     */
+    static ScriptCommandAst tryCloseCommand(@Nullable String branch, @Nullable Integer steps,
+            boolean assertClosed) {
+        List<Object> positional;
+        if (branch == null || branch.isBlank() || "branch".equals(branch)) {
+            positional = List.of("branch");
+        } else if ("all".equals(branch)) {
+            positional = List.of();
+        } else {
+            try {
+                Integer.parseInt(branch);
+                positional = List.of(branch);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException(
+                    "'branch' must be \"branch\", \"all\" or a goal index, got: " + branch);
+            }
+        }
+
+        var named = new HashMap<String, Object>();
+        if (steps != null) {
+            named.put("steps", steps);
+        }
+        if (assertClosed) {
+            named.put("assertClosed", true);
+        }
+        return new ScriptCommandAst("tryclose", named, positional);
+    }
+
+    /** Builds the {@code auto} script command from the tool parameters. */
+    static ScriptCommandAst autoCommand(@Nullable Integer steps, boolean all) {
+        var named = new HashMap<String, Object>();
+        if (steps != null) {
+            named.put("steps", steps);
+        }
+        if (all) {
+            named.put("all", true);
+        }
+        return new ScriptCommandAst("auto", named, List.of());
+    }
+
+    /**
+     * Executes a single proof-script command on the currently selected proof via the
+     * {@link ProofScriptEngine}, i.e. through the same machinery as the "Apply Script" action.
+     * The result tells the agent how many open goals remain.
+     */
+    private static String runScript(ScriptCommandAst command) {
+        var proof = selectedProof();
+        if (proof == null) {
+            return "Error: no proof selected";
+        }
+        int before = proof.openGoals().size();
+        var ui = MainWindow.getInstance().getMediator().getUI();
+        try {
+            new ProofScriptEngine(proof).execute(ui, List.of(command));
+        } catch (ScriptException e) {
+            return "Error: " + e.getMessage();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return "Error: proof search interrupted";
+        }
+        int after = proof.openGoals().size();
+        int closed = before - after;
+        return command.commandName() + ": " + closed + " goal(s) closed, " + after
+            + " open goal(s) remain" + (after == 0 ? " - the proof is closed" : "") + ".";
     }
 
     private static String contextBlock(Map<String, Object> args) {
