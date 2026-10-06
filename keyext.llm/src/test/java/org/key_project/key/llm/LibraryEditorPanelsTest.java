@@ -4,6 +4,10 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.llm;
 
+import java.util.List;
+
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -11,9 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * Smoke tests for the prompt/skill editors embedded in the LLM settings panel. They only read the
- * file-backed libraries (empty when the config directory does not exist), so they are safe to
- * construct headless.
+ * Smoke tests for the prompt/skill editors and the tools panel that are shown as separate nodes
+ * under "LLM Settings" in the settings dialog. They only read the file-backed libraries (empty
+ * when the config directory does not exist), so they are safe to construct headless.
  */
 class LibraryEditorPanelsTest {
 
@@ -44,5 +48,22 @@ class LibraryEditorPanelsTest {
     void skillEditorForwardsToTheSkillLibrary() {
         var editor = new SkillLibraryEditor();
         assertEquals(SkillLibrary.INSTANCE.all().size(), editor.tableRowCount());
+    }
+
+    @Test
+    void toolsPanelCanBeConstructed() {
+        assertDoesNotThrow(() -> {
+            var panel = new LlmToolsPanel(new LlmSettings(LlmSettings.INSTANCE));
+            assertNotNull(panel.getComponentCount());
+            assertEquals(LlmSettings.INSTANCE.getToolsDisabled(),
+                panel.getModel().getToolsDisabled());
+        });
+    }
+
+    @Test
+    void settingsTreeHasToolsPromptsAndSkillsChildren() {
+        var children = LlmExtension.LlmSettingsProvider.INSTANCE.getChildren();
+        assertEquals(List.of("Tools", "Prompts", "Skills"),
+            children.stream().map(SettingsProvider::getDescription).toList());
     }
 }
