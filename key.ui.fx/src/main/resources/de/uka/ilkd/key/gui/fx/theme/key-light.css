@@ -1,0 +1,62 @@
+/*
+ * Light theme for the JavaFX UI of KeY (key.ui.fx).
+ *
+ * This stylesheet is applied on top of the default Modena theme and
+ * defines the KeY-specific color palette via CSS custom properties.
+ * Components should reference the -key-* properties instead of hard-coding
+ * colors, so that switching to the dark theme (key-dark.css) restyles the
+ * whole UI automatically.
+ */
+.root {
+    /*
+     * KeY palette. Modena look-up colors keep the default control styling;
+     * -key-* properties are used by KeY-specific components (status bar,
+     * sequent view, proof tree, notifications, ...).
+     */
+    -key-background: #f4f4f4;
+    -key-surface: #ffffff;
+    -key-text: #1c1c1c;
+    -key-text-secondary: #555555;
+    -key-accent: #1a73e8;
+    -key-accent-text: #ffffff;
+    -key-success: #188038;
+    -key-warning: #b06000;
+    -key-error: #d93025;
+    -key-proved: #188038;
+    -key-linked: #1a73e8;
+    -key-interactive: #b06000;
+    -key-border: #d0d0d0;
+}
+
+/* status bar */
+.status-bar {
+    -fx-background-color: -key-surface;
+    -fx-border-color: -key-border transparent transparent transparent;
+    -fx-padding: 2 6 2 6;
+}
+
+.status-bar .label {
+    -fx-text-fill: -key-text-secondary;
+}
+
+/* notifications (toast) */
+.notification-toast {
+    -fx-background-color: -key-surface;
+    -fx-background-radius: 4;
+    -fx-border-color: -key-border;
+    -fx-border-radius: 4;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 10, 0.2, 0, 2);
+}
+
+.notification-toast.error {
+    -fx-border-color: -key-error;
+}
+
+.notification-toast.warning {
+    -fx-border-color: -key-warning;
+}
+
+/* dock tab pane */
+.key-dock-tab-pane > .tab-header-area {
+    -fx-padding: 2 4 0 4;
+}

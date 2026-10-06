@@ -1,0 +1,66 @@
+/*
+ * Dark theme for the JavaFX UI of KeY (key.ui.fx).
+ *
+ * This stylesheet is applied on top of the default Modena theme. It
+ * re-defines the -key-* custom properties and adjusts the standard Modena
+ * look-up colors, such that both our own components and the built-in
+ * controls render in a dark color scheme.
+ */
+.root {
+    -key-background: #2b2b2b;
+    -key-surface: #3c3f41;
+    -key-text: #dedede;
+    -key-text-secondary: #9d9d9d;
+    -key-accent: #4a90e2;
+    -key-accent-text: #ffffff;
+    -key-success: #6fc46f;
+    -key-warning: #e3a94f;
+    -key-error: #e06c62;
+    -key-proved: #6fc46f;
+    -key-linked: #4a90e2;
+    -key-interactive: #e3a94f;
+    -key-border: #555555;
+
+    /* restyle the built-in Modena controls for the dark theme */
+    -fx-base: #3c3f41;
+    -fx-background: #2b2b2b;
+    -fx-control-inner-background: #2f3134;
+    -fx-text-background-color: -key-text;
+    -fx-text-fill: -key-text;
+    -fx-selection-bar: -key-accent;
+    -fx-selection-bar-non-focused: derive(-key-accent, 60%);
+    -fx-accent: -key-accent;
+}
+
+/* status bar */
+.status-bar {
+    -fx-background-color: -key-surface;
+    -fx-border-color: -key-border transparent transparent transparent;
+    -fx-padding: 2 6 2 6;
+}
+
+.status-bar .label {
+    -fx-text-fill: -key-text-secondary;
+}
+
+/* notifications (toast) */
+.notification-toast {
+    -fx-background-color: -key-surface;
+    -fx-background-radius: 4;
+    -fx-border-color: -key-border;
+    -fx-border-radius: 4;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0.2, 0, 2);
+}
+
+.notification-toast.error {
+    -fx-border-color: -key-error;
+}
+
+.notification-toast.warning {
+    -fx-border-color: -key-warning;
+}
+
+/* dock tab pane */
+.key-dock-tab-pane > .tab-header-area {
+    -fx-padding: 2 4 0 4;
+}
