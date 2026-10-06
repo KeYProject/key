@@ -37,35 +37,35 @@ public class MostSimpleInner {
             if (!@($classInitialized)) {
                 if (!@($classInitializationInProgress)) {
                     if (!@($classPrepared)) {
-                        //Created by ClassInitializeMethodBuilder.java:219
+                        //Created by ClassInitializeMethodBuilder.java:220
                         @($clprepare());
                     }
                     if (@($classErroneous)) {
                         throw new java.lang.NoClassDefFoundError();
                     }
-                    //Created by ClassInitializeMethodBuilder.java:243
+                    //Created by ClassInitializeMethodBuilder.java:244
                     @($classInitializationInProgress) = true;
                     try {
                         @(java.lang.Object.$clinit());
-                    }//Created by ClassInitializeMethodBuilder.java:194
+                    }//Created by ClassInitializeMethodBuilder.java:195
                      catch (java.lang.Error err) {
-                        //Created by ClassInitializeMethodBuilder.java:154
-                        @($classInitializationInProgress) = false;
                         //Created by ClassInitializeMethodBuilder.java:155
+                        @($classInitializationInProgress) = false;
+                        //Created by ClassInitializeMethodBuilder.java:156
                         @($classErroneous) = true;
                         throw err;
                     } catch (java.lang.Throwable twa) {
-                        //Created by ClassInitializeMethodBuilder.java:154
-                        @($classInitializationInProgress) = false;
                         //Created by ClassInitializeMethodBuilder.java:155
+                        @($classInitializationInProgress) = false;
+                        //Created by ClassInitializeMethodBuilder.java:156
                         @($classErroneous) = true;
                         throw new java.lang.ExceptionInInitializerError(twa);
                     }
-                    //Created by ClassInitializeMethodBuilder.java:249
+                    //Created by ClassInitializeMethodBuilder.java:250
                     @($classInitializationInProgress) = false;
-                    //Created by ClassInitializeMethodBuilder.java:251
+                    //Created by ClassInitializeMethodBuilder.java:252
                     @($classErroneous) = false;
-                    //Created by ClassInitializeMethodBuilder.java:253
+                    //Created by ClassInitializeMethodBuilder.java:254
                     @($classInitialized) = true;
                 }
             }
@@ -80,7 +80,7 @@ public class MostSimpleInner {
         }
 
         public MyInnerClass $create() {
-            //Created by CreateBuilder.java:57
+            //Created by CreateBuilder.java:58
             this.$initialized = false;
             $prepareEnter();
             return this;
@@ -88,7 +88,7 @@ public class MostSimpleInner {
 
         public static MyInnerClass $createObject() {
             MyInnerClass __NEW__;
-            //Created by CreateObjectBuilder.java:70
+            //Created by CreateObjectBuilder.java:71
             __NEW__ = MyInnerClass.$allocate();
             __NEW__.$create()@MyInnerClass
             return __NEW__;
@@ -130,35 +130,35 @@ public class MostSimpleInner {
         if (!@($classInitialized)) {
             if (!@($classInitializationInProgress)) {
                 if (!@($classPrepared)) {
-                    //Created by ClassInitializeMethodBuilder.java:219
+                    //Created by ClassInitializeMethodBuilder.java:220
                     @($clprepare());
                 }
                 if (@($classErroneous)) {
                     throw new java.lang.NoClassDefFoundError();
                 }
-                //Created by ClassInitializeMethodBuilder.java:243
+                //Created by ClassInitializeMethodBuilder.java:244
                 @($classInitializationInProgress) = true;
                 try {
                     @(java.lang.Object.$clinit());
-                }//Created by ClassInitializeMethodBuilder.java:194
+                }//Created by ClassInitializeMethodBuilder.java:195
                  catch (java.lang.Error err) {
-                    //Created by ClassInitializeMethodBuilder.java:154
-                    @($classInitializationInProgress) = false;
                     //Created by ClassInitializeMethodBuilder.java:155
+                    @($classInitializationInProgress) = false;
+                    //Created by ClassInitializeMethodBuilder.java:156
                     @($classErroneous) = true;
                     throw err;
                 } catch (java.lang.Throwable twa) {
-                    //Created by ClassInitializeMethodBuilder.java:154
-                    @($classInitializationInProgress) = false;
                     //Created by ClassInitializeMethodBuilder.java:155
+                    @($classInitializationInProgress) = false;
+                    //Created by ClassInitializeMethodBuilder.java:156
                     @($classErroneous) = true;
                     throw new java.lang.ExceptionInInitializerError(twa);
                 }
-                //Created by ClassInitializeMethodBuilder.java:249
+                //Created by ClassInitializeMethodBuilder.java:250
                 @($classInitializationInProgress) = false;
-                //Created by ClassInitializeMethodBuilder.java:251
+                //Created by ClassInitializeMethodBuilder.java:252
                 @($classErroneous) = false;
-                //Created by ClassInitializeMethodBuilder.java:253
+                //Created by ClassInitializeMethodBuilder.java:254
                 @($classInitialized) = true;
             }
         }
@@ -173,7 +173,7 @@ public class MostSimpleInner {
     }
 
     public MostSimpleInner $create() {
-        //Created by CreateBuilder.java:57
+        //Created by CreateBuilder.java:58
         this.$initialized = false;
         $prepareEnter();
         return this;
@@ -181,7 +181,7 @@ public class MostSimpleInner {
 
     public static MostSimpleInner $createObject() {
         MostSimpleInner __NEW__;
-        //Created by CreateObjectBuilder.java:70
+        //Created by CreateObjectBuilder.java:71
         __NEW__ = MostSimpleInner.$allocate();
         __NEW__.$create()@MostSimpleInner
         return __NEW__;
