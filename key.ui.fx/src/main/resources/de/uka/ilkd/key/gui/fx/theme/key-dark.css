@@ -134,3 +134,46 @@
 .proof-tree-interactive {
     -fx-text-fill: -key-interactive;
 }
+
+/* info view (M2 first version) */
+.info-view {
+    -fx-background: -key-surface;
+    -fx-background-color: -key-surface;
+}
+
+.info-view-content {
+    -fx-padding: 8;
+}
+
+.info-view-title {
+    -fx-font-size: 1.15em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text;
+    -fx-padding: 0 0 6 0;
+}
+
+.info-view-grid {
+    -fx-hgap: 10;
+    -fx-vgap: 4;
+}
+
+.info-row-label {
+    -fx-text-fill: -key-text-secondary;
+    -fx-font-weight: bold;
+}
+
+.info-row-value {
+    -fx-text-fill: -key-text;
+}
+
+.info-view-status-closed {
+    -fx-text-fill: -key-proved;
+}
+
+.info-view-status-open {
+    -fx-text-fill: -key-error;
+}
+
+.info-view-placeholder {
+    -fx-text-fill: -key-text-secondary;
+}
