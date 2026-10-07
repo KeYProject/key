@@ -385,6 +385,13 @@ public final class MainWindowF {
                     if (System.getProperty("key.fx.verify.sequentsearch") != null) {
                         runSequentSearchVerification();
                     }
+                    if (System.getProperty("key.fx.verify.treefilters") != null) {
+                        String report = proofTreeView.verifyTreeFilters();
+                        LOGGER.info("Proof tree filter verification: {}", report);
+                        NotificationManagerF.getInstance()
+                                .notify("Tree filter verification: " + report,
+                                    report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+                    }
                     String report = proofTreeView.verifyTreeStructure() + " "
                         + proofTreeView.getLiveUpdateReport();
                     LOGGER.info("Proof tree live update verification: {}", report);
