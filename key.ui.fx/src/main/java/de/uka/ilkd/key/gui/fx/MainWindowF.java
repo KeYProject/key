@@ -38,6 +38,7 @@ import javafx.stage.Stage;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
 import de.uka.ilkd.key.gui.fx.docking.DockLayoutStore;
@@ -108,13 +109,16 @@ public final class MainWindowF {
     private final SequentViewF sequentView = new SequentViewF();
 
     /**
-     * The selection model of the window, copy of the Swing mediator's model. Until the
-     * {@code KeYMediatorF} exists (M2c) the proof binding is a no-op.
+     * The mediator of the window (M2 skeleton): owns the selection model, binds the proof
+     * listeners and shares the notation info. The demo load routes the proof through
+     * {@code setSelectedProof}, which invokes the mediator's {@code setProof}.
      */
-    private final KeYSelectionModel selectionModel = new KeYSelectionModel((newProof,
-            previousProof) -> LOGGER.debug("Selected proof changed: {} -> {}",
-                previousProof == null ? null : previousProof.name(),
-                newProof == null ? null : newProof.name()));
+    private final KeYMediatorF mediator = new KeYMediatorF();
+
+    /**
+     * The selection model of the window, owned by the mediator.
+     */
+    private final KeYSelectionModel selectionModel = mediator.getSelectionModel();
 
     /**
      * The proof tree view (first M2 version): displays the proof of the selection model, node
@@ -246,9 +250,11 @@ public final class MainWindowF {
         };
         loadTask.setOnSucceeded(event -> {
             KeYEnvironment<DefaultUserInterfaceControl> env = loadTask.getValue();
-            // route the proof through the selection model (as the mediator will do in M2c):
-            // fires selectedProofChanged + selects the first open goal or a leaf, which the
-            // sequent view observes and displays.
+            // the mediator observes the proof control (auto mode state, closed-goal counter)
+            mediator.attach(env.getProofControl());
+            // route the proof through the selection model: setSelectedProof invokes the
+            // mediator's setProof (listener swap, abbreviation rebind, OSS refresh) and then
+            // selects the first open goal or a leaf, which the views observe.
             selectionModel.setSelectedProof(env.getLoadedProof());
             String show = System.getProperty("key.fx.show", ID_SEQUENT);
             String target = ID_PROOF_TREE.equalsIgnoreCase(show) ? ID_PROOF_TREE : ID_SEQUENT;
