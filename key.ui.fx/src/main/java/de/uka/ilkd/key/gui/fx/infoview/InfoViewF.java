@@ -10,9 +10,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
@@ -109,6 +113,13 @@ public class InfoViewF extends ScrollPane {
         grid.getStyleClass().add("info-view-grid");
         grid.setHgap(10);
         grid.setVgap(4);
+        // the label column keeps its preferred width (it must not be truncated by a long value,
+        // e.g. the proof file path); the value column takes the remaining space and wraps
+        ColumnConstraints labelColumn = new ColumnConstraints();
+        labelColumn.setMinWidth(Region.USE_PREF_SIZE);
+        ColumnConstraints valueColumn = new ColumnConstraints();
+        valueColumn.setHgrow(Priority.ALWAYS);
+        grid.getColumnConstraints().addAll(labelColumn, valueColumn);
 
         fileValue = addRow("Proof File");
         openGoalsValue = addRow("Open Goals");
@@ -134,6 +145,9 @@ public class InfoViewF extends ScrollPane {
         Label label = new Label(key);
         label.getStyleClass().add("info-row-label");
         Label value = new Label();
+        value.getStyleClass().add("info-row-value");
+        value.setWrapText(true);
+        value.setAlignment(Pos.TOP_LEFT);
         value.getStyleClass().add("info-row-value");
         int rowIndex = grid.getRowCount();
         grid.add(label, 0, rowIndex);
