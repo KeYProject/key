@@ -65,9 +65,13 @@ public final class SettingsManagerF {
     /** the first provider of the tree (Swing {@code SettingsManager.STANDARD_UI_SETTINGS}) */
     public static final StandardUISettingsF STANDARD_UI_SETTINGS = new StandardUISettingsF();
 
-    // Deliberately deferred to later milestones (the provider seam stays open): the taclet
-    // options provider follows in this milestone, SMTSettingsProvider, JavacSettingsProvider,
-    // ParallelProverSettingsProvider, FeatureSettingsPanel and the ShowActiveSettings dump later.
+    /** the taclet options provider (Swing {@code SettingsManager.TACLET_OPTIONS_SETTINGS}) */
+    public static final TacletOptionsSettingsF TACLET_OPTIONS_SETTINGS =
+        new TacletOptionsSettingsF();
+
+    // Deliberately deferred to later milestones (the provider seam stays open):
+    // SMTSettingsProvider, JavacSettingsProvider, ParallelProverSettingsProvider,
+    // FeatureSettingsPanel and the ShowActiveSettings dump.
 
     private static SettingsManagerF INSTANCE;
 
@@ -83,6 +87,7 @@ public final class SettingsManagerF {
         if (INSTANCE == null) {
             INSTANCE = new SettingsManagerF();
             INSTANCE.add(STANDARD_UI_SETTINGS);
+            INSTANCE.add(TACLET_OPTIONS_SETTINGS);
         }
         return INSTANCE;
     }
