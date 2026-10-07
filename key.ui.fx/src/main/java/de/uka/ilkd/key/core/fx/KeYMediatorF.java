@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.javafx.FxUtil;
 
 import org.slf4j.Logger;
@@ -207,6 +208,99 @@ public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
         if (proofControl != null && inAutoMode) {
             proofControl.stopAutoMode();
         }
+    }
+
+    /**
+     * Undoes the last rule application on the selected goal (Swing {@code GoalBackAction}):
+     * without a selected goal the newest goal of the selected node's subtree is used — the one
+     * with the highest node serial number, where a closed goal wins if its serial is higher. As
+     * in Swing, {@code Proof.pruneProof} refuses to prune a closed cutting point while
+     * {@code GeneralSettings.noPruningClosed} is set (the default), so a goal back on a closed
+     * branch is a no-op.
+     */
+    public void goalBack() {
+        Node selNode = getSelectedNode();
+        Goal selGoal = getSelectedGoal();
+        if (selGoal == null && selNode != null) {
+            selGoal = findNewestGoal(selNode);
+        }
+        if (selGoal != null) {
+            setBack(selGoal);
+            // set the selection to give the user a visual feedback (Swing GoalBackAction);
+            // selGoal.node() is re-read after the prune, see setBack(Goal)
+            keySelectionModel.setSelectedNode(selGoal.node());
+        }
+    }
+
+    /**
+     * Removes the proof subtree below the selected node (Swing {@code PruneProofAction}).
+     */
+    public void pruneProof() {
+        Node node = getSelectedNode();
+        if (node != null) {
+            setBack(node);
+        }
+    }
+
+    /**
+     * Swing {@code KeYMediator.setBack(Goal)}: undoes the rule application that created the goal
+     * ({@code ProofControl.pruneTo(Goal)} prunes to the goal's parent) and selects the pre-rule
+     * node. The Swing task-finished notification is not yet mirrored.
+     */
+    private void setBack(Goal goal) {
+        Proof proof = getSelectedProof();
+        if (proof == null) {
+            return;
+        }
+        if (goal.node().parent() != null) {
+            // ProofControl.pruneTo(Goal): undo the rule application that created the goal's node
+            proof.pruneProof(goal.node().parent());
+        }
+        // The goal's node must be re-read here: the pruner re-associates the goal with the
+        // cutting point (Goal.pruneToParent), the old node is detached and its parent pointer
+        // is cleared (Node.remove). Swing's KeYMediator.setBack reads goal.node() after
+        // pruneTo as well.
+        Node node = goal.node();
+        keySelectionModel.setSelectedNode(node == proof.root() ? node : node.parent());
+    }
+
+    /**
+     * Swing {@code KeYMediator.setBack(Node)}: prunes the subtree below the given node and
+     * selects it.
+     */
+    private void setBack(Node node) {
+        node.proof().pruneProof(node);
+        keySelectionModel.setSelectedNode(node);
+    }
+
+    /**
+     * Swing {@code GoalBackAction.findNewestGoal}: the goal of the subtree that was changed last
+     * (the highest node serial number), open and closed goals considered.
+     */
+    private static Goal findNewestGoal(Node subtree) {
+        if (subtree == null) {
+            return null;
+        }
+        Proof proof = subtree.proof();
+        ImmutableList<Goal> closedGoals = proof.getClosedSubtreeGoals(subtree);
+        ImmutableList<Goal> openGoals = proof.getSubtreeGoals(subtree);
+        int closedID = -1;
+        Goal closed = null;
+        int openID = -1;
+        Goal open = null;
+        for (Goal g : closedGoals) {
+            if (g.node().serialNr() > closedID) {
+                closedID = g.node().serialNr();
+                closed = g;
+            }
+        }
+        for (Goal g : openGoals) {
+            if (g.node().serialNr() > openID) {
+                openID = g.node().serialNr();
+                open = g;
+            }
+        }
+        return closedID > openID ? closed : open;
     }
 
     /**
