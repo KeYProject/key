@@ -49,6 +49,7 @@ import de.uka.ilkd.key.gui.fx.docking.DockWorkspace;
 import de.uka.ilkd.key.gui.fx.docking.Dockable;
 import de.uka.ilkd.key.gui.fx.docking.SimpleDockable;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
+import de.uka.ilkd.key.gui.fx.goallist.GoalListViewF;
 import de.uka.ilkd.key.gui.fx.infoview.InfoViewF;
 import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
 import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
@@ -57,6 +58,7 @@ import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
 import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeViewF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsManagerF;
 import de.uka.ilkd.key.gui.fx.settings.ThemeSettingsProviderF;
+import de.uka.ilkd.key.gui.fx.strategy.StrategySelectionViewF;
 import de.uka.ilkd.key.gui.fx.theme.Theme;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
 import de.uka.ilkd.key.proof.Proof;
@@ -133,6 +135,18 @@ public final class MainWindowF {
      * branch counts, closed status) of the selected proof.
      */
     private final InfoViewF infoView = new InfoViewF();
+
+    /**
+     * The goal list view (first M2 version): lists the open goals of the selected proof; a click
+     * selects the goal.
+     */
+    private final GoalListViewF goalListView = new GoalListViewF();
+
+    /**
+     * The strategy selection view (first M2 version): settings-definition-driven control panel
+     * writing through to the selected proof's strategy settings.
+     */
+    private final StrategySelectionViewF strategyView = new StrategySelectionViewF();
 
     /**
      * Updates the left status text whenever the selection changes: proof name, closed state or
@@ -234,6 +248,8 @@ public final class MainWindowF {
         sequentView.attach(selectionModel);
         proofTreeView.attach(selectionModel);
         infoView.attach(selectionModel);
+        goalListView.attach(selectionModel);
+        strategyView.attach(selectionModel);
         selectionModel.addKeYSelectionListenerChecked(statusSelectionListener);
         sequentView.setOnPosSelected(pos -> {
             if (pos == null) {
@@ -298,6 +314,9 @@ public final class MainWindowF {
                         .notify("Tree structure verification: " + report,
                             report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
             }
+            if (System.getProperty("key.fx.verify.goallist") != null) {
+                LOGGER.info("Goal list verification: {}", goalListView.verifyGoalList());
+            }
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 startLiveAutoMode(env);
             }
@@ -342,10 +361,7 @@ public final class MainWindowF {
                 // run, so the final tree state arrives only here (Swing parity:
                 // MainWindow.autoModeStopped refreshes the views from the final state)
                 FxUtil.runLater(() -> {
-                    proofTreeView.refresh();
-                    // no selection event fires at auto mode stop (the proof suspended its
-                    // listeners), so the status line is refreshed from the final state here
-                    updateProofStatus();
+                    refreshViewsFromFinalState();
                     String report = proofTreeView.verifyTreeStructure() + " "
                         + proofTreeView.getLiveUpdateReport();
                     LOGGER.info("Proof tree live update verification: {}", report);
@@ -364,6 +380,21 @@ public final class MainWindowF {
         worker.start();
     }
 
+    /**
+     * Refreshes all views from the final proof state. Called at auto mode stop (Swing parity:
+     * {@code MainWindow.autoModeStopped}): the proof suspends its non-essential listeners during
+     * the run, so no selection or structural event fires at the stop and the views would
+     * otherwise show stale content.
+     */
+    private void refreshViewsFromFinalState() {
+        Proof proof = selectionModel.getSelectedProof();
+        proofTreeView.refresh();
+        goalListView.setProof(proof);
+        infoView.display(proof);
+        sequentView.display(selectionModel.getSelectedNode());
+        updateProofStatus();
+    }
+
     private void setWindowIcons() {
         Image icon = new Image(MainWindowF.class.getResourceAsStream(IMAGE_DIR
             + "key-color-icon-square.png"));
@@ -378,11 +409,13 @@ public final class MainWindowF {
 
     private void buildDockables() {
         registerDockable(ID_LOADED_PROOFS, "Loaded Proofs"); // TaskTree
-        registerDockable(ID_GOAL_LIST, "Goal List");
+        dockables.put(ID_GOAL_LIST,
+            new SimpleDockable(ID_GOAL_LIST, "Goal List", goalListView));
         dockables.put(ID_PROOF_TREE,
             new SimpleDockable(ID_PROOF_TREE, "Proof Tree", proofTreeView));
         dockables.put(ID_INFO_VIEW, new SimpleDockable(ID_INFO_VIEW, "Info", infoView));
-        registerDockable(ID_STRATEGY, "Strategy");
+        dockables.put(ID_STRATEGY,
+            new SimpleDockable(ID_STRATEGY, "Strategy", strategyView));
         dockables.put(ID_SEQUENT, new SimpleDockable(ID_SEQUENT, "Sequent", sequentView));
         registerDockable(ID_SOURCE_VIEW, "Source");
     }
