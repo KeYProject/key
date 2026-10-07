@@ -15,6 +15,8 @@ import de.uka.ilkd.key.gui.settings.SettingsPanel;
 
 import org.key_project.key.llm.mcp.BuiltInMCPClient;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import net.miginfocom.layout.CC;
 import org.jspecify.annotations.Nullable;
 
@@ -60,13 +62,15 @@ public class SkillLibraryEditor extends LibraryEditorPanel<Skill> {
             toolBox.add(check);
         }
 
-        setForm(buildForm(toolBox));
+        setFormComponent(buildForm(toolBox));
         reload();
     }
 
     private JComponent buildForm(JComponent allowedToolsBox) {
         return new SettingsPanel() {
             {
+                // the form lives in its own dialog; no extra header here
+                pNorth.setVisible(false);
                 addRowWithHelp(HELP_ENABLED, new JLabel(), enabled);
                 addTitledComponent("Name", txtName, HELP_NAME);
                 addTitledComponent("Description", txtDescription, HELP_DESCRIPTION);
@@ -126,5 +130,22 @@ public class SkillLibraryEditor extends LibraryEditorPanel<Skill> {
     @Override
     protected String removeByName(String name) {
         return SkillLibrary.INSTANCE.delete(name);
+    }
+
+    @Override
+    protected String toJson(List<Skill> entries) {
+        return new GsonBuilder().setPrettyPrinting().create().toJson(entries);
+    }
+
+    @Override
+    protected List<Skill> fromJson(String json) {
+        try {
+            var type = new TypeToken<List<Skill>>() {
+            }.getType();
+            List<Skill> list = new GsonBuilder().create().fromJson(json, type);
+            return list == null ? List.of() : list;
+        } catch (Exception e) {
+            return List.of();
+        }
     }
 }

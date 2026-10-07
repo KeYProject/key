@@ -9,6 +9,8 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -36,13 +38,15 @@ public class PromptLibraryEditor extends LibraryEditorPanel<Prompt> {
                 + " saved immediately.");
         template.setLineWrap(true);
         template.setWrapStyleWord(true);
-        setForm(buildForm());
+        setFormComponent(buildForm());
         reload();
     }
 
     private JComponent buildForm() {
         return new SettingsPanel() {
             {
+                // the form lives in its own dialog; no extra header here
+                pNorth.setVisible(false);
                 addTitledComponent("Name", txtName, HELP_NAME);
                 addTitledComponent("Description", txtDescription, HELP_DESCRIPTION);
                 addTitledComponent("Template", new JScrollPane(template), HELP_TEMPLATE);
@@ -85,5 +89,22 @@ public class PromptLibraryEditor extends LibraryEditorPanel<Prompt> {
     @Override
     protected String removeByName(String name) {
         return PromptLibrary.INSTANCE.delete(name);
+    }
+
+    @Override
+    protected String toJson(List<Prompt> entries) {
+        return new GsonBuilder().setPrettyPrinting().create().toJson(entries);
+    }
+
+    @Override
+    protected List<Prompt> fromJson(String json) {
+        try {
+            var type = new TypeToken<List<Prompt>>() {
+            }.getType();
+            List<Prompt> list = new GsonBuilder().create().fromJson(json, type);
+            return list == null ? List.of() : list;
+        } catch (Exception e) {
+            return List.of();
+        }
     }
 }
