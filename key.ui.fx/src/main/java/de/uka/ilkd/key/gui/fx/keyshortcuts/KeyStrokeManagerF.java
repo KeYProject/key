@@ -353,7 +353,13 @@ public final class KeyStrokeManagerF {
         if (key == null) {
             return Optional.empty();
         }
-        KeyCode code = KeyCode.valueOf(key);
+        KeyCode code;
+        try {
+            code = KeyCode.valueOf(key);
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("Unknown key name '{}' in the keystroke spec '{}'", key, spec);
+            return Optional.empty();
+        }
         if (isModifier(code)) {
             return Optional.empty();
         }
@@ -365,8 +371,10 @@ public final class KeyStrokeManagerF {
      * Formats a {@link KeyCombination} as a Swing {@code KeyStroke.toString()} spec, e.g.
      * {@code "shift ctrl pressed P"}. The {@code SHORTCUT} modifier resolves to {@code ctrl} on
      * non-Mac platforms and {@code meta} on Mac. Key names are the JavaFX {@link KeyCode} names,
-     * which match the Swing key names for all default shortcuts; exotic codes may produce names
-     * the Swing parser rejects (logged as a warning on the next load).
+     * which are the Swing {@code VK_*} constant names for all default shortcuts (the human
+     * readable {@link KeyCode#getName()} would emit e.g. {@code "Space"}, which neither Swing nor
+     * this parser accept); exotic codes may produce names the Swing parser rejects (logged as a
+     * warning on the next load).
      *
      * @param combination the combination
      * @return the Swing spec
@@ -391,7 +399,7 @@ public final class KeyStrokeManagerF {
         if (codeCombination.getAlt() == ModifierValue.DOWN) {
             builder.append("alt ");
         }
-        builder.append("pressed ").append(codeCombination.getCode().getName());
+        builder.append("pressed ").append(codeCombination.getCode().name());
         return builder.toString();
     }
 

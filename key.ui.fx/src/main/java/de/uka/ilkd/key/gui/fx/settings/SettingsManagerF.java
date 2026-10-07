@@ -295,6 +295,14 @@ public final class SettingsManagerF {
             txtSearch.textProperty()
                     .addListener((obs, old, value) -> treeSettingsPanels.refresh());
 
+            // the placeholder must be in place before buildTree shows the first panel
+            panelArea.setContent(panelHolder);
+            panelArea.setFitToWidth(true);
+            panelArea.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+            panelHolder.getStyleClass().add("settings-panel-holder");
+            panelHolder.getChildren().add(new Label("empty"));
+            setCenter(panelArea);
+
             treeSettingsPanels.setShowRoot(true);
             treeSettingsPanels.setCellFactory(this::createCell);
             buildTree(providers);
@@ -305,13 +313,6 @@ public final class SettingsManagerF {
             westPanel.getStyleClass().add("settings-tree-panel");
             VBox.setVgrow(treeSettingsPanels, javafx.scene.layout.Priority.ALWAYS);
             setLeft(westPanel);
-
-            panelArea.setContent(panelHolder);
-            panelArea.setFitToWidth(true);
-            panelArea.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-            panelHolder.getStyleClass().add("settings-panel-holder");
-            panelHolder.getChildren().add(new Label("empty"));
-            setCenter(panelArea);
 
             treeSettingsPanels.getSelectionModel().selectedItemProperty()
                     .addListener((obs, old, item) -> {
