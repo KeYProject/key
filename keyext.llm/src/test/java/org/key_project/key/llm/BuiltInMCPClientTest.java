@@ -6,6 +6,7 @@ package org.key_project.key.llm;
 
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.key_project.key.llm.mcp.BuiltInMCPClient;
 import org.key_project.key.llm.mcp.KeYAgentTools;
@@ -14,6 +15,7 @@ import org.key_project.key.llm.mcp.McpToolNowAllowedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -65,6 +67,22 @@ class BuiltInMCPClientTest {
         assertTrue(client.getAllToolNames().equals(before));
         assertTrue(LlmSettings.INSTANCE.getAllowedToolsWithApproval().equals(Set.of("x")));
         assertTrue(LlmSettings.INSTANCE.getAllowedToolsWithoutApproval().equals(Set.of("y")));
+    }
+
+    @Test
+    void getAllToolsListsEveryToolWithDescriptionIncludingDisabled() {
+        LlmSettings.INSTANCE.setToolsDisabled(new TreeSet<>(Set.of(TestMcpToolProvider.ECHO)));
+        var all = client.getAllTools();
+        // disabled tools must still be listed so the settings UI can re-enable them
+        assertTrue(all.stream().anyMatch(t -> t.function().name().equals(TestMcpToolProvider.ECHO)),
+            "disabled tools must still be visible in the settings list");
+        assertEquals(new TreeSet<>(client.getAllToolNames()),
+            all.stream().map(t -> t.function().name()).collect(Collectors.toCollection(
+                TreeSet::new)));
+        for (var tool : all) {
+            assertFalse(tool.function().description().isBlank(),
+                "every tool must carry an explanation for the settings UI");
+        }
     }
 
     @Test
