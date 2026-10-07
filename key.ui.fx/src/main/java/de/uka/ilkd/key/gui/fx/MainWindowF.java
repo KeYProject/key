@@ -1025,7 +1025,8 @@ public final class MainWindowF {
 
     /**
      * Creates a menu item with an optional icon and accelerator (bound via the
-     * {@link KeyStrokeManagerF}).
+     * {@link KeyStrokeManagerF}). The item is registered with the manager, so a shortcut change
+     * in the settings dialog updates the accelerator live.
      */
     private MenuItem menuItem(String text, String actionId, IconFactoryF.Key icon,
             Runnable action) {
@@ -1036,6 +1037,7 @@ public final class MainWindowF {
         if (actionId != null) {
             KeyStrokeManagerF manager = KeyStrokeManagerF.getInstance();
             manager.binding(actionId).ifPresent(item::setAccelerator);
+            manager.register(item, actionId);
         }
         item.setOnAction(e -> action.run());
         return item;
