@@ -35,6 +35,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
@@ -54,11 +55,15 @@ import de.uka.ilkd.key.gui.fx.settings.SettingsManagerF;
 import de.uka.ilkd.key.gui.fx.settings.ThemeSettingsProviderF;
 import de.uka.ilkd.key.gui.fx.theme.Theme;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
+
+import org.key_project.util.javafx.FxUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -259,6 +264,9 @@ public final class MainWindowF {
                         .notify("Tree structure verification: " + report,
                             report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
             }
+            if (System.getProperty("key.fx.demo.autoprove.live") != null) {
+                startLiveAutoMode(env);
+            }
         });
         loadTask.setOnFailed(event -> {
             Throwable error = loadTask.getException();
@@ -269,6 +277,54 @@ public final class MainWindowF {
         Thread loader = new Thread(loadTask, "fx-demo-proof-loader");
         loader.setDaemon(true);
         loader.start();
+    }
+
+    /**
+     * Milestone M2 verification affordance: runs the automatic prover <b>after</b> the proof was
+     * bound to the selection model ({@code key.fx.demo.autoprove.live}). During the run the
+     * parallel prover suspends the proof's non-essential tree listeners ({@code
+     * Proof#suspendNonEssentialListeners}), so no per-application events reach the views; the
+     * final state is delivered via {@code autoModeStopped} — the same contract the Swing UI
+     * implements ({@code MainWindow.autoModeStopped}). The structure self test afterwards proves
+     * the rebuilt tree matches the final proof state. {@code key.fx.demo.maxsteps} optionally
+     * limits the strategy steps (tests the non-closed case).
+     */
+    private void startLiveAutoMode(KeYEnvironment<DefaultUserInterfaceControl> env) {
+        Proof proof = env.getLoadedProof();
+        String maxSteps = System.getProperty("key.fx.demo.maxsteps");
+        if (maxSteps != null && !maxSteps.isBlank()) {
+            proof.getSettings().getStrategySettings()
+                    .setMaxSteps(Integer.parseInt(maxSteps.trim()));
+        }
+        env.getProofControl().addAutoModeListener(new AutoModeListener() {
+            @Override
+            public void autoModeStarted(ProofEvent e) {
+                LOGGER.info("Demo: live auto mode started");
+            }
+
+            @Override
+            public void autoModeStopped(ProofEvent e) {
+                // the parallel prover suspends the non-essential tree listeners for the whole
+                // run, so the final tree state arrives only here (Swing parity:
+                // MainWindow.autoModeStopped refreshes the views from the final state)
+                FxUtil.runLater(() -> {
+                    proofTreeView.refresh();
+                    String report = proofTreeView.verifyTreeStructure() + " "
+                        + proofTreeView.getLiveUpdateReport();
+                    LOGGER.info("Proof tree live update verification: {}", report);
+                    NotificationManagerF.getInstance()
+                            .notify("Live update verification: " + report,
+                                report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+                });
+            }
+        });
+        Thread worker = new Thread(() -> {
+            LOGGER.info("Demo: starting live auto mode on the selected proof");
+            env.getProofControl().startAndWaitForAutoMode(proof);
+            LOGGER.info("Demo: live auto mode finished");
+        }, "fx-demo-live-autoprover");
+        worker.setDaemon(true);
+        worker.start();
     }
 
     private void setWindowIcons() {
