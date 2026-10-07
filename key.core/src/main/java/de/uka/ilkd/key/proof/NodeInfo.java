@@ -86,7 +86,7 @@ public class NodeInfo {
     private boolean uselessApplication = false;
 
     /** User-provided plain-text annotations to the node. */
-    private String notes;
+    private @Nullable String notes;
 
     /** Information about changes respective to the parent of this node. */
     private SequentChangeInfo sequentChangeInfo;
@@ -477,7 +477,7 @@ public class NodeInfo {
      *
      * @param newNotes annotations as described above
      */
-    public void setNotes(String newNotes) {
+    public void setNotes(@Nullable String newNotes) {
         String oldNotes = notes;
         notes = newNotes;
         if (!Objects.equals(oldNotes, newNotes)) {
@@ -490,7 +490,7 @@ public class NodeInfo {
      *
      * @return annotations as described above
      */
-    public String getNotes() {
+    public @Nullable String getNotes() {
         return notes;
     }
 
