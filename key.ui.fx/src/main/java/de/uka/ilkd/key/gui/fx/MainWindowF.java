@@ -307,6 +307,12 @@ public final class MainWindowF {
                             report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
                 statusRight.setText(report);
             }
+            if (System.getProperty("key.fx.verify.sequentsearch") != null
+                    && System.getProperty("key.fx.demo.autoprove.live") == null) {
+                // without the live auto mode the sequent at load is final; with the live mode
+                // the sequent search verification runs at its stop
+                runSequentSearchVerification();
+            }
             if (System.getProperty("key.fx.verify.tree") != null) {
                 String report = proofTreeView.verifyTreeStructure();
                 LOGGER.info("Proof tree structure verification: {}", report);
@@ -371,6 +377,9 @@ public final class MainWindowF {
                     if (System.getProperty("key.fx.verify.search") != null) {
                         runSearchVerification();
                     }
+                    if (System.getProperty("key.fx.verify.sequentsearch") != null) {
+                        runSequentSearchVerification();
+                    }
                     String report = proofTreeView.verifyTreeStructure() + " "
                         + proofTreeView.getLiveUpdateReport();
                     LOGGER.info("Proof tree live update verification: {}", report);
@@ -387,6 +396,21 @@ public final class MainWindowF {
         }, "fx-demo-live-autoprover");
         worker.setDaemon(true);
         worker.start();
+    }
+
+    /**
+     * Runs the sequent search self test with the query given as the value of
+     * {@code key.fx.verify.sequentsearch} (default {@code agatha}, which occurs in the Agatha
+     * demo's sequent).
+     */
+    private void runSequentSearchVerification() {
+        String query = System.getProperty("key.fx.verify.sequentsearch");
+        String report = sequentView
+                .verifySequentSearch(query == null || query.isBlank() ? "agatha" : query.trim());
+        LOGGER.info("Sequent search verification: {}", report);
+        NotificationManagerF.getInstance()
+                .notify("Sequent search verification: " + report,
+                    report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
     }
 
     /**

@@ -106,6 +106,48 @@
     -fx-fill: -key-text-secondary;
 }
 
+/* sequent search bar (M2, Swing SequentViewSearchBar) */
+.sequent-search-bar {
+    -fx-background-color: -key-surface;
+    -fx-border-color: -key-border transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 4;
+}
+
+.sequent-search-field {
+    -fx-background-color: -key-background;
+    -fx-text-fill: -key-text;
+    -fx-prompt-text-fill: -key-text-secondary;
+    -fx-highlight-fill: derive(-key-accent, -40%);
+    -fx-border-color: -key-border;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-padding: 2 6 2 6;
+}
+
+.sequent-search-field.search-alert {
+    -fx-background-color: #552828;
+}
+
+.sequent-search-button {
+    -fx-background-color: transparent;
+    -fx-padding: 3 5 3 5;
+}
+
+.sequent-search-button:hover {
+    -fx-background-color: derive(-key-accent, -65%);
+}
+
+/* the search colors the matched text (Swing paints translucent blue rectangles behind it) */
+.sequent-search-match {
+    -fx-fill: derive(-key-accent, 30%);
+}
+
+.sequent-search-match-current {
+    -fx-fill: derive(-key-accent, 60%);
+    -fx-font-weight: bold;
+}
+
 /* proof tree (M2 first version) */
 .proof-tree {
     -fx-background-color: -key-surface;
