@@ -314,6 +314,12 @@ public final class MainWindowF {
                         .notify("Tree structure verification: " + report,
                             report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
             }
+            if (System.getProperty("key.fx.verify.search") != null
+                    && System.getProperty("key.fx.demo.autoprove.live") == null) {
+                // without the live auto mode the proof state at load is final (fresh or already
+                // auto-closed); with the live mode the search verification runs at its stop
+                runSearchVerification();
+            }
             if (System.getProperty("key.fx.verify.goallist") != null) {
                 LOGGER.info("Goal list verification: {}", goalListView.verifyGoalList());
             }
@@ -362,6 +368,9 @@ public final class MainWindowF {
                 // MainWindow.autoModeStopped refreshes the views from the final state)
                 FxUtil.runLater(() -> {
                     refreshViewsFromFinalState();
+                    if (System.getProperty("key.fx.verify.search") != null) {
+                        runSearchVerification();
+                    }
                     String report = proofTreeView.verifyTreeStructure() + " "
                         + proofTreeView.getLiveUpdateReport();
                     LOGGER.info("Proof tree live update verification: {}", report);
@@ -378,6 +387,21 @@ public final class MainWindowF {
         }, "fx-demo-live-autoprover");
         worker.setDaemon(true);
         worker.start();
+    }
+
+    /**
+     * Runs the proof tree search self test with the query given as the value of
+     * {@code key.fx.verify.search} (default {@code andleft}, which matches the Agatha demo's
+     * rule applications).
+     */
+    private void runSearchVerification() {
+        String query = System.getProperty("key.fx.verify.search");
+        String report = proofTreeView
+                .verifySearch(query == null || query.isBlank() ? "andleft" : query.trim());
+        LOGGER.info("Proof tree search verification: {}", report);
+        NotificationManagerF.getInstance()
+                .notify("Tree search verification: " + report,
+                    report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
     }
 
     /**

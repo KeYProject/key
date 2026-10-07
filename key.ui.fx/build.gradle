@@ -58,10 +58,11 @@ run {
     //  * key.fx.demo.maxsteps = <n>  (M2: limit the auto mode strategy steps, e.g. 3 — tests
     //    the live-update refresh for the non-closed case)
     //  * key.fx.verify.goallist = any  (M2: run the goal list self test after the demo load)
+    //  * key.fx.verify.search = any  (M2: run the proof tree search self test after the demo load)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
-        "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist"]
-        .each { name ->
+        "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
+        "key.fx.verify.search"].each { name ->
         def value = System.getProperty(name)
         if (value != null) {
             systemProperties[name] = value
