@@ -150,6 +150,8 @@ public interface Visitor {
 
     void performActionOnSetStatement(SetStatement x);
 
+    void performActionOnUseLemmaStatement(UseLemmaStatement x);
+
     void performActionOnConditional(Conditional x);
 
     void performActionOnNewArray(NewArray x);
