@@ -1,3 +1,6 @@
+//@ /*@ nullable */
+
+
 record MyRecord(String test) {
 
     public int hashCode() {

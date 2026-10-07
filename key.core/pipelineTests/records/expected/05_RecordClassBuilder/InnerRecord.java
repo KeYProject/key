@@ -49,7 +49,7 @@ public class OuterClass {
 
         @Override()
         @javax.annotation.processing.Generated("RecordClassBuilder")
-        public final non_null String toString() {
+        public final /*@ non_null */ String toString() {
             return "MyRecord[" + "test=" + test + "]";
         }
     }
