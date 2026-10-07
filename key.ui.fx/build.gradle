@@ -49,7 +49,11 @@ run {
     //  * key.fx.theme  = light|dark  (theme override, also used by headless UI tests)
     //  * key.fx.demo.sequent = <file.key>  (M2a spike: load a demo proof into the sequent view)
     //  * key.fx.verify.sequent = any  (M2a spike: run the position-mapping self test afterwards)
-    ["key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent"].each { name ->
+    //  * key.fx.show = sequent|prooftree  (M2: dockable selected after the demo load)
+    //  * key.fx.demo.autoprove = any  (M2: run the automatic prover on the demo proof)
+    //  * key.fx.verify.tree = any  (M2: run the proof tree structure self test afterwards)
+    ["key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent", "key.fx.show",
+        "key.fx.demo.autoprove", "key.fx.verify.tree"].each { name ->
         def value = System.getProperty(name)
         if (value != null) {
             systemProperties[name] = value

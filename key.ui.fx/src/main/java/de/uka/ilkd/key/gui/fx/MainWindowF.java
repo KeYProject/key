@@ -49,6 +49,7 @@ import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
 import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
+import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeViewF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsManagerF;
 import de.uka.ilkd.key.gui.fx.settings.ThemeSettingsProviderF;
 import de.uka.ilkd.key.gui.fx.theme.Theme;
@@ -105,8 +106,15 @@ public final class MainWindowF {
      * {@code KeYMediatorF} exists (M2c) the proof binding is a no-op.
      */
     private final KeYSelectionModel selectionModel = new KeYSelectionModel((newProof,
-            previousProof) -> LOGGER.debug("Selected proof changed: {} -> {}", previousProof,
-                newProof));
+            previousProof) -> LOGGER.debug("Selected proof changed: {} -> {}",
+                previousProof == null ? null : previousProof.name(),
+                newProof == null ? null : newProof.name()));
+
+    /**
+     * The proof tree view (first M2 version): displays the proof of the selection model, node
+     * clicks drive the selection.
+     */
+    private final ProofTreeViewF proofTreeView = new ProofTreeViewF();
 
     /**
      * Creates the main window bound to the given stage.
@@ -188,6 +196,7 @@ public final class MainWindowF {
 
     private void wireSequentView() {
         sequentView.attach(selectionModel);
+        proofTreeView.attach(selectionModel);
         sequentView.setOnPosSelected(pos -> {
             if (pos == null) {
                 statusRight.setText("");
@@ -213,7 +222,13 @@ public final class MainWindowF {
         Task<KeYEnvironment<DefaultUserInterfaceControl>> loadTask = new Task<>() {
             @Override
             protected KeYEnvironment<DefaultUserInterfaceControl> call() throws Exception {
-                return KeYEnvironment.load(location);
+                KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(location);
+                if (System.getProperty("key.fx.demo.autoprove") != null) {
+                    LOGGER.info("Demo: running auto mode on the loaded proof");
+                    env.getProofControl().startAndWaitForAutoMode(env.getLoadedProof());
+                    LOGGER.info("Demo: auto mode finished");
+                }
+                return env;
             }
         };
         loadTask.setOnSucceeded(event -> {
@@ -222,7 +237,10 @@ public final class MainWindowF {
             // fires selectedProofChanged + selects the first open goal or a leaf, which the
             // sequent view observes and displays.
             selectionModel.setSelectedProof(env.getLoadedProof());
-            workspace.select(dockables.get(ID_SEQUENT));
+            String show = System.getProperty("key.fx.show", ID_SEQUENT);
+            String target = ID_PROOF_TREE.equalsIgnoreCase(show) ? ID_PROOF_TREE : ID_SEQUENT;
+            LOGGER.info("Demo: selecting dockable '{}' (key.fx.show={})", target, show);
+            workspace.select(dockables.get(target));
             NotificationManagerF.getInstance()
                     .notify("Demo proof loaded: " + location, Kind.INFO);
             statusLeft.setText("Proof: " + env.getLoadedProof().name());
@@ -233,6 +251,13 @@ public final class MainWindowF {
                         .notify("Position mapping verification: " + report,
                             report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
                 statusRight.setText(report);
+            }
+            if (System.getProperty("key.fx.verify.tree") != null) {
+                String report = proofTreeView.verifyTreeStructure();
+                LOGGER.info("Proof tree structure verification: {}", report);
+                NotificationManagerF.getInstance()
+                        .notify("Tree structure verification: " + report,
+                            report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
             }
         });
         loadTask.setOnFailed(event -> {
@@ -261,7 +286,8 @@ public final class MainWindowF {
     private void buildDockables() {
         registerDockable(ID_LOADED_PROOFS, "Loaded Proofs"); // TaskTree
         registerDockable(ID_GOAL_LIST, "Goal List");
-        registerDockable(ID_PROOF_TREE, "Proof Tree");
+        dockables.put(ID_PROOF_TREE,
+            new SimpleDockable(ID_PROOF_TREE, "Proof Tree", proofTreeView));
         registerDockable(ID_INFO_VIEW, "Info");
         registerDockable(ID_STRATEGY, "Strategy");
         dockables.put(ID_SEQUENT, new SimpleDockable(ID_SEQUENT, "Sequent", sequentView));

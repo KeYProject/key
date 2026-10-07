@@ -101,3 +101,32 @@
 .sequent-placeholder {
     -fx-fill: -key-text-secondary;
 }
+
+/* proof tree (M2 first version) */
+.proof-tree {
+    -fx-background-color: -key-surface;
+}
+
+.proof-tree-cell {
+    -fx-text-fill: -key-text;
+    -fx-fill: -key-text;
+    -fx-padding: 1 4 1 2;
+}
+
+.proof-tree-branch {
+    -fx-text-fill: -key-text;
+    -fx-font-weight: bold;
+}
+
+.proof-tree-branch-closed,
+.proof-tree-closed {
+    -fx-text-fill: -key-proved;
+}
+
+.proof-tree-open {
+    -fx-text-fill: -key-error;
+}
+
+.proof-tree-interactive {
+    -fx-text-fill: -key-interactive;
+}
