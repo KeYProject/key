@@ -43,13 +43,30 @@
     -fx-text-fill: -key-text-secondary;
 }
 
+/* placeholder views (milestone M1) */
+.view-title {
+    -fx-font-size: 1.4em;
+    -fx-text-fill: -key-text;
+    -fx-font-weight: bold;
+}
+
+.view-hint {
+    -fx-text-fill: -key-text-secondary;
+}
+
 /* notifications (toast) */
 .notification-toast {
     -fx-background-color: -key-surface;
     -fx-background-radius: 4;
     -fx-border-color: -key-border;
     -fx-border-radius: 4;
+    -fx-padding: 8 12 8 12;
+    -fx-text-fill: -key-text;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0.2, 0, 2);
+}
+
+.notification-toast.info {
+    -fx-border-color: -key-accent;
 }
 
 .notification-toast.error {
