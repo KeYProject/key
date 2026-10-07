@@ -32,6 +32,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
+import de.uka.ilkd.key.gui.fx.colors.ColorSettingsF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF.Key;
 
@@ -53,6 +54,15 @@ import org.slf4j.LoggerFactory;
 public abstract class SettingsPanelF extends BorderPane {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsPanelF.class);
+
+    /**
+     * The color property marking erroneous input fields, ported from
+     * {@code SimpleSettingsPanel.COLOR_ERROR} (Swing {@code SimpleSettingsPanel}); the value is
+     * applied via the {@code settings-input-error} style class using {@code -key-settings-error}.
+     */
+    public static final ColorSettingsF.ColorPropertyF COLOR_ERROR = ColorSettingsF
+            .define("SETTINGS_TEXTFIELD_ERROR", "Color for marking errornous textfields in "
+                + "settings dialog", ColorSettingsF.color(200, 100, 100));
 
     /** the form area; subclasses append rows via the {@code add*} factory methods */
     protected final GridPane pCenter = new GridPane();

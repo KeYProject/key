@@ -150,8 +150,8 @@ public class StandardUISettingsF extends SettingsPanelF implements SettingsProvi
 
     @Override
     public java.util.List<SettingsProviderF> getChildProviders() {
-        // the colors and keyboard shortcut panels are added with their commits in this milestone
-        return java.util.List.of();
+        // the keyboard shortcut panel is added with its commit in this milestone
+        return java.util.List.of(new ColorSettingsProviderF());
     }
 
     @Override
