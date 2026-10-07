@@ -61,6 +61,7 @@ import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
 import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeViewF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsManagerF;
 import de.uka.ilkd.key.gui.fx.settings.ThemeSettingsProviderF;
+import de.uka.ilkd.key.gui.fx.sourceview.SourceViewF;
 import de.uka.ilkd.key.gui.fx.strategy.StrategySelectionViewF;
 import de.uka.ilkd.key.gui.fx.theme.Theme;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
@@ -150,6 +151,13 @@ public final class MainWindowF {
      * writing through to the selected proof's strategy settings.
      */
     private final StrategySelectionViewF strategyView = new StrategySelectionViewF();
+
+    /**
+     * The source view (first M2 version): shows the Java source file(s) relevant to the selected
+     * proof (via {@code ProofJavaSourceCollection} + {@code FileRepo}, like the Swing view);
+     * pure {@code .key} problems without Java source show the loaded problem file as a fallback.
+     */
+    private final SourceViewF sourceView = new SourceViewF();
 
     /**
      * Updates the left status text whenever the selection changes: proof name, closed state or
@@ -256,6 +264,10 @@ public final class MainWindowF {
         infoView.attach(selectionModel);
         goalListView.attach(selectionModel);
         strategyView.attach(selectionModel);
+        sourceView.attach(selectionModel);
+        // the hook doubles as the :99 verification signal (same line as the standalone driver)
+        sourceView.setOnContentLoaded(
+            () -> LOGGER.info("Source self test: {}", sourceView.verifySourceView()));
         selectionModel.addKeYSelectionListenerChecked(statusSelectionListener);
         sequentView.setOnPosSelected(pos -> {
             if (pos == null) {
@@ -285,6 +297,8 @@ public final class MainWindowF {
             return;
         }
         Path location = Path.of(file);
+        // pure .key problems carry no Java source; the source view then shows the problem file
+        sourceView.setFallbackSourceFile(location);
         Task<KeYEnvironment<DefaultUserInterfaceControl>> loadTask = new Task<>() {
             @Override
             protected KeYEnvironment<DefaultUserInterfaceControl> call() throws Exception {
@@ -532,7 +546,20 @@ public final class MainWindowF {
         dockables.put(ID_STRATEGY,
             new SimpleDockable(ID_STRATEGY, "Strategy", strategyView));
         dockables.put(ID_SEQUENT, new SimpleDockable(ID_SEQUENT, "Sequent", sequentView));
-        registerDockable(ID_SOURCE_VIEW, "Source");
+        dockables.put(ID_SOURCE_VIEW,
+            new SimpleDockable(ID_SOURCE_VIEW, "Source", buildSourceViewContent()));
+    }
+
+    /**
+     * The content of the source view dockable: the source area with a one-line header showing
+     * the currently displayed file (the standalone driver shows the same header).
+     */
+    private Node buildSourceViewContent() {
+        Label header = new Label(SourceViewF.NO_SOURCE);
+        header.getStyleClass().add("source-view-header");
+        header.textProperty().bind(sourceView.headerTextProperty());
+        header.setTextOverrun(OverrunStyle.ELLIPSIS);
+        return new BorderPane(sourceView, header, null, null, null);
     }
 
     private void registerDockable(String id, String title) {
