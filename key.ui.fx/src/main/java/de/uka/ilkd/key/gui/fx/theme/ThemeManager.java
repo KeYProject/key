@@ -27,12 +27,27 @@ public final class ThemeManager {
     /** Property key under which the currently applied stylesheet URL is stored per scene. */
     private static final String SCENE_KEY = "key-ui.theme-stylesheet";
 
+    /**
+     * System property selecting the initial theme ({@code "light"} or {@code "dark"}, default
+     * light). Also handy for UI tests running headless against Xvfb.
+     */
+    public static final String THEME_PROPERTY = "key.fx.theme";
+
     private final List<Scene> scenes = new CopyOnWriteArrayList<>();
 
     private final ReadOnlyObjectWrapper<Theme> currentTheme =
-        new ReadOnlyObjectWrapper<>(this, "theme", Theme.LIGHT);
+        new ReadOnlyObjectWrapper<>(this, "theme", initialTheme());
 
     private ThemeManager() {
+    }
+
+    /**
+     * Determines the initial theme from the {@code key.fx.theme} system property ({@code "light"}
+     * or {@code "dark"}); defaults to light.
+     */
+    private static Theme initialTheme() {
+        String property = System.getProperty(THEME_PROPERTY, "");
+        return Theme.DARK.name().equalsIgnoreCase(property) ? Theme.DARK : Theme.LIGHT;
     }
 
     /**
