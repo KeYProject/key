@@ -659,9 +659,9 @@ public final class MainWindowF {
         automation.getItems().addAll(startAuto, stopAuto);
         proof.getItems().addAll(automation, new SeparatorMenuItem(),
             menuItem("Goal Back", "de.uka.ilkd.key.gui.actions.GoalBackAction",
-                IconFactoryF.Key.GOAL_BACK, this::notYetImplemented),
+                IconFactoryF.Key.GOAL_BACK, mediator::goalBack),
             menuItem("Prune Proof", "de.uka.ilkd.key.gui.actions.PruneProofAction",
-                IconFactoryF.Key.PRUNE, this::notYetImplemented));
+                IconFactoryF.Key.PRUNE, mediator::pruneProof));
         return proof;
     }
 
@@ -708,8 +708,8 @@ public final class MainWindowF {
         ToolBar bar = new ToolBar();
         bar.getStyleClass().add("key-proof-tool-bar");
         bar.getItems().addAll(startAuto, stopAuto,
-            toolbarButton("Goal Back", IconFactoryF.Key.GOAL_BACK, this::notYetImplemented),
-            toolbarButton("Prune Proof", IconFactoryF.Key.PRUNE, this::notYetImplemented));
+            toolbarButton("Goal Back", IconFactoryF.Key.GOAL_BACK, mediator::goalBack),
+            toolbarButton("Prune Proof", IconFactoryF.Key.PRUNE, mediator::pruneProof));
         return bar;
     }
 
