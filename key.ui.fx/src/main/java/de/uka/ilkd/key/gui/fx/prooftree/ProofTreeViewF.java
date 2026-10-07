@@ -183,6 +183,9 @@ public class ProofTreeViewF extends BorderPane {
      */
     private TreeItem<Entry> popupBranchItem;
 
+    /** the node the popup was invoked on (Swing {@code ProofTreeContext.invokedNode}) */
+    private Node popupNode;
+
     /**
      * Listens to structural changes of the displayed proof and schedules a coalesced rebuild on
      * the FX thread — the analogue of the Swing view's {@code GUIProofTreeModel} update calls.
@@ -264,8 +267,13 @@ public class ProofTreeViewF extends BorderPane {
         tree.setOnContextMenuRequested(e -> {
             TreeItem<Entry> selected = tree.getSelectionModel().getSelectedItem();
             TreeItem<Entry> item = selected != null ? selected : tree.getRoot();
-            if (item != null && !item.getValue().isBranch()) {
-                item = item.getParent();
+            if (item != null) {
+                // Swing ProofTreeContext: the invoked node is the clicked entry's node, for node
+                // entries and branch entries alike; the branch item is its parent for node entries
+                popupNode = item.getValue().node();
+                if (!item.getValue().isBranch()) {
+                    item = item.getParent();
+                }
             }
             popupBranchItem = item;
             contextMenu.show(tree, e.getScreenX(), e.getScreenY());
@@ -821,7 +829,10 @@ public class ProofTreeViewF extends BorderPane {
             actionItem("Collapse Other Branches", null, () -> collapseOthers(popupBranchItem)),
             new SeparatorMenuItem(),
             actionItem("Previous Sibling", IconFactoryF.Key.PREVIOUS, () -> gotoSibling(-1)),
-            actionItem("Next Sibling", IconFactoryF.Key.NEXT, () -> gotoSibling(1)));
+            actionItem("Next Sibling", IconFactoryF.Key.NEXT, () -> gotoSibling(1)),
+            new SeparatorMenuItem(),
+            actionItem("Set All Goals Below to Interactive", null, () -> setGoalsBelow(false)),
+            actionItem("Set All Goals Below to Automatic", null, () -> setGoalsBelow(true)));
         menu.setOnShowing(e -> {
             // pick up changes made elsewhere (e.g. by the classic UI sharing the settings)
             hideIntermediateItem.setSelected(hideIntermediateSteps());
@@ -976,6 +987,22 @@ public class ProofTreeViewF extends BorderPane {
                 return;
             }
         }
+    }
+
+    /**
+     * Sets the automatic state of all open goals below the node the popup was invoked on (Swing
+     * {@code SetGoalsBelowEnableStatus}, {@code Proof.getSubtreeGoals}). The goal list picks the
+     * change up via its goal listener; the tree is refreshed because the "hide interactive
+     * goals" filter depends on the goal states.
+     */
+    private void setGoalsBelow(boolean enable) {
+        if (proof == null || proof.isDisposed() || popupNode == null) {
+            return;
+        }
+        for (Goal goal : proof.getSubtreeGoals(popupNode)) {
+            goal.setEnabled(enable);
+        }
+        refresh();
     }
 
     /**
