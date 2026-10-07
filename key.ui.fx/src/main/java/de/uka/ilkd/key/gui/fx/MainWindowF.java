@@ -46,6 +46,7 @@ import de.uka.ilkd.key.gui.fx.docking.DockWorkspace;
 import de.uka.ilkd.key.gui.fx.docking.Dockable;
 import de.uka.ilkd.key.gui.fx.docking.SimpleDockable;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
+import de.uka.ilkd.key.gui.fx.infoview.InfoViewF;
 import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
 import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
@@ -120,6 +121,12 @@ public final class MainWindowF {
      * clicks drive the selection.
      */
     private final ProofTreeViewF proofTreeView = new ProofTreeViewF();
+
+    /**
+     * The info view (first M2 version): shows the proof-level details (name, file, goal/node/
+     * branch counts, closed status) of the selected proof.
+     */
+    private final InfoViewF infoView = new InfoViewF();
 
     /**
      * Creates the main window bound to the given stage.
@@ -202,6 +209,7 @@ public final class MainWindowF {
     private void wireSequentView() {
         sequentView.attach(selectionModel);
         proofTreeView.attach(selectionModel);
+        infoView.attach(selectionModel);
         sequentView.setOnPosSelected(pos -> {
             if (pos == null) {
                 statusRight.setText("");
@@ -344,7 +352,7 @@ public final class MainWindowF {
         registerDockable(ID_GOAL_LIST, "Goal List");
         dockables.put(ID_PROOF_TREE,
             new SimpleDockable(ID_PROOF_TREE, "Proof Tree", proofTreeView));
-        registerDockable(ID_INFO_VIEW, "Info");
+        dockables.put(ID_INFO_VIEW, new SimpleDockable(ID_INFO_VIEW, "Info", infoView));
         registerDockable(ID_STRATEGY, "Strategy");
         dockables.put(ID_SEQUENT, new SimpleDockable(ID_SEQUENT, "Sequent", sequentView));
         registerDockable(ID_SOURCE_VIEW, "Source");
