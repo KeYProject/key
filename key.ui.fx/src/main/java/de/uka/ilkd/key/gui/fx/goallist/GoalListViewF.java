@@ -31,10 +31,13 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.GoalListener;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.SequentChangeInfo;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.javafx.FxUtil;
 
 import org.slf4j.Logger;
@@ -110,6 +113,9 @@ public class GoalListViewF extends ListView<Goal> {
     /** true while this view mutates the items or the ListView selection programmatically */
     private boolean updatingSelection;
 
+    /** guards against queueing more than one pending goal state refresh (see the listener) */
+    private boolean goalStateRefreshPending;
+
     private final KeYSelectionListener selectionListener = new KeYSelectionListener() {
         @Override
         public void selectedNodeChanged(KeYSelectionEvent<Node> event) {
@@ -138,6 +144,38 @@ public class GoalListViewF extends ListView<Goal> {
         getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldItem, newItem) -> handleListSelection(newItem));
     }
+
+    /**
+     * Re-renders the rows when a goal's automatic state changes from anywhere (the goal list
+     * popup, the proof tree popup, ...). The listener is attached to the displayed goals on
+     * rebuild; only {@code automaticStateChanged} is handled, sequent changes are covered by the
+     * proof-level rebuilds. Several goals can change in one batch (the proof tree popup disables
+     * a whole subtree), so the refreshes are coalesced.
+     */
+    private final GoalListener goalStateListener = new GoalListener() {
+        @Override
+        public void automaticStateChanged(Goal source, boolean oldAutomatic,
+                boolean newAutomatic) {
+            if (goalStateRefreshPending) {
+                return;
+            }
+            goalStateRefreshPending = true;
+            FxUtil.runLater(() -> {
+                goalStateRefreshPending = false;
+                refreshAfterGoalStateChange();
+            });
+        }
+
+        @Override
+        public void sequentChanged(Goal source, SequentChangeInfo sci) {
+            // covered by the proof-level rebuilds
+        }
+
+        @Override
+        public void goalReplaced(Goal source, Node parent, ImmutableList<Goal> newGoals) {
+            // covered by the proof-level rebuilds
+        }
+    };
 
     /**
      * Registers this view as a selection listener on the given model and shows the open goals of
@@ -216,6 +254,7 @@ public class GoalListViewF extends ListView<Goal> {
         if (proof != newProof) {
             sequentTextCache.clear();
         }
+        detachGoalStateListener();
         proof = newProof;
         updatingSelection = true;
         try {
@@ -228,11 +267,26 @@ public class GoalListViewF extends ListView<Goal> {
                     goals.add(goal);
                 }
                 getItems().setAll(goals);
+                attachGoalStateListener(goals);
                 setPlaceholder(goals.isEmpty() ? closedPlaceholder() : emptyPlaceholder());
             }
             highlightSelectedGoal();
         } finally {
             updatingSelection = false;
+        }
+    }
+
+    /** Stops observing the goals that are currently displayed, before the items are replaced. */
+    private void detachGoalStateListener() {
+        for (Goal goal : getItems()) {
+            goal.removeGoalListener(goalStateListener);
+        }
+    }
+
+    /** Observes the displayed goals for automatic state changes (see {@code goalStateListener}). */
+    private void attachGoalStateListener(List<Goal> goals) {
+        for (Goal goal : goals) {
+            goal.addGoalListener(goalStateListener);
         }
     }
 
@@ -305,12 +359,10 @@ public class GoalListViewF extends ListView<Goal> {
         }
         ContextMenu menu = new ContextMenu();
 
-        // DisableSingleGoal: the label flips with the goal's state, the action toggles it
+        // DisableSingleGoal: the label flips with the goal's state, the action toggles it; the
+        // row re-render happens through the goal state listener
         MenuItem single = new MenuItem(goal.isAutomatic() ? "Interactive Goal" : "Automatic Goal");
-        single.setOnAction(ev -> {
-            goal.setEnabled(!goal.isAutomatic());
-            refreshAfterGoalStateChange();
-        });
+        single.setOnAction(ev -> goal.setEnabled(!goal.isAutomatic()));
 
         // DisableOtherGoals: all other goals get the opposite of this goal's state; Swing
         // enables the action only when the model holds more than one goal
@@ -324,7 +376,6 @@ public class GoalListViewF extends ListView<Goal> {
                     other.setEnabled(enable);
                 }
             }
-            refreshAfterGoalStateChange();
         });
 
         menu.getItems().addAll(single, others);
@@ -333,8 +384,9 @@ public class GoalListViewF extends ListView<Goal> {
     }
 
     /**
-     * Re-renders the rows after a goal state change (Swing {@code GoalList.updateUI}): the items
-     * are re-set from the proof so every cell recomputes marker text and style.
+     * Re-renders the rows after a goal state change: the items are re-set from the proof so every
+     * cell recomputes marker text and style. Invoked by {@code goalStateListener}; keeping the
+     * selection.
      */
     private void refreshAfterGoalStateChange() {
         if (proof == null || proof.isDisposed()) {
