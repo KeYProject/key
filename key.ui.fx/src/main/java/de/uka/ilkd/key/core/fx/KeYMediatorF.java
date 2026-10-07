@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.core.fx;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
+
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.java.Services;
@@ -63,6 +66,13 @@ public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
 
     /** the proof control this mediator is attached to, may be {@code null} until M3. */
     private ProofControl proofControl;
+
+    /**
+     * Observable auto mode state for the UI (buttons and menu items bind their enabled state to
+     * it); updated on the FX thread from the auto mode events.
+     */
+    private final ReadOnlyBooleanWrapper autoModeRunning =
+        new ReadOnlyBooleanWrapper(this, "autoModeRunning");
 
     /**
      * Creates the mediator. The selection model is owned by the mediator; views and the main
@@ -169,6 +179,37 @@ public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
     }
 
     /**
+     * @return the observable auto mode state (updated on the FX thread); the automatic proof
+     *         buttons and menu items bind their disabled state to it
+     */
+    public ReadOnlyBooleanProperty autoModeRunningProperty() {
+        return autoModeRunning.getReadOnlyProperty();
+    }
+
+    /**
+     * Starts the automatic prover on the selected proof (Swing {@code AutoModeAction}: guarded by
+     * {@code isInAutoMode} and {@code ProofControl#isAutoModeSupported}, then
+     * {@code startAutoMode(proof, proof.openEnabledGoals())}). No-op without an attached proof
+     * control, without a selected proof, while a run is active or when auto mode is not supported
+     * for the proof.
+     */
+    public void startAutoMode() {
+        Proof proof = getSelectedProof();
+        if (proofControl == null || proof == null || inAutoMode
+                || !proofControl.isAutoModeSupported(proof)) {
+            return;
+        }
+        proofControl.startAutoMode(proof, proof.openEnabledGoals());
+    }
+
+    /** Stops the running automatic prover (Swing {@code AutoModeAction}); no-op when idle. */
+    public void stopAutoMode() {
+        if (proofControl != null && inAutoMode) {
+            proofControl.stopAutoMode();
+        }
+    }
+
+    /**
      * Counts a closed goal (called when a rule application produced no new goals).
      */
     public void closedAGoal() {
@@ -241,11 +282,13 @@ public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
         public void autoModeStarted(ProofEvent e) {
             inAutoMode = true;
             resetNrGoalsClosedByHeuristics();
+            FxUtil.runLater(() -> autoModeRunning.set(true));
         }
 
         @Override
         public void autoModeStopped(ProofEvent e) {
             inAutoMode = false;
+            FxUtil.runLater(() -> autoModeRunning.set(false));
         }
     }
 }

@@ -27,6 +27,8 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -196,6 +198,9 @@ public final class MainWindowF {
 
         Scene scene = new Scene(root, 1100, 800);
         ThemeManager.getInstance().manage(scene);
+        // the global action keys of the Swing AutoModeAction (Ctrl+Space starts, Escape stops);
+        // an open search bar consumes Escape itself, so it never stops a run while visible
+        scene.setOnKeyPressed(this::handleMainWindowKeyPressed);
         stage.setScene(scene);
         stage.show();
 
@@ -287,8 +292,10 @@ public final class MainWindowF {
         };
         loadTask.setOnSucceeded(event -> {
             KeYEnvironment<DefaultUserInterfaceControl> env = loadTask.getValue();
-            // the mediator observes the proof control (auto mode state, closed-goal counter)
+            // the mediator observes the proof control (auto mode state, closed-goal counter);
+            // the UI's own listener refreshes the views after interactive auto mode runs
             mediator.attach(env.getProofControl());
+            env.getProofControl().addAutoModeListener(autoModeUiListener);
             // route the proof through the selection model: setSelectedProof invokes the
             // mediator's setProof (listener swap, abbreviation rebind, OSS refresh) and then
             // selects the first open goal or a leaf, which the views observe.
@@ -455,6 +462,47 @@ public final class MainWindowF {
         updateProofStatus();
     }
 
+    /**
+     * The global action keys of the Swing {@code AutoModeAction}: {@code Ctrl+Space} starts the
+     * automatic prover on the selected proof, {@code Escape} stops a running one. The scene
+     * handler sees the key events that no focused control consumed — an open search bar consumes
+     * {@code Escape} itself (Swing parity: the Swing search bars behave the same against the
+     * global stop shortcut).
+     */
+    private void handleMainWindowKeyPressed(KeyEvent event) {
+        if (event.getCode() == KeyCode.SPACE && event.isControlDown()) {
+            mediator.startAutoMode();
+            event.consume();
+        } else if (event.getCode() == KeyCode.ESCAPE) {
+            mediator.stopAutoMode();
+            event.consume();
+        }
+    }
+
+    /**
+     * The UI's own auto mode listener: refreshes the views from the final state after an
+     * <em>interactive</em> auto mode run (Swing {@code MainWindow.autoModeStopped}). The demo's
+     * live run has its own listener which also runs the verification reports; the UI listener
+     * skips the refresh in that case to avoid the duplicate work.
+     */
+    private final AutoModeListener autoModeUiListener = new AutoModeListener() {
+        @Override
+        public void autoModeStarted(ProofEvent e) {
+            LOGGER.info("Auto mode started");
+        }
+
+        @Override
+        public void autoModeStopped(ProofEvent e) {
+            if (System.getProperty("key.fx.demo.autoprove.live") != null) {
+                return; // the demo listener handles the final state incl. the verification reports
+            }
+            FxUtil.runLater(() -> {
+                refreshViewsFromFinalState();
+                LOGGER.info("Views refreshed after the auto mode stop");
+            });
+        }
+    };
+
     private void setWindowIcons() {
         Image icon = new Image(MainWindowF.class.getResourceAsStream(IMAGE_DIR
             + "key-color-icon-square.png"));
@@ -601,11 +649,14 @@ public final class MainWindowF {
     private Menu buildProofMenu() {
         Menu proof = new Menu("Proof");
         Menu automation = new Menu("Automation");
-        automation.getItems().addAll(
+        MenuItem startAuto =
             menuItem("Start Automatic Proof", "de.uka.ilkd.key.gui.actions.AutoModeAction",
-                IconFactoryF.Key.AUTO_MODE_START, this::notYetImplemented),
-            menuItem("Stop Automatic Proof", IconFactoryF.Key.AUTO_MODE_STOP,
-                this::notYetImplemented));
+                IconFactoryF.Key.AUTO_MODE_START, mediator::startAutoMode);
+        startAuto.disableProperty().bind(mediator.autoModeRunningProperty());
+        MenuItem stopAuto = menuItem("Stop Automatic Proof", IconFactoryF.Key.AUTO_MODE_STOP,
+            mediator::stopAutoMode);
+        stopAuto.disableProperty().bind(mediator.autoModeRunningProperty().not());
+        automation.getItems().addAll(startAuto, stopAuto);
         proof.getItems().addAll(automation, new SeparatorMenuItem(),
             menuItem("Goal Back", "de.uka.ilkd.key.gui.actions.GoalBackAction",
                 IconFactoryF.Key.GOAL_BACK, this::notYetImplemented),
@@ -646,19 +697,24 @@ public final class MainWindowF {
     }
 
     private ToolBar buildProofToolBar() {
+        javafx.scene.control.Button startAuto =
+            toolbarButton("Start Automatic Proof (Ctrl+Space)", IconFactoryF.Key.AUTO_MODE_START,
+                mediator::startAutoMode);
+        startAuto.disableProperty().bind(mediator.autoModeRunningProperty());
+        javafx.scene.control.Button stopAuto =
+            toolbarButton("Stop Automatic Proof (Escape)", IconFactoryF.Key.AUTO_MODE_STOP,
+                mediator::stopAutoMode);
+        stopAuto.disableProperty().bind(mediator.autoModeRunningProperty().not());
         ToolBar bar = new ToolBar();
         bar.getStyleClass().add("key-proof-tool-bar");
-        bar.getItems().addAll(
-            toolbarButton("Start Automatic Proof", IconFactoryF.Key.AUTO_MODE_START,
-                this::notYetImplemented),
-            toolbarButton("Stop Automatic Proof", IconFactoryF.Key.AUTO_MODE_STOP,
-                this::notYetImplemented),
+        bar.getItems().addAll(startAuto, stopAuto,
             toolbarButton("Goal Back", IconFactoryF.Key.GOAL_BACK, this::notYetImplemented),
             toolbarButton("Prune Proof", IconFactoryF.Key.PRUNE, this::notYetImplemented));
         return bar;
     }
 
-    private Node toolbarButton(String tooltip, IconFactoryF.Key icon, Runnable action) {
+    private javafx.scene.control.Button toolbarButton(String tooltip, IconFactoryF.Key icon,
+            Runnable action) {
         javafx.scene.control.Button button =
             new javafx.scene.control.Button(null, IconFactoryF.createIcon(icon));
         button.setTooltip(new Tooltip(tooltip));
