@@ -299,8 +299,9 @@ Auto-scroll output (`true`) and show tool activity (`true`).
 Editors for the user libraries described in [section 5](#5-skills) and [section 6](#6-prompts):
 the entries are shown as a selectable list (name + description), `New`/`Edit` (or double click)
 open a dialog with the full form and `Delete` removes the selected entry. `Export...` saves the
-whole library as a JSON file, `Import...` merges one back in (new entries are added, entries with
-an existing name are updated). Changes are saved immediately.
+whole library as a JSON file, `Import...` merges one back in (new entries are added; entries with
+an existing name are only overwritten after you confirm, otherwise they are kept). Changes are
+saved immediately.
 
 ---
 
