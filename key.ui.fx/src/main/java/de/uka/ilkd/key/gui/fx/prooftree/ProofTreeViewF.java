@@ -5,10 +5,12 @@
 package de.uka.ilkd.key.gui.fx.prooftree;
 
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
@@ -20,8 +22,13 @@ import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeListener;
 
 import org.key_project.util.javafx.FxUtil;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * First JavaFX version of the proof tree view, the counter-part of
@@ -38,10 +45,12 @@ import org.key_project.util.javafx.FxUtil;
  * <p>
  * Deliberately deferred to later M2/M3 chunks: search, filters (ProofTreeViewFilter), heatmap,
  * notes/tooltips of the rich Swing renderer, one-step-simplifier protocol children, lazy
- * population for very large proofs (currently built eagerly), and live updates on rule
- * applications.
+ * population for very large proofs (currently built eagerly), and incremental per-event tree
+ * model updates (live updates currently coalesce into a full rebuild).
  */
 public class ProofTreeViewF extends TreeView<ProofTreeViewF.Entry> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProofTreeViewF.class);
 
     /**
      * One tree entry: either a proof node entry (a rule application) or a branch entry (labeled
@@ -87,6 +96,64 @@ public class ProofTreeViewF extends TreeView<ProofTreeViewF.Entry> {
     private KeYSelectionModel selectionModel;
     private Proof proof;
     private boolean updatingSelection;
+
+    /**
+     * Coalescing flag for live updates: structural proof events (which can arrive in bursts from
+     * the prover thread) schedule at most one refresh.
+     */
+    private volatile boolean refreshScheduled;
+
+    /** Number of proof tree events observed since the current proof was set (verification). */
+    private final AtomicInteger liveEventCount = new AtomicInteger();
+
+    /** Number of coalesced refreshes executed for live events (verification). */
+    private final AtomicInteger liveRefreshCount = new AtomicInteger();
+
+    /**
+     * Listens to structural changes of the displayed proof and schedules a coalesced rebuild on
+     * the FX thread — the analogue of the Swing view's {@code GUIProofTreeModel} update calls.
+     */
+    private final ProofTreeListener proofTreeListener = new ProofTreeListener() {
+        @Override
+        public void proofExpanded(ProofTreeEvent e) {
+            handleProofTreeEvent();
+        }
+
+        @Override
+        public void proofPruned(ProofTreeEvent e) {
+            handleProofTreeEvent();
+        }
+
+        @Override
+        public void proofStructureChanged(ProofTreeEvent e) {
+            handleProofTreeEvent();
+        }
+
+        @Override
+        public void proofClosed(ProofTreeEvent e) {
+            handleProofTreeEvent();
+        }
+
+        @Override
+        public void proofGoalRemoved(ProofTreeEvent e) {
+            handleProofTreeEvent();
+        }
+
+        @Override
+        public void proofGoalsAdded(ProofTreeEvent e) {
+            handleProofTreeEvent();
+        }
+
+        @Override
+        public void proofGoalsChanged(ProofTreeEvent e) {
+            handleProofTreeEvent();
+        }
+
+        @Override
+        public void notesChanged(ProofTreeEvent e) {
+            handleProofTreeEvent();
+        }
+    };
 
     private final KeYSelectionListener selectionListener = new KeYSelectionListener() {
         @Override
@@ -140,7 +207,18 @@ public class ProofTreeViewF extends TreeView<ProofTreeViewF.Entry> {
             FxUtil.runLater(() -> setProof(newProof));
             return;
         }
-        proof = newProof;
+        Proof oldProof = this.proof;
+        this.proof = newProof;
+        if (oldProof != newProof) {
+            if (oldProof != null) {
+                oldProof.removeProofTreeListener(proofTreeListener);
+            }
+            if (newProof != null) {
+                newProof.addProofTreeListener(proofTreeListener);
+            }
+            liveEventCount.set(0);
+            liveRefreshCount.set(0);
+        }
         updatingSelection = true;
         try {
             if (proof == null) {
@@ -156,10 +234,80 @@ public class ProofTreeViewF extends TreeView<ProofTreeViewF.Entry> {
     }
 
     /**
-     * Rebuilds the tree from the current proof (used when rule applications changed it).
+     * Rebuilds the tree from the current proof, preserving the expansion state of the branches
+     * and the selection. Used when rule applications changed the proof (live updates) and by the
+     * self tests.
      */
     public void refresh() {
+        if (proof == null) {
+            setProof(null);
+            return;
+        }
+        Set<Node> expandedBranches = Collections.newSetFromMap(new IdentityHashMap<>());
+        collectExpandedBranches(getRoot(), expandedBranches);
         setProof(proof);
+        if (getRoot() != null) {
+            applyExpandedBranches(getRoot(), expandedBranches);
+            revealSelectedNode();
+        }
+    }
+
+    /**
+     * Coalesces structural proof events into at most one scheduled rebuild: events arrive in
+     * bursts from the prover thread and a full rebuild of the current proof state covers all of
+     * them.
+     */
+    private void handleProofTreeEvent() {
+        liveEventCount.incrementAndGet();
+        if (refreshScheduled) {
+            return;
+        }
+        refreshScheduled = true;
+        FxUtil.runLater(() -> {
+            refreshScheduled = false;
+            if (proof == null) {
+                return;
+            }
+            liveRefreshCount.incrementAndGet();
+            try {
+                refresh();
+            } catch (ConcurrentModificationException | IndexOutOfBoundsException e) {
+                // the proof was mutated concurrently while the tree was rebuilt; the
+                // corresponding structural event schedules another coalesced refresh
+                LOGGER.debug("Proof tree refresh raced with proof mutation, retrying", e);
+                handleProofTreeEvent();
+            }
+        });
+    }
+
+    /**
+     * @return a one-line report about the observed live proof tree events and the executed
+     *         coalesced refreshes (for the M2 verification)
+     */
+    public String getLiveUpdateReport() {
+        return "liveEvents=" + liveEventCount.get() + " liveRefreshes=" + liveRefreshCount.get();
+    }
+
+    private static void collectExpandedBranches(TreeItem<Entry> item, Set<Node> into) {
+        if (item == null) {
+            return;
+        }
+        if (item.isExpanded() && item.getValue() != null && item.getValue().isBranch()) {
+            into.add(item.getValue().node());
+        }
+        for (TreeItem<Entry> child : item.getChildren()) {
+            collectExpandedBranches(child, into);
+        }
+    }
+
+    private static void applyExpandedBranches(TreeItem<Entry> item, Set<Node> expandedBranches) {
+        if (item.getValue() != null && item.getValue().isBranch()
+                && expandedBranches.contains(item.getValue().node())) {
+            item.setExpanded(true);
+        }
+        for (TreeItem<Entry> child : item.getChildren()) {
+            applyExpandedBranches(child, expandedBranches);
+        }
     }
 
     /**
@@ -215,8 +363,12 @@ public class ProofTreeViewF extends TreeView<ProofTreeViewF.Entry> {
             }
             break;
         }
-        // at a branch point (or a leaf): one branch item per child
-        for (Node child : current.children()) {
+        // at a branch point (or a leaf): one branch item per child. Read by index instead of
+        // iterating the live children list: the prover thread may add children concurrently
+        // (ArrayList view); a concurrent mutation is healed by the next structural event.
+        int branchCount = current.childrenCount();
+        for (int i = 0; i < branchCount; i++) {
+            Node child = current.child(i);
             branchItem.getChildren().add(buildBranch(child, ensureBranchLabelIsSet(child)));
         }
         return branchItem;
