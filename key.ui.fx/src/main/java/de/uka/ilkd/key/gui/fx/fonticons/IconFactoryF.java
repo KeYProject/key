@@ -64,12 +64,22 @@ public final class IconFactoryF {
         PROOF_SEARCH_STRATEGY(FontAwesomeSolid.COG),
         KEY_HOLE(FontAwesomeSolid.KEY),
         KEY_HOLE_INTERACTIVE(FontAwesomeSolid.HAND_PAPER),
-        KEY_HOLE_LINKED(FontAwesomeSolid.LINK);
+        KEY_HOLE_LINKED(FontAwesomeSolid.LINK),
+        WARNING_INCOMPLETE(FontAwesomeSolid.EXCLAMATION_TRIANGLE, "key-icon-warning"),
+        WARNING_UNSOUND(FontAwesomeSolid.EXCLAMATION_TRIANGLE, "key-icon-error");
 
         private final IconFont glyph;
 
+        /** an optional extra style class giving the icon its themed color, may be null */
+        private final String colorStyleClass;
+
         Key(IconFont glyph) {
+            this(glyph, null);
+        }
+
+        Key(IconFont glyph, String colorStyleClass) {
             this.glyph = glyph;
+            this.colorStyleClass = colorStyleClass;
         }
 
         /**
@@ -101,7 +111,11 @@ public final class IconFactoryF {
      * @return a new icon node
      */
     public static Node createIcon(Key key, double size) {
-        return createIcon(key.glyph(), size);
+        Node node = createIcon(key.glyph(), size);
+        if (key.colorStyleClass != null) {
+            node.getStyleClass().add(key.colorStyleClass);
+        }
+        return node;
     }
 
     /**

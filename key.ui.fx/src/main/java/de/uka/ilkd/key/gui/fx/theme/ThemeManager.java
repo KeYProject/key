@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.fx.theme;
 
-import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 
@@ -33,7 +33,8 @@ public final class ThemeManager {
      */
     public static final String THEME_PROPERTY = "key.fx.theme";
 
-    private final List<Scene> scenes = new CopyOnWriteArrayList<>();
+    private final ObservableList<Scene> scenes =
+        FXCollections.observableList(new CopyOnWriteArrayList<>());
 
     private final ReadOnlyObjectWrapper<Theme> currentTheme =
         new ReadOnlyObjectWrapper<>(this, "theme", initialTheme());
@@ -69,6 +70,14 @@ public final class ThemeManager {
             scenes.add(scene);
         }
         updateScene(scene);
+    }
+
+    /**
+     * @return the managed scenes (observable, so listeners can follow scene registration, e.g.
+     *         the {@code ColorSettingsF} applying its CSS overrides to new scenes)
+     */
+    public ObservableList<Scene> getScenes() {
+        return scenes;
     }
 
     /**
