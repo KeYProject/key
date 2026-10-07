@@ -289,8 +289,10 @@ max model listing entries `1000`.
 | Blocked shell patterns | built-in blocklist, one regex per line |
 
 ### Tools (sub-panel: LLM Settings → Tools)
-One row per tool with three checkboxes: **Disabled**, **With approval**, **Without approval
-(always)**. Read tools are auto-approved by default; `run_command` asks by default.
+One row per tool with a short explanation and a radio group selecting its permission:
+**Default** (the tool's own behavior, `auto` or `ask`), **With approval** (always ask),
+**Without approval (always)** or **Disabled** (not sent to the model). Read-only tools default to
+`auto`, `run_command` to `ask`.
 
 ### User interface
 Auto-scroll output (`true`) and show tool activity (`true`).
