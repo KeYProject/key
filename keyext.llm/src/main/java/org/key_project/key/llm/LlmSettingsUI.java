@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.llm;
 
 import java.awt.FlowLayout;
@@ -36,6 +37,10 @@ public class LlmSettingsUI extends SettingsPanel {
 
     public LlmSettingsUI(LlmSettings settings) {
         model = new LlmSettings(settings);
+
+        setHeaderText("LLM Settings");
+        setSubHeaderText("Connection, agent behavior, context and history budgets, file handling,"
+            + " shell security and chat appearance for the KeY-Agent.");
 
         addSeparator("Connection");
         txtApiBaseUrl = addTextField("API Base URL", model.getApiEndpoint(), "",

@@ -1,27 +1,39 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.llm;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.util.List;
 import javax.swing.*;
+
+import de.uka.ilkd.key.gui.settings.SettingsPanel;
 
 import org.jspecify.annotations.Nullable;
 
 /**
  * Embedded editor for the user-defined prompts ({@link PromptLibrary}) shown in the LLM settings
- * panel.
+ * panel. The form follows the usual KeY settings layout: label, input and help icon per row.
  *
  * @author Alexander Weigl
  */
 public class PromptLibraryEditor extends LibraryEditorPanel<Prompt> {
+    /** Explanations shown as help icons behind the form fields. */
+    static final String HELP_NAME =
+        "A unique short identifier (letters, digits, '_', '-'). It is also the file name and the"
+            + " trigger for /prompt:NAME.";
+    static final String HELP_DESCRIPTION =
+        "A short summary shown in the chat (/prompts).";
+    static final String HELP_TEMPLATE =
+        "The prompt text inserted into the chat when the prompt is used. Placeholders such as"
+            + " $seq, $goals or file references @path are resolved at insertion time.";
+
     private final JTextArea template = new JTextArea(8, 50);
 
     public PromptLibraryEditor() {
-        super();
+        super("Prompts",
+            "Reusable prompt templates for the chat; insert them with /prompt:NAME. Changes are"
+                + " saved immediately.");
         template.setLineWrap(true);
         template.setWrapStyleWord(true);
         setForm(buildForm());
@@ -29,37 +41,13 @@ public class PromptLibraryEditor extends LibraryEditorPanel<Prompt> {
     }
 
     private JComponent buildForm() {
-        var form = new JPanel(new GridBagLayout());
-        var gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = new Insets(4, 4, 4, 4);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        form.add(new JLabel("Name (letters, digits, '_', '-'):"), gbc);
-        gbc.gridx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1;
-        form.add(txtName, gbc);
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.weightx = 0;
-        form.add(new JLabel("Description:"), gbc);
-        gbc.gridx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1;
-        form.add(txtDescription, gbc);
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.weightx = 0;
-        form.add(new JLabel("Template:"), gbc);
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weighty = 1;
-        form.add(new JScrollPane(template), gbc);
-        return form;
+        return new SettingsPanel() {
+            {
+                addTitledComponent("Name", txtName, HELP_NAME);
+                addTitledComponent("Description", txtDescription, HELP_DESCRIPTION);
+                addTitledComponent("Template", new JScrollPane(template), HELP_TEMPLATE);
+            }
+        };
     }
 
     @Override

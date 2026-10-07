@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.llm;
 
 import javax.swing.*;
@@ -23,7 +24,10 @@ public class LlmToolsPanel extends SettingsPanel {
     public LlmToolsPanel(LlmSettings model) {
         this.model = model;
 
-        addSeparator("Tools");
+        setHeaderText("Tools");
+        setSubHeaderText("Control which tools the KeY-Agent may call and whether they require"
+            + " approval. Disabled tools are not sent to the model at all.");
+
         var mcpClient = new BuiltInMCPClient().getAllToolNames().stream().toList();
         var name = new Column<String, String>("Name", String.class, s -> s);
         var disabled = new Column<String, Boolean>("Disabled", Boolean.class,
@@ -54,8 +58,10 @@ public class LlmToolsPanel extends SettingsPanel {
                         model.getAllowedToolsWithoutApproval().remove(s);
                     }
                 });
-        table = addTableBox("Tools", "Disable tools, or change their approval"
-            + " behavior. Disabled tools are not sent to the model at all.", mcpClient, name,
+        table = addTableBox("Tool approval",
+            "Disable tools, or change their approval"
+                + " behavior. Disabled tools are not sent to the model at all.",
+            mcpClient, name,
             disabled, withApproval, withoutApproval);
 
         // Set checkbox editor and renderer for boolean columns
