@@ -306,6 +306,11 @@ public final class MainWindowF {
                         .notify("Position mapping verification: " + report,
                             report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
                 statusRight.setText(report);
+                String hlReport = sequentView.verifySyntaxHighlighting();
+                LOGGER.info("Sequent syntax highlighting verification: {}", hlReport);
+                NotificationManagerF.getInstance()
+                        .notify("Syntax highlighting verification: " + hlReport,
+                            hlReport.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
             }
             if (System.getProperty("key.fx.verify.sequentsearch") != null
                     && System.getProperty("key.fx.demo.autoprove.live") == null) {
@@ -557,6 +562,9 @@ public final class MainWindowF {
         CheckMenuItem prettyPrint = new CheckMenuItem("Pretty Print");
         CheckMenuItem unicode = new CheckMenuItem("Unicode Symbols");
         CheckMenuItem syntaxHighlighting = new CheckMenuItem("Syntax Highlighting");
+        syntaxHighlighting.setSelected(sequentView.isSyntaxHighlightingEnabled());
+        syntaxHighlighting.setOnAction(
+            e -> sequentView.setSyntaxHighlightingEnabled(syntaxHighlighting.isSelected()));
 
         ToggleGroup themeGroup = new ToggleGroup();
         RadioMenuItem lightTheme = new RadioMenuItem("Light Theme");
