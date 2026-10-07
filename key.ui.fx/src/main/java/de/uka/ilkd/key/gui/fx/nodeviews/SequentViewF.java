@@ -128,6 +128,12 @@ public class SequentViewF extends BorderPane {
     private String printed;
     private Range highlightedRange;
 
+    /** Syntax highlighting on/off (Swing View menu, on by default). */
+    private boolean syntaxHighlighting = true;
+
+    /** The syntax highlight intervals of the current printing, sorted by start. */
+    private List<SequentSyntaxHighlighterF.Highlight> syntaxHighlights = List.of();
+
     // search state (Swing SequentViewSearchBar)
     /** the matches of the current query as {@code [start, end)} ranges into {@link #printed}. */
     private final List<int[]> searchMatches = new ArrayList<>();
@@ -308,7 +314,32 @@ public class SequentViewF extends BorderPane {
         // TODO(M2): compute the line width from the font metrics and the viewport width
         printer.update(filter, PosTableLayouter.DEFAULT_LINE_WIDTH);
         printed = printer.result();
+        syntaxHighlights = syntaxHighlighting
+                ? SequentSyntaxHighlighterF.highlight(printed, selectedNode)
+                : List.of();
+        syntaxHighlights.sort((a, b) -> Integer.compare(a.start(), b.start()));
         rebuildRuns();
+    }
+
+    /**
+     * Switches the syntax highlighting of the printed sequent (Swing View menu "Syntax
+     * Highlighting").
+     *
+     * @param enabled {@code true} to color keywords, program variables and comments
+     */
+    public void setSyntaxHighlightingEnabled(boolean enabled) {
+        if (syntaxHighlighting == enabled) {
+            return;
+        }
+        syntaxHighlighting = enabled;
+        printSequent();
+    }
+
+    /**
+     * @return whether the syntax highlighting of the printed sequent is enabled
+     */
+    public boolean isSyntaxHighlightingEnabled() {
+        return syntaxHighlighting;
     }
 
     /**
@@ -514,52 +545,85 @@ public class SequentViewF extends BorderPane {
         }
         Font font = ConfigF.DEFAULT.monoFont();
 
-        // highlight intervals: the clicked term plus the search matches; the current search
+        // syntax highlight intervals (one category wins per segment, see priority below)
+        List<SequentSyntaxHighlighterF.Highlight> syntax = syntaxHighlights;
+
+        // overlay intervals: the clicked term plus the search matches; the current search
         // match is styled stronger (Swing highlight_1 vs highlight_2)
-        List<int[]> intervals = new ArrayList<>();
-        List<String> intervalStyles = new ArrayList<>();
+        List<int[]> overlays = new ArrayList<>();
+        List<String> overlayStyles = new ArrayList<>();
         if (highlightedRange != null) {
             int start = Math.clamp(highlightedRange.start(), 0, printed.length());
             int end = Math.clamp(highlightedRange.start() + highlightedRange.length(), start,
                 printed.length());
             if (end > start) {
-                intervals.add(new int[] { start, end });
-                intervalStyles.add("sequent-term-highlight");
+                overlays.add(new int[] { start, end });
+                overlayStyles.add("sequent-term-highlight");
             }
         }
         for (int i = 0; i < searchMatches.size(); i++) {
-            intervals.add(searchMatches.get(i));
-            intervalStyles.add(i == searchResultPos ? "sequent-search-match-current"
+            overlays.add(searchMatches.get(i));
+            overlayStyles.add(i == searchResultPos ? "sequent-search-match-current"
                     : "sequent-search-match");
         }
-        if (intervals.isEmpty()) {
+        if (syntax.isEmpty() && overlays.isEmpty()) {
             addRun(printed, font, "sequent-text");
             return;
         }
 
-        // split the text at every interval boundary and style each segment with the classes of
-        // all intervals covering it
+        // split the text at every interval boundary; each segment is then uniformly covered by
+        // the intervals that overlap it
         TreeSet<Integer> points = new TreeSet<>();
         points.add(0);
         points.add(printed.length());
-        for (int[] interval : intervals) {
-            if (interval[0] > 0 && interval[0] < printed.length()) {
-                points.add(interval[0]);
+        for (SequentSyntaxHighlighterF.Highlight highlight : syntax) {
+            if (highlight.start() > 0 && highlight.start() < printed.length()) {
+                points.add(highlight.start());
             }
-            if (interval[1] > 0 && interval[1] < printed.length()) {
-                points.add(interval[1]);
+            if (highlight.end() > 0 && highlight.end() < printed.length()) {
+                points.add(highlight.end());
             }
         }
+        for (int[] overlay : overlays) {
+            if (overlay[0] > 0 && overlay[0] < printed.length()) {
+                points.add(overlay[0]);
+            }
+            if (overlay[1] > 0 && overlay[1] < printed.length()) {
+                points.add(overlay[1]);
+            }
+        }
+
+        // sweep over the segments: the syntax intervals starting at or before the segment become
+        // active, ended ones drop out; the winner is the lowest priority among the active ones
+        // (mirrors the innermost-wins nesting of the Swing HTML spans)
+        List<SequentSyntaxHighlighterF.Highlight> active = new ArrayList<>();
+        int pointer = 0;
         Integer[] sorted = points.toArray(new Integer[0]);
         for (int p = 0; p < sorted.length - 1; p++) {
             int start = sorted[p];
             int end = sorted[p + 1];
+            while (pointer < syntax.size() && syntax.get(pointer).start() <= start) {
+                active.add(syntax.get(pointer++));
+            }
+            active.removeIf(highlight -> highlight.end() <= start);
             List<String> styles = new ArrayList<>();
             styles.add("sequent-text");
-            for (int i = 0; i < intervals.size(); i++) {
-                int[] interval = intervals.get(i);
-                if (interval[0] <= start && end <= interval[1]) {
-                    styles.add(intervalStyles.get(i));
+            if (!active.isEmpty()) {
+                SequentSyntaxHighlighterF.Kind winner = active.get(0).kind();
+                int winnerPriority = SequentSyntaxHighlighterF.priority(winner);
+                for (SequentSyntaxHighlighterF.Highlight highlight : active) {
+                    int priority = SequentSyntaxHighlighterF.priority(highlight.kind());
+                    if (priority < winnerPriority) {
+                        winnerPriority = priority;
+                        winner = highlight.kind();
+                    }
+                }
+                styles.add(SequentSyntaxHighlighterF.styleClass(winner));
+            }
+            for (int i = 0; i < overlays.size(); i++) {
+                int[] overlay = overlays.get(i);
+                if (overlay[0] <= start && end <= overlay[1]) {
+                    styles.add(overlayStyles.get(i));
                 }
             }
             addRun(printed.substring(start, end), font, styles.toArray(new String[0]));
@@ -632,6 +696,35 @@ public class SequentViewF extends BorderPane {
                 && wrapped == count - 1 && searchMatches.isEmpty();
         return "query=" + query + " matches=" + count + " next=" + first + "," + second + ","
             + back + "," + wrapped + " rangesOk=" + rangesOk + " " + (pass ? "PASS" : "FAIL");
+    }
+
+    /**
+     * Development self-test (M2): verifies the syntax highlighting of the current printing — the
+     * intervals must be valid ranges of the printed text, at least the sequent arrow must be
+     * highlighted, and the category of every interval must map to a style class.
+     *
+     * @return a one-line report, {@code "... PASS"} if the highlighting behaves as expected
+     */
+    public String verifySyntaxHighlighting() {
+        if (printed == null) {
+            return "no printed sequent";
+        }
+        int arrows = 0;
+        int progvars = 0;
+        boolean inBounds = true;
+        for (SequentSyntaxHighlighterF.Highlight highlight : syntaxHighlights) {
+            inBounds &= highlight.start() >= 0 && highlight.end() > highlight.start()
+                    && highlight.end() <= printed.length();
+            if (highlight.kind() == SequentSyntaxHighlighterF.Kind.ARROW) {
+                arrows++;
+            }
+            if (highlight.kind() == SequentSyntaxHighlighterF.Kind.PROGVAR) {
+                progvars++;
+            }
+        }
+        boolean pass = inBounds && !syntaxHighlights.isEmpty() && arrows >= 1;
+        return "intervals=" + syntaxHighlights.size() + " arrows=" + arrows + " progvars="
+            + progvars + " inBounds=" + inBounds + " " + (pass ? "PASS" : "FAIL");
     }
 
     /**

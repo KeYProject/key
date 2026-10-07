@@ -106,6 +106,40 @@
     -fx-fill: -key-text-secondary;
 }
 
+/* syntax highlighting of the printed sequent (Swing HTMLSyntaxHighlighter colors);
+   these rules must stay before the search rules so the search and click highlights
+   override the syntax coloring for -fx-fill */
+.sequent-hl-prop {
+    -fx-font-weight: bold;
+}
+
+.sequent-hl-dyn {
+    -fx-fill: #9696fa;
+    -fx-font-weight: bold;
+}
+
+.sequent-hl-java {
+    -fx-fill: #cf50a5;
+    -fx-font-weight: bold;
+}
+
+.sequent-hl-progvar {
+    -fx-fill: #6464fa;
+}
+
+.sequent-hl-comment {
+    -fx-fill: #9fbf9f;
+}
+
+.sequent-hl-jml {
+    -fx-fill: #8888cf;
+}
+
+.sequent-hl-arrow {
+    -fx-fill: #6464fa;
+    -fx-font-weight: bold;
+}
+
 /* sequent search bar (M2, Swing SequentViewSearchBar) */
 .sequent-search-bar {
     -fx-background-color: -key-surface;
