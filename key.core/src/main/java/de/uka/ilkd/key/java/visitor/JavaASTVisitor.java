@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.Annotation;
 import de.uka.ilkd.key.java.ast.ccatch.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.expression.*;
@@ -330,6 +331,17 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
+    public void performActionOnAnnotationInterfaceDeclaration(AnnotationInterfaceDeclaration x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnAnnotationInterfaceMemberDeclaration(
+            AnnotationInterfaceMemberDeclaration x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnIntLiteral(IntLiteral x) {
         doDefaultAction(x);
     }
@@ -432,6 +444,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnParenthesizedExpression(ParenthesizedExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnAnnotation(Annotation x) {
         doDefaultAction(x);
     }
 

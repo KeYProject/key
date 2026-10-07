@@ -4,10 +4,13 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.reference;
 
+import de.uka.ilkd.key.java.ast.Annotation;
 import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * TypeReferences reference Types by name. A TypeReference can refer to
@@ -28,4 +31,6 @@ public interface TypeReference extends TypeReferenceInfix, TypeReferenceContaine
     int getDimensions();
 
     KeYJavaType getKeYJavaType();
+
+    ImmutableList<Annotation> getAnnotations();
 }

@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -234,8 +235,9 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 KeYJavaASTFactory.assign(thrownExc, excParam) };
 
             Catch ctch =
-                KeYJavaASTFactory.catchClause(KeYJavaASTFactory.parameterDeclaration(javaInfo,
-                    javaInfo.getKeYJavaType("java.lang.Throwable"), excParam), catchStatements);
+                KeYJavaASTFactory.catchClause(KeYJavaASTFactory.parameterDeclaration(
+                    new TypeRef(javaInfo.getKeYJavaType("java.lang.Throwable")), excParam),
+                    catchStatements);
 
             Branch[] branch = { ctch };
             Statement res = KeYJavaASTFactory.tryBlock(newBody, branch);
@@ -298,8 +300,9 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 KeYJavaASTFactory.assign(thrownExc, excParam) };
 
             Catch ctch =
-                KeYJavaASTFactory.catchClause(KeYJavaASTFactory.parameterDeclaration(javaInfo,
-                    javaInfo.getKeYJavaType("java.lang.Throwable"), excParam), catchStatements);
+                KeYJavaASTFactory.catchClause(KeYJavaASTFactory.parameterDeclaration(
+                    new TypeRef(javaInfo.getKeYJavaType("java.lang.Throwable")), excParam),
+                    catchStatements);
 
             addChild(KeYJavaASTFactory.tryBlock(body, ctch));
             changed();
