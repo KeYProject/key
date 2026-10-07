@@ -10,11 +10,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -291,6 +294,72 @@ public class GoalListViewF extends ListView<Goal> {
     }
 
     /**
+     * Shows the goal popup on the given goal (Swing {@code GoalList.popupMenu}, rebuilt on every
+     * open): toggles the automatic/interactive state of the goal itself or of all other goals.
+     * Swing's right-click handler selects the row under the pointer first, which the cell does
+     * before calling this.
+     */
+    private void showGoalPopup(Goal goal, ContextMenuEvent e) {
+        if (goal == null) {
+            return;
+        }
+        ContextMenu menu = new ContextMenu();
+
+        // DisableSingleGoal: the label flips with the goal's state, the action toggles it
+        MenuItem single = new MenuItem(goal.isAutomatic() ? "Interactive Goal" : "Automatic Goal");
+        single.setOnAction(ev -> {
+            goal.setEnabled(!goal.isAutomatic());
+            refreshAfterGoalStateChange();
+        });
+
+        // DisableOtherGoals: all other goals get the opposite of this goal's state; Swing
+        // enables the action only when the model holds more than one goal
+        MenuItem others = new MenuItem(
+            goal.isAutomatic() ? "Set Other Goals Interactive" : "Set Other Goals Automatic");
+        others.setDisable(getItems().size() <= 1);
+        others.setOnAction(ev -> {
+            boolean enable = !goal.isAutomatic();
+            for (Goal other : getItems()) {
+                if (other != goal) {
+                    other.setEnabled(enable);
+                }
+            }
+            refreshAfterGoalStateChange();
+        });
+
+        menu.getItems().addAll(single, others);
+        menu.show(this, e.getScreenX(), e.getScreenY());
+        e.consume();
+    }
+
+    /**
+     * Re-renders the rows after a goal state change (Swing {@code GoalList.updateUI}): the items
+     * are re-set from the proof so every cell recomputes marker text and style.
+     */
+    private void refreshAfterGoalStateChange() {
+        if (proof == null || proof.isDisposed()) {
+            return;
+        }
+        List<Goal> goals = new ArrayList<>();
+        for (Goal goal : proof.openGoals()) {
+            goals.add(goal);
+        }
+        updatingSelection = true;
+        try {
+            Goal selected = getSelectionModel().getSelectedItem();
+            getItems().setAll(goals);
+            if (selected != null) {
+                int index = getItems().indexOf(selected);
+                if (index >= 0) {
+                    getSelectionModel().select(index);
+                }
+            }
+        } finally {
+            updatingSelection = false;
+        }
+    }
+
+    /**
      * @return the one-line printed sequent text of the goal (truncated, no term labels), cached
      *         per goal node
      */
@@ -385,6 +454,14 @@ public class GoalListViewF extends ListView<Goal> {
             sequentLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
             HBox.setHgrow(sequentLabel, Priority.ALWAYS);
             content = new HBox(6, nameLabel, markerLabel, sequentLabel);
+            // Swing GoalList's mouse listener selects the row under the pointer before the popup
+            // opens; the popup acts on the (now selected) goal
+            setOnContextMenuRequested(e -> {
+                if (getItem() != null && getListView() != null) {
+                    getListView().getSelectionModel().select(getIndex());
+                    showGoalPopup(getItem(), e);
+                }
+            });
         }
 
         /**
