@@ -228,3 +228,40 @@
     -fx-background-color: -key-background;
     -fx-border-color: transparent transparent -key-border transparent;
 }
+
+/* strategy selection view */
+.strategy-view {
+    -fx-background-color: -key-surface;
+}
+
+.strategy-content {
+    -fx-background-color: -key-surface;
+}
+
+.strategy-maxsteps-row {
+    -fx-padding: 0 0 4 0;
+}
+
+.strategy-maxsteps-label,
+.strategy-property-label {
+    -fx-text-fill: -key-text;
+}
+
+.strategy-section-title {
+    -fx-text-fill: -key-text;
+    -fx-font-weight: bold;
+    -fx-padding: 4 0 2 0;
+}
+
+.strategy-radio {
+    -fx-text-fill: -key-text;
+}
+
+.strategy-radio:selected {
+    -fx-text-fill: -key-accent;
+    -fx-font-weight: bold;
+}
+
+.strategy-status {
+    -fx-text-fill: -key-text-secondary;
+}
