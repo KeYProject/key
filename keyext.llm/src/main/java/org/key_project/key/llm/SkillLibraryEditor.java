@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.llm;
 
-import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +15,7 @@ import de.uka.ilkd.key.gui.settings.SettingsPanel;
 
 import org.key_project.key.llm.mcp.BuiltInMCPClient;
 
+import net.miginfocom.layout.CC;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -52,29 +53,32 @@ public class SkillLibraryEditor extends LibraryEditorPanel<Skill> {
         instructions.setLineWrap(true);
         instructions.setWrapStyleWord(true);
 
-        var toolBox = new JPanel();
-        toolBox.setLayout(new BoxLayout(toolBox, BoxLayout.Y_AXIS));
+        var toolBox = new JPanel(new GridLayout(0, 1));
         for (var name : new BuiltInMCPClient().getAllToolNames()) {
             var check = new JCheckBox(name);
             toolChecks.add(check);
             toolBox.add(check);
         }
-        var toolsScroll = new JScrollPane(toolBox);
-        toolsScroll.setPreferredSize(new Dimension(240, 120));
 
-        setForm(buildForm(toolsScroll));
+        setForm(buildForm(toolBox));
         reload();
     }
 
-    private JComponent buildForm(JComponent toolsScroll) {
+    private JComponent buildForm(JComponent allowedToolsBox) {
         return new SettingsPanel() {
             {
+                addRowWithHelp(HELP_ENABLED, new JLabel(), enabled);
                 addTitledComponent("Name", txtName, HELP_NAME);
                 addTitledComponent("Description", txtDescription, HELP_DESCRIPTION);
                 addTitledComponent("Instructions", new JScrollPane(instructions),
                     HELP_INSTRUCTIONS);
-                addTitledComponent("Allowed tools", toolsScroll, HELP_ALLOWED_TOOLS);
-                addRowWithHelp(HELP_ENABLED, new JLabel(), enabled);
+                // "Allowed tools": label, checkbox list and help icon are top-aligned, and the
+                // list is rendered in full (no scroll pane).
+                var label = new JLabel("Allowed tools");
+                label.setLabelFor(allowedToolsBox);
+                pCenter.add(label, new CC().alignY("top"));
+                pCenter.add(allowedToolsBox, new CC().alignY("top"));
+                pCenter.add(createHelpLabel(HELP_ALLOWED_TOOLS), new CC().alignY("top"));
             }
         };
     }
