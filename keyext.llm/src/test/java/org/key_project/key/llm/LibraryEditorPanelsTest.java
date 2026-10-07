@@ -40,14 +40,32 @@ class LibraryEditorPanelsTest {
     @Test
     void promptEditorForwardsToThePromptLibrary() {
         var editor = new PromptLibraryEditor();
-        // reload must not throw and the table stays consistent with the (possibly empty) library
-        assertEquals(PromptLibrary.INSTANCE.all().size(), editor.tableRowCount());
+        // reload must not throw and the list stays consistent with the (possibly empty) library
+        assertEquals(PromptLibrary.INSTANCE.all().size(), editor.entryCount());
     }
 
     @Test
     void skillEditorForwardsToTheSkillLibrary() {
         var editor = new SkillLibraryEditor();
-        assertEquals(SkillLibrary.INSTANCE.all().size(), editor.tableRowCount());
+        assertEquals(SkillLibrary.INSTANCE.all().size(), editor.entryCount());
+    }
+
+    @Test
+    void promptExportImportJsonRoundTrip() {
+        var editor = new PromptLibraryEditor();
+        var original = List.of(new Prompt("p1", "First prompt", "Do $seq"),
+            new Prompt("p2", "With markup", "Read @file and reply with \"quotes\"."));
+        assertEquals(original, editor.fromJson(editor.toJson(original)));
+    }
+
+    @Test
+    void skillExportImportJsonRoundTrip() {
+        var editor = new SkillLibraryEditor();
+        var original = List.of(
+            new Skill("s1", "A skill", "instructions and $goals", List.of("auto", "tryclose"),
+                true),
+            new Skill("s2", "", "", List.of(), false));
+        assertEquals(original, editor.fromJson(editor.toJson(original)));
     }
 
     @Test

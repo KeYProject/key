@@ -147,8 +147,9 @@ optionally restricting the tool set:
 }
 ```
 
-- Skills are managed in **Settings → LLM Settings → Skills** (table + edit form with
-  `New`/`Save`/`Delete`; see [section 9](#9-settings-reference-settings--llm-settings)).
+- Skills are managed in **Settings → LLM Settings → Skills**: a list of the stored skills, with
+  `New`/`Edit`/`Delete` (editing happens in a dialog) and `Export...`/`Import...` to share the
+  whole library as a JSON file (see [section 9](#9-settings-reference-settings--llm-settings)).
 - If a skill restricts `allowedTools`, only those tools are offered to the model while the skill
   is active.
 - The agent itself can activate a skill through the `use_skill` tool — this is **off by default**
@@ -171,7 +172,8 @@ A **prompt** is a named, reusable message template:
 
 Templates are inserted from the *Prompts* toolbar button or via `/prompt:name`; markup inside the
 template is resolved like normal input. Prompts are managed in **Settings → LLM Settings →
-Prompts** (table + edit form with `New`/`Save`/`Delete`).
+Prompts**: a list of the stored prompts with `New`/`Edit`/`Delete` (editing happens in a dialog)
+and `Export...`/`Import...` to share the whole library as a JSON file.
 
 ---
 
@@ -294,8 +296,11 @@ One row per tool with three checkboxes: **Disabled**, **With approval**, **Witho
 Auto-scroll output (`true`) and show tool activity (`true`).
 
 ### Prompts / Skills (sub-panels)
-Embedded editors for the user libraries described in [section 5](#5-skills) and
-[section 6](#6-prompts). Changes are saved immediately.
+Editors for the user libraries described in [section 5](#5-skills) and [section 6](#6-prompts):
+the entries are shown as a selectable list (name + description), `New`/`Edit` (or double click)
+open a dialog with the full form and `Delete` removes the selected entry. `Export...` saves the
+whole library as a JSON file, `Import...` merges one back in (new entries are added, entries with
+an existing name are updated). Changes are saved immediately.
 
 ---
 
