@@ -438,3 +438,28 @@
 .source-jml-keyword {
     -fx-font-weight: bold;
 }
+
+/* ------------------------------------------------------------------
+ * proof diff frame (M5, Swing ProofDiffFrame)
+ * The diff area is a StyleClassedTextArea; deleted/inserted text carries
+ * the Swing span background colors (#ff8080 / #80ff80) as RichTextFX
+ * -rtfx-background-color on the styled text segments.
+ * ------------------------------------------------------------------ */
+.proof-diff-area {
+    -fx-background-color: -key-surface;
+}
+
+.diff-delete {
+    -rtfx-background-color: #ff8080;
+    -fx-fill: -key-text;
+}
+
+.diff-insert {
+    -rtfx-background-color: #80ff80;
+    -fx-fill: -key-text;
+}
+
+.diff-help-heading {
+    -fx-font-weight: bold;
+    -fx-underline: true;
+}

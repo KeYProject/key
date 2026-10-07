@@ -62,6 +62,7 @@ import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
 import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
+import de.uka.ilkd.key.gui.fx.proofdiff.ProofDiffFrameF;
 import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeViewF;
 import de.uka.ilkd.key.gui.fx.recentfiles.RecentFilesF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsManagerF;
@@ -288,6 +289,21 @@ public final class MainWindowF {
         return selectionModel;
     }
 
+    /**
+     * @return the mediator of the window (Swing {@code MainWindow.getMediator()}); used by
+     *         secondary windows like the proof diff frame
+     */
+    public KeYMediatorF getMediator() {
+        return mediator;
+    }
+
+    /**
+     * @return the stage of this window (the owner of secondary windows)
+     */
+    public Stage getStage() {
+        return stage;
+    }
+
     // ------------------------------------------------------------------
     // sequent view (M2a spike)
     // ------------------------------------------------------------------
@@ -413,6 +429,13 @@ public final class MainWindowF {
             }
             if (System.getProperty("key.fx.verify.goallist") != null) {
                 LOGGER.info("Goal list verification: {}", goalListView.verifyGoalList());
+            }
+            if (System.getProperty("key.fx.verify.proofdiff") != null) {
+                String report = ProofDiffFrameF.verifyDiffLogic();
+                LOGGER.info("Proof diff verification: {}", report);
+                NotificationManagerF.getInstance()
+                        .notify("Proof diff verification: " + report,
+                            report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
             }
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 startLiveAutoMode(env);
@@ -907,7 +930,9 @@ public final class MainWindowF {
                 IconFactoryF.Key.MINUS, () -> changeFontSize(-1)));
 
         view.getItems().addAll(prettyPrint, unicode, syntaxHighlighting, new SeparatorMenuItem(),
-            themeMenu, fontSize);
+            themeMenu, fontSize, new SeparatorMenuItem(),
+            menuItem("Visual Node Diff", "de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame$Action",
+                this::showProofDiffFrame));
         return view;
     }
 
@@ -1096,6 +1121,14 @@ public final class MainWindowF {
 
     private void openSettings() {
         SettingsManagerF.getInstance().openSettings(stage);
+    }
+
+    /**
+     * Opens the visual node diff window (Swing {@code ProofDiffFrame.Action}: a new window per
+     * invocation, non-modal, always enabled).
+     */
+    private void showProofDiffFrame() {
+        new ProofDiffFrameF(this).showCenteredOnOwner();
     }
 
     private void resetLayout() {
