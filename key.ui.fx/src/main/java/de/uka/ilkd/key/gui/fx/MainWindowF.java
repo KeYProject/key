@@ -4,13 +4,16 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.fx;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -36,6 +39,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -59,6 +63,7 @@ import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
 import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeViewF;
+import de.uka.ilkd.key.gui.fx.recentfiles.RecentFilesF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsManagerF;
 import de.uka.ilkd.key.gui.fx.settings.ThemeSettingsProviderF;
 import de.uka.ilkd.key.gui.fx.sourceview.SourceViewF;
@@ -67,11 +72,13 @@ import de.uka.ilkd.key.gui.fx.theme.Theme;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.javafx.FxUtil;
 
@@ -160,6 +167,31 @@ public final class MainWindowF {
     private final SourceViewF sourceView = new SourceViewF();
 
     /**
+     * The recent files store: the same {@code recentFiles_v2.json} as the Swing UI, so both UIs
+     * share one list. Populated by the File menu actions only — the demo property load must not
+     * pollute the user's shared recent-files file.
+     */
+    private final RecentFilesF recentFiles = new RecentFilesF();
+
+    /**
+     * The "Recent Files" submenu of the File menu; rebuilt by {@link #updateRecentFilesMenu()}
+     * whenever the store changes.
+     */
+    private final Menu recentFilesMenu = new Menu("Recent Files");
+
+    /**
+     * Last directory of the open/save dialogs (Swing {@code OpenFileAction.lastSelectedPath}).
+     */
+    private Path lastSelectedDir = Path.of(System.getProperty("user.dir"));
+
+    /**
+     * Whether a proof is selected (updated in {@link #updateProofStatus()}); the enablement
+     * condition of the save action (Swing {@code enableWhenProofLoaded}).
+     */
+    private final ReadOnlyBooleanWrapper proofLoaded =
+        new ReadOnlyBooleanWrapper(this, "proofLoaded");
+
+    /**
      * Updates the left status text whenever the selection changes: proof name, closed state or
      * the number of open goals (Swing's status line is message-driven; the proof summary is the
      * persistent M2 content). Marshalled to the FX thread (the mediator's
@@ -219,6 +251,8 @@ public final class MainWindowF {
         updateStatus();
 
         wireSequentView();
+        recentFiles.setOnChange(this::updateRecentFilesMenu);
+        recentFiles.load();
         startDemoProofLoad();
 
         NotificationManagerF.getInstance()
@@ -296,7 +330,24 @@ public final class MainWindowF {
         if (file == null || file.isBlank()) {
             return;
         }
-        Path location = Path.of(file);
+        startProofLoad(Path.of(file), true);
+    }
+
+    /**
+     * Loads a proof or problem file with the core {@link KeYEnvironment} on a background thread
+     * and routes the loaded proof through the mediator/selection model. Shared by the demo
+     * property load and the File menu actions ({@link #openFileChooser()}, {@link
+     * #reloadLastFile()}, the recent-files menu). The optional {@code key.fx.demo.autoprove}
+     * run happens inside the load task, so only demo loads prove automatically.
+     * <p>
+     * Note: recent files are registered by the <em>callers</em> — the menu actions register the
+     * file before starting the load; the demo load must not pollute the user's shared
+     * {@code recentFiles_v2.json}.
+     *
+     * @param location the problem, proof or Java file to load
+     * @param demo whether this is the demo property load (notification prefix "Demo proof")
+     */
+    private void startProofLoad(Path location, boolean demo) {
         // pure .key problems carry no Java source; the source view then shows the problem file
         sourceView.setFallbackSourceFile(location);
         Task<KeYEnvironment<DefaultUserInterfaceControl>> loadTask = new Task<>() {
@@ -323,10 +374,11 @@ public final class MainWindowF {
             selectionModel.setSelectedProof(env.getLoadedProof());
             String show = System.getProperty("key.fx.show", ID_SEQUENT);
             String target = ID_PROOF_TREE.equalsIgnoreCase(show) ? ID_PROOF_TREE : ID_SEQUENT;
-            LOGGER.info("Demo: selecting dockable '{}' (key.fx.show={})", target, show);
+            LOGGER.info("Selecting dockable '{}' (key.fx.show={})", target, show);
             workspace.select(dockables.get(target));
             NotificationManagerF.getInstance()
-                    .notify("Demo proof loaded: " + location, Kind.INFO);
+                    .notify((demo ? "Demo proof loaded: " : "Proof loaded: ") + location,
+                        Kind.INFO);
             if (System.getProperty("key.fx.verify.sequent") != null) {
                 String report = sequentView.verifyPositionMapping();
                 LOGGER.info("Sequent position mapping verification: {}", report);
@@ -368,13 +420,177 @@ public final class MainWindowF {
         });
         loadTask.setOnFailed(event -> {
             Throwable error = loadTask.getException();
-            LOGGER.error("Demo proof loading failed", error);
+            LOGGER.error((demo ? "Demo proof" : "Proof") + " loading failed", error);
             NotificationManagerF.getInstance()
-                    .notify("Demo proof loading failed: " + error.getMessage(), Kind.ERROR);
+                    .notify((demo ? "Demo proof" : "Proof") + " loading failed: "
+                        + error.getMessage(), Kind.ERROR);
         });
         Thread loader = new Thread(loadTask, "fx-demo-proof-loader");
         loader.setDaemon(true);
         loader.start();
+    }
+
+    // ------------------------------------------------------------------
+    // file menu actions: open / reload / recent files / save (M3)
+    // ------------------------------------------------------------------
+
+    /**
+     * The Open File action (Swing {@code OpenFileAction}): a file chooser for problem, proof and
+     * Java files, remembering the last directory like the Swing original.
+     */
+    private void openFileChooser() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Select file to load proof or problem");
+        if (lastSelectedDir != null && Files.isDirectory(lastSelectedDir)) {
+            chooser.setInitialDirectory(lastSelectedDir.toFile());
+        }
+        // Swing KeYFileChooser.DEFAULT_FILTER
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+            "Java files, (compressed) KeY files, proof bundles, and source directories",
+            "*.java", "*.key", "*.proof", "*.proof.gz", "*.zproof"));
+        chooser.getExtensionFilters()
+                .add(new FileChooser.ExtensionFilter("All Files", "*.*"));
+        File file = chooser.showOpenDialog(stage);
+        if (file == null) {
+            return;
+        }
+        if (file.getParentFile() != null) {
+            lastSelectedDir = file.getParentFile().toPath();
+        }
+        openProofFile(file.toPath());
+    }
+
+    /**
+     * Loads the given file and registers it in the recent files list (Swing
+     * {@code WindowUserInterfaceControl.loadProblem} registers before the load starts). Proof
+     * bundles require the Swing {@code ProofSelectionDialog} flow and are deferred.
+     *
+     * @param file the file to load
+     */
+    private void openProofFile(Path file) {
+        if (file.toString().endsWith(".zproof")) {
+            LOGGER.info("Proof bundle requested: {} (deferred)", file);
+            NotificationManagerF.getInstance()
+                    .notify("Proof bundles (.zproof) are not supported yet.", Kind.WARNING);
+            return;
+        }
+        recentFiles.add(file.toAbsolutePath().toString(), null, false, null);
+        startProofLoad(file, false);
+    }
+
+    /**
+     * The Reload action (Swing {@code OpenMostRecentFileAction}): loads the most recent file.
+     */
+    private void reloadLastFile() {
+        String recent = recentFiles.getMostRecent();
+        if (recent == null) {
+            // the item is disabled without a proof/recent; keep the Swing action's silent guard
+            LOGGER.info("Reload requested, but no recent file exists");
+            return;
+        }
+        openProofFile(Path.of(recent));
+    }
+
+    /**
+     * The Save File action (Swing {@code SaveFileAction} +
+     * {@code WindowUserInterfaceControl.saveProof}): a save dialog pre-filled with the proof's
+     * file (or a sanitized proof name), then {@link ProofSaver} on the FX thread (the Swing
+     * original runs on the EDT as well; the interaction lock prevents concurrent auto mode).
+     */
+    private void saveProofFile() {
+        Proof proof = selectionModel.getSelectedProof();
+        if (proof == null) {
+            return; // the action is disabled without a proof (Swing enableWhenProofLoaded)
+        }
+        if (mediator.isInAutoMode()) {
+            // Swing wraps the save in stopInterface/startInterface: no interaction while saving
+            LOGGER.info("Save requested during auto mode");
+            NotificationManagerF.getInstance()
+                    .notify("Cannot save while the automatic prover is running.", Kind.WARNING);
+            return;
+        }
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choose filename to save proof");
+        if (lastSelectedDir != null && Files.isDirectory(lastSelectedDir)) {
+            chooser.setInitialDirectory(lastSelectedDir.toFile());
+        }
+        chooser.setInitialFileName(initialSaveFileName(proof, ".proof"));
+        File file = chooser.showSaveDialog(stage);
+        if (file == null) {
+            return;
+        }
+        if (file.getParentFile() != null) {
+            lastSelectedDir = file.getParentFile().toPath();
+        }
+        Path target = file.toPath().toAbsolutePath();
+        // the Swing chooser offers a "compressed" checkbox (GZipProofSaver); deferred, the plain
+        // saver is the default
+        ProofSaver saver = new ProofSaver(proof, target, KeYConstants.INTERNAL_VERSION);
+        try {
+            String errorMsg = saver.save();
+            if (errorMsg != null) {
+                LOGGER.error("Saving proof failed: {}", errorMsg);
+                NotificationManagerF.getInstance()
+                        .notify("Saving proof failed. Error: " + errorMsg, Kind.ERROR);
+            } else {
+                proof.setProofFile(target);
+                LOGGER.info("Proof saved to {}", target);
+                NotificationManagerF.getInstance()
+                        .notify("Proof saved to " + target, Kind.INFO);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Saving proof failed", e);
+            NotificationManagerF.getInstance()
+                    .notify("Saving proof failed. Error: " + e.getMessage(), Kind.ERROR);
+        }
+    }
+
+    /**
+     * The initial file name of the save dialog (Swing {@code WindowUserInterfaceControl.fileName}):
+     * the file the proof was loaded from if it already is a {@code .proof} file, otherwise the
+     * sanitized proof name.
+     */
+    private static String initialSaveFileName(Proof proof, String extension) {
+        Path proofFile = proof.getProofFile();
+        if (proofFile != null && proofFile.toString().endsWith(extension)
+                && proofFile.getFileName() != null) {
+            return proofFile.getFileName().toString();
+        }
+        String name = proof.name().toString();
+        for (String suffix : List.of(".key", ".proof")) {
+            if (name.endsWith(suffix)) {
+                name = name.substring(0, name.length() - suffix.length());
+                break;
+            }
+        }
+        return MiscTools.toValidFileName(name) + extension;
+    }
+
+    /**
+     * Rebuilds the Recent Files submenu from the store (invoked after every store change): the
+     * entries show their short unique file names (Swing {@code ShortUniqueFileNames}) plus the
+     * profile suffix for entries loaded with a non-default profile.
+     */
+    private void updateRecentFilesMenu() {
+        if (!FxUtil.isFxThread()) {
+            FxUtil.runLater(this::updateRecentFilesMenu);
+            return;
+        }
+        List<RecentFilesF.Entry> entries = recentFiles.getEntries();
+        List<String> names = RecentFilesF
+                .uniqueNames(entries.stream().map(RecentFilesF.Entry::path).toList());
+        recentFilesMenu.getItems().clear();
+        for (int i = 0; i < entries.size(); i++) {
+            RecentFilesF.Entry entry = entries.get(i);
+            String name = names.get(i);
+            // Swing's RecentFileAction labels entries loaded with a non-default profile
+            String text = entry.profile() != null ? name + " (Profile: " + entry.profile() + ")"
+                    : name;
+            recentFilesMenu.getItems()
+                    .add(menuItem(text, () -> openProofFile(Path.of(entry.path()))));
+        }
+        // an empty submenu would render as a dark clickable nothing (Swing leaves it enabled)
+        recentFilesMenu.setDisable(entries.isEmpty());
     }
 
     /**
@@ -624,21 +840,36 @@ public final class MainWindowF {
 
     private Menu buildFileMenu() {
         Menu file = new Menu("File");
+        MenuItem openFile = menuItem("Open File…", "de.uka.ilkd.key.gui.actions.OpenFileAction",
+            IconFactoryF.Key.OPEN_KEY_FILE, this::openFileChooser);
+        openFile.disableProperty().bind(mediator.autoModeRunningProperty());
+        MenuItem reload =
+            menuItem("Reload", "de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction",
+                this::reloadLastFile);
+        // Swing OpenMostRecentFileAction: enabled when a proof is loaded (the action then reloads
+        // the most recent file; disabled during auto mode like all interaction)
+        reload.disableProperty()
+                .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
+        MenuItem saveFile = menuItem("Save File…", "de.uka.ilkd.key.gui.actions.SaveFileAction",
+            IconFactoryF.Key.SAVE_FILE, this::saveProofFile);
+        // Swing SaveFileAction: enableWhenProofLoaded; interaction is locked during auto mode
+        saveFile.disableProperty()
+                .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
         file.getItems().addAll(
-            menuItem("Open Example…", IconFactoryF.Key.OPEN_KEY_FILE, this::notYetImplemented),
-            menuItem("Open File…", "de.uka.ilkd.key.gui.actions.OpenFileAction",
+            menuItem("Open Example…", "de.uka.ilkd.key.gui.actions.OpenExampleAction",
                 IconFactoryF.Key.OPEN_KEY_FILE, this::notYetImplemented),
-            menuItem("Open Most Recent…", "de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction",
-                this::notYetImplemented),
+            openFile,
+            reload,
             new SeparatorMenuItem(),
-            menuItem("Save File…", "de.uka.ilkd.key.gui.actions.SaveFileAction",
-                IconFactoryF.Key.SAVE_FILE, this::notYetImplemented),
+            saveFile,
             menuItem("Save Bundle…", "de.uka.ilkd.key.gui.actions.SaveBundleAction",
                 this::notYetImplemented),
             menuItem("Quick Save", "de.uka.ilkd.key.gui.actions.QuickSaveAction",
                 this::notYetImplemented),
             menuItem("Quick Load", "de.uka.ilkd.key.gui.actions.QuickLoadAction",
                 this::notYetImplemented),
+            new SeparatorMenuItem(),
+            recentFilesMenu,
             new SeparatorMenuItem(),
             menuItem("Exit", "de.uka.ilkd.key.gui.actions.ExitMainAction",
                 IconFactoryF.Key.QUIT, Platform::exit));
@@ -722,11 +953,20 @@ public final class MainWindowF {
     private ToolBar buildFileToolBar() {
         ToolBar bar = new ToolBar();
         bar.getStyleClass().add("key-file-tool-bar");
-        bar.getItems().addAll(
-            toolbarButton("Open File", IconFactoryF.Key.OPEN_KEY_FILE, this::notYetImplemented),
-            toolbarButton("Open Most Recent", IconFactoryF.Key.OPEN_MOST_RECENT,
-                this::notYetImplemented),
-            toolbarButton("Save File", IconFactoryF.Key.SAVE_FILE, this::notYetImplemented));
+        javafx.scene.control.Button openFile =
+            toolbarButton("Browse and load problem or proof files",
+                IconFactoryF.Key.OPEN_KEY_FILE, this::openFileChooser);
+        openFile.disableProperty().bind(mediator.autoModeRunningProperty());
+        javafx.scene.control.Button reload =
+            toolbarButton("Reload last opened file", IconFactoryF.Key.OPEN_MOST_RECENT,
+                this::reloadLastFile);
+        reload.disableProperty()
+                .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
+        javafx.scene.control.Button saveFile =
+            toolbarButton("Save current proof", IconFactoryF.Key.SAVE_FILE, this::saveProofFile);
+        saveFile.disableProperty()
+                .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
+        bar.getItems().addAll(openFile, reload, saveFile);
         return bar;
     }
 
@@ -829,6 +1069,7 @@ public final class MainWindowF {
             return;
         }
         Proof proof = selectionModel.getSelectedProof();
+        proofLoaded.set(proof != null);
         if (proof == null) {
             statusLeft.setText(KeYConstants.COPYRIGHT);
             return;
