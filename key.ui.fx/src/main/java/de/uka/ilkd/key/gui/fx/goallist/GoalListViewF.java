@@ -218,12 +218,14 @@ public class GoalListViewF extends ListView<Goal> {
         try {
             if (proof == null || proof.isDisposed()) {
                 getItems().clear();
+                setPlaceholder(emptyPlaceholder());
             } else {
                 List<Goal> goals = new ArrayList<>();
                 for (Goal goal : proof.openGoals()) {
                     goals.add(goal);
                 }
                 getItems().setAll(goals);
+                setPlaceholder(goals.isEmpty() ? closedPlaceholder() : emptyPlaceholder());
             }
             highlightSelectedGoal();
         } finally {
@@ -343,6 +345,15 @@ public class GoalListViewF extends ListView<Goal> {
     private static Label emptyPlaceholder() {
         Label placeholder = new Label("No proof loaded.\n"
             + "Start with -Dkey.fx.demo.sequent=<file.key> to try the goal list.");
+        placeholder.getStyleClass().add("goal-list-empty");
+        placeholder.setWrapText(true);
+        placeholder.setFont(ConfigF.DEFAULT.systemFont());
+        return placeholder;
+    }
+
+    /** placeholder shown while a proof is selected but all of its goals are closed. */
+    private static Label closedPlaceholder() {
+        Label placeholder = new Label("No open goals — the proof is closed.");
         placeholder.getStyleClass().add("goal-list-empty");
         placeholder.setWrapText(true);
         placeholder.setFont(ConfigF.DEFAULT.systemFont());
