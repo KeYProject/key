@@ -17,6 +17,9 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
@@ -41,7 +44,9 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.javafx.FxUtil;
 
 import org.slf4j.Logger;
@@ -162,6 +167,14 @@ public class ProofTreeViewF extends BorderPane {
     private final Map<Node, Boolean> containsMatchCache = new HashMap<>();
 
     /**
+     * The filter toggle menu shown on right click (Swing keeps these checkboxes in the dockable's
+     * "Settings" menu, which the FX docking framework does not have yet). The state itself lives
+     * in {@link ProofIndependentSettings} like in Swing, so it persists and is shared with the
+     * classic UI.
+     */
+    private final ContextMenu filterMenu = createFilterMenu();
+
+    /**
      * Listens to structural changes of the displayed proof and schedules a coalesced rebuild on
      * the FX thread — the analogue of the Swing view's {@code GUIProofTreeModel} update calls.
      */
@@ -237,6 +250,12 @@ public class ProofTreeViewF extends BorderPane {
         // the shortcut fires whenever the keyboard focus is anywhere inside this view (the key
         // events bubble from the focused control up to this pane).
         setOnKeyPressed(this::handleTreeKeyPressed);
+        // the filter toggles live in a right-click menu (Swing exposes them in the dockable's
+        // "Settings" menu, which the FX docking framework does not have yet)
+        tree.setOnContextMenuRequested(e -> {
+            filterMenu.show(tree, e.getScreenX(), e.getScreenY());
+            e.consume();
+        });
     }
 
     /**
@@ -456,8 +475,16 @@ public class ProofTreeViewF extends BorderPane {
             proofNodeCount++;
         }
         boolean pass = seen.size() == proofNodeCount && counters[0] == proofNodeCount;
+        boolean filtersActive = hideIntermediateSteps() || hideAutomodeSteps()
+                || hideClosedSubtrees() || hideInteractiveGoals();
+        if (filtersActive) {
+            // with an active filter the displayed tree is intentionally a subset of the proof;
+            // consistency means: every displayed entry is a real proof node, without duplicates
+            pass = seen.size() == counters[0] + counters[1] && counters[0] <= proofNodeCount;
+        }
         return "proofNodes=" + proofNodeCount + " nodeEntries=" + counters[0] + " unique="
-            + seen.size() + " branches=" + counters[1] + " " + (pass ? "PASS" : "FAIL");
+            + seen.size() + " branches=" + counters[1] + (filtersActive ? " filtered" : "")
+            + " " + (pass ? "PASS" : "FAIL");
     }
 
     /**
@@ -487,6 +514,63 @@ public class ProofTreeViewF extends BorderPane {
         return "query=" + queryString + " matches=" + matchCount + " collapsedNodes=" + counters[0]
             + " nonMatchingNodes=" + counters[1] + " collapsedBranches=" + counters[2]
             + " restored=[" + restored + "] " + (pass ? "PASS" : "FAIL");
+    }
+
+    /**
+     * Development self-test (M2): exercises the tree filters like the Swing "Settings" menu —
+     * counts the entries with every filter off, then with Hide Intermediate Proofsteps, Hide
+     * Closed Subtrees and Hide Non-interactive Proofsteps in turn (each must shrink the tree),
+     * then restores the baseline. The filter state is left exactly as it was found.
+     *
+     * @return a one-line report, {@code "... PASS"} if all filter applications shrink the tree
+     *         and the baseline is restored
+     */
+    public String verifyTreeFilters() {
+        if (proof == null || tree.getRoot() == null) {
+            return "no proof";
+        }
+        boolean wasIntermediate = hideIntermediateSteps();
+        boolean wasAutomode = hideAutomodeSteps();
+        boolean wasClosed = hideClosedSubtrees();
+        boolean wasInteractive = hideInteractiveGoals();
+        setHideIntermediateSteps(false);
+        setHideAutomodeSteps(false);
+        setHideClosedSubtrees(false);
+        setHideInteractiveGoals(false);
+        refresh();
+        int baseline = countEntries();
+        setHideIntermediateSteps(true);
+        refresh();
+        int intermediate = countEntries();
+        setHideIntermediateSteps(false);
+        setHideClosedSubtrees(true);
+        refresh();
+        int closedHidden = countEntries();
+        setHideClosedSubtrees(false);
+        setHideAutomodeSteps(true);
+        refresh();
+        int automode = countEntries();
+        setHideAutomodeSteps(false);
+        refresh();
+        int restored = countEntries();
+        // restore the persisted state found on entry
+        setHideIntermediateSteps(wasIntermediate);
+        setHideAutomodeSteps(wasAutomode);
+        setHideClosedSubtrees(wasClosed);
+        setHideInteractiveGoals(wasInteractive);
+        refresh();
+        boolean pass = baseline > 0 && intermediate < baseline && closedHidden < baseline
+                && automode < baseline && restored == baseline;
+        return "baseline=" + baseline + " hideIntermediate=" + intermediate + " hideClosed="
+            + closedHidden + " hideAutomode=" + automode + " restored=" + restored + " "
+            + (pass ? "PASS" : "FAIL");
+    }
+
+    /** @return the number of entries (node + branch) currently displayed */
+    private int countEntries() {
+        int[] counters = { 0, 0 };
+        collect(tree.getRoot(), Collections.newSetFromMap(new IdentityHashMap<>()), counters);
+        return counters[0] + counters[1];
     }
 
     /**
@@ -527,31 +611,197 @@ public class ProofTreeViewF extends BorderPane {
     private TreeItem<Entry> buildBranch(Node branchRoot, String label) {
         TreeItem<Entry> branchItem = new TreeItem<>(Entry.branch(branchRoot, label));
 
+        // collect the branch's linear chain first (mirrors GUIBranchNode.fillChildrenCache)
+        List<Node> chain = new ArrayList<>();
         Node current = branchRoot;
-        // linear walk along single-child nodes, mirroring GUIBranchNode.fillChildrenCache
         while (true) {
-            if (!filterActive() || matches(current)) {
-                branchItem.getChildren().add(new TreeItem<>(Entry.node(current)));
-            }
+            chain.add(current);
             if (current.childrenCount() == 1) {
                 current = current.child(0);
                 continue;
             }
             break;
         }
-        // at a branch point (or a leaf): one branch item per child. Read by index instead of
-        // iterating the live children list: the prover thread may add children concurrently
-        // (ArrayList view); a concurrent mutation is healed by the next structural event.
+        boolean searchActive = filterActive();
+        // Swing: while the collapsing search is active it takes precedence over the
+        // intermediate-step filters (GUIProofTreeModel.bypassNodeFilter)
+        boolean nodeFilterActive =
+            !searchActive && (hideIntermediateSteps() || hideAutomodeSteps());
         int branchCount = current.childrenCount();
+
+        if (!nodeFilterActive) {
+            // all chain steps, search-filtered
+            for (Node node : chain) {
+                if (!searchActive || matches(node)) {
+                    branchItem.getChildren().add(new TreeItem<>(Entry.node(node)));
+                }
+            }
+        } else if (hideIntermediateSteps()) {
+            // Hide Intermediate Proofsteps: a branch shows only the last element of its
+            // [chain..., branch folders...] list (the Swing NodeFilter shows the child at the
+            // last position); with branch folders below, the whole chain — including the split
+            // step — is hidden, without them the chain's final node (the goal) remains
+            if (branchCount == 0) {
+                branchItem.getChildren()
+                        .add(new TreeItem<>(Entry.node(chain.get(chain.size() - 1))));
+            }
+        } else {
+            // Hide Non-interactive Proofsteps: interactive steps stay visible, plus the final
+            // node of leaf chains
+            for (int i = 0; i < chain.size(); i++) {
+                Node node = chain.get(i);
+                boolean last = i == chain.size() - 1;
+                if (node.getNodeInfo().getInteractiveRuleApplication()
+                        || last && branchCount == 0) {
+                    branchItem.getChildren().add(new TreeItem<>(Entry.node(node)));
+                }
+            }
+        }
+
+        // at a branch point (or a leaf): one branch item per child, pruned by the global filters.
+        // Read by index instead of iterating the live children list: the prover thread may add
+        // children concurrently (ArrayList view); a concurrent mutation is healed by the next
+        // structural event.
         for (int i = 0; i < branchCount; i++) {
             Node child = current.child(i);
-            if (filterActive() && !containsMatch(child)) {
+            if (searchActive && !containsMatch(child)) {
                 // the subtree contains no match: hidden (Swing TreeSearchFilter.showSubtree)
+                continue;
+            }
+            if (hiddenByGlobalFilters(child)) {
                 continue;
             }
             branchItem.getChildren().add(buildBranch(child, ensureBranchLabelIsSet(child)));
         }
         return branchItem;
+    }
+
+    /**
+     * @return whether the subtree starting at {@code node} is hidden by an active global filter
+     *         (Swing {@code ProofTreeViewFilter.hiddenByGlobalFilters}): the search filter, Hide
+     *         Closed Subtrees and Hide Subtrees Whose Goals are Interactive
+     */
+    private boolean hiddenByGlobalFilters(Node node) {
+        if (filterActive() && !containsMatch(node)) {
+            return true;
+        }
+        if (hideClosedSubtrees() && node.isClosed()) {
+            return true;
+        }
+        if (hideInteractiveGoals() && subtreeGoalsAllInteractive(node)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return whether the subtree rooted at {@code node} has open goals but none of them is
+     *         automatic (Swing {@code HideInteractiveGoalsFilter.showSubtree} hides such
+     *         subtrees; subtrees without goals stay visible)
+     */
+    private boolean subtreeGoalsAllInteractive(Node node) {
+        ImmutableList<Goal> goals = proof.getSubtreeGoals(node);
+        if (goals.isEmpty()) {
+            return false;
+        }
+        for (Goal goal : goals) {
+            if (goal.isAutomatic()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // -----------------------------------------------------------------------
+    // Filters (Swing ProofTreeViewFilter, state in ProofIndependentSettings)
+    // -----------------------------------------------------------------------
+
+    private static boolean hideIntermediateSteps() {
+        return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .getHideIntermediateProofsteps();
+    }
+
+    private static boolean hideAutomodeSteps() {
+        return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .getHideAutomodeProofsteps();
+    }
+
+    private static boolean hideClosedSubtrees() {
+        return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getHideClosedSubtrees();
+    }
+
+    private static boolean hideInteractiveGoals() {
+        return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .getHideInteractiveGoals();
+    }
+
+    private static void setHideIntermediateSteps(boolean active) {
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .setHideIntermediateProofsteps(active);
+    }
+
+    private static void setHideAutomodeSteps(boolean active) {
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .setHideAutomodeProofsteps(active);
+    }
+
+    private static void setHideClosedSubtrees(boolean active) {
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHideClosedSubtrees(active);
+    }
+
+    private static void setHideInteractiveGoals(boolean active) {
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHideInteractiveGoals(active);
+    }
+
+    /**
+     * Builds the right-click filter menu: the two mutually exclusive node filters and the two
+     * independently toggleable global filters, like the Swing dockable's "Settings" menu.
+     */
+    private ContextMenu createFilterMenu() {
+        CheckMenuItem hideIntermediateItem = new CheckMenuItem("Hide Intermediate Proofsteps");
+        hideIntermediateItem.setSelected(hideIntermediateSteps());
+        CheckMenuItem onlyInteractiveItem = new CheckMenuItem("Hide Non-interactive Proofsteps");
+        onlyInteractiveItem.setSelected(hideAutomodeSteps());
+        // Swing keeps only one node filter active: activating one deactivates the other
+        hideIntermediateItem.setOnAction(e -> {
+            setHideIntermediateSteps(hideIntermediateItem.isSelected());
+            if (hideIntermediateItem.isSelected() && hideAutomodeSteps()) {
+                setHideAutomodeSteps(false);
+                onlyInteractiveItem.setSelected(false);
+            }
+            refresh();
+        });
+        onlyInteractiveItem.setOnAction(e -> {
+            setHideAutomodeSteps(onlyInteractiveItem.isSelected());
+            if (onlyInteractiveItem.isSelected() && hideIntermediateSteps()) {
+                setHideIntermediateSteps(false);
+                hideIntermediateItem.setSelected(false);
+            }
+            refresh();
+        });
+        CheckMenuItem hideClosedItem = new CheckMenuItem("Hide Closed Subtrees");
+        hideClosedItem.setSelected(hideClosedSubtrees());
+        hideClosedItem.setOnAction(e -> {
+            setHideClosedSubtrees(hideClosedItem.isSelected());
+            refresh();
+        });
+        CheckMenuItem hideInteractiveItem =
+            new CheckMenuItem("Hide Subtrees Whose Goals are Interactive");
+        hideInteractiveItem.setSelected(hideInteractiveGoals());
+        hideInteractiveItem.setOnAction(e -> {
+            setHideInteractiveGoals(hideInteractiveItem.isSelected());
+            refresh();
+        });
+        ContextMenu menu = new ContextMenu(hideIntermediateItem, onlyInteractiveItem,
+            new SeparatorMenuItem(), hideClosedItem, hideInteractiveItem);
+        menu.setOnShowing(e -> {
+            // pick up changes made elsewhere (e.g. by the classic UI sharing the settings)
+            hideIntermediateItem.setSelected(hideIntermediateSteps());
+            onlyInteractiveItem.setSelected(hideAutomodeSteps());
+            hideClosedItem.setSelected(hideClosedSubtrees());
+            hideInteractiveItem.setSelected(hideInteractiveGoals());
+        });
+        return menu;
     }
 
     /**
