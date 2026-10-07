@@ -312,20 +312,21 @@
     -fx-text-fill: -key-text-secondary;
 }
 
+/* the marker is a font glyph (a Text node); its size comes from IconFactoryF.DEFAULT_SIZE */
 .goal-list-marker {
-    -fx-font-size: 0.9em;
+    -fx-fill: -key-text;
 }
 
 .goal-list-automatic {
-    -fx-text-fill: -key-success;
+    -fx-fill: -key-text;
 }
 
 .goal-list-interactive {
-    -fx-text-fill: -key-interactive;
+    -fx-fill: -key-interactive;
 }
 
 .goal-list-linked {
-    -fx-text-fill: -key-linked;
+    -fx-fill: -key-linked;
 }
 
 .goal-list-sequent {
