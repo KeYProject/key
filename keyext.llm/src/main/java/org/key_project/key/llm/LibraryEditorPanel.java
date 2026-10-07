@@ -288,11 +288,30 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
             return;
         }
         reload();
+        var conflicts = imported.stream()
+                .filter(e -> items.stream().anyMatch(cur -> nameOf(cur).equals(nameOf(e))))
+                .toList();
+        boolean overrideExisting = false;
+        if (!conflicts.isEmpty()) {
+            var confirm = JOptionPane.showConfirmDialog(this,
+                conflicts.size() + " of the imported " + title.toLowerCase() + " already exist.\n"
+                    + "\u201CYes\u201D overrides them, \u201CNo\u201D keeps the existing entries.",
+                "Import " + title.toLowerCase(), JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+            if (confirm == JOptionPane.CANCEL_OPTION || confirm == JOptionPane.CLOSED_OPTION) {
+                return;
+            }
+            overrideExisting = confirm == JOptionPane.YES_OPTION;
+        }
         int added = 0;
         int updated = 0;
         int skipped = 0;
         for (var e : imported) {
             var existed = items.stream().anyMatch(cur -> nameOf(cur).equals(nameOf(e)));
+            if (existed && !overrideExisting) {
+                skipped++;
+                continue;
+            }
             var error = store(e);
             if (error != null) {
                 skipped++;
@@ -306,7 +325,8 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
         var summary = "Imported " + (added + updated) + " of " + imported.size() + " "
             + title.toLowerCase() + " (" + added + " new, " + updated + " updated).";
         if (skipped > 0) {
-            summary += "\n" + skipped + " entries were invalid and skipped.";
+            summary += "\n" + skipped + " entries were skipped"
+                + (overrideExisting ? " (invalid)." : " (kept existing).");
         }
         JOptionPane.showMessageDialog(this, summary);
     }
