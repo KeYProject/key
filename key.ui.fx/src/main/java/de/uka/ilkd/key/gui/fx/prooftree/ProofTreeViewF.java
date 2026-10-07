@@ -19,6 +19,7 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
@@ -167,12 +168,20 @@ public class ProofTreeViewF extends BorderPane {
     private final Map<Node, Boolean> containsMatchCache = new HashMap<>();
 
     /**
-     * The filter toggle menu shown on right click (Swing keeps these checkboxes in the dockable's
-     * "Settings" menu, which the FX docking framework does not have yet). The state itself lives
-     * in {@link ProofIndependentSettings} like in Swing, so it persists and is shared with the
-     * classic UI.
+     * The context menu shown on right click: the filter toggles (Swing keeps these checkboxes in
+     * the dockable's "Settings" menu, which the FX docking framework does not have yet) plus the
+     * expand/collapse and sibling actions of the Swing proof tree popup menu
+     * (ProofTreePopupFactory). The state lives in {@link ProofIndependentSettings} like in Swing,
+     * so it persists and is shared with the classic UI.
      */
-    private final ContextMenu filterMenu = createFilterMenu();
+    private final ContextMenu contextMenu = createContextMenu();
+
+    /**
+     * The branch entry the popup actions apply to, resolved when the menu opens: the selected
+     * entry itself if it is a branch, otherwise its parent — like the Swing popup's
+     * {@code context.branch}.
+     */
+    private TreeItem<Entry> popupBranchItem;
 
     /**
      * Listens to structural changes of the displayed proof and schedules a coalesced rebuild on
@@ -250,10 +259,16 @@ public class ProofTreeViewF extends BorderPane {
         // the shortcut fires whenever the keyboard focus is anywhere inside this view (the key
         // events bubble from the focused control up to this pane).
         setOnKeyPressed(this::handleTreeKeyPressed);
-        // the filter toggles live in a right-click menu (Swing exposes them in the dockable's
-        // "Settings" menu, which the FX docking framework does not have yet)
+        // the filter toggles and the popup actions live in a right-click menu (Swing exposes
+        // them in the dockable's "Settings" menu and the proof tree popup)
         tree.setOnContextMenuRequested(e -> {
-            filterMenu.show(tree, e.getScreenX(), e.getScreenY());
+            TreeItem<Entry> selected = tree.getSelectionModel().getSelectedItem();
+            TreeItem<Entry> item = selected != null ? selected : tree.getRoot();
+            if (item != null && !item.getValue().isBranch()) {
+                item = item.getParent();
+            }
+            popupBranchItem = item;
+            contextMenu.show(tree, e.getScreenX(), e.getScreenY());
             e.consume();
         });
     }
@@ -754,10 +769,13 @@ public class ProofTreeViewF extends BorderPane {
     }
 
     /**
-     * Builds the right-click filter menu: the two mutually exclusive node filters and the two
-     * independently toggleable global filters, like the Swing dockable's "Settings" menu.
+     * Builds the right-click context menu: the two mutually exclusive node filters and the two
+     * independently toggleable global filters, like the Swing dockable's "Settings" menu, plus
+     * the expand/collapse and sibling actions of the Swing proof tree popup menu
+     * ({@code ProofTreePopupFactory}). The action items that need prover control (Run Strategy
+     * On Node, Prune, Notes, goals enablement, statistics) arrive with the M3 action framework.
      */
-    private ContextMenu createFilterMenu() {
+    private ContextMenu createContextMenu() {
         CheckMenuItem hideIntermediateItem = new CheckMenuItem("Hide Intermediate Proofsteps");
         hideIntermediateItem.setSelected(hideIntermediateSteps());
         CheckMenuItem onlyInteractiveItem = new CheckMenuItem("Hide Non-interactive Proofsteps");
@@ -793,7 +811,17 @@ public class ProofTreeViewF extends BorderPane {
             refresh();
         });
         ContextMenu menu = new ContextMenu(hideIntermediateItem, onlyInteractiveItem,
-            new SeparatorMenuItem(), hideClosedItem, hideInteractiveItem);
+            new SeparatorMenuItem(), hideClosedItem, hideInteractiveItem, new SeparatorMenuItem(),
+            actionItem("Expand All Below", IconFactoryF.Key.PLUS,
+                () -> expandAllBelow(popupBranchItem)),
+            actionItem("Expand Goals Only Below", IconFactoryF.Key.EXPAND_GOALS,
+                () -> expandGoalsOnlyBelow(popupBranchItem)),
+            actionItem("Collapse Below", IconFactoryF.Key.MINUS,
+                () -> collapseAllBelow(popupBranchItem)),
+            actionItem("Collapse Other Branches", null, () -> collapseOthers(popupBranchItem)),
+            new SeparatorMenuItem(),
+            actionItem("Previous Sibling", IconFactoryF.Key.PREVIOUS, () -> gotoSibling(-1)),
+            actionItem("Next Sibling", IconFactoryF.Key.NEXT, () -> gotoSibling(1)));
         menu.setOnShowing(e -> {
             // pick up changes made elsewhere (e.g. by the classic UI sharing the settings)
             hideIntermediateItem.setSelected(hideIntermediateSteps());
@@ -802,6 +830,152 @@ public class ProofTreeViewF extends BorderPane {
             hideInteractiveItem.setSelected(hideInteractiveGoals());
         });
         return menu;
+    }
+
+    /** @return a menu item with an optional icon and the given action */
+    private static MenuItem actionItem(String label, IconFactoryF.Key icon, Runnable action) {
+        MenuItem item = new MenuItem(label);
+        if (icon != null) {
+            item.setGraphic(IconFactoryF.createIcon(icon));
+        }
+        item.setOnAction(e -> action.run());
+        return item;
+    }
+
+    // -----------------------------------------------------------------------
+    // Popup expand/collapse and sibling actions (Swing ProofTreePopupFactory)
+    // -----------------------------------------------------------------------
+
+    /** Expands every branch below the given item (Swing Expand All Below). */
+    private void expandAllBelow(TreeItem<Entry> item) {
+        if (item == null) {
+            return;
+        }
+        expandRec(item);
+    }
+
+    private static void expandRec(TreeItem<Entry> item) {
+        item.setExpanded(true);
+        for (TreeItem<Entry> child : new ArrayList<>(item.getChildren())) {
+            expandRec(child);
+        }
+    }
+
+    /** Collapses every branch below the given item, the item itself stays expanded. */
+    private void collapseAllBelow(TreeItem<Entry> item) {
+        if (item == null) {
+            return;
+        }
+        for (TreeItem<Entry> child : new ArrayList<>(item.getChildren())) {
+            collapseRec(child);
+        }
+    }
+
+    private static void collapseRec(TreeItem<Entry> item) {
+        item.setExpanded(false);
+        for (TreeItem<Entry> child : new ArrayList<>(item.getChildren())) {
+            collapseRec(child);
+        }
+    }
+
+    /**
+     * Collapses everything below the given branch and then expands the branches along the paths
+     * of the open goals, so only the goals remain visible (Swing Expand Goals Only Below).
+     */
+    private void expandGoalsOnlyBelow(TreeItem<Entry> branchItem) {
+        if (branchItem == null) {
+            return;
+        }
+        collapseAllBelow(branchItem);
+        branchItem.setExpanded(true);
+        for (Goal goal : proof.openGoals()) {
+            TreeItem<Entry> item = findItem(branchItem, goal.node());
+            for (TreeItem<Entry> i = item == null ? null : item.getParent(); i != null
+                    && i != branchItem.getParent(); i = i.getParent()) {
+                i.setExpanded(true);
+            }
+        }
+    }
+
+    /**
+     * Collapses every expanded branch that is neither the given branch nor one of its ancestors
+     * (Swing {@code collapseOthers}).
+     */
+    private void collapseOthers(TreeItem<Entry> target) {
+        if (target == null) {
+            return;
+        }
+        collapseOthersRec(tree.getRoot(), target);
+    }
+
+    private static void collapseOthersRec(TreeItem<Entry> item, TreeItem<Entry> target) {
+        if (item == null || !item.isExpanded() || item == target) {
+            return;
+        }
+        if (isAncestorOf(item, target)) {
+            for (TreeItem<Entry> child : new ArrayList<>(item.getChildren())) {
+                collapseOthersRec(child, target);
+            }
+        } else {
+            item.setExpanded(false);
+        }
+    }
+
+    private static boolean isAncestorOf(TreeItem<?> ancestor, TreeItem<?> item) {
+        for (TreeItem<?> i = item; i != null; i = i.getParent()) {
+            if (i == ancestor) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Selects the next ({@code direction == 1}) or previous ({@code direction == -1}) branch
+     * sibling of the selected entry's branch (Swing Previous/Next Sibling): the immediate
+     * neighbor first, then wrapping around from the far end like the Swing actions.
+     */
+    private void gotoSibling(int direction) {
+        TreeItem<Entry> start = tree.getSelectionModel().getSelectedItem();
+        if (start == null) {
+            return;
+        }
+        TreeItem<Entry> branchItem = start.getValue().isBranch() ? start : start.getParent();
+        if (branchItem == null || !branchItem.getValue().isBranch()) {
+            return;
+        }
+        TreeItem<Entry> parent = branchItem.getParent();
+        if (parent == null) {
+            return;
+        }
+        List<TreeItem<Entry>> children = new ArrayList<>(parent.getChildren());
+        int index = children.indexOf(branchItem);
+        int count = children.size();
+        if (index < 0 || count < 2) {
+            return;
+        }
+        List<Integer> candidates = new ArrayList<>();
+        candidates.add(index + direction);
+        if (direction < 0) {
+            for (int i = count - 1; i > index; i--) {
+                candidates.add(i);
+            }
+        } else {
+            for (int i = 0; i < index; i++) {
+                candidates.add(i);
+            }
+        }
+        for (int candidate : candidates) {
+            if (candidate < 0 || candidate >= count) {
+                continue;
+            }
+            TreeItem<Entry> sibling = children.get(candidate);
+            if (sibling.getValue().isBranch()) {
+                tree.getSelectionModel().select(sibling);
+                tree.scrollTo(tree.getRow(sibling));
+                return;
+            }
+        }
     }
 
     /**
