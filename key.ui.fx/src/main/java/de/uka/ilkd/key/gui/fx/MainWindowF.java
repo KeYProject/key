@@ -39,6 +39,8 @@ import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
+import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
+import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
 import de.uka.ilkd.key.gui.fx.docking.DockLayoutStore;
@@ -133,6 +135,24 @@ public final class MainWindowF {
     private final InfoViewF infoView = new InfoViewF();
 
     /**
+     * Updates the left status text whenever the selection changes: proof name, closed state or
+     * the number of open goals (Swing's status line is message-driven; the proof summary is the
+     * persistent M2 content). Marshalled to the FX thread (the mediator's
+     * {@code defaultSelection} may fire from the prover thread).
+     */
+    private final KeYSelectionListener statusSelectionListener = new KeYSelectionListener() {
+        @Override
+        public void selectedProofChanged(KeYSelectionEvent<Proof> event) {
+            updateProofStatus();
+        }
+
+        @Override
+        public void selectedNodeChanged(KeYSelectionEvent<de.uka.ilkd.key.proof.Node> event) {
+            updateProofStatus();
+        }
+    };
+
+    /**
      * Creates the main window bound to the given stage.
      *
      * @param stage the primary stage of the JavaFX application
@@ -214,6 +234,7 @@ public final class MainWindowF {
         sequentView.attach(selectionModel);
         proofTreeView.attach(selectionModel);
         infoView.attach(selectionModel);
+        selectionModel.addKeYSelectionListenerChecked(statusSelectionListener);
         sequentView.setOnPosSelected(pos -> {
             if (pos == null) {
                 statusRight.setText("");
@@ -262,7 +283,6 @@ public final class MainWindowF {
             workspace.select(dockables.get(target));
             NotificationManagerF.getInstance()
                     .notify("Demo proof loaded: " + location, Kind.INFO);
-            statusLeft.setText("Proof: " + env.getLoadedProof().name());
             if (System.getProperty("key.fx.verify.sequent") != null) {
                 String report = sequentView.verifyPositionMapping();
                 LOGGER.info("Sequent position mapping verification: {}", report);
@@ -323,6 +343,9 @@ public final class MainWindowF {
                 // MainWindow.autoModeStopped refreshes the views from the final state)
                 FxUtil.runLater(() -> {
                     proofTreeView.refresh();
+                    // no selection event fires at auto mode stop (the proof suspended its
+                    // listeners), so the status line is refreshed from the final state here
+                    updateProofStatus();
                     String report = proofTreeView.verifyTreeStructure() + " "
                         + proofTreeView.getLiveUpdateReport();
                     LOGGER.info("Proof tree live update verification: {}", report);
@@ -597,9 +620,31 @@ public final class MainWindowF {
     private void updateStatus() {
         Theme theme = ThemeManager.getInstance().getTheme();
         int sizeIndex = ConfigF.DEFAULT.sizeIndex();
-        statusLeft.setText(KeYConstants.COPYRIGHT);
+        updateProofStatus();
         statusRight.setText("Theme: " + theme.name().toLowerCase() + " · Font size: "
             + ConfigF.SIZES[sizeIndex]);
+    }
+
+    /**
+     * Sets the left status text from the current selection: the copyright if no proof is
+     * selected, otherwise the proof name plus its closed state or open-goal count.
+     */
+    private void updateProofStatus() {
+        if (!FxUtil.isFxThread()) {
+            FxUtil.runLater(this::updateProofStatus);
+            return;
+        }
+        Proof proof = selectionModel.getSelectedProof();
+        if (proof == null) {
+            statusLeft.setText(KeYConstants.COPYRIGHT);
+            return;
+        }
+        if (proof.closed()) {
+            statusLeft.setText("Proof: " + proof.name() + " (closed)");
+        } else {
+            statusLeft.setText("Proof: " + proof.name() + " · " + proof.openGoals().size()
+                + " open goal(s)");
+        }
     }
 
     private void setTheme(Theme theme) {
