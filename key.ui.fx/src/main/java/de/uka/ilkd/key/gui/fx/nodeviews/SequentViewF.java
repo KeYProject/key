@@ -20,8 +20,10 @@ import javafx.scene.text.HitInfo;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
+import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
+import de.uka.ilkd.key.core.fx.KeYSelectionListener;
+import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.InitialPositionTable;
@@ -35,6 +37,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.logic.Name;
+import org.key_project.util.javafx.FxUtil;
 
 /**
  * First JavaFX version of the sequent view, the counter-part of
@@ -80,6 +83,21 @@ public class SequentViewF extends ScrollPane {
     private String printed;
     private Range highlightedRange;
 
+    private KeYSelectionModel selectionModel;
+    private final KeYSelectionListener selectionListener = new KeYSelectionListener() {
+        @Override
+        public void selectedNodeChanged(KeYSelectionEvent<Node> event) {
+            display(selectionModel.getSelectedNode());
+        }
+
+        @Override
+        public void selectedProofChanged(KeYSelectionEvent<Proof> event) {
+            // setSelectedProof fires only the proof event (no node event); re-display here,
+            // mirroring MainWindow.setSequentView of the Swing UI
+            display(selectionModel.getSelectedNode());
+        }
+    };
+
     private Consumer<PosInSequent> onPosSelected = pos -> {
     };
 
@@ -98,18 +116,50 @@ public class SequentViewF extends ScrollPane {
     }
 
     /**
-     * Sets the proof whose root node is displayed.
+     * Registers this view as a selection listener on the given model and displays the currently
+     * selected node, mirroring how the Swing {@code SequentView} observes the mediator's
+     * selection model.
      *
-     * @param proof the loaded proof, may be {@code null} to reset the view
-     * @param services the services of the proof's environment
+     * @param model the selection model to observe
      */
-    public void setProof(Proof proof, Services services) {
-        this.proof = proof;
-        this.selectedNode = proof != null ? proof.root() : null;
-        this.printer = proof != null
-                ? SequentViewLogicPrinter.positionPrinter(new NotationInfo(), services,
-                    NO_VISIBLE_TERM_LABELS)
-                : null;
+    public void attach(KeYSelectionModel model) {
+        Objects.requireNonNull(model);
+        if (selectionModel == model) {
+            return;
+        }
+        if (selectionModel != null) {
+            selectionModel.removeKeYSelectionListener(selectionListener);
+        }
+        selectionModel = model;
+        model.addKeYSelectionListenerChecked(selectionListener);
+        display(model.getSelectedNode());
+    }
+
+    /**
+     * Displays the sequent of the given node.
+     *
+     * @param node the node whose sequent is shown, may be {@code null} to reset the view
+     */
+    public void display(Node node) {
+        if (!FxUtil.isFxThread()) {
+            FxUtil.runLater(() -> display(node));
+            return;
+        }
+        highlightedRange = null;
+        if (node == null) {
+            proof = null;
+            selectedNode = null;
+            printer = null;
+            printPlaceholder();
+            return;
+        }
+        if (node.proof() != proof) {
+            proof = node.proof();
+            // TODO(M2c): share the NotationInfo and the term label visibility with the mediator
+            printer = SequentViewLogicPrinter.positionPrinter(new NotationInfo(),
+                node.proof().getServices(), NO_VISIBLE_TERM_LABELS);
+        }
+        selectedNode = node;
         printSequent();
     }
 

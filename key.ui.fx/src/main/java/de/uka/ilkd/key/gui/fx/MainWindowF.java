@@ -37,6 +37,7 @@ import javafx.stage.Stage;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
 import de.uka.ilkd.key.gui.fx.docking.DockLayoutStore;
 import de.uka.ilkd.key.gui.fx.docking.DockLocation;
@@ -98,6 +99,14 @@ public final class MainWindowF {
      * printed sequent of the root node of a demo proof, see {@link #startDemoProofLoad()}).
      */
     private final SequentViewF sequentView = new SequentViewF();
+
+    /**
+     * The selection model of the window, copy of the Swing mediator's model. Until the
+     * {@code KeYMediatorF} exists (M2c) the proof binding is a no-op.
+     */
+    private final KeYSelectionModel selectionModel = new KeYSelectionModel((newProof,
+            previousProof) -> LOGGER.debug("Selected proof changed: {} -> {}", previousProof,
+                newProof));
 
     /**
      * Creates the main window bound to the given stage.
@@ -166,11 +175,19 @@ public final class MainWindowF {
         return sequentView;
     }
 
+    /**
+     * @return the selection model of the window
+     */
+    public KeYSelectionModel getSelectionModel() {
+        return selectionModel;
+    }
+
     // ------------------------------------------------------------------
     // sequent view (M2a spike)
     // ------------------------------------------------------------------
 
     private void wireSequentView() {
+        sequentView.attach(selectionModel);
         sequentView.setOnPosSelected(pos -> {
             if (pos == null) {
                 statusRight.setText("");
@@ -201,7 +218,10 @@ public final class MainWindowF {
         };
         loadTask.setOnSucceeded(event -> {
             KeYEnvironment<DefaultUserInterfaceControl> env = loadTask.getValue();
-            sequentView.setProof(env.getLoadedProof(), env.getServices());
+            // route the proof through the selection model (as the mediator will do in M2c):
+            // fires selectedProofChanged + selects the first open goal or a leaf, which the
+            // sequent view observes and displays.
+            selectionModel.setSelectedProof(env.getLoadedProof());
             workspace.select(dockables.get(ID_SEQUENT));
             NotificationManagerF.getInstance()
                     .notify("Demo proof loaded: " + location, Kind.INFO);
