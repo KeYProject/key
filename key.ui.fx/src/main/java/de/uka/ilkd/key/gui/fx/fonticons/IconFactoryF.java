@@ -61,7 +61,10 @@ public final class IconFactoryF {
         AUTO_MODE_STOP(FontAwesomeSolid.STOP_CIRCLE),
         PROOF_TREE(FontAwesomeSolid.SITEMAP),
         INFO_VIEW(FontAwesomeSolid.INFO_CIRCLE),
-        PROOF_SEARCH_STRATEGY(FontAwesomeSolid.COG);
+        PROOF_SEARCH_STRATEGY(FontAwesomeSolid.COG),
+        KEY_HOLE(FontAwesomeSolid.KEY),
+        KEY_HOLE_INTERACTIVE(FontAwesomeSolid.HAND_PAPER),
+        KEY_HOLE_LINKED(FontAwesomeSolid.LINK);
 
         private final IconFont glyph;
 
@@ -119,8 +122,23 @@ public final class IconFactoryF {
      * @return a new icon node
      */
     public static Node createIcon(IconFont glyph, double size) {
-        Text text = new Text(String.valueOf(glyph.getUnicode()));
+        Text text = render(new Text(), glyph, size);
         text.getStyleClass().add(ICON_STYLE_CLASS);
+        return text;
+    }
+
+    /**
+     * Renders the given glyph into an existing text node, for icon nodes that swap glyphs without
+     * being recreated (the node keeps its style classes). The caller adds the icon style class and
+     * the themed fill classes.
+     *
+     * @param text the text node to render into
+     * @param glyph the glyph
+     * @param size the font size of the icon
+     * @return the text node, rendering the glyph
+     */
+    public static Text render(Text text, IconFont glyph, double size) {
+        text.setText(String.valueOf(glyph.getUnicode()));
         javafx.scene.text.Font base = glyph.getFont();
         text.setFont(Font.font(base.getFamily(), size));
         return text;

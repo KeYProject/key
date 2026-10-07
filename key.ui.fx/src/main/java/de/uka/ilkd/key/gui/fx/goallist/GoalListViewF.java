@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import javafx.geometry.Pos;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -21,11 +22,14 @@ import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.text.Text;
 
 import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
+import de.uka.ilkd.key.gui.fx.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
@@ -56,8 +60,9 @@ import org.slf4j.LoggerFactory;
  * user's cursor. Clicking a row selects the goal in the {@link KeYSelectionModel}; the ListView
  * selection is kept in sync with the model's selected goal.
  * <p>
- * A cell shows the node serial ({@code #n}), an automatic/interactive/linked marker (text
- * analogue of the key-hole icons of the Swing {@code IconCellRenderer}), and a one-line printed
+ * A cell shows the node serial ({@code #n}), an automatic/interactive/linked marker icon (font
+ * glyphs standing in for the key-hole icons of the Swing {@code IconCellRenderer}), and a
+ * one-line printed
  * sequent truncated to {@value #MAX_DISPLAYED_SEQUENT_LENGTH} characters, exactly like the Swing
  * renderer. The sequent text is produced by the core pretty printer
  * ({@link SequentViewLogicPrinter} with {@link NotationInfo} and the proof's {@code Services},
@@ -442,8 +447,8 @@ public class GoalListViewF extends ListView<Goal> {
     }
 
     /**
-     * @return the marker text of the goal, the text analogue of the icon choice of the Swing
-     *         {@code IconCellRenderer} (linked, key-hole for automatic, disabled key-hole for
+     * @return the marker text of the goal for the cell tooltip, the text analogue of the icon
+     *         choice of the Swing {@code IconCellRenderer} (linked, key-hole for automatic,
      *         interactive)
      */
     private static String markerText(Goal goal) {
@@ -451,6 +456,19 @@ public class GoalListViewF extends ListView<Goal> {
             return "linked";
         }
         return goal.isAutomatic() ? "automatic" : "interactive";
+    }
+
+    /**
+     * @return the glyph of the goal's marker icon, the font-glyph counterpart of the icon choice
+     *         of the Swing {@code IconCellRenderer}: a key-hole for automatic goals (Swing's black
+     *         key-hole), a hand for interactive goals (Swing's yellow hand over the key-hole), a
+     *         link for goals joined by a one-step simplification (Swing's linked icon)
+     */
+    private static FontAwesomeSolid markerGlyph(Goal goal) {
+        if (goal.isLinked()) {
+            return FontAwesomeSolid.LINK;
+        }
+        return goal.isAutomatic() ? FontAwesomeSolid.KEY : FontAwesomeSolid.HAND_PAPER;
     }
 
     /**
@@ -482,30 +500,30 @@ public class GoalListViewF extends ListView<Goal> {
     }
 
     /**
-     * The cell rendering: node serial, goal marker, one-line sequent; selected state comes from
-     * the ListView selection (styled via {@code .goal-list-cell:selected}).
+     * The cell rendering: node serial, goal state icon (the Swing key-hole icons as font glyphs),
+     * one-line sequent; selected state comes from the ListView selection (styled via
+     * {@code .goal-list-cell:selected}).
      */
     private final class GoalListCell extends ListCell<Goal> {
         private final Label nameLabel = new Label();
-        private final Label markerLabel = new Label();
+        private final Text markerIcon = new Text();
         private final Label sequentLabel = new Label();
         private final HBox content;
 
         GoalListCell() {
             nameLabel.getStyleClass().add("goal-list-label");
-            markerLabel.getStyleClass().add("goal-list-marker");
+            markerIcon.getStyleClass().add("goal-list-marker");
             sequentLabel.getStyleClass().add("goal-list-sequent");
             nameLabel.setFont(ConfigF.DEFAULT.systemFont());
-            markerLabel.setFont(ConfigF.DEFAULT.systemFont());
             sequentLabel.setFont(ConfigF.DEFAULT.monoFont());
-            // keep the node serial and the marker at their preferred size: only the sequent
-            // label shrinks and ellipsizes when the cell is too narrow
+            // keep the node serial at its preferred size: only the sequent label shrinks and
+            // ellipsizes when the cell is too narrow
             nameLabel.setMinWidth(Region.USE_PREF_SIZE);
-            markerLabel.setMinWidth(Region.USE_PREF_SIZE);
             sequentLabel.setMaxWidth(Double.MAX_VALUE);
             sequentLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
             HBox.setHgrow(sequentLabel, Priority.ALWAYS);
-            content = new HBox(6, nameLabel, markerLabel, sequentLabel);
+            content = new HBox(6, nameLabel, markerIcon, sequentLabel);
+            content.setAlignment(Pos.CENTER_LEFT);
             // Swing GoalList's mouse listener selects the row under the pointer before the popup
             // opens; the popup acts on the (now selected) goal
             setOnContextMenuRequested(e -> {
@@ -543,9 +561,9 @@ public class GoalListViewF extends ListView<Goal> {
             }
             String text = sequentText(goal);
             String marker = markerText(goal);
-            markerLabel.getStyleClass().setAll("goal-list-marker", markerStyleClass(goal));
+            markerIcon.getStyleClass().setAll("goal-list-marker", markerStyleClass(goal));
+            IconFactoryF.render(markerIcon, markerGlyph(goal), IconFactoryF.DEFAULT_SIZE);
             nameLabel.setText("#" + goal.node().serialNr());
-            markerLabel.setText(marker);
             sequentLabel.setText(text);
             setGraphic(content);
             setText(null);
