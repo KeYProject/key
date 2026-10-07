@@ -173,3 +173,58 @@
 .info-view-placeholder {
     -fx-text-fill: -key-text-secondary;
 }
+
+/* goal list view */
+.goal-list {
+    -fx-background-color: -key-surface;
+}
+
+.goal-list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 3 8 3 8;
+}
+
+.goal-list-label {
+    -fx-text-fill: -key-text-secondary;
+}
+
+.goal-list-marker {
+    -fx-font-size: 0.9em;
+}
+
+.goal-list-automatic {
+    -fx-text-fill: -key-success;
+}
+
+.goal-list-interactive {
+    -fx-text-fill: -key-interactive;
+}
+
+.goal-list-linked {
+    -fx-text-fill: -key-linked;
+}
+
+.goal-list-sequent {
+    -fx-text-fill: -key-text;
+}
+
+/* selected row: subtle accent background, readable text for all labels */
+.goal-list-cell:selected {
+    -fx-background-color: derive(-key-accent, 85%);
+}
+
+.goal-list-cell:selected .label {
+    -fx-text-fill: -key-text;
+}
+
+.goal-list-empty {
+    -fx-text-fill: -key-text-secondary;
+}
+
+.goal-list-header {
+    -fx-font-size: 1.1em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text;
+    -fx-background-color: -key-background;
+    -fx-border-color: transparent transparent -key-border transparent;
+}
