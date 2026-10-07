@@ -21,6 +21,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleGroup;
@@ -262,7 +263,13 @@ public final class MainWindowF {
                 return;
             }
             String text = sequentView.getHighlightedText(pos);
-            statusRight.setText(text.isBlank() ? String.valueOf(pos) : text);
+            // the status bar stays single-line: flatten the pretty-printed term and cap it; the
+            // full position is in the log line below
+            String flat = text.replaceAll("\\s+", " ").strip();
+            if (flat.length() > 120) {
+                flat = flat.substring(0, 117) + "...";
+            }
+            statusRight.setText(flat.isBlank() ? String.valueOf(pos) : flat);
             LOGGER.info("Clicked sequent position: {}", pos);
         });
     }
@@ -759,12 +766,20 @@ public final class MainWindowF {
         HBox bar = new HBox();
         bar.getStyleClass().add("status-bar");
         bar.setPadding(new Insets(2, 8, 2, 8));
+        // both labels must never drive the bar's size: a Label's min size defaults to its text
+        // size, and a long (multi-line) term text would blow the bar up and squeeze the workspace
         statusLeft.setAlignment(Pos.CENTER_LEFT);
+        statusLeft.setTextOverrun(OverrunStyle.ELLIPSIS);
+        statusLeft.setMinWidth(0);
+        statusLeft.setMinHeight(0);
         statusLeft.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(statusLeft, Priority.ALWAYS);
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         statusRight.setAlignment(Pos.CENTER_RIGHT);
+        statusRight.setTextOverrun(OverrunStyle.ELLIPSIS);
+        statusRight.setMinWidth(0);
+        statusRight.setMinHeight(0);
         bar.getChildren().addAll(statusLeft, spacer, statusRight);
         return bar;
     }
