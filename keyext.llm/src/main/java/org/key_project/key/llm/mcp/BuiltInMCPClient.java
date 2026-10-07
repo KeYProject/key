@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.llm.mcp;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import org.jspecify.annotations.Nullable;
  */
 public class BuiltInMCPClient implements McpClient {
     private final Map<String, McpClient> toolOwners = new HashMap<>();
+    private final Map<String, Tool> allTools = new HashMap<>();
     private boolean isClosed = false;
 
     public BuiltInMCPClient() {
@@ -46,12 +48,23 @@ public class BuiltInMCPClient implements McpClient {
     private void register(McpClient client) {
         for (Tool tool : client.getTools()) {
             toolOwners.putIfAbsent(tool.function().name(), client);
+            allTools.putIfAbsent(tool.function().name(), tool);
         }
     }
 
     /** Names of all known tools (including disabled ones; used by the settings UI). */
     public Set<String> getAllToolNames() {
         return new TreeSet<>(toolOwners.keySet());
+    }
+
+    /**
+     * Tool definitions of all known tools (including disabled ones), sorted by name. Used by the
+     * settings UI, which must be able to re-enable disabled tools.
+     */
+    public List<Tool> getAllTools() {
+        return allTools.values().stream()
+                .sorted(Comparator.comparing(t -> t.function().name()))
+                .toList();
     }
 
     /**
