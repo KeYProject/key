@@ -390,3 +390,51 @@
 .strategy-status {
     -fx-text-fill: -key-text-secondary;
 }
+
+/* source view */
+/* M2, first read-only version; see SourceViewF */
+.source-view {
+    -fx-background-color: -key-surface;
+}
+
+.source-view-header {
+    -fx-background-color: -key-background;
+    -fx-text-fill: -key-text-secondary;
+    -fx-padding: 4 8 4 8;
+    -fx-border-color: transparent transparent -key-border transparent;
+}
+
+/*
+ * Segment classes applied to the text nodes of the area (see SourceHighlighter).
+ * The colors reuse the -key-* palette so the dark theme needs no extra rules.
+ */
+.source-text {
+    -fx-fill: -key-text;
+}
+
+.source-placeholder {
+    -fx-fill: -key-text-secondary;
+    -fx-font-style: italic;
+}
+
+.source-keyword {
+    -fx-fill: -key-accent;
+    -fx-font-weight: bold;
+}
+
+.source-comment {
+    -fx-fill: -key-text-secondary;
+    -fx-font-style: italic;
+}
+
+.source-string {
+    -fx-fill: -key-success;
+}
+
+.source-annotation {
+    -fx-fill: -key-warning;
+}
+
+.source-jml-keyword {
+    -fx-font-weight: bold;
+}

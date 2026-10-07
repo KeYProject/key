@@ -34,7 +34,7 @@ docking-frames = "1.1.3p1"
 
 # JavaFX user interface (key.ui.fx)
 javafx = "25.0.4"
-richtextfx = "0.11.5"
+richtextfx = "0.11.7"
 openjfx-plugin = "0.1.0"
 
 # External tools
