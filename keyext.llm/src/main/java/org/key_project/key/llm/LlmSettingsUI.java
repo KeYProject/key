@@ -38,6 +38,10 @@ public class LlmSettingsUI extends SettingsPanel {
     public LlmSettingsUI(LlmSettings settings) {
         model = new LlmSettings(settings);
 
+        setHeaderText("LLM Settings");
+        setSubHeaderText("Connection, agent behavior, context and history budgets, file handling,"
+            + " shell security and chat appearance for the KeY-Agent.");
+
         addSeparator("Connection");
         txtApiBaseUrl = addTextField("API Base URL", model.getApiEndpoint(), "",
             model::setApiEndpoint);

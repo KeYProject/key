@@ -12,6 +12,8 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
+
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -21,10 +23,14 @@ import org.jspecify.annotations.Nullable;
  * manage the library. Persistence is immediate (the library is written on {@code Save}), it is
  * not deferred to the settings {@code Apply} button.
  *
+ * <p>
+ * Like every KeY settings panel it renders the standard header (title + optional subtitle)
+ * via {@link SimpleSettingsPanel}.
+ *
  * @param <E> the library element type
  * @author Alexander Weigl
  */
-public abstract class LibraryEditorPanel<E> extends JPanel {
+public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
     private static final String[] COLUMNS = { "Name", "Description" };
 
     private final List<E> items = new ArrayList<>();
@@ -42,8 +48,12 @@ public abstract class LibraryEditorPanel<E> extends JPanel {
     protected final JTextField txtName = new JTextField(20);
     protected final JTextField txtDescription = new JTextField(20);
 
-    protected LibraryEditorPanel() {
-        super(new BorderLayout(8, 8));
+    protected LibraryEditorPanel(String description, String subHeader) {
+        setHeaderText(description);
+        if (subHeader != null && !subHeader.isEmpty()) {
+            setSubHeaderText(subHeader);
+        }
+        pCenter.setLayout(new BorderLayout(8, 8));
         table.setModel(tableModel);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getSelectionModel().addListSelectionListener(e -> {
@@ -66,11 +76,11 @@ public abstract class LibraryEditorPanel<E> extends JPanel {
         var center = new JPanel(new BorderLayout(4, 4));
         center.add(new JScrollPane(table), BorderLayout.CENTER);
         center.add(actions, BorderLayout.SOUTH);
-        add(center, BorderLayout.CENTER);
+        pCenter.add(center, BorderLayout.CENTER);
 
         status.setForeground(Color.RED);
         formArea.add(status, BorderLayout.SOUTH);
-        add(formArea, BorderLayout.SOUTH);
+        pCenter.add(formArea, BorderLayout.SOUTH);
     }
 
     private static JButton button(String text, Runnable action) {
