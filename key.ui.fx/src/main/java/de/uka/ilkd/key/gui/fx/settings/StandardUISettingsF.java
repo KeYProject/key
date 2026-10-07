@@ -16,6 +16,7 @@ import javafx.scene.control.ToggleGroup;
 
 import de.uka.ilkd.key.gui.fx.MainWindowF;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
+import de.uka.ilkd.key.gui.fx.keyshortcuts.ShortcutSettingsF;
 import de.uka.ilkd.key.gui.fx.theme.Theme;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
 import de.uka.ilkd.key.settings.GeneralSettings;
@@ -150,8 +151,7 @@ public class StandardUISettingsF extends SettingsPanelF implements SettingsProvi
 
     @Override
     public java.util.List<SettingsProviderF> getChildProviders() {
-        // the keyboard shortcut panel is added with its commit in this milestone
-        return java.util.List.of(new ColorSettingsProviderF());
+        return java.util.Arrays.asList(new ColorSettingsProviderF(), new ShortcutSettingsF());
     }
 
     @Override
