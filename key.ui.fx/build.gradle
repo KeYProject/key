@@ -45,6 +45,17 @@ run {
     systemProperties["key.examples.dir"] = "$rootDir/key.ui/examples"
     systemProperties["KeyDebugFlag"] = "on"
 
+    // Forward selected system properties from the Gradle command line to the application:
+    //  * key.fx.theme  = light|dark  (theme override, also used by headless UI tests)
+    //  * key.fx.demo.sequent = <file.key>  (M2a spike: load a demo proof into the sequent view)
+    //  * key.fx.verify.sequent = any  (M2a spike: run the position-mapping self test afterwards)
+    ["key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent"].each { name ->
+        def value = System.getProperty(name)
+        if (value != null) {
+            systemProperties[name] = value
+        }
+    }
+
     // enable assertions
     jvmArgs += "-ea"
 

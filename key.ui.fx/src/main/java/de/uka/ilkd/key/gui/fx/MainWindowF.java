@@ -5,11 +5,13 @@
 package de.uka.ilkd.key.gui.fx;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -33,6 +35,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
 import de.uka.ilkd.key.gui.fx.docking.DockLayoutStore;
 import de.uka.ilkd.key.gui.fx.docking.DockLocation;
@@ -41,6 +45,7 @@ import de.uka.ilkd.key.gui.fx.docking.Dockable;
 import de.uka.ilkd.key.gui.fx.docking.SimpleDockable;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
+import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
 import de.uka.ilkd.key.gui.fx.settings.SettingsManagerF;
@@ -89,6 +94,12 @@ public final class MainWindowF {
     private final Label statusRight = new Label();
 
     /**
+     * The sequent view is the first real view of milestone M2 (currently a spike rendering the
+     * printed sequent of the root node of a demo proof, see {@link #startDemoProofLoad()}).
+     */
+    private final SequentViewF sequentView = new SequentViewF();
+
+    /**
      * Creates the main window bound to the given stage.
      *
      * @param stage the primary stage of the JavaFX application
@@ -126,6 +137,9 @@ public final class MainWindowF {
         ThemeManager.getInstance().themeProperty().addListener((obs, old, theme) -> updateStatus());
         updateStatus();
 
+        wireSequentView();
+        startDemoProofLoad();
+
         NotificationManagerF.getInstance()
                 .notify("KeY (JavaFX) started. Docking layout restored from "
                     + layoutStore.file() + ".");
@@ -143,6 +157,73 @@ public final class MainWindowF {
      */
     public Map<String, Dockable> getDockables() {
         return dockables;
+    }
+
+    /**
+     * @return the sequent view docked in the main area
+     */
+    public SequentViewF getSequentView() {
+        return sequentView;
+    }
+
+    // ------------------------------------------------------------------
+    // sequent view (M2a spike)
+    // ------------------------------------------------------------------
+
+    private void wireSequentView() {
+        sequentView.setOnPosSelected(pos -> {
+            if (pos == null) {
+                statusRight.setText("");
+                return;
+            }
+            String text = sequentView.getHighlightedText(pos);
+            statusRight.setText(text.isBlank() ? String.valueOf(pos) : text);
+            LOGGER.info("Clicked sequent position: {}", pos);
+        });
+    }
+
+    /**
+     * Milestone M2a spike affordance: if the system property {@code key.fx.demo.sequent} is set to
+     * a {@code .key} file, load it with the core {@link KeYEnvironment} on a background thread and
+     * display the root sequent in the sequent view.
+     */
+    private void startDemoProofLoad() {
+        String file = System.getProperty("key.fx.demo.sequent");
+        if (file == null || file.isBlank()) {
+            return;
+        }
+        Path location = Path.of(file);
+        Task<KeYEnvironment<DefaultUserInterfaceControl>> loadTask = new Task<>() {
+            @Override
+            protected KeYEnvironment<DefaultUserInterfaceControl> call() throws Exception {
+                return KeYEnvironment.load(location);
+            }
+        };
+        loadTask.setOnSucceeded(event -> {
+            KeYEnvironment<DefaultUserInterfaceControl> env = loadTask.getValue();
+            sequentView.setProof(env.getLoadedProof(), env.getServices());
+            workspace.select(dockables.get(ID_SEQUENT));
+            NotificationManagerF.getInstance()
+                    .notify("Demo proof loaded: " + location, Kind.INFO);
+            statusLeft.setText("Proof: " + env.getLoadedProof().name());
+            if (System.getProperty("key.fx.verify.sequent") != null) {
+                String report = sequentView.verifyPositionMapping();
+                LOGGER.info("Sequent position mapping verification: {}", report);
+                NotificationManagerF.getInstance()
+                        .notify("Position mapping verification: " + report,
+                            report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+                statusRight.setText(report);
+            }
+        });
+        loadTask.setOnFailed(event -> {
+            Throwable error = loadTask.getException();
+            LOGGER.error("Demo proof loading failed", error);
+            NotificationManagerF.getInstance()
+                    .notify("Demo proof loading failed: " + error.getMessage(), Kind.ERROR);
+        });
+        Thread loader = new Thread(loadTask, "fx-demo-proof-loader");
+        loader.setDaemon(true);
+        loader.start();
     }
 
     private void setWindowIcons() {
@@ -163,7 +244,7 @@ public final class MainWindowF {
         registerDockable(ID_PROOF_TREE, "Proof Tree");
         registerDockable(ID_INFO_VIEW, "Info");
         registerDockable(ID_STRATEGY, "Strategy");
-        registerDockable(ID_SEQUENT, "Sequent");
+        dockables.put(ID_SEQUENT, new SimpleDockable(ID_SEQUENT, "Sequent", sequentView));
         registerDockable(ID_SOURCE_VIEW, "Source");
     }
 

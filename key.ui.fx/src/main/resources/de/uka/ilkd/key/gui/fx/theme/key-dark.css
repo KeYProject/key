@@ -86,3 +86,22 @@
 .key-icon {
     -fx-fill: -key-text;
 }
+
+/* sequent view (M2a spike) */
+.sequent-view,
+.sequent-view-flow {
+    -fx-background-color: transparent;
+}
+
+.sequent-text {
+    -fx-fill: -key-text;
+}
+
+.sequent-term-highlight {
+    -fx-fill: -key-accent;
+    -fx-font-weight: bold;
+}
+
+.sequent-placeholder {
+    -fx-fill: -key-text-secondary;
+}
