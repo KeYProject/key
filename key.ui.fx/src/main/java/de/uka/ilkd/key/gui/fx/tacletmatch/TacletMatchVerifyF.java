@@ -37,9 +37,10 @@ import org.slf4j.LoggerFactory;
  * <li>the dialog renders with the match highlighted (status line + schema-variable spans in the
  * matched term);</li>
  * <li>cancel closes the dialog and leaves the proof unchanged (node count stable);</li>
- * <li>apply closes the dialog and adds the application to the proof (node count changes);</li>
  * <li>the classic (table-based) completion dialog renders the instantiation table and
- * {@code cancelAndClose()} leaves the proof unchanged (assertion 4, port deliverable 2).</li>
+ * {@code cancelAndClose()} leaves the proof unchanged (port deliverable 2);</li>
+ * <li>apply closes the dialog and adds the application to the proof (node count changes; last, as
+ * it modifies the proof).</li>
  * </ol>
  * Each assertion logs {@code PASS}/{@code FAIL} (and is surfaced as a toast by MainWindowF).
  *
@@ -125,24 +126,9 @@ public final class TacletMatchVerifyF {
             + "after={})", cancelled ? "PASS" : "FAIL", nodesBefore,
             proof.countNodes());
 
-        // ---- assertion 3: apply closes the dialog and adds the application to the proof ------
-        if (chosen.taclet().assumesSequent().isEmpty()) {
-            // the schema-variable rows carry the model's pre-filled proposals, so the plain apply
-            // flow (push input → createTacletApp → applyInteractive) completes the instantiation
-            TacletMatchDialogF applyDlg = openDialog(control, chosen, goal, owner, proofControl,
-                services, notationInfo);
-            applyDlg.fireApply();
-            boolean applied = !applyDlg.isShowing() && proof.countNodes() != nodesBefore;
-            LOGGER.info("tacletmatch verification: apply-adds-to-proof: {} (node count before={}, "
-                + "after={})", applied ? "PASS" : "FAIL", nodesBefore, proof.countNodes());
-        } else {
-            LOGGER.info(
-                "tacletmatch verification: apply-adds-to-proof: SKIPPED (chosen taclet {} "
-                    + "requires \\assumes instantiation, which needs typed user input)",
-                chosen.taclet().name());
-        }
-
-        // ---- assertion 4: the classic (table-based) completion dialog renders and cancels ----
+        // ---- assertion 3: the classic (table-based) completion dialog renders and cancels ----
+        // (non-destructive, so it runs before the apply step; building the models against the
+        // proof state the dialog flow would actually see)
         try {
             TacletInstantiationModel[] classicModels =
                 control.completeAndApplyApp(List.of(chosen), goal);
@@ -156,8 +142,7 @@ public final class TacletMatchVerifyF {
                     classic.tableRowCount());
                 return;
             }
-            boolean classicRendered =
-                classic.isShowing() && classic.tableRowCount() > 0;
+            boolean classicRendered = classic.isShowing() && classic.tableRowCount() > 0;
             LOGGER.info(
                 "tacletmatch verification: classic-dialog-renders: {} ({} instantiation row(s), "
                     + "showing={})",
@@ -172,6 +157,24 @@ public final class TacletMatchVerifyF {
         } catch (Throwable t) {
             LOGGER.info("tacletmatch verification: classic-dialog: FAIL (unexpected error: {})",
                 t.toString());
+        }
+
+        // ---- assertion 4 (last, it changes the proof): apply closes the dialog and adds the
+        // application to the proof ------------------------------------------------------------
+        if (chosen.taclet().assumesSequent().isEmpty()) {
+            // the schema-variable rows carry the model's pre-filled proposals, so the plain apply
+            // flow (push input → createTacletApp → applyInteractive) completes the instantiation
+            TacletMatchDialogF applyDlg = openDialog(control, chosen, goal, owner, proofControl,
+                services, notationInfo);
+            applyDlg.fireApply();
+            boolean applied = !applyDlg.isShowing() && proof.countNodes() != nodesBefore;
+            LOGGER.info("tacletmatch verification: apply-adds-to-proof: {} (node count before={}, "
+                + "after={})", applied ? "PASS" : "FAIL", nodesBefore, proof.countNodes());
+        } else {
+            LOGGER.info(
+                "tacletmatch verification: apply-adds-to-proof: SKIPPED (chosen taclet {} "
+                    + "requires \\assumes instantiation, which needs typed user input)",
+                chosen.taclet().name());
         }
     }
 
