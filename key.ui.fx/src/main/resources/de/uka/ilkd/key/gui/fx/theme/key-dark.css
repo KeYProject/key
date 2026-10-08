@@ -635,3 +635,43 @@
     -fx-text-fill: -key-success;
     -fx-font-weight: bold;
 }
+
+/* ---------------------------------------------------------------------
+ * Proof management (proofmgmt: JavaFX port of the Swing ProofManagementDialog
+ * and the "Loaded Proofs" TaskTree view)
+ * --------------------------------------------------------------------- */
+
+/* the key-hole status icons of the Swing TaskTreeIconCellRenderer
+ * (TaskTree.java:348-394), colored like the proof tree node icons */
+.proof-status-open {
+    -fx-text-fill: -key-error;
+}
+
+.proof-status-closed {
+    -fx-text-fill: -key-proved;
+}
+
+.proof-status-almost-closed {
+    -fx-text-fill: -key-warning;
+}
+
+.proof-status-closed-cache {
+    -fx-text-fill: -key-accent;
+}
+
+/* the "Loaded Proofs" view (Swing de.uka.ilkd.key.gui.TaskTree) */
+.loaded-proofs {
+    -fx-font-size: 1em;
+}
+
+/* the environment group rows (Swing TaskTreeModel EnvNodes) */
+.loaded-proofs-env {
+    -fx-text-fill: -key-text-secondary;
+    -fx-font-weight: bold;
+}
+
+/* the placeholder shown when no proof is loaded */
+.loaded-proofs-empty {
+    -fx-text-fill: -key-text-secondary;
+    -fx-padding: 6;
+}

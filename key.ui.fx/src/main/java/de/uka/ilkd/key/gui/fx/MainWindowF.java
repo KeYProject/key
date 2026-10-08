@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.concurrent.Task;
@@ -68,11 +69,14 @@ import de.uka.ilkd.key.gui.fx.notification.NotificationCenterF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
 import de.uka.ilkd.key.gui.fx.proofdiff.ProofDiffFrameF;
+import de.uka.ilkd.key.gui.fx.proofmanagement.ProofManagementDialogF;
+import de.uka.ilkd.key.gui.fx.proofmanagement.ProofManagerF;
 import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeViewF;
 import de.uka.ilkd.key.gui.fx.recentfiles.RecentFilesF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsManagerF;
 import de.uka.ilkd.key.gui.fx.sourceview.SourceViewF;
 import de.uka.ilkd.key.gui.fx.strategy.StrategySelectionViewF;
+import de.uka.ilkd.key.gui.fx.tasktree.TaskTreeF;
 import de.uka.ilkd.key.gui.fx.theme.Theme;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
 import de.uka.ilkd.key.proof.Proof;
@@ -183,6 +187,26 @@ public final class MainWindowF {
     private final RecentFilesF recentFiles = new RecentFilesF();
 
     /**
+     * proofmgmt: the multi-proof state (the Swing {@code TaskTreeModel} state of the
+     * {@code TaskTree}): the loaded proofs and the active one, consulted by the Loaded Proofs
+     * view and the Proof Management dialog.
+     */
+    private final ProofManagerF proofManager = new ProofManagerF();
+
+    /**
+     * proofmgmt: the "Loaded Proofs" view (JavaFX port of the Swing {@code TaskTree}): lists the
+     * loaded proofs with status and open-goal count and switches the active proof on click.
+     */
+    private final TaskTreeF loadedProofs = new TaskTreeF(proofManager);
+
+    /**
+     * proofmgmt: the environment of the most recent load; the Proof Management dialog (Swing
+     * {@code ProofManagementDialog}, opened from the File menu) operates on its init config and
+     * starts proofs via its user interface control.
+     */
+    private @Nullable KeYEnvironment<DefaultUserInterfaceControl> lastEnvironment;
+
+    /**
      * The "Recent Files" submenu of the File menu; rebuilt by {@link #updateRecentFilesMenu()}
      * whenever the store changes.
      */
@@ -262,6 +286,14 @@ public final class MainWindowF {
         recentFiles.setOnChange(this::updateRecentFilesMenu);
         recentFiles.load();
         startDemoProofLoad();
+        // proofmgmt: the Loaded Proofs view's clicks and the Proof Management dialog route the
+        // active-proof switch through the selection model (the Swing mediator path)
+        proofManager.setActivationHandler(this::activateProof);
+        // proofmgmt: self test hook (independent of the demo load; the verification loads its
+        // own examples so that it also runs without key.fx.demo.sequent)
+        if (System.getProperty("key.fx.verify.proofmgmt") != null) {
+            runProofMgmtVerification();
+        }
 
         NotificationManagerF.getInstance()
                 .notify("KeY (JavaFX) started. Docking layout restored from "
@@ -321,6 +353,7 @@ public final class MainWindowF {
         goalListView.attach(selectionModel);
         strategyView.attach(selectionModel);
         sourceView.attach(selectionModel);
+        loadedProofs.attach(selectionModel); // proofmgmt: row highlight follows the active proof
         // the hook doubles as the :99 verification signal (same line as the standalone driver)
         sourceView.setOnContentLoaded(
             () -> LOGGER.info("Source self test: {}", sourceView.verifySourceView()));
@@ -431,6 +464,10 @@ public final class MainWindowF {
             // mediator's setProof (listener swap, abbreviation rebind, OSS refresh) and then
             // selects the first open goal or a leaf, which the views observe.
             selectionModel.setSelectedProof(env.getLoadedProof());
+            // proofmgmt: register the loaded proof in the multi-proof state (the Loaded Proofs
+            // view follows) and remember the environment for the Proof Management dialog
+            lastEnvironment = env;
+            proofManager.addProof(env.getLoadedProof());
             String show = System.getProperty("key.fx.show", ID_SEQUENT);
             String target = ID_PROOF_TREE.equalsIgnoreCase(show) ? ID_PROOF_TREE : ID_SEQUENT;
             LOGGER.info("Selecting dockable '{}' (key.fx.show={})", target, show);
@@ -1038,7 +1075,10 @@ public final class MainWindowF {
     // ------------------------------------------------------------------
 
     private void buildDockables() {
-        registerDockable(ID_LOADED_PROOFS, "Loaded Proofs"); // TaskTree
+        // proofmgmt: the Loaded Proofs view replaces the M1 placeholder dockable (JavaFX port of
+        // the Swing TaskTree)
+        dockables.put(ID_LOADED_PROOFS,
+            new SimpleDockable(ID_LOADED_PROOFS, "Loaded Proofs", loadedProofs));
         dockables.put(ID_GOAL_LIST,
             new SimpleDockable(ID_GOAL_LIST, "Goal List", goalListView));
         dockables.put(ID_PROOF_TREE,
@@ -1061,11 +1101,6 @@ public final class MainWindowF {
         header.textProperty().bind(sourceView.headerTextProperty());
         header.setTextOverrun(OverrunStyle.ELLIPSIS);
         return new BorderPane(sourceView, header, null, null, null);
-    }
-
-    private void registerDockable(String id, String title) {
-        dockables.put(id,
-            new SimpleDockable(id, title, placeholderContent(title)));
     }
 
     private List<DockWorkspace.Default> defaultLayout() {
@@ -1162,11 +1197,18 @@ public final class MainWindowF {
         // Swing QuickLoadAction has no proof enablement — it always tries to load the quick save
         // location (a missing file fails the load); disabled during auto mode like all interaction
         quickLoad.disableProperty().bind(mediator.autoModeRunningProperty());
+        // proofmgmt: Swing ProofManagementAction (menu + toolbar button): opens the Proof
+        // Management dialog for the most recently loaded problem's init config
+        MenuItem proofManagement =
+            menuItem("Proof Management…", "de.uka.ilkd.key.gui.actions.ProofManagementAction",
+                IconFactoryF.Key.PROOF_MANAGEMENT, this::openProofManagement);
+        proofManagement.disableProperty().bind(mediator.autoModeRunningProperty());
         file.getItems().addAll(
             openExample,
             openFile,
             reload,
             new SeparatorMenuItem(),
+            proofManagement,
             saveFile,
             saveBundle,
             quickSave,
@@ -1274,7 +1316,12 @@ public final class MainWindowF {
             toolbarButton("Save current proof", IconFactoryF.Key.SAVE_FILE, this::saveProofFile);
         saveFile.disableProperty()
                 .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
-        bar.getItems().addAll(openFile, reload, saveFile);
+        // proofmgmt: Swing file toolbar has the Proof Management button as well
+        javafx.scene.control.Button proofManagement =
+            toolbarButton("Proof Management", IconFactoryF.Key.PROOF_MANAGEMENT,
+                this::openProofManagement);
+        proofManagement.disableProperty().bind(mediator.autoModeRunningProperty());
+        bar.getItems().addAll(openFile, reload, saveFile, proofManagement);
         return bar;
     }
 
@@ -1436,5 +1483,197 @@ public final class MainWindowF {
     private void notYetImplemented() {
         NotificationManagerF.getInstance().notify(
             "This action arrives in a later milestone of the key.ui.fx rewrite.", Kind.WARNING);
+    }
+
+    // ------------------------------------------------------------------
+    // proof management (proofmgmt: JavaFX port of the Swing ProofManagementDialog
+    // and the Loaded Proofs/TaskTree view)
+    // ------------------------------------------------------------------
+
+    /**
+     * proofmgmt: opens the Proof Management dialog for the most recently loaded problem's init
+     * config (Swing {@code ProofManagementAction}); proofs started or selected in the dialog are
+     * registered in the multi-proof state and activated via {@link #activateProof(Proof)}.
+     */
+    private void openProofManagement() {
+        if (lastEnvironment == null) {
+            popupWarning("No problem has been loaded yet. Load a Java source or a "
+                + "problem with contracts first.");
+            return;
+        }
+        ProofManagementDialogF.showInstance(stage, lastEnvironment.getInitConfig(),
+            lastEnvironment.getUi(), this::activateAndRegisterProof,
+            selectionModel.getSelectedProof());
+    }
+
+    /**
+     * proofmgmt: activates the given proof (the selection model routes the switch through the
+     * mediator, which swaps the proof listeners and refreshes the views).
+     *
+     * @param proof the proof to make the active one
+     */
+    private void activateProof(Proof proof) {
+        selectionModel.setSelectedProof(proof);
+    }
+
+    /**
+     * proofmgmt: the proof selector handed to the Proof Management dialog: a proof started in
+     * the dialog is registered in the multi-proof state (it appears in the Loaded Proofs view)
+     * and activated.
+     *
+     * @param proof the started or selected proof
+     */
+    private void activateAndRegisterProof(Proof proof) {
+        proofManager.addProof(proof);
+        activateProof(proof);
+    }
+
+    /**
+     * proofmgmt: the {@code key.fx.verify.proofmgmt} self test driver. The value selects what is
+     * verified: {@code 1} (default) the Proof Management dialog with a real JML example,
+     * {@code 2} the Loaded Proofs view with two loaded proofs and active-proof switching,
+     * {@code all} both.
+     */
+    private void runProofMgmtVerification() {
+        String mode = System.getProperty("key.fx.verify.proofmgmt", "1").trim();
+        if (mode.equals("2")) {
+            runLoadedProofsVerification();
+        } else {
+            runProofMgmtDialogVerification();
+            if (mode.equals("all")) {
+                runLoadedProofsVerification();
+            }
+        }
+    }
+
+    /**
+     * proofmgmt: loads an example with the core {@link KeYEnvironment} on a background thread
+     * and hands it to the given continuation on the FX thread. The examples of this self test
+     * are loaded independently of the demo load and do not touch the recent files.
+     */
+    private void loadProofMgmtExample(Path location,
+            Consumer<KeYEnvironment<DefaultUserInterfaceControl>> onSuccess) {
+        Task<KeYEnvironment<DefaultUserInterfaceControl>> task = new Task<>() {
+            @Override
+            protected KeYEnvironment<DefaultUserInterfaceControl> call() throws Exception {
+                return KeYEnvironment.load(location);
+            }
+        };
+        task.setOnSucceeded(e -> onSuccess.accept(task.getValue()));
+        task.setOnFailed(e -> {
+            LOGGER.error("Proof management self test: loading {} failed", location,
+                task.getException());
+            NotificationManagerF.getInstance()
+                    .notify("Proof management self test load failed: " + location, Kind.ERROR);
+        });
+        Thread worker = new Thread(task, "fx-proofmgmt-loader");
+        worker.setDaemon(true);
+        worker.start();
+    }
+
+    /**
+     * proofmgmt: path of an example file, relative to the examples directory of the run task
+     * ({@code key.examples.dir}); absolute paths pass through.
+     */
+    private static Path proofMgmtExample(String relative) {
+        Path path = Path.of(relative);
+        if (path.isAbsolute()) {
+            return path;
+        }
+        return Path.of(System.getProperty("key.examples.dir", "key.ui/examples"), relative);
+    }
+
+    /**
+     * proofmgmt: the Proof Management dialog self test ({@code key.fx.verify.proofmgmt=1}). The
+     * dialog is exercised with a real JML example (default
+     * {@code heap/vstte10_01_SumAndMax/SumAndMax_sumAndMax.key}, override with
+     * {@code key.fx.demo.proofmgmt}): the dialog is shown non-blocking first (the structural
+     * checks read the laid-out scene graph), then the programmatic interactions run and are
+     * reported to the log; the dialog stays open for the visual inspection (the run continues
+     * when the dialog is closed with Cancel).
+     */
+    private void runProofMgmtDialogVerification() {
+        String example = System.getProperty("key.fx.demo.proofmgmt",
+            "heap/vstte10_01_SumAndMax/SumAndMax_sumAndMax.key");
+        loadProofMgmtExample(proofMgmtExample(example), env -> {
+            // the dialog self test's problem becomes the "most recent" one, so the dialog can
+            // also be opened from the File menu afterwards
+            lastEnvironment = env;
+            ProofManagementDialogF dialog = ProofManagementDialogF
+                    .createForVerification(stage, env.getInitConfig(), env.getUi(),
+                        this::activateAndRegisterProof);
+            // showForVerification first (non-blocking stage.show()), then the structural self
+            // test (ProofManagementDialogF.verifyDialog requires the shown dialog)
+            dialog.showForVerification();
+            String report = dialog.verifyDialog();
+            LOGGER.info("Proof management dialog verification: {}", report);
+            NotificationManagerF.getInstance()
+                    .notify("Proof management dialog verification: " + report,
+                        report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+            // the dialog stays open for the visual inspection; the user closes it with Cancel
+        });
+    }
+
+    /**
+     * proofmgmt: the Loaded Proofs view self test ({@code key.fx.verify.proofmgmt=2}, also part
+     * of {@code all}). Loads two examples (default Agatha and the useQuery problem, override
+     * with {@code key.fx.demo.sequent2} and {@code key.fx.demo.sequent3}), registers both in the
+     * {@link ProofManagerF} and switches the active proof back and forth (the Swing TaskTree
+     * click semantics), verifying the rows, the selection sync and that the sequent view follows
+     * the switch.
+     */
+    private void runLoadedProofsVerification() {
+        String first = System.getProperty("key.fx.demo.sequent2",
+            "firstTouch/01-Agatha/project.key");
+        String second = System.getProperty("key.fx.demo.sequent3",
+            "standard_key/queries/useQuery.key");
+        loadProofMgmtExample(proofMgmtExample(first), envA -> loadProofMgmtExample(
+            proofMgmtExample(second), envB -> {
+                Proof proofA = envA.getLoadedProof();
+                Proof proofB = envB.getLoadedProof();
+                proofManager.addProof(proofA);
+                proofManager.addProof(proofB);
+                // A1: both proofs are registered (the Loaded Proofs view binds to the manager)
+                check("both proofs registered in ProofManagerF",
+                    proofManager.contains(proofA) && proofManager.contains(proofB));
+                // A2: the Loaded Proofs view lists both with name/status/open-goal rows
+                check("Loaded Proofs view lists both proofs",
+                    loadedProofs.getProofCount() == 2);
+                String rows = loadedProofs.verifyContent();
+                LOGGER.info("Loaded proofs rows verification: {}", rows);
+                check("Loaded Proofs rows in sync (" + rows + ")", rows.endsWith("PASS"));
+                // switch the active proof: B, then back to A (Swing TaskTree problemChosen)
+                proofManager.setActive(proofB);
+                check("switch to " + proofB.name() + ": selection model follows",
+                    selectionModel.getSelectedProof() == proofB);
+                check("switch to " + proofB.name() + ": sequent view follows",
+                    sequentView.getProof() == proofB);
+                check("switch to " + proofB.name() + ": rows follow",
+                    loadedProofs.verifyContent().endsWith("PASS"));
+                proofManager.setActive(proofA);
+                check("switch back to " + proofA.name() + ": selection model follows",
+                    selectionModel.getSelectedProof() == proofA);
+                check("switch back to " + proofA.name() + ": sequent view follows",
+                    sequentView.getProof() == proofA);
+                check("switch back to " + proofA.name() + ": rows follow",
+                    loadedProofs.verifyContent().endsWith("PASS"));
+                boolean ok = proofManager.getActiveProof() == proofA
+                        && selectionModel.getSelectedProof() == proofA;
+                LOGGER.info("Loaded proofs verification: {}", ok ? "PASS" : "FAIL");
+                NotificationManagerF.getInstance()
+                        .notify("Loaded proofs verification: " + (ok ? "PASS" : "FAIL"),
+                            ok ? Kind.INFO : Kind.ERROR);
+            }));
+    }
+
+    /**
+     * proofmgmt: logs one PASS/FAIL self-test assertion line (the {@code
+     * key.fx.verify.proofmgmt} report).
+     *
+     * @param what the assertion description
+     * @param ok whether the assertion holds
+     */
+    private void check(String what, boolean ok) {
+        LOGGER.info("proofmgmt self test: {} {}", what, ok ? "PASS" : "FAIL");
     }
 }
