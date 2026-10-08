@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.concurrent.Task;
@@ -19,6 +20,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -73,6 +76,7 @@ import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
@@ -82,6 +86,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.javafx.FxUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -348,12 +353,43 @@ public final class MainWindowF {
      * @param demo whether this is the demo property load (notification prefix "Demo proof")
      */
     private void startProofLoad(Path location, boolean demo) {
-        // pure .key problems carry no Java source; the source view then shows the problem file
-        sourceView.setFallbackSourceFile(location);
+        startProofLoad(location, demo, null);
+    }
+
+    /**
+     * Loads a proof or problem file, optionally a specific proof out of a proof bundle.
+     *
+     * @param location the problem, proof, Java file or proof bundle to load
+     * @param demo whether this is the demo property load (notification prefix "Demo proof")
+     * @param proofFilename the proof to load relative to the bundle root, or {@code null} if
+     *        {@code location} is not a proof bundle
+     */
+    private void startProofLoad(Path location, boolean demo, @Nullable Path proofFilename) {
+        // pure .key problems carry no Java source; the source view then shows the problem file.
+        // Proof bundles carry their own sources (or none) — never show the bundle zip as text
+        if (proofFilename == null) {
+            sourceView.setFallbackSourceFile(location);
+        }
         Task<KeYEnvironment<DefaultUserInterfaceControl>> loadTask = new Task<>() {
             @Override
             protected KeYEnvironment<DefaultUserInterfaceControl> call() throws Exception {
-                KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(location);
+                KeYEnvironment<DefaultUserInterfaceControl> env;
+                if (proofFilename != null) {
+                    // proof bundle: load the user-chosen proof from the bundle (Swing
+                    // ProblemLoader.setProofPath in loadProofFromBundle). The core loader unzips
+                    // the bundle to a temporary directory and loads the selected proof file from
+                    // there. This mirrors KeYEnvironment.load, which offers no proofFilename
+                    // parameter.
+                    DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();
+                    var loader = new SingleThreadProblemLoader(location, null, null, null, null,
+                        false, ui, false, new Properties());
+                    loader.setProofFilename(proofFilename);
+                    loader.load();
+                    env = new KeYEnvironment<>(ui, loader.getInitConfig(), loader.getProof(),
+                        loader.getProofScript(), loader.getResult());
+                } else {
+                    env = KeYEnvironment.load(location);
+                }
                 if (System.getProperty("key.fx.demo.autoprove") != null) {
                     LOGGER.info("Demo: running auto mode on the loaded proof");
                     env.getProofControl().startAndWaitForAutoMode(env.getLoadedProof());
@@ -431,7 +467,7 @@ public final class MainWindowF {
     }
 
     // ------------------------------------------------------------------
-    // file menu actions: open / reload / recent files / save (M3)
+    // file menu actions: open / reload / recent files / save (M3/M4)
     // ------------------------------------------------------------------
 
     /**
@@ -462,20 +498,61 @@ public final class MainWindowF {
 
     /**
      * Loads the given file and registers it in the recent files list (Swing
-     * {@code WindowUserInterfaceControl.loadProblem} registers before the load starts). Proof
-     * bundles require the Swing {@code ProofSelectionDialog} flow and are deferred.
+     * {@code WindowUserInterfaceControl.loadProblem} registers before the load starts).
+     * <p>
+     * Proof bundles ({@code .zproof}, Swing {@code OpenFileAction} special case) first show the
+     * {@link ProofSelectionDialogF}; the chosen proof is loaded from the bundle and the
+     * <em>bundle</em> is registered in the recent files (Swing
+     * {@code WindowUserInterfaceControl.loadProofFromBundle}). A bare {@code .java} file shows
+     * the load-behaviour warning (Swing {@code OpenFileAction}, view setting
+     * {@code notifyLoadBehaviour}).
      *
      * @param file the file to load
      */
-    private void openProofFile(Path file) {
-        if (file.toString().endsWith(".zproof")) {
-            LOGGER.info("Proof bundle requested: {} (deferred)", file);
-            NotificationManagerF.getInstance()
-                    .notify("Proof bundles (.zproof) are not supported yet.", Kind.WARNING);
+    public void openProofFile(Path file) {
+        // special case proof bundles -> allow to select the proof to load
+        if (ProofSelectionDialogF.isProofBundle(file)) {
+            Path proofPath = ProofSelectionDialogF.chooseProofToLoad(file, stage);
+            if (proofPath == null) {
+                return; // canceled by user!
+            }
+            recentFiles.add(file.toAbsolutePath().toString(), null, false, null);
+            startProofLoad(file, false, proofPath);
             return;
         }
+
+        warnOnBareJavaFile(file);
         recentFiles.add(file.toAbsolutePath().toString(), null, false, null);
         startProofLoad(file, false);
+    }
+
+    /**
+     * The load-behaviour warning for bare Java files (Swing
+     * {@code OpenFileAction.actionPerformed}):
+     * shown when the view setting {@code notifyLoadBehaviour} is active, with a "don't show this
+     * warning again" checkbox writing the setting back (persisted via
+     * {@code ProofIndependentSettings.saveSettings}).
+     *
+     * @param file the file about to be loaded
+     */
+    private void warnOnBareJavaFile(Path file) {
+        ViewSettings viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        if (!viewSettings.getNotifyLoadBehaviour() || !file.toString().endsWith(".java")) {
+            return;
+        }
+        CheckBox checkbox = new CheckBox("Don't show this warning again");
+        VBox message = new VBox(6,
+            new Label("When you load a Java file, all java files in the current"),
+            new Label("directory and all subdirectories will be loaded as well."), checkbox);
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Please note");
+        alert.setHeaderText(null);
+        alert.getDialogPane().setContent(message);
+        alert.initOwner(stage);
+        ExampleChooserF.themeDialogPane(alert);
+        alert.showAndWait();
+        viewSettings.setNotifyLoadBehaviour(!checkbox.isSelected());
+        ProofIndependentSettings.DEFAULT_INSTANCE.saveSettings();
     }
 
     /**
