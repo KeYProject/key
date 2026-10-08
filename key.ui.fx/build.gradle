@@ -65,11 +65,14 @@ run {
     //    Hide/Regroup) with the key.fx.verify.sequentsearch query after the demo load)
     //  * key.fx.verify.updatehighlight = any  (M2: run the update-highlight overlay self test;
     //    needs a sequent printing update operators, e.g. standard_key/queries/useQuery.key)
+    //  * key.fx.verify.joinmerge = any  (joinmerge: run the join/merge dialog self test; needs
+    //    a proof with open branches, e.g. a limited auto mode run — see JoinMergeVerifyF)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
         "key.fx.verify.search", "key.fx.verify.sequentsearch", "key.fx.verify.treefilters",
-        "key.fx.verify.sequentsearchmodes", "key.fx.verify.updatehighlight"]
+        "key.fx.verify.sequentsearchmodes", "key.fx.verify.updatehighlight",
+        "key.fx.verify.joinmerge", "key.fx.verify.joinmerge.maxsteps"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {

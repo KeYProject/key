@@ -62,6 +62,7 @@ import de.uka.ilkd.key.gui.fx.docking.SimpleDockable;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.goallist.GoalListViewF;
 import de.uka.ilkd.key.gui.fx.infoview.InfoViewF;
+import de.uka.ilkd.key.gui.fx.join.JoinMergeVerifyF;
 import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
 import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
@@ -474,6 +475,10 @@ public final class MainWindowF {
             }
             if (System.getProperty("key.fx.verify.goallist") != null) {
                 LOGGER.info("Goal list verification: {}", goalListView.verifyGoalList());
+            }
+            // joinmerge: run the join/merge dialog self test (key.fx.verify.joinmerge)
+            if (System.getProperty("key.fx.verify.joinmerge") != null) {
+                runJoinMergeVerification(env);
             }
             if (System.getProperty("key.fx.verify.proofdiff") != null) {
                 String report = ProofDiffFrameF.verifyDiffLogic();
@@ -928,6 +933,23 @@ public final class MainWindowF {
         NotificationManagerF.getInstance()
                 .notify("Update highlight verification: " + report,
                     report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+    }
+
+    /**
+     * Runs the join/merge dialog self test ({@code key.fx.verify.joinmerge}); the dialogs are
+     * constructed directly with the loaded proof, see {@link JoinMergeVerifyF}.
+     *
+     * @param env the environment of the loaded proof
+     */
+    // joinmerge: TODO-merge registration seam — once the FX rule-application completion registry
+    // exists (WindowUserInterfaceControlF, port of Swing WindowUserInterfaceControl.java:74-82),
+    // register the interactive completions there via
+    // uiControl.register(MergeRuleCompletionF.INSTANCE);
+    // the join trigger is JoinActionF.run(partners, proof, proofControl, owner) for the future
+    // sequent-view context menu (Swing JoinMenuItem via CurrentGoalViewMenu.java:235-238).
+    // joinmerge: keep this hook minimal, all logic lives in JoinMergeVerifyF
+    private void runJoinMergeVerification(KeYEnvironment<DefaultUserInterfaceControl> env) {
+        JoinMergeVerifyF.run(stage, env.getLoadedProof(), env.getProofControl());
     }
 
     /**

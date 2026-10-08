@@ -601,3 +601,68 @@
 .sequent-search-mode {
     -fx-padding: 1;
 }
+
+/* ------------------------------------------------------------------
+   join / merge rule dialogs (key.fx.verify.joinmerge; Swing
+   gui/join/SequentViewer.java + gui/mergerule/MergePartnerSelectionDialog.java)
+   ------------------------------------------------------------------ */
+
+/* read-only sequent panes of the join dialog and the merge partner dialog
+   (Swing JTextPane / JEditorPane with the monospaced proof font) */
+.join-sequent-view {
+    -fx-font-family: "DejaVu Sans Mono";
+    -fx-font-size: 12px;
+}
+
+/* invalid input in the distinguishing-formula field of the merge partner
+   dialog (Swing: red foreground) */
+.join-input-error {
+    -fx-text-fill: -key-error;
+}
+
+/* the "Decision Formula (true for Goal ..., false for Goal ...)" info label
+   of the join dialog (Swing predicate info label) */
+.join-predicate-info {
+    -fx-text-fill: -key-text-secondary;
+    -fx-padding: 2 0 2 0;
+}
+
+/* the "with" separator between the two join partner panes */
+.join-with-label {
+    -fx-font-weight: bold;
+    -fx-padding: 0 4 0 0;
+}
+
+/* join message box states (Swing ClickableMessageBox: red/green text) */
+.message-error {
+    -fx-text-fill: -key-error;
+}
+.message-ok {
+    -fx-text-fill: -key-success;
+}
+
+/* the traffic light of the checked predicate input (Swing TrafficLight) */
+.traffic-light {
+    -fx-background-color: -key-border;
+    -fx-background-radius: 6;
+    -fx-min-width: 12;
+    -fx-max-width: 12;
+    -fx-min-height: 12;
+    -fx-max-height: 12;
+}
+.traffic-light-ok {
+    -fx-background-color: -key-success;
+}
+.traffic-light-error {
+    -fx-background-color: -key-error;
+}
+
+/* the details box rows of the join dialog (Swing ClickableMessageBox rows) */
+.join-message-row {
+    -fx-cursor: hand;
+    -fx-padding: 1 4 1 4;
+}
+.join-details-box {
+    -fx-background-color: transparent;
+    -fx-padding: 2;
+}
