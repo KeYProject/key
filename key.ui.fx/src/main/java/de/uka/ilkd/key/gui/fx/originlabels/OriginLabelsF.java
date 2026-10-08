@@ -260,36 +260,66 @@ public final class OriginLabelsF {
         de.uka.ilkd.key.control.TermLabelVisibilityManager manager =
             termLabelMenu.getVisibleTermLabels();
         List<Name> names = TermLabelVisibilityManager.getSortedTermLabelNames(view.getProof());
-        String before = view.printedText();
-        // show every label (Swing default state of the TermLabelVisibilityManager)
-        for (Name name : names) {
-            manager.setHidden(name, false);
-        }
         manager.setShowLabels(true);
-        String shown = view.printedText();
-        boolean grew = shown.length() > before.length();
-        // find a label whose printed name is part of the rendered text
-        Name printed = names.stream()
-                .filter(n -> shown.contains(n.toString())).findFirst().orElse(null);
-        boolean hiddenOk = true;
+        // walk the proof tree for a node whose printed sequent contains a term label (the root
+        // sequent of the loaded problem usually has none — labels appear during the proof, so
+        // the visibility test needs a node whose terms carry labels, like the user's view does)
+        Proof proof = view.getProof();
+        Name printed = null;
+        Node labelNode = null;
+        String shown = null;
+        outer: for (Node node = proof.root(); node != null;) {
+            mainWindow.getSelectionModel().setSelectedNode(node);
+            String text = view.printedText();
+            for (Name name : names) {
+                if (text.contains(name.toString())) {
+                    printed = name;
+                    labelNode = node;
+                    shown = text;
+                    break outer;
+                }
+            }
+            node = nextPreorderNode(node);
+        }        boolean grew = false, hiddenOk = true;
         if (printed != null) {
-            manager.setHidden(printed, true);
+            // hide everything (Swing "Display Term Labels in Formulas" off) and back on
+            manager.setShowLabels(false);
             String hidden = view.printedText();
-            hiddenOk = !hidden.contains(printed.toString());
-            manager.setHidden(printed, false);
+            manager.setShowLabels(true);
+            String shownAgain = view.printedText();
+            grew = shownAgain.length() > hidden.length();
+            hiddenOk = !hidden.contains(printed.toString()) && shown.contains(printed.toString());
         }
-        // restore the pre-test state: show all labels (the default of the manager)
+        // restore the default state: show all labels and select the root again
         manager.setShowLabels(true);
-        LOGGER.info("verify term labels: names={} grew={} printedLabel={} hiddenOk={}",
-            names.size(),
-            grew, printed, hiddenOk);
-        boolean pass = grew && printed != null && hiddenOk;
-        String termLabelReport = "termLabels: names=" + names.size() + " chars " + before.length()
-            + "->" + shown.length() + " printedLabel=" + printed + " " + (pass ? "PASS" : "FAIL");
+        mainWindow.getSelectionModel().setSelectedNode(proof.root());
+        LOGGER.info("verify term labels: names={} printedLabel={} node={} grew={} hiddenOk={}",
+            names.size(), printed, labelNode == null ? -1 : labelNode.serialNr(), grew, hiddenOk);
+        boolean pass = printed != null && grew && hiddenOk;
+        String termLabelReport = "termLabels: names=" + names.size() + " printedLabel=" + printed
+            + (labelNode == null ? "" : " node=" + labelNode.serialNr()) + " "
+            + (pass ? "PASS" : "FAIL");
 
         // --- origin visualizer part (Swing OriginTermLabelVisualizer / NodeInfoVisualizer) ---
         String visReport = verifyOriginVisualizer(mainWindow);
         return termLabelReport + " | " + visReport;
+    }
+
+    /** @return the next node in pre-order (node itself first), {@code null} after the last */
+    private static Node nextPreorderNode(Node node) {
+        if (node.childrenCount() > 0) {
+            return node.child(0);
+        }
+        Node current = node;
+        while (current.parent() != null) {
+            Node parent = current.parent();
+            int index = parent.getChildNr(current);
+            if (index + 1 < parent.childrenCount()) {
+                return parent.child(index + 1);
+            }
+            current = parent;
+        }
+        return null;
     }
 
     /**
