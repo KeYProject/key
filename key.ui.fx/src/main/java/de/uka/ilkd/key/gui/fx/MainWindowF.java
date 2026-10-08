@@ -64,6 +64,7 @@ import de.uka.ilkd.key.gui.fx.goallist.GoalListViewF;
 import de.uka.ilkd.key.gui.fx.infoview.InfoViewF;
 import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
 import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
+import de.uka.ilkd.key.gui.fx.notification.NotificationCenterF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
 import de.uka.ilkd.key.gui.fx.proofdiff.ProofDiffFrameF;
@@ -421,6 +422,11 @@ public final class MainWindowF {
             // the UI's own listener refreshes the views after interactive auto mode runs
             mediator.attach(env.getProofControl());
             env.getProofControl().addAutoModeListener(autoModeUiListener);
+            // notification: register the notification framework's auto-mode tracker on the
+            // proof control (Swing parity: the NotificationManager constructor registers its
+            // listener, NotificationManager.java:99-101; created in MainWindow.java:333)
+            env.getProofControl().addAutoModeListener(
+                NotificationCenterF.getInstance().notificationListener());
             // route the proof through the selection model: setSelectedProof invokes the
             // mediator's setProof (listener swap, abbreviation rebind, OSS refresh) and then
             // selects the first open goal or a leaf, which the views observe.
@@ -482,12 +488,22 @@ public final class MainWindowF {
                         .notify("Proof diff verification: " + report,
                             report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
             }
+            if (System.getProperty("key.fx.verify.notifications") != null) {
+                // notification: notification-framework self test (fires each notification type
+                // and asserts the actions' visible counterparts; report logged/toasted there)
+                NotificationCenterF.getInstance()
+                        .verifyNotifications(selectionModel.getSelectedProof());
+            }
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 startLiveAutoMode(env);
             }
         });
         loadTask.setOnFailed(event -> {
             Throwable error = loadTask.getException();
+            // notification: TODO-merge wire into WindowUserInterfaceControlF — the seam agent
+            // routes exceptions through NotificationCenterF.handleNotificationEvent(
+            // new ExceptionFailureEventF(...)) there (Swing parity:
+            // IssueDialog.showExceptionDialog)
             LOGGER.error((demo ? "Demo proof" : "Proof") + " loading failed", error);
             NotificationManagerF.getInstance()
                     .notify((demo ? "Demo proof" : "Proof") + " loading failed: "
@@ -958,6 +974,11 @@ public final class MainWindowF {
         infoView.display(proof);
         sequentView.display(selectionModel.getSelectedNode());
         updateProofStatus();
+        // notification: proof-closed + "Automated proof search" notifications after an automatic
+        // run (Swing parity: KeYMediator.proofClosed fires a ProofClosedNotificationEvent;
+        // WindowUserInterfaceControl.taskFinishedInternal fires the showNotification
+        // information, gated by ViewSettings.notificationAfterMacro)
+        NotificationCenterF.getInstance().afterAutoModeFinished(proof, stage.isFocused());
     }
 
     /**
@@ -996,6 +1017,9 @@ public final class MainWindowF {
             }
             FxUtil.runLater(() -> {
                 refreshViewsFromFinalState();
+                // notification: the proof-closed / "Automated proof search" notifications are
+                // fired inside refreshViewsFromFinalState (the framework's only auto-mode-stop
+                // hook, covering the interactive and the demo-live run)
                 LOGGER.info("Views refreshed after the auto mode stop");
             });
         }

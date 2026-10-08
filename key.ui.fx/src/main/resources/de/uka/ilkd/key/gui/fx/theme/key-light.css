@@ -601,3 +601,31 @@
 .sequent-search-mode {
     -fx-padding: 1;
 }
+
+/* proof-closed notification dialog (port of the Swing ProofClosedJTextPaneDisplay dialog) */
+.notification-dialog {
+    -fx-background-color: -key-background;
+}
+
+.notification-dialog-header {
+    -fx-font-size: 1.1em;
+    -fx-text-fill: -key-text;
+    -fx-padding: 0 0 4 0;
+}
+
+/* notification framework proof-closed dialog (Swing ProofClosedJTextPaneDisplay ->
+ * ShowProofStatistics.Window port; FX ProofClosedDialogF) */
+.notification-dialog {
+    -fx-background-color: -key-surface;
+    -fx-border-color: -key-border;
+    -fx-text-fill: -key-text;
+}
+
+.notification-dialog .label {
+    -fx-text-fill: -key-text;
+}
+
+.notification-dialog-header {
+    -fx-text-fill: -key-success;
+    -fx-font-weight: bold;
+}
