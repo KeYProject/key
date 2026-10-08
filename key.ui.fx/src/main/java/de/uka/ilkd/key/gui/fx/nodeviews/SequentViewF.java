@@ -4,16 +4,22 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.fx.nodeviews;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javafx.animation.PauseTransition;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
@@ -25,17 +31,21 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.shape.HLineTo;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
 import javafx.scene.shape.VLineTo;
 import javafx.scene.text.Font;
 import javafx.scene.text.HitInfo;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.util.Duration;
 
 import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
@@ -43,6 +53,7 @@ import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.pp.HideSequentPrintFilter;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.IllegalRegexException;
 import de.uka.ilkd.key.pp.InitialPositionTable;
@@ -50,13 +61,22 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.pp.RegroupSequentPrintFilter;
 import de.uka.ilkd.key.pp.SearchSequentPrintFilter;
+import de.uka.ilkd.key.pp.SequentPrintFilter;
+import de.uka.ilkd.key.pp.SequentPrintFilterEntry;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
+import org.key_project.prover.sequent.Semisequent;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.javafx.FxUtil;
 
 import org.slf4j.Logger;
@@ -81,14 +101,30 @@ import org.slf4j.LoggerFactory;
  * {@code SearchSequentPrintFilter.createPattern}: an all-lowercase query matches
  * case-insensitively, whitespace runs match line breaks) highlights all matches in the rendered
  * text; Prev/Next cycle the current match (stronger styling) and scroll it into view. Open with
- * {@code Ctrl+Shift+F}, close with {@code Escape}. The Swing modes that change the printed text
- * (Hide, Regroup — implemented as sequent print filters) are deferred to the print-filter chunk.
+ * {@code Ctrl+Shift+F}, close with {@code Escape}. The mode combo ports the Swing modes: Highlight
+ * keeps the sequent unchanged; Hide only prints the formulas matching the query
+ * ({@code HideSequentPrintFilter}); Regroup arranges the matching formulas around the sequent
+ * arrow ({@code RegroupSequentPrintFilter}) — both filters are reused from {@code key.core} and
+ * drive the printer like in Swing, so the click→position mapping follows the filtered printing.
+ * While a search filter hides formulas, a warning banner shows the Swing
+ * {@code SequentHideWarningBorder} message.
  * <p>
- * Deliberately deferred to later chunks: syntax highlighting of the printed terms, hover
- * tooltips, update highlighting (highlighting the formulas changed by a rule application),
- * sequent hiding, mediator wiring (shared {@code NotationInfo} and term label visibility), and
- * translucent rectangle highlights behind the matches (the search currently colors the matched
- * text; inline background spans of a {@link TextFlow} cannot split across wrapped lines).
+ * <b>Update highlights</b> (Swing {@code CurrentGoalView.updateUpdateHighlights}): the ranges of
+ * the printed update operators, reported by {@link InitialPositionTable#getUpdateRanges()}, are
+ * painted as translucent rectangles behind the text ({@link TextFlow#getRangeShape} shapes in an
+ * overlay pane; Swing paints the same ranges with the HTML +1 offset that the FX view does not
+ * need). The term under the mouse gets the same treatment as the Swing hover highlight
+ * ({@code DEFAULT_HIGHLIGHT_COLOR}).
+ * <p>
+ * <b>Tooltip</b> (Swing {@code SequentView.getToolTipText}): hovering a position shows the
+ * operator class, operator and sort of the term at that position in a {@link Tooltip} shown after
+ * a short delay; gated by the shared {@code ViewSettings.isShowSequentViewTooltips()} like in
+ * Swing.
+ * <p>
+ * Deliberately deferred to later chunks: mediator wiring (shared {@code NotationInfo} and term
+ * label visibility), the tooltip strings of the GUI extensions ({@code KeYGuiExtensionFacade}
+ * has no FX counterpart yet), and the search-mode menu items of the Swing proof-tree popup
+ * ({@code SearchModeChangeAction}, M3 popups).
  */
 public class SequentViewF extends BorderPane {
 
@@ -115,12 +151,36 @@ public class SequentViewF extends BorderPane {
 
     private final ScrollPane scrollPane = new ScrollPane();
     private final TextFlow textFlow = new TextFlow();
+    /**
+     * Translucent rectangles painted behind the printed text (Swing's highlighter layer): the
+     * update-operator highlight of the current printing. The pane fills the same area as the
+     * {@link #textFlow} inside the content {@link StackPane}, so the {@link TextFlow} local
+     * coordinates of {@link TextFlow#getRangeShape} address it directly.
+     */
+    private final Pane updateOverlay = new Pane();
+    /**
+     * Overlay pane for the term under the mouse (Swing {@code DEFAULT_HIGHLIGHT_COLOR} hover
+     * highlight), above the update highlights, behind the text.
+     */
+    private final Pane hoverOverlay = new Pane();
 
     private final HBox searchBar = new HBox(4);
     private final TextField searchField = new TextField();
     private final ToggleButton regexToggle = new ToggleButton("RegExp");
+    /** the search mode combo (Swing {@code SequentViewSearchBar.searchModeBox}). */
+    private final ComboBox<SearchMode> searchModeBox = new ComboBox<>();
 
-    private final IdentitySequentPrintFilter filter = new IdentitySequentPrintFilter();
+    /**
+     * the warning banner shown while a search filter hides formulas (Swing
+     * {@code SequentHideWarningBorder} message).
+     */
+    private final Label hideWarning = new Label(WARNING_TEXT);
+
+    /**
+     * The current sequent print filter (Swing {@code SequentView.filter}): the identity filter by
+     * default; the search bar's Hide/Regroup modes install the print filters of {@code key.core}.
+     */
+    private SequentPrintFilter filter = new IdentitySequentPrintFilter();
 
     private SequentViewLogicPrinter printer;
     private Proof proof;
@@ -139,6 +199,25 @@ public class SequentViewF extends BorderPane {
     private final List<int[]> searchMatches = new ArrayList<>();
     /** the index of the current match in {@link #searchMatches}, {@code -1} if none. */
     private int searchResultPos = -1;
+
+    // update highlights (Swing CurrentGoalView.updateUpdateHighlights)
+    /** number of update-highlight rectangles currently displayed. */
+    private int updateRectCount;
+
+    // hover highlight + tooltip (Swing SequentViewInputListener.mouseMoved / getToolTipText)
+    /** the term range under the mouse, {@code null} when the mouse is over empty space. */
+    private Range hoveredRange;
+    /** shows the term info of the hovered position after the Swing-like display delay. */
+    private final Tooltip hoverTooltip = new Tooltip();
+    /** delay before the tooltip shows (Swing ToolTipManager initial delay ≈ 500 ms). */
+    private final PauseTransition hoverTooltipDelay =
+        new PauseTransition(Duration.millis(600));
+    /** last mouse screen position for placing the tooltip below-right of the cursor. */
+    private double hoverScreenX;
+    private double hoverScreenY;
+
+    /** the warning message painted by the Swing {@code SequentHideWarningBorder}. */
+    private static final String WARNING_TEXT = "Some formulas have been hidden (by search phrase)";
 
     private KeYSelectionModel selectionModel;
     private final KeYSelectionListener selectionListener = new KeYSelectionListener() {
@@ -166,12 +245,36 @@ public class SequentViewF extends BorderPane {
         scrollPane.getStyleClass().add("sequent-view");
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
-        scrollPane.setContent(textFlow);
+        // the overlay panes fill the same area as the text flow, so the TextFlow local
+        // coordinates of the range shapes can be used directly; they sit behind the text like
+        // the Swing highlighter layer and never receive mouse events
+        updateOverlay.getStyleClass().add("sequent-overlay");
+        updateOverlay.setMouseTransparent(true);
+        updateOverlay.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        hoverOverlay.getStyleClass().add("sequent-overlay");
+        hoverOverlay.setMouseTransparent(true);
+        hoverOverlay.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        StackPane content = new StackPane(updateOverlay, hoverOverlay, textFlow);
+        scrollPane.setContent(content);
         setCenter(scrollPane);
         textFlow.getStyleClass().add("sequent-view-flow");
         textFlow.setPadding(new Insets(6));
         textFlow.setOnMouseClicked(this::handleMouseClick);
-        printPlaceholder();
+        textFlow.setOnMouseMoved(this::handleMouseMove);
+        textFlow.setOnMouseExited(this::handleMouseExited);
+        // recompute the overlay rectangles when the layout changes (viewport resize); the prints
+        // rebuild them directly
+        textFlow.layoutBoundsProperty()
+                .addListener((obs, oldBounds, newBounds) -> FxUtil.runLater(this::rebuildOverlays));
+        // the tooltip shows when the mouse pauses over a term (Swing ToolTipManager)
+        hoverTooltipDelay.setOnFinished(event -> showHoverTooltip());
+
+        // the warning banner replaces the Swing SequentHideWarningBorder painted around the
+        // enclosing panel; hidden (and unmanaged) unless a search filter hides formulas
+        hideWarning.getStyleClass().add("sequent-hide-warning");
+        hideWarning.setManaged(false);
+        hideWarning.setVisible(false);
+        setTop(hideWarning);
 
         createSearchBar();
         setBottom(searchBar);
@@ -181,6 +284,7 @@ public class SequentViewF extends BorderPane {
         // shortcut fires whenever the keyboard focus is anywhere inside this view (the key
         // events bubble from the focused control up to this pane).
         setOnKeyPressed(this::handlePaneKeyPressed);
+        printPlaceholder();
     }
 
     /**
@@ -230,13 +334,74 @@ public class SequentViewF extends BorderPane {
             runSearch();
         });
 
+        searchModeBox.getStyleClass().add("sequent-search-mode");
+        searchModeBox.setMaxWidth(Region.USE_PREF_SIZE);
+        searchModeBox.getItems().addAll(SearchMode.values());
+        searchModeBox.setCellFactory(view -> new SearchModeListCell());
+        searchModeBox.setButtonCell(new SearchModeListCell());
+        searchModeBox.setTooltip(new Tooltip("Determines search behaviour: Hide only shows "
+            + "sequent formulas that match the search. Regroup arranges the matching formulas "
+            + "around the sequent arrow. Highlight leaves the sequent unchanged."));
+        searchModeBox.getSelectionModel().select(SearchMode.HIGHLIGHT);
+        searchModeBox.setOnAction(e -> applySearchMode(searchModeBox.getValue()));
+
         searchBar.getChildren().addAll(searchField, prevButton, nextButton, closeButton,
-            regexToggle);
+            regexToggle, searchModeBox);
         searchBar.setOnKeyPressed(e -> {
             if (KeyCode.ESCAPE.equals(e.getCode())) {
                 hideSearchBar();
             }
         });
+    }
+
+    /**
+     * A combo cell with the mode name and icon (Swing {@code SearchMode} items carry icons).
+     */
+    private static final class SearchModeListCell extends ListCell<SearchMode> {
+        @Override
+        protected void updateItem(SearchMode item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null) {
+                setText(null);
+                setGraphic(null);
+            } else {
+                setText(item.getDisplayName());
+                setGraphic(IconFactoryF.createIcon(item.getIcon()));
+            }
+        }
+    }
+
+    /**
+     * The search modes of the sequent search bar (Swing
+     * {@code SequentViewSearchBar.SearchMode}): Highlight leaves the sequent unchanged, Hide only
+     * shows the formulas matching the query and Regroup arranges the matching formulas around the
+     * sequent arrow. Hide and Regroup are print filters reused from {@code key.core}.
+     */
+    public enum SearchMode {
+        HIGHLIGHT("Highlight", IconFactoryF.Key.SEARCH_HIGHLIGHT),
+        HIDE("Hide", IconFactoryF.Key.SEARCH_HIDE),
+        REGROUP("Regroup", IconFactoryF.Key.SEARCH_REGROUP);
+
+        private final String displayName;
+        private final IconFactoryF.Key icon;
+
+        SearchMode(String name, IconFactoryF.Key icon) {
+            this.displayName = name;
+            this.icon = icon;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        public IconFactoryF.Key getIcon() {
+            return icon;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
     }
 
     private void handlePaneKeyPressed(KeyEvent event) {
@@ -289,6 +454,11 @@ public class SequentViewF extends BorderPane {
             // TODO(M2c): share the NotationInfo and the term label visibility with the mediator
             printer = SequentViewLogicPrinter.positionPrinter(new NotationInfo(),
                 node.proof().getServices(), NO_VISIBLE_TERM_LABELS);
+            if (filter instanceof SearchSequentPrintFilter searchFilter) {
+                // the search filters print single formulas through the view's printer (Swing
+                // SequentViewSearchBar.search refreshes it the same way)
+                searchFilter.setLogicPrinter(printer);
+            }
         }
         selectedNode = node;
         printSequent();
@@ -314,11 +484,20 @@ public class SequentViewF extends BorderPane {
         // TODO(M2): compute the line width from the font metrics and the viewport width
         printer.update(filter, PosTableLayouter.DEFAULT_LINE_WIDTH);
         printed = printer.result();
+        LOGGER.debug("printSequent: chars={} filter={} antec={} succ={}", printed.length(), filter
+                .getClass().getSimpleName(),
+            filter.getFilteredAntec() == null ? -1 : filter.getFilteredAntec().size(),
+            filter.getFilteredSucc() == null ? -1 : filter.getFilteredSucc().size());
         syntaxHighlights = syntaxHighlighting
                 ? SequentSyntaxHighlighterF.highlight(printed, selectedNode)
                 : List.of();
         syntaxHighlights.sort((a, b) -> Integer.compare(a.start(), b.start()));
+        // the reprint invalidates the mouse-dependent state (Swing's setText clears the
+        // highlights, CurrentGoalView re-paints the update highlights afterwards)
+        clearHover();
         rebuildRuns();
+        updateHideWarning();
+        rebuildOverlays();
     }
 
     /**
@@ -401,6 +580,178 @@ public class SequentViewF extends BorderPane {
     }
 
     // -----------------------------------------------------------------------
+    // Hover highlight + tooltip (Swing SequentViewInputListener.mouseMoved /
+    // SequentView.getToolTipText)
+    // -----------------------------------------------------------------------
+
+    /**
+     * Follows the mouse (Swing {@code mouseMoved}): the term under the cursor gets a translucent
+     * highlight rectangle and the tooltip shows the term info of the hovered position.
+     */
+    private void handleMouseMove(MouseEvent event) {
+        InitialPositionTable table = getInitialPositionTable();
+        if (table == null || printed == null) {
+            return;
+        }
+        Point2D local = textFlow.sceneToLocal(event.getSceneX(), event.getSceneY());
+        HitInfo hit = textFlow.getHitInfo(local);
+        int charIndex = hit == null ? -1 : hit.getCharIndex();
+        PosInSequent pos =
+            charIndex >= 0 && charIndex < printed.length() ? table.getPosInSequent(charIndex,
+                filter) : null;
+        Range bounds = pos != null ? pos.getBounds() : null;
+        Range hover = bounds != null && bounds.length() > 0 ? bounds : null;
+        if (!Objects.equals(hover, hoveredRange)) {
+            hoveredRange = hover;
+            rebuildHoverOverlay();
+        }
+        updateHoverTooltip(event, pos);
+    }
+
+    /**
+     * Clears the hover state when the mouse leaves the view (Swing {@code mouseExited} →
+     * {@code disableHighlights}).
+     */
+    private void handleMouseExited(MouseEvent event) {
+        clearHover();
+    }
+
+    /** Clears the hovered term range and hides the tooltip. */
+    private void clearHover() {
+        if (hoveredRange != null) {
+            hoveredRange = null;
+            rebuildHoverOverlay();
+        }
+        hideHoverTooltip();
+    }
+
+    /** Stops the display delay and hides the tooltip (its content would be stale). */
+    private void hideHoverTooltip() {
+        hoverTooltipDelay.stop();
+        if (hoverTooltip.isShowing()) {
+            hoverTooltip.hide();
+        }
+    }
+
+    /**
+     * Shows the tooltip with the term info of the given position (Swing
+     * {@code SequentView.getToolTipText}): operator class, operator and sort of the term. The
+     * tooltip appears when the mouse pauses over a term; while it is visible its content updates
+     * with the position.
+     */
+    private void updateHoverTooltip(MouseEvent event, PosInSequent pos) {
+        hoverScreenX = event.getScreenX();
+        hoverScreenY = event.getScreenY();
+        String text = getTooltipText(pos);
+        if (text.isEmpty()) {
+            hideHoverTooltip();
+            return;
+        }
+        hoverTooltip.setText(text);
+        if (hoverTooltip.isShowing()) {
+            // the content updates live while the mouse moves over terms
+            return;
+        }
+        hoverTooltipDelay.playFromStart();
+    }
+
+    /** Shows the tooltip below-right of the current mouse position. */
+    private void showHoverTooltip() {
+        if (hoveredRange == null || hoverTooltip.getText() == null
+                || hoverTooltip.getText().isEmpty()) {
+            return;
+        }
+        var window = textFlow.getScene() != null ? textFlow.getScene().getWindow() : null;
+        if (window == null || !window.isShowing()) {
+            return;
+        }
+        if (!hoverTooltip.isShowing()) {
+            hoverTooltip.show(textFlow, hoverScreenX + 16, hoverScreenY + 24);
+        }
+    }
+
+    /**
+     * The tooltip text for the given position (Swing {@code SequentView.getToolTipText} without
+     * the HTML markup and without the GUI extension strings, which have no FX counterpart yet).
+     */
+    private String getTooltipText(PosInSequent pos) {
+        if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .isShowSequentViewTooltips()) {
+            return "";
+        }
+        if (pos == null || pos.isSequent() || pos.getPosInOccurrence() == null) {
+            return "";
+        }
+        Term term = pos.getPosInOccurrence().subTerm();
+        return "Operator: " + term.op().getClass().getSimpleName() + " (" + term.op() + ")\nSort: "
+            + term.sort();
+    }
+
+    // -----------------------------------------------------------------------
+    // Overlay rectangles (Swing paints the same ranges with the highlighter behind the text)
+    // -----------------------------------------------------------------------
+
+    /** Rebuilds all overlay rectangles behind the text. */
+    private void rebuildOverlays() {
+        rebuildUpdateOverlays();
+        rebuildHoverOverlay();
+    }
+
+    /**
+     * Rebuilds the update-highlight rectangles of the current printing (Swing
+     * {@code CurrentGoalView.updateUpdateHighlights}): one translucent rectangle per update range
+     * of the position table, shaped with {@link TextFlow#getRangeShape}. Unlike the Swing view no
+     * +1 offset is applied — the character indexes of the position table match the TextFlow
+     * character model exactly.
+     */
+    private void rebuildUpdateOverlays() {
+        updateOverlay.getChildren().clear();
+        updateRectCount = 0;
+        InitialPositionTable table = getInitialPositionTable();
+        if (printed == null || table == null) {
+            return;
+        }
+        // make sure the text flow is laid out before asking for glyph shapes
+        textFlow.applyCss();
+        textFlow.layout();
+        for (Range range : table.getUpdateRanges()) {
+            int start = Math.clamp(range.start(), 0, printed.length());
+            int end = Math.clamp(range.end(), start, printed.length());
+            if (end <= start) {
+                continue;
+            }
+            updateOverlay.getChildren()
+                    .add(rectForRange(start, end, "sequent-update-highlight"));
+            updateRectCount++;
+        }
+    }
+
+    /** Rebuilds the highlight rectangle of the term under the mouse. */
+    private void rebuildHoverOverlay() {
+        hoverOverlay.getChildren().clear();
+        if (hoveredRange == null || printed == null) {
+            return;
+        }
+        int start = Math.clamp(hoveredRange.start(), 0, printed.length());
+        int end = Math.clamp(hoveredRange.start() + hoveredRange.length(), start,
+            printed.length());
+        if (end > start) {
+            hoverOverlay.getChildren().add(rectForRange(start, end, "sequent-hover-highlight"));
+        }
+    }
+
+    /**
+     * @return a filled path over the on-screen shape of the given character range (a per-line
+     *         polygon like the Swing highlighter paints)
+     */
+    private Path rectForRange(int start, int end, String styleClass) {
+        Path rect = new Path(textFlow.getRangeShape(start, end, true));
+        rect.getStyleClass().add(styleClass);
+        rect.setManaged(false);
+        return rect;
+    }
+
+    // -----------------------------------------------------------------------
     // Search (Swing SequentViewSearchBar)
     // -----------------------------------------------------------------------
 
@@ -421,11 +772,15 @@ public class SequentViewF extends BorderPane {
     /**
      * Hides the search bar and clears the highlights so the plain sequent is shown again (Swing
      * {@code setVisible(false)}). The field text is kept like in the Swing view and re-applied on
-     * the next opening.
+     * the next opening; the mode resets to Highlight, which reinstalls the identity filter.
      */
     public void hideSearchBar() {
         searchBar.setVisible(false);
         searchBar.setManaged(false);
+        // Swing setVisible(false) resets the mode combo, which re-installs the identity filter
+        if (searchModeBox.getValue() != SearchMode.HIGHLIGHT) {
+            searchModeBox.getSelectionModel().select(SearchMode.HIGHLIGHT);
+        }
         if (!searchMatches.isEmpty() || searchResultPos >= 0) {
             searchMatches.clear();
             searchResultPos = -1;
@@ -436,28 +791,102 @@ public class SequentViewF extends BorderPane {
     }
 
     /**
-     * Runs the search for the current field text (Swing {@code search()}): highlights all
-     * matches of the query in the rendered text. An invalid regular expression and a query
-     * without matches switch the field to the alert styling.
+     * Switches the sequent print filter to the given search mode (Swing
+     * {@code SequentViewSearchBar}'s combo listener): Hide and Regroup install the print filters
+     * of {@code key.core} on the view's printer, Highlight returns to the identity filter. The
+     * search itself runs afterwards ({@link #runSearch()}, Swing {@code search()}).
+     */
+    private void applySearchMode(SearchMode mode) {
+        if (mode == null) {
+            return;
+        }
+        switch (mode) {
+            case HIDE -> setSequentFilter(
+                printer == null ? new IdentitySequentPrintFilter()
+                        : new HideSequentPrintFilter(printer, regexToggle.isSelected()),
+                false);
+            case REGROUP -> setSequentFilter(
+                printer == null ? new IdentitySequentPrintFilter()
+                        : new RegroupSequentPrintFilter(printer, regexToggle.isSelected()),
+                false);
+            case HIGHLIGHT -> setSequentFilter(new IdentitySequentPrintFilter(), false);
+        }
+        LOGGER.debug("applySearchMode: {} filter={}", mode, filter.getClass().getSimpleName());
+        runSearch();
+    }
+
+    /**
+     * Sets the sequent print filter used for the next printing (Swing
+     * {@code SequentView.setFilter}): the filter receives the selected sequent immediately, a
+     * forced update re-prints.
+     */
+    private void setSequentFilter(SequentPrintFilter newFilter, boolean forceUpdate) {
+        filter = newFilter;
+        if (selectedNode != null) {
+            filter.setSequent(selectedNode.sequent());
+        }
+        if (forceUpdate) {
+            printSequent();
+        }
+    }
+
+    /**
+     * Does the active print filter hide formulas from the sequent (Swing
+     * {@code SequentView.isHiding}).
+     *
+     * @return {@code true} iff at least one formula is not shown
+     */
+    public boolean isHiding() {
+        Sequent originalSequent = filter.getOriginalSequent();
+        if (originalSequent == null) {
+            return false;
+        }
+        int filteredSize =
+            (filter.getFilteredAntec() == null ? 0 : filter.getFilteredAntec().size())
+                    + (filter.getFilteredSucc() == null ? 0 : filter.getFilteredSucc().size());
+        return originalSequent.size() != filteredSize;
+    }
+
+    /** Shows or hides the hide-warning banner (Swing {@code updateHidingProperty}). */
+    private void updateHideWarning() {
+        boolean hiding = isHiding();
+        hideWarning.setVisible(hiding);
+        hideWarning.setManaged(hiding);
+    }
+
+    /**
+     * Runs the search for the current field text (Swing {@code search()}): the sequent is always
+     * re-printed (Swing {@code SequentViewSearchBar.search}: "search always does a repaint") — an
+     * active search filter (Hide/Regroup mode) re-filters the sequent with the query, the
+     * identity filter of the Highlight mode re-prints the plain sequent so that formulas hidden
+     * by a previous mode reappear. Then all matches of the query are highlighted in the rendered
+     * text. An invalid regular expression and a query without matches switch the field to the
+     * alert styling.
      */
     private void runSearch() {
-        String text = searchField.getText();
         searchMatches.clear();
         searchResultPos = -1;
+        String text = searchField.getText();
+        if (filter instanceof SearchSequentPrintFilter searchFilter && printer != null
+                && selectedNode != null) {
+            searchFilter.setRegex(regexToggle.isSelected());
+            searchFilter.setLogicPrinter(printer);
+            // an invalid regular expression leaves the filter unchanged: the Swing bar
+            // re-filters with the broken pattern and then crashes printing it (latent Swing
+            // bug); here the previous filter state stays and the field alerts below
+            if (createPattern(text) != null) {
+                searchFilter.setSearchString(text);
+            }
+        }
+        if (printer != null && selectedNode != null) {
+            printSequent();
+        }
         if (text.isEmpty()) {
             setAlert(false);
             rebuildRuns();
             return;
         }
-        Pattern pattern;
-        try {
-            pattern = SearchSequentPrintFilter.createPattern(text, regexToggle.isSelected());
-        } catch (IllegalRegexException e) {
-            LOGGER.debug("runSearch: text={} invalid regex", text);
-            setAlert(true);
-            rebuildRuns();
-            return;
-        }
+        Pattern pattern = createPattern(text);
         if (pattern == null || printed == null) {
             setAlert(true);
             rebuildRuns();
@@ -471,6 +900,20 @@ public class SequentViewF extends BorderPane {
         LOGGER.debug("runSearch: text={} matches={}", text, searchMatches.size());
         rebuildRuns();
         setAlert(searchMatches.isEmpty());
+    }
+
+    /**
+     * Creates the search pattern for the current field text (Swing
+     * {@code SearchSequentPrintFilter.createPattern}), {@code null} if it is not a valid regular
+     * expression.
+     */
+    private Pattern createPattern(String text) {
+        try {
+            return SearchSequentPrintFilter.createPattern(text, regexToggle.isSelected());
+        } catch (IllegalRegexException e) {
+            LOGGER.debug("runSearch: text={} invalid regex", text);
+            return null;
+        }
     }
 
     /** Switches to the next match (Swing {@code searchNext}), wrapping around. */
@@ -641,7 +1084,12 @@ public class SequentViewF extends BorderPane {
     }
 
     private void printPlaceholder() {
+        clearHover();
+        updateHideWarning();
         textFlow.getChildren().clear();
+        printed = null;
+        updateOverlay.getChildren().clear();
+        updateRectCount = 0;
         Text placeholder = new Text("No proof loaded.\n"
             + "Start with -Dkey.fx.demo.sequent=<file.key> to try the sequent view spike.");
         placeholder.getStyleClass().add("sequent-placeholder");
@@ -676,7 +1124,13 @@ public class SequentViewF extends BorderPane {
             return "no printed sequent";
         }
         showSearchBar();
-        searchField.setText(query);
+        // the bar was closed before (mode Highlight); make the baseline deterministic
+        searchModeBox.getSelectionModel().select(SearchMode.HIGHLIGHT);
+        if (!query.equals(searchField.getText())) {
+            searchField.setText(query);
+        } else {
+            runSearch();
+        }
         int count = searchMatches.size();
         boolean rangesOk = true;
         for (int[] match : searchMatches) {
@@ -696,6 +1150,322 @@ public class SequentViewF extends BorderPane {
                 && wrapped == count - 1 && searchMatches.isEmpty();
         return "query=" + query + " matches=" + count + " next=" + first + "," + second + ","
             + back + "," + wrapped + " rangesOk=" + rangesOk + " " + (pass ? "PASS" : "FAIL");
+    }
+
+    /**
+     * Development self-test (M2): exercises the search modes like the Swing search bar. In the
+     * Highlight mode the plain sequent with all matches is the baseline; the Hide mode must print
+     * only the formulas matching the query (a subset of the baseline formulas, hiding = fewer
+     * characters); the Regroup mode must print the same formulas with the matching ones grouped
+     * at the sequent arrow (antecedent: matching at the end, succedent: matching at the start,
+     * like Swing's {@code RegroupSequentPrintFilter} reorders). The baseline must reproduce the
+     * original sequent exactly — a half that is empty in the original sequent stays legitimately
+     * empty (e.g. the Agatha demo has no antecedent formula); with a query that matches every
+     * formula Hide and Regroup are no-ops and the report marks them {@code vacuous}. Restores the
+     * plain view.
+     * <p>
+     * The modes can only be exercised on a sequent with at least two formulas; the displayed node
+     * of a fresh demo proof (the root) has a single one. The test therefore runs on
+     * {@link #findModeTestNode()} and restores the display of the original node afterwards, like
+     * the Swing bar closing leaves the selected node displayed.
+     *
+     * @param query the query to search for
+     * @return a one-line report, {@code "... PASS"} if the modes behave as expected
+     */
+    public String verifySearchModes(String query) {
+        if (printed == null || selectedNode == null) {
+            return "no printed sequent";
+        }
+        Node originalNode = selectedNode;
+        Node testNode = findModeTestNode();
+        if (testNode != null && testNode != originalNode) {
+            display(testNode);
+        }
+        showSearchBar();
+        // baseline: Highlight mode = the plain printing with the matches highlighted
+        SequentPrintFilter baselineFilter = new IdentitySequentPrintFilter();
+        setSequentFilter(baselineFilter, true);
+        searchModeBox.getSelectionModel().select(SearchMode.HIGHLIGHT);
+        if (!query.equals(searchField.getText())) {
+            searchField.setText(query);
+        } else {
+            runSearch();
+        }
+        int highlightChars = printed.length();
+        int highlightMatches = searchMatches.size();
+        String highlightText = printed;
+        List<SequentFormula> highlightAntec = filterFormulas(filter.getFilteredAntec());
+        List<SequentFormula> highlightSucc = filterFormulas(filter.getFilteredSucc());
+
+        // Hide: only the formulas matching the query are printed
+        searchModeBox.getSelectionModel().select(SearchMode.HIDE);
+        int hideChars = printed.length();
+        int hideMatches = searchMatches.size();
+        boolean hideHiding = isHiding();
+        List<SequentFormula> matchingAntec = filterFormulas(filter.getFilteredAntec());
+        List<SequentFormula> matchingSucc = filterFormulas(filter.getFilteredSucc());
+        boolean hideSubset = isSubsequence(highlightAntec, matchingAntec)
+                && isSubsequence(highlightSucc, matchingSucc);
+
+        // Regroup: the same formulas, the matching ones regrouped around the arrow
+        searchModeBox.getSelectionModel().select(SearchMode.REGROUP);
+        int regroupChars = printed.length();
+        int regroupMatches = searchMatches.size();
+        List<SequentFormula> regroupAntec = filterFormulas(filter.getFilteredAntec());
+        List<SequentFormula> regroupSucc = filterFormulas(filter.getFilteredSucc());
+        boolean regroupSame = sameFormulas(highlightAntec, regroupAntec)
+                && sameFormulas(highlightSucc, regroupSucc);
+        boolean regroupOrder = expectedRegroup(highlightAntec, matchingAntec, false)
+                .equals(regroupAntec)
+                && expectedRegroup(highlightSucc, matchingSucc, true).equals(regroupSucc);
+        boolean regrouped = !printed.equals(highlightText);
+
+        // restore the plain view (Highlight mode + closed bar), as the Swing bar closes
+        hideSearchBar();
+        if (testNode != null && testNode != originalNode) {
+            display(originalNode);
+        }
+        // the baseline must be the full original sequent (the identity filter keeps every
+        // formula; a half that is empty in the original sequent stays legitimately empty —
+        // e.g. the Agatha demo sequent has no antecedent because KeY does not split the
+        // top-level implication of the problem statement)
+        List<SequentFormula> originalAntec = sequentFormulas(baselineFilter.getOriginalSequent(),
+            true);
+        List<SequentFormula> originalSucc = sequentFormulas(baselineFilter.getOriginalSequent(),
+            false);
+        boolean baselineOk = highlightMatches > 0 && sameFormulas(originalAntec, highlightAntec)
+                && sameFormulas(originalSucc, highlightSucc);
+        boolean hideOk = hideChars <= highlightChars && hideMatches > 0
+                && hideHiding == (hideChars < highlightChars) && hideSubset;
+        boolean regroupOk = regroupSame && regroupOrder && regroupMatches == highlightMatches;
+        boolean pass = baselineOk && hideOk && regroupOk;
+        // vacuous: the query matched every formula, Hide and Regroup cannot change anything
+        boolean vacuous = hideChars == highlightChars && regroupChars == highlightChars;
+        return "query=" + query + " node=" + (testNode != null ? testNode.serialNr() : -1)
+            + " highlight chars=" + highlightChars + " matches="
+            + highlightMatches + " antec=" + highlightAntec.size() + " succ="
+            + highlightSucc.size() + " | hide chars=" + hideChars + " matches=" + hideMatches
+            + " antec=" + matchingAntec.size() + " succ=" + matchingSucc.size() + " hiding="
+            + hideHiding + " subset=" + hideSubset + " | regroup chars=" + regroupChars
+            + " matches=" + regroupMatches + " antec=" + regroupAntec.size() + " succ="
+            + regroupSucc.size() + " same=" + regroupSame + " order=" + regroupOrder
+            + " regrouped=" + regrouped + " | baselineOk=" + baselineOk + " hideOk=" + hideOk
+            + " regroupOk=" + regroupOk + " vacuous=" + vacuous + " "
+            + (pass ? "PASS" : "FAIL");
+    }
+
+    /**
+     * Finds the node to run the search mode self test on: the node with the most sequent formulas
+     * in the subtree of the displayed node — or, if even that subtree has no multi-formula node,
+     * of the whole proof, falling back to the displayed node itself. The richest node is wanted
+     * because the modes can only be exercised on a sequent with several formulas, and the
+     * displayed node of a demo proof is often poor (the root has a single formula; after the tree
+     * search verification the selection rests on a two-formula node).
+     *
+     * @return the test node (never {@code null} if a node is displayed)
+     */
+    private Node findModeTestNode() {
+        if (selectedNode == null) {
+            return null;
+        }
+        Node best = findRichestNode(selectedNode);
+        if (best == null && proof != null) {
+            best = findRichestNode(proof.root());
+        }
+        return best != null ? best : selectedNode;
+    }
+
+    /**
+     * @return the node with the most sequent formulas in the subtree of the given node where at
+     *         least two formulas exist ({@code null} if there is none; pre-order walk, the first
+     *         node wins on ties)
+     */
+    private static Node findRichestNode(Node node) {
+        ArrayDeque<Node> stack = new ArrayDeque<>();
+        stack.push(node);
+        Node best = null;
+        int bestSize = 1;
+        while (!stack.isEmpty()) {
+            Node current = stack.pop();
+            int size = current.sequent().size();
+            if (size > bestSize) {
+                best = current;
+                bestSize = size;
+            }
+            for (int i = 0; i < current.childrenCount(); i++) {
+                stack.push(current.child(i));
+            }
+        }
+        return best;
+    }
+
+    /**
+     * Development self-test (M2): verifies the update-highlight overlays of the current printing
+     * (Swing {@code CurrentGoalView.updateUpdateHighlights}): every update range of the position
+     * table must be displayed as one translucent rectangle whose shape lies inside the text flow
+     * bounds. Requires a sequent that prints update operators (e.g. a program verification goal
+     * after symbolic execution); a plain sequent reports {@code ranges=0 ... FAIL}.
+     *
+     * @return a one-line report, {@code "... PASS"} if the overlays exist with valid geometry
+     */
+    public String verifyUpdateHighlights() {
+        if (printed == null) {
+            return "no printed sequent";
+        }
+        textFlow.applyCss();
+        textFlow.layout();
+        InitialPositionTable table = getInitialPositionTable();
+        Range[] ranges = table == null ? new Range[0] : table.getUpdateRanges();
+        boolean geometryOk = ranges.length > 0;
+        for (Range range : ranges) {
+            int start = Math.clamp(range.start(), 0, printed.length());
+            int end = Math.clamp(range.end(), start, printed.length());
+            double minX = Double.POSITIVE_INFINITY;
+            double minY = Double.POSITIVE_INFINITY;
+            double maxX = Double.NEGATIVE_INFINITY;
+            double maxY = Double.NEGATIVE_INFINITY;
+            for (PathElement element : textFlow.getRangeShape(start, end, true)) {
+                double x = Double.NaN;
+                double y = Double.NaN;
+                if (element instanceof MoveTo m) {
+                    x = m.getX();
+                    y = m.getY();
+                } else if (element instanceof LineTo l) {
+                    x = l.getX();
+                    y = l.getY();
+                } else if (element instanceof HLineTo h) {
+                    x = h.getX();
+                } else if (element instanceof VLineTo v) {
+                    y = v.getY();
+                }
+                if (!Double.isNaN(x)) {
+                    minX = Math.min(minX, x);
+                    maxX = Math.max(maxX, x);
+                }
+                if (!Double.isNaN(y)) {
+                    minY = Math.min(minY, y);
+                    maxY = Math.max(maxY, y);
+                }
+            }
+            geometryOk &= Double.isFinite(minX) && maxX > minX && maxY > minY
+                    && minX >= -1 && minY >= -1 && maxX <= textFlow.getWidth() + 1
+                    && maxY <= textFlow.getHeight() + 1;
+        }
+        boolean pass = ranges.length > 0 && updateRectCount == ranges.length && geometryOk;
+        return "ranges=" + ranges.length + " rects=" + updateRectCount + " geometryOk="
+            + geometryOk + " " + (pass ? "PASS" : "FAIL");
+    }
+
+    /**
+     * @return the original formulas of the given filter entries, in printing order
+     */
+    private static List<SequentFormula> filterFormulas(
+            ImmutableList<SequentPrintFilterEntry> entries) {
+        List<SequentFormula> formulas = new ArrayList<>();
+        if (entries != null) {
+            for (SequentPrintFilterEntry entry : entries) {
+                formulas.add(entry.getOriginalFormula());
+            }
+        }
+        return formulas;
+    }
+
+    /**
+     * @return the formulas of the given sequent half, in printing order
+     */
+    private static List<SequentFormula> sequentFormulas(Sequent sequent, boolean antecedent) {
+        List<SequentFormula> formulas = new ArrayList<>();
+        if (sequent != null) {
+            Semisequent semisequent = antecedent ? sequent.antecedent() : sequent.succedent();
+            for (Iterator<SequentFormula> it = semisequent.iterator(); it.hasNext();) {
+                formulas.add(it.next());
+            }
+        }
+        return formulas;
+    }
+
+    /**
+     * @return {@code true} iff {@code sub} is a subsequence of {@code list} (same formula
+     *         objects, same order) — the Hide filter keeps the matching formulas in order
+     */
+    private static boolean isSubsequence(List<SequentFormula> list, List<SequentFormula> sub) {
+        if (sub.size() > list.size()) {
+            return false;
+        }
+        int i = 0;
+        for (SequentFormula formula : sub) {
+            while (i < list.size() && list.get(i) != formula) {
+                i++;
+            }
+            if (i == list.size()) {
+                return false;
+            }
+            i++;
+        }
+        return true;
+    }
+
+    /**
+     * @return {@code true} iff both lists contain the same formula objects (any order) — the
+     *         Regroup filter reorders but never drops formulas
+     */
+    private static boolean sameFormulas(List<SequentFormula> list, List<SequentFormula> other) {
+        if (list.size() != other.size()) {
+            return false;
+        }
+        List<SequentFormula> copy = new ArrayList<>(other);
+        for (SequentFormula formula : list) {
+            if (!removeRef(copy, formula)) {
+                return false;
+            }
+        }
+        return copy.isEmpty();
+    }
+
+    /**
+     * The regrouped order the Swing {@code RegroupSequentPrintFilter.filterSequent} computes:
+     * iterating the original order, a matching formula is appended (antecedent) resp. prepended
+     * (succedent), a non-matching one prepended (antecedent) resp. appended (succedent) — so the
+     * matching formulas end up grouped at the sequent arrow.
+     *
+     * @param base the formulas in original order (the Highlight mode printing)
+     * @param matching the formulas matching the query (the Hide mode printing), as a subsequence
+     *        of {@code base}
+     * @param matchingAtStart whether the matching formulas belong at the arrow-adjacent start of
+     *        the list (succedent) or at its end (antecedent)
+     * @return the expected regrouped formula list
+     */
+    private static List<SequentFormula> expectedRegroup(List<SequentFormula> base,
+            List<SequentFormula> matching, boolean matchingAtStart) {
+        ArrayDeque<SequentFormula> deque = new ArrayDeque<>();
+        for (SequentFormula formula : base) {
+            boolean match = containsRef(matching, formula);
+            if (match == matchingAtStart) {
+                deque.addFirst(formula);
+            } else {
+                deque.addLast(formula);
+            }
+        }
+        return new ArrayList<>(deque);
+    }
+
+    private static boolean containsRef(List<SequentFormula> list, SequentFormula formula) {
+        for (SequentFormula candidate : list) {
+            if (candidate == formula) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean removeRef(List<SequentFormula> list, SequentFormula formula) {
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i) == formula) {
+                list.remove(i);
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -451,6 +451,14 @@ public final class MainWindowF {
                 // the sequent search verification runs at its stop
                 runSequentSearchVerification();
             }
+            if (System.getProperty("key.fx.verify.sequentsearchmodes") != null
+                    && System.getProperty("key.fx.demo.autoprove.live") == null) {
+                // ditto; runs after the plain search verification and restores the plain view
+                runSequentSearchModesVerification();
+            }
+            if (System.getProperty("key.fx.verify.updatehighlight") != null) {
+                runUpdateHighlightVerification();
+            }
             if (System.getProperty("key.fx.verify.tree") != null) {
                 String report = proofTreeView.verifyTreeStructure();
                 LOGGER.info("Proof tree structure verification: {}", report);
@@ -841,6 +849,12 @@ public final class MainWindowF {
                     if (System.getProperty("key.fx.verify.sequentsearch") != null) {
                         runSequentSearchVerification();
                     }
+                    if (System.getProperty("key.fx.verify.sequentsearchmodes") != null) {
+                        runSequentSearchModesVerification();
+                    }
+                    if (System.getProperty("key.fx.verify.updatehighlight") != null) {
+                        runUpdateHighlightVerification();
+                    }
                     if (System.getProperty("key.fx.verify.treefilters") != null) {
                         String report = proofTreeView.verifyTreeFilters();
                         LOGGER.info("Proof tree filter verification: {}", report);
@@ -878,6 +892,41 @@ public final class MainWindowF {
         LOGGER.info("Sequent search verification: {}", report);
         NotificationManagerF.getInstance()
                 .notify("Sequent search verification: " + report,
+                    report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+    }
+
+    /**
+     * Runs the search mode self test (Highlight/Hide/Regroup) with the query given as the value
+     * of {@code key.fx.verify.sequentsearchmodes} (like the other search verifications the VALUE
+     * is the query itself; the flag value {@code 1} falls back to the
+     * {@code key.fx.verify.sequentsearch} query, default {@code agatha}); restores the plain
+     * view.
+     */
+    private void runSequentSearchModesVerification() {
+        String value = System.getProperty("key.fx.verify.sequentsearchmodes");
+        String query;
+        if (value == null || value.isBlank() || "1".equals(value.trim())) {
+            String searchQuery = System.getProperty("key.fx.verify.sequentsearch");
+            query = searchQuery == null || searchQuery.isBlank() ? "agatha" : searchQuery.trim();
+        } else {
+            query = value.trim();
+        }
+        String report = sequentView.verifySearchModes(query);
+        LOGGER.info("Sequent search modes verification: {}", report);
+        NotificationManagerF.getInstance()
+                .notify("Sequent search modes verification: " + report,
+                    report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+    }
+
+    /**
+     * Runs the update-highlight overlay self test (needs a sequent that prints update operators,
+     * e.g. the normalisation11.key demo).
+     */
+    private void runUpdateHighlightVerification() {
+        String report = sequentView.verifyUpdateHighlights();
+        LOGGER.info("Update highlight verification: {}", report);
+        NotificationManagerF.getInstance()
+                .notify("Update highlight verification: " + report,
                     report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
     }
 

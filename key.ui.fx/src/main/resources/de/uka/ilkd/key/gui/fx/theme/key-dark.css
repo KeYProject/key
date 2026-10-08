@@ -588,3 +588,30 @@
     -fx-font-weight: bold;
     -fx-underline: true;
 }
+
+/* update highlights of the printed update operators (M2, Swing
+   CurrentGoalView.updateUpdateHighlights paints InitialPositionTable.getUpdateRanges with
+   UPDATE_HIGHLIGHT_COLOR behind the text); the rectangles are Path nodes styled with -fx-fill;
+   the Swing dark color is fully opaque (painted behind the text) */
+.sequent-update-highlight {
+    -fx-fill: rgba(0, 150, 130, 1.0);
+}
+
+/* hover highlight of the term under the mouse (Swing DEFAULT_HIGHLIGHT_COLOR dark) */
+.sequent-hover-highlight {
+    -fx-fill: rgba(140, 200, 255, 0.71);
+}
+
+/* warning banner while a search filter hides formulas (Swing SequentHideWarningBorder message;
+   the Swing border uses the same single color in both themes) */
+.sequent-hide-warning {
+    -fx-background-color: #ffb2b2;
+    -fx-text-fill: #000000;
+    -fx-font-size: 0.9em;
+    -fx-padding: 2 8 2 8;
+}
+
+/* the search mode combo (Swing SequentViewSearchBar.searchModeBox with the mode icons) */
+.sequent-search-mode {
+    -fx-padding: 1;
+}
