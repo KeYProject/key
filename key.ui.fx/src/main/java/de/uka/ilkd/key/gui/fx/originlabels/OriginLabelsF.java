@@ -25,6 +25,7 @@ import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -280,7 +281,8 @@ public final class OriginLabelsF {
                 }
             }
             node = nextPreorderNode(node);
-        }        boolean grew = false, hiddenOk = true;
+        }
+        boolean grew = false, hiddenOk = true;
         if (printed != null) {
             // hide everything (Swing "Display Term Labels in Formulas" off) and back on
             manager.setShowLabels(false);
@@ -332,6 +334,23 @@ public final class OriginLabelsF {
         Node node = mainWindow.getSelectionModel().getSelectedNode();
         if (node == null) {
             return "originVis: no node FAIL";
+        }
+        // prefer a node whose sequent carries origin labels (nodes from the interactive part of
+        // the saved proofs do; the root usually does not)
+        Node originNode = null;
+        for (Node n = node.proof().root(); n != null; n = nextPreorderNode(n)) {
+            if ((!n.sequent().succedent().isEmpty() && OriginTermLabel
+                    .getOrigin(new PosInOccurrence(n.sequent().succedent().getFirst(),
+                        org.key_project.logic.PosInTerm.getTopLevel(), false)) != null)
+                    || (!n.sequent().antecedent().isEmpty() && OriginTermLabel.getOrigin(
+                        new PosInOccurrence(n.sequent().antecedent().getFirst(),
+                            org.key_project.logic.PosInTerm.getTopLevel(), true)) != null)) {
+                originNode = n;
+                break;
+            }
+        }
+        if (originNode != null) {
+            node = originNode;
         }
         // first top-level formula of the sequent (Swing ShowOriginAction walks up to a formula;
         // the first formula is as good a demonstration position as any)
