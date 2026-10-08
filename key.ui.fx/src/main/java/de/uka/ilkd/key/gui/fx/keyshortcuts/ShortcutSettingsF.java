@@ -102,6 +102,9 @@ public class ShortcutSettingsF extends SettingsPanelF implements SettingsProvide
         List<ShortcutRow> rows =
             entries.entrySet().stream().map(e -> new ShortcutRow(e.getKey(), e.getValue()))
                     .toList();
+        // re-render all cells when a spec changes, so both rows of a duplicate pair get the
+        // error marking (the marking is computed per cell in updateItem)
+        rows.forEach(row -> row.spec.addListener((obs, old, value) -> tblShortcuts.refresh()));
         tblShortcuts.setItems(FXCollections.observableList(rows));
         tblShortcuts.sort();
     }

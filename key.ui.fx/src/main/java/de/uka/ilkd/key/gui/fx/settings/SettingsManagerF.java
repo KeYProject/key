@@ -31,6 +31,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import de.uka.ilkd.key.gui.fx.MainWindowF;
+import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -180,6 +181,9 @@ public final class SettingsManagerF {
         root.setPadding(new Insets(8));
         root.setBottom(createButtonBar(mainWindow, providers, stage));
         stage.setScene(new Scene(root, 900, 600));
+        // track the dialog scene so it is styled with the current theme and follows theme
+        // switches applied by its own appearance panel while it is open
+        ThemeManager.getInstance().manage(stage.getScene());
         stage.setUserData(ui);
 
         stage.getScene().setOnKeyPressed(e -> {
@@ -333,8 +337,13 @@ public final class SettingsManagerF {
                 protected void updateItem(SettingsProviderF item, boolean empty) {
                     super.updateItem(item, empty);
                     getStyleClass().remove("settings-tree-match");
-                    if (empty || item == null) {
+                    if (empty) {
                         setText(null);
+                        return;
+                    }
+                    if (item == null) {
+                        // the invisible root carries no provider; Swing labels it "KeY Settings"
+                        setText("KeY Settings");
                         return;
                     }
                     setText(item.getDescription());

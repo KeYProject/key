@@ -66,6 +66,12 @@ public class StandardUISettingsF extends SettingsPanelF implements SettingsProvi
             """;
 
     private final ToggleGroup themeGroup = new ToggleGroup();
+    /**
+     * The child providers, created once: the tree, the initialization and the apply process must
+     * share the same instances (a per-call creation would apply fresh, unpopulated panels).
+     */
+    private final java.util.List<SettingsProviderF> childProviders =
+        java.util.List.of(new ColorSettingsProviderF(), new ShortcutSettingsF());
     private RadioButton lightRadio;
     private RadioButton darkRadio;
     private Spinner<Double> spFontSizeGlobal;
@@ -151,7 +157,7 @@ public class StandardUISettingsF extends SettingsPanelF implements SettingsProvi
 
     @Override
     public java.util.List<SettingsProviderF> getChildProviders() {
-        return java.util.Arrays.asList(new ColorSettingsProviderF(), new ShortcutSettingsF());
+        return childProviders;
     }
 
     @Override
