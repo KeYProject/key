@@ -22,6 +22,7 @@ import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.gui.fx.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
+import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -96,6 +97,10 @@ public class TacletMatchDialogF extends ApplyTacletDialogF {
         root.setBottom(createFooter());
 
         Scene scene = new Scene(root, 1000, 620);
+        // style the dialog scene with the active theme stylesheet (like every other FX window;
+        // the classic completion dialog does the same) — without it the dialog would render in
+        // plain Modena regardless of the light/dark theme
+        ThemeManager.getInstance().style(scene);
         root.setMinSize(640, 400);
         setScene(scene);
         if (owner != null) {
