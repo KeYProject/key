@@ -400,6 +400,7 @@ public final class JoinMergeVerifyF {
         try {
             JoinDialogF dialog = new JoinDialogF(partners, proof, PredicateEstimator.STD_ESTIMATOR,
                 proof.getServices(), owner);
+            dialog.showNonBlocking();
             assertJoinDialog(dialog, proof, partners, real);
             assertOkCancelSemantics(proof, partners);
             LOGGER.info("JoinMerge verification: join dialog open for screenshot ({} s window)",
