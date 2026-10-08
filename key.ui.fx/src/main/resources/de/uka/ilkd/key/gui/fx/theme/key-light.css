@@ -448,30 +448,20 @@
     -fx-text-fill: -key-text-secondary;
 }
 
-    /*
-     * Configurable colors shared with the Swing UI (colors.json); the file keys are mapped to
-     * these properties by ColorSettingsF.CSS_VARIABLES and the defaults are the light defaults
-     * of the Swing ColorSettings. The sequent prop-logic default is the plain text color
-     * (black in the Swing UI).
-     */
-    -key-settings-error: #c86464;
-    -key-hl-java: #7f0055;
-    -key-hl-comment: #3f7f5f;
-    -key-hl-jml: #0000c0;
-    -key-hl-jml-keyword: #0000f0;
-    -key-sequent-hl-prop: -key-text;
-    -key-sequent-hl-dyn: #0000d0;
-    -key-sequent-hl-progvar: #6a3e3e;
-    -key-sequent-hl-arrow: #6a3e3e;
-    -fx-fill: -key-sequent-hl-prop;
-    -fx-fill: -key-sequent-hl-dyn;
-    -fx-fill: -key-hl-java;
-    -fx-fill: -key-sequent-hl-progvar;
+.source-comment {
     -fx-fill: -key-hl-comment;
-    -fx-fill: -key-hl-jml;
-    -fx-fill: -key-sequent-hl-arrow;
-    -fx-fill: -key-hl-java;
-    -fx-fill: -key-hl-comment;
+    -fx-font-style: italic;
+}
+
+.source-string {
+    -fx-fill: -key-success;
+}
+
+.source-annotation {
+    -fx-fill: -key-warning;
+}
+
+.source-jml-keyword {
     -fx-fill: -key-hl-jml-keyword;
     -fx-font-weight: bold;
 }
@@ -498,6 +488,7 @@
 }
 
 .settings-separator-title {
+    -fx-font-weight: bold;
     -fx-text-fill: -key-text;
 }
 
@@ -559,6 +550,7 @@
 
 .key-icon.key-icon-error {
     -fx-fill: -key-error;
+}
 
 /* ------------------------------------------------------------------
  * proof diff frame (M5, Swing ProofDiffFrame)
