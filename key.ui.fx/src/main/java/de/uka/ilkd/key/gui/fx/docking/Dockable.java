@@ -6,8 +6,6 @@ package de.uka.ilkd.key.gui.fx.docking;
 
 import java.util.List;
 
-import java.util.List;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
