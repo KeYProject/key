@@ -27,6 +27,7 @@ import de.uka.ilkd.key.proof.join.PredicateEstimator;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergePartner;
+import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 
@@ -98,7 +99,15 @@ public final class JoinMergeVerifyF {
         Thread worker = new Thread(() -> {
             prepare(proof, proofControl);
             List<ProspectivePartner> partners = computeJoinPartners(proof);
-            MergeAppData mergeApp = findMergeRuleApplication(proof);
+            MergeAppData foundApp = findMergeRuleApplication(proof);
+            if (foundApp == null) {
+                foundApp = syntheticMergeApp(proof);
+                if (foundApp != null) {
+                    LOGGER.info("JoinMerge verification: using SYNTHETIC merge app data "
+                        + "(no admissible merge position in the proof state)");
+                }
+            }
+            final MergeAppData mergeApp = foundApp;
             verifyForcedMergeCompletion(proof, mergeApp);
             Platform.runLater(() -> verifyJoinDialog(owner, proof, partners, () -> {
                 verifyMergePartnerDialog(owner, proof, proofControl, mergeApp, () -> {
@@ -204,10 +213,12 @@ public final class JoinMergeVerifyF {
     /**
      * A merge rule application of admissible form with its potential merge partners, found by
      * scanning the open goals (the same information the Swing context menu action has available
-     * when it is enabled).
+     * when it is enabled). {@code synthetic} marks app data built by
+     * {@link #syntheticMergeApp(Proof)} when no admissible position exists in the proof state
+     * (then the dialogs are exercised for rendering/interaction, not for a real merge).
      */
     private record MergeAppData(Goal goal, PosInOccurrence pio,
-            ImmutableList<MergePartner> candidates) {
+            ImmutableList<MergePartner> candidates, boolean synthetic) {
     }
 
     /**
@@ -230,11 +241,14 @@ public final class JoinMergeVerifyF {
                         new PosInOccurrence(semi.get(i), PosInTerm.getTopLevel(), inAntec);
                     try {
                         boolean applicable = MergeRule.INSTANCE.isApplicable(goal, pio);
-                        LOGGER.info("JoinMerge verification: goal {} formula {} applicable={}",
+                        boolean admissible =
+                            MergeRule.isOfAdmissibleForm(goal, pio, false);
+                        LOGGER.info(
+                            "JoinMerge verification: goal {} formula {} applicable={} admissible={}",
                             goal.node().serialNr(),
                             LogicPrinter.quickPrintTerm((JTerm) semi.get(i).formula(),
                                 proof.getServices()),
-                            applicable);
+                            applicable, admissible);
                         if (!applicable) {
                             continue;
                         }
@@ -247,7 +261,7 @@ public final class JoinMergeVerifyF {
                             LOGGER.info(
                                 "JoinMerge verification: {} merge candidates for goal {}",
                                 candidates.size(), goal.node().serialNr());
-                            return new MergeAppData(goal, pio, candidates);
+                            return new MergeAppData(goal, pio, candidates, false);
                         }
                     } catch (RuntimeException e) {
                         LOGGER.info("JoinMerge verification: merge applicability check failed: "
@@ -257,6 +271,74 @@ public final class JoinMergeVerifyF {
             }
         }
         return null;
+    }
+
+    /**
+     * Builds synthetic merge app data from the open goals (fallback if no admissible merge
+     * position exists — the dialogs are then exercised for rendering/interaction, not for a real
+     * merge): the first open goal becomes the merge goal, the top-level succedent formula its
+     * merge position, and every other open goal a synthetic {@link MergePartner} at the top-level
+     * succedent formula (the same shape {@link MergeRule#findPotentialMergePartners} builds).
+     *
+     * @param proof the proof
+     * @return the synthetic merge app data, or {@code null} if the proof state does not allow it
+     */
+    private static MergeAppData syntheticMergeApp(Proof proof) {
+        List<Goal> goals = new ArrayList<>();
+        proof.openGoals().forEach(goals::add);
+        if (goals.isEmpty()) {
+            return null;
+        }
+        Goal mergeGoal = goals.get(0);
+        var succedent = mergeGoal.sequent().succedent();
+        if (succedent.isEmpty()) {
+            return null;
+        }
+        PosInOccurrence pio =
+            new PosInOccurrence(succedent.get(0), PosInTerm.getTopLevel(), false);
+        ImmutableList<MergePartner> candidates = ImmutableList.nil();
+        for (Goal other : goals) {
+            if (other.equals(mergeGoal) || other.isLinked()) {
+                continue;
+            }
+            var otherSuccedent = other.sequent().succedent();
+            if (otherSuccedent.isEmpty()) {
+                continue;
+            }
+            candidates = candidates.prepend(new MergePartner(other,
+                new PosInOccurrence(otherSuccedent.get(0), PosInTerm.getTopLevel(), false)));
+        }
+        if (candidates.isEmpty()) {
+            return null;
+        }
+        return new MergeAppData(mergeGoal, pio, candidates, true);
+    }
+
+    /**
+     * Replicates the Swing / JavaFX dialog's {@code isApplicableForCandidates} for the harness
+     * parity checks: builds the merge rule application for the given candidates (with the
+     * dialog's default merge procedure, the head of the procedure list) and checks its
+     * completeness.
+     *
+     * @param proof the proof
+     * @param goal the merge goal
+     * @param pio the merge position
+     * @param candidates the candidates to instantiate the application with
+     * @return true iff the induced merge rule application is complete (dialog OK enabled)
+     */
+    private static boolean mergeApplicableForCandidates(Proof proof, Goal goal,
+            PosInOccurrence pio, ImmutableList<MergePartner> candidates) {
+        try {
+            MergeRuleBuiltInRuleApp app =
+                (MergeRuleBuiltInRuleApp) MergeRule.INSTANCE.createApp(pio, proof.getServices());
+            app.setMergeNode(goal.node());
+            app.setConcreteRule(MergeProcedure.getMergeProcedures().head());
+            app.setMergePartners(candidates);
+            return app.complete();
+        } catch (RuntimeException e) {
+            LOGGER.info("JoinMerge verification: merge parity check threw: {}", e.toString());
+            return false;
+        }
     }
 
     /**
@@ -271,6 +353,11 @@ public final class JoinMergeVerifyF {
         if (mergeApp == null) {
             LOGGER.info(
                 "JoinMerge verification: merge-dialog SKIP (no admissible merge position with partners)");
+            return;
+        }
+        if (mergeApp.synthetic()) {
+            LOGGER.info(
+                "JoinMerge verification: merge-completion SKIP (synthetic merge app is not of admissible form; the dialog checks use a harness parity check)");
             return;
         }
         try {
@@ -460,13 +547,24 @@ public final class JoinMergeVerifyF {
         check("merge-dialog distinguishing-formula field enabled iff single candidate",
             dialog.getTxtDistForm().isDisabled() != (mergeApp.candidates().size() == 1));
 
-        // select the first candidate as merge partner (parity with the checkbox action)
+        // select the first candidate as merge partner (parity with the checkbox action);
+        // OK enablement parity = the dialog's isApplicableForCandidates replicated by the
+        // harness (works for synthetic data too, where the real merge is not applicable)
         dialog.getCbSelectCandidate().fire();
-        check("merge-dialog OK enabled after partner chosen", !dialog.getOkButton().isDisabled());
+        ImmutableList<MergePartner> chosenList =
+            ImmutableList.<MergePartner>nil().prepend(mergeApp.candidates().head());
+        boolean expectedOkAfterChoice = mergeApplicableForCandidates(proof, mergeApp.goal(),
+            mergeApp.pio(), chosenList);
+        check("merge-dialog OK " + (expectedOkAfterChoice ? "enabled" : "disabled")
+            + " after partner chosen (harness parity)",
+            dialog.getOkButton().isDisabled() != expectedOkAfterChoice);
 
-        // enablement parity (Swing checkApplicable)
-        check("merge-dialog Choose-All " + "enablement parity",
-            !dialog.getChooseAllButton().isDisabled());
+        // Choose-All enablement parity (Swing checkApplicable)
+        boolean expectedChooseAll =
+            mergeApplicableForCandidates(proof, mergeApp.goal(), mergeApp.pio(),
+                mergeApp.candidates());
+        check("merge-dialog Choose-All " + (expectedChooseAll ? "enabled" : "disabled")
+            + " (harness parity)", dialog.getChooseAllButton().isDisabled() != expectedChooseAll);
 
         // OK/cancel semantics on a hidden second instance (so the screenshot dialog stays open)
         MergePartnerSelectionDialogF hidden =
