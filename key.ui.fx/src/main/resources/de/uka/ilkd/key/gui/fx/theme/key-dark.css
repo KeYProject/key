@@ -608,17 +608,6 @@
     -fx-padding: 1;
 }
 
-/* proof-closed notification dialog (port of the Swing ProofClosedJTextPaneDisplay dialog) */
-.notification-dialog {
-    -fx-background-color: -key-background;
-}
-
-.notification-dialog-header {
-    -fx-font-size: 1.1em;
-    -fx-text-fill: -key-text;
-    -fx-padding: 0 0 4 0;
-}
-
 /* notification framework proof-closed dialog (Swing ProofClosedJTextPaneDisplay ->
  * ShowProofStatistics.Window port; FX ProofClosedDialogF) */
 .notification-dialog {
@@ -632,8 +621,10 @@
 }
 
 .notification-dialog-header {
+    -fx-font-size: 1.1em;
     -fx-text-fill: -key-success;
     -fx-font-weight: bold;
+    -fx-padding: 0 0 4 0;
 }
 
 /* ---------------------------------------------------------------------

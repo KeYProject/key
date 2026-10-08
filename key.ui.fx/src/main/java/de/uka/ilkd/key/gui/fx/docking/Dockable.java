@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.fx.docking;
 
+import java.util.List;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
@@ -89,5 +91,15 @@ public interface Dockable {
      */
     default void setClosable(boolean closable) {
         closableProperty().set(closable);
+    }
+
+    /**
+     * @return the custom actions shown in this dockable's tab context menu (and later in its tab
+     *         header), like the Swing {@code TabPanel.getTitleActions()}/{@code
+     *         TabPanel.getTitleCActions()} rendered by {@code DockingHelper} into the dockable's
+     *         title bar and title popup menu
+     */
+    default List<DockTitleActionF> getTitleActions() {
+        return List.of();
     }
 }

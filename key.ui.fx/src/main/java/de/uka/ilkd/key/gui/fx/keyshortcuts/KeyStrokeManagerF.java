@@ -100,6 +100,18 @@ public final class KeyStrokeManagerF {
         defineDefault("de.uka.ilkd.key.gui.actions.QuickSaveAction", "F5");
         defineDefault("de.uka.ilkd.key.gui.actions.QuickLoadAction", "F6");
 
+        // docking layout slots (Swing DockingLayout: the save actions use the shortcut mask +
+        // SHIFT (Ctrl+Shift+F10..F12), the load actions the shortcut mask (Ctrl+F10..F12))
+        defineDefault("de.uka.ilkd.key.gui.docking.SaveLayoutAction$Default",
+            modifier() + "SHIFT+F10");
+        defineDefault("de.uka.ilkd.key.gui.docking.SaveLayoutAction$Slot 1",
+            modifier() + "SHIFT+F11");
+        defineDefault("de.uka.ilkd.key.gui.docking.SaveLayoutAction$Slot 2",
+            modifier() + "SHIFT+F12");
+        defineDefault("de.uka.ilkd.key.gui.docking.LoadLayoutAction$Default", modifier() + "F10");
+        defineDefault("de.uka.ilkd.key.gui.docking.LoadLayoutAction$Slot 1", modifier() + "F11");
+        defineDefault("de.uka.ilkd.key.gui.docking.LoadLayoutAction$Slot 2", modifier() + "F12");
+
         defineDefault("de.uka.ilkd.key.gui.actions.IncreaseFontSizeAction", modifier() + "PLUS");
         defineDefault("de.uka.ilkd.key.gui.actions.DecreaseFontSizeAction", modifier() + "MINUS");
         defineDefault("de.uka.ilkd.key.gui.actions.AbandonTaskAction", modifier() + "W");
@@ -314,10 +326,12 @@ public final class KeyStrokeManagerF {
         if (spec == null || spec.isBlank()) {
             return Optional.empty();
         }
-        ModifierValue shift = ModifierValue.ANY;
-        ModifierValue ctrl = ModifierValue.ANY;
-        ModifierValue meta = ModifierValue.ANY;
-        ModifierValue alt = ModifierValue.ANY;
+        // Swing KeyStroke semantics: a modifier not mentioned in the spec must be UP (a Swing
+        // "ctrl pressed F11" stroke does not match an event with shift also pressed)
+        ModifierValue shift = ModifierValue.UP;
+        ModifierValue ctrl = ModifierValue.UP;
+        ModifierValue meta = ModifierValue.UP;
+        ModifierValue alt = ModifierValue.UP;
         String key = null;
         for (String token : spec.trim().split("\\s+")) {
             switch (token) {
