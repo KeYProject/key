@@ -53,12 +53,12 @@ public final class UiControlSelfTestF {
                 new IllegalStateException("Seam self test: synthetic exception"));
             FxUtil.runLater(() -> {
                 IssueDialogF dialog = IssueDialogF.getLastDialog().orElse(null);
-                boolean dialogPass = dialog != null && dialog.isVisible()
+                boolean dialogPass = dialog != null && dialog.wasShown()
                         && dialog.getIssues().stream()
                                 .anyMatch(i -> i.text().contains("synthetic exception"));
                 report("exception verification", dialogPass,
                     dialog == null ? "no IssueDialogF was opened"
-                            : "IssueDialogF visible=" + dialog.isVisible() + ", issues="
+                            : "IssueDialogF wasShown=" + dialog.wasShown() + ", issues="
                                 + dialog.getIssues().size());
 
                 // 3. log view: emitted log lines must be rendered by the LogViewF
