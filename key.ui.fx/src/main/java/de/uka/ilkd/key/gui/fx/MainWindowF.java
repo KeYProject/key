@@ -524,6 +524,11 @@ public final class MainWindowF {
         loadTask.setOnFailed(event -> {
             Throwable error = loadTask.getException();
             LOGGER.error((demo ? "Demo proof" : "Proof") + " loading failed", error);
+            // seam: loading errors surface in the IssueDialog (Swing parity: the
+            // ProblemLoader branch of WindowUserInterfaceControl.taskFinishedInternal,
+            // WindowUserInterfaceControl.java:236-244, calls IssueDialog.showExceptionDialog;
+            // the FX load task throws instead of reporting a failed TaskFinishedInfo)
+            IssueDialogF.showExceptionDialog(getStage(), error);
             NotificationManagerF.getInstance()
                     .notify((demo ? "Demo proof" : "Proof") + " loading failed: "
                         + error.getMessage(), Kind.ERROR);
