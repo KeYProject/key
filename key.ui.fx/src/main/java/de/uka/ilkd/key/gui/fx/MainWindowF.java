@@ -66,7 +66,6 @@ import de.uka.ilkd.key.gui.fx.proofdiff.ProofDiffFrameF;
 import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeViewF;
 import de.uka.ilkd.key.gui.fx.recentfiles.RecentFilesF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsManagerF;
-import de.uka.ilkd.key.gui.fx.settings.ThemeSettingsProviderF;
 import de.uka.ilkd.key.gui.fx.sourceview.SourceViewF;
 import de.uka.ilkd.key.gui.fx.strategy.StrategySelectionViewF;
 import de.uka.ilkd.key.gui.fx.theme.Theme;
@@ -227,7 +226,6 @@ public final class MainWindowF {
         stage.setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
         setWindowIcons();
 
-        registerSettingsProviders();
         buildDockables();
         workspace.setDefaultLayout(defaultLayout());
 
@@ -276,6 +274,20 @@ public final class MainWindowF {
     }
 
     /**
+     * @return the mediator of the window (Swing {@code MainWindow.getMediator()})
+     */
+    public KeYMediatorF getMediator() {
+        return mediator;
+    }
+
+    /**
+     * @return the primary stage of the main window (owner for dialogs)
+     */
+    public Stage getStage() {
+        return stage;
+    }
+
+    /**
      * @return the sequent view docked in the main area
      */
     public SequentViewF getSequentView() {
@@ -287,21 +299,6 @@ public final class MainWindowF {
      */
     public KeYSelectionModel getSelectionModel() {
         return selectionModel;
-    }
-
-    /**
-     * @return the mediator of the window (Swing {@code MainWindow.getMediator()}); used by
-     *         secondary windows like the proof diff frame
-     */
-    public KeYMediatorF getMediator() {
-        return mediator;
-    }
-
-    /**
-     * @return the stage of this window (the owner of secondary windows)
-     */
-    public Stage getStage() {
-        return stage;
     }
 
     // ------------------------------------------------------------------
@@ -918,6 +915,9 @@ public final class MainWindowF {
                 .setSelected(true);
         lightTheme.setOnAction(e -> setTheme(Theme.LIGHT));
         darkTheme.setOnAction(e -> setTheme(Theme.DARK));
+        // theme switches from elsewhere (e.g. the settings dialog) update the menu radios
+        ThemeManager.getInstance().themeProperty().addListener(
+            (obs, old, theme) -> (theme == Theme.DARK ? darkTheme : lightTheme).setSelected(true));
 
         Menu themeMenu = new Menu("Theme");
         themeMenu.getItems().addAll(lightTheme, darkTheme);
@@ -958,7 +958,7 @@ public final class MainWindowF {
     private Menu buildOptionsMenu() {
         Menu options = new Menu("Options");
         options.getItems().addAll(
-            menuItem("Preferences…",
+            menuItem("Settings",
                 "de.uka.ilkd.key.gui.settings.SettingsManager$ShowSettingsAction",
                 IconFactoryF.Key.CONFIGURE, this::openSettings),
             new SeparatorMenuItem(),
@@ -1035,7 +1035,8 @@ public final class MainWindowF {
 
     /**
      * Creates a menu item with an optional icon and accelerator (bound via the
-     * {@link KeyStrokeManagerF}).
+     * {@link KeyStrokeManagerF}). The item is registered with the manager, so a shortcut change
+     * in the settings dialog updates the accelerator live.
      */
     private MenuItem menuItem(String text, String actionId, IconFactoryF.Key icon,
             Runnable action) {
@@ -1044,7 +1045,9 @@ public final class MainWindowF {
             item.setGraphic(IconFactoryF.createIcon(icon));
         }
         if (actionId != null) {
-            KeyStrokeManagerF.getInstance().binding(actionId).ifPresent(item::setAccelerator);
+            KeyStrokeManagerF manager = KeyStrokeManagerF.getInstance();
+            manager.binding(actionId).ifPresent(item::setAccelerator);
+            manager.register(item, actionId);
         }
         item.setOnAction(e -> action.run());
         return item;
@@ -1120,7 +1123,7 @@ public final class MainWindowF {
     }
 
     private void openSettings() {
-        SettingsManagerF.getInstance().openSettings(stage);
+        SettingsManagerF.getInstance().showSettingsDialog(this);
     }
 
     /**
@@ -1150,9 +1153,5 @@ public final class MainWindowF {
     private void notYetImplemented() {
         NotificationManagerF.getInstance().notify(
             "This action arrives in a later milestone of the key.ui.fx rewrite.", Kind.WARNING);
-    }
-
-    private void registerSettingsProviders() {
-        SettingsManagerF.getInstance().addProvider(new ThemeSettingsProviderF());
     }
 }

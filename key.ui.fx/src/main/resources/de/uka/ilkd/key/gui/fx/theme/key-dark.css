@@ -21,6 +21,22 @@
     -key-interactive: #e3a94f;
     -key-border: #555555;
 
+    /*
+     * Configurable colors shared with the Swing UI (colors.json); the file keys are mapped to
+     * these properties by ColorSettingsF.CSS_VARIABLES and the defaults are the dark defaults
+     * of the Swing ColorSettings. The sequent prop-logic default is the plain text color
+     * (white in the Swing UI).
+     */
+    -key-settings-error: #c86464;
+    -key-hl-java: #cf50a5;
+    -key-hl-comment: #9fbf9f;
+    -key-hl-jml: #8888cf;
+    -key-hl-jml-keyword: #8888cf;
+    -key-sequent-hl-prop: -key-text;
+    -key-sequent-hl-dyn: #9696fa;
+    -key-sequent-hl-progvar: #6464fa;
+    -key-sequent-hl-arrow: #6464fa;
+
     /* restyle the built-in Modena controls for the dark theme */
     -fx-base: #3c3f41;
     -fx-background: #2b2b2b;
@@ -110,33 +126,34 @@
    these rules must stay before the search rules so the search and click highlights
    override the syntax coloring for -fx-fill */
 .sequent-hl-prop {
+    -fx-fill: -key-sequent-hl-prop;
     -fx-font-weight: bold;
 }
 
 .sequent-hl-dyn {
-    -fx-fill: #9696fa;
+    -fx-fill: -key-sequent-hl-dyn;
     -fx-font-weight: bold;
 }
 
 .sequent-hl-java {
-    -fx-fill: #cf50a5;
+    -fx-fill: -key-hl-java;
     -fx-font-weight: bold;
 }
 
 .sequent-hl-progvar {
-    -fx-fill: #6464fa;
+    -fx-fill: -key-sequent-hl-progvar;
 }
 
 .sequent-hl-comment {
-    -fx-fill: #9fbf9f;
+    -fx-fill: -key-hl-comment;
 }
 
 .sequent-hl-jml {
-    -fx-fill: #8888cf;
+    -fx-fill: -key-hl-jml;
 }
 
 .sequent-hl-arrow {
-    -fx-fill: #6464fa;
+    -fx-fill: -key-sequent-hl-arrow;
     -fx-font-weight: bold;
 }
 
@@ -422,12 +439,12 @@
 }
 
 .source-keyword {
-    -fx-fill: -key-accent;
+    -fx-fill: -key-hl-java;
     -fx-font-weight: bold;
 }
 
 .source-comment {
-    -fx-fill: -key-text-secondary;
+    -fx-fill: -key-hl-comment;
     -fx-font-style: italic;
 }
 
@@ -440,7 +457,94 @@
 }
 
 .source-jml-keyword {
+    -fx-fill: -key-hl-jml-keyword;
     -fx-font-weight: bold;
+}
+
+/*
+ * Settings dialog (M4, Swing SettingsDialog/SettingsUi/SimpleSettingsPanel).
+ */
+.settings-panel-header {
+    -fx-background-color: -key-surface;
+}
+
+.settings-panel-title {
+    -fx-font-size: 1.3em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text;
+}
+
+.settings-panel-subtitle {
+    -fx-text-fill: -key-text-secondary;
+}
+
+.settings-form {
+    -fx-background-color: -key-surface;
+}
+
+.settings-separator-title {
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text;
+}
+
+.settings-warning-header {
+    -fx-font-size: 1.1em;
+    -fx-text-fill: -key-text;
+}
+
+.settings-taclet-option-title {
+    -fx-font-size: 1.1em;
+    -fx-text-fill: -key-text;
+}
+
+.settings-explanation {
+    -fx-text-fill: -key-text-secondary;
+}
+
+/* the provider tree with the search field on the left */
+.settings-tree-panel {
+    -fx-background-color: -key-surface;
+    -fx-border-color: -key-border;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-padding: 4;
+    -fx-min-width: 200;
+}
+
+.settings-search-row .label {
+    -fx-text-fill: -key-text-secondary;
+}
+
+.settings-tree-match {
+    -fx-text-fill: -key-accent;
+    -fx-font-weight: bold;
+}
+
+/* the selected provider's panel on the right */
+.settings-panel-holder {
+    -fx-background-color: -key-surface;
+    -fx-padding: 4;
+}
+
+/* erroneous input components (SettingsPanelF.markComponentAsErrornous); -key-settings-error is
+   configurable as SETTINGS_TEXTFIELD_ERROR in colors.json */
+.settings-input-error {
+    -fx-background-color: -key-settings-error;
+}
+
+.color-swatch {
+    -fx-border-color: -key-border;
+    -fx-background-radius: 2;
+    -fx-border-radius: 2;
+}
+
+/* warning icons (IconFactoryF.Key.WARNING_*; the plain .key-icon fill is the text color) */
+.key-icon.key-icon-warning {
+    -fx-fill: -key-warning;
+}
+
+.key-icon.key-icon-error {
+    -fx-fill: -key-error;
 }
 
 /* ------------------------------------------------------------------
