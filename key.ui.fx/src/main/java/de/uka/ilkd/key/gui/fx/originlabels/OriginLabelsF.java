@@ -19,13 +19,21 @@ import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.MainWindowF;
 import de.uka.ilkd.key.gui.fx.actions.QuickSaveF;
+import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
+import de.uka.ilkd.key.gui.fx.nodeinfo.NodeInfoVisualizerF;
 import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
+import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
+import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
+import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,8 +139,10 @@ public final class OriginLabelsF {
 
     /**
      * The "Origin Tracking" submenu (Swing {@code OriginTermLabelsExt.getMainMenuActions}):
-     * "Toggle Term Origin Tracking" with the Swing reload dialog, plus "Show Origin" once the
-     * {@link OriginTermLabelVisualizerF} is available.
+     * "Toggle Term Origin Tracking" with the Swing reload dialog and "Show Origin", which opens
+     * the {@link OriginTermLabelVisualizerF} window for the last clicked term (in Swing the
+     * action is a sequent context-menu contribution; the FX sequent view has no context menu
+     * yet, so the item lives here).
      */
     private static MenuItem createOriginTrackingMenu(MainWindowF mainWindow) {
         Menu menu = new Menu("Origin Tracking");
@@ -142,7 +152,57 @@ public final class OriginLabelsF {
             ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         tracking.setOnAction(e -> toggleTermOriginTracking(mainWindow, tracking));
         menu.getItems().add(tracking);
+
+        MenuItem showOrigin =
+            menuItem("Show Origin", mainWindow, IconFactoryF.Key.INFO_VIEW,
+                () -> showOrigin(mainWindow));
+        menu.getItems().add(showOrigin);
         return menu;
+    }
+
+    /** Helper building a plain menu item (JavaFX MenuItem has no tooltip API). */
+    private static MenuItem menuItem(String text, MainWindowF mainWindow, IconFactoryF.Key icon,
+            Runnable action) {
+        javafx.scene.control.MenuItem item = new javafx.scene.control.MenuItem(text);
+        if (icon != null) {
+            item.setGraphic(IconFactoryF.createIcon(icon));
+        }
+        item.setOnAction(e -> action.run());
+        return item;
+    }
+
+    /**
+     * The Swing {@code ShowOriginAction.actionPerformed}: opens a new origin visualizer for the
+     * selected term. The position is the last clicked term of the sequent view, walked up to a
+     * formula ({@code TermView} can only print sequents or formulas, not terms); with no term
+     * clicked the whole sequent is shown. Enablement follows
+     * {@code TermLabelSettings.useOriginLabels}.
+     */
+    private static void showOrigin(MainWindowF mainWindow) {
+        boolean enabled =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels();
+        if (!enabled) {
+            NotificationManagerF.getInstance().notify(
+                "Origin tracking is switched off (View▸Origin Tracking▸Toggle Term Origin Tracking).",
+                Kind.WARNING);
+            return;
+        }
+        de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF view = mainWindow.getSequentView();
+        de.uka.ilkd.key.pp.PosInSequent pos = view.getLastClickedPos();
+        PosInOccurrence pio = pos == null ? null : pos.getPosInOccurrence();
+        // OriginTermLabelVisualizer.TermView can only print sequents or formulas, not terms
+        while (pio != null && !pio.subTerm().sort().equals(JavaDLTheory.FORMULA)) {
+            pio = pio.up();
+        }
+        Node node = mainWindow.getSelectionModel().getSelectedNode();
+        if (node == null) {
+            NotificationManagerF.getInstance().notify("No proof node selected.", Kind.WARNING);
+            return;
+        }
+        OriginTermLabelVisualizerF visualizer =
+            new OriginTermLabelVisualizerF(mainWindow, pio, node,
+                mainWindow.getSelectionModel().getSelectedProof().getServices());
+        visualizer.show();
     }
 
     /**
@@ -185,8 +245,9 @@ public final class OriginLabelsF {
 
     /**
      * Development self test: verifies that term labels can be shown/hidden in the sequent view
-     * through the shared visibility manager (Swing View▸Term Labels). The report is a single
-     * line ending in {@code PASS} or {@code FAIL}.
+     * through the shared visibility manager (Swing View▸Term Labels) and that the origin
+     * visualizer window registers/disposes and builds its tree for the loaded proof. The report
+     * is a single line ending in {@code PASS} or containing {@code FAIL}.
      *
      * @param mainWindow the FX main window with a loaded proof
      * @return the report line
@@ -223,7 +284,58 @@ public final class OriginLabelsF {
             names.size(),
             grew, printed, hiddenOk);
         boolean pass = grew && printed != null && hiddenOk;
-        return "termLabels: names=" + names.size() + " chars " + before.length() + "->"
-            + shown.length() + " printedLabel=" + printed + " " + (pass ? "PASS" : "FAIL");
+        String termLabelReport = "termLabels: names=" + names.size() + " chars " + before.length()
+            + "->" + shown.length() + " printedLabel=" + printed + " " + (pass ? "PASS" : "FAIL");
+
+        // --- origin visualizer part (Swing OriginTermLabelVisualizer / NodeInfoVisualizer) ---
+        String visReport = verifyOriginVisualizer(mainWindow);
+        return termLabelReport + " | " + visReport;
+    }
+
+    /**
+     * Self test part 2 (Swing {@code OriginTermLabelVisualizer}): opens the visualizer for the
+     * first sequent formula of the selected node, verifies that it registered itself
+     * ({@link NodeInfoVisualizerF} registry), that its origin tree has rows and that the term
+     * view printed something, then disposes it and verifies that the registry is empty again.
+     */
+    private static String verifyOriginVisualizer(MainWindowF mainWindow) {
+        Node node = mainWindow.getSelectionModel().getSelectedNode();
+        if (node == null) {
+            return "originVis: no node FAIL";
+        }
+        // first top-level formula of the sequent (Swing ShowOriginAction walks up to a formula;
+        // the first formula is as good a demonstration position as any)
+        PosInOccurrence pio = null;
+        for (SequentFormula cfma : node.sequent().antecedent()) {
+            pio = new PosInOccurrence(cfma, org.key_project.logic.PosInTerm.getTopLevel(), true);
+            break;
+        }
+        if (pio == null) {
+            for (SequentFormula cfma : node.sequent().succedent()) {
+                pio = new PosInOccurrence(cfma, org.key_project.logic.PosInTerm.getTopLevel(),
+                    false);
+                break;
+            }
+        }
+        if (pio == null) {
+            return "originVis: empty sequent FAIL";
+        }
+        try {
+            OriginTermLabelVisualizerF visualizer =
+                new OriginTermLabelVisualizerF(mainWindow, pio, node, node.proof().getServices());
+            visualizer.show();
+            boolean registered = NodeInfoVisualizerF.hasInstances(node);
+            int rows = visualizer.treeRowCount();
+            boolean viewPrinted = visualizer.viewPrinted();
+            visualizer.dispose();
+            boolean unregistered = !NodeInfoVisualizerF.hasInstances(node);
+            LOGGER.info("verify origin visualizer: registered={} rows={} viewPrinted={} "
+                + "unregistered={}", registered, rows, viewPrinted, unregistered);
+            boolean pass = registered && rows > 1 && viewPrinted && unregistered;
+            return "originVis: rows=" + rows + " " + (pass ? "PASS" : "FAIL");
+        } catch (RuntimeException e) {
+            LOGGER.warn("verify origin visualizer failed", e);
+            return "originVis: exception " + e + " FAIL";
+        }
     }
 }
