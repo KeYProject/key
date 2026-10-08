@@ -148,8 +148,13 @@ public final class TacletMatchVerifyF {
     /**
      * finds a taclet application on the given goal whose instantiation is incomplete (the condition
      * under which the Swing term menu routes to the instantiation dialog,
-     * AbstractProofControl.java:226-258). Preferences, in order: a find-taclet app with a match
-     * position and no {@code \assumes} (exercises the match highlighting and the plain apply flow),
+     * AbstractProofControl.java:226-258) and that the dialog can complete without typed user
+     * input: the models pre-fill a proposal for every remaining (skolem/variable) schema variable
+     * (TacletFindModel.java:121-138), so an application with {@code completeExceptSkolemConstants
+     * () == false} still has unproposable (formula) inputs and would fail the apply step.
+     * Preferences, in order: a find-taclet app with a match position, no {@code \assumes} and only
+     * proposable inputs left (exercises the match highlighting and the plain apply flow — e.g. an
+     * {@code \existsRight} skolem constant), then any find-taclet app without {@code \assumes},
      * then any app without {@code \assumes}, then any incomplete app.
      */
     private static TacletApp findIncompleteTacletApp(Goal goal, Services services) {
@@ -161,11 +166,11 @@ public final class TacletMatchVerifyF {
         for (int i = 1; i <= seq.size(); i++) {
             PosInOccurrence pio = PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
             ImmutableList<TacletApp> apps =
-                goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, pio, services);
+                goal.ruleAppIndex().getTacletAppAtAndBelow(TacletFilter.TRUE, pio, services);
             apps.forEach(candidates::add);
         }
 
-        TacletApp findNeedsFull = null;
+        TacletApp findProposable = null;
         TacletApp findWithoutAssumes = null;
         TacletApp withoutAssumes = null;
         TacletApp any = null;
@@ -173,26 +178,24 @@ public final class TacletMatchVerifyF {
             if (app.complete()) {
                 continue;
             }
+            boolean proposable = app.completeExceptSkolemConstants();
             boolean hasAssumes = !app.taclet().assumesSequent().isEmpty();
-            // applications needing a full instantiation (not just skolem constants) are the ones
-            // the Swing term menu routes to the instantiation dialog
-            boolean needsFull = !app.completeExceptSkolemConstants();
             if (app.posInOccurrence() != null && !hasAssumes) {
-                if (needsFull && findNeedsFull == null) {
-                    findNeedsFull = app;
+                if (proposable && findProposable == null) {
+                    findProposable = app;
                 }
                 if (findWithoutAssumes == null) {
                     findWithoutAssumes = app;
                 }
             }
-            if (!hasAssumes && withoutAssumes == null) {
+            if (proposable && !hasAssumes && withoutAssumes == null) {
                 withoutAssumes = app;
             }
             if (any == null) {
                 any = app;
             }
         }
-        return findNeedsFull != null ? findNeedsFull
+        return findProposable != null ? findProposable
                 : findWithoutAssumes != null ? findWithoutAssumes
                         : withoutAssumes != null ? withoutAssumes : any;
     }
