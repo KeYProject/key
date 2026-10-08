@@ -144,6 +144,16 @@ public final class MainWindowF {
     private final KeYSelectionModel selectionModel = mediator.getSelectionModel();
 
     /**
+     * seam: the window-side {@link de.uka.ilkd.key.control.UserInterfaceControl} (Swing
+     * {@code MainWindow.getUserInterface()} returning the {@code WindowUserInterfaceControl}):
+     * routes the core's status/task/exception/warning callbacks into this window and hosts the
+     * interactive rule-completion registry. Created once for the whole application lifetime
+     * (like the Swing original).
+     */
+    private final WindowUserInterfaceControlF userInterface =
+        new WindowUserInterfaceControlF(this);
+
+    /**
      * The proof tree view (first M2 version): displays the proof of the selection model, node
      * clicks drive the selection.
      */
@@ -309,6 +319,15 @@ public final class MainWindowF {
         return selectionModel;
     }
 
+    /**
+     * seam: the window's {@link de.uka.ilkd.key.control.UserInterfaceControl} (Swing
+     * {@code MainWindow.getUserInterface()}); the host of the status/task/exception callbacks
+     * and the rule-completion registry (merge point for the interactive completion ports).
+     */
+    public WindowUserInterfaceControlF getUserInterfaceControl() {
+        return userInterface;
+    }
+
     // ------------------------------------------------------------------
     // sequent view (M2a spike)
     // ------------------------------------------------------------------
@@ -397,7 +416,9 @@ public final class MainWindowF {
                     // the bundle to a temporary directory and loads the selected proof file from
                     // there. This mirrors KeYEnvironment.load, which offers no proofFilename
                     // parameter.
-                    DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();
+                    // seam: load through the window's own UserInterfaceControlF instead of the
+                    // headless DefaultUserInterfaceControl, so its callbacks reach the UI
+                    var ui = getUserInterfaceControl();
                     var loader = new SingleThreadProblemLoader(location, null, null, null, null,
                         false, ui, false, new Properties());
                     loader.setProofFilename(proofFilename);
@@ -405,7 +426,16 @@ public final class MainWindowF {
                     env = new KeYEnvironment<>(ui, loader.getInitConfig(), loader.getProof(),
                         loader.getProofScript(), loader.getResult());
                 } else {
-                    env = KeYEnvironment.load(location);
+                    // seam: load through the window's own UserInterfaceControlF instead of the
+                    // headless KeYEnvironment.load (Swing parity: KeYEnvironment.loadInMainWindow
+                    // uses the WindowUserInterfaceControl as UI, WindowUserInterfaceControl.java
+                    // :600-613), so status/task/exception callbacks reach the UI
+                    var ui = getUserInterfaceControl();
+                    var loader = new SingleThreadProblemLoader(location, null, null, null, null,
+                        false, ui, false, new Properties());
+                    loader.load();
+                    env = new KeYEnvironment<>(ui, loader.getInitConfig(), loader.getProof(),
+                        loader.getProofScript(), loader.getResult());
                 }
                 if (System.getProperty("key.fx.demo.autoprove") != null) {
                     LOGGER.info("Demo: running auto mode on the loaded proof");
@@ -481,6 +511,11 @@ public final class MainWindowF {
                 NotificationManagerF.getInstance()
                         .notify("Proof diff verification: " + report,
                             report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+            }
+            // seam: key.fx.verify.uicontrol — self test of the WindowUserInterfaceControlF seam
+            // (status line, IssueDialogF, LogViewF, AutoDismissDialogF) after the demo load
+            if (System.getProperty("key.fx.verify.uicontrol") != null) {
+                UiControlSelfTestF.run(this);
             }
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 startLiveAutoMode(env);
@@ -784,6 +819,22 @@ public final class MainWindowF {
      */
     public void setStatusLine(String status) {
         statusLeft.setText(status);
+    }
+
+    /**
+     * seam: resets the status line to the proof summary (Swing
+     * {@code MainWindow.setStandardStatusLine}); called by
+     * {@link #userInterface} on {@code resetStatus}.
+     */
+    public void resetStatusLine() {
+        updateProofStatus();
+    }
+
+    /**
+     * seam: current left status text (used by the {@code key.fx.verify.uicontrol} self test).
+     */
+    public String getStatusLineText() {
+        return statusLeft.getText();
     }
 
     /**
