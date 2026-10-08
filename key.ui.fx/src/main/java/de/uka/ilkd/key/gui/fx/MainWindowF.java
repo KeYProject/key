@@ -1357,8 +1357,21 @@ public final class MainWindowF {
                 this::showProofDiffFrame),
             new SeparatorMenuItem(),
             // docking: named layout slots (Swing DockingLayout, menu path View > Layout)
-            dockingLayout.layoutMenu());
+            dockingLayout.layoutMenu(),
+            // seam: the Swing LogView is opened by a status-line extension button
+            // (ShowLogAction; no FX extension SPI yet), so the FX entry point is a View menu
+            // item (LogViewF.showInstance)
+            menuItem("Log View", "de.uka.ilkd.key.gui.actions.LogViewAction",
+                this::showLogView));
         return view;
+    }
+
+    /**
+     * seam: opens the log view window (Swing {@code ShowLogAction} →
+     * {@code LogView.showInstance}, {@code LogView.java:88-126}).
+     */
+    private void showLogView() {
+        LogViewF.showInstance(getStage());
     }
 
     private Menu buildProofMenu() {
