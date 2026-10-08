@@ -138,6 +138,16 @@ public final class IssueDialogF {
     private final Map<URI, String> fileContentsCache = new HashMap<>();
     private final boolean critical;
     private final List<IssueEntry> issues;
+    /**
+     * whether the dialog was shown at least once (self-test hook; {@link #isVisible()} is
+     * {@code false} again as soon as a modal dialog is dismissed)
+     */
+    private boolean shown;
+    /**
+     * whether this dialog was shown at least once (self-test hook: {@code isVisible()} is
+     * {@code false} again after a modal dialog was dismissed)
+     */
+    private boolean shown;
 
     private IssueDialogF(Window owner, String title, String head, Collection<IssueEntry> issueSet,
             boolean critical) {
@@ -351,6 +361,7 @@ public final class IssueDialogF {
      * @param autoClose the delay after which the dialog closes itself
      */
     public void showAndCloseAfter(Duration autoClose) {
+        shown = true;
         dialog.show();
         javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(autoClose);
         pause.setOnFinished(ignored -> dialog.close());
@@ -483,9 +494,18 @@ public final class IssueDialogF {
         return Optional.ofNullable(lastDialog);
     }
 
-    /** @return {@code true} while the dialog is shown (self-test hook) */
+    /** @return whether the dialog is currently shown (self-test hook) */
     public boolean isVisible() {
         return dialog.isShowing();
+    }
+
+    /**
+     * @return whether the dialog was shown at least once — unlike {@link #isVisible()}, this
+     *         stays {@code true} after a modal dialog is dismissed (self-test hook: the seam
+     *         verification runs after the user closed the blocking {@code showAndWait})
+     */
+    public boolean wasShown() {
+        return shown;
     }
 
     /** @return the issues shown by this dialog (self-test hook) */
@@ -495,6 +515,7 @@ public final class IssueDialogF {
 
     /** Forwards to the underlying dialog (this class wraps a {@link Dialog}). */
     public void showAndWait() {
+        shown = true;
         dialog.showAndWait();
     }
 }
