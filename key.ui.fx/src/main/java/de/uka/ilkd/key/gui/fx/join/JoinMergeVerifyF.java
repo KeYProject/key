@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.join.JoinIsApplicable;
@@ -220,17 +221,28 @@ public final class JoinMergeVerifyF {
     private static MergeAppData findMergeRuleApplication(Proof proof) {
         for (Goal goal : proof.openGoals()) {
             var sequent = goal.sequent();
+            LOGGER.info("JoinMerge verification: scanning goal {} for merge positions",
+                goal.node().serialNr());
             for (boolean inAntec : new boolean[] { false, true }) {
                 var semi = inAntec ? sequent.antecedent() : sequent.succedent();
                 for (int i = 0; i < semi.size(); i++) {
                     PosInOccurrence pio =
                         new PosInOccurrence(semi.get(i), PosInTerm.getTopLevel(), inAntec);
                     try {
-                        if (!MergeRule.INSTANCE.isApplicable(goal, pio)) {
+                        boolean applicable = MergeRule.INSTANCE.isApplicable(goal, pio);
+                        LOGGER.info("JoinMerge verification: goal {} formula {} applicable={}",
+                            goal.node().serialNr(),
+                            LogicPrinter.quickPrintTerm((JTerm) semi.get(i).formula(),
+                                proof.getServices()),
+                            applicable);
+                        if (!applicable) {
                             continue;
                         }
                         ImmutableList<MergePartner> candidates =
                             MergeRule.findPotentialMergePartners(goal, pio);
+                        LOGGER.info(
+                            "JoinMerge verification: goal {} merge position has {} candidates",
+                            goal.node().serialNr(), candidates.size());
                         if (!candidates.isEmpty()) {
                             LOGGER.info(
                                 "JoinMerge verification: {} merge candidates for goal {}",
@@ -238,8 +250,8 @@ public final class JoinMergeVerifyF {
                             return new MergeAppData(goal, pio, candidates);
                         }
                     } catch (RuntimeException e) {
-                        LOGGER.debug("JoinMerge verification: merge applicability check failed",
-                            e);
+                        LOGGER.info("JoinMerge verification: merge applicability check failed: "
+                            + e.toString());
                     }
                 }
             }
@@ -406,7 +418,8 @@ public final class JoinMergeVerifyF {
     private static void verifyMergePartnerDialog(Window owner, Proof proof,
             ProofControl proofControl, MergeAppData mergeApp, Runnable next) {
         if (mergeApp == null) {
-            return; // SKIP already logged by verifyForcedMergeCompletion
+            next.run(); // SKIP already logged by verifyForcedMergeCompletion
+            return;
         }
         try {
             MergePartnerSelectionDialogF dialog = new MergePartnerSelectionDialogF(mergeApp.goal(),
