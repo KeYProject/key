@@ -66,6 +66,7 @@ import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
 import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
+import de.uka.ilkd.key.gui.fx.originlabels.OriginLabelsF;
 import de.uka.ilkd.key.gui.fx.proofdiff.ProofDiffFrameF;
 import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeViewF;
 import de.uka.ilkd.key.gui.fx.recentfiles.RecentFilesF;
@@ -482,6 +483,15 @@ public final class MainWindowF {
                         .notify("Proof diff verification: " + report,
                             report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
             }
+            // lemmaorigin: begin — term labels / origin visualizer / lemma generator self test
+            if (System.getProperty("key.fx.verify.lemmaorigin") != null) {
+                String report = OriginLabelsF.verify(this);
+                LOGGER.info("Lemmaorigin verification: {}", report);
+                NotificationManagerF.getInstance()
+                        .notify("Lemmaorigin verification: " + report,
+                            report.contains("FAIL") ? Kind.ERROR : Kind.INFO);
+            }
+            // lemmaorigin: end
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 startLiveAutoMode(env);
             }
@@ -1192,6 +1202,10 @@ public final class MainWindowF {
             themeMenu, fontSize, new SeparatorMenuItem(),
             menuItem("Visual Node Diff", "de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame$Action",
                 this::showProofDiffFrame));
+        // lemmaorigin: begin — term labels + origin tracking view controls (Swing TermLabelMenu /
+        // HidePackagePrefixToggleAction / OriginTermLabelsExt MainMenu items)
+        view.getItems().addAll(OriginLabelsF.install(this));
+        // lemmaorigin: end
         return view;
     }
 
