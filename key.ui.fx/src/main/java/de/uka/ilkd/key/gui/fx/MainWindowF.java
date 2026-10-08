@@ -58,6 +58,7 @@ import de.uka.ilkd.key.gui.fx.docking.DockLayoutStore;
 import de.uka.ilkd.key.gui.fx.docking.DockLocation;
 import de.uka.ilkd.key.gui.fx.docking.DockWorkspace;
 import de.uka.ilkd.key.gui.fx.docking.Dockable;
+import de.uka.ilkd.key.gui.fx.docking.DockingLayoutF;
 import de.uka.ilkd.key.gui.fx.docking.SimpleDockable;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.goallist.GoalListViewF;
@@ -121,6 +122,10 @@ public final class MainWindowF {
     private final DockWorkspace workspace = new DockWorkspace();
     private final DockLayoutStore layoutStore;
     private final Map<String, Dockable> dockables = new LinkedHashMap<>();
+
+    // docking: layout slots, maximize toggle, shutdown persistence and self test (Swing
+    // DockingLayout)
+    private final DockingLayoutF dockingLayout;
 
     private final Label statusLeft = new Label();
     private final Label statusRight = new Label();
@@ -225,6 +230,8 @@ public final class MainWindowF {
     public MainWindowF(Stage stage) {
         this.stage = stage;
         this.layoutStore = new DockLayoutStore(PathConfig.currentPaths.keyConfigDir);
+        // docking: the layout extension needs the workspace and the layout store
+        this.dockingLayout = new DockingLayoutF(this);
     }
 
     /**
@@ -249,6 +256,9 @@ public final class MainWindowF {
         // the global action keys of the Swing AutoModeAction (Ctrl+Space starts, Escape stops);
         // an open search bar consumes Escape itself, so it never stops a run while visible
         scene.setOnKeyPressed(this::handleMainWindowKeyPressed);
+        // docking: Ctrl+M maximize toggle (bibliothek CControl.KEY_MAXIMIZE_CHANGE) and the
+        // shutdown persistence of the Swing GUIListener.shutDown
+        dockingLayout.install(scene);
         stage.setScene(scene);
         stage.show();
 
@@ -272,6 +282,13 @@ public final class MainWindowF {
      */
     public DockWorkspace getWorkspace() {
         return workspace;
+    }
+
+    /**
+     * @return the docking layout store (docking: needed by the {@link DockingLayoutF} slots)
+     */
+    public DockLayoutStore getLayoutStore() {
+        return layoutStore;
     }
 
     /**
@@ -481,6 +498,13 @@ public final class MainWindowF {
                 NotificationManagerF.getInstance()
                         .notify("Proof diff verification: " + report,
                             report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+            }
+            if (System.getProperty("key.fx.verify.docking") != null) { // docking: docking self test
+                String report = dockingLayout.runSelfTest();
+                LOGGER.info("Docking self test: {}", report);
+                NotificationManagerF.getInstance()
+                        .notify("Docking self test: " + report,
+                            report.startsWith("PASS") ? Kind.INFO : Kind.ERROR);
             }
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 startLiveAutoMode(env);
@@ -1191,7 +1215,10 @@ public final class MainWindowF {
         view.getItems().addAll(prettyPrint, unicode, syntaxHighlighting, new SeparatorMenuItem(),
             themeMenu, fontSize, new SeparatorMenuItem(),
             menuItem("Visual Node Diff", "de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame$Action",
-                this::showProofDiffFrame));
+                this::showProofDiffFrame),
+            new SeparatorMenuItem(),
+            // docking: named layout slots (Swing DockingLayout, menu path View > Layout)
+            dockingLayout.layoutMenu());
         return view;
     }
 
