@@ -1242,8 +1242,21 @@ public final class MainWindowF {
         view.getItems().addAll(prettyPrint, unicode, syntaxHighlighting, new SeparatorMenuItem(),
             themeMenu, fontSize, new SeparatorMenuItem(),
             menuItem("Visual Node Diff", "de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame$Action",
-                this::showProofDiffFrame));
+                this::showProofDiffFrame),
+            // seam: the Swing LogView is opened by a status-line extension button
+            // (ShowLogAction; no FX extension SPI yet), so the FX entry point is a View menu
+            // item (LogViewF.showInstance)
+            menuItem("Log View", "de.uka.ilkd.key.gui.actions.LogViewAction",
+                this::showLogView));
         return view;
+    }
+
+    /**
+     * seam: opens the log view window (Swing {@code ShowLogAction} →
+     * {@code LogView.showInstance}, {@code LogView.java:88-126}).
+     */
+    private void showLogView() {
+        LogViewF.showInstance(getStage());
     }
 
     private Menu buildProofMenu() {
