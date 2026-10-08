@@ -126,4 +126,12 @@ public final class NotificationManagerF {
             fade.play();
         }
     }
+
+    /**
+     * @return the number of currently visible toasts (self-test hook used by the
+     *         {@code key.fx.verify.notifications} verification)
+     */
+    public int getVisibleToastCount() {
+        return toastBox.getChildren().size();
+    }
 }
