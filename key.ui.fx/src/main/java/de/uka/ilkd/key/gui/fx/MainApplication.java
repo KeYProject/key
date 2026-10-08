@@ -7,6 +7,8 @@ package de.uka.ilkd.key.gui.fx;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+import de.uka.ilkd.key.gui.fx.help.HelpFacadeF;
+
 /**
  * The JavaFX application of KeY, counter-part of {@code de.uka.ilkd.key.gui.MainWindow} in the
  * Swing module {@code key.ui}.
@@ -21,6 +23,8 @@ public final class MainApplication extends Application {
 
     @Override
     public void start(final Stage stage) throws Exception {
+        // smalldialogs: hand the host services to the help facade (browser opening)
+        HelpFacadeF.setHostServices(this);
         String driverName = System.getProperty("key.fx.driver");
         if (driverName != null && !driverName.isBlank()) {
             Class<?> driverClass = Class.forName(driverName);

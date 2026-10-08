@@ -61,6 +61,7 @@ import de.uka.ilkd.key.gui.fx.docking.Dockable;
 import de.uka.ilkd.key.gui.fx.docking.SimpleDockable;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.goallist.GoalListViewF;
+import de.uka.ilkd.key.gui.fx.help.HelpFacadeF;
 import de.uka.ilkd.key.gui.fx.infoview.InfoViewF;
 import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
 import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
@@ -247,8 +248,12 @@ public final class MainWindowF {
         Scene scene = new Scene(root, 1100, 800);
         ThemeManager.getInstance().manage(scene);
         // the global action keys of the Swing AutoModeAction (Ctrl+Space starts, Escape stops);
-        // an open search bar consumes Escape itself, so it never stops a run while visible
+        // an open search bar consumes Escape itself, so it never stops a run while visible.
+        // smalldialogs: F1 context help is handled by HelpFacadeF.installAccelerator below —
+        // a key-handler branch here would open the page twice.
         scene.setOnKeyPressed(this::handleMainWindowKeyPressed);
+        // smalldialogs: F1 context help (Swing MainWindow.java:300-302 registers the F1 action)
+        HelpFacadeF.installAccelerator(scene);
         stage.setScene(scene);
         stage.show();
 
@@ -261,6 +266,17 @@ public final class MainWindowF {
         recentFiles.setOnChange(this::updateRecentFilesMenu);
         recentFiles.load();
         startDemoProofLoad();
+
+        // smalldialogs: startup self test of the F1 help URL resolution; reports to the log and
+        // toast (same pattern as the key.fx.verify.* hooks in startProofLoad). The help facade is
+        // proof-independent, so the hook runs at startup rather than after a demo proof load.
+        if (System.getProperty("key.fx.verify.help") != null) {
+            String report = HelpFacadeF.verifyHelp();
+            LOGGER.info("Help verification: {}", report);
+            NotificationManagerF.getInstance()
+                    .notify("Help verification: " + report,
+                        report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+        }
 
         NotificationManagerF.getInstance()
                 .notify("KeY (JavaFX) started. Docking layout restored from "
@@ -975,6 +991,8 @@ public final class MainWindowF {
             mediator.stopAutoMode();
             event.consume();
         }
+        // smalldialogs: F1 context help is handled by HelpFacadeF.installAccelerator(scene)
+        // (registered in initialize), not here — a second handler would open the page twice.
     }
 
     /**
