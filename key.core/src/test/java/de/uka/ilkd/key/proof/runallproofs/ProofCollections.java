@@ -1215,9 +1215,9 @@ public class ProofCollections {
 
         g = c.group("JavaFeatures");
         g.loadable("Java/TextBlockLiterals/project.key");
-
         g.loadable("Java/Records/Use.key");
         g.loadable("Java/Records/Constructor.key");
+        g.provable("Java/Annotations/test_annotation.key");
 
         g = c.group("StipuLa");
         g.provable("case-studies/stipula/behavior_run_bet.key");
