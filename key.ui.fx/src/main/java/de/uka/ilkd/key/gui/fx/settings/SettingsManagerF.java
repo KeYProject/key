@@ -186,14 +186,32 @@ public final class SettingsManagerF {
         ThemeManager.getInstance().manage(stage.getScene());
         stage.setUserData(ui);
 
-        stage.getScene().setOnKeyPressed(e -> {
-            // Swing registers ESCAPE on the root pane (WHEN_IN_FOCUSED_WINDOW)
-            if (ui.isEscapeConsumed(e)) {
+        stage.getScene().addEventFilter(javafx.scene.input.KeyEvent.KEY_PRESSED, e -> {
+            // Swing registers ESCAPE on the root pane (WHEN_IN_FOCUSED_WINDOW): Escape closes
+            // the dialog from any focus. The event filter catches the key before controls like
+            // the provider tree consume it; an open cell editor still wins (its Escape cancels
+            // the edit), like the WHEN_ANCESTOR bindings of the Swing cell editors.
+            if (e.getCode() == javafx.scene.input.KeyCode.ESCAPE
+                    && !isCellEditing(stage.getScene().getFocusOwner())) {
                 stage.close();
                 e.consume();
             }
         });
         return stage;
+    }
+
+    /**
+     * @return whether the focus owner or one of its ancestors is an editing cell, so the Escape
+     *         key belongs to the cell editor and must not close the dialog
+     */
+    private static boolean isCellEditing(javafx.scene.Node node) {
+        while (node != null) {
+            if (node instanceof javafx.scene.control.IndexedCell<?> cell && cell.isEditing()) {
+                return true;
+            }
+            node = node.getParent();
+        }
+        return false;
     }
 
     private javafx.scene.Node createButtonBar(MainWindowF mainWindow,
@@ -405,14 +423,6 @@ public final class SettingsManagerF {
                 }
             }
             return java.util.Optional.empty();
-        }
-
-        /**
-         * @return whether the given key event is the dialog's escape key (consumed by the tree
-         *         and the search field otherwise)
-         */
-        boolean isEscapeConsumed(javafx.scene.input.KeyEvent event) {
-            return !event.isConsumed() && event.getCode() == javafx.scene.input.KeyCode.ESCAPE;
         }
     }
 }
