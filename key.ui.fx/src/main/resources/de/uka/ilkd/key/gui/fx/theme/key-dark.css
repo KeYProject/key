@@ -442,3 +442,12 @@
 .source-jml-keyword {
     -fx-font-weight: bold;
 }
+
+/* ------------------------------------------------------------------
+ * M4 file/proof dialogs (ExampleChooserF, ProofSelectionDialogF):
+ * section headings replace the Swing TitledBorder labels
+ * ------------------------------------------------------------------ */
+.dialog-section-title {
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text-secondary;
+}
