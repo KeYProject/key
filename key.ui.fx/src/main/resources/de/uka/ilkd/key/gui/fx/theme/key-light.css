@@ -660,3 +660,62 @@
     -fx-text-fill: -key-text-secondary;
     -fx-padding: 6;
 }
+
+/* ------------------------------------------------------------------
+ * seam: dialog trio (Swing IssueDialog / AutoDismissDialog / LogView)
+ * ------------------------------------------------------------------ */
+
+/* IssueDialogF: monospaced source/stacktrace preview (Swing IssueDialog.txtSource,
+   txtStacktrace), location labels (Swing fTextField/lTextField/cTextField) */
+.issue-dialog-source {
+    -fx-font-family: "Monospaced";
+    -fx-font-size: 1em;
+}
+
+.issue-dialog-location {
+    -fx-text-fill: -key-linked;
+}
+
+/* AutoDismissDialogF: the pink message panel of the Swing original
+   (AutoDismissDialog.java:40, color (1, 0.7f, 0.7f) — a fixed Swing color without a
+   theme variable) */
+.auto-dismiss-dialog {
+    -fx-background-color: #ffb3b3;
+}
+
+/* LogViewF: styled log fields (Swing LogViewPane styles: time/thread/class gray, level bold);
+   the level colors use the theme palette */
+.log-view-area {
+    -fx-font-family: "Monospaced";
+    -fx-font-size: 1em;
+    -fx-background-color: -key-surface;
+    -fx-padding: 4;
+}
+
+.log-time, .log-thread, .log-class, .log-file {
+    -fx-fill: -key-text-secondary;
+}
+
+.log-level {
+    -fx-font-weight: bold;
+}
+
+.log-level.ERROR {
+    -fx-fill: -key-error;
+}
+
+.log-level.WARN {
+    -fx-fill: -key-warning;
+}
+
+.log-level.INFO, .log-level.DEBUG, .log-level.TRACE {
+    -fx-fill: -key-text;
+}
+
+.log-msg {
+    -fx-fill: -key-text;
+}
+
+.log-ex {
+    -fx-fill: -key-error;
+}

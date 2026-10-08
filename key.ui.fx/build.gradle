@@ -79,6 +79,8 @@ run {
     //    firstTouch/05-ReverseArray/reverseArray.key)
     //  * key.fx.verify.docking = any  (docking: run the docking interaction self test (named
     //    layout slots, maximize/restore, close-while-maximized) after the demo load)
+    //  * key.fx.verify.uicontrol = any  (seam: run the WindowUserInterfaceControlF self test
+    //    (status line / IssueDialogF / LogViewF / AutoDismissDialogF) after the demo load)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
@@ -87,7 +89,7 @@ run {
         "key.fx.verify.notifications",
         "key.fx.verify.proofmgmt", "key.fx.demo.proofmgmt", "key.fx.demo.sequent2",
         "key.fx.demo.sequent3",
-        "key.fx.verify.docking"]
+        "key.fx.verify.docking", "key.fx.verify.uicontrol"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {
