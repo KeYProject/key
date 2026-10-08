@@ -66,7 +66,10 @@ public final class IconFactoryF {
         KEY_HOLE_INTERACTIVE(FontAwesomeSolid.HAND_PAPER),
         KEY_HOLE_LINKED(FontAwesomeSolid.LINK),
         WARNING_INCOMPLETE(FontAwesomeSolid.EXCLAMATION_TRIANGLE, "key-icon-warning"),
-        WARNING_UNSOUND(FontAwesomeSolid.EXCLAMATION_TRIANGLE, "key-icon-error");
+        WARNING_UNSOUND(FontAwesomeSolid.EXCLAMATION_TRIANGLE, "key-icon-error"),
+        SEARCH_HIGHLIGHT(FontAwesomeSolid.HIGHLIGHTER),
+        SEARCH_HIDE(FontAwesomeSolid.LOW_VISION),
+        SEARCH_REGROUP(FontAwesomeSolid.VIDEO);
 
         private final IconFont glyph;
 
