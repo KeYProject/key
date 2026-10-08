@@ -65,11 +65,15 @@ run {
     //    Hide/Regroup) with the key.fx.verify.sequentsearch query after the demo load)
     //  * key.fx.verify.updatehighlight = any  (M2: run the update-highlight overlay self test;
     //    needs a sequent printing update operators, e.g. standard_key/queries/useQuery.key)
+    //  * key.fx.verify.notifications = any  (run the notification framework self test after the
+    //    demo load: framework semantics plus one PASS/FAIL line per type (task-finished,
+    //    proof-closed, synthetic exception); report logged and toasted)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
         "key.fx.verify.search", "key.fx.verify.sequentsearch", "key.fx.verify.treefilters",
-        "key.fx.verify.sequentsearchmodes", "key.fx.verify.updatehighlight"]
+        "key.fx.verify.sequentsearchmodes", "key.fx.verify.updatehighlight",
+        "key.fx.verify.notifications"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {
