@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
+import de.uka.ilkd.key.gui.fx.tacletmatch.classic.TacletMatchCompletionDialogF;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -36,14 +37,17 @@ import org.slf4j.LoggerFactory;
  * <li>the dialog renders with the match highlighted (status line + schema-variable spans in the
  * matched term);</li>
  * <li>cancel closes the dialog and leaves the proof unchanged (node count stable);</li>
- * <li>apply closes the dialog and adds the application to the proof (node count changes).</li>
+ * <li>apply closes the dialog and adds the application to the proof (node count changes);</li>
+ * <li>the classic (table-based) completion dialog renders the instantiation table and
+ * {@code cancelAndClose()} leaves the proof unchanged (assertion 4, port deliverable 2).</li>
  * </ol>
  * Each assertion logs {@code PASS}/{@code FAIL} (and is surfaced as a toast by MainWindowF).
  *
  * <p>
  * The value of {@code key.fx.verify.tacletmatch} selects the mode: {@code 1} (default) runs the
- * full three-assertion flow; {@code hold} runs only the render assertion and leaves the dialog open
- * for interactive screenshots (light/dark theme checks).
+ * full four-assertion flow; {@code hold} runs only the render assertion of the redesigned dialog
+ * and leaves it open for interactive screenshots; {@code hold-classic} does the same for the
+ * classic (table-based) dialog (light/dark theme checks).
  */
 public final class TacletMatchVerifyF {
 
@@ -59,15 +63,16 @@ public final class TacletMatchVerifyF {
             Stage owner, NotationInfo notationInfo) {
         String mode = System.getProperty("key.fx.verify.tacletmatch", "1").trim();
         boolean hold = "hold".equalsIgnoreCase(mode);
+        boolean holdClassic = "hold-classic".equalsIgnoreCase(mode);
         try {
-            run(proof, proofControl, owner, notationInfo, hold);
+            run(proof, proofControl, owner, notationInfo, hold, holdClassic);
         } catch (Throwable t) {
             LOGGER.error("tacletmatch verification: FAIL (unexpected error: {})", t, t);
         }
     }
 
     private static void run(Proof proof, ProofControl proofControl, Stage owner,
-            NotationInfo notationInfo, boolean hold) {
+            NotationInfo notationInfo, boolean hold, boolean holdClassic) {
         Services services = proof.getServices();
         Goal goal = proof.openEnabledGoals().head();
         AbstractProofControl control = (AbstractProofControl) proofControl;
@@ -135,6 +140,38 @@ public final class TacletMatchVerifyF {
                 "tacletmatch verification: apply-adds-to-proof: SKIPPED (chosen taclet {} "
                     + "requires \\assumes instantiation, which needs typed user input)",
                 chosen.taclet().name());
+        }
+
+        // ---- assertion 4: the classic (table-based) completion dialog renders and cancels ----
+        try {
+            TacletInstantiationModel[] classicModels =
+                control.completeAndApplyApp(List.of(chosen), goal);
+            TacletMatchCompletionDialogF classic =
+                new TacletMatchCompletionDialogF(owner, classicModels, goal, services, notationInfo,
+                    proofControl);
+            if (holdClassic) {
+                LOGGER.info(
+                    "tacletmatch verification: hold-classic mode — classic dialog left open for "
+                        + "screenshots ({} instantiation row(s))",
+                    classic.tableRowCount());
+                return;
+            }
+            boolean classicRendered =
+                classic.isShowing() && classic.tableRowCount() > 0;
+            LOGGER.info(
+                "tacletmatch verification: classic-dialog-renders: {} ({} instantiation row(s), "
+                    + "showing={})",
+                classicRendered ? "PASS" : "FAIL", classic.tableRowCount(), classic.isShowing());
+            int nodesBeforeClassic = proof.countNodes();
+            classic.cancelAndClose();
+            boolean classicCancelled =
+                !classic.isShowing() && proof.countNodes() == nodesBeforeClassic;
+            LOGGER.info("tacletmatch verification: classic-cancel: {} (node count before={}, "
+                + "after={})", classicCancelled ? "PASS" : "FAIL", nodesBeforeClassic,
+                proof.countNodes());
+        } catch (Throwable t) {
+            LOGGER.info("tacletmatch verification: classic-dialog: FAIL (unexpected error: {})",
+                t.toString());
         }
     }
 

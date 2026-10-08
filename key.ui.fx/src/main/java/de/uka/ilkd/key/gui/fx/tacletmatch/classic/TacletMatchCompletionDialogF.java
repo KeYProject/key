@@ -119,10 +119,11 @@ public class TacletMatchCompletionDialogF extends ApplyTacletDialogF {
         setScene(scene);
         setMinWidth(620);
         setMinHeight(480);
-        if (owner != null) {
-            setOnShown(e -> centerOn(owner));
-        }
         setStatus(model[current()].getStatusString());
+        if (owner != null) {
+            centerOn(owner);
+        }
+        show();
         LOGGER.info("TacletMatchCompletionDialogF opened: alternatives={} taclet={}", model.length,
             model[0].taclet().name());
     }
@@ -391,6 +392,16 @@ public class TacletMatchCompletionDialogF extends ApplyTacletDialogF {
     /** cancels the dialog (used by the self-test hook; identical to the Cancel button) */
     public void cancelAndClose() {
         closeDialog();
+    }
+
+    /**
+     * the number of instantiation rows of the current alternative (used by the self-test hook to
+     * assert the table renders)
+     */
+    public int tableRowCount() {
+        return current < dataTables.length && dataTables[current] != null
+                ? dataTables[current].getItems().size()
+                : 0;
     }
 
     /** one row of the instantiation table (Swing {@code DataTable} row) */
