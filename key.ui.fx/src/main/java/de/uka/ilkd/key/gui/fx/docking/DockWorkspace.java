@@ -92,6 +92,12 @@ public final class DockWorkspace {
     private EnumMap<DockLocation, String> preMaximizedSelection;
 
     /**
+     * Last known arrangement, refreshed on every change; read by the shutdown hook because
+     * the live scene graph must not be touched from a non-FX thread at JVM shutdown.
+     */
+    private volatile Map<DockLocation, List<String>> lastSnapshot = Map.of();
+
+    /**
      * Creates an empty workspace with three role areas.
      */
     public DockWorkspace() {
@@ -468,17 +474,26 @@ public final class DockWorkspace {
             ids.put(location,
                 dockables.get(location).stream().map(Dockable::getId).toList());
         }
+        lastSnapshot = ids;
         return ids;
     }
 
     /**
-     * Persists the current layout through the given store.
+     * Persists the current layout through the given store. If the live model cannot be read
+     * (e.g. the JavaFX toolkit is already shutting down), the last known arrangement is
+     * persisted instead.
      *
      * @param store the store to write to
      * @throws IOException on I/O errors
      */
     public void saveLayout(DockLayoutStore store) throws IOException {
-        store.save(snapshotIds());
+        Map<DockLocation, List<String>> snapshot;
+        try {
+            snapshot = snapshotIds();
+        } catch (RuntimeException e) {
+            snapshot = lastSnapshot;
+        }
+        store.save(snapshot);
     }
 
     /**
@@ -580,6 +595,8 @@ public final class DockWorkspace {
     }
 
     private void updateVisibility(DockLocation location) {
+        // docking: refresh the shutdown-hook snapshot on every arrangement change
+        lastSnapshot = snapshotIds();
         if (location == DockLocation.MAIN) {
             return;
         }

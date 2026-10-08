@@ -86,8 +86,10 @@ public final class DockingLayoutF {
             try {
                 workspace.saveLayout(store);
                 LOGGER.info("Docking layout saved to {}", store.file());
-            } catch (IOException e) {
-                LOGGER.warn("Failed to save the docking layout", e);
+            } catch (Throwable t) {
+                // the shutdown save must never abort the JVM exit; logback may already be down
+                LOGGER.warn("Failed to save the docking layout", t);
+                t.printStackTrace(System.err);
             }
         }, "fx-docking-shutdown"));
     }
