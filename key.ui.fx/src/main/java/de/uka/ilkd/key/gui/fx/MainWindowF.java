@@ -52,6 +52,7 @@ import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
+import de.uka.ilkd.key.gui.fx.actions.QuickSaveF;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
 import de.uka.ilkd.key.gui.fx.docking.DockLayoutStore;
 import de.uka.ilkd.key.gui.fx.docking.DockLocation;
@@ -75,6 +76,8 @@ import de.uka.ilkd.key.gui.fx.theme.Theme;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.io.GZipProofSaver;
+import de.uka.ilkd.key.proof.io.ProofBundleSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.settings.PathConfig;
@@ -342,8 +345,9 @@ public final class MainWindowF {
      * Loads a proof or problem file with the core {@link KeYEnvironment} on a background thread
      * and routes the loaded proof through the mediator/selection model. Shared by the demo
      * property load and the File menu actions ({@link #openFileChooser()}, {@link
-     * #reloadLastFile()}, the recent-files menu). The optional {@code key.fx.demo.autoprove}
-     * run happens inside the load task, so only demo loads prove automatically.
+     * #reloadLastFile()}, the recent-files menu, quick load). The optional {@code
+     * key.fx.demo.autoprove} run happens inside the load task, so only demo loads prove
+     * automatically.
      * <p>
      * Note: recent files are registered by the <em>callers</em> — the menu actions register the
      * file before starting the load; the demo load must not pollute the user's shared
@@ -592,6 +596,12 @@ public final class MainWindowF {
             chooser.setInitialDirectory(lastSelectedDir.toFile());
         }
         chooser.setInitialFileName(initialSaveFileName(proof, ".proof"));
+        // Swing KeYFileChooser offers the COMPRESSED_FILTER ("compressed proof files
+        // (.proof.gz)") alongside the default filter
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+            "KeY proof files (*.proof)", "*.proof"));
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+            "compressed proof files (.proof.gz)", "*.proof.gz"));
         File file = chooser.showSaveDialog(stage);
         if (file == null) {
             return;
@@ -600,9 +610,15 @@ public final class MainWindowF {
             lastSelectedDir = file.getParentFile().toPath();
         }
         Path target = file.toPath().toAbsolutePath();
-        // the Swing chooser offers a "compressed" checkbox (GZipProofSaver); deferred, the plain
-        // saver is the default
-        ProofSaver saver = new ProofSaver(proof, target, KeYConstants.INTERNAL_VERSION);
+        // compression by file name: Swing KeYFileChooser.useCompression() checks the selected
+        // file name for the ".proof.gz" extension and uses the GZipProofSaver in that case
+        // (there is no separate checkbox in the current Swing save dialog)
+        ProofSaver saver;
+        if (target.getFileName().toString().endsWith(".proof.gz")) {
+            saver = new GZipProofSaver(proof, target.toString(), KeYConstants.INTERNAL_VERSION);
+        } else {
+            saver = new ProofSaver(proof, target, KeYConstants.INTERNAL_VERSION);
+        }
         try {
             String errorMsg = saver.save();
             if (errorMsg != null) {
@@ -641,6 +657,112 @@ public final class MainWindowF {
             }
         }
         return MiscTools.toValidFileName(name) + extension;
+    }
+
+    /**
+     * The Open Example action (Swing {@code OpenExampleAction}): shows the example chooser
+     * (Swing {@code ExampleChooser.showInstance(Main.getExamplesDir())}; the directory comes from
+     * the {@code key.examples.dir} property set by the run task) and loads the chosen file like
+     * any other problem file.
+     * <p>
+     * Swing registers the example in the recent files through {@code loadProblem} — the port
+     * does the same via {@link #openProofFile(Path)}.
+     */
+    private void openExampleChooser() {
+        Path file = ExampleChooserF.showInstance(null, stage);
+        if (file != null) {
+            openProofFile(file);
+        }
+    }
+
+    /**
+     * The Save Bundle action (Swing {@code SaveBundleAction} +
+     * {@code WindowUserInterfaceControl.saveProofBundle}): a save dialog with the bundle filter
+     * and the sanitized proof name + ".zproof", then the core {@link ProofBundleSaver} (which
+     * packs the proof and all dependencies into a zip archive via the proof's FileRepo) on the
+     * FX thread (the Swing original runs on the EDT as well).
+     */
+    private void saveProofBundle() {
+        Proof proof = selectionModel.getSelectedProof();
+        if (proof == null) {
+            return; // the action is disabled without a proof (Swing updateStatus)
+        }
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Choose filename to save proof");
+        if (lastSelectedDir != null && Files.isDirectory(lastSelectedDir)) {
+            chooser.setInitialDirectory(lastSelectedDir.toFile());
+        }
+        // Swing KeYFileChooser.PROOF_BUNDLE_FILTER
+        chooser.getExtensionFilters()
+                .add(new FileChooser.ExtensionFilter("proof bundles (.zproof)", "*.zproof"));
+        chooser.setInitialFileName(initialSaveFileName(proof, ".zproof"));
+        File file = chooser.showSaveDialog(stage);
+        if (file == null) {
+            return;
+        }
+        if (file.getParentFile() != null) {
+            lastSelectedDir = file.getParentFile().toPath();
+        }
+        Path target = file.toPath().toAbsolutePath();
+        ProofBundleSaver saver = new ProofBundleSaver(proof, target);
+        try {
+            String errorMsg = saver.save();
+            if (errorMsg != null) {
+                LOGGER.error("Saving proof bundle failed: {}", errorMsg);
+                NotificationManagerF.getInstance()
+                        .notify("Saving Proof failed. Error: " + errorMsg, Kind.ERROR);
+            } else {
+                proof.setProofFile(target);
+                LOGGER.info("Proof bundle saved to {}", target);
+                NotificationManagerF.getInstance()
+                        .notify("Proof bundle saved to " + target, Kind.INFO);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Saving proof bundle failed", e);
+            NotificationManagerF.getInstance()
+                    .notify("Saving Proof failed. Error: " + e.getMessage(), Kind.ERROR);
+        }
+    }
+
+    /**
+     * The Quick Save action (Swing {@code QuickSaveAction}, F5): saves the selected proof to the
+     * temporary quick save location ({@link QuickSaveF#QUICK_SAVE_PATH}).
+     */
+    private void quickSave() {
+        QuickSaveF.quickSave(this);
+    }
+
+    /**
+     * The Quick Load action (Swing {@code QuickLoadAction}, F6): loads the quick save location.
+     */
+    private void quickLoad() {
+        QuickSaveF.quickLoad(this);
+    }
+
+    /**
+     * Shows a warning toast (the JavaFX counter-part of Swing {@code MainWindow.popupWarning},
+     * which opens a modal message dialog; the JavaFX UI reports via toasts).
+     *
+     * @param message the warning message
+     */
+    public void popupWarning(String message) {
+        NotificationManagerF.getInstance().notify(message, Kind.WARNING);
+    }
+
+    /**
+     * Sets the left status line text (Swing {@code MainWindow.setStatusLine}).
+     *
+     * @param status the status message
+     */
+    public void setStatusLine(String status) {
+        statusLeft.setText(status);
+    }
+
+    /**
+     * @return the mediator of the main window (Swing {@code MainWindow.getMediator})
+     */
+    public KeYMediatorF getMediator() {
+        return mediator;
     }
 
     /**
@@ -932,19 +1054,37 @@ public final class MainWindowF {
         // Swing SaveFileAction: enableWhenProofLoaded; interaction is locked during auto mode
         saveFile.disableProperty()
                 .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
-        file.getItems().addAll(
+        MenuItem openExample =
             menuItem("Open Example…", "de.uka.ilkd.key.gui.actions.OpenExampleAction",
-                IconFactoryF.Key.OPEN_KEY_FILE, this::notYetImplemented),
+                IconFactoryF.Key.OPEN_KEY_FILE, this::openExampleChooser);
+        // Swing disables all actions during auto mode (like the Open File action)
+        openExample.disableProperty().bind(mediator.autoModeRunningProperty());
+        MenuItem saveBundle =
+            menuItem("Save Bundle…", "de.uka.ilkd.key.gui.actions.SaveBundleAction",
+                this::saveProofBundle);
+        // Swing SaveBundleAction: enabled only when a proof is selected (updateStatus); disabled
+        // during auto mode like all interaction
+        saveBundle.disableProperty()
+                .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
+        MenuItem quickSave =
+            menuItem("Quick Save", "de.uka.ilkd.key.gui.actions.QuickSaveAction", this::quickSave);
+        // Swing QuickSaveAction: enableWhenProofLoaded; disabled during auto mode
+        quickSave.disableProperty()
+                .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
+        MenuItem quickLoad =
+            menuItem("Quick Load", "de.uka.ilkd.key.gui.actions.QuickLoadAction", this::quickLoad);
+        // Swing QuickLoadAction has no proof enablement — it always tries to load the quick save
+        // location (a missing file fails the load); disabled during auto mode like all interaction
+        quickLoad.disableProperty().bind(mediator.autoModeRunningProperty());
+        file.getItems().addAll(
+            openExample,
             openFile,
             reload,
             new SeparatorMenuItem(),
             saveFile,
-            menuItem("Save Bundle…", "de.uka.ilkd.key.gui.actions.SaveBundleAction",
-                this::notYetImplemented),
-            menuItem("Quick Save", "de.uka.ilkd.key.gui.actions.QuickSaveAction",
-                this::notYetImplemented),
-            menuItem("Quick Load", "de.uka.ilkd.key.gui.actions.QuickLoadAction",
-                this::notYetImplemented),
+            saveBundle,
+            quickSave,
+            quickLoad,
             new SeparatorMenuItem(),
             recentFilesMenu,
             new SeparatorMenuItem(),
