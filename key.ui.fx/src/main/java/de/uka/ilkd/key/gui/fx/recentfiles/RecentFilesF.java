@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import de.uka.ilkd.key.gui.fx.actions.QuickSaveF;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
@@ -129,9 +130,15 @@ public final class RecentFilesF {
     /**
      * Adds a new file with the load options of the Swing original (profile, single Java file,
      * additional profile options).
+     * <p>
+     * The quick save location is never added (Swing {@code RecentFileMenu.addNewToModelAndView}:
+     * "do not add quick save location to recent files").
      */
     public void add(String path, String profile, boolean singleJava,
             Configuration additionalOption) {
+        if (QuickSaveF.QUICK_SAVE_PATH.endsWith(path)) {
+            return;
+        }
         Optional<Entry> existing = entries.stream().filter(it -> path.equals(it.path()))
                 .findFirst();
         if (existing.isPresent()) {
