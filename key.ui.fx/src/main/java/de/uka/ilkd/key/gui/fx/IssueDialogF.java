@@ -143,11 +143,6 @@ public final class IssueDialogF {
      * {@code false} again as soon as a modal dialog is dismissed)
      */
     private boolean shown;
-    /**
-     * whether this dialog was shown at least once (self-test hook: {@code isVisible()} is
-     * {@code false} again after a modal dialog was dismissed)
-     */
-    private boolean shown;
 
     private IssueDialogF(Window owner, String title, String head, Collection<IssueEntry> issueSet,
             boolean critical) {
