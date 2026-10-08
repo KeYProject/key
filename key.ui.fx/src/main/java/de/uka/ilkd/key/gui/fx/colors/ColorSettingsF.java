@@ -100,6 +100,9 @@ public final class ColorSettingsF {
         Map.entry("[proofTree]orange", "-key-interactive"));
 
     private ColorSettingsF() {
+        // follow the theme switches of the UI, so the overrides use the values of the active
+        // theme (a snapshot taken at class initialization goes stale after a theme switch)
+        theme.bind(ThemeManager.getInstance().themeProperty());
         theme.addListener((obs, old, value) -> applyToScenes());
         ObservableList<Scene> scenes = ThemeManager.getInstance().getScenes();
         scenes.addListener(
