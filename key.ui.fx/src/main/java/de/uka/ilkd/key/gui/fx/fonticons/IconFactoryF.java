@@ -64,7 +64,10 @@ public final class IconFactoryF {
         PROOF_SEARCH_STRATEGY(FontAwesomeSolid.COG),
         KEY_HOLE(FontAwesomeSolid.KEY),
         KEY_HOLE_INTERACTIVE(FontAwesomeSolid.HAND_PAPER),
-        KEY_HOLE_LINKED(FontAwesomeSolid.LINK);
+        KEY_HOLE_LINKED(FontAwesomeSolid.LINK),
+        SEARCH_HIGHLIGHT(FontAwesomeSolid.HIGHLIGHTER),
+        SEARCH_HIDE(FontAwesomeSolid.LOW_VISION),
+        SEARCH_REGROUP(FontAwesomeSolid.VIDEO);
 
         private final IconFont glyph;
 
