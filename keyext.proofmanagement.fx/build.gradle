@@ -19,4 +19,11 @@ javafx {
 dependencies {
     implementation project(":key.ui.fx")
     implementation project(":keyext.proofmanagement")
+    // REQUIRED for the FX compile classpath: the SPI types (MainWindowF, KeYMediatorF, ...) are
+    // annotated with JSpecify type annotations referencing key.core types (e.g. a @Nullable
+    // KeYEnvironment<DefaultUserInterfaceControl> field), so javac must find `key.core` when it
+    // loads those class files — `key.ui.fx` / `keyext.proofmanagement` declare it as
+    // `implementation`, which does not leak onto this module's compile classpath. The runtime
+    // classpath is unaffected (key.core is already transitively present at runtime).
+    implementation project(":key.core")
 }
