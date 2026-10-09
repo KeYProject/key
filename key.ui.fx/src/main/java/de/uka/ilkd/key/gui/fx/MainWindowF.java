@@ -594,6 +594,11 @@ public final class MainWindowF {
             // the mediator observes the proof control (auto mode state, closed-goal counter);
             // the UI's own listener refreshes the views after interactive auto mode runs
             mediator.attach(env.getProofControl());
+            // termmenu: give the sequent view the mediator + proof control of the loaded
+            // environment so the right-click context menu can be built (Swing parity:
+            // CurrentGoalViewMenu is built with the mediator's selected goal and the proof
+            // control of the loaded environment)
+            sequentView.setMenuContext(mediator, env.getProofControl());
             env.getProofControl().addAutoModeListener(autoModeUiListener);
             // notification: register the notification framework's auto-mode tracker on the
             // proof control (Swing parity: the NotificationManager constructor registers its
