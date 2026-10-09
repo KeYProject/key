@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.fx;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -122,6 +123,7 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.GZipProofSaver;
 import de.uka.ilkd.key.proof.io.ProofBundleSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -428,6 +430,11 @@ public final class MainWindowF {
         wireSequentView();
         recentFiles.setOnChange(this::updateRecentFilesMenu);
         recentFiles.load();
+        // menu: MP7 — honor a persisted non-zero auto-save period at startup (Swing: the saver is
+        // active whenever the period is > 0, KeYMediator.java:87 + :148-150); the saver must be
+        // armed before the demo load so the load-success selection hands it the proof
+        applyAutoSave(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                .autoSavePeriod());
         startDemoProofLoad();
         // proofmgmt: the Loaded Proofs view's clicks and the Proof Management dialog route the
         // active-proof switch through the selection model (the Swing mediator path)
@@ -887,6 +894,39 @@ public final class MainWindowF {
                 NotificationManagerF.getInstance()
                         .notify("Right-click macro verification: " + report,
                             report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+            }
+            // menu: MP7 — auto-save self test (key.fx.verify.autosave): asserts the saver is armed
+            // iff the persisted period is > 0 and that it received the loaded proof (the proof
+            // identity is read reflectively; see readAutoSaveProof)
+            if (System.getProperty("key.fx.verify.autosave") != null) {
+                GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+                int savedPeriod = gs.autoSavePeriod();
+                boolean ok;
+                try {
+                    // the startup arming must match the persisted period (armed iff > 0)
+                    boolean armedOk =
+                        (mediator.getAutoSaver() != null) == (savedPeriod > 0);
+                    // force the armed state and route the loaded proof again through the real
+                    // selection path, so the saver's setProof fires (mediator.setProof hook)
+                    gs.setAutoSave(DEFAULT_AUTO_SAVE_PERIOD);
+                    applyAutoSave(DEFAULT_AUTO_SAVE_PERIOD);
+                    selectionModel.setSelectedProof(null);
+                    selectionModel.setSelectedProof(env.getLoadedProof());
+                    AutoSaver saver = mediator.getAutoSaver();
+                    boolean proofOk =
+                        saver != null && readAutoSaveProof(saver) == env.getLoadedProof();
+                    // the disarmed state after the switch
+                    gs.setAutoSave(0);
+                    applyAutoSave(0);
+                    ok = armedOk && proofOk && mediator.getAutoSaver() == null;
+                } finally {
+                    gs.setAutoSave(savedPeriod);
+                    applyAutoSave(savedPeriod);
+                }
+                LOGGER.info("Auto save verification: {}", ok ? "PASS" : "FAIL");
+                NotificationManagerF.getInstance()
+                        .notify("Auto save verification: " + (ok ? "PASS" : "FAIL"),
+                            ok ? Kind.INFO : Kind.ERROR);
             }
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 startLiveAutoMode(env);
@@ -2793,17 +2833,65 @@ public final class MainWindowF {
      * (AutoSave.java:29-31;
      * Swing {@code AutoSave.DEFAULT_PERIOD = 2000}, AutoSave.java:16 — key.ui, not importable into
      * this module, hence the inlined constant).
-     * // menu: auto-save timer wiring deferred (no FX mediator support): Swing additionally calls
-     * getMediator().setAutoSave(p) (AutoSave.java:31); the FX KeYMediatorF has no setAutoSave, so
-     * only the persisted flag is written.
+     * // menu: MP7 — the timer wiring is no longer deferred: the action arms/disarms the
+     * // {@link AutoSaver} through {@link #applyAutoSave(int)} (Swing AutoSave.java:31 calls
+     * // getMediator().setAutoSave(p), KeYMediator.java:148-150); arming is also applied at
+     * // startup from the persisted period (see {@link #initialize()}).
      */
     private CheckMenuItem autoSaveProofsToggle() {
         GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
         CheckMenuItem item = new CheckMenuItem("Auto Save Proofs");
         item.setSelected(gs.autoSavePeriod() > 0);
         item.setOnAction(
-            e -> gs.setAutoSave(item.isSelected() ? DEFAULT_AUTO_SAVE_PERIOD : 0));
+            e -> {
+                int period = item.isSelected() ? DEFAULT_AUTO_SAVE_PERIOD : 0;
+                gs.setAutoSave(period);
+                applyAutoSave(period);
+            });
         return item;
+    }
+
+    /**
+     * menu: MP7 — arms or disarms the {@link AutoSaver} (Swing {@code KeYMediator.setAutoSave},
+     * KeYMediator.java:148-150, called by {@code AutoSave} with the new period, AutoSave.java
+     * :29-31): the saver is created with the given interval and registered on the window's UI
+     * control as a {@code ProverTaskListener} so the core's proof runs deliver it the task
+     * events — the FX equivalent of the Swing {@code MediatorProofControl.AutoModeWorker}
+     * registration (MediatorProofControl.java:209-211). The saver field itself lives on the
+     * mediator ({@code KeYMediatorF#getAutoSaver}), which hands it every newly selected proof
+     * from {@code setProof}.
+     *
+     * @param period the save interval in proof steps, 0 disables auto save
+     */
+    private void applyAutoSave(int period) {
+        AutoSaver oldSaver = mediator.getAutoSaver();
+        if (oldSaver != null) {
+            getUserInterfaceControl().removeProverTaskListener(oldSaver);
+        }
+        mediator.setAutoSave(period);
+        AutoSaver newSaver = mediator.getAutoSaver();
+        if (newSaver != null) {
+            getUserInterfaceControl().addProverTaskListener(newSaver);
+        }
+    }
+
+    /**
+     * menu: MP7 — auto-save self-test helper: {@code AutoSaver} (key.core) stores the proof from
+     * {@code setProof} in a private field without a getter (AutoSaver.java:40, :102-104); the
+     * proof identity is read reflectively for the {@code key.fx.verify.autosave} assertion.
+     *
+     * @param saver the armed auto saver
+     * @return the proof the saver received, or {@code null} on failure/reflection error
+     */
+    private static Object readAutoSaveProof(AutoSaver saver) {
+        try {
+            Field proofField = AutoSaver.class.getDeclaredField("proof");
+            proofField.setAccessible(true);
+            return proofField.get(saver);
+        } catch (ReflectiveOperationException e) {
+            LOGGER.error("Auto save verification: cannot read AutoSaver.proof", e);
+            return null;
+        }
     }
 
     /** menu: MP4 — Swing {@code AutoSave.DEFAULT_PERIOD} (key.ui), see autoSaveProofsToggle(). */

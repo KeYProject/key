@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 
 import org.key_project.util.collection.ImmutableList;
@@ -42,8 +43,10 @@ import org.slf4j.LoggerFactory;
  * the final state on {@code autoModeStopped}.
  * <p>
  * Deliberately deferred: notifications ({@code ProofClosedNotificationEvent} needs the Swing
- * notification events of key.ui — the FX notification arrives with M3), the auto saver, user
- * action listeners and the task/progress plumbing of the Swing mediator.
+ * notification events of key.ui — the FX notification arrives with M3), user
+ * action listeners and the task/progress plumbing of the Swing mediator. The auto saver is
+ * wired since MP7 ({@link #setAutoSave(int)} / {@link #getAutoSaver()}, mirroring the Swing
+ * mediator).
  */
 public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
 
@@ -67,6 +70,13 @@ public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
 
     /** the proof control this mediator is attached to, may be {@code null} until M3. */
     private ProofControl proofControl;
+
+    /**
+     * menu: MP7 — the optional {@link AutoSaver} (Swing {@code KeYMediator} field,
+     * KeYMediator.java:85-87); armed/disarmed via {@link #setAutoSave(int)}, the saver follows
+     * the selected proof through {@link #setProof(Proof, Proof)}.
+     */
+    private AutoSaver autoSaver;
 
     /**
      * Observable auto mode state for the UI (buttons and menu items bind their enabled state to
@@ -118,7 +128,33 @@ public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
             newProof.addProofTreeListener(proofTreeListener);
             newProof.addRuleAppListener(proofListener);
         }
+        // menu: MP7 — the auto saver follows the selected proof (Swing
+        // {@code KeYMediator.setProof}, KeYMediator.java:240-241: {@code
+        // getAutoSaver().setProof(newProof)}); the saver accepts {@code null} (abandoned proof)
+        if (getAutoSaver() != null) {
+            getAutoSaver().setProof(newProof);
+        }
         OneStepSimplifier.refreshOSS(newProof);
+    }
+
+    /**
+     * menu: MP7 — arms or disarms the {@link AutoSaver} (Swing {@code KeYMediator.setAutoSave},
+     * KeYMediator.java:148-150: {@code autoSaver = interval > 0 ? new AutoSaver(interval, true)
+     * : null}); the saver writes intermediate .key artifacts every {@code interval} proof steps
+     * and the final closed proof (see {@link AutoSaver}).
+     *
+     * @param interval the save interval in proof steps, 0 disables auto save
+     */
+    public void setAutoSave(int interval) {
+        autoSaver = interval > 0 ? new AutoSaver(interval, true) : null;
+    }
+
+    /**
+     * @return the auto saver to use, or {@code null} if auto save is disabled (Swing
+     *         {@code KeYMediator.getAutoSaver}, KeYMediator.java:791-796)
+     */
+    public AutoSaver getAutoSaver() {
+        return autoSaver;
     }
 
     /**
