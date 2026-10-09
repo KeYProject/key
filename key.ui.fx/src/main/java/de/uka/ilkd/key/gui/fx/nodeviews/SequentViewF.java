@@ -776,11 +776,13 @@ public class SequentViewF extends BorderPane {
     /**
      * menu: MP7 — the visible text of a menu item: the item text, or the content text of a
      * {@link CustomMenuItem} (the macro popup uses label-backed custom items for the tooltips),
-     * or the empty string.
+     * or the empty string. {@code getText()} may be {@code null} (e.g. separators/Swing-ish
+     * placeholder items of the term menu), which counts as empty.
      */
     private static String visibleText(MenuItem item) {
-        if (!item.getText().isEmpty()) {
-            return item.getText();
+        String text = item.getText();
+        if (text != null && !text.isEmpty()) {
+            return text;
         }
         if (item instanceof CustomMenuItem custom && custom.getContent() instanceof Label label) {
             return label.getText();
