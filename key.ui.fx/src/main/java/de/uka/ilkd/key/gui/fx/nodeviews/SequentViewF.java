@@ -758,15 +758,10 @@ public class SequentViewF extends BorderPane {
         int count = 0;
         for (ProofMacro macro : MainWindowF.AUTOMATION_MACROS) {
             if (macro.canApplyTo(proof, goals, pio)) {
-                // menu: MP7 — JavaFX MenuItem has no tooltip property (unlike Swing
-                // JMenuItem.setToolTipText, ProofMacroMenu.java:144); the item is a
-                // CustomMenuItem wrapping a tooltip-bearing Label, so the description actually
-                // appears on hover (the visible label also keeps the macro name readable)
-                Label label = new Label(macro.getName());
-                Tooltip.install(label, new Tooltip(macro.getDescription()));
-                CustomMenuItem item = new CustomMenuItem(label);
-                item.setOnAction(e -> menuProofControl.runMacro(node, macro, pio));
-                menu.getItems().add(item);
+                // menu: MP7/MP8 — the item construction (name label + description tooltip via
+                // CustomMenuItem, since JavaFX MenuItem has no tooltip property) is shared with
+                // the term-menu "Strategy Macros" section, see {@link ProofMacroMenuF#itemFor}.
+                menu.getItems().add(ProofMacroMenuF.itemFor(macro, node, menuProofControl, pio));
                 count++;
             }
         }
@@ -846,8 +841,13 @@ public class SequentViewF extends BorderPane {
                 macroNames.add(macro.getName());
             }
             boolean hasMacros = onLabels.containsAll(macroNames);
-            // the macro popup must not contain any term-menu entry
-            boolean noTermEntries = onLabels.stream().noneMatch(offLabels::contains);
+            // menu: MP8 — the macro popup must not contain any term-menu entry other than the
+            // shared macro names: since MP8b the term menu has a "Strategy Macros" section with
+            // the very same four macros, so the names are excluded from the comparison (the
+            // MP7b term menu had them only in the macro popup).
+            boolean noTermEntries = onLabels.stream()
+                    .filter(l -> !macroNames.contains(l))
+                    .noneMatch(offLabels::contains);
             // the OFF path is the term menu (fixed structural items of SequentTermContextMenuF)
             boolean termPath = offLabels.contains("Apply rules automatically here")
                     || offLabels.contains("Copy to clipboard")
