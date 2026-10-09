@@ -2947,8 +2947,10 @@ public final class MainWindowF {
      * RightMouseClickToggleAction.java:22-33): the selected state mirrors
      * {@code GeneralSettings.isRightClickMacro()} and the action writes
      * {@code setRightClickMacros} back.
-     * // menu: Swing's direct-macro-on-right-click behavior is deferred — the FX right click
-     * currently always opens the term context menu; only the flag persists here.
+     * // menu: MP7 — the right-click behavior is no longer deferred: while the flag is set the
+     * // sequent view shows the proof-macro popup instead of the term context menu
+     * // (SequentViewF.buildRightClickMenu, Swing CurrentGoalViewListener.java:54-67 /
+     * ProofMacroMenu).
      */
     private CheckMenuItem rightClickMacroToggle() {
         GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
@@ -2963,8 +2965,12 @@ public final class MainWindowF {
      * EnsureSourceConsistencyToggleAction, EnsureSourceConsistencyToggleAction.java:37-48): the
      * selected state mirrors {@code GeneralSettings.isEnsureSourceConsistency()} and the action
      * writes {@code setEnsureSourceConsistency} back.
-     * // menu: Swing's info dialog is dropped — the FX port has no source-consistency machinery
-     * (no proof-bundle/source-cache backend); only the flag persists for now.
+     * // menu: MP7 — the flag is honored at runtime by the core and the FX soundiness report:
+     * // AbstractProblemLoader.createFileRepo (AbstractProblemLoader.java:400-409) picks the
+     * // DiskFileRepo (source-cache backend) over the SimpleFileRepo when it is set, and the FX
+     * // SoundinessAnalyzer warns when it is off (SoundinessAnalyzer.java:377-383). Only the
+     * // Swing info dialog of the toggle action (EnsureSourceConsistencyToggleAction.java:42-47)
+     * // is dropped.
      */
     private CheckMenuItem ensureSourceConsistencyToggle() {
         GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
