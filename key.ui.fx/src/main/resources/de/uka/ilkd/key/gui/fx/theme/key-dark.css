@@ -917,3 +917,11 @@
 .join-input-error {
     -fx-text-fill: -key-error;
 }
+
+/* origin term label visualizer (Swing OriginTermLabelVisualizer): the origin of the selected
+   term in the tree is highlighted in the term view (Swing HIGHLIGHT_COLOR = orange, here the
+   existing warning color variable) */
+.origin-visualizer-highlight {
+    -fx-fill: derive(-key-warning, 30%);
+    -fx-opacity: 0.45;
+}

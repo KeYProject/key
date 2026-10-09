@@ -146,6 +146,42 @@ public class SequentViewF extends BorderPane {
         }
     };
 
+    // lemmaorigin: begin — term-label visibility hook (Swing SequentView.getVisibleTermLabels,
+    // which feeds mainWindow.getVisibleTermLabels() to the printer). Defaults to the spike stub
+    // so the view is unchanged until de.uka.ilkd.key.gui.fx.originlabels.TermLabelMenuF attaches.
+    private VisibleTermLabels visibleTermLabels = NO_VISIBLE_TERM_LABELS;
+
+    /**
+     * Installs the given visible-term-labels provider and re-creates the printer with it (Swing
+     * {@code SequentView} passes {@code mainWindow.getVisibleTermLabels()} to every printer). The
+     * printer must be rebuilt because the label visibility is bound at construction; a plain
+     * {@link #printSequent()} suffices for later visibility changes, since the manager is
+     * consulted live while printing.
+     *
+     * @param labels the label visibility to use from now on, {@code null} restores the stub
+     */
+    public void setVisibleTermLabels(VisibleTermLabels labels) {
+        visibleTermLabels = labels != null ? labels : NO_VISIBLE_TERM_LABELS;
+        if (printer != null && selectedNode != null) {
+            printer = SequentViewLogicPrinter.positionPrinter(new NotationInfo(),
+                selectedNode.proof().getServices(), visibleTermLabels);
+            if (filter instanceof SearchSequentPrintFilter searchFilter) {
+                searchFilter.setLogicPrinter(printer);
+            }
+            printSequent();
+        }
+    }
+
+    /**
+     * The printed sequent string of the current display, for the term-label self test
+     * ({@code key.fx.verify.lemmaorigin}).
+     */
+    public String printedText() {
+        return printed;
+    }
+
+    // lemmaorigin: end
+
     private static final KeyCombination OPEN_SEARCH =
         new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
 
@@ -452,8 +488,9 @@ public class SequentViewF extends BorderPane {
         if (node.proof() != proof) {
             proof = node.proof();
             // TODO(M2c): share the NotationInfo and the term label visibility with the mediator
+            // lemmaorigin: use the installed label visibility (Swing SequentView printer setup)
             printer = SequentViewLogicPrinter.positionPrinter(new NotationInfo(),
-                node.proof().getServices(), NO_VISIBLE_TERM_LABELS);
+                node.proof().getServices(), visibleTermLabels);
             if (filter instanceof SearchSequentPrintFilter searchFilter) {
                 // the search filters print single formulas through the view's printer (Swing
                 // SequentViewSearchBar.search refreshes it the same way)
@@ -573,11 +610,26 @@ public class SequentViewF extends BorderPane {
             return;
         }
         PosInSequent pos = table.getPosInSequent(charIndex, filter);
+        lastClickedPos = pos; // lemmaorigin: remember the clicked term (Swing context-menu target)
         Range bounds = pos != null ? pos.getBounds() : null;
         highlightedRange = bounds != null && bounds.length() > 0 ? bounds : null;
         rebuildRuns();
         onPosSelected.accept(pos);
     }
+
+    // lemmaorigin: begin — the last clicked position (Swing's term context-menu target; the
+    // View▸Origin Tracking▸Show Origin item of OriginLabelsF uses it because the FX sequent view
+    // has no context menu yet)
+    private PosInSequent lastClickedPos;
+
+    /**
+     * @return the position of the last clicked term, or {@code null} if nothing was clicked or
+     *         the click missed a position
+     */
+    public PosInSequent getLastClickedPos() {
+        return lastClickedPos;
+    }
+    // lemmaorigin: end
 
     // -----------------------------------------------------------------------
     // Hover highlight + tooltip (Swing SequentViewInputListener.mouseMoved /
