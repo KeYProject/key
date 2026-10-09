@@ -19,4 +19,10 @@ javafx {
 dependencies {
     implementation project(":key.ui.fx")
     implementation project(":keyext.caching")
+    // MP9.1: the FX SPI (KeYGuiExtensionF) and the reused keyext.caching logic classes expose
+    // key.core types (Goal, PosInSequent, Proof, ProofCachingSettings/Hierarchy, ...) in their
+    // signatures; key.ui.fx and keyext.caching declare key.core as 'implementation' (not 'api'),
+    // so this module must declare the core dependency itself to compile against those signatures.
+    // Runtime-wise key.core arrives transitively anyway (via keyext.caching) — no classpath change.
+    implementation project(":key.core")
 }
