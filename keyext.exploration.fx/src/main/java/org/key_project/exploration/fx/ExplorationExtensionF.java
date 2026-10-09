@@ -37,6 +37,8 @@ import org.key_project.util.javafx.FxUtil;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.kordamp.ikonli.fontawesome6.FontAwesomeSolid;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 /**
  * JavaFX port of the proof-exploration extension, MP9.2 counter-part of {@code
@@ -139,7 +141,9 @@ public class ExplorationExtensionF implements KeYGuiExtensionF, KeYGuiExtensionF
 
     private CheckBox getExploreModeToggle() {
         if (exploreModeCheck == null) {
+            // Swing ToggleExplorationAction.setIcon(Icons.EXPLORE.get())
             CheckBox check = new CheckBox("Exploration Mode");
+            check.setGraphic(new FontIcon(FontAwesomeSolid.COMPASS));
             check.setTooltip(new Tooltip("Choose to start ExplorationMode"));
             check.setSelected(model.isExplorationModeSelected());
             check.setOnAction(e -> model.setExplorationModeSelected(check.isSelected()));
@@ -151,7 +155,9 @@ public class ExplorationExtensionF implements KeYGuiExtensionF, KeYGuiExtensionF
 
     private CheckBox getHideJustificationToggle() {
         if (hideJustificationCheck == null) {
+            // Swing ShowInteractiveBranchesAction.setIcon(Icons.SECOND_BRANCH.get())
             CheckBox check = new CheckBox("Hide justification");
+            check.setGraphic(new FontIcon(FontAwesomeSolid.CODE_BRANCH));
             check.setTooltip(new Tooltip("""
                     Exploration actions are often done using a cut. \
                     Choose to hide the second cut-branches from the view to focus on the \
@@ -183,6 +189,7 @@ public class ExplorationExtensionF implements KeYGuiExtensionF, KeYGuiExtensionF
 
     private MenuItem getExploreModeMenuItem() {
         CheckMenuItem item = new CheckMenuItem("Exploration Mode");
+        item.setGraphic(new FontIcon(FontAwesomeSolid.COMPASS));
         item.setSelected(model.isExplorationModeSelected());
         item.setOnAction(e -> model.setExplorationModeSelected(item.isSelected()));
         exploreModeMenuItems.add(item);
@@ -191,6 +198,7 @@ public class ExplorationExtensionF implements KeYGuiExtensionF, KeYGuiExtensionF
 
     private MenuItem getHideJustificationMenuItem() {
         CheckMenuItem item = new CheckMenuItem("Hide justification");
+        item.setGraphic(new FontIcon(FontAwesomeSolid.CODE_BRANCH));
         item.setSelected(!model.isShowInteractiveBranches());
         item.setDisable(!model.isExplorationModeSelected());
         item.setOnAction(e -> setHideJustification(item.isSelected()));
