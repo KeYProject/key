@@ -39,6 +39,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ToolBar;
@@ -1962,6 +1963,14 @@ public final class MainWindowF {
         sb.append(" heatmapSettings=").append(heatmapSettings);
         pass &= heatmapSettings;
 
+        // drawer: MP10 — the extension left-panel tabs are west drawer items now; with only the
+        // ported built-in extensions registered none contributes tabs, so the west drawer holds
+        // exactly its five built-in panels (+ one item per contributed left-panel tab)
+        int facadeTabs = KeYGuiExtensionFacadeF.getLeftPanelTabs(this, mediator).size();
+        int westItems = westDrawer == null ? -1 : westDrawer.getItems().size();
+        sb.append(" westDrawerItems=").append(westItems);
+        pass &= westItems == 5 + facadeTabs;
+
         // term-menu extension section: with no position the disabled placeholder must render
         // without crashing (SequentTermContextMenuF.extensionSection)
         Goal goal = mediator.getSelectedGoal();
@@ -2256,6 +2265,14 @@ public final class MainWindowF {
         westDrawer.item("Loaded Proofs", loadedProofs);
         westDrawer.item("Info", infoView);
         westDrawer.item("Strategy", strategyView);
+        // extension: MP10 — the extension left-panel tabs become west drawer items (Swing
+        // KeYGuiExtension.LeftPanel returns tabs for the left JTabbedPane,
+        // KeYGuiExtension.java:127-143): a button per tab in the west bar toggles the panel,
+        // drag and drop can move it to another port; without LeftPanelF providers this appends
+        // nothing.
+        for (Tab tab : KeYGuiExtensionFacadeF.getLeftPanelTabs(this, mediator)) {
+            westDrawer.item(tab.getText(), tab.getContent());
+        }
         eastDrawer = new DrawerF(Side.RIGHT, true);
         eastDrawer.item("Source", buildSourceViewContent());
         southDrawer = new DrawerF(Side.BOTTOM, true);
