@@ -16,19 +16,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Headless unit test of the {@link TestgenExtensionF} provider (MP9.5): the {@code @Info}
- * annotation, the compilable SPI capability surface ({@link KeYGuiExtensionF.SettingsF} +
- * {@link KeYGuiExtensionF.StatusLineF}) and the reflection-dispatched settings entry (a
- * {@code SettingsProviderF} proxy whose {@code getPanel/apply} forward the main window to the
- * extension).
+ * annotation, the compilable SPI capability surface ({@link KeYGuiExtensionF.MainMenuF} +
+ * {@link KeYGuiExtensionF.SettingsF} + {@link KeYGuiExtensionF.StatusLineF}) and the
+ * reflection-dispatched settings entry (a {@code SettingsProviderF} proxy whose
+ * {@code getPanel/apply} forward the main window to the extension).
  * <p>
  * <b>KNOWN-SIMPLIFIED (headless):</b> every {@code javafx.scene.control.Control} triggers the FX
- * toolkit in its class initializer ("Toolkit not initialized"), and this module's frozen
+ * toolkit in its class initializer ("Toolkit not initialized"), and this module's
  * {@code build.gradle} exposes no headless toolkit to the tests — so the status-line {@code
- * MenuButton}/{@code Button}s and the settings-panel {@code CheckBox}/spinner widgets are built
- * lazily inside the running app only, and the test asserts the provider/capability surface
- * instead of the control trees. Neither the provider construction nor the capability asserts
- * touch the JavaFX toolkit; the run dialogs and the generation workers are deliberately not
- * exercised here.
+ * MenuButton}/{@code Button}s, the "Test Case Generation" menu and the settings-panel {@code
+ * CheckBox}/spinner widgets are built lazily inside the running app only, and the test asserts
+ * the provider/capability surface instead of the control trees. Neither the provider construction
+ * nor the capability asserts touch the JavaFX toolkit; the run dialogs and the generation workers
+ * are deliberately not exercised here.
  */
 class TestgenExtensionFTest {
 
@@ -49,14 +49,16 @@ class TestgenExtensionFTest {
     @Test
     void capabilitySurface() {
         KeYGuiExtensionF extension = new TestgenExtensionF();
-        // KNOWN-SIMPLIFIED: the MainMenuF/ToolbarF/StartupF slots are compile-impossible in this
-        // module (their signatures reference MainWindowF/KeYMediatorF, see TestgenExtensionF),
-        // so the Swing menu + toolbar contributions are merged into the StatusLineF slot; the
-        // control trees are built lazily in the app (they need the FX toolkit).
+        // KNOWN-SIMPLIFIED: the ToolbarF/StartupF slots are not implemented (see
+        // TestgenExtensionF) — the Swing toolbar actions are expressed through the two plain
+        // status-line buttons; the control trees are built lazily in the app (they need the FX
+        // toolkit).
+        assertInstanceOf(KeYGuiExtensionF.MainMenuF.class, extension,
+            "Test Generation menu with the two Swing menu actions + SHORTCUT+T");
         assertInstanceOf(KeYGuiExtensionF.SettingsF.class, extension,
             "TestgenOptionsPanel port");
         assertInstanceOf(KeYGuiExtensionF.StatusLineF.class, extension,
-            "menu + toolbar actions merged into the status line");
+            "MenuButton + toolbar buttons in the status line");
     }
 
     @Test
