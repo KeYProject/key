@@ -153,10 +153,12 @@ public final class SequentTermContextMenuF {
         return switch (action.id()) {
             case "join" -> joinItem(action, ctx);
             case "merge_rule" -> mergeItem(action, ctx);
-            // termmenu: TODO wire the focused-auto-mode activation (Swing
-            // FocussedRuleApplicationAction) once the shift-click hit-test wiring lands (S3);
-            // for now the item is a faithful disabled placeholder.
-            case "focus_auto_mode" -> disabledItem(action.label());
+            // menu: MP8 — the focused-auto-mode activation is wired (Swing
+            // FocussedRuleApplicationAction, FocussedAutoModeUserAction.java:43: {@code
+            // mediator.getUI().getProofControl().startFocussedAutoMode(pio, goal)}); unlike the
+            // Swing entry there is no separate caret to remember — the clicked position is the
+            // focus, mirroring the shift+left-click fast path (CurrentGoalViewListener.java:57).
+            case "focus_auto_mode" -> focusAutoModeItem(action, ctx);
             case "copy_clipboard" -> copyClipboardItem(ctx);
             case "name_creation_info" -> nameCreationInfoItem(action, ctx);
             case "no_rules" -> disabledItem(action.label());
@@ -166,6 +168,27 @@ public final class SequentTermContextMenuF {
             case "macro_menu", "extension", "smt" -> disabledItem(action.label());
             default -> disabledItem(action.label());
         };
+    }
+
+    /**
+     * The focused-auto-mode entry: starts an automatic proof search restricted to the clicked
+     * position (Swing FocussedRuleApplicationAction, FocussedAutoModeUserAction.java:43: {@code
+     * mediator.getUI().getProofControl().startFocussedAutoMode(pio, goal)}). The FX sequent view
+     * is single-caret, so the clicked position <em>is</em> the focus — no separate caret state to
+     * read (the Swing action takes it from {@code SequentView.getCaretPosition()},
+     * FocussedAutoModeUserAction.java:39-40).
+     */
+    private static MenuItem focusAutoModeItem(NamedAction action, MenuContext ctx) {
+        MenuItem item = new MenuItem(action.label());
+        item.setOnAction(e -> {
+            Goal goal = ctx.goal();
+            PosInOccurrence pio = ctx.pos() == null ? null : ctx.pos().getPosInOccurrence();
+            if (goal != null && ctx.proofControl() != null) {
+                ctx.proofControl().startFocussedAutoMode(pio, goal);
+                ctx.afterApply().run();
+            }
+        });
+        return item;
     }
 
     /** Delayed-cut join (Swing JoinMenuItem / CurrentGoalViewMenu.createDelayedCutJoinMenu). */
