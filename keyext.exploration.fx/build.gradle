@@ -19,4 +19,10 @@ javafx {
 dependencies {
     implementation project(":key.ui.fx")
     implementation project(":keyext.exploration")
+    // MP9.2: the FX extension SPI (KeYGuiExtensionF.ContextMenuF/TooltipF) and the reusable
+    // keyext.exploration logic classes (ExplorationModeModel, ProofExplorationService,
+    // ExplorationNodeData) are typed against key.core (Goal, Proof, Node, PosInSequent,
+    // Services, JTerm, KeyIO, ProofControl); neither :key.ui.fx nor :keyext.exploration exposes
+    // key.core on their API surface, so the provider cannot compile against the SPI without it.
+    implementation project(":key.core")
 }
