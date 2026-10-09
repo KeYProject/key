@@ -704,10 +704,13 @@ public final class MainWindowF {
                 UiControlSelfTestF.run(this);
             }
             // tacletmatch: run the interactive taclet application self test (dialog render,
-            // cancel keeps the proof, apply adds to the proof) after the demo load
+            // cancel keeps the proof, seam dispatch opens the dialog, apply adds to the proof)
+            // after the demo load; termmenu/S4 passes the seam so the dispatch path
+            // (WindowUserInterfaceControlF.completeAndApplyTacletMatch) is covered
             if (System.getProperty("key.fx.verify.tacletmatch") != null) {
                 TacletMatchVerifyF.runTacletMatchVerification(env.getLoadedProof(),
-                    env.getProofControl(), stage, mediator.getNotationInfo());
+                    env.getProofControl(), stage, mediator.getNotationInfo(),
+                    getUserInterfaceControl());
             }
             // lemmaorigin: begin — term labels / origin visualizer / lemma generator self test
             if (System.getProperty("key.fx.verify.lemmaorigin") != null) {
