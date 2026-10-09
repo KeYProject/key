@@ -19,4 +19,14 @@ javafx {
 dependencies {
     implementation project(":key.ui.fx")
     implementation project(":keyext.exploration")
+    // MP9.2: the FX extension SPI (KeYGuiExtensionF.ContextMenuF/TooltipF) and the reusable
+    // keyext.exploration logic classes (ExplorationModeModel, ProofExplorationService,
+    // ExplorationNodeData) are typed against key.core (Goal, Proof, Node, PosInSequent,
+    // Services, JTerm, KeyIO, ProofControl); neither :key.ui.fx nor :keyext.exploration exposes
+    // key.core on their API surface, so the provider cannot compile against the SPI without it.
+    implementation project(":key.core")
+    // MP9.2 icon review: ikonli FontAwesome glyphs for the toolbar/menu/status-line controls
+    // (replacing the unicode ◆/◇ fallback of the first revision)
+    implementation libs.ikonli.javafx
+    implementation libs.ikonli.fontawesome6
 }
