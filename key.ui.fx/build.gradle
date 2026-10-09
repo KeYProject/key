@@ -103,6 +103,8 @@ run {
     //    the demo proof and open the SoundinessDialogF)
     //  * key.fx.verify.javacsettings = any  (smalldialogs: run the javac settings provider
     //    self test; the settings dialog is not opened)
+    //  * key.fx.verify.termmenu = any  (termmenu: run the headless sequent context-menu self test
+    //    after the demo load; text report on stdout)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
@@ -115,7 +117,8 @@ run {
         "key.fx.verify.docking", "key.fx.verify.uicontrol", "key.fx.verify.tacletmatch",
         "key.fx.verify.joinmerge", "key.fx.verify.joinmerge.maxsteps", "key.fx.verify.lemmaorigin",
         "key.fx.verify.help", "key.fx.verify.soundiness", "key.fx.verify.profileloading",
-        "key.fx.verify.profileloadingdialog", "key.fx.verify.javacsettings"]
+        "key.fx.verify.profileloadingdialog", "key.fx.verify.javacsettings",
+        "key.fx.verify.termmenu"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {

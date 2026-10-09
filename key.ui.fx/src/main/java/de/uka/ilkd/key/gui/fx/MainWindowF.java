@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -68,10 +70,13 @@ import de.uka.ilkd.key.gui.fx.infoview.InfoViewF;
 import de.uka.ilkd.key.gui.fx.join.JoinMergeVerifyF;
 import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
 import de.uka.ilkd.key.gui.fx.mergerule.MergeRuleCompletionF;
+import de.uka.ilkd.key.gui.fx.nodeviews.SequentMenuModelF;
+import de.uka.ilkd.key.gui.fx.nodeviews.SequentTermContextMenuF;
 import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationCenterF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
+import de.uka.ilkd.key.gui.fx.notification.events.ExceptionFailureEventF;
 import de.uka.ilkd.key.gui.fx.originlabels.OriginLabelsF;
 import de.uka.ilkd.key.gui.fx.plugins.javac.JavacSettingsProviderF;
 import de.uka.ilkd.key.gui.fx.profileloading.LoadingOptionsDialogF;
@@ -91,6 +96,8 @@ import de.uka.ilkd.key.gui.fx.tacletmatch.TacletMatchVerifyF;
 import de.uka.ilkd.key.gui.fx.tasktree.TaskTreeF;
 import de.uka.ilkd.key.gui.fx.theme.Theme;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
+import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.io.GZipProofSaver;
@@ -594,6 +601,11 @@ public final class MainWindowF {
             // the mediator observes the proof control (auto mode state, closed-goal counter);
             // the UI's own listener refreshes the views after interactive auto mode runs
             mediator.attach(env.getProofControl());
+            // termmenu: give the sequent view the mediator + proof control of the loaded
+            // environment so the right-click context menu can be built (Swing parity:
+            // CurrentGoalViewMenu is built with the mediator's selected goal and the proof
+            // control of the loaded environment)
+            sequentView.setMenuContext(mediator, env.getProofControl());
             env.getProofControl().addAutoModeListener(autoModeUiListener);
             // notification: register the notification framework's auto-mode tracker on the
             // proof control (Swing parity: the NotificationManager constructor registers its
@@ -693,10 +705,13 @@ public final class MainWindowF {
                 UiControlSelfTestF.run(this);
             }
             // tacletmatch: run the interactive taclet application self test (dialog render,
-            // cancel keeps the proof, apply adds to the proof) after the demo load
+            // cancel keeps the proof, seam dispatch opens the dialog, apply adds to the proof)
+            // after the demo load; termmenu/S4 passes the seam so the dispatch path
+            // (WindowUserInterfaceControlF.completeAndApplyTacletMatch) is covered
             if (System.getProperty("key.fx.verify.tacletmatch") != null) {
                 TacletMatchVerifyF.runTacletMatchVerification(env.getLoadedProof(),
-                    env.getProofControl(), stage, mediator.getNotationInfo());
+                    env.getProofControl(), stage, mediator.getNotationInfo(),
+                    getUserInterfaceControl());
             }
             // lemmaorigin: begin — term labels / origin visualizer / lemma generator self test
             if (System.getProperty("key.fx.verify.lemmaorigin") != null) {
@@ -707,25 +722,34 @@ public final class MainWindowF {
                             report.contains("FAIL") ? Kind.ERROR : Kind.INFO);
             }
             // lemmaorigin: end
+            // termmenu: run the headless sequent context-menu self test
+            // (key.fx.verify.termmenu) after the demo load like the other proof-dependent
+            // verify hooks; the text report goes to stdout
+            if (System.getProperty("key.fx.verify.termmenu") != null) {
+                runTermMenuVerification(env);
+            }
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 startLiveAutoMode(env);
             }
         });
         loadTask.setOnFailed(event -> {
             Throwable error = loadTask.getException();
-            // notification: TODO-merge wire into WindowUserInterfaceControlF — the seam agent
-            // routes exceptions through NotificationCenterF.handleNotificationEvent(
-            // new ExceptionFailureEventF(...)) there (Swing parity:
-            // IssueDialog.showExceptionDialog)
-            LOGGER.error((demo ? "Demo proof" : "Proof") + " loading failed", error);
+            String message = (demo ? "Demo proof" : "Proof") + " loading failed";
+            LOGGER.error(message, error);
             // seam: loading errors surface in the IssueDialog (Swing parity: the
             // ProblemLoader branch of WindowUserInterfaceControl.taskFinishedInternal,
             // WindowUserInterfaceControl.java:236-244, calls IssueDialog.showExceptionDialog;
             // the FX load task throws instead of reporting a failed TaskFinishedInfo)
             IssueDialogF.showExceptionDialog(getStage(), error);
-            NotificationManagerF.getInstance()
-                    .notify((demo ? "Demo proof" : "Proof") + " loading failed: "
-                        + error.getMessage(), Kind.ERROR);
+            // notification: termmenu/S4 — route the failure through the notification center
+            // instead of the plain toast (Swing parity: the ExceptionFailureEvent framework,
+            // NotificationManager.setDefaultNotification + the FIXME'd
+            // ExceptionFailureNotification; the FX ExceptionFailureNotificationF is toast-only,
+            // so the Swing double-dialog concern does not apply and it is a default task).
+            // The IssueDialog above stays the primary surface; the center's toast is the
+            // notification sink.
+            NotificationCenterF.getInstance().handleNotificationEvent(
+                new ExceptionFailureEventF(message, error));
         });
         Thread loader = new Thread(loadTask, "fx-demo-proof-loader");
         loader.setDaemon(true);
@@ -1205,6 +1229,84 @@ public final class MainWindowF {
         NotificationManagerF.getInstance()
                 .notify("Update highlight verification: " + report,
                     report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+    }
+
+    /**
+     * termmenu: headless self test of the sequent context menu ({@code key.fx.verify.termmenu}),
+     * run after the demo load like the other proof-dependent verify hooks: computes a
+     * {@link PosInSequent} at a known character index of the current printing, builds the menu
+     * with {@link SequentMenuModelF#build} + {@link SequentTermContextMenuF#build} and asserts
+     * the fixed structural items on the rendered {@link ContextMenu}. Text report on stdout only
+     * — no screenshots, no interaction. Skips gracefully when no goal or position is available.
+     *
+     * @param env the environment of the loaded proof
+     */
+    private void runTermMenuVerification(KeYEnvironment<DefaultUserInterfaceControl> env) {
+        Goal goal = mediator.getSelectedGoal();
+        PosInSequent pos = findTermMenuPos();
+        if (goal == null || pos == null) {
+            System.out.println("termmenu verify: SKIP - no goal/position (no printed sequent)");
+            return;
+        }
+        List<SequentMenuModelF.Entry> entries =
+            SequentMenuModelF.build(pos, mediator, env.getProofControl(), null, null);
+        ContextMenu menu = SequentTermContextMenuF.build(entries,
+            new SequentTermContextMenuF.MenuContext(mediator, env.getProofControl(), goal, pos,
+                null, sequentView::printSequent));
+        List<String> labels = new ArrayList<>();
+        int[] enabled = { 0 };
+        collectMenuLabels(menu.getItems(), labels, enabled);
+        boolean hasFocus = labels.contains("Apply rules automatically here");
+        boolean hasCopy = labels.contains("Copy to clipboard");
+        boolean hasNoRules = labels.contains("No rules applicable.");
+        boolean pass = menu.getItems().size() >= 4 && hasFocus && hasCopy
+                && (hasNoRules || enabled[0] > 0);
+        List<String> found = new ArrayList<>();
+        found.add("focus_auto_mode");
+        found.add("copy_clipboard");
+        if (hasNoRules) {
+            found.add("no_rules");
+        }
+        System.out.println("termmenu verify: " + (pass ? "OK" : "FAIL") + " - "
+            + menu.getItems().size() + " items, found: " + String.join(", ", found));
+    }
+
+    /**
+     * termmenu: the first {@link PosInSequent} of the current printing (the printed text may
+     * start with whitespace or symbols that do not map to a position — the first indexed
+     * character that resolves is used).
+     */
+    private PosInSequent findTermMenuPos() {
+        String printed = sequentView.printedText();
+        if (printed == null) {
+            return null;
+        }
+        for (int i = 0; i < printed.length(); i++) {
+            PosInSequent pos = sequentView.getSequentPosAt(i);
+            if (pos != null) {
+                return pos;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * termmenu: collects the labels of a menu-item tree (sub-menus are flattened) and counts the
+     * enabled, non-separator items.
+     */
+    private static void collectMenuLabels(List<MenuItem> items, List<String> labels,
+            int[] enabled) {
+        for (MenuItem item : items) {
+            if (!(item instanceof SeparatorMenuItem)) {
+                labels.add(item.getText());
+                if (!item.isDisable()) {
+                    enabled[0]++;
+                }
+            }
+            if (item instanceof Menu menu) {
+                collectMenuLabels(menu.getItems(), labels, enabled);
+            }
+        }
     }
 
     /**

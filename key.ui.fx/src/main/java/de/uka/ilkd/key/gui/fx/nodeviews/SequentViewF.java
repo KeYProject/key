@@ -18,6 +18,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ScrollPane;
@@ -28,6 +29,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -47,6 +49,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Duration;
 
+import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
@@ -67,6 +71,7 @@ import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentPrintFilterEntry;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -596,6 +601,14 @@ public class SequentViewF extends BorderPane {
     }
 
     private void handleMouseClick(MouseEvent event) {
+        // termmenu: a right-click shows the sequent context menu instead of running the
+        // selection path below (Swing CurrentGoalViewListener: a right mouse click builds
+        // CurrentGoalViewMenu at the caret position and shows it at the mouse location); the
+        // left-click selection / highlight logic is left untouched
+        if (event.getButton() == MouseButton.SECONDARY) {
+            showContextMenu(event);
+            return;
+        }
         InitialPositionTable table = getInitialPositionTable();
         if (table == null || printed == null) {
             return;
@@ -617,6 +630,52 @@ public class SequentViewF extends BorderPane {
         onPosSelected.accept(pos);
     }
 
+    // termmenu: begin — right-click sequent context menu (SequentMenuModelF +
+    // SequentTermContextMenuF)
+    /**
+     * Builds and shows the sequent context menu at the given right-click position (Swing
+     * {@code CurrentGoalViewListener.mouseClicked}: the menu is built from the
+     * {@link PosInSequent} at the caret position and displayed at the mouse location). A no-op
+     * until the menu context ({@link #setMenuContext}) and a printable position are available.
+     *
+     * @param event the right-click event
+     */
+    private void showContextMenu(MouseEvent event) {
+        if (menuMediator == null || menuProofControl == null) {
+            return;
+        }
+        Goal goal = menuMediator.getSelectedGoal();
+        if (goal == null) {
+            return;
+        }
+        PosInSequent pos = getSequentPosAt(charIndexOf(event));
+        if (pos == null) {
+            return;
+        }
+        List<SequentMenuModelF.Entry> entries =
+            SequentMenuModelF.build(pos, menuMediator, menuProofControl, null, null);
+        ContextMenu menu = SequentTermContextMenuF.build(entries,
+            new SequentTermContextMenuF.MenuContext(menuMediator, menuProofControl, goal, pos,
+                null, this::printSequent));
+        menu.show(textFlow, event.getScreenX(), event.getScreenY());
+    }
+
+    /**
+     * The character index of the printed text under the given mouse event (the same mapping
+     * {@link #handleMouseClick} uses), or {@code -1} if the event does not address a character.
+     */
+    private int charIndexOf(MouseEvent event) {
+        InitialPositionTable table = getInitialPositionTable();
+        if (table == null || printed == null) {
+            return -1;
+        }
+        Point2D local = textFlow.sceneToLocal(event.getSceneX(), event.getSceneY());
+        HitInfo hit = textFlow.getHitInfo(local);
+        int charIndex = hit == null ? -1 : hit.getCharIndex();
+        return charIndex >= 0 && charIndex < printed.length() ? charIndex : -1;
+    }
+    // termmenu: end
+
     // lemmaorigin: begin — the last clicked position (Swing's term context-menu target; the
     // View▸Origin Tracking▸Show Origin item of OriginLabelsF uses it because the FX sequent view
     // has no context menu yet)
@@ -630,6 +689,42 @@ public class SequentViewF extends BorderPane {
         return lastClickedPos;
     }
     // lemmaorigin: end
+
+    // termmenu: begin — right-click context menu support (S3 hit-test wiring): the shared
+    // mediator + proof control supplied by MainWindowF (Swing parity: the sequent view builds
+    // CurrentGoalViewMenu with the mediator's selected goal and the proof control of the loaded
+    // environment) and the char-index → PosInSequent lookup shared by the right-click handler and
+    // the key.fx.verify.termmenu self test.
+    private KeYMediatorF menuMediator;
+    private ProofControl menuProofControl;
+
+    /**
+     * Supplies the FX mediator and the proof control used to build the right-click sequent
+     * context menu (Swing {@code MainWindow.setSequentView} passes its mediator and the proof
+     * control of the loaded environment). No-op until both are set — the menu only appears when
+     * the full context is available.
+     *
+     * @param mediator the shared mediator, {@code null} clears the reference
+     * @param proofControl the proof control of the loaded environment, {@code null} clears it
+     */
+    public void setMenuContext(KeYMediatorF mediator, ProofControl proofControl) {
+        this.menuMediator = mediator;
+        this.menuProofControl = proofControl;
+    }
+
+    /**
+     * @return the {@link PosInSequent} of the printed sequent at the given character index (the
+     *         same lookup the mouse handlers perform), or {@code null} if there is no printing or
+     *         the index does not address a position
+     */
+    public PosInSequent getSequentPosAt(int charIndex) {
+        InitialPositionTable table = getInitialPositionTable();
+        if (table == null || printed == null || charIndex < 0 || charIndex >= printed.length()) {
+            return null;
+        }
+        return table.getPosInSequent(charIndex, filter);
+    }
+    // termmenu: end
 
     // -----------------------------------------------------------------------
     // Hover highlight + tooltip (Swing SequentViewInputListener.mouseMoved /
