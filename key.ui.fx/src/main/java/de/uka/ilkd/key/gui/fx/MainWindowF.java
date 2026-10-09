@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -68,6 +70,8 @@ import de.uka.ilkd.key.gui.fx.infoview.InfoViewF;
 import de.uka.ilkd.key.gui.fx.join.JoinMergeVerifyF;
 import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
 import de.uka.ilkd.key.gui.fx.mergerule.MergeRuleCompletionF;
+import de.uka.ilkd.key.gui.fx.nodeviews.SequentMenuModelF;
+import de.uka.ilkd.key.gui.fx.nodeviews.SequentTermContextMenuF;
 import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationCenterF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
@@ -91,6 +95,8 @@ import de.uka.ilkd.key.gui.fx.tacletmatch.TacletMatchVerifyF;
 import de.uka.ilkd.key.gui.fx.tasktree.TaskTreeF;
 import de.uka.ilkd.key.gui.fx.theme.Theme;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
+import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.io.GZipProofSaver;
@@ -712,6 +718,12 @@ public final class MainWindowF {
                             report.contains("FAIL") ? Kind.ERROR : Kind.INFO);
             }
             // lemmaorigin: end
+            // termmenu: run the headless sequent context-menu self test
+            // (key.fx.verify.termmenu) after the demo load like the other proof-dependent
+            // verify hooks; the text report goes to stdout
+            if (System.getProperty("key.fx.verify.termmenu") != null) {
+                runTermMenuVerification(env);
+            }
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 startLiveAutoMode(env);
             }
@@ -1210,6 +1222,84 @@ public final class MainWindowF {
         NotificationManagerF.getInstance()
                 .notify("Update highlight verification: " + report,
                     report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+    }
+
+    /**
+     * termmenu: headless self test of the sequent context menu ({@code key.fx.verify.termmenu}),
+     * run after the demo load like the other proof-dependent verify hooks: computes a
+     * {@link PosInSequent} at a known character index of the current printing, builds the menu
+     * with {@link SequentMenuModelF#build} + {@link SequentTermContextMenuF#build} and asserts
+     * the fixed structural items on the rendered {@link ContextMenu}. Text report on stdout only
+     * — no screenshots, no interaction. Skips gracefully when no goal or position is available.
+     *
+     * @param env the environment of the loaded proof
+     */
+    private void runTermMenuVerification(KeYEnvironment<DefaultUserInterfaceControl> env) {
+        Goal goal = mediator.getSelectedGoal();
+        PosInSequent pos = findTermMenuPos();
+        if (goal == null || pos == null) {
+            System.out.println("termmenu verify: SKIP - no goal/position (no printed sequent)");
+            return;
+        }
+        List<SequentMenuModelF.Entry> entries =
+            SequentMenuModelF.build(pos, mediator, env.getProofControl(), null, null);
+        ContextMenu menu = SequentTermContextMenuF.build(entries,
+            new SequentTermContextMenuF.MenuContext(mediator, env.getProofControl(), goal, pos,
+                null, sequentView::printSequent));
+        List<String> labels = new ArrayList<>();
+        int[] enabled = { 0 };
+        collectMenuLabels(menu.getItems(), labels, enabled);
+        boolean hasFocus = labels.contains("Apply rules automatically here");
+        boolean hasCopy = labels.contains("Copy to clipboard");
+        boolean hasNoRules = labels.contains("No rules applicable.");
+        boolean pass = menu.getItems().size() >= 4 && hasFocus && hasCopy
+                && (hasNoRules || enabled[0] > 0);
+        List<String> found = new ArrayList<>();
+        found.add("focus_auto_mode");
+        found.add("copy_clipboard");
+        if (hasNoRules) {
+            found.add("no_rules");
+        }
+        System.out.println("termmenu verify: " + (pass ? "OK" : "FAIL") + " - "
+            + menu.getItems().size() + " items, found: " + String.join(", ", found));
+    }
+
+    /**
+     * termmenu: the first {@link PosInSequent} of the current printing (the printed text may
+     * start with whitespace or symbols that do not map to a position — the first indexed
+     * character that resolves is used).
+     */
+    private PosInSequent findTermMenuPos() {
+        String printed = sequentView.printedText();
+        if (printed == null) {
+            return null;
+        }
+        for (int i = 0; i < printed.length(); i++) {
+            PosInSequent pos = sequentView.getSequentPosAt(i);
+            if (pos != null) {
+                return pos;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * termmenu: collects the labels of a menu-item tree (sub-menus are flattened) and counts the
+     * enabled, non-separator items.
+     */
+    private static void collectMenuLabels(List<MenuItem> items, List<String> labels,
+            int[] enabled) {
+        for (MenuItem item : items) {
+            if (!(item instanceof SeparatorMenuItem)) {
+                labels.add(item.getText());
+                if (!item.isDisable()) {
+                    enabled[0]++;
+                }
+            }
+            if (item instanceof Menu menu) {
+                collectMenuLabels(menu.getItems(), labels, enabled);
+            }
+        }
     }
 
     /**
