@@ -37,6 +37,9 @@ javafx = "25.0.4"
 richtextfx = "0.11.7"
 openjfx-plugin = "0.1.0"
 
+# Icon fonts (ikonli, kordamp.org/ikonli) — FontAwesome glyphs for the keyext FX ports
+ikonli = "12.4.0"
+
 # External tools
 scala-isabelle = "0.4.5"
 
@@ -91,6 +94,10 @@ javafx-base = { module = "org.openjfx:javafx-base", version.ref = "javafx" }
 javafx-controls = { module = "org.openjfx:javafx-controls", version.ref = "javafx" }
 javafx-graphics = { module = "org.openjfx:javafx-graphics", version.ref = "javafx" }
 javafx-web = { module = "org.openjfx:javafx-web", version.ref = "javafx" }
+
+# ikonli — FontAwesome icon fonts (see kordamp.org/ikonli), used by the keyext FX ports
+ikonli-javafx = { module = "org.kordamp.ikonli:ikonli-javafx", version.ref = "ikonli" }
+ikonli-fontawesome6 = { module = "org.kordamp.ikonli:ikonli-fontawesome6-pack", version.ref = "ikonli" }
 
 # CLI
 picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
