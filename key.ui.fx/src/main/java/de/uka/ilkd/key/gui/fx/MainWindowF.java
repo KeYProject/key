@@ -100,6 +100,11 @@ import de.uka.ilkd.key.gui.fx.tacletmatch.TacletMatchVerifyF;
 import de.uka.ilkd.key.gui.fx.tasktree.TaskTreeF;
 import de.uka.ilkd.key.gui.fx.theme.Theme;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
+import de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro;
+import de.uka.ilkd.key.macros.DefaultAutoMacro;
+import de.uka.ilkd.key.macros.FullAutoPilotProofMacro;
+import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ScriptAwareMacro;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -1658,7 +1663,38 @@ public final class MainWindowF {
         MenuItem stopAuto = menuItem("Stop Automatic Proof", IconFactoryF.Key.AUTO_MODE_STOP,
             mediator::stopAutoMode);
         stopAuto.disableProperty().bind(mediator.autoModeRunningProperty().not());
-        automation.getItems().addAll(startAuto, stopAuto);
+        // menu: MP2 — after Start/Stop Automatic Proof the Automation submenu mirrors the four
+        // proof-macro entries of Swing MainWindow.createAutomationActions (MainWindow.java:814-827,
+        // MacroAutomationAction.java:40-45), same order, item text = macro.getName(). The Swing
+        // icons (IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "A"|"S"|"P"|"J"),
+        // MainWindow.java:817-827) have no FX counterpart in IconFactoryF.Key, so the items pass
+        // null.
+        // The actionId is the FQN binding key of KeyStrokeManagerF.registerDefaults
+        // (KeyStrokeManagerF.java:83-84), so the existing Ctrl+V / Ctrl+D accelerators of
+        // FullAutoPilotProofMacro / AutoPilotPrepareProofMacro are wired automatically (that was
+        // the point of the key binding); DefaultAutoMacro and ScriptAwareMacro have no default
+        // binding but are still registered with the manager for settings-driven rebinding.
+        // Enablement binds to proofLoaded only — deliberately NO auto-mode lock: Swing keeps the
+        // macro actions enabled while auto mode runs so a click stops the automation
+        // (MacroAutomationAction.actionPerformed, MacroAutomationAction.java:48-61).
+        MenuItem defaultAuto = menuItem(new DefaultAutoMacro().getName(),
+            "de.uka.ilkd.key.macros.DefaultAutoMacro", null,
+            () -> runMacro(new DefaultAutoMacro()));
+        defaultAuto.disableProperty().bind(proofLoaded.not());
+        MenuItem structuredAuto = menuItem(new FullAutoPilotProofMacro().getName(),
+            "de.uka.ilkd.key.macros.FullAutoPilotProofMacro", null,
+            () -> runMacro(new FullAutoPilotProofMacro()));
+        structuredAuto.disableProperty().bind(proofLoaded.not());
+        MenuItem prepareAuto = menuItem(new AutoPilotPrepareProofMacro().getName(),
+            "de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro", null,
+            () -> runMacro(new AutoPilotPrepareProofMacro()));
+        prepareAuto.disableProperty().bind(proofLoaded.not());
+        MenuItem scriptAuto = menuItem(new ScriptAwareMacro().getName(),
+            "de.uka.ilkd.key.macros.ScriptAwareMacro", null,
+            () -> runMacro(new ScriptAwareMacro()));
+        scriptAuto.disableProperty().bind(proofLoaded.not());
+        automation.getItems().addAll(startAuto, stopAuto,
+            defaultAuto, structuredAuto, prepareAuto, scriptAuto);
         // menu: MP1 — the entries after Prune Proof mirror Swing MainWindow.createProofMenu
         // (MainWindow.java:1082-1142) with selected == null in the same order: Abandon Proof,
         // separator, the search group (Search in Proof Tree/Sequent + Next/Previous + the
@@ -1744,6 +1780,23 @@ public final class MainWindowF {
     // ------------------------------------------------------------------
 
     /**
+     * menu: MP2 — runs a proof macro on the selected node (Swing
+     * {@code MacroAutomationAction.actionPerformed}, MacroAutomationAction.java:48-61): while auto
+     * mode is running the click only stops it (Swing {@code proofControl.stopAutoMode()}, where
+     * {@code proofControl = mediator.getUI().getProofControl()}); otherwise the macro runs on the
+     * selected node ({@code new ProofMacroUserAction(mediator, macro, null).actionPerformed(e)}).
+     * The macro-finished notifications are produced by {@link WindowUserInterfaceControlF}
+     * (:380-398), which already reacts to the macro-sourced {@code ProofEvent}s.
+     */
+    private void runMacro(ProofMacro macro) {
+        if (mediator.isInAutoMode()) {
+            mediator.stopAutoMode(); // Swing: proofControl.stopAutoMode()
+        } else if (lastEnvironment != null) {
+            lastEnvironment.getProofControl().runMacro(mediator.getSelectedNode(), macro, null);
+        }
+    }
+
+    /**
      * menu: abandons the selected proof (Swing {@code AbandonTaskAction.actionPerformed},
      * AbandonTaskAction.java:33-46): asks for confirmation first (Swing
      * {@code confirmTaskRemoval("Are you sure?")}, a YES/NO dialog titled "Abandon Proof",
@@ -1822,10 +1875,11 @@ public final class MainWindowF {
     }
 
     /**
-     * menu: MP1 self test of the Proof menu (system property {@code key.fx.verify.menuparity},
+     * menu: MP1/MP2 self test of the Proof menu (system property {@code key.fx.verify.menuparity},
      * run after a proof load like the other verify hooks): builds the menu bar and walks the
      * Proof menu, asserting the presence of the entries of {@link #buildProofMenu()} in the
-     * Swing order (MainWindow.createProofMenu :1082-1142). Table-driven so MP2-MP5 can extend
+     * Swing order (MainWindow.createProofMenu :1082-1142, and the Automation submenu entries of
+     * MainWindow.createAutomationActions :814-827 since MP2). Table-driven so MP3-MP5 can extend
      * it with the other menus later.
      */
     private void verifyMenuParity() {
@@ -1852,7 +1906,9 @@ public final class MainWindowF {
             return "FAIL - missing: <Proof menu>";
         }
         String[][] expected = {
-            { "Automation", "Start Automatic Proof", "Stop Automatic Proof" },
+            { "Automation", "Start Automatic Proof", "Stop Automatic Proof", "Full Automation",
+                "Structured Automation", "Structured Automation (Prep. Only)",
+                "Script-aware Auto" },
             { "Goal Back" },
             { "Prune Proof" },
             { "Abandon Proof" },
