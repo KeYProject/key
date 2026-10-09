@@ -19,4 +19,14 @@ javafx {
 dependencies {
     implementation project(":key.ui.fx")
     implementation project(":keyext.ui.testgen")
+    // MP9.5 (integration review): like the other keyext FX ports, the module declares key.core on
+    // its compile classpath — the SPI signatures (KeYGuiExtensionF.MainMenuF/ToolbarF/StartupF)
+    // and the reused keyext.ui.testgen logic reference key.core types, and without it javac
+    // cannot complete MainWindowF (its annotations touch KeYEnvironment). Runtime-wise key.core
+    // arrives transitively anyway (via key.ui.fx) — no classpath change.
+    implementation project(":key.core")
+    // MP9.5 icon review: ikonli FontAwesome glyphs on the menu items and toolbar buttons (the
+    // Swing TestGenerationAction/CounterExampleAction carry SMALL_ICONs)
+    implementation libs.ikonli.javafx
+    implementation libs.ikonli.fontawesome6
 }
