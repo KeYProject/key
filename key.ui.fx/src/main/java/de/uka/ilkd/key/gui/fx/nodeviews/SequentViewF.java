@@ -841,8 +841,13 @@ public class SequentViewF extends BorderPane {
                 macroNames.add(macro.getName());
             }
             boolean hasMacros = onLabels.containsAll(macroNames);
-            // the macro popup must not contain any term-menu entry
-            boolean noTermEntries = onLabels.stream().noneMatch(offLabels::contains);
+            // menu: MP8 — the macro popup must not contain any term-menu entry other than the
+            // shared macro names: since MP8b the term menu has a "Strategy Macros" section with
+            // the very same four macros, so the names are excluded from the comparison (the
+            // MP7b term menu had them only in the macro popup).
+            boolean noTermEntries = onLabels.stream()
+                    .filter(l -> !macroNames.contains(l))
+                    .noneMatch(offLabels::contains);
             // the OFF path is the term menu (fixed structural items of SequentTermContextMenuF)
             boolean termPath = offLabels.contains("Apply rules automatically here")
                     || offLabels.contains("Copy to clipboard")
