@@ -32,8 +32,19 @@ import java.util.Properties;
  */
 public final class DockLayoutStore {
 
-    /** The name of the properties file inside the config directory. */
+    /**
+     * The name of the properties file inside the config directory.
+     */
     public static final String FILE_NAME = "layout.properties";
+
+    /**
+     * The layout format version, persisted next to the roles. Bumped when the set of dockable
+     * roles changes incompatibly (MP10 removed the left/right dockables): files written by an
+     * older version are discarded so stale persisted layouts fall back to the factory default
+     * instead of half-restoring references to dockables that no longer exist.
+     */
+    private static final int LAYOUT_VERSION = 2;
+    private static final String VERSION_KEY = "dock.version";
 
     /**
      * The name of the slot applied at startup (Swing {@code DockingLayout.LAYOUT_NAMES[0]}: if
@@ -75,6 +86,7 @@ public final class DockLayoutStore {
             List<String> ids = openDockables.getOrDefault(location, List.of());
             properties.setProperty(KEY_PREFIX + location.name(), String.join(",", ids));
         }
+        properties.setProperty(VERSION_KEY, String.valueOf(LAYOUT_VERSION));
         writeProperties(properties);
     }
 
@@ -95,6 +107,7 @@ public final class DockLayoutStore {
             properties.setProperty(KEY_PREFIX + SLOT_PREFIX + name + "." + location.name(),
                 String.join(",", ids));
         }
+        properties.setProperty(VERSION_KEY, String.valueOf(LAYOUT_VERSION));
         writeProperties(properties);
     }
 
@@ -112,6 +125,9 @@ public final class DockLayoutStore {
             return Optional.empty();
         }
         Properties properties = readProperties();
+        if (!isVersionCompatible(properties)) {
+            return Optional.empty();
+        }
         // a slot is "defined" once its save wrote its keys (all three role keys are always written)
         if (properties.getProperty(KEY_PREFIX + SLOT_PREFIX + name + "."
             + DockLocation.LEFT.name()) == null) {
@@ -165,7 +181,31 @@ public final class DockLayoutStore {
             }
             return result;
         }
-        return parse(readProperties(), KEY_PREFIX);
+        Properties properties = readProperties();
+        if (!isVersionCompatible(properties)) {
+            // stale layout written before the MP10 dockable-role change: discard it so the
+            // workspace falls back to the factory default layout
+            clear();
+            EnumMap<DockLocation, List<String>> result = new EnumMap<>(DockLocation.class);
+            for (DockLocation location : DockLocation.values()) {
+                result.put(location, List.of());
+            }
+            return result;
+        }
+        return parse(properties, KEY_PREFIX);
+    }
+
+    /**
+     * @param properties the persisted properties
+     * @return whether the file carries the current layout version (files without the version key
+     *         are pre-MP10 and stale)
+     */
+    private boolean isVersionCompatible(Properties properties) {
+        try {
+            return Integer.parseInt(properties.getProperty(VERSION_KEY, "-1")) == LAYOUT_VERSION;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     /**
