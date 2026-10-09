@@ -19,4 +19,9 @@ javafx {
 dependencies {
     implementation project(":key.ui.fx")
     implementation project(":keyext.isabelletranslation")
+
+    // The FX SPI is declared with key.core types (Goal, PosInSequent, Services, ...), and both
+    // key.ui.fx and the keyext module use non-transitive `implementation` dependencies; the
+    // provider therefore needs key.core on its own compile classpath. (Scaffold adjustment.)
+    implementation project(":key.core")
 }
