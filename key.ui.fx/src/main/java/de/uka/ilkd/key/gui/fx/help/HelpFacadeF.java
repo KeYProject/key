@@ -237,6 +237,23 @@ public final class HelpFacadeF {
     }
 
     /**
+     * Opens the given external URL in the default system browser via the application's host
+     * services (Swing {@code SwingUtil.browse}, used by the About-menu browser actions
+     * {@code KeYProjectHomepageAction} / {@code CreateGithubIssueAction} and by
+     * {@code EditMostRecentFileAction}).
+     * <p>
+     * // menu: MP5 — opens the URL through the same {@linkplain #setBrowserOpener seam} as the
+     * help pages (host services of the running application with a {@link Desktop} fallback), so
+     * the self tests can record the target instead of launching a real browser.
+     *
+     * @param url the external URL to open
+     */
+    public static void openExternal(String url) {
+        LOGGER.info("Opening external URL in browser: {}", url);
+        browserOpener.accept(url);
+    }
+
+    /**
      * Replaces the browser-opening seam (self tests only).
      *
      * @param opener the new opener

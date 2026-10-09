@@ -34,6 +34,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
@@ -58,6 +59,9 @@ import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.actions.QuickSaveF;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
+import de.uka.ilkd.key.gui.fx.dialogs.FeedbackDialogF;
+import de.uka.ilkd.key.gui.fx.dialogs.LoadUserTacletsDialogF;
+import de.uka.ilkd.key.gui.fx.dialogs.RunAllProofsF;
 import de.uka.ilkd.key.gui.fx.docking.DockLayoutStore;
 import de.uka.ilkd.key.gui.fx.docking.DockLocation;
 import de.uka.ilkd.key.gui.fx.docking.DockWorkspace;
@@ -101,6 +105,7 @@ import de.uka.ilkd.key.gui.fx.tacletmatch.TacletMatchVerifyF;
 import de.uka.ilkd.key.gui.fx.tasktree.TaskTreeF;
 import de.uka.ilkd.key.gui.fx.theme.Theme;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro;
 import de.uka.ilkd.key.macros.DefaultAutoMacro;
 import de.uka.ilkd.key.macros.FullAutoPilotProofMacro;
@@ -110,19 +115,32 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.GZipProofSaver;
 import de.uka.ilkd.key.proof.io.ProofBundleSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.javafx.FxUtil;
 
 import org.jspecify.annotations.Nullable;
@@ -143,6 +161,53 @@ public final class MainWindowF {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainWindowF.class);
 
     private static final String IMAGE_DIR = "/de/uka/ilkd/key/gui/images/";
+
+    // menu: MP5 — external targets of the About menu's browser actions (Swing
+    // KeYProjectHomepageAction.url / CreateGithubIssueAction.URL), opened via the
+    // HelpFacadeF browser seam (host services).
+    private static final String KEY_PROJECT_URL = "https://www.key-project.org/";
+    private static final String GITHUB_ISSUE_URL = "https://github.com/keyproject/key/issues/new";
+
+    // menu: MP5 — the "Run All Proofs" QA feature lives behind the same feature flag as the
+    // Swing original (Swing MainWindow.FEATURE_BULK_UI_TEST, MainWindow.java:109-113). The
+    // feature is already registered in the shared FeatureSettings.FEATURES registry by the
+    // Swing side in a full build; the stream lookup reuses it, the createFeature fallback
+    // covers a key.ui.fx-only run (otherwise the same id would register twice, which the
+    // Swing FeatureSettingsPanel would then list twice).
+    private static final FeatureSettings.Feature FEATURE_BULK_UI_TEST =
+        FeatureSettings.Feature.FEATURES.stream().filter(f -> "BULK_UI_TEST".equals(f.id()))
+                .findFirst()
+                .orElseGet(() -> FeatureSettings.createFeature("BULK_UI_TEST",
+                    "Activates the 'Run All Proofs' action that allows you to run multiple"
+                        + " proofs inside the UI.",
+                    false));
+
+    // menu: MP5 — the batch-mode help text of the "Lemma Generation (Batch Mode)" info dialog
+    // (Swing LemmaGenerationBatchModeAction.DESCRIPTION, trimmed of the trailing blank line).
+    private static final String BATCH_MODE_TEXT =
+        """
+                In case that one wants to prove a huge set of taclets, it can be convenient and useful to do this automatically.
+                The new lemma generation offers now the possibility to use the batch mode of the KeY system
+                in order to generate and prove the proof obligations for the correctness of (non-axiomatic) taclets.
+
+                The basic command using the batch mode is:
+
+                runProver --justify-rules  FILE1 --jr-axioms FILE2 --jr-signature FILE3
+
+                FILE1: The file containing the taclets that should be proved sound.
+                FILE2: The file containing the taclets that should be used as axioms when proving the taclets of FILE1
+                being sound.
+                FILE3: The file containing the signature that should be used for loading the taclets.
+                If this option is not set, the signature declared in FILE1 is used.
+
+                In order to store the resulting proofs to files one can set the option "--jr-saveProofToFile true".
+                The corresponding proofs are stored into the folder in which FILE1 is located. In case that one wants to
+                store the proofs into another folder, one can specify the path of the folder by
+                "--jr-pathOfResult PATH_OF_DEST_FOLDER".
+                Some more options are available, which are shown when using the command:
+
+                runProver --help
+                in the batch mode.""";
 
     /** Known dockable ids, in the order they appear in the factory-default layout. */
     public static final String ID_LOADED_PROOFS = "loadedProofs";
@@ -277,6 +342,13 @@ public final class MainWindowF {
      * Last directory of the open/save dialogs (Swing {@code OpenFileAction.lastSelectedPath}).
      */
     private Path lastSelectedDir = Path.of(System.getProperty("user.dir"));
+
+    /**
+     * menu: MP5 — whether the {@link FeatureSettings} listener of the "Run All Proofs" menu item
+     * (see {@link #FEATURE_BULK_UI_TEST} / {@link #buildProveSubmenu()}) has been registered;
+     * the parity self test rebuilds the menu bar, so the registration happens at most once.
+     */
+    private boolean bulkUiTestListenerRegistered;
 
     /**
      * Whether a proof is selected (updated in {@link #updateProofStatus()}); the enablement
@@ -527,7 +599,7 @@ public final class MainWindowF {
      * @param demo whether this is the demo property load (notification prefix "Demo proof")
      */
     private void startProofLoad(Path location, boolean demo) {
-        startProofLoad(location, demo, null, null);
+        startProofLoad(location, demo, null, null, false);
     }
 
     /**
@@ -539,7 +611,7 @@ public final class MainWindowF {
      *        {@code location} is not a proof bundle
      */
     private void startProofLoad(Path location, boolean demo, @Nullable Path proofFilename) {
-        startProofLoad(location, demo, proofFilename, null);
+        startProofLoad(location, demo, proofFilename, null, false);
     }
 
     /**
@@ -556,6 +628,26 @@ public final class MainWindowF {
      */
     private void startProofLoad(Path location, boolean demo, @Nullable Path proofFilename,
             @Nullable LoadOptions options) {
+        startProofLoad(location, demo, proofFilename, options, false);
+    }
+
+    /**
+     * Loads a proof or problem file, optionally a specific proof out of a proof bundle, with
+     * optional loading options and an optional automatic proof run.
+     *
+     * @param location the problem, proof, Java file or proof bundle to load
+     * @param demo whether this is the demo property load (notification prefix "Demo proof")
+     * @param proofFilename the proof to load relative to the bundle root, or {@code null} if
+     *        {@code location} is not a proof bundle
+     * @param options the loading options from the {@link LoadingOptionsDialogF} (Swing: the
+     *        {@code KeYFileChooserLoadingOptions} accessory consumed by {@code OpenFileAction}),
+     *        or {@code null} for the legacy load (recent files, quick load, demo)
+     * @param autoProve whether the automatic prover should run on the loaded proof right after
+     *        the load (Swing {@code RunAllProofsAction}: {@code problemLoader.runSynchronously()}
+     *        + {@code startAutoMode} + {@code waitWhileAutoMode})
+     */
+    private void startProofLoad(Path location, boolean demo, @Nullable Path proofFilename,
+            @Nullable LoadOptions options, boolean autoProve) {
         // pure .key problems carry no Java source; the source view then shows the problem file.
         // Proof bundles carry their own sources (or none) — never show the bundle zip as text
         if (proofFilename == null) {
@@ -611,6 +703,14 @@ public final class MainWindowF {
                     LOGGER.info("Demo: running auto mode on the loaded proof");
                     env.getProofControl().startAndWaitForAutoMode(env.getLoadedProof());
                     LOGGER.info("Demo: auto mode finished");
+                }
+                // menu: MP5 — auto prove after the load (Swing RunAllProofsAction: run
+                // synchronously, then startAutoMode + waitWhileAutoMode on the
+                // MediatorProofControl)
+                if (autoProve) {
+                    LOGGER.info("Run All Proofs: running auto mode on the loaded proof");
+                    env.getProofControl().startAndWaitForAutoMode(env.getLoadedProof());
+                    LOGGER.info("Run All Proofs: auto mode finished");
                 }
                 return env;
             }
@@ -909,6 +1009,297 @@ public final class MainWindowF {
             return;
         }
         openProofFile(Path.of(recent));
+    }
+
+    /**
+     * menu: MP5 — the Edit Last Opened File action (Swing {@code EditMostRecentFileAction}): opens
+     * the most recently opened file with the default external editor. The Swing original goes
+     * through {@code EditFileActionHandler.workWithFile} (finally {@code Desktop.open}); the FX
+     * port opens the file's {@code file://} URI through the {@link HelpFacadeF} browser seam
+     * (host services), so the same seam that serves the About-menu browser actions is reused.
+     */
+    private void editLastOpenedFile() {
+        String recent = recentFiles.getMostRecent();
+        if (recent == null) {
+            // the item is disabled without a recent file; keep the Swing action's silent guard
+            return;
+        }
+        HelpFacadeF.openExternal(Path.of(recent).toUri().toString());
+    }
+
+    // ------------------------------------------------------------------
+    // menu: MP5 — taclet loading / proving (Swing LemmaGenerationAction)
+    // ------------------------------------------------------------------
+
+    /**
+     * menu: MP5 — the "Load User Defined Taclets…" action (Swing
+     * {@code LemmaGenerationAction.ProveAndAddTaclets}, Mode.LOAD): loads the taclets of a
+     * user-chosen {@code .key} file into the current proof. The {@code TacletSoundnessPOLoader}
+     * runs the soundness proof obligations; on success the loaded taclets are prepended to the
+     * proof's init config and added to its open goals (the Swing doStopped flow,
+     * LemmaGenerationAction.java:307-326).
+     */
+    private void loadUserDefinedTaclets() {
+        Proof proof = selectionModel.getSelectedProof();
+        if (proof == null) {
+            return; // the item is disabled without a proof (Swing proofIsRequired()==true)
+        }
+        Optional<LoadUserTacletsDialogF.Result> result =
+            LoadUserTacletsDialogF.showDialog(stage, LoadUserTacletsDialogF.Mode.LOAD);
+        if (result.isEmpty()) {
+            return;
+        }
+        Path fileForTaclets = result.get().fileForTaclets();
+        boolean loadAsLemmata = result.get().generateProofObligations();
+        // menu: the Swing axiom-file list of the dialog is not ported (KNOWN-DEFERRED, see
+        // LoadUserTacletsDialogF) — the loader never gets axiom files.
+        List<Path> filesForAxioms = List.of();
+        final WindowUserInterfaceControlF ui = getUserInterfaceControl();
+        Profile profile = proof.getServices().getProfile();
+        ProblemInitializer problemInitializer =
+            new ProblemInitializer(ui, new Services(profile), ui);
+        TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(ui, ui,
+            problemInitializer, fileForTaclets, filesForAxioms, proof.getInitConfig().copy());
+
+        LemmaLoaderListener listener = new LemmaLoaderListener() {
+            @Override
+            protected void doStopped(Throwable exception) {
+                handleTacletLoadException(exception);
+            }
+
+            @Override
+            protected void doStopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
+                    boolean addAxioms) {
+                // menu: getMediator().startInterface(true) is a no-op — the FX port has no
+                // interface lock (KeYMediatorF has no startInterface/stopInterface)
+                if (p != null) {
+                    ui.registerProofAggregate(p);
+                }
+                if (p != null || addAxioms) {
+                    // add only the taclets to the goals if the proof obligations were added
+                    // successfully (Swing LemmaGenerationAction.java:314-326)
+                    ImmutableList<Taclet> base = proof.getInitConfig().getTaclets();
+                    base = base.prependReverse(taclets);
+                    proof.getInitConfig().setTaclets(base);
+                    for (Taclet taclet : taclets) {
+                        for (Goal goal : proof.openGoals()) {
+                            goal.addTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, false);
+                        }
+                    }
+                }
+            }
+        };
+        // LOAD mode: the loaded taclets are only used for the current proof, not for proving
+        // (isOnlyUsedForProvingTaclets=false); the loader works on a copy of the proof's init
+        // config (Swing LemmaGenerationAction.java:295, :331-333)
+        runTacletSoundnessLoader(tacletLoader, proof.getInitConfig(), loadAsLemmata, false,
+            listener);
+    }
+
+    /**
+     * menu: MP5 — the "Load User Defined Taclets for Proving" action (Swing
+     * {@code LemmaGenerationAction.ProveUserDefinedTaclets}, Mode.PROVE): creates proof
+     * obligations for the taclets of a user-chosen file without loading them into the current
+     * proof. The created proofs are registered (they appear in the Loaded Proofs view) and the
+     * first proof is selected, like the Swing doStopped (LemmaGenerationAction.java:231-240).
+     */
+    private void proveUserDefinedTaclets() {
+        Optional<LoadUserTacletsDialogF.Result> result =
+            LoadUserTacletsDialogF.showDialog(stage, LoadUserTacletsDialogF.Mode.PROVE);
+        if (result.isEmpty()) {
+            return;
+        }
+        Path fileForTaclets = result.get().fileForTaclets();
+        boolean loadAsLemmata = result.get().generateProofObligations();
+        // menu: the Swing axiom-file list of the dialog is not ported (KNOWN-DEFERRED, see
+        // LoadUserTacletsDialogF)
+        List<Path> filesForAxioms = List.of();
+        final WindowUserInterfaceControlF ui = getUserInterfaceControl();
+        Profile profile = lastEnvironment != null ? lastEnvironment.getProfile()
+                : AbstractProfile.getDefaultProfile();
+        ProblemInitializer problemInitializer =
+            new ProblemInitializer(ui, new Services(profile), ui);
+        TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(ui, ui,
+            problemInitializer, profile, fileForTaclets, filesForAxioms);
+
+        LemmaLoaderListener listener = new LemmaLoaderListener() {
+            @Override
+            protected void doStopped(Throwable exception) {
+                handleTacletLoadException(exception);
+            }
+
+            @Override
+            protected void doStopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
+                    boolean addAxioms) {
+                // menu: getMediator().startInterface(true) is a no-op (see loadUserDefinedTaclets)
+                if (p != null) {
+                    ui.registerProofAggregate(p);
+                    selectionModel.setSelectedProof(p.getFirstProof());
+                }
+            }
+        };
+        // PROVE mode: only used for proving (isOnlyUsedForProvingTaclets=true), original config
+        // from the fresh proof environment (Swing LemmaGenerationAction.java:244-246)
+        runTacletSoundnessLoader(tacletLoader,
+            tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(), loadAsLemmata,
+            true, listener);
+    }
+
+    /**
+     * menu: MP5 — the "Load KeY Taclets" action (Swing {@code LemmaGenerationAction
+     * .ProveKeYTaclets}): creates proof obligations for the system taclets of the profile
+     * (Swing LemmaGenerationAction.java:137-168).
+     */
+    private void proveKeYTaclets() {
+        final WindowUserInterfaceControlF ui = getUserInterfaceControl();
+        Profile profile = lastEnvironment != null ? lastEnvironment.getProfile()
+                : AbstractProfile.getDefaultProfile();
+        TacletLoader tacletLoader = new TacletLoader.KeYsTacletsLoader(ui, ui, profile);
+
+        LemmaLoaderListener listener = new LemmaLoaderListener() {
+            @Override
+            protected void doStopped(Throwable exception) {
+                handleTacletLoadException(exception);
+            }
+
+            @Override
+            protected void doStopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
+                    boolean addAxioms) {
+                // menu: getMediator().startInterface(true) is a no-op (see loadUserDefinedTaclets)
+                if (p != null) {
+                    ui.registerProofAggregate(p);
+                }
+            }
+        };
+        // KeY mode: the system taclets always get proof obligations (Swing passes the literal
+        // true, LemmaGenerationAction.java:163-165)
+        runTacletSoundnessLoader(tacletLoader,
+            tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(), true, true,
+            listener);
+    }
+
+    /**
+     * menu: MP5 — the "Lemma Generation (Batch Mode)" info dialog (Swing
+     * {@code LemmaGenerationBatchModeAction.actionPerformed}: {@code JOptionPane} with the
+     * batch-mode {@link #BATCH_MODE_TEXT} description).
+     */
+    private void showLemmaGenerationBatchMode() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Using the Batch Mode for Proving Taclets");
+        alert.setHeaderText(null);
+        TextArea text = new TextArea(BATCH_MODE_TEXT);
+        text.setEditable(false);
+        text.setWrapText(true);
+        alert.getDialogPane().setContent(text);
+        alert.initOwner(stage);
+        ExampleChooserF.themeDialogPane(alert);
+        alert.showAndWait();
+    }
+
+    /**
+     * menu: MP5 — the "Run All Proofs" action (Swing {@code RunAllProofsAction}, behind the
+     * {@code BULK_UI_TEST} feature flag): loads the proof named by the
+     * {@link RunAllProofsF#ENV_VARIABLE} environment variable (or system property) and
+     * auto-proves it; without a usable spec a short usage/status message is shown (the Swing
+     * multi-file batch loop is not ported, see {@link RunAllProofsF}).
+     */
+    private void runAllProofs() {
+        Path proofFile = RunAllProofsF.proofToRun();
+        if (proofFile == null) {
+            popupWarning(RunAllProofsF.usageMessage());
+            return;
+        }
+        LOGGER.info("Run All Proofs: loading and auto-proving {}", proofFile);
+        startProofLoad(proofFile, false, null, null, true);
+    }
+
+    /**
+     * menu: MP5 — shared failure handling of the taclet loaders (Swing
+     * {@code LemmaGenerationAction.handleException}): the exception surfaces in the issue
+     * dialog.
+     */
+    private void handleTacletLoadException(Throwable exception) {
+        LOGGER.error("Taclet loading failed", exception);
+        IssueDialogF.showExceptionDialog(getStage(), exception);
+    }
+
+    /**
+     * menu: MP5 — builds and starts a {@link TacletSoundnessPOLoader} with the shared
+     * "supported taclets only" filter (the default of the not-ported Swing
+     * {@code LemmaSelectionDialog}).
+     *
+     * @param tacletLoader the loader of the candidate taclets
+     * @param originalConfig the init config the proof obligations are based on
+     * @param loadAsLemmata whether proof obligations are generated (the dialog's "Generate proof
+     *        obligations for taclets" checkbox, Swing {@code isGenerateProofObligations})
+     * @param isOnlyUsedForProvingTaclets whether the taclets are only used for proving (PROVE/
+     *        KeY mode) or also added to the current proof (LOAD mode)
+     * @param listener the FX-side loader listener (stopped callbacks are marshalled to the FX
+     *        thread)
+     */
+    private void runTacletSoundnessLoader(TacletLoader tacletLoader, InitConfig originalConfig,
+            boolean loadAsLemmata, boolean isOnlyUsedForProvingTaclets,
+            LemmaLoaderListener listener) {
+        // menu: instead of the Swing LemmaSelectionDialog, keep all "supported" taclets (the
+        // dialog's default "show only supported" filter) — the selection dialog is not ported
+        TacletSoundnessPOLoader.TacletFilter filter = tacletInfos -> {
+            ImmutableSet<Taclet> supported = DefaultImmutableSet.nil();
+            for (TacletSoundnessPOLoader.TacletInfo info : tacletInfos) {
+                if (!info.isNotSupported()) {
+                    supported = supported.add(info.getTaclet());
+                }
+            }
+            return supported;
+        };
+        TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(listener, filter,
+            loadAsLemmata, tacletLoader, originalConfig, isOnlyUsedForProvingTaclets);
+        loader.start();
+    }
+
+    /**
+     * menu: MP5 — the loader listener of the taclet flows (Swing
+     * {@code LemmaGenerationAction.AbstractLoaderListener}): forwards the progress callbacks to
+     * the window's user interface control and marshals the stopped callbacks to the FX thread
+     * (the {@code TacletSoundnessPOLoader} runs on its own thread).
+     */
+    private abstract class LemmaLoaderListener implements TacletSoundnessPOLoader.LoaderListener {
+
+        @Override
+        public void started() {
+            // menu: Swing AbstractLoaderListener.started() calls mediator.stopInterface(true) to
+            // lock the interface; the FX port has no interface lock, so this is a no-op
+        }
+
+        @Override
+        public void progressStarted(Object sender) {
+            getUserInterfaceControl().progressStarted(sender);
+        }
+
+        @Override
+        public void reportStatus(Object sender, String status) {
+            getUserInterfaceControl().reportStatus(sender, status);
+        }
+
+        @Override
+        public void resetStatus(Object sender) {
+            getUserInterfaceControl().resetStatus(sender);
+        }
+
+        @Override
+        public final void stopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
+                boolean addAsAxioms) {
+            FxUtil.runLater(() -> doStopped(p, taclets, addAsAxioms));
+        }
+
+        @Override
+        public final void stopped(Throwable exception) {
+            FxUtil.runLater(() -> doStopped(exception));
+        }
+
+        protected abstract void doStopped(@Nullable ProofAggregate p,
+                ImmutableSet<Taclet> taclets, boolean addAsAxioms);
+
+        protected abstract void doStopped(Throwable exception);
     }
 
     /**
@@ -1541,6 +1932,21 @@ public final class MainWindowF {
         // the most recent file; disabled during auto mode like all interaction)
         reload.disableProperty()
                 .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
+        // menu: MP5 — edit the most recently opened file in the default external editor (Swing
+        // EditMostRecentFileAction, placed right after Reload like MainWindow.createFileMenu
+        // :997-998). Swing enables the action as long as a recent file exists (binding to the
+        // most-recent-file state) and opens the file with Desktop.open/EditFileActionHandler; the
+        // FX port opens the file's file:// URI through the HelpFacadeF browser seam (host
+        // services, like the About browser actions).
+        MenuItem editLastOpenedFile =
+            menuItem("Edit Last Opened File",
+                "de.uka.ilkd.key.gui.actions.EditMostRecentFileAction",
+                IconFactoryF.Key.EDIT, this::editLastOpenedFile);
+        // menu: MP5 — bound to the RecentFilesF "has a recent file" property (the Swing original
+        // re-checks the list when the menu is shown); disabled during auto mode like the other
+        // file actions.
+        editLastOpenedFile.disableProperty().bind(mediator.autoModeRunningProperty()
+                .or(recentFiles.hasRecentFileProperty().not()));
         MenuItem saveFile = menuItem("Save File…", "de.uka.ilkd.key.gui.actions.SaveFileAction",
             IconFactoryF.Key.SAVE_FILE, this::saveProofFile);
         // Swing SaveFileAction: enableWhenProofLoaded; interaction is locked during auto mode
@@ -1574,12 +1980,24 @@ public final class MainWindowF {
             menuItem("Proof Management…", "de.uka.ilkd.key.gui.actions.ProofManagementAction",
                 IconFactoryF.Key.PROOF_MANAGEMENT, this::openProofManagement);
         proofManagement.disableProperty().bind(mediator.autoModeRunningProperty());
+        // menu: MP5 — load user-defined taclets into the current proof (Swing
+        // LemmaGenerationAction.ProveAndAddTaclets, Mode.LOAD; after Proof Management like
+        // MainWindow.createFileMenu :1019-1021). A proof is required (Swing proofIsRequired()).
+        MenuItem loadUserDefinedTaclets =
+            menuItem("Load User Defined Taclets…",
+                "de.uka.ilkd.key.gui.actions.LemmaGenerationAction$ProveAndAddTaclets",
+                this::loadUserDefinedTaclets);
+        loadUserDefinedTaclets.disableProperty().bind(mediator.autoModeRunningProperty()
+                .or(proofLoaded.not()));
         file.getItems().addAll(
             openExample,
             openFile,
             reload,
+            editLastOpenedFile,
             new SeparatorMenuItem(),
             proofManagement,
+            loadUserDefinedTaclets,
+            buildProveSubmenu(),
             saveFile,
             saveBundle,
             quickSave,
@@ -1590,6 +2008,47 @@ public final class MainWindowF {
             menuItem("Exit", "de.uka.ilkd.key.gui.actions.ExitMainAction",
                 IconFactoryF.Key.QUIT, Platform::exit));
         return file;
+    }
+
+    /**
+     * menu: MP5 — the File&gt;Prove submenu (Swing {@code MainWindow.createFileMenu} :1022-1031:
+     * {@code Load User Defined Taclets for Proving} = {@code LemmaGenerationAction
+     * .ProveUserDefinedTaclets}, {@code Load KeY Taclets} = {@code LemmaGenerationAction
+     * .ProveKeYTaclets}, {@code Lemma Generation (Batch Mode)} = {@code
+     * LemmaGenerationBatchModeAction} info dialog, and the {@code Run All Proofs} QA action
+     * behind the {@link FeatureSettings} flag {@code BULK_UI_TEST}). The Prove entries need no
+     * proof (Swing {@code proofIsRequired() == false}) and are only disabled during auto mode.
+     */
+    private Menu buildProveSubmenu() {
+        Menu prove = new Menu("Prove");
+        MenuItem proveUserDefined = menuItem("Load User Defined Taclets for Proving",
+            "de.uka.ilkd.key.gui.actions.LemmaGenerationAction$ProveUserDefinedTaclets",
+            this::proveUserDefinedTaclets);
+        proveUserDefined.disableProperty().bind(mediator.autoModeRunningProperty());
+        MenuItem proveKeYTaclets = menuItem("Load KeY Taclets",
+            "de.uka.ilkd.key.gui.actions.LemmaGenerationAction$ProveKeYTaclets",
+            this::proveKeYTaclets);
+        proveKeYTaclets.disableProperty().bind(mediator.autoModeRunningProperty());
+        MenuItem lemmaBatchMode = menuItem("Lemma Generation (Batch Mode)",
+            "de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction",
+            this::showLemmaGenerationBatchMode);
+        lemmaBatchMode.disableProperty().bind(mediator.autoModeRunningProperty());
+        prove.getItems().addAll(proveUserDefined, proveKeYTaclets, lemmaBatchMode);
+
+        // menu: MP5 — "Run All Proofs" behind the BULK_UI_TEST feature flag, mirroring the
+        // Swing registration (FeatureSettings.onAndActivate(FEATURE_BULK_UI_TEST,
+        // showRAPAction), MainWindow.java:1023-1027). The item's visibility follows the flag;
+        // the listener is registered at most once — the parity self test rebuilds the menu bar,
+        // which would otherwise stack duplicate listeners on the shared FeatureSettings.
+        MenuItem runAllProofs = menuItem("Run All Proofs",
+            "de.uka.ilkd.key.gui.actions.RunAllProofsAction", this::runAllProofs);
+        runAllProofs.setVisible(FeatureSettings.isFeatureActivated(FEATURE_BULK_UI_TEST));
+        if (!bulkUiTestListenerRegistered) {
+            bulkUiTestListenerRegistered = true;
+            FeatureSettings.onAndActivate(FEATURE_BULK_UI_TEST, runAllProofs::setVisible);
+        }
+        prove.getItems().add(runAllProofs);
+        return prove;
     }
 
     private Menu buildViewMenu() {
@@ -2093,8 +2552,42 @@ public final class MainWindowF {
         { "Ensure Source Consistency" },
     };
 
+    // menu: MP5 — expected File menu entries in the FX order after the MP5 inserts (the Swing
+    // {@code MainWindow.createFileMenu} :991-1031 order with the port's existing grouping:
+    // example/open/reload/edit-last-opened | proof mgmt/load-taclets/Prove | save/quick |
+    // recent | exit). The three Prove submenu entries are the always-present ones; "Run All
+    // Proofs" sits behind the BULK_UI_TEST feature flag (off by default) and is therefore not
+    // part of the table.
+    private static final String[][] FILE_MENU_EXPECTED = {
+        { "Open Example…" },
+        { "Open File…" },
+        { "Reload" },
+        { "Edit Last Opened File" },
+        { "Proof Management…" },
+        { "Load User Defined Taclets…" },
+        { "Prove", "Load User Defined Taclets for Proving", "Load KeY Taclets",
+            "Lemma Generation (Batch Mode)" },
+        { "Save File…" },
+        { "Save Bundle…" },
+        { "Quick Save" },
+        { "Quick Load" },
+        { "Recent Files" },
+        { "Exit" },
+    };
+
+    // menu: MP5 — expected About menu entries in the Swing order of MainWindow.createHelpMenu
+    // (:1163-1174).
+    private static final String[][] ABOUT_MENU_EXPECTED = {
+        { "About KeY…" },
+        { "KeY Homepage" },
+        { "Send Feedback…" },
+        { "Create Github Issue" },
+        { "License…" },
+    };
+
     /**
-     * menu: MP1/MP3/MP4 — menu parity self test (system property {@code key.fx.verify.menuparity},
+     * menu: MP1/MP3/MP4/MP5 — menu parity self test (system property
+     * {@code key.fx.verify.menuparity},
      * run after a proof load like the other verify hooks): builds the menu bar and emits one
      * marker line per asserted menu, each ending in PASS or FAIL.
      */
@@ -2102,6 +2595,8 @@ public final class MainWindowF {
         logMenuParity("Proof", verifyMenuParityReport("Proof", PROOF_MENU_EXPECTED));
         logMenuParity("View", verifyMenuParityReport("View", VIEW_MENU_EXPECTED));
         logMenuParity("Options", verifyMenuParityReport("Options", OPTIONS_MENU_EXPECTED));
+        logMenuParity("File", verifyMenuParityReport("File", FILE_MENU_EXPECTED));
+        logMenuParity("About", verifyMenuParityReport("About", ABOUT_MENU_EXPECTED));
     }
 
     private void logMenuParity(String menuName, String report) {
@@ -2324,11 +2819,27 @@ public final class MainWindowF {
         return item;
     }
 
+    /**
+     * menu: MP5 — the About menu in the Swing order of {@code MainWindow.createHelpMenu}
+     * (:1163-1174): About KeY, KeY Homepage, Send Feedback, Create Github Issue, License. The
+     * browser actions go through the {@link HelpFacadeF} browser seam (host services); the
+     * feedback dialog is the minimal {@link FeedbackDialogF} port of the Swing
+     * {@code SendFeedbackAction}.
+     */
     private Menu buildAboutMenu() {
         Menu about = new Menu("About");
         about.getItems().addAll(
-            menuItem("License…", IconFactoryF.Key.INFO_VIEW, this::showLicense),
-            menuItem("About KeY…", this::showAbout));
+            menuItem("About KeY…", "de.uka.ilkd.key.gui.actions.AboutAction", this::showAbout),
+            menuItem("KeY Homepage",
+                "de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction",
+                () -> HelpFacadeF.openExternal(KEY_PROJECT_URL)),
+            menuItem("Send Feedback…", "de.uka.ilkd.key.gui.actions.MenuSendFeedackAction",
+                () -> FeedbackDialogF.show(stage)),
+            menuItem("Create Github Issue",
+                "de.uka.ilkd.key.gui.actions.CreateGithubIssueAction",
+                () -> HelpFacadeF.openExternal(GITHUB_ISSUE_URL)),
+            menuItem("License…", "de.uka.ilkd.key.gui.actions.LicenseAction",
+                IconFactoryF.Key.INFO_VIEW, this::showLicense));
         return about;
     }
 

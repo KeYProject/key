@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanWrapper;
 
 import de.uka.ilkd.key.gui.fx.actions.QuickSaveF;
 import de.uka.ilkd.key.nparser.ParsingFacade;
@@ -83,6 +85,23 @@ public final class RecentFilesF {
     /** invoked after every model change, used by the main window to rebuild the menu */
     private Runnable onChange = () -> {
     };
+
+    /**
+     * Whether at least one recent file exists. Backs the enablement of the "Edit Last Opened
+     * File" menu entry (Swing {@code EditMostRecentFileAction}; the Swing original re-checks the
+     * file list on every menu showing, the FX equivalent observes this property).
+     * <p>
+     * The property is updated on the FX thread together with {@link #setOnChange(Runnable)}.
+     */
+    private final ReadOnlyBooleanWrapper hasRecentFile = new ReadOnlyBooleanWrapper(false);
+
+    /**
+     * @return whether at least one recent file exists ({@code true} while
+     *         {@link #getMostRecent()} is not {@code null})
+     */
+    public ReadOnlyBooleanProperty hasRecentFileProperty() {
+        return hasRecentFile.getReadOnlyProperty();
+    }
 
     /**
      * Loads the entries from the current default configuration folder (falls back to the previous
@@ -187,6 +206,7 @@ public final class RecentFilesF {
     }
 
     private void fireChange() {
+        hasRecentFile.set(!entries.isEmpty());
         onChange.run();
     }
 
