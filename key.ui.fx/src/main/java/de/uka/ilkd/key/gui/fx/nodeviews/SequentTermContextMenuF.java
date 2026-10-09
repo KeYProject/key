@@ -23,6 +23,7 @@ import javafx.stage.Window;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.gui.fx.MainWindowF;
+import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
 import de.uka.ilkd.key.gui.fx.join.JoinActionF;
 import de.uka.ilkd.key.gui.fx.mergerule.MergeRuleMenuItemF;
 import de.uka.ilkd.key.gui.fx.nodeviews.SequentMenuModelF.AbbrevActionEntry;
@@ -67,9 +68,9 @@ import org.jspecify.annotations.Nullable;
  * The shell is pure JavaFX construction — no FXML — and keeps every side effect (rule application,
  * rule instantiation dialog, reprint of the sequent) behind the proof control or the supplied
  * {@link MenuContext} callbacks, so the item structure is unit-testable without a live {@code
- * Stage}. The milestone-deferred sections ({@code macro_menu}, {@code extension}, {@code smt}) are
- * rendered as disabled placeholders so the skeleton stays faithful; they are wired in later
- * milestones.
+ * Stage}. The milestone-wired sections ({@code macro_menu}, {@code extension}, {@code smt})
+ * render their real content; the disabled placeholders remain only for fixed skeleton entries
+ * without a handler ({@code no_rules}).
  */
 public final class SequentTermContextMenuF {
 
@@ -177,12 +178,15 @@ public final class SequentTermContextMenuF {
             case "no_rules" -> disabledItem(action.label());
             // menu: MP8 — the Strategy Macros section is wired (Swing ProofMacroMenu,
             // ProofMacroMenu.java:81: JMenu("Strategy Macros") with one item per applicable
-            // macro); "extension" and "smt" notes follow below.
+            // macro); the extension and smt notes follow below.
             case "macro_menu" -> macroMenu(action, ctx);
-            // menu: MP8 — KNOWN-DEFERRED extension section: needs the KeYGuiExtensionFacade
-            // registry of the external keyext modules (no FX counterpart, keyext modules are
-            // Swing UIs); stays a disabled placeholder so the menu structure stays faithful.
-            case "extension" -> disabledItem(action.label());
+            // extension: MP9.0 — the extension section is wired through the FX extension
+            // facade (Swing KeYGuiExtension.ContextMenu for ContextMenuKind.SEQUENT_VIEW,
+            // KeYGuiExtensionFacade.createTermMenu, KeYGuiExtensionFacade.java:271-277: the
+            // extension actions of every provider are grouped into the "Extensions" sub-menu);
+            // the disabled placeholder stays only when there are no contributions or no
+            // position.
+            case "extension" -> extensionSection(action, ctx);
             // menu: MP8 — SMT section item, wired in MP8c (Swing CurrentGoalViewMenu.
             // createSMTMenu, CurrentGoalViewMenu.java:219-231, SMTAction :765-790).
             case "smt" -> smtItem(action, ctx);
@@ -233,6 +237,29 @@ public final class SequentTermContextMenuF {
         for (ProofMacro macro : MainWindowF.AUTOMATION_MACROS) {
             menu.getItems().add(ProofMacroMenuF.itemFor(macro, node, ctx.proofControl(), pio));
         }
+        return menu;
+    }
+
+    /**
+     * extension: MP9.0 — the "Extensions" section of the term menu (Swing
+     * KeYGuiExtensionFacade.createTermMenu, KeYGuiExtensionFacade.java:271-277: the
+     * SEQUENT_VIEW context actions of every provider are grouped into an "Extensions"
+     * sub-menu of the term menu). When the clicked position is available and the providers
+     * contribute items, the section renders them ENABLED inside the sub-menu; the disabled
+     * placeholder stays only when there are no contributions — or no position, the fallback
+     * exercised by the {@code key.fx.verify.extensions} self test.
+     */
+    private static MenuItem extensionSection(NamedAction action, MenuContext ctx) {
+        if (ctx.pos() == null || ctx.mediator() == null || ctx.goal() == null) {
+            return disabledItem(action.label());
+        }
+        List<MenuItem> items =
+            KeYGuiExtensionFacadeF.getSequentContextItems(ctx.mediator(), ctx.goal(), ctx.pos());
+        if (items.isEmpty()) {
+            return disabledItem(action.label());
+        }
+        Menu menu = new Menu(action.label());
+        menu.getItems().addAll(items);
         return menu;
     }
 
