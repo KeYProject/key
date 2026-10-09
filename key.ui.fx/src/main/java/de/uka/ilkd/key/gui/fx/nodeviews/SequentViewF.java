@@ -75,6 +75,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
@@ -514,6 +515,38 @@ public class SequentViewF extends BorderPane {
     }
 
     /**
+     * menu: MP3a — re-creates the printer with a {@link NotationInfo} refreshed from the current
+     * view settings, so the View-menu Pretty Print / Unicode Symbols toggles change the printed
+     * symbols (Swing {@code MainWindow.makePrettyView}, MainWindow.java:954-959: refresh the
+     * mediator's shared NotationInfo against the services and re-display the sequent
+     * {@code SwingUtilities.invokeLater(this::updateSequentView)}). The FX sequent view builds
+     * its own {@code NotationInfo} per proof ({@link #display(Node)} — it does not use the
+     * mediator's shared instance yet), so this mirrors the printer rebuild of
+     * {@link #setVisibleTermLabels(VisibleTermLabels)} with the settings passed to
+     * {@code NotationInfo.refresh(Services, boolean, boolean, boolean)}
+     * (NotationInfo.java:425-438): {@code (isUsePretty(), isUseUnicode(), isHidePackagePrefix())}
+     * exactly like Swing's {@code ViewSettings}-driven refresh, keeping the search filter re-bound
+     * to the new printer and re-printing the current node.
+     */
+    public void refreshPrettyView() {
+        if (printer == null || selectedNode == null) {
+            return;
+        }
+        ViewSettings viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        NotationInfo notationInfo = new NotationInfo();
+        notationInfo.refresh(selectedNode.proof().getServices(), viewSettings.isUsePretty(),
+            viewSettings.isUseUnicode(), viewSettings.isHidePackagePrefix());
+        printer = SequentViewLogicPrinter.positionPrinter(notationInfo,
+            selectedNode.proof().getServices(), visibleTermLabels);
+        if (filter instanceof SearchSequentPrintFilter searchFilter) {
+            // the search filters print single formulas through the view's printer (Swing
+            // SequentViewSearchBar.search refreshes it the same way)
+            searchFilter.setLogicPrinter(printer);
+        }
+        printSequent();
+    }
+
+    /**
      * Re-prints the sequent of the currently selected node.
      */
     public void printSequent() {
@@ -820,6 +853,10 @@ public class SequentViewF extends BorderPane {
     /**
      * The tooltip text for the given position (Swing {@code SequentView.getToolTipText} without
      * the HTML markup and without the GUI extension strings, which have no FX counterpart yet).
+     * menu: MP3a — the {@code isShowSequentViewTooltips()} gate is driven by the View menu "Show
+     * Tooltips in Sequent View" toggle (Swing {@code ToggleSequentViewTooltipAction}, NAME =
+     * "Show Tooltips in Sequent View"); {@link #updateHoverTooltip} hides the tooltip whenever
+     * this method returns the empty string, so no further gating is needed at the show site.
      */
     private String getTooltipText(PosInSequent pos) {
         if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
@@ -1082,6 +1119,20 @@ public class SequentViewF extends BorderPane {
             (searchResultPos + searchMatches.size() - 1) % searchMatches.size();
         rebuildRuns();
         scrollToMatch(searchResultPos);
+    }
+
+    /**
+     * menu: selects the search mode in the search bar's combo (Swing
+     * {@code SequentViewSearchBar.setSearchMode}, SequentViewSearchBar.java:82-84:
+     * {@code searchModeBox.setSelectedItem(mode)}). The combo's own listener applies the mode
+     * ({@link #applySearchMode(SearchMode)}) and re-runs the search, so selecting here is
+     * sufficient. Entry point of the "Proof > Search Mode" submenu (Swing
+     * {@code SearchModeChangeAction}, MainWindow.createProofMenu :1125-1131).
+     *
+     * @param mode the search mode to select (Highlight/Hide/Regroup), must not be {@code null}
+     */
+    public void setSearchMode(SearchMode mode) {
+        searchModeBox.getSelectionModel().select(mode);
     }
 
     /**

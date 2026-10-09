@@ -80,9 +80,16 @@ public final class SettingsManagerF {
     public static final JavacSettingsProviderF JAVAC_SETTINGS =
         new JavacSettingsProviderF();
 
+    /**
+     * menu: MP4 — the SMT options provider (Swing {@code SMTSettingsProvider}, registered as
+     * {@code SettingsManager.SMT_SETTINGS} between the standard UI and the taclet options,
+     * SettingsManager.java:37-63); the target of the Options | SMT Solvers… action
+     * (Swing {@code SMTOptionsAction}).
+     */
+    public static final SMTSettingsProviderF SMT_SETTINGS = new SMTSettingsProviderF();
+
     // Deliberately deferred to later milestones (the provider seam stays open):
-    // SMTSettingsProvider, ParallelProverSettingsProvider,
-    // FeatureSettingsPanel and the ShowActiveSettings dump.
+    // ParallelProverSettingsProvider, FeatureSettingsPanel and the ShowActiveSettings dump.
 
     private static SettingsManagerF INSTANCE;
 
@@ -98,6 +105,9 @@ public final class SettingsManagerF {
         if (INSTANCE == null) {
             INSTANCE = new SettingsManagerF();
             INSTANCE.add(STANDARD_UI_SETTINGS);
+            // menu: MP4 — SMT between the standard UI and the taclet options, like the Swing
+            // SettingsManager registration order (SettingsManager.java:59-63)
+            INSTANCE.add(SMT_SETTINGS);
             INSTANCE.add(TACLET_OPTIONS_SETTINGS);
             INSTANCE.add(JAVAC_SETTINGS);
         }

@@ -23,6 +23,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
@@ -33,6 +34,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
@@ -57,6 +59,9 @@ import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.actions.QuickSaveF;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
+import de.uka.ilkd.key.gui.fx.dialogs.FeedbackDialogF;
+import de.uka.ilkd.key.gui.fx.dialogs.LoadUserTacletsDialogF;
+import de.uka.ilkd.key.gui.fx.dialogs.RunAllProofsF;
 import de.uka.ilkd.key.gui.fx.docking.DockLayoutStore;
 import de.uka.ilkd.key.gui.fx.docking.DockLocation;
 import de.uka.ilkd.key.gui.fx.docking.DockWorkspace;
@@ -76,6 +81,7 @@ import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationCenterF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
+import de.uka.ilkd.key.gui.fx.notification.ProofStatisticsDialogF;
 import de.uka.ilkd.key.gui.fx.notification.events.ExceptionFailureEventF;
 import de.uka.ilkd.key.gui.fx.originlabels.OriginLabelsF;
 import de.uka.ilkd.key.gui.fx.plugins.javac.JavacSettingsProviderF;
@@ -83,11 +89,14 @@ import de.uka.ilkd.key.gui.fx.profileloading.LoadingOptionsDialogF;
 import de.uka.ilkd.key.gui.fx.profileloading.LoadingOptionsDialogF.LoadOptions;
 import de.uka.ilkd.key.gui.fx.profileloading.WDLoadOptionPanelF;
 import de.uka.ilkd.key.gui.fx.proofdiff.ProofDiffFrameF;
+import de.uka.ilkd.key.gui.fx.proofmanagement.KnownTypesDialogF;
 import de.uka.ilkd.key.gui.fx.proofmanagement.ProofManagementDialogF;
 import de.uka.ilkd.key.gui.fx.proofmanagement.ProofManagerF;
 import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeViewF;
 import de.uka.ilkd.key.gui.fx.recentfiles.RecentFilesF;
+import de.uka.ilkd.key.gui.fx.settings.ActiveSettingsDialogF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsManagerF;
+import de.uka.ilkd.key.gui.fx.settings.ToolTipOptionsDialogF;
 import de.uka.ilkd.key.gui.fx.soundiness.SoundinessAnalyzer;
 import de.uka.ilkd.key.gui.fx.soundiness.SoundinessDialogF;
 import de.uka.ilkd.key.gui.fx.sourceview.SourceViewF;
@@ -96,21 +105,42 @@ import de.uka.ilkd.key.gui.fx.tacletmatch.TacletMatchVerifyF;
 import de.uka.ilkd.key.gui.fx.tasktree.TaskTreeF;
 import de.uka.ilkd.key.gui.fx.theme.Theme;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro;
+import de.uka.ilkd.key.macros.DefaultAutoMacro;
+import de.uka.ilkd.key.macros.FullAutoPilotProofMacro;
+import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.ScriptAwareMacro;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProblemInitializer;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.GZipProofSaver;
 import de.uka.ilkd.key.proof.io.ProofBundleSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.settings.FeatureSettings;
+import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
+import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.javafx.FxUtil;
 
 import org.jspecify.annotations.Nullable;
@@ -131,6 +161,53 @@ public final class MainWindowF {
     private static final Logger LOGGER = LoggerFactory.getLogger(MainWindowF.class);
 
     private static final String IMAGE_DIR = "/de/uka/ilkd/key/gui/images/";
+
+    // menu: MP5 — external targets of the About menu's browser actions (Swing
+    // KeYProjectHomepageAction.url / CreateGithubIssueAction.URL), opened via the
+    // HelpFacadeF browser seam (host services).
+    private static final String KEY_PROJECT_URL = "https://www.key-project.org/";
+    private static final String GITHUB_ISSUE_URL = "https://github.com/keyproject/key/issues/new";
+
+    // menu: MP5 — the "Run All Proofs" QA feature lives behind the same feature flag as the
+    // Swing original (Swing MainWindow.FEATURE_BULK_UI_TEST, MainWindow.java:109-113). The
+    // feature is already registered in the shared FeatureSettings.FEATURES registry by the
+    // Swing side in a full build; the stream lookup reuses it, the createFeature fallback
+    // covers a key.ui.fx-only run (otherwise the same id would register twice, which the
+    // Swing FeatureSettingsPanel would then list twice).
+    private static final FeatureSettings.Feature FEATURE_BULK_UI_TEST =
+        FeatureSettings.Feature.FEATURES.stream().filter(f -> "BULK_UI_TEST".equals(f.id()))
+                .findFirst()
+                .orElseGet(() -> FeatureSettings.createFeature("BULK_UI_TEST",
+                    "Activates the 'Run All Proofs' action that allows you to run multiple"
+                        + " proofs inside the UI.",
+                    false));
+
+    // menu: MP5 — the batch-mode help text of the "Lemma Generation (Batch Mode)" info dialog
+    // (Swing LemmaGenerationBatchModeAction.DESCRIPTION, trimmed of the trailing blank line).
+    private static final String BATCH_MODE_TEXT =
+        """
+                In case that one wants to prove a huge set of taclets, it can be convenient and useful to do this automatically.
+                The new lemma generation offers now the possibility to use the batch mode of the KeY system
+                in order to generate and prove the proof obligations for the correctness of (non-axiomatic) taclets.
+
+                The basic command using the batch mode is:
+
+                runProver --justify-rules  FILE1 --jr-axioms FILE2 --jr-signature FILE3
+
+                FILE1: The file containing the taclets that should be proved sound.
+                FILE2: The file containing the taclets that should be used as axioms when proving the taclets of FILE1
+                being sound.
+                FILE3: The file containing the signature that should be used for loading the taclets.
+                If this option is not set, the signature declared in FILE1 is used.
+
+                In order to store the resulting proofs to files one can set the option "--jr-saveProofToFile true".
+                The corresponding proofs are stored into the folder in which FILE1 is located. In case that one wants to
+                store the proofs into another folder, one can specify the path of the folder by
+                "--jr-pathOfResult PATH_OF_DEST_FOLDER".
+                Some more options are available, which are shown when using the command:
+
+                runProver --help
+                in the batch mode.""";
 
     /** Known dockable ids, in the order they appear in the factory-default layout. */
     public static final String ID_LOADED_PROOFS = "loadedProofs";
@@ -209,6 +286,13 @@ public final class MainWindowF {
     private final GoalListViewF goalListView = new GoalListViewF();
 
     /**
+     * menu: MP3b — the selection history backing the View menu Back / Forward actions (Swing
+     * {@code MainWindow.selectionHistory}, {@code new SelectionHistory(mediator)}): traces the
+     * user-selected proof nodes and exposes the Back/Forward enablement as JavaFX properties.
+     */
+    private final SelectionHistoryF selectionHistory = new SelectionHistoryF(selectionModel);
+
+    /**
      * The strategy selection view (first M2 version): settings-definition-driven control panel
      * writing through to the selected proof's strategy settings.
      */
@@ -258,6 +342,13 @@ public final class MainWindowF {
      * Last directory of the open/save dialogs (Swing {@code OpenFileAction.lastSelectedPath}).
      */
     private Path lastSelectedDir = Path.of(System.getProperty("user.dir"));
+
+    /**
+     * menu: MP5 — whether the {@link FeatureSettings} listener of the "Run All Proofs" menu item
+     * (see {@link #FEATURE_BULK_UI_TEST} / {@link #buildProveSubmenu()}) has been registered;
+     * the parity self test rebuilds the menu bar, so the registration happens at most once.
+     */
+    private boolean bulkUiTestListenerRegistered;
 
     /**
      * Whether a proof is selected (updated in {@link #updateProofStatus()}); the enablement
@@ -508,7 +599,7 @@ public final class MainWindowF {
      * @param demo whether this is the demo property load (notification prefix "Demo proof")
      */
     private void startProofLoad(Path location, boolean demo) {
-        startProofLoad(location, demo, null, null);
+        startProofLoad(location, demo, null, null, false);
     }
 
     /**
@@ -520,7 +611,7 @@ public final class MainWindowF {
      *        {@code location} is not a proof bundle
      */
     private void startProofLoad(Path location, boolean demo, @Nullable Path proofFilename) {
-        startProofLoad(location, demo, proofFilename, null);
+        startProofLoad(location, demo, proofFilename, null, false);
     }
 
     /**
@@ -537,6 +628,26 @@ public final class MainWindowF {
      */
     private void startProofLoad(Path location, boolean demo, @Nullable Path proofFilename,
             @Nullable LoadOptions options) {
+        startProofLoad(location, demo, proofFilename, options, false);
+    }
+
+    /**
+     * Loads a proof or problem file, optionally a specific proof out of a proof bundle, with
+     * optional loading options and an optional automatic proof run.
+     *
+     * @param location the problem, proof, Java file or proof bundle to load
+     * @param demo whether this is the demo property load (notification prefix "Demo proof")
+     * @param proofFilename the proof to load relative to the bundle root, or {@code null} if
+     *        {@code location} is not a proof bundle
+     * @param options the loading options from the {@link LoadingOptionsDialogF} (Swing: the
+     *        {@code KeYFileChooserLoadingOptions} accessory consumed by {@code OpenFileAction}),
+     *        or {@code null} for the legacy load (recent files, quick load, demo)
+     * @param autoProve whether the automatic prover should run on the loaded proof right after
+     *        the load (Swing {@code RunAllProofsAction}: {@code problemLoader.runSynchronously()}
+     *        + {@code startAutoMode} + {@code waitWhileAutoMode})
+     */
+    private void startProofLoad(Path location, boolean demo, @Nullable Path proofFilename,
+            @Nullable LoadOptions options, boolean autoProve) {
         // pure .key problems carry no Java source; the source view then shows the problem file.
         // Proof bundles carry their own sources (or none) — never show the bundle zip as text
         if (proofFilename == null) {
@@ -592,6 +703,14 @@ public final class MainWindowF {
                     LOGGER.info("Demo: running auto mode on the loaded proof");
                     env.getProofControl().startAndWaitForAutoMode(env.getLoadedProof());
                     LOGGER.info("Demo: auto mode finished");
+                }
+                // menu: MP5 — auto prove after the load (Swing RunAllProofsAction: run
+                // synchronously, then startAutoMode + waitWhileAutoMode on the
+                // MediatorProofControl)
+                if (autoProve) {
+                    LOGGER.info("Run All Proofs: running auto mode on the loaded proof");
+                    env.getProofControl().startAndWaitForAutoMode(env.getLoadedProof());
+                    LOGGER.info("Run All Proofs: auto mode finished");
                 }
                 return env;
             }
@@ -727,6 +846,13 @@ public final class MainWindowF {
             // verify hooks; the text report goes to stdout
             if (System.getProperty("key.fx.verify.termmenu") != null) {
                 runTermMenuVerification(env);
+            }
+            // menu: MP1/MP3c — menu parity self test (key.fx.verify.menuparity): walks the
+            // built menu bar and asserts the Proof menu entries against the Swing
+            // createProofMenu table and (since MP3c) the View menu entries against the Swing
+            // createViewMenu table; each marker line must end with PASS
+            if (System.getProperty("key.fx.verify.menuparity") != null) {
+                verifyMenuParity();
             }
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 startLiveAutoMode(env);
@@ -883,6 +1009,297 @@ public final class MainWindowF {
             return;
         }
         openProofFile(Path.of(recent));
+    }
+
+    /**
+     * menu: MP5 — the Edit Last Opened File action (Swing {@code EditMostRecentFileAction}): opens
+     * the most recently opened file with the default external editor. The Swing original goes
+     * through {@code EditFileActionHandler.workWithFile} (finally {@code Desktop.open}); the FX
+     * port opens the file's {@code file://} URI through the {@link HelpFacadeF} browser seam
+     * (host services), so the same seam that serves the About-menu browser actions is reused.
+     */
+    private void editLastOpenedFile() {
+        String recent = recentFiles.getMostRecent();
+        if (recent == null) {
+            // the item is disabled without a recent file; keep the Swing action's silent guard
+            return;
+        }
+        HelpFacadeF.openExternal(Path.of(recent).toUri().toString());
+    }
+
+    // ------------------------------------------------------------------
+    // menu: MP5 — taclet loading / proving (Swing LemmaGenerationAction)
+    // ------------------------------------------------------------------
+
+    /**
+     * menu: MP5 — the "Load User Defined Taclets…" action (Swing
+     * {@code LemmaGenerationAction.ProveAndAddTaclets}, Mode.LOAD): loads the taclets of a
+     * user-chosen {@code .key} file into the current proof. The {@code TacletSoundnessPOLoader}
+     * runs the soundness proof obligations; on success the loaded taclets are prepended to the
+     * proof's init config and added to its open goals (the Swing doStopped flow,
+     * LemmaGenerationAction.java:307-326).
+     */
+    private void loadUserDefinedTaclets() {
+        Proof proof = selectionModel.getSelectedProof();
+        if (proof == null) {
+            return; // the item is disabled without a proof (Swing proofIsRequired()==true)
+        }
+        Optional<LoadUserTacletsDialogF.Result> result =
+            LoadUserTacletsDialogF.showDialog(stage, LoadUserTacletsDialogF.Mode.LOAD);
+        if (result.isEmpty()) {
+            return;
+        }
+        Path fileForTaclets = result.get().fileForTaclets();
+        boolean loadAsLemmata = result.get().generateProofObligations();
+        // menu: the Swing axiom-file list of the dialog is not ported (KNOWN-DEFERRED, see
+        // LoadUserTacletsDialogF) — the loader never gets axiom files.
+        List<Path> filesForAxioms = List.of();
+        final WindowUserInterfaceControlF ui = getUserInterfaceControl();
+        Profile profile = proof.getServices().getProfile();
+        ProblemInitializer problemInitializer =
+            new ProblemInitializer(ui, new Services(profile), ui);
+        TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(ui, ui,
+            problemInitializer, fileForTaclets, filesForAxioms, proof.getInitConfig().copy());
+
+        LemmaLoaderListener listener = new LemmaLoaderListener() {
+            @Override
+            protected void doStopped(Throwable exception) {
+                handleTacletLoadException(exception);
+            }
+
+            @Override
+            protected void doStopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
+                    boolean addAxioms) {
+                // menu: getMediator().startInterface(true) is a no-op — the FX port has no
+                // interface lock (KeYMediatorF has no startInterface/stopInterface)
+                if (p != null) {
+                    ui.registerProofAggregate(p);
+                }
+                if (p != null || addAxioms) {
+                    // add only the taclets to the goals if the proof obligations were added
+                    // successfully (Swing LemmaGenerationAction.java:314-326)
+                    ImmutableList<Taclet> base = proof.getInitConfig().getTaclets();
+                    base = base.prependReverse(taclets);
+                    proof.getInitConfig().setTaclets(base);
+                    for (Taclet taclet : taclets) {
+                        for (Goal goal : proof.openGoals()) {
+                            goal.addTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, false);
+                        }
+                    }
+                }
+            }
+        };
+        // LOAD mode: the loaded taclets are only used for the current proof, not for proving
+        // (isOnlyUsedForProvingTaclets=false); the loader works on a copy of the proof's init
+        // config (Swing LemmaGenerationAction.java:295, :331-333)
+        runTacletSoundnessLoader(tacletLoader, proof.getInitConfig(), loadAsLemmata, false,
+            listener);
+    }
+
+    /**
+     * menu: MP5 — the "Load User Defined Taclets for Proving" action (Swing
+     * {@code LemmaGenerationAction.ProveUserDefinedTaclets}, Mode.PROVE): creates proof
+     * obligations for the taclets of a user-chosen file without loading them into the current
+     * proof. The created proofs are registered (they appear in the Loaded Proofs view) and the
+     * first proof is selected, like the Swing doStopped (LemmaGenerationAction.java:231-240).
+     */
+    private void proveUserDefinedTaclets() {
+        Optional<LoadUserTacletsDialogF.Result> result =
+            LoadUserTacletsDialogF.showDialog(stage, LoadUserTacletsDialogF.Mode.PROVE);
+        if (result.isEmpty()) {
+            return;
+        }
+        Path fileForTaclets = result.get().fileForTaclets();
+        boolean loadAsLemmata = result.get().generateProofObligations();
+        // menu: the Swing axiom-file list of the dialog is not ported (KNOWN-DEFERRED, see
+        // LoadUserTacletsDialogF)
+        List<Path> filesForAxioms = List.of();
+        final WindowUserInterfaceControlF ui = getUserInterfaceControl();
+        Profile profile = lastEnvironment != null ? lastEnvironment.getProfile()
+                : AbstractProfile.getDefaultProfile();
+        ProblemInitializer problemInitializer =
+            new ProblemInitializer(ui, new Services(profile), ui);
+        TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(ui, ui,
+            problemInitializer, profile, fileForTaclets, filesForAxioms);
+
+        LemmaLoaderListener listener = new LemmaLoaderListener() {
+            @Override
+            protected void doStopped(Throwable exception) {
+                handleTacletLoadException(exception);
+            }
+
+            @Override
+            protected void doStopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
+                    boolean addAxioms) {
+                // menu: getMediator().startInterface(true) is a no-op (see loadUserDefinedTaclets)
+                if (p != null) {
+                    ui.registerProofAggregate(p);
+                    selectionModel.setSelectedProof(p.getFirstProof());
+                }
+            }
+        };
+        // PROVE mode: only used for proving (isOnlyUsedForProvingTaclets=true), original config
+        // from the fresh proof environment (Swing LemmaGenerationAction.java:244-246)
+        runTacletSoundnessLoader(tacletLoader,
+            tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(), loadAsLemmata,
+            true, listener);
+    }
+
+    /**
+     * menu: MP5 — the "Load KeY Taclets" action (Swing {@code LemmaGenerationAction
+     * .ProveKeYTaclets}): creates proof obligations for the system taclets of the profile
+     * (Swing LemmaGenerationAction.java:137-168).
+     */
+    private void proveKeYTaclets() {
+        final WindowUserInterfaceControlF ui = getUserInterfaceControl();
+        Profile profile = lastEnvironment != null ? lastEnvironment.getProfile()
+                : AbstractProfile.getDefaultProfile();
+        TacletLoader tacletLoader = new TacletLoader.KeYsTacletsLoader(ui, ui, profile);
+
+        LemmaLoaderListener listener = new LemmaLoaderListener() {
+            @Override
+            protected void doStopped(Throwable exception) {
+                handleTacletLoadException(exception);
+            }
+
+            @Override
+            protected void doStopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
+                    boolean addAxioms) {
+                // menu: getMediator().startInterface(true) is a no-op (see loadUserDefinedTaclets)
+                if (p != null) {
+                    ui.registerProofAggregate(p);
+                }
+            }
+        };
+        // KeY mode: the system taclets always get proof obligations (Swing passes the literal
+        // true, LemmaGenerationAction.java:163-165)
+        runTacletSoundnessLoader(tacletLoader,
+            tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(), true, true,
+            listener);
+    }
+
+    /**
+     * menu: MP5 — the "Lemma Generation (Batch Mode)" info dialog (Swing
+     * {@code LemmaGenerationBatchModeAction.actionPerformed}: {@code JOptionPane} with the
+     * batch-mode {@link #BATCH_MODE_TEXT} description).
+     */
+    private void showLemmaGenerationBatchMode() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Using the Batch Mode for Proving Taclets");
+        alert.setHeaderText(null);
+        TextArea text = new TextArea(BATCH_MODE_TEXT);
+        text.setEditable(false);
+        text.setWrapText(true);
+        alert.getDialogPane().setContent(text);
+        alert.initOwner(stage);
+        ExampleChooserF.themeDialogPane(alert);
+        alert.showAndWait();
+    }
+
+    /**
+     * menu: MP5 — the "Run All Proofs" action (Swing {@code RunAllProofsAction}, behind the
+     * {@code BULK_UI_TEST} feature flag): loads the proof named by the
+     * {@link RunAllProofsF#ENV_VARIABLE} environment variable (or system property) and
+     * auto-proves it; without a usable spec a short usage/status message is shown (the Swing
+     * multi-file batch loop is not ported, see {@link RunAllProofsF}).
+     */
+    private void runAllProofs() {
+        Path proofFile = RunAllProofsF.proofToRun();
+        if (proofFile == null) {
+            popupWarning(RunAllProofsF.usageMessage());
+            return;
+        }
+        LOGGER.info("Run All Proofs: loading and auto-proving {}", proofFile);
+        startProofLoad(proofFile, false, null, null, true);
+    }
+
+    /**
+     * menu: MP5 — shared failure handling of the taclet loaders (Swing
+     * {@code LemmaGenerationAction.handleException}): the exception surfaces in the issue
+     * dialog.
+     */
+    private void handleTacletLoadException(Throwable exception) {
+        LOGGER.error("Taclet loading failed", exception);
+        IssueDialogF.showExceptionDialog(getStage(), exception);
+    }
+
+    /**
+     * menu: MP5 — builds and starts a {@link TacletSoundnessPOLoader} with the shared
+     * "supported taclets only" filter (the default of the not-ported Swing
+     * {@code LemmaSelectionDialog}).
+     *
+     * @param tacletLoader the loader of the candidate taclets
+     * @param originalConfig the init config the proof obligations are based on
+     * @param loadAsLemmata whether proof obligations are generated (the dialog's "Generate proof
+     *        obligations for taclets" checkbox, Swing {@code isGenerateProofObligations})
+     * @param isOnlyUsedForProvingTaclets whether the taclets are only used for proving (PROVE/
+     *        KeY mode) or also added to the current proof (LOAD mode)
+     * @param listener the FX-side loader listener (stopped callbacks are marshalled to the FX
+     *        thread)
+     */
+    private void runTacletSoundnessLoader(TacletLoader tacletLoader, InitConfig originalConfig,
+            boolean loadAsLemmata, boolean isOnlyUsedForProvingTaclets,
+            LemmaLoaderListener listener) {
+        // menu: instead of the Swing LemmaSelectionDialog, keep all "supported" taclets (the
+        // dialog's default "show only supported" filter) — the selection dialog is not ported
+        TacletSoundnessPOLoader.TacletFilter filter = tacletInfos -> {
+            ImmutableSet<Taclet> supported = DefaultImmutableSet.nil();
+            for (TacletSoundnessPOLoader.TacletInfo info : tacletInfos) {
+                if (!info.isNotSupported()) {
+                    supported = supported.add(info.getTaclet());
+                }
+            }
+            return supported;
+        };
+        TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(listener, filter,
+            loadAsLemmata, tacletLoader, originalConfig, isOnlyUsedForProvingTaclets);
+        loader.start();
+    }
+
+    /**
+     * menu: MP5 — the loader listener of the taclet flows (Swing
+     * {@code LemmaGenerationAction.AbstractLoaderListener}): forwards the progress callbacks to
+     * the window's user interface control and marshals the stopped callbacks to the FX thread
+     * (the {@code TacletSoundnessPOLoader} runs on its own thread).
+     */
+    private abstract class LemmaLoaderListener implements TacletSoundnessPOLoader.LoaderListener {
+
+        @Override
+        public void started() {
+            // menu: Swing AbstractLoaderListener.started() calls mediator.stopInterface(true) to
+            // lock the interface; the FX port has no interface lock, so this is a no-op
+        }
+
+        @Override
+        public void progressStarted(Object sender) {
+            getUserInterfaceControl().progressStarted(sender);
+        }
+
+        @Override
+        public void reportStatus(Object sender, String status) {
+            getUserInterfaceControl().reportStatus(sender, status);
+        }
+
+        @Override
+        public void resetStatus(Object sender) {
+            getUserInterfaceControl().resetStatus(sender);
+        }
+
+        @Override
+        public final void stopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
+                boolean addAsAxioms) {
+            FxUtil.runLater(() -> doStopped(p, taclets, addAsAxioms));
+        }
+
+        @Override
+        public final void stopped(Throwable exception) {
+            FxUtil.runLater(() -> doStopped(exception));
+        }
+
+        protected abstract void doStopped(@Nullable ProofAggregate p,
+                ImmutableSet<Taclet> taclets, boolean addAsAxioms);
+
+        protected abstract void doStopped(Throwable exception);
     }
 
     /**
@@ -1515,6 +1932,21 @@ public final class MainWindowF {
         // the most recent file; disabled during auto mode like all interaction)
         reload.disableProperty()
                 .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
+        // menu: MP5 — edit the most recently opened file in the default external editor (Swing
+        // EditMostRecentFileAction, placed right after Reload like MainWindow.createFileMenu
+        // :997-998). Swing enables the action as long as a recent file exists (binding to the
+        // most-recent-file state) and opens the file with Desktop.open/EditFileActionHandler; the
+        // FX port opens the file's file:// URI through the HelpFacadeF browser seam (host
+        // services, like the About browser actions).
+        MenuItem editLastOpenedFile =
+            menuItem("Edit Last Opened File",
+                "de.uka.ilkd.key.gui.actions.EditMostRecentFileAction",
+                IconFactoryF.Key.EDIT, this::editLastOpenedFile);
+        // menu: MP5 — bound to the RecentFilesF "has a recent file" property (the Swing original
+        // re-checks the list when the menu is shown); disabled during auto mode like the other
+        // file actions.
+        editLastOpenedFile.disableProperty().bind(mediator.autoModeRunningProperty()
+                .or(recentFiles.hasRecentFileProperty().not()));
         MenuItem saveFile = menuItem("Save File…", "de.uka.ilkd.key.gui.actions.SaveFileAction",
             IconFactoryF.Key.SAVE_FILE, this::saveProofFile);
         // Swing SaveFileAction: enableWhenProofLoaded; interaction is locked during auto mode
@@ -1548,12 +1980,24 @@ public final class MainWindowF {
             menuItem("Proof Management…", "de.uka.ilkd.key.gui.actions.ProofManagementAction",
                 IconFactoryF.Key.PROOF_MANAGEMENT, this::openProofManagement);
         proofManagement.disableProperty().bind(mediator.autoModeRunningProperty());
+        // menu: MP5 — load user-defined taclets into the current proof (Swing
+        // LemmaGenerationAction.ProveAndAddTaclets, Mode.LOAD; after Proof Management like
+        // MainWindow.createFileMenu :1019-1021). A proof is required (Swing proofIsRequired()).
+        MenuItem loadUserDefinedTaclets =
+            menuItem("Load User Defined Taclets…",
+                "de.uka.ilkd.key.gui.actions.LemmaGenerationAction$ProveAndAddTaclets",
+                this::loadUserDefinedTaclets);
+        loadUserDefinedTaclets.disableProperty().bind(mediator.autoModeRunningProperty()
+                .or(proofLoaded.not()));
         file.getItems().addAll(
             openExample,
             openFile,
             reload,
+            editLastOpenedFile,
             new SeparatorMenuItem(),
             proofManagement,
+            loadUserDefinedTaclets,
+            buildProveSubmenu(),
             saveFile,
             saveBundle,
             quickSave,
@@ -1566,15 +2010,124 @@ public final class MainWindowF {
         return file;
     }
 
+    /**
+     * menu: MP5 — the File&gt;Prove submenu (Swing {@code MainWindow.createFileMenu} :1022-1031:
+     * {@code Load User Defined Taclets for Proving} = {@code LemmaGenerationAction
+     * .ProveUserDefinedTaclets}, {@code Load KeY Taclets} = {@code LemmaGenerationAction
+     * .ProveKeYTaclets}, {@code Lemma Generation (Batch Mode)} = {@code
+     * LemmaGenerationBatchModeAction} info dialog, and the {@code Run All Proofs} QA action
+     * behind the {@link FeatureSettings} flag {@code BULK_UI_TEST}). The Prove entries need no
+     * proof (Swing {@code proofIsRequired() == false}) and are only disabled during auto mode.
+     */
+    private Menu buildProveSubmenu() {
+        Menu prove = new Menu("Prove");
+        MenuItem proveUserDefined = menuItem("Load User Defined Taclets for Proving",
+            "de.uka.ilkd.key.gui.actions.LemmaGenerationAction$ProveUserDefinedTaclets",
+            this::proveUserDefinedTaclets);
+        proveUserDefined.disableProperty().bind(mediator.autoModeRunningProperty());
+        MenuItem proveKeYTaclets = menuItem("Load KeY Taclets",
+            "de.uka.ilkd.key.gui.actions.LemmaGenerationAction$ProveKeYTaclets",
+            this::proveKeYTaclets);
+        proveKeYTaclets.disableProperty().bind(mediator.autoModeRunningProperty());
+        MenuItem lemmaBatchMode = menuItem("Lemma Generation (Batch Mode)",
+            "de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction",
+            this::showLemmaGenerationBatchMode);
+        lemmaBatchMode.disableProperty().bind(mediator.autoModeRunningProperty());
+        prove.getItems().addAll(proveUserDefined, proveKeYTaclets, lemmaBatchMode);
+
+        // menu: MP5 — "Run All Proofs" behind the BULK_UI_TEST feature flag, mirroring the
+        // Swing registration (FeatureSettings.onAndActivate(FEATURE_BULK_UI_TEST,
+        // showRAPAction), MainWindow.java:1023-1027). The item's visibility follows the flag;
+        // the listener is registered at most once — the parity self test rebuilds the menu bar,
+        // which would otherwise stack duplicate listeners on the shared FeatureSettings.
+        MenuItem runAllProofs = menuItem("Run All Proofs",
+            "de.uka.ilkd.key.gui.actions.RunAllProofsAction", this::runAllProofs);
+        runAllProofs.setVisible(FeatureSettings.isFeatureActivated(FEATURE_BULK_UI_TEST));
+        if (!bulkUiTestListenerRegistered) {
+            bulkUiTestListenerRegistered = true;
+            FeatureSettings.onAndActivate(FEATURE_BULK_UI_TEST, runAllProofs::setVisible);
+        }
+        prove.getItems().add(runAllProofs);
+        return prove;
+    }
+
     private Menu buildViewMenu() {
         Menu view = new Menu("View");
-        // placeholder toggles; wired to the real views in M2
+        // menu: MP3a — Pretty Print toggle (Swing PrettyPrintToggleAction,
+        // PrettyPrintToggleAction.java:45-59): updateSelectedState mirrors the settings into the
+        // NotationInfo static and the selected state; actionPerformed sets the static BEFORE the
+        // ViewSettings are modified, because the UI reacts on the settings change event (the
+        // printers consult the static at construction). The re-render mirrors
+        // MainWindow.makePrettyView (MainWindow.java:954-959).
+        ViewSettings viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         CheckMenuItem prettyPrint = new CheckMenuItem("Pretty Print");
+        NotationInfo.DEFAULT_PRETTY_SYNTAX = viewSettings.isUsePretty();
+        prettyPrint.setSelected(viewSettings.isUsePretty());
+        prettyPrint.setOnAction(e -> {
+            boolean selected = prettyPrint.isSelected();
+            // Swing: "Needs to be executed before the ViewSettings are modified, because the UI
+            // will react on the settings change event!" (PrettyPrintToggleAction.java:55-57)
+            NotationInfo.DEFAULT_PRETTY_SYNTAX = selected;
+            viewSettings.setUsePretty(selected);
+            refreshPrettyViews();
+        });
+        // menu: MP3a — Unicode toggle (Swing UnicodeToggleAction, UnicodeToggleAction.java:47-69):
+        // only meaningful in combination with pretty printing (updateSelectedState:
+        // setEnabled(usePretty), setSelected(useUnicode && usePretty)); the disable binding
+        // replaces Swing's setEnabled(usePretty).
         CheckMenuItem unicode = new CheckMenuItem("Unicode Symbols");
+        unicode.setSelected(viewSettings.isUseUnicode() && viewSettings.isUsePretty());
+        unicode.setDisable(!viewSettings.isUsePretty());
+        unicode.disableProperty().bind(prettyPrint.selectedProperty().not());
+        unicode.setOnAction(e -> {
+            boolean selected = unicode.isSelected();
+            boolean pretty = viewSettings.isUsePretty();
+            // before the ViewSettings are modified, like the Swing original
+            // (UnicodeToggleAction.java:63)
+            NotationInfo.DEFAULT_UNICODE_ENABLED = selected && pretty;
+            viewSettings.setUseUnicode(selected);
+            refreshPrettyViews();
+        });
         CheckMenuItem syntaxHighlighting = new CheckMenuItem("Syntax Highlighting");
         syntaxHighlighting.setSelected(sequentView.isSyntaxHighlightingEnabled());
         syntaxHighlighting.setOnAction(
             e -> sequentView.setSyntaxHighlightingEnabled(syntaxHighlighting.isSelected()));
+
+        // menu: MP3a — tooltip toggles (Swing ToggleSequentViewTooltipAction /
+        // ToggleSourceViewTooltipAction / ToggleProofTreeTooltipAction, MainWindow.createViewMenu
+        // :1042-1044): each persists the shared ViewSettings flag like the Swing actionPerformed
+        // implementations. The sequent view consults isShowSequentViewTooltips() in its tooltip
+        // code (SequentViewF.getTooltipText, SequentViewF.java:824-835), so the toggle needs no
+        // re-render; the proof tree re-creates its cell tooltips on refresh().
+        CheckMenuItem showSequentViewTooltips = new CheckMenuItem("Show Tooltips in Sequent View");
+        showSequentViewTooltips.setSelected(viewSettings.isShowSequentViewTooltips());
+        showSequentViewTooltips.setOnAction(
+            e -> viewSettings.setShowSequentViewTooltips(showSequentViewTooltips.isSelected()));
+        CheckMenuItem showSourceViewTooltips = new CheckMenuItem("Show Tooltips in Source View");
+        showSourceViewTooltips.setSelected(viewSettings.isShowSourceViewTooltips());
+        // menu: MP3a — no source view in the FX UI: the toggle only persists the flag (Swing
+        // ToggleSourceViewTooltipAction, ToggleSourceViewTooltipAction.java:58-62)
+        showSourceViewTooltips.setOnAction(
+            e -> viewSettings.setShowSourceViewTooltips(showSourceViewTooltips.isSelected()));
+        CheckMenuItem showProofTreeTooltips = new CheckMenuItem("Show Tooltips in Proof Tree");
+        showProofTreeTooltips.setSelected(viewSettings.isShowProofTreeTooltips());
+        showProofTreeTooltips.setOnAction(e -> {
+            viewSettings.setShowProofTreeTooltips(showProofTreeTooltips.isSelected());
+            // re-render the cells so the per-cell tooltip appears/disappears immediately (the
+            // cell tooltip consults the flag, see ProofTreeViewF.ProofTreeCell.updateItem)
+            proofTreeView.refresh();
+        });
+
+        // menu: MP3a — the Ctrl+P / Ctrl+U accelerators of the Swing KeyStrokeManager
+        // (KeyStrokeManagerF.registerDefaults) apply to the check items like to the plain
+        // menuItem() factory items.
+        KeyStrokeManagerF shortcuts = KeyStrokeManagerF.getInstance();
+        shortcuts.binding("de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction")
+                .ifPresent(prettyPrint::setAccelerator);
+        shortcuts.register(prettyPrint, "de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction");
+        shortcuts.binding("de.uka.ilkd.key.gui.actions.UnicodeToggleAction")
+                .ifPresent(unicode::setAccelerator);
+        shortcuts.register(unicode, "de.uka.ilkd.key.gui.actions.UnicodeToggleAction");
 
         ToggleGroup themeGroup = new ToggleGroup();
         RadioMenuItem lightTheme = new RadioMenuItem("Light Theme");
@@ -1599,6 +2152,12 @@ public final class MainWindowF {
             menuItem("Decrease", "de.uka.ilkd.key.gui.actions.DecreaseFontSizeAction",
                 IconFactoryF.Key.MINUS, () -> changeFontSize(-1)));
 
+        // menu: MP3a — ToolTip Options right after Font Size, before the diff frame, like Swing
+        // MainWindow.createViewMenu :1053 (ToolTipOptionsAction → ViewSelector,
+        // ToolTipOptionsAction.java:26 / ViewSelector.java:26-27).
+        MenuItem toolTipOptions = menuItem("ToolTip Options…",
+            "de.uka.ilkd.key.gui.actions.ToolTipOptionsAction", this::showToolTipOptions);
+
         // smalldialogs: the soundiness report (Swing ShowSoundinessAction, contributed to
         // the proof-list context menu by SoundinessExtension). The FX proof-list dockable
         // does not exist yet, so the action lives in the View menu; Swing
@@ -1608,8 +2167,45 @@ public final class MainWindowF {
         javafx.scene.control.MenuItem soundinessItem = menuItem("Show Soundiness Report",
             "de.uka.ilkd.key.gui.actions.ShowSoundinessAction", this::showSoundinessReport);
 
-        view.getItems().addAll(prettyPrint, unicode, syntaxHighlighting, new SeparatorMenuItem(),
-            themeMenu, fontSize, new SeparatorMenuItem(),
+        // menu: MP3b — end of the View menu, mirroring Swing MainWindow.createViewMenu
+        // :1057-1064: separator, Select Goal submenu (createSelectionMenu :1069-1074, the
+        // GoalSelectAboveAction / GoalSelectBelowAction call
+        // mainWindow.getProofTreeView().selectAbove()/selectBelow(),
+        // GoalSelectAboveAction.java:31-33), separator, Back/Forward over the SelectionHistory
+        // controller (SelectionBackAction/SelectionForwardAction, SelectionHistory.java), and a
+        // trailing separator. The Ctrl+K / Ctrl+J / Ctrl+Alt+Left / Ctrl+Alt+Right accelerators
+        // arrive via the actionIds from KeyStrokeManagerF.registerDefaults (:122-123, :134-135).
+        // The Select Goal items are proof-gated (Swing MainWindowAction enableWhenProofLoaded);
+        // Back/Forward are enabled purely by the history like the Swing actions.
+        Menu selectGoal = new Menu("Select Goal");
+        MenuItem goalSelectAbove = menuItem("Select Goal Above",
+            "de.uka.ilkd.key.gui.actions.GoalSelectAboveAction", this::selectGoalAbove);
+        goalSelectAbove.disableProperty().bind(proofLoaded.not());
+        MenuItem goalSelectBelow = menuItem("Select Goal Below",
+            "de.uka.ilkd.key.gui.actions.GoalSelectBelowAction", this::selectGoalBelow);
+        goalSelectBelow.disableProperty().bind(proofLoaded.not());
+        selectGoal.getItems().addAll(goalSelectAbove, goalSelectBelow);
+        MenuItem selectionBack = menuItem("Back",
+            "de.uka.ilkd.key.gui.actions.SelectionBackAction", IconFactoryF.Key.PREVIOUS,
+            selectionHistory::navigateBack);
+        selectionBack.disableProperty().bind(selectionHistory.canGoBackProperty().not());
+        MenuItem selectionForward = menuItem("Forward",
+            "de.uka.ilkd.key.gui.actions.SelectionForwardAction", IconFactoryF.Key.NEXT,
+            selectionHistory::navigateForward);
+        selectionForward.disableProperty().bind(selectionHistory.canGoForwardProperty().not());
+
+        view.getItems().addAll(prettyPrint, unicode, syntaxHighlighting);
+        // lemmaorigin: begin — term labels + origin tracking view controls (Swing TermLabelMenu /
+        // HidePackagePrefixToggleAction / OriginTermLabelsExt MainMenu items)
+        // menu: MP3a — moved to the Swing position right after Syntax Highlighting
+        // (MainWindow.createViewMenu :1040-1041 appends termLabelMenu and hidePackagePrefix before
+        // the tooltip toggles), so the View menu follows the Swing order
+        view.getItems().addAll(OriginLabelsF.install(this));
+        // lemmaorigin: end
+        view.getItems().addAll(showSequentViewTooltips, showSourceViewTooltips,
+            showProofTreeTooltips,
+            new SeparatorMenuItem(),
+            themeMenu, fontSize, toolTipOptions, new SeparatorMenuItem(),
             menuItem("Visual Node Diff", "de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame$Action",
                 this::showProofDiffFrame),
             new SeparatorMenuItem(),
@@ -1620,14 +2216,52 @@ public final class MainWindowF {
             // item (LogViewF.showInstance)
             menuItem("Log View", "de.uka.ilkd.key.gui.actions.LogViewAction",
                 this::showLogView),
-            soundinessItem);
-        // lemmaorigin: begin — term labels + origin tracking view controls (Swing TermLabelMenu /
-        // HidePackagePrefixToggleAction / OriginTermLabelsExt MainMenu items)
-        view.getItems().addAll(OriginLabelsF.install(this));
-        // lemmaorigin: end
+            soundinessItem,
+            new SeparatorMenuItem(), selectGoal, new SeparatorMenuItem(),
+            selectionBack, selectionForward, new SeparatorMenuItem());
         soundinessItem.disableProperty()
                 .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
         return view;
+    }
+
+    /**
+     * menu: MP3b — selects the next open goal above the current tree selection (Swing
+     * {@code GoalSelectAboveAction.actionPerformed} →
+     * {@code mainWindow.getProofTreeView().selectAbove()}, GoalSelectAboveAction.java:25-34).
+     */
+    private void selectGoalAbove() {
+        proofTreeView.selectAbove();
+    }
+
+    /**
+     * menu: MP3b — selects the next open goal below the current tree selection (Swing
+     * {@code GoalSelectBelowAction.actionPerformed} →
+     * {@code mainWindow.getProofTreeView().selectBelow()}, GoalSelectBelowAction.java:25-34).
+     */
+    private void selectGoalBelow() {
+        proofTreeView.selectBelow();
+    }
+
+    /**
+     * menu: MP3a — re-renders the sequent and goal list views after the Pretty Print / Unicode
+     * Symbols toggles (Swing {@code MainWindow.makePrettyView}, MainWindow.java:954-959: refresh
+     * the mediator's shared NotationInfo against the services and re-display the sequent). The FX
+     * views build their own NotationInfo per print (they do not use the mediator's shared
+     * instance yet) and expose the re-render as {@code refreshPrettyView} hooks; the goal list
+     * prints terms too, so it is refreshed the same way.
+     */
+    private void refreshPrettyViews() {
+        sequentView.refreshPrettyView();
+        goalListView.refreshPrettyView();
+    }
+
+    /**
+     * menu: MP3a — opens the tooltip options dialog (Swing {@code ToolTipOptionsAction},
+     * ToolTipOptionsAction.java:26, constructs the {@code ViewSelector}). The dialog edits the
+     * shared {@code ViewSettings} directly.
+     */
+    private void showToolTipOptions() {
+        ToolTipOptionsDialogF.show(stage);
     }
 
     /**
@@ -1648,32 +2282,564 @@ public final class MainWindowF {
         MenuItem stopAuto = menuItem("Stop Automatic Proof", IconFactoryF.Key.AUTO_MODE_STOP,
             mediator::stopAutoMode);
         stopAuto.disableProperty().bind(mediator.autoModeRunningProperty().not());
-        automation.getItems().addAll(startAuto, stopAuto);
+        // menu: MP2 — after Start/Stop Automatic Proof the Automation submenu mirrors the four
+        // proof-macro entries of Swing MainWindow.createAutomationActions (MainWindow.java:814-827,
+        // MacroAutomationAction.java:40-45), same order, item text = macro.getName(). The Swing
+        // icons (IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "A"|"S"|"P"|"J"),
+        // MainWindow.java:817-827) have no FX counterpart in IconFactoryF.Key, so the items pass
+        // null.
+        // The actionId is the FQN binding key of KeyStrokeManagerF.registerDefaults
+        // (KeyStrokeManagerF.java:83-84), so the existing Ctrl+V / Ctrl+D accelerators of
+        // FullAutoPilotProofMacro / AutoPilotPrepareProofMacro are wired automatically (that was
+        // the point of the key binding); DefaultAutoMacro and ScriptAwareMacro have no default
+        // binding but are still registered with the manager for settings-driven rebinding.
+        // Enablement binds to proofLoaded only — deliberately NO auto-mode lock: Swing keeps the
+        // macro actions enabled while auto mode runs so a click stops the automation
+        // (MacroAutomationAction.actionPerformed, MacroAutomationAction.java:48-61).
+        MenuItem defaultAuto = menuItem(new DefaultAutoMacro().getName(),
+            "de.uka.ilkd.key.macros.DefaultAutoMacro", null,
+            () -> runMacro(new DefaultAutoMacro()));
+        defaultAuto.disableProperty().bind(proofLoaded.not());
+        MenuItem structuredAuto = menuItem(new FullAutoPilotProofMacro().getName(),
+            "de.uka.ilkd.key.macros.FullAutoPilotProofMacro", null,
+            () -> runMacro(new FullAutoPilotProofMacro()));
+        structuredAuto.disableProperty().bind(proofLoaded.not());
+        MenuItem prepareAuto = menuItem(new AutoPilotPrepareProofMacro().getName(),
+            "de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro", null,
+            () -> runMacro(new AutoPilotPrepareProofMacro()));
+        prepareAuto.disableProperty().bind(proofLoaded.not());
+        MenuItem scriptAuto = menuItem(new ScriptAwareMacro().getName(),
+            "de.uka.ilkd.key.macros.ScriptAwareMacro", null,
+            () -> runMacro(new ScriptAwareMacro()));
+        scriptAuto.disableProperty().bind(proofLoaded.not());
+        automation.getItems().addAll(startAuto, stopAuto,
+            defaultAuto, structuredAuto, prepareAuto, scriptAuto);
+        // menu: MP1 — the entries after Prune Proof mirror Swing MainWindow.createProofMenu
+        // (MainWindow.java:1082-1142) with selected == null in the same order: Abandon Proof,
+        // separator, the search group (Search in Proof Tree/Sequent + Next/Previous + the
+        // Search Mode submenu), separator, then Show Used Contracts / Show All Active Settings /
+        // Show Proof Statistics / Show Known Types. The search group and the
+        // statistics/settings group are proof-gated via proofLoaded (Swing
+        // enableWhenProofLoaded on each action); Abandon Proof additionally carries the
+        // auto-mode lock (Swing AbandonTaskAction is enabled whenever a proof is loaded, but the
+        // removal of a running proof stops auto mode first — keep the lock like the other
+        // interaction actions).
+        // menu: Abandon Proof — Swing AbandonTaskAction (AbandonTaskAction.java:13-46), reused
+        // actionId so the Ctrl+W accelerator from KeyStrokeManagerF (defineDefault
+        // AbandonTaskAction
+        // = modifier()+W, KeyStrokeManagerF.java:117) is bound; enablement mirrored from
+        // enableWhenProofLoaded + the auto-mode lock.
+        MenuItem abandonProof = menuItem("Abandon Proof",
+            "de.uka.ilkd.key.gui.actions.AbandonTaskAction",
+            IconFactoryF.Key.CLOSE, this::abandonProof);
+        abandonProof.disableProperty()
+                .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
+        // menu: search group — Swing SearchInProofTreeAction / SearchInSequentAction /
+        // SearchNextAction / SearchPreviousAction (MainWindow.java:1121-1124) and the
+        // SearchModeChangeAction entries of the "Search Mode" submenu (:1125-1131). All bound
+        // only to proofLoaded (matches the FX read-only-action style: no auto-mode lock).
+        MenuItem searchInTree = menuItem("Search in Proof Tree",
+            "de.uka.ilkd.key.gui.actions.SearchInProofTreeAction",
+            IconFactoryF.Key.PROOF_TREE, proofTreeView::showSearchBar);
+        searchInTree.disableProperty().bind(proofLoaded.not());
+        MenuItem searchInSequent = menuItem("Search in Sequent",
+            "de.uka.ilkd.key.gui.actions.SearchInSequentAction",
+            IconFactoryF.Key.SEARCH, sequentView::showSearchBar);
+        searchInSequent.disableProperty().bind(proofLoaded.not());
+        MenuItem searchNext = menuItem("Search Next",
+            "de.uka.ilkd.key.gui.actions.SearchNextAction",
+            IconFactoryF.Key.NEXT, sequentView::searchNext);
+        searchNext.disableProperty().bind(proofLoaded.not());
+        MenuItem searchPrevious = menuItem("Search Previous",
+            "de.uka.ilkd.key.gui.actions.SearchPreviousAction",
+            IconFactoryF.Key.PREVIOUS, sequentView::searchPrevious);
+        searchPrevious.disableProperty().bind(proofLoaded.not());
+        Menu searchMode = new Menu("Search Mode");
+        for (SequentViewF.SearchMode mode : SequentViewF.SearchMode.values()) {
+            MenuItem modeItem = menuItem(mode.getDisplayName(),
+                () -> sequentView.setSearchMode(mode));
+            modeItem.disableProperty().bind(proofLoaded.not());
+            searchMode.getItems().add(modeItem);
+        }
+        // menu: statistics/settings group — Swing ShowUsedContractsAction (:1134,
+        // ProofManagementDialog with the selected proof preselected = openProofManagement()),
+        // ShowActiveSettingsAction (:1138, ActiveSettingsDialogF), ShowProofStatistics (:1139,
+        // ProofStatisticsDialogF) and ShowKnownTypesAction (:1140, KnownTypesDialogF). All
+        // proof-gated (Swing enableWhenProofLoaded).
+        MenuItem usedContracts = menuItem("Show Used Contracts",
+            "de.uka.ilkd.key.gui.actions.ShowUsedContractsAction",
+            this::openProofManagement);
+        usedContracts.disableProperty().bind(proofLoaded.not());
+        MenuItem activeSettings = menuItem("Show All Active Settings",
+            "de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction",
+            IconFactoryF.Key.CONFIGURE, this::showActiveSettings);
+        activeSettings.disableProperty().bind(proofLoaded.not());
+        MenuItem proofStatistics = menuItem("Show Proof Statistics",
+            "de.uka.ilkd.key.gui.actions.ShowProofStatistics",
+            IconFactoryF.Key.STATISTICS, this::showProofStatistics);
+        proofStatistics.disableProperty().bind(proofLoaded.not());
+        MenuItem knownTypes = menuItem("Show Known Types",
+            "de.uka.ilkd.key.gui.actions.ShowKnownTypesAction",
+            this::showKnownTypes);
+        knownTypes.disableProperty().bind(proofLoaded.not());
         proof.getItems().addAll(automation, new SeparatorMenuItem(),
             menuItem("Goal Back", "de.uka.ilkd.key.gui.actions.GoalBackAction",
                 IconFactoryF.Key.GOAL_BACK, mediator::goalBack),
             menuItem("Prune Proof", "de.uka.ilkd.key.gui.actions.PruneProofAction",
-                IconFactoryF.Key.PRUNE, mediator::pruneProof));
+                IconFactoryF.Key.PRUNE, mediator::pruneProof),
+            abandonProof, new SeparatorMenuItem(),
+            searchInTree, searchInSequent, searchNext, searchPrevious, searchMode,
+            new SeparatorMenuItem(),
+            usedContracts, activeSettings, proofStatistics, knownTypes);
         return proof;
+    }
+
+    // ------------------------------------------------------------------
+    // proof menu actions (menu: MP1 — Swing MainWindow.createProofMenu :1082-1142)
+    // ------------------------------------------------------------------
+
+    /**
+     * menu: MP2 — runs a proof macro on the selected node (Swing
+     * {@code MacroAutomationAction.actionPerformed}, MacroAutomationAction.java:48-61): while auto
+     * mode is running the click only stops it (Swing {@code proofControl.stopAutoMode()}, where
+     * {@code proofControl = mediator.getUI().getProofControl()}); otherwise the macro runs on the
+     * selected node ({@code new ProofMacroUserAction(mediator, macro, null).actionPerformed(e)}).
+     * The macro-finished notifications are produced by {@link WindowUserInterfaceControlF}
+     * (:380-398), which already reacts to the macro-sourced {@code ProofEvent}s.
+     */
+    private void runMacro(ProofMacro macro) {
+        if (mediator.isInAutoMode()) {
+            mediator.stopAutoMode(); // Swing: proofControl.stopAutoMode()
+        } else if (lastEnvironment != null) {
+            lastEnvironment.getProofControl().runMacro(mediator.getSelectedNode(), macro, null);
+        }
+    }
+
+    /**
+     * menu: abandons the selected proof (Swing {@code AbandonTaskAction.actionPerformed},
+     * AbandonTaskAction.java:33-46): asks for confirmation first (Swing
+     * {@code confirmTaskRemoval("Are you sure?")}, a YES/NO dialog titled "Abandon Proof",
+     * WindowUserInterfaceControl.java:341-345), stops auto mode if the proof is being proved
+     * automatically, disposes the proof and resets the UI to its "no proof" state.
+     */
+    private void abandonProof() {
+        Proof proof = selectionModel.getSelectedProof();
+        if (proof == null) {
+            return; // the item is disabled without a proof (Swing enableWhenProofLoaded)
+        }
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure?");
+        alert.setTitle("Abandon Proof");
+        alert.setHeaderText(null);
+        alert.initOwner(stage);
+        ExampleChooserF.themeDialogPane(alert);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            return; // Swing: confirmTaskRemoval returns false on No/close
+        }
+        // menu: stop auto mode through the window's proof control if a run is active (Swing
+        // getMediator().getUI().getProofControl().stopAutoMode()); lastEnvironment is the loaded
+        // env of the selection (like the other proof-dependent flows, see :603-622)
+        if (mediator.isInAutoMode() && lastEnvironment != null) {
+            lastEnvironment.getProofControl().stopAutoMode();
+        }
+        // menu: unregister from the multi-proof state (Swing TaskTree.removeProof on abandon,
+        // TaskTree.java:241-267; ProofManagerF.removeProof was provided for exactly this caller)
+        proofManager.removeProof(proof);
+        proof.dispose();
+        // menu: reset the UI to the "no proof" state — the selection model supports a null
+        // selection (KeYSelectionModel.setSelectedProof(null) nulls the selection and fires
+        // selectedProofChanged, KeYSelectionModel.java:89-115); updateProofStatus then sets
+        // proofLoaded=false, which re-enables the proof-gated menu items
+        selectionModel.setSelectedProof(null);
+        NotificationManagerF.getInstance().notify("Proof abandoned.", Kind.INFO);
+    }
+
+    /**
+     * menu: opens the active settings of the selected proof (Swing
+     * {@code ShowActiveSettingsAction.actionPerformed}, ShowActiveSettingsAction.java:32-47: the
+     * "All active settings" {@code ViewSettingsDialog} over the {@code SettingsTreeModel}).
+     */
+    private void showActiveSettings() {
+        Proof proof = selectionModel.getSelectedProof();
+        if (proof == null) {
+            return; // the item is disabled without a proof (Swing enableWhenProofLoaded)
+        }
+        ActiveSettingsDialogF.show(stage, proof);
+    }
+
+    /**
+     * menu: shows the statistics of the selected proof (Swing
+     * {@code ShowProofStatistics.actionPerformed}, ShowProofStatistics.java:69-78: non-modal
+     * {@code Proof Statistics} window).
+     */
+    private void showProofStatistics() {
+        Proof proof = selectionModel.getSelectedProof();
+        if (proof == null) {
+            return; // the item is disabled without a proof (Swing enableWhenProofLoaded)
+        }
+        ProofStatisticsDialogF.show(stage, proof);
+    }
+
+    /**
+     * menu: shows the type hierarchy known to the selected proof (Swing
+     * {@code ShowKnownTypesAction.showTypeHierarchy}, ShowKnownTypesAction.java:47-83: the modal
+     * "Known types for this proof" dialog with the {@code ClassTree} of the proof's services).
+     */
+    private void showKnownTypes() {
+        Proof proof = selectionModel.getSelectedProof();
+        if (proof == null) {
+            return; // the item is disabled without a proof (Swing enableWhenProofLoaded)
+        }
+        KnownTypesDialogF.show(stage, proof);
+    }
+
+    // menu: MP1/MP2 — expected entries of the Proof menu (system property
+    // {@code key.fx.verify.menuparity}; MainWindow.createProofMenu :1082-1142, and the
+    // Automation submenu entries of MainWindow.createAutomationActions :814-827 since MP2).
+    // Table rows are leaf items, plain separators (the {@code "---"} row) or submenu names whose
+    // own children are checked recursively; MP4/MP5 can extend the tables for the other menus.
+    private static final String[][] PROOF_MENU_EXPECTED = {
+        { "Automation", "Start Automatic Proof", "Stop Automatic Proof", "Full Automation",
+            "Structured Automation", "Structured Automation (Prep. Only)",
+            "Script-aware Auto" },
+        { "Goal Back" },
+        { "Prune Proof" },
+        { "Abandon Proof" },
+        { "---" },
+        { "Search in Proof Tree" },
+        { "Search in Sequent" },
+        { "Search Next" },
+        { "Search Previous" },
+        { "Search Mode", "Highlight", "Hide", "Regroup" },
+        { "---" },
+        { "Show Used Contracts" },
+        { "Show All Active Settings" },
+        { "Show Proof Statistics" },
+        { "Show Known Types" },
+    };
+
+    // menu: MP3c — expected View menu entries in the Swing order of MainWindow.createViewMenu
+    // (:985-1064; Select Goal children from createSelectionMenu :1069-1074). The FX-only extras
+    // between the parity entries (OriginLabelsF cluster, Theme, Font Size, Layout, Log View,
+    // Soundiness, plain separators) are not listed: the walker skips unlisted built entries and
+    // only asserts that the listed ones occur in this relative order.
+    private static final String[][] VIEW_MENU_EXPECTED = {
+        { "Pretty Print" },
+        { "Unicode Symbols" },
+        { "Syntax Highlighting" },
+        { "Show Tooltips in Sequent View" },
+        { "Show Tooltips in Source View" },
+        { "Show Tooltips in Proof Tree" },
+        { "ToolTip Options…" },
+        { "Select Goal", "Select Goal Above", "Select Goal Below" },
+        { "Back" },
+        { "Forward" },
+    };
+
+    // menu: MP4 — expected Options menu entries in the Swing order of MainWindow.createOptionsMenu
+    // (:1144-1161: Settings, SMT Solvers…, ─sep─, Confirm Exit, Auto Save Proofs, Minimize
+    // Interaction, Right Click for Proof Macros, Ensure Source Consistency). The FX-only extras
+    // between the parity entries ("Reset Dock Layout" and the two plain separators) are not
+    // listed: the walker skips unlisted built entries and only asserts that the listed ones
+    // occur in this relative order.
+    private static final String[][] OPTIONS_MENU_EXPECTED = {
+        { "Settings" },
+        { "SMT Solvers…" },
+        { "Confirm Exit" },
+        { "Auto Save Proofs" },
+        { "Minimize Interaction" },
+        { "Right Click for Proof Macros" },
+        { "Ensure Source Consistency" },
+    };
+
+    // menu: MP5 — expected File menu entries in the FX order after the MP5 inserts (the Swing
+    // {@code MainWindow.createFileMenu} :991-1031 order with the port's existing grouping:
+    // example/open/reload/edit-last-opened | proof mgmt/load-taclets/Prove | save/quick |
+    // recent | exit). The three Prove submenu entries are the always-present ones; "Run All
+    // Proofs" sits behind the BULK_UI_TEST feature flag (off by default) and is therefore not
+    // part of the table.
+    private static final String[][] FILE_MENU_EXPECTED = {
+        { "Open Example…" },
+        { "Open File…" },
+        { "Reload" },
+        { "Edit Last Opened File" },
+        { "Proof Management…" },
+        { "Load User Defined Taclets…" },
+        { "Prove", "Load User Defined Taclets for Proving", "Load KeY Taclets",
+            "Lemma Generation (Batch Mode)" },
+        { "Save File…" },
+        { "Save Bundle…" },
+        { "Quick Save" },
+        { "Quick Load" },
+        { "Recent Files" },
+        { "Exit" },
+    };
+
+    // menu: MP5 — expected About menu entries in the Swing order of MainWindow.createHelpMenu
+    // (:1163-1174).
+    private static final String[][] ABOUT_MENU_EXPECTED = {
+        { "About KeY…" },
+        { "KeY Homepage" },
+        { "Send Feedback…" },
+        { "Create Github Issue" },
+        { "License…" },
+    };
+
+    /**
+     * menu: MP1/MP3/MP4/MP5 — menu parity self test (system property
+     * {@code key.fx.verify.menuparity},
+     * run after a proof load like the other verify hooks): builds the menu bar and emits one
+     * marker line per asserted menu, each ending in PASS or FAIL.
+     */
+    private void verifyMenuParity() {
+        logMenuParity("Proof", verifyMenuParityReport("Proof", PROOF_MENU_EXPECTED));
+        logMenuParity("View", verifyMenuParityReport("View", VIEW_MENU_EXPECTED));
+        logMenuParity("Options", verifyMenuParityReport("Options", OPTIONS_MENU_EXPECTED));
+        logMenuParity("File", verifyMenuParityReport("File", FILE_MENU_EXPECTED));
+        logMenuParity("About", verifyMenuParityReport("About", ABOUT_MENU_EXPECTED));
+    }
+
+    private void logMenuParity(String menuName, String report) {
+        LOGGER.info("Menu parity verification ({}): {}", menuName, report);
+        NotificationManagerF.getInstance()
+                .notify("Menu parity verification (" + menuName + "): " + report,
+                    report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+    }
+
+    /**
+     * menu: builds the {@link #buildMenuBar() menu bar} and checks the Proof menu entries
+     * (compatibility entry point: same table and report as the Proof part of
+     * {@link #verifyMenuParity()}).
+     *
+     * @return {@code "PASS - <n> items, found: <comma list>"} or
+     *         {@code "FAIL - missing: <list>"}
+     */
+    String verifyMenuParityReport() {
+        return verifyMenuParityReport("Proof", PROOF_MENU_EXPECTED);
+    }
+
+    /**
+     * menu: builds the {@link #buildMenuBar() menu bar} and checks one menu against an expected
+     * table. A row may be a leaf item, a plain separator (the {@code "---"} row) or a submenu
+     * name ({@code "Search Mode"}) whose own children are checked recursively, in their order.
+     * Built entries that are not listed in the table are skipped.
+     *
+     * @return {@code "PASS - <n> items, found: <comma list>"} or
+     *         {@code "FAIL - missing: <list>"}
+     */
+    String verifyMenuParityReport(String menuName, String[][] expected) {
+        MenuBar menuBar = buildMenuBar();
+        Menu menu = menuBar.getMenus().stream().filter(m -> menuName.equals(m.getText()))
+                .findFirst().orElse(null);
+        if (menu == null) {
+            return "FAIL - missing: <" + menuName + " menu>";
+        }
+        List<String> present = new ArrayList<>();
+        List<String> missing = new ArrayList<>();
+        List<MenuItem> remaining = new ArrayList<>(menu.getItems());
+        for (String[] row : expected) {
+            String label = row[0];
+            if ("---".equals(label)) {
+                // a separator has no text; match the control type directly
+                int sepIndex = -1;
+                for (int i = 0; i < remaining.size(); i++) {
+                    if (remaining.get(i) instanceof SeparatorMenuItem) {
+                        sepIndex = i;
+                        break;
+                    }
+                }
+                if (sepIndex < 0) {
+                    missing.add("separator");
+                } else {
+                    present.add("separator");
+                    remaining = new ArrayList<>(
+                        remaining.subList(sepIndex + 1, remaining.size()));
+                }
+                continue;
+            }
+            int index = indexOfItem(remaining, label);
+            if (index < 0) {
+                missing.add(label);
+                continue;
+            }
+            present.add(label);
+            MenuItem node = remaining.get(index);
+            if (node instanceof Menu submenu && row.length > 1) {
+                // check the submenu's entries in their order (e.g. Automation, Search Mode,
+                // Select Goal)
+                List<MenuItem> children = new ArrayList<>(submenu.getItems());
+                for (int i = 1; i < row.length; i++) {
+                    int childIndex = indexOfItem(children, row[i]);
+                    if (childIndex < 0) {
+                        missing.add(label + " > " + row[i]);
+                    } else {
+                        present.add(label + " > " + row[i]);
+                        children = new ArrayList<>(
+                            children.subList(childIndex + 1, children.size()));
+                    }
+                }
+            }
+            remaining = new ArrayList<>(remaining.subList(index + 1, remaining.size()));
+        }
+        String found = String.join(", ", present);
+        if (missing.isEmpty()) {
+            return "PASS - " + present.size() + " items, found: " + found;
+        }
+        return "FAIL - missing: " + String.join(", ", missing) + " (found " + found + ")";
+    }
+
+    /** menu: index of the first remaining menu item with the given text, or -1. */
+    private static int indexOfItem(List<MenuItem> items, String text) {
+        for (int i = 0; i < items.size(); i++) {
+            MenuItem item = items.get(i);
+            if (text.equals(item.getText())) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private Menu buildOptionsMenu() {
         Menu options = new Menu("Options");
+        // menu: MP4 — Swing MainWindow.createOptionsMenu :1144-1161: Settings, SMT Solvers…
+        // (SMTOptionsAction → settings dialog on the SMT panel), separator, then the five check
+        // items; the FX-only "Reset Dock Layout" extra is kept between two separators (Settings,
+        // SMT Solvers…, ─sep─, Reset Dock Layout, ─sep─, Confirm Exit, Auto Save Proofs,
+        // Minimize Interaction, Right Click for Proof Macros, Ensure Source Consistency).
         options.getItems().addAll(
             menuItem("Settings",
                 "de.uka.ilkd.key.gui.settings.SettingsManager$ShowSettingsAction",
                 IconFactoryF.Key.CONFIGURE, this::openSettings),
+            menuItem("SMT Solvers…", "de.uka.ilkd.key.gui.actions.SMTOptionsAction",
+                IconFactoryF.Key.TOOLBOX, this::showSMTOptions),
             new SeparatorMenuItem(),
             menuItem("Reset Dock Layout", this::resetLayout),
-            menuItem("SMT Solvers…", IconFactoryF.Key.TOOLBOX, this::notYetImplemented));
+            new SeparatorMenuItem(),
+            confirmExitToggle(),
+            autoSaveProofsToggle(),
+            minimizeInteractionToggle(),
+            rightClickMacroToggle(),
+            ensureSourceConsistencyToggle());
         return options;
     }
 
+    /**
+     * menu: MP4 — SMT Solvers… opens the settings dialog on the SMT panel (Swing
+     * SMTOptionsAction, SMTOptionsAction.java:27-28: {@code
+     * SettingsManager.getInstance().showSettingsDialog(mainWindow, SettingsManager.SMT_SETTINGS)};
+     * here the provider registered as {@link SettingsManagerF#SMT_SETTINGS} is selected in the
+     * settings tree, SettingsManagerF.java:169-177).
+     */
+    private void showSMTOptions() {
+        SettingsManagerF.getInstance().showSettingsDialog(this, SettingsManagerF.SMT_SETTINGS);
+    }
+
+    /**
+     * menu: MP4 — Confirm Exit check item (Swing ToggleConfirmExitAction,
+     * ToggleConfirmExitAction.java:20-31): the selected state mirrors
+     * {@code ViewSettings.confirmExit()} and the action writes it back.
+     */
+    private CheckMenuItem confirmExitToggle() {
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        CheckMenuItem item = new CheckMenuItem("Confirm Exit");
+        item.setSelected(vs.confirmExit());
+        item.setOnAction(e -> vs.setConfirmExit(item.isSelected()));
+        return item;
+    }
+
+    /**
+     * menu: MP4 — Auto Save Proofs check item (Swing {@code AutoSave},
+     * AutoSave.java:14-33): the initial state is {@code autoSavePeriod() > 0} (AutoSave.java:22-24)
+     * and the action writes {@code setAutoSave(2000)} / {@code setAutoSave(0)}
+     * (AutoSave.java:29-31;
+     * Swing {@code AutoSave.DEFAULT_PERIOD = 2000}, AutoSave.java:16 — key.ui, not importable into
+     * this module, hence the inlined constant).
+     * // menu: auto-save timer wiring deferred (no FX mediator support): Swing additionally calls
+     * getMediator().setAutoSave(p) (AutoSave.java:31); the FX KeYMediatorF has no setAutoSave, so
+     * only the persisted flag is written.
+     */
+    private CheckMenuItem autoSaveProofsToggle() {
+        GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+        CheckMenuItem item = new CheckMenuItem("Auto Save Proofs");
+        item.setSelected(gs.autoSavePeriod() > 0);
+        item.setOnAction(
+            e -> gs.setAutoSave(item.isSelected() ? DEFAULT_AUTO_SAVE_PERIOD : 0));
+        return item;
+    }
+
+    /** menu: MP4 — Swing {@code AutoSave.DEFAULT_PERIOD} (key.ui), see autoSaveProofsToggle(). */
+    private static final int DEFAULT_AUTO_SAVE_PERIOD = 2000;
+
+    /**
+     * menu: MP4 — Minimize Interaction check item (Swing {@code MinimizeInteraction},
+     * MinimizeInteraction.java:17-73, display name "Minimize Interaction"): the selected state
+     * mirrors and writes the {@code GeneralSettings} taclet filter.
+     * // menu: the FX context-menu filter wiring for this flag is deferred — Swing additionally
+     * applies a taclet filter on the current goal view via
+     * mainWindow.getUserInterface().getProofControl().setMinimizeInteraction(b)
+     * (MinimizeInteraction.java:64-66); only the flag is persisted here.
+     */
+    private CheckMenuItem minimizeInteractionToggle() {
+        GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+        CheckMenuItem item = new CheckMenuItem("Minimize Interaction");
+        item.setSelected(gs.getTacletFilter());
+        item.setOnAction(e -> gs.setTacletFilter(item.isSelected()));
+        return item;
+    }
+
+    /**
+     * menu: MP4 — Right Click for Proof Macros check item (Swing RightMouseClickToggleAction,
+     * RightMouseClickToggleAction.java:22-33): the selected state mirrors
+     * {@code GeneralSettings.isRightClickMacro()} and the action writes
+     * {@code setRightClickMacros} back.
+     * // menu: Swing's direct-macro-on-right-click behavior is deferred — the FX right click
+     * currently always opens the term context menu; only the flag persists here.
+     */
+    private CheckMenuItem rightClickMacroToggle() {
+        GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+        CheckMenuItem item = new CheckMenuItem("Right Click for Proof Macros");
+        item.setSelected(gs.isRightClickMacro());
+        item.setOnAction(e -> gs.setRightClickMacros(item.isSelected()));
+        return item;
+    }
+
+    /**
+     * menu: MP4 — Ensure Source Consistency check item (Swing
+     * EnsureSourceConsistencyToggleAction, EnsureSourceConsistencyToggleAction.java:37-48): the
+     * selected state mirrors {@code GeneralSettings.isEnsureSourceConsistency()} and the action
+     * writes {@code setEnsureSourceConsistency} back.
+     * // menu: Swing's info dialog is dropped — the FX port has no source-consistency machinery
+     * (no proof-bundle/source-cache backend); only the flag persists for now.
+     */
+    private CheckMenuItem ensureSourceConsistencyToggle() {
+        GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+        CheckMenuItem item = new CheckMenuItem("Ensure Source Consistency");
+        item.setSelected(gs.isEnsureSourceConsistency());
+        item.setOnAction(e -> gs.setEnsureSourceConsistency(item.isSelected()));
+        return item;
+    }
+
+    /**
+     * menu: MP5 — the About menu in the Swing order of {@code MainWindow.createHelpMenu}
+     * (:1163-1174): About KeY, KeY Homepage, Send Feedback, Create Github Issue, License. The
+     * browser actions go through the {@link HelpFacadeF} browser seam (host services); the
+     * feedback dialog is the minimal {@link FeedbackDialogF} port of the Swing
+     * {@code SendFeedbackAction}.
+     */
     private Menu buildAboutMenu() {
         Menu about = new Menu("About");
         about.getItems().addAll(
-            menuItem("License…", IconFactoryF.Key.INFO_VIEW, this::showLicense),
-            menuItem("About KeY…", this::showAbout));
+            menuItem("About KeY…", "de.uka.ilkd.key.gui.actions.AboutAction", this::showAbout),
+            menuItem("KeY Homepage",
+                "de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction",
+                () -> HelpFacadeF.openExternal(KEY_PROJECT_URL)),
+            menuItem("Send Feedback…", "de.uka.ilkd.key.gui.actions.MenuSendFeedackAction",
+                () -> FeedbackDialogF.show(stage)),
+            menuItem("Create Github Issue",
+                "de.uka.ilkd.key.gui.actions.CreateGithubIssueAction",
+                () -> HelpFacadeF.openExternal(GITHUB_ISSUE_URL)),
+            menuItem("License…", "de.uka.ilkd.key.gui.actions.LicenseAction",
+                IconFactoryF.Key.INFO_VIEW, this::showLicense));
         return about;
     }
 
