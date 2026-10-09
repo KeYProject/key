@@ -38,6 +38,9 @@ import org.key_project.util.javafx.FxUtil;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.kordamp.ikonli.fontawesome6.FontAwesomeRegular;
+import org.kordamp.ikonli.fontawesome6.FontAwesomeSolid;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 /**
  * JavaFX port of the Swing {@code
@@ -52,11 +55,9 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * <b>KNOWN-SIMPLIFIED:</b>
  * <ul>
- * <li>The Swing panel contributes a help button to its tab title via {@code getTitleCActions()}
- * ({@code HelpFacade.createHelpButton}); the FX tab model has no title-action seam, the button is
- * dropped.</li>
- * <li>The Swing {@code Icons} class is AWT/Swing-bound — the status indicator uses the unicode
- * glyphs {@code ◆}/{@code ◇} instead of the icon images.</li>
+ * <li>The Swing {@code Icons} class is AWT/Swing-bound — the tab title's help button is not
+ * ported; the status indicator uses ikonli FontAwesome glyphs (solid vs. regular compass,
+ * mirroring {@code Icons.EXPLORE}/{@code Icons.EXPLORE_DISABLE}) instead of the icon images.</li>
  * <li>Pruning goes through {@code MainWindowF.getUserInterfaceControl().getProofControl()} (the
  * FX counterpart of the Swing {@code mediator.getUI().getProofControl()}).</li>
  * </ul>
@@ -65,13 +66,15 @@ import org.jspecify.annotations.Nullable;
 final class ExplorationStepsPanelF extends VBox {
 
     /**
-     * status-line indicator glyphs (KNOWN-SIMPLIFIED: unicode instead of the Swing {@code Icons})
+     * status-line indicator icons (ikonli FontAwesome): the solid compass marks a proof with
+     * exploration steps, the regular (outline) compass an empty one — the Swing
+     * {@code Icons.EXPLORE}/{@code Icons.EXPLORE_DISABLE} pair
      */
-    private static final String GLYPH_HAS_STEPS = "\u25C6"; // ◆
-    private static final String GLYPH_NO_STEPS = "\u25C7"; // ◇
+    private final FontIcon hasStepsIcon = new FontIcon(FontAwesomeSolid.COMPASS);
+    private final FontIcon noStepsIcon = new FontIcon(FontAwesomeRegular.COMPASS);
 
     /** the singleton status-line indicator label (Swing {@code hasExplorationSteps}) */
-    private final Label hasExplorationSteps = new Label(GLYPH_NO_STEPS);
+    private final Label hasExplorationSteps = new Label(null, noStepsIcon);
     /** the list of exploration nodes in traversal order (Swing {@code listModelExploration}) */
     private final ObservableList<Node> listModelExploration = FXCollections.observableArrayList();
     private final ListView<Node> listExplorations = new ListView<>(listModelExploration);
@@ -349,11 +352,11 @@ final class ExplorationStepsPanelF extends VBox {
 
     private void updateLabel() {
         if (listModelExploration.isEmpty()) {
-            hasExplorationSteps.setText(GLYPH_NO_STEPS);
+            hasExplorationSteps.setGraphic(noStepsIcon);
             hasExplorationSteps.setTooltip(new Tooltip(
                 "The current proof does not contain any exploratory proof steps."));
         } else {
-            hasExplorationSteps.setText(GLYPH_HAS_STEPS);
+            hasExplorationSteps.setGraphic(hasStepsIcon);
             hasExplorationSteps.setTooltip(new Tooltip(
                 "The current proof contains exploratory proof steps."));
         }
