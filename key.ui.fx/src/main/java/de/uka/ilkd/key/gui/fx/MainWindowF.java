@@ -220,6 +220,13 @@ public final class MainWindowF {
     private final GoalListViewF goalListView = new GoalListViewF();
 
     /**
+     * menu: MP3b — the selection history backing the View menu Back / Forward actions (Swing
+     * {@code MainWindow.selectionHistory}, {@code new SelectionHistory(mediator)}): traces the
+     * user-selected proof nodes and exposes the Back/Forward enablement as JavaFX properties.
+     */
+    private final SelectionHistoryF selectionHistory = new SelectionHistoryF(selectionModel);
+
+    /**
      * The strategy selection view (first M2 version): settings-definition-driven control panel
      * writing through to the selected proof's strategy settings.
      */
@@ -1699,6 +1706,33 @@ public final class MainWindowF {
         javafx.scene.control.MenuItem soundinessItem = menuItem("Show Soundiness Report",
             "de.uka.ilkd.key.gui.actions.ShowSoundinessAction", this::showSoundinessReport);
 
+        // menu: MP3b — end of the View menu, mirroring Swing MainWindow.createViewMenu
+        // :1057-1064: separator, Select Goal submenu (createSelectionMenu :1069-1074, the
+        // GoalSelectAboveAction / GoalSelectBelowAction call
+        // mainWindow.getProofTreeView().selectAbove()/selectBelow(),
+        // GoalSelectAboveAction.java:31-33), separator, Back/Forward over the SelectionHistory
+        // controller (SelectionBackAction/SelectionForwardAction, SelectionHistory.java), and a
+        // trailing separator. The Ctrl+K / Ctrl+J / Ctrl+Alt+Left / Ctrl+Alt+Right accelerators
+        // arrive via the actionIds from KeyStrokeManagerF.registerDefaults (:122-123, :134-135).
+        // The Select Goal items are proof-gated (Swing MainWindowAction enableWhenProofLoaded);
+        // Back/Forward are enabled purely by the history like the Swing actions.
+        Menu selectGoal = new Menu("Select Goal");
+        MenuItem goalSelectAbove = menuItem("Select Goal Above",
+            "de.uka.ilkd.key.gui.actions.GoalSelectAboveAction", this::selectGoalAbove);
+        goalSelectAbove.disableProperty().bind(proofLoaded.not());
+        MenuItem goalSelectBelow = menuItem("Select Goal Below",
+            "de.uka.ilkd.key.gui.actions.GoalSelectBelowAction", this::selectGoalBelow);
+        goalSelectBelow.disableProperty().bind(proofLoaded.not());
+        selectGoal.getItems().addAll(goalSelectAbove, goalSelectBelow);
+        MenuItem selectionBack = menuItem("Back",
+            "de.uka.ilkd.key.gui.actions.SelectionBackAction", IconFactoryF.Key.PREVIOUS,
+            selectionHistory::navigateBack);
+        selectionBack.disableProperty().bind(selectionHistory.canGoBackProperty().not());
+        MenuItem selectionForward = menuItem("Forward",
+            "de.uka.ilkd.key.gui.actions.SelectionForwardAction", IconFactoryF.Key.NEXT,
+            selectionHistory::navigateForward);
+        selectionForward.disableProperty().bind(selectionHistory.canGoForwardProperty().not());
+
         view.getItems().addAll(prettyPrint, unicode, syntaxHighlighting);
         // lemmaorigin: begin — term labels + origin tracking view controls (Swing TermLabelMenu /
         // HidePackagePrefixToggleAction / OriginTermLabelsExt MainMenu items)
@@ -1721,10 +1755,30 @@ public final class MainWindowF {
             // item (LogViewF.showInstance)
             menuItem("Log View", "de.uka.ilkd.key.gui.actions.LogViewAction",
                 this::showLogView),
-            soundinessItem);
+            soundinessItem,
+            new SeparatorMenuItem(), selectGoal, new SeparatorMenuItem(),
+            selectionBack, selectionForward, new SeparatorMenuItem());
         soundinessItem.disableProperty()
                 .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
         return view;
+    }
+
+    /**
+     * menu: MP3b — selects the next open goal above the current tree selection (Swing
+     * {@code GoalSelectAboveAction.actionPerformed} →
+     * {@code mainWindow.getProofTreeView().selectAbove()}, GoalSelectAboveAction.java:25-34).
+     */
+    private void selectGoalAbove() {
+        proofTreeView.selectAbove();
+    }
+
+    /**
+     * menu: MP3b — selects the next open goal below the current tree selection (Swing
+     * {@code GoalSelectBelowAction.actionPerformed} →
+     * {@code mainWindow.getProofTreeView().selectBelow()}, GoalSelectBelowAction.java:25-34).
+     */
+    private void selectGoalBelow() {
+        proofTreeView.selectBelow();
     }
 
     /**
