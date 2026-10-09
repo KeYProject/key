@@ -92,6 +92,7 @@ import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeViewF;
 import de.uka.ilkd.key.gui.fx.recentfiles.RecentFilesF;
 import de.uka.ilkd.key.gui.fx.settings.ActiveSettingsDialogF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsManagerF;
+import de.uka.ilkd.key.gui.fx.settings.ToolTipOptionsDialogF;
 import de.uka.ilkd.key.gui.fx.soundiness.SoundinessAnalyzer;
 import de.uka.ilkd.key.gui.fx.soundiness.SoundinessDialogF;
 import de.uka.ilkd.key.gui.fx.sourceview.SourceViewF;
@@ -105,6 +106,7 @@ import de.uka.ilkd.key.macros.DefaultAutoMacro;
 import de.uka.ilkd.key.macros.FullAutoPilotProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ScriptAwareMacro;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -1583,13 +1585,81 @@ public final class MainWindowF {
 
     private Menu buildViewMenu() {
         Menu view = new Menu("View");
-        // placeholder toggles; wired to the real views in M2
+        // menu: MP3a — Pretty Print toggle (Swing PrettyPrintToggleAction,
+        // PrettyPrintToggleAction.java:45-59): updateSelectedState mirrors the settings into the
+        // NotationInfo static and the selected state; actionPerformed sets the static BEFORE the
+        // ViewSettings are modified, because the UI reacts on the settings change event (the
+        // printers consult the static at construction). The re-render mirrors
+        // MainWindow.makePrettyView (MainWindow.java:954-959).
+        ViewSettings viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         CheckMenuItem prettyPrint = new CheckMenuItem("Pretty Print");
+        NotationInfo.DEFAULT_PRETTY_SYNTAX = viewSettings.isUsePretty();
+        prettyPrint.setSelected(viewSettings.isUsePretty());
+        prettyPrint.setOnAction(e -> {
+            boolean selected = prettyPrint.isSelected();
+            // Swing: "Needs to be executed before the ViewSettings are modified, because the UI
+            // will react on the settings change event!" (PrettyPrintToggleAction.java:55-57)
+            NotationInfo.DEFAULT_PRETTY_SYNTAX = selected;
+            viewSettings.setUsePretty(selected);
+            refreshPrettyViews();
+        });
+        // menu: MP3a — Unicode toggle (Swing UnicodeToggleAction, UnicodeToggleAction.java:47-69):
+        // only meaningful in combination with pretty printing (updateSelectedState:
+        // setEnabled(usePretty), setSelected(useUnicode && usePretty)); the disable binding
+        // replaces Swing's setEnabled(usePretty).
         CheckMenuItem unicode = new CheckMenuItem("Unicode Symbols");
+        unicode.setSelected(viewSettings.isUseUnicode() && viewSettings.isUsePretty());
+        unicode.setDisable(!viewSettings.isUsePretty());
+        unicode.disableProperty().bind(prettyPrint.selectedProperty().not());
+        unicode.setOnAction(e -> {
+            boolean selected = unicode.isSelected();
+            boolean pretty = viewSettings.isUsePretty();
+            // before the ViewSettings are modified, like the Swing original
+            // (UnicodeToggleAction.java:63)
+            NotationInfo.DEFAULT_UNICODE_ENABLED = selected && pretty;
+            viewSettings.setUseUnicode(selected);
+            refreshPrettyViews();
+        });
         CheckMenuItem syntaxHighlighting = new CheckMenuItem("Syntax Highlighting");
         syntaxHighlighting.setSelected(sequentView.isSyntaxHighlightingEnabled());
         syntaxHighlighting.setOnAction(
             e -> sequentView.setSyntaxHighlightingEnabled(syntaxHighlighting.isSelected()));
+
+        // menu: MP3a — tooltip toggles (Swing ToggleSequentViewTooltipAction /
+        // ToggleSourceViewTooltipAction / ToggleProofTreeTooltipAction, MainWindow.createViewMenu
+        // :1042-1044): each persists the shared ViewSettings flag like the Swing actionPerformed
+        // implementations. The sequent view consults isShowSequentViewTooltips() in its tooltip
+        // code (SequentViewF.getTooltipText, SequentViewF.java:824-835), so the toggle needs no
+        // re-render; the proof tree re-creates its cell tooltips on refresh().
+        CheckMenuItem showSequentViewTooltips = new CheckMenuItem("Show Tooltips in Sequent View");
+        showSequentViewTooltips.setSelected(viewSettings.isShowSequentViewTooltips());
+        showSequentViewTooltips.setOnAction(
+            e -> viewSettings.setShowSequentViewTooltips(showSequentViewTooltips.isSelected()));
+        CheckMenuItem showSourceViewTooltips = new CheckMenuItem("Show Tooltips in Source View");
+        showSourceViewTooltips.setSelected(viewSettings.isShowSourceViewTooltips());
+        // menu: MP3a — no source view in the FX UI: the toggle only persists the flag (Swing
+        // ToggleSourceViewTooltipAction, ToggleSourceViewTooltipAction.java:58-62)
+        showSourceViewTooltips.setOnAction(
+            e -> viewSettings.setShowSourceViewTooltips(showSourceViewTooltips.isSelected()));
+        CheckMenuItem showProofTreeTooltips = new CheckMenuItem("Show Tooltips in Proof Tree");
+        showProofTreeTooltips.setSelected(viewSettings.isShowProofTreeTooltips());
+        showProofTreeTooltips.setOnAction(e -> {
+            viewSettings.setShowProofTreeTooltips(showProofTreeTooltips.isSelected());
+            // re-render the cells so the per-cell tooltip appears/disappears immediately (the
+            // cell tooltip consults the flag, see ProofTreeViewF.ProofTreeCell.updateItem)
+            proofTreeView.refresh();
+        });
+
+        // menu: MP3a — the Ctrl+P / Ctrl+U accelerators of the Swing KeyStrokeManager
+        // (KeyStrokeManagerF.registerDefaults) apply to the check items like to the plain
+        // menuItem() factory items.
+        KeyStrokeManagerF shortcuts = KeyStrokeManagerF.getInstance();
+        shortcuts.binding("de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction")
+                .ifPresent(prettyPrint::setAccelerator);
+        shortcuts.register(prettyPrint, "de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction");
+        shortcuts.binding("de.uka.ilkd.key.gui.actions.UnicodeToggleAction")
+                .ifPresent(unicode::setAccelerator);
+        shortcuts.register(unicode, "de.uka.ilkd.key.gui.actions.UnicodeToggleAction");
 
         ToggleGroup themeGroup = new ToggleGroup();
         RadioMenuItem lightTheme = new RadioMenuItem("Light Theme");
@@ -1614,6 +1684,12 @@ public final class MainWindowF {
             menuItem("Decrease", "de.uka.ilkd.key.gui.actions.DecreaseFontSizeAction",
                 IconFactoryF.Key.MINUS, () -> changeFontSize(-1)));
 
+        // menu: MP3a — ToolTip Options right after Font Size, before the diff frame, like Swing
+        // MainWindow.createViewMenu :1053 (ToolTipOptionsAction → ViewSelector,
+        // ToolTipOptionsAction.java:26 / ViewSelector.java:26-27).
+        MenuItem toolTipOptions = menuItem("ToolTip Options…",
+            "de.uka.ilkd.key.gui.actions.ToolTipOptionsAction", this::showToolTipOptions);
+
         // smalldialogs: the soundiness report (Swing ShowSoundinessAction, contributed to
         // the proof-list context menu by SoundinessExtension). The FX proof-list dockable
         // does not exist yet, so the action lives in the View menu; Swing
@@ -1623,8 +1699,18 @@ public final class MainWindowF {
         javafx.scene.control.MenuItem soundinessItem = menuItem("Show Soundiness Report",
             "de.uka.ilkd.key.gui.actions.ShowSoundinessAction", this::showSoundinessReport);
 
-        view.getItems().addAll(prettyPrint, unicode, syntaxHighlighting, new SeparatorMenuItem(),
-            themeMenu, fontSize, new SeparatorMenuItem(),
+        view.getItems().addAll(prettyPrint, unicode, syntaxHighlighting);
+        // lemmaorigin: begin — term labels + origin tracking view controls (Swing TermLabelMenu /
+        // HidePackagePrefixToggleAction / OriginTermLabelsExt MainMenu items)
+        // menu: MP3a — moved to the Swing position right after Syntax Highlighting
+        // (MainWindow.createViewMenu :1040-1041 appends termLabelMenu and hidePackagePrefix before
+        // the tooltip toggles), so the View menu follows the Swing order
+        view.getItems().addAll(OriginLabelsF.install(this));
+        // lemmaorigin: end
+        view.getItems().addAll(showSequentViewTooltips, showSourceViewTooltips,
+            showProofTreeTooltips,
+            new SeparatorMenuItem(),
+            themeMenu, fontSize, toolTipOptions, new SeparatorMenuItem(),
             menuItem("Visual Node Diff", "de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame$Action",
                 this::showProofDiffFrame),
             new SeparatorMenuItem(),
@@ -1636,13 +1722,31 @@ public final class MainWindowF {
             menuItem("Log View", "de.uka.ilkd.key.gui.actions.LogViewAction",
                 this::showLogView),
             soundinessItem);
-        // lemmaorigin: begin — term labels + origin tracking view controls (Swing TermLabelMenu /
-        // HidePackagePrefixToggleAction / OriginTermLabelsExt MainMenu items)
-        view.getItems().addAll(OriginLabelsF.install(this));
-        // lemmaorigin: end
         soundinessItem.disableProperty()
                 .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
         return view;
+    }
+
+    /**
+     * menu: MP3a — re-renders the sequent and goal list views after the Pretty Print / Unicode
+     * Symbols toggles (Swing {@code MainWindow.makePrettyView}, MainWindow.java:954-959: refresh
+     * the mediator's shared NotationInfo against the services and re-display the sequent). The FX
+     * views build their own NotationInfo per print (they do not use the mediator's shared
+     * instance yet) and expose the re-render as {@code refreshPrettyView} hooks; the goal list
+     * prints terms too, so it is refreshed the same way.
+     */
+    private void refreshPrettyViews() {
+        sequentView.refreshPrettyView();
+        goalListView.refreshPrettyView();
+    }
+
+    /**
+     * menu: MP3a — opens the tooltip options dialog (Swing {@code ToolTipOptionsAction},
+     * ToolTipOptionsAction.java:26, constructs the {@code ViewSelector}). The dialog edits the
+     * shared {@code ViewSettings} directly.
+     */
+    private void showToolTipOptions() {
+        ToolTipOptionsDialogF.show(stage);
     }
 
     /**
