@@ -19,4 +19,19 @@ javafx {
 dependencies {
     implementation project(":key.ui.fx")
     implementation project(":keyext.slicing")
+
+    // MP9.4 (slicing port): needed on the COMPILE classpath. key.ui.fx and keyext.slicing
+    // declare :key.core as `implementation`, which does not leak into a consumer's compile
+    // classpath — yet the KeYGuiExtensionF SPI (PosInSequent, Goal, Proof), KeYMediatorF
+    // (Proof/Node accessors) and the keyext.slicing logic APIs all reference key.core types.
+    // key.core itself `api`-exposes key.util, key.ncore and key.ncore.calculus
+    // (org.key_project.prover.sequent.PosInOccurrence), so a single implementation dep suffices.
+    implementation project(":key.core")
+
+    // The slicing settings singleton lives behind the Swing SlicingSettingsProvider
+    // (SlicingSettingsProvider.getSlicingSettings) and the reused slicing logic reads it
+    // from there, so resolving that class file requires key.ui (the same "key.ui transitively,
+    // accepted for the user-approved extension migration; the FX sources never import Swing"
+    // wiring the key.ui.fx scaffold documents). No Swing type is used in this module's code.
+    implementation project(":key.ui")
 }
