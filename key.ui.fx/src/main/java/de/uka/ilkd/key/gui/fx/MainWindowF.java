@@ -76,6 +76,7 @@ import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationCenterF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
+import de.uka.ilkd.key.gui.fx.notification.events.ExceptionFailureEventF;
 import de.uka.ilkd.key.gui.fx.originlabels.OriginLabelsF;
 import de.uka.ilkd.key.gui.fx.plugins.javac.JavacSettingsProviderF;
 import de.uka.ilkd.key.gui.fx.profileloading.LoadingOptionsDialogF;
@@ -733,19 +734,22 @@ public final class MainWindowF {
         });
         loadTask.setOnFailed(event -> {
             Throwable error = loadTask.getException();
-            // notification: TODO-merge wire into WindowUserInterfaceControlF — the seam agent
-            // routes exceptions through NotificationCenterF.handleNotificationEvent(
-            // new ExceptionFailureEventF(...)) there (Swing parity:
-            // IssueDialog.showExceptionDialog)
-            LOGGER.error((demo ? "Demo proof" : "Proof") + " loading failed", error);
+            String message = (demo ? "Demo proof" : "Proof") + " loading failed";
+            LOGGER.error(message, error);
             // seam: loading errors surface in the IssueDialog (Swing parity: the
             // ProblemLoader branch of WindowUserInterfaceControl.taskFinishedInternal,
             // WindowUserInterfaceControl.java:236-244, calls IssueDialog.showExceptionDialog;
             // the FX load task throws instead of reporting a failed TaskFinishedInfo)
             IssueDialogF.showExceptionDialog(getStage(), error);
-            NotificationManagerF.getInstance()
-                    .notify((demo ? "Demo proof" : "Proof") + " loading failed: "
-                        + error.getMessage(), Kind.ERROR);
+            // notification: termmenu/S4 — route the failure through the notification center
+            // instead of the plain toast (Swing parity: the ExceptionFailureEvent framework,
+            // NotificationManager.setDefaultNotification + the FIXME'd
+            // ExceptionFailureNotification; the FX ExceptionFailureNotificationF is toast-only,
+            // so the Swing double-dialog concern does not apply and it is a default task).
+            // The IssueDialog above stays the primary surface; the center's toast is the
+            // notification sink.
+            NotificationCenterF.getInstance().handleNotificationEvent(
+                new ExceptionFailureEventF(message, error));
         });
         Thread loader = new Thread(loadTask, "fx-demo-proof-loader");
         loader.setDaemon(true);
