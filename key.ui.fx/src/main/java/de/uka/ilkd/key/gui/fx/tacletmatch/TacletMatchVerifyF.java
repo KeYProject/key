@@ -7,16 +7,19 @@ package de.uka.ilkd.key.gui.fx.tacletmatch;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
+import de.uka.ilkd.key.gui.fx.WindowUserInterfaceControlF;
 import de.uka.ilkd.key.gui.fx.tacletmatch.classic.TacletMatchCompletionDialogF;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
@@ -39,6 +42,10 @@ import org.slf4j.LoggerFactory;
  * <li>cancel closes the dialog and leaves the proof unchanged (node count stable);</li>
  * <li>the classic (table-based) completion dialog renders the instantiation table and
  * {@code cancelAndClose()} leaves the proof unchanged (port deliverable 2);</li>
+ * <li>the seam dispatch ({@code WindowUserInterfaceControlF.completeAndApplyTacletMatch},
+ * termmenu/S4) opens the ported dialog for the real models + goal — the interactive path the
+ * sequent-view term menu triggers via {@code selectedTaclet} — and closing it leaves the proof
+ * unchanged;</li>
  * <li>apply closes the dialog and adds the application to the proof (node count changes; last, as
  * it modifies the proof).</li>
  * </ol>
@@ -46,7 +53,7 @@ import org.slf4j.LoggerFactory;
  *
  * <p>
  * The value of {@code key.fx.verify.tacletmatch} selects the mode: {@code 1} (default) runs the
- * full four-assertion flow; {@code hold} runs only the render assertion of the redesigned dialog
+ * full five-assertion flow; {@code hold} runs only the render assertion of the redesigned dialog
  * and leaves it open for interactive screenshots; {@code hold-classic} does the same for the
  * classic (table-based) dialog (light/dark theme checks).
  */
@@ -59,21 +66,25 @@ public final class TacletMatchVerifyF {
     /**
      * Runs the verification on the FX thread (called from the demo-load success handler in
      * MainWindowF).
+     *
+     * @param seam the window's {@link WindowUserInterfaceControlF}; the seam dispatch assertion
+     *        (termmenu/S4) exercises {@code completeAndApplyTacletMatch} through it
      */
     public static void runTacletMatchVerification(Proof proof, ProofControl proofControl,
-            Stage owner, NotationInfo notationInfo) {
+            Stage owner, NotationInfo notationInfo, WindowUserInterfaceControlF seam) {
         String mode = System.getProperty("key.fx.verify.tacletmatch", "1").trim();
         boolean hold = "hold".equalsIgnoreCase(mode);
         boolean holdClassic = "hold-classic".equalsIgnoreCase(mode);
         try {
-            run(proof, proofControl, owner, notationInfo, hold, holdClassic);
+            run(proof, proofControl, owner, notationInfo, hold, holdClassic, seam);
         } catch (Throwable t) {
             LOGGER.error("tacletmatch verification: FAIL (unexpected error: {})", t, t);
         }
     }
 
     private static void run(Proof proof, ProofControl proofControl, Stage owner,
-            NotationInfo notationInfo, boolean hold, boolean holdClassic) {
+            NotationInfo notationInfo, boolean hold, boolean holdClassic,
+            WindowUserInterfaceControlF seam) {
         Services services = proof.getServices();
         Goal goal = proof.openEnabledGoals().head();
         AbstractProofControl control = (AbstractProofControl) proofControl;
@@ -159,6 +170,39 @@ public final class TacletMatchVerifyF {
                 t.toString());
         }
 
+        // ---- assertion: the seam dispatch (WindowUserInterfaceControlF
+        // .completeAndApplyTacletMatch, termmenu/S4) opens the ported dialog for the real
+        // models + goal — the interactive path the sequent-view term menu triggers via
+        // selectedTaclet — and closing it leaves the proof unchanged. The branch (redesigned
+        // vs. classic) is chosen by ViewSettings.isUseClassicTacletDialog and printed so the
+        // runner sees which seam branch was exercised (the dialog constructors show() their
+        // stage, which is safe on the FX thread here; the "showing" check is the guard). -----
+        try {
+            boolean seamClassic =
+                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                        .isUseClassicTacletDialog();
+            TacletInstantiationModel[] seamModels =
+                control.completeAndApplyApp(List.of(chosen), goal);
+            seam.completeAndApplyTacletMatch(seamModels, goal);
+            Stage seamDialog = findSeamDialog();
+            boolean seamOpened = seamDialog != null && seamDialog.isShowing();
+            LOGGER.info("tacletmatch verification: seam-dispatch: {} (branch={}, showing={})",
+                seamOpened ? "PASS" : "FAIL", seamClassic ? "classic" : "redesigned",
+                seamOpened);
+            int nodesBeforeSeam = proof.countNodes();
+            if (seamDialog != null) {
+                seamDialog.close();
+            }
+            boolean seamClosed = (seamDialog == null || !seamDialog.isShowing())
+                    && proof.countNodes() == nodesBeforeSeam;
+            LOGGER.info("tacletmatch verification: seam-close: {} (node count before={}, "
+                + "after={})", seamClosed ? "PASS" : "FAIL", nodesBeforeSeam,
+                proof.countNodes());
+        } catch (Throwable t) {
+            LOGGER.info("tacletmatch verification: seam-dispatch: FAIL (unexpected error: {})",
+                t.toString());
+        }
+
         // ---- assertion 4 (last, it changes the proof): apply closes the dialog and adds the
         // application to the proof ------------------------------------------------------------
         if (chosen.taclet().assumesSequent().isEmpty()) {
@@ -183,6 +227,21 @@ public final class TacletMatchVerifyF {
             NotationInfo notationInfo) {
         TacletInstantiationModel[] models = control.completeAndApplyApp(List.of(app), goal);
         return new TacletMatchDialogF(owner, models, goal, proofControl, services, notationInfo);
+    }
+
+    /**
+     * the dialog window opened by the seam dispatch (the redesigned and the classic dialog
+     * share the title "Choose Taclet Instantiation", set by the common super constructor
+     * {@code ApplyTacletDialogF}); {@code null} when the seam did not open one.
+     */
+    private static Stage findSeamDialog() {
+        for (Window window : Window.getWindows()) {
+            if (window instanceof Stage stage
+                    && "Choose Taclet Instantiation".equals(stage.getTitle())) {
+                return stage;
+            }
+        }
+        return null;
     }
 
     /**
