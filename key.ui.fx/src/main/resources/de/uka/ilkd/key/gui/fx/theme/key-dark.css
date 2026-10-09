@@ -725,3 +725,135 @@
 .log-ex {
     -fx-fill: -key-error;
 }
+/* ==========================================================================
+ * Taclet match / interactive taclet application dialogs (ported from the
+ * Swing de.uka.ilkd.key.gui.tacletmatch dialogs; classes prefixed
+ * "tacletmatch-"). Colours come from the shared palette; the schema-variable
+ * chip colours are data colours kept in code (SvPaletteF), not theme chrome.
+ * ========================================================================== */
+
+/* monospaced logic/term text (TmStyle.mono) */
+.tacletmatch-mono {
+    -fx-font-family: "monospace";
+}
+
+/* muted captions, row labels and hints (TmStyle.muted) */
+.tacletmatch-muted {
+    -fx-text-fill: -key-text-secondary;
+}
+
+/* a titled section: bold header with a hairline rule beneath it, no box
+ * (TmStyle.section) */
+.tacletmatch-section {
+    -fx-spacing: 4;
+    -fx-padding: 6 0 2 0;
+}
+
+.tacletmatch-section-title {
+    -fx-font-weight: bold;
+    -fx-padding: 2 0 1 0;
+    -fx-border-color: transparent transparent -key-border transparent;
+    -fx-border-insets: 0 0 2 0;
+}
+
+/* the compact footer with the status line and the Apply/Cancel buttons
+ * (TmStyle.styleFooter: faint surface bar under a hairline) */
+.tacletmatch-footer {
+    -fx-background-color: derive(-key-surface, -6%);
+    -fx-border-color: -key-border transparent transparent transparent;
+}
+
+/* the small, unobtrusive disclosure (expand/collapse) toggle
+ * (TmStyle.disclosure) */
+.tacletmatch-disclosure {
+    -fx-background-color: transparent;
+    -fx-padding: 1 3 1 3;
+    -fx-min-width: 0;
+    -fx-alignment: CENTER_LEFT;
+    -fx-content-display: GRAPHIC_ONLY;
+    -fx-text-fill: -key-text-secondary;
+    -fx-cursor: hand;
+}
+
+.tacletmatch-disclosure:hover {
+    -fx-background-color: derive(-key-border, 40%);
+    -fx-background-radius: 3;
+}
+
+/* the concrete matched term, set apart by a faint full-width band
+ * (MatchInfoPanel.matchedRow) */
+.tacletmatch-matched-band {
+    -fx-background-color: derive(-key-border, 70%);
+    -fx-background-radius: 3;
+    -fx-padding: 3 6 3 6;
+}
+
+/* the result preview surface card (ResultPreviewPanel: the "answer") */
+.tacletmatch-preview-card {
+    -fx-background-color: -key-surface;
+    -fx-border-color: -key-border;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 6;
+}
+
+/* added (+) and removed (−) formula markers of the result preview */
+.tacletmatch-added {
+    -fx-text-fill: -key-success;
+    -fx-font-weight: bold;
+}
+
+.tacletmatch-removed {
+    -fx-text-fill: -key-error;
+    -fx-font-weight: bold;
+}
+
+/* status colours of the footer icon/message and the manual-input status
+ * (TacletMatchDialog.statusLine / AssumesSelectionPanel.status) */
+.tacletmatch-status-ok {
+    -fx-text-fill: -key-success;
+    -fx-fill: -key-success;
+}
+
+.tacletmatch-status-warn {
+    -fx-text-fill: -key-warning;
+    -fx-fill: -key-warning;
+}
+
+.tacletmatch-status-error {
+    -fx-text-fill: -key-error;
+    -fx-fill: -key-error;
+}
+
+/* instantiation field highlighted while a term is dragged over it
+ * (SVInstantiationPanel drop target) */
+.tacletmatch-drop-highlight {
+    -fx-border-color: -key-accent;
+    -fx-border-width: 1;
+}
+
+/* the small inline "edit in larger window" icon button */
+.tacletmatch-edit-button {
+    -fx-background-color: transparent;
+    -fx-padding: 1 4 1 4;
+    -fx-text-fill: -key-text-secondary;
+    -fx-cursor: hand;
+}
+
+.tacletmatch-edit-button:hover {
+    -fx-background-color: derive(-key-border, 40%);
+    -fx-background-radius: 3;
+}
+
+/* schema-variable chip: the colours are set inline (SvPaletteF); only the
+ * pill shape comes from the theme */
+.tacletmatch-chip {
+    -fx-padding: 0 5 0 5;
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+}
+
+/* an instantiation row (chip / arrow / field alignment) */
+.tacletmatch-row {
+    -fx-fill-height: false;
+}

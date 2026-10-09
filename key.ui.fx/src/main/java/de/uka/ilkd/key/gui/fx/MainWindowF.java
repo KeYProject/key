@@ -77,6 +77,7 @@ import de.uka.ilkd.key.gui.fx.recentfiles.RecentFilesF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsManagerF;
 import de.uka.ilkd.key.gui.fx.sourceview.SourceViewF;
 import de.uka.ilkd.key.gui.fx.strategy.StrategySelectionViewF;
+import de.uka.ilkd.key.gui.fx.tacletmatch.TacletMatchVerifyF;
 import de.uka.ilkd.key.gui.fx.tasktree.TaskTreeF;
 import de.uka.ilkd.key.gui.fx.theme.Theme;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
@@ -589,6 +590,12 @@ public final class MainWindowF {
             // (status line, IssueDialogF, LogViewF, AutoDismissDialogF) after the demo load
             if (System.getProperty("key.fx.verify.uicontrol") != null) {
                 UiControlSelfTestF.run(this);
+            }
+            // tacletmatch: run the interactive taclet application self test (dialog render,
+            // cancel keeps the proof, apply adds to the proof) after the demo load
+            if (System.getProperty("key.fx.verify.tacletmatch") != null) {
+                TacletMatchVerifyF.runTacletMatchVerification(env.getLoadedProof(),
+                    env.getProofControl(), stage, mediator.getNotationInfo());
             }
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 startLiveAutoMode(env);
