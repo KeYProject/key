@@ -73,6 +73,7 @@ import de.uka.ilkd.key.gui.fx.docking.DockWorkspace;
 import de.uka.ilkd.key.gui.fx.docking.Dockable;
 import de.uka.ilkd.key.gui.fx.docking.DockingLayoutF;
 import de.uka.ilkd.key.gui.fx.docking.SimpleDockable;
+import de.uka.ilkd.key.gui.fx.drawer.DrawerF;
 import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.goallist.GoalListViewF;
@@ -801,6 +802,15 @@ public final class MainWindowF {
             }
             if (System.getProperty("key.fx.verify.updatehighlight") != null) {
                 runUpdateHighlightVerification();
+            }
+            // drawer: headless self test of the DrawerF port (exclusive/multiselect semantics,
+            // side placement, button-order split, drag-and-drop reorder + transfer seams)
+            if (System.getProperty("key.fx.verify.drawer") != null) {
+                String drawerReport = DrawerF.selfTest();
+                LOGGER.info("Drawer verification: {}", drawerReport);
+                NotificationManagerF.getInstance()
+                        .notify("Drawer verification: " + drawerReport,
+                            drawerReport.startsWith("PASS") ? Kind.INFO : Kind.ERROR);
             }
             if (System.getProperty("key.fx.verify.tree") != null) {
                 String report = proofTreeView.verifyTreeStructure();
