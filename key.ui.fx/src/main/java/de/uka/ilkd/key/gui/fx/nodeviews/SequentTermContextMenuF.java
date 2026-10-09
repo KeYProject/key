@@ -21,6 +21,7 @@ import javafx.stage.Window;
 
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
+import de.uka.ilkd.key.gui.fx.MainWindowF;
 import de.uka.ilkd.key.gui.fx.join.JoinActionF;
 import de.uka.ilkd.key.gui.fx.mergerule.MergeRuleMenuItemF;
 import de.uka.ilkd.key.gui.fx.nodeviews.SequentMenuModelF.AbbrevActionEntry;
@@ -33,10 +34,12 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NameCreationInfo;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
 
@@ -162,10 +165,17 @@ public final class SequentTermContextMenuF {
             case "copy_clipboard" -> copyClipboardItem(ctx);
             case "name_creation_info" -> nameCreationInfoItem(action, ctx);
             case "no_rules" -> disabledItem(action.label());
-            // termmenu: TODO these sections need the FX macro list (ProofMacroMenu), extension
-            // registry (KeYGuiExtensionFacade) and SMT-launch plumbing — deferred milestones.
-            // They are rendered as disabled placeholders so the menu structure stays faithful.
-            case "macro_menu", "extension", "smt" -> disabledItem(action.label());
+            // menu: MP8 — the Strategy Macros section is wired (Swing ProofMacroMenu,
+            // ProofMacroMenu.java:81: JMenu("Strategy Macros") with one item per applicable
+            // macro); "extension" and "smt" notes follow below.
+            case "macro_menu" -> macroMenu(action, ctx);
+            // menu: MP8 — KNOWN-DEFERRED extension section: needs the KeYGuiExtensionFacade
+            // registry of the external keyext modules (no FX counterpart, keyext modules are
+            // Swing UIs); stays a disabled placeholder so the menu structure stays faithful.
+            case "extension" -> disabledItem(action.label());
+            // menu: MP8 — SMT section (Swing CurrentGoalViewMenu.createSMTMenu,
+            // CurrentGoalViewMenu.java:219-231): wired in MP8c.
+            case "smt" -> disabledItem(action.label());
             default -> disabledItem(action.label());
         };
     }
@@ -189,6 +199,31 @@ public final class SequentTermContextMenuF {
             }
         });
         return item;
+    }
+
+    /**
+     * menu: MP8 — the "Strategy Macros" section (Swing {@code ProofMacroMenu}, a {@code
+     * JMenu("Strategy Macros")}, ProofMacroMenu.java:81, with one item per applicable macro;
+     * CurrentGoalViewMenu.addMacroMenu adds it to the term menu, CurrentGoalViewMenu.java:
+     * 212-217). The FX model emits the section unconditionally (SequentMenuModelF.compute), so
+     * all four macros of the Automation submenu / right-click popup ({@code
+     * MainWindowF.AUTOMATION_MACROS}, same order as Swing MainWindow.createAutomationActions,
+     * MainWindow.java:814-827) are shown — Swing instead filters by {@code canApplyTo} and
+     * omits the whole menu when it is empty; with the model's fixed skeleton the section keeps
+     * its label either way. Each item is built by the shared {@link ProofMacroMenuF} helper.
+     */
+    private static MenuItem macroMenu(NamedAction action, MenuContext ctx) {
+        Node node = ctx.mediator() == null ? null : ctx.mediator().getSelectedNode();
+        if (node == null || ctx.proofControl() == null) {
+            // no proof context: keep the faithful disabled placeholder
+            return disabledItem(action.label());
+        }
+        Menu menu = new Menu(action.label());
+        PosInOccurrence pio = ctx.pos() == null ? null : ctx.pos().getPosInOccurrence();
+        for (ProofMacro macro : MainWindowF.AUTOMATION_MACROS) {
+            menu.getItems().add(ProofMacroMenuF.itemFor(macro, node, ctx.proofControl(), pio));
+        }
+        return menu;
     }
 
     /** Delayed-cut join (Swing JoinMenuItem / CurrentGoalViewMenu.createDelayedCutJoinMenu). */
