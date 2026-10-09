@@ -30,6 +30,7 @@ import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
 import de.uka.ilkd.key.gui.fx.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
@@ -38,6 +39,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.GoalListener;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.sequent.SequentChangeInfo;
@@ -417,6 +420,22 @@ public class GoalListViewF extends ListView<Goal> {
     }
 
     /**
+     * menu: MP3a — re-renders the goal rows after the View-menu Pretty Print / Unicode Symbols
+     * toggles changed the notation (Swing {@code MainWindow.makePrettyView},
+     * MainWindow.java:954-959 re-prints the sequent views through the refreshed shared
+     * NotationInfo). The cached one-line sequent texts are flushed (they were printed with the
+     * previous notation) and the rows re-set from the proof so every cell recomputes its sequent
+     * text; the selection is kept like {@link #refreshAfterGoalStateChange()}.
+     */
+    public void refreshPrettyView() {
+        if (proof == null || proof.isDisposed()) {
+            return;
+        }
+        sequentTextCache.clear();
+        refreshAfterGoalStateChange();
+    }
+
+    /**
      * @return the one-line printed sequent text of the goal (truncated, no term labels), cached
      *         per goal node
      */
@@ -429,7 +448,7 @@ public class GoalListViewF extends ListView<Goal> {
         String res;
         try {
             SequentViewLogicPrinter printer =
-                SequentViewLogicPrinter.purePrinter(new NotationInfo(),
+                SequentViewLogicPrinter.purePrinter(notationInfo(node.proof().getServices()),
                     node.proof().getServices(), NO_VISIBLE_TERM_LABELS);
             printer.setMaxChar(MAX_DISPLAYED_SEQUENT_LENGTH);
             printer.printSequent(goal.sequent());
@@ -444,6 +463,21 @@ public class GoalListViewF extends ListView<Goal> {
         }
         sequentTextCache.put(node, res);
         return res;
+    }
+
+    /**
+     * menu: MP3a — a {@link NotationInfo} refreshed with the current view settings (Swing
+     * {@code MainWindow.makePrettyView} refreshes the shared NotationInfo against the services
+     * before re-printing, MainWindow.java:954-959; the goal list builds its own NotationInfo per
+     * print, so the refresh happens here with {@code (isUsePretty(), isUseUnicode(),
+     * isHidePackagePrefix())}, NotationInfo.java:425-438).
+     */
+    private static NotationInfo notationInfo(Services services) {
+        ViewSettings viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        NotationInfo notationInfo = new NotationInfo();
+        notationInfo.refresh(services, viewSettings.isUsePretty(), viewSettings.isUseUnicode(),
+            viewSettings.isHidePackagePrefix());
+        return notationInfo;
     }
 
     /**

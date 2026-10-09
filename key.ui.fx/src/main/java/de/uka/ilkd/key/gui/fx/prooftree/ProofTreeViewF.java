@@ -47,6 +47,7 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.javafx.FxUtil;
 
@@ -1290,7 +1291,20 @@ public class ProofTreeViewF extends BorderPane {
             if (matched) {
                 getStyleClass().add("proof-tree-match");
             }
-            setTooltip(new Tooltip(tooltipText(item)));
+            // menu: MP3a — proof-tree tooltips are gated by the shared ViewSettings flag "Show
+            // Tooltips in Proof Tree" (Swing ProofTreeView.getToolTipText,
+            // ProofTreeView.java:195-217 renders no tooltip unless isShowProofTreeTooltips()).
+            // The cell re-consults the flag on every updateItem; the View-menu toggle triggers a
+            // refresh() (MainWindowF.buildViewMenu) so the change applies immediately. Minimal
+            // fidelity: the Swing renderer builds a rich styled tooltip (rule name, position in
+            // occurrence, notes, rendered by ProofTreeView.renderTooltip :1202-1219); the FX cell
+            // shows the node/rule name only.
+            if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                    .isShowProofTreeTooltips()) {
+                setTooltip(new Tooltip(tooltipText(item)));
+            } else {
+                setTooltip(null);
+            }
         }
 
         private String styleClassOf(Entry item) {
@@ -1315,7 +1329,14 @@ public class ProofTreeViewF extends BorderPane {
             if (item.isBranch()) {
                 return "Branch: " + item.branchLabel;
             }
-            return "Node " + item.node.serialNr();
+            // menu: MP3a — the node's applied rule name (Swing rule-application nodes show the
+            // applied rule, ProofTreeView.java:1389), falling back to the plain node serial.
+            Node node = item.node;
+            RuleApp appliedRule = node.getAppliedRuleApp();
+            if (appliedRule != null) {
+                return "Node " + node.serialNr() + ": " + appliedRule.rule().name();
+            }
+            return "Node " + node.serialNr();
         }
     }
 }
