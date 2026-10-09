@@ -7,6 +7,7 @@ package de.uka.ilkd.key.gui.fx.nodeviews;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
@@ -42,6 +43,15 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
+import de.uka.ilkd.key.settings.DefaultSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SMTSolver;
+import de.uka.ilkd.key.smt.SMTSolverResult;
+import de.uka.ilkd.key.smt.SolverLauncher;
+import de.uka.ilkd.key.smt.SolverLauncherListener;
+import de.uka.ilkd.key.smt.SolverTypeCollection;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
@@ -173,9 +183,9 @@ public final class SequentTermContextMenuF {
             // registry of the external keyext modules (no FX counterpart, keyext modules are
             // Swing UIs); stays a disabled placeholder so the menu structure stays faithful.
             case "extension" -> disabledItem(action.label());
-            // menu: MP8 — SMT section (Swing CurrentGoalViewMenu.createSMTMenu,
-            // CurrentGoalViewMenu.java:219-231): wired in MP8c.
-            case "smt" -> disabledItem(action.label());
+            // menu: MP8 — SMT section item, wired in MP8c (Swing CurrentGoalViewMenu.
+            // createSMTMenu, CurrentGoalViewMenu.java:219-231, SMTAction :765-790).
+            case "smt" -> smtItem(action, ctx);
             default -> disabledItem(action.label());
         };
     }
@@ -420,6 +430,91 @@ public final class SequentTermContextMenuF {
         MenuItem item = new MenuItem(label);
         item.setDisable(true);
         return item;
+    }
+
+    /**
+     * menu: MP8 — the SMT section item: runs the given solver union on the clicked goal's
+     * sequent (Swing {@code CurrentGoalViewMenu.SMTAction}, CurrentGoalViewMenu.java:765-790: a
+     * background thread builds a {@code DefaultSMTSettings}, a {@code SolverLauncher} with a
+     * listener, an {@code SMTProblem} for the goal and launches the union's solver types on the
+     * goal's services, then shows the outcome). Swing presents the outcome in the heavy
+     * {@code FullSmtSolverDialog} (progress dialog + countermodel application); the FX minimum
+     * shows a read-only result dialog with each solver's outcome and the combined final result —
+     * the counterexample-application UI of the Swing dialog is not ported.
+     */
+    private static MenuItem smtItem(NamedAction action, MenuContext ctx) {
+        MenuItem item = new MenuItem(action.label());
+        item.setOnAction(e -> runSmt(action, ctx));
+        return item;
+    }
+
+    /**
+     * menu: MP8 — launches the solver union of the SMT item on the clicked goal (Swing
+     * CurrentGoalViewMenu.SMTAction.actionPerformed, CurrentGoalViewMenu.java:773-789). The
+     * launch is synchronous and blocking (SolverLauncher.launch waits for every solver), so it
+     * runs in a daemon thread; the read-only result dialog is presented back on the FX thread.
+     */
+    private static void runSmt(NamedAction action, MenuContext ctx) {
+        Goal goal = ctx.goal();
+        if (goal == null || !(action.payload() instanceof SolverTypeCollection union)) {
+            return;
+        }
+        Window owner = ctx.owner();
+        Thread thread = new Thread(() -> {
+            DefaultSMTSettings settings =
+                new DefaultSMTSettings(goal.proof().getSettings().getSMTSettings(),
+                    ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),
+                    goal.proof().getSettings().getNewSMTSettings(), goal.proof());
+            SolverLauncher launcher = new SolverLauncher(settings);
+            // a listener suppresses the launcher's SolverException for failing solvers
+            // (SolverLauncher.notifyListenersOfStop, SolverLauncher.java:370-376); Swing's
+            // SolverListener plays the same role (CurrentGoalViewMenu.java:783)
+            launcher.addListener(new SolverLauncherListener() {
+                @Override
+                public void launcherStopped(SolverLauncher launcher,
+                        Collection<SMTSolver> finishedSolvers) {
+                }
+
+                @Override
+                public void launcherStarted(Collection<SMTProblem> problems,
+                        Collection<SolverType> solverTypes, SolverLauncher launcher) {
+                }
+            });
+            SMTProblem problem = new SMTProblem(goal);
+            String report;
+            try {
+                launcher.launch(union.getTypes(), List.of(problem),
+                    goal.proof().getServices());
+                StringBuilder sb = new StringBuilder();
+                for (SMTSolver solver : problem.getSolvers()) {
+                    SMTSolverResult result = solver.getFinalResult();
+                    sb.append(solver.name()).append(": ")
+                            .append(result == null ? "no result" : result.isValid()).append("\n");
+                }
+                sb.append("\n").append(problem.getFinalResult().isValid());
+                report = sb.toString();
+            } catch (RuntimeException ex) {
+                report = "SMT run failed: " + ex;
+            }
+            String finalReport = report;
+            Platform.runLater(() -> showSmtResult(union.toString(), finalReport, owner));
+        }, "SMTRunner");
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    /**
+     * menu: MP8 — read-only SMT result dialog (the FX minimum replacing the heavy Swing
+     * FullSmtSolverDialog progress/countermodel UI).
+     */
+    private static void showSmtResult(String unionName, String report, Window owner) {
+        Alert alert = new Alert(AlertType.INFORMATION, report, ButtonType.OK);
+        alert.setTitle("SMT: " + unionName);
+        alert.setHeaderText(null);
+        if (owner != null) {
+            alert.initOwner(owner);
+        }
+        alert.showAndWait();
     }
 
     private static void showError(String message, String title, Window owner) {
