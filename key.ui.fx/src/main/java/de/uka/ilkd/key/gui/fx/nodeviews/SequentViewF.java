@@ -1085,6 +1085,20 @@ public class SequentViewF extends BorderPane {
     }
 
     /**
+     * menu: selects the search mode in the search bar's combo (Swing
+     * {@code SequentViewSearchBar.setSearchMode}, SequentViewSearchBar.java:82-84:
+     * {@code searchModeBox.setSelectedItem(mode)}). The combo's own listener applies the mode
+     * ({@link #applySearchMode(SearchMode)}) and re-runs the search, so selecting here is
+     * sufficient. Entry point of the "Proof > Search Mode" submenu (Swing
+     * {@code SearchModeChangeAction}, MainWindow.createProofMenu :1125-1131).
+     *
+     * @param mode the search mode to select (Highlight/Hide/Regroup), must not be {@code null}
+     */
+    public void setSearchMode(SearchMode mode) {
+        searchModeBox.getSelectionModel().select(mode);
+    }
+
+    /**
      * Scrolls the current match into view (Swing {@code setCaretPosition(foundAt)}): the vertical
      * position of the match's shape is centered in the viewport.
      */

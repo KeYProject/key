@@ -23,6 +23,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
@@ -76,6 +77,7 @@ import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationCenterF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
+import de.uka.ilkd.key.gui.fx.notification.ProofStatisticsDialogF;
 import de.uka.ilkd.key.gui.fx.notification.events.ExceptionFailureEventF;
 import de.uka.ilkd.key.gui.fx.originlabels.OriginLabelsF;
 import de.uka.ilkd.key.gui.fx.plugins.javac.JavacSettingsProviderF;
@@ -83,10 +85,12 @@ import de.uka.ilkd.key.gui.fx.profileloading.LoadingOptionsDialogF;
 import de.uka.ilkd.key.gui.fx.profileloading.LoadingOptionsDialogF.LoadOptions;
 import de.uka.ilkd.key.gui.fx.profileloading.WDLoadOptionPanelF;
 import de.uka.ilkd.key.gui.fx.proofdiff.ProofDiffFrameF;
+import de.uka.ilkd.key.gui.fx.proofmanagement.KnownTypesDialogF;
 import de.uka.ilkd.key.gui.fx.proofmanagement.ProofManagementDialogF;
 import de.uka.ilkd.key.gui.fx.proofmanagement.ProofManagerF;
 import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeViewF;
 import de.uka.ilkd.key.gui.fx.recentfiles.RecentFilesF;
+import de.uka.ilkd.key.gui.fx.settings.ActiveSettingsDialogF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsManagerF;
 import de.uka.ilkd.key.gui.fx.soundiness.SoundinessAnalyzer;
 import de.uka.ilkd.key.gui.fx.soundiness.SoundinessDialogF;
@@ -727,6 +731,12 @@ public final class MainWindowF {
             // verify hooks; the text report goes to stdout
             if (System.getProperty("key.fx.verify.termmenu") != null) {
                 runTermMenuVerification(env);
+            }
+            // menu: MP1 — menu parity self test (key.fx.verify.menuparity): walks the built
+            // menu bar and asserts the Proof menu entries against the Swing createProofMenu
+            // table; the marker line must end with PASS
+            if (System.getProperty("key.fx.verify.menuparity") != null) {
+                verifyMenuParity();
             }
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 startLiveAutoMode(env);
@@ -1649,12 +1659,277 @@ public final class MainWindowF {
             mediator::stopAutoMode);
         stopAuto.disableProperty().bind(mediator.autoModeRunningProperty().not());
         automation.getItems().addAll(startAuto, stopAuto);
+        // menu: MP1 — the entries after Prune Proof mirror Swing MainWindow.createProofMenu
+        // (MainWindow.java:1082-1142) with selected == null in the same order: Abandon Proof,
+        // separator, the search group (Search in Proof Tree/Sequent + Next/Previous + the
+        // Search Mode submenu), separator, then Show Used Contracts / Show All Active Settings /
+        // Show Proof Statistics / Show Known Types. The search group and the
+        // statistics/settings group are proof-gated via proofLoaded (Swing
+        // enableWhenProofLoaded on each action); Abandon Proof additionally carries the
+        // auto-mode lock (Swing AbandonTaskAction is enabled whenever a proof is loaded, but the
+        // removal of a running proof stops auto mode first — keep the lock like the other
+        // interaction actions).
+        // menu: Abandon Proof — Swing AbandonTaskAction (AbandonTaskAction.java:13-46), reused
+        // actionId so the Ctrl+W accelerator from KeyStrokeManagerF (defineDefault
+        // AbandonTaskAction
+        // = modifier()+W, KeyStrokeManagerF.java:117) is bound; enablement mirrored from
+        // enableWhenProofLoaded + the auto-mode lock.
+        MenuItem abandonProof = menuItem("Abandon Proof",
+            "de.uka.ilkd.key.gui.actions.AbandonTaskAction",
+            IconFactoryF.Key.CLOSE, this::abandonProof);
+        abandonProof.disableProperty()
+                .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
+        // menu: search group — Swing SearchInProofTreeAction / SearchInSequentAction /
+        // SearchNextAction / SearchPreviousAction (MainWindow.java:1121-1124) and the
+        // SearchModeChangeAction entries of the "Search Mode" submenu (:1125-1131). All bound
+        // only to proofLoaded (matches the FX read-only-action style: no auto-mode lock).
+        MenuItem searchInTree = menuItem("Search in Proof Tree",
+            "de.uka.ilkd.key.gui.actions.SearchInProofTreeAction",
+            IconFactoryF.Key.PROOF_TREE, proofTreeView::showSearchBar);
+        searchInTree.disableProperty().bind(proofLoaded.not());
+        MenuItem searchInSequent = menuItem("Search in Sequent",
+            "de.uka.ilkd.key.gui.actions.SearchInSequentAction",
+            IconFactoryF.Key.SEARCH, sequentView::showSearchBar);
+        searchInSequent.disableProperty().bind(proofLoaded.not());
+        MenuItem searchNext = menuItem("Search Next",
+            "de.uka.ilkd.key.gui.actions.SearchNextAction",
+            IconFactoryF.Key.NEXT, sequentView::searchNext);
+        searchNext.disableProperty().bind(proofLoaded.not());
+        MenuItem searchPrevious = menuItem("Search Previous",
+            "de.uka.ilkd.key.gui.actions.SearchPreviousAction",
+            IconFactoryF.Key.PREVIOUS, sequentView::searchPrevious);
+        searchPrevious.disableProperty().bind(proofLoaded.not());
+        Menu searchMode = new Menu("Search Mode");
+        for (SequentViewF.SearchMode mode : SequentViewF.SearchMode.values()) {
+            MenuItem modeItem = menuItem(mode.getDisplayName(),
+                () -> sequentView.setSearchMode(mode));
+            modeItem.disableProperty().bind(proofLoaded.not());
+            searchMode.getItems().add(modeItem);
+        }
+        // menu: statistics/settings group — Swing ShowUsedContractsAction (:1134,
+        // ProofManagementDialog with the selected proof preselected = openProofManagement()),
+        // ShowActiveSettingsAction (:1138, ActiveSettingsDialogF), ShowProofStatistics (:1139,
+        // ProofStatisticsDialogF) and ShowKnownTypesAction (:1140, KnownTypesDialogF). All
+        // proof-gated (Swing enableWhenProofLoaded).
+        MenuItem usedContracts = menuItem("Show Used Contracts",
+            "de.uka.ilkd.key.gui.actions.ShowUsedContractsAction",
+            this::openProofManagement);
+        usedContracts.disableProperty().bind(proofLoaded.not());
+        MenuItem activeSettings = menuItem("Show All Active Settings",
+            "de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction",
+            IconFactoryF.Key.CONFIGURE, this::showActiveSettings);
+        activeSettings.disableProperty().bind(proofLoaded.not());
+        MenuItem proofStatistics = menuItem("Show Proof Statistics",
+            "de.uka.ilkd.key.gui.actions.ShowProofStatistics",
+            IconFactoryF.Key.STATISTICS, this::showProofStatistics);
+        proofStatistics.disableProperty().bind(proofLoaded.not());
+        MenuItem knownTypes = menuItem("Show Known Types",
+            "de.uka.ilkd.key.gui.actions.ShowKnownTypesAction",
+            this::showKnownTypes);
+        knownTypes.disableProperty().bind(proofLoaded.not());
         proof.getItems().addAll(automation, new SeparatorMenuItem(),
             menuItem("Goal Back", "de.uka.ilkd.key.gui.actions.GoalBackAction",
                 IconFactoryF.Key.GOAL_BACK, mediator::goalBack),
             menuItem("Prune Proof", "de.uka.ilkd.key.gui.actions.PruneProofAction",
-                IconFactoryF.Key.PRUNE, mediator::pruneProof));
+                IconFactoryF.Key.PRUNE, mediator::pruneProof),
+            abandonProof, new SeparatorMenuItem(),
+            searchInTree, searchInSequent, searchNext, searchPrevious, searchMode,
+            new SeparatorMenuItem(),
+            usedContracts, activeSettings, proofStatistics, knownTypes);
         return proof;
+    }
+
+    // ------------------------------------------------------------------
+    // proof menu actions (menu: MP1 — Swing MainWindow.createProofMenu :1082-1142)
+    // ------------------------------------------------------------------
+
+    /**
+     * menu: abandons the selected proof (Swing {@code AbandonTaskAction.actionPerformed},
+     * AbandonTaskAction.java:33-46): asks for confirmation first (Swing
+     * {@code confirmTaskRemoval("Are you sure?")}, a YES/NO dialog titled "Abandon Proof",
+     * WindowUserInterfaceControl.java:341-345), stops auto mode if the proof is being proved
+     * automatically, disposes the proof and resets the UI to its "no proof" state.
+     */
+    private void abandonProof() {
+        Proof proof = selectionModel.getSelectedProof();
+        if (proof == null) {
+            return; // the item is disabled without a proof (Swing enableWhenProofLoaded)
+        }
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure?");
+        alert.setTitle("Abandon Proof");
+        alert.setHeaderText(null);
+        alert.initOwner(stage);
+        ExampleChooserF.themeDialogPane(alert);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            return; // Swing: confirmTaskRemoval returns false on No/close
+        }
+        // menu: stop auto mode through the window's proof control if a run is active (Swing
+        // getMediator().getUI().getProofControl().stopAutoMode()); lastEnvironment is the loaded
+        // env of the selection (like the other proof-dependent flows, see :603-622)
+        if (mediator.isInAutoMode() && lastEnvironment != null) {
+            lastEnvironment.getProofControl().stopAutoMode();
+        }
+        // menu: unregister from the multi-proof state (Swing TaskTree.removeProof on abandon,
+        // TaskTree.java:241-267; ProofManagerF.removeProof was provided for exactly this caller)
+        proofManager.removeProof(proof);
+        proof.dispose();
+        // menu: reset the UI to the "no proof" state — the selection model supports a null
+        // selection (KeYSelectionModel.setSelectedProof(null) nulls the selection and fires
+        // selectedProofChanged, KeYSelectionModel.java:89-115); updateProofStatus then sets
+        // proofLoaded=false, which re-enables the proof-gated menu items
+        selectionModel.setSelectedProof(null);
+        NotificationManagerF.getInstance().notify("Proof abandoned.", Kind.INFO);
+    }
+
+    /**
+     * menu: opens the active settings of the selected proof (Swing
+     * {@code ShowActiveSettingsAction.actionPerformed}, ShowActiveSettingsAction.java:32-47: the
+     * "All active settings" {@code ViewSettingsDialog} over the {@code SettingsTreeModel}).
+     */
+    private void showActiveSettings() {
+        Proof proof = selectionModel.getSelectedProof();
+        if (proof == null) {
+            return; // the item is disabled without a proof (Swing enableWhenProofLoaded)
+        }
+        ActiveSettingsDialogF.show(stage, proof);
+    }
+
+    /**
+     * menu: shows the statistics of the selected proof (Swing
+     * {@code ShowProofStatistics.actionPerformed}, ShowProofStatistics.java:69-78: non-modal
+     * {@code Proof Statistics} window).
+     */
+    private void showProofStatistics() {
+        Proof proof = selectionModel.getSelectedProof();
+        if (proof == null) {
+            return; // the item is disabled without a proof (Swing enableWhenProofLoaded)
+        }
+        ProofStatisticsDialogF.show(stage, proof);
+    }
+
+    /**
+     * menu: shows the type hierarchy known to the selected proof (Swing
+     * {@code ShowKnownTypesAction.showTypeHierarchy}, ShowKnownTypesAction.java:47-83: the modal
+     * "Known types for this proof" dialog with the {@code ClassTree} of the proof's services).
+     */
+    private void showKnownTypes() {
+        Proof proof = selectionModel.getSelectedProof();
+        if (proof == null) {
+            return; // the item is disabled without a proof (Swing enableWhenProofLoaded)
+        }
+        KnownTypesDialogF.show(stage, proof);
+    }
+
+    /**
+     * menu: MP1 self test of the Proof menu (system property {@code key.fx.verify.menuparity},
+     * run after a proof load like the other verify hooks): builds the menu bar and walks the
+     * Proof menu, asserting the presence of the entries of {@link #buildProofMenu()} in the
+     * Swing order (MainWindow.createProofMenu :1082-1142). Table-driven so MP2-MP5 can extend
+     * it with the other menus later.
+     */
+    private void verifyMenuParity() {
+        String report = verifyMenuParityReport();
+        LOGGER.info("Menu parity verification (MP1 Proof): {}", report);
+        NotificationManagerF.getInstance()
+                .notify("Menu parity verification (MP1 Proof): " + report,
+                    report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+    }
+
+    /**
+     * menu: builds the {@link #buildMenuBar() menu bar} and checks the Proof menu entries. A
+     * table holds the expected labels; entries may be leaf items, plain separators (the
+     * {@code "---"} row) or submenu names ({@code "Search Mode"}) whose own children are
+     * checked recursively.
+     *
+     * @return {@code "PASS - <n> items, found: <comma list>"} or {@code "FAIL - missing: <list>"}
+     */
+    String verifyMenuParityReport() {
+        MenuBar menuBar = buildMenuBar();
+        Menu proof = menuBar.getMenus().stream().filter(m -> "Proof".equals(m.getText()))
+                .findFirst().orElse(null);
+        if (proof == null) {
+            return "FAIL - missing: <Proof menu>";
+        }
+        String[][] expected = {
+            { "Automation", "Start Automatic Proof", "Stop Automatic Proof" },
+            { "Goal Back" },
+            { "Prune Proof" },
+            { "Abandon Proof" },
+            { "---" },
+            { "Search in Proof Tree" },
+            { "Search in Sequent" },
+            { "Search Next" },
+            { "Search Previous" },
+            { "Search Mode", "Highlight", "Hide", "Regroup" },
+            { "---" },
+            { "Show Used Contracts" },
+            { "Show All Active Settings" },
+            { "Show Proof Statistics" },
+            { "Show Known Types" },
+        };
+        List<String> present = new ArrayList<>();
+        List<String> missing = new ArrayList<>();
+        List<MenuItem> remaining = new ArrayList<>(proof.getItems());
+        for (String[] row : expected) {
+            String label = row[0];
+            if ("---".equals(label)) {
+                // a separator has no text; match the control type directly
+                int sepIndex = -1;
+                for (int i = 0; i < remaining.size(); i++) {
+                    if (remaining.get(i) instanceof SeparatorMenuItem) {
+                        sepIndex = i;
+                        break;
+                    }
+                }
+                if (sepIndex < 0) {
+                    missing.add("separator");
+                } else {
+                    present.add("separator");
+                    remaining = new ArrayList<>(
+                        remaining.subList(sepIndex + 1, remaining.size()));
+                }
+                continue;
+            }
+            int index = indexOfItem(remaining, label);
+            if (index < 0) {
+                missing.add(label);
+                continue;
+            }
+            present.add(label);
+            MenuItem node = remaining.get(index);
+            if (node instanceof Menu submenu && row.length > 1) {
+                // check the submenu's entries in their order (e.g. Automation, Search Mode)
+                List<MenuItem> children = new ArrayList<>(submenu.getItems());
+                for (int i = 1; i < row.length; i++) {
+                    int childIndex = indexOfItem(children, row[i]);
+                    if (childIndex < 0) {
+                        missing.add(label + " > " + row[i]);
+                    } else {
+                        present.add(label + " > " + row[i]);
+                        children = new ArrayList<>(
+                            children.subList(childIndex + 1, children.size()));
+                    }
+                }
+            }
+            remaining = new ArrayList<>(remaining.subList(index + 1, remaining.size()));
+        }
+        String found = String.join(", ", present);
+        if (missing.isEmpty()) {
+            return "PASS - " + present.size() + " items, found: " + found;
+        }
+        return "FAIL - missing: " + String.join(", ", missing) + " (found " + found + ")";
+    }
+
+    /** menu: index of the first remaining menu item with the given text, or -1. */
+    private static int indexOfItem(List<MenuItem> items, String text) {
+        for (int i = 0; i < items.size(); i++) {
+            MenuItem item = items.get(i);
+            if (text.equals(item.getText())) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private Menu buildOptionsMenu() {
