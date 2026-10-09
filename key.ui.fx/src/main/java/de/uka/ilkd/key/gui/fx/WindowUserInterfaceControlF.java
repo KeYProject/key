@@ -9,6 +9,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.stage.Stage;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.DefaultProofControl;
@@ -16,7 +17,11 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.RuleCompletionHandler;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
+import de.uka.ilkd.key.gui.fx.tacletmatch.TacletMatchDialogF;
+import de.uka.ilkd.key.gui.fx.tacletmatch.classic.TacletMatchCompletionDialogF;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
@@ -67,10 +72,11 @@ import org.slf4j.LoggerFactory;
  * apps the user cannot complete.
  * <p>
  * Deliberately deferred (see the port report): the load/save/recents methods of the Swing
- * original (the FX load path lives in {@code MainWindowF.startProofLoad}), the taclet-match
- * dialogs ({@code TacletMatchDialog}, a stub here), {@code selectProofObligation}
+ * original (the FX load path lives in {@code MainWindowF.startProofLoad}),
+ * {@code selectProofObligation}
  * ({@code ProofManagementDialog}) and the progress bar (the FX status bar has no progress bar
- * yet).
+ * yet). The taclet-match dialogs are wired through {@link #completeAndApplyTacletMatch}
+ * (termmenu/S4).
  */
 public class WindowUserInterfaceControlF extends DefaultUserInterfaceControl
         implements RuleCompletionHandler {
@@ -199,19 +205,41 @@ public class WindowUserInterfaceControlF extends DefaultUserInterfaceControl
 
     /**
      * Port of Swing WindowUserInterfaceControl.java:329-338
-     * ({@code completeAndApplyTacletMatch}): the Swing original opens the redesigned
-     * {@code TacletMatchDialog} (or the classic one via
-     * {@code ViewSettings.isUseClassicTacletDialog}
-     * — a migration toggle). The FX taclet-match dialog suite is a separate port item; for now
-     * the completion is reported and skipped (the core then keeps the app unapplied).
+     * ({@code completeAndApplyTacletMatch}): opens the redesigned {@link TacletMatchDialogF} —
+     * or the classic {@link TacletMatchCompletionDialogF} via
+     * {@code ViewSettings.isUseClassicTacletDialog} (a migration toggle) — with the main
+     * window's stage as owner and the mediator's services/notation info; the dialogs own the
+     * interactive apply flow ({@code ApplyTacletDialogF.handleApply}).
      */
     @Override
     public void completeAndApplyTacletMatch(TacletInstantiationModel[] models, Goal goal) {
-        LOGGER.warn("The taclet match dialog is not yet ported to the JavaFX UI; "
-            + "the taclet application is skipped ({} model(s))", models.length);
-        NotificationManagerF.getInstance().notify(
-            "The taclet match dialog arrives in a later milestone of the key.ui.fx rewrite.",
-            NotificationManagerF.Kind.WARNING);
+        // termmenu: owner stage and the printing context come from the main window (Swing
+        // parity: WindowUserInterfaceControl.java:329-338 passes mainWindow / its mediator);
+        // both dialogs accept the main window's stage as owner (a Stage is a Window)
+        final Stage owner = mainWindow.getStage();
+        final Services services = mainWindow.getMediator().getServices();
+        final NotationInfo notationInfo = mainWindow.getMediator().getNotationInfo();
+        if (owner == null || services == null || notationInfo == null) {
+            // termmenu: without an owner stage or a loaded proof the dialog cannot be
+            // constructed — keep the app unapplied and report (the former stub behavior)
+            LOGGER.warn("The taclet match dialog cannot be opened (owner={}, services={}, "
+                + "notationInfo={}); the taclet application is skipped ({} model(s))", owner,
+                services, notationInfo, models.length);
+            NotificationManagerF.getInstance().notify(
+                "The taclet match dialog cannot be opened right now.",
+                NotificationManagerF.Kind.WARNING);
+            return;
+        }
+        // the redesigned dialog is the default; the classic one is offered as a migration
+        // fallback (Swing parity, WindowUserInterfaceControl.java:332-337)
+        if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .isUseClassicTacletDialog()) {
+            new TacletMatchCompletionDialogF(owner, models, goal, services, notationInfo,
+                getProofControl());
+        } else {
+            new TacletMatchDialogF(owner, models, goal, getProofControl(), services,
+                notationInfo);
+        }
     }
 
     // ------------------------------------------------------------------
