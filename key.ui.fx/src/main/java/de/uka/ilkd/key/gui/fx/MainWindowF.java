@@ -28,6 +28,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Control;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -36,6 +37,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ToolBar;
@@ -71,6 +73,7 @@ import de.uka.ilkd.key.gui.fx.docking.DockWorkspace;
 import de.uka.ilkd.key.gui.fx.docking.Dockable;
 import de.uka.ilkd.key.gui.fx.docking.DockingLayoutF;
 import de.uka.ilkd.key.gui.fx.docking.SimpleDockable;
+import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.goallist.GoalListViewF;
 import de.uka.ilkd.key.gui.fx.help.HelpFacadeF;
@@ -99,6 +102,7 @@ import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeViewF;
 import de.uka.ilkd.key.gui.fx.recentfiles.RecentFilesF;
 import de.uka.ilkd.key.gui.fx.settings.ActiveSettingsDialogF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsManagerF;
+import de.uka.ilkd.key.gui.fx.settings.SettingsProviderF;
 import de.uka.ilkd.key.gui.fx.settings.ToolTipOptionsDialogF;
 import de.uka.ilkd.key.gui.fx.soundiness.SoundinessAnalyzer;
 import de.uka.ilkd.key.gui.fx.soundiness.SoundinessDialogF;
@@ -482,6 +486,17 @@ public final class MainWindowF {
                     .notify("Javac settings verification: " + report,
                         report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
         }
+
+        // extension: MP9.0 — register the FX extensions' settings providers into the settings
+        // manager registry (Swing SettingsManager registers each KeYGuiExtension.Settings
+        // provider at startup) and call the StartupF.init hook of every discovered provider
+        // once, at the end of the startup sequence (Swing KeYMediator/ExtensionManager call
+        // init right after the window is built; here after the demo load is started so the
+        // status-line extensions can observe the selection events of the load).
+        for (SettingsProviderF provider : KeYGuiExtensionFacadeF.getSettingsProviders()) {
+            SettingsManagerF.getInstance().add(provider);
+        }
+        KeYGuiExtensionFacadeF.initAll(this, mediator);
 
         NotificationManagerF.getInstance()
                 .notify("KeY (JavaFX) started. Docking layout restored from "
@@ -937,6 +952,14 @@ public final class MainWindowF {
                 NotificationManagerF.getInstance()
                         .notify("Auto save verification: " + (ok ? "PASS" : "FAIL"),
                             ok ? Kind.INFO : Kind.ERROR);
+            }
+            // extension: MP9.0 — extension SPI self test (key.fx.verify.extensions): asserts
+            // the facade discovery (3 registered FX extensions), the two status-line controls
+            // in the built status bar, the Heatmap menu in the menu bar, the Heatmap settings
+            // provider in the settings registry and the term-menu extension section falling
+            // back to the disabled placeholder without a position. One stdout report line.
+            if (System.getProperty("key.fx.verify.extensions") != null) {
+                runExtensionVerification(env);
             }
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 startLiveAutoMode(env);
@@ -1832,6 +1855,74 @@ public final class MainWindowF {
     }
 
     /**
+     * extension: MP9.0 — headless self test of the FX extension SPI
+     * ({@code key.fx.verify.extensions}), run after the demo load like the other
+     * proof-dependent verify hooks. Asserts (a) the facade discovers exactly the three ported
+     * built-in extensions, (b) the two status-line controls of the facade appear in the built
+     * status bar, (c) the Heatmap menu is a separate menu of the built menu bar, (d) the
+     * SettingsManagerF registry holds the Heatmap settings provider, and (e) the term-menu
+     * extension section renders the disabled placeholder when <em>no position</em> is available
+     * (the fallback of SequentTermContextMenuF; contributed items would be enabled only with a
+     * position). One stdout report line; skips the term-menu sub-assertion gracefully when no
+     * goal is loaded.
+     *
+     * @param env the environment of the loaded proof
+     */
+    private void runExtensionVerification(KeYEnvironment<DefaultUserInterfaceControl> env) {
+        boolean pass = true;
+        StringBuilder sb = new StringBuilder();
+
+        int discovered = KeYGuiExtensionFacadeF.discoveredCount();
+        sb.append("discovered=").append(discovered);
+        pass &= discovered == 3;
+
+        List<Control> statusControls = KeYGuiExtensionFacadeF.getStatusLineControls();
+        sb.append(" statusControls=").append(statusControls.size());
+        HBox statusBar = buildStatusBar();
+        pass &= statusControls.size() == 2
+                && statusBar.getChildren().containsAll(statusControls);
+
+        MenuBar menuBar = buildMenuBar();
+        boolean heatmapMenu =
+            menuBar.getMenus().stream().anyMatch(m -> "Heatmap".equals(m.getText()));
+        sb.append(" heatmapMenu=").append(heatmapMenu);
+        pass &= heatmapMenu;
+
+        boolean heatmapSettings = SettingsManagerF.getInstance().getProviders().stream()
+                .anyMatch(p -> "Heatmap".equals(p.getDescription()));
+        sb.append(" heatmapSettings=").append(heatmapSettings);
+        pass &= heatmapSettings;
+
+        // term-menu extension section: with no position the disabled placeholder must render
+        // without crashing (SequentTermContextMenuF.extensionSection)
+        Goal goal = mediator.getSelectedGoal();
+        String termMenuSection;
+        if (goal == null) {
+            termMenuSection = "skipped";
+        } else {
+            PosInSequent pos = findTermMenuPos();
+            List<SequentMenuModelF.Entry> entries = pos == null
+                    ? List.of(new SequentMenuModelF.NamedAction("extension", "Extensions", null,
+                        null))
+                    : SequentMenuModelF.build(pos, mediator, env.getProofControl(), null, null);
+            ContextMenu menu = SequentTermContextMenuF.build(entries,
+                new SequentTermContextMenuF.MenuContext(mediator, env.getProofControl(), goal,
+                    null, null, sequentView::printSequent));
+            MenuItem extensionItem = menu.getItems().stream()
+                    .filter(it -> "Extensions".equals(it.getText())).findFirst().orElse(null);
+            boolean disabledFallback = extensionItem != null && extensionItem.isDisable()
+                    && extensionItem.getOnAction() == null;
+            termMenuSection = disabledFallback ? "disabled-fallback" : "FAIL";
+            pass &= disabledFallback;
+        }
+        sb.append(" termmenuExtension=").append(termMenuSection);
+
+        String report = (pass ? "PASS" : "FAIL") + " - " + sb;
+        System.out.println("Extension verification: " + report);
+        LOGGER.info("Extension verification: {}", report);
+    }
+
+    /**
      * menu: MP8 — visible text of a menu item, unwrapping label-backed {@code CustomMenuItem}s
      * (the macro items of the term menu carry their name in the wrapped label).
      */
@@ -2009,6 +2100,15 @@ public final class MainWindowF {
         dockables.put(ID_SEQUENT, new SimpleDockable(ID_SEQUENT, "Sequent", sequentView));
         dockables.put(ID_SOURCE_VIEW,
             new SimpleDockable(ID_SOURCE_VIEW, "Source", buildSourceViewContent()));
+        // extension: MP9.0 — register each left-panel Tab contributed by the FX extensions as
+        // a dockable (Swing KeYGuiExtension.LeftPanel returns tabs for the left JTabbedPane,
+        // KeYGuiExtension.java:127-143; the FX host mirrors the built-in views' registration
+        // pattern, so extension panels appear in the docking layout and its persistence).
+        int extensionPanel = 0;
+        for (Tab tab : KeYGuiExtensionFacadeF.getLeftPanelTabs(this, mediator)) {
+            String id = "extension-left-panel-" + extensionPanel++;
+            dockables.put(id, new SimpleDockable(id, tab.getText(), tab.getContent()));
+        }
     }
 
     /**
@@ -2024,14 +2124,27 @@ public final class MainWindowF {
     }
 
     private List<DockWorkspace.Default> defaultLayout() {
-        return List.of(new DockWorkspace.Default(DockLocation.LEFT,
-            requireDockable(ID_LOADED_PROOFS)),
-            new DockWorkspace.Default(DockLocation.LEFT, requireDockable(ID_GOAL_LIST)),
-            new DockWorkspace.Default(DockLocation.LEFT, requireDockable(ID_PROOF_TREE)),
-            new DockWorkspace.Default(DockLocation.LEFT, requireDockable(ID_INFO_VIEW)),
-            new DockWorkspace.Default(DockLocation.LEFT, requireDockable(ID_STRATEGY)),
-            new DockWorkspace.Default(DockLocation.MAIN, requireDockable(ID_SEQUENT)),
+        List<DockWorkspace.Default> defaults = new ArrayList<>();
+        defaults.add(new DockWorkspace.Default(DockLocation.LEFT,
+            requireDockable(ID_LOADED_PROOFS)));
+        defaults.add(new DockWorkspace.Default(DockLocation.LEFT, requireDockable(ID_GOAL_LIST)));
+        defaults.add(
+            new DockWorkspace.Default(DockLocation.LEFT, requireDockable(ID_PROOF_TREE)));
+        defaults.add(new DockWorkspace.Default(DockLocation.LEFT, requireDockable(ID_INFO_VIEW)));
+        defaults.add(
+            new DockWorkspace.Default(DockLocation.LEFT, requireDockable(ID_STRATEGY)));
+        defaults.add(new DockWorkspace.Default(DockLocation.MAIN, requireDockable(ID_SEQUENT)));
+        defaults.add(
             new DockWorkspace.Default(DockLocation.RIGHT, requireDockable(ID_SOURCE_VIEW)));
+        // extension: MP9.0 — the extension left-panel dockables (registered in
+        // {@link #buildDockables()}) appear at the bottom of the left docking area in the
+        // factory-default layout; without LeftPanelF providers this appends nothing.
+        for (Dockable dockable : dockables.values()) {
+            if (dockable.getId().startsWith("extension-left-panel-")) {
+                defaults.add(new DockWorkspace.Default(DockLocation.LEFT, dockable));
+            }
+        }
+        return defaults;
     }
 
     private void restoreLayout() {
@@ -2066,6 +2179,19 @@ public final class MainWindowF {
         VBox top = new VBox();
         MenuBar menuBar = buildMenuBar();
         HBox toolBarArea = new HBox(buildFileToolBar(), buildProofToolBar());
+        // extension: MP9.0 — a third toolbar holds the controls contributed by the FX
+        // extensions (Swing MainWindow.appendToolbar /
+        // KeYGuiExtensionFacade.createToolbars, KeYGuiExtensionFacade.java:217-221: each
+        // extension toolbar is embedded next to the built-in file/proof toolbars); shown only
+        // when an extension contributes controls.
+        List<Control> extensionToolbarControls =
+            KeYGuiExtensionFacadeF.getToolbarControls(this, mediator);
+        if (!extensionToolbarControls.isEmpty()) {
+            ToolBar extensionToolBar = new ToolBar();
+            extensionToolBar.getStyleClass().add("key-extension-tool-bar");
+            extensionToolBar.getItems().addAll(extensionToolbarControls);
+            toolBarArea.getChildren().add(extensionToolBar);
+        }
         toolBarArea.getStyleClass().add("key-toolbar-area");
         top.getChildren().addAll(menuBar, toolBarArea);
         return top;
@@ -2075,6 +2201,18 @@ public final class MainWindowF {
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().addAll(buildFileMenu(), buildViewMenu(), buildProofMenu(),
             buildOptionsMenu(), buildAboutMenu());
+        // extension: MP9.0 — the extension-contributed menus are appended after the About menu
+        // as NEW separate menu-bar menus (Swing MainWindow.createMenuBar :983 calls
+        // KeYGuiExtensionFacade.addExtensionsToMainMenu after the built-in menus,
+        // KeYGuiExtensionFacade.java:81-89; the Swing original groups the extension actions
+        // into one "Extensions" JMenu, the FX SPI contributes whole Menu objects — the
+        // grouping decision stays with the extension). The five built-in menus' item sets are
+        // untouched: key.fx.verify.menuparity keeps asserting 16/24/12/7/5.
+        List<javafx.scene.control.Menu> extensionMenus =
+            KeYGuiExtensionFacadeF.getMenus(this, mediator);
+        if (!extensionMenus.isEmpty()) {
+            menuBar.getMenus().addAll(extensionMenus);
+        }
         return menuBar;
     }
 
@@ -3196,6 +3334,15 @@ public final class MainWindowF {
         statusRight.setMinWidth(0);
         statusRight.setMinHeight(0);
         bar.getChildren().addAll(statusLeft, spacer, statusRight);
+        // extension: MP9.0 — the status-line controls contributed by the FX extensions are
+        // appended at the right end of the status bar, after the theme/font-size label (Swing
+        // MainWindow.createStatusBar / KeYGuiExtensionFacade.getStatusLineComponents,
+        // KeYGuiExtensionFacade.java:325-333); shown only when an extension contributes
+        // controls.
+        List<Control> extensionStatusControls = KeYGuiExtensionFacadeF.getStatusLineControls();
+        if (!extensionStatusControls.isEmpty()) {
+            bar.getChildren().addAll(extensionStatusControls);
+        }
         return bar;
     }
 
