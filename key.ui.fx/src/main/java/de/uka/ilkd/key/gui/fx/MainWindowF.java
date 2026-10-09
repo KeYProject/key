@@ -115,6 +115,7 @@ import de.uka.ilkd.key.proof.io.GZipProofSaver;
 import de.uka.ilkd.key.proof.io.ProofBundleSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
+import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
@@ -2076,14 +2077,31 @@ public final class MainWindowF {
         { "Forward" },
     };
 
+    // menu: MP4 — expected Options menu entries in the Swing order of MainWindow.createOptionsMenu
+    // (:1144-1161: Settings, SMT Solvers…, ─sep─, Confirm Exit, Auto Save Proofs, Minimize
+    // Interaction, Right Click for Proof Macros, Ensure Source Consistency). The FX-only extras
+    // between the parity entries ("Reset Dock Layout" and the two plain separators) are not
+    // listed: the walker skips unlisted built entries and only asserts that the listed ones
+    // occur in this relative order.
+    private static final String[][] OPTIONS_MENU_EXPECTED = {
+        { "Settings" },
+        { "SMT Solvers…" },
+        { "Confirm Exit" },
+        { "Auto Save Proofs" },
+        { "Minimize Interaction" },
+        { "Right Click for Proof Macros" },
+        { "Ensure Source Consistency" },
+    };
+
     /**
-     * menu: MP1/MP3 — menu parity self test (system property {@code key.fx.verify.menuparity},
+     * menu: MP1/MP3/MP4 — menu parity self test (system property {@code key.fx.verify.menuparity},
      * run after a proof load like the other verify hooks): builds the menu bar and emits one
      * marker line per asserted menu, each ending in PASS or FAIL.
      */
     private void verifyMenuParity() {
         logMenuParity("Proof", verifyMenuParityReport("Proof", PROOF_MENU_EXPECTED));
         logMenuParity("View", verifyMenuParityReport("View", VIEW_MENU_EXPECTED));
+        logMenuParity("Options", verifyMenuParityReport("Options", OPTIONS_MENU_EXPECTED));
     }
 
     private void logMenuParity(String menuName, String report) {
@@ -2188,14 +2206,122 @@ public final class MainWindowF {
 
     private Menu buildOptionsMenu() {
         Menu options = new Menu("Options");
+        // menu: MP4 — Swing MainWindow.createOptionsMenu :1144-1161: Settings, SMT Solvers…
+        // (SMTOptionsAction → settings dialog on the SMT panel), separator, then the five check
+        // items; the FX-only "Reset Dock Layout" extra is kept between two separators (Settings,
+        // SMT Solvers…, ─sep─, Reset Dock Layout, ─sep─, Confirm Exit, Auto Save Proofs,
+        // Minimize Interaction, Right Click for Proof Macros, Ensure Source Consistency).
         options.getItems().addAll(
             menuItem("Settings",
                 "de.uka.ilkd.key.gui.settings.SettingsManager$ShowSettingsAction",
                 IconFactoryF.Key.CONFIGURE, this::openSettings),
+            menuItem("SMT Solvers…", "de.uka.ilkd.key.gui.actions.SMTOptionsAction",
+                IconFactoryF.Key.TOOLBOX, this::showSMTOptions),
             new SeparatorMenuItem(),
             menuItem("Reset Dock Layout", this::resetLayout),
-            menuItem("SMT Solvers…", IconFactoryF.Key.TOOLBOX, this::notYetImplemented));
+            new SeparatorMenuItem(),
+            confirmExitToggle(),
+            autoSaveProofsToggle(),
+            minimizeInteractionToggle(),
+            rightClickMacroToggle(),
+            ensureSourceConsistencyToggle());
         return options;
+    }
+
+    /**
+     * menu: MP4 — SMT Solvers… opens the settings dialog on the SMT panel (Swing
+     * SMTOptionsAction, SMTOptionsAction.java:27-28: {@code
+     * SettingsManager.getInstance().showSettingsDialog(mainWindow, SettingsManager.SMT_SETTINGS)};
+     * here the provider registered as {@link SettingsManagerF#SMT_SETTINGS} is selected in the
+     * settings tree, SettingsManagerF.java:169-177).
+     */
+    private void showSMTOptions() {
+        SettingsManagerF.getInstance().showSettingsDialog(this, SettingsManagerF.SMT_SETTINGS);
+    }
+
+    /**
+     * menu: MP4 — Confirm Exit check item (Swing ToggleConfirmExitAction,
+     * ToggleConfirmExitAction.java:20-31): the selected state mirrors
+     * {@code ViewSettings.confirmExit()} and the action writes it back.
+     */
+    private CheckMenuItem confirmExitToggle() {
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        CheckMenuItem item = new CheckMenuItem("Confirm Exit");
+        item.setSelected(vs.confirmExit());
+        item.setOnAction(e -> vs.setConfirmExit(item.isSelected()));
+        return item;
+    }
+
+    /**
+     * menu: MP4 — Auto Save Proofs check item (Swing {@code AutoSave},
+     * AutoSave.java:14-33): the initial state is {@code autoSavePeriod() > 0} (AutoSave.java:22-24)
+     * and the action writes {@code setAutoSave(2000)} / {@code setAutoSave(0)}
+     * (AutoSave.java:29-31;
+     * Swing {@code AutoSave.DEFAULT_PERIOD = 2000}, AutoSave.java:16 — key.ui, not importable into
+     * this module, hence the inlined constant).
+     * // menu: auto-save timer wiring deferred (no FX mediator support): Swing additionally calls
+     * getMediator().setAutoSave(p) (AutoSave.java:31); the FX KeYMediatorF has no setAutoSave, so
+     * only the persisted flag is written.
+     */
+    private CheckMenuItem autoSaveProofsToggle() {
+        GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+        CheckMenuItem item = new CheckMenuItem("Auto Save Proofs");
+        item.setSelected(gs.autoSavePeriod() > 0);
+        item.setOnAction(
+            e -> gs.setAutoSave(item.isSelected() ? DEFAULT_AUTO_SAVE_PERIOD : 0));
+        return item;
+    }
+
+    /** menu: MP4 — Swing {@code AutoSave.DEFAULT_PERIOD} (key.ui), see autoSaveProofsToggle(). */
+    private static final int DEFAULT_AUTO_SAVE_PERIOD = 2000;
+
+    /**
+     * menu: MP4 — Minimize Interaction check item (Swing {@code MinimizeInteraction},
+     * MinimizeInteraction.java:17-73, display name "Minimize Interaction"): the selected state
+     * mirrors and writes the {@code GeneralSettings} taclet filter.
+     * // menu: the FX context-menu filter wiring for this flag is deferred — Swing additionally
+     * applies a taclet filter on the current goal view via
+     * mainWindow.getUserInterface().getProofControl().setMinimizeInteraction(b)
+     * (MinimizeInteraction.java:64-66); only the flag is persisted here.
+     */
+    private CheckMenuItem minimizeInteractionToggle() {
+        GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+        CheckMenuItem item = new CheckMenuItem("Minimize Interaction");
+        item.setSelected(gs.getTacletFilter());
+        item.setOnAction(e -> gs.setTacletFilter(item.isSelected()));
+        return item;
+    }
+
+    /**
+     * menu: MP4 — Right Click for Proof Macros check item (Swing RightMouseClickToggleAction,
+     * RightMouseClickToggleAction.java:22-33): the selected state mirrors
+     * {@code GeneralSettings.isRightClickMacro()} and the action writes
+     * {@code setRightClickMacros} back.
+     * // menu: Swing's direct-macro-on-right-click behavior is deferred — the FX right click
+     * currently always opens the term context menu; only the flag persists here.
+     */
+    private CheckMenuItem rightClickMacroToggle() {
+        GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+        CheckMenuItem item = new CheckMenuItem("Right Click for Proof Macros");
+        item.setSelected(gs.isRightClickMacro());
+        item.setOnAction(e -> gs.setRightClickMacros(item.isSelected()));
+        return item;
+    }
+
+    /**
+     * menu: MP4 — Ensure Source Consistency check item (Swing
+     * EnsureSourceConsistencyToggleAction, EnsureSourceConsistencyToggleAction.java:37-48): the
+     * selected state mirrors {@code GeneralSettings.isEnsureSourceConsistency()} and the action
+     * writes {@code setEnsureSourceConsistency} back.
+     * // menu: Swing's info dialog is dropped — the FX port has no source-consistency machinery
+     * (no proof-bundle/source-cache backend); only the flag persists for now.
+     */
+    private CheckMenuItem ensureSourceConsistencyToggle() {
+        GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+        CheckMenuItem item = new CheckMenuItem("Ensure Source Consistency");
+        item.setSelected(gs.isEnsureSourceConsistency());
+        item.setOnAction(e -> gs.setEnsureSourceConsistency(item.isSelected()));
+        return item;
     }
 
     private Menu buildAboutMenu() {
