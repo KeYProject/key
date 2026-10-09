@@ -158,6 +158,8 @@ public interface Visitor {
 
     void performActionOnExactInstanceof(ExactInstanceof x);
 
+    void performActionOnInstanceofPattern(InstanceofPattern x);
+
     void performActionOnNew(New x);
 
     void performActionOnTypeCast(TypeCast x);
