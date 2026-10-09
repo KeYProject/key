@@ -18,9 +18,11 @@ import java.util.Properties;
 import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -74,6 +76,7 @@ import de.uka.ilkd.key.gui.fx.docking.Dockable;
 import de.uka.ilkd.key.gui.fx.docking.DockingLayoutF;
 import de.uka.ilkd.key.gui.fx.docking.SimpleDockable;
 import de.uka.ilkd.key.gui.fx.drawer.DrawerF;
+import de.uka.ilkd.key.gui.fx.drawer.DrawerItemF;
 import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.goallist.GoalListViewF;
@@ -335,6 +338,18 @@ public final class MainWindowF {
     private final TaskTreeF loadedProofs = new TaskTreeF(proofManager);
 
     /**
+     * drawer: MP10 — the west/east/south drawer hosts of the main window (Java port of the
+     * TornadoFX {@code Drawer}, package {@code de.uka.ilkd.key.gui.fx.drawer}). The panels that
+     * used to live in the left/right docking areas are now toggle buttons in these drawers:
+     * dragging a button onto another drawer moves the panel to that port
+     * ({@link DrawerF#transferItem(DrawerItemF, DrawerF)}), dragging within a bar reorders the
+     * split ({@link DrawerF#moveItem(int, int)}). The docking centre only hosts the sequent.
+     */
+    private DrawerF westDrawer;
+    private DrawerF eastDrawer;
+    private DrawerF southDrawer;
+
+    /**
      * proofmgmt: the environment of the most recent load; the Proof Management dialog (Swing
      * {@code ProofManagementDialog}, opened from the File menu) operates on its init config and
      * starts proofs via its user interface control.
@@ -405,10 +420,18 @@ public final class MainWindowF {
 
         buildDockables();
         workspace.setDefaultLayout(defaultLayout());
+        buildDrawerHosts();
 
         BorderPane root = new BorderPane();
         root.setTop(buildTop());
-        StackPane center = new StackPane(workspace.getRoot());
+        // drawer: MP10 — the workspace (the sequent) stays the centre of the main area; the
+        // west/east/south drawers host the panels that previously lived in the docking areas
+        BorderPane mainArea = new BorderPane();
+        mainArea.setCenter(workspace.getRoot());
+        mainArea.setLeft(westDrawer);
+        mainArea.setRight(eastDrawer);
+        mainArea.setBottom(southDrawer);
+        StackPane center = new StackPane(mainArea);
         NotificationManagerF.getInstance().attach(center);
         root.setCenter(center);
         root.setBottom(buildStatusBar());
@@ -516,6 +539,30 @@ public final class MainWindowF {
      */
     public DockLayoutStore getLayoutStore() {
         return layoutStore;
+    }
+
+    /**
+     * @return the west (left) drawer host of the main window — Proof Tree, Goal List, Loaded
+     *         Proofs, Info, Strategy plus the extension left-panel items (used by the drawer
+     *         layout verification and the extension verification)
+     */
+    public DrawerF getWestDrawer() {
+        return westDrawer;
+    }
+
+    /**
+     * @return the east (right) drawer host — currently the Source panel
+     */
+    public DrawerF getEastDrawer() {
+        return eastDrawer;
+    }
+
+    /**
+     * @return the south (bottom) drawer host; starts empty and is filled by dragging panels
+     *         there (cross-port drag and drop)
+     */
+    public DrawerF getSouthDrawer() {
+        return southDrawer;
     }
 
     /**
@@ -770,7 +817,15 @@ public final class MainWindowF {
             lastEnvironment = env;
             proofManager.addProof(env.getLoadedProof());
             String show = System.getProperty("key.fx.show", ID_SEQUENT);
-            String target = ID_PROOF_TREE.equalsIgnoreCase(show) ? ID_PROOF_TREE : ID_SEQUENT;
+            // drawer: MP10 — the proof tree is a west drawer item now, not a dockable; expanding
+            // it (the sequent is selected in the workspace after the load)
+            if (ID_PROOF_TREE.equalsIgnoreCase(show) && westDrawer != null) {
+                westDrawer.getItems().stream()
+                        .filter(item -> "Proof Tree".equals(item.getButton().getText()))
+                        .findFirst().ifPresent(item -> item.getButton().setSelected(true));
+                show = ID_SEQUENT;
+            }
+            String target = ID_SEQUENT;
             LOGGER.info("Selecting dockable '{}' (key.fx.show={})", target, show);
             workspace.select(dockables.get(target));
             NotificationManagerF.getInstance()
@@ -811,6 +866,11 @@ public final class MainWindowF {
                 NotificationManagerF.getInstance()
                         .notify("Drawer verification: " + drawerReport,
                             drawerReport.startsWith("PASS") ? Kind.INFO : Kind.ERROR);
+            }
+            // drawer: MP10 — headless self test of the drawered main area (drawer hosts, item
+            // sets, default expansions and the drag-and-drop seams on the live drawers)
+            if (System.getProperty("key.fx.verify.drawerlayout") != null) {
+                runDrawerLayoutVerification(env);
             }
             if (System.getProperty("key.fx.verify.tree") != null) {
                 String report = proofTreeView.verifyTreeStructure();
@@ -1903,6 +1963,14 @@ public final class MainWindowF {
         sb.append(" heatmapSettings=").append(heatmapSettings);
         pass &= heatmapSettings;
 
+        // drawer: MP10 — the extension left-panel tabs are west drawer items now; with only the
+        // ported built-in extensions registered none contributes tabs, so the west drawer holds
+        // exactly its five built-in panels (+ one item per contributed left-panel tab)
+        int facadeTabs = KeYGuiExtensionFacadeF.getLeftPanelTabs(this, mediator).size();
+        int westItems = westDrawer == null ? -1 : westDrawer.getItems().size();
+        sb.append(" westDrawerItems=").append(westItems);
+        pass &= westItems == 5 + facadeTabs;
+
         // term-menu extension section: with no position the disabled placeholder must render
         // without crashing (SequentTermContextMenuF.extensionSection)
         Goal goal = mediator.getSelectedGoal();
@@ -1930,6 +1998,75 @@ public final class MainWindowF {
         String report = (pass ? "PASS" : "FAIL") + " - " + sb;
         System.out.println("Extension verification: " + report);
         LOGGER.info("Extension verification: {}", report);
+    }
+
+    /**
+     * drawer: MP10 — headless self test of the drawered main window layout
+     * ({@code key.fx.verify.drawerlayout}), run after the demo load like the other
+     * proof-dependent verify hooks. Asserts the west/east/south {@link DrawerF} hosts with
+     * their expected item sets and default expansions (Proof Tree + Goal List share the west
+     * split in button order), then exercises the same drag-and-drop seams the handlers invoke
+     * on the live drawers: a cross-port transfer of the Strategy panel west→east and back
+     * (owner re-keying) and a button reorder whose split follows the new button order. One
+     * stdout report line; leaves the drawers in their pre-test arrangement.
+     *
+     * @param env the environment of the loaded proof
+     */
+    private void runDrawerLayoutVerification(KeYEnvironment<DefaultUserInterfaceControl> env) {
+        boolean pass = true;
+        StringBuilder sb = new StringBuilder();
+        DrawerF west = getWestDrawer();
+        DrawerF east = getEastDrawer();
+        DrawerF south = getSouthDrawer();
+        if (west == null || east == null || south == null) {
+            System.out.println("Drawer layout verification: FAIL - hosts=null");
+            return;
+        }
+        sb.append("west=").append(west.getItems().size()).append(" east=")
+                .append(east.getItems().size()).append(" south=").append(south.getItems().size());
+        pass &= west.getItems().size() == 5 && east.getItems().size() == 1
+                && south.getItems().size() == 0;
+        pass &= west.getDockingSide() == Side.LEFT && west.isMultiselect();
+        pass &= east.getDockingSide() == Side.RIGHT && east.isMultiselect();
+        pass &= south.getDockingSide() == Side.BOTTOM;
+
+        // default expansions: Proof Tree + Goal List share the west split in button order
+        ObservableList<Node> westContent = west.getContentArea().getChildren();
+        sb.append(" expanded=").append(westContent.size());
+        pass &= westContent.size() == 2 && westContent.get(0) == west.getItems().get(0)
+                && westContent.get(1) == west.getItems().get(1);
+
+        // cross-port transfer round trip: Strategy panel west->east, then east->west
+        boolean movedEast = false;
+        boolean movedBack = false;
+        DrawerItemF strategy = west.getItems().size() > 4 ? west.getItems().get(4) : null;
+        if (strategy != null && "Strategy".equals(strategy.getButton().getText())) {
+            west.transferItem(strategy, east);
+            movedEast = east.getItems().size() == 2 && east.getItems().contains(strategy)
+                    && strategy.getDrawer() == east;
+            east.transferItem(strategy, west);
+            movedBack = west.getItems().size() == 5 && east.getItems().size() == 1
+                    && strategy.getDrawer() == west && !east.getItems().contains(strategy);
+        }
+        sb.append(" transferRoundTrip=").append(movedEast && movedBack ? "PASS" : "FAIL");
+        pass &= movedEast && movedBack;
+
+        // button reorder: move the first west button behind the third; bar + split follow
+        boolean reorderOk = false;
+        if (west.getItems().size() > 2) {
+            DrawerItemF first = west.getItems().get(0);
+            west.moveItem(0, 2);
+            reorderOk = west.getItems().get(2) == first
+                    && west.getContentArea().getChildren().contains(first);
+            west.moveItem(2, 0);
+            reorderOk &= west.getItems().get(0) == first;
+        }
+        sb.append(" reorder=").append(reorderOk ? "PASS" : "FAIL");
+        pass &= reorderOk;
+
+        String report = (pass ? "PASS" : "FAIL") + " - " + sb;
+        System.out.println("Drawer layout verification: " + report);
+        LOGGER.info("Drawer layout verification: {}", report);
     }
 
     /**
@@ -2096,29 +2233,49 @@ public final class MainWindowF {
     // ------------------------------------------------------------------
 
     private void buildDockables() {
-        // proofmgmt: the Loaded Proofs view replaces the M1 placeholder dockable (JavaFX port of
-        // the Swing TaskTree)
-        dockables.put(ID_LOADED_PROOFS,
-            new SimpleDockable(ID_LOADED_PROOFS, "Loaded Proofs", loadedProofs));
-        dockables.put(ID_GOAL_LIST,
-            new SimpleDockable(ID_GOAL_LIST, "Goal List", goalListView));
-        dockables.put(ID_PROOF_TREE,
-            new SimpleDockable(ID_PROOF_TREE, "Proof Tree", proofTreeView));
-        dockables.put(ID_INFO_VIEW, new SimpleDockable(ID_INFO_VIEW, "Info", infoView));
-        dockables.put(ID_STRATEGY,
-            new SimpleDockable(ID_STRATEGY, "Strategy", strategyView));
+        // drawer: MP10 — the Loaded Proofs / Goal List / Proof Tree / Info / Strategy panels
+        // moved out of the docking area into the west drawer (buildDrawerHosts), the Source view
+        // into the east drawer; the docking centre now only hosts the sequent (its dock actions,
+        // layout slots and shutdown persistence keep working). The left/right dock-layout
+        // registrations are gone, so DockLayoutStore was bumped to version 2: older persisted
+        // layouts referencing the removed dockables are discarded (they were the pre-MP10
+        // arrangement) and the workspace falls back to the factory default — the sequent only.
         dockables.put(ID_SEQUENT, new SimpleDockable(ID_SEQUENT, "Sequent", sequentView));
-        dockables.put(ID_SOURCE_VIEW,
-            new SimpleDockable(ID_SOURCE_VIEW, "Source", buildSourceViewContent()));
-        // extension: MP9.0 — register each left-panel Tab contributed by the FX extensions as
-        // a dockable (Swing KeYGuiExtension.LeftPanel returns tabs for the left JTabbedPane,
-        // KeYGuiExtension.java:127-143; the FX host mirrors the built-in views' registration
-        // pattern, so extension panels appear in the docking layout and its persistence).
-        int extensionPanel = 0;
+    }
+
+    /**
+     * drawer: MP10 — builds the west/east/south drawer hosts of the main window (Java port of
+     * the TornadoFX {@code Drawer}). The panels of the Swing left tab area / right dock become
+     * drawer items: a toggle button per panel in the drawer's button bar; expanding a button
+     * shows the panel in the split next to the bar, always in the order of the buttons. The
+     * drawers are multiselect (the tornadofx "Multiselect" mode) so Proof Tree and Goal List
+     * share the west split; the per-item header distinguishes them there.
+     * <p>
+     * Drag and drop (added on top of the original implementation) turns this into a docking
+     * UI: dragging a button onto another drawer moves the panel to that port (e.g. the Strategy
+     * panel from west to east), dragging within a bar reorders the panels in the split. The
+     * south drawer starts empty — it is the drop port for panels dragged there and the future
+     * home of a log console; the log view stays a separate window ({@link #showLogView()}),
+     * matching the Swing status-line behaviour.
+     */
+    private void buildDrawerHosts() {
+        westDrawer = new DrawerF(Side.LEFT, true);
+        westDrawer.item("Proof Tree", proofTreeView, true);
+        westDrawer.item("Goal List", goalListView, true);
+        westDrawer.item("Loaded Proofs", loadedProofs);
+        westDrawer.item("Info", infoView);
+        westDrawer.item("Strategy", strategyView);
+        // extension: MP10 — the extension left-panel tabs become west drawer items (Swing
+        // KeYGuiExtension.LeftPanel returns tabs for the left JTabbedPane,
+        // KeYGuiExtension.java:127-143): a button per tab in the west bar toggles the panel,
+        // drag and drop can move it to another port; without LeftPanelF providers this appends
+        // nothing.
         for (Tab tab : KeYGuiExtensionFacadeF.getLeftPanelTabs(this, mediator)) {
-            String id = "extension-left-panel-" + extensionPanel++;
-            dockables.put(id, new SimpleDockable(id, tab.getText(), tab.getContent()));
+            westDrawer.item(tab.getText(), tab.getContent());
         }
+        eastDrawer = new DrawerF(Side.RIGHT, true);
+        eastDrawer.item("Source", buildSourceViewContent());
+        southDrawer = new DrawerF(Side.BOTTOM, true);
     }
 
     /**
@@ -2134,26 +2291,10 @@ public final class MainWindowF {
     }
 
     private List<DockWorkspace.Default> defaultLayout() {
+        // drawer: MP10 — only the sequent remains dockable; the west/east/south panels are
+        // drawer items (buildDrawerHosts) and the extension left panels are west drawer items
         List<DockWorkspace.Default> defaults = new ArrayList<>();
-        defaults.add(new DockWorkspace.Default(DockLocation.LEFT,
-            requireDockable(ID_LOADED_PROOFS)));
-        defaults.add(new DockWorkspace.Default(DockLocation.LEFT, requireDockable(ID_GOAL_LIST)));
-        defaults.add(
-            new DockWorkspace.Default(DockLocation.LEFT, requireDockable(ID_PROOF_TREE)));
-        defaults.add(new DockWorkspace.Default(DockLocation.LEFT, requireDockable(ID_INFO_VIEW)));
-        defaults.add(
-            new DockWorkspace.Default(DockLocation.LEFT, requireDockable(ID_STRATEGY)));
         defaults.add(new DockWorkspace.Default(DockLocation.MAIN, requireDockable(ID_SEQUENT)));
-        defaults.add(
-            new DockWorkspace.Default(DockLocation.RIGHT, requireDockable(ID_SOURCE_VIEW)));
-        // extension: MP9.0 — the extension left-panel dockables (registered in
-        // {@link #buildDockables()}) appear at the bottom of the left docking area in the
-        // factory-default layout; without LeftPanelF providers this appends nothing.
-        for (Dockable dockable : dockables.values()) {
-            if (dockable.getId().startsWith("extension-left-panel-")) {
-                defaults.add(new DockWorkspace.Default(DockLocation.LEFT, dockable));
-            }
-        }
         return defaults;
     }
 
