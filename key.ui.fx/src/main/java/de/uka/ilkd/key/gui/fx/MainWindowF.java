@@ -2369,6 +2369,8 @@ public final class MainWindowF {
         MenuItem stopAuto = menuItem("Stop Automatic Proof", IconFactoryF.Key.AUTO_MODE_STOP,
             mediator::stopAutoMode);
         stopAuto.disableProperty().bind(mediator.autoModeRunningProperty().not());
+        automation.getItems().add(startAuto);
+        automation.getItems().add(stopAuto);
         // menu: MP2 — after Start/Stop Automatic Proof the Automation submenu mirrors the four
         // proof-macro entries of Swing MainWindow.createAutomationActions (MainWindow.java:814-827,
         // MacroAutomationAction.java:40-45), same order, item text = macro.getName(). The Swing
