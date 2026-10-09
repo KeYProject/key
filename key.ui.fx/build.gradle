@@ -22,11 +22,17 @@ javafx {
     version = libs.versions.javafx.get()
     // key.ui.fx intentionally avoids javafx-fxml and javafx-swing:
     // all UIs are built in code (no FXML) and no Swing components are used.
-    modules = ['javafx.base', 'javafx.controls', 'javafx.graphics']
+    // smalldialogs: javafx.web hosts the WebView of SoundinessDialogF (the Swing
+    // SoundinessDialog renders the HTML soundiness report in a JEditorPane).
+    modules = ['javafx.base', 'javafx.controls', 'javafx.graphics', 'javafx.web']
 }
 
 dependencies {
     implementation project(":key.core")
+
+    // smalldialogs: WDLoadOptionPanelF (port of gui/profileloading) references the
+    // well-definedness profile (Swing key.ui depends on key.core.wd the same way)
+    implementation project(":key.core.wd")
 
     // Java/JML source editor with syntax highlighting (Milestone M2).
     implementation(libs.richtextfx)
@@ -87,12 +93,29 @@ run {
     //    a proof with open branches, e.g. a limited auto mode run — see JoinMergeVerifyF)
     //  * key.fx.verify.lemmaorigin = any  (lemmaorigin: run the term-label / origin-label /
     //    lemma-generator self test after the demo load)
+    //  * key.fx.verify.help = any  (smalldialogs: run the F1 context help resolution self test;
+    //    no browser window is opened)
+    //  * key.fx.verify.profileloading = any  (smalldialogs: run the WD load-option panel self
+    //    test; no proof load is started)
+    //  * key.fx.verify.profileloadingdialog = any  (smalldialogs: open the loading options
+    //    dialog at startup and log the options returned on confirm)
+    //  * key.fx.verify.soundiness = any  (smalldialogs: run the soundiness report self test on
+    //    the demo proof and open the SoundinessDialogF)
+    //  * key.fx.verify.javacsettings = any  (smalldialogs: run the javac settings provider
+    //    self test; the settings dialog is not opened)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
         "key.fx.verify.search", "key.fx.verify.sequentsearch", "key.fx.verify.treefilters",
+        "key.fx.verify.search", "key.fx.verify.sequentsearch", "key.fx.verify.treefilters",
+        "key.fx.verify.sequentsearchmodes", "key.fx.verify.updatehighlight",
+        "key.fx.verify.notifications",
+        "key.fx.verify.proofmgmt", "key.fx.demo.proofmgmt", "key.fx.demo.sequent2",
+        "key.fx.demo.sequent3",
         "key.fx.verify.docking", "key.fx.verify.uicontrol", "key.fx.verify.tacletmatch",
-        "key.fx.verify.joinmerge", "key.fx.verify.joinmerge.maxsteps", "key.fx.verify.lemmaorigin"]
+        "key.fx.verify.joinmerge", "key.fx.verify.joinmerge.maxsteps", "key.fx.verify.lemmaorigin",
+        "key.fx.verify.help", "key.fx.verify.soundiness", "key.fx.verify.profileloading",
+        "key.fx.verify.profileloadingdialog", "key.fx.verify.javacsettings"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {

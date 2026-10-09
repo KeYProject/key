@@ -63,6 +63,7 @@ import de.uka.ilkd.key.gui.fx.docking.DockingLayoutF;
 import de.uka.ilkd.key.gui.fx.docking.SimpleDockable;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.goallist.GoalListViewF;
+import de.uka.ilkd.key.gui.fx.help.HelpFacadeF;
 import de.uka.ilkd.key.gui.fx.infoview.InfoViewF;
 import de.uka.ilkd.key.gui.fx.join.JoinMergeVerifyF;
 import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
@@ -72,12 +73,18 @@ import de.uka.ilkd.key.gui.fx.notification.NotificationCenterF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
 import de.uka.ilkd.key.gui.fx.originlabels.OriginLabelsF;
+import de.uka.ilkd.key.gui.fx.plugins.javac.JavacSettingsProviderF;
+import de.uka.ilkd.key.gui.fx.profileloading.LoadingOptionsDialogF;
+import de.uka.ilkd.key.gui.fx.profileloading.LoadingOptionsDialogF.LoadOptions;
+import de.uka.ilkd.key.gui.fx.profileloading.WDLoadOptionPanelF;
 import de.uka.ilkd.key.gui.fx.proofdiff.ProofDiffFrameF;
 import de.uka.ilkd.key.gui.fx.proofmanagement.ProofManagementDialogF;
 import de.uka.ilkd.key.gui.fx.proofmanagement.ProofManagerF;
 import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeViewF;
 import de.uka.ilkd.key.gui.fx.recentfiles.RecentFilesF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsManagerF;
+import de.uka.ilkd.key.gui.fx.soundiness.SoundinessAnalyzer;
+import de.uka.ilkd.key.gui.fx.soundiness.SoundinessDialogF;
 import de.uka.ilkd.key.gui.fx.sourceview.SourceViewF;
 import de.uka.ilkd.key.gui.fx.strategy.StrategySelectionViewF;
 import de.uka.ilkd.key.gui.fx.tacletmatch.TacletMatchVerifyF;
@@ -302,11 +309,15 @@ public final class MainWindowF {
         Scene scene = new Scene(root, 1100, 800);
         ThemeManager.getInstance().manage(scene);
         // the global action keys of the Swing AutoModeAction (Ctrl+Space starts, Escape stops);
-        // an open search bar consumes Escape itself, so it never stops a run while visible
+        // an open search bar consumes Escape itself, so it never stops a run while visible.
+        // smalldialogs: F1 context help is handled by HelpFacadeF.installAccelerator below —
+        // a key-handler branch here would open the page twice.
         scene.setOnKeyPressed(this::handleMainWindowKeyPressed);
         // docking: Ctrl+M maximize toggle (bibliothek CControl.KEY_MAXIMIZE_CHANGE) and the
         // shutdown persistence of the Swing GUIListener.shutDown
         dockingLayout.install(scene);
+        // smalldialogs: F1 context help (Swing MainWindow.java:300-302 registers the F1 action)
+        HelpFacadeF.installAccelerator(scene);
         stage.setScene(scene);
         stage.show();
 
@@ -326,6 +337,43 @@ public final class MainWindowF {
         // own examples so that it also runs without key.fx.demo.sequent)
         if (System.getProperty("key.fx.verify.proofmgmt") != null) {
             runProofMgmtVerification();
+        }
+
+        // smalldialogs: startup self tests of the ported small dialogs; reports to the log and
+        // toast (same pattern as the key.fx.verify.* hooks in startProofLoad). The help facade
+        // and the WD load-option panel are proof-independent, so the hooks run at startup rather
+        // than after a demo proof load.
+        if (System.getProperty("key.fx.verify.help") != null) {
+            String report = HelpFacadeF.verifyHelp();
+            LOGGER.info("Help verification: {}", report);
+            NotificationManagerF.getInstance()
+                    .notify("Help verification: " + report,
+                        report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+        }
+        if (System.getProperty("key.fx.verify.profileloading") != null) {
+            String report = WDLoadOptionPanelF.verifyProfileLoading();
+            LOGGER.info("Profile loading verification: {}", report);
+            NotificationManagerF.getInstance()
+                    .notify("Profile loading verification: " + report,
+                        report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+        }
+        // smalldialogs: opens the loading options dialog (Swing KeYFileChooserLoadingOptions
+        // accessory) for an interactive check; the selected options are logged when the dialog
+        // is confirmed (Enter = Load), Escape/Cancel logs "null"
+        if (System.getProperty("key.fx.verify.profileloadingdialog") != null) {
+            javafx.application.Platform.runLater(() -> {
+                LoadOptions options = LoadingOptionsDialogF.showOptions(stage);
+                LOGGER.info("Loading options dialog returned: {}", options);
+            });
+        }
+        // smalldialogs: javac settings provider self test (Swing JavacSettingsProvider); the
+        // settings dialog itself is not opened — this checks the read/write round trip
+        if (System.getProperty("key.fx.verify.javacsettings") != null) {
+            String report = JavacSettingsProviderF.verifyJavacSettings();
+            LOGGER.info("Javac settings verification: {}", report);
+            NotificationManagerF.getInstance()
+                    .notify("Javac settings verification: " + report,
+                        report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
         }
 
         NotificationManagerF.getInstance()
@@ -453,7 +501,7 @@ public final class MainWindowF {
      * @param demo whether this is the demo property load (notification prefix "Demo proof")
      */
     private void startProofLoad(Path location, boolean demo) {
-        startProofLoad(location, demo, null);
+        startProofLoad(location, demo, null, null);
     }
 
     /**
@@ -465,6 +513,23 @@ public final class MainWindowF {
      *        {@code location} is not a proof bundle
      */
     private void startProofLoad(Path location, boolean demo, @Nullable Path proofFilename) {
+        startProofLoad(location, demo, proofFilename, null);
+    }
+
+    /**
+     * Loads a proof or problem file, optionally a specific proof out of a proof bundle, with
+     * optional loading options.
+     *
+     * @param location the problem, proof, Java file or proof bundle to load
+     * @param demo whether this is the demo property load (notification prefix "Demo proof")
+     * @param proofFilename the proof to load relative to the bundle root, or {@code null} if
+     *        {@code location} is not a proof bundle
+     * @param options the loading options from the {@link LoadingOptionsDialogF} (Swing: the
+     *        {@code KeYFileChooserLoadingOptions} accessory consumed by {@code OpenFileAction}),
+     *        or {@code null} for the legacy load (recent files, quick load, demo)
+     */
+    private void startProofLoad(Path location, boolean demo, @Nullable Path proofFilename,
+            @Nullable LoadOptions options) {
         // pure .key problems carry no Java source; the source view then shows the problem file.
         // Proof bundles carry their own sources (or none) — never show the bundle zip as text
         if (proofFilename == null) {
@@ -486,6 +551,21 @@ public final class MainWindowF {
                     var loader = new SingleThreadProblemLoader(location, null, null, null, null,
                         false, ui, false, new Properties());
                     loader.setProofFilename(proofFilename);
+                    loader.load();
+                    env = new KeYEnvironment<>(ui, loader.getInitConfig(), loader.getProof(),
+                        loader.getProofScript(), loader.getResult());
+                } else if (options != null) {
+                    // smalldialogs: forward the loading options collected by
+                    // LoadingOptionsDialogF (Swing OpenFileAction.java:70-76 wires the same
+                    // four accessors into the ProblemLoader); force the chosen profile unless
+                    // the legacy "Respect profile given in file" mode is active
+                    DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();
+                    var loader = new SingleThreadProblemLoader(location, null, null, null, null,
+                        false, ui, false, new Properties());
+                    loader.forceNewProfileOfNewProofs(options.selectedProfile() != null);
+                    loader.setProfileOfNewProofs(options.selectedProfile());
+                    loader.setAdditionalProfileOptions(options.additionalProfileOptions());
+                    loader.setLoadSingleJavaFile(options.singleJavaFile());
                     loader.load();
                     env = new KeYEnvironment<>(ui, loader.getInitConfig(), loader.getProof(),
                         loader.getProofScript(), loader.getResult());
@@ -582,6 +662,11 @@ public final class MainWindowF {
             if (System.getProperty("key.fx.verify.joinmerge") != null) {
                 runJoinMergeVerification(env);
             }
+            // smalldialogs: soundiness report self test (Swing SoundinessDialog/
+            // SoundinessAnalyzer), runs on the freshly loaded demo proof and opens the dialog
+            if (System.getProperty("key.fx.verify.soundiness") != null) {
+                runSoundinessVerification();
+            }
             if (System.getProperty("key.fx.verify.proofdiff") != null) {
                 String report = ProofDiffFrameF.verifyDiffLogic();
                 LOGGER.info("Proof diff verification: {}", report);
@@ -674,6 +759,19 @@ public final class MainWindowF {
         if (file.getParentFile() != null) {
             lastSelectedDir = file.getParentFile().toPath();
         }
+        // smalldialogs: loading options (Swing KeYFileChooserLoadingOptions accessory, read by
+        // OpenFileAction on approve, OpenFileAction.java:70-76). The JavaFX FileChooser has no
+        // accessory, so the options are collected in a pre-load dialog; Cancel aborts the load
+        // like the Swing chooser cancel. Proof bundles keep the profile of the bundle (Swing
+        // OpenFileAction returns before the options wiring), so no dialog for them.
+        if (!ProofSelectionDialogF.isProofBundle(file.toPath())) {
+            LoadOptions options = LoadingOptionsDialogF.showOptions(stage);
+            if (options == null) {
+                return;
+            }
+            openProofFile(file.toPath(), options);
+            return;
+        }
         openProofFile(file.toPath());
     }
 
@@ -691,6 +789,20 @@ public final class MainWindowF {
      * @param file the file to load
      */
     public void openProofFile(Path file) {
+        openProofFile(file, null);
+    }
+
+    /**
+     * Loads the given file with the given loading options and registers it in the recent files
+     * list. The options come from the {@link LoadingOptionsDialogF} in {@code
+     * openFileChooser()} (Swing: the {@code KeYFileChooserLoadingOptions} accessory); the
+     * recent-files and quick-load flows keep the legacy behavior (no options, like Swing where
+     * the accessory only exists in the file chooser).
+     *
+     * @param file the file to load
+     * @param options the loading options, or {@code null} for the legacy load
+     */
+    public void openProofFile(Path file, @Nullable LoadOptions options) {
         // special case proof bundles -> allow to select the proof to load
         if (ProofSelectionDialogF.isProofBundle(file)) {
             Path proofPath = ProofSelectionDialogF.chooseProofToLoad(file, stage);
@@ -704,7 +816,7 @@ public final class MainWindowF {
 
         warnOnBareJavaFile(file);
         recentFiles.add(file.toAbsolutePath().toString(), null, false, null);
-        startProofLoad(file, false);
+        startProofLoad(file, false, null, options);
     }
 
     /**
@@ -1162,6 +1274,8 @@ public final class MainWindowF {
             mediator.stopAutoMode();
             event.consume();
         }
+        // smalldialogs: F1 context help is handled by HelpFacadeF.installAccelerator(scene)
+        // (registered in initialize), not here — a second handler would open the page twice.
     }
 
     /**
@@ -1383,6 +1497,15 @@ public final class MainWindowF {
             menuItem("Decrease", "de.uka.ilkd.key.gui.actions.DecreaseFontSizeAction",
                 IconFactoryF.Key.MINUS, () -> changeFontSize(-1)));
 
+        // smalldialogs: the soundiness report (Swing ShowSoundinessAction, contributed to
+        // the proof-list context menu by SoundinessExtension). The FX proof-list dockable
+        // does not exist yet, so the action lives in the View menu; Swing
+        // enableWhenProofLoaded + the general auto-mode lock carry over. Created as a
+        // named item so the enablement binding below stays correct after the lemmaorigin
+        // addAll runs (the index-from-end trick of the standalone port no longer applies).
+        javafx.scene.control.MenuItem soundinessItem = menuItem("Show Soundiness Report",
+            "de.uka.ilkd.key.gui.actions.ShowSoundinessAction", this::showSoundinessReport);
+
         view.getItems().addAll(prettyPrint, unicode, syntaxHighlighting, new SeparatorMenuItem(),
             themeMenu, fontSize, new SeparatorMenuItem(),
             menuItem("Visual Node Diff", "de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame$Action",
@@ -1394,11 +1517,14 @@ public final class MainWindowF {
             // (ShowLogAction; no FX extension SPI yet), so the FX entry point is a View menu
             // item (LogViewF.showInstance)
             menuItem("Log View", "de.uka.ilkd.key.gui.actions.LogViewAction",
-                this::showLogView));
+                this::showLogView),
+            soundinessItem);
         // lemmaorigin: begin — term labels + origin tracking view controls (Swing TermLabelMenu /
         // HidePackagePrefixToggleAction / OriginTermLabelsExt MainMenu items)
         view.getItems().addAll(OriginLabelsF.install(this));
         // lemmaorigin: end
+        soundinessItem.disableProperty()
+                .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
         return view;
     }
 
@@ -1611,6 +1737,49 @@ public final class MainWindowF {
      */
     private void showProofDiffFrame() {
         new ProofDiffFrameF(this).showCenteredOnOwner();
+    }
+
+    /**
+     * smalldialogs: opens the soundiness report for the selected proof (Swing
+     * {@code ShowSoundinessAction.actionPerformed}: modal {@code SoundinessDialog} for
+     * {@code mediator.getSelectedProof()}, no-op without a proof).
+     */
+    private void showSoundinessReport() {
+        Proof proof = selectionModel.getSelectedProof();
+        if (proof == null) {
+            return; // the item is disabled without a proof (Swing enableWhenProofLoaded)
+        }
+        new SoundinessDialogF(stage, proof).showCenteredOnOwner();
+    }
+
+    /**
+     * smalldialogs: self test of the soundiness report (system property
+     * {@code key.fx.verify.soundiness}, run after a proof load like the other proof-dependent
+     * verify hooks): the report of the loaded proof must contain the four report sections, then
+     * the dialog itself is opened for visual inspection (close it to continue).
+     */
+    private void runSoundinessVerification() {
+        Proof proof = selectionModel.getSelectedProof();
+        if (proof == null) {
+            LOGGER.info("Soundiness verification: skipped, no proof loaded FAIL");
+            NotificationManagerF.getInstance()
+                    .notify("Soundiness verification: skipped, no proof loaded FAIL", Kind.ERROR);
+            return;
+        }
+        String html = SoundinessAnalyzer.generateHTMLReport(proof);
+        boolean sectionsOk = html.contains("KeY Soundiness Report")
+                && html.contains("1. General KeY Soundiness")
+                && html.contains("2. Taclet Option Soundiness")
+                && html.contains("3. Proof Tree Analysis");
+        String report = "chars=" + html.length() + " sections=" + sectionsOk
+            + (sectionsOk ? " PASS" : " FAIL");
+        LOGGER.info("Soundiness verification: {}", report);
+        NotificationManagerF.getInstance()
+                .notify("Soundiness verification: " + report,
+                    sectionsOk ? Kind.INFO : Kind.ERROR);
+        if (sectionsOk) {
+            new SoundinessDialogF(stage, proof).showCenteredOnOwner();
+        }
     }
 
     private void resetLayout() {
