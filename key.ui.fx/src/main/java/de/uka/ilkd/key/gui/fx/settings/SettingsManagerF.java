@@ -31,6 +31,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import de.uka.ilkd.key.gui.fx.MainWindowF;
+import de.uka.ilkd.key.gui.fx.plugins.javac.JavacSettingsProviderF;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ChoiceSettings;
@@ -70,8 +71,17 @@ public final class SettingsManagerF {
     public static final TacletOptionsSettingsF TACLET_OPTIONS_SETTINGS =
         new TacletOptionsSettingsF();
 
+    /**
+     * smalldialogs: the javac options provider (Swing {@code JavacSettingsProvider}, the
+     * settings tab of the {@code JavacExtension} plugin). Swing reaches it via the
+     * {@code KeYGuiExtension.Settings} capability; the FX extension SPI does not exist yet, so
+     * it is registered directly here (the provider seam stays open for the SPI).
+     */
+    public static final JavacSettingsProviderF JAVAC_SETTINGS =
+        new JavacSettingsProviderF();
+
     // Deliberately deferred to later milestones (the provider seam stays open):
-    // SMTSettingsProvider, JavacSettingsProvider, ParallelProverSettingsProvider,
+    // SMTSettingsProvider, ParallelProverSettingsProvider,
     // FeatureSettingsPanel and the ShowActiveSettings dump.
 
     private static SettingsManagerF INSTANCE;
@@ -89,6 +99,7 @@ public final class SettingsManagerF {
             INSTANCE = new SettingsManagerF();
             INSTANCE.add(STANDARD_UI_SETTINGS);
             INSTANCE.add(TACLET_OPTIONS_SETTINGS);
+            INSTANCE.add(JAVAC_SETTINGS);
         }
         return INSTANCE;
     }
