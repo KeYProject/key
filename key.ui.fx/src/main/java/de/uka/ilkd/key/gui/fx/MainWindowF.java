@@ -66,6 +66,7 @@ import de.uka.ilkd.key.gui.fx.goallist.GoalListViewF;
 import de.uka.ilkd.key.gui.fx.infoview.InfoViewF;
 import de.uka.ilkd.key.gui.fx.join.JoinMergeVerifyF;
 import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
+import de.uka.ilkd.key.gui.fx.mergerule.MergeRuleCompletionF;
 import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationCenterF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
