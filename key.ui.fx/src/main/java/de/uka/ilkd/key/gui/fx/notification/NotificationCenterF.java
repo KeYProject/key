@@ -38,7 +38,9 @@ import org.slf4j.LoggerFactory;
  * App-level wiring status (parity audit {@code parity-unported-dialogs.md} §10): the proof-closed
  * and "Automated proof search" triggers are wired through
  * {@link #afterAutoModeFinished(Proof, boolean)} (called from the FX auto-mode-stop hook);
- * the exception routing and the exit/abandon triggers are not ported yet.
+ * the exception routing (termmenu/S4: {@code ExceptionFailureEventF} dispatch in
+ * {@code MainWindowF.setOnFailed}, the task registered in {@link #setDefaultNotifications()})
+ * is wired; the exit/abandon triggers are not ported yet.
  */
 public final class NotificationCenterF {
 
@@ -77,16 +79,18 @@ public final class NotificationCenterF {
         addNotificationTask(new GeneralInformationNotificationF());
         addNotificationTask(new AbandonNotificationF());
         addNotificationTask(new ExitKeYNotificationF());
-
-        // FIXME (DS): Obviously, adding ExceptionFailureNotification at this place leads to a
-        // double appearance of Dialogs in case of a parser error. However, the user is not
-        // notified in case of an ExceptionFailure occurring *after* the parsing procedure, so
-        // for instance at an erroneous BuiltInRule application. This is not desirable, since
-        // then there might be a strange GUI behavior without even a notification.
-        // (comment ported from NotificationManager.setDefaultNotification)
+        // termmenu/S4: the exception-failure task is registered by default. This resolves the
+        // TODO-merge left by the seam agent: MainWindowF.setOnFailed routes load failures
+        // through handleNotificationEvent(new ExceptionFailureEventF(...)).
         //
-        // TODO-merge (seam agent, branch weigl/ocfx-seam): the exception routing decides
-        // whether/where ExceptionFailureNotificationF is registered.
+        // The Swing FIXME (ported from NotificationManager.setDefaultNotification) is not
+        // applicable to the FX port: the Swing ExceptionFailureNotification opened a *dialog*
+        // (ExceptionFailureNotificationDialog -> IssueDialog.showExceptionDialog), causing a
+        // double dialog for parser errors (the ProblemLoader branch already surfaces the
+        // IssueDialog); the FX ExceptionFailureNotificationF only shows an error *toast*, so
+        // dialog + toast is the intended surface (Swing parity: WindowUserInterfaceControl
+        // reports parser errors in the IssueDialog while the toast keeps the notification sink).
+        addNotificationTask(new ExceptionFailureNotificationF());
     }
 
     /**
@@ -333,9 +337,9 @@ public final class NotificationCenterF {
                         : "FAIL: neither dialog nor fallback toast shown"));
 
                 // 4. synthetic exception (Swing parity: ExceptionFailureEvent ->
-                // ExceptionFailureNotificationDialog; not registered by default, see the FIXME
-                // in setDefaultNotifications — registered here for the exercise, then removed)
-                addNotificationTask(new ExceptionFailureNotificationF());
+                // ExceptionFailureNotificationDialog; registered by default since termmenu/S4 —
+                // ExceptionFailureNotificationF is toast-only, see setDefaultNotifications —
+                // so no add/remove dance needed; the assertion uses the toast-count delta)
                 int beforeError = NotificationManagerF.getInstance().getVisibleToastCount();
                 handleNotificationEvent(new ExceptionFailureEventF(
                     "Synthetic exception (notification self-test)",
@@ -345,7 +349,6 @@ public final class NotificationCenterF {
                         + (NotificationManagerF.getInstance().getVisibleToastCount() > beforeError
                                 ? "PASS"
                                 : "FAIL: error toast not shown"));
-                    removeNotificationTask(NotificationEventIDF.EXCEPTION_CAUSED_FAILURE);
                     String report = String.join("\n", lines);
                     LOGGER.info("Notification verification report:\n{}", report);
                     boolean pass = report.lines().allMatch(line -> line.endsWith("PASS"));

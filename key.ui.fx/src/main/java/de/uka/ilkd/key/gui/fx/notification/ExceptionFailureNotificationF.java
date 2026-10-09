@@ -13,11 +13,13 @@ import de.uka.ilkd.key.gui.fx.notification.actions.ToastActionF;
  * ExceptionFailureNotification.java} (Swing action:
  * {@code ExceptionFailureNotificationDialog} → {@code IssueDialog.showExceptionDialog}).
  * <p>
- * TODO-merge (seam agent, branch {@code weigl/ocfx-seam}): exception routing (the Swing
- * {@code mediator.notify(new ExceptionFailureEvent(...))} call sites and the exception-dialog
- * path) is owned by the exception-seam agent; this task ships with the ERROR-toast action only
- * and is not wired into any control construction yet — it is exercised by the
- * {@code key.fx.verify.notifications} self-test hook. Runs also during auto mode (Swing parity).
+ * termmenu/S4: this task is a default registration of {@code NotificationCenterF}
+ * ({@code setDefaultNotifications}) and receives the exception events fired by the
+ * application — e.g. the load-failure path {@code MainWindowF.setOnFailed} routes its
+ * {@code ExceptionFailureEventF} through the center. Deviation from the Swing original,
+ * which is why the Swing FIXME (double dialog for parser errors) does not apply: the action
+ * is a toast, not a dialog ({@link ToastActionF}); the IssueDialog stays the primary
+ * surface of the reporting exception path. Runs also during auto mode (Swing parity).
  */
 public class ExceptionFailureNotificationF extends NotificationTaskF {
 
