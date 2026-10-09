@@ -28,6 +28,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -859,6 +860,15 @@ public final class MainWindowF {
             // verify hooks; the text report goes to stdout
             if (System.getProperty("key.fx.verify.termmenu") != null) {
                 runTermMenuVerification(env);
+            }
+            // menu: MP8 — term-menu wiring self test (key.fx.verify.termmenuwiring), same seam
+            // as key.fx.verify.termmenu: asserts the MP8a/MP8b wiring on the loaded demo — the
+            // focus_auto_mode item is ENABLED with a non-null action handler and the
+            // macro_menu section exists with exactly the four AUTOMATION_MACROS names. The
+            // handlers are NOT invoked (a real focused auto mode / macro run is too heavy
+            // mid-regression); enablement + handler presence is the assertion.
+            if (System.getProperty("key.fx.verify.termmenuwiring") != null) {
+                runTermMenuWiringVerification(env);
             }
             // menu: MP1/MP3c — menu parity self test (key.fx.verify.menuparity): walks the
             // built menu bar and asserts the Proof menu entries against the Swing
@@ -1760,6 +1770,80 @@ public final class MainWindowF {
         }
         System.out.println("termmenu verify: " + (pass ? "OK" : "FAIL") + " - "
             + menu.getItems().size() + " items, found: " + String.join(", ", found));
+    }
+
+    /**
+     * menu: MP8 — headless self test of the MP8a/MP8b term-menu wiring
+     * ({@code key.fx.verify.termmenuwiring}), run after the demo load like the termmenu hook:
+     * builds the term menu through the same seam as {@link #runTermMenuVerification} and
+     * asserts (a) the {@code focus_auto_mode} item ("Apply rules automatically here") is ENABLED
+     * and its action handler is non-null (Swing FocussedAutoModeUserAction, wired at
+     * FocussedAutoModeUserAction.java:43), and (b) the {@code macro_menu} section ("Strategy
+     * Macros", Swing ProofMacroMenu.java:81) exists and contains exactly the four macro names of
+     * the Automation submenu ({@link #AUTOMATION_MACROS}, same order). The handlers are
+     * deliberately NOT invoked — starting a real focused auto mode or running a macro headless
+     * mid-regression is too heavy; enablement and handler presence is the assertion.
+     */
+    private void runTermMenuWiringVerification(KeYEnvironment<DefaultUserInterfaceControl> env) {
+        Goal goal = mediator.getSelectedGoal();
+        PosInSequent pos = findTermMenuPos();
+        if (goal == null || pos == null) {
+            System.out.println(
+                "termmenu wiring verify: SKIP - no goal/position (no printed sequent)");
+            return;
+        }
+        List<SequentMenuModelF.Entry> entries =
+            SequentMenuModelF.build(pos, mediator, env.getProofControl(), null, null);
+        ContextMenu menu = SequentTermContextMenuF.build(entries,
+            new SequentTermContextMenuF.MenuContext(mediator, env.getProofControl(), goal, pos,
+                null, sequentView::printSequent));
+        MenuItem focusItem = null;
+        Menu macroMenu = null;
+        for (MenuItem item : menu.getItems()) {
+            if ("Apply rules automatically here".equals(item.getText())) {
+                focusItem = item;
+            }
+            if (item instanceof Menu m && "Strategy Macros".equals(m.getText())) {
+                macroMenu = m;
+            }
+        }
+        boolean focusOk = focusItem != null && !focusItem.isDisable()
+                && focusItem.getOnAction() != null;
+        List<String> macroNames = new ArrayList<>();
+        if (macroMenu != null) {
+            for (MenuItem item : macroMenu.getItems()) {
+                String text = menuItemText(item);
+                if (!text.isEmpty()) {
+                    macroNames.add(text);
+                }
+            }
+        }
+        List<String> expected = new ArrayList<>();
+        for (ProofMacro macro : AUTOMATION_MACROS) {
+            expected.add(macro.getName());
+        }
+        boolean macroOk = macroNames.equals(expected);
+        boolean pass = focusOk && macroOk;
+        System.out.println("termmenu wiring verify: " + (pass ? "PASS" : "FAIL") + " - "
+            + "focus_auto_mode[" + (focusItem == null ? "missing"
+                    : (focusOk ? "enabled" : "disabled-or-no-handler"))
+            + "] macro_menu["
+            + macroNames + "]");
+    }
+
+    /**
+     * menu: MP8 — visible text of a menu item, unwrapping label-backed {@code CustomMenuItem}s
+     * (the macro items of the term menu carry their name in the wrapped label).
+     */
+    private static String menuItemText(MenuItem item) {
+        String text = item.getText();
+        if (text != null && !text.isEmpty()) {
+            return text;
+        }
+        if (item instanceof CustomMenuItem custom && custom.getContent() instanceof Label label) {
+            return label.getText();
+        }
+        return "";
     }
 
     /**
