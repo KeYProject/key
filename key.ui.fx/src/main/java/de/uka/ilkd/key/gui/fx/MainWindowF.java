@@ -2016,11 +2016,13 @@ public final class MainWindowF {
      * drawer: MP10 — headless self test of the drawered main window layout
      * ({@code key.fx.verify.drawerlayout}), run after the demo load like the other
      * proof-dependent verify hooks. Asserts the west/east/south {@link DrawerF} hosts with
-     * their expected item sets and default expansions (Proof Tree + Goal List share the west
-     * split in button order), then exercises the same drag-and-drop seams the handlers invoke
-     * on the live drawers: a cross-port transfer of the Strategy panel west→east and back
-     * (owner re-keying) and a button reorder whose split follows the new button order. One
-     * stdout report line; leaves the drawers in their pre-test arrangement.
+     * their expected item sets — the five built-in west panels plus one item per contributed
+     * extension left-panel tab (= MP9.1-9.6: exploration + slicing) — and default expansions
+     * (Proof Tree + Goal List share the west split in button order), then exercises the same
+     * drag-and-drop seams the handlers invoke on the live drawers: a cross-port transfer of the
+     * Strategy panel west→east and back (owner re-keying) and a button reorder whose split
+     * follows the new button order. One stdout report line; leaves the drawers in their
+     * pre-test arrangement.
      *
      * @param env the environment of the loaded proof
      */
@@ -2034,9 +2036,12 @@ public final class MainWindowF {
             System.out.println("Drawer layout verification: FAIL - hosts=null");
             return;
         }
+        // MP9.1-9.6: the keyext left-panel tabs (exploration, slicing) are also west items, so
+        // the expected count mirrors runExtensionVerification: five built-ins + one per tab
+        int expectedWest = 5 + KeYGuiExtensionFacadeF.getLeftPanelTabs(this, mediator).size();
         sb.append("west=").append(west.getItems().size()).append(" east=")
                 .append(east.getItems().size()).append(" south=").append(south.getItems().size());
-        pass &= west.getItems().size() == 5 && east.getItems().size() == 1
+        pass &= west.getItems().size() == expectedWest && east.getItems().size() == 1
                 && south.getItems().size() == 0;
         pass &= west.getDockingSide() == Side.LEFT && west.isMultiselect();
         pass &= east.getDockingSide() == Side.RIGHT && east.isMultiselect();
@@ -2057,7 +2062,7 @@ public final class MainWindowF {
             movedEast = east.getItems().size() == 2 && east.getItems().contains(strategy)
                     && strategy.getDrawer() == east;
             east.transferItem(strategy, west);
-            movedBack = west.getItems().size() == 5 && east.getItems().size() == 1
+            movedBack = west.getItems().size() == expectedWest && east.getItems().size() == 1
                     && strategy.getDrawer() == west && !east.getItems().contains(strategy);
         }
         sb.append(" transferRoundTrip=").append(movedEast && movedBack ? "PASS" : "FAIL");
