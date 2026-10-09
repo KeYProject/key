@@ -878,6 +878,16 @@ public final class MainWindowF {
                         .notify("Minimize interaction verification: " + (ok ? "PASS" : "FAIL"),
                             ok ? Kind.INFO : Kind.ERROR);
             }
+            // menu: MP7 — right-click macro popup self test (key.fx.verify.rightclickmacro):
+            // builds the popup through the SequentViewF seam with the flag ON and OFF and asserts
+            // the macro names / the term-menu fallback (report logged/toasted there)
+            if (System.getProperty("key.fx.verify.rightclickmacro") != null) {
+                String report = sequentView.verifyRightClickMacro();
+                LOGGER.info("Right-click macro verification: {}", report);
+                NotificationManagerF.getInstance()
+                        .notify("Right-click macro verification: " + report,
+                            report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+            }
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 startLiveAutoMode(env);
             }
@@ -2296,6 +2306,19 @@ public final class MainWindowF {
         LogViewF.showInstance(getStage());
     }
 
+    /**
+     * menu: MP2/MP7 — the proof macros of the Automation submenu (Swing
+     * {@code MainWindow.createAutomationActions}, MainWindow.java:814-827, in the same order:
+     * DefaultAutoMacro, FullAutoPilotProofMacro, AutoPilotPrepareProofMacro, ScriptAwareMacro).
+     * Shared with the sequent-view right-click macro popup (MP7; Swing {@code
+     * ProofMacroMenu.REGISTERED_MACROS} is the ServiceLoader superset, ProofMacroMenu.java:60-61
+     * — the FX popup mirrors the app's own Automation submenu instead, see
+     * SequentViewF#buildMacroPopup).
+     */
+    public static final List<ProofMacro> AUTOMATION_MACROS =
+        List.of(new DefaultAutoMacro(), new FullAutoPilotProofMacro(),
+            new AutoPilotPrepareProofMacro(), new ScriptAwareMacro());
+
     private Menu buildProofMenu() {
         Menu proof = new Menu("Proof");
         Menu automation = new Menu("Automation");
@@ -2320,24 +2343,16 @@ public final class MainWindowF {
         // Enablement binds to proofLoaded only — deliberately NO auto-mode lock: Swing keeps the
         // macro actions enabled while auto mode runs so a click stops the automation
         // (MacroAutomationAction.actionPerformed, MacroAutomationAction.java:48-61).
-        MenuItem defaultAuto = menuItem(new DefaultAutoMacro().getName(),
-            "de.uka.ilkd.key.macros.DefaultAutoMacro", null,
-            () -> runMacro(new DefaultAutoMacro()));
-        defaultAuto.disableProperty().bind(proofLoaded.not());
-        MenuItem structuredAuto = menuItem(new FullAutoPilotProofMacro().getName(),
-            "de.uka.ilkd.key.macros.FullAutoPilotProofMacro", null,
-            () -> runMacro(new FullAutoPilotProofMacro()));
-        structuredAuto.disableProperty().bind(proofLoaded.not());
-        MenuItem prepareAuto = menuItem(new AutoPilotPrepareProofMacro().getName(),
-            "de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro", null,
-            () -> runMacro(new AutoPilotPrepareProofMacro()));
-        prepareAuto.disableProperty().bind(proofLoaded.not());
-        MenuItem scriptAuto = menuItem(new ScriptAwareMacro().getName(),
-            "de.uka.ilkd.key.macros.ScriptAwareMacro", null,
-            () -> runMacro(new ScriptAwareMacro()));
-        scriptAuto.disableProperty().bind(proofLoaded.not());
-        automation.getItems().addAll(startAuto, stopAuto,
-            defaultAuto, structuredAuto, prepareAuto, scriptAuto);
+        // menu: MP7 — the items are built from the shared {@link #AUTOMATION_MACROS} list so the
+        // right-click macro popup of the sequent view (SequentViewF#buildMacroPopup) offers the
+        // very same macros.
+        for (ProofMacro macro : AUTOMATION_MACROS) {
+            MenuItem autoItem = menuItem(macro.getName(),
+                "de.uka.ilkd.key.macros." + macro.getClass().getSimpleName(), null,
+                () -> runMacro(macro));
+            autoItem.disableProperty().bind(proofLoaded.not());
+            automation.getItems().add(autoItem);
+        }
         // menu: MP1 — the entries after Prune Proof mirror Swing MainWindow.createProofMenu
         // (MainWindow.java:1082-1142) with selected == null in the same order: Abandon Proof,
         // separator, the search group (Search in Proof Tree/Sequent + Next/Previous + the
