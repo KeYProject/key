@@ -1944,12 +1944,24 @@ public final class MainWindowF {
 
         int discovered = KeYGuiExtensionFacadeF.discoveredCount();
         sb.append("discovered=").append(discovered);
-        pass &= discovered == 3;
+        // MP9.1-9.6: the six keyext FX modules register further providers, so the count is no
+        // longer fixed at 3 — the assertion is the built-in trio's presence and a sane number
+        List<String> classes = KeYGuiExtensionFacadeF.getExtensions().stream()
+                .map(e -> e.getClass().getName()).toList();
+        pass &= discovered >= 3
+                && discovered == classes.size()
+                && classes.contains("de.uka.ilkd.key.gui.fx.extension.contrib.HeatmapF")
+                && classes.contains(
+                    "de.uka.ilkd.key.gui.fx.extension.contrib.ParallelProverStatusIndicatorF")
+                && classes.contains(
+                    "de.uka.ilkd.key.gui.fx.extension.contrib.ProfileNameInStatusBarF");
 
         List<Control> statusControls = KeYGuiExtensionFacadeF.getStatusLineControls();
         sb.append(" statusControls=").append(statusControls.size());
         HBox statusBar = buildStatusBar();
-        pass &= statusControls.size() == 2
+        // the two built-in status-line controls are always contributed; the keyext ports may
+        // add more, so the assertion is a membership check on the built status bar
+        pass &= statusControls.size() >= 2
                 && statusBar.getChildren().containsAll(statusControls);
 
         MenuBar menuBar = buildMenuBar();

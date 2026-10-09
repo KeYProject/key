@@ -41,6 +41,17 @@ dependencies {
 
     // logging implementation used by the slf4j facade
     implementation(libs.logback.classic)
+
+    // MP9.1-9.6: the JavaFX keyext ports (one module per keyext extension) are discovered at
+    // runtime through the KeYGuiExtensionF service loader; they stay off the compile classpath
+    // (runtimeOnly). Each module pulls its keyext counterpart — and key.ui (Swing) transitively,
+    // accepted for the user-approved extension migration; the FX sources never import Swing.
+    runtimeOnly project(":keyext.caching.fx")
+    runtimeOnly project(":keyext.exploration.fx")
+    runtimeOnly project(":keyext.isabelletranslation.fx")
+    runtimeOnly project(":keyext.slicing.fx")
+    runtimeOnly project(":keyext.ui.testgen.fx")
+    runtimeOnly project(":keyext.proofmanagement.fx")
 }
 
 application {
