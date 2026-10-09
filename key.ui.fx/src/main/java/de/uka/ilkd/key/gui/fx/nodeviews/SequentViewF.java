@@ -758,15 +758,10 @@ public class SequentViewF extends BorderPane {
         int count = 0;
         for (ProofMacro macro : MainWindowF.AUTOMATION_MACROS) {
             if (macro.canApplyTo(proof, goals, pio)) {
-                // menu: MP7 — JavaFX MenuItem has no tooltip property (unlike Swing
-                // JMenuItem.setToolTipText, ProofMacroMenu.java:144); the item is a
-                // CustomMenuItem wrapping a tooltip-bearing Label, so the description actually
-                // appears on hover (the visible label also keeps the macro name readable)
-                Label label = new Label(macro.getName());
-                Tooltip.install(label, new Tooltip(macro.getDescription()));
-                CustomMenuItem item = new CustomMenuItem(label);
-                item.setOnAction(e -> menuProofControl.runMacro(node, macro, pio));
-                menu.getItems().add(item);
+                // menu: MP7/MP8 — the item construction (name label + description tooltip via
+                // CustomMenuItem, since JavaFX MenuItem has no tooltip property) is shared with
+                // the term-menu "Strategy Macros" section, see {@link ProofMacroMenuF#itemFor}.
+                menu.getItems().add(ProofMacroMenuF.itemFor(macro, node, menuProofControl, pio));
                 count++;
             }
         }
