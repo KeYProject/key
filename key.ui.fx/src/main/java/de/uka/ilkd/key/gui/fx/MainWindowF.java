@@ -746,9 +746,10 @@ public final class MainWindowF {
             if (System.getProperty("key.fx.verify.termmenu") != null) {
                 runTermMenuVerification(env);
             }
-            // menu: MP1 — menu parity self test (key.fx.verify.menuparity): walks the built
-            // menu bar and asserts the Proof menu entries against the Swing createProofMenu
-            // table; the marker line must end with PASS
+            // menu: MP1/MP3c — menu parity self test (key.fx.verify.menuparity): walks the
+            // built menu bar and asserts the Proof menu entries against the Swing
+            // createProofMenu table and (since MP3c) the View menu entries against the Swing
+            // createViewMenu table; each marker line must end with PASS
             if (System.getProperty("key.fx.verify.menuparity") != null) {
                 verifyMenuParity();
             }
@@ -2032,59 +2033,97 @@ public final class MainWindowF {
         KnownTypesDialogF.show(stage, proof);
     }
 
+    // menu: MP1/MP2 — expected entries of the Proof menu (system property
+    // {@code key.fx.verify.menuparity}; MainWindow.createProofMenu :1082-1142, and the
+    // Automation submenu entries of MainWindow.createAutomationActions :814-827 since MP2).
+    // Table rows are leaf items, plain separators (the {@code "---"} row) or submenu names whose
+    // own children are checked recursively; MP4/MP5 can extend the tables for the other menus.
+    private static final String[][] PROOF_MENU_EXPECTED = {
+        { "Automation", "Start Automatic Proof", "Stop Automatic Proof", "Full Automation",
+            "Structured Automation", "Structured Automation (Prep. Only)",
+            "Script-aware Auto" },
+        { "Goal Back" },
+        { "Prune Proof" },
+        { "Abandon Proof" },
+        { "---" },
+        { "Search in Proof Tree" },
+        { "Search in Sequent" },
+        { "Search Next" },
+        { "Search Previous" },
+        { "Search Mode", "Highlight", "Hide", "Regroup" },
+        { "---" },
+        { "Show Used Contracts" },
+        { "Show All Active Settings" },
+        { "Show Proof Statistics" },
+        { "Show Known Types" },
+    };
+
+    // menu: MP3c — expected View menu entries in the Swing order of MainWindow.createViewMenu
+    // (:985-1064; Select Goal children from createSelectionMenu :1069-1074). The FX-only extras
+    // between the parity entries (OriginLabelsF cluster, Theme, Font Size, Layout, Log View,
+    // Soundiness, plain separators) are not listed: the walker skips unlisted built entries and
+    // only asserts that the listed ones occur in this relative order.
+    private static final String[][] VIEW_MENU_EXPECTED = {
+        { "Pretty Print" },
+        { "Unicode Symbols" },
+        { "Syntax Highlighting" },
+        { "Show Tooltips in Sequent View" },
+        { "Show Tooltips in Source View" },
+        { "Show Tooltips in Proof Tree" },
+        { "ToolTip Options…" },
+        { "Select Goal", "Select Goal Above", "Select Goal Below" },
+        { "Back" },
+        { "Forward" },
+    };
+
     /**
-     * menu: MP1/MP2 self test of the Proof menu (system property {@code key.fx.verify.menuparity},
-     * run after a proof load like the other verify hooks): builds the menu bar and walks the
-     * Proof menu, asserting the presence of the entries of {@link #buildProofMenu()} in the
-     * Swing order (MainWindow.createProofMenu :1082-1142, and the Automation submenu entries of
-     * MainWindow.createAutomationActions :814-827 since MP2). Table-driven so MP3-MP5 can extend
-     * it with the other menus later.
+     * menu: MP1/MP3 — menu parity self test (system property {@code key.fx.verify.menuparity},
+     * run after a proof load like the other verify hooks): builds the menu bar and emits one
+     * marker line per asserted menu, each ending in PASS or FAIL.
      */
     private void verifyMenuParity() {
-        String report = verifyMenuParityReport();
-        LOGGER.info("Menu parity verification (MP1 Proof): {}", report);
+        logMenuParity("Proof", verifyMenuParityReport("Proof", PROOF_MENU_EXPECTED));
+        logMenuParity("View", verifyMenuParityReport("View", VIEW_MENU_EXPECTED));
+    }
+
+    private void logMenuParity(String menuName, String report) {
+        LOGGER.info("Menu parity verification ({}): {}", menuName, report);
         NotificationManagerF.getInstance()
-                .notify("Menu parity verification (MP1 Proof): " + report,
+                .notify("Menu parity verification (" + menuName + "): " + report,
                     report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
     }
 
     /**
-     * menu: builds the {@link #buildMenuBar() menu bar} and checks the Proof menu entries. A
-     * table holds the expected labels; entries may be leaf items, plain separators (the
-     * {@code "---"} row) or submenu names ({@code "Search Mode"}) whose own children are
-     * checked recursively.
+     * menu: builds the {@link #buildMenuBar() menu bar} and checks the Proof menu entries
+     * (compatibility entry point: same table and report as the Proof part of
+     * {@link #verifyMenuParity()}).
      *
-     * @return {@code "PASS - <n> items, found: <comma list>"} or {@code "FAIL - missing: <list>"}
+     * @return {@code "PASS - <n> items, found: <comma list>"} or
+     *         {@code "FAIL - missing: <list>"}
      */
     String verifyMenuParityReport() {
+        return verifyMenuParityReport("Proof", PROOF_MENU_EXPECTED);
+    }
+
+    /**
+     * menu: builds the {@link #buildMenuBar() menu bar} and checks one menu against an expected
+     * table. A row may be a leaf item, a plain separator (the {@code "---"} row) or a submenu
+     * name ({@code "Search Mode"}) whose own children are checked recursively, in their order.
+     * Built entries that are not listed in the table are skipped.
+     *
+     * @return {@code "PASS - <n> items, found: <comma list>"} or
+     *         {@code "FAIL - missing: <list>"}
+     */
+    String verifyMenuParityReport(String menuName, String[][] expected) {
         MenuBar menuBar = buildMenuBar();
-        Menu proof = menuBar.getMenus().stream().filter(m -> "Proof".equals(m.getText()))
+        Menu menu = menuBar.getMenus().stream().filter(m -> menuName.equals(m.getText()))
                 .findFirst().orElse(null);
-        if (proof == null) {
-            return "FAIL - missing: <Proof menu>";
+        if (menu == null) {
+            return "FAIL - missing: <" + menuName + " menu>";
         }
-        String[][] expected = {
-            { "Automation", "Start Automatic Proof", "Stop Automatic Proof", "Full Automation",
-                "Structured Automation", "Structured Automation (Prep. Only)",
-                "Script-aware Auto" },
-            { "Goal Back" },
-            { "Prune Proof" },
-            { "Abandon Proof" },
-            { "---" },
-            { "Search in Proof Tree" },
-            { "Search in Sequent" },
-            { "Search Next" },
-            { "Search Previous" },
-            { "Search Mode", "Highlight", "Hide", "Regroup" },
-            { "---" },
-            { "Show Used Contracts" },
-            { "Show All Active Settings" },
-            { "Show Proof Statistics" },
-            { "Show Known Types" },
-        };
         List<String> present = new ArrayList<>();
         List<String> missing = new ArrayList<>();
-        List<MenuItem> remaining = new ArrayList<>(proof.getItems());
+        List<MenuItem> remaining = new ArrayList<>(menu.getItems());
         for (String[] row : expected) {
             String label = row[0];
             if ("---".equals(label)) {
@@ -2113,7 +2152,8 @@ public final class MainWindowF {
             present.add(label);
             MenuItem node = remaining.get(index);
             if (node instanceof Menu submenu && row.length > 1) {
-                // check the submenu's entries in their order (e.g. Automation, Search Mode)
+                // check the submenu's entries in their order (e.g. Automation, Search Mode,
+                // Select Goal)
                 List<MenuItem> children = new ArrayList<>(submenu.getItems());
                 for (int i = 1; i < row.length; i++) {
                     int childIndex = indexOfItem(children, row[i]);
