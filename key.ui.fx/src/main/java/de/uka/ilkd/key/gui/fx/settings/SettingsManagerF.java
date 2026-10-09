@@ -149,6 +149,17 @@ public final class SettingsManagerF {
     }
 
     /**
+     * extension: MP9.0 — the currently registered settings providers (a defensive copy), used
+     * by the {@code key.fx.verify.extensions} self test to assert the registration of the
+     * extension-contributed providers.
+     *
+     * @return the registered providers
+     */
+    public List<SettingsProviderF> getProviders() {
+        return new ArrayList<>(settingsProviders);
+    }
+
+    /**
      * Removes the given settings provider.
      *
      * @param settingsProvider the provider to remove
