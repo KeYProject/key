@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.fx;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -53,6 +54,7 @@ import javafx.stage.Stage;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
@@ -121,6 +123,7 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.GZipProofSaver;
 import de.uka.ilkd.key.proof.io.ProofBundleSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -427,6 +430,11 @@ public final class MainWindowF {
         wireSequentView();
         recentFiles.setOnChange(this::updateRecentFilesMenu);
         recentFiles.load();
+        // menu: MP7 — honor a persisted non-zero auto-save period at startup (Swing: the saver is
+        // active whenever the period is > 0, KeYMediator.java:87 + :148-150); the saver must be
+        // armed before the demo load so the load-success selection hands it the proof
+        applyAutoSave(ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                .autoSavePeriod());
         startDemoProofLoad();
         // proofmgmt: the Loaded Proofs view's clicks and the Proof Management dialog route the
         // active-proof switch through the selection model (the Swing mediator path)
@@ -720,6 +728,11 @@ public final class MainWindowF {
             // the mediator observes the proof control (auto mode state, closed-goal counter);
             // the UI's own listener refreshes the views after interactive auto mode runs
             mediator.attach(env.getProofControl());
+            // menu: MP7 — a freshly attached proof control inherits the persisted Minimize
+            // Interaction flag (Swing MinimizeInteraction.updateMainWindow applies the flag to the
+            // UI's proof control on construction and on GeneralSettings changes,
+            // MinimizeInteraction.java:64-66)
+            applyMinimizeInteraction(env.getProofControl());
             // termmenu: give the sequent view the mediator + proof control of the loaded
             // environment so the right-click context menu can be built (Swing parity:
             // CurrentGoalViewMenu is built with the mediator's selected goal and the proof
@@ -853,6 +866,67 @@ public final class MainWindowF {
             // createViewMenu table; each marker line must end with PASS
             if (System.getProperty("key.fx.verify.menuparity") != null) {
                 verifyMenuParity();
+            }
+            // menu: MP7 — Minimize Interaction self test (key.fx.verify.minimizeinteraction):
+            // flips the persisted taclet filter through the same apply helper the toggle uses and
+            // asserts the proof control mirrors the flag in both directions
+            if (System.getProperty("key.fx.verify.minimizeinteraction") != null) {
+                GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+                boolean original = gs.getTacletFilter();
+                boolean ok;
+                gs.setTacletFilter(!original);
+                applyMinimizeInteraction(env.getProofControl());
+                ok = env.getProofControl().isMinimizeInteraction() == gs.getTacletFilter();
+                gs.setTacletFilter(original);
+                applyMinimizeInteraction(env.getProofControl());
+                ok &= env.getProofControl().isMinimizeInteraction() == gs.getTacletFilter();
+                LOGGER.info("Minimize interaction verification: {}", ok ? "PASS" : "FAIL");
+                NotificationManagerF.getInstance()
+                        .notify("Minimize interaction verification: " + (ok ? "PASS" : "FAIL"),
+                            ok ? Kind.INFO : Kind.ERROR);
+            }
+            // menu: MP7 — right-click macro popup self test (key.fx.verify.rightclickmacro):
+            // builds the popup through the SequentViewF seam with the flag ON and OFF and asserts
+            // the macro names / the term-menu fallback (report logged/toasted there)
+            if (System.getProperty("key.fx.verify.rightclickmacro") != null) {
+                String report = sequentView.verifyRightClickMacro();
+                LOGGER.info("Right-click macro verification: {}", report);
+                NotificationManagerF.getInstance()
+                        .notify("Right-click macro verification: " + report,
+                            report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+            }
+            // menu: MP7 — auto-save self test (key.fx.verify.autosave): asserts the saver is armed
+            // iff the persisted period is > 0 and that it received the loaded proof (the proof
+            // identity is read reflectively; see readAutoSaveProof)
+            if (System.getProperty("key.fx.verify.autosave") != null) {
+                GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+                int savedPeriod = gs.autoSavePeriod();
+                boolean ok;
+                try {
+                    // the startup arming must match the persisted period (armed iff > 0)
+                    boolean armedOk =
+                        (mediator.getAutoSaver() != null) == (savedPeriod > 0);
+                    // force the armed state and route the loaded proof again through the real
+                    // selection path, so the saver's setProof fires (mediator.setProof hook)
+                    gs.setAutoSave(DEFAULT_AUTO_SAVE_PERIOD);
+                    applyAutoSave(DEFAULT_AUTO_SAVE_PERIOD);
+                    selectionModel.setSelectedProof(null);
+                    selectionModel.setSelectedProof(env.getLoadedProof());
+                    AutoSaver saver = mediator.getAutoSaver();
+                    boolean proofOk =
+                        saver != null && readAutoSaveProof(saver) == env.getLoadedProof();
+                    // the disarmed state after the switch
+                    gs.setAutoSave(0);
+                    applyAutoSave(0);
+                    ok = armedOk && proofOk && mediator.getAutoSaver() == null;
+                } finally {
+                    gs.setAutoSave(savedPeriod);
+                    applyAutoSave(savedPeriod);
+                }
+                LOGGER.info("Auto save verification: {}", ok ? "PASS" : "FAIL");
+                NotificationManagerF.getInstance()
+                        .notify("Auto save verification: " + (ok ? "PASS" : "FAIL"),
+                            ok ? Kind.INFO : Kind.ERROR);
             }
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 startLiveAutoMode(env);
@@ -2272,6 +2346,19 @@ public final class MainWindowF {
         LogViewF.showInstance(getStage());
     }
 
+    /**
+     * menu: MP2/MP7 — the proof macros of the Automation submenu (Swing
+     * {@code MainWindow.createAutomationActions}, MainWindow.java:814-827, in the same order:
+     * DefaultAutoMacro, FullAutoPilotProofMacro, AutoPilotPrepareProofMacro, ScriptAwareMacro).
+     * Shared with the sequent-view right-click macro popup (MP7; Swing {@code
+     * ProofMacroMenu.REGISTERED_MACROS} is the ServiceLoader superset, ProofMacroMenu.java:60-61
+     * — the FX popup mirrors the app's own Automation submenu instead, see
+     * SequentViewF#buildMacroPopup).
+     */
+    public static final List<ProofMacro> AUTOMATION_MACROS =
+        List.of(new DefaultAutoMacro(), new FullAutoPilotProofMacro(),
+            new AutoPilotPrepareProofMacro(), new ScriptAwareMacro());
+
     private Menu buildProofMenu() {
         Menu proof = new Menu("Proof");
         Menu automation = new Menu("Automation");
@@ -2282,6 +2369,8 @@ public final class MainWindowF {
         MenuItem stopAuto = menuItem("Stop Automatic Proof", IconFactoryF.Key.AUTO_MODE_STOP,
             mediator::stopAutoMode);
         stopAuto.disableProperty().bind(mediator.autoModeRunningProperty().not());
+        automation.getItems().add(startAuto);
+        automation.getItems().add(stopAuto);
         // menu: MP2 — after Start/Stop Automatic Proof the Automation submenu mirrors the four
         // proof-macro entries of Swing MainWindow.createAutomationActions (MainWindow.java:814-827,
         // MacroAutomationAction.java:40-45), same order, item text = macro.getName(). The Swing
@@ -2296,24 +2385,16 @@ public final class MainWindowF {
         // Enablement binds to proofLoaded only — deliberately NO auto-mode lock: Swing keeps the
         // macro actions enabled while auto mode runs so a click stops the automation
         // (MacroAutomationAction.actionPerformed, MacroAutomationAction.java:48-61).
-        MenuItem defaultAuto = menuItem(new DefaultAutoMacro().getName(),
-            "de.uka.ilkd.key.macros.DefaultAutoMacro", null,
-            () -> runMacro(new DefaultAutoMacro()));
-        defaultAuto.disableProperty().bind(proofLoaded.not());
-        MenuItem structuredAuto = menuItem(new FullAutoPilotProofMacro().getName(),
-            "de.uka.ilkd.key.macros.FullAutoPilotProofMacro", null,
-            () -> runMacro(new FullAutoPilotProofMacro()));
-        structuredAuto.disableProperty().bind(proofLoaded.not());
-        MenuItem prepareAuto = menuItem(new AutoPilotPrepareProofMacro().getName(),
-            "de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro", null,
-            () -> runMacro(new AutoPilotPrepareProofMacro()));
-        prepareAuto.disableProperty().bind(proofLoaded.not());
-        MenuItem scriptAuto = menuItem(new ScriptAwareMacro().getName(),
-            "de.uka.ilkd.key.macros.ScriptAwareMacro", null,
-            () -> runMacro(new ScriptAwareMacro()));
-        scriptAuto.disableProperty().bind(proofLoaded.not());
-        automation.getItems().addAll(startAuto, stopAuto,
-            defaultAuto, structuredAuto, prepareAuto, scriptAuto);
+        // menu: MP7 — the items are built from the shared {@link #AUTOMATION_MACROS} list so the
+        // right-click macro popup of the sequent view (SequentViewF#buildMacroPopup) offers the
+        // very same macros.
+        for (ProofMacro macro : AUTOMATION_MACROS) {
+            MenuItem autoItem = menuItem(macro.getName(),
+                "de.uka.ilkd.key.macros." + macro.getClass().getSimpleName(), null,
+                () -> runMacro(macro));
+            autoItem.disableProperty().bind(proofLoaded.not());
+            automation.getItems().add(autoItem);
+        }
         // menu: MP1 — the entries after Prune Proof mirror Swing MainWindow.createProofMenu
         // (MainWindow.java:1082-1142) with selected == null in the same order: Abandon Proof,
         // separator, the search group (Search in Proof Tree/Sequent + Next/Previous + the
@@ -2754,17 +2835,65 @@ public final class MainWindowF {
      * (AutoSave.java:29-31;
      * Swing {@code AutoSave.DEFAULT_PERIOD = 2000}, AutoSave.java:16 — key.ui, not importable into
      * this module, hence the inlined constant).
-     * // menu: auto-save timer wiring deferred (no FX mediator support): Swing additionally calls
-     * getMediator().setAutoSave(p) (AutoSave.java:31); the FX KeYMediatorF has no setAutoSave, so
-     * only the persisted flag is written.
+     * // menu: MP7 — the timer wiring is no longer deferred: the action arms/disarms the
+     * // {@link AutoSaver} through {@link #applyAutoSave(int)} (Swing AutoSave.java:31 calls
+     * // getMediator().setAutoSave(p), KeYMediator.java:148-150); arming is also applied at
+     * // startup from the persisted period (see {@link #initialize()}).
      */
     private CheckMenuItem autoSaveProofsToggle() {
         GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
         CheckMenuItem item = new CheckMenuItem("Auto Save Proofs");
         item.setSelected(gs.autoSavePeriod() > 0);
         item.setOnAction(
-            e -> gs.setAutoSave(item.isSelected() ? DEFAULT_AUTO_SAVE_PERIOD : 0));
+            e -> {
+                int period = item.isSelected() ? DEFAULT_AUTO_SAVE_PERIOD : 0;
+                gs.setAutoSave(period);
+                applyAutoSave(period);
+            });
         return item;
+    }
+
+    /**
+     * menu: MP7 — arms or disarms the {@link AutoSaver} (Swing {@code KeYMediator.setAutoSave},
+     * KeYMediator.java:148-150, called by {@code AutoSave} with the new period, AutoSave.java
+     * :29-31): the saver is created with the given interval and registered on the window's UI
+     * control as a {@code ProverTaskListener} so the core's proof runs deliver it the task
+     * events — the FX equivalent of the Swing {@code MediatorProofControl.AutoModeWorker}
+     * registration (MediatorProofControl.java:209-211). The saver field itself lives on the
+     * mediator ({@code KeYMediatorF#getAutoSaver}), which hands it every newly selected proof
+     * from {@code setProof}.
+     *
+     * @param period the save interval in proof steps, 0 disables auto save
+     */
+    private void applyAutoSave(int period) {
+        AutoSaver oldSaver = mediator.getAutoSaver();
+        if (oldSaver != null) {
+            getUserInterfaceControl().removeProverTaskListener(oldSaver);
+        }
+        mediator.setAutoSave(period);
+        AutoSaver newSaver = mediator.getAutoSaver();
+        if (newSaver != null) {
+            getUserInterfaceControl().addProverTaskListener(newSaver);
+        }
+    }
+
+    /**
+     * menu: MP7 — auto-save self-test helper: {@code AutoSaver} (key.core) stores the proof from
+     * {@code setProof} in a private field without a getter (AutoSaver.java:40, :102-104); the
+     * proof identity is read reflectively for the {@code key.fx.verify.autosave} assertion.
+     *
+     * @param saver the armed auto saver
+     * @return the proof the saver received, or {@code null} on failure/reflection error
+     */
+    private static Object readAutoSaveProof(AutoSaver saver) {
+        try {
+            Field proofField = AutoSaver.class.getDeclaredField("proof");
+            proofField.setAccessible(true);
+            return proofField.get(saver);
+        } catch (ReflectiveOperationException e) {
+            LOGGER.error("Auto save verification: cannot read AutoSaver.proof", e);
+            return null;
+        }
     }
 
     /** menu: MP4 — Swing {@code AutoSave.DEFAULT_PERIOD} (key.ui), see autoSaveProofsToggle(). */
@@ -2773,18 +2902,46 @@ public final class MainWindowF {
     /**
      * menu: MP4 — Minimize Interaction check item (Swing {@code MinimizeInteraction},
      * MinimizeInteraction.java:17-73, display name "Minimize Interaction"): the selected state
-     * mirrors and writes the {@code GeneralSettings} taclet filter.
-     * // menu: the FX context-menu filter wiring for this flag is deferred — Swing additionally
-     * applies a taclet filter on the current goal view via
-     * mainWindow.getUserInterface().getProofControl().setMinimizeInteraction(b)
-     * (MinimizeInteraction.java:64-66); only the flag is persisted here.
+     * mirrors and writes the {@code GeneralSettings} taclet filter and applies it to the proof
+     * control of the currently loaded environment.
+     * // menu: MP7 — the proof-control wiring is no longer deferred: the toggle applies the flag
+     * // through {@link #applyMinimizeInteraction(ProofControl)} (Swing
+     * // MinimizeInteraction.handleClickEvent, MinimizeInteraction.java:57-66:
+     * // mainWindow.getUserInterface().getProofControl().setMinimizeInteraction(b)).
      */
     private CheckMenuItem minimizeInteractionToggle() {
         GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
         CheckMenuItem item = new CheckMenuItem("Minimize Interaction");
         item.setSelected(gs.getTacletFilter());
-        item.setOnAction(e -> gs.setTacletFilter(item.isSelected()));
+        item.setOnAction(e -> {
+            // menu: MP7 — the flag is written first, then applied to the proof control of the
+            // loaded environment (Swing MinimizeInteraction.handleClickEvent writes the settings
+            // after updateMainWindow; here the settings change must happen first so the helper
+            // reads the new value)
+            gs.setTacletFilter(item.isSelected());
+            applyMinimizeInteraction(
+                lastEnvironment == null ? null : lastEnvironment.getProofControl());
+        });
         return item;
+    }
+
+    /**
+     * menu: MP7 — applies the persisted Minimize Interaction flag to the given proof control
+     * (Swing {@code MinimizeInteraction.updateMainWindow}, MinimizeInteraction.java:64-66: {@code
+     * mainWindow.getUserInterface().getProofControl().setMinimizeInteraction(b)}); the core honors
+     * the flag in {@code AbstractProofControl} (only complete rule applications are offered to the
+     * user). No-op for a {@code null} control (no proof loaded — the flag is applied to the next
+     * attached proof control by the load-success path).
+     *
+     * @param pc the proof control to update, may be {@code null}
+     */
+    private void applyMinimizeInteraction(@Nullable ProofControl pc) {
+        if (pc == null) {
+            return;
+        }
+        boolean flag = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                .getTacletFilter();
+        pc.setMinimizeInteraction(flag);
     }
 
     /**
@@ -2792,8 +2949,10 @@ public final class MainWindowF {
      * RightMouseClickToggleAction.java:22-33): the selected state mirrors
      * {@code GeneralSettings.isRightClickMacro()} and the action writes
      * {@code setRightClickMacros} back.
-     * // menu: Swing's direct-macro-on-right-click behavior is deferred — the FX right click
-     * currently always opens the term context menu; only the flag persists here.
+     * // menu: MP7 — the right-click behavior is no longer deferred: while the flag is set the
+     * // sequent view shows the proof-macro popup instead of the term context menu
+     * // (SequentViewF.buildRightClickMenu, Swing CurrentGoalViewListener.java:54-67 /
+     * ProofMacroMenu).
      */
     private CheckMenuItem rightClickMacroToggle() {
         GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
@@ -2808,8 +2967,12 @@ public final class MainWindowF {
      * EnsureSourceConsistencyToggleAction, EnsureSourceConsistencyToggleAction.java:37-48): the
      * selected state mirrors {@code GeneralSettings.isEnsureSourceConsistency()} and the action
      * writes {@code setEnsureSourceConsistency} back.
-     * // menu: Swing's info dialog is dropped — the FX port has no source-consistency machinery
-     * (no proof-bundle/source-cache backend); only the flag persists for now.
+     * // menu: MP7 — the flag is honored at runtime by the core and the FX soundiness report:
+     * // AbstractProblemLoader.createFileRepo (AbstractProblemLoader.java:400-409) picks the
+     * // DiskFileRepo (source-cache backend) over the SimpleFileRepo when it is set, and the FX
+     * // SoundinessAnalyzer warns when it is off (SoundinessAnalyzer.java:377-383). Only the
+     * // Swing info dialog of the toggle action (EnsureSourceConsistencyToggleAction.java:42-47)
+     * // is dropped.
      */
     private CheckMenuItem ensureSourceConsistencyToggle() {
         GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();

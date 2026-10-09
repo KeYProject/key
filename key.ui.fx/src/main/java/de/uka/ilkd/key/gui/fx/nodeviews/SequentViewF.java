@@ -19,8 +19,10 @@ import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
@@ -54,9 +56,11 @@ import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
+import de.uka.ilkd.key.gui.fx.MainWindowF;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.HideSequentPrintFilter;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.IllegalRegexException;
@@ -74,17 +78,20 @@ import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.javafx.FxUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -687,11 +694,191 @@ public class SequentViewF extends BorderPane {
         }
         List<SequentMenuModelF.Entry> entries =
             SequentMenuModelF.build(pos, menuMediator, menuProofControl, null, null);
-        ContextMenu menu = SequentTermContextMenuF.build(entries,
+        ContextMenu fallback = SequentTermContextMenuF.build(entries,
             new SequentTermContextMenuF.MenuContext(menuMediator, menuProofControl, goal, pos,
                 null, this::printSequent));
+        // menu: MP7 — the macro popup replaces the term menu while "Right Click for Proof Macros"
+        // is active ({@link #buildRightClickMenu} falls back to the term menu when no macro is
+        // applicable)
+        ContextMenu menu = buildRightClickMenu(pos, fallback);
         menu.show(textFlow, event.getScreenX(), event.getScreenY());
     }
+
+    // menu: MP7 — begin — right-click proof-macro popup (Swing CurrentGoalViewListener.java:54-67
+    // + ProofMacroMenu)
+    /**
+     * menu: MP7 — the right-click popup seam: with the "Right Click for Proof Macros" setting
+     * active the macro popup replaces the term context menu (Swing
+     * {@code CurrentGoalViewListener.mouseClicked}, CurrentGoalViewListener.java:53-67: {@code
+     * isRightClickMacro()} selects {@code ProofMacroMenu} over the taclet menu); when no macro is
+     * applicable the term menu is used (Swing politely adds a "No strategies available" label,
+     * CurrentGoalViewListener.java:62-64 / {@code ProofMacroMenu.isEmpty()}, ProofMacroMenu.java
+     * :160-162 — the term menu is the FX equivalent fallback).
+     *
+     * @param pos the clicked sequent position (already non-null for the interactive callers)
+     * @param fallback the term context menu built for the same position
+     * @return the popup to show
+     */
+    private ContextMenu buildRightClickMenu(PosInSequent pos, ContextMenu fallback) {
+        if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isRightClickMacro()) {
+            ContextMenu macroMenu = buildMacroPopup(pos);
+            if (macroMenu != null) {
+                return macroMenu;
+            }
+        }
+        return fallback;
+    }
+
+    /**
+     * menu: MP7 — builds the macro popup for the clicked position: one item per macro of the
+     * Automation submenu's {@link MainWindowF#AUTOMATION_MACROS} list that is applicable at the
+     * position (Swing {@code ProofMacroMenu} iterates the registered macros and keeps those with
+     * {@code canApplyTo}, ProofMacroMenu.java:87-99); item text = {@code macro.getName()}, tooltip
+     * = {@code macro.getDescription()} (ProofMacroMenu.java:143-144). The action runs the macro on
+     * the selected node with the {@link PosInOccurrence} of the clicked position (Swing
+     * {@code ProofMacroUserAction}, ProofMacroUserAction.java:57-59: {@code
+     * mediator.getUI().getProofControl().runMacro(node, macro, pio)}; the core silently ignores
+     * the run while auto mode is active, and the {@code pio} may be {@code null} — the position
+     * may resolve to no occurrence and global macros accept that). Returns {@code null} when no
+     * macro is applicable (the caller then falls back to the term menu).
+     *
+     * @param pos the clicked sequent position or {@code null}
+     * @return the macro popup, or {@code null} if no macro is applicable
+     */
+    private ContextMenu buildMacroPopup(@Nullable PosInSequent pos) {
+        Node node = menuMediator.getSelectedNode();
+        Goal goal = menuMediator.getSelectedGoal();
+        if (node == null || goal == null) {
+            return null;
+        }
+        Proof proof = node.proof();
+        PosInOccurrence pio = pos == null ? null : pos.getPosInOccurrence();
+        ImmutableList<Goal> goals = proof.getSubtreeEnabledGoals(node);
+        ContextMenu menu = new ContextMenu();
+        int count = 0;
+        for (ProofMacro macro : MainWindowF.AUTOMATION_MACROS) {
+            if (macro.canApplyTo(proof, goals, pio)) {
+                // menu: MP7 — JavaFX MenuItem has no tooltip property (unlike Swing
+                // JMenuItem.setToolTipText, ProofMacroMenu.java:144); the item is a
+                // CustomMenuItem wrapping a tooltip-bearing Label, so the description actually
+                // appears on hover (the visible label also keeps the macro name readable)
+                Label label = new Label(macro.getName());
+                Tooltip.install(label, new Tooltip(macro.getDescription()));
+                CustomMenuItem item = new CustomMenuItem(label);
+                item.setOnAction(e -> menuProofControl.runMacro(node, macro, pio));
+                menu.getItems().add(item);
+                count++;
+            }
+        }
+        return count == 0 ? null : menu;
+    }
+
+    /**
+     * menu: MP7 — the visible text of a menu item: the item text, or the content text of a
+     * {@link CustomMenuItem} (the macro popup uses label-backed custom items for the tooltips),
+     * or the empty string. {@code getText()} may be {@code null} (e.g. separators/Swing-ish
+     * placeholder items of the term menu), which counts as empty.
+     */
+    private static String visibleText(MenuItem item) {
+        String text = item.getText();
+        if (text != null && !text.isEmpty()) {
+            return text;
+        }
+        if (item instanceof CustomMenuItem custom && custom.getContent() instanceof Label label) {
+            return label.getText();
+        }
+        return "";
+    }
+
+    /**
+     * menu: MP7 — the labels of the given menu items (separators skipped, sub-menus flattened).
+     */
+    private static List<String> menuLabels(List<MenuItem> items) {
+        List<String> labels = new ArrayList<>();
+        for (MenuItem item : items) {
+            if (!(item instanceof javafx.scene.control.SeparatorMenuItem)) {
+                String text = visibleText(item);
+                if (!text.isEmpty()) {
+                    labels.add(text);
+                }
+            }
+            if (item instanceof javafx.scene.control.Menu subMenu) {
+                labels.addAll(menuLabels(subMenu.getItems()));
+            }
+        }
+        return labels;
+    }
+
+    /**
+     * menu: MP7 — headless self test of the right-click popup ({@code
+     * key.fx.verify.rightclickmacro}), run after the demo load from MainWindowF: computes a
+     * {@link PosInSequent} of the current printing and builds the popup through the
+     * {@link #buildRightClickMenu} seam with the "Right Click for Proof Macros" flag ON and OFF
+     * (the persisted setting is restored afterwards). With the flag ON the popup must contain the
+     * macro names of the Automation submenu ({@link MainWindowF#AUTOMATION_MACROS}) and no
+     * term-menu entries; with the flag OFF the term-menu path must be taken. Uses the printed
+     * position table — no synthetic mouse events. Skips gracefully without a goal or position.
+     *
+     * @return {@code "PASS - ..."} or {@code "FAIL - ..."}
+     */
+    public String verifyRightClickMacro() {
+        Goal goal = menuMediator == null ? null : menuMediator.getSelectedGoal();
+        PosInSequent pos = firstIndexedPos();
+        if (goal == null || pos == null) {
+            return "SKIP - no goal/position (no printed sequent)";
+        }
+        List<SequentMenuModelF.Entry> entries =
+            SequentMenuModelF.build(pos, menuMediator, menuProofControl, null, null);
+        ContextMenu fallback = SequentTermContextMenuF.build(entries,
+            new SequentTermContextMenuF.MenuContext(menuMediator, menuProofControl, goal, pos,
+                null, this::printSequent));
+        GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+        boolean saved = gs.isRightClickMacro();
+        try {
+            gs.setRightClickMacros(true);
+            ContextMenu on = buildRightClickMenu(pos, fallback);
+            gs.setRightClickMacros(false);
+            ContextMenu off = buildRightClickMenu(pos, fallback);
+            List<String> onLabels = menuLabels(on.getItems());
+            List<String> offLabels = menuLabels(off.getItems());
+            List<String> macroNames = new ArrayList<>();
+            for (ProofMacro macro : MainWindowF.AUTOMATION_MACROS) {
+                macroNames.add(macro.getName());
+            }
+            boolean hasMacros = onLabels.containsAll(macroNames);
+            // the macro popup must not contain any term-menu entry
+            boolean noTermEntries = onLabels.stream().noneMatch(offLabels::contains);
+            // the OFF path is the term menu (fixed structural items of SequentTermContextMenuF)
+            boolean termPath = offLabels.contains("Apply rules automatically here")
+                    || offLabels.contains("Copy to clipboard")
+                    || offLabels.contains("No rules applicable.");
+            boolean pass = hasMacros && noTermEntries && termPath;
+            return (pass ? "PASS" : "FAIL") + " - on[" + String.join(", ", onLabels) + "] off["
+                + String.join(", ", offLabels) + "]";
+        } finally {
+            gs.setRightClickMacros(saved);
+        }
+    }
+
+    /**
+     * menu: MP7 — the first {@link PosInSequent} of the current printing (the printed text may
+     * start with whitespace or symbols that do not map to a position — the first indexed
+     * character that resolves is used).
+     */
+    private PosInSequent firstIndexedPos() {
+        String text = printedText();
+        if (text == null) {
+            return null;
+        }
+        for (int i = 0; i < text.length(); i++) {
+            PosInSequent pos = getSequentPosAt(i);
+            if (pos != null) {
+                return pos;
+            }
+        }
+        return null;
+    }
+    // menu: MP7 — end
 
     /**
      * The character index of the printed text under the given mouse event (the same mapping
