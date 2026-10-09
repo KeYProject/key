@@ -54,6 +54,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.javafx.FxUtil;
 
 import org.jspecify.annotations.Nullable;
+import org.kordamp.ikonli.fontawesome6.FontAwesomeSolid;
+import org.kordamp.ikonli.javafx.FontIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,7 +158,10 @@ public class CachingExtensionF
     private CheckMenuItem menuToggleItem() {
         CheckMenuItem item = toggleMenuItem;
         if (item == null) {
+            // MP9.1 icon review: Swing CachingToggleAction carries the keyCachedClosed icon — a
+            // database glyph stands in
             item = new CheckMenuItem("Proof Caching");
+            item.setGraphic(new FontIcon(FontAwesomeSolid.DATABASE));
             item.setSelected(toggle.get());
             // the checked state is synced into {@link #toggle} by the binding
             item.selectedProperty().bindBidirectional(toggle);
@@ -172,7 +177,9 @@ public class CachingExtensionF
     private ToggleButton toolbarToggleButton() {
         ToggleButton button = toggleButton;
         if (button == null) {
+            // MP9.1 icon review: Swing CachingToggleAction.cached icon — database glyph
             button = new ToggleButton("Proof Caching");
+            button.setGraphic(new FontIcon(FontAwesomeSolid.DATABASE));
             button.selectedProperty().bindBidirectional(toggle);
             button.disableProperty().bind(multiCoreActive);
             toggleButton = button;
@@ -362,6 +369,7 @@ public class CachingExtensionF
     private MenuItem autoSearchItem() {
         CheckMenuItem item =
             new CheckMenuItem("Automatically search for references in auto mode");
+        item.setGraphic(new FontIcon(FontAwesomeSolid.SEARCH));
         item.setSelected(settings.getEnabled());
         item.setOnAction(e -> settings.setEnabled(item.isSelected()));
         return item;
@@ -370,6 +378,7 @@ public class CachingExtensionF
     /** Opens the "Proof Caching" settings panel in the settings dialog (like the HeatmapF). */
     private MenuItem settingsItem() {
         MenuItem item = new MenuItem("Proof Caching Options…");
+        item.setGraphic(new FontIcon(FontAwesomeSolid.COG));
         item.setOnAction(e -> {
             MainWindowF owner = window;
             if (owner != null) {

@@ -25,4 +25,7 @@ dependencies {
     // so this module must declare the core dependency itself to compile against those signatures.
     // Runtime-wise key.core arrives transitively anyway (via keyext.caching) — no classpath change.
     implementation project(":key.core")
+    // MP9.1 icon review: ikonli FontAwesome glyphs for the toolbar toggle + Caching menu
+    implementation libs.ikonli.javafx
+    implementation libs.ikonli.fontawesome6
 }
