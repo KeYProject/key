@@ -1085,6 +1085,134 @@ public class ProofTreeViewF extends BorderPane {
     }
 
     // -----------------------------------------------------------------------
+    // Goal select above/below (menu: MP3b — Swing ProofTreeView.selectAbove/selectBelow,
+    // ProofTreeView.java:550-606, invoked by GoalSelectAboveAction/GoalSelectBelowAction)
+    // -----------------------------------------------------------------------
+
+    /**
+     * menu: MP3b — selects the next open goal above the currently selected node (Swing
+     * {@code ProofTreeView.selectAbove}, ProofTreeView.java:550-577). The Swing version walks
+     * the visible JTree rows upward from the current row: a collapsed branch row is expanded
+     * while crossing it (the search continues at the far end of the just-expanded branch,
+     * {@code row += newRows - prevRows}, :563-568) and the first LEAF node row is selected via
+     * the selection model. JavaFX has no row API, so {@link #visibleRows()} builds the ordered
+     * list of currently visible rows from the expansion state ({@code TreeItem.isExpanded()});
+     * a collapsed branch is expanded (with a row-list rebuild) and the walk continues from the
+     * far end of its subtree — the same behaviour as Swing.
+     *
+     * @return whether a goal above the current selection was found and selected
+     */
+    public boolean selectAbove() {
+        return selectGoal(-1);
+    }
+
+    /**
+     * menu: MP3b — the downward counterpart of {@link #selectAbove()} (Swing
+     * {@code ProofTreeView.selectBelow}, ProofTreeView.java:584-606): a collapsed branch is
+     * expanded and the walk continues at the branch row itself, moving into the expanded subtree.
+     *
+     * @return whether a goal below the current selection was found and selected
+     */
+    public boolean selectBelow() {
+        return selectGoal(1);
+    }
+
+    /**
+     * Walks the visible rows from the current selection in the given direction and selects the
+     * first leaf row via the {@link KeYSelectionModel} (the selection listener then reveals and
+     * scrolls the new selection like a user click, see {@link #revealSelectedNode}).
+     */
+    private boolean selectGoal(int direction) {
+        TreeItem<Entry> start = tree.getSelectionModel().getSelectedItem();
+        if (start == null || start.getValue() == null || tree.getRoot() == null) {
+            return false;
+        }
+        List<TreeItem<Entry>> rows = visibleRows();
+        int cursor = rows.indexOf(start);
+        if (cursor < 0) {
+            return false;
+        }
+        for (int i = cursor + direction; i >= 0 && i < rows.size(); i += direction) {
+            TreeItem<Entry> item = rows.get(i);
+            Entry entry = item.getValue();
+            if (entry.isBranch() && isExpandableBranch(item)) {
+                // Swing: expandPath(tp) — a collapsed branch is expanded while crossing it;
+                // selectAbove continues at the far end of the expanded subtree
+                // (ProofTreeView.java:563-568), selectBelow at the branch root (:596-598)
+                item.setExpanded(true);
+                rows = visibleRows();
+                int branchIndex = rows.indexOf(item);
+                if (direction < 0) {
+                    i = branchIndex + visibleRowCount(item) - 1;
+                } else {
+                    i = branchIndex;
+                }
+                continue;
+            }
+            if (!entry.isBranch() && entry.node.leaf()) {
+                if (selectionModel != null) {
+                    selectionModel.setSelectedNode(entry.node);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param item a branch entry
+     * @return whether the branch is a real collapsed branch point that Swing would expand while
+     *         walking (a {@code GUIBranchNode} whose node has a multi-child parent — the root
+     *         branch is excluded by {@code parent() != null}; Swing ProofTreeView.java:560-562)
+     */
+    private static boolean isExpandableBranch(TreeItem<Entry> item) {
+        Entry entry = item.getValue();
+        return !item.isExpanded() && entry.node.parent() != null
+                && entry.node.parent().childrenCount() > 1;
+    }
+
+    /**
+     * @return the currently visible tree rows in display order — the FX counterpart of the
+     *         Swing {@code JTree} row API used by {@code selectAbove/selectBelow}: a pre-order
+     *         walk that descends only into expanded items (this mirrors the rows allocated by
+     *         the {@link TreeView}, whose {@code TreeItem.expandedProperty} gates visibility)
+     */
+    private List<TreeItem<Entry>> visibleRows() {
+        List<TreeItem<Entry>> rows = new ArrayList<>();
+        TreeItem<Entry> root = tree.getRoot();
+        if (root != null) {
+            collectVisibleRows(root, rows);
+        }
+        return rows;
+    }
+
+    private static void collectVisibleRows(TreeItem<Entry> item, List<TreeItem<Entry>> into) {
+        if (item == null) {
+            return;
+        }
+        into.add(item);
+        if (item.isExpanded()) {
+            for (TreeItem<Entry> child : item.getChildren()) {
+                collectVisibleRows(child, into);
+            }
+        }
+    }
+
+    /**
+     * @return the number of visible rows in the subtree of the given item, the item's own row
+     *         included
+     */
+    private static int visibleRowCount(TreeItem<Entry> item) {
+        int count = 1;
+        if (item.isExpanded()) {
+            for (TreeItem<Entry> child : item.getChildren()) {
+                count += visibleRowCount(child);
+            }
+        }
+        return count;
+    }
+
+    // -----------------------------------------------------------------------
     // Search (Swing ProofTreeSearchBar + ProofTreeViewFilter.TreeSearchFilter)
     // -----------------------------------------------------------------------
 
