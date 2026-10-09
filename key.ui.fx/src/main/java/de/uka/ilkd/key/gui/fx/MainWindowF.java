@@ -53,6 +53,7 @@ import javafx.stage.Stage;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
@@ -720,6 +721,11 @@ public final class MainWindowF {
             // the mediator observes the proof control (auto mode state, closed-goal counter);
             // the UI's own listener refreshes the views after interactive auto mode runs
             mediator.attach(env.getProofControl());
+            // menu: MP7 — a freshly attached proof control inherits the persisted Minimize
+            // Interaction flag (Swing MinimizeInteraction.updateMainWindow applies the flag to the
+            // UI's proof control on construction and on GeneralSettings changes,
+            // MinimizeInteraction.java:64-66)
+            applyMinimizeInteraction(env.getProofControl());
             // termmenu: give the sequent view the mediator + proof control of the loaded
             // environment so the right-click context menu can be built (Swing parity:
             // CurrentGoalViewMenu is built with the mediator's selected goal and the proof
@@ -853,6 +859,24 @@ public final class MainWindowF {
             // createViewMenu table; each marker line must end with PASS
             if (System.getProperty("key.fx.verify.menuparity") != null) {
                 verifyMenuParity();
+            }
+            // menu: MP7 — Minimize Interaction self test (key.fx.verify.minimizeinteraction):
+            // flips the persisted taclet filter through the same apply helper the toggle uses and
+            // asserts the proof control mirrors the flag in both directions
+            if (System.getProperty("key.fx.verify.minimizeinteraction") != null) {
+                GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+                boolean original = gs.getTacletFilter();
+                boolean ok;
+                gs.setTacletFilter(!original);
+                applyMinimizeInteraction(env.getProofControl());
+                ok = env.getProofControl().isMinimizeInteraction() == gs.getTacletFilter();
+                gs.setTacletFilter(original);
+                applyMinimizeInteraction(env.getProofControl());
+                ok &= env.getProofControl().isMinimizeInteraction() == gs.getTacletFilter();
+                LOGGER.info("Minimize interaction verification: {}", ok ? "PASS" : "FAIL");
+                NotificationManagerF.getInstance()
+                        .notify("Minimize interaction verification: " + (ok ? "PASS" : "FAIL"),
+                            ok ? Kind.INFO : Kind.ERROR);
             }
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 startLiveAutoMode(env);
@@ -2773,18 +2797,46 @@ public final class MainWindowF {
     /**
      * menu: MP4 — Minimize Interaction check item (Swing {@code MinimizeInteraction},
      * MinimizeInteraction.java:17-73, display name "Minimize Interaction"): the selected state
-     * mirrors and writes the {@code GeneralSettings} taclet filter.
-     * // menu: the FX context-menu filter wiring for this flag is deferred — Swing additionally
-     * applies a taclet filter on the current goal view via
-     * mainWindow.getUserInterface().getProofControl().setMinimizeInteraction(b)
-     * (MinimizeInteraction.java:64-66); only the flag is persisted here.
+     * mirrors and writes the {@code GeneralSettings} taclet filter and applies it to the proof
+     * control of the currently loaded environment.
+     * // menu: MP7 — the proof-control wiring is no longer deferred: the toggle applies the flag
+     * // through {@link #applyMinimizeInteraction(ProofControl)} (Swing
+     * // MinimizeInteraction.handleClickEvent, MinimizeInteraction.java:57-66:
+     * // mainWindow.getUserInterface().getProofControl().setMinimizeInteraction(b)).
      */
     private CheckMenuItem minimizeInteractionToggle() {
         GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
         CheckMenuItem item = new CheckMenuItem("Minimize Interaction");
         item.setSelected(gs.getTacletFilter());
-        item.setOnAction(e -> gs.setTacletFilter(item.isSelected()));
+        item.setOnAction(e -> {
+            // menu: MP7 — the flag is written first, then applied to the proof control of the
+            // loaded environment (Swing MinimizeInteraction.handleClickEvent writes the settings
+            // after updateMainWindow; here the settings change must happen first so the helper
+            // reads the new value)
+            gs.setTacletFilter(item.isSelected());
+            applyMinimizeInteraction(
+                lastEnvironment == null ? null : lastEnvironment.getProofControl());
+        });
         return item;
+    }
+
+    /**
+     * menu: MP7 — applies the persisted Minimize Interaction flag to the given proof control
+     * (Swing {@code MinimizeInteraction.updateMainWindow}, MinimizeInteraction.java:64-66: {@code
+     * mainWindow.getUserInterface().getProofControl().setMinimizeInteraction(b)}); the core honors
+     * the flag in {@code AbstractProofControl} (only complete rule applications are offered to the
+     * user). No-op for a {@code null} control (no proof loaded — the flag is applied to the next
+     * attached proof control by the load-success path).
+     *
+     * @param pc the proof control to update, may be {@code null}
+     */
+    private void applyMinimizeInteraction(@Nullable ProofControl pc) {
+        if (pc == null) {
+            return;
+        }
+        boolean flag = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                .getTacletFilter();
+        pc.setMinimizeInteraction(flag);
     }
 
     /**
