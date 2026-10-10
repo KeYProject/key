@@ -25,7 +25,8 @@ import org.jspecify.annotations.Nullable;
 public abstract class AbstractDocGenerator {
 
     /// Runs this generator. If a command line argument is given, the markdown output is written
-    /// to that file; otherwise it is printed to stdout.
+    /// to that file together with a JSON dump ([#generateJsonData()]) next to it; otherwise the
+    /// markdown is printed to stdout.
     ///
     /// @param args an optional single argument with the path of the output file
     /// @throws IOException if the output file cannot be written
@@ -35,13 +36,20 @@ public abstract class AbstractDocGenerator {
         StaticJavaParser.setConfiguration(config);
 
         if (args != null && args.length > 0) {
-            Path file = Path.of(args[0]);
-            if (file.getParent() != null) {
-                Files.createDirectories(file.getParent());
+            Path mdFile = Path.of(args[0]);
+            if (mdFile.getParent() != null) {
+                Files.createDirectories(mdFile.getParent());
             }
             try (var out =
-                new PrintStream(Files.newOutputStream(file), false, StandardCharsets.UTF_8)) {
+                new PrintStream(Files.newOutputStream(mdFile), false, StandardCharsets.UTF_8)) {
                 generateDocumentation(out);
+            }
+            Object data = generateJsonData();
+            if (data != null) {
+                Path jsonFile =
+                    mdFile.resolveSibling(mdFile.getFileName().toString().replaceFirst("\\.md$",
+                        "") + ".json");
+                Files.writeString(jsonFile, JsonWriter.toJson(data) + "\n");
             }
         } else {
             generateDocumentation(System.out);
@@ -50,6 +58,15 @@ public abstract class AbstractDocGenerator {
 
     /// Writes the documentation of this generator in markdown format.
     protected abstract void generateDocumentation(PrintStream out);
+
+    /// Returns the documentation data of this generator in a structured form, which is serialized
+    /// into a JSON dump next to the markdown file. Returns `null` if this generator does not
+    /// support a JSON dump.
+    ///
+    /// @return the structured documentation data, or `null`
+    protected @Nullable Object generateJsonData() {
+        return null;
+    }
 
     /// Converts a javadoc comment into markdown by replacing common HTML tags and inline tags
     /// with their markdown equivalents.
