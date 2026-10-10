@@ -25,6 +25,13 @@ public class StoreTermInCondition implements VariableCondition {
     private final SchemaVariable storeInSV;
     private final JTerm term;
 
+    /**
+     * Instantiates a new store-term-in condition.
+     *
+     * @param resultVarSV the schema variable to which the (substituted) term is bound
+     * @param term the term to store; it is substituted with the current schema variable
+     *        instantiations first
+     */
     public StoreTermInCondition(SchemaVariable resultVarSV, JTerm term) {
         this.storeInSV = resultVarSV;
         this.term = term;

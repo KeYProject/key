@@ -28,6 +28,12 @@ public class SubFormulaCondition extends VariableConditionAdapter {
     private final FormulaSV a;
     private final boolean negated;
 
+    /**
+     * Instantiates a new sub-formula condition.
+     *
+     * @param a the formula schema variable whose instantiation is checked for formula sub-terms
+     * @param negated whether the condition is negated ({@code \not hasSubFormulas})
+     */
     public SubFormulaCondition(FormulaSV a, boolean negated) {
         this.a = a;
         this.negated = negated;

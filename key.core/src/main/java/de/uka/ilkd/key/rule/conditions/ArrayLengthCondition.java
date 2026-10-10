@@ -15,12 +15,25 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 
+/**
+ * A variable condition for the taclet construct {@code \isArrayLength}, checking that a schema
+ * variable is instantiated with the implicit array length attribute.
+ *
+ * @author Michael Kirsten
+ */
 public final class ArrayLengthCondition extends VariableConditionAdapter {
 
     private final SchemaVariable reference;
     private final boolean negation;
 
 
+    /**
+     * Instantiates a new array length condition.
+     *
+     * @param reference the schema variable which must be instantiated with the array length
+     *        attribute of some array type
+     * @param negation whether the condition is negated ({@code \not isArrayLength})
+     */
     public ArrayLengthCondition(SchemaVariable reference, boolean negation) {
         this.reference = reference;
         this.negation = negation;
