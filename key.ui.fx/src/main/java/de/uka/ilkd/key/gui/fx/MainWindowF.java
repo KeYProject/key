@@ -1922,6 +1922,22 @@ public final class MainWindowF {
     }
 
     /**
+     * D37 seam: whether the status progress bar is currently visible (used by the
+     * {@code key.fx.verify.uicontrol} self test).
+     */
+    boolean isStatusProgressVisible() {
+        return statusProgress.isVisible();
+    }
+
+    /**
+     * D37 seam: the current status progress bar value ({@link ProgressBar#INDETERMINATE_PROGRESS}
+     * in indeterminate mode; used by the {@code key.fx.verify.uicontrol} self test).
+     */
+    double getStatusProgressValue() {
+        return statusProgress.getProgress();
+    }
+
+    /**
      * Rebuilds the Recent Files submenu from the store (invoked after every store change): the
      * entries show their short unique file names (Swing {@code ShortUniqueFileNames}) plus the
      * profile suffix for entries loaded with a non-default profile.
