@@ -2562,17 +2562,21 @@ public final class MainWindowF {
 
         int toastsBefore = NotificationManagerF.getInstance().getVisibleToastCount();
         // Ctrl+Shift+F12 — the combination TestExtensionF registered for SEQUENT_VIEW
-        // (KeyEvent args: eventType, character, text, keyCode, shift, control, alt, meta)
+        // (KeyEvent args: eventType, character, text, keyCode, shift, control, alt, meta).
+        // The toast shows asynchronously (NotificationManagerF.notify → Platform.runLater),
+        // so the assertion and the report run on a later FX pulse behind it.
         sequentView.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "F12", KeyCode.F12, true,
             true, false, false));
-        int toastsAfter = NotificationManagerF.getInstance().getVisibleToastCount();
-        boolean shortcutFires = toastsAfter > toastsBefore;
-        sb.append(" sequentShortcutToast=").append(shortcutFires);
-        pass &= shortcutFires;
-
-        String report = (pass ? "PASS" : "FAIL") + " - " + sb;
-        System.out.println("Extension verification: " + report);
-        LOGGER.info("Extension verification: {}", report);
+        boolean passSoFar = pass;
+        Platform.runLater(() -> {
+            boolean shortcutFires =
+                NotificationManagerF.getInstance().getVisibleToastCount() > toastsBefore;
+            sb.append(" sequentShortcutToast=").append(shortcutFires);
+            boolean ok = passSoFar && shortcutFires;
+            String report = (ok ? "PASS" : "FAIL") + " - " + sb;
+            System.out.println("Extension verification: " + report);
+            LOGGER.info("Extension verification: {}", report);
+        });
     }
 
     /** @return the direct sub menu of the given menu with the given text, or {@code null}. */
