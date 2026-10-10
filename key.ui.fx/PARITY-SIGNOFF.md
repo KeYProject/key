@@ -38,7 +38,7 @@ marked `OPEN (unverified)` rather than assumed fixed.
 | Abandon Proof | Proof menu (24 items) | `key.fx.verify.menuparity` Proof 24 | **RESOLVED** |
 | ProofManagementDialog + TaskTree / Loaded Proofs dockable | `keyext.proofmanagement.fx` (MP9.6) + Loaded Proofs view | `key.fx.verify.proofmgmt` 1/2 | **RESOLVED** |
 | IssueDialog / error reporting | `IssueDialogF` (toasts + dialog) | `key.fx.verify.uicontrol` (exception leg) | **RESOLVED** |
-| Goal Back / Prune disable bindings; input freeze during auto mode | enablement listeners exist; **input freeze still open** | — | **PARTIAL / OPEN** |
+| Goal Back / Prune disable bindings; input freeze during auto mode | **RESOLVED** (P1: the auto mode blocking overlay — main area covered, mouse input blocked, keys swallowed except Escape, wait cursor; wired to the auto mode listener incl. the demo-live stop path; `key.fx.verify.inputfreeze` PASS) | — | **RESOLVED** |
 | Apply Strategy on node + Prune-at-node in the tree popup | right-click macro menu ported (`key.fx.verify.rightclickmacro`); Apply Strategy-at-node unverified | — | **PARTIAL** |
 
 P0 bugs from the audit:
@@ -87,7 +87,9 @@ as open.
 
 ## Still-open work list (carried forward)
 
-1. Input freeze during auto mode (blocking glass pane port) — P0 remainder.
+1. Input freeze during auto mode (blocking glass pane port) — RESOLVED via P1
+   `key.fx.verify.inputfreeze`; the menus stay clickable while frozen (Swing's glass pane
+   covered everything except the `isAutoButton` stop controls) — KNOWN-SIMPLIFIED.
 2. Proof-tree: Apply Strategy on clicked node, Prune-at-node in the popup, renderer surface
    (tooltips, goal icons, linked/cache marks, notes, branch-label F2 editing), NodeInfoVisualizer.
 3. Sequent: multi-select highlight + reprint persistence, drag & drop, inner-node highlights +

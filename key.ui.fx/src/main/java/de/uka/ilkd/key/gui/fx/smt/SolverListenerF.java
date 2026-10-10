@@ -80,9 +80,10 @@ import org.slf4j.LoggerFactory;
  * <p>
  * KNOWN-SIMPLIFIED: the results are applied directly ({@code SMTRule} built-in rule application
  * with the unsat core if available) instead of through the Swing {@code SMTProofApplyUserAction}
- * history mechanism (no undo entry for the automatic CLOSE-mode application), and the input
- * freeze around the rule application is not available yet (the {@code stopInterface} P0
- * remainder).
+ * history mechanism (no undo entry for the automatic CLOSE-mode application). Swing also stops
+ * the interface ({@code stopInterface}) around the rule application; the FX application runs
+ * synchronously on the FX thread, so a freeze would be unobservable (the auto mode freeze of
+ * MainWindowF.freezeExceptAutoModeButton covers the long-running case).
  */
 public class SolverListenerF implements SolverLauncherListener {
 
