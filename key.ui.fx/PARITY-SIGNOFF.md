@@ -137,7 +137,7 @@ differences found by a second Swing↔JavaFX sweep, with stable IDs used by the 
 | A7 | Feedback: no zip archive of logs | OPEN (P3c) |
 | A8 | ToolTip options: "Save as Default" behaviour | OPEN (P3c) |
 | A9 | `EnsureSourceConsistency` info dialog | RESOLVED (P2b) |
-| A10 | Dialog triage remainder of the sweep | OPEN (triaged in P4) |
+| A10 | Dialog triage remainder of the sweep | RESOLVED (P4, triage) |
 
 ## B. Menus / actions / toolbar
 
@@ -145,10 +145,10 @@ differences found by a second Swing↔JavaFX sweep, with stable IDs used by the 
 |----|---------------------------|--------|
 | B11 | Dynamic "Goal Back" label (`GoalBackAction.java:113-125`) vs. static `MainWindowF.java:3325-3327` | OPEN (P3b) |
 | B12 | Macro superset + category submenus + ProofScript actions vs. the 4-macro `AUTOMATION_MACROS` | OPEN (P3b) |
-| B13 | Extension PATH nesting (extension menus cannot nest) | OPEN (P4) |
-| B14 | Per-extension toolbars merged into one | OPEN (P4, decide) |
+| B13 | Extension PATH nesting (extension menus cannot nest) | RESOLVED (P4) |
+| B14 | Per-extension toolbars merged into one | RESOLVED (P4, decided) |
 | B15 | Toolbar GoalBack/Prune have no enablement | OPEN (P3b) |
-| B16 | Popup dialogs replaced by toasts (per site) | OPEN (P4, decide) |
+| B16 | Popup dialogs replaced by toasts (per site) | RESOLVED (P4, decided) |
 | B17 | TermLabelMenu persistence/styling | OPEN (P3b) |
 | B18 | Recent-Files empty menu not disabled + font-size item order | OPEN (P3b) |
 
@@ -161,9 +161,9 @@ differences found by a second Swing↔JavaFX sweep, with stable IDs used by the 
 | C21 | OSS child nodes in the tree | RESOLVED (P3a) |
 | C22 | Whole-tree actions (expand all/collapse all/...) | RESOLVED (P3a) |
 | C23 | Popup items incl. SubtreeStatistics | RESOLVED (P3a) |
-| C24 | `PROOF_TREE` extension seam (tree popup contributions) | OPEN (P4) |
+| C24 | `PROOF_TREE` extension seam (tree popup contributions) | RESOLVED (P4) |
 | C25 | Node-filter counting rule | RESOLVED (P3a) |
-| C26 | Hidden-tab passivation (Swing docking detail) | OPEN (P4, likely WONT-REPLICATE) |
+| C26 | Hidden-tab passivation (Swing docking detail) | WONT-REPLICATE (P4, decided) |
 | C27 | Auto-mode partial subtree updates | RESOLVED (P3a) |
 
 ## D. Sequent / strategy / goal list / status bar
@@ -172,13 +172,13 @@ differences found by a second Swing↔JavaFX sweep, with stable IDs used by the 
 |----|---------------------------|--------|
 | D28 | Left-click taclet menu + `POPUP_DELAY` guard (`CurrentGoalViewListener.java:48-95`, `SequentViewListener.java:29`) | RESOLVED (P2a) |
 | D29 | Shift+click focussed auto mode (`CurrentGoalViewListener.java:56-58`) | RESOLVED (P2a) |
-| D30 | Extension tooltip strings unwired | OPEN (P4) |
+| D30 | Extension tooltip strings unwired | RESOLVED (P4) |
 | D31 | Sequent line width computed from the viewport | OPEN (P3c) |
 | D32 | Sequent search prefill from the hovered term (`SearchInSequentAction.java:32-37`) | RESOLVED (P2a) |
 | D33 | Fonts vs. `KEY_FONT_*` settings | OPEN (P3c) |
 | D34 | `SequentViewDock` missing | OPEN (P3c) |
 | D35 | Strategy tab Go button + parallel-prover merge-point lock (`StrategySelectionView.java:157-208/869-895`) | RESOLVED (P2a) |
-| D36 | `KeyboardShortcuts` extension seams absent | OPEN (P4) |
+| D36 | `KeyboardShortcuts` extension seams absent | RESOLVED (P4) |
 | D37 | Status-line task progress bar (log-only stubs, `WindowUserInterfaceControlF.java:317-327`) | OPEN (P3c) |
 
 P2a (`weigl/ocfx-p2-sequent`, merged 2026-10-10) resolved D28/D29/D32/D35 —
@@ -217,3 +217,37 @@ covering the OSS rows on a strategy-proved proof. The view filters and the tree 
 in the tree context menu because the FX docking framework has no tab-title gear menu (documented
 in `ProofTreeViewF`); the subtree statistics report is a plain-text window rather than the Swing
 HTML one (export is A4/P3c). C24 (the `PROOF_TREE` extension seam) stays open for P4.
+
+P4 (`weigl/ocfx-p4-extensions`) resolved B13/C24 (extension-seam parity) and decided
+B14/B16/C26; A10 and the D-section remainder D30/D36 are triaged/resolved in the same batch:
+- B13: `KeYGuiExtensionF.MainMenuF.getMenuPath()` (Swing `KeyAction.PATH`) + facade
+  `KeYGuiExtensionFacadeF.installMenus`: path-bearing providers splice their items into
+  existing or new menus of the bar (first segment matched by text — the five built-ins
+  included — deeper segments by sub-menu text); the empty path keeps the FX default (separate
+  top-level menus after About).
+- C24: `ContextMenuF.getProofTreeContextItems(mediator, node)` default + facade aggregate;
+  `ProofTreeViewF` appends the contributions after a separator at the end of the popup,
+  rebuilt per showing, and drops the separator when nothing is contributed (Swing
+  `ProofTreePopupFactory.create`, :152-154).
+- B14 (decided): the FX keeps ONE merged `key-extension-tool-bar` holding every extension
+  toolbar control; Swing embeds one JToolBar per extension in a FlowLayout. The single-bar
+  layout is asserted by `key.fx.verify.extensions` (`extensionToolbars=1`).
+- B16 (decided): informational popups map to non-modal toasts (`NotificationManagerF`);
+  confirmations stay modal; the decision is applied per site (e.g. MainWindowF:1795-1802;
+  the P3c A5/A7 sites follow the same convention).
+- C26 (WONT-REPLICATE): the FX docking framework keeps dockables mounted — there is no
+  tab-visibility lifecycle, so the Swing hidden-tab passivation
+  (`ProofTreeView.java:339-428` dirty-flag + listener detach, `GUIProofTreeModel.setAttentive`)
+  has nothing to attach to; documented in `ProofTreeViewF`.
+- D30: `SequentViewF.getTooltipText` appends `KeYGuiExtensionFacadeF.getTooltipStrings`
+  (Swing `SequentView.getToolTipText`, SequentView.java:234).
+- D36: new `KeYGuiExtensionF.KeyboardShortcutsF` capability (view-scoped `ShortcutF`
+  records; component constants mirroring the Swing `KeyboardShortcuts` set) bound by
+  `installKeyboardShortcuts` as key-pressed filters on the six host views
+  (sequent/goallist/prooftree/strategy/source/info).
+- A10 (triage): all sweep dialog findings are now accounted for — A1-A3/A9 (P2b),
+  A4-A8 (P3c), and the remaining per-site dialog decisions follow the B16 toast convention.
+- The ported Swing `TestExtension` (`TestExtensionF`, priority 100000) exercises each seam:
+  the `Test.Test.Test`-nested menu, a PROOF_TREE popup item, an extension-toolbar button and a
+  Ctrl+Shift+F12 sequent shortcut — asserted headlessly by `key.fx.verify.extensions`
+  (`testExtension`/`testNested`/`prooftreeExtensionItems`/`sequentShortcutToast`).
