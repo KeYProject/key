@@ -7,6 +7,8 @@ package de.uka.ilkd.key.gui.fx;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,10 +17,12 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -148,6 +152,7 @@ import de.uka.ilkd.key.macros.DefaultAutoMacro;
 import de.uka.ilkd.key.macros.FullAutoPilotProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ScriptAwareMacro;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
@@ -3979,8 +3984,7 @@ public final class MainWindowF {
             menuItem("Send Feedback…", "de.uka.ilkd.key.gui.actions.MenuSendFeedackAction",
                 () -> FeedbackDialogF.show(stage)),
             menuItem("Create Github Issue",
-                "de.uka.ilkd.key.gui.actions.CreateGithubIssueAction",
-                () -> HelpFacadeF.openExternal(GITHUB_ISSUE_URL)),
+                "de.uka.ilkd.key.gui.actions.CreateGithubIssueAction", this::createGithubIssue),
             menuItem("License…", "de.uka.ilkd.key.gui.actions.LicenseAction",
                 IconFactoryF.Key.INFO_VIEW, this::showLicense));
         return about;
@@ -4204,6 +4208,115 @@ public final class MainWindowF {
 
     private void resetLayout() {
         workspace.restoreFactoryDefault();
+    }
+
+    /**
+     * A6 (P3c): JavaFX port of the Swing {@code CreateGithubIssueAction} About-menu entry
+     * (key.ui/.../gui/actions/CreateGithubIssueAction.java) — opens the GitHub new-issue page
+     * with the bug template pre-filled (current proof's Java sources + the internal version).
+     * The URL is opened through the {@link HelpFacadeF} browser seam; unlike the Swing original
+     * there is no "generated text" fallback dialog when no browser is available (the seam logs
+     * the failure instead).
+     */
+    private void createGithubIssue() {
+        HelpFacadeF.openExternal(buildGithubIssueUrl());
+    }
+
+    /**
+     * Builds the "new issue" URL for the current proof, with the GitHub bug template from the
+     * Swing {@code CreateGithubIssueAction} as pre-filled body:
+     * <ul>
+     * <li>{@code %CHECKSUM%} is replaced by {@link KeYConstants#INTERNAL_VERSION}
+     * (Swing {@code KeYConstants.INTERNAL_VERSION}),</li>
+     * <li>{@code %JAVA%} is replaced by the {@code .java} sources of the selected proof's
+     * declared Java source location (Swing {@code SendFeedbackAction.getJavaSourceLocation} +
+     * the {@code Files.walk} over that location).</li>
+     * </ul>
+     * <p>
+     * Port notes: Swing encodes the body with {@code Charset.defaultCharset()}; this port uses
+     * UTF-8 (the encoding every {@code +} in the template relies on for correct decoding by
+     * GitHub).
+     *
+     * @return the fully encoded URL, e.g.
+     *         {@code https://github.com/keyproject/key/issues/new?body=…}
+     */
+    String buildGithubIssueUrl() {
+        String template = """
+                ## Description
+                > Please describe your concern in detail!
+
+                %JAVA%
+
+                ## Reproducible
+
+                > Is the issue reproducible?
+                > Select one of: always, sometimes, random, have not tried, n/a
+
+                ### Steps to reproduce
+                > Describe the steps needed to reproduce the issue.
+
+                1. ...
+                2. ...
+                3. ...
+                > What is your expected behavior and what was the actual behavior?
+
+                ### Additional information
+
+                > Add more details here. In particular: if you have a stacktrace, put it here.
+                ---
+                * Commit: %CHECKSUM%
+                """;
+        return GITHUB_ISSUE_URL + "?body="
+            + URLEncoder.encode(template
+                    .replace("%CHECKSUM%", KeYConstants.INTERNAL_VERSION)
+                    .replace("%JAVA%", collectJavaSources(selectionModel.getSelectedProof())),
+                StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Collects the {@code .java} sources of the given proof for the GitHub issue body (Swing
+     * {@code CreateGithubIssueAction.actionPerformed}: walk over
+     * {@code SendFeedbackAction.getJavaSourceLocation(proof)}, one fenced block per file).
+     *
+     * @param proof the selected proof, may be {@code null}
+     * @return the concatenated source blocks, or the empty string when the proof has no Java
+     *         source location
+     */
+    private static String collectJavaSources(Proof proof) {
+        if (proof == null) {
+            return "";
+        }
+        KeyAst.@Nullable Declarations header = proof.header();
+        if (header == null) {
+            return "";
+        }
+        final Path javaSourceLocation;
+        try {
+            javaSourceLocation = header.getJavaSourceLocation();
+        } catch (RuntimeException e) {
+            // no program source declared in the KeY file (Declarations.getJavaSourceLocation
+            // indexes ctx.programSource(0)); the Swing helper is not annotated either and
+            // would blow up the same way
+            return "";
+        }
+        if (javaSourceLocation == null) {
+            return "";
+        }
+        try (var walker = Files.walk(javaSourceLocation)) {
+            return walker.map(it -> {
+                try {
+                    if (it.getFileName().toString().endsWith(".java")) {
+                        return "* " + it.getFileName() + "\n```\n" + Files.readString(it) + "```\n";
+                    }
+                } catch (IOException e) {
+                    // skip unreadable files, like the Swing original (empty catch)
+                }
+                return null;
+            }).filter(Objects::nonNull).collect(Collectors.joining("\n"));
+        } catch (IOException e) {
+            LOGGER.warn("Could not collect Java sources for the GitHub issue", e);
+            return "";
+        }
     }
 
     private void showLicense() {
