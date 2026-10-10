@@ -15,7 +15,9 @@ import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
@@ -273,6 +275,26 @@ public class SequentViewF extends BorderPane {
      * {@code CurrentGoalView.getMousePosInSequent()}).
      */
     private PosInSequent hoveredPos;
+    // termmenu: left-click term menu (Swing SequentViewListener)
+    /**
+     * termmenu: the delay after closing a popup menu before another menu may be opened (Swing
+     * {@code SequentViewListener.POPUP_DELAY}, SequentViewListener.java:29): the click that
+     * dismissed a popup (or a rapid re-click) must not instantly reopen a new menu.
+     */
+    public static final int POPUP_DELAY = 400;
+    /**
+     * termmenu: the time of the last popup-menu close (Swing
+     * {@code SequentViewListener.lastPopupCloseTime}, SequentViewListener.java:31), stamped by
+     * the menu close handler of {@link #showTermMenu}.
+     */
+    private long lastPopupCloseTime;
+    /**
+     * termmenu: whether a popup menu is currently open — the hover highlight is frozen while it
+     * is (Swing {@code SequentViewListener} toggles {@code sequentView.refreshHighlightning} in
+     * the PopupMenuListener, SequentViewListener.java:79-97, so the highlighted term does not
+     * change under the open menu).
+     */
+    private boolean termMenuOpen;
     /** shows the term info of the hovered position after the Swing-like display delay. */
     private final Tooltip hoverTooltip = new Tooltip();
     /** delay before the tooltip shows (Swing ToolTipManager initial delay ≈ 500 ms). */
@@ -771,12 +793,138 @@ public class SequentViewF extends BorderPane {
             return;
         }
         PosInSequent pos = table.getPosInSequent(charIndex, filter);
+        // termmenu: the Swing click branches (Swing CurrentGoalViewListener.mouseClicked,
+        // CurrentGoalViewListener.java:56-86): Shift+click starts the focussed auto mode at the
+        // clicked position and does not show a menu (CurrentGoalViewListener.java:56-58);
+        // plain left click (no Ctrl) opens the taclet term menu at the clicked position
+        // (CurrentGoalViewListener.java:68-86), guarded by the popup delay
+        // (SequentViewListener.POPUP_DELAY checked at CurrentGoalViewListener.java:51); Ctrl+
+        // click keeps the FX selection path (the Swing left-click does not select, but the
+        // selection drives the FX status line, see setOnPosSelected)
+        if (event.isShiftDown()) {
+            startFocussedAutoModeAt(pos);
+            return;
+        }
+        if (event.getButton() == MouseButton.PRIMARY && !event.isControlDown()) {
+            lastClickedPos = pos; // lemmaorigin: remember the clicked term
+            if (pos != null) {
+                // the selection path stays live (status line) like the Swing hover highlight
+                highlightedRange = pos.getBounds() != null && pos.getBounds().length() > 0
+                        ? pos.getBounds()
+                        : null;
+                rebuildRuns();
+                onPosSelected.accept(pos);
+                if (canOpenTermMenu()) {
+                    showTermMenu(event, pos);
+                }
+            }
+            return;
+        }
         lastClickedPos = pos; // lemmaorigin: remember the clicked term (Swing context-menu target)
         Range bounds = pos != null ? pos.getBounds() : null;
         highlightedRange = bounds != null && bounds.length() > 0 ? bounds : null;
         rebuildRuns();
         onPosSelected.accept(pos);
     }
+
+    // termmenu: begin — left-click term menu + focussed auto mode (Swing
+    // CurrentGoalViewListener.mouseClicked + SequentViewListener)
+    /**
+     * termmenu: whether a term menu may be opened right now — the popup delay of Swing
+     * {@code SequentViewListener.mouseClicked} (CurrentGoalViewListener.java:51): a click within
+     * {@link #POPUP_DELAY} milliseconds after a popup closed only re-highlights, it never opens
+     * a new menu.
+     *
+     * @return {@code true} if at least {@link #POPUP_DELAY} ms elapsed since the last menu close
+     */
+    boolean canOpenTermMenu() {
+        return !termMenuOpen
+                && Math.abs(System.currentTimeMillis() - lastPopupCloseTime) >= POPUP_DELAY;
+    }
+
+    /**
+     * termmenu: stamps the close handler of the given popup menu (the hover-highlight freeze
+     * and the {@link #POPUP_DELAY} close time of Swing {@code SequentViewListener.showPopup}'s
+     * PopupMenuListener, SequentViewListener.java:79-97) — shared by the left-click term menu
+     * and the right-click context menu.
+     *
+     * @param menu the popup menu about to be shown
+     */
+    private void stampMenuOnHidden(ContextMenu menu) {
+        termMenuOpen = true;
+        menu.setOnHidden(e -> {
+            termMenuOpen = false;
+            // Swing popupMenuWillBecomeInvisible/popupMenuCanceled stamp the close time
+            lastPopupCloseTime = System.currentTimeMillis();
+        });
+    }
+
+    /**
+     * termmenu: Shift+click focussed auto mode (Swing CurrentGoalViewListener.mouseClicked,
+     * CurrentGoalViewListener.java:56-58): starts the automatic strategy restricted to the
+     * clicked position of the selected goal via
+     * {@code ProofControl.startFocussedAutoMode(PosInOccurrence, Goal)} (Swing
+     * AbstractProofControl.startFocussedAutoMode, AbstractProofControl.java:627-642 — the goal's
+     * rule app manager is exchanged for a {@code FocussedRuleApplicationManager} and the
+     * regular auto mode is started for the single selected goal). A no-op without menu context,
+     * goal or a resolvable position.
+     *
+     * @param pos the clicked sequent position, may be {@code null}
+     * @return {@code true} if the focussed auto mode was started
+     */
+    boolean startFocussedAutoModeAt(PosInSequent pos) {
+        if (menuMediator == null || menuProofControl == null || pos == null) {
+            return false;
+        }
+        Goal goal = menuMediator.getSelectedGoal();
+        if (goal == null) {
+            return false;
+        }
+        menuProofControl.startFocussedAutoMode(pos.getPosInOccurrence(), goal);
+        return true;
+    }
+
+    /**
+     * termmenu: builds and shows the taclet term menu at the given position and mouse location
+     * (Swing {@code CurrentGoalViewMenu} built in CurrentGoalViewListener.mouseClicked:68-86 and
+     * shown at the mouse with a {@code -5, -5} offset by SequentViewListener.showPopup,78-103).
+     * The menu is the plain term menu (no macro replacement — the Swing left-click branch is
+     * independent of the "Right Click for Proof Macros" setting). While the menu is open the
+     * hover highlight is frozen and the close time is stamped for the
+     * {@link #POPUP_DELAY} guard (Swing PopupMenuListener, SequentViewListener.java:79-97).
+     * A no-op without menu context or goal.
+     *
+     * @param event the mouse event the menu is shown at
+     * @param pos the (non-null) sequent position the menu is built for
+     */
+    private void showTermMenu(MouseEvent event, PosInSequent pos) {
+        if (menuMediator == null || menuProofControl == null) {
+            return;
+        }
+        Goal goal = menuMediator.getSelectedGoal();
+        if (goal == null) {
+            return;
+        }
+        List<SequentMenuModelF.Entry> entries =
+            SequentMenuModelF.build(pos, menuMediator, menuProofControl, null, null);
+        ContextMenu menu = SequentTermContextMenuF.build(entries,
+            new SequentTermContextMenuF.MenuContext(menuMediator, menuProofControl, goal, pos,
+                null, this::printSequent));
+        stampMenuOnHidden(menu);
+        // Swing showPopup shows the menu at the mouse position with a (-5, -5) offset
+        menu.show(textFlow, event.getScreenX() - 5, event.getScreenY() - 5);
+    }
+
+    /**
+     * termmenu: whether a term menu is currently open (the hover highlight is frozen while it
+     * is, see {@link #termMenuOpen}).
+     *
+     * @return {@code true} if a popup menu is open
+     */
+    boolean isTermMenuOpen() {
+        return termMenuOpen;
+    }
+    // termmenu: end
 
     // termmenu: begin — right-click sequent context menu (SequentMenuModelF +
     // SequentTermContextMenuF)
@@ -809,6 +957,9 @@ public class SequentViewF extends BorderPane {
         // is active ({@link #buildRightClickMenu} falls back to the term menu when no macro is
         // applicable)
         ContextMenu menu = buildRightClickMenu(pos, fallback);
+        // termmenu: the right-click popup shares the hover freeze + close-time stamping of the
+        // left-click term menu (Swing SequentViewListener.showPopup handles both popups)
+        stampMenuOnHidden(menu);
         menu.show(textFlow, event.getScreenX(), event.getScreenY());
     }
 
@@ -988,6 +1139,125 @@ public class SequentViewF extends BorderPane {
     }
     // menu: MP7 — end
 
+    // termmenu: begin — key.fx.verify.sequentmenu (P2a: left-click term menu, POPUP_DELAY guard,
+    // search prefill, shift+click focussed auto mode)
+    /**
+     * termmenu: headless self test of the P2a sequent interaction ({@code
+     * key.fx.verify.sequentmenu}), run after the demo load from MainWindowF. Checks, in order:
+     * <ol>
+     * <li>the term menu built for the first indexed position is non-empty (the taclet entries of
+     * Swing {@code CurrentGoalViewMenu});</li>
+     * <li>the {@link #POPUP_DELAY} guard: immediately after a menu close a new menu is
+     * suppressed, after the delay it may open again (Swing
+     * {@code CurrentGoalViewListener.mouseClicked:51});</li>
+     * <li>the search-bar prefill from the hovered position (Swing
+     * {@code SearchInSequentAction}: plain and RegExp-escaped);</li>
+     * <li>the Shift+click wiring: a click without position is safely ignored, and the real
+     * focussed auto mode starts at the position (observed via the mediator's running property;
+     * it is stopped after the report — the run itself is asynchronous).</li>
+     * </ol>
+     *
+     * @return {@code "... PASS - ..."} or {@code "... FAIL - ..."}
+     */
+    public String verifySequentMenu() {
+        Goal goal = menuMediator == null ? null : menuMediator.getSelectedGoal();
+        PosInSequent pos = firstIndexedPos();
+        if (goal == null || pos == null) {
+            return "SKIP - no goal/position (no printed sequent)";
+        }
+        List<String> failures = new ArrayList<>();
+        // 1. the term menu at the position
+        List<SequentMenuModelF.Entry> entries =
+            SequentMenuModelF.build(pos, menuMediator, menuProofControl, null, null);
+        ContextMenu menu = SequentTermContextMenuF.build(entries,
+            new SequentTermContextMenuF.MenuContext(menuMediator, menuProofControl, goal, pos,
+                null, this::printSequent));
+        List<String> labels = menuLabels(menu.getItems());
+        if (labels.isEmpty()) {
+            failures.add("the term menu is empty");
+        }
+        // 2. the popup delay guard: a close stamps the time, a reopen needs the elapsed delay
+        boolean openAllowedBefore = canOpenTermMenu();
+        lastPopupCloseTime = System.currentTimeMillis();
+        boolean suppressed = !canOpenTermMenu();
+        lastPopupCloseTime = System.currentTimeMillis() - POPUP_DELAY - 1;
+        boolean openAllowedAfter = canOpenTermMenu();
+        if (!openAllowedBefore || !suppressed || !openAllowedAfter) {
+            failures.add("POPUP_DELAY guard broken (before=" + openAllowedBefore + ", suppressed="
+                + suppressed + ", after=" + openAllowedAfter + ")");
+        }
+        lastPopupCloseTime = 0; // restore the open state for the remaining checks
+        // 3. the search prefill from the hovered position (plain + RegExp-escaped); the Swing
+        // prefill uses the hovered TERM, so the test picks the first position whose text is a
+        // single-line term (the first indexed position covers the whole sequent, which a
+        // TextField cannot hold)
+        PosInSequent prefillPos = null;
+        for (int i = 0; i < printed.length() && prefillPos == null; i++) {
+            PosInSequent candidate = getSequentPosAt(i);
+            if (candidate == null) {
+                continue;
+            }
+            String text = getHighlightedText(candidate);
+            if (!text.isBlank() && !text.contains("\n")) {
+                prefillPos = candidate;
+            }
+        }
+        if (prefillPos == null) {
+            return "FAIL - no single-line term position for the search prefill test";
+        }
+        PosInSequent savedHovered = hoveredPos;
+        boolean savedRegex = regexToggle.isSelected();
+        hoveredPos = prefillPos;
+        String expected = getHighlightedText(prefillPos);
+        showSearchBar();
+        if (!expected.equals(searchField.getText())) {
+            failures.add("search prefill mismatch: expected '" + expected + "', got '"
+                + searchField.getText() + "'");
+        }
+        regexToggle.setSelected(true);
+        // the reprint of the first search invalidated the hover state (printSequent →
+        // clearHover, the Swing setText behaviour) — re-arm the hover for the escape check
+        hoveredPos = prefillPos;
+        showSearchBar();
+        String escaped = expected.replaceAll("[-\\[\\]{}()*+?.,\\\\^$|#s]", "\\\\$0");
+        if (!escaped.equals(searchField.getText())) {
+            failures.add("regexp search prefill mismatch: expected '" + escaped + "', got '"
+                + searchField.getText() + "'");
+        }
+        regexToggle.setSelected(savedRegex);
+        hoveredPos = savedHovered;
+        hideSearchBar();
+        if (!failures.isEmpty()) {
+            return "FAIL - " + String.join("; ", failures);
+        }
+        // 4. the real focussed auto mode at the position (Swing CurrentGoalViewListener:56-58);
+        // it runs asynchronously — the stop is scheduled below and reported through the log
+        boolean started = startFocussedAutoModeAt(pos);
+        if (!started) {
+            return "FAIL - startFocussedAutoModeAt returned false";
+        }
+        Timeline[] holder = new Timeline[1];
+        int[] ticks = { 0 };
+        holder[0] = new Timeline(new KeyFrame(Duration.millis(200), event -> {
+            boolean running = menuMediator.autoModeRunningProperty().get();
+            if (running && ++ticks[0] < 60) {
+                return; // keep polling (max ~12 s), then request the stop
+            }
+            holder[0].stop();
+            boolean stillRunning = menuMediator.autoModeRunningProperty().get();
+            if (stillRunning) {
+                menuProofControl.stopAutoMode();
+            }
+            LOGGER.info("Sequent menu verification focussed auto mode: {}",
+                stillRunning ? "stopped" : "finished");
+        }));
+        holder[0].setCycleCount(javafx.animation.Animation.INDEFINITE);
+        holder[0].play();
+        return "PASS - term menu " + labels.size() + " entries, POPUP_DELAY guard, search "
+            + "prefill, focussed auto mode started";
+    }
+    // termmenu: end
+
     /**
      * The character index of the printed text under the given mouse event (the same mapping
      * {@link #handleMouseClick} uses), or {@code -1} if the event does not address a character.
@@ -1064,6 +1334,12 @@ public class SequentViewF extends BorderPane {
      * highlight rectangle and the tooltip shows the term info of the hovered position.
      */
     private void handleMouseMove(MouseEvent event) {
+        // termmenu: the hover highlight is frozen while a popup menu is open (Swing
+        // SequentViewListener toggles sequentView.refreshHighlightning in the PopupMenuListener,
+        // SequentViewListener.java:79-97, so the highlighted term does not change under the menu)
+        if (termMenuOpen) {
+            return;
+        }
         InitialPositionTable table = getInitialPositionTable();
         if (table == null || printed == null) {
             return;
@@ -1241,6 +1517,18 @@ public class SequentViewF extends BorderPane {
      * focuses the field. A query kept from a previous opening is re-applied.
      */
     public void showSearchBar() {
+        // searchprefill: the Swing Ctrl+F action prefills the field with the hovered term text
+        // (Swing SearchInSequentAction.actionPerformed, SearchInSequentAction.java:32-37:
+        // searchFor(view.getHighlightedText()) with the mouse position's term, escaped when the
+        // RegExp toggle is active, SequentViewSearchBar.searchFor:220-230); a no-op when the
+        // mouse is not over a term (the previously entered query is kept)
+        if (hoveredPos != null) {
+            String prefill = getHighlightedText(hoveredPos);
+            if (regexToggle.isSelected()) {
+                prefill = prefill.replaceAll("[-\\[\\]{}()*+?.,\\\\^$|#s]", "\\\\$0");
+            }
+            searchField.setText(prefill);
+        }
         searchBar.setVisible(true);
         searchBar.setManaged(true);
         searchField.selectAll();

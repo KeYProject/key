@@ -676,6 +676,9 @@ public final class MainWindowF {
         infoView.attach(selectionModel);
         goalListView.attach(selectionModel);
         strategyView.attach(selectionModel);
+        // strategy (P2a): the Go/Stop button + the parallel-prover merge lock follow the
+        // mediator (Swing StrategySelectionView constructor wiring)
+        strategyView.attachMediator(mediator);
         sourceView.attach(selectionModel);
         loadedProofs.attach(selectionModel); // proofmgmt: row highlight follows the active proof
         // the hook doubles as the :99 verification signal (same line as the standalone driver)
@@ -930,6 +933,18 @@ public final class MainWindowF {
             // then an auto-mode-driven run
             if (System.getProperty("key.fx.verify.inputfreeze") != null) {
                 runInputFreezeVerification();
+            }
+            // sequentmenu (P2a): the left-click term menu + POPUP_DELAY guard, search prefill
+            // and the shift+click focussed auto mode
+            if (System.getProperty("key.fx.verify.sequentmenu") != null) {
+                String report = sequentView.verifySequentMenu();
+                LOGGER.info("Sequent menu verification: {}", report);
+                NotificationManagerF.getInstance()
+                        .notify("Sequent menu verification: " + report,
+                            report.endsWith("PASS") || report.startsWith("PASS")
+                                    ? Kind.INFO
+                                    : Kind.ERROR);
+                statusRight.setText(report);
             }
             // loadingexit (P1): recent-files round trip with loading options + profile
             // resolution, then the exit flow — the window close button path with Confirm Exit
