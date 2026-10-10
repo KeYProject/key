@@ -1851,8 +1851,10 @@ public final class MainWindowF {
             recentFilesMenu.getItems()
                     .add(menuItem(text, () -> openRecentFile(entry)));
         }
-        // an empty submenu would render as a dark clickable nothing (Swing leaves it enabled)
-        recentFilesMenu.setDisable(entries.isEmpty());
+        // P3b/B18: Swing leaves the empty recent-files submenu ENABLED (it just shows nothing):
+        // RecentFileMenu's constructor does not disable it (the effect of the commented-out line
+        // RecentFileMenu.java:78) and setEnabled(getItemCount() != 0) in addRecentFileNoSave
+        // (:144) only ever runs after an entry was inserted. Do the same here — no setDisable.
     }
 
     /**
@@ -3143,11 +3145,16 @@ public final class MainWindowF {
         themeMenu.getItems().addAll(lightTheme, darkTheme);
 
         Menu fontSize = new Menu("Font Size");
+        // P3b/B18: Swing order + labels of the Font Size submenu
+        // (MainWindow.createViewMenu :1048-1051: first DecreaseFontSizeAction = "Smaller" with the
+        // minus icon, then IncreaseFontSizeAction = "Larger"; DecreaseFontSizeAction.java:30 /
+        // IncreaseFontSizeAction.java:30 set NAME to "Smaller"/"Larger", the menus show the minus
+        // icon for "Smaller" and the plus icon for "Larger").
         fontSize.getItems().addAll(
-            menuItem("Increase", "de.uka.ilkd.key.gui.actions.IncreaseFontSizeAction",
-                IconFactoryF.Key.PLUS, () -> changeFontSize(1)),
-            menuItem("Decrease", "de.uka.ilkd.key.gui.actions.DecreaseFontSizeAction",
-                IconFactoryF.Key.MINUS, () -> changeFontSize(-1)));
+            menuItem("Smaller", "de.uka.ilkd.key.gui.actions.DecreaseFontSizeAction",
+                IconFactoryF.Key.MINUS, () -> changeFontSize(-1)),
+            menuItem("Larger", "de.uka.ilkd.key.gui.actions.IncreaseFontSizeAction",
+                IconFactoryF.Key.PLUS, () -> changeFontSize(1)));
 
         // menu: MP3a — ToolTip Options right after Font Size, before the diff frame, like Swing
         // MainWindow.createViewMenu :1053 (ToolTipOptionsAction → ViewSelector,
