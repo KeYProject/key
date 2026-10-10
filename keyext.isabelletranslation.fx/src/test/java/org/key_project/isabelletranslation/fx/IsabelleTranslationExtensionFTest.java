@@ -7,19 +7,16 @@ package org.key_project.isabelletranslation.fx;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import javafx.application.Platform;
 import javafx.scene.control.MenuItem;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.gui.fx.extension.api.KeYGuiExtensionF;
-import de.uka.ilkd.key.gui.fx.settings.SettingsProviderF;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,31 +26,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Headless unit test of the MP9.3 FX port of the Isabelle translation extension
- * ({@link IsabelleTranslationExtensionF}): the {@link KeYGuiExtensionF.Info} metadata, the
- * settings contribution and the sequent context-menu contribution (including the null guards of
- * the SPI call).
+ * ({@link IsabelleTranslationExtensionF}): the {@link KeYGuiExtensionF.Info} metadata and the
+ * sequent context-menu contribution (including the null guards of the SPI call).
  * <p>
- * Like the other extension tests of this repository the term-level assertion runs against a real
- * {@link Goal} of a headlessly loaded trivial proof ({@code \problem { true }}, same pattern as
- * {@code SequentMenuModelFTest}). Constructing JavaFX controls (the settings panel, the menu
- * items) requires the JavaFX toolkit, which is started once in {@link #initFx()} (no window is
- * ever shown; the toolkit runs with software rendering).
+ * This class is deliberately <b>toolkit-free</b> (like the other keyext FX tests): the provider
+ * constructs its two context items as plain {@link MenuItem}s with string constructors, which
+ * needs no running JavaFX toolkit, and the settings panel is created lazily (it is a JavaFX
+ * {@code Control} and needs the toolkit — that assertion lives in
+ * {@link IsabelleSettingsProviderFTest}, which starts the toolkit and skips on headless CI
+ * runners). The term-level assertion runs against a real {@link Goal} of a headlessly loaded
+ * trivial proof ({@code \problem { true }}, same pattern as {@code SequentMenuModelFTest}').
  */
 class IsabelleTranslationExtensionFTest {
 
     private KeYEnvironment<DefaultUserInterfaceControl> env;
-
-    @BeforeAll
-    static void initFx() {
-        try {
-            Platform.startup(() -> {
-            });
-        } catch (IllegalStateException e) {
-            // the platform is already running (e.g. a shared test JVM)
-        }
-        // keep the toolkit alive without any open window for the whole test class
-        Platform.setImplicitExit(false);
-    }
 
     @AfterEach
     void tearDown() {
@@ -72,16 +58,6 @@ class IsabelleTranslationExtensionFTest {
         assertTrue(info.optional(), "the Swing original is optional (the user may disable it)");
         assertFalse(info.experimental(),
             "the Swing original is not experimental (IsabelleTranslationExtension.java:29)");
-    }
-
-    @Test
-    void settingsContribution() {
-        IsabelleTranslationExtensionF extension = new IsabelleTranslationExtensionF();
-        SettingsProviderF settings = extension.getSettings();
-        assertNotNull(settings, "the extension must contribute a settings provider");
-        assertTrue(settings instanceof IsabelleSettingsProviderF,
-            "the provider must be the FX settings panel");
-        assertEquals("Isabelle Translation", settings.getDescription());
     }
 
     @Test
