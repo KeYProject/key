@@ -252,6 +252,9 @@ public class RewriteCommand extends AbstractCommand {
         }
     }
 
+    @Documentation(category = "Auxiliary", value = """
+            Rewrites all occurrences of a term pattern into a replacement term.
+            """)
     public static class Parameters {
         @Option(value = "find")
         @Documentation("The term pattern to search for and replace")

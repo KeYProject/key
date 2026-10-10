@@ -26,6 +26,13 @@ public class ConstantCondition extends VariableConditionAdapter {
     private final JAbstractSortedOperator t;
     private final boolean negated;
 
+    /**
+     * Instantiates a new constant condition.
+     *
+     * @param t the term or formula schema variable which must be instantiated with a constant
+     *        (zero-arity) term
+     * @param negated whether the condition is negated ({@code \not isConstant})
+     */
     public ConstantCondition(JAbstractSortedOperator t, boolean negated) {
         this.t = t;
         this.negated = negated;

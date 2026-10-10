@@ -17,13 +17,21 @@ import org.key_project.logic.op.sv.SchemaVariable;
 
 
 /**
- * This variable condition checks if a given type denotes an abstract class or interface type.
+ * This variable condition checks if a program variable is instantiated with a {@code this}
+ * reference.
  */
 public final class IsThisReference extends VariableConditionAdapter {
 
     private final boolean negated;
     private final ParsableVariable var;
 
+    /**
+     * Instantiates a new this-reference condition.
+     *
+     * @param var the program schema variable which must be instantiated with a {@code this}
+     *        reference
+     * @param negation whether the condition is negated ({@code \not isThisReference})
+     */
     public IsThisReference(ParsableVariable var, boolean negation) {
         this.negated = negation;
         this.var = var;

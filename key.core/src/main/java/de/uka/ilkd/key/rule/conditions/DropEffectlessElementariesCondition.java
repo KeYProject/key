@@ -27,11 +27,26 @@ import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 
+/**
+ * A variable condition for the taclet construct {@code \dropEffectlessElementaries}: given an
+ * update and a target term, it computes the update with all elementary updates removed that do not
+ * affect (are not "relevant" for) the target term, and binds the result to a third schema variable.
+ *
+ * @author Michael Kirsten
+ */
 public final class DropEffectlessElementariesCondition implements VariableCondition {
     private final UpdateSV u;
     private final SchemaVariable x;
     private final SchemaVariable result;
 
+    /**
+     * Instantiates a new drop-effectless-elementaries condition.
+     *
+     * @param u the update schema variable whose instantiation is simplified
+     * @param x the schema variable holding the target term which determines the relevant locations
+     * @param x2 the schema variable to which the simplified update application
+     *        {@code u(x)} is bound
+     */
     public DropEffectlessElementariesCondition(UpdateSV u, SchemaVariable x, SchemaVariable x2) {
         this.u = u;
         this.x = x;

@@ -38,6 +38,15 @@ public class LoopFreeInvariantCondition implements VariableCondition {
     private final SchemaVariable modalitySV;
     private final SchemaVariable invSV;
 
+    /**
+     * Instantiates a new free-loop-invariant condition.
+     *
+     * @param loopStmtSV the program schema variable which must be instantiated with a loop
+     *        statement
+     * @param modalitySV the schema variable for the modality kind determining the applicable heap
+     *        context
+     * @param invSV the schema variable to which the free loop invariant is bound
+     */
     public LoopFreeInvariantCondition(ProgramSV loopStmtSV, SchemaVariable modalitySV,
             SchemaVariable invSV) {
         this.loopStmtSV = loopStmtSV;

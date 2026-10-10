@@ -19,12 +19,28 @@ import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 
+/**
+ * A variable condition for the taclet construct {@code \equalUnique}: checks that two term schema
+ * variables are instantiated with (distinct) applications of functions marked as {@code unique},
+ * and if so binds a formula schema variable to the equation of both terms.
+ *
+ * @author Michael Kirsten
+ */
 public final class EqualUniqueCondition implements VariableCondition {
     private final TermSV t;
     private final TermSV t2;
     private final FormulaSV res;
 
 
+    /**
+     * Instantiates a new equal-unique condition.
+     *
+     * @param t the first term schema variable; its instantiation must be the application of a
+     *        unique function
+     * @param t2 the second term schema variable; its instantiation must be the application of a
+     *        unique function
+     * @param res the formula schema variable to which the equation {@code t = t2} is bound
+     */
     public EqualUniqueCondition(TermSV t, TermSV t2, FormulaSV res) {
         this.t = t;
         this.t2 = t2;
