@@ -60,6 +60,7 @@ regression-tested on a virtual display. Demo proof paths default into
 | `key.fx.verify.termmenu` | headless sequent context-menu model (25 checks) |
 | `key.fx.verify.sequentmenu` | left-click sequent term menu + POPUP_DELAY guard, search prefill, shift+click focussed auto mode (P2a) |
 | `key.fx.verify.dialogs` | contract-completion registry + dialog skeletons (P2b): contract/auxiliary configurators, lemma selection dialog, item chooser |
+| `key.fx.verify.prooftree` | proof tree (P3a): per-proof view-state cache, linearized mode, OSS protocol rows + expand toggle, whole-tree expand/collapse, node-filter counting rule, notes + subtree-statistics popup dialogs; combine with `key.fx.demo.autoprove` or `key.fx.demo.autoprove.live` for auto-mode coverage |
 | `key.fx.verify.tacletmatch=1\|hold` | interactive taclet application (`hold` keeps the dialog open) |
 | `key.fx.verify.uicontrol` | `WindowUserInterfaceControlF` seam: status line, IssueDialogF, LogViewF, AutoDismissDialogF |
 | `key.fx.verify.docking` | named layout slots, maximize/restore, close-while-maximized |
