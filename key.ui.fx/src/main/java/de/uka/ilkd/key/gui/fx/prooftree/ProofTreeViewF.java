@@ -43,6 +43,7 @@ import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
+import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -280,6 +281,13 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
      * so it persists and is shared with the classic UI.
      */
     private final ContextMenu contextMenu = createContextMenu();
+
+    /**
+     * C24 (P4): the tail of {@link #contextMenu} holding the PROOF_TREE extension
+     * contributions for the last clicked node (a separator plus the contributed items, or
+     * nothing); rebuilt in {@link #refreshPopupExtensions()} on every showing.
+     */
+    private final List<MenuItem> popupExtensionItems = new ArrayList<>();
 
     /**
      * The branch entry the popup actions apply to, resolved when the menu opens: the selected
@@ -1314,8 +1322,9 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
      * framework has no tab-title "Settings" gear menu like the Swing dockable, so these live
      * here — plus the popup actions of the Swing {@code ProofTreePopupFactory}: Apply Strategy,
      * Prune, Edit Notes, the per-node expand/collapse and sibling actions, the goals enablement
-     * and P3a's Show Subtree Statistics. Delayed Cut (feature-flagged) and the macro submenu
-     * (B12, P3b) are not yet ported; the PROOF_TREE extension contributions belong to P4 (C24).
+     * and P3a's Show Subtree Statistics, and finally (P4, C24) the PROOF_TREE extension
+     * contributions after a separator (Swing ProofTreePopupFactory.java:152-154). Delayed Cut
+     * (feature-flagged) and the macro submenu (B12, P3b) are not yet ported.
      */
     private ContextMenu createContextMenu() {
         CheckMenuItem hideIntermediateItem = new CheckMenuItem("Hide Intermediate Proofsteps");
@@ -1415,8 +1424,34 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             notesItem.setDisable(proof == null);
             subtreeStatsItem.setDisable(proof == null);
             pruneItem.setDisable(!isPrunable(popupNode));
+            refreshPopupExtensions();
         });
         return menu;
+    }
+
+    /**
+     * C24 (P4): the PROOF_TREE extension contributions spliced at the end of the popup — the
+     * items of {@code KeYGuiExtensionFacadeF.getProofTreeContextItems} for the clicked node
+     * behind a separator (Swing {@code ProofTreePopupFactory.create},
+     * ProofTreePopupFactory.java:152-154: {@code menu.addSeparator(); addContextMenuItems(
+     * ContextMenuKind.PROOF_TREE, menu, context.invokedNode, context.mediator);} followed by
+     * dropping the separator when nothing was contributed). Rebuilt on every showing since the
+     * clicked node changes; the section always stays the tail of the menu.
+     */
+    private void refreshPopupExtensions() {
+        contextMenu.getItems().removeAll(popupExtensionItems);
+        popupExtensionItems.clear();
+        if (mediator == null) {
+            return;
+        }
+        List<MenuItem> items =
+            KeYGuiExtensionFacadeF.getProofTreeContextItems(mediator, popupNode);
+        if (items.isEmpty()) {
+            return; // no separator without contributions (Swing drops it too)
+        }
+        popupExtensionItems.add(new SeparatorMenuItem());
+        popupExtensionItems.addAll(items);
+        contextMenu.getItems().addAll(popupExtensionItems);
     }
 
     /** @return a menu item with an optional icon and the given action */

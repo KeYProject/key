@@ -64,6 +64,7 @@ import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.MainWindowF;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
+import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -1424,12 +1425,15 @@ public class SequentViewF extends BorderPane {
     }
 
     /**
-     * The tooltip text for the given position (Swing {@code SequentView.getToolTipText} without
-     * the HTML markup and without the GUI extension strings, which have no FX counterpart yet).
-     * menu: MP3a — the {@code isShowSequentViewTooltips()} gate is driven by the View menu "Show
-     * Tooltips in Sequent View" toggle (Swing {@code ToggleSequentViewTooltipAction}, NAME =
-     * "Show Tooltips in Sequent View"); {@link #updateHoverTooltip} hides the tooltip whenever
-     * this method returns the empty string, so no further gating is needed at the show site.
+     * The tooltip text for the given position (Swing {@code SequentView.getToolTipText}):
+     * operator class, operator and sort of the term, plus the GUI-extension tooltip strings
+     * (P4, D30) — Swing appends {@code KeYGuiExtensionFacade.getTooltipStrings(window, pos)},
+     * SequentView.java:234 / KeYGuiExtensionFacade.java:385-399.
+     * menu: MP3a — the {@code isShowSequentViewTooltips()} gate is driven by the View menu
+     * "Show Tooltips in Sequent View" toggle (Swing {@code ToggleSequentViewTooltipAction},
+     * NAME = "Show Tooltips in Sequent View"); {@link #updateHoverTooltip} hides the tooltip
+     * whenever this method returns the empty string, so no further gating is needed at the
+     * show site.
      */
     private String getTooltipText(PosInSequent pos) {
         if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
@@ -1440,8 +1444,18 @@ public class SequentViewF extends BorderPane {
             return "";
         }
         Term term = pos.getPosInOccurrence().subTerm();
-        return "Operator: " + term.op().getClass().getSimpleName() + " (" + term.op() + ")\nSort: "
-            + term.sort();
+        String text = "Operator: " + term.op().getClass().getSimpleName() + " (" + term.op()
+            + ")\nSort: " + term.sort();
+        // D30: the extension tooltip strings (KeYGuiExtensionF.TooltipF); the menu context
+        // (and hence the mediator) may not be attached yet, then no strings can be resolved
+        if (menuMediator != null) {
+            for (String extension : KeYGuiExtensionFacadeF.getTooltipStrings(menuMediator, pos)) {
+                if (extension != null && !extension.isBlank()) {
+                    text += "\n" + extension;
+                }
+            }
+        }
+        return text;
     }
 
     // -----------------------------------------------------------------------

@@ -5,15 +5,21 @@
 package de.uka.ilkd.key.gui.fx.extension;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
+import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
+import javafx.scene.input.KeyEvent;
 
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.gui.fx.MainWindowF;
@@ -108,6 +114,127 @@ public final class KeYGuiExtensionFacadeF {
     }
 
     /**
+     * Installs the extension menus into the given menu bar, honouring the Swing
+     * {@code KeyAction.PATH} nesting (P4, B13). Providers with an empty
+     * {@link KeYGuiExtensionF.MainMenuF#getMenuPath()} keep the FX default: their menus are
+     * appended as separate top-level menus after the built-in menus (Swing
+     * {@code MainWindow.createMenuBar} :983 + {@code addExtensionsToMainMenu},
+     * KeYGuiExtensionFacade.java:81-89). Providers with a non-empty path get their menus
+     * sorted into the menu bar: the first segment matches (or creates) a top-level menu by
+     * text — the five built-in menus included, so a path starting with {@code "Proof"} nests
+     * under the Proof menu — then each further segment matches (or creates) a sub menu of the
+     * same name. The provider's own first menu is used as the terminal menu of the path when
+     * its text equals the last segment (the common case: the Swing shape
+     * {@code Test > Test > Test} with the action leaf), otherwise the last segment is created
+     * and the provider's menus are nested below it. Unlike the Swing original the provider's
+     * menu <em>objects</em> are kept intact — their items are never re-parented, because
+     * JavaFX warns when a {@code MenuItem} that already belongs to a menu is moved into another
+     * one. The five built-in menus' item sets stay untouched.
+     *
+     * @param window the main window
+     * @param menuBar the menu bar to install the extension menus into
+     * @param mediator the mediator of the window
+     */
+    public static void installMenus(MainWindowF window, MenuBar menuBar,
+            KeYMediatorF mediator) {
+        for (KeYGuiExtensionF extension : getExtensions()) {
+            if (!(extension instanceof KeYGuiExtensionF.MainMenuF mainMenu)) {
+                continue;
+            }
+            List<Menu> menus = mainMenu.getMenus(window, mediator);
+            if (menus.isEmpty()) {
+                continue;
+            }
+            String path = mainMenu.getMenuPath();
+            if (path == null || path.isBlank()) {
+                menuBar.getMenus().addAll(menus);
+                continue;
+            }
+            // B13: split the Swing KeyAction.PATH into the non-empty segments
+            String[] segments = Arrays.stream(path.split("\\.")).filter(s -> !s.isBlank())
+                    .toArray(String[]::new);
+            if (segments.length == 0) {
+                menuBar.getMenus().addAll(menus);
+                continue;
+            }
+            // navigate/create all segments except the terminal one
+            Menu parent = null;
+            for (int i = 0; i < segments.length - 1; i++) {
+                String segment = segments[i];
+                if (parent == null) {
+                    Menu top = menuBar.getMenus().stream()
+                            .filter(m -> segment.equals(m.getText())).findFirst().orElse(null);
+                    parent = top != null ? top : createBarMenu(menuBar, segment);
+                } else {
+                    parent = findOrCreateChildMenu(parent, segment);
+                }
+            }
+            String terminalSegment = segments[segments.length - 1];
+            Menu terminal = menus.get(0);
+            List<Menu> extraMenus = menus.subList(1, menus.size());
+            boolean slotTaken = parent == null
+                    ? menuBar.getMenus().stream()
+                            .anyMatch(m -> terminalSegment.equals(m.getText()))
+                    : findMenu(parent, terminalSegment).isPresent();
+            if (terminalSegment.equals(terminal.getText()) && !slotTaken) {
+                // the provider's own menu becomes the terminal path menu (no re-parenting:
+                // its items keep their parent menu); only the first call wins the slot
+                if (parent == null) {
+                    menuBar.getMenus().add(terminal);
+                } else {
+                    parent.getItems().add(terminal);
+                }
+            } else {
+                // terminal slot already taken or text mismatch: create/nest it, the provider's
+                // menus (whole, items included) live below it
+                if (parent == null) {
+                    terminal = menuBar.getMenus().stream()
+                            .filter(m -> terminalSegment.equals(m.getText())).findFirst()
+                            .orElseGet(() -> createBarMenu(menuBar, terminalSegment));
+                } else {
+                    terminal = findOrCreateChildMenu(parent, terminalSegment);
+                }
+                for (Menu menu : menus) {
+                    terminal.getItems().add(menu);
+                }
+                extraMenus = List.of();
+            }
+            for (Menu menu : extraMenus) {
+                terminal.getItems().add(menu);
+            }
+        }
+    }
+
+    /** Creates a bar-level menu with the given text and appends it. */
+    private static Menu createBarMenu(MenuBar menuBar, String text) {
+        Menu menu = new Menu(text);
+        menuBar.getMenus().add(menu);
+        return menu;
+    }
+
+    /** Creates a menu with the given text and appends it to the given items list. */
+    private static Menu createMenu(ObservableList<MenuItem> items, String text) {
+        Menu menu = new Menu(text);
+        items.add(menu);
+        return menu;
+    }
+
+    /** @return the direct sub menu of the given menu with the given text, if any. */
+    private static Optional<Menu> findMenu(Menu parent, String text) {
+        for (MenuItem item : parent.getItems()) {
+            if (item instanceof Menu menu && text.equals(menu.getText())) {
+                return Optional.of(menu);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /** @return the direct sub menu with the given text, creating it if absent. */
+    private static Menu findOrCreateChildMenu(Menu parent, String text) {
+        return findMenu(parent, text).orElseGet(() -> createMenu(parent.getItems(), text));
+    }
+
+    /**
      * The toolbar controls contributed by every {@link KeYGuiExtensionF.ToolbarF} provider
      * (Swing {@code KeYGuiExtensionFacade.createToolbars}, KeYGuiExtensionFacade.java:217-221).
      *
@@ -183,6 +310,29 @@ public final class KeYGuiExtensionFacadeF {
     }
 
     /**
+     * The proof-tree popup items contributed by every {@link KeYGuiExtensionF.ContextMenuF}
+     * provider for the given node (P4, C24; Swing {@code
+     * KeYGuiExtensionFacade.addContextMenuItems} with {@code ContextMenuKind.PROOF_TREE},
+     * KeYGuiExtensionFacade.java:258-262, consumed by ProofTreePopupFactory.java:152-154). The
+     * host appends them after a separator at the end of the proof-tree context menu and drops
+     * the separator when nothing is contributed.
+     *
+     * @param mediator the mediator of the window
+     * @param node the clicked proof-tree node
+     * @return non-null, emptiable list of menu items
+     */
+    public static List<MenuItem> getProofTreeContextItems(KeYMediatorF mediator,
+            de.uka.ilkd.key.proof.Node node) {
+        List<MenuItem> items = new ArrayList<>();
+        for (KeYGuiExtensionF extension : getExtensions()) {
+            if (extension instanceof KeYGuiExtensionF.ContextMenuF contextMenu) {
+                items.addAll(contextMenu.getProofTreeContextItems(mediator, node));
+            }
+        }
+        return items;
+    }
+
+    /**
      * The settings providers contributed by every {@link KeYGuiExtensionF.SettingsF} provider
      * (Swing {@code KeYGuiExtensionFacade.getSettingsProvider},
      * KeYGuiExtensionFacade.java:335-337); the host registers them into the
@@ -217,6 +367,39 @@ public final class KeYGuiExtensionFacadeF {
             }
         }
         return strings;
+    }
+
+    /**
+     * Binds the view-scoped shortcuts of every {@link KeYGuiExtensionF.KeyboardShortcutsF}
+     * provider into the given view node as key-pressed event filters (P4, D36; Swing
+     * {@code installKeyboardShortcuts}, KeYGuiExtensionFacade.java:361-375, which fills the
+     * Swing input maps of the view). Only the shortcuts whose component id equals the given one
+     * are bound; a matching combination runs the shortcut's action and consumes the event.
+     *
+     * @param mediator the mediator of the window
+     * @param node the view node the shortcuts are active on
+     * @param componentId one of {@link KeYGuiExtensionF.KeyboardShortcutsF}'s constants
+     */
+    public static void installKeyboardShortcuts(KeYMediatorF mediator, Node node,
+            String componentId) {
+        for (KeYGuiExtensionF extension : getExtensions()) {
+            if (!(extension instanceof KeYGuiExtensionF.KeyboardShortcutsF shortcuts)) {
+                continue;
+            }
+            for (KeYGuiExtensionF.KeyboardShortcutsF.ShortcutF shortcut : shortcuts
+                    .getShortcuts(mediator, componentId)) {
+                if (!componentId.equals(shortcut.componentId())) {
+                    continue;
+                }
+                var combination = shortcut.combination();
+                node.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+                    if (combination.match(e)) {
+                        shortcut.action().run();
+                        e.consume();
+                    }
+                });
+            }
+        }
     }
 
     /**

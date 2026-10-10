@@ -101,6 +101,7 @@ import de.uka.ilkd.key.gui.fx.docking.SimpleDockable;
 import de.uka.ilkd.key.gui.fx.drawer.DrawerF;
 import de.uka.ilkd.key.gui.fx.drawer.DrawerItemF;
 import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
+import de.uka.ilkd.key.gui.fx.extension.api.KeYGuiExtensionF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.goallist.GoalListViewF;
 import de.uka.ilkd.key.gui.fx.help.HelpFacadeF;
@@ -705,6 +706,25 @@ public final class MainWindowF {
         strategyView.attachMediator(mediator);
         sourceView.attach(selectionModel);
         loadedProofs.attach(selectionModel); // proofmgmt: row highlight follows the active proof
+        // extension: P4 (D36) — the KeyboardShortcuts extension seam: bind the view-scoped
+        // shortcuts of every KeYGuiExtensionF.KeyboardShortcutsF provider as key filters on the
+        // views (Swing KeYGuiExtensionFacade.installKeyboardShortcuts into the input maps of
+        // SequentView, GoalList, ProofTreeView, StrategySelectionView, SourceView and InfoView;
+        // KeYGuiExtensionFacade.java:361-375, called from SequentView.java:192,
+        // GoalList.java:108, ProofTreeView.java:334-335, StrategySelectionView.java:172,
+        // SourceView.java:225, InfoView.java:212)
+        KeYGuiExtensionFacadeF.installKeyboardShortcuts(mediator, sequentView,
+            KeYGuiExtensionF.KeyboardShortcutsF.SEQUENT_VIEW);
+        KeYGuiExtensionFacadeF.installKeyboardShortcuts(mediator, goalListView,
+            KeYGuiExtensionF.KeyboardShortcutsF.GOAL_LIST);
+        KeYGuiExtensionFacadeF.installKeyboardShortcuts(mediator, proofTreeView,
+            KeYGuiExtensionF.KeyboardShortcutsF.PROOF_TREE_VIEW);
+        KeYGuiExtensionFacadeF.installKeyboardShortcuts(mediator, strategyView,
+            KeYGuiExtensionF.KeyboardShortcutsF.STRATEGY_SELECTION_VIEW);
+        KeYGuiExtensionFacadeF.installKeyboardShortcuts(mediator, sourceView,
+            KeYGuiExtensionF.KeyboardShortcutsF.SOURCE_VIEW);
+        KeYGuiExtensionFacadeF.installKeyboardShortcuts(mediator, infoView,
+            KeYGuiExtensionF.KeyboardShortcutsF.INFO_TREE);
         // the hook doubles as the :99 verification signal (same line as the standalone driver)
         sourceView.setOnContentLoaded(
             () -> LOGGER.info("Source self test: {}", sourceView.verifySourceView()));
@@ -2416,14 +2436,18 @@ public final class MainWindowF {
     /**
      * extension: MP9.0 — headless self test of the FX extension SPI
      * ({@code key.fx.verify.extensions}), run after the demo load like the other
-     * proof-dependent verify hooks. Asserts (a) the facade discovers exactly the three ported
-     * built-in extensions, (b) the two status-line controls of the facade appear in the built
-     * status bar, (c) the Heatmap menu is a separate menu of the built menu bar, (d) the
-     * SettingsManagerF registry holds the Heatmap settings provider, and (e) the term-menu
+     * proof-dependent verify hooks. Asserts (a) the facade discovers the built-in extensions
+     * incl. the ported TestExtensionF, (b) the status-line controls of the facade appear in the
+     * built status bar, (c) the Heatmap menu is a separate menu of the built menu bar,
+     * (d) the SettingsManagerF registry holds the Heatmap settings provider, (e) the term-menu
      * extension section renders the disabled placeholder when <em>no position</em> is available
      * (the fallback of SequentTermContextMenuF; contributed items would be enabled only with a
-     * position). One stdout report line; skips the term-menu sub-assertion gracefully when no
-     * goal is loaded.
+     * position), and P4's seams: (f) B13 the "Test" menu nests at Test>Test>Test in the built
+     * menu bar, (g) B14 all extension toolbar controls sit in the single extension toolbar,
+     * (h) C24 the PROOF_TREE popup items of the selected node are non-empty, and (i) D36 the
+     * TestExtensionF SEQUENT_VIEW shortcut fires a toast when a matching key event hits the
+     * sequent view. One stdout report line; skips the term-menu sub-assertion gracefully when
+     * no goal is loaded.
      *
      * @param env the environment of the loaded proof
      */
@@ -2496,9 +2520,82 @@ public final class MainWindowF {
         }
         sb.append(" termmenuExtension=").append(termMenuSection);
 
-        String report = (pass ? "PASS" : "FAIL") + " - " + sb;
-        System.out.println("Extension verification: " + report);
-        LOGGER.info("Extension verification: {}", report);
+        // P4 — the four seam assertions (see the javadoc): TestExtensionF present (a), B13
+        // nested Test menu (f), B14 merged extension toolbar (g), C24 PROOF_TREE items (h),
+        // D36 sequent-view shortcut toast (i)
+        boolean testExtensionPresent =
+            classes.contains("de.uka.ilkd.key.gui.fx.extension.contrib.TestExtensionF");
+        sb.append(" testExtension=").append(testExtensionPresent ? "present" : "MISSING");
+        pass &= testExtensionPresent;
+
+        Menu testTop = menuBar.getMenus().stream().filter(m -> "Test".equals(m.getText()))
+                .findFirst().orElse(null);
+        boolean testNested = hasSubMenuItem(subMenuNamed(subMenuNamed(testTop, "Test"), "Test"),
+            "Test");
+        sb.append(" testNested=").append(testNested);
+        pass &= testNested;
+
+        List<Control> extToolbarControls =
+            KeYGuiExtensionFacadeF.getToolbarControls(this, mediator);
+        List<ToolBar> extToolBars = new ArrayList<>();
+        VBox topBox = buildTop();
+        for (Node child : topBox.getChildren()) {
+            if (child instanceof HBox area) {
+                for (Node toolBar : area.getChildren()) {
+                    if (toolBar instanceof ToolBar bar
+                            && bar.getStyleClass().contains("key-extension-tool-bar")) {
+                        extToolBars.add(bar);
+                    }
+                }
+            }
+        }
+        boolean mergedToolbar = extToolBars.size() == 1
+                && extToolBars.get(0).getItems().containsAll(extToolbarControls);
+        sb.append(" extensionToolbars=").append(extToolBars.size());
+        pass &= mergedToolbar;
+
+        de.uka.ilkd.key.proof.Node selNode = mediator.getSelectedNode();
+        int proofTreeItems = selNode == null ? 0
+                : KeYGuiExtensionFacadeF.getProofTreeContextItems(mediator, selNode).size();
+        sb.append(" prooftreeExtensionItems=").append(proofTreeItems);
+        pass &= proofTreeItems >= 1;
+
+        int toastsBefore = NotificationManagerF.getInstance().getVisibleToastCount();
+        // Ctrl+Shift+F12 — the combination TestExtensionF registered for SEQUENT_VIEW
+        // (KeyEvent args: eventType, character, text, keyCode, shift, control, alt, meta).
+        // The toast shows asynchronously (NotificationManagerF.notify → Platform.runLater),
+        // so the assertion and the report run on a later FX pulse behind it.
+        sequentView.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "F12", KeyCode.F12, true,
+            true, false, false));
+        boolean passSoFar = pass;
+        Platform.runLater(() -> {
+            boolean shortcutFires =
+                NotificationManagerF.getInstance().getVisibleToastCount() > toastsBefore;
+            sb.append(" sequentShortcutToast=").append(shortcutFires);
+            boolean ok = passSoFar && shortcutFires;
+            String report = (ok ? "PASS" : "FAIL") + " - " + sb;
+            System.out.println("Extension verification: " + report);
+            LOGGER.info("Extension verification: {}", report);
+        });
+    }
+
+    /** @return the direct sub menu of the given menu with the given text, or {@code null}. */
+    private static Menu subMenuNamed(Menu parent, String text) {
+        if (parent == null) {
+            return null;
+        }
+        for (MenuItem item : parent.getItems()) {
+            if (item instanceof Menu menu && text.equals(menu.getText())) {
+                return menu;
+            }
+        }
+        return null;
+    }
+
+    /** @return whether any direct item of the given menu has the given text. */
+    private static boolean hasSubMenuItem(Menu menu, String text) {
+        return menu != null
+                && menu.getItems().stream().anyMatch(item -> text.equals(item.getText()));
     }
 
     /**
@@ -2907,13 +3004,13 @@ public final class MainWindowF {
         // KeYGuiExtensionFacade.addExtensionsToMainMenu after the built-in menus,
         // KeYGuiExtensionFacade.java:81-89; the Swing original groups the extension actions
         // into one "Extensions" JMenu, the FX SPI contributes whole Menu objects — the
-        // grouping decision stays with the extension). The five built-in menus' item sets are
+        // grouping decision stays with the extension). P4 (B13): KeYGuiExtensionFacadeF.
+        // installMenus additionally splices providers with a non-empty KeyAction.PATH-style
+        // getMenuPath() into existing or new menus of the bar (first segment matched by text,
+        // deeper segments by sub-menu text — the Swing sortActionIntoMenu semantics). Extensions
+        // with the empty path keep the above default. The five built-in menus' item sets stay
         // untouched: key.fx.verify.menuparity keeps asserting 16/24/12/7/5.
-        List<javafx.scene.control.Menu> extensionMenus =
-            KeYGuiExtensionFacadeF.getMenus(this, mediator);
-        if (!extensionMenus.isEmpty()) {
-            menuBar.getMenus().addAll(extensionMenus);
-        }
+        KeYGuiExtensionFacadeF.installMenus(this, menuBar, mediator);
         return menuBar;
     }
 
