@@ -5,8 +5,12 @@
 package de.uka.ilkd.key.doc;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -32,25 +36,13 @@ public class VarcondDoc extends AbstractDocGenerator {
 
     @Override
     protected void generateDocumentation(PrintStream out) {
-        Function<String, String> normalizeCmdName =
-            (String it) -> it.startsWith("\\") ? it.replace("\\\\", "\\") : "\\" + it;
-        Function<TacletBuilderCommandInfo, String> getTriggerName = TacletBuilderCommandInfo::name;
+        for (var entry : collectVarconds().entrySet()) {
+            String name = entry.getKey();
+            List<TacletBuilderCommandInfo> cmds = entry.getValue();
 
-        var g = TacletBuilderManipulators.getConditionBuilders().stream()
-                .map(TacletBuilderCommand::getInformation)
-                .collect(Collectors.groupingBy(getTriggerName.andThen(normalizeCmdName)));
-        Comparator<TacletBuilderCommandInfo> reversed =
-            Comparator.comparing((TacletBuilderCommandInfo it) -> it.argumentTypes().length)
-                    .reversed();
-
-        var conds = g.keySet().stream().sorted().toList();
-
-        for (var name : conds) {
-            var cmds = g.get(name);
             out.println();
             out.println();
             out.format("### `%s`\n\n", name);
-            cmds.sort(reversed);
 
             final var generalDocumentation = cmds.getFirst().getGeneralDocumentation();
             out.println(
@@ -82,5 +74,74 @@ public class VarcondDoc extends AbstractDocGenerator {
                 out.println();
             }
         }
+    }
+
+    @Override
+    protected Object generateJsonData() {
+        var varconds = new ArrayList<Map<String, Object>>();
+        for (var entry : collectVarconds().entrySet()) {
+            String name = entry.getKey();
+            List<TacletBuilderCommandInfo> cmds = entry.getValue();
+
+            var varcond = new LinkedHashMap<String, Object>();
+            varcond.put("name", name);
+            final var generalDocumentation = cmds.getFirst().getGeneralDocumentation();
+            varcond.put("description",
+                cleanJavadoc(new CommentFormatter().format(generalDocumentation.getComment())));
+
+            var signatures = new ArrayList<Map<String, Object>>();
+            for (TacletBuilderCommandInfo cmd : cmds) {
+                final var argumentInformation = cmd.getArgumentInformation();
+                var params = argumentInformation.getParams();
+
+                var signature = new LinkedHashMap<String, Object>();
+                signature.put("negated", cmd.isNegationSupported());
+                signature.put("description",
+                    cleanJavadoc(argumentInformation.getComment().toString()));
+
+                var arguments = new ArrayList<Map<String, Object>>();
+                for (var i = 0; i < cmd.argumentTypes().length; i++) {
+                    var argument = new LinkedHashMap<String, Object>();
+                    argument.put("name", cmd.argNames()[i]);
+                    argument.put("type", cmd.argumentTypes()[i].toString());
+                    if (i < params.size()) {
+                        final var comment = params.get(i).getComment();
+                        argument.put("description",
+                            cleanJavadoc(comment == null ? null : comment.toString()));
+                    }
+                    arguments.add(argument);
+                }
+                signature.put("arguments", arguments);
+                signatures.add(signature);
+            }
+            varcond.put("signatures", signatures);
+            varconds.add(varcond);
+        }
+        return Map.of("varconds", varconds);
+    }
+
+    /// Collects all registered variable conditions, grouped and sorted by their trigger name;
+    /// within a group, the signatures are sorted by the number of declared argument types
+    /// (descending).
+    private LinkedHashMap<String, List<TacletBuilderCommandInfo>> collectVarconds() {
+        Function<String, String> normalizeCmdName =
+            (String it) -> it.startsWith("\\") ? it.replace("\\\\", "\\") : "\\" + it;
+        Function<TacletBuilderCommandInfo, String> getTriggerName = TacletBuilderCommandInfo::name;
+
+        var grouped = TacletBuilderManipulators.getConditionBuilders().stream()
+                .map(TacletBuilderCommand::getInformation)
+                .collect(Collectors.groupingBy(getTriggerName.andThen(normalizeCmdName)));
+        Comparator<TacletBuilderCommandInfo> reversed =
+            Comparator.comparing((TacletBuilderCommandInfo it) -> it.argumentTypes().length)
+                    .reversed();
+
+        var result = new LinkedHashMap<String, List<TacletBuilderCommandInfo>>();
+        grouped.keySet().stream().sorted().forEach(
+            name -> {
+                var cmds = grouped.get(name);
+                cmds.sort(reversed);
+                result.put(name, cmds);
+            });
+        return result;
     }
 }
