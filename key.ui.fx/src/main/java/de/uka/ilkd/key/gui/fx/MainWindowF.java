@@ -2561,8 +2561,10 @@ public final class MainWindowF {
         pass &= proofTreeItems >= 1;
 
         int toastsBefore = NotificationManagerF.getInstance().getVisibleToastCount();
-        sequentView.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "F12", KeyCode.F12, false,
-            true, true, false));
+        // Ctrl+Shift+F12 — the combination TestExtensionF registered for SEQUENT_VIEW
+        // (KeyEvent args: eventType, character, text, keyCode, shift, control, alt, meta)
+        sequentView.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "F12", KeyCode.F12, true,
+            true, false, false));
         int toastsAfter = NotificationManagerF.getInstance().getVisibleToastCount();
         boolean shortcutFires = toastsAfter > toastsBefore;
         sb.append(" sequentShortcutToast=").append(shortcutFires);
