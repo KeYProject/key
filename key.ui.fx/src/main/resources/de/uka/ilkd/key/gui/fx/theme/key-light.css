@@ -42,6 +42,17 @@
     -key-sequent-hl-dyn: #0000d0;
     -key-sequent-hl-progvar: #6a3e3e;
     -key-sequent-hl-arrow: #6a3e3e;
+    /* configurable highlight colors (ColorSettingsF.CSS_VARIABLES): the values below are the
+       light-theme defaults; user overrides from colors.json are applied inline on scene roots */
+    -key-hl-java: #7f0055;
+    -key-hl-comment: #3f7f5f;
+    -key-hl-jml: #0000f0;
+    -key-hl-jml-keyword: #0000f0;
+    -key-sequent-hl-prop: #1c1c1c;
+    -key-sequent-hl-dyn: #0000d0;
+    -key-sequent-hl-progvar: #6a3e3e;
+    -key-sequent-hl-arrow: #6a3e3e;
+    -key-settings-error: #c86464;
 }
 
 /* status bar */
@@ -480,6 +491,15 @@
 .diff-help-heading {
     -fx-font-weight: bold;
     -fx-underline: true;
+}
+
+/* ------------------------------------------------------------------
+ * M4 file/proof dialogs (ExampleChooserF, ProofSelectionDialogF):
+ * section headings replace the Swing TitledBorder labels
+ * ------------------------------------------------------------------ */
+.dialog-section-title {
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text-secondary;
 }
 
 /*

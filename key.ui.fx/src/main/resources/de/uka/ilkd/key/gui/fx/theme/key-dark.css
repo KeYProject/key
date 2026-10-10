@@ -20,6 +20,17 @@
     -key-linked: #4a90e2;
     -key-interactive: #e3a94f;
     -key-border: #555555;
+    /* configurable highlight colors (ColorSettingsF.CSS_VARIABLES): the values below are the
+       dark-theme defaults; user overrides from colors.json are applied inline on scene roots */
+    -key-hl-java: #cf50a5;
+    -key-hl-comment: #9fbf9f;
+    -key-hl-jml: #8888cf;
+    -key-hl-jml-keyword: #8888cf;
+    -key-sequent-hl-prop: #dedede;
+    -key-sequent-hl-dyn: #9696fa;
+    -key-sequent-hl-progvar: #6464fa;
+    -key-sequent-hl-arrow: #6464fa;
+    -key-settings-error: #c86464;
 
     /*
      * Configurable colors shared with the Swing UI (colors.json); the file keys are mapped to
@@ -484,6 +495,15 @@
 .diff-help-heading {
     -fx-font-weight: bold;
     -fx-underline: true;
+}
+
+/* ------------------------------------------------------------------
+ * M4 file/proof dialogs (ExampleChooserF, ProofSelectionDialogF):
+ * section headings replace the Swing TitledBorder labels
+ * ------------------------------------------------------------------ */
+.dialog-section-title {
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text-secondary;
 }
 
 /*
