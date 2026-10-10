@@ -70,8 +70,6 @@ tasks.register('generateSMTListings') {
     }
 }
 
-def keyScriptDocsDir = layout.buildDirectory.dir("docs/keydocs")
-
 // Generates the markdown documentation of all variable conditions (varconds),
 // see de.uka.ilkd.key.doc.VarcondDoc.
 tasks.register('generateVarcondDoc', JavaExec) {
@@ -82,9 +80,7 @@ tasks.register('generateVarcondDoc', JavaExec) {
     def outputFile = layout.buildDirectory.file("docs/keydocs/varconds.md")
     outputs.file(outputFile)
     doFirst {
-        def f = outputFile.get().asFile
-        f.parentFile.mkdirs()
-        standardOutput = new FileOutputStream(f)
+        args = [outputFile.get().asFile.absolutePath]
     }
 }
 
@@ -98,9 +94,7 @@ tasks.register('generateScriptDoc', JavaExec) {
     def outputFile = layout.buildDirectory.file("docs/keydocs/script-commands.md")
     outputs.file(outputFile)
     doFirst {
-        def f = outputFile.get().asFile
-        f.parentFile.mkdirs()
-        standardOutput = new FileOutputStream(f)
+        args = [outputFile.get().asFile.absolutePath]
     }
 }
 
