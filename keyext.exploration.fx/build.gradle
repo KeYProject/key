@@ -1,0 +1,32 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2,
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
+
+plugins {
+    // JavaFX is not bundled with the JDK; this plugin resolves the matching
+    // platform-specific runtime artifacts (see gradle/libs.versions.toml).
+    alias(libs.plugins.openjfx)
+}
+
+description = "JavaFX port of the keyext.exploration extension (MP9.2)"
+
+javafx {
+    version = libs.versions.javafx.get()
+    modules = ['javafx.base', 'javafx.controls', 'javafx.graphics']
+}
+
+dependencies {
+    implementation project(":key.ui.fx")
+    implementation project(":keyext.exploration")
+    // MP9.2: the FX extension SPI (KeYGuiExtensionF.ContextMenuF/TooltipF) and the reusable
+    // keyext.exploration logic classes (ExplorationModeModel, ProofExplorationService,
+    // ExplorationNodeData) are typed against key.core (Goal, Proof, Node, PosInSequent,
+    // Services, JTerm, KeyIO, ProofControl); neither :key.ui.fx nor :keyext.exploration exposes
+    // key.core on their API surface, so the provider cannot compile against the SPI without it.
+    implementation project(":key.core")
+    // MP9.2 icon review: ikonli FontAwesome glyphs for the toolbar/menu/status-line controls
+    // (replacing the unicode ◆/◇ fallback of the first revision)
+    implementation libs.ikonli.javafx
+    implementation libs.ikonli.fontawesome6
+}

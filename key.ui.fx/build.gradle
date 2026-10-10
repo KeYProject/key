@@ -1,0 +1,193 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2,
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
+
+plugins {
+    id 'application'
+
+    // JavaFX is not bundled with the JDK; this plugin resolves the matching
+    // platform-specific runtime artifacts (see gradle/libs.versions.toml).
+    alias(libs.plugins.openjfx)
+
+    // Used to create a single executable jar file with all dependencies
+    // see task "shadowJar" below
+    // https://github.com/GradleUp/shadow
+    alias(libs.plugins.shadow)
+}
+
+description = "JavaFX user interface for the deductive verification of Java programs"
+
+javafx {
+    version = libs.versions.javafx.get()
+    // key.ui.fx intentionally avoids javafx-fxml and javafx-swing:
+    // all UIs are built in code (no FXML) and no Swing components are used.
+    // smalldialogs: javafx.web hosts the WebView of SoundinessDialogF (the Swing
+    // SoundinessDialog renders the HTML soundiness report in a JEditorPane).
+    modules = ['javafx.base', 'javafx.controls', 'javafx.graphics', 'javafx.web']
+}
+
+dependencies {
+    implementation project(":key.core")
+
+    // smalldialogs: WDLoadOptionPanelF (port of gui/profileloading) references the
+    // well-definedness profile (Swing key.ui depends on key.core.wd the same way)
+    implementation project(":key.core.wd")
+
+    // contractcompletions: the contract type order needs the information-flow contract
+    // implementation class (Swing key.ui depends on key.core.infflow the same way)
+    implementation project(":key.core.infflow")
+
+    // Java/JML source editor with syntax highlighting (Milestone M2).
+    implementation(libs.richtextfx)
+
+    implementation(libs.picocli)
+
+    // logging implementation used by the slf4j facade
+    implementation(libs.logback.classic)
+
+    // MP9.1-9.6: the JavaFX keyext ports (one module per keyext extension) are discovered at
+    // runtime through the KeYGuiExtensionF service loader; they stay off the compile classpath
+    // (runtimeOnly). Each module pulls its keyext counterpart — and key.ui (Swing) transitively,
+    // accepted for the user-approved extension migration; the FX sources never import Swing.
+    runtimeOnly project(":keyext.caching.fx")
+    runtimeOnly project(":keyext.exploration.fx")
+    runtimeOnly project(":keyext.isabelletranslation.fx")
+    runtimeOnly project(":keyext.slicing.fx")
+    runtimeOnly project(":keyext.ui.testgen.fx")
+    runtimeOnly project(":keyext.proofmanagement.fx")
+}
+
+application {
+    mainClass.set("de.uka.ilkd.key.core.fx.MainEx")
+}
+
+run {
+    systemProperties["key.examples.dir"] = "$rootDir/key.ui/examples"
+    systemProperties["KeyDebugFlag"] = "on"
+
+    // Forward selected system properties from the Gradle command line to the application:
+    //  * key.fx.driver = <FQCN>  (M2: launch a standalone FxDriver view instead of MainWindowF)
+    //  * key.fx.theme  = light|dark  (theme override, also used by headless UI tests)
+    //  * key.fx.demo.sequent = <file.key>  (M2a spike: load a demo proof into the sequent view)
+    //  * key.fx.verify.sequent = any  (M2a spike: run the position-mapping self test afterwards)
+    //  * key.fx.show = sequent|prooftree  (M2: dockable selected after the demo load)
+    //  * key.fx.demo.autoprove = any  (M2: run the automatic prover on the demo proof)
+    //  * key.fx.verify.tree = any  (M2: run the proof tree structure self test afterwards)
+    //  * key.fx.demo.autoprove.live = any  (M2: auto mode AFTER the proof is selected — the
+    //    views observe the final state via autoModeStopped; ends with the structure self test)
+    //  * key.fx.demo.maxsteps = <n>  (M2: limit the auto mode strategy steps, e.g. 3 — tests
+    //    the live-update refresh for the non-closed case)
+    //  * key.fx.verify.goallist = any  (M2: run the goal list self test after the demo load)
+    //  * key.fx.verify.search = any  (M2: run the proof tree search self test after the demo load)
+    //  * key.fx.verify.sequentsearch = q  (M2: run the sequent search self test with query q)
+    //  * key.fx.verify.treefilters = any  (M2: run the tree filter self test after auto mode)
+    //  * key.fx.verify.sequentsearchmodes = any  (M2: run the search mode self test (Highlight/
+    //    Hide/Regroup) with the key.fx.verify.sequentsearch query after the demo load)
+    //  * key.fx.verify.updatehighlight = any  (M2: run the update-highlight overlay self test;
+    //    needs a sequent printing update operators, e.g. standard_key/queries/useQuery.key)
+    //  * key.fx.verify.notifications = any  (run the notification framework self test after the
+    //    demo load: framework semantics plus one PASS/FAIL line per type (task-finished,
+    //    proof-closed, synthetic exception); report logged and toasted)
+    // proofmgmt (JavaFX port of the Swing ProofManagementDialog and TaskTree view):
+    //  * key.fx.verify.proofmgmt = 1|2|all  (M?: run the proof management self test; 1 the
+    //    ProofManagementDialogF self test with a real JML example, 2 the Loaded Proofs view
+    //    self test with two loaded proofs and active-proof switching, all both)
+    //  * key.fx.demo.proofmgmt = <file.key>  (M?: example for the dialog self test; default
+    //    heap/vstte10_01_SumAndMax/SumAndMax_sumAndMax.key)
+    //  * key.fx.demo.sequent2 / key.fx.demo.sequent3 = <file.key>  (M?: the two examples of the
+    //    Loaded Proofs view self test; default firstTouch/01-Agatha/project.key and
+    //    firstTouch/05-ReverseArray/reverseArray.key)
+    //  * key.fx.verify.docking = any  (docking: run the docking interaction self test (named
+    //    layout slots, maximize/restore, close-while-maximized) after the demo load)
+    //  * key.fx.verify.uicontrol = any  (seam: run the WindowUserInterfaceControlF self test
+    //    (status line / IssueDialogF / LogViewF / AutoDismissDialogF) after the demo load)
+    //  * key.fx.verify.tacletmatch = 1|hold  (tacletmatch: run the interactive taclet
+    //    application self test after the demo load; "hold" leaves the dialog open)
+    //  * key.fx.verify.joinmerge = any  (joinmerge: run the join/merge dialog self test; needs
+    //    a proof with open branches, e.g. a limited auto mode run — see JoinMergeVerifyF)
+    //  * key.fx.verify.lemmaorigin = any  (lemmaorigin: run the term-label / origin-label /
+    //    lemma-generator self test after the demo load)
+    //  * key.fx.verify.help = any  (smalldialogs: run the F1 context help resolution self test;
+    //    no browser window is opened)
+    //  * key.fx.verify.profileloading = any  (smalldialogs: run the WD load-option panel self
+    //    test; no proof load is started)
+    //  * key.fx.verify.profileloadingdialog = any  (smalldialogs: open the loading options
+    //    dialog at startup and log the options returned on confirm)
+    //  * key.fx.verify.soundiness = any  (smalldialogs: run the soundiness report self test on
+    //    the demo proof and open the SoundinessDialogF)
+    //  * key.fx.verify.javacsettings = any  (smalldialogs: run the javac settings provider
+    //    self test; the settings dialog is not opened)
+    //  * key.fx.verify.termmenu = any  (termmenu: run the headless sequent context-menu self test
+    //    after the demo load; text report on stdout)
+    //  * key.fx.verify.colors = any  (colors: run the Swing-parity palette + mapped CSS variable
+    //    self test; proof-independent, runs at startup like the other smalldialogs hooks)
+    //  * key.fx.verify.smt = any  (smt: run the SMT run UI end to end on the first open goal of
+    //    the demo proof; needs an installed SMT solver (e.g. z3 on the PATH), the dialog
+    //    auto-applies the results with the CLOSE progress mode)
+    //  * key.fx.verify.loadingexit = any  (loadingexit: recent-files store round trip with
+    //    loading options + profile resolution, then the window close button path — the process
+    //    must terminate with exit code 0; the demo load is optional for this flag)
+    //  * key.fx.verify.shortcuts = any  (shortcuts: Swing-parity defaults, no collisions,
+    //    bind round trip, the sequent view Ctrl+F key path)
+    //  * key.fx.verify.inputfreeze = any  (inputfreeze: the auto mode blocking overlay — direct
+    //    freeze/unfreeze with key blocking, then an auto-mode-driven run)
+    //  * key.fx.verify.sequentmenu = any  (P2a: run the sequent interaction self test — left-click
+    //    term menu + POPUP_DELAY guard, search prefill, shift+click focussed auto mode)
+    //  * key.fx.verify.dialogs = any  (P2b: run the contract-completion registry + dialog
+    //    skeletons — contract/auxiliary configurators, lemma selection dialog, item chooser)
+    //  * key.fx.verify.prooftree = any  (P3a: run the proof tree C19-C23/C25/C27 self test —
+    //    per-proof view states, linearized mode, OSS protocol rows, whole-tree expand/collapse,
+    //    node-filter counting, notes + subtree statistics dialogs; combine with
+    //    key.fx.demo.autoprove.live to exercise the auto-mode partial updates)
+    ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
+        "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
+        "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
+        "key.fx.verify.search", "key.fx.verify.sequentsearch", "key.fx.verify.treefilters",
+        "key.fx.verify.search", "key.fx.verify.sequentsearch", "key.fx.verify.treefilters",
+        "key.fx.verify.sequentsearchmodes", "key.fx.verify.updatehighlight",
+        "key.fx.verify.notifications",
+        "key.fx.verify.proofmgmt", "key.fx.demo.proofmgmt", "key.fx.demo.sequent2",
+        "key.fx.demo.sequent3",
+        "key.fx.verify.docking", "key.fx.verify.uicontrol", "key.fx.verify.tacletmatch",
+        "key.fx.verify.joinmerge", "key.fx.verify.joinmerge.maxsteps", "key.fx.verify.lemmaorigin",
+        "key.fx.verify.help", "key.fx.verify.soundiness", "key.fx.verify.profileloading",
+        "key.fx.verify.profileloadingdialog", "key.fx.verify.javacsettings",
+        "key.fx.verify.termmenu", "key.fx.verify.colors", "key.fx.verify.smt",
+        "key.fx.verify.loadingexit", "key.fx.verify.shortcuts", "key.fx.verify.inputfreeze",
+        "key.fx.verify.sequentmenu", "key.fx.verify.dialogs", "key.fx.verify.prooftree"]
+        .each { name ->
+        def value = System.getProperty(name)
+        if (value != null) {
+            systemProperties[name] = value
+        }
+    }
+
+    // enable assertions
+    jvmArgs += "-ea"
+
+    // JavaFX 25 loads its native libraries (glass, prism) via restricted methods;
+    // allow native access to silence the JDK warning (mandatory on future JDKs).
+    jvmArgs += "--enable-native-access=javafx.graphics"
+}
+
+tasks.register('runExperimental', JavaExec) {
+    group = "application"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass.set("de.uka.ilkd.key.core.fx.MainEx")
+    args("--experimental")
+}
+
+tasks.register('runDebug', JavaExec) {
+    systemProperties["key.examples.dir"] = "$rootDir/key.ui/examples"
+    systemProperties["KeyDebugFlag"] = "on"
+}
+
+/*
+ * Packaging note (M0):
+ * A JavaFX application does not assemble into a plain "fat jar" simply by
+ * shading the Java bytecode: the platform-specific native runtime
+ * (libglass, libprism, ...) comes from classifier jars and must be bundled
+ * with jlink/jpackage. Shadow/jlink packaging for key.ui.fx is therefore a
+ * later milestone; until then run via `./gradlew :key.ui.fx:run`.
+ */

@@ -1,0 +1,31 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2,
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
+
+plugins {
+    // JavaFX is not bundled with the JDK; this plugin resolves the matching
+    // platform-specific runtime artifacts (see gradle/libs.versions.toml).
+    alias(libs.plugins.openjfx)
+}
+
+description = "JavaFX port of the keyext.caching extension (MP9.1)"
+
+javafx {
+    version = libs.versions.javafx.get()
+    modules = ['javafx.base', 'javafx.controls', 'javafx.graphics']
+}
+
+dependencies {
+    implementation project(":key.ui.fx")
+    implementation project(":keyext.caching")
+    // MP9.1: the FX SPI (KeYGuiExtensionF) and the reused keyext.caching logic classes expose
+    // key.core types (Goal, PosInSequent, Proof, ProofCachingSettings/Hierarchy, ...) in their
+    // signatures; key.ui.fx and keyext.caching declare key.core as 'implementation' (not 'api'),
+    // so this module must declare the core dependency itself to compile against those signatures.
+    // Runtime-wise key.core arrives transitively anyway (via keyext.caching) — no classpath change.
+    implementation project(":key.core")
+    // MP9.1 icon review: ikonli FontAwesome glyphs for the toolbar toggle + Caching menu
+    implementation libs.ikonli.javafx
+    implementation libs.ikonli.fontawesome6
+}

@@ -1,0 +1,1059 @@
+/*
+ * Dark theme for the JavaFX UI of KeY (key.ui.fx).
+ *
+ * This stylesheet is applied on top of the default Modena theme. It
+ * re-defines the -key-* custom properties and adjusts the standard Modena
+ * look-up colors, such that both our own components and the built-in
+ * controls render in a dark color scheme.
+ */
+.root {
+    -key-background: #2b2b2b;
+    -key-surface: #3c3f41;
+    -key-text: #dedede;
+    -key-text-secondary: #9d9d9d;
+    -key-accent: #4a90e2;
+    -key-accent-text: #ffffff;
+    -key-success: #6fc46f;
+    -key-warning: #e3a94f;
+    -key-error: #e06c62;
+    -key-proved: #6fc46f;
+    -key-linked: #4a90e2;
+    -key-interactive: #e3a94f;
+    -key-border: #555555;
+    /* configurable highlight colors (ColorSettingsF.CSS_VARIABLES): the values below are the
+       dark-theme defaults; user overrides from colors.json are applied inline on scene roots */
+    -key-hl-java: #cf50a5;
+    -key-hl-comment: #9fbf9f;
+    -key-hl-jml: #8888cf;
+    -key-hl-jml-keyword: #8888cf;
+    -key-sequent-hl-prop: #dedede;
+    -key-sequent-hl-dyn: #9696fa;
+    -key-sequent-hl-progvar: #6464fa;
+    -key-sequent-hl-arrow: #6464fa;
+    -key-settings-error: #c86464;
+
+    /* restyle the built-in Modena controls for the dark theme */
+    -fx-base: #3c3f41;
+    -fx-background: #2b2b2b;
+    -fx-control-inner-background: #2f3134;
+    -fx-text-background-color: -key-text;
+    -fx-text-fill: -key-text;
+    -fx-selection-bar: -key-accent;
+    -fx-selection-bar-non-focused: derive(-key-accent, 60%);
+    -fx-accent: -key-accent;
+}
+
+/* status bar */
+.status-bar {
+    -fx-background-color: -key-surface;
+    -fx-border-color: -key-border transparent transparent transparent;
+    -fx-padding: 2 6 2 6;
+}
+
+.status-bar .label {
+    -fx-text-fill: -key-text-secondary;
+}
+
+/* placeholder views (milestone M1) */
+.view-title {
+    -fx-font-size: 1.4em;
+    -fx-text-fill: -key-text;
+    -fx-font-weight: bold;
+}
+
+.view-hint {
+    -fx-text-fill: -key-text-secondary;
+}
+
+/* notifications (toast) */
+.notification-toast {
+    -fx-background-color: -key-surface;
+    -fx-background-radius: 4;
+    -fx-border-color: -key-border;
+    -fx-border-radius: 4;
+    -fx-padding: 8 12 8 12;
+    -fx-text-fill: -key-text;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0.2, 0, 2);
+}
+
+.notification-toast.info {
+    -fx-border-color: -key-accent;
+}
+
+.notification-toast.error {
+    -fx-border-color: -key-error;
+}
+
+.notification-toast.warning {
+    -fx-border-color: -key-warning;
+}
+
+/* dock tab pane */
+.key-dock-tab-pane > .tab-header-area {
+    -fx-padding: 2 4 0 4;
+}
+
+/* icon text nodes (see IconFactoryF) follow the theme text color */
+.key-icon {
+    -fx-fill: -key-text;
+}
+
+/* sequent view (M2a spike) */
+.sequent-view,
+.sequent-view-flow {
+    -fx-background-color: transparent;
+}
+
+.sequent-text {
+    -fx-fill: -key-text;
+}
+
+.sequent-term-highlight {
+    -fx-fill: -key-accent;
+    -fx-font-weight: bold;
+}
+
+.sequent-placeholder {
+    -fx-fill: -key-text-secondary;
+}
+
+/* syntax highlighting of the printed sequent (Swing HTMLSyntaxHighlighter colors);
+   these rules must stay before the search rules so the search and click highlights
+   override the syntax coloring for -fx-fill */
+.sequent-hl-prop {
+    -fx-fill: -key-sequent-hl-prop;
+    -fx-font-weight: bold;
+}
+
+.sequent-hl-dyn {
+    -fx-fill: -key-sequent-hl-dyn;
+    -fx-font-weight: bold;
+}
+
+.sequent-hl-java {
+    -fx-fill: -key-hl-java;
+    -fx-font-weight: bold;
+}
+
+.sequent-hl-progvar {
+    -fx-fill: -key-sequent-hl-progvar;
+}
+
+.sequent-hl-comment {
+    -fx-fill: -key-hl-comment;
+}
+
+.sequent-hl-jml {
+    -fx-fill: -key-hl-jml;
+}
+
+.sequent-hl-arrow {
+    -fx-fill: -key-sequent-hl-arrow;
+    -fx-font-weight: bold;
+}
+
+/* sequent search bar (M2, Swing SequentViewSearchBar) */
+.sequent-search-bar {
+    -fx-background-color: -key-surface;
+    -fx-border-color: -key-border transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 4;
+}
+
+.sequent-search-field {
+    -fx-background-color: -key-background;
+    -fx-text-fill: -key-text;
+    -fx-prompt-text-fill: -key-text-secondary;
+    -fx-highlight-fill: derive(-key-accent, -40%);
+    -fx-border-color: -key-border;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-padding: 2 6 2 6;
+}
+
+.sequent-search-field.search-alert {
+    -fx-background-color: #552828;
+}
+
+.sequent-search-button {
+    -fx-background-color: transparent;
+    -fx-padding: 3 5 3 5;
+}
+
+.sequent-search-button:hover {
+    -fx-background-color: derive(-key-accent, -65%);
+}
+
+/* the search colors the matched text (Swing paints translucent blue rectangles behind it) */
+.sequent-search-match {
+    -fx-fill: derive(-key-accent, 30%);
+}
+
+.sequent-search-match-current {
+    -fx-fill: derive(-key-accent, 60%);
+    -fx-font-weight: bold;
+}
+
+/* proof tree (M2 first version) */
+.proof-tree {
+    -fx-background-color: -key-surface;
+}
+
+.proof-tree-cell {
+    -fx-text-fill: -key-text;
+    -fx-fill: -key-text;
+    -fx-padding: 1 4 1 2;
+}
+
+.proof-tree-branch {
+    -fx-text-fill: -key-text;
+    -fx-font-weight: bold;
+}
+
+.proof-tree-branch-closed,
+.proof-tree-closed {
+    -fx-text-fill: -key-proved;
+}
+
+.proof-tree-open {
+    -fx-text-fill: -key-error;
+}
+
+.proof-tree-interactive {
+    -fx-text-fill: -key-interactive;
+}
+
+/* prooftree (P3a, C21): the One Step Simplifier node and its protocol rows */
+.proof-tree-oss {
+    -fx-text-fill: -key-text;
+    -fx-font-weight: bold;
+}
+
+.proof-tree-oss-child {
+    -fx-text-fill: -key-text-secondary;
+    -fx-font-style: italic;
+    -fx-padding: 1 4 1 16;
+}
+
+/* prooftree (P3a, C23): the Edit Notes popup (ProofTreeNotesDialogF) */
+.proof-tree-notes-title {
+    -fx-text-fill: -key-text;
+    -fx-font-weight: bold;
+}
+
+.proof-tree-notes-area {
+    -fx-font-family: monospace;
+}
+
+/* prooftree (P3a, C23): the Show Subtree Statistics popup (SubtreeStatisticsDialogF) */
+.subtree-stats-title {
+    -fx-text-fill: -key-text;
+    -fx-font-weight: bold;
+}
+
+.subtree-stats-area {
+    -fx-font-family: monospace;
+}
+
+/* proof tree search bar (M2, Swing ProofTreeSearchBar) */
+.proof-tree-search-bar {
+    -fx-background-color: -key-surface;
+    -fx-border-color: -key-border transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 4;
+}
+
+.proof-tree-search-field {
+    -fx-background-color: -key-background;
+    -fx-text-fill: -key-text;
+    -fx-prompt-text-fill: -key-text-secondary;
+    -fx-highlight-fill: derive(-key-accent, -40%);
+    -fx-border-color: -key-border;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-padding: 2 6 2 6;
+}
+
+.proof-tree-search-field.search-alert {
+    -fx-background-color: #552828;
+}
+
+.proof-tree-search-button {
+    -fx-background-color: transparent;
+    -fx-padding: 3 5 3 5;
+}
+
+.proof-tree-search-button:hover {
+    -fx-background-color: derive(-key-accent, -65%);
+}
+
+.proof-tree-match {
+    -fx-background-color: derive(-key-warning, -70%);
+    -fx-text-fill: -key-text;
+}
+
+.proof-tree-cell:selected {
+    -fx-background-color: derive(-key-accent, -60%);
+    -fx-text-fill: -key-text;
+}
+
+/* a row that is both selected and a search match shows the selection (Swing parity) */
+.proof-tree-cell.proof-tree-match:selected {
+    -fx-background-color: derive(-key-accent, -60%);
+    -fx-text-fill: -key-text;
+}
+
+/* info view (M2 first version) */
+.info-view {
+    -fx-background: -key-surface;
+    -fx-background-color: -key-surface;
+}
+
+.info-view-content {
+    -fx-padding: 8;
+}
+
+.info-view-title {
+    -fx-font-size: 1.15em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text;
+    -fx-padding: 0 0 6 0;
+}
+
+.info-view-grid {
+    -fx-hgap: 10;
+    -fx-vgap: 4;
+}
+
+.info-row-label {
+    -fx-text-fill: -key-text-secondary;
+    -fx-font-weight: bold;
+}
+
+.info-row-value {
+    -fx-text-fill: -key-text;
+}
+
+.info-view-status-closed {
+    -fx-text-fill: -key-proved;
+}
+
+.info-view-status-open {
+    -fx-text-fill: -key-error;
+}
+
+.info-view-placeholder {
+    -fx-text-fill: -key-text-secondary;
+}
+
+/* goal list view */
+.goal-list {
+    -fx-background-color: -key-surface;
+}
+
+.goal-list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 3 8 3 8;
+}
+
+.goal-list-label {
+    -fx-text-fill: -key-text-secondary;
+}
+
+/* the marker is a font glyph (a Text node); its size comes from IconFactoryF.DEFAULT_SIZE */
+.goal-list-marker {
+    -fx-fill: -key-text;
+}
+
+.goal-list-automatic {
+    -fx-fill: -key-text;
+}
+
+.goal-list-interactive {
+    -fx-fill: -key-interactive;
+}
+
+.goal-list-linked {
+    -fx-fill: -key-linked;
+}
+
+.goal-list-sequent {
+    -fx-text-fill: -key-text;
+}
+
+/* selected row: darkened accent background, readable text for all labels */
+.goal-list-cell:selected {
+    -fx-background-color: derive(-key-accent, -65%);
+}
+
+.goal-list-cell:selected .label {
+    -fx-text-fill: -key-text;
+}
+
+.goal-list-empty {
+    -fx-text-fill: -key-text-secondary;
+}
+
+.goal-list-header {
+    -fx-font-size: 1.1em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text;
+    -fx-background-color: -key-background;
+    -fx-border-color: transparent transparent -key-border transparent;
+}
+
+/* strategy selection view */
+.strategy-view {
+    -fx-background-color: -key-surface;
+}
+
+.strategy-content {
+    -fx-background-color: -key-surface;
+}
+
+.strategy-maxsteps-row {
+    -fx-padding: 0 0 4 0;
+}
+
+.strategy-maxsteps-label,
+.strategy-property-label {
+    -fx-text-fill: -key-text;
+}
+
+.strategy-section-title {
+    -fx-text-fill: -key-text;
+    -fx-font-weight: bold;
+    -fx-padding: 4 0 2 0;
+}
+
+.strategy-radio {
+    -fx-text-fill: -key-text;
+}
+
+.strategy-radio:selected {
+    -fx-text-fill: -key-accent;
+    -fx-font-weight: bold;
+}
+
+.strategy-status {
+    -fx-text-fill: -key-text-secondary;
+}
+
+/* source view */
+/* M2, first read-only version; see SourceViewF */
+.source-view {
+    -fx-background-color: -key-surface;
+}
+
+.source-view-header {
+    -fx-background-color: -key-background;
+    -fx-text-fill: -key-text-secondary;
+    -fx-padding: 4 8 4 8;
+    -fx-border-color: transparent transparent -key-border transparent;
+}
+
+/*
+ * Segment classes applied to the text nodes of the area (see SourceHighlighter).
+ * The colors reuse the -key-* palette so the dark theme needs no extra rules.
+ */
+.source-text {
+    -fx-fill: -key-text;
+}
+
+.source-placeholder {
+    -fx-fill: -key-text-secondary;
+    -fx-font-style: italic;
+}
+
+.source-keyword {
+    -fx-fill: -key-hl-java;
+    -fx-font-weight: bold;
+}
+
+.source-comment {
+    -fx-fill: -key-hl-comment;
+    -fx-font-style: italic;
+}
+
+.source-string {
+    -fx-fill: -key-success;
+}
+
+.source-annotation {
+    -fx-fill: -key-warning;
+}
+
+.source-jml-keyword {
+    -fx-fill: -key-hl-jml-keyword;
+    -fx-font-weight: bold;
+}
+
+/* ------------------------------------------------------------------
+ * M4 file/proof dialogs (ExampleChooserF, ProofSelectionDialogF):
+ * section headings replace the Swing TitledBorder labels
+ * ------------------------------------------------------------------ */
+.dialog-section-title {
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text-secondary;
+}
+
+/*
+ * Settings dialog (M4, Swing SettingsDialog/SettingsUi/SimpleSettingsPanel).
+ */
+.settings-panel-header {
+    -fx-background-color: -key-surface;
+}
+
+.settings-panel-title {
+    -fx-font-size: 1.3em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text;
+}
+
+.settings-panel-subtitle {
+    -fx-text-fill: -key-text-secondary;
+}
+
+.settings-form {
+    -fx-background-color: -key-surface;
+}
+
+.settings-separator-title {
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text;
+}
+
+.settings-warning-header {
+    -fx-font-size: 1.1em;
+    -fx-text-fill: -key-text;
+}
+
+.settings-taclet-option-title {
+    -fx-font-size: 1.1em;
+    -fx-text-fill: -key-text;
+}
+
+.settings-explanation {
+    -fx-text-fill: -key-text-secondary;
+}
+
+/* the provider tree with the search field on the left */
+.settings-tree-panel {
+    -fx-background-color: -key-surface;
+    -fx-border-color: -key-border;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-padding: 4;
+    -fx-min-width: 200;
+}
+
+.settings-search-row .label {
+    -fx-text-fill: -key-text-secondary;
+}
+
+.settings-tree-match {
+    -fx-text-fill: -key-accent;
+    -fx-font-weight: bold;
+}
+
+/* the selected provider's panel on the right */
+.settings-panel-holder {
+    -fx-background-color: -key-surface;
+    -fx-padding: 4;
+}
+
+/* erroneous input components (SettingsPanelF.markComponentAsErrornous); -key-settings-error is
+   configurable as SETTINGS_TEXTFIELD_ERROR in colors.json */
+.settings-input-error {
+    -fx-background-color: -key-settings-error;
+}
+
+.color-swatch {
+    -fx-border-color: -key-border;
+    -fx-background-radius: 2;
+    -fx-border-radius: 2;
+}
+
+/* warning icons (IconFactoryF.Key.WARNING_*; the plain .key-icon fill is the text color) */
+.key-icon.key-icon-warning {
+    -fx-fill: -key-warning;
+}
+
+.key-icon.key-icon-error {
+    -fx-fill: -key-error;
+}
+
+/* ------------------------------------------------------------------
+ * proof diff frame (M5, Swing ProofDiffFrame)
+ * The diff area is a StyleClassedTextArea; deleted/inserted text carries
+ * the Swing span background colors (#ff8080 / #80ff80) as RichTextFX
+ * -rtfx-background-color on the styled text segments.
+ * ------------------------------------------------------------------ */
+.proof-diff-area {
+    -fx-background-color: -key-surface;
+}
+
+.diff-delete {
+    -rtfx-background-color: #ff8080;
+    -fx-fill: -key-text;
+}
+
+.diff-insert {
+    -rtfx-background-color: #80ff80;
+    -fx-fill: -key-text;
+}
+
+.diff-help-heading {
+    -fx-font-weight: bold;
+    -fx-underline: true;
+}
+
+/* update highlights of the printed update operators (M2, Swing
+   CurrentGoalView.updateUpdateHighlights paints InitialPositionTable.getUpdateRanges with
+   UPDATE_HIGHLIGHT_COLOR behind the text); the rectangles are Path nodes styled with -fx-fill;
+   the Swing dark color is fully opaque (painted behind the text) */
+.sequent-update-highlight {
+    -fx-fill: rgba(0, 150, 130, 1.0);
+}
+
+/* hover highlight of the term under the mouse (Swing DEFAULT_HIGHLIGHT_COLOR dark) */
+.sequent-hover-highlight {
+    -fx-fill: rgba(140, 200, 255, 0.71);
+}
+
+/* warning banner while a search filter hides formulas (Swing SequentHideWarningBorder message;
+   the Swing border uses the same single color in both themes) */
+.sequent-hide-warning {
+    -fx-background-color: #ffb2b2;
+    -fx-text-fill: #000000;
+    -fx-font-size: 0.9em;
+    -fx-padding: 2 8 2 8;
+}
+
+/* the search mode combo (Swing SequentViewSearchBar.searchModeBox with the mode icons) */
+.sequent-search-mode {
+    -fx-padding: 1;
+}
+
+/* notification framework proof-closed dialog (Swing ProofClosedJTextPaneDisplay ->
+ * ShowProofStatistics.Window port; FX ProofClosedDialogF) */
+.notification-dialog {
+    -fx-background-color: -key-surface;
+    -fx-border-color: -key-border;
+    -fx-text-fill: -key-text;
+}
+
+.notification-dialog .label {
+    -fx-text-fill: -key-text;
+}
+
+.notification-dialog-header {
+    -fx-font-size: 1.1em;
+    -fx-text-fill: -key-success;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 4 0;
+}
+
+/* ---------------------------------------------------------------------
+ * Proof management (proofmgmt: JavaFX port of the Swing ProofManagementDialog
+ * and the "Loaded Proofs" TaskTree view)
+ * --------------------------------------------------------------------- */
+
+/* the key-hole status icons of the Swing TaskTreeIconCellRenderer
+ * (TaskTree.java:348-394), colored like the proof tree node icons */
+.proof-status-open {
+    -fx-text-fill: -key-error;
+}
+
+.proof-status-closed {
+    -fx-text-fill: -key-proved;
+}
+
+.proof-status-almost-closed {
+    -fx-text-fill: -key-warning;
+}
+
+.proof-status-closed-cache {
+    -fx-text-fill: -key-accent;
+}
+
+/* the "Loaded Proofs" view (Swing de.uka.ilkd.key.gui.TaskTree) */
+.loaded-proofs {
+    -fx-font-size: 1em;
+}
+
+/* the environment group rows (Swing TaskTreeModel EnvNodes) */
+.loaded-proofs-env {
+    -fx-text-fill: -key-text-secondary;
+    -fx-font-weight: bold;
+}
+
+/* the placeholder shown when no proof is loaded */
+.loaded-proofs-empty {
+    -fx-text-fill: -key-text-secondary;
+    -fx-padding: 6;
+}
+
+/* ------------------------------------------------------------------
+ * seam: dialog trio (Swing IssueDialog / AutoDismissDialog / LogView)
+ * ------------------------------------------------------------------ */
+
+/* IssueDialogF: monospaced source/stacktrace preview (Swing IssueDialog.txtSource,
+   txtStacktrace), location labels (Swing fTextField/lTextField/cTextField) */
+.issue-dialog-source {
+    -fx-font-family: "Monospaced";
+    -fx-font-size: 1em;
+}
+
+.issue-dialog-location {
+    -fx-text-fill: -key-linked;
+}
+
+/* AutoDismissDialogF: the pink message panel of the Swing original
+   (AutoDismissDialog.java:40, color (1, 0.7f, 0.7f) — a fixed Swing color without a
+   theme variable) */
+.auto-dismiss-dialog {
+    -fx-background-color: #ffb3b3;
+}
+
+/* LogViewF: styled log fields (Swing LogViewPane styles: time/thread/class gray, level bold);
+   the level colors use the theme palette */
+.log-view-area {
+    -fx-font-family: "Monospaced";
+    -fx-font-size: 1em;
+    -fx-background-color: -key-surface;
+    -fx-padding: 4;
+}
+
+.log-time, .log-thread, .log-class, .log-file {
+    -fx-fill: -key-text-secondary;
+}
+
+.log-level {
+    -fx-font-weight: bold;
+}
+
+.log-level.ERROR {
+    -fx-fill: -key-error;
+}
+
+.log-level.WARN {
+    -fx-fill: -key-warning;
+}
+
+.log-level.INFO, .log-level.DEBUG, .log-level.TRACE {
+    -fx-fill: -key-text;
+}
+
+.log-msg {
+    -fx-fill: -key-text;
+}
+
+.log-ex {
+    -fx-fill: -key-error;
+}
+/* ==========================================================================
+ * Taclet match / interactive taclet application dialogs (ported from the
+ * Swing de.uka.ilkd.key.gui.tacletmatch dialogs; classes prefixed
+ * "tacletmatch-"). Colours come from the shared palette; the schema-variable
+ * chip colours are data colours kept in code (SvPaletteF), not theme chrome.
+ * ========================================================================== */
+
+/* monospaced logic/term text (TmStyle.mono) */
+.tacletmatch-mono {
+    -fx-font-family: "monospace";
+}
+
+/* muted captions, row labels and hints (TmStyle.muted) */
+.tacletmatch-muted {
+    -fx-text-fill: -key-text-secondary;
+}
+
+/* a titled section: bold header with a hairline rule beneath it, no box
+ * (TmStyle.section) */
+.tacletmatch-section {
+    -fx-spacing: 4;
+    -fx-padding: 6 0 2 0;
+}
+
+.tacletmatch-section-title {
+    -fx-font-weight: bold;
+    -fx-padding: 2 0 1 0;
+    -fx-border-color: transparent transparent -key-border transparent;
+    -fx-border-insets: 0 0 2 0;
+}
+
+/* the compact footer with the status line and the Apply/Cancel buttons
+ * (TmStyle.styleFooter: faint surface bar under a hairline) */
+.tacletmatch-footer {
+    -fx-background-color: derive(-key-surface, -6%);
+    -fx-border-color: -key-border transparent transparent transparent;
+}
+
+/* the small, unobtrusive disclosure (expand/collapse) toggle
+ * (TmStyle.disclosure) */
+.tacletmatch-disclosure {
+    -fx-background-color: transparent;
+    -fx-padding: 1 3 1 3;
+    -fx-min-width: 0;
+    -fx-alignment: CENTER_LEFT;
+    -fx-content-display: GRAPHIC_ONLY;
+    -fx-text-fill: -key-text-secondary;
+    -fx-cursor: hand;
+}
+
+.tacletmatch-disclosure:hover {
+    -fx-background-color: derive(-key-border, 40%);
+    -fx-background-radius: 3;
+}
+
+/* the concrete matched term, set apart by a faint full-width band
+ * (MatchInfoPanel.matchedRow) */
+.tacletmatch-matched-band {
+    -fx-background-color: derive(-key-border, 70%);
+    -fx-background-radius: 3;
+    -fx-padding: 3 6 3 6;
+}
+
+/* the result preview surface card (ResultPreviewPanel: the "answer") */
+.tacletmatch-preview-card {
+    -fx-background-color: -key-surface;
+    -fx-border-color: -key-border;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 6;
+}
+
+/* added (+) and removed (−) formula markers of the result preview */
+.tacletmatch-added {
+    -fx-text-fill: -key-success;
+    -fx-font-weight: bold;
+}
+
+.tacletmatch-removed {
+    -fx-text-fill: -key-error;
+    -fx-font-weight: bold;
+}
+
+/* status colours of the footer icon/message and the manual-input status
+ * (TacletMatchDialog.statusLine / AssumesSelectionPanel.status) */
+.tacletmatch-status-ok {
+    -fx-text-fill: -key-success;
+    -fx-fill: -key-success;
+}
+
+.tacletmatch-status-warn {
+    -fx-text-fill: -key-warning;
+    -fx-fill: -key-warning;
+}
+
+.tacletmatch-status-error {
+    -fx-text-fill: -key-error;
+    -fx-fill: -key-error;
+}
+
+/* instantiation field highlighted while a term is dragged over it
+ * (SVInstantiationPanel drop target) */
+.tacletmatch-drop-highlight {
+    -fx-border-color: -key-accent;
+    -fx-border-width: 1;
+}
+
+/* the small inline "edit in larger window" icon button */
+.tacletmatch-edit-button {
+    -fx-background-color: transparent;
+    -fx-padding: 1 4 1 4;
+    -fx-text-fill: -key-text-secondary;
+    -fx-cursor: hand;
+}
+
+.tacletmatch-edit-button:hover {
+    -fx-background-color: derive(-key-border, 40%);
+    -fx-background-radius: 3;
+}
+
+/* schema-variable chip: the colours are set inline (SvPaletteF); only the
+ * pill shape comes from the theme */
+.tacletmatch-chip {
+    -fx-padding: 0 5 0 5;
+    -fx-background-radius: 8;
+    -fx-font-weight: bold;
+}
+
+/* an instantiation row (chip / arrow / field alignment) */
+.tacletmatch-row {
+    -fx-fill-height: false;
+}
+
+/* ------------------------------------------------------------------
+   join / merge rule dialogs (key.fx.verify.joinmerge; Swing
+   gui/join/SequentViewer.java + gui/mergerule/MergePartnerSelectionDialog.java)
+   ------------------------------------------------------------------ */
+
+/* read-only sequent panes of the join dialog and the merge partner dialog
+   (Swing JTextPane / JEditorPane with the monospaced proof font) */
+.join-sequent-view {
+    -fx-font-family: "DejaVu Sans Mono";
+    -fx-font-size: 12px;
+}
+
+/* the details box rows of the join dialog (Swing ClickableMessageBox rows) */
+.join-message-row {
+    -fx-cursor: hand;
+    -fx-padding: 1 4 1 4;
+}
+.join-details-box {
+    -fx-background-color: transparent;
+    -fx-padding: 2;
+}
+
+/* the "with" separator and the decision-predicate info label of the join dialog
+   (Swing: gray JLabels) */
+.join-with-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text-secondary;
+}
+.join-predicate-info {
+    -fx-text-fill: -key-text-secondary;
+}
+
+/* message states of the join dialog info box (Swing ClickableMessageBox colors) */
+.message-ok {
+    -fx-text-fill: -key-success;
+}
+.message-error {
+    -fx-text-fill: -key-error;
+}
+
+/* the checked predicate input traffic light (Swing TrafficLight becomes a
+   colored dot label) */
+.traffic-light {
+    -fx-background-radius: 5;
+    -fx-max-width: 10;
+    -fx-max-height: 10;
+}
+.traffic-light-ok {
+    -fx-background-color: -key-success;
+}
+.traffic-light-error {
+    -fx-background-color: -key-error;
+}
+
+/* invalid distinguishing-formula input in the merge partner dialog
+   (Swing: red foreground on the text field) */
+.join-input-error {
+    -fx-text-fill: -key-error;
+}
+
+/* origin term label visualizer (Swing OriginTermLabelVisualizer): the origin of the selected
+   term in the tree is highlighted in the term view (Swing HIGHLIGHT_COLOR = orange, here the
+   existing warning color variable) */
+.origin-visualizer-highlight {
+    -fx-fill: derive(-key-warning, 30%);
+    -fx-opacity: 0.45;
+}
+
+/* the traffic light of the checked predicate input (Swing TrafficLight) */
+.traffic-light {
+    -fx-background-color: -key-border;
+    -fx-background-radius: 6;
+    -fx-min-width: 12;
+    -fx-max-width: 12;
+    -fx-min-height: 12;
+    -fx-max-height: 12;
+}
+.traffic-light-ok {
+    -fx-background-color: -key-success;
+}
+.traffic-light-error {
+    -fx-background-color: -key-error;
+}
+
+/* the details box rows of the join dialog (Swing ClickableMessageBox rows) */
+.join-message-row {
+    -fx-cursor: hand;
+    -fx-padding: 1 4 1 4;
+}
+.join-details-box {
+    -fx-background-color: transparent;
+    -fx-padding: 2;
+}
+
+/* origin term label visualizer (Swing OriginTermLabelVisualizer): the origin of the selected
+   term in the tree is highlighted in the term view (Swing HIGHLIGHT_COLOR = orange, here the
+   existing warning color variable) */
+.origin-visualizer-highlight {
+    -fx-fill: derive(-key-warning, 30%);
+    -fx-opacity: 0.45;
+}
+
+/* ---------------------------------------------------------------------------
+   contract completions (P2b) — dark theme: the contract configurator cells
+   (ContractConfigurator/ContractSelectionPanel + auxiliary/block variants) and
+   the invariant configurator (Swing InvariantConfigurator)
+   --------------------------------------------------------------------------- */
+.contract-selection-panel {
+    -fx-padding: 4;
+}
+.contract-cell {
+    -fx-background-color: -key-surface;
+    -fx-border-color: -key-border;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 4;
+    -fx-cursor: hand;
+}
+.contract-cell-gray {
+    -fx-background-color: derive(-key-background, -5%);
+    -fx-text-fill: -key-text-secondary;
+}
+.contract-cell-gray .label {
+    -fx-text-fill: -key-text-secondary;
+}
+.contract-cell-name {
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text;
+}
+.contract-cell-text {
+    -fx-text-fill: -key-text;
+    -fx-wrap-text: true;
+}
+.invariant-loop-representation {
+    -fx-font-family: monospace;
+    -fx-wrap-text: true;
+    -fx-text-fill: -key-text;
+}
+.invariant-heap-pane {
+    -fx-padding: 4;
+}
+.invariant-input {
+    -fx-font-family: monospace;
+}
+.invariant-status-ok {
+    -fx-text-fill: -key-success;
+}
+.invariant-status-error {
+    -fx-text-fill: -key-error;
+}
+
+/* lemma dialogs (P2b): the ItemChooser dual list of the taclet selection dialog
+   and the axiom panel of the user-taclets dialog */
+.item-chooser .list-view {
+    -fx-background-color: -key-surface;
+}
+.item-chooser-middle {
+    -fx-padding: 0 2 0 2;
+}
+.axioms-panel {
+    -fx-border-color: -key-border;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 6;
+}
+.axioms-title {
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text-secondary;
+}
+.axioms-list {
+    -fx-background-color: -key-surface;
+}

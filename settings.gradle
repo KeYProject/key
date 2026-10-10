@@ -24,6 +24,7 @@ include "key.core.testgen"
 include "key.core.example"
 
 include "key.ui"
+include "key.ui.fx"
 
 include "keyext.ui.testgen"
 include "keyext.proofmanagement"
@@ -31,6 +32,16 @@ include "keyext.exploration"
 include "keyext.slicing"
 include "keyext.caching"
 include "keyext.isabelletranslation"
+
+// MP9.1-9.6: JavaFX ports of the keyext extensions (one FX module per extension).
+// Each module depends on :key.ui.fx and its keyext counterpart; the providers are
+// discovered via the service loader (KeYGuiExtensionF) on the :key.ui.fx runtime classpath.
+include "keyext.caching.fx"
+include "keyext.exploration.fx"
+include "keyext.isabelletranslation.fx"
+include "keyext.slicing.fx"
+include "keyext.ui.testgen.fx"
+include "keyext.proofmanagement.fx"
 
 // ENABLE NULLNESS here or on the CLI
 // This flag is activated to enable the checker framework.

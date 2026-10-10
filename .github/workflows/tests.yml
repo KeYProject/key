@@ -24,12 +24,17 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest ]
-        java: [ 21 ]
+        java: [ 25 ]
         modules: [
           keyext.exploration, keyext.slicing, key.ncore, key.ui, key.core,
           key.core.testgen, keyext.isabelletranslation,  keyext.ui.testgen,  key.ncore.calculus,
           key.util, key.core.example, keyext.caching, key.core.wd, key.core.infflow,
-          keyext.proofmanagement]
+          keyext.proofmanagement,
+          # JavaFX UI module and its six keyext ports (MP9.x): the unit tests are toolkit-free
+          # and headless-safe (the one panel test that needs the FX toolkit skips on
+          # display-less runners), see the per-module READMEs.
+          key.ui.fx, keyext.caching.fx, keyext.exploration.fx, keyext.isabelletranslation.fx,
+          keyext.slicing.fx, keyext.ui.testgen.fx, keyext.proofmanagement.fx]
     continue-on-error: true
     runs-on: ${{ matrix.os }}
     env:
@@ -51,7 +56,7 @@ jobs:
       - name: cvc5 version
         run: cvc5 --version
 
-      - name: Set up JDK 21
+      - name: Set up JDK 25
         uses: actions/setup-java@v6.0.1
         with:
           java-version: ${{ matrix.java }}
@@ -86,11 +91,11 @@ jobs:
       matrix:
         test: [ testProveRules, testRunAllFunProofs, testRunAllInfProofs, testRunAllWdProofs, testMtStress, testMt2w, testMt4w ]
         os: [ ubuntu-latest ]
-        java: [ 21 ]
+        java: [ 25 ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
-      - name: Set up JDK 21
+      - name: Set up JDK 25
         uses: actions/setup-java@v6.0.1
         with:
           java-version: ${{ matrix.java }}

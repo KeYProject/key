@@ -69,8 +69,8 @@ subprojects {
     version = rootProject.version
 
     java {
-        sourceCompatibility = 21
-        targetCompatibility = 21
+        sourceCompatibility = 25
+        targetCompatibility = 25
     }
 
     repositories {
@@ -109,8 +109,9 @@ subprojects {
     tasks.withType(JavaCompile).configureEach {
         // Setting UTF-8 as the java source encoding.
         options.encoding = "UTF-8"
-        // Setting the release to Java 21
-        options.release = 21
+        // Setting the release to Java 25 (also required by the JavaFX 25 jars, which are
+        // class-file version 67 = JDK 23+)
+        options.release = 25
     }
 
     tasks.withType(Javadoc).configureEach {
