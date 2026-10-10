@@ -7,6 +7,8 @@ package de.uka.ilkd.key.gui.fx;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,10 +17,12 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -45,6 +49,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.OverrunStyle;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tab;
@@ -90,6 +95,7 @@ import de.uka.ilkd.key.gui.fx.contractcompletions.LoopInvariantRuleCompletionF;
 import de.uka.ilkd.key.gui.fx.dialogs.DialogsVerifyF;
 import de.uka.ilkd.key.gui.fx.dialogs.FeedbackDialogF;
 import de.uka.ilkd.key.gui.fx.dialogs.LemmaSelectionDialogF;
+import de.uka.ilkd.key.gui.fx.dialogs.LicenseDialogF;
 import de.uka.ilkd.key.gui.fx.dialogs.LoadUserTacletsDialogF;
 import de.uka.ilkd.key.gui.fx.dialogs.RunAllProofsF;
 import de.uka.ilkd.key.gui.fx.docking.DockLayoutStore;
@@ -97,10 +103,12 @@ import de.uka.ilkd.key.gui.fx.docking.DockLocation;
 import de.uka.ilkd.key.gui.fx.docking.DockWorkspace;
 import de.uka.ilkd.key.gui.fx.docking.Dockable;
 import de.uka.ilkd.key.gui.fx.docking.DockingLayoutF;
+import de.uka.ilkd.key.gui.fx.docking.SequentViewDockF;
 import de.uka.ilkd.key.gui.fx.docking.SimpleDockable;
 import de.uka.ilkd.key.gui.fx.drawer.DrawerF;
 import de.uka.ilkd.key.gui.fx.drawer.DrawerItemF;
 import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
+import de.uka.ilkd.key.gui.fx.extension.api.KeYGuiExtensionF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.goallist.GoalListViewF;
 import de.uka.ilkd.key.gui.fx.help.HelpFacadeF;
@@ -147,6 +155,7 @@ import de.uka.ilkd.key.macros.DefaultAutoMacro;
 import de.uka.ilkd.key.macros.FullAutoPilotProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ScriptAwareMacro;
+import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
@@ -270,6 +279,17 @@ public final class MainWindowF {
 
     private final Label statusLeft = new Label();
     private final Label statusRight = new Label();
+    /**
+     * D37 (P3c): the status-line progress bar (Swing {@code MainStatusLine.progressBar}), hidden
+     * and unmanaged while no task reports progress (Swing {@code progressBar.setVisible(false)}).
+     */
+    private final ProgressBar statusProgress = new ProgressBar();
+    /**
+     * D37: the current determinate maximum of {@link #statusProgress}, mirroring the Swing
+     * {@code JProgressBar} model: {@code -1} = indeterminate ("busy"), {@code 0} = hidden,
+     * {@code > 0} = determinate range.
+     */
+    private int statusProgressMax;
 
     /**
      * The sequent view is the first real view of milestone M2 (currently a spike rendering the
@@ -741,6 +761,25 @@ public final class MainWindowF {
         strategyView.attachMediator(mediator);
         sourceView.attach(selectionModel);
         loadedProofs.attach(selectionModel); // proofmgmt: row highlight follows the active proof
+        // extension: P4 (D36) — the KeyboardShortcuts extension seam: bind the view-scoped
+        // shortcuts of every KeYGuiExtensionF.KeyboardShortcutsF provider as key filters on the
+        // views (Swing KeYGuiExtensionFacade.installKeyboardShortcuts into the input maps of
+        // SequentView, GoalList, ProofTreeView, StrategySelectionView, SourceView and InfoView;
+        // KeYGuiExtensionFacade.java:361-375, called from SequentView.java:192,
+        // GoalList.java:108, ProofTreeView.java:334-335, StrategySelectionView.java:172,
+        // SourceView.java:225, InfoView.java:212)
+        KeYGuiExtensionFacadeF.installKeyboardShortcuts(mediator, sequentView,
+            KeYGuiExtensionF.KeyboardShortcutsF.SEQUENT_VIEW);
+        KeYGuiExtensionFacadeF.installKeyboardShortcuts(mediator, goalListView,
+            KeYGuiExtensionF.KeyboardShortcutsF.GOAL_LIST);
+        KeYGuiExtensionFacadeF.installKeyboardShortcuts(mediator, proofTreeView,
+            KeYGuiExtensionF.KeyboardShortcutsF.PROOF_TREE_VIEW);
+        KeYGuiExtensionFacadeF.installKeyboardShortcuts(mediator, strategyView,
+            KeYGuiExtensionF.KeyboardShortcutsF.STRATEGY_SELECTION_VIEW);
+        KeYGuiExtensionFacadeF.installKeyboardShortcuts(mediator, sourceView,
+            KeYGuiExtensionF.KeyboardShortcutsF.SOURCE_VIEW);
+        KeYGuiExtensionFacadeF.installKeyboardShortcuts(mediator, infoView,
+            KeYGuiExtensionF.KeyboardShortcutsF.INFO_TREE);
         // the hook doubles as the :99 verification signal (same line as the standalone driver)
         sourceView.setOnContentLoaded(
             () -> LOGGER.info("Source self test: {}", sourceView.verifySourceView()));
@@ -927,6 +966,9 @@ public final class MainWindowF {
             // ProofTreeView registers itself as AutoModeListener on the UI's proof control,
             // ProofTreeView.java:532)
             proofTreeView.setActionContext(mediator, env.getProofControl());
+            // D34 (P3c): the proof-tree popup's "Open Node in Separate Buffer" opens the node's
+            // sequent in a separate dockable (Swing SequentViewDock.OpenCurrentNodeAction)
+            proofTreeView.setOpenNodeInSeparateBuffer(this::openNodeInSeparateBuffer);
             env.getProofControl().addAutoModeListener(autoModeUiListener);
             // notification: register the notification framework's auto-mode tracker on the
             // proof control (Swing parity: the NotificationManager constructor registers its
@@ -968,6 +1010,12 @@ public final class MainWindowF {
                 NotificationManagerF.getInstance()
                         .notify("Syntax highlighting verification: " + hlReport,
                             hlReport.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+                // D31 (P3c): viewport-driven print line width (Swing computeLineWidthFor)
+                String lwReport = sequentView.verifyViewportLineWidth();
+                LOGGER.info("Sequent viewport line width verification: {}", lwReport);
+                NotificationManagerF.getInstance()
+                        .notify("Viewport line width verification: " + lwReport,
+                            lwReport.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
             }
             if (System.getProperty("key.fx.verify.sequentsearch") != null
                     && System.getProperty("key.fx.demo.autoprove.live") == null) {
@@ -1847,11 +1895,78 @@ public final class MainWindowF {
     }
 
     /**
+     * D37 (P3c): sets the status line text and shows the progress bar for a task with the given
+     * workload (Swing {@code MainWindow.setStatusLine(String, int)} →
+     * {@code MainStatusLine.setProgressBarMaximum}: a negative maximum switches the bar to
+     * indeterminate ("busy") mode, a positive maximum to determinate mode with that range, a
+     * maximum of {@code 0} hides the bar).
+     *
+     * @param status the status message
+     * @param max the workload maximum, or a negative value for an unknown workload
+     */
+    public void setStatusLine(String status, int max) {
+        setStatusLine(status);
+        setTaskProgressBarMaximum(max);
+    }
+
+    /**
+     * D37 (P3c): sets the range of the status progress bar (Swing
+     * {@code MainStatusLine.setProgressBarMaximum}): {@code < 0} switches the bar to
+     * indeterminate ("busy") mode ({@code JProgressBar.setIndeterminate(true)}), {@code 0} hides
+     * it, {@code > 0} shows it in determinate mode with the given maximum
+     * ({@code setMaximum(value)}).
+     *
+     * @param maximum the workload maximum, or a negative value for an unknown workload
+     */
+    public void setTaskProgressBarMaximum(int maximum) {
+        if (maximum < 0) {
+            statusProgressMax = -1;
+            statusProgress.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+            statusProgress.setVisible(true);
+            statusProgress.setManaged(true);
+        } else {
+            statusProgressMax = maximum;
+            // leave the bar in a clean determinate state (Swing
+            // setProgressPanelVisible(false) resets setIndeterminate(false))
+            statusProgress.setProgress(0);
+            boolean visible = maximum != 0;
+            statusProgress.setVisible(visible);
+            statusProgress.setManaged(visible);
+        }
+    }
+
+    /**
+     * D37 (P3c): sets the current position of the status progress bar (Swing
+     * {@code MainStatusLine.setProgress} → {@code progressBar.setValue}). Values of a hidden or
+     * indeterminate bar are ignored, like the Swing {@code JProgressBar}.
+     *
+     * @param value the finished work units within the range set by
+     *        {@link #setTaskProgressBarMaximum(int)}
+     */
+    public void setTaskProgressValue(int value) {
+        if (statusProgressMax <= 0) {
+            return; // hidden or indeterminate bar
+        }
+        statusProgress.setProgress(Math.clamp((double) value / statusProgressMax, 0.0, 1.0));
+    }
+
+    /**
+     * D37 (P3c): hides the status progress bar (Swing {@code MainStatusLine.reset()}: hide the
+     * progress panel at task/macro end).
+     */
+    public void hideStatusProgress() {
+        setTaskProgressBarMaximum(0);
+    }
+
+    /**
      * seam: resets the status line to the proof summary (Swing
      * {@code MainWindow.setStandardStatusLine}); called by
      * {@link #userInterface} on {@code resetStatus}.
      */
     public void resetStatusLine() {
+        // D37: a status reset also hides the progress bar (Swing setStandardStatusLine →
+        // MainStatusLine.reset() hides the progress panel)
+        hideStatusProgress();
         updateProofStatus();
     }
 
@@ -1860,6 +1975,22 @@ public final class MainWindowF {
      */
     public String getStatusLineText() {
         return statusLeft.getText();
+    }
+
+    /**
+     * D37 seam: whether the status progress bar is currently visible (used by the
+     * {@code key.fx.verify.uicontrol} self test).
+     */
+    boolean isStatusProgressVisible() {
+        return statusProgress.isVisible();
+    }
+
+    /**
+     * D37 seam: the current status progress bar value ({@link ProgressBar#INDETERMINATE_PROGRESS}
+     * in indeterminate mode; used by the {@code key.fx.verify.uicontrol} self test).
+     */
+    double getStatusProgressValue() {
+        return statusProgress.getProgress();
     }
 
     /**
@@ -2462,14 +2593,18 @@ public final class MainWindowF {
     /**
      * extension: MP9.0 — headless self test of the FX extension SPI
      * ({@code key.fx.verify.extensions}), run after the demo load like the other
-     * proof-dependent verify hooks. Asserts (a) the facade discovers exactly the three ported
-     * built-in extensions, (b) the two status-line controls of the facade appear in the built
-     * status bar, (c) the Heatmap menu is a separate menu of the built menu bar, (d) the
-     * SettingsManagerF registry holds the Heatmap settings provider, and (e) the term-menu
+     * proof-dependent verify hooks. Asserts (a) the facade discovers the built-in extensions
+     * incl. the ported TestExtensionF, (b) the status-line controls of the facade appear in the
+     * built status bar, (c) the Heatmap menu is a separate menu of the built menu bar,
+     * (d) the SettingsManagerF registry holds the Heatmap settings provider, (e) the term-menu
      * extension section renders the disabled placeholder when <em>no position</em> is available
      * (the fallback of SequentTermContextMenuF; contributed items would be enabled only with a
-     * position). One stdout report line; skips the term-menu sub-assertion gracefully when no
-     * goal is loaded.
+     * position), and P4's seams: (f) B13 the "Test" menu nests at Test>Test>Test in the built
+     * menu bar, (g) B14 all extension toolbar controls sit in the single extension toolbar,
+     * (h) C24 the PROOF_TREE popup items of the selected node are non-empty, and (i) D36 the
+     * TestExtensionF SEQUENT_VIEW shortcut fires a toast when a matching key event hits the
+     * sequent view. One stdout report line; skips the term-menu sub-assertion gracefully when
+     * no goal is loaded.
      *
      * @param env the environment of the loaded proof
      */
@@ -2542,9 +2677,82 @@ public final class MainWindowF {
         }
         sb.append(" termmenuExtension=").append(termMenuSection);
 
-        String report = (pass ? "PASS" : "FAIL") + " - " + sb;
-        System.out.println("Extension verification: " + report);
-        LOGGER.info("Extension verification: {}", report);
+        // P4 — the four seam assertions (see the javadoc): TestExtensionF present (a), B13
+        // nested Test menu (f), B14 merged extension toolbar (g), C24 PROOF_TREE items (h),
+        // D36 sequent-view shortcut toast (i)
+        boolean testExtensionPresent =
+            classes.contains("de.uka.ilkd.key.gui.fx.extension.contrib.TestExtensionF");
+        sb.append(" testExtension=").append(testExtensionPresent ? "present" : "MISSING");
+        pass &= testExtensionPresent;
+
+        Menu testTop = menuBar.getMenus().stream().filter(m -> "Test".equals(m.getText()))
+                .findFirst().orElse(null);
+        boolean testNested = hasSubMenuItem(subMenuNamed(subMenuNamed(testTop, "Test"), "Test"),
+            "Test");
+        sb.append(" testNested=").append(testNested);
+        pass &= testNested;
+
+        List<Control> extToolbarControls =
+            KeYGuiExtensionFacadeF.getToolbarControls(this, mediator);
+        List<ToolBar> extToolBars = new ArrayList<>();
+        VBox topBox = buildTop();
+        for (Node child : topBox.getChildren()) {
+            if (child instanceof HBox area) {
+                for (Node toolBar : area.getChildren()) {
+                    if (toolBar instanceof ToolBar bar
+                            && bar.getStyleClass().contains("key-extension-tool-bar")) {
+                        extToolBars.add(bar);
+                    }
+                }
+            }
+        }
+        boolean mergedToolbar = extToolBars.size() == 1
+                && extToolBars.get(0).getItems().containsAll(extToolbarControls);
+        sb.append(" extensionToolbars=").append(extToolBars.size());
+        pass &= mergedToolbar;
+
+        de.uka.ilkd.key.proof.Node selNode = mediator.getSelectedNode();
+        int proofTreeItems = selNode == null ? 0
+                : KeYGuiExtensionFacadeF.getProofTreeContextItems(mediator, selNode).size();
+        sb.append(" prooftreeExtensionItems=").append(proofTreeItems);
+        pass &= proofTreeItems >= 1;
+
+        int toastsBefore = NotificationManagerF.getInstance().getVisibleToastCount();
+        // Ctrl+Shift+F12 — the combination TestExtensionF registered for SEQUENT_VIEW
+        // (KeyEvent args: eventType, character, text, keyCode, shift, control, alt, meta).
+        // The toast shows asynchronously (NotificationManagerF.notify → Platform.runLater),
+        // so the assertion and the report run on a later FX pulse behind it.
+        sequentView.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "F12", KeyCode.F12, true,
+            true, false, false));
+        boolean passSoFar = pass;
+        Platform.runLater(() -> {
+            boolean shortcutFires =
+                NotificationManagerF.getInstance().getVisibleToastCount() > toastsBefore;
+            sb.append(" sequentShortcutToast=").append(shortcutFires);
+            boolean ok = passSoFar && shortcutFires;
+            String report = (ok ? "PASS" : "FAIL") + " - " + sb;
+            System.out.println("Extension verification: " + report);
+            LOGGER.info("Extension verification: {}", report);
+        });
+    }
+
+    /** @return the direct sub menu of the given menu with the given text, or {@code null}. */
+    private static Menu subMenuNamed(Menu parent, String text) {
+        if (parent == null) {
+            return null;
+        }
+        for (MenuItem item : parent.getItems()) {
+            if (item instanceof Menu menu && text.equals(menu.getText())) {
+                return menu;
+            }
+        }
+        return null;
+    }
+
+    /** @return whether any direct item of the given menu has the given text. */
+    private static boolean hasSubMenuItem(Menu menu, String text) {
+        return menu != null
+                && menu.getItems().stream().anyMatch(item -> text.equals(item.getText()));
     }
 
     /**
@@ -2953,13 +3161,13 @@ public final class MainWindowF {
         // KeYGuiExtensionFacade.addExtensionsToMainMenu after the built-in menus,
         // KeYGuiExtensionFacade.java:81-89; the Swing original groups the extension actions
         // into one "Extensions" JMenu, the FX SPI contributes whole Menu objects — the
-        // grouping decision stays with the extension). The five built-in menus' item sets are
+        // grouping decision stays with the extension). P4 (B13): KeYGuiExtensionFacadeF.
+        // installMenus additionally splices providers with a non-empty KeyAction.PATH-style
+        // getMenuPath() into existing or new menus of the bar (first segment matched by text,
+        // deeper segments by sub-menu text — the Swing sortActionIntoMenu semantics). Extensions
+        // with the empty path keep the above default. The five built-in menus' item sets stay
         // untouched: key.fx.verify.menuparity keeps asserting 16/24/12/7/5.
-        List<javafx.scene.control.Menu> extensionMenus =
-            KeYGuiExtensionFacadeF.getMenus(this, mediator);
-        if (!extensionMenus.isEmpty()) {
-            menuBar.getMenus().addAll(extensionMenus);
-        }
+        KeYGuiExtensionFacadeF.installMenus(this, menuBar, mediator);
         return menuBar;
     }
 
@@ -4137,8 +4345,7 @@ public final class MainWindowF {
             menuItem("Send Feedback…", "de.uka.ilkd.key.gui.actions.MenuSendFeedackAction",
                 () -> FeedbackDialogF.show(stage)),
             menuItem("Create Github Issue",
-                "de.uka.ilkd.key.gui.actions.CreateGithubIssueAction",
-                () -> HelpFacadeF.openExternal(GITHUB_ISSUE_URL)),
+                "de.uka.ilkd.key.gui.actions.CreateGithubIssueAction", this::createGithubIssue),
             menuItem("License…", "de.uka.ilkd.key.gui.actions.LicenseAction",
                 IconFactoryF.Key.INFO_VIEW, this::showLicense));
         return about;
@@ -4249,6 +4456,13 @@ public final class MainWindowF {
         statusLeft.setMinWidth(0);
         statusLeft.setMinHeight(0);
         statusLeft.setMaxWidth(Double.MAX_VALUE);
+        // D37 (P3c): the progress bar between the status text and the flex spacer (Swing
+        // MainStatusLine: lblStatusText, strut, progressBar, glue); hidden and unmanaged while
+        // no task drives it, so the bar does not participate in the status bar layout
+        statusProgress.setPrefWidth(120);
+        statusProgress.setMaxWidth(120);
+        statusProgress.setVisible(false);
+        statusProgress.setManaged(false);
         HBox.setHgrow(statusLeft, Priority.ALWAYS);
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -4256,7 +4470,7 @@ public final class MainWindowF {
         statusRight.setTextOverrun(OverrunStyle.ELLIPSIS);
         statusRight.setMinWidth(0);
         statusRight.setMinHeight(0);
-        bar.getChildren().addAll(statusLeft, spacer, statusRight);
+        bar.getChildren().addAll(statusLeft, statusProgress, spacer, statusRight);
         // extension: MP9.0 — the status-line controls contributed by the FX extensions are
         // appended at the right end of the status bar, after the theme/font-size label (Swing
         // MainWindow.createStatusBar / KeYGuiExtensionFacade.getStatusLineComponents,
@@ -4416,16 +4630,154 @@ public final class MainWindowF {
         workspace.restoreFactoryDefault();
     }
 
+    /**
+     * D34 (P3c): opens a {@link SequentViewDockF} with the sequent of the given proof node in a
+     * separate buffer (Swing {@code SequentViewDock.OpenCurrentNodeAction.actionPerformed}:
+     * create the dock and add it to the dock control, here via the workspace {@code MAIN} role).
+     * The dock's "Jump into Tree" title action selects the node in the main proof tree again
+     * (Swing {@code SequentViewDock.JumpIntoTreeAction}).
+     *
+     * @param node the proof node to display
+     * @return the opened dockable (self test / programmatic reuse)
+     */
+    Dockable openNodeInSeparateBuffer(de.uka.ilkd.key.proof.Node node) {
+        SequentViewDockF dock = new SequentViewDockF(node, () -> jumpIntoTree(node));
+        workspace.open(dock, DockLocation.MAIN);
+        return dock;
+    }
+
+    /** D34: selects the given node in the main proof tree, switching the proof if necessary. */
+    private void jumpIntoTree(de.uka.ilkd.key.proof.Node node) {
+        Proof proof = node.proof();
+        if (selectionModel.getSelectedProof() != proof) {
+            selectionModel.setSelectedProof(proof);
+        }
+        selectionModel.setSelectedNode(node);
+    }
+
+    /**
+     * A6 (P3c): JavaFX port of the Swing {@code CreateGithubIssueAction} About-menu entry
+     * (key.ui/.../gui/actions/CreateGithubIssueAction.java) — opens the GitHub new-issue page
+     * with the bug template pre-filled (current proof's Java sources + the internal version).
+     * The URL is opened through the {@link HelpFacadeF} browser seam; unlike the Swing original
+     * there is no "generated text" fallback dialog when no browser is available (the seam logs
+     * the failure instead).
+     */
+    private void createGithubIssue() {
+        HelpFacadeF.openExternal(buildGithubIssueUrl());
+    }
+
+    /**
+     * Builds the "new issue" URL for the current proof, with the GitHub bug template from the
+     * Swing {@code CreateGithubIssueAction} as pre-filled body:
+     * <ul>
+     * <li>{@code %CHECKSUM%} is replaced by {@link KeYConstants#INTERNAL_VERSION}
+     * (Swing {@code KeYConstants.INTERNAL_VERSION}),</li>
+     * <li>{@code %JAVA%} is replaced by the {@code .java} sources of the selected proof's
+     * declared Java source location (Swing {@code SendFeedbackAction.getJavaSourceLocation} +
+     * the {@code Files.walk} over that location).</li>
+     * </ul>
+     * <p>
+     * Port notes: Swing encodes the body with {@code Charset.defaultCharset()}; this port uses
+     * UTF-8 (the encoding every {@code +} in the template relies on for correct decoding by
+     * GitHub).
+     *
+     * @return the fully encoded URL, e.g.
+     *         {@code https://github.com/keyproject/key/issues/new?body=…}
+     */
+    String buildGithubIssueUrl() {
+        String template = """
+                ## Description
+                > Please describe your concern in detail!
+
+                %JAVA%
+
+                ## Reproducible
+
+                > Is the issue reproducible?
+                > Select one of: always, sometimes, random, have not tried, n/a
+
+                ### Steps to reproduce
+                > Describe the steps needed to reproduce the issue.
+
+                1. ...
+                2. ...
+                3. ...
+                > What is your expected behavior and what was the actual behavior?
+
+                ### Additional information
+
+                > Add more details here. In particular: if you have a stacktrace, put it here.
+                ---
+                * Commit: %CHECKSUM%
+                """;
+        return GITHUB_ISSUE_URL + "?body="
+            + URLEncoder.encode(template
+                    .replace("%CHECKSUM%", KeYConstants.INTERNAL_VERSION)
+                    .replace("%JAVA%", collectJavaSources(selectionModel.getSelectedProof())),
+                StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Collects the {@code .java} sources of the given proof for the GitHub issue body (Swing
+     * {@code CreateGithubIssueAction.actionPerformed}: walk over
+     * {@code SendFeedbackAction.getJavaSourceLocation(proof)}, one fenced block per file).
+     *
+     * @param proof the selected proof, may be {@code null}
+     * @return the concatenated source blocks, or the empty string when the proof has no Java
+     *         source location
+     */
+    private static String collectJavaSources(Proof proof) {
+        if (proof == null) {
+            return "";
+        }
+        KeyAst.@Nullable Declarations header = proof.header();
+        if (header == null) {
+            return "";
+        }
+        final Path javaSourceLocation;
+        try {
+            javaSourceLocation = header.getJavaSourceLocation();
+        } catch (RuntimeException e) {
+            // no program source declared in the KeY file (Declarations.getJavaSourceLocation
+            // indexes ctx.programSource(0)); the Swing helper is not annotated either and
+            // would blow up the same way
+            return "";
+        }
+        if (javaSourceLocation == null) {
+            return "";
+        }
+        try (var walker = Files.walk(javaSourceLocation)) {
+            return walker.map(it -> {
+                try {
+                    if (it.getFileName().toString().endsWith(".java")) {
+                        return "* " + it.getFileName() + "\n```\n" + Files.readString(it) + "```\n";
+                    }
+                } catch (IOException e) {
+                    // skip unreadable files, like the Swing original (empty catch)
+                }
+                return null;
+            }).filter(Objects::nonNull).collect(Collectors.joining("\n"));
+        } catch (IOException e) {
+            LOGGER.warn("Could not collect Java sources for the GitHub issue", e);
+            return "";
+        }
+    }
+
     private void showLicense() {
-        NotificationManagerF.getInstance().notify(
-            KeYConstants.COPYRIGHT + " KeY is free software and comes with ABSOLUTELY NO "
-                + "WARRANTY. See About | License.",
-            Kind.INFO);
+        // A5 (P3c): the license becomes a real dialog (LicenseDialogF) — it IS inspectable legal
+        // text (KeY license + third-party libraries), so unlike "About KeY" an INFO toast would
+        // not suffice. This replaces the Swing LicenseAction.showLicense dialog.
+        LicenseDialogF.show(stage);
     }
 
     private void showAbout() {
-        NotificationManagerF.getInstance().notify(
-            KeYResourceManager.getManager().getUserInterfaceTitle() + " — JavaFX UI (key.ui.fx).");
+        // B16 (P3c): "About KeY" stays an information toast (an invisible-at-a-glance info
+        // styled message) instead of becoming a modal dialog; the toast is enriched with the
+        // Swing AboutAction content (copyright, WWW, version) to keep the parity information.
+        NotificationManagerF.getInstance().notify(KeYConstants.COPYRIGHT
+            + "\n\nWWW: http://key-project.org/\n\nVersion " + KeYConstants.VERSION,
+            Kind.INFO);
     }
 
     private void notYetImplemented() {
