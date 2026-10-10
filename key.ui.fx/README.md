@@ -70,6 +70,7 @@ regression-tested on a virtual display. Demo proof paths default into
 | `key.fx.verify.profileloadingdialog` | loading options dialog at startup |
 | `key.fx.verify.javacsettings` | javac settings provider |
 | `key.fx.verify.colors` | colors palette: Swing-parity property count, mapped CSS-variable wiring, override round trip |
+| `key.fx.verify.smt` | SMT run UI end to end (needs an installed solver, e.g. `z3` on the `PATH`): launches the union on the demo goal, auto-applies the result, checks the closed goal |
 
 Harness-injected flags (read in `MainWindowF` but not on the `run`-task whitelist; the
 verification harness sets them via `JAVA_TOOL_OPTIONS`):
