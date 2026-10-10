@@ -22,6 +22,14 @@ public final class LocalVariableCondition extends VariableConditionAdapter {
     private final SchemaVariable var;
     private final boolean neg;
 
+    /**
+     * Instantiates a new local-variable condition.
+     *
+     * @param var the schema variable which must be instantiated with a local (non-member) program
+     *        variable
+     * @param neg whether the condition is negated ({@code \not isLocalVariable})
+     * @throws IllegalArgumentException if the given schema variable is not a {@link ProgramSV}
+     */
     public LocalVariableCondition(SchemaVariable var, boolean neg) {
         this.var = var;
         this.neg = neg;

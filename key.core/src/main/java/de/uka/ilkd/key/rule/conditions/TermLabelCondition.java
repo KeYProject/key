@@ -27,6 +27,13 @@ public class TermLabelCondition extends VariableConditionAdapter {
     private final Name ln;
     private final boolean negated;
 
+    /**
+     * Instantiates a new term-label condition.
+     *
+     * @param l the term-label schema variable whose instantiations are searched for the label
+     * @param t the name of the term label to look for
+     * @param negated whether the condition is negated ({@code \not hasLabel})
+     */
     public TermLabelCondition(TermLabelSV l, String t, boolean negated) {
         this.l = l;
         this.ln = new Name(t);
