@@ -79,6 +79,7 @@ tasks.register('generateVarcondDoc', JavaExec) {
     mainClass = 'de.uka.ilkd.key.doc.VarcondDoc'
     def outputFile = layout.buildDirectory.file("docs/keydocs/varconds.md")
     outputs.file(outputFile)
+    outputs.file(layout.buildDirectory.file("docs/keydocs/varconds.json"))
     doFirst {
         args = [outputFile.get().asFile.absolutePath]
     }
@@ -93,6 +94,7 @@ tasks.register('generateScriptDoc', JavaExec) {
     mainClass = 'de.uka.ilkd.key.doc.ScriptDoc'
     def outputFile = layout.buildDirectory.file("docs/keydocs/script-commands.md")
     outputs.file(outputFile)
+    outputs.file(layout.buildDirectory.file("docs/keydocs/script-commands.json"))
     doFirst {
         args = [outputFile.get().asFile.absolutePath]
     }
