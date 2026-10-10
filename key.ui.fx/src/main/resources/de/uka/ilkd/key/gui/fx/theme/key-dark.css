@@ -20,6 +20,17 @@
     -key-linked: #4a90e2;
     -key-interactive: #e3a94f;
     -key-border: #555555;
+    /* configurable highlight colors (ColorSettingsF.CSS_VARIABLES): the values below are the
+       dark-theme defaults; user overrides from colors.json are applied inline on scene roots */
+    -key-hl-java: #cf50a5;
+    -key-hl-comment: #9fbf9f;
+    -key-hl-jml: #8888cf;
+    -key-hl-jml-keyword: #8888cf;
+    -key-sequent-hl-prop: #dedede;
+    -key-sequent-hl-dyn: #9696fa;
+    -key-sequent-hl-progvar: #6464fa;
+    -key-sequent-hl-arrow: #6464fa;
+    -key-settings-error: #c86464;
 
     /* restyle the built-in Modena controls for the dark theme */
     -fx-base: #3c3f41;
@@ -110,33 +121,34 @@
    these rules must stay before the search rules so the search and click highlights
    override the syntax coloring for -fx-fill */
 .sequent-hl-prop {
+    -fx-fill: -key-sequent-hl-prop;
     -fx-font-weight: bold;
 }
 
 .sequent-hl-dyn {
-    -fx-fill: #9696fa;
+    -fx-fill: -key-sequent-hl-dyn;
     -fx-font-weight: bold;
 }
 
 .sequent-hl-java {
-    -fx-fill: #cf50a5;
+    -fx-fill: -key-hl-java;
     -fx-font-weight: bold;
 }
 
 .sequent-hl-progvar {
-    -fx-fill: #6464fa;
+    -fx-fill: -key-sequent-hl-progvar;
 }
 
 .sequent-hl-comment {
-    -fx-fill: #9fbf9f;
+    -fx-fill: -key-hl-comment;
 }
 
 .sequent-hl-jml {
-    -fx-fill: #8888cf;
+    -fx-fill: -key-hl-jml;
 }
 
 .sequent-hl-arrow {
-    -fx-fill: #6464fa;
+    -fx-fill: -key-sequent-hl-arrow;
     -fx-font-weight: bold;
 }
 
@@ -422,34 +434,8 @@
 }
 
 .source-keyword {
-    -fx-fill: -key-accent;
+    -fx-fill: -key-hl-java;
     -fx-font-weight: bold;
-}
-
-.source-comment {
-    -fx-fill: -key-text-secondary;
-    -fx-font-style: italic;
-}
-
-.source-string {
-    -fx-fill: -key-success;
-}
-
-.source-annotation {
-    -fx-fill: -key-warning;
-}
-
-.source-jml-keyword {
-    -fx-font-weight: bold;
-}
-
-/* ------------------------------------------------------------------
- * M4 file/proof dialogs (ExampleChooserF, ProofSelectionDialogF):
- * section headings replace the Swing TitledBorder labels
- * ------------------------------------------------------------------ */
-.dialog-section-title {
-    -fx-font-weight: bold;
-    -fx-text-fill: -key-text-secondary;
 }
 
 .source-comment {
@@ -468,6 +454,15 @@
 .source-jml-keyword {
     -fx-fill: -key-hl-jml-keyword;
     -fx-font-weight: bold;
+}
+
+/* ------------------------------------------------------------------
+ * M4 file/proof dialogs (ExampleChooserF, ProofSelectionDialogF):
+ * section headings replace the Swing TitledBorder labels
+ * ------------------------------------------------------------------ */
+.dialog-section-title {
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text-secondary;
 }
 
 /*

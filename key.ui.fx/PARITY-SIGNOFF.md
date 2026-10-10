@@ -25,7 +25,7 @@ marked `OPEN (unverified)` rather than assumed fixed.
 | goallist-strategy-info | 37 | goal list at parity; strategy preset UI missing; info view re-designed | — | preset combo + stats staleness OPEN |
 | source-search-filechooser | 74 | 30 / 5 / **28 MISSING** | search bars + loading-options dialog ported | source-view interaction (symbex highlights, cross-highlight) OPEN |
 | menus-actions | 57 leaves | ~25 MISSING | menu parity 5/5 (File 16 / Proof 24 / Options 12 / View 7 / About 5) plus automation submenu | RESOLVED at surface level; a few behaviours below |
-| settings-config | 117 | 83 / 8 / 11 MISSING / 13 KNOWN-DEF | settings framework + providers + colors mechanics + search | SMT run-UI, theme persistence, color defs OPEN |
+| settings-config | 117 | 83 / 8 / 11 MISSING / 13 KNOWN-DEF | settings framework + providers + colors mechanics + search | SMT run-UI + theme persistence OPEN; color definitions RESOLVED (P1) |
 | unported-dialogs | 18 | 13 MISSING / 2 PARTIAL | proofmgmt, tacletmatch, IssueDialog, notification, Loaded Proofs | RESOLVED where noted below; join/mergerule/lemmatagenerator/etc. track their MP9.x modules |
 
 ## P0 sign-off (the audit's "prover workflow critical" list)
@@ -51,7 +51,7 @@ P0 bugs from the audit:
 | Recent-file clicks drop stored profile / single-java options | `OPEN` (loading-options dialog itself is ported — see below) |
 | Shortcut-default mismatches (`KeyStrokeManagerF`: tree search, sequent search, macro defaults) | `OPEN (unverified)` |
 | Dead registered bindings (Ctrl+C term copy, F3/Shift+F3, Ctrl+K/Ctrl+J, Goal Back/Prune) | `PARTIAL` (term-menu copy + menu accelerators exist; several bindings unverified) |
-| Colors: 12 mapped CSS variables ineffective (47 property definitions missing) | `OPEN` |
+| Colors: 12 mapped CSS variables ineffective (47 property definitions missing) | **RESOLVED** (P1: `ColorPaletteF` defines all 51 Swing-parity properties — the true count incl. the two multi-line `define(` keys; the 9 previously-undeclared mapped CSS vars are declared in both themes and consumed by the re-wired `.sequent-hl-*`/`.source-*` rules; `key.fx.verify.colors` PASS) |
 | UPSTREAM (Swing, not FX): `LoopApplyHeadCompletion` + `LoopContract*` dead code; seed-clobber `overwriteWith` | **Not our defect** — flags for upstream `key.ui`/`key.core` cleanup |
 
 ## P1 sign-off
@@ -78,7 +78,8 @@ actions/layout slots/maximize (partially done — `key.fx.verify.docking` PASS; 
 exist as `DockTitleActionF`), join+mergerule dialogs (track MP9.x modules), lemmatagenerator
 (`key.fx.verify.lemmaorigin` PASS for the generator path), soundiness (`key.fx.verify.soundiness`
 PASS), originlabels (lemmaorigin), plugins, profileloading (RESOLVED), help windows
-(`key.fx.verify.help` PASS), theme persistence + the 47 color property definitions, feature
+(`key.fx.verify.help` PASS), theme persistence (color definitions RESOLVED via P1
+`key.fx.verify.colors`), feature
 flags + parallel prover (`ParallelProverStatusIndicatorF` partial), settings dump, modal
 grey-out, proof-disposal clearing (auto saver handles the disposal part), tab icons/titles,
 file-chooser bookmarks. Each is either documented in the KNOWN-SIMPLIFIED ledger or listed above
@@ -99,7 +100,7 @@ as open.
 6. Keyboard: shortcut-default regressions; dead bindings audit.
 7. Options dialogs: SMT run UI, strategy preset UI, HeatmapOptionsDialog.
 8. Exit flow: close-request + confirmExit + layout persistence on close.
-9. Colors/theme: 47 color property definitions; theme persistence.
+9. Colors/theme: all 51 Swing-parity color property definitions RESOLVED (P1 `key.fx.verify.colors` PASS); theme persistence remains.
 10. Notification framework depth: proof-closed/exception dialogs beyond toasts are in
     (`IssueDialogF`); the `NotificationTask`/action framework remains partial.
 11. Docking: remaining title actions, layout-slot keys F10–F12 (named slots exist).
