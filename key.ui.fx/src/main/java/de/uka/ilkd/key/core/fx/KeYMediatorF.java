@@ -258,6 +258,35 @@ public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
     }
 
     /**
+     * prooftree (P3a, C23): starts the automatic prover restricted to the given goals (Swing
+     * {@code RunStrategyOnNodeUserAction.apply} — the "Apply Strategy" popup item of the proof
+     * tree): all enabled goals below the invoked node, or the invoked node itself when it is an
+     * open goal. No-op without an attached proof control or while a run is active.
+     *
+     * @param goals the goals to run on, may be empty (then nothing is started)
+     */
+    public void startAutoMode(ImmutableList<Goal> goals) {
+        Proof proof = getSelectedProof();
+        if (proofControl == null || proof == null || inAutoMode
+                || !proofControl.isAutoModeSupported(proof) || goals == null || goals.isEmpty()) {
+            return;
+        }
+        proofControl.startAutoMode(proof, goals);
+    }
+
+    /**
+     * prooftree (P3a, C23): prunes the proof below the given node and selects it (Swing
+     * {@code KeYMediator.setBack(Node)} — the "Prune Proof" popup item of the proof tree).
+     *
+     * @param node the cutting point, must belong to the selected proof
+     */
+    public void pruneNode(Node node) {
+        if (node != null) {
+            setBack(node);
+        }
+    }
+
+    /**
      * Undoes the last rule application on the selected goal (Swing {@code GoalBackAction}):
      * without a selected goal the newest goal of the selected node's subtree is used — the one
      * with the highest node serial number, where a closed goal wins if its serial is higher. As
