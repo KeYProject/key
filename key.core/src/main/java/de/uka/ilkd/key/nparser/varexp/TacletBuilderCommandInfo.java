@@ -163,7 +163,7 @@ class TacletBuilderCommandInfoImpl implements TacletBuilderCommandInfo {
     @Override
     public boolean isNegationSupported() {
         if (isNegationSupported == null) {
-            isNegationSupported = lastArgumentOfFirstConstructorIsBoolean(clazz, argTypes);
+            isNegationSupported = lastArgumentOfFirstConstructorIsBoolean(clazz);
         }
         return isNegationSupported;
     }
@@ -201,6 +201,11 @@ class TacletBuilderCommandInfoImpl implements TacletBuilderCommandInfo {
     /// instead of failing.
     private void findDocumentation() {
         ClassJavadoc classDoc = RuntimeJavadoc.getJavadoc(clazz.getName());
+        if (classDoc == null) {
+            // The class was not processed by the therapi javadoc scribe; use empty
+            // documentation instead of failing.
+            classDoc = ClassJavadoc.createEmpty(clazz.getName());
+        }
         generalDocumentation = classDoc;
 
         final var constr = findConstructor(clazz, getConstructorClasses());
@@ -234,38 +239,39 @@ class TacletBuilderCommandInfoImpl implements TacletBuilderCommandInfo {
     }
 
 
-    /// Checks whether `clazz` declares a constructor whose parameter types are
-    /// `argTypes` followed by a trailing `boolean` parameter, which indicates
-    /// support for an optional negation flag.
+    /// Checks whether the first declared public constructor of `clazz` has a trailing
+    /// `boolean` parameter, which indicates support for an optional negation flag.
+    ///
+    /// Note: this check is intentionally lenient and does not try to match the declared
+    /// [ArgumentType]s against the constructor's parameter types. The argument types are
+    /// only categories used during parsing and only loosely approximate the actual
+    /// parameter types (e.g., `\isConstant` expects an [ArgumentType.VARIABLE] argument,
+    /// but `ConstantCondition`'s constructor takes a `JAbstractSortedOperator`).
+    /// A strict type-based matching would fail here and wrongly report "negation not
+    /// supported" or even throw, breaking the parsing of otherwise valid taclets.
     ///
     /// @param clazz the implementation class to inspect
-    /// @param argTypes the expected leading argument types
     /// @return `true` if such a constructor exists, `false` otherwise
-    /// @throws IllegalStateException if no suitable constructor exists in `clazz`
-    private static boolean lastArgumentOfFirstConstructorIsBoolean(
-            Class<?> clazz, ArgumentType[] argTypes) {
-        if (findConstructor(clazz, getConstructorClasses(argTypes, true)) != null) {
-            return true;
-        }
-        if (findConstructor(clazz, getConstructorClasses(argTypes, false)) != null) {
+    private static boolean lastArgumentOfFirstConstructorIsBoolean(Class<?> clazz) {
+        try {
+            Class<?>[] types = clazz.getConstructors()[0].getParameterTypes();
+            return types[types.length - 1] == Boolean.class
+                    || types[types.length - 1] == Boolean.TYPE;
+        } catch (ArrayIndexOutOfBoundsException e) {
             return false;
         }
-        throw new IllegalStateException();
     }
 
+    /// Looks up a constructor of `clazz` by the number of expected parameters. The
+    /// parameter types are deliberately not compared against the expected classes:
+    /// [ArgumentType]s only categorize the arguments for parsing and do not match the
+    /// concrete parameter types of the implementation classes.
     private static @Nullable Constructor<?> findConstructor(Class<?> clazz,
             Class<?>[] constructorClasses) {
         final var constructors = clazz.getConstructors();
-        c: for (var constructor : constructors) {
-            if (constructor.getParameterCount() != constructorClasses.length)
-                continue;
-            final var parameterTypes = constructor.getParameterTypes();
-            for (var i = 0; i < parameterTypes.length; i++) {
-                if (!constructorClasses[i].isAssignableFrom(parameterTypes[i])) {
-                    continue c;
-                }
-            }
-            return constructor;
+        for (var constructor : constructors) {
+            if (constructor.getParameterCount() == constructorClasses.length)
+                return constructor;
         }
         return null;
     }
