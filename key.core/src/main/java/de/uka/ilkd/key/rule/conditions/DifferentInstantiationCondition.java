@@ -13,10 +13,22 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 
+/**
+ * A variable condition for the taclet construct {@code \different}, ensuring that two schema
+ * variables are instantiated with distinct elements.
+ *
+ * @author Michael Kirsten
+ */
 public final class DifferentInstantiationCondition extends VariableConditionAdapter {
 
     private final SchemaVariable var1, var2;
 
+    /**
+     * Instantiates a new different-instantiation condition.
+     *
+     * @param var1 the first schema variable
+     * @param var2 the second schema variable; both must not be instantiated with the same element
+     */
     public DifferentInstantiationCondition(SchemaVariable var1, SchemaVariable var2) {
         this.var1 = var1;
         this.var2 = var2;

@@ -19,12 +19,24 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 
+/**
+ * A variable condition for the taclet construct {@code \metaDisjoint}, checking that the two
+ * instantiations of the given term schema variables denote provably disjoint location sets.
+ *
+ * @author Michael Kirsten
+ */
 public final class MetaDisjointCondition extends VariableConditionAdapter {
 
     private final TermSV var1;
     private final TermSV var2;
 
 
+    /**
+     * Instantiates a new meta-disjoint condition.
+     *
+     * @param s1 the first term schema variable; its instantiation is interpreted as a location set
+     * @param s2 the second term schema variable; its instantiation is interpreted as a location set
+     */
     public MetaDisjointCondition(TermSV s1, TermSV s2) {
         this.var1 = s1;
         this.var2 = s2;

@@ -18,7 +18,9 @@ import org.key_project.logic.sort.Sort;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
+ * Defines a schema variable that can be used in subsequent script commands.
  *
+ * @deprecated use the abbreviation mechanism of the KeY parser instead.
  */
 @Deprecated
 public class SchemaVarCommand extends AbstractCommand {

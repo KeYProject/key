@@ -29,6 +29,13 @@ public class IsLabeledCondition implements VariableCondition {
     private final boolean negated;
     private final ProgramSV stmtSV;
 
+    /**
+     * Instantiates a new is-labeled condition.
+     *
+     * @param stmtSV the program schema variable which must be instantiated with a labeled
+     *        statement
+     * @param negated whether the condition is negated ({@code \not isLabeled})
+     */
     public IsLabeledCondition(ProgramSV stmtSV, boolean negated) {
         this.stmtSV = stmtSV;
         this.negated = negated;

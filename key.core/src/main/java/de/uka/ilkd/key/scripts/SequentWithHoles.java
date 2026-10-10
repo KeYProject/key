@@ -20,6 +20,11 @@ import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/// A sequent whose antecedent and succedent formulas may contain holes (placeholders).
+/// It is used to express term patterns with holes in proof script commands, which are
+/// matched against (parts of) the current goals.
+///
+/// @author Alexander Weigl
 @NullMarked
 public class SequentWithHoles {
 
