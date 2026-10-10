@@ -24,6 +24,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Port of the Swing {@code TestExtension} (key.ui {@code gui.extension.impl.TestExtension},
@@ -45,6 +46,9 @@ public final class TestExtensionF implements KeYGuiExtensionF, KeYGuiExtensionF.
 
     /** The "Test" menu item label of the Swing original (TestExtension.java:106). */
     private static final String TEST = "Test";
+
+    /** The shared toolbar button (singleton — the host checks toolbar membership by identity). */
+    private @Nullable Button testToolbarButton = null;
 
     /** Shows the Swing original's "Test!" message (a JOptionPane) as an FX toast. */
     private static void showTestMessage() {
@@ -94,10 +98,16 @@ public final class TestExtensionF implements KeYGuiExtensionF, KeYGuiExtensionF.
 
     @Override
     public List<Control> getToolbarControls(MainWindowF window, KeYMediatorF mediator) {
-        Button button = new Button(null, IconFactoryF.createIcon(IconFactoryF.Key.INFO_VIEW));
-        button.setTooltip(new Tooltip(TEST));
-        button.setOnAction(e -> showTestMessage());
-        return List.of(button);
+        // a singleton like the sibling providers: the host (re)builds the toolbars and checks
+        // membership by identity, so every call must return the same control instances
+        if (testToolbarButton == null) {
+            Button button =
+                new Button(null, IconFactoryF.createIcon(IconFactoryF.Key.INFO_VIEW));
+            button.setTooltip(new Tooltip(TEST));
+            button.setOnAction(e -> showTestMessage());
+            testToolbarButton = button;
+        }
+        return List.of(testToolbarButton);
     }
 
     // --- KeyboardShortcutsF (D36) ------------------
