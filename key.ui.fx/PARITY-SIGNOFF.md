@@ -131,11 +131,11 @@ differences found by a second Swing↔JavaFX sweep, with stable IDs used by the 
 | A1 | Contract/invariant configurator dialogs: the Swing registration `WindowUserInterfaceControl.java:74-82` (FunctionalOperationContract/DependencyContract/LoopInvariantRule/BlockContractInternal/BlockContractExternal completions + `ContractConfigurator.java`) — the FX registry (`WindowUserInterfaceControlF.java:126-135`) holds only `MergeRuleCompletionF` | RESOLVED (P2b) |
 | A2 | `LemmaSelectionDialog` (lemmatagenerator, 161 lines) not ported | RESOLVED (P2b) |
 | A3 | `LoadUserTacletsDialog` reduced (Swing 499 lines) | RESOLVED (P2b) |
-| A4 | Proof Statistics: no export (Swing exports HTML/text) | OPEN (P3c) |
-| A5 | About/License reduced to toasts instead of dialogs | OPEN (P3c) |
-| A6 | GitHub-issue prefill dropped (bug-reporting URL parameters) | OPEN (P3c) |
-| A7 | Feedback: no zip archive of logs | OPEN (P3c) |
-| A8 | ToolTip options: "Save as Default" behaviour | OPEN (P3c) |
+| A4 | Proof Statistics: no export (Swing exports HTML/text) | RESOLVED (P3c) |
+| A5 | About/License reduced to toasts instead of dialogs | RESOLVED (P3c) |
+| A6 | GitHub-issue prefill dropped (bug-reporting URL parameters) | RESOLVED (P3c) |
+| A7 | Feedback: no zip archive of logs | RESOLVED (P3c) |
+| A8 | ToolTip options: "Save as Default" behaviour | RESOLVED (P3c) |
 | A9 | `EnsureSourceConsistency` info dialog | RESOLVED (P2b) |
 | A10 | Dialog triage remainder of the sweep | OPEN (triaged in P4) |
 
@@ -173,13 +173,13 @@ differences found by a second Swing↔JavaFX sweep, with stable IDs used by the 
 | D28 | Left-click taclet menu + `POPUP_DELAY` guard (`CurrentGoalViewListener.java:48-95`, `SequentViewListener.java:29`) | RESOLVED (P2a) |
 | D29 | Shift+click focussed auto mode (`CurrentGoalViewListener.java:56-58`) | RESOLVED (P2a) |
 | D30 | Extension tooltip strings unwired | OPEN (P4) |
-| D31 | Sequent line width computed from the viewport | OPEN (P3c) |
+| D31 | Sequent line width computed from the viewport | RESOLVED (P3c) |
 | D32 | Sequent search prefill from the hovered term (`SearchInSequentAction.java:32-37`) | RESOLVED (P2a) |
-| D33 | Fonts vs. `KEY_FONT_*` settings | OPEN (P3c) |
-| D34 | `SequentViewDock` missing | OPEN (P3c) |
+| D33 | Fonts vs. `KEY_FONT_*` settings | RESOLVED (P3c) |
+| D34 | `SequentViewDock` missing | RESOLVED (P3c) |
 | D35 | Strategy tab Go button + parallel-prover merge-point lock (`StrategySelectionView.java:157-208/869-895`) | RESOLVED (P2a) |
 | D36 | `KeyboardShortcuts` extension seams absent | OPEN (P4) |
-| D37 | Status-line task progress bar (log-only stubs, `WindowUserInterfaceControlF.java:317-327`) | OPEN (P3c) |
+| D37 | Status-line task progress bar (log-only stubs, `WindowUserInterfaceControlF.java:317-327`) | RESOLVED (P3c) |
 
 P2a (`weigl/ocfx-p2-sequent`, merged 2026-10-10) resolved D28/D29/D32/D35 —
 `key.fx.verify.sequentmenu` PASS (term menu 31 entries, POPUP_DELAY guard, search prefill,
@@ -217,3 +217,29 @@ covering the OSS rows on a strategy-proved proof. The view filters and the tree 
 in the tree context menu because the FX docking framework has no tab-title gear menu (documented
 in `ProofTreeViewF`); the subtree statistics report is a plain-text window rather than the Swing
 HTML one (export is A4/P3c). C24 (the `PROOF_TREE` extension seam) stays open for P4.
+
+P3c (`weigl/ocfx-p3c-dialogs`, this branch) resolved A4/A5/A6/A7/A8 and D31/D33/D34/D37 — the
+dialog/status-line parity items of the sweep:
+A4 `ProofStatisticsDialogF` now exports the Swing CSV/HTML formats (`verifyStatisticsExport`);
+A5 keeps "About KeY" as the enriched INFO toast (B16 convention) and turns the license into the
+real `LicenseDialogF` (tabs "KeY License" + "Third party libraries", Swing `LicenseAction`);
+A6 `MainWindowF.createGithubIssue`/`buildGithubIssueUrl` rebuilds the Swing
+`CreateGithubIssueAction` issue template (%CHECKSUM% → internal version, %JAVA% → proof Java
+sources) and opens it through the `HelpFacadeF` browser seam; A7 `FeedbackDialogF` "Save ZIP…"
+writes `bugDescription.txt`/`keyVersion.txt`/`systemProperties.txt` + the `key_*.log` run logs
+(`verifyLogArchive`); A8 `ToolTipOptionsDialogF` "Save as Default" persists the tooltip options
+via `ProofIndependentSettings.saveSettings()` (`verifySaveAsDefault`); D31 `SequentViewF`
+computes the print line width from the scroll-pane viewport via a `Text("W")` probe (Swing
+`computeLineWidthFor`, reprint on width changes, `verifyViewportLineWidth` under
+`key.fx.verify.sequent`); D33 `ConfigF` mirrors the Swing `KEY_FONT_*` families/sizes (proof
+tree/sequent at the current size, goal/proof list at the fixed `SIZES[2]`); D34
+`SequentViewDockF` shows a node's sequent in a separate buffer with the "Jump into Tree" title
+action (proof-tree popup "Open Node in Separate Buffer"); D37 `MainWindowF.buildStatusBar` gains
+the hidden-until-used progress bar with `setStatusLine(String,int)` /
+`setTaskProgressBarMaximum` (`<0` indeterminate, `0` hidden, `>0` determinate) /
+`setTaskProgressValue` / `hideStatusProgress`, wired from `WindowUserInterfaceControlF` exactly
+like Swing's `WindowUserInterfaceControl` (taskStarted → `setStatusLine(msg,size)`, setMaximum /
+setProgress / taskProgress → bar, macro end → hide). `key.fx.verify.uicontrol` +
+`key.fx.verify.menuparity` PASS (10 seam steps incl. the six P3c seams, menu counts
+File 16 / Proof 24 / Options 7 / View 12 / About 5) and `key.fx.verify.prooftree` +
+`key.fx.demo.autoprove` PASS on Xvnc :98. A10 stays open for P4 (dialog triage remainder).
