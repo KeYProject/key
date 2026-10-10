@@ -19,13 +19,17 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -52,8 +56,10 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
@@ -61,6 +67,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -446,6 +453,20 @@ public final class MainWindowF {
         mainArea.setRight(eastDrawer);
         mainArea.setBottom(southDrawer);
         StackPane center = new StackPane(mainArea);
+        // inputfreeze (P1): the blocking overlay covers the main area (workspace + drawers) for
+        // the duration of an auto mode run, see freezeExceptAutoModeButton
+        inputBlocker.getStyleClass().add("auto-mode-blocker");
+        inputBlocker.setCursor(Cursor.WAIT);
+        inputBlocker.setVisible(false);
+        inputBlocker.addEventFilter(MouseEvent.ANY, Event::consume);
+        center.getChildren().add(inputBlocker);
+        // keys targeted inside the main area are swallowed while frozen — except Escape, which
+        // must reach the global stop handler (Swing AutoModeAction's stop shortcut)
+        center.addEventFilter(KeyEvent.ANY, event -> {
+            if (inputBlocker.isVisible() && event.getCode() != KeyCode.ESCAPE) {
+                event.consume();
+            }
+        });
         NotificationManagerF.getInstance().attach(center);
         root.setCenter(center);
         root.setBottom(buildStatusBar());
@@ -904,6 +925,11 @@ public final class MainWindowF {
             // sequent view key path (Ctrl+F shows the search bar)
             if (System.getProperty("key.fx.verify.shortcuts") != null) {
                 runShortcutsVerification();
+            }
+            // inputfreeze (P1): the auto mode freeze — direct freeze/unfreeze with key blocking,
+            // then an auto-mode-driven run
+            if (System.getProperty("key.fx.verify.inputfreeze") != null) {
+                runInputFreezeVerification();
             }
             // loadingexit (P1): recent-files round trip with loading options + profile
             // resolution, then the exit flow — the window close button path with Confirm Exit
@@ -1973,6 +1999,94 @@ public final class MainWindowF {
     }
 
     /**
+     * inputfreeze (P1): runs the input-freeze verification ({@code key.fx.verify.inputfreeze}):
+     * (1) the deterministic freeze/unfreeze — the blocking overlay shows, a fired Ctrl+F key
+     * event is blocked while frozen and shows the search bar after the unfreeze (input
+     * restored); (2) the listener-driven path — an auto mode run started via the mediator
+     * freezes the views and the stop (requested or natural) unfreezes them.
+     */
+    private void runInputFreezeVerification() {
+        ArrayList<String> failures = new ArrayList<>();
+        // 1. deterministic freeze/unfreeze (the mechanism the auto mode listener drives)
+        freezeExceptAutoModeButton();
+        if (!inputBlocker.isVisible()) {
+            failures.add("freezeExceptAutoModeButton: overlay not visible");
+        } else {
+            sequentView.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "f", KeyCode.F, false,
+                true, false, false));
+            if (sequentView.isSearchBarShowing()) {
+                failures.add("key input not blocked while frozen (Ctrl+F showed the search bar)");
+                sequentView.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "",
+                    KeyCode.ESCAPE, false, false, false, false));
+            }
+        }
+        unfreezeExceptAutoModeButton();
+        if (inputBlocker.isVisible()) {
+            failures.add("unfreezeExceptAutoModeButton: overlay still visible");
+        }
+        sequentView.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "f", KeyCode.F, false, true,
+            false, false));
+        if (!sequentView.isSearchBarShowing()) {
+            failures.add("key input not restored after the unfreeze");
+        } else {
+            // close the search bar for a clean state
+            sequentView.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.ESCAPE,
+                false, false, false, false));
+        }
+        // 2. the listener-driven path: an auto mode run must freeze the views (polled on the FX
+        // thread; the auto mode run may finish on its own before the stop is requested)
+        mediator.startAutoMode();
+        Boolean[] sawFrozen = { false };
+        Integer[] ticks = { 0 };
+        Timeline[] holder = new Timeline[1];
+        holder[0] = new Timeline(new KeyFrame(Duration.millis(100), event -> {
+            if (inputBlocker.isVisible()) {
+                sawFrozen[0] = true;
+            }
+            boolean running = mediator.autoModeRunningProperty().get();
+            if (running && ++ticks[0] < 120) {
+                return; // keep polling (max ~12 s), then request the stop
+            }
+            holder[0].stop();
+            if (running) {
+                mediator.stopAutoMode();
+                Timeline post = new Timeline(new KeyFrame(Duration.millis(500), ev -> {
+                    if (inputBlocker.isVisible()) {
+                        failures.add("the overlay stayed visible after stopAutoMode");
+                    }
+                    reportInputFreeze(failures, sawFrozen[0]);
+                }));
+                post.play();
+                return;
+            }
+            // the run finished on its own: the overlay must be hidden again
+            if (sawFrozen[0] && !inputBlocker.isVisible()) {
+                LOGGER.info("inputfreeze: auto-mode-driven freeze/unfreeze observed");
+            } else if (!sawFrozen[0]) {
+                LOGGER.info(
+                    "inputfreeze: the auto mode run ended before the freeze could be observed (the listener wiring is covered by the direct test)");
+            } else {
+                failures.add("the overlay stayed visible after the auto mode stop");
+            }
+            reportInputFreeze(failures, sawFrozen[0]);
+        }));
+        holder[0].setCycleCount(Timeline.INDEFINITE);
+        holder[0].play();
+    }
+
+    /** inputfreeze (P1): logs and reports the freeze verification result. */
+    private void reportInputFreeze(ArrayList<String> failures, boolean sawFrozen) {
+        String report = failures.isEmpty()
+                ? "PASS (freeze/unfreeze" + (sawFrozen ? " + auto-mode-driven freeze)" : ")")
+                : "FAIL: " + String.join("; ", failures);
+        LOGGER.info("Input freeze verification: {}", report);
+        NotificationManagerF.getInstance()
+                .notify("Input freeze verification: " + report,
+                    report.startsWith("PASS") ? Kind.INFO : Kind.ERROR);
+        statusRight.setText(report);
+    }
+
+    /**
      * Runs the search mode self test (Highlight/Hide/Regroup) with the query given as the value
      * of {@code key.fx.verify.sequentsearchmodes} (like the other search verifications the VALUE
      * is the query itself; the flag value {@code 1} falls back to the
@@ -2526,14 +2640,48 @@ public final class MainWindowF {
      * live run has its own listener which also runs the verification reports; the UI listener
      * skips the refresh in that case to avoid the duplicate work.
      */
+    /**
+     * inputfreeze (P1) — the blocking overlay of the auto mode freeze (Swing
+     * {@code BlockingGlassPane} + {@code GlassPaneListener}, MainWindow.java:1620-1746): shown
+     * by {@link #freezeExceptAutoModeButton()} for the duration of an auto mode run, it covers
+     * the main area (workspace + drawers), blocks all mouse input, swallows key events targeted
+     * inside it (except Escape, which reaches the global stop handler) and shows the wait
+     * cursor. The top toolbar with the automation/stop controls and the status bar stay live.
+     */
+    private final Pane inputBlocker = new Pane();
+
+    /**
+     * inputfreeze (P1) — Swing {@code MainWindow.freezeExceptAutoModeButton} (MainWindow.java
+     * :934): during auto mode all input except the stop controls is frozen. The FX overlay
+     * covers the main area only — the menu bar, the toolbar (with the stop controls) and the
+     * status bar stay interactive.
+     * <p>
+     * KNOWN-SIMPLIFIED: Swing's glass pane covered the whole content pane and re-delivered
+     * events only to components marked {@code isAutoButton} (the automation/stop buttons and
+     * the status-line abort button); the FX overlay instead covers only the views area, so the
+     * menus stay clickable while frozen (their actions are disabled during auto mode anyway).
+     */
+    private void freezeExceptAutoModeButton() {
+        inputBlocker.setVisible(true);
+    }
+
+    /** inputfreeze (P1) — Swing {@code MainWindow.unfreezeExceptAutoModeButton} (:944). */
+    private void unfreezeExceptAutoModeButton() {
+        inputBlocker.setVisible(false);
+    }
+
     private final AutoModeListener autoModeUiListener = new AutoModeListener() {
         @Override
         public void autoModeStarted(ProofEvent e) {
             LOGGER.info("Auto mode started");
+            FxUtil.runLater(this::freeze);
         }
 
         @Override
         public void autoModeStopped(ProofEvent e) {
+            // inputfreeze (P1): unfreeze before the demo-live early return — every stop must
+            // undo the freeze
+            FxUtil.runLater(this::unfreeze);
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 return; // the demo listener handles the final state incl. the verification reports
             }
@@ -2544,6 +2692,16 @@ public final class MainWindowF {
                 // hook, covering the interactive and the demo-live run)
                 LOGGER.info("Views refreshed after the auto mode stop");
             });
+        }
+
+        /** inputfreeze (P1): shows the blocking overlay (Swing freezeExceptAutoModeButton). */
+        private void freeze() {
+            freezeExceptAutoModeButton();
+        }
+
+        /** inputfreeze (P1): hides the blocking overlay (Swing unfreezeExceptAutoModeButton). */
+        private void unfreeze() {
+            unfreezeExceptAutoModeButton();
         }
     };
 
