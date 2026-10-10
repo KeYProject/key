@@ -3733,6 +3733,10 @@ public final class MainWindowF {
      */
     private void verifyGoalBackPruneEnablement() {
         buildMenuBar();
+        // P3b/B15: rebuilding the menu bar re-creates the Goal Back / Prune items with default
+        // enablement; apply the selection-based refresh (the real bar gets it from the selection
+        // listener / updateProofStatus on every change) before asserting the states
+        refreshGoalBackPrune();
         boolean autoMode = mediator.autoModeRunningProperty().get();
         Proof proof = selectionModel.getSelectedProof();
         de.uka.ilkd.key.proof.Node selNode = selectionModel.getSelectedNode();
