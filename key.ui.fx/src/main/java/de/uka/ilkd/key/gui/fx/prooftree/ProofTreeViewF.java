@@ -936,8 +936,12 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
         List<String> scripts = List.of("Run proof script from file...", "Input proof script...");
         List<String> macroLabels = labels.stream().filter(l -> !scripts.contains(l)).toList();
         boolean ok = !strategyMacrosMenu.isDisable() && macroLabels.equals(expected);
-        return (ok ? "PASS" : "FAIL") + " - macro submenu " + macroLabels.size() + " items, "
-            + separators + " separators, disabled=" + strategyMacrosMenu.isDisable();
+        String detail = "macro submenu " + macroLabels.size() + " items, " + separators
+            + " separators, disabled=" + strategyMacrosMenu.isDisable();
+        if (!ok && !macroLabels.equals(expected)) {
+            detail += ", actual=" + macroLabels + ", expected=" + expected;
+        }
+        return (ok ? "PASS" : "FAIL") + " - " + detail;
     }
 
     /** P3b/B12: the visible text of the macro submenu items (label-backed custom items). */

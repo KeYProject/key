@@ -192,16 +192,22 @@ public final class ProofMacroMenuF {
 
     /**
      * P3b/B12: the names of the {@code canApplyTo}-applicable macros at the given position, in
-     * registration order (exposed for the {@code key.fx.verify.prooftree} count seam: the
-     * proof-tree macro submenu must present exactly these items).
+     * the same first-appearance category grouping the strategy-macro menus present (Swing
+     * ProofMacroMenu.java:84-99 — exposed for the {@code key.fx.verify.prooftree} count seam:
+     * the proof-tree macro submenu must present exactly these items, grouped like Swing).
      */
     public static List<String> applicableMacroNames(Proof proof, ImmutableList<Goal> goals,
             @Nullable PosInOccurrence pio) {
-        List<String> names = new ArrayList<>();
+        Map<String, List<String>> groups = new LinkedHashMap<>();
         for (ProofMacro macro : REGISTERED_MACROS) {
             if (macro.canApplyTo(proof, goals, pio)) {
-                names.add(macro.getName());
+                groups.computeIfAbsent(macro.getCategory(), x -> new ArrayList<>())
+                        .add(macro.getName());
             }
+        }
+        List<String> names = new ArrayList<>();
+        for (List<String> group : groups.values()) {
+            names.addAll(group);
         }
         return names;
     }
