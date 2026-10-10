@@ -21,7 +21,6 @@ import javafx.stage.Window;
 
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
-import de.uka.ilkd.key.gui.fx.MainWindowF;
 import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
 import de.uka.ilkd.key.gui.fx.join.JoinActionF;
 import de.uka.ilkd.key.gui.fx.mergerule.MergeRuleMenuItemF;
@@ -36,7 +35,6 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.NameCreationInfo;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -208,15 +206,17 @@ public final class SequentTermContextMenuF {
     }
 
     /**
-     * menu: MP8 — the "Strategy Macros" section (Swing {@code ProofMacroMenu}, a {@code
+     * menu: MP8/B12 — the "Strategy Macros" section (Swing {@code ProofMacroMenu}, a {@code
      * JMenu("Strategy Macros")}, ProofMacroMenu.java:81, with one item per applicable macro;
      * CurrentGoalViewMenu.addMacroMenu adds it to the term menu, CurrentGoalViewMenu.java:
      * 212-217). The FX model emits the section unconditionally (SequentMenuModelF.compute), so
-     * all four macros of the Automation submenu / right-click popup ({@code
-     * MainWindowF.AUTOMATION_MACROS}, same order as Swing MainWindow.createAutomationActions,
-     * MainWindow.java:814-827) are shown — Swing instead filters by {@code canApplyTo} and
-     * omits the whole menu when it is empty; with the model's fixed skeleton the section keeps
-     * its label either way. Each item is built by the shared {@link ProofMacroMenuF} helper.
+     * the section keeps its label even when no macro is applicable at the position (Swing
+     * instead omits the whole empty menu, CurrentGoalViewMenu.java:216-217). The content is the
+     * P3b/B12 registered-macro superset built by the shared {@link ProofMacroMenuF} factory:
+     * every macro of {@code ProofMacroMenu.REGISTERED_MACROS} (which contains the four
+     * Automation-submenu macros, {@code MainWindowF.AUTOMATION_MACROS}) that is applicable at
+     * the position, category-grouped with separators, plus the PROOF_SCRIPTS section — exactly
+     * like Swing ProofMacroMenu.java:87-134.
      */
     private static MenuItem macroMenu(NamedAction action, MenuContext ctx) {
         Node node = ctx.mediator() == null ? null : ctx.mediator().getSelectedNode();
@@ -225,10 +225,10 @@ public final class SequentTermContextMenuF {
             return disabledItem(action.label());
         }
         Menu menu = new Menu(action.label());
+        Proof proof = node.proof();
         PosInOccurrence pio = ctx.pos() == null ? null : ctx.pos().getPosInOccurrence();
-        for (ProofMacro macro : MainWindowF.AUTOMATION_MACROS) {
-            menu.getItems().add(ProofMacroMenuF.itemFor(macro, node, ctx.proofControl(), pio));
-        }
+        menu.getItems().addAll(ProofMacroMenuF.items(proof, proof.getSubtreeEnabledGoals(node),
+            node, ctx.proofControl(), pio));
         return menu;
     }
 

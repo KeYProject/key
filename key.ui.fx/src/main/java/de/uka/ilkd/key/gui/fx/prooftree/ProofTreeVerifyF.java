@@ -124,6 +124,16 @@ public final class ProofTreeVerifyF {
         waitUntil(() -> !statsDialog.getStage().isShowing(),
             "subtree statistics dialog closes", problems);
 
+        // B12 (P3b): the "Strategy Macros" submenu of the popup — repopulated from the current
+        // context and asserted (enabled, exactly the applicable-macro count, category separators)
+        String[] macroReport = { null };
+        runOnFx(() -> macroReport[0] = view.verifyStrategyMacros());
+        if (macroReport[0] == null || !macroReport[0].startsWith("PASS")) {
+            problems.append("strategy macros: ").append(macroReport[0]).append("; ");
+        } else {
+            notes.append(' ').append(macroReport[0]);
+        }
+
         notes.append(' ').append(autoModeReport);
 
         boolean pass = problems.length() == 0 && notes.toString().contains("PASS");
