@@ -195,6 +195,20 @@ public final class RecentFilesF {
     }
 
     /**
+     * Replaces the whole entry list with the given snapshot (a list taken from
+     * {@link #getEntries()}) and saves; used by the {@code key.fx.verify.loadingexit} round trip
+     * to restore the store after the test entry.
+     *
+     * @param restored the entries to store, most-recent-first
+     */
+    public void restore(List<Entry> restored) {
+        entries.clear();
+        entries.addAll(restored);
+        fireChange();
+        save();
+    }
+
+    /**
      * Registers the hook invoked after every model change (on the FX thread; all mutators must be
      * called on the FX thread).
      *
@@ -210,7 +224,11 @@ public final class RecentFilesF {
         onChange.run();
     }
 
-    private void save() {
+    /**
+     * Writes the entries to the store file (Swing {@code RecentFileMenu.save}; called on every
+     * change and from the exit flow, Swing ExitMainAction.java:82).
+     */
+    public void save() {
         List<Configuration> stored =
             entries.stream().map(Entry::asConfiguration).toList();
         try (BufferedWriter writer =
