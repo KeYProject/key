@@ -5,14 +5,20 @@
 package de.uka.ilkd.key.gui.fx.colors;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -265,6 +271,150 @@ public final class ColorSettingsF {
      */
     public Stream<ColorPropertyF> getProperties() {
         return propertyEntries.stream();
+    }
+
+    /**
+     * Self test of the colors palette (Swing parity) and of the CSS variable wiring, used by
+     * the {@code key.fx.verify.colors} verification flag. Checks that
+     * <ul>
+     * <li>all {@value #SWING_PARITY_COUNT} Swing-parity properties are defined,</li>
+     * <li>every key of {@link #CSS_VARIABLES} has a defined property (so an override in
+     * {@code colors.json} is applied to the scenes),</li>
+     * <li>both theme stylesheets declare and reference every mapped CSS variable,</li>
+     * <li>an override round trip (set value, apply, inspect the scene root's inline style) works
+     * and restores the previous settings without writing a change to {@code colors.json}.</li>
+     * </ul>
+     *
+     * @return a report string ending in {@code PASS} or {@code FAIL}
+     */
+    public static String verifyColors() {
+        StringBuilder report = new StringBuilder();
+        ColorSettingsF settings = getInstance();
+        // class load of the palette registers all properties; the settings panel field
+        // SettingsPanelF.COLOR_ERROR reuses the palette's SETTINGS_TEXTFIELD_ERROR property
+        ColorPaletteF.ensureRegistered();
+        List<ColorPropertyF> properties = settings.getProperties().toList();
+        Set<String> definedKeys =
+            properties.stream().map(ColorPropertyF::getKey).collect(Collectors.toSet());
+        // the palette's own fields are the Swing-parity key set; fetch it reflectively so the
+        // self test cannot drift from the definitions. The registry total may legitimately
+        // exceed it — the FX extensions (e.g. keyext.caching.fx's CachingStatusButtonF) register
+        // their own properties exactly like the Swing extensions do.
+        Set<String> paletteKeys = paletteKeys();
+        if (paletteKeys.size() != SWING_PARITY_COUNT) {
+            report.append("FAIL: palette defines ").append(paletteKeys.size())
+                    .append(" properties, expected ").append(SWING_PARITY_COUNT).append('\n');
+        }
+        for (String key : paletteKeys) {
+            if (!definedKeys.contains(key)) {
+                report.append("FAIL: palette property not registered: ").append(key).append('\n');
+            }
+        }
+        for (String key : CSS_VARIABLES.keySet()) {
+            if (!definedKeys.contains(key)) {
+                report.append("FAIL: mapped color key without defined property: ").append(key)
+                        .append('\n');
+            }
+        }
+        // the theme stylesheets must declare the mapped variables (the default renderings) and
+        // reference them in rules (the parts that can be overridden)
+        for (String theme : new String[] { "key-light.css", "key-dark.css" }) {
+            String css = readStylesheet(theme);
+            if (css == null) {
+                report.append("FAIL: stylesheet resource missing: ").append(theme).append('\n');
+                continue;
+            }
+            for (Map.Entry<String, String> e : CSS_VARIABLES.entrySet()) {
+                String variable = e.getValue();
+                long occurrences = countOccurrences(css, variable);
+                if (occurrences < 2) {
+                    // at least one declaration and one consumer rule
+                    report.append("FAIL: ").append(theme).append(" has only ")
+                            .append(occurrences).append(" occurrence(s) of ").append(variable)
+                            .append(" (declaration + consumer expected)\n");
+                }
+            }
+        }
+        // override round trip without a persistent change: snapshot the file entry, apply a
+        // sentinel, check the managed scenes, restore the snapshot and re-apply
+        ColorPropertyF proved = properties.stream()
+                .filter(p -> p.getKey().equals("[proofTree]darkGreen")).findFirst().orElse(null);
+        if (proved == null) {
+            report.append("FAIL: [proofTree]darkGreen not defined\n");
+        } else {
+            Object previous = settings.properties.get(proved.getKey());
+            Color sentinel = Color.rgb(0, 255, 0);
+            proved.setLightValue(sentinel);
+            proved.setDarkValue(sentinel);
+            String expected = "-key-proved: " + toCssHex(sentinel) + ";";
+            var scenes = ThemeManager.getInstance().getScenes().stream()
+                    .map(Scene::getRoot).filter(Objects::nonNull).toList();
+            if (scenes.isEmpty()) {
+                report.append("FAIL: no managed scene for the override round trip\n");
+            } else if (scenes.stream().allMatch(root -> root.getStyle().contains(expected))) {
+                report.append("override round trip: PASS\n");
+            } else {
+                report.append("FAIL: override of [proofTree]darkGreen not applied to the scenes\n");
+            }
+            if (previous == null) {
+                settings.properties.remove(proved.getKey());
+            } else {
+                settings.properties.put(proved.getKey(), previous);
+            }
+            proved.update();
+            settings.applyToScenes();
+        }
+        boolean pass = report.indexOf("FAIL") < 0;
+        return (pass ? "PASS" : "FAIL") + " (palette " + paletteKeys.size() + "/"
+            + SWING_PARITY_COUNT + " properties, " + definedKeys.size() + " registered, "
+            + CSS_VARIABLES.size() + " mapped CSS variables)\n" + report;
+    }
+
+    /**
+     * The number of Swing-parity color properties (the {@code ColorSettings.define} call sites
+     * of {@code key.ui}, incl. {@code SETTINGS_TEXTFIELD_ERROR}).
+     */
+    private static final int SWING_PARITY_COUNT = 51;
+
+    /**
+     * @return the keys of the {@link ColorPaletteF} fields — the Swing-parity key set, read
+     *         reflectively so the self test always checks the actual definitions
+     */
+    private static Set<String> paletteKeys() {
+        Set<String> keys = new HashSet<>();
+        for (var field : ColorPaletteF.class.getFields()) {
+            if (ColorSettingsF.ColorPropertyF.class.isAssignableFrom(field.getType())) {
+                try {
+                    keys.add(((ColorSettingsF.ColorPropertyF) field.get(null)).getKey());
+                } catch (IllegalAccessException e) {
+                    LOGGER.error("Cannot read palette field {}", field.getName(), e);
+                }
+            }
+        }
+        return keys;
+    }
+
+    private static String readStylesheet(String name) {
+        try {
+            try (InputStream in = ColorSettingsF.class.getResourceAsStream(
+                "/de/uka/ilkd/key/gui/fx/theme/" + name)) {
+                return in == null ? null
+                        : new String(in.readAllBytes(),
+                            StandardCharsets.UTF_8);
+            }
+        } catch (IOException e) {
+            LOGGER.error("Could not read stylesheet {}", name, e);
+            return null;
+        }
+    }
+
+    private static long countOccurrences(String haystack, String needle) {
+        long count = 0;
+        for (int idx = haystack.indexOf(needle); idx >= 0; idx =
+            haystack.indexOf(needle, idx + needle.length())) {
+            count++;
+        }
+        return count;
     }
 
     /**

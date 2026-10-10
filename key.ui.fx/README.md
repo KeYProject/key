@@ -69,6 +69,7 @@ regression-tested on a virtual display. Demo proof paths default into
 | `key.fx.verify.profileloading` | WD loading-options panel |
 | `key.fx.verify.profileloadingdialog` | loading options dialog at startup |
 | `key.fx.verify.javacsettings` | javac settings provider |
+| `key.fx.verify.colors` | colors palette: Swing-parity property count, mapped CSS-variable wiring, override round trip |
 
 Harness-injected flags (read in `MainWindowF` but not on the `run`-task whitelist; the
 verification harness sets them via `JAVA_TOOL_OPTIONS`):

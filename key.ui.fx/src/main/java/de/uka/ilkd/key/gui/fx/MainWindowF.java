@@ -65,6 +65,8 @@ import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.actions.QuickSaveF;
+import de.uka.ilkd.key.gui.fx.colors.ColorPaletteF;
+import de.uka.ilkd.key.gui.fx.colors.ColorSettingsF;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
 import de.uka.ilkd.key.gui.fx.dialogs.FeedbackDialogF;
 import de.uka.ilkd.key.gui.fx.dialogs.LoadUserTacletsDialogF;
@@ -438,6 +440,12 @@ public final class MainWindowF {
 
         Scene scene = new Scene(root, 1100, 800);
         ThemeManager.getInstance().manage(scene);
+        // colors: register the Swing-parity palette and apply the overrides recorded in
+        // colors.json to the managed scene (Swing registers ColorSettings.ColorProperty entries
+        // via the static consumers; the FX registry only knows defined properties, so the
+        // palette must be loaded before the overrides can be applied at startup)
+        ColorPaletteF.ensureRegistered();
+        ColorSettingsF.getInstance().applyToScenes();
         // the global action keys of the Swing AutoModeAction (Ctrl+Space starts, Escape stops);
         // an open search bar consumes Escape itself, so it never stops a run while visible.
         // smalldialogs: F1 context help is handled by HelpFacadeF.installAccelerator below —
@@ -508,6 +516,16 @@ public final class MainWindowF {
             LOGGER.info("Javac settings verification: {}", report);
             NotificationManagerF.getInstance()
                     .notify("Javac settings verification: " + report,
+                        report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+        }
+        // colors: P1 parity close-out — Swing-parity palette count, mapped CSS variable wiring
+        // and an override round trip (key.fx.verify.colors); proof-independent, so it runs at
+        // startup like the other smalldialogs hooks
+        if (System.getProperty("key.fx.verify.colors") != null) {
+            String report = ColorSettingsF.verifyColors();
+            LOGGER.info("Colors verification: {}", report);
+            NotificationManagerF.getInstance()
+                    .notify("Colors verification: " + report,
                         report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
         }
 
