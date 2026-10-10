@@ -179,6 +179,17 @@ public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
     }
 
     /**
+     * uicontrol (P2b): whether a proof is loaded (port of Swing
+     * {@code KeYMediator.ensureProofLoaded}, KeYMediator.java:152-154); used by the source
+     * consistency toggle and other actions that need a loaded proof before taking effect.
+     *
+     * @return {@code true} if a proof is selected
+     */
+    public boolean ensureProofLoaded() {
+        return getSelectedProof() != null;
+    }
+
+    /**
      * @return the currently selected node or {@code null}
      */
     public Node getSelectedNode() {
