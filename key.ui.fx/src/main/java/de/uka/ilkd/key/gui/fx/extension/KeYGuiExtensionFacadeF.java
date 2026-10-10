@@ -10,10 +10,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
+import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
+import javafx.scene.input.KeyEvent;
 
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.gui.fx.MainWindowF;
@@ -108,6 +111,78 @@ public final class KeYGuiExtensionFacadeF {
     }
 
     /**
+     * Installs the extension menus into the given menu bar, honouring the Swing
+     * {@code KeyAction.PATH} nesting (P4, B13). Providers with an empty
+     * {@link KeYGuiExtensionF.MainMenuF#getMenuPath()} keep the FX default: their menus are
+     * appended as separate top-level menus after the built-in menus (Swing
+     * {@code MainWindow.createMenuBar} :983 + {@code addExtensionsToMainMenu},
+     * KeYGuiExtensionFacade.java:81-89). Providers with a non-empty path get their menus
+     * sorted into the menu bar: the first segment matches (or creates) a top-level menu by
+     * text — the five built-in menus included, so a path starting with {@code "Proof"} nests
+     * under the Proof menu — then each further segment matches (or creates) a sub menu of the
+     * same name, and finally the contributed menu items are spliced into the innermost menu
+     * (Swing {@code sortActionIntoMenu}, KeYGuiExtensionFacade.java:134-160). The five
+     * built-in menus' item sets stay untouched.
+     *
+     * @param window the main window
+     * @param menuBar the menu bar to install the extension menus into
+     * @param mediator the mediator of the window
+     */
+    public static void installMenus(MainWindowF window, MenuBar menuBar,
+            KeYMediatorF mediator) {
+        for (KeYGuiExtensionF extension : getExtensions()) {
+            if (!(extension instanceof KeYGuiExtensionF.MainMenuF mainMenu)) {
+                continue;
+            }
+            List<Menu> menus = mainMenu.getMenus(window, mediator);
+            if (menus.isEmpty()) {
+                continue;
+            }
+            String path = mainMenu.getMenuPath();
+            if (path == null || path.isBlank()) {
+                menuBar.getMenus().addAll(menus);
+                continue;
+            }
+            // B13: splash the menu path (Swing KeyAction.PATH dot-separated segments)
+            Menu current = null;
+            for (String segment : path.split("\\.")) {
+                if (segment.isBlank()) {
+                    continue;
+                }
+                if (current == null) {
+                    Menu top = menuBar.getMenus().stream()
+                            .filter(m -> segment.equals(m.getText())).findFirst().orElse(null);
+                    if (top == null) {
+                        top = new Menu(segment);
+                        menuBar.getMenus().add(top);
+                    }
+                    current = top;
+                } else {
+                    Menu child = null;
+                    for (MenuItem item : current.getItems()) {
+                        if (item instanceof Menu m && segment.equals(m.getText())) {
+                            child = m;
+                            break;
+                        }
+                    }
+                    if (child == null) {
+                        child = new Menu(segment);
+                        current.getItems().add(child);
+                    }
+                    current = child;
+                }
+            }
+            // splice the provider's items into the innermost menu of the path (Swing inserts
+            // each action at the path; the provider's own Menu wrapper is not reused)
+            if (current != null) {
+                for (Menu menu : menus) {
+                    current.getItems().addAll(menu.getItems());
+                }
+            }
+        }
+    }
+
+    /**
      * The toolbar controls contributed by every {@link KeYGuiExtensionF.ToolbarF} provider
      * (Swing {@code KeYGuiExtensionFacade.createToolbars}, KeYGuiExtensionFacade.java:217-221).
      *
@@ -183,6 +258,29 @@ public final class KeYGuiExtensionFacadeF {
     }
 
     /**
+     * The proof-tree popup items contributed by every {@link KeYGuiExtensionF.ContextMenuF}
+     * provider for the given node (P4, C24; Swing {@code
+     * KeYGuiExtensionFacade.addContextMenuItems} with {@code ContextMenuKind.PROOF_TREE},
+     * KeYGuiExtensionFacade.java:258-262, consumed by ProofTreePopupFactory.java:152-154). The
+     * host appends them after a separator at the end of the proof-tree context menu and drops
+     * the separator when nothing is contributed.
+     *
+     * @param mediator the mediator of the window
+     * @param node the clicked proof-tree node
+     * @return non-null, emptiable list of menu items
+     */
+    public static List<MenuItem> getProofTreeContextItems(KeYMediatorF mediator,
+            de.uka.ilkd.key.proof.Node node) {
+        List<MenuItem> items = new ArrayList<>();
+        for (KeYGuiExtensionF extension : getExtensions()) {
+            if (extension instanceof KeYGuiExtensionF.ContextMenuF contextMenu) {
+                items.addAll(contextMenu.getProofTreeContextItems(mediator, node));
+            }
+        }
+        return items;
+    }
+
+    /**
      * The settings providers contributed by every {@link KeYGuiExtensionF.SettingsF} provider
      * (Swing {@code KeYGuiExtensionFacade.getSettingsProvider},
      * KeYGuiExtensionFacade.java:335-337); the host registers them into the
@@ -217,6 +315,39 @@ public final class KeYGuiExtensionFacadeF {
             }
         }
         return strings;
+    }
+
+    /**
+     * Binds the view-scoped shortcuts of every {@link KeYGuiExtensionF.KeyboardShortcutsF}
+     * provider into the given view node as key-pressed event filters (P4, D36; Swing
+     * {@code installKeyboardShortcuts}, KeYGuiExtensionFacade.java:361-375, which fills the
+     * Swing input maps of the view). Only the shortcuts whose component id equals the given one
+     * are bound; a matching combination runs the shortcut's action and consumes the event.
+     *
+     * @param mediator the mediator of the window
+     * @param node the view node the shortcuts are active on
+     * @param componentId one of {@link KeYGuiExtensionF.KeyboardShortcutsF}'s constants
+     */
+    public static void installKeyboardShortcuts(KeYMediatorF mediator, Node node,
+            String componentId) {
+        for (KeYGuiExtensionF extension : getExtensions()) {
+            if (!(extension instanceof KeYGuiExtensionF.KeyboardShortcutsF shortcuts)) {
+                continue;
+            }
+            for (KeYGuiExtensionF.KeyboardShortcutsF.ShortcutF shortcut : shortcuts
+                    .getShortcuts(mediator, componentId)) {
+                if (!componentId.equals(shortcut.componentId())) {
+                    continue;
+                }
+                var combination = shortcut.combination();
+                node.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+                    if (combination.match(e)) {
+                        shortcut.action().run();
+                        e.consume();
+                    }
+                });
+            }
+        }
     }
 
     /**
