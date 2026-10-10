@@ -49,6 +49,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.OverrunStyle;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tab;
@@ -277,6 +278,17 @@ public final class MainWindowF {
 
     private final Label statusLeft = new Label();
     private final Label statusRight = new Label();
+    /**
+     * D37 (P3c): the status-line progress bar (Swing {@code MainStatusLine.progressBar}), hidden
+     * and unmanaged while no task reports progress (Swing {@code progressBar.setVisible(false)}).
+     */
+    private final ProgressBar statusProgress = new ProgressBar();
+    /**
+     * D37: the current determinate maximum of {@link #statusProgress}, mirroring the Swing
+     * {@code JProgressBar} model: {@code -1} = indeterminate ("busy"), {@code 0} = hidden,
+     * {@code > 0} = determinate range.
+     */
+    private int statusProgressMax;
 
     /**
      * The sequent view is the first real view of milestone M2 (currently a spike rendering the
@@ -1827,11 +1839,78 @@ public final class MainWindowF {
     }
 
     /**
+     * D37 (P3c): sets the status line text and shows the progress bar for a task with the given
+     * workload (Swing {@code MainWindow.setStatusLine(String, int)} →
+     * {@code MainStatusLine.setProgressBarMaximum}: a negative maximum switches the bar to
+     * indeterminate ("busy") mode, a positive maximum to determinate mode with that range, a
+     * maximum of {@code 0} hides the bar).
+     *
+     * @param status the status message
+     * @param max the workload maximum, or a negative value for an unknown workload
+     */
+    public void setStatusLine(String status, int max) {
+        setStatusLine(status);
+        setTaskProgressBarMaximum(max);
+    }
+
+    /**
+     * D37 (P3c): sets the range of the status progress bar (Swing
+     * {@code MainStatusLine.setProgressBarMaximum}): {@code < 0} switches the bar to
+     * indeterminate ("busy") mode ({@code JProgressBar.setIndeterminate(true)}), {@code 0} hides
+     * it, {@code > 0} shows it in determinate mode with the given maximum
+     * ({@code setMaximum(value)}).
+     *
+     * @param maximum the workload maximum, or a negative value for an unknown workload
+     */
+    public void setTaskProgressBarMaximum(int maximum) {
+        if (maximum < 0) {
+            statusProgressMax = -1;
+            statusProgress.setProgress(ProgressBar.INDETERMINATE_PROGRESS);
+            statusProgress.setVisible(true);
+            statusProgress.setManaged(true);
+        } else {
+            statusProgressMax = maximum;
+            // leave the bar in a clean determinate state (Swing
+            // setProgressPanelVisible(false) resets setIndeterminate(false))
+            statusProgress.setProgress(0);
+            boolean visible = maximum != 0;
+            statusProgress.setVisible(visible);
+            statusProgress.setManaged(visible);
+        }
+    }
+
+    /**
+     * D37 (P3c): sets the current position of the status progress bar (Swing
+     * {@code MainStatusLine.setProgress} → {@code progressBar.setValue}). Values of a hidden or
+     * indeterminate bar are ignored, like the Swing {@code JProgressBar}.
+     *
+     * @param value the finished work units within the range set by
+     *        {@link #setTaskProgressBarMaximum(int)}
+     */
+    public void setTaskProgressValue(int value) {
+        if (statusProgressMax <= 0) {
+            return; // hidden or indeterminate bar
+        }
+        statusProgress.setProgress(Math.clamp((double) value / statusProgressMax, 0.0, 1.0));
+    }
+
+    /**
+     * D37 (P3c): hides the status progress bar (Swing {@code MainStatusLine.reset()}: hide the
+     * progress panel at task/macro end).
+     */
+    public void hideStatusProgress() {
+        setTaskProgressBarMaximum(0);
+    }
+
+    /**
      * seam: resets the status line to the proof summary (Swing
      * {@code MainWindow.setStandardStatusLine}); called by
      * {@link #userInterface} on {@code resetStatus}.
      */
     public void resetStatusLine() {
+        // D37: a status reset also hides the progress bar (Swing setStandardStatusLine →
+        // MainStatusLine.reset() hides the progress panel)
+        hideStatusProgress();
         updateProofStatus();
     }
 
@@ -4098,6 +4177,13 @@ public final class MainWindowF {
         statusLeft.setMinWidth(0);
         statusLeft.setMinHeight(0);
         statusLeft.setMaxWidth(Double.MAX_VALUE);
+        // D37 (P3c): the progress bar between the status text and the flex spacer (Swing
+        // MainStatusLine: lblStatusText, strut, progressBar, glue); hidden and unmanaged while
+        // no task drives it, so the bar does not participate in the status bar layout
+        statusProgress.setPrefWidth(120);
+        statusProgress.setMaxWidth(120);
+        statusProgress.setVisible(false);
+        statusProgress.setManaged(false);
         HBox.setHgrow(statusLeft, Priority.ALWAYS);
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -4105,7 +4191,7 @@ public final class MainWindowF {
         statusRight.setTextOverrun(OverrunStyle.ELLIPSIS);
         statusRight.setMinWidth(0);
         statusRight.setMinHeight(0);
-        bar.getChildren().addAll(statusLeft, spacer, statusRight);
+        bar.getChildren().addAll(statusLeft, statusProgress, spacer, statusRight);
         // extension: MP9.0 — the status-line controls contributed by the FX extensions are
         // appended at the right end of the status bar, after the theme/font-size label (Swing
         // MainWindow.createStatusBar / KeYGuiExtensionFacade.getStatusLineComponents,
