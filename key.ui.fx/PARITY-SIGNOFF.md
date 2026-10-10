@@ -48,7 +48,7 @@ P0 bugs from the audit:
 | FX search stale on node switch | **RESOLVED** (search re-runs on reprint; sequent-leftovers milestone `18df960b35`) |
 | Proof-tree context menu acts on the selection, not the clicked node | `OPEN (unverified)` |
 | View-menu Pretty Print / Unicode inert placeholders | `OPEN` (placeholders remain) |
-| Recent-file clicks drop stored profile / single-java options | `OPEN` (loading-options dialog itself is ported — see below) |
+| Recent-file clicks drop stored profile / single-java options | **RESOLVED** (P1: `openProofFile` registers the loading options with the entry like Swing `WindowUserInterfaceControl.loadProblem`; the recent-files menu restores profile (resolved via `DefaultProfileResolver`) / additional options / single-java like Swing `RecentFileAction`, `key.fx.verify.loadingexit` round trip PASS) |
 | Shortcut-default mismatches (`KeyStrokeManagerF`: tree search, sequent search, macro defaults) | `OPEN (unverified)` |
 | Dead registered bindings (Ctrl+C term copy, F3/Shift+F3, Ctrl+K/Ctrl+J, Goal Back/Prune) | `PARTIAL` (term-menu copy + menu accelerators exist; several bindings unverified) |
 | Colors: 12 mapped CSS variables ineffective (47 property definitions missing) | **RESOLVED** (P1: `ColorPaletteF` defines all 51 Swing-parity properties — the true count incl. the two multi-line `define(` keys; the 9 previously-undeclared mapped CSS vars are declared in both themes and consumed by the re-wired `.sequent-hl-*`/`.source-*` rules; `key.fx.verify.colors` PASS) |
@@ -64,7 +64,7 @@ P0 bugs from the audit:
 | Join / merge dialogs | **RESOLVED** for the merge/join flow (`key.fx.verify.joinmerge` PASS on gcd 32/0); `keyext.slicing.fx` SMT routing partial |
 | Strategy preset combo / stash UI | `OPEN` |
 | SMT settings + run UI | **RESOLVED** (P1: settings providers ported in MP4; the run UI — `SolverListenerF` + `ProgressDialogF` progress table + `InformationWindowF` + result application via the SMT rule — ported, `key.fx.verify.smt` PASS: Z3 closes the Agatha goal; the Swing toolbar `DropdownSelectionButton` remains tracked under the toolbar item) |
-| Exit flow (close-request, `confirmExit`, layout save) | `OPEN (unverified)` |
+| Exit flow (close-request, `confirmExit`, layout save) | **RESOLVED** (P1: the window close button and the Exit menu item run the Swing `ExitMainAction` flow — `confirmExit` dialog, recent-files save, `System.exit(0)` which runs the docking/colors/keystrokes shutdown hooks; the Swing mediator `fireShutDown` has no FX seam — see KNOWN-SIMPLIFIED; `key.fx.verify.loadingexit` PASS: recent-files round trip + profile resolution, then the close-request path terminates with exit code 0 and the docking layout is saved) |
 | Term labels; Pretty Print / Unicode wiring | `OPEN` (lemmaorigin hook covers labels mechanically — see `key.fx.verify.lemmaorigin`) |
 | User-selection highlight + Ctrl+C copy | **RESOLVED** (term-menu copy item in the skeleton); multi-selection highlight + reprint persistence `OPEN` |
 | Symbex source line highlights + sequent-hover origin cross-highlight | `OPEN` |
@@ -100,7 +100,8 @@ as open.
 6. Keyboard: shortcut-default regressions; dead bindings audit.
 7. Options dialogs: strategy preset UI, HeatmapOptionsDialog (SMT run UI RESOLVED via P1
    `key.fx.verify.smt`).
-8. Exit flow: close-request + confirmExit + layout persistence on close.
+8. Exit flow: close-request + confirmExit + layout persistence on close (RESOLVED via P1
+   `key.fx.verify.loadingexit`; the Swing `fireShutDown` event has no FX seam — KNOWN-SIMPLIFIED).
 9. Colors/theme: all 51 Swing-parity color property definitions RESOLVED (P1 `key.fx.verify.colors` PASS); theme persistence remains.
 10. Notification framework depth: proof-closed/exception dialogs beyond toasts are in
     (`IssueDialogF`); the `NotificationTask`/action framework remains partial.

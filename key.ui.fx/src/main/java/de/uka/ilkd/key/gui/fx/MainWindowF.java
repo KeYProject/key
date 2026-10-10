@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.function.Consumer;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
@@ -27,6 +28,7 @@ import javafx.geometry.Side;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.CheckMenuItem;
@@ -56,6 +58,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -133,6 +136,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
+import de.uka.ilkd.key.proof.init.DefaultProfileResolver;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -462,6 +466,12 @@ public final class MainWindowF {
         dockingLayout.install(scene);
         // smalldialogs: F1 context help (Swing MainWindow.java:300-302 registers the F1 action)
         HelpFacadeF.installAccelerator(scene);
+        // loadingexit (P1): the window close button runs the same exit flow as the Exit menu
+        // item (Swing MainWindow.java:366 addWindowListener(exitMainAction.windowListener))
+        stage.setOnCloseRequest(e -> {
+            e.consume();
+            exitApplication();
+        });
         stage.setScene(scene);
         stage.show();
 
@@ -888,6 +898,12 @@ public final class MainWindowF {
             if (System.getProperty("key.fx.verify.smt") != null) {
                 runSmtVerification();
             }
+            // loadingexit (P1): recent-files round trip with loading options + profile
+            // resolution, then the exit flow — the window close button path with Confirm Exit
+            // off must terminate the process with exit code 0
+            if (System.getProperty("key.fx.verify.loadingexit") != null) {
+                runLoadingExitVerification();
+            }
             // drawer: headless self test of the DrawerF port (exclusive/multiselect semantics,
             // side placement, button-order split, drag-and-drop reorder + transfer seams)
             if (System.getProperty("key.fx.verify.drawer") != null) {
@@ -1172,7 +1188,16 @@ public final class MainWindowF {
         }
 
         warnOnBareJavaFile(file);
-        recentFiles.add(file.toAbsolutePath().toString(), null, false, null);
+        // loadingexit (P1): remember the loading options with the entry (Swing
+        // WindowUserInterfaceControl.loadProblem registers problemLoader.getProfileOfNewProofs()
+        // / isLoadSingleJavaFile() / getAdditionalProfileOptions, WindowUserInterfaceControl
+        // .java:102-105); the recent-files menu restores them on open
+        recentFiles.add(file.toAbsolutePath().toString(),
+            options != null && options.selectedProfile() != null
+                    ? options.selectedProfile().ident()
+                    : null,
+            options != null && options.singleJavaFile(),
+            options != null ? options.additionalProfileOptions() : null);
         startProofLoad(file, false, null, options);
     }
 
@@ -1731,11 +1756,61 @@ public final class MainWindowF {
             // Swing's RecentFileAction labels entries loaded with a non-default profile
             String text = entry.profile() != null ? name + " (Profile: " + entry.profile() + ")"
                     : name;
+            // loadingexit (P1): restore the entry's profile / single-java loading options on
+            // open (Swing RecentFileAction.actionPerformed, RecentFileMenu.java:386-427)
             recentFilesMenu.getItems()
-                    .add(menuItem(text, () -> openProofFile(Path.of(entry.path()))));
+                    .add(menuItem(text, () -> openRecentFile(entry)));
         }
         // an empty submenu would render as a dark clickable nothing (Swing leaves it enabled)
         recentFilesMenu.setDisable(entries.isEmpty());
+    }
+
+    /**
+     * loadingexit (P1) — opens a recent-files entry with its stored loading options (Swing
+     * {@code RecentFileAction.actionPerformed}, RecentFileMenu.java:386-427): proof bundles show
+     * the proof selection dialog; other files resolve the stored profile ident through the
+     * {@code DefaultProfileResolver} services (a missing profile warns like the Swing
+     * {@code JOptionPane}) and load with the resolved profile, its additional profile options
+     * and the single-java flag.
+     */
+    private void openRecentFile(RecentFilesF.Entry entry) {
+        Path file = Path.of(entry.path());
+
+        // special case proof bundles -> allow to select the proof to load
+        if (ProofSelectionDialogF.isProofBundle(file)) {
+            Path proofPath = ProofSelectionDialogF.chooseProofToLoad(file, stage);
+            if (proofPath == null) {
+                return; // canceled by user!
+            }
+            recentFiles.add(file.toAbsolutePath().toString(), null, false, null);
+            startProofLoad(file, false, proofPath);
+            return;
+        }
+
+        String profileName = entry.profile();
+        // A missing profile -- null, or the literal string "null" that older recent-file
+        // entries stored for it -- means "use the default profile", not an error.
+        boolean hasProfile = profileName != null && !profileName.equals("null");
+        Profile profile = null;
+        if (hasProfile) {
+            profile = ServiceLoader.load(DefaultProfileResolver.class).stream()
+                    .filter(it -> it.get().getProfileName().equals(profileName)).findFirst()
+                    .map(it -> it.get().getDefaultProfile()).orElse(null);
+            if (profile == null) {
+                Alert alert = new Alert(AlertType.WARNING,
+                    "Could not find previous selected profile %s.".formatted(profileName),
+                    ButtonType.OK);
+                alert.setTitle("Recent File");
+                alert.setHeaderText(null);
+                alert.initOwner(stage);
+                alert.showAndWait();
+                return;
+            }
+        }
+        LoadOptions options = hasProfile || entry.singleJava()
+                ? new LoadOptions(profile, entry.additionalOption(), entry.singleJava())
+                : null;
+        openProofFile(file, options);
     }
 
     /**
@@ -1922,6 +1997,65 @@ public final class MainWindowF {
                     .notify("SMT verification: " + finalReport,
                         finalReport.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
         });
+    }
+
+    /**
+     * loadingexit (P1): runs the loading/exit verification ({@code key.fx.verify.loadingexit}),
+     * run after the demo load like the other proof-dependent verify hooks: (1) the recent-files
+     * store round trip — an entry registered with loading options (profile ident, single-java
+     * flag) survives the save/load cycle like Swing's recent-files entries, plus the
+     * profile-ident resolution used when opening a recent file — both with a snapshot/restore so
+     * the shared {@code recentFiles_v2.json} is not polluted; (2) the exit flow — the Confirm
+     * Exit setting is switched off (snapshot/restore) and the window close button path is fired,
+     * which must terminate the process with exit code 0.
+     */
+    private void runLoadingExitVerification() {
+        String report;
+        List<RecentFilesF.Entry> snapshot = recentFiles.getEntries();
+        try {
+            // the round trip uses a temp file so an existing demo entry is not reordered
+            Path temp = Files.createTempFile("loadingexit-verify", ".key");
+            Profile profile = ServiceLoader.load(DefaultProfileResolver.class).stream()
+                    .map(resolver -> resolver.get().getDefaultProfile()).findFirst().orElse(null);
+            if (profile == null) {
+                report = "FAIL: no DefaultProfileResolver service";
+            } else {
+                recentFiles.add(temp.toAbsolutePath().toString(), profile.ident(), true, null);
+                recentFiles.load();
+                RecentFilesF.Entry entry = recentFiles.getEntries().isEmpty() ? null
+                        : recentFiles.getEntries().getFirst();
+                boolean stored = entry != null
+                        && entry.path().equals(temp.toAbsolutePath().toString())
+                        && profile.ident().equals(entry.profile()) && entry.singleJava();
+                // profile resolution by ident (the recent-file open lookup, Swing
+                // RecentFileMenu.java:403-406)
+                boolean resolved = ServiceLoader.load(DefaultProfileResolver.class).stream()
+                        .filter(resolver -> resolver.get().getProfileName().equals(profile.ident()))
+                        .findFirst().isPresent();
+                report = stored && resolved ? "PASS (store round trip + profile resolution)"
+                        : "FAIL (stored=" + stored + ", resolved=" + resolved + ")";
+                Files.deleteIfExists(temp);
+            }
+        } catch (IOException e) {
+            report = "FAIL: " + e;
+        }
+        // restore the store and the Confirm Exit setting before anything else
+        recentFiles.restore(snapshot);
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        boolean confirmExit = vs.confirmExit();
+        vs.setConfirmExit(false);
+        if (report.startsWith("PASS")) {
+            LOGGER.info("loadingexit verification: {} — closing the window", report);
+            // the window close button path (stage.setOnCloseRequest -> exitApplication ->
+            // exitApplicationWithoutInteraction): the process must terminate with exit code 0
+            stage.fireEvent(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST));
+        } else {
+            vs.setConfirmExit(confirmExit);
+            LOGGER.info("loadingexit verification: {}", report);
+            NotificationManagerF.getInstance()
+                    .notify("Loading/exit verification: " + report,
+                        report.startsWith("PASS") ? Kind.INFO : Kind.ERROR);
+        }
     }
 
     /**
@@ -2569,7 +2703,7 @@ public final class MainWindowF {
             recentFilesMenu,
             new SeparatorMenuItem(),
             menuItem("Exit", "de.uka.ilkd.key.gui.actions.ExitMainAction",
-                IconFactoryF.Key.QUIT, Platform::exit));
+                IconFactoryF.Key.QUIT, this::exitApplication));
         return file;
     }
 
@@ -3315,6 +3449,49 @@ public final class MainWindowF {
         item.setSelected(vs.confirmExit());
         item.setOnAction(e -> vs.setConfirmExit(item.isSelected()));
         return item;
+    }
+
+    /**
+     * loadingexit (P1) — Exit (Swing {@code ExitMainAction.exitMain}, ExitMainAction.java:55-66,
+     * reached from the File menu <em>and</em> the window close button, MainWindow.java:366): when
+     * the Confirm Exit view setting is on (the Options menu toggle above), asks
+     * {@code Really Quit?} first.
+     */
+    private void exitApplication() {
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        if (vs.confirmExit()) {
+            Alert alert = new Alert(AlertType.CONFIRMATION, "Really Quit?\n", ButtonType.YES,
+                ButtonType.NO);
+            alert.setTitle("Exit");
+            alert.setHeaderText(null);
+            alert.initOwner(stage);
+            Optional<ButtonType> answer = alert.showAndWait();
+            if (answer.isEmpty() || answer.get() != ButtonType.YES) {
+                return;
+            }
+        }
+        exitApplicationWithoutInteraction();
+    }
+
+    /**
+     * loadingexit (P1) — Swing {@code ExitMainAction.exitMainWithoutInteraction},
+     * ExitMainAction.java:87-101: recent-files store save, mediator shutdown event, preferences
+     * sync and {@code System.exit(0)} (the {@code exitSystem} flag of the standalone
+     * application). The FX port: the recent-files store is saved here (the
+     * colors/keystrokes/docking stores persist via their own shutdown hooks, which
+     * {@code System.exit(0)} still runs); and {@code System.exit(0)} is required because
+     * background threads of a running solver or verification would otherwise keep the process
+     * alive after {@link Platform#exit()}.
+     * <p>
+     * KNOWN-SIMPLIFIED: the Swing mediator shutdown event ({@code fireShutDown} notifying the
+     * {@code GUIListener}s) has no FX seam — {@link KeYMediatorF} has no GUI listener registry,
+     * so the FX port omits the event.
+     */
+    private void exitApplicationWithoutInteraction() {
+        recentFiles.save();
+        LOGGER.info("Have a nice day.");
+        Platform.exit();
+        System.exit(0);
     }
 
     /**
