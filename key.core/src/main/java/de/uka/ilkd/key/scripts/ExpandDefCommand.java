@@ -122,6 +122,9 @@ public class ExpandDefCommand extends AbstractCommand {
 
     }
 
+    @Documentation(category = "Auxiliary", value = """
+            Expands method and class invariant definitions at a given location in the goal.
+            """)
     public static class Parameters {
         @Option(value = "on")
         @Documentation("A term pattern to match the expansion location against")

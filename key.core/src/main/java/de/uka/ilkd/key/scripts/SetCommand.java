@@ -168,6 +168,10 @@ public class SetCommand extends AbstractCommand {
         return "set";
     }
 
+    @Documentation(category = "Control", value = """
+            Configures the automatic strategy and further proof settings by assigning
+            key-value pairs, e.g. `set oss false` or `set steps 100`.
+            """)
     public static class Parameters {
 
         @Documentation("Enable/disable one-step simplification")

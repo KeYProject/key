@@ -30,6 +30,15 @@ public final class NewJumpLabelCondition implements VariableCondition {
 
     private final ProgramSV labelSV;
 
+    /**
+     * Instantiates a new jump-label condition.
+     *
+     * @param sv the program schema variable of sort {@code LABEL} which must be instantiated with
+     *        a label not occurring elsewhere in the context program or the schema variable
+     *        instantiations
+     * @throws IllegalArgumentException if the given schema variable is not a program schema
+     *         variable of sort {@code LABEL}
+     */
     public NewJumpLabelCondition(SchemaVariable sv) {
         if (!(sv instanceof ProgramSV psv) || psv.sort() != ProgramSVSort.LABEL) {
             throw new IllegalArgumentException(

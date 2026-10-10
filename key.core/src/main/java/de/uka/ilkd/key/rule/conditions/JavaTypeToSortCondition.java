@@ -36,6 +36,14 @@ public final class JavaTypeToSortCondition implements VariableCondition {
     private final boolean elemSort;
 
 
+    /**
+     * Instantiates a new java-type-to-sort condition.
+     *
+     * @param exprOrTypeSV the expression or type schema variable whose instantiation determines
+     *        the sort
+     * @param sort the generic sort which is instantiated with the sort of the instantiation
+     * @param elemSort whether the elementary sort is to be used for array types
+     */
     public JavaTypeToSortCondition(final JOperatorSV exprOrTypeSV, final GenericSort sort,
             final boolean elemSort) {
         this.exprOrTypeSV = exprOrTypeSV;

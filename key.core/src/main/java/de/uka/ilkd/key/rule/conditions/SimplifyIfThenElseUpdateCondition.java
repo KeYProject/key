@@ -23,6 +23,14 @@ import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.instantiation.SVInstantiations;
 
+/**
+ * A variable condition for the taclet construct {@code \simplifyIfThenElseUpdate}: it turns two
+ * updates guarded by a condition {@code phi} into a single parallel update whose right-hand sides
+ * are {@code if phi then r1 else r2} expressions, and binds the common condition to a formula
+ * schema variable.
+ *
+ * @author Michael Kirsten
+ */
 public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     private final FormulaSV phi;
@@ -32,7 +40,16 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
     private final SchemaVariable result;
 
 
-
+    /**
+     * Instantiates a new simplify-if-then-else-update condition.
+     *
+     * @param phi the formula schema variable guarding the two updates
+     * @param u1 the update schema variable applied if {@code phi} holds
+     * @param u2 the update schema variable applied if {@code phi} does not hold
+     * @param commonFormula the formula schema variable to which the guard {@code phi} is bound
+     * @param result the schema variable to which the merged update
+     *        {@code if phi then u1 else u2} is bound
+     */
     public SimplifyIfThenElseUpdateCondition(FormulaSV phi, UpdateSV u1, UpdateSV u2,
             FormulaSV commonFormula, SchemaVariable result) {
         super();

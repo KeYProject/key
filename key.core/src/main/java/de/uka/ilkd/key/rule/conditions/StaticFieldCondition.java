@@ -31,6 +31,12 @@ public class StaticFieldCondition extends VariableConditionAdapter {
     private final SchemaVariable field;
     private final boolean negated;
 
+    /**
+     * Instantiates a new static-field condition.
+     *
+     * @param field the schema variable which must be instantiated with a Java field
+     * @param negated whether the condition is negated ({@code \not isStaticField})
+     */
     public StaticFieldCondition(SchemaVariable field, boolean negated) {
         this.field = field;
         this.negated = negated;

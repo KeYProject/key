@@ -21,6 +21,12 @@ public final class AbstractOrInterfaceType extends VariableConditionAdapter {
     private final TypeResolver resolver;
     private final boolean negated;
 
+    /**
+     * Instantiates a new abstract-or-interface condition.
+     *
+     * @param tr the type resolver for the type to check
+     * @param negation whether the condition is negated ({@code \not isAbstractOrInterface})
+     */
     public AbstractOrInterfaceType(TypeResolver tr, boolean negation) {
         this.resolver = tr;
         this.negated = negation;

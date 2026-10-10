@@ -80,3 +80,25 @@ jobs:
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{secrets.GPG_PASSPHRASE}}
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_USERNAME }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_PASSWORD }}
+
+      # The documentation generation for varconds and proof script commands
+      # extracts `///` markdown javadocs via therapi, which requires JDK 23+.
+      - name: Set up JDK 25 (documentation generation)
+        uses: actions/setup-java@v6.0.1
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Generate varcond and proof script documentation
+        run: ./gradlew --parallel :key.core:generateVarcondDoc :key.core:generateScriptDoc
+
+      - name: Package varcond and proof script documentation
+        run: zip -j key-varcond-script-docs.zip key.core/build/docs/keydocs/*
+
+      - name: Upload varcond and proof script documentation
+        uses: actions/upload-artifact@v7
+        with:
+          name: varcond-script-docs
+          path: "key-varcond-script-docs.zip"
+          retention-days: 30

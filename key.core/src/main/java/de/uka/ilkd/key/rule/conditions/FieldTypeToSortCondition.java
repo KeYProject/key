@@ -34,6 +34,13 @@ public final class FieldTypeToSortCondition implements VariableCondition {
     private final SchemaVariable exprOrTypeSV;
     private final GenericSort sort;
 
+    /**
+     * Instantiates a new field-type condition.
+     *
+     * @param exprOrTypeSV the expression or type schema variable whose instantiation must be a
+     *        field constant
+     * @param sort the generic sort which is instantiated with the referred type of the field
+     */
     public FieldTypeToSortCondition(final JOperatorSV exprOrTypeSV, final GenericSort sort) {
         this.exprOrTypeSV = exprOrTypeSV;
         this.sort = sort;
