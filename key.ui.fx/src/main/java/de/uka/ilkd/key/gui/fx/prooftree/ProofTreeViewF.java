@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
@@ -290,6 +291,13 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
 
     /** the node the popup was invoked on (Swing {@code ProofTreeContext.invokedNode}) */
     private Node popupNode;
+
+    /**
+     * D34 (P3c): opens a separate sequent buffer for a proof-tree node, installed by
+     * {@code MainWindowF} (Swing {@code SequentViewDock.OpenCurrentNodeAction} creates the dock
+     * and adds it to the dock control); {@code null} before the wiring.
+     */
+    private Consumer<Node> openNodeInSeparateBuffer;
 
     /**
      * Listens to structural changes of the displayed proof and schedules a coalesced rebuild on
@@ -1381,6 +1389,13 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
         MenuItem notesItem = actionItem("Edit Notes...", null, this::editNotes);
         MenuItem subtreeStatsItem = actionItem("Show Subtree Statistics",
             IconFactoryF.Key.STATISTICS, this::showSubtreeStatistics);
+        // D34 (P3c): Swing ProofTreePopupFactory adds OpenCurrentNodeAction as the final popup
+        // entry (ProofTreePopupFactory.java:143) — opens the node's sequent in a separate buffer
+        MenuItem openNodeItem = actionItem("Open Node in Separate Buffer", null, () -> {
+            if (openNodeInSeparateBuffer != null && popupNode != null) {
+                openNodeInSeparateBuffer.accept(popupNode);
+            }
+        });
         ContextMenu menu = new ContextMenu(hideIntermediateItem, onlyInteractiveItem,
             new SeparatorMenuItem(), hideClosedItem, hideInteractiveItem, linearizeItem,
             expandOssItem, new SeparatorMenuItem(), expandAllItem, collapseAllItem,
@@ -1399,7 +1414,7 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             new SeparatorMenuItem(),
             actionItem("Set All Goals Below to Interactive", null, () -> setGoalsBelow(false)),
             actionItem("Set All Goals Below to Automatic", null, () -> setGoalsBelow(true)),
-            new SeparatorMenuItem(), subtreeStatsItem);
+            new SeparatorMenuItem(), subtreeStatsItem, openNodeItem);
         menu.setOnShowing(e -> {
             // pick up changes made elsewhere (e.g. by the classic UI sharing the settings)
             hideIntermediateItem.setSelected(hideIntermediateSteps());
@@ -1415,6 +1430,8 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             notesItem.setDisable(proof == null);
             subtreeStatsItem.setDisable(proof == null);
             pruneItem.setDisable(!isPrunable(popupNode));
+            // D34: Opening a node buffer needs a proof node to open
+            openNodeItem.setDisable(proof == null || popupNode == null);
         });
         return menu;
     }
@@ -1646,6 +1663,17 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
         if (proofControl != null) {
             proofControl.addAutoModeListener(this);
         }
+    }
+
+    /**
+     * D34 (P3c): installs the "Open Node in Separate Buffer" popup handler (Swing
+     * {@code SequentViewDock.OpenCurrentNodeAction}); the consumer opens a
+     * {@link de.uka.ilkd.key.gui.fx.docking.SequentViewDockF} for the given node.
+     *
+     * @param openNode the consumer handling the popup action, or {@code null} to uninstall
+     */
+    public void setOpenNodeInSeparateBuffer(Consumer<Node> openNode) {
+        this.openNodeInSeparateBuffer = openNode;
     }
 
     /**

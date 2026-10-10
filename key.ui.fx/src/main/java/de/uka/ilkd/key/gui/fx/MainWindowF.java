@@ -102,6 +102,7 @@ import de.uka.ilkd.key.gui.fx.docking.DockLocation;
 import de.uka.ilkd.key.gui.fx.docking.DockWorkspace;
 import de.uka.ilkd.key.gui.fx.docking.Dockable;
 import de.uka.ilkd.key.gui.fx.docking.DockingLayoutF;
+import de.uka.ilkd.key.gui.fx.docking.SequentViewDockF;
 import de.uka.ilkd.key.gui.fx.docking.SimpleDockable;
 import de.uka.ilkd.key.gui.fx.drawer.DrawerF;
 import de.uka.ilkd.key.gui.fx.drawer.DrawerItemF;
@@ -897,6 +898,9 @@ public final class MainWindowF {
             // ProofTreeView registers itself as AutoModeListener on the UI's proof control,
             // ProofTreeView.java:532)
             proofTreeView.setActionContext(mediator, env.getProofControl());
+            // D34 (P3c): the proof-tree popup's "Open Node in Separate Buffer" opens the node's
+            // sequent in a separate dockable (Swing SequentViewDock.OpenCurrentNodeAction)
+            proofTreeView.setOpenNodeInSeparateBuffer(this::openNodeInSeparateBuffer);
             env.getProofControl().addAutoModeListener(autoModeUiListener);
             // notification: register the notification framework's auto-mode tracker on the
             // proof control (Swing parity: the NotificationManager constructor registers its
@@ -4214,6 +4218,31 @@ public final class MainWindowF {
 
     private void resetLayout() {
         workspace.restoreFactoryDefault();
+    }
+
+    /**
+     * D34 (P3c): opens a {@link SequentViewDockF} with the sequent of the given proof node in a
+     * separate buffer (Swing {@code SequentViewDock.OpenCurrentNodeAction.actionPerformed}:
+     * create the dock and add it to the dock control, here via the workspace {@code MAIN} role).
+     * The dock's "Jump into Tree" title action selects the node in the main proof tree again
+     * (Swing {@code SequentViewDock.JumpIntoTreeAction}).
+     *
+     * @param node the proof node to display
+     * @return the opened dockable (self test / programmatic reuse)
+     */
+    Dockable openNodeInSeparateBuffer(de.uka.ilkd.key.proof.Node node) {
+        SequentViewDockF dock = new SequentViewDockF(node, () -> jumpIntoTree(node));
+        workspace.open(dock, DockLocation.MAIN);
+        return dock;
+    }
+
+    /** D34: selects the given node in the main proof tree, switching the proof if necessary. */
+    private void jumpIntoTree(de.uka.ilkd.key.proof.Node node) {
+        Proof proof = node.proof();
+        if (selectionModel.getSelectedProof() != proof) {
+            selectionModel.setSelectedProof(proof);
+        }
+        selectionModel.setSelectedNode(node);
     }
 
     /**
