@@ -5,11 +5,14 @@
 package de.uka.ilkd.key.gui.fx.extension;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
@@ -120,9 +123,13 @@ public final class KeYGuiExtensionFacadeF {
      * sorted into the menu bar: the first segment matches (or creates) a top-level menu by
      * text — the five built-in menus included, so a path starting with {@code "Proof"} nests
      * under the Proof menu — then each further segment matches (or creates) a sub menu of the
-     * same name, and finally the contributed menu items are spliced into the innermost menu
-     * (Swing {@code sortActionIntoMenu}, KeYGuiExtensionFacade.java:134-160). The five
-     * built-in menus' item sets stay untouched.
+     * same name. The provider's own first menu is used as the terminal menu of the path when
+     * its text equals the last segment (the common case: the Swing shape
+     * {@code Test > Test > Test} with the action leaf), otherwise the last segment is created
+     * and the provider's menus are nested below it. Unlike the Swing original the provider's
+     * menu <em>objects</em> are kept intact — their items are never re-parented, because
+     * JavaFX warns when a {@code MenuItem} that already belongs to a menu is moved into another
+     * one. The five built-in menus' item sets stay untouched.
      *
      * @param window the main window
      * @param menuBar the menu bar to install the extension menus into
@@ -143,43 +150,88 @@ public final class KeYGuiExtensionFacadeF {
                 menuBar.getMenus().addAll(menus);
                 continue;
             }
-            // B13: splash the menu path (Swing KeyAction.PATH dot-separated segments)
-            Menu current = null;
-            for (String segment : path.split("\\.")) {
-                if (segment.isBlank()) {
-                    continue;
-                }
-                if (current == null) {
+            // B13: split the Swing KeyAction.PATH into the non-empty segments
+            String[] segments = Arrays.stream(path.split("\\.")).filter(s -> !s.isBlank())
+                    .toArray(String[]::new);
+            if (segments.length == 0) {
+                menuBar.getMenus().addAll(menus);
+                continue;
+            }
+            // navigate/create all segments except the terminal one
+            Menu parent = null;
+            for (int i = 0; i < segments.length - 1; i++) {
+                String segment = segments[i];
+                if (parent == null) {
                     Menu top = menuBar.getMenus().stream()
                             .filter(m -> segment.equals(m.getText())).findFirst().orElse(null);
-                    if (top == null) {
-                        top = new Menu(segment);
-                        menuBar.getMenus().add(top);
-                    }
-                    current = top;
+                    parent = top != null ? top : createBarMenu(menuBar, segment);
                 } else {
-                    Menu child = null;
-                    for (MenuItem item : current.getItems()) {
-                        if (item instanceof Menu m && segment.equals(m.getText())) {
-                            child = m;
-                            break;
-                        }
-                    }
-                    if (child == null) {
-                        child = new Menu(segment);
-                        current.getItems().add(child);
-                    }
-                    current = child;
+                    parent = findOrCreateChildMenu(parent, segment);
                 }
             }
-            // splice the provider's items into the innermost menu of the path (Swing inserts
-            // each action at the path; the provider's own Menu wrapper is not reused)
-            if (current != null) {
-                for (Menu menu : menus) {
-                    current.getItems().addAll(menu.getItems());
+            String terminalSegment = segments[segments.length - 1];
+            Menu terminal = menus.get(0);
+            List<Menu> extraMenus = menus.subList(1, menus.size());
+            boolean slotTaken = parent == null
+                    ? menuBar.getMenus().stream()
+                            .anyMatch(m -> terminalSegment.equals(m.getText()))
+                    : findMenu(parent, terminalSegment).isPresent();
+            if (terminalSegment.equals(terminal.getText()) && !slotTaken) {
+                // the provider's own menu becomes the terminal path menu (no re-parenting:
+                // its items keep their parent menu); only the first call wins the slot
+                if (parent == null) {
+                    menuBar.getMenus().add(terminal);
+                } else {
+                    parent.getItems().add(terminal);
                 }
+            } else {
+                // terminal slot already taken or text mismatch: create/nest it, the provider's
+                // menus (whole, items included) live below it
+                if (parent == null) {
+                    terminal = menuBar.getMenus().stream()
+                            .filter(m -> terminalSegment.equals(m.getText())).findFirst()
+                            .orElseGet(() -> createBarMenu(menuBar, terminalSegment));
+                } else {
+                    terminal = findOrCreateChildMenu(parent, terminalSegment);
+                }
+                for (Menu menu : menus) {
+                    terminal.getItems().add(menu);
+                }
+                extraMenus = List.of();
+            }
+            for (Menu menu : extraMenus) {
+                terminal.getItems().add(menu);
             }
         }
+    }
+
+    /** Creates a bar-level menu with the given text and appends it. */
+    private static Menu createBarMenu(MenuBar menuBar, String text) {
+        Menu menu = new Menu(text);
+        menuBar.getMenus().add(menu);
+        return menu;
+    }
+
+    /** Creates a menu with the given text and appends it to the given items list. */
+    private static Menu createMenu(ObservableList<MenuItem> items, String text) {
+        Menu menu = new Menu(text);
+        items.add(menu);
+        return menu;
+    }
+
+    /** @return the direct sub menu of the given menu with the given text, if any. */
+    private static Optional<Menu> findMenu(Menu parent, String text) {
+        for (MenuItem item : parent.getItems()) {
+            if (item instanceof Menu menu && text.equals(menu.getText())) {
+                return Optional.of(menu);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /** @return the direct sub menu with the given text, creating it if absent. */
+    private static Menu findOrCreateChildMenu(Menu parent, String text) {
+        return findMenu(parent, text).orElseGet(() -> createMenu(parent.getItems(), text));
     }
 
     /**
