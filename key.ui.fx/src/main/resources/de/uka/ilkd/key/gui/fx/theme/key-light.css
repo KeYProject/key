@@ -920,3 +920,74 @@
     -fx-fill: derive(-key-warning, 30%);
     -fx-opacity: 0.45;
 }
+
+/* ---------------------------------------------------------------------------
+   contract completions (P2b): the contract configurator cells
+   (ContractConfigurator/ContractSelectionPanel + auxiliary/block variants) and
+   the invariant configurator (Swing InvariantConfigurator)
+   --------------------------------------------------------------------------- */
+.contract-selection-panel {
+    -fx-padding: 4;
+}
+.contract-cell {
+    -fx-background-color: -key-surface;
+    -fx-border-color: -key-border;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 4;
+    -fx-cursor: hand;
+}
+.contract-cell-gray {
+    -fx-background-color: derive(-key-background, -5%);
+    -fx-text-fill: -key-text-secondary;
+}
+.contract-cell-gray .label {
+    -fx-text-fill: -key-text-secondary;
+}
+.contract-cell-name {
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text;
+}
+.contract-cell-text {
+    -fx-text-fill: -key-text;
+    -fx-wrap-text: true;
+}
+.invariant-loop-representation {
+    -fx-font-family: monospace;
+    -fx-wrap-text: true;
+    -fx-text-fill: -key-text;
+}
+.invariant-heap-pane {
+    -fx-padding: 4;
+}
+.invariant-input {
+    -fx-font-family: monospace;
+}
+.invariant-status-ok {
+    -fx-text-fill: -key-success;
+}
+.invariant-status-error {
+    -fx-text-fill: -key-error;
+}
+
+/* lemma dialogs (P2b): the ItemChooser dual list of the taclet selection dialog
+   and the axiom panel of the user-taclets dialog */
+.item-chooser .list-view {
+    -fx-background-color: -key-surface;
+}
+.item-chooser-middle {
+    -fx-padding: 0 2 0 2;
+}
+.axioms-panel {
+    -fx-border-color: -key-border;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 6;
+}
+.axioms-title {
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text-secondary;
+}
+.axioms-list {
+    -fx-background-color: -key-surface;
+}

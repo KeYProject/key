@@ -184,3 +184,19 @@ differences found by a second Swing↔JavaFX sweep, with stable IDs used by the 
 P2a (`weigl/ocfx-p2-sequent`, merged 2026-10-10) resolved D28/D29/D32/D35 —
 `key.fx.verify.sequentmenu` PASS (term menu 31 entries, POPUP_DELAY guard, search prefill,
 focussed auto mode) on Xvnc :99.
+
+P2b (`weigl/ocfx-p2-dialogs`, merged 2026-10-10) resolved A1/A2/A3/A9 — the five contract
+completions (`FunctionalOperationContractCompletionF`, `DependencyContractCompletionF`,
+`LoopInvariantRuleCompletionF`, `BlockContractInternalCompletionF`,
+`BlockContractExternalCompletionF`) are registered in the FX control next to
+`MergeRuleCompletionF` (Swing parity WindowUserInterfaceControl.java:74-82); the dialogs
+(`ContractConfiguratorF`, `AuxiliaryContractConfiguratorF`, `BlockContractSelectionPanelF`,
+`ContractSelectionPanelF`, `InvariantConfiguratorF`, `LemmaSelectionDialogF` + `ItemChooserF`,
+`LoadUserTacletsDialogF` axiom panel/warning/help, `EnsureSourceConsistency` info dialog) are
+ported; `key.fx.verify.dialogs` PASS (registry + dialog skeletons) on Xvnc :99.
+
+Interactive end-to-end contract application (completing a use-operation-contract rule app on a
+spec-bearing method) is not headless-drivable without a JML-annotated example in
+`key.ui/examples`; it stays covered by the skeletons above plus the to-be-added example in a
+later batch. HTML-styled contract cells of the Swing configurator are plain text in the FX port
+(KNOWN-SIMPLIFIED, see the class javadocs).

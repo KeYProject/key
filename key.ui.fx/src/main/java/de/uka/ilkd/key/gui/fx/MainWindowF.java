@@ -81,7 +81,15 @@ import de.uka.ilkd.key.gui.fx.actions.QuickSaveF;
 import de.uka.ilkd.key.gui.fx.colors.ColorPaletteF;
 import de.uka.ilkd.key.gui.fx.colors.ColorSettingsF;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
+import de.uka.ilkd.key.gui.fx.contractcompletions.BlockContractExternalCompletionF;
+import de.uka.ilkd.key.gui.fx.contractcompletions.BlockContractInternalCompletionF;
+import de.uka.ilkd.key.gui.fx.contractcompletions.DependencyContractCompletionF;
+import de.uka.ilkd.key.gui.fx.contractcompletions.FunctionalOperationContractCompletionF;
+import de.uka.ilkd.key.gui.fx.contractcompletions.InvariantConfiguratorF;
+import de.uka.ilkd.key.gui.fx.contractcompletions.LoopInvariantRuleCompletionF;
+import de.uka.ilkd.key.gui.fx.dialogs.DialogsVerifyF;
 import de.uka.ilkd.key.gui.fx.dialogs.FeedbackDialogF;
+import de.uka.ilkd.key.gui.fx.dialogs.LemmaSelectionDialogF;
 import de.uka.ilkd.key.gui.fx.dialogs.LoadUserTacletsDialogF;
 import de.uka.ilkd.key.gui.fx.dialogs.RunAllProofsF;
 import de.uka.ilkd.key.gui.fx.docking.DockLayoutStore;
@@ -171,7 +179,6 @@ import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.javafx.FxUtil;
@@ -298,6 +305,22 @@ public final class MainWindowF {
         // the join trigger JoinActionF.run(...) is wired with the future sequent-view
         // context menu (Swing JoinMenuItem, CurrentGoalViewMenu.java:235-238)
         userInterface.register(MergeRuleCompletionF.INSTANCE);
+        // contractcompletions (P2b): register the interactive contract/invariant completions
+        // (Swing parity: WindowUserInterfaceControl constructor, WindowUserInterfaceControl
+        // .java:74-82 — FunctionalOperationContractCompletion (:76),
+        // DependencyContractCompletion (:77), LoopInvariantRuleCompletion (:78),
+        // BlockContractInternalCompletion(mainWindow) (:79),
+        // BlockContractExternalCompletion(mainWindow) (:80)); the dialogs of the completions
+        // are the FX ports in de.uka.ilkd.key.gui.fx.contractcompletions
+        userInterface.register(new FunctionalOperationContractCompletionF());
+        userInterface.register(new DependencyContractCompletionF());
+        userInterface.register(new LoopInvariantRuleCompletionF());
+        userInterface.register(new BlockContractInternalCompletionF());
+        userInterface.register(new BlockContractExternalCompletionF());
+        // contractcompletions (P2b): the invariant configurator parses with the editor's
+        // abbreviation map (Swing: MainWindow.getMediator().getNotationInfo().getAbbrevMap(),
+        // InvariantConfigurator.getAbbrevMap)
+        InvariantConfiguratorF.setAbbrevMap(mediator.getNotationInfo().getAbbrevMap());
     }
 
     /**
@@ -946,6 +969,14 @@ public final class MainWindowF {
                                     : Kind.ERROR);
                 statusRight.setText(report);
             }
+            // dialogs (P2b): the contract-completion dialogs and the lemma dialogs — registry
+            // completeness + the contract/auxiliary configurator and lemma selection dialog
+            // skeletons + the item chooser semantics
+            if (System.getProperty("key.fx.verify.dialogs") != null) {
+                String report = DialogsVerifyF.run(stage, selectionModel.getSelectedProof(),
+                    userInterface);
+                statusRight.setText(report);
+            }
             // loadingexit (P1): recent-files round trip with loading options + profile
             // resolution, then the exit flow — the window close button path with Confirm Exit
             // off must terminate the process with exit code 0
@@ -1331,9 +1362,8 @@ public final class MainWindowF {
         }
         Path fileForTaclets = result.get().fileForTaclets();
         boolean loadAsLemmata = result.get().generateProofObligations();
-        // menu: the Swing axiom-file list of the dialog is not ported (KNOWN-DEFERRED, see
-        // LoadUserTacletsDialogF) — the loader never gets axiom files.
-        List<Path> filesForAxioms = List.of();
+        // lemma (P2b, A3): the axiom files chosen in the dialog are loaded for the lemmata only
+        List<Path> filesForAxioms = result.get().filesForAxioms();
         final WindowUserInterfaceControlF ui = getUserInterfaceControl();
         Profile profile = proof.getServices().getProfile();
         ProblemInitializer problemInitializer =
@@ -1391,9 +1421,8 @@ public final class MainWindowF {
         }
         Path fileForTaclets = result.get().fileForTaclets();
         boolean loadAsLemmata = result.get().generateProofObligations();
-        // menu: the Swing axiom-file list of the dialog is not ported (KNOWN-DEFERRED, see
-        // LoadUserTacletsDialogF)
-        List<Path> filesForAxioms = List.of();
+        // lemma (P2b, A3): the axiom files chosen in the dialog are loaded for the lemmata only
+        List<Path> filesForAxioms = result.get().filesForAxioms();
         final WindowUserInterfaceControlF ui = getUserInterfaceControl();
         Profile profile = lastEnvironment != null ? lastEnvironment.getProfile()
                 : AbstractProfile.getDefaultProfile();
@@ -1520,17 +1549,12 @@ public final class MainWindowF {
     private void runTacletSoundnessLoader(TacletLoader tacletLoader, InitConfig originalConfig,
             boolean loadAsLemmata, boolean isOnlyUsedForProvingTaclets,
             LemmaLoaderListener listener) {
-        // menu: instead of the Swing LemmaSelectionDialog, keep all "supported" taclets (the
-        // dialog's default "show only supported" filter) — the selection dialog is not ported
-        TacletSoundnessPOLoader.TacletFilter filter = tacletInfos -> {
-            ImmutableSet<Taclet> supported = DefaultImmutableSet.nil();
-            for (TacletSoundnessPOLoader.TacletInfo info : tacletInfos) {
-                if (!info.isNotSupported()) {
-                    supported = supported.add(info.getTaclet());
-                }
-            }
-            return supported;
-        };
+        // lemma (P2b, A2): the Swing LemmaSelectionDialog is the taclet filter — the user picks
+        // the taclets the soundness proof obligations are created for (the hardcoded
+        // "supported taclets only" default of the MP5 port is gone); it defaults to the same
+        // behavior while "Show only supported taclets." is active and everything is left on the
+        // choice side
+        TacletSoundnessPOLoader.TacletFilter filter = new LemmaSelectionDialogF();
         TacletSoundnessPOLoader loader = new TacletSoundnessPOLoader(listener, filter,
             loadAsLemmata, tacletLoader, originalConfig, isOnlyUsedForProvingTaclets);
         loader.start();
@@ -3886,15 +3910,28 @@ public final class MainWindowF {
      * // menu: MP7 — the flag is honored at runtime by the core and the FX soundiness report:
      * // AbstractProblemLoader.createFileRepo (AbstractProblemLoader.java:400-409) picks the
      * // DiskFileRepo (source-cache backend) over the SimpleFileRepo when it is set, and the FX
-     * // SoundinessAnalyzer warns when it is off (SoundinessAnalyzer.java:377-383). Only the
-     * // Swing info dialog of the toggle action (EnsureSourceConsistencyToggleAction.java:42-47)
-     * // is dropped.
+     * // SoundinessAnalyzer warns when it is off (SoundinessAnalyzer.java:377-383). The Swing
+     * // info dialog of the toggle action (EnsureSourceConsistencyToggleAction.java:42-47) is
+     * // ported below (dialogs marker, audit item A9).
      */
     private CheckMenuItem ensureSourceConsistencyToggle() {
         GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
         CheckMenuItem item = new CheckMenuItem("Ensure Source Consistency");
         item.setSelected(gs.isEnsureSourceConsistency());
-        item.setOnAction(e -> gs.setEnsureSourceConsistency(item.isSelected()));
+        item.setOnAction(e -> {
+            // dialogs (P2b, A9): the Swing toggle shows an info dialog when a proof is loaded —
+            // the change becomes effective with the NEXT load (Swing
+            // EnsureSourceConsistencyToggleAction.actionPerformed:42-47)
+            if (mediator.ensureProofLoaded()) {
+                Alert info = new Alert(Alert.AlertType.INFORMATION,
+                    "Your changes will become effective when the next problem is loaded.\n");
+                info.setTitle("Allow Proof Bundle Saving");
+                info.setHeaderText("Allow Proof Bundle Saving");
+                info.initOwner(getStage());
+                info.show();
+            }
+            gs.setEnsureSourceConsistency(item.isSelected());
+        });
         return item;
     }
 

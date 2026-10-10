@@ -58,6 +58,8 @@ regression-tested on a virtual display. Demo proof paths default into
 | `key.fx.verify.updatehighlight` | update-highlight overlay (needs `useQuery.key`) |
 | `key.fx.verify.notifications` | notification framework (task-finished, proof-closed, exception) |
 | `key.fx.verify.termmenu` | headless sequent context-menu model (25 checks) |
+| `key.fx.verify.sequentmenu` | left-click sequent term menu + POPUP_DELAY guard, search prefill, shift+click focussed auto mode (P2a) |
+| `key.fx.verify.dialogs` | contract-completion registry + dialog skeletons (P2b): contract/auxiliary configurators, lemma selection dialog, item chooser |
 | `key.fx.verify.tacletmatch=1\|hold` | interactive taclet application (`hold` keeps the dialog open) |
 | `key.fx.verify.uicontrol` | `WindowUserInterfaceControlF` seam: status line, IssueDialogF, LogViewF, AutoDismissDialogF |
 | `key.fx.verify.docking` | named layout slots, maximize/restore, close-while-maximized |
