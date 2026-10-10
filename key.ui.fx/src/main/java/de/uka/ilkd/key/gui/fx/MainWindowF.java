@@ -458,11 +458,19 @@ public final class MainWindowF {
     };
 
     /**
+     * P3b/B12: the one main window of the application (Swing {@code MainWindow.getInstance()},
+     * MainWindow.java:107-111). Set by the constructor; the proof-script entry points
+     * ({@code ProofMacroMenuF}) reach the window's stage + user-interface control through it.
+     */
+    private static @Nullable MainWindowF instance;
+
+    /**
      * Creates the main window bound to the given stage.
      *
      * @param stage the primary stage of the JavaFX application
      */
     public MainWindowF(Stage stage) {
+        instance = this;
         this.stage = stage;
         this.layoutStore = new DockLayoutStore(PathConfig.currentPaths.keyConfigDir);
         // docking: the layout extension needs the workspace and the layout store
@@ -671,6 +679,14 @@ public final class MainWindowF {
      */
     public Map<String, Dockable> getDockables() {
         return dockables;
+    }
+
+    /**
+     * @return the (single) main window of the application, or {@code null} before construction
+     *         (Swing {@code MainWindow.getInstance()})
+     */
+    public static @Nullable MainWindowF getInstance() {
+        return instance;
     }
 
     /**
@@ -2377,16 +2393,18 @@ public final class MainWindowF {
     }
 
     /**
-     * menu: MP8 — headless self test of the MP8a/MP8b term-menu wiring
+     * menu: MP8/B12 — headless self test of the MP8a/MP8b term-menu wiring
      * ({@code key.fx.verify.termmenuwiring}), run after the demo load like the termmenu hook:
      * builds the term menu through the same seam as {@link #runTermMenuVerification} and
      * asserts (a) the {@code focus_auto_mode} item ("Apply rules automatically here") is ENABLED
      * and its action handler is non-null (Swing FocussedAutoModeUserAction, wired at
      * FocussedAutoModeUserAction.java:43), and (b) the {@code macro_menu} section ("Strategy
-     * Macros", Swing ProofMacroMenu.java:81) exists and contains exactly the four macro names of
-     * the Automation submenu ({@link #AUTOMATION_MACROS}, same order). The handlers are
-     * deliberately NOT invoked — starting a real focused auto mode or running a macro headless
-     * mid-regression is too heavy; enablement and handler presence is the assertion.
+     * Macros", Swing ProofMacroMenu.java:81) contains the four macro names of the Automation
+     * submenu ({@link #AUTOMATION_MACROS}) as a subset of the P3b/B12 superset (all registered
+     * macros applicable at the position, category-grouped with separators — Swing iterates
+     * {@code ProofMacroMenu.REGISTERED_MACROS}, ProofMacroMenu.java:60-61/90-99). The handlers
+     * are deliberately NOT invoked — starting a real focused auto mode or running a macro
+     * headless mid-regression is too heavy; enablement and handler presence is the assertion.
      */
     private void runTermMenuWiringVerification(KeYEnvironment<DefaultUserInterfaceControl> env) {
         Goal goal = mediator.getSelectedGoal();
@@ -2426,13 +2444,19 @@ public final class MainWindowF {
         for (ProofMacro macro : AUTOMATION_MACROS) {
             expected.add(macro.getName());
         }
-        boolean macroOk = macroNames.equals(expected);
+        // P3b/B12: since MP8 the section shows the registered-macro superset grouped by category
+        // (ProofMacroMenuF, Swing iterates ProofMacroMenu.REGISTERED_MACROS) — the Automation
+        // submenu's four names must all be present, and at least one category separator must
+        // separate the groups (Swing ProofMacroMenu.java:101-113).
+        boolean separators = macroMenu != null && macroMenu.getItems().stream()
+                .anyMatch(SeparatorMenuItem.class::isInstance);
+        boolean macroOk = macroNames.containsAll(expected) && separators;
         boolean pass = focusOk && macroOk;
         System.out.println("termmenu wiring verify: " + (pass ? "PASS" : "FAIL") + " - "
             + "focus_auto_mode[" + (focusItem == null ? "missing"
                     : (focusOk ? "enabled" : "disabled-or-no-handler"))
-            + "] macro_menu["
-            + macroNames + "]");
+            + "] macro_menu[" + macroNames.size() + " items, separators=" + separators
+            + "]");
     }
 
     /**

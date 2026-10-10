@@ -989,17 +989,20 @@ public class SequentViewF extends BorderPane {
     }
 
     /**
-     * menu: MP7 — builds the macro popup for the clicked position: one item per macro of the
-     * Automation submenu's {@link MainWindowF#AUTOMATION_MACROS} list that is applicable at the
-     * position (Swing {@code ProofMacroMenu} iterates the registered macros and keeps those with
-     * {@code canApplyTo}, ProofMacroMenu.java:87-99); item text = {@code macro.getName()}, tooltip
-     * = {@code macro.getDescription()} (ProofMacroMenu.java:143-144). The action runs the macro on
-     * the selected node with the {@link PosInOccurrence} of the clicked position (Swing
-     * {@code ProofMacroUserAction}, ProofMacroUserAction.java:57-59: {@code
+     * menu: MP7/B12 — builds the macro popup for the clicked position (Swing {@code
+     * ProofMacroMenu} iterates the registered macros and keeps those with {@code canApplyTo},
+     * ProofMacroMenu.java:87-99): the P3b/B12 superset of the Automation submenu's
+     * {@link MainWindowF#AUTOMATION_MACROS}, built by the shared {@link ProofMacroMenuF} factory
+     * (item text = {@code macro.getName()}, tooltip = {@code macro.getDescription()},
+     * ProofMacroMenu.java:143-144; category-grouped, PROOF_SCRIPTS section). The action runs
+     * the macro on the selected node with the {@link PosInOccurrence} of the clicked position
+     * (Swing {@code ProofMacroUserAction}, ProofMacroUserAction.java:57-59: {@code
      * mediator.getUI().getProofControl().runMacro(node, macro, pio)}; the core silently ignores
      * the run while auto mode is active, and the {@code pio} may be {@code null} — the position
      * may resolve to no occurrence and global macros accept that). Returns {@code null} when no
-     * macro is applicable (the caller then falls back to the term menu).
+     * macro is applicable (the caller then falls back to the term menu, Swing
+     * {@code ProofMacroMenu.isEmpty()}, ProofMacroMenu.java:160-162 + CurrentGoalViewListener
+     * .java:62-64).
      *
      * @param pos the clicked sequent position or {@code null}
      * @return the macro popup, or {@code null} if no macro is applicable
@@ -1013,18 +1016,14 @@ public class SequentViewF extends BorderPane {
         Proof proof = node.proof();
         PosInOccurrence pio = pos == null ? null : pos.getPosInOccurrence();
         ImmutableList<Goal> goals = proof.getSubtreeEnabledGoals(node);
-        ContextMenu menu = new ContextMenu();
-        int count = 0;
-        for (ProofMacro macro : MainWindowF.AUTOMATION_MACROS) {
-            if (macro.canApplyTo(proof, goals, pio)) {
-                // menu: MP7/MP8 — the item construction (name label + description tooltip via
-                // CustomMenuItem, since JavaFX MenuItem has no tooltip property) is shared with
-                // the term-menu "Strategy Macros" section, see {@link ProofMacroMenuF#itemFor}.
-                menu.getItems().add(ProofMacroMenuF.itemFor(macro, node, menuProofControl, pio));
-                count++;
-            }
+        // Swing ProofMacroMenu.isEmpty(): the popup is shown only when at least one macro is
+        // applicable — otherwise the right-click falls back to the term menu
+        if (!ProofMacroMenuF.anyApplicable(proof, goals, pio)) {
+            return null;
         }
-        return count == 0 ? null : menu;
+        ContextMenu menu = new ContextMenu();
+        menu.getItems().addAll(ProofMacroMenuF.items(proof, goals, node, menuProofControl, pio));
+        return menu;
     }
 
     /**
@@ -1064,14 +1063,17 @@ public class SequentViewF extends BorderPane {
     }
 
     /**
-     * menu: MP7 — headless self test of the right-click popup ({@code
+     * menu: MP7/B12 — headless self test of the right-click popup ({@code
      * key.fx.verify.rightclickmacro}), run after the demo load from MainWindowF: computes a
      * {@link PosInSequent} of the current printing and builds the popup through the
      * {@link #buildRightClickMenu} seam with the "Right Click for Proof Macros" flag ON and OFF
-     * (the persisted setting is restored afterwards). With the flag ON the popup must contain the
-     * macro names of the Automation submenu ({@link MainWindowF#AUTOMATION_MACROS}) and no
-     * term-menu entries; with the flag OFF the term-menu path must be taken. Uses the printed
-     * position table — no synthetic mouse events. Skips gracefully without a goal or position.
+     * (the persisted setting is restored afterwards). With the flag ON the popup must contain
+     * the macro names of the Automation submenu ({@link MainWindowF#AUTOMATION_MACROS}) and no
+     * term-menu entries other than the shared "Strategy Macros" items (B12: both surfaces are
+     * built from the same {@link ProofMacroMenuF} factory, so the P3b/B12 registered-macro
+     * superset labels of the term menu's Strategy Macros section are the exact macro-name
+     * overlap); with the flag OFF the term-menu path must be taken. Uses the printed position
+     * table — no synthetic mouse events. Skips gracefully without a goal or position.
      *
      * @return {@code "PASS - ..."} or {@code "FAIL - ..."}
      */
@@ -1100,12 +1102,13 @@ public class SequentViewF extends BorderPane {
                 macroNames.add(macro.getName());
             }
             boolean hasMacros = onLabels.containsAll(macroNames);
-            // menu: MP8 — the macro popup must not contain any term-menu entry other than the
-            // shared macro names: since MP8b the term menu has a "Strategy Macros" section with
-            // the very same four macros, so the names are excluded from the comparison (the
-            // MP7b term menu had them only in the macro popup).
-            boolean noTermEntries = onLabels.stream()
-                    .filter(l -> !macroNames.contains(l))
+            // menu: MP8/B12 — the macro popup must not contain any term-menu entry other than the
+            // shared macro names: the term menu has a "Strategy Macros" section backed by the
+            // very same ProofMacroMenuF factory, so its labels (the applicable macros + the
+            // optional PROOF_SCRIPTS entries) are exactly the expected overlap — every other
+            // popup label must not appear in the term menu.
+            List<String> strategyLabels = macroSectionLabels(off.getItems());
+            boolean noTermEntries = onLabels.stream().filter(l -> !strategyLabels.contains(l))
                     .noneMatch(offLabels::contains);
             // the OFF path is the term menu (fixed structural items of SequentTermContextMenuF)
             boolean termPath = offLabels.contains("Apply rules automatically here")
@@ -1117,6 +1120,20 @@ public class SequentViewF extends BorderPane {
         } finally {
             gs.setRightClickMacros(saved);
         }
+    }
+
+    /**
+     * menu: MP7/B12 — the labels of the "Strategy Macros" section of the term menu (the labels
+     * of its {@link ProofMacroMenuF}-built items, flattened over sub-menus).
+     */
+    private static List<String> macroSectionLabels(List<MenuItem> items) {
+        for (MenuItem item : items) {
+            if (item instanceof javafx.scene.control.Menu menu
+                    && "Strategy Macros".equals(menu.getText())) {
+                return menuLabels(menu.getItems());
+            }
+        }
+        return List.of();
     }
 
     /**
