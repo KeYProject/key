@@ -22,9 +22,11 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.javafx.FxUtil;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -347,6 +349,26 @@ public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
     private void setBack(Node node) {
         node.proof().pruneProof(node);
         keySelectionModel.setSelectedNode(node);
+    }
+
+    /**
+     * P3b/B11: the display name of the rule that the next "Goal Back" would undo, or {@code null}
+     * when there is none (Swing {@code GoalBackAction.updateName},
+     * GoalBackAction.java:113-125: the name of the {@code getAppliedRuleApp} of the parent of the
+     * newest goal's node is appended to the menu item text).
+     *
+     * @return the rule display name (e.g. {@code "andLeft"}), or {@code null} when no goal / no
+     *         applied rule is found
+     */
+    public @Nullable String goalBackRuleName() {
+        Goal goal = findNewestGoal(getSelectedNode());
+        if (goal != null && goal.node() != null && goal.node().parent() != null) {
+            RuleApp app = goal.node().parent().getAppliedRuleApp();
+            if (app != null) {
+                return app.rule().displayName();
+            }
+        }
+        return null;
     }
 
     /**

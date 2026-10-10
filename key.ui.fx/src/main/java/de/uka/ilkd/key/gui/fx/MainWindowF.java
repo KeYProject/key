@@ -408,6 +408,19 @@ public final class MainWindowF {
     private final Menu recentFilesMenu = new Menu("Recent Files");
 
     /**
+     * P3b/B11+B15: the Goal Back / Prune Proof controls of the Proof menu and the proof toolbar,
+     * kept as references so the dynamic "Goal Back" label ({@link #refreshGoalBackItem()},
+     * B11) and the Swing-parity enablement ({@link #refreshGoalBackPrune()}, B15) can update
+     * them without rebuilding the menu/toolbar. Set in {@link #buildProofMenu()} and
+     * {@link #buildProofToolBar()}; the menu parity self test rebuilds the menu bar, which
+     * assigns them again.
+     */
+    private javafx.scene.control.MenuItem goalBackMenuItem;
+    private javafx.scene.control.MenuItem pruneMenuItem;
+    private javafx.scene.control.Button goalBackToolbarButton;
+    private javafx.scene.control.Button pruneToolbarButton;
+
+    /**
      * Last directory of the open/save dialogs (Swing {@code OpenFileAction.lastSelectedPath}).
      */
     private Path lastSelectedDir = Path.of(System.getProperty("user.dir"));
@@ -462,6 +475,13 @@ public final class MainWindowF {
     public void initialize() {
         stage.setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
         setWindowIcons();
+        // P3b/B15: the Goal Back / Prune enablement must also react to auto mode start/stop
+        // (Swing's actions remove their selection listener and disable themselves,
+        // GoalBackAction.java:94-106 / PruneProofAction.java:95-107). The property is updated on
+        // the FX thread (see KeYMediatorF.RuleAppListenerProofListener); the null guards of
+        // refreshGoalBackPrune cover the controls not yet built.
+        mediator.autoModeRunningProperty()
+                .addListener((obs, old, running) -> refreshGoalBackPrune());
 
         buildDockables();
         workspace.setDefaultLayout(defaultLayout());
@@ -3393,16 +3413,49 @@ public final class MainWindowF {
             "de.uka.ilkd.key.gui.actions.ShowKnownTypesAction",
             this::showKnownTypes);
         knownTypes.disableProperty().bind(proofLoaded.not());
+        // P3b/B11: the Goal Back item carries the dynamic label of Swing GoalBackAction
+        // (updateName, GoalBackAction.java:113-125: "Undo Last Rule Application" plus, when the
+        // newest goal's parent has an applied rule, " (RuleName)"); like Swing
+        // (MainWindow.java:1094-1105) the name is refreshed only when the Proof menu opens —
+        // scanning all subtree goals on every selection change would be too slow. The actionId
+        // binding is unchanged (KeyStrokeManagerF shortcut wiring).
+        // P3b/B15: Goal Back / Prune Proof are NOT proofLoaded-bound like the surrounding items:
+        // like the Swing actions (GoalBackAction.java:65-108, PruneProofAction.java:53-109) their
+        // enablement is driven by the selection + the noPruningClosed setting and updated from
+        // the selection change / auto-mode hooks (refreshGoalBackPrune, see updateProofStatus).
+        goalBackMenuItem = menuItem("Undo Last Rule Application",
+            "de.uka.ilkd.key.gui.actions.GoalBackAction",
+            IconFactoryF.Key.GOAL_BACK, mediator::goalBack);
+        pruneMenuItem = menuItem("Prune Proof", "de.uka.ilkd.key.gui.actions.PruneProofAction",
+            IconFactoryF.Key.PRUNE, mediator::pruneProof);
         proof.getItems().addAll(automation, new SeparatorMenuItem(),
-            menuItem("Goal Back", "de.uka.ilkd.key.gui.actions.GoalBackAction",
-                IconFactoryF.Key.GOAL_BACK, mediator::goalBack),
-            menuItem("Prune Proof", "de.uka.ilkd.key.gui.actions.PruneProofAction",
-                IconFactoryF.Key.PRUNE, mediator::pruneProof),
+            goalBackMenuItem, pruneMenuItem,
             abandonProof, new SeparatorMenuItem(),
             searchInTree, searchInSequent, searchNext, searchPrevious, searchMode,
             new SeparatorMenuItem(),
             usedContracts, activeSettings, proofStatistics, knownTypes);
+        // P3b/B11: refresh the Goal Back text when the Proof menu opens (Swing's MenuListener
+        // menuSelected, MainWindow.java:1094-1105)
+        proof.setOnShowing(e -> refreshGoalBackItem());
         return proof;
+    }
+
+    /**
+     * P3b/B11: updates the "Goal Back" menu item text from the newest goal of the selected
+     * subtree (Swing {@code GoalBackAction.updateName}, GoalBackAction.java:113-125; called from
+     * the Proof menu's {@code setOnShowing} like Swing's {@code MenuListener.menuSelected},
+     * MainWindow.java:1094-1105). The toolbar button keeps its static tooltip (Swing's toolbar
+     * action is constructed with {@code longName = false},
+     * {@code new GoalBackAction(this, false)} at MainWindow.java:696). The stored reference may
+     * be a freshly rebuilt item (menu-parity self test rebuilds the menu bar).
+     */
+    private void refreshGoalBackItem() {
+        if (goalBackMenuItem == null) {
+            return;
+        }
+        String app = mediator.goalBackRuleName();
+        goalBackMenuItem
+                .setText("Undo Last Rule Application" + (app == null ? "" : " (" + app + ")"));
     }
 
     // ------------------------------------------------------------------
@@ -3509,11 +3562,13 @@ public final class MainWindowF {
     // Automation submenu entries of MainWindow.createAutomationActions :814-827 since MP2).
     // Table rows are leaf items, plain separators (the {@code "---"} row) or submenu names whose
     // own children are checked recursively; MP4/MP5 can extend the tables for the other menus.
+    // P3b/B11: the Goal Back row asserts the base label — the dynamic " (RuleName)" suffix of
+    // GoalBackAction.updateName appears only after the Proof menu opens (setOnShowing).
     private static final String[][] PROOF_MENU_EXPECTED = {
         { "Automation", "Start Automatic Proof", "Stop Automatic Proof", "Full Automation",
             "Structured Automation", "Structured Automation (Prep. Only)",
             "Script-aware Auto" },
-        { "Goal Back" },
+        { "Undo Last Rule Application" },
         { "Prune Proof" },
         { "Abandon Proof" },
         { "---" },
@@ -3608,6 +3663,75 @@ public final class MainWindowF {
         logMenuParity("Options", verifyMenuParityReport("Options", OPTIONS_MENU_EXPECTED));
         logMenuParity("File", verifyMenuParityReport("File", FILE_MENU_EXPECTED));
         logMenuParity("About", verifyMenuParityReport("About", ABOUT_MENU_EXPECTED));
+        // P3b/B11: the Goal Back label seam — simulate the Proof menu opening (the Swing
+        // MenuListener.menuSelected, MainWindow.java:1094-1105, ported as the menu's
+        // setOnShowing handler) and assert the item text was refreshed from the newest goal
+        logMenuParity("GoalBack", verifyGoalBackLabel());
+        // P3b/B15: assert the Goal Back / Prune enablement of the menu items and toolbar buttons
+        verifyGoalBackPruneEnablement();
+    }
+
+    /**
+     * P3b/B11: headless self test of the dynamic "Goal Back" label ({@code
+     * key.fx.verify.menuparity}): opens the freshly built Proof menu via its {@code setOnShowing}
+     * handler (the port of Swing's {@code MenuListener.menuSelected}, MainWindow.java:1094-1105)
+     * and asserts the Goal Back item text — either the plain base or the base plus the
+     * {@code " (RuleName)"} suffix of {@code mediator.goalBackRuleName()} (Swing
+     * GoalBackAction.updateName, GoalBackAction.java:113-125).
+     *
+     * @return {@code "PASS - ..."} or {@code "FAIL - ..."}
+     */
+    private String verifyGoalBackLabel() {
+        MenuBar bar = buildMenuBar();
+        javafx.scene.control.MenuItem item = goalBackMenuItem;
+        if (item == null) {
+            return "FAIL - no Goal Back item";
+        }
+        Menu proofMenu = bar.getMenus().stream()
+                .filter(m -> "Proof".equals(m.getText())).findFirst().orElse(null);
+        if (proofMenu != null && proofMenu.getOnShowing() != null) {
+            proofMenu.getOnShowing().handle(null);
+        } else {
+            return "FAIL - no Proof menu/onShowing handler";
+        }
+        String text = item.getText();
+        boolean ok = "Undo Last Rule Application".equals(text)
+                || text != null && text.startsWith("Undo Last Rule Application (");
+        return (ok ? "PASS" : "FAIL") + " - goalBack[" + text + "]";
+    }
+
+    /**
+     * P3b/B15: headless self test of the Goal Back / Prune Proof enablement ({@code
+     * key.fx.verify.menuparity}): the freshly built menu items must mirror the Swing conditions
+     * of GoalBackAction.selectedNodeChanged (GoalBackAction.java:70-80) / PruneProofAction
+     * (PruneProofAction.java:61-77). With a loaded demo proof (no auto mode run, the root leaf
+     * condition decides) the enablement is compared to the expected value.
+     */
+    private void verifyGoalBackPruneEnablement() {
+        buildMenuBar();
+        boolean autoMode = mediator.autoModeRunningProperty().get();
+        Proof proof = selectionModel.getSelectedProof();
+        de.uka.ilkd.key.proof.Node selNode = selectionModel.getSelectedNode();
+        boolean expectGoalBack = !autoMode && proof != null && selNode != null
+                && !proof.root().leaf()
+                && !(GeneralSettings.noPruningClosed && selNode.isClosed());
+        boolean expectPrune = !autoMode && proof != null && selNode != null
+                && !selNode.leaf()
+                && (!proof.getSubtreeGoals(selNode).isEmpty()
+                        || (!GeneralSettings.noPruningClosed
+                                && !proof.getClosedSubtreeGoals(selNode).isEmpty()));
+        boolean goalBackOk = goalBackMenuItem != null
+                && goalBackMenuItem.isDisable() == !expectGoalBack;
+        boolean pruneOk =
+            pruneMenuItem != null && pruneMenuItem.isDisable() == !expectPrune;
+        boolean toolsOk = goalBackToolbarButton != null
+                && goalBackToolbarButton.isDisable() == !expectGoalBack
+                && pruneToolbarButton != null
+                && pruneToolbarButton.isDisable() == !expectPrune;
+        boolean ok = goalBackOk && pruneOk && toolsOk;
+        logMenuParity("GoalBackPrune",
+            (ok ? "PASS" : "FAIL") + " - goalBack[" + (goalBackOk ? "enabled" : "wrong")
+                + "] prune[" + (pruneOk ? "enabled" : "wrong") + "]");
     }
 
     private void logMenuParity(String menuName, String report) {
@@ -4026,11 +4150,18 @@ public final class MainWindowF {
             toolbarButton("Stop Automatic Proof (Escape)", IconFactoryF.Key.AUTO_MODE_STOP,
                 mediator::stopAutoMode);
         stopAuto.disableProperty().bind(mediator.autoModeRunningProperty().not());
+        // P3b/B11+B15: the buttons keep the static Swing tooltips (GoalBackAction SHORT_DESCRIPTION
+        // "Undo the last rule application.", PruneProofAction SHORT_DESCRIPTION "Prune the tree
+        // below the selected node."; the Swing toolbar actions are created with longName=false,
+        // MainWindow.java:696) and their enablement is driven by refreshGoalBackPrune (B15) like
+        // the corresponding Proof menu items — NOT by static bindings.
+        goalBackToolbarButton = toolbarButton("Undo the last rule application.",
+            IconFactoryF.Key.GOAL_BACK, mediator::goalBack);
+        pruneToolbarButton = toolbarButton("Prune the tree below the selected node.",
+            IconFactoryF.Key.PRUNE, mediator::pruneProof);
         ToolBar bar = new ToolBar();
         bar.getStyleClass().add("key-proof-tool-bar");
-        bar.getItems().addAll(startAuto, stopAuto,
-            toolbarButton("Goal Back", IconFactoryF.Key.GOAL_BACK, mediator::goalBack),
-            toolbarButton("Prune Proof", IconFactoryF.Key.PRUNE, mediator::pruneProof));
+        bar.getItems().addAll(startAuto, stopAuto, goalBackToolbarButton, pruneToolbarButton);
         return bar;
     }
 
@@ -4129,6 +4260,8 @@ public final class MainWindowF {
         }
         Proof proof = selectionModel.getSelectedProof();
         proofLoaded.set(proof != null);
+        // P3b/B15: the goal-back / prune enablement follows the selection like the Swing actions
+        refreshGoalBackPrune();
         if (proof == null) {
             statusLeft.setText(KeYConstants.COPYRIGHT);
             return;
@@ -4138,6 +4271,49 @@ public final class MainWindowF {
         } else {
             statusLeft.setText("Proof: " + proof.name() + " · " + proof.openGoals().size()
                 + " open goal(s)");
+        }
+    }
+
+    /**
+     * P3b/B15: applies the Swing-parity enablement of the Goal Back / Prune Proof controls to the
+     * two Proof menu items and the two proof toolbar buttons (Swing {@code GoalBackAction} and
+     * {@code PruneProofAction}, GoalBackAction.java:66-108 / PruneProofAction.java:54-109):
+     * <ul>
+     * <li>Goal Back is enabled iff a proof is selected, a node is selected, the proof is not
+     * trivial ({@code !proof.root().leaf()}) and the selected node is not closed while
+     * {@code GeneralSettings.noPruningClosed} is set ({@code !(noPruningClosed &&
+     * selNode.isClosed())});</li>
+     * <li>Prune Proof is enabled iff proof + node are selected, the node is not a leaf and its
+     * subtree has open goals or — unless {@code noPruningClosed} — closed goals; and</li>
+     * <li>both are disabled while auto mode runs (Swing's AutoModeListener removes the selection
+     * listener and disables the actions, GoalBackAction.java:94-106).</li>
+     * </ul>
+     * Called from {@link #updateProofStatus()} on every selection change and from the
+     * {@code autoModeRunningProperty} listener (both run on the FX thread).
+     */
+    private void refreshGoalBackPrune() {
+        boolean autoMode = mediator.autoModeRunningProperty().get();
+        Proof proof = selectionModel.getSelectedProof();
+        de.uka.ilkd.key.proof.Node selNode = selectionModel.getSelectedNode();
+        boolean goalBack = !autoMode && proof != null && selNode != null
+                && !proof.root().leaf()
+                && !(GeneralSettings.noPruningClosed && selNode.isClosed());
+        boolean prune = !autoMode && proof != null && selNode != null
+                && !selNode.leaf()
+                && (!proof.getSubtreeGoals(selNode).isEmpty()
+                        || (!GeneralSettings.noPruningClosed
+                                && !proof.getClosedSubtreeGoals(selNode).isEmpty()));
+        if (goalBackMenuItem != null) {
+            goalBackMenuItem.setDisable(!goalBack);
+        }
+        if (pruneMenuItem != null) {
+            pruneMenuItem.setDisable(!prune);
+        }
+        if (goalBackToolbarButton != null) {
+            goalBackToolbarButton.setDisable(!goalBack);
+        }
+        if (pruneToolbarButton != null) {
+            pruneToolbarButton.setDisable(!prune);
         }
     }
 
