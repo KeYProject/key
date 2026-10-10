@@ -143,14 +143,14 @@ differences found by a second Swing↔JavaFX sweep, with stable IDs used by the 
 
 | ID | Finding (Swing reference) | Status |
 |----|---------------------------|--------|
-| B11 | Dynamic "Goal Back" label (`GoalBackAction.java:113-125`) vs. static `MainWindowF.java:3325-3327` | OPEN (P3b) |
-| B12 | Macro superset + category submenus + ProofScript actions vs. the 4-macro `AUTOMATION_MACROS` | OPEN (P3b) |
+| B11 | Dynamic "Goal Back" label (`GoalBackAction.java:113-125`) vs. static `MainWindowF.java:3325-3327` | RESOLVED (P3b) |
+| B12 | Macro superset + category submenus + ProofScript actions vs. the 4-macro `AUTOMATION_MACROS` | RESOLVED (P3b) |
 | B13 | Extension PATH nesting (extension menus cannot nest) | OPEN (P4) |
 | B14 | Per-extension toolbars merged into one | OPEN (P4, decide) |
-| B15 | Toolbar GoalBack/Prune have no enablement | OPEN (P3b) |
+| B15 | Toolbar GoalBack/Prune have no enablement | RESOLVED (P3b) |
 | B16 | Popup dialogs replaced by toasts (per site) | OPEN (P4, decide) |
-| B17 | TermLabelMenu persistence/styling | OPEN (P3b) |
-| B18 | Recent-Files empty menu not disabled + font-size item order | OPEN (P3b) |
+| B17 | TermLabelMenu persistence/styling | RESOLVED (P3b) |
+| B18 | Recent-Files empty menu not disabled + font-size item order | RESOLVED (P3b) |
 
 ## C. Proof tree
 
@@ -217,3 +217,28 @@ covering the OSS rows on a strategy-proved proof. The view filters and the tree 
 in the tree context menu because the FX docking framework has no tab-title gear menu (documented
 in `ProofTreeViewF`); the subtree statistics report is a plain-text window rather than the Swing
 HTML one (export is A4/P3c). C24 (the `PROOF_TREE` extension seam) stays open for P4.
+
+P3b (`weigl/ocfx-p3b-menus`, see the branch report) resolved B11/B12/B15/B17/B18 — menu/toolbar
+parity items:
+
+- B11/B15 — the Proof-menu item and toolbar buttons now follow Swing enablement and labels:
+  "Undo Last Rule Application" shows the applied rule name dynamically (`KeYMediatorF
+  .`goalBackRuleName`), and Goal Back / Prune are enabled per the selected node and auto mode
+  (`key.fx.verify.menuparity` legs).
+- B12 — the macro surfaces (sequent right-click popup, term-menu "Strategy Macros", proof-tree
+  context-menu "Strategy Macros") now show the registered-`ProofMacro` superset
+  (`ProofMacroMenuF`), category-grouped like Swing, plus the PROOF_SCRIPTS menu (file chooser /
+  input dialog) executed by a new `ProofScriptWorkerF`; the proof-tree macro submenu is
+  persistent with a live PROOF_SCRIPTS feature listener.
+- B17 — `TermLabelMenuF` items are `CustomMenuItem(HBox(CheckBox+Label))` rows that persist
+  their state to `Preferences.userNodeForPackage(MainWindowF.class)` under the exact Swing
+  `AbstractButtonSaver` keys (`DisplayLabelsCheckBox.DisplayLabelsCheckBox.selected` /
+  `TermLabelCheckBox.<label>.selected`) and carry the bold/italic occurrence styling
+  (+ per-state tooltips) from Swing's `selectedNodeChanged`; `OriginLabelsF.verify` gained a
+  preference round-trip leg.
+- B18 — the recent-files menu is never force-disabled (`recentFilesMenu.setDisable` removed),
+  and the Font Size submenu items are ordered Smaller then Larger like Swing.
+
+`key.fx.verify.menuparity` + `key.fx.verify.uicontrol` PASS (B11/B12/B15/B17/B18 legs) and
+`key.fx.verify.prooftree` PASS (B12 macro submenu seam incl. the closed-demo zero-applicable
+case) on Xvnc :99.
