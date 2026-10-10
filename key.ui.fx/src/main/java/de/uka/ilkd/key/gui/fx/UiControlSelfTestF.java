@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.fx;
 
+import javafx.application.Platform;
+
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
 
@@ -48,7 +50,11 @@ public final class UiControlSelfTestF {
             boolean pass = status.contains(statusMessage);
             report("status verification", pass, "status line = '" + status + "'");
 
-            // 2. exception reporting: reportException must open an IssueDialogF
+            // 2. exception reporting: reportException must open an IssueDialogF. The seam shows
+            // a modal showAndWait dialog; headless there is no user to click "OK", so a close is
+            // scheduled BEFORE the callback fires — the modal's nested event loop picks the task
+            // up and showAndWait returns, letting the verification run right after the dismissal
+            Platform.runLater(() -> IssueDialogF.getLastDialog().ifPresent(IssueDialogF::close));
             ui.reportException(UiControlSelfTestF.class, null,
                 new IllegalStateException("Seam self test: synthetic exception"));
             FxUtil.runLater(() -> {

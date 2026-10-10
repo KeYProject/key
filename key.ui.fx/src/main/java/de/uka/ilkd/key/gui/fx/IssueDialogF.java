@@ -513,4 +513,15 @@ public final class IssueDialogF {
         shown = true;
         dialog.showAndWait();
     }
+
+    /**
+     * Closes the dialog if it is showing — the programmatic counterpart of clicking "OK". The
+     * seam self test pre-schedules this dismissal before firing {@code reportException}, so the
+     * modal {@link #showAndWait()} returns without a user having to close it (headless runs).
+     */
+    public void close() {
+        if (dialog.isShowing()) {
+            dialog.close();
+        }
+    }
 }
