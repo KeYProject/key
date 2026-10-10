@@ -21,6 +21,9 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.CustomMenuItem;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
@@ -46,6 +49,7 @@ import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
+import de.uka.ilkd.key.gui.fx.nodeviews.ProofMacroMenuF;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -56,6 +60,7 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
@@ -299,6 +304,16 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
 
     /** the node the popup was invoked on (Swing {@code ProofTreeContext.invokedNode}) */
     private Node popupNode;
+
+    /**
+     * P3b/B12: the "Strategy Macros" submenu of the context menu (Swing
+     * {@code ProofTreePopupFactory.initMacroMenu}, ProofTreePopupFactory.java:98-103: a {@code
+     * ProofMacroMenu} right after Prune, only when not empty). Persistent (built once in
+     * {@link #createContextMenu()}); its items are (re)populated whenever the menu opens or the
+     * PROOF_SCRIPTS feature changes ({@link #populateStrategyMacros()}), so every context uses
+     * the currently invoked node.
+     */
+    private Menu strategyMacrosMenu;
 
     /**
      * D34 (P3c): opens a separate sequent buffer for a proof-tree node, installed by
@@ -900,6 +915,63 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
         return "PASS: linearized, OSS rows, whole-tree actions, filter counting, view states";
     }
 
+    /**
+     * P3b/B12: headless self test of the proof-tree "Strategy Macros" submenu (run from the
+     * {@code key.fx.verify.prooftree} harness on the FX thread): repopulates the submenu from the
+     * current context (the invoked node, or the selection/root fallback of
+     * {@link #populateStrategyMacros()}) and asserts the menu is enabled with a loaded proof and
+     * that its macro items are EXACTLY the {@code canApplyTo}-applicable registered macros of the
+     * current context node (the count seam — Swing ProofMacroMenu.java:87-99; the PROOF_SCRIPTS
+     * entries are excluded: they carry no macro semantics and are gated by the feature). On a
+     * closed proof (e.g. the demo autoprove run) no macro is applicable and an empty, enabled
+     * submenu is the Swing-equivalent state (Swing would not even add it,
+     * ProofTreePopupFactory.java:100-102).
+     *
+     * @return {@code "PASS ..."} or {@code "FAIL ..."}; the item count is included for the log
+     */
+    public String verifyStrategyMacros() {
+        populateStrategyMacros();
+        if (strategyMacrosMenu == null) {
+            return "SKIP - no macro submenu";
+        }
+        List<String> labels = new ArrayList<>();
+        int separators = 0;
+        for (MenuItem item : strategyMacrosMenu.getItems()) {
+            if (item instanceof SeparatorMenuItem) {
+                separators++;
+            } else {
+                labels.add(macroMenuItemText(item));
+            }
+        }
+        Node node = popupNode != null ? popupNode
+                : mediator != null && mediator.getSelectedNode() != null
+                        ? mediator.getSelectedNode()
+                        : proof.root();
+        List<String> expected = ProofMacroMenuF.applicableMacroNames(proof,
+            proof.getSubtreeEnabledGoals(node), null);
+        List<String> scripts = List.of("Run proof script from file...", "Input proof script...");
+        List<String> macroLabels = labels.stream().filter(l -> !scripts.contains(l)).toList();
+        boolean ok = !strategyMacrosMenu.isDisable() && macroLabels.equals(expected);
+        String detail = "macro submenu " + macroLabels.size() + " items, " + separators
+            + " separators, disabled=" + strategyMacrosMenu.isDisable();
+        if (!ok && !macroLabels.equals(expected)) {
+            detail += ", actual=" + macroLabels + ", expected=" + expected;
+        }
+        return (ok ? "PASS" : "FAIL") + " - " + detail;
+    }
+
+    /** P3b/B12: the visible text of the macro submenu items (label-backed custom items). */
+    private static String macroMenuItemText(MenuItem item) {
+        String text = item.getText();
+        if (text != null && !text.isEmpty()) {
+            return text;
+        }
+        if (item instanceof CustomMenuItem custom && custom.getContent() instanceof Label label) {
+            return label.getText();
+        }
+        return "";
+    }
+
     /** @return the number of OSS protocol rows currently present in the tree */
     private static long countOssRows(TreeItem<Entry> item) {
         long count = 0;
@@ -1395,6 +1467,10 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             this::runStrategyOnNode);
         MenuItem pruneItem = actionItem("Prune Proof", IconFactoryF.Key.PRUNE,
             this::prunePopupNode);
+        // P3b/B12: the "Strategy Macros" submenu right after Prune (Swing
+        // ProofTreePopupFactory.initMacroMenu, ProofTreePopupFactory.java:98-103). The items are
+        // (re)populated per popup-open from the invoked node, see populateStrategyMacros().
+        strategyMacrosMenu = new Menu("Strategy Macros");
         MenuItem notesItem = actionItem("Edit Notes...", null, this::editNotes);
         MenuItem subtreeStatsItem = actionItem("Show Subtree Statistics",
             IconFactoryF.Key.STATISTICS, this::showSubtreeStatistics);
@@ -1408,7 +1484,8 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
         ContextMenu menu = new ContextMenu(hideIntermediateItem, onlyInteractiveItem,
             new SeparatorMenuItem(), hideClosedItem, hideInteractiveItem, linearizeItem,
             expandOssItem, new SeparatorMenuItem(), expandAllItem, collapseAllItem,
-            new SeparatorMenuItem(), applyStrategyItem, pruneItem, notesItem,
+            new SeparatorMenuItem(), applyStrategyItem, pruneItem, strategyMacrosMenu,
+            new SeparatorMenuItem(), notesItem,
             new SeparatorMenuItem(),
             actionItem("Expand All Below", IconFactoryF.Key.PLUS,
                 () -> expandAllBelow(popupBranchItem)),
@@ -1439,11 +1516,52 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             notesItem.setDisable(proof == null);
             subtreeStatsItem.setDisable(proof == null);
             pruneItem.setDisable(!isPrunable(popupNode));
+            // P3b/B12: rebuild the macro submenu from the invoked node (Swing
+            // ProofTreePopupFactory.initMacroMenu rebuilds it per popup-open)
+            populateStrategyMacros();
             // D34: Opening a node buffer needs a proof node to open
             openNodeItem.setDisable(proof == null || popupNode == null);
             refreshPopupExtensions();
         });
+        // P3b/B12: the submenu is persistent (unlike the term menu / sequent popup, which are
+        // rebuilt per show and pick up the PROOF_SCRIPTS feature at build time), so it gets the
+        // live feature listener of the Swing ProofMacroMenu (ProofMacroMenu.java:125-133). The
+        // listener immediately re-populates with the current value; on the FX thread, since it
+        // touches the menu items (the feature may be toggled from the settings dialog's thread).
+        FeatureSettings.onAndActivate(ProofMacroMenuF.PROOF_SCRIPTS_FEATURE,
+            active -> FxUtil.runLater(this::populateStrategyMacros));
         return menu;
+    }
+
+    /**
+     * P3b/B12: (re)populates the persistent "Strategy Macros" submenu for the currently invoked
+     * node ({@link #popupNode}; falls back to the mediator's selected node and then to the proof
+     * root for the headless self test): the applicable macros of the registered-macro superset
+     * ({@link ProofMacroMenuF}), category-grouped, plus the PROOF_SCRIPTS section according to
+     * the current feature state — the exact content of the Swing {@code ProofMacroMenu}.
+     * <p>
+     * The macro items run on the {@link #popupNode} of the invocation (Swing's
+     * {@code ProofMacroUserAction} runs them on the mediator selection — a quirk of reusing the
+     * same action factory for the tree popup; the invoked node is the deliberate FX choice).
+     * Without a proof the submenu is disabled and empty (Swing's
+     * {@code mediator.enableWhenProofLoaded(this)}).
+     */
+    private void populateStrategyMacros() {
+        if (strategyMacrosMenu == null) {
+            return;
+        }
+        strategyMacrosMenu.getItems().clear();
+        if (proof == null || proof.isDisposed() || proofControl == null) {
+            strategyMacrosMenu.setDisable(true);
+            return;
+        }
+        Node node = popupNode != null ? popupNode
+                : mediator != null && mediator.getSelectedNode() != null
+                        ? mediator.getSelectedNode()
+                        : proof.root();
+        strategyMacrosMenu.setDisable(false);
+        strategyMacrosMenu.getItems().addAll(ProofMacroMenuF.items(proof,
+            proof.getSubtreeEnabledGoals(node), node, proofControl, null));
     }
 
     /**
