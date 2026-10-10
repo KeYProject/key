@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,6 +111,7 @@ import de.uka.ilkd.key.gui.fx.settings.ActiveSettingsDialogF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsManagerF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsProviderF;
 import de.uka.ilkd.key.gui.fx.settings.ToolTipOptionsDialogF;
+import de.uka.ilkd.key.gui.fx.smt.SolverListenerF;
 import de.uka.ilkd.key.gui.fx.soundiness.SoundinessAnalyzer;
 import de.uka.ilkd.key.gui.fx.soundiness.SoundinessDialogF;
 import de.uka.ilkd.key.gui.fx.sourceview.SourceViewF;
@@ -144,8 +146,12 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSMTSettings.ProgressMode;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletLoader;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader;
 import de.uka.ilkd.key.util.KeYConstants;
@@ -875,6 +881,12 @@ public final class MainWindowF {
             }
             if (System.getProperty("key.fx.verify.updatehighlight") != null) {
                 runUpdateHighlightVerification();
+            }
+            // smt (P1): run the FX SMT run UI end to end — launch the usable solver union on the
+            // first open goal of the demo proof with the auto-applying CLOSE progress mode and
+            // check that the goal got closed by the SMT rule application
+            if (System.getProperty("key.fx.verify.smt") != null) {
+                runSmtVerification();
             }
             // drawer: headless self test of the DrawerF port (exclusive/multiselect semantics,
             // side placement, button-order split, drag-and-drop reorder + transfer seams)
@@ -1841,6 +1853,75 @@ public final class MainWindowF {
         NotificationManagerF.getInstance()
                 .notify("Update highlight verification: " + report,
                     report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+    }
+
+    /**
+     * smt (P1): runs the FX SMT run UI end to end ({@code key.fx.verify.smt}), run after the
+     * demo load like the other proof-dependent verify hooks: launches the first usable solver
+     * union on the first open goal with the auto-applying {@code ProgressMode.CLOSE} (the
+     * {@link SolverListenerF} closes the goal via the SMT rule on completion) and checks the
+     * solver result and the closed goal. The waiting happens on a background thread (the hook
+     * itself is invoked on the FX thread; the modal progress dialog stays interactive).
+     */
+    private void runSmtVerification() {
+        Thread thread = new Thread(this::runSmtVerificationAsync, "SMTVerify");
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    private void runSmtVerificationAsync() {
+        String report;
+        Proof proof = mediator.getSelectedProof();
+        ProofIndependentSMTSettings smtSettings =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings();
+        Collection<SolverTypeCollection> unions = smtSettings.getUsableSolverUnions();
+        if (proof == null || proof.closed() || unions.isEmpty()) {
+            report = "FAIL: no open proof or no usable solver union (unions=" + unions.size()
+                + ")";
+        } else {
+            Goal goal = proof.openGoals().iterator().next();
+            SolverTypeCollection union = unions.iterator().next();
+            // the CLOSE progress mode auto-applies the results on completion (and closes the
+            // goals); snapshot + restore so the user's setting is not persisted
+            ProgressMode previousMode = smtSettings.getModeOfProgressDialog();
+            smtSettings.setModeOfProgressDialog(ProgressMode.CLOSE);
+            SMTProblem problem = new SMTProblem(goal);
+            SolverListenerF.launch(mediator, getStage(), proof, List.of(problem),
+                union.getTypes());
+            // SolverLauncher.launch blocks its background thread until every solver finished
+            // and the CLOSE auto-apply is posted afterwards (FIFO on the FX thread): poll for
+            // the closed goal (the solvers are quick on the demo problem)
+            long deadline = System.currentTimeMillis() + 120_000;
+            while (System.currentTimeMillis() < deadline && !goal.node().isClosed()) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
+                }
+            }
+            boolean closed = goal.node().isClosed();
+            if (!closed) {
+                // discard the still open modal dialog so the verify run does not stall
+                Platform.runLater(SolverListenerF::discardCurrentDialog);
+            }
+            report = (closed ? "PASS" : "FAIL") + " (union=" + union + ", goalClosed=" + closed
+                + ")";
+            // restore the user's progress mode after the auto-apply settled
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            smtSettings.setModeOfProgressDialog(previousMode);
+        }
+        String finalReport = report;
+        Platform.runLater(() -> {
+            LOGGER.info("SMT verification: {}", finalReport);
+            NotificationManagerF.getInstance()
+                    .notify("SMT verification: " + finalReport,
+                        finalReport.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+        });
     }
 
     /**

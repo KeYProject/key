@@ -25,7 +25,7 @@ marked `OPEN (unverified)` rather than assumed fixed.
 | goallist-strategy-info | 37 | goal list at parity; strategy preset UI missing; info view re-designed | — | preset combo + stats staleness OPEN |
 | source-search-filechooser | 74 | 30 / 5 / **28 MISSING** | search bars + loading-options dialog ported | source-view interaction (symbex highlights, cross-highlight) OPEN |
 | menus-actions | 57 leaves | ~25 MISSING | menu parity 5/5 (File 16 / Proof 24 / Options 12 / View 7 / About 5) plus automation submenu | RESOLVED at surface level; a few behaviours below |
-| settings-config | 117 | 83 / 8 / 11 MISSING / 13 KNOWN-DEF | settings framework + providers + colors mechanics + search | SMT run-UI + theme persistence OPEN; color definitions RESOLVED (P1) |
+| settings-config | 117 | 83 / 8 / 11 MISSING / 13 KNOWN-DEF | settings framework + providers + colors mechanics + search | theme persistence OPEN; color definitions + SMT run UI RESOLVED (P1) |
 | unported-dialogs | 18 | 13 MISSING / 2 PARTIAL | proofmgmt, tacletmatch, IssueDialog, notification, Loaded Proofs | RESOLVED where noted below; join/mergerule/lemmatagenerator/etc. track their MP9.x modules |
 
 ## P0 sign-off (the audit's "prover workflow critical" list)
@@ -63,7 +63,7 @@ P0 bugs from the audit:
 | Automation submenu + macro invocation | **RESOLVED** (automation submenu MP2, macro menu in term menu); global toolbar dropdown `OPEN` |
 | Join / merge dialogs | **RESOLVED** for the merge/join flow (`key.fx.verify.joinmerge` PASS on gcd 32/0); `keyext.slicing.fx` SMT routing partial |
 | Strategy preset combo / stash UI | `OPEN` |
-| SMT settings + run UI | `OPEN` (settings providers ported; the run UI — `ProgressDialog` table, `DropdownSelectionButton` — remains) |
+| SMT settings + run UI | **RESOLVED** (P1: settings providers ported in MP4; the run UI — `SolverListenerF` + `ProgressDialogF` progress table + `InformationWindowF` + result application via the SMT rule — ported, `key.fx.verify.smt` PASS: Z3 closes the Agatha goal; the Swing toolbar `DropdownSelectionButton` remains tracked under the toolbar item) |
 | Exit flow (close-request, `confirmExit`, layout save) | `OPEN (unverified)` |
 | Term labels; Pretty Print / Unicode wiring | `OPEN` (lemmaorigin hook covers labels mechanically — see `key.fx.verify.lemmaorigin`) |
 | User-selection highlight + Ctrl+C copy | **RESOLVED** (term-menu copy item in the skeleton); multi-selection highlight + reprint persistence `OPEN` |
@@ -98,7 +98,8 @@ as open.
    Back/Forward bindings, Edit Last File, Load User Taclets + Prove submenu, Run All Proofs
    (dialogs exist for several), EnableWhenProofLoaded analogue, toolbars 9 remaining buttons.
 6. Keyboard: shortcut-default regressions; dead bindings audit.
-7. Options dialogs: SMT run UI, strategy preset UI, HeatmapOptionsDialog.
+7. Options dialogs: strategy preset UI, HeatmapOptionsDialog (SMT run UI RESOLVED via P1
+   `key.fx.verify.smt`).
 8. Exit flow: close-request + confirmExit + layout persistence on close.
 9. Colors/theme: all 51 Swing-parity color property definitions RESOLVED (P1 `key.fx.verify.colors` PASS); theme persistence remains.
 10. Notification framework depth: proof-closed/exception dialogs beyond toasts are in

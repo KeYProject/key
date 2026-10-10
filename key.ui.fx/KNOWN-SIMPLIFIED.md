@@ -10,14 +10,14 @@ Marker counts per module:
 
 | Module | Markers |
 |---|---|
-| `key.ui.fx` (contrib extensions) | 3 |
+| `key.ui.fx` (contrib extensions + SMT run UI) | 5 |
 | `keyext.caching.fx` | 10 |
 | `keyext.exploration.fx` | 9 |
 | `keyext.isabelletranslation.fx` | 4 |
 | `keyext.slicing.fx` | 16 |
 | `keyext.ui.testgen.fx` | 18 |
 | `keyext.proofmanagement.fx` | 4 |
-| **Total** | **64** |
+| **Total** | **66** |
 
 To re-derive this table at any point: `grep -rn 'KNOWN-SIMPLIFIED' */src/main */src/test`.
 
@@ -34,6 +34,13 @@ milestone, **FIXED-UPSTREAM** items differ from a Swing bug that the port delibe
 | `extension/contrib/HeatmapF.java:28` | `HeatmapExt` renders the heat highlight into the proof tree / sequent | menu + toolbar toggle + persisted `ViewSettings` options only; proof-tree heat overlay deferred | OPEN |
 | `extension/contrib/HeatmapF.java:37` | — (doubles the `@Info` description) | same decision restated for the extension dialog | OPEN |
 | `extension/contrib/ParallelProverStatusIndicatorF.java:27` | toggle button "SC" / "MT N×" with left-click toggle and right-click worker-count menu | plain `Label` showing the live auto-mode state ("Auto"/"Manual"), left-click toggles `PARALLEL_PROVER_ENABLED`, reacts to property changes; worker-count picker and button styling out of scope | OPEN |
+
+## `key.ui.fx` — SMT run UI (2)
+
+| Site | Swing original | FX port | Status |
+|---|---|---|---|
+| `SolverListenerF.java:81` | results applied via `SMTProofApplyUserAction` (undoable history entry) with the `stopInterface` input freeze around it | direct `SMTRule` application on the FX thread (no undo entry for the automatic CLOSE-mode application; the input freeze is the P0 `stopInterface` remainder) | OPEN |
+| `InformationWindowF.java:24` | counterexample model tree (`CETree`) with line numbers (`TextLineNumber`) and the counterexample help tab | tabs per information entry as read-only monospaced text areas; model tree + line numbers + help tab not ported | OPEN |
 
 ## `keyext.caching.fx` (10)
 
