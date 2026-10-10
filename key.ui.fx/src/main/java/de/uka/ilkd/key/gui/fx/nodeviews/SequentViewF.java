@@ -214,6 +214,20 @@ public class SequentViewF extends BorderPane {
 
     private final ScrollPane scrollPane = new ScrollPane();
     private final TextFlow textFlow = new TextFlow();
+
+    /**
+     * D31 (P3c): hidden unmanaged {@code Text("W")} probe used to measure the character width of
+     * the mono font for {@link #computeLineWidth()} (Swing {@code SequentView}
+     * {@code FontMetrics.charWidth('W')}; not attached to any layout, it only resolves the font).
+     */
+    private final Text charProbe = new Text("W");
+
+    /**
+     * D31 (P3c): the last used print line width (Swing {@code SequentView.lineWidth}); 0 until
+     * the first measurement, {@link #computeLineWidth()} falls back to
+     * {@link PosTableLayouter#DEFAULT_LINE_WIDTH} then.
+     */
+    private int lineWidth;
     /**
      * Translucent rectangles painted behind the printed text (Swing's highlighter layer): the
      * update-operator highlight of the current printing. The pane fills the same area as the
@@ -354,6 +368,16 @@ public class SequentViewF extends BorderPane {
         // rebuild them directly
         textFlow.layoutBoundsProperty()
                 .addListener((obs, oldBounds, newBounds) -> FxUtil.runLater(this::rebuildOverlays));
+        // D31 (P3c): re-measure the print line width when the viewport width changes (Swing
+        // SequentViewChangeListener on the visible-rect change, SequentView.java:745-749, which
+        // recomputes the line width and re-displays); prints are only re-run when the width
+        // really differs (sub-pixel jitter would otherwise reprint on every layout pass)
+        scrollPane.viewportBoundsProperty().addListener((obs, oldBounds, newBounds) -> {
+            if (newBounds != null
+                    && ((int) computeLineWidth()) != lineWidth) {
+                FxUtil.runLater(this::printSequent);
+            }
+        });
         // the tooltip shows when the mouse pauses over a term (Swing ToolTipManager)
         hoverTooltipDelay.setOnFinished(event -> showHoverTooltip());
 
@@ -693,8 +717,8 @@ public class SequentViewF extends BorderPane {
             return;
         }
         filter.setSequent(selectedNode.sequent());
-        // TODO(M2): compute the line width from the font metrics and the viewport width
-        printer.update(filter, PosTableLayouter.DEFAULT_LINE_WIDTH);
+        lineWidth = computeLineWidth();
+        printer.update(filter, lineWidth);
         printed = printer.result();
         LOGGER.debug("printSequent: chars={} filter={} antec={} succ={}", printed.length(), filter
                 .getClass().getSimpleName(),
@@ -710,6 +734,66 @@ public class SequentViewF extends BorderPane {
         rebuildRuns();
         updateHideWarning();
         rebuildOverlays();
+    }
+
+    /**
+     * D31 (P3c): computes the print line width from the {@link #scrollPane} viewport width and
+     * the mono font's character width (Swing {@code SequentView.computeLineWidthFor},
+     * SequentView.java:710-719: {@code (int)(visibleWidth / charWidth('W'))}, minus one when the
+     * result exceeds one character). Before the first layout pass the viewport has no width, so
+     * the fallback {@link PosTableLayouter#DEFAULT_LINE_WIDTH} is used then.
+     *
+     * @return the number of characters per printed line
+     */
+    private int computeLineWidth() {
+        double viewportWidth = scrollPane.getViewportBounds().getWidth();
+        if (viewportWidth <= 0) {
+            // not laid out yet (or collapsed): keep the previous width, fall back to the Swing
+            // default 55 characters
+            return lineWidth != 0 ? lineWidth : PosTableLayouter.DEFAULT_LINE_WIDTH;
+        }
+        double charWidth = measureCharWidth();
+        if (charWidth <= 0) {
+            return lineWidth != 0 ? lineWidth : PosTableLayouter.DEFAULT_LINE_WIDTH;
+        }
+        int maxChars = (int) (viewportWidth / charWidth);
+        if (maxChars > 1) {
+            maxChars -= 1;
+        }
+        // Swing returns maxChars unchecked; the printer must not see 0 (or negative) widths, so
+        // one character is the floor
+        return Math.max(maxChars, 1);
+    }
+
+    /**
+     * D31 (P3c): measures the width of one {@code W} in the mono display font (Swing
+     * {@code FontMetrics.charWidth('W')} of {@code SequentView.computeLineWidthFor}) via the
+     * hidden unmanaged {@link #charProbe}; the probe's {@code getLayoutBounds()} is computed on
+     * demand from the font, without a scene attachment.
+     *
+     * @return the character width in pixels, or {@code 0} when the font is not resolvable yet
+     */
+    private double measureCharWidth() {
+        charProbe.setFont(ConfigF.DEFAULT.monoFont());
+        return charProbe.getLayoutBounds().getWidth();
+    }
+
+    /**
+     * D31 (P3c): self test of the viewport line width (Swing {@code computeLineWidthFor}) —
+     * asserts that the computed width is positive, below the Swing default when the viewport is
+     * narrower, and stable across two calls with the same viewport size. Hooked into the
+     * {@code key.fx.verify.sequent} block of {@code MainWindowF}.
+     *
+     * @return a self-test report ending in {@code PASS} or {@code FAIL}
+     */
+    public String verifyViewportLineWidth() {
+        int width = computeLineWidth();
+        double viewportWidth = scrollPane.getViewportBounds().getWidth();
+        double charWidth = measureCharWidth();
+        boolean pass = width > 0 && viewportWidth > 0 && charWidth > 0
+                && (int) (viewportWidth / charWidth) >= width;
+        return "viewport=" + (int) viewportWidth + " char=" + (int) charWidth + " lineWidth="
+            + width + (pass ? " PASS" : " FAIL");
     }
 
     /**

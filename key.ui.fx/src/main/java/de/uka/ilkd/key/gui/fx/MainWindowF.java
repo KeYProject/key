@@ -938,6 +938,12 @@ public final class MainWindowF {
                 NotificationManagerF.getInstance()
                         .notify("Syntax highlighting verification: " + hlReport,
                             hlReport.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+                // D31 (P3c): viewport-driven print line width (Swing computeLineWidthFor)
+                String lwReport = sequentView.verifyViewportLineWidth();
+                LOGGER.info("Sequent viewport line width verification: {}", lwReport);
+                NotificationManagerF.getInstance()
+                        .notify("Viewport line width verification: " + lwReport,
+                            lwReport.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
             }
             if (System.getProperty("key.fx.verify.sequentsearch") != null
                     && System.getProperty("key.fx.demo.autoprove.live") == null) {
