@@ -90,6 +90,7 @@ import de.uka.ilkd.key.gui.fx.contractcompletions.LoopInvariantRuleCompletionF;
 import de.uka.ilkd.key.gui.fx.dialogs.DialogsVerifyF;
 import de.uka.ilkd.key.gui.fx.dialogs.FeedbackDialogF;
 import de.uka.ilkd.key.gui.fx.dialogs.LemmaSelectionDialogF;
+import de.uka.ilkd.key.gui.fx.dialogs.LicenseDialogF;
 import de.uka.ilkd.key.gui.fx.dialogs.LoadUserTacletsDialogF;
 import de.uka.ilkd.key.gui.fx.dialogs.RunAllProofsF;
 import de.uka.ilkd.key.gui.fx.docking.DockLayoutStore;
@@ -4206,15 +4207,19 @@ public final class MainWindowF {
     }
 
     private void showLicense() {
-        NotificationManagerF.getInstance().notify(
-            KeYConstants.COPYRIGHT + " KeY is free software and comes with ABSOLUTELY NO "
-                + "WARRANTY. See About | License.",
-            Kind.INFO);
+        // A5 (P3c): the license becomes a real dialog (LicenseDialogF) — it IS inspectable legal
+        // text (KeY license + third-party libraries), so unlike "About KeY" an INFO toast would
+        // not suffice. This replaces the Swing LicenseAction.showLicense dialog.
+        LicenseDialogF.show(stage);
     }
 
     private void showAbout() {
-        NotificationManagerF.getInstance().notify(
-            KeYResourceManager.getManager().getUserInterfaceTitle() + " — JavaFX UI (key.ui.fx).");
+        // B16 (P3c): "About KeY" stays an information toast (an invisible-at-a-glance info
+        // styled message) instead of becoming a modal dialog; the toast is enriched with the
+        // Swing AboutAction content (copyright, WWW, version) to keep the parity information.
+        NotificationManagerF.getInstance().notify(KeYConstants.COPYRIGHT
+            + "\n\nWWW: http://key-project.org/\n\nVersion " + KeYConstants.VERSION,
+            Kind.INFO);
     }
 
     private void notYetImplemented() {
