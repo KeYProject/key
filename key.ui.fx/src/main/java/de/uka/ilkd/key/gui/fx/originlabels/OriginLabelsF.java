@@ -99,14 +99,25 @@ public final class OriginLabelsF {
         sequentView.setVisibleTermLabels(termLabelMenu.getVisibleTermLabels());
 
         // Swing TermLabelMenu rebuilds on selectedProofChanged (label names depend on the proof)
+        // and re-styles the label items on selectedNodeChanged (bold = occurs in the displayed
+        // sequent, B17)
         KeYSelectionModel selectionModel = mainWindow.getSelectionModel();
         selectionModel.addKeYSelectionListenerChecked(new KeYSelectionListener() {
             @Override
             public void selectedProofChanged(KeYSelectionEvent<Proof> event) {
                 termLabelMenu.rebuildMenu(selectionModel.getSelectedProof());
+                termLabelMenu.applyStyles(selectionModel.getSelectedNode());
+            }
+
+            @Override
+            public void selectedNodeChanged(KeYSelectionEvent<Node> event) {
+                // P3b/B17: Swing TermLabelMenu.selectedNodeChanged — the font style indicates
+                // whether a label occurs in the currently displayed sequent
+                termLabelMenu.applyStyles(selectionModel.getSelectedNode());
             }
         });
         termLabelMenu.rebuildMenu(selectionModel.getSelectedProof());
+        termLabelMenu.applyStyles(selectionModel.getSelectedNode());
 
         List<MenuItem> items = new ArrayList<>();
         items.add(termLabelMenu);
@@ -304,7 +315,53 @@ public final class OriginLabelsF {
 
         // --- origin visualizer part (Swing OriginTermLabelVisualizer / NodeInfoVisualizer) ---
         String visReport = verifyOriginVisualizer(mainWindow);
-        return termLabelReport + " | " + visReport;
+
+        // --- B17 persistence part: the Swing AbstractButtonSaver preference round trip ---
+        String prefReport = verifyPreferencePersistence(proof);
+        return termLabelReport + " | " + visReport + " | " + prefReport;
+    }
+
+    /**
+     * Self test part (B17): the check states persist under the exact Swing
+     * {@code AbstractButtonSaver} keys ("{@code <SimpleName>.<name>.selected}" in {@code
+     * Preferences.userNodeForPackage(MainWindowF)}, PreferenceSaver.java:260) — driving the
+     * user-click path must flip the menu state AND the raw preference, and reading the key back
+     * must round-trip. One label name of the loaded proof is used when one exists; the toggled
+     * states are restored afterwards (menu + preferences).
+     *
+     * @param proof the loaded proof (its term label names select the tested label item)
+     */
+    private static String verifyPreferencePersistence(Proof proof) {
+        boolean ok = true;
+        StringBuilder report = new StringBuilder("termLabels-prefs:");
+        // master switch: toggle through the real click path (handler + save), read it back
+        boolean display = termLabelMenu.isDisplayLabelsSelected();
+        termLabelMenu.clickDisplayLabels();
+        ok &= termLabelMenu.isDisplayLabelsSelected() == !display;
+        ok &= TermLabelMenuF.readDisplaySelected(display) == !display;
+        report.append(" display=").append(TermLabelMenuF.readDisplaySelected(display));
+        // one label item (when the loaded proof supports one): toggle there and back, checking
+        // the state AND the stored preference each way — the click path saves like Swing
+        List<Name> names = TermLabelVisibilityManager.getSortedTermLabelNames(proof);
+        if (!names.isEmpty()) {
+            Name label = names.get(0);
+            boolean labelState = termLabelMenu.isLabelSelected(label);
+            termLabelMenu.clickLabel(label);
+            ok &= termLabelMenu.isLabelSelected(label) == !labelState;
+            ok &= TermLabelMenuF.readLabelSelected(label, labelState) == !labelState;
+            report.append(" label=").append(!labelState);
+            termLabelMenu.clickLabel(label);
+            ok &= termLabelMenu.isLabelSelected(label) == labelState;
+            ok &= TermLabelMenuF.readLabelSelected(label, !labelState) == labelState;
+        } else {
+            report.append(" label=skipped");
+        }
+        // restore the master switch (the click path also restores the saved preference)
+        termLabelMenu.clickDisplayLabels();
+        ok &= termLabelMenu.isDisplayLabelsSelected() == display;
+        ok &= TermLabelMenuF.readDisplaySelected(display) == display;
+        report.append(' ').append(ok ? "PASS" : "FAIL");
+        return report.toString();
     }
 
     /** @return the next node in pre-order (node itself first), {@code null} after the last */
