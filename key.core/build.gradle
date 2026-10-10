@@ -70,6 +70,40 @@ tasks.register('generateSMTListings') {
     }
 }
 
+def keyScriptDocsDir = layout.buildDirectory.dir("docs/keydocs")
+
+// Generates the markdown documentation of all variable conditions (varconds),
+// see de.uka.ilkd.key.doc.VarcondDoc.
+tasks.register('generateVarcondDoc', JavaExec) {
+    group = 'documentation'
+    description = 'Generates the markdown documentation of all variable conditions (varconds).'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'de.uka.ilkd.key.doc.VarcondDoc'
+    def outputFile = layout.buildDirectory.file("docs/keydocs/varconds.md")
+    outputs.file(outputFile)
+    doFirst {
+        def f = outputFile.get().asFile
+        f.parentFile.mkdirs()
+        standardOutput = new FileOutputStream(f)
+    }
+}
+
+// Generates the markdown documentation of all proof script commands,
+// see de.uka.ilkd.key.doc.ScriptDoc.
+tasks.register('generateScriptDoc', JavaExec) {
+    group = 'documentation'
+    description = 'Generates the markdown documentation of all proof script commands.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'de.uka.ilkd.key.doc.ScriptDoc'
+    def outputFile = layout.buildDirectory.file("docs/keydocs/script-commands.md")
+    outputs.file(outputFile)
+    doFirst {
+        def f = outputFile.get().asFile
+        f.parentFile.mkdirs()
+        standardOutput = new FileOutputStream(f)
+    }
+}
+
 tasks.register('generateSolverPropsList') {
     def pack = "de/uka/ilkd/key/smt/solvertypes"
     def resourcesDir = "${project.projectDir}/src/main/resources"
