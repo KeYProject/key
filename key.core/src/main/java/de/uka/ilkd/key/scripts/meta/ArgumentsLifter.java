@@ -14,7 +14,7 @@ import java.util.List;
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
 
 import com.github.therapi.runtimejavadoc.ClassJavadoc;
-import com.github.therapi.runtimejavadoc.FieldJavadoc;
+import com.github.therapi.runtimejavadoc.CommentFormatter;
 import com.github.therapi.runtimejavadoc.RuntimeJavadoc;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -102,7 +102,9 @@ public final class ArgumentsLifter {
         if (docCommand != null) {
             sb.append(docCommand.value());
             sb.append("\n\n");
-        } else {
+        } else if (jdocCommand != null && jdocCommand.getComment() != null) {
+            // the javadoc is only available if the class was compiled with a JDK that
+            // understands the doc comment style used in the source (e.g., JDK 23+ for ///)
             sb.append(jdocCommand.getComment());
             sb.append("\n\n");
         }
@@ -117,7 +119,7 @@ public final class ArgumentsLifter {
         if (docAn != null) {
             sb.append(docAn.value());
             sb.append("\n\n");
-        } else {
+        } else if (jdocParams != null && jdocParams.getComment() != null) {
             sb.append(jdocParams.getComment());
             sb.append("\n\n");
         }
@@ -133,10 +135,12 @@ public final class ArgumentsLifter {
             sb.append("\n\n");
 
             var documentation = meta.getDocumentation();
-            if (documentation.isEmpty()) {
+            if (documentation.isEmpty() && jdocParams != null) {
                 documentation = jdocParams.getFields().stream()
                         .filter(it -> it.getName().equals(meta.getField().getName()))
-                        .findFirst().map(FieldJavadoc::toString).orElse("");
+                        .findFirst()
+                        .map(field -> new CommentFormatter().format(field.getComment()))
+                        .orElse("");
             }
 
             if (meta.isPositional()) {

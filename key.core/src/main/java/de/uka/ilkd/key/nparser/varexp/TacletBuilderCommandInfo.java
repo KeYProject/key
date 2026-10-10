@@ -223,13 +223,13 @@ class TacletBuilderCommandInfoImpl implements TacletBuilderCommandInfo {
 
         final var parameters = constr.getParameters();
         argNames = new String[argTypes.length];
-        for (int i = 0; i < argTypes.length; i++) {
+        for (int i = 0; i < argTypes.length && i < parameters.length; i++) {
             argNames[i] = parameters[i].getName();
         }
 
         constructorDeclaration.ifPresent(it -> {
             List<ParamJavadoc> params = it.getParams();
-            for (int i = 0; i < argNames.length; i++) {
+            for (int i = 0; i < argNames.length && i < params.size(); i++) {
                 argNames[i] = params.get(i).getName();
             }
         });
