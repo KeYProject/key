@@ -50,6 +50,17 @@ public final class KeyStrokeManagerF {
     /** the shared shortcut file (the same as the Swing module's) */
     public static final Path SETTINGS_FILE = PathConfig.getSettingsFile("keystrokes.json");
 
+    /**
+     * shortcuts (P1): the former (pre Swing-parity) FX defaults of the re-mapped actions, in the
+     * shared Swing spec format. A persisted entry equal to one of these is treated as "not
+     * customized" on load, so a {@code keystrokes.json} written by an earlier FX version (which
+     * persists the full binding table on exit) heals to the new defaults instead of keeping the
+     * stale ones. A genuine user customization that coincides with an old default is re-defaulted
+     * with it (indistinguishable from the stale entry). Declared before the singleton field:
+     * {@link #load()} runs from the constructor during class initialization.
+     */
+    private static final Map<String, String> LEGACY_DEFAULTS = createLegacyDefaults();
+
     private static final boolean MAC =
         System.getProperty("os.name", "").toLowerCase(Locale.ROOT).contains("mac");
 
@@ -80,22 +91,30 @@ public final class KeyStrokeManagerF {
     }
 
     private void registerDefaults() {
-        defineDefault("de.uka.ilkd.key.macros.FullAutoPilotProofMacro", modifier() + "V");
-        defineDefault("de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro", modifier() + "D");
-        defineDefault("de.uka.ilkd.key.macros.PropositionalExpansionMacro", modifier() + "A");
-        defineDefault("de.uka.ilkd.key.macros.FullPropositionalExpansionMacro", modifier() + "S");
-        defineDefault("de.uka.ilkd.key.macros.TryCloseMacro", modifier() + "C");
-        defineDefault("de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro", modifier() + "X");
-        defineDefault("de.uka.ilkd.key.macros.OneStepProofMacro", modifier() + "SPACE");
-        defineDefault("de.uka.ilkd.key.macros.HeapSimplificationMacro", modifier() + "H");
-        defineDefault("de.uka.ilkd.key.macros.UpdateSimplificationMacro", modifier() + "L");
-        defineDefault("de.uka.ilkd.key.macros.IntegerSimplificationMacro", modifier() + "I");
-        defineDefault("de.uka.ilkd.key.macros.SMTPreparationMacro", modifier() + "Y");
+        // shortcuts (P1): Swing-parity defaults — macros and the search/toggle actions use
+        // CTRL+SHIFT (KeyStrokeSettings.java:44 "use CTRL+SHIFT+letter for macros", :60-76), so
+        // the former FX defaults without the Shift modifier no longer collide with the
+        // Ctrl+SPACE auto mode and the Ctrl+C term copy
+        defineDefault("de.uka.ilkd.key.macros.FullAutoPilotProofMacro", modifier() + "SHIFT+V");
+        defineDefault("de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro", modifier() + "SHIFT+D");
+        defineDefault("de.uka.ilkd.key.macros.PropositionalExpansionMacro", modifier() + "SHIFT+A");
+        defineDefault("de.uka.ilkd.key.macros.FullPropositionalExpansionMacro",
+            modifier() + "SHIFT+S");
+        defineDefault("de.uka.ilkd.key.macros.TryCloseMacro", modifier() + "SHIFT+C");
+        defineDefault("de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro",
+            modifier() + "SHIFT+X");
+        defineDefault("de.uka.ilkd.key.macros.OneStepProofMacro", modifier() + "SHIFT+SPACE");
+        defineDefault("de.uka.ilkd.key.macros.HeapSimplificationMacro", modifier() + "SHIFT+H");
+        defineDefault("de.uka.ilkd.key.macros.UpdateSimplificationMacro", modifier() + "SHIFT+L");
+        defineDefault("de.uka.ilkd.key.macros.IntegerSimplificationMacro", modifier() + "SHIFT+I");
+        defineDefault("de.uka.ilkd.key.macros.SMTPreparationMacro", modifier() + "SHIFT+Y");
 
-        defineDefault("de.uka.ilkd.key.gui.actions.SearchInProofTreeAction", modifier() + "F");
-        defineDefault("de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction", modifier() + "P");
-        defineDefault("de.uka.ilkd.key.gui.actions.UnicodeToggleAction", modifier() + "U");
-        defineDefault("de.uka.ilkd.key.gui.actions.ProofManagementAction", modifier() + "M");
+        defineDefault("de.uka.ilkd.key.gui.actions.SearchInProofTreeAction",
+            modifier() + "SHIFT+F");
+        defineDefault("de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction",
+            modifier() + "SHIFT+P");
+        defineDefault("de.uka.ilkd.key.gui.actions.UnicodeToggleAction", modifier() + "SHIFT+U");
+        defineDefault("de.uka.ilkd.key.gui.actions.ProofManagementAction", modifier() + "SHIFT+M");
 
         defineDefault("de.uka.ilkd.key.gui.actions.QuickSaveAction", "F5");
         defineDefault("de.uka.ilkd.key.gui.actions.QuickLoadAction", "F6");
@@ -128,11 +147,44 @@ public final class KeyStrokeManagerF {
         defineDefault("de.uka.ilkd.key.gui.settings.SettingsManager$ShowSettingsAction",
             modifier() + "N");
         defineDefault("de.uka.ilkd.key.gui.actions.OpenFileAction", modifier() + "O");
-        defineDefault("de.uka.ilkd.key.gui.actions.SearchInSequentAction", "F");
+        // sequent search is Ctrl+F in Swing (KeyStrokeSettings.java:102
+        // SearchInSequentAction.java:15 "Keyboard shortcut: STRG+F"); the former FX default was
+        // the bare F, which hijacked typing F anywhere
+        defineDefault("de.uka.ilkd.key.gui.actions.SearchInSequentAction", modifier() + "F");
         defineDefault("de.uka.ilkd.key.gui.actions.SearchNextAction", "F3");
         defineDefault("de.uka.ilkd.key.gui.actions.SearchPreviousAction", "SHIFT+F3");
         defineDefault("de.uka.ilkd.key.gui.actions.SelectionBackAction", "SHORTCUT+ALT+LEFT");
         defineDefault("de.uka.ilkd.key.gui.actions.SelectionForwardAction", "SHORTCUT+ALT+RIGHT");
+    }
+
+    /**
+     * shortcuts (P1): the former (pre Swing-parity) FX defaults of the re-mapped actions, in the
+     * shared Swing spec format. See {@link #LEGACY_DEFAULTS} (declared before the singleton
+     * field) for the rationale.
+     */
+    private static Map<String, String> createLegacyDefaults() {
+        String[][] changed = {
+            { "de.uka.ilkd.key.macros.FullAutoPilotProofMacro", "V" },
+            { "de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro", "D" },
+            { "de.uka.ilkd.key.macros.PropositionalExpansionMacro", "A" },
+            { "de.uka.ilkd.key.macros.FullPropositionalExpansionMacro", "S" },
+            { "de.uka.ilkd.key.macros.TryCloseMacro", "C" },
+            { "de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro", "X" },
+            { "de.uka.ilkd.key.macros.OneStepProofMacro", "SPACE" },
+            { "de.uka.ilkd.key.macros.HeapSimplificationMacro", "H" },
+            { "de.uka.ilkd.key.macros.UpdateSimplificationMacro", "L" },
+            { "de.uka.ilkd.key.macros.IntegerSimplificationMacro", "I" },
+            { "de.uka.ilkd.key.macros.SMTPreparationMacro", "Y" },
+            { "de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction", "P" },
+            { "de.uka.ilkd.key.gui.actions.UnicodeToggleAction", "U" },
+            { "de.uka.ilkd.key.gui.actions.ProofManagementAction", "M" },
+            { "de.uka.ilkd.key.gui.actions.SearchInProofTreeAction", "F" } };
+        Map<String, String> legacy = new HashMap<>();
+        for (String[] entry : changed) {
+            legacy.put(entry[0], "ctrl pressed " + entry[1]);
+        }
+        legacy.put("de.uka.ilkd.key.gui.actions.SearchInSequentAction", "pressed F");
+        return legacy;
     }
 
     private static String modifier() {
@@ -276,9 +328,19 @@ public final class KeyStrokeManagerF {
                 String value = entry.getValue() == null ? "" : entry.getValue().toString();
                 Optional<KeyCombination> combination = fromSwingSpec(value);
                 if (bindings.containsKey(entry.getKey())) {
-                    // an empty entry falls back to the default, like the Swing constructor
-                    combination.ifPresent(keyCombination -> bindings.put(entry.getKey(),
-                        keyCombination));
+                    // a stale persisted entry that equals a former FX default heals to the new
+                    // (Swing-parity) default; an empty entry falls back to the default, like the
+                    // Swing constructor
+                    boolean legacy = combination.isPresent() && combination.get()
+                            .equals(fromSwingSpec(LEGACY_DEFAULTS.get(entry.getKey()))
+                                    .orElse(null));
+                    if (!legacy) {
+                        combination
+                                .ifPresent(keyCombination -> bindings.put(entry.getKey(),
+                                    keyCombination));
+                    } else {
+                        LOGGER.info("Re-defaulting the stale entry {} = {}", entry.getKey(), value);
+                    }
                 } else {
                     persistedEntries.put(entry.getKey(), value);
                 }

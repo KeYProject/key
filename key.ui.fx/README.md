@@ -72,6 +72,7 @@ regression-tested on a virtual display. Demo proof paths default into
 | `key.fx.verify.colors` | colors palette: Swing-parity property count, mapped CSS-variable wiring, override round trip |
 | `key.fx.verify.smt` | SMT run UI end to end (needs an installed solver, e.g. `z3` on the `PATH`): launches the union on the demo goal, auto-applies the result, checks the closed goal |
 | `key.fx.verify.loadingexit` | loading/exit: recent-files store round trip with loading options + profile resolution (snapshot/restore), then the window close button path — the process must terminate with exit code 0 |
+| `key.fx.verify.shortcuts` | shortcuts: Swing-parity defaults, no binding collisions, an override round trip, and the sequent view Ctrl+F key path |
 
 Harness-injected flags (read in `MainWindowF` but not on the `run`-task whitelist; the
 verification harness sets them via `JAVA_TOOL_OPTIONS`):
