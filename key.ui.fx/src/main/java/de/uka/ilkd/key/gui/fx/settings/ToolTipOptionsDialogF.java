@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.fx.settings;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -20,8 +23,12 @@ import javafx.stage.Modality;
 import javafx.stage.Window;
 
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
+import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * menu: MP3a — JavaFX port of the Swing {@code ViewSelector}
@@ -38,11 +45,15 @@ import de.uka.ilkd.key.settings.ViewSettings;
  * <li>"pretty-print whole Taclet" (Swing {@code showWholeTacletCB},
  * {@code ViewSettings.getShowWholeTaclet}).</li>
  * </ul>
- * The Swing "Save as Default" button (persisting via {@code ProofIndependentSettings.saveSettings})
- * is deliberately not ported — the default settings are written by the FX settings dialog
- * (SettingsManagerF), which exposes the same options.
+ * The Swing "Save as Default" button ({@code ViewSelector.java:116-130}: write the three
+ * settings into {@code ProofIndependentSettings.DEFAULT_INSTANCE}, persist them via
+ * {@code ProofIndependentSettings.saveSettings()} and close) is ported (A8, P3c) so the tooltip
+ * defaults survive a restart — the {@link SettingsManagerF} settings dialog does not expose these
+ * tooltip options, contrary to the earlier note.
  */
 public final class ToolTipOptionsDialogF extends javafx.stage.Stage {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ToolTipOptionsDialogF.class);
 
     private ToolTipOptionsDialogF(Window owner) {
         setTitle("Maximum line number for tooltips");
@@ -90,15 +101,19 @@ public final class ToolTipOptionsDialogF extends javafx.stage.Stage {
         // Integer.parseInt throws on invalid input; like Swing's intended behavior the value then
         // falls back to the previously stored setting instead of being applied.
         okButton.setOnAction(e -> {
-            int maxSteps;
-            try {
-                maxSteps = Integer.parseInt(maxLinesField.getText());
-            } catch (NumberFormatException nfe) {
-                maxSteps = viewSettings.getMaxTooltipLines();
-            }
-            viewSettings.setMaxTooltipLines(maxSteps);
+            viewSettings.setMaxTooltipLines(
+                parseMaxLines(maxLinesField, viewSettings));
             viewSettings.setShowWholeTaclet(showWholeTacletBox.isSelected());
             viewSettings.setShowUninstantiatedTaclet(showUninstantiatedTacletBox.isSelected());
+            close();
+        });
+        Button saveButton = new Button("Save as Default");
+        // A8 (P3c): the Swing "Save as Default" button (ViewSelector.java:116-130) — writes the
+        // same three settings, persists them via ProofIndependentSettings.saveSettings() and
+        // closes (the value survives a restart).
+        saveButton.setOnAction(e -> {
+            applyAsDefault(viewSettings, parseMaxLines(maxLinesField, viewSettings),
+                showWholeTacletBox.isSelected(), showUninstantiatedTacletBox.isSelected());
             close();
         });
         Button cancelButton = new Button("Cancel");
@@ -106,8 +121,9 @@ public final class ToolTipOptionsDialogF extends javafx.stage.Stage {
         cancelButton.setOnAction(e -> close());
         ButtonBar.setButtonData(okButton, ButtonBar.ButtonData.OK_DONE);
         ButtonBar.setButtonData(cancelButton, ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonBar.setButtonData(saveButton, ButtonBar.ButtonData.LEFT);
         ButtonBar buttonBar = new ButtonBar();
-        buttonBar.getButtons().addAll(okButton, cancelButton);
+        buttonBar.getButtons().addAll(okButton, saveButton, cancelButton);
         BorderPane.setMargin(buttonBar, new Insets(10));
 
         BorderPane root = new BorderPane();
@@ -131,5 +147,72 @@ public final class ToolTipOptionsDialogF extends javafx.stage.Stage {
      */
     public static void show(Window owner) {
         new ToolTipOptionsDialogF(owner).show();
+    }
+
+    /** Parses the numeric tooltip-line field; on invalid input the stored value is kept. */
+    private static int parseMaxLines(TextField field, ViewSettings viewSettings) {
+        try {
+            return Integer.parseInt(field.getText());
+        } catch (NumberFormatException nfe) {
+            return viewSettings.getMaxTooltipLines();
+        }
+    }
+
+    /**
+     * A8 (P3c): writes the three tooltip options and persists them as default
+     * (Swing {@code ViewSelector} Save as Default: {@code ProofIndependentSettings.saveSettings()},
+     * ViewSelector.java:118-130).
+     *
+     * @param viewSettings the (proof-independent) view settings to write
+     * @param maxLines parsed maximum tooltip line count
+     * @param showWholeTaclet {@code showWholeTaclet} flag
+     * @param showUninstantiatedTaclet {@code showUninstantiatedTaclet} flag
+     */
+    static void applyAsDefault(ViewSettings viewSettings, int maxLines, boolean showWholeTaclet,
+            boolean showUninstantiatedTaclet) {
+        ProofIndependentSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE;
+        settings.getViewSettings().setMaxTooltipLines(maxLines);
+        settings.getViewSettings().setShowWholeTaclet(showWholeTaclet);
+        settings.getViewSettings().setShowUninstantiatedTaclet(showUninstantiatedTaclet);
+        // temporary solution, stores more than wanted %%%% (comment kept from the Swing original)
+        settings.saveSettings();
+    }
+
+    /**
+     * A8 (P3c): self test of the "Save as Default" persistence behind the button — writes a
+     * distinctive value, verifies that the settings file on disk contains it, and restores the
+     * previous values (also persisted, so the test leaves no trace).
+     *
+     * @return a self-test report ending in {@code PASS} or {@code FAIL}
+     */
+    public static String verifySaveAsDefault() {
+        ProofIndependentSettings settings = ProofIndependentSettings.DEFAULT_INSTANCE;
+        ViewSettings viewSettings = settings.getViewSettings();
+        int originalMax = viewSettings.getMaxTooltipLines();
+        boolean originalWhole = viewSettings.getShowWholeTaclet();
+        boolean originalUninst = viewSettings.getShowUninstantiatedTaclet();
+        try {
+            int testValue = originalMax == 4242 ? 4243 : 4242;
+            applyAsDefault(viewSettings, testValue, !originalWhole, !originalUninst);
+            // the persisted file is the .json (or the legacy .props) proof-independent settings
+            Path settingsPath = PathConfig.currentPaths.proofIndependentSettings;
+            if (!Files.exists(settingsPath)) {
+                settingsPath = settingsPath.resolveSibling(
+                    settingsPath.getFileName().toString().replace(".json", ".props"));
+            }
+            String content = Files.exists(settingsPath) ? Files.readString(settingsPath) : "";
+            boolean persisted = content.contains(String.valueOf(testValue));
+            String verdict = persisted ? "PASS" : "FAIL";
+            return "save-as-default value=" + testValue + " persisted=" + persisted
+                + " file=" + settingsPath + " " + verdict;
+        } catch (IOException e) {
+            LOGGER.warn("Save-as-default self test failed", e);
+            return "Save-as-default self test failed: " + e.getMessage() + " FAIL";
+        } finally {
+            viewSettings.setMaxTooltipLines(originalMax);
+            viewSettings.setShowWholeTaclet(originalWhole);
+            viewSettings.setShowUninstantiatedTaclet(originalUninst);
+            settings.saveSettings();
+        }
     }
 }
