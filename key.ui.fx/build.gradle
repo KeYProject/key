@@ -124,6 +124,8 @@ run {
     //  * key.fx.verify.loadingexit = any  (loadingexit: recent-files store round trip with
     //    loading options + profile resolution, then the window close button path — the process
     //    must terminate with exit code 0; the demo load is optional for this flag)
+    //  * key.fx.verify.shortcuts = any  (shortcuts: Swing-parity defaults, no collisions,
+    //    bind round trip, the sequent view Ctrl+F key path)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
@@ -138,7 +140,7 @@ run {
         "key.fx.verify.help", "key.fx.verify.soundiness", "key.fx.verify.profileloading",
         "key.fx.verify.profileloadingdialog", "key.fx.verify.javacsettings",
         "key.fx.verify.termmenu", "key.fx.verify.colors", "key.fx.verify.smt",
-        "key.fx.verify.loadingexit"]
+        "key.fx.verify.loadingexit", "key.fx.verify.shortcuts"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {

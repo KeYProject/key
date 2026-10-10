@@ -7,7 +7,9 @@ package de.uka.ilkd.key.gui.fx.nodeviews;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.TreeSet;
 import java.util.function.Consumer;
@@ -27,6 +29,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -59,6 +63,7 @@ import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.MainWindowF;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
+import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.HideSequentPrintFilter;
@@ -195,8 +200,15 @@ public class SequentViewF extends BorderPane {
 
     // lemmaorigin: end
 
+    // shortcuts (P1): the sequent search opens with Ctrl+F (Swing SearchInSequentAction, the
+    // menu accelerator of KeyStrokeSettings.java:102 / SearchInSequentAction.java:15 "Keyboard
+    // shortcut: STRG+F"); the former FX combination Ctrl+Shift+F doubled the proof-tree search
     private static final KeyCombination OPEN_SEARCH =
-        new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
+        new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+
+    /** shortcuts (P1): Ctrl+C copies the term under the mouse (Swing CopyToClipboardAction). */
+    private static final KeyCombination COPY_TERM =
+        new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_DOWN);
 
     private final ScrollPane scrollPane = new ScrollPane();
     private final TextFlow textFlow = new TextFlow();
@@ -256,6 +268,11 @@ public class SequentViewF extends BorderPane {
     // hover highlight + tooltip (Swing SequentViewInputListener.mouseMoved / getToolTipText)
     /** the term range under the mouse, {@code null} when the mouse is over empty space. */
     private Range hoveredRange;
+    /**
+     * the term position under the mouse for the Ctrl+C term copy (Swing
+     * {@code CurrentGoalView.getMousePosInSequent()}).
+     */
+    private PosInSequent hoveredPos;
     /** shows the term info of the hovered position after the Swing-like display delay. */
     private final Tooltip hoverTooltip = new Tooltip();
     /** delay before the tooltip shows (Swing ToolTipManager initial delay ≈ 500 ms). */
@@ -329,9 +346,9 @@ public class SequentViewF extends BorderPane {
         setBottom(searchBar);
         searchBar.setVisible(false);
         searchBar.setManaged(false);
-        // Swing SequentView registers Ctrl+Shift+F with WHEN_ANCESTOR_OF_FOCUSED_COMPONENT: the
-        // shortcut fires whenever the keyboard focus is anywhere inside this view (the key
-        // events bubble from the focused control up to this pane).
+        // shortcuts (P1): Swing SequentViewSearchBar opens via the SearchInSequentAction menu
+        // accelerator (Ctrl+F, KeyStrokeSettings.java:102); the FX view handles Ctrl+F locally
+        // for the same effect (the key events bubble from the focused control up to this pane)
         setOnKeyPressed(this::handlePaneKeyPressed);
         printPlaceholder();
     }
@@ -453,11 +470,102 @@ public class SequentViewF extends BorderPane {
         }
     }
 
+    /**
+     * shortcuts (P1): view-level macro bindings, built on first use (Swing
+     * {@code MacroKeyBinding.registerMacroKeyBindings} registers the same set once).
+     */
+    private Map<KeyCombination, ProofMacro> macroBindings;
+
+    /** Builds the view-level macro bindings ({@link #buildMacroBindings()}) once. */
+    private Map<KeyCombination, ProofMacro> macroBindings() {
+        if (macroBindings == null) {
+            macroBindings = buildMacroBindings();
+        }
+        return macroBindings;
+    }
+
     private void handlePaneKeyPressed(KeyEvent event) {
         if (OPEN_SEARCH.match(event)) {
             event.consume();
             showSearchBar();
+            return;
         }
+        // shortcuts (P1): Ctrl+C copies the term under the mouse (Swing CopyToClipboardAction,
+        // KeyStrokeSettings.java:90, bound WHEN_IN_FOCUSED_WINDOW on the sequent view's
+        // MainFrame, MainFrame.java:88-90; the copy body is GuiUtilities
+        // .copyHighlightToClipboard — the term text at the mouse position with the non-breaking
+        // spaces replaced)
+        if (COPY_TERM.match(event)) {
+            event.consume();
+            copyHoveredTermToClipboard();
+            return;
+        }
+        // shortcuts (P1): view-level macro invocation (Swing MacroKeyBinding
+        // .registerMacroKeyBindings, MacroKeyBinding.java:66-78: each registered macro's
+        // keystroke runs the macro at the last position in the sequent view without opening the
+        // term menu)
+        if (invokeMacroBinding(event)) {
+            event.consume();
+        }
+    }
+
+    /**
+     * shortcuts (P1): copies the hovered term to the system clipboard (Swing
+     * {@code CopyToClipboardAction} → {@code GuiUtilities.copyHighlightToClipboard}: the term
+     * at the mouse position, non-breaking spaces replaced); a no-op when the mouse is not over
+     * a term.
+     */
+    private void copyHoveredTermToClipboard() {
+        PosInOccurrence occ = hoveredPos == null ? null : hoveredPos.getPosInOccurrence();
+        if (occ != null && occ.subTerm() != null) {
+            ClipboardContent content = new ClipboardContent();
+            content.putString(occ.subTerm().toString().replace('\u00A0', ' '));
+            Clipboard.getSystemClipboard().setContent(content);
+        }
+    }
+
+    /**
+     * shortcuts (P1): runs the macro bound to the pressed keystroke (Swing
+     * {@code MacroKeyBinding}: the macro runs at {@code sequentView.getLastPosInSequent()}
+     * when a goal is selected and {@code canApplyTo} holds).
+     *
+     * @return whether the event matched a macro binding (the caller consumes it then)
+     */
+    private boolean invokeMacroBinding(KeyEvent event) {
+        if (macroBindings().isEmpty()) {
+            return false;
+        }
+        for (Map.Entry<KeyCombination, ProofMacro> entry : macroBindings.entrySet()) {
+            if (entry.getKey().match(event)) {
+                ProofMacro macro = entry.getValue();
+                Node node = menuMediator == null ? null : menuMediator.getSelectedNode();
+                if (node != null && menuMediator.getSelectedGoal() != null
+                        && menuProofControl != null) {
+                    PosInOccurrence pio =
+                        lastClickedPos == null ? null : lastClickedPos.getPosInOccurrence();
+                    if (macro.canApplyTo(node, pio)) {
+                        menuProofControl.runMacro(node, macro, pio);
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * shortcuts (P1): the view-level macro bindings (keystroke → macro), built once from the
+     * {@link MainWindowF#AUTOMATION_MACROS} entries that have a registered shortcut (Swing
+     * {@code MacroKeyBinding.registerMacroKeyBindings} iterates the same macros and looks each
+     * up in the {@code KeyStrokeManager}).
+     */
+    private Map<KeyCombination, ProofMacro> buildMacroBindings() {
+        Map<KeyCombination, ProofMacro> bindings = new LinkedHashMap<>();
+        for (ProofMacro macro : MainWindowF.AUTOMATION_MACROS) {
+            KeyStrokeManagerF.getInstance().binding(macro.getClass().getName())
+                    .ifPresent(combination -> bindings.put(combination, macro));
+        }
+        return bindings;
     }
 
     /**
@@ -972,6 +1080,7 @@ public class SequentViewF extends BorderPane {
             hoveredRange = hover;
             rebuildHoverOverlay();
         }
+        hoveredPos = pos;
         updateHoverTooltip(event, pos);
     }
 
@@ -985,6 +1094,7 @@ public class SequentViewF extends BorderPane {
 
     /** Clears the hovered term range and hides the tooltip. */
     private void clearHover() {
+        hoveredPos = null;
         if (hoveredRange != null) {
             hoveredRange = null;
             rebuildHoverOverlay();
@@ -1127,8 +1237,8 @@ public class SequentViewF extends BorderPane {
     // -----------------------------------------------------------------------
 
     /**
-     * Shows the search bar (Swing: {@code Ctrl+Shift+F}) and focuses the field. A query kept
-     * from a previous opening is re-applied.
+     * Shows the search bar (Swing: the {@code SearchInSequentAction} accelerator, Ctrl+F) and
+     * focuses the field. A query kept from a previous opening is re-applied.
      */
     public void showSearchBar() {
         searchBar.setVisible(true);
@@ -1138,6 +1248,13 @@ public class SequentViewF extends BorderPane {
         if (!searchField.getText().isEmpty()) {
             runSearch();
         }
+    }
+
+    /**
+     * shortcuts (P1) verify: whether the search bar is currently shown.
+     */
+    public boolean isSearchBarShowing() {
+        return searchBar.isVisible();
     }
 
     /**

@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,7 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -897,6 +899,11 @@ public final class MainWindowF {
             // check that the goal got closed by the SMT rule application
             if (System.getProperty("key.fx.verify.smt") != null) {
                 runSmtVerification();
+            }
+            // shortcuts (P1): Swing-parity defaults, no collisions, override round trip and the
+            // sequent view key path (Ctrl+F shows the search bar)
+            if (System.getProperty("key.fx.verify.shortcuts") != null) {
+                runShortcutsVerification();
             }
             // loadingexit (P1): recent-files round trip with loading options + profile
             // resolution, then the exit flow — the window close button path with Confirm Exit
@@ -1893,6 +1900,76 @@ public final class MainWindowF {
         NotificationManagerF.getInstance()
                 .notify("Sequent search verification: " + report,
                     report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+    }
+
+    /**
+     * shortcuts (P1): runs the shortcut verification ({@code key.fx.verify.shortcuts}): the
+     * re-mapped defaults match the Swing table (KeyStrokeSettings.java:60-106), no two
+     * registered actions share a keystroke (the old FX defaults collided: OneStep/AutoMode both
+     * Ctrl+SPACE, TryClose/Copy both Ctrl+C), an explicit user override still wins over the
+     * defaults (bind round trip, restored), and the sequent view's Ctrl+F handler shows the
+     * search bar.
+     */
+    private void runShortcutsVerification() {
+        ArrayList<String> failures = new ArrayList<>();
+        KeyStrokeManagerF manager = KeyStrokeManagerF.getInstance();
+        // compared in the shared Swing spec format (the effective end state: defaults merged
+        // with the persisted keystrokes.json, which is shared with the Swing UI)
+        String[][] expected = {
+            { "de.uka.ilkd.key.macros.FullAutoPilotProofMacro", "shift ctrl pressed V" },
+            { "de.uka.ilkd.key.macros.OneStepProofMacro", "shift ctrl pressed SPACE" },
+            { "de.uka.ilkd.key.macros.TryCloseMacro", "shift ctrl pressed C" },
+            { "de.uka.ilkd.key.gui.actions.SearchInProofTreeAction", "shift ctrl pressed F" },
+            { "de.uka.ilkd.key.gui.actions.SearchInSequentAction", "ctrl pressed F" },
+            { "de.uka.ilkd.key.gui.actions.SearchNextAction", "pressed F3" },
+            { "de.uka.ilkd.key.gui.actions.SearchPreviousAction", "shift pressed F3" },
+            { "de.uka.ilkd.key.gui.actions.CopyToClipboardAction", "ctrl pressed C" },
+            { "de.uka.ilkd.key.gui.actions.GoalSelectAboveAction", "ctrl pressed K" },
+            { "de.uka.ilkd.key.gui.actions.GoalSelectBelowAction", "ctrl pressed J" },
+            { "de.uka.ilkd.key.gui.actions.GoalBackAction", "ctrl pressed Z" },
+            { "de.uka.ilkd.key.gui.actions.PruneProofAction", "ctrl pressed DELETE" },
+            { "de.uka.ilkd.key.gui.actions.AutoModeAction", "ctrl pressed SPACE" },
+            { "de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction", "shift ctrl pressed P" } };
+        Map<String, String> snapshot = manager.snapshot();
+        for (String[] entry : expected) {
+            String actual = snapshot.get(entry[0]);
+            if (!entry[1].equals(actual)) {
+                failures.add(entry[0] + ": " + actual + " != " + entry[1]);
+            }
+        }
+        // no two registered actions may share one keystroke (the old FX defaults collided:
+        // OneStep/AutoMode both Ctrl+SPACE, TryClose/Copy both Ctrl+C)
+        HashSet<String> seen = new HashSet<>();
+        for (String spec : snapshot.values()) {
+            if (!seen.add(spec)) {
+                failures.add("duplicate binding: " + spec);
+            }
+        }
+        // an explicit user override still wins over the defaults (bind round trip, restored)
+        KeyCombination original =
+            manager.binding("de.uka.ilkd.key.gui.actions.CopyToClipboardAction")
+                    .orElseThrow();
+        manager.bind("de.uka.ilkd.key.gui.actions.CopyToClipboardAction",
+            KeyCombination.valueOf("Shortcut+Shift+C"));
+        if (!"shift ctrl pressed C".equals(manager.snapshot()
+                .get("de.uka.ilkd.key.gui.actions.CopyToClipboardAction"))) {
+            failures.add("override round trip: bind() did not take effect");
+        }
+        manager.bind("de.uka.ilkd.key.gui.actions.CopyToClipboardAction", original);
+        // sequent view key path: Ctrl+F shows the search bar (SearchInSequentAction)
+        sequentView.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "f", KeyCode.F, false, true,
+            false, false));
+        if (!sequentView.isSearchBarShowing()) {
+            failures.add("Ctrl+F did not show the sequent search bar");
+        }
+        String report = failures.isEmpty()
+                ? "PASS (defaults, no collisions, override round trip, sequent key path)"
+                : "FAIL: " + String.join("; ", failures);
+        LOGGER.info("Shortcuts verification: {}", report);
+        NotificationManagerF.getInstance()
+                .notify("Shortcuts verification: " + report,
+                    report.startsWith("PASS") ? Kind.INFO : Kind.ERROR);
+        statusRight.setText(report);
     }
 
     /**
