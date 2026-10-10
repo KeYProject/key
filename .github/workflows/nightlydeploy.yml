@@ -94,11 +94,11 @@ jobs:
         run: ./gradlew --parallel :key.core:generateVarcondDoc :key.core:generateScriptDoc
 
       - name: Package varcond and proof script documentation
-        run: tar cvf key-varcond-script-docs.tar.xz -C key.core/build/docs/keydocs .
+        run: zip -j key-varcond-script-docs.zip key.core/build/docs/keydocs/*
 
       - name: Upload varcond and proof script documentation
         uses: actions/upload-artifact@v7
         with:
           name: varcond-script-docs
-          path: "key-varcond-script-docs.tar.xz"
+          path: "key-varcond-script-docs.zip"
           retention-days: 30
