@@ -11,12 +11,14 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
+import javafx.scene.input.KeyCombination;
 
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.gui.fx.MainWindowF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsProviderF;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -92,6 +94,12 @@ public interface KeYGuiExtensionF {
      * keeps the grouping decision with the extension and contributes ready {@code Menu}s).
      * The five built-in menus (File / Proof / View / Options / About) and their item sets are
      * never touched.
+     * <p>
+     * P4 (B13): a provider may return a non-empty {@link #getMenuPath()} to nest its menus
+     * into the menu bar instead of appending them on the top level — the mirror of the Swing
+     * {@code KeyAction.PATH} dot-separated path (KeyAction.java:46, applied by
+     * {@code KeYGuiExtensionFacade.sortActionIntoMenu}), matching menu names by text and
+     * creating missing menus along the way.
      *
      * @param window the main window
      * @param mediator the mediator of the window
@@ -99,6 +107,20 @@ public interface KeYGuiExtensionF {
      */
     interface MainMenuF {
         List<Menu> getMenus(MainWindowF window, KeYMediatorF mediator);
+
+        /**
+         * The dot-separated menu path under which the contributed menus are nested (Swing
+         * {@code KeyAction.PATH}, KeyAction.java:39-46). The empty path keeps the FX default:
+         * the menus are appended as new separate top-level menus after the built-in About menu.
+         * A non-empty path (e.g. {@code "View.Tools"}) matches or creates a top-level menu of
+         * the first segment in the existing menu bar, then descends/creates the nested sub
+         * menus, and finally splices the contributed menu items into the innermost menu.
+         *
+         * @return the path, may be empty
+         */
+        default String getMenuPath() {
+            return "";
+        }
     }
 
     /**
@@ -139,11 +161,12 @@ public interface KeYGuiExtensionF {
     }
 
     /**
-     * Context-menu extension for the sequent term menu: contributes {@link MenuItem}s for the
-     * clicked position (Swing {@code KeYGuiExtension.ContextMenu},
-     * KeYGuiExtension.java:145-168 with {@code ContextMenuKind.SEQUENT_VIEW} — the FX port
-     * exposes only the sequent slot because it is the only term-menu slot). The host renders
-     * the items inside the "Extensions" section of the sequent context menu.
+     * Context-menu extension for the sequent term menu and (P4, C24) the proof-tree popup
+     * (Swing {@code KeYGuiExtension.ContextMenu}, KeYGuiExtension.java:145-168 — the two
+     * {@code ContextMenuKind} slots {@code SEQUENT_VIEW} and {@code PROOF_TREE}). The host
+     * renders the sequent items inside the "Extensions" section of the sequent context menu,
+     * and the proof-tree items after a separator at the end of the proof-tree popup
+     * (Swing {@code ProofTreePopupFactory}, ProofTreePopupFactory.java:152-154).
      *
      * @param mediator the mediator of the window
      * @param goal the goal whose sequent was clicked
@@ -153,6 +176,20 @@ public interface KeYGuiExtensionF {
     interface ContextMenuF {
         List<MenuItem> getSequentContextItems(KeYMediatorF mediator, Goal goal,
                 PosInSequent pos);
+
+        /**
+         * The menu items contributed to the proof-tree popup for the given node (Swing
+         * {@code KeYGuiExtensionFacade.addContextMenuItems} with
+         * {@code ContextMenuKind.PROOF_TREE}, ProofTreePopupFactory.java:152-154). The empty
+         * list is the default — most extensions only serve the sequent slot.
+         *
+         * @param mediator the mediator of the window
+         * @param node the clicked proof-tree node
+         * @return non-null, emptiable list of menu items
+         */
+        default List<MenuItem> getProofTreeContextItems(KeYMediatorF mediator, Node node) {
+            return List.of();
+        }
     }
 
     /**
@@ -167,9 +204,9 @@ public interface KeYGuiExtensionF {
 
     /**
      * Sequent-view tooltip extension: contributes term-information strings for the given
-     * position (Swing {@code KeYGuiExtension.Tooltip}, KeYGuiExtension.java:186-201). The FX
-     * host integration with the sequent view tooltips is a later milestone; the facade already
-     * aggregates the strings.
+     * position (Swing {@code KeYGuiExtension.Tooltip}, KeYGuiExtension.java:186-201, shown by
+     * Swing {@code SequentView.getToolTipText}). P4 (D30): the FX sequent view appends the
+     * strings to its hover tooltip (SequentViewF#getTooltipText).
      *
      * @param mediator the mediator of the window
      * @param pos the position of the term whose info shall be shown
@@ -177,6 +214,56 @@ public interface KeYGuiExtensionF {
      */
     interface TooltipF {
         List<String> getTooltipStrings(KeYMediatorF mediator, PosInSequent pos);
+    }
+
+    /**
+     * Keyboard-shortcut extension: contributes additional shortcuts bound to a host view
+     * (Swing {@code KeYGuiExtension.KeyboardShortcuts}, KeYGuiExtension.java:234-248, bound
+     * into the Swing input maps by {@code KeYGuiExtensionFacade.installKeyboardShortcuts} for
+     * the sequent view, goal list, proof tree, strategy selection, source view and info view).
+     * P4 (D36): the FX host binds {@link ShortcutF}s as key-pressed event filters on the view
+     * node whose <em>componentId</em> matches, see
+     * {@code KeYGuiExtensionFacadeF.installKeyboardShortcuts}.
+     */
+    interface KeyboardShortcutsF {
+
+        /** The sequent view (Swing {@code KeyboardShortcuts.SEQUENT_VIEW}). */
+        String SEQUENT_VIEW = "SEQUENT_VIEW";
+        /** The goal list (Swing {@code KeyboardShortcuts.GOAL_LIST}). */
+        String GOAL_LIST = "GOAL_LIST";
+        /** The proof tree (Swing {@code KeyboardShortcuts.PROOF_TREE_VIEW}). */
+        String PROOF_TREE_VIEW = "PROOF_TREE_VIEW";
+        /**
+         * The strategy-selection view (Swing {@code KeyboardShortcuts.STRATEGY_SELECTION_VIEW}).
+         */
+        String STRATEGY_SELECTION_VIEW = "STRATEGY_SELECTION_VIEW";
+        /** The source view (Swing {@code KeyboardShortcuts.SOURCE_VIEW}). */
+        String SOURCE_VIEW = "SOURCE_VIEW";
+        /** The info view (Swing {@code KeyboardShortcuts.INFO_TREE}). */
+        String INFO_TREE = "INFO_TREE";
+
+        /**
+         * The shortcuts to bind for the given view.
+         *
+         * @param mediator the mediator of the window
+         * @param componentId one of the component constants above
+         * @return non-null, emptiable list of shortcuts
+         */
+        default List<ShortcutF> getShortcuts(KeYMediatorF mediator, String componentId) {
+            return List.of();
+        }
+
+        /**
+         * One view-scoped shortcut: a {@link KeyCombination} with the action to run when it is
+         * pressed while the view it is bound to has the keyboard focus.
+         */
+        record ShortcutF(String componentId, KeyCombination combination, Runnable action) {
+            public ShortcutF {
+                java.util.Objects.requireNonNull(componentId);
+                java.util.Objects.requireNonNull(combination);
+                java.util.Objects.requireNonNull(action);
+            }
+        }
     }
 
     /**
