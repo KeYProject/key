@@ -71,6 +71,11 @@ public abstract class TypeResolver {
 
         private final GenericSort gs;
 
+        /**
+         * Instantiates a new resolver for the instantiation of a generic sort.
+         *
+         * @param gs the generic sort whose instantiation is resolved
+         */
         public GenericSortResolver(GenericSort gs) {
             this.gs = gs;
         }
@@ -101,6 +106,11 @@ public abstract class TypeResolver {
 
         private final Sort s;
 
+        /**
+         * Instantiates a new resolver for a non-generic (concrete) sort.
+         *
+         * @param s the sort to resolve
+         */
         public NonGenericSortResolver(Sort s) {
             this.s = s;
         }
@@ -131,6 +141,12 @@ public abstract class TypeResolver {
 
         private final SchemaVariable resolveSV;
 
+        /**
+         * Instantiates a new resolver for the element type of the instantiation of a schema
+         * variable.
+         *
+         * @param sv the schema variable whose instantiation's element type is resolved
+         */
         public ElementTypeResolverForSV(SchemaVariable sv) {
             this.resolveSV = sv;
         }
@@ -179,6 +195,12 @@ public abstract class TypeResolver {
 
         private final SchemaVariable memberSV;
 
+        /**
+         * Instantiates a new resolver for the container type of the instantiation of a schema
+         * variable.
+         *
+         * @param sv the schema variable whose instantiation's container type is resolved
+         */
         public ContainerTypeResolver(SchemaVariable sv) {
             this.memberSV = sv;
         }
@@ -243,6 +265,11 @@ public abstract class TypeResolver {
     private static class ParametricSortResolver extends TypeResolver {
         private final ParametricSortInstance psi;
 
+        /**
+         * Instantiates a new resolver for the instantiation of a parametric sort instance.
+         *
+         * @param psi the parametric sort instance whose instantiation is resolved
+         */
         public ParametricSortResolver(ParametricSortInstance psi) {
             this.psi = psi;
         }

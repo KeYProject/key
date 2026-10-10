@@ -34,6 +34,13 @@ public class StoreStmtInCondition implements VariableCondition {
     private final ProgramSV storeInSV;
     private final JTerm term;
 
+    /**
+     * Instantiates a new store-statement-in condition.
+     *
+     * @param resultVarSV the program schema variable to which the extracted statement is bound
+     * @param term the term whose Java block contains the statement to store; the statement is
+     *        substituted with the current schema variable instantiations first
+     */
     public StoreStmtInCondition(ProgramSV resultVarSV, JTerm term) {
         this.storeInSV = resultVarSV;
         this.term = term;
