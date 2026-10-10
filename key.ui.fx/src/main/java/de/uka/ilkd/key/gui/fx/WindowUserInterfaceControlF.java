@@ -279,8 +279,10 @@ public class WindowUserInterfaceControlF extends DefaultUserInterfaceControl
     /** Port of Swing WindowUserInterfaceControl.java:157-160. */
     @Override
     public void reportStatus(Object sender, String status, int progress) {
-        // the FX status bar has no progress bar yet; the message is shown regardless
-        reportStatus(sender, status);
+        // D37 (P3c): Swing WindowUserInterfaceControl.java:158-160
+        // (mainWindow.setStatusLine(status, progress)) — the FX status bar hosts the progress
+        // bar now, so the workload is forwarded instead of dropped
+        FxUtil.runLater(() -> mainWindow.setStatusLine(status, progress));
     }
 
     /** Port of Swing WindowUserInterfaceControl.java:162-165 (mainWindow.setStatusLine). */
@@ -306,13 +308,14 @@ public class WindowUserInterfaceControlF extends DefaultUserInterfaceControl
     }
 
     /**
-     * Port of Swing WindowUserInterfaceControl.java:294-299 (status line progress): the FX status
-     * bar has no progress bar yet, so the position is logged only.
+     * Port of Swing WindowUserInterfaceControl.java:294-297 (status line progress): the position
+     * is forwarded to the FX status progress bar.
      */
     @Override
     public void taskProgress(int position) {
         super.taskProgress(position);
-        LOGGER.debug("Task progress: {}", position);
+        // D37 (P3c): Swing gets the progress bar via getStatusLine().setProgress(position)
+        FxUtil.runLater(() -> mainWindow.setTaskProgressValue(position));
     }
 
     /**
@@ -322,19 +325,23 @@ public class WindowUserInterfaceControlF extends DefaultUserInterfaceControl
     @Override
     public void taskStarted(TaskStartedInfo info) {
         super.taskStarted(info);
-        reportStatus(this, info.message());
+        // D37 (P3c): Swing passes info.size() straight into the status bar; a size of 0 (unknown
+        // workload) hides the progress bar there, negative sizes are not produced by the core
+        FxUtil.runLater(() -> mainWindow.setStatusLine(info.message(), info.size()));
     }
 
-    /** Port of Swing WindowUserInterfaceControl.java:307-315 (progress bar maximum). */
+    /** Port of Swing WindowUserInterfaceControl.java:307-309 (progress bar maximum). */
     @Override
     public void setMaximum(int maximum) {
-        LOGGER.debug("Task progress maximum: {}", maximum);
+        // D37 (P3c): Swing gets the maximum via getStatusLine().setProgressBarMaximum(maximum)
+        FxUtil.runLater(() -> mainWindow.setTaskProgressBarMaximum(maximum));
     }
 
     /** Port of Swing WindowUserInterfaceControl.java:312-315 (progress bar position). */
     @Override
     public void setProgress(int progress) {
-        LOGGER.debug("Task progress: {}", progress);
+        // D37 (P3c): Swing gets the position via getStatusLine().setProgress(progress)
+        FxUtil.runLater(() -> mainWindow.setTaskProgressValue(progress));
     }
 
     // ------------------------------------------------------------------
@@ -390,7 +397,9 @@ public class WindowUserInterfaceControlF extends DefaultUserInterfaceControl
             mainWindow.setStatusLine(info.toString());
         } else if (info != null && info.getSource() instanceof ProofMacro macro) {
             if (!isAtLeastOneMacroRunning()) {
-                // Swing hides the status progress here (:213); the FX status bar has none yet
+                // D37 (P3c): Swing hides the status progress here (WindowUserInterfaceControl
+                // .java:213)
+                mainWindow.hideStatusProgress();
                 mainWindow.setStatusLine(info.toString());
                 final Proof proof = (Proof) info.getProof();
                 if (proof != null && !proof.closed()
