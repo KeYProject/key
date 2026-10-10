@@ -115,3 +115,72 @@ as open.
 The KNOWN-SIMPLIFIED ledger mirrors the module-level subset of this list with per-site
 file:line markers and statuses (`OPEN` / `FIXED-UPSTREAM` / `WONT-REPLICATE`). This sign-off is
 re-run after each milestone batch that closes any of the items above.
+
+# Difference audit — Swing↔JavaFX (2026-10-10)
+
+The 2026-10-08 sign-off covered the documented deviations (the 68 KNOWN-SIMPLIFIED markers plus
+the still-open list above). This section records the **new, previously undocumented**
+differences found by a second Swing↔JavaFX sweep, with stable IDs used by the P2/P3/P4 batches
+(`weigl/ocfx-p2-*`, `weigl/ocfx-p3-*`, `weigl/ocfx-p4-*`). Statuses: OPEN / RESOLVED (batch)
+/ WONT-REPLICATE.
+
+## A. Dialogs missing or reduced
+
+| ID | Finding (Swing reference) | Status |
+|----|---------------------------|--------|
+| A1 | Contract/invariant configurator dialogs: the Swing registration `WindowUserInterfaceControl.java:74-82` (FunctionalOperationContract/DependencyContract/LoopInvariantRule/BlockContractInternal/BlockContractExternal completions + `ContractConfigurator.java`) — the FX registry (`WindowUserInterfaceControlF.java:126-135`) holds only `MergeRuleCompletionF` | RESOLVED (P2b) |
+| A2 | `LemmaSelectionDialog` (lemmatagenerator, 161 lines) not ported | RESOLVED (P2b) |
+| A3 | `LoadUserTacletsDialog` reduced (Swing 499 lines) | RESOLVED (P2b) |
+| A4 | Proof Statistics: no export (Swing exports HTML/text) | OPEN (P3c) |
+| A5 | About/License reduced to toasts instead of dialogs | OPEN (P3c) |
+| A6 | GitHub-issue prefill dropped (bug-reporting URL parameters) | OPEN (P3c) |
+| A7 | Feedback: no zip archive of logs | OPEN (P3c) |
+| A8 | ToolTip options: "Save as Default" behaviour | OPEN (P3c) |
+| A9 | `EnsureSourceConsistency` info dialog | RESOLVED (P2b) |
+| A10 | Dialog triage remainder of the sweep | OPEN (triaged in P4) |
+
+## B. Menus / actions / toolbar
+
+| ID | Finding (Swing reference) | Status |
+|----|---------------------------|--------|
+| B11 | Dynamic "Goal Back" label (`GoalBackAction.java:113-125`) vs. static `MainWindowF.java:3325-3327` | OPEN (P3b) |
+| B12 | Macro superset + category submenus + ProofScript actions vs. the 4-macro `AUTOMATION_MACROS` | OPEN (P3b) |
+| B13 | Extension PATH nesting (extension menus cannot nest) | OPEN (P4) |
+| B14 | Per-extension toolbars merged into one | OPEN (P4, decide) |
+| B15 | Toolbar GoalBack/Prune have no enablement | OPEN (P3b) |
+| B16 | Popup dialogs replaced by toasts (per site) | OPEN (P4, decide) |
+| B17 | TermLabelMenu persistence/styling | OPEN (P3b) |
+| B18 | Recent-Files empty menu not disabled + font-size item order | OPEN (P3b) |
+
+## C. Proof tree
+
+| ID | Finding (Swing reference) | Status |
+|----|---------------------------|--------|
+| C19 | Per-proof view state cache (expansion/selection per proof) | OPEN (P3a) |
+| C20 | Linearized (flat) proof view mode | OPEN (P3a) |
+| C21 | OSS child nodes in the tree | OPEN (P3a) |
+| C22 | Whole-tree actions (expand all/collapse all/...) | OPEN (P3a) |
+| C23 | Popup items incl. SubtreeStatistics | OPEN (P3a) |
+| C24 | `PROOF_TREE` extension seam (tree popup contributions) | OPEN (P4) |
+| C25 | Node-filter counting rule | OPEN (P3a) |
+| C26 | Hidden-tab passivation (Swing docking detail) | OPEN (P4, likely WONT-REPLICATE) |
+| C27 | Auto-mode partial subtree updates | OPEN (P3a) |
+
+## D. Sequent / strategy / goal list / status bar
+
+| ID | Finding (Swing reference) | Status |
+|----|---------------------------|--------|
+| D28 | Left-click taclet menu + `POPUP_DELAY` guard (`CurrentGoalViewListener.java:48-95`, `SequentViewListener.java:29`) | RESOLVED (P2a) |
+| D29 | Shift+click focussed auto mode (`CurrentGoalViewListener.java:56-58`) | RESOLVED (P2a) |
+| D30 | Extension tooltip strings unwired | OPEN (P4) |
+| D31 | Sequent line width computed from the viewport | OPEN (P3c) |
+| D32 | Sequent search prefill from the hovered term (`SearchInSequentAction.java:32-37`) | RESOLVED (P2a) |
+| D33 | Fonts vs. `KEY_FONT_*` settings | OPEN (P3c) |
+| D34 | `SequentViewDock` missing | OPEN (P3c) |
+| D35 | Strategy tab Go button + parallel-prover merge-point lock (`StrategySelectionView.java:157-208/869-895`) | RESOLVED (P2a) |
+| D36 | `KeyboardShortcuts` extension seams absent | OPEN (P4) |
+| D37 | Status-line task progress bar (log-only stubs, `WindowUserInterfaceControlF.java:317-327`) | OPEN (P3c) |
+
+P2a (`weigl/ocfx-p2-sequent`, merged 2026-10-10) resolved D28/D29/D32/D35 —
+`key.fx.verify.sequentmenu` PASS (term menu 31 entries, POPUP_DELAY guard, search prefill,
+focussed auto mode) on Xvnc :99.
