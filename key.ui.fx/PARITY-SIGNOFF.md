@@ -49,8 +49,8 @@ P0 bugs from the audit:
 | Proof-tree context menu acts on the selection, not the clicked node | `OPEN (unverified)` |
 | View-menu Pretty Print / Unicode inert placeholders | `OPEN` (placeholders remain) |
 | Recent-file clicks drop stored profile / single-java options | **RESOLVED** (P1: `openProofFile` registers the loading options with the entry like Swing `WindowUserInterfaceControl.loadProblem`; the recent-files menu restores profile (resolved via `DefaultProfileResolver`) / additional options / single-java like Swing `RecentFileAction`, `key.fx.verify.loadingexit` round trip PASS) |
-| Shortcut-default mismatches (`KeyStrokeManagerF`: tree search, sequent search, macro defaults) | `OPEN (unverified)` |
-| Dead registered bindings (Ctrl+C term copy, F3/Shift+F3, Ctrl+K/Ctrl+J, Goal Back/Prune) | `PARTIAL` (term-menu copy + menu accelerators exist; several bindings unverified) |
+| Shortcut-default mismatches (`KeyStrokeManagerF`: tree search, sequent search, macro defaults) | **RESOLVED** (P1: the defaults match the Swing table now — macros and PrettyPrint/Unicode/ProofManagement/tree-search on Ctrl+Shift, sequent search on Ctrl+F instead of the bare F that hijacked typing; stale persisted old defaults heal on load; `key.fx.verify.shortcuts` PASS) |
+| Dead registered bindings (Ctrl+C term copy, F3/Shift+F3, Ctrl+K/Ctrl+J, Goal Back/Prune) | **RESOLVED** (P1: Ctrl+C copies the term under the mouse via the sequent view handler + the term-menu copy item carries the accelerator; term-menu global macro items carry their accelerators and the view-level macro keys run at the last clicked position (Swing `MacroKeyBinding`); F3/Shift+F3, Ctrl+K/Ctrl+J, Goal Back/Prune wired and covered by `key.fx.verify.shortcuts`) |
 | Colors: 12 mapped CSS variables ineffective (47 property definitions missing) | **RESOLVED** (P1: `ColorPaletteF` defines all 51 Swing-parity properties — the true count incl. the two multi-line `define(` keys; the 9 previously-undeclared mapped CSS vars are declared in both themes and consumed by the re-wired `.sequent-hl-*`/`.source-*` rules; `key.fx.verify.colors` PASS) |
 | UPSTREAM (Swing, not FX): `LoopApplyHeadCompletion` + `LoopContract*` dead code; seed-clobber `overwriteWith` | **Not our defect** — flags for upstream `key.ui`/`key.core` cleanup |
 
@@ -97,7 +97,9 @@ as open.
 5. Menus/actions: Pretty Print / Unicode wiring, term labels, tooltip toggles, selection
    Back/Forward bindings, Edit Last File, Load User Taclets + Prove submenu, Run All Proofs
    (dialogs exist for several), EnableWhenProofLoaded analogue, toolbars 9 remaining buttons.
-6. Keyboard: shortcut-default regressions; dead bindings audit.
+6. Keyboard: shortcut-default regressions; dead bindings audit (RESOLVED via P1
+   `key.fx.verify.shortcuts`; the Swing-persisted `keystrokes.json` stays the source of truth
+   for user overrides).
 7. Options dialogs: strategy preset UI, HeatmapOptionsDialog (SMT run UI RESOLVED via P1
    `key.fx.verify.smt`).
 8. Exit flow: close-request + confirmExit + layout persistence on close (RESOLVED via P1

@@ -10,6 +10,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 
 import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Node;
 
@@ -50,6 +51,13 @@ final class ProofMacroMenuF {
         Tooltip.install(label, new Tooltip(macro.getDescription()));
         CustomMenuItem item = new CustomMenuItem(label);
         item.setOnAction(e -> proofControl.runMacro(node, macro, pio));
+        // shortcuts (P1): macro accelerators on the term-menu items for global applications
+        // (Swing ProofMacroMenu.createMenuItem, ProofMacroMenu.java:146-148: "currently only
+        // for global macro applications")
+        if (pio == null) {
+            KeyStrokeManagerF.getInstance().binding(macro.getClass().getName())
+                    .ifPresent(item::setAccelerator);
+        }
         return item;
     }
 }
