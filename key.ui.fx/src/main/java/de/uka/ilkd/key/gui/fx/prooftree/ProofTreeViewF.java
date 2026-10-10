@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
@@ -36,6 +37,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 
+import de.uka.ilkd.key.control.AutoModeListener;
+import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
@@ -43,11 +47,19 @@ import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.reference.ClosedBy;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
+import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.javafx.FxUtil;
 
@@ -83,7 +95,7 @@ import org.slf4j.LoggerFactory;
  * (currently built eagerly), and incremental per-event tree model updates (live updates currently
  * coalesce into a full rebuild).
  */
-public class ProofTreeViewF extends BorderPane {
+public class ProofTreeViewF extends BorderPane implements AutoModeListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofTreeViewF.class);
 
@@ -91,32 +103,62 @@ public class ProofTreeViewF extends BorderPane {
         new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
 
     /**
-     * One tree entry: either a proof node entry (a rule application) or a branch entry (labeled
-     * sub-tree; {@code node} is the root of the branch).
+     * One tree entry: either a proof node entry (a rule application), a branch entry (labeled
+     * sub-tree; {@code node} is the root of the branch) or a one-step-simplification protocol
+     * step of an OSS node entry ({@code node} is the OSS node, {@link #ossRuleApp()} the single
+     * rewriting step performed inside the OSS rule).
      */
     public static final class Entry {
         final Node node;
         final String branchLabel;
+        final RuleApp ossApp;
+        final int ossFormulaNr;
 
-        private Entry(Node node, String branchLabel) {
+        private Entry(Node node, String branchLabel, RuleApp ossApp, int ossFormulaNr) {
             this.node = node;
             this.branchLabel = branchLabel;
+            this.ossApp = ossApp;
+            this.ossFormulaNr = ossFormulaNr;
         }
 
         static Entry node(Node node) {
-            return new Entry(node, null);
+            return new Entry(node, null, null, -1);
         }
 
         static Entry branch(Node node, String label) {
-            return new Entry(node, Objects.requireNonNull(label));
+            return new Entry(node, Objects.requireNonNull(label), null, -1);
+        }
+
+        static Entry oss(Node node, RuleApp app, int formulaNr) {
+            return new Entry(node, null, Objects.requireNonNull(app), formulaNr);
         }
 
         public boolean isBranch() {
             return branchLabel != null;
         }
 
+        /**
+         * @return whether this entry is an OSS protocol step of the node entry's applied
+         *         {@link OneStepSimplifierRuleApp} (Swing {@code GUIOneStepChildTreeNode})
+         */
+        public boolean isOssChild() {
+            return ossApp != null;
+        }
+
         public Node node() {
             return node;
+        }
+
+        /**
+         * @return the OSS protocol step of an {@link #isOssChild()} entry, never {@code null} there
+         */
+        public RuleApp ossRuleApp() {
+            return ossApp;
+        }
+
+        /** @return the formula number of the OSS application's position in the sequent */
+        public int ossFormulaNr() {
+            return ossFormulaNr;
         }
 
         /**
@@ -125,6 +167,9 @@ public class ProofTreeViewF extends BorderPane {
         public String displayText() {
             if (branchLabel != null) {
                 return branchLabel;
+            }
+            if (ossApp != null) {
+                return ossApp.rule().name().toString();
             }
             String text = node.serialNr() + ":" + node.name();
             return text.replaceAll("\\s+", " ");
@@ -152,6 +197,65 @@ public class ProofTreeViewF extends BorderPane {
 
     /** Number of coalesced refreshes executed for live events (verification). */
     private final AtomicInteger liveRefreshCount = new AtomicInteger();
+
+    // -----------------------------------------------------------------------
+    // P3a: per-proof view state (C19), linearized mode (C20), OSS (C21), auto-mode
+    // partial updates (C27)
+    // -----------------------------------------------------------------------
+
+    /**
+     * C19: the per-proof view state cache (Swing {@code ProofTreeView.viewStates},
+     * {@code WeakHashMap<Proof, ProofTreeViewState>}): the expansion set (branch-root nodes),
+     * the selected node and the scroll offset of the previously shown proofs. Saved when the
+     * displayed proof is switched, restored when a proof is shown again.
+     */
+    private static final class ViewState {
+        final Set<Node> expandedBranches;
+        final Node selectedNode;
+
+        ViewState(Set<Node> expandedBranches, Node selectedNode) {
+            this.expandedBranches = expandedBranches;
+            this.selectedNode = selectedNode;
+        }
+    }
+
+    private final Map<Proof, ViewState> viewStates = new WeakHashMap<>(4);
+
+    /**
+     * C20: linearized proof tree mode (Swing {@code ProofTreeView.linearizedMode}): at a split
+     * where the applied rule's last goal template is tagged {@code "main"} the main branch is
+     * continued on the same indentation level (Swing {@code GUIBranchNode.fillChildrenCache}).
+     * Not persisted (Swing keeps it as a view instance flag).
+     */
+    private boolean linearizedMode;
+
+    /**
+     * C21: whether whole-tree "Expand All" also expands the one-step-simplification protocol
+     * children (Swing {@code ProofTreeView.expandOSSNodes}); default {@code false} — OSS nodes
+     * stay collapsed and may be expanded manually.
+     */
+    private boolean expandOSSNodes;
+
+    /**
+     * C27: the open goals recorded in {@link #autoModeStarted}; the prover may work on those
+     * subtrees, and {@link #autoModeStopped} updates exactly the changed ones (Swing
+     * {@code ProofTreeView.modifiedSubtrees}). {@code null} when no auto mode run is pending.
+     * Written on the prover thread, read on the FX thread.
+     */
+    private volatile ImmutableList<Node> modifiedSubtrees;
+
+    /** C27: number of partial (subtree-level) updates executed after auto mode stops. */
+    private final AtomicInteger partialUpdateCount = new AtomicInteger();
+
+    /** C27: number of auto mode stops that had to fall back to a full tree rebuild. */
+    private final AtomicInteger fullUpdateAfterAutoCount = new AtomicInteger();
+
+    /** C27: if more subtrees changed than this, the whole tree is rebuilt (Swing constant). */
+    private static final int MAX_PARTIAL_TREE_UPDATES = 16;
+
+    /** P3a: the mediator and proof control driving the popup strategy/prune actions (C23). */
+    private KeYMediatorF mediator;
+    private ProofControl proofControl;
 
     /** the current search query (lowercase), empty if the search is inactive. */
     private String query = "";
@@ -377,6 +481,16 @@ public class ProofTreeViewF extends BorderPane {
         Proof oldProof = this.proof;
         this.proof = newProof;
         if (oldProof != newProof) {
+            // P3a (C19): memorize the view state of the proof we are leaving (expansion,
+            // selection; the scroll position is approximated by the selection reveal) — Swing
+            // ProofTreeView.setProof stores a ProofTreeViewState per proof and restores it when
+            // the proof is shown again
+            if (oldProof != null && tree.getRoot() != null) {
+                Set<Node> expandedBranches = Collections.newSetFromMap(new IdentityHashMap<>());
+                collectExpandedBranches(tree.getRoot(), expandedBranches);
+                Node selected = selectionModel != null ? selectionModel.getSelectedNode() : null;
+                viewStates.put(oldProof, new ViewState(expandedBranches, selected));
+            }
             if (oldProof != null) {
                 oldProof.removeProofTreeListener(proofTreeListener);
             }
@@ -385,6 +499,9 @@ public class ProofTreeViewF extends BorderPane {
             }
             liveEventCount.set(0);
             liveRefreshCount.set(0);
+            partialUpdateCount.set(0);
+            fullUpdateAfterAutoCount.set(0);
+            modifiedSubtrees = null;
             containsMatchCache.clear();
         }
         updatingSelection = true;
@@ -398,6 +515,26 @@ public class ProofTreeViewF extends BorderPane {
             }
         } finally {
             updatingSelection = false;
+        }
+        if (oldProof != newProof && newProof != null) {
+            // C19: restore the memorized view state of the proof that is now shown
+            ViewState state = viewStates.get(newProof);
+            if (state != null && tree.getRoot() != null) {
+                applyExpandedBranches(tree.getRoot(), state.expandedBranches);
+                if (state.selectedNode != null) {
+                    TreeItem<Entry> item = findItem(tree.getRoot(), state.selectedNode);
+                    if (item != null && !updatingSelection) {
+                        tree.getSelectionModel().select(item);
+                        tree.scrollTo(tree.getRow(item));
+                    }
+                }
+            }
+            // the current selection model usually already points into the new proof; when it does
+            // not (fresh proof), fall back to the default selection
+            if (selectionModel != null && selectionModel.getSelectedNode() != null
+                    && selectionModel.getSelectedNode().proof() != newProof) {
+                selectionModel.defaultSelection();
+            }
         }
         updateMatches();
     }
@@ -491,7 +628,7 @@ public class ProofTreeViewF extends BorderPane {
             return "no proof";
         }
         Set<Node> seen = Collections.newSetFromMap(new IdentityHashMap<>());
-        int[] counters = { 0, 0 }; // node entries, branch entries
+        int[] counters = { 0, 0, 0 }; // node entries, branch entries, OSS rows
         collect(tree.getRoot(), seen, counters);
         int proofNodeCount = 0;
         for (Iterator<Node> it = proof.root().subtreeIterator(); it.hasNext();) {
@@ -507,8 +644,8 @@ public class ProofTreeViewF extends BorderPane {
             pass = seen.size() == counters[0] + counters[1] && counters[0] <= proofNodeCount;
         }
         return "proofNodes=" + proofNodeCount + " nodeEntries=" + counters[0] + " unique="
-            + seen.size() + " branches=" + counters[1] + (filtersActive ? " filtered" : "")
-            + " " + (pass ? "PASS" : "FAIL");
+            + seen.size() + " branches=" + counters[1] + " ossRows=" + counters[2]
+            + (filtersActive ? " filtered" : "") + " " + (pass ? "PASS" : "FAIL");
     }
 
     /**
@@ -590,11 +727,294 @@ public class ProofTreeViewF extends BorderPane {
             + (pass ? "PASS" : "FAIL");
     }
 
-    /** @return the number of entries (node + branch) currently displayed */
+    /**
+     * prooftree (P3a): self-test of the C19-C22/C25 parity items — the per-proof view state
+     * cache, the linearized mode, the OSS protocol rows and the whole-tree expand/collapse —
+     * plus the C25 node-filter counting rule. Leaves every state (filters, toggles, expansion)
+     * exactly as it was found.
+     *
+     * @return a one-line report, {@code "... PASS"} if every check passes
+     */
+    public String verifyProoftreeSemantics() {
+        if (proof == null || tree.getRoot() == null) {
+            return "no proof";
+        }
+        List<String> problems = new ArrayList<>();
+        boolean wasLinearized = linearizedMode;
+        boolean wasExpandOss = expandOSSNodes;
+        boolean wasIntermediate = hideIntermediateSteps();
+        boolean wasAutomode = hideAutomodeSteps();
+        boolean wasClosed = hideClosedSubtrees();
+        boolean wasInteractive = hideInteractiveGoals();
+        Set<Node> originallyExpanded = Collections.newSetFromMap(new IdentityHashMap<>());
+        collectExpandedBranches(tree.getRoot(), originallyExpanded);
+        try {
+            // baseline: all filters off, both P3a toggles off
+            linearizedMode = false;
+            expandOSSNodes = false;
+            setHideIntermediateSteps(false);
+            setHideAutomodeSteps(false);
+            setHideClosedSubtrees(false);
+            setHideInteractiveGoals(false);
+            refresh();
+            int baseline = countEntries();
+            String structure = verifyTreeStructure();
+            if (!structure.endsWith("PASS")) {
+                problems.add("baseline structure: " + structure);
+            }
+
+            // C20: linearized mode folds "main"-tagged splits into the chain — the entry count
+            // must not grow and the structure must stay consistent
+            linearizedMode = true;
+            refresh();
+            int linearized = countEntries();
+            String linearizedStructure = verifyTreeStructure();
+            linearizedMode = false;
+            refresh();
+            int restored = countEntries();
+            if (linearized > baseline || restored != baseline
+                    || !linearizedStructure.endsWith("PASS")) {
+                problems.add("linearized baseline=" + baseline + " linear=" + linearized
+                    + " restored=" + restored + " [" + linearizedStructure + "]");
+            }
+
+            // C21: count the OSS protocol rows in the tree; with "expand OSS nodes" off the
+            // whole-tree expand must keep the OSS rows collapsed, on it must expand them
+            long ossRows = countOssRows(tree.getRoot());
+            long ossNodes = 0;
+            long expectedOssRows = 0;
+            for (Iterator<Node> it = proof.root().subtreeIterator(); it.hasNext();) {
+                Node n = it.next();
+                if (n.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp oss
+                        && oss.getProtocol() != null) {
+                    ossNodes++;
+                    // one row per rule application performed inside the step
+                    expectedOssRows += oss.getProtocol().size();
+                }
+            }
+            collapseEntireTree();
+            expandEntireTree();
+            long collapsedOssParents = countExpandedOssParents(tree.getRoot());
+            expandOSSNodes = true;
+            expandEntireTree();
+            long expandedOssParents = countExpandedOssParents(tree.getRoot());
+            expandOSSNodes = false;
+            // proofs without one-step simplifications vacuous-pass (the demo's stored proof
+            // only gains OSS nodes once the strategy applies OneStepSimplifier)
+            boolean ossOk = true;
+            if (ossNodes > 0) {
+                ossOk = ossRows == expectedOssRows && collapsedOssParents == 0
+                        && expandedOssParents == ossNodes;
+            }
+            if (!ossOk) {
+                problems.add("oss rows=" + ossRows + " ossNodes=" + ossNodes
+                    + " expectedRows=" + expectedOssRows
+                    + " expandedParents(off)=" + collapsedOssParents
+                    + " expandedParents(on)=" + expandedOssParents);
+            }
+
+            // C22: collapse all leaves only the root expanded; expand all expands the whole tree
+            // (OSS protocol rows stay collapsed unless the C21 toggle is on — asserted above)
+            collapseEntireTree();
+            boolean onlyRoot = onlyRootExpanded(tree.getRoot());
+            expandEntireTree();
+            long expandedRows = countExpandedRows(tree.getRoot());
+            long totalRows = countEntries();
+            if (!onlyRoot || expandedRows <= 1 || expandedRows > totalRows) {
+                problems.add("collapseAll onlyRoot=" + onlyRoot + " expandAll rows="
+                    + expandedRows + "/" + totalRows);
+            }
+
+            // C25: with "hide intermediate proofsteps" active and no global filter the Swing
+            // counting rule keeps exactly the last child of every child list — no node entry may
+            // sit before a later sibling
+            setHideIntermediateSteps(true);
+            refresh();
+            boolean nonLastNodeEntries = hasNonLastNodeEntry(tree.getRoot());
+            setHideIntermediateSteps(false);
+            refresh();
+            if (nonLastNodeEntries) {
+                problems.add("hideIntermediate counting rule violated (non-last node entry)");
+            }
+
+            // C19: switching proofs away and back restores the expanded branches and the
+            // selection (view-states cache)
+            int[] ossCounters = { 0, 0, 0 };
+            collect(tree.getRoot(), Collections.newSetFromMap(new IdentityHashMap<>()),
+                ossCounters);
+            if (ossCounters[1] > 0) {
+                TreeItem<Entry> someBranch = firstBranchItem(tree.getRoot());
+                if (someBranch != null) {
+                    Node branchNode = someBranch.getValue().node();
+                    someBranch.setExpanded(true);
+                    Node savedSelection = selectionModel != null
+                            ? selectionModel.getSelectedNode()
+                            : null;
+                    Proof currentProof = this.proof;
+                    setProof(null);
+                    setProof(currentProof);
+                    boolean branchRestored = isBranchExpanded(branchNode);
+                    boolean selectionRestored = savedSelection != null
+                            && selectionModel != null
+                            && selectionModel.getSelectedNode() == savedSelection;
+                    if (!branchRestored || !selectionRestored) {
+                        problems.add("view-state restore branch=" + branchRestored
+                            + " selection=" + selectionRestored);
+                    }
+                }
+            }
+        } finally {
+            // restore the state found on entry
+            linearizedMode = wasLinearized;
+            expandOSSNodes = wasExpandOss;
+            setHideIntermediateSteps(wasIntermediate);
+            setHideAutomodeSteps(wasAutomode);
+            setHideClosedSubtrees(wasClosed);
+            setHideInteractiveGoals(wasInteractive);
+            refresh();
+            if (tree.getRoot() != null) {
+                collapseEntireTree();
+                applyExpandedBranches(tree.getRoot(), originallyExpanded);
+                revealSelectedNode();
+            }
+        }
+        if (!problems.isEmpty()) {
+            return "FAIL: " + String.join("; ", problems);
+        }
+        return "PASS: linearized, OSS rows, whole-tree actions, filter counting, view states";
+    }
+
+    /** @return the number of OSS protocol rows currently present in the tree */
+    private static long countOssRows(TreeItem<Entry> item) {
+        long count = 0;
+        if (item.getValue() != null && item.getValue().isOssChild()) {
+            count++;
+        }
+        for (TreeItem<Entry> child : item.getChildren()) {
+            count += countOssRows(child);
+        }
+        return count;
+    }
+
+    /** @return the number of expanded OSS node rows (parents of protocol rows) in the tree */
+    private static long countExpandedOssParents(TreeItem<Entry> item) {
+        long count = 0;
+        Entry entry = item.getValue();
+        if (entry != null && !entry.isBranch() && !entry.isOssChild()
+                && item.isExpanded()
+                && entry.node() != null
+                && entry.node().getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
+            count++;
+        }
+        for (TreeItem<Entry> child : item.getChildren()) {
+            count += countExpandedOssParents(child);
+        }
+        return count;
+    }
+
+    /** @return whether only the root item is expanded below the given item */
+    private static boolean onlyRootExpanded(TreeItem<Entry> root) {
+        if (!root.isExpanded()) {
+            return false;
+        }
+        for (TreeItem<Entry> child : root.getChildren()) {
+            if (isAnyExpanded(child)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isAnyExpanded(TreeItem<Entry> item) {
+        if (item.isExpanded()) {
+            return true;
+        }
+        for (TreeItem<Entry> child : item.getChildren()) {
+            if (isAnyExpanded(child)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** @return the number of expanded rows below and including {@code item} */
+    private static long countExpandedRows(TreeItem<Entry> item) {
+        long count = item.isExpanded() ? 1 : 0;
+        for (TreeItem<Entry> child : item.getChildren()) {
+            count += countExpandedRows(child);
+        }
+        return count;
+    }
+
+    /**
+     * C25: whether any displayed node entry sits before a later sibling of its parent — under
+     * "hide intermediate proofsteps" without active global filters the Swing counting rule keeps
+     * only the last child, so such an entry would violate the rule.
+     */
+    private static boolean hasNonLastNodeEntry(TreeItem<Entry> item) {
+        List<TreeItem<Entry>> children = item.getChildren();
+        for (int i = 0; i < children.size() - 1; i++) {
+            Entry entry = children.get(i).getValue();
+            if (entry != null && !entry.isBranch() && !entry.isOssChild()) {
+                return true;
+            }
+        }
+        for (TreeItem<Entry> child : children) {
+            if (hasNonLastNodeEntry(child)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static TreeItem<Entry> firstBranchItem(TreeItem<Entry> item) {
+        // the root item is itself a branch; a meaningful expansion test needs a sub-branch below
+        for (TreeItem<Entry> child : item.getChildren()) {
+            TreeItem<Entry> found = firstBranchBelow(child);
+            if (found != null) {
+                return found;
+            }
+        }
+        return null;
+    }
+
+    private static TreeItem<Entry> firstBranchBelow(TreeItem<Entry> item) {
+        if (item.getValue() != null && item.getValue().isBranch()) {
+            return item;
+        }
+        for (TreeItem<Entry> child : item.getChildren()) {
+            TreeItem<Entry> found = firstBranchBelow(child);
+            if (found != null) {
+                return found;
+            }
+        }
+        return null;
+    }
+
+    private boolean isBranchExpanded(Node branchRoot) {
+        TreeItem<Entry> item = findBranchItem(tree.getRoot(), branchRoot);
+        return item != null && item.isExpanded();
+    }
+
+    private static TreeItem<Entry> findBranchItem(TreeItem<Entry> item, Node branchRoot) {
+        if (item.getValue() != null && item.getValue().isBranch()
+                && item.getValue().node() == branchRoot) {
+            return item;
+        }
+        for (TreeItem<Entry> child : item.getChildren()) {
+            TreeItem<Entry> found = findBranchItem(child, branchRoot);
+            if (found != null) {
+                return found;
+            }
+        }
+        return null;
+    }
+
+    /** @return the number of entries (node + branch + OSS rows) currently displayed */
     private int countEntries() {
-        int[] counters = { 0, 0 };
+        int[] counters = { 0, 0, 0 };
         collect(tree.getRoot(), Collections.newSetFromMap(new IdentityHashMap<>()), counters);
-        return counters[0] + counters[1];
+        return counters[0] + counters[1] + counters[2];
     }
 
     /**
@@ -620,11 +1040,17 @@ public class ProofTreeViewF extends BorderPane {
     private static void collect(TreeItem<Entry> item, Set<Node> seen, int[] counters) {
         Entry entry = item.getValue();
         if (entry != null && entry.node != null) {
-            seen.add(entry.node);
-            if (entry.isBranch()) {
-                counters[1]++;
+            if (entry.isOssChild()) {
+                // P3a (C21): OSS protocol rows are decorative sub-rows of their node entry —
+                // the node is already seen via the node row, only the extra row is counted
+                counters[2]++;
             } else {
-                counters[0]++;
+                seen.add(entry.node);
+                if (entry.isBranch()) {
+                    counters[1]++;
+                } else {
+                    counters[0]++;
+                }
             }
         }
         for (TreeItem<Entry> child : item.getChildren()) {
@@ -635,69 +1061,174 @@ public class ProofTreeViewF extends BorderPane {
     private TreeItem<Entry> buildBranch(Node branchRoot, String label) {
         TreeItem<Entry> branchItem = new TreeItem<>(Entry.branch(branchRoot, label));
 
-        // collect the branch's linear chain first (mirrors GUIBranchNode.fillChildrenCache)
-        List<Node> chain = new ArrayList<>();
-        Node current = branchRoot;
-        while (true) {
-            chain.add(current);
-            if (current.childrenCount() == 1) {
-                current = current.child(0);
-                continue;
-            }
-            break;
-        }
+        // P3a: collect the branch's linear chain first (Swing GUIBranchNode.fillChildrenCache).
+        // The chain walk follows the *visible* children (Swing GUIAbstractTreeNode.findChild):
+        // with a global filter active a subtree can be inlined even if the node has several
+        // children (C25 — the node-filter "counting rule" keeps such an inlined split visible);
+        // in linearized mode (C20) a "main"-tagged taclet split continues the chain with its
+        // first child and turns the remaining children into branch folders.
+        List<TreeItem<Entry>> childItems = new ArrayList<>();
+        List<Node> branchChildren = new ArrayList<>();
         boolean searchActive = filterActive();
         // Swing: while the collapsing search is active it takes precedence over the
         // intermediate-step filters (GUIProofTreeModel.bypassNodeFilter)
         boolean nodeFilterActive =
             !searchActive && (hideIntermediateSteps() || hideAutomodeSteps());
-        int branchCount = current.childrenCount();
 
-        if (!nodeFilterActive) {
-            // all chain steps, search-filtered
-            for (Node node : chain) {
-                if (!searchActive || matches(node)) {
-                    branchItem.getChildren().add(new TreeItem<>(Entry.node(node)));
+        Node current = branchRoot;
+        while (true) {
+            if (!searchActive || matches(current)) {
+                TreeItem<Entry> stepItem = new TreeItem<>(Entry.node(current));
+                childItems.add(stepItem);
+                // C21: one-step-simplification protocol children (Swing GUIProofTreeNode
+                // .ensureChildrenArray): a row per rule application performed inside the OSS
+                // step, only visible when the node row is expanded. While the collapsing search
+                // is active the rows are omitted so the collapsed tree shows matching steps only
+                // (Swing's search filter operates on step rows, the OSS children are decorative).
+                if (!searchActive
+                        && current.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp oss) {
+                    OneStepSimplifier.Protocol protocol = oss.getProtocol();
+                    if (protocol != null) {
+                        int formulaNr =
+                            current.sequent().formulaNumberInSequent(oss.posInOccurrence());
+                        for (RuleApp step : protocol) {
+                            stepItem.getChildren().add(new TreeItem<>(Entry.oss(current, step,
+                                formulaNr)));
+                        }
+                    }
                 }
             }
-        } else if (hideIntermediateSteps()) {
-            // Hide Intermediate Proofsteps: a branch shows only the last element of its
-            // [chain..., branch folders...] list (the Swing NodeFilter shows the child at the
-            // last position); with branch folders below, the whole chain — including the split
-            // step — is hidden, without them the chain's final node (the goal) remains
-            if (branchCount == 0) {
-                branchItem.getChildren()
-                        .add(new TreeItem<>(Entry.node(chain.get(chain.size() - 1))));
-            }
-        } else {
-            // Hide Non-interactive Proofsteps: interactive steps stay visible, plus the final
-            // node of leaf chains
-            for (int i = 0; i < chain.size(); i++) {
-                Node node = chain.get(i);
-                boolean last = i == chain.size() - 1;
-                if (node.getNodeInfo().getInteractiveRuleApplication()
-                        || last && branchCount == 0) {
-                    branchItem.getChildren().add(new TreeItem<>(Entry.node(node)));
+            List<Node> nextN = visibleChildren(current);
+            if (nextN.isEmpty()) {
+                if (current.childrenCount() > 0) {
+                    // the chain stopped at a split point (more than one child, no inlining):
+                    // each child becomes a branch folder below — Swing
+                    // GUIBranchNode.fillChildrenCache iterates model.children() once findChild
+                    // returns null; the per-child hidden check in the folder loop prunes the
+                    // children hidden by global filters again (an empty visible list with an
+                    // active filter means all children are hidden, so the folders vanish too)
+                    for (int i = 0; i < current.childrenCount(); i++) {
+                        branchChildren.add(current.child(i));
+                    }
                 }
+                break;
             }
+            if (nextN.size() > 1) {
+                if (linearizedMode && isMainTaggedTacletSplit(current)) {
+                    // C20: continue the main branch on the same level; the other children become
+                    // branch folders below (Swing GUIBranchNode.fillChildrenCache:85-101)
+                    for (int i = 1; i < nextN.size(); i++) {
+                        branchChildren.add(nextN.get(i));
+                    }
+                    current = nextN.get(0);
+                    continue;
+                }
+                branchChildren.addAll(nextN);
+                break;
+            }
+            current = nextN.get(0);
         }
 
-        // at a branch point (or a leaf): one branch item per child, pruned by the global filters.
-        // Read by index instead of iterating the live children list: the prover thread may add
-        // children concurrently (ArrayList view); a concurrent mutation is healed by the next
-        // structural event.
-        for (int i = 0; i < branchCount; i++) {
-            Node child = current.child(i);
-            if (searchActive && !containsMatch(child)) {
-                // the subtree contains no match: hidden (Swing TreeSearchFilter.showSubtree)
-                continue;
-            }
+        // at a branch point (or a leaf): one branch item per visible child, pruned by the global
+        // filters (Swing fillChildrenCache's final loop). Read by index instead of iterating the
+        // live children list: the prover thread may add children concurrently.
+        for (Node child : branchChildren) {
             if (hiddenByGlobalFilters(child)) {
+                // the search filter is part of hiddenByGlobalFilters (containsMatch)
                 continue;
             }
-            branchItem.getChildren().add(buildBranch(child, ensureBranchLabelIsSet(child)));
+            childItems.add(buildBranch(child, ensureBranchLabelIsSet(child)));
         }
+
+        // C25: the node filters (hide intermediate / hide non-interactive) count over the child
+        // list like the Swing NodeFilter (ProofTreeViewFilter.countChild) — including the
+        // "inlined because of a hidden subtree" rule
+        if (nodeFilterActive) {
+            List<TreeItem<Entry>> filtered = new ArrayList<>();
+            for (int i = 0; i < childItems.size(); i++) {
+                TreeItem<Entry> item = childItems.get(i);
+                Entry entry = item.getValue();
+                // branch folders and OSS protocol rows are always counted (Swing
+                // ProofTreeViewFilter.countChild keeps GUIBranchNode children)
+                if (entry.isBranch() || entry.isOssChild()) {
+                    filtered.add(item);
+                } else if (countChainStep(entry.node(), childItems, i)) {
+                    filtered.add(item);
+                }
+            }
+            childItems = filtered;
+        }
+        branchItem.getChildren().setAll(childItems);
         return branchItem;
+    }
+
+    /**
+     * @param node a proof node
+     * @return the node's children that survive the global filters, mirroring Swing
+     *         {@code GUIAbstractTreeNode.findChild} (GUIAbstractTreeNode.java:139-167): a single
+     *         child always continues the chain; with an active global filter or in linearized
+     *         mode the multi-child case keeps the visible children, otherwise the chain stops.
+     */
+    private List<Node> visibleChildren(Node node) {
+        if (node.childrenCount() == 1) {
+            return List.of(node.child(0));
+        }
+        if (!globalFilterActive() && !linearizedMode) {
+            return List.of();
+        }
+        List<Node> visible = new ArrayList<>();
+        for (int i = 0; i < node.childrenCount(); i++) {
+            Node child = node.child(i);
+            if (!hiddenByGlobalFilters(child)) {
+                visible.add(child);
+            }
+        }
+        return visible;
+    }
+
+    /**
+     * @return whether any global filter is active (the collapsing search, Hide Closed Subtrees
+     *         or Hide Subtrees Whose Goals are Interactive) — Swing
+     *         {@code ProofTreeViewFilter.anyGlobalFilterActive}
+     */
+    private boolean globalFilterActive() {
+        return filterActive() || hideClosedSubtrees() || hideInteractiveGoals();
+    }
+
+    /**
+     * C20: whether the node's applied rule is a taclet whose <em>last</em> goal template is
+     * tagged {@code "main"} — such a split continues in linearized mode (Swing
+     * {@code GUIBranchNode.fillChildrenCache:83-88}).
+     */
+    private static boolean isMainTaggedTacletSplit(Node node) {
+        RuleApp app = node.getAppliedRuleApp();
+        if (!(app != null && app.rule() instanceof Taclet taclet)) {
+            return false;
+        }
+        ImmutableList<TacletGoalTemplate> templates = taclet.goalTemplates();
+        return templates.size() > 0 && "main".equals(templates.last().tag());
+    }
+
+    /**
+     * C25: whether the chain step at {@code pos} in {@code siblings} is counted by the active
+     * node filter (Swing {@code HideIntermediateFilter}/{@code OnlyInteractiveFilter}
+     * {@code countChild}, ProofTreeViewFilter.java:214-282): the last child is always shown;
+     * with a global filter active, a split that was inlined because its sibling subtree is
+     * hidden is shown too.
+     */
+    private boolean countChainStep(Node node, List<TreeItem<Entry>> siblings, int pos) {
+        if (!hideIntermediateSteps() && node.getNodeInfo().getInteractiveRuleApplication()) {
+            // Hide Non-interactive Proofsteps keeps interactive steps
+            return true;
+        }
+        if (pos == siblings.size() - 1) {
+            return true;
+        }
+        if (globalFilterActive() && !siblings.get(pos + 1).getValue().isBranch()
+                && node.childrenCount() != 1) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -778,11 +1309,13 @@ public class ProofTreeViewF extends BorderPane {
     }
 
     /**
-     * Builds the right-click context menu: the two mutually exclusive node filters and the two
-     * independently toggleable global filters, like the Swing dockable's "Settings" menu, plus
-     * the expand/collapse and sibling actions of the Swing proof tree popup menu
-     * ({@code ProofTreePopupFactory}). The action items that need prover control (Run Strategy
-     * On Node, Prune, Notes, goals enablement, statistics) arrive with the M3 action framework.
+     * Builds the right-click context menu: the four view filters and the tree controls (C20
+     * linearized mode, C21 OSS expansion, C22 whole-tree expand/collapse) — the FX docking
+     * framework has no tab-title "Settings" gear menu like the Swing dockable, so these live
+     * here — plus the popup actions of the Swing {@code ProofTreePopupFactory}: Apply Strategy,
+     * Prune, Edit Notes, the per-node expand/collapse and sibling actions, the goals enablement
+     * and P3a's Show Subtree Statistics. Delayed Cut (feature-flagged) and the macro submenu
+     * (B12, P3b) are not yet ported; the PROOF_TREE extension contributions belong to P4 (C24).
      */
     private ContextMenu createContextMenu() {
         CheckMenuItem hideIntermediateItem = new CheckMenuItem("Hide Intermediate Proofsteps");
@@ -819,8 +1352,40 @@ public class ProofTreeViewF extends BorderPane {
             setHideInteractiveGoals(hideInteractiveItem.isSelected());
             refresh();
         });
+        // C20/C21 (P3a): the linearized mode and the OSS expansion toggles (Swing
+        // ProofTreeSettingsMenuFactory creates both as checkboxes of the "Settings" gear menu)
+        CheckMenuItem linearizeItem = new CheckMenuItem("Linearize Proof Tree");
+        linearizeItem.setSelected(linearizedMode);
+        linearizeItem.setOnAction(e -> {
+            boolean isChange = linearizedMode != linearizeItem.isSelected();
+            linearizedMode = linearizeItem.isSelected();
+            if (isChange) {
+                refresh();
+            }
+        });
+        CheckMenuItem expandOssItem = new CheckMenuItem("Expand One Step Simplifications nodes");
+        expandOssItem.setSelected(expandOSSNodes);
+        expandOssItem.setOnAction(e -> expandOSSNodes = expandOssItem.isSelected());
+        // C22 (P3a): whole-tree actions (Swing ProofTreeSettingsMenuFactory createExpandAll /
+        // createCollapseAll, operating on the whole tree instead of one subtree)
+        MenuItem expandAllItem = actionItem("Expand All", IconFactoryF.Key.PLUS,
+            this::expandEntireTree);
+        MenuItem collapseAllItem = actionItem("Collapse All", IconFactoryF.Key.MINUS,
+            this::collapseEntireTree);
+        // C23 (P3a): the Swing popup's prover-control actions (ProofTreePopupFactory
+        // RunStrategyOnNode / Prune / Notes)
+        MenuItem applyStrategyItem = actionItem("Apply Strategy", IconFactoryF.Key.START,
+            this::runStrategyOnNode);
+        MenuItem pruneItem = actionItem("Prune Proof", IconFactoryF.Key.PRUNE,
+            this::prunePopupNode);
+        MenuItem notesItem = actionItem("Edit Notes...", null, this::editNotes);
+        MenuItem subtreeStatsItem = actionItem("Show Subtree Statistics",
+            IconFactoryF.Key.STATISTICS, this::showSubtreeStatistics);
         ContextMenu menu = new ContextMenu(hideIntermediateItem, onlyInteractiveItem,
-            new SeparatorMenuItem(), hideClosedItem, hideInteractiveItem, new SeparatorMenuItem(),
+            new SeparatorMenuItem(), hideClosedItem, hideInteractiveItem, linearizeItem,
+            expandOssItem, new SeparatorMenuItem(), expandAllItem, collapseAllItem,
+            new SeparatorMenuItem(), applyStrategyItem, pruneItem, notesItem,
+            new SeparatorMenuItem(),
             actionItem("Expand All Below", IconFactoryF.Key.PLUS,
                 () -> expandAllBelow(popupBranchItem)),
             actionItem("Expand Goals Only Below", IconFactoryF.Key.EXPAND_GOALS,
@@ -833,13 +1398,23 @@ public class ProofTreeViewF extends BorderPane {
             actionItem("Next Sibling", IconFactoryF.Key.NEXT, () -> gotoSibling(1)),
             new SeparatorMenuItem(),
             actionItem("Set All Goals Below to Interactive", null, () -> setGoalsBelow(false)),
-            actionItem("Set All Goals Below to Automatic", null, () -> setGoalsBelow(true)));
+            actionItem("Set All Goals Below to Automatic", null, () -> setGoalsBelow(true)),
+            new SeparatorMenuItem(), subtreeStatsItem);
         menu.setOnShowing(e -> {
             // pick up changes made elsewhere (e.g. by the classic UI sharing the settings)
             hideIntermediateItem.setSelected(hideIntermediateSteps());
             onlyInteractiveItem.setSelected(hideAutomodeSteps());
             hideClosedItem.setSelected(hideClosedSubtrees());
             hideInteractiveItem.setSelected(hideInteractiveGoals());
+            linearizeItem.setSelected(linearizedMode);
+            expandOssItem.setSelected(expandOSSNodes);
+            // C23: enablement mirrors the Swing popup — Apply Strategy needs a proof, Prune only
+            // makes sense on an inner node whose subtree still has something to prune, Notes and
+            // the statistics need a proof
+            applyStrategyItem.setDisable(proof == null);
+            notesItem.setDisable(proof == null);
+            subtreeStatsItem.setDisable(proof == null);
+            pruneItem.setDisable(!isPrunable(popupNode));
         });
         return menu;
     }
@@ -858,6 +1433,36 @@ public class ProofTreeViewF extends BorderPane {
     // Popup expand/collapse and sibling actions (Swing ProofTreePopupFactory)
     // -----------------------------------------------------------------------
 
+    /**
+     * C22 (P3a): expands the whole tree (Swing {@code ProofTreeSettingsMenuFactory}
+     * {@code CreateExpandAll} / {@code ProofTreeExpansionState.expandAll}): everything except
+     * the one-step-simplification nodes unless {@link #expandOSSNodes} is set — their protocol
+     * rows stay collapsed like in Swing's default ({@code ProofTreePopupFactory.ossPathFilter}).
+     */
+    void expandEntireTree() {
+        TreeItem<Entry> root = tree.getRoot();
+        if (root == null) {
+            return;
+        }
+        root.setExpanded(true);
+        expandRec(root);
+    }
+
+    /**
+     * C22 (P3a): collapses the whole tree below the root (Swing
+     * {@code ProofTreeSettingsMenuFactory.createCollapseAll}; the root row is re-expanded).
+     */
+    void collapseEntireTree() {
+        TreeItem<Entry> root = tree.getRoot();
+        if (root == null) {
+            return;
+        }
+        for (TreeItem<Entry> child : new ArrayList<>(root.getChildren())) {
+            collapseRec(child);
+        }
+        root.setExpanded(true);
+    }
+
     /** Expands every branch below the given item (Swing Expand All Below). */
     private void expandAllBelow(TreeItem<Entry> item) {
         if (item == null) {
@@ -866,7 +1471,22 @@ public class ProofTreeViewF extends BorderPane {
         expandRec(item);
     }
 
-    private static void expandRec(TreeItem<Entry> item) {
+    /**
+     * Recursively expands the item and its children; an OSS node row (a proof node whose applied
+     * rule is the one-step simplifier) and its protocol rows are only expanded when
+     * {@link #expandOSSNodes} is set (Swing {@code ProofTreeExpansionState.expandAll} with the
+     * OSS path filter {@code ProofTreePopupFactory.ossPathFilter}).
+     */
+    private void expandRec(TreeItem<Entry> item) {
+        if (item.getValue() != null && item.getValue().isOssChild()) {
+            return;
+        }
+        if (item.getValue() != null && !item.getValue().isBranch()
+                && item.getValue().node() != null
+                && item.getValue().node().getAppliedRuleApp() instanceof OneStepSimplifierRuleApp
+                && !expandOSSNodes) {
+            return; // OSS protocol rows stay collapsed unless "Expand OSS nodes" is set
+        }
         item.setExpanded(true);
         for (TreeItem<Entry> child : new ArrayList<>(item.getChildren())) {
             expandRec(child);
@@ -1006,6 +1626,240 @@ public class ProofTreeViewF extends BorderPane {
         refresh();
     }
 
+    // -----------------------------------------------------------------------
+    // P3a (C23): popup prover-control actions (Swing ProofTreePopupFactory)
+    // -----------------------------------------------------------------------
+
+    /**
+     * Gives the tree the mediator + proof control of the loaded environment (Swing
+     * {@code ProofTreeView} extracts both from the mediator): the Apply Strategy and Prune
+     * popup actions and the auto-mode partial updates ({@link #autoModeStarted}
+     * /{@link #autoModeStopped}) need them.
+     */
+    public void setActionContext(KeYMediatorF mediator, ProofControl proofControl) {
+        Objects.requireNonNull(mediator);
+        this.mediator = mediator;
+        if (this.proofControl != null) {
+            this.proofControl.removeAutoModeListener(this);
+        }
+        this.proofControl = proofControl;
+        if (proofControl != null) {
+            proofControl.addAutoModeListener(this);
+        }
+    }
+
+    /**
+     * C23: runs the automatic strategy on the subtree of the node the popup was invoked on
+     * (Swing {@code RunStrategyOnNodeUserAction}): all enabled goals below the node, or the node
+     * itself when it is an open goal.
+     */
+    private void runStrategyOnNode() {
+        if (proof == null || proof.isDisposed() || popupNode == null || mediator == null
+                || proofControl == null) {
+            return;
+        }
+        Goal invokedGoal = proof.getOpenGoal(popupNode);
+        ImmutableList<Goal> goals = invokedGoal != null
+                ? ImmutableList.of(invokedGoal)
+                : proof.getSubtreeEnabledGoals(popupNode);
+        mediator.startAutoMode(goals);
+    }
+
+    /**
+     * C23: prunes the proof below the node the popup was invoked on (Swing {@code Prune} calls
+     * {@code KeYMediator.setBack(context.invokedNode)}).
+     */
+    private void prunePopupNode() {
+        if (mediator == null || popupNode == null) {
+            return;
+        }
+        mediator.pruneNode(popupNode);
+    }
+
+    /**
+     * C23: whether the Swing {@code Prune} popup item is enabled for the popup node
+     * (ProofTreePopupFactory.java:377-398): pruning is disabled for goals and for closed
+     * subtrees when the command line flag {@code --no-pruning-closed} is set, enabled when the
+     * subtree still contains prunable goals or the node is a cached cutting point.
+     */
+    private boolean isPrunable(Node node) {
+        if (node == null || node.proof() == null
+                || node.proof().isOpenGoal(node) || node.proof().isClosedGoal(node)) {
+            return false;
+        }
+        if (node.proof().getSubtreeGoals(node).size() > 0
+                || (!GeneralSettings.noPruningClosed
+                        && node.proof().getClosedSubtreeGoals(node).size() > 0)
+                || node.lookup(ClosedBy.class) != null) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * C23: opens the proof node notes editor (Swing {@code Notes} popup item): the text is
+     * stored on the node via {@code NodeInfo.setNotes} ({@code null} clears it).
+     */
+    private void editNotes() {
+        if (proof == null || proof.isDisposed() || popupNode == null) {
+            return;
+        }
+        String original = popupNode.getNodeInfo().getNotes();
+        ProofTreeNotesDialogF dialog = new ProofTreeNotesDialogF(original, popupNode);
+        dialog.showNonBlocking();
+    }
+
+    /**
+     * C23: opens the subtree statistics report for the node the popup was invoked on (Swing
+     * {@code ShowProofStatistics}, simplified — the Swing HTML-styled report window with
+     * CSV export is ported as a plain-text report; the export follow-up is A4 (P3c)).
+     */
+    private void showSubtreeStatistics() {
+        if (proof == null || proof.isDisposed() || popupNode == null) {
+            return;
+        }
+        SubtreeStatisticsDialogF dialog = new SubtreeStatisticsDialogF(popupNode);
+        dialog.showNonBlocking();
+    }
+
+    // -----------------------------------------------------------------------
+    // P3a (C27): auto-mode partial subtree updates (Swing ProofTreeView
+    // autoModeStarted / autoModeStopped, ProofTreeView.java:1072-1137)
+    // -----------------------------------------------------------------------
+
+    @Override
+    public void autoModeStarted(ProofEvent e) {
+        if (e.getSource() != proof) {
+            // Auto mode on a proof this view does not display (e.g. an auxiliary side proof of
+            // the information-flow macros, see KeY issue #3713): ignore.
+            return;
+        }
+        // save the goals on which the prover may work
+        modifiedSubtrees = e.getSource().openGoals().map(Goal::node);
+    }
+
+    @Override
+    public void autoModeStopped(ProofEvent e) {
+        if (proof == null || proof.isDisposed()) {
+            modifiedSubtrees = null;
+            return;
+        }
+        final List<Node> changed;
+        if (modifiedSubtrees != null) {
+            changed = new ArrayList<>();
+            for (Node n : modifiedSubtrees) {
+                // skip nodes of other proofs; changed = no longer an open goal
+                if (n.proof() == proof && proof.openGoals().filter(g -> g.node() == n).isEmpty()) {
+                    changed.add(n);
+                }
+            }
+        } else {
+            changed = List.of();
+        }
+        // all tree mutation must happen on the FX thread (Swing marshals via the EDT)
+        FxUtil.runLater(() -> {
+            modifiedSubtrees = null;
+            if (proof == null || proof.isDisposed() || tree.getRoot() == null) {
+                return;
+            }
+            if (changed.size() > MAX_PARTIAL_TREE_UPDATES) {
+                // update the whole tree
+                fullUpdateAfterAutoCount.incrementAndGet();
+                refresh();
+            } else if (!changed.isEmpty()) {
+                // update only the affected subtrees (Swing delegateModel.updateTree(n));
+                // counted at the stop decision so the post-run verification reports it even if
+                // the FX work is still queued
+                partialUpdateCount.incrementAndGet();
+                for (Node n : changed) {
+                    partialUpdateSubtree(n);
+                }
+            }
+            revealSelectedNode();
+        });
+    }
+
+    /**
+     * C27: rebuilds the subtree below the nearest branch item of {@code node} in place, keeping
+     * the expansion state of the surrounding branches (Swing {@code GUIProofTreeModel.updateTree
+     * (Node)}).
+     */
+    private void partialUpdateSubtree(Node subtreeRoot) {
+        FxUtil.runLater(() -> {
+            if (proof == null || proof.isDisposed() || tree.getRoot() == null) {
+                return;
+            }
+            TreeItem<Entry> target = nearestBranchItem(tree.getRoot(), subtreeRoot);
+            if (target == null) {
+                refresh();
+                return;
+            }
+            Set<Node> expanded = Collections.newSetFromMap(new IdentityHashMap<>());
+            collectExpandedBranches(target, expanded);
+            TreeItem<Entry> rebuilt = buildBranch(target.getValue().node(),
+                target.getValue().branchLabel);
+            target.getChildren().setAll(new ArrayList<>(rebuilt.getChildren()));
+            applyExpandedBranches(target, expanded);
+            containsMatchCache.clear();
+            updateMatches();
+            if (selectionModel != null && selectionModel.getSelectedNode() != null) {
+                TreeItem<Entry> sel = findItem(tree.getRoot(), selectionModel.getSelectedNode());
+                if (sel != null) {
+                    tree.getSelectionModel().select(sel);
+                }
+            }
+        });
+    }
+
+    /**
+     * @param from the tree item to search (itself a branch)
+     * @param node a proof node below the branch
+     * @return the deepest branch item whose displayed subtree contains {@code node}, or
+     *         {@code null} when the node is not displayed
+     */
+    private static TreeItem<Entry> nearestBranchItem(TreeItem<Entry> from, Node node) {
+        if (from == null || from.getValue() == null || from.getValue().node() == null) {
+            return null;
+        }
+        TreeItem<Entry> result = null;
+        for (TreeItem<Entry> child : from.getChildren()) {
+            Entry entry = child.getValue();
+            if (entry == null || entry.node() == null) {
+                continue;
+            }
+            boolean contains = entry.node() == node || isInSubtree(entry.node(), node);
+            if (!contains) {
+                continue;
+            }
+            if (entry.isBranch()) {
+                TreeItem<Entry> deeper = nearestBranchItem(child, node);
+                result = deeper != null ? deeper : child;
+            } else if (result == null) {
+                result = from; // the node is on this branch's chain
+            }
+        }
+        return result;
+    }
+
+    /** @return whether {@code maybeDescendant} is {@code ancestor} itself or below it */
+    private static boolean isInSubtree(Node ancestor, Node maybeDescendant) {
+        for (Node n = maybeDescendant; n != null; n = n.parent()) {
+            if (n == ancestor) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * P3a (C27): a one-line report of the auto-mode partial update counters for the
+     * verification hook.
+     */
+    public String getAutoModeReport() {
+        return "autoModePartialUpdates=" + partialUpdateCount.get()
+            + " autoModeFullUpdates=" + fullUpdateAfterAutoCount.get();
+    }
+
     /**
      * Returns the branch label of the given node, falling back to {@code Case <n>} and storing it
      * on the node like {@code GUIAbstractTreeNode.ensureBranchLabelIsSet}.
@@ -1031,7 +1885,23 @@ public class ProofTreeViewF extends BorderPane {
         if (updatingSelection || item == null || item.getValue() == null) {
             return;
         }
-        Node node = item.getValue().node();
+        Entry entry = item.getValue();
+        if (entry.isOssChild()) {
+            // C21 (P3a): selecting an OSS protocol row shows a sequent modified to include the
+            // transformed formula and marks the single rewriting step as the selected rule app
+            // (Swing ProofTreeView GUITreeSelectionListener, ProofTreeView.java:1174-1190)
+            Node ossParent = entry.node();
+            if (selectionModel != null && ossParent != null && ossParent.sequent() != null) {
+                var pio = entry.ossRuleApp().posInOccurrence();
+                Sequent modified =
+                    ossParent.sequent().replaceFormula(entry.ossFormulaNr(),
+                        pio.sequentFormula()).sequent();
+                selectionModel.setSelectedSequentAndRuleApp(ossParent, modified,
+                    entry.ossRuleApp());
+            }
+            return;
+        }
+        Node node = entry.node();
         if (node != null && selectionModel != null && node != selectionModel.getSelectedNode()) {
             selectionModel.setSelectedNode(node);
         }
@@ -1352,7 +2222,7 @@ public class ProofTreeViewF extends BorderPane {
      *         the query (case-insensitive)
      */
     private boolean matches(Node node) {
-        return matches(new Entry(node, null));
+        return matches(Entry.node(node));
     }
 
     /**
@@ -1365,7 +2235,7 @@ public class ProofTreeViewF extends BorderPane {
         if (cached != null) {
             return cached;
         }
-        boolean result = matches(new Entry(node, null));
+        boolean result = matches(Entry.node(node));
         for (int i = 0; !result && i < node.childrenCount(); i++) {
             result = containsMatch(node.child(i));
         }
@@ -1436,6 +2306,10 @@ public class ProofTreeViewF extends BorderPane {
         }
 
         private String styleClassOf(Entry item) {
+            if (item.isOssChild()) {
+                // C21 (P3a): OSS protocol rows render styled like a branch decoration
+                return "proof-tree-oss-child";
+            }
             Node node = item.node;
             if (item.isBranch()) {
                 return node.isClosed() ? "proof-tree-branch-closed" : "proof-tree-branch";
@@ -1450,12 +2324,22 @@ public class ProofTreeViewF extends BorderPane {
                 }
                 return goal.isAutomatic() ? "proof-tree-open" : "proof-tree-interactive";
             }
+            if (node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
+                // C21: the One Step Simplifier node itself (Swing renders it like a rule
+                // application node; the protocol rows are its children)
+                return "proof-tree-oss";
+            }
             return "proof-tree-inner";
         }
 
         private String tooltipText(Entry item) {
             if (item.isBranch()) {
                 return "Branch: " + item.branchLabel;
+            }
+            if (item.isOssChild()) {
+                // C21: Swing GUIOneStepChildTreeNode.getSearchString shows the applied rule and
+                // the pretty-printed sub-term; the tooltip mirrors it without the term printer
+                return "One Step Simplification step: " + item.displayText();
             }
             // menu: MP3a — the node's applied rule name (Swing rule-application nodes show the
             // applied rule, ProofTreeView.java:1389), falling back to the plain node serial.

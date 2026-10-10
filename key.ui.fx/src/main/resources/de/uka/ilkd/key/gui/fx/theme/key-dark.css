@@ -223,6 +223,38 @@
     -fx-text-fill: -key-interactive;
 }
 
+/* prooftree (P3a, C21): the One Step Simplifier node and its protocol rows */
+.proof-tree-oss {
+    -fx-text-fill: -key-text;
+    -fx-font-weight: bold;
+}
+
+.proof-tree-oss-child {
+    -fx-text-fill: -key-text-secondary;
+    -fx-font-style: italic;
+    -fx-padding: 1 4 1 16;
+}
+
+/* prooftree (P3a, C23): the Edit Notes popup (ProofTreeNotesDialogF) */
+.proof-tree-notes-title {
+    -fx-text-fill: -key-text;
+    -fx-font-weight: bold;
+}
+
+.proof-tree-notes-area {
+    -fx-font-family: monospace;
+}
+
+/* prooftree (P3a, C23): the Show Subtree Statistics popup (SubtreeStatisticsDialogF) */
+.subtree-stats-title {
+    -fx-text-fill: -key-text;
+    -fx-font-weight: bold;
+}
+
+.subtree-stats-area {
+    -fx-font-family: monospace;
+}
+
 /* proof tree search bar (M2, Swing ProofTreeSearchBar) */
 .proof-tree-search-bar {
     -fx-background-color: -key-surface;

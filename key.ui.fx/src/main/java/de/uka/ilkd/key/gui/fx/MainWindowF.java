@@ -125,6 +125,7 @@ import de.uka.ilkd.key.gui.fx.proofdiff.ProofDiffFrameF;
 import de.uka.ilkd.key.gui.fx.proofmanagement.KnownTypesDialogF;
 import de.uka.ilkd.key.gui.fx.proofmanagement.ProofManagementDialogF;
 import de.uka.ilkd.key.gui.fx.proofmanagement.ProofManagerF;
+import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeVerifyF;
 import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeViewF;
 import de.uka.ilkd.key.gui.fx.recentfiles.RecentFilesF;
 import de.uka.ilkd.key.gui.fx.settings.ActiveSettingsDialogF;
@@ -885,6 +886,11 @@ public final class MainWindowF {
             // CurrentGoalViewMenu is built with the mediator's selected goal and the proof
             // control of the loaded environment)
             sequentView.setMenuContext(mediator, env.getProofControl());
+            // prooftree (P3a): the tree popup's Apply Strategy / Prune actions and the
+            // auto-mode partial updates need the mediator + proof control (Swing parity:
+            // ProofTreeView registers itself as AutoModeListener on the UI's proof control,
+            // ProofTreeView.java:532)
+            proofTreeView.setActionContext(mediator, env.getProofControl());
             env.getProofControl().addAutoModeListener(autoModeUiListener);
             // notification: register the notification framework's auto-mode tracker on the
             // proof control (Swing parity: the NotificationManager constructor registers its
@@ -975,6 +981,18 @@ public final class MainWindowF {
             if (System.getProperty("key.fx.verify.dialogs") != null) {
                 String report = DialogsVerifyF.run(stage, selectionModel.getSelectedProof(),
                     userInterface);
+                statusRight.setText(report);
+            }
+            if (System.getProperty("key.fx.verify.prooftree") != null
+                    && System.getProperty("key.fx.demo.autoprove.live") == null) {
+                // prooftree (P3a): the C19-C23/C25/C27 self test — per-proof view states,
+                // linearized mode, OSS protocol rows, whole-tree expand/collapse, node-filter
+                // counting and the notes/statistics popup dialogs. Skipped when the live demo
+                // auto-prover runs in parallel (the auto-mode-stop dispatch below verifies the
+                // final tree instead — running the self test against a proof the prover is
+                // still mutating would race with the structural events)
+                String report = ProofTreeVerifyF.run(stage, selectionModel.getSelectedProof(),
+                    proofTreeView);
                 statusRight.setText(report);
             }
             // loadingexit (P1): recent-files round trip with loading options + profile
@@ -1933,6 +1951,14 @@ public final class MainWindowF {
                         NotificationManagerF.getInstance()
                                 .notify("Tree filter verification: " + report,
                                     report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+                    }
+                    if (System.getProperty("key.fx.verify.prooftree") != null) {
+                        // prooftree (P3a): re-run the C19-C23/C25/C27 self test after a live
+                        // auto mode — the tree listeners already applied the C27 partial subtree
+                        // updates on the auto mode stop, so the counter report shows them
+                        String report = ProofTreeVerifyF.run(stage,
+                            selectionModel.getSelectedProof(), proofTreeView);
+                        LOGGER.info("Proof tree verification (after live auto mode): {}", report);
                     }
                     String report = proofTreeView.verifyTreeStructure() + " "
                         + proofTreeView.getLiveUpdateReport();

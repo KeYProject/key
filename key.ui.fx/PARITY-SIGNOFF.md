@@ -156,15 +156,15 @@ differences found by a second Swing↔JavaFX sweep, with stable IDs used by the 
 
 | ID | Finding (Swing reference) | Status |
 |----|---------------------------|--------|
-| C19 | Per-proof view state cache (expansion/selection per proof) | OPEN (P3a) |
-| C20 | Linearized (flat) proof view mode | OPEN (P3a) |
-| C21 | OSS child nodes in the tree | OPEN (P3a) |
-| C22 | Whole-tree actions (expand all/collapse all/...) | OPEN (P3a) |
-| C23 | Popup items incl. SubtreeStatistics | OPEN (P3a) |
+| C19 | Per-proof view state cache (expansion/selection per proof) | RESOLVED (P3a) |
+| C20 | Linearized (flat) proof view mode | RESOLVED (P3a) |
+| C21 | OSS child nodes in the tree | RESOLVED (P3a) |
+| C22 | Whole-tree actions (expand all/collapse all/...) | RESOLVED (P3a) |
+| C23 | Popup items incl. SubtreeStatistics | RESOLVED (P3a) |
 | C24 | `PROOF_TREE` extension seam (tree popup contributions) | OPEN (P4) |
-| C25 | Node-filter counting rule | OPEN (P3a) |
+| C25 | Node-filter counting rule | RESOLVED (P3a) |
 | C26 | Hidden-tab passivation (Swing docking detail) | OPEN (P4, likely WONT-REPLICATE) |
-| C27 | Auto-mode partial subtree updates | OPEN (P3a) |
+| C27 | Auto-mode partial subtree updates | RESOLVED (P3a) |
 
 ## D. Sequent / strategy / goal list / status bar
 
@@ -200,3 +200,20 @@ spec-bearing method) is not headless-drivable without a JML-annotated example in
 `key.ui/examples`; it stays covered by the skeletons above plus the to-be-added example in a
 later batch. HTML-styled contract cells of the Swing configurator are plain text in the FX port
 (KNOWN-SIMPLIFIED, see the class javadocs).
+
+P3a (`weigl/ocfx-p3a-prooftree`, merged 2026-10-10) resolved C19/C20/C21/C22/C23/C25/C27 —
+`ProofTreeViewF`: the per-proof view-state cache (WeakHashMap<Proof, ViewState>, saved and
+restored in the proof switch, C19); the linearized mode with the "main"-tagged taclet splice
+(C20); the OneStepSimplifier protocol child rows with an "expand OSS nodes" toggle that gates
+the whole-tree expand (C21); the whole-tree expand-all/collapse-all actions (C22); the popup
+additions Apply Strategy / Prune Proof / Edit Notes / Show Subtree Statistics (C23, Swing
+`ProofTreePopupFactory`); the node-filter counting rule incl. the "inlined due to hidden
+subtree" case (C25); and the auto-mode partial subtree updates (C27, `modifiedSubtrees`,
+`MAX_PARTIAL_TREE_UPDATES=16`). `key.fx.verify.prooftree` PASS (semantics self test + notes
+dialog + subtree statistics dialog) on Xvnc :99, plus a live-autoprove run
+(`key.fx.verify.prooftree` + `key.fx.demo.autoprove.live`) that exercised the partial subtree
+updates (`autoModePartialUpdates=1`) and a post-autoprove run (`+ key.fx.demo.autoprove`)
+covering the OSS rows on a strategy-proved proof. The view filters and the tree controls live
+in the tree context menu because the FX docking framework has no tab-title gear menu (documented
+in `ProofTreeViewF`); the subtree statistics report is a plain-text window rather than the Swing
+HTML one (export is A4/P3c). C24 (the `PROOF_TREE` extension seam) stays open for P4.
