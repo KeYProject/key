@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
@@ -24,6 +25,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
@@ -31,6 +33,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.settings.GeneralSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -81,8 +85,8 @@ import org.slf4j.LoggerFactory;
  * {@code .strategy-status} (driver status label, not part of this view).
  * <p>
  * Deliberately deferred: the strategy preset combo box (built-in and user-defined presets with
- * save/stash/rename), the parallel-prover merge lock, the auto-prove "go" button, keyboard
- * shortcuts and the timeout setting (not shown by the Swing view either).
+ * save/stash/rename) and the timeout setting (not shown by the Swing view either). The
+ * parallel-prover merge lock and the auto-prove "go" button are implemented (strategy markers).
  */
 public class StrategySelectionViewF extends ScrollPane {
 
@@ -115,6 +119,15 @@ public class StrategySelectionViewF extends ScrollPane {
     private final VBox content = new VBox();
 
     /**
+     * strategy: the "Go"/"Stop" button (Swing {@code StrategySelectionView.btnGo}, a plain
+     * button carrying the shared {@code AutoModeAction}, StrategySelectionView.java:157-208):
+     * starts the automatic proof search of the selected proof, or stops a running one. The label
+     * follows the auto mode via {@link KeYMediatorF#autoModeRunningProperty()} (Swing
+     * {@code AutoModeAction.autoModeStarted/autoModeStopped}, AutoModeAction.java:109-138).
+     */
+    private final Button goButton = new Button("Go");
+
+    /**
      * Edits {@link StrategySettings#getMaxSteps()} ("Max. Rule Applications"), the
      * {@code MaxRuleAppSlider} of the Swing view.
      */
@@ -135,6 +148,12 @@ public class StrategySelectionViewF extends ScrollPane {
 
     private KeYSelectionModel selectionModel;
     private Proof proof;
+
+    /**
+     * strategy: the shared mediator (via {@link #attachMediator}), driving the {@link #goButton};
+     * {@code null} until attached (the button stays disabled).
+     */
+    private KeYMediatorF mediator;
 
     /**
      * Set while the widgets are updated programmatically from the settings ({@link #refresh}).
@@ -160,6 +179,16 @@ public class StrategySelectionViewF extends ScrollPane {
         content.setPadding(new Insets(8));
         content.setSpacing(6);
         setContent(content);
+
+        // strategy: the Go/Stop button row (Swing btnGo, StrategySelectionView.java:207-208/179)
+        goButton.getStyleClass().add("strategy-go");
+        goButton.setTooltip(new Tooltip("Start or stop the automatic proof search"));
+        goButton.setDisable(true);
+        goButton.setOnAction(e -> handleGoButton());
+        HBox goRow = new HBox(8, goButton);
+        goRow.getStyleClass().add("strategy-go-row");
+        goRow.setAlignment(Pos.CENTER_LEFT);
+        content.getChildren().add(goRow);
 
         // "Max. Rule Applications": label + spinner, the MaxRuleAppSlider of the Swing view
         Label maxStepsLabel = new Label(DEFINITION.getMaxRuleApplicationsLabel());
@@ -205,6 +234,102 @@ public class StrategySelectionViewF extends ScrollPane {
         refresh(model.getSelectedProof());
     }
 
+    // strategy: begin — the Go/Stop button + the parallel-prover merge lock (Swing
+    // StrategySelectionView.btnGo + reflectParallelProverMergeLock)
+    /**
+     * strategy: supplies the mediator driving the {@link #goButton} and registers the
+     * parallel-prover merge-lock listener (Swing {@code StrategySelectionView} constructor
+     * property-change listener, StrategySelectionView.java:161-165). Idempotent: re-attaching
+     * the same mediator is a no-op.
+     *
+     * @param newMediator the shared mediator, may be {@code null} to detach
+     */
+    public void attachMediator(KeYMediatorF newMediator) {
+        if (this.mediator == newMediator) {
+            return;
+        }
+        this.mediator = newMediator;
+        if (newMediator == null) {
+            goButton.setDisable(true);
+            goButton.setText("Go");
+            return;
+        }
+        // the label follows the auto mode (Swing AutoModeAction.autoModeStarted/autoModeStopped,
+        // AutoModeAction.java:109-138: "Stop" while running, "Start"/"Continue" otherwise)
+        newMediator.autoModeRunningProperty().addListener(
+            (obs, wasRunning, running) -> updateGoButton(running));
+        updateGoButton(newMediator.autoModeRunningProperty().get());
+        // the merge lock follows the parallel-prover toggle (the Swing view re-registers the
+        // same property-change listener in its constructor)
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                .addPropertyChangeListener(GeneralSettings.PARALLEL_PROVER_ENABLED,
+                    evt -> reflectParallelProverMergeLock());
+        reflectParallelProverMergeLock();
+    }
+
+    /**
+     * strategy: the Go/Stop button action (Swing AutoModeAction.actionPerformed,
+     * AutoModeAction.java:154-177): starts the automatic proof search of the selected proof, or
+     * stops a running one. While auto mode runs the input freeze blocks the rest of the UI (the
+     * Freeze of the Swing MainWindow) — the freeze keeps {@code Escape} (the Swing
+     * {@code AutoModeAction.STOP_KEY}) live, which stops the run.
+     */
+    private void handleGoButton() {
+        if (mediator == null) {
+            return;
+        }
+        if (mediator.autoModeRunningProperty().get()) {
+            mediator.stopAutoMode();
+        } else {
+            mediator.startAutoMode();
+        }
+    }
+
+    /**
+     * strategy: updates the Go/Stop button label (Swing AutoModeAction: "Stop" while the auto
+     * mode runs, "Start"/"Continue" otherwise — the FX button always shows "Go" when idle).
+     *
+     * @param running whether the auto mode is running
+     */
+    private void updateGoButton(boolean running) {
+        goButton.setText(running ? "Stop" : "Go");
+        goButton.setTooltip(new Tooltip(running ? "Stop the automatic proof search"
+                : "Start the automatic proof search"));
+    }
+
+    /**
+     * strategy: reflects in the strategy view that the merge rule is unavailable while the
+     * multi-core prover is active: the merge-point option group is forced to <em>skip</em> and
+     * greyed with an explanatory tooltip (Swing
+     * {@code StrategySelectionView.reflectParallelProverMergeLock},
+     * StrategySelectionView.java:869-895). This is view-only — the stored strategy property is
+     * left untouched, so the user's real choice reappears when they switch back to the
+     * single-core prover (the merge rule is additionally disabled at the engine level during
+     * parallel runs, {@code MergeRule.isApplicable}).
+     */
+    private void reflectParallelProverMergeLock() {
+        boolean mt =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                    .isParallelProverEnabled();
+        List<RadioButton> mergeButtons = propertyButtons.get(StrategyProperties.MPS_OPTIONS_KEY);
+        if (mergeButtons == null) {
+            return;
+        }
+        for (RadioButton button : mergeButtons) {
+            if (mt) {
+                button.setSelected(StrategyProperties.MPS_SKIP.equals(button.getUserData()));
+                button.setDisable(true);
+                button.setTooltip(new Tooltip("The merge rule is disabled while the multi-core "
+                    + "prover is active (forced to 'skip'). Switch to the single-core prover "
+                    + "to use it."));
+            } else {
+                button.setDisable(false);
+                button.setTooltip(null);
+            }
+        }
+    }
+    // strategy: end
+
     /**
      * Shows the strategy settings of the given proof, the counter-part of
      * {@code StrategySelectionView.refresh(Proof)}: the radio buttons reflect the proof's active
@@ -239,6 +364,9 @@ public class StrategySelectionViewF extends ScrollPane {
         } finally {
             updating = false;
         }
+        // strategy: the merge lock reflects on every refresh (Swing
+        // StrategySelectionView.refresh calls reflectParallelProverMergeLock, :863)
+        reflectParallelProverMergeLock();
     }
 
     /**
