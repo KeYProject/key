@@ -133,7 +133,10 @@ contract; capability interfaces: `MainMenuF`, `ToolbarF`, `StatusLineF`, `Contex
 * Per-commit gate: `./gradlew --no-daemon :key.ui.fx:spotlessApply :key.ui.fx:compileJava
   :key.ui.fx:test`.
 * CI: the FX modules are part of the `tests.yml` unit-test matrix, the `spotlessCheck` quality
-  job and the broad release-test `test` runs.
+  job and the broad release-test `test` runs. The JavaFX 25 jars are class-file version 67
+  (JDK 23+), so the FX modules build with a pinned **JDK 25 toolchain** (root `build.gradle`);
+  on Java-21-only machines (the CI baseline) the foojay resolver provisions it automatically.
+  The emitted bytecode stays Java-21 compatible (`--release 21`).
 
 ## Documents
 

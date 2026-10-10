@@ -73,6 +73,19 @@ subprojects {
         targetCompatibility = 21
     }
 
+    // The JavaFX 25 jars (javafx-*) are class-file version 67, i.e. they require JDK 23+, while
+    // the baseline of the build is Java 21. The JavaFX UI modules (key.ui.fx and the keyext.*.fx
+    // ports) therefore compile and test with a pinned JDK 25 toolchain: the foojay resolver
+    // (settings.gradle) provisions it on machines that only have a Java 21 (e.g. the CI jobs),
+    // and the emitted bytecode stays Java-21 compatible via options.release = 21 below.
+    if (project.name.endsWith('.fx')) {
+        java {
+            toolchain {
+                languageVersion = JavaLanguageVersion.of(25)
+            }
+        }
+    }
+
     repositories {
         mavenCentral()
         //maven { url = "https://git.key-project.org/api/v4/projects/35/packages/maven/" }
