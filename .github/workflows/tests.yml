@@ -29,7 +29,12 @@ jobs:
           keyext.exploration, keyext.slicing, key.ncore, key.ui, key.core,
           key.core.testgen, keyext.isabelletranslation,  keyext.ui.testgen,  key.ncore.calculus,
           key.util, key.core.example, keyext.caching, key.core.wd, key.core.infflow,
-          keyext.proofmanagement]
+          keyext.proofmanagement,
+          # JavaFX UI module and its six keyext ports (MP9.x): the unit tests are toolkit-free
+          # and headless-safe (the one panel test that needs the FX toolkit skips on
+          # display-less runners), see the per-module READMEs.
+          key.ui.fx, keyext.caching.fx, keyext.exploration.fx, keyext.isabelletranslation.fx,
+          keyext.slicing.fx, keyext.ui.testgen.fx, keyext.proofmanagement.fx]
     continue-on-error: true
     runs-on: ${{ matrix.os }}
     env:
