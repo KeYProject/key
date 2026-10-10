@@ -34,6 +34,10 @@ dependencies {
     // well-definedness profile (Swing key.ui depends on key.core.wd the same way)
     implementation project(":key.core.wd")
 
+    // contractcompletions: the contract type order needs the information-flow contract
+    // implementation class (Swing key.ui depends on key.core.infflow the same way)
+    implementation project(":key.core.infflow")
+
     // Java/JML source editor with syntax highlighting (Milestone M2).
     implementation(libs.richtextfx)
 
@@ -130,6 +134,8 @@ run {
     //    freeze/unfreeze with key blocking, then an auto-mode-driven run)
     //  * key.fx.verify.sequentmenu = any  (P2a: run the sequent interaction self test — left-click
     //    term menu + POPUP_DELAY guard, search prefill, shift+click focussed auto mode)
+    //  * key.fx.verify.dialogs = any  (P2b: run the contract-completion registry + dialog
+    //    skeletons — contract/auxiliary configurators, lemma selection dialog, item chooser)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
@@ -145,7 +151,7 @@ run {
         "key.fx.verify.profileloadingdialog", "key.fx.verify.javacsettings",
         "key.fx.verify.termmenu", "key.fx.verify.colors", "key.fx.verify.smt",
         "key.fx.verify.loadingexit", "key.fx.verify.shortcuts", "key.fx.verify.inputfreeze",
-        "key.fx.verify.sequentmenu"]
+        "key.fx.verify.sequentmenu", "key.fx.verify.dialogs"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {

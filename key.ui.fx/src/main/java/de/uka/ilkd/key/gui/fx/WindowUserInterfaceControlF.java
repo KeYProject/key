@@ -160,6 +160,17 @@ public class WindowUserInterfaceControlF extends DefaultUserInterfaceControl
     }
 
     /**
+     * The registered interactive completions in dispatch order (verification harness and
+     * diagnostics; the dispatch chain is consulted in registration order, see the field
+     * comment).
+     *
+     * @return the registered completions
+     */
+    public List<InteractiveRuleApplicationCompletionF> getCompletions() {
+        return completions;
+    }
+
+    /**
      * Registers a core {@link RuleCompletionHandler} (e.g. an interactive taclet-match
      * completion port) that is consulted after all registered
      * {@link InteractiveRuleApplicationCompletionF}s. Such a handler has no {@code canComplete};

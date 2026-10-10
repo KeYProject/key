@@ -920,3 +920,108 @@
     -fx-fill: derive(-key-warning, 30%);
     -fx-opacity: 0.45;
 }
+
+/* the traffic light of the checked predicate input (Swing TrafficLight) */
+.traffic-light {
+    -fx-background-color: -key-border;
+    -fx-background-radius: 6;
+    -fx-min-width: 12;
+    -fx-max-width: 12;
+    -fx-min-height: 12;
+    -fx-max-height: 12;
+}
+.traffic-light-ok {
+    -fx-background-color: -key-success;
+}
+.traffic-light-error {
+    -fx-background-color: -key-error;
+}
+
+/* the details box rows of the join dialog (Swing ClickableMessageBox rows) */
+.join-message-row {
+    -fx-cursor: hand;
+    -fx-padding: 1 4 1 4;
+}
+.join-details-box {
+    -fx-background-color: transparent;
+    -fx-padding: 2;
+}
+
+/* origin term label visualizer (Swing OriginTermLabelVisualizer): the origin of the selected
+   term in the tree is highlighted in the term view (Swing HIGHLIGHT_COLOR = orange, here the
+   existing warning color variable) */
+.origin-visualizer-highlight {
+    -fx-fill: derive(-key-warning, 30%);
+    -fx-opacity: 0.45;
+}
+
+/* ---------------------------------------------------------------------------
+   contract completions (P2b) — dark theme: the contract configurator cells
+   (ContractConfigurator/ContractSelectionPanel + auxiliary/block variants) and
+   the invariant configurator (Swing InvariantConfigurator)
+   --------------------------------------------------------------------------- */
+.contract-selection-panel {
+    -fx-padding: 4;
+}
+.contract-cell {
+    -fx-background-color: -key-surface;
+    -fx-border-color: -key-border;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 4;
+    -fx-cursor: hand;
+}
+.contract-cell-gray {
+    -fx-background-color: derive(-key-background, -5%);
+    -fx-text-fill: -key-text-secondary;
+}
+.contract-cell-gray .label {
+    -fx-text-fill: -key-text-secondary;
+}
+.contract-cell-name {
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text;
+}
+.contract-cell-text {
+    -fx-text-fill: -key-text;
+    -fx-wrap-text: true;
+}
+.invariant-loop-representation {
+    -fx-font-family: monospace;
+    -fx-wrap-text: true;
+    -fx-text-fill: -key-text;
+}
+.invariant-heap-pane {
+    -fx-padding: 4;
+}
+.invariant-input {
+    -fx-font-family: monospace;
+}
+.invariant-status-ok {
+    -fx-text-fill: -key-success;
+}
+.invariant-status-error {
+    -fx-text-fill: -key-error;
+}
+
+/* lemma dialogs (P2b): the ItemChooser dual list of the taclet selection dialog
+   and the axiom panel of the user-taclets dialog */
+.item-chooser .list-view {
+    -fx-background-color: -key-surface;
+}
+.item-chooser-middle {
+    -fx-padding: 0 2 0 2;
+}
+.axioms-panel {
+    -fx-border-color: -key-border;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 6;
+}
+.axioms-title {
+    -fx-font-weight: bold;
+    -fx-text-fill: -key-text-secondary;
+}
+.axioms-list {
+    -fx-background-color: -key-surface;
+}
