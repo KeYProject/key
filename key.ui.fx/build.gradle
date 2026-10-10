@@ -128,6 +128,8 @@ run {
     //    bind round trip, the sequent view Ctrl+F key path)
     //  * key.fx.verify.inputfreeze = any  (inputfreeze: the auto mode blocking overlay — direct
     //    freeze/unfreeze with key blocking, then an auto-mode-driven run)
+    //  * key.fx.verify.sequentmenu = any  (P2a: run the sequent interaction self test — left-click
+    //    term menu + POPUP_DELAY guard, search prefill, shift+click focussed auto mode)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
@@ -142,7 +144,8 @@ run {
         "key.fx.verify.help", "key.fx.verify.soundiness", "key.fx.verify.profileloading",
         "key.fx.verify.profileloadingdialog", "key.fx.verify.javacsettings",
         "key.fx.verify.termmenu", "key.fx.verify.colors", "key.fx.verify.smt",
-        "key.fx.verify.loadingexit", "key.fx.verify.shortcuts", "key.fx.verify.inputfreeze"]
+        "key.fx.verify.loadingexit", "key.fx.verify.shortcuts", "key.fx.verify.inputfreeze",
+        "key.fx.verify.sequentmenu"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {
