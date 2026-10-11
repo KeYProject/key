@@ -19,7 +19,7 @@ marked `OPEN (unverified)` rather than assumed fixed.
 | Component (audit report) | Behaviors | Audit verdict | Resolution since | Current status |
 |---|---|---|---|---|
 | mainwindow | 62 | 13 PORTED / 24 PARTIAL / **17 MISSING** / 6 KNOWN-DEF | window shell, menu/toolbar/status parity, docking, drawers (MP1–MP10) | mostly resolved; open items below |
-| prooftree | 53 | 20 / 8 / **13 MISSING** / 5 KNOWN-DEF | core tree faithful; heatmap etc. deferred | heatmap/NodeInfoVisualizer/branch editing still OPEN |
+| prooftree | 53 | 20 / 8 / **13 MISSING** / 5 KNOWN-DEF | core tree faithful; P3a sweep items, WP-10 click-target + Apply-Strategy, WP-2 heatmap/NodeInfoVisualizer/branch editing | RESOLVED (remaining gaps documented in KNOWN-SIMPLIFIED) |
 | sequent | 45 | 14 / 10 / **15 MISSING** / 4 KNOWN-DEF | term context menu + taclet application + search (MP8) | context menu RESOLVED; remaining items below |
 | interactive-completion | 25 | 0 / 0 / **20 MISSING** | `WindowUserInterfaceControlF` seam + tacletmatch + join/merge | RESOLVED (was the top P0; evidence uicontrol + tacletmatch 9/9) |
 | goallist-strategy-info | 37 | goal list at parity; strategy preset UI missing; info view re-designed | — | preset combo + stats staleness OPEN |
@@ -59,7 +59,7 @@ P0 bugs from the audit:
 | Audit item | Status |
 |---|---|
 | Loading options (profile / ignore other Java files) | **RESOLVED** — load-options dialog ported (`key.fx.verify.profileloading` + `profileloadingdialog` PASS) |
-| Select Goal Above / Below + menu set (View 7) | **RESOLVED** at surface level (`key.fx.verify.menuparity` View 7); Selection Back/Forward binding `OPEN (unverified)` |
+| Select Goal Above / Below + menu set (View 7) | **RESOLVED** (WP-10: Selection Back/Forward verified — `key.fx.verify.selectionhistory` PASS: the View menu's Back/Forward items carry the KeyStrokeManagerF accelerators (Ctrl+Alt+Left/Right), follow the history-driven enablement and firing them moves the mediator selection back/forward over the `SelectionHistoryF` — "PASS (navigation: moved 0->148)"; the View-menu surface itself was already `key.fx.verify.menuparity` View 7 PASS) |
 | Automation submenu + macro invocation | **RESOLVED** (automation submenu MP2, macro menu in term menu); global toolbar dropdown `OPEN` |
 | Join / merge dialogs | **RESOLVED** for the merge/join flow (`key.fx.verify.joinmerge` PASS on gcd 32/0); `keyext.slicing.fx` SMT routing partial |
 | Strategy preset combo / stash UI | `OPEN` |
@@ -72,8 +72,11 @@ P0 bugs from the audit:
 
 ## P2 sign-off
 
-Heatmap overlay (settings+toggle only, ledger `HeatmapF`), NodeInfoVisualizer, branch-label F2
-editing, info-view node-change refresh, notification framework depth, docking title
+Heatmap overlay (RESOLVED via WP-2 — the heat overlay is ported onto `SequentViewF` in the
+Swing-faithful scope: the Swing original `SequentView.updateHeatMapHighlights` renders into the
+sequent views only, never the proof tree), NodeInfoVisualizer + the proof-tree renderer surface
+and branch-label F2 editing (RESOLVED via WP-2, see carried-forward item 2),
+info-view node-change refresh, notification framework depth, docking title
 actions/layout slots/maximize (partially done — `key.fx.verify.docking` PASS; title actions
 exist as `DockTitleActionF`), join+mergerule dialogs (track MP9.x modules), lemmatagenerator
 (`key.fx.verify.lemmaorigin` PASS for the generator path), soundiness (`key.fx.verify.soundiness`
@@ -92,14 +95,31 @@ as open.
    overlay keeps covering only the views area (the menu/toolbar proof actions are disabled
    during auto mode anyway, the automation macro items must stay clickable to stop a run, and
    the status bar must stay live for the progress display) — KNOWN-SIMPLIFIED.
-2. Proof-tree: Apply Strategy on clicked node, Prune-at-node in the popup, renderer surface
-   (tooltips, goal icons, linked/cache marks, notes, branch-label F2 editing), NodeInfoVisualizer.
+2. Proof-tree: Apply Strategy on clicked node, Prune-at-node in the popup (both RESOLVED via
+   WP-10 `key.fx.verify.prooftree`), renderer surface, NodeInfoVisualizer, branch-label F2
+   editing — RESOLVED (WP-2): the renderer surface is ported (leaf goal icons — closed goal,
+   cached-closed, linked, interactive, open — as FontAwesome glyph stand-ins for the Swing
+   key-hole gifs, non-leaf marker icons in the Swing priority window/notes/useless/interactive/
+   script, the branch linked-folder icon, tooltip notes + useless-analysis lines, and the
+   `NodeInfoVisualizerListenerF` attachment that re-renders on register/unregister like Swing's
+   `nodeInfoVisListener`); branch-label F2 editing is ported with the Swing
+   `DefaultTreeCellEditor.isCellEditable` gate (only branch entries whose node has a parent —
+   the root branch is denied) and the commit seam mirroring
+   `GUIProofTreeModel.valueForPathChanged → GUIBranchNode.setLabel → NodeInfo.setBranchLabel`
+   plus the full rebuild; the heatmap heat overlay renders into the sequent view (the Swing
+   original touches the sequent views only). Documented deviations: the Swing key-hole gif
+   images have no FontAwesome glyph equivalents (state colors stay on the text classes, icons
+   use the neutral `key-icon` fill), and `key.fx.verify.prooftree` asserts the surface —
+   `branchEdit rootEditable=false labelEdit=PASS leafIcons=3 nodeInfoVisualizer=PASS PASS`
+   (`/tmp/opencode/wp2/prooftree-agatha3.log`) and the heatmap leg
+   `sfAge=1 sfNewest=5 termsAge=6 termsNewest=3 off=0 PASS` (`/tmp/opencode/wp2/heatmap1.log`).
 3. Sequent: multi-select highlight + reprint persistence, drag & drop, inner-node highlights +
    taclet info pane, source cross-highlight.
 4. Source view: symbex line highlights, click-to-jump into the proof tree, hover
    cursor/line highlight, multi-file tabs, branch status bar.
 5. Menus/actions: Pretty Print / Unicode wiring, term labels, tooltip toggles, selection
-   Back/Forward bindings, Edit Last File, Load User Taclets + Prove submenu, Run All Proofs
+   Back/Forward bindings (RESOLVED via WP-10 `key.fx.verify.selectionhistory`), Edit Last File,
+   Load User Taclets + Prove submenu, Run All Proofs
    (dialogs exist for several), EnableWhenProofLoaded analogue, toolbars 9 remaining buttons.
 6. Keyboard: shortcut-default regressions; dead bindings audit (RESOLVED via P1
    `key.fx.verify.shortcuts`; the Swing-persisted `keystrokes.json` stays the source of truth
@@ -107,7 +127,8 @@ as open.
 7. Options dialogs: strategy preset UI, HeatmapOptionsDialog (SMT run UI RESOLVED via P1
    `key.fx.verify.smt`).
 8. Exit flow: close-request + confirmExit + layout persistence on close (RESOLVED via P1
-   `key.fx.verify.loadingexit`; the Swing `fireShutDown` event has no FX seam — KNOWN-SIMPLIFIED).
+   `key.fx.verify.loadingexit`; the Swing `fireShutDown` event now fires through the WP-1
+   `GUIListenerF` registry seam — `MainWindowF.java:3721` RESOLVED).
 9. Colors/theme: all 51 Swing-parity color property definitions RESOLVED (P1 `key.fx.verify.colors` PASS); theme persistence remains.
 10. Notification framework depth: proof-closed/exception dialogs beyond toasts are in
     (`IssueDialogF`); the `NotificationTask`/action framework remains partial.
@@ -245,33 +266,6 @@ parity items:
 `key.fx.verify.prooftree` PASS (B12 macro submenu seam incl. the closed-demo zero-applicable
 case) on Xvnc :99.
 
-P3c (`weigl/ocfx-p3c-dialogs`, this branch) resolved A4/A5/A6/A7/A8 and D31/D33/D34/D37 — the
-dialog/status-line parity items of the sweep:
-A4 `ProofStatisticsDialogF` now exports the Swing CSV/HTML formats (`verifyStatisticsExport`);
-A5 keeps "About KeY" as the enriched INFO toast (B16 convention) and turns the license into the
-real `LicenseDialogF` (tabs "KeY License" + "Third party libraries", Swing `LicenseAction`);
-A6 `MainWindowF.createGithubIssue`/`buildGithubIssueUrl` rebuilds the Swing
-`CreateGithubIssueAction` issue template (%CHECKSUM% → internal version, %JAVA% → proof Java
-sources) and opens it through the `HelpFacadeF` browser seam; A7 `FeedbackDialogF` "Save ZIP…"
-writes `bugDescription.txt`/`keyVersion.txt`/`systemProperties.txt` + the `key_*.log` run logs
-(`verifyLogArchive`); A8 `ToolTipOptionsDialogF` "Save as Default" persists the tooltip options
-via `ProofIndependentSettings.saveSettings()` (`verifySaveAsDefault`); D31 `SequentViewF`
-computes the print line width from the scroll-pane viewport via a `Text("W")` probe (Swing
-`computeLineWidthFor`, reprint on width changes, `verifyViewportLineWidth` under
-`key.fx.verify.sequent`); D33 `ConfigF` mirrors the Swing `KEY_FONT_*` families/sizes (proof
-tree/sequent at the current size, goal/proof list at the fixed `SIZES[2]`); D34
-`SequentViewDockF` shows a node's sequent in a separate buffer with the "Jump into Tree" title
-action (proof-tree popup "Open Node in Separate Buffer"); D37 `MainWindowF.buildStatusBar` gains
-the hidden-until-used progress bar with `setStatusLine(String,int)` /
-`setTaskProgressBarMaximum` (`<0` indeterminate, `0` hidden, `>0` determinate) /
-`setTaskProgressValue` / `hideStatusProgress`, wired from `WindowUserInterfaceControlF` exactly
-like Swing's `WindowUserInterfaceControl` (taskStarted → `setStatusLine(msg,size)`, setMaximum /
-setProgress / taskProgress → bar, macro end → hide). `key.fx.verify.uicontrol` +
-`key.fx.verify.menuparity` PASS (10 seam steps incl. the six P3c seams, menu counts
-File 16 / Proof 24 / Options 7 / View 12 / About 5) and `key.fx.verify.prooftree` +
-`key.fx.demo.autoprove` PASS on Xvnc :98. A10 stays open for P4 (dialog triage remainder).
-
-
 P4 (`weigl/ocfx-p4-extensions`) resolved B13/C24 (extension-seam parity) and decided
 B14/B16/C26; A10 and the D-section remainder D30/D36 are triaged/resolved in the same batch:
 - B13: `KeYGuiExtensionF.MainMenuF.getMenuPath()` (Swing `KeyAction.PATH`) + facade
@@ -306,3 +300,29 @@ B14/B16/C26; A10 and the D-section remainder D30/D36 are triaged/resolved in the
   Ctrl+Shift+F12 sequent shortcut — asserted headlessly by `key.fx.verify.extensions`
   (`testExtension`/`testNested`/`prooftreeExtensionItems`/`sequentShortcutToast`).
 
+
+P3c (`weigl/ocfx-p3c-dialogs`, this branch) resolved A4/A5/A6/A7/A8 and D31/D33/D34/D37 — the
+dialog/status-line parity items of the sweep:
+A4 `ProofStatisticsDialogF` now exports the Swing CSV/HTML formats (`verifyStatisticsExport`);
+A5 keeps "About KeY" as the enriched INFO toast (B16 convention) and turns the license into the
+real `LicenseDialogF` (tabs "KeY License" + "Third party libraries", Swing `LicenseAction`);
+A6 `MainWindowF.createGithubIssue`/`buildGithubIssueUrl` rebuilds the Swing
+`CreateGithubIssueAction` issue template (%CHECKSUM% → internal version, %JAVA% → proof Java
+sources) and opens it through the `HelpFacadeF` browser seam; A7 `FeedbackDialogF` "Save ZIP…"
+writes `bugDescription.txt`/`keyVersion.txt`/`systemProperties.txt` + the `key_*.log` run logs
+(`verifyLogArchive`); A8 `ToolTipOptionsDialogF` "Save as Default" persists the tooltip options
+via `ProofIndependentSettings.saveSettings()` (`verifySaveAsDefault`); D31 `SequentViewF`
+computes the print line width from the scroll-pane viewport via a `Text("W")` probe (Swing
+`computeLineWidthFor`, reprint on width changes, `verifyViewportLineWidth` under
+`key.fx.verify.sequent`); D33 `ConfigF` mirrors the Swing `KEY_FONT_*` families/sizes (proof
+tree/sequent at the current size, goal/proof list at the fixed `SIZES[2]`); D34
+`SequentViewDockF` shows a node's sequent in a separate buffer with the "Jump into Tree" title
+action (proof-tree popup "Open Node in Separate Buffer"); D37 `MainWindowF.buildStatusBar` gains
+the hidden-until-used progress bar with `setStatusLine(String,int)` /
+`setTaskProgressBarMaximum` (`<0` indeterminate, `0` hidden, `>0` determinate) /
+`setTaskProgressValue` / `hideStatusProgress`, wired from `WindowUserInterfaceControlF` exactly
+like Swing's `WindowUserInterfaceControl` (taskStarted → `setStatusLine(msg,size)`, setMaximum /
+setProgress / taskProgress → bar, macro end → hide). `key.fx.verify.uicontrol` +
+`key.fx.verify.menuparity` PASS (10 seam steps incl. the six P3c seams, menu counts
+File 16 / Proof 24 / Options 7 / View 12 / About 5) and `key.fx.verify.prooftree` +
+`key.fx.demo.autoprove` PASS on Xvnc :98. A10 stays open for P4 (dialog triage remainder).
