@@ -53,8 +53,8 @@ import org.slf4j.LoggerFactory;
  * recursive listing of the configured output folder (the Swing dialog only prints "Writing test
  * file" into the log). The window may be {@code null} when the extension has not been connected
  * through the settings dialog yet (see {@link TestgenExtensionF}) — the dialog then starts with a
- * hint instead of a run; the owner stage is resolved from the clicked status-line control so the
- * dialog still opens properly owner-relative. The window is passed as a plain {@code Object}
+ * hint instead of a run; the owner stage is resolved from the clicked toolbar control (WP-7) so
+ * the dialog still opens properly owner-relative. The window is passed as a plain {@code Object}
  * because every {@code MainWindowF} type use in this module fails to compile (see
  * {@link TestgenReflectionF}).
  */
@@ -117,7 +117,7 @@ final class TestGenResultsDialogF extends Dialog<Void> {
 
         btnStart.setOnAction(e -> startRun());
         btnStop.setOnAction(e -> requestStop());
-        btnClose.setOnAction(e -> close());
+        btnClose.setOnAction(e -> requestHide());
         btnClose.setDefaultButton(true);
         btnStart.disableProperty().bind(running);
         btnStop.disableProperty().bind(running.not());
@@ -246,6 +246,19 @@ final class TestGenResultsDialogF extends Dialog<Void> {
             log.appendText(text);
         } else {
             Platform.runLater(() -> log.appendText(text));
+        }
+    }
+
+    /**
+     * Hides the dialog window: a plain {@link Dialog} without a cancel {@code ButtonType} refuses
+     * every {@link Dialog#close()} close request (the button bar lives in the custom content, so
+     * the pane has none — the Swing {@code JDialog.dispose} parity hides unconditionally).
+     */
+    private void requestHide() {
+        javafx.stage.Window window = getDialogPane().getScene() == null ? null
+                : getDialogPane().getScene().getWindow();
+        if (window != null) {
+            window.hide();
         }
     }
 }

@@ -41,8 +41,8 @@ import org.slf4j.LoggerFactory;
  * The auto-mode shell around the search (CounterExampleAction.java:169-191) lives in
  * {@link CounterExampleTaskF}. The window may be {@code null} when the extension has not been
  * connected through the settings dialog yet (see {@link TestgenExtensionF}) — the dialog then
- * starts with a hint instead of a search; the owner stage is resolved from the clicked
- * status-line control.
+ * starts with a hint instead of a search; the owner stage is resolved from the clicked toolbar
+ * control (WP-7).
  */
 @NullMarked
 final class CounterExampleResultsDialogF extends Dialog<Void> {
@@ -96,7 +96,7 @@ final class CounterExampleResultsDialogF extends Dialog<Void> {
 
         btnStart.setOnAction(e -> startSearch());
         btnStop.setOnAction(e -> requestStop());
-        btnClose.setOnAction(e -> close());
+        btnClose.setOnAction(e -> requestHide());
         btnClose.setDefaultButton(true);
         btnStart.disableProperty().bind(running);
         btnStop.disableProperty().bind(running.not());
@@ -197,6 +197,19 @@ final class CounterExampleResultsDialogF extends Dialog<Void> {
             log.appendText(text);
         } else {
             Platform.runLater(() -> log.appendText(text));
+        }
+    }
+
+    /**
+     * Hides the dialog window: a plain {@link Dialog} without a cancel {@code ButtonType} refuses
+     * every {@link Dialog#close()} close request (the button bar lives in the custom content, so
+     * the pane has none — the Swing {@code JDialog.dispose} parity hides unconditionally).
+     */
+    private void requestHide() {
+        javafx.stage.Window window = getDialogPane().getScene() == null ? null
+                : getDialogPane().getScene().getWindow();
+        if (window != null) {
+            window.hide();
         }
     }
 }

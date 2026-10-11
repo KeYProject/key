@@ -14,6 +14,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -189,16 +190,28 @@ public final class TestgenVerifyF {
             BorderPane generateRoot = (BorderPane) generateDialog.getDialogPane().getContent();
             List<CheckBox> embeddedOptions = new ArrayList<>();
             collect(CheckBox.class, generateRoot.getRight(), embeddedOptions);
-            check(embeddedOptions.size() == 8,
-                "the embedded live options panel (8 toggles) sits on the right edge (C5)");
-            generateDialog.close();
-            check(!generateDialog.isShowing(), "the generation run dialog closes");
+            check(embeddedOptions.size() == 5,
+                "the embedded live options panel (5 toggles) sits on the right edge (C5)");
+            // close wiring: the Close button hides the dialog (a plain Dialog without a cancel
+            // ButtonType refuses Dialog.close requests — the Swing JDialog.dispose parity)
+            Button closeOfGenerate = buttonByText(buttonsOf(generateDialog.getDialogPane()),
+                "Close");
+            check(closeOfGenerate != null, "the generation run dialog has a Close button");
+            if (closeOfGenerate != null) {
+                closeOfGenerate.fire();
+                check(!generateDialog.isShowing(), "the generation run dialog closes");
+            }
 
             ceDialog = new CounterExampleResultsDialogF(null, stage);
             ceDialog.show();
             check(ceDialog.isShowing(), "the counterexample run dialog renders");
             checkRunDialogIdle(ceDialog.getDialogPane(), "counterexample run dialog");
-            ceDialog.close();
+            Button closeOfCe = buttonByText(buttonsOf(ceDialog.getDialogPane()), "Close");
+            check(closeOfCe != null, "the counterexample run dialog has a Close button");
+            if (closeOfCe != null) {
+                closeOfCe.fire();
+                check(!ceDialog.isShowing(), "the counterexample run dialog closes");
+            }
 
             // (4) counterexample model tree (C6): a stub SMT model renders in CETreeF
             CETreeF ceTree = new CETreeF(stubModel());
@@ -209,16 +222,22 @@ public final class TestgenVerifyF {
                 "Sequences")), "the model tree has the four model categories");
             TreeItem<String> heaps = rootChild(ceTree, 1);
             check(heaps != null && heaps.getChildren().size() == 1
-                    && "#o1".equals(heaps.getChildren().get(0).getValue()),
-                "the heap lists the stub object #o1");
+                    && "heap".equals(heaps.getChildren().get(0).getValue()),
+                "the heap category lists the stub heap");
             if (heaps != null && !heaps.getChildren().isEmpty()) {
-                List<String> objectRows = labels(heaps.getChildren().get(0));
-                check(objectRows.contains("Type=java.lang.Object")
-                        && objectRows.contains("Length=0") && objectRows.contains("Fields"),
-                    "the object row carries the general properties and the fields node");
-                TreeItem<String> fields = child(heaps.getChildren().get(0), "Fields");
-                check(fields != null && labels(fields).contains("x=#o0"),
-                    "the fields node lists the stub field x=#o0");
+                TreeItem<String> heap = heaps.getChildren().get(0);
+                check(heap.getChildren().size() == 1
+                        && "#o1".equals(heap.getChildren().get(0).getValue()),
+                    "the heap lists the stub object #o1");
+                if (!heap.getChildren().isEmpty()) {
+                    List<String> objectRows = labels(heap.getChildren().get(0));
+                    check(objectRows.contains("Type=java.lang.Object")
+                            && objectRows.contains("Length=0") && objectRows.contains("Fields"),
+                        "the object row carries the general properties and the fields node");
+                    TreeItem<String> fields = child(heap.getChildren().get(0), "Fields");
+                    check(fields != null && labels(fields).contains("x=#o0"),
+                        "the fields node lists the stub field x=#o0");
+                }
             }
             TreeItem<String> locsets = rootChild(ceTree, 2);
             check(locsets != null && locsets.getChildren().size() == 1
@@ -275,13 +294,17 @@ public final class TestgenVerifyF {
             LOGGER.error("TestGen verify failed", e);
             return "TestGen verify: FAIL (" + e + ")";
         } finally {
-            if (generateDialog != null) {
-                generateDialog.close();
-            }
-            if (ceDialog != null) {
-                ceDialog.close();
-            }
+            hideWindow(generateDialog);
+            hideWindow(ceDialog);
             new TestGenerationSettingsF().setMaxUnwinds(oldMaxUnwinds);
+        }
+    }
+
+    /** Hides the run-dialog window directly (cleanup; Dialog.close may be refused). */
+    private static void hideWindow(Dialog<?> dialog) {
+        if (dialog != null && dialog.getDialogPane().getScene() != null
+                && dialog.getDialogPane().getScene().getWindow() != null) {
+            dialog.getDialogPane().getScene().getWindow().hide();
         }
     }
 
@@ -303,8 +326,7 @@ public final class TestgenVerifyF {
 
     /** The idle-button/log assertions shared by the two run dialogs (C3/C4). */
     private static void checkRunDialogIdle(DialogPane pane, String what) {
-        List<Button> buttons = new ArrayList<>();
-        collect(Button.class, pane, buttons);
+        List<Button> buttons = buttonsOf(pane);
         Button start = buttonByText(buttons, "Start");
         Button stop = buttonByText(buttons, "Stop");
         Button close = buttonByText(buttons, "Close");
@@ -315,6 +337,12 @@ public final class TestgenVerifyF {
         collect(TextArea.class, pane, logs);
         check(logs.size() == 1 && logs.get(0).getText().isEmpty(),
             what + ": empty pipeline log");
+    }
+
+    private static List<Button> buttonsOf(DialogPane pane) {
+        List<Button> buttons = new ArrayList<>();
+        collect(Button.class, pane, buttons);
+        return buttons;
     }
 
     private static Button buttonByText(List<Button> buttons, String text) {

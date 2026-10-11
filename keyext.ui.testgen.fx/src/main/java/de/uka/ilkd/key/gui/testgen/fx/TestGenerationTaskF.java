@@ -17,8 +17,8 @@ import org.jspecify.annotations.NullMarked;
  * Runs the test-case generation off the FX thread, FX port of {@code TGWorker} (Swing
  * TGWorker.java:30-86). The Swing worker is a {@code SwingWorker} that wraps the
  * {@code MainWindowTestGenerator} ({@code AbstractTestGenerator} subclass) and reports through
- * the lifecycle logger of the {@code TGInfoDialog}; this port drives the reflective
- * {@code TestgenFacade} pipeline ({@link TestgenReflectionF#generateTestcases}) in a
+ * the lifecycle logger of the {@code TGInfoDialog}; this port drives the reflective port of the
+ * Swing {@code TestgenFacade} pipeline ({@link TestgenReflectionF#generateTestcases}) in a
  * {@link Task} and dispatches the report events to the {@link LogSinkF} of the
  * {@code TestGenResultsDialogF}.
  * <p>
