@@ -1122,6 +1122,19 @@ public final class MainWindowF {
                             report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
                 statusRight.setText(report);
             }
+            // testgen (WP-7): run the TestGen extension self test — the extension capability
+            // surface (toolbar + Startup hook + macro accelerator), the options panel round
+            // trips, the two run dialogs' idle modes, the CE model tree of a stub SMT model and
+            // the cooperative stop (no real generation run; the real SMT run is key.fx.verify.smt)
+            if (System.getProperty("key.fx.verify.testgen") != null) {
+                String report =
+                    runTestgenVerification(stage, selectionModel.getSelectedProof(), mediator);
+                LOGGER.info("TestGen verification: {}", report);
+                NotificationManagerF.getInstance()
+                        .notify("TestGen verification: " + report,
+                            report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+                statusRight.setText(report);
+            }
             // shortcuts (P1): Swing-parity defaults, no collisions, override round trip and the
             // sequent view key path (Ctrl+F shows the search bar)
             if (System.getProperty("key.fx.verify.shortcuts") != null) {
@@ -2500,6 +2513,29 @@ public final class MainWindowF {
         } catch (ReflectiveOperationException | RuntimeException e) {
             LOGGER.error("Proof caching verification failed", e);
             return "Proof caching verification FAIL (" + e + ")";
+        }
+    }
+
+    /**
+     * testgen (WP-7): runs the TestGen extension self test ({@code key.fx.verify.testgen}, run
+     * after the demo load like the other proof-dependent verify hooks). The harness lives in the
+     * {@code keyext.ui.testgen.fx} extension module, which is not a compile dependency of
+     * key.ui.fx (the dependency direction is reversed), so it is invoked reflectively; the report
+     * string ends in {@code PASS} or {@code FAIL}.
+     */
+    private static String runTestgenVerification(javafx.stage.Window owner, Proof proof,
+            KeYMediatorF mediator) {
+        try {
+            Class<?> verify = Class.forName("de.uka.ilkd.key.gui.testgen.fx.TestgenVerifyF");
+            Object report = verify
+                    .getMethod("run", javafx.stage.Window.class, Proof.class, KeYMediatorF.class)
+                    .invoke(null, owner, proof, mediator);
+            return (String) report;
+        } catch (ClassNotFoundException e) {
+            return "TestGen verification SKIP (keyext.ui.testgen.fx not on the classpath)";
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            LOGGER.error("TestGen verification failed", e);
+            return "TestGen verification FAIL (" + e + ")";
         }
     }
 
