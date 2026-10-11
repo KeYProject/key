@@ -638,6 +638,12 @@
     -fx-fill: rgba(140, 200, 255, 0.71);
 }
 
+/* WP-3: sticky user-selection highlight (Swing PERMANENT_HIGHLIGHT_COLOR,
+   [currentGoal]permaHighlight dark color) */
+.sequent-user-selection {
+    -fx-fill: rgba(210, 185, 201, 0.78);
+}
+
 /* warning banner while a search filter hides formulas (Swing SequentHideWarningBorder message;
    the Swing border uses the same single color in both themes) */
 .sequent-hide-warning {
