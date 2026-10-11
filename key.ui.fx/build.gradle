@@ -166,6 +166,10 @@ run {
     //    documented no-graphviz fallback), the HTML statistics dialog with its four sort
     //    orders, the iterative fixed-point slicing run and the recent-files bypass of the
     //    direct slice loads)
+    //  * key.fx.verify.themepersist = save|restore  (WP-3: theme persistence round trip, two
+    //    app runs — "save" applies the dark theme through ThemeManager.setTheme and asserts the
+    //    choice persisted; "restore" restarts without the key.fx.theme override and asserts the
+    //    dark theme was restored from the persisted preference, then resets to light)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
@@ -182,7 +186,8 @@ run {
         "key.fx.verify.loadingexit", "key.fx.verify.shortcuts", "key.fx.verify.inputfreeze",
         "key.fx.verify.sequentmenu", "key.fx.verify.dialogs", "key.fx.verify.prooftree",
         "key.fx.verify.selectionhistory", "key.fx.verify.isabelle", "key.fx.verify.heatmap",
-        "key.fx.verify.exploration", "key.fx.verify.caching", "key.fx.verify.slicing"]
+        "key.fx.verify.exploration", "key.fx.verify.caching", "key.fx.verify.slicing",
+        "key.fx.verify.themepersist"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {

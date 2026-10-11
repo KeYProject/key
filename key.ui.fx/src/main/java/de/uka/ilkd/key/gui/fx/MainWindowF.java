@@ -112,6 +112,7 @@ import de.uka.ilkd.key.gui.fx.drawer.DrawerF;
 import de.uka.ilkd.key.gui.fx.drawer.DrawerItemF;
 import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
 import de.uka.ilkd.key.gui.fx.extension.api.KeYGuiExtensionF;
+import de.uka.ilkd.key.gui.fx.extension.contrib.ParallelProverStatusIndicatorF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.goallist.GoalListViewF;
 import de.uka.ilkd.key.gui.fx.help.HelpFacadeF;
@@ -695,6 +696,21 @@ public final class MainWindowF {
                     .notify("Colors verification: " + report,
                         report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
         }
+        // WP-3 (settings-config): theme persistence round trip (key.fx.verify.themepersist) —
+        // two app runs: "save" applies the dark theme through the real ThemeManager.setTheme
+        // (the View menu's Dark Theme action) and asserts the choice persisted; "restore"
+        // restarts the app without the key.fx.theme override and asserts the dark theme was
+        // restored from the persisted preference, then resets to light so the round trip is
+        // repeatable. Proof-independent, so it runs at startup like the other smalldialogs hooks.
+        if (System.getProperty("key.fx.verify.themepersist") != null) {
+            String report =
+                runThemePersistVerification(System.getProperty("key.fx.verify.themepersist"));
+            LOGGER.info("Theme persistence verification: {}", report);
+            NotificationManagerF.getInstance()
+                    .notify("Theme persistence verification: " + report,
+                        report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+            statusRight.setText(report);
+        }
 
         // extension: MP9.0 — register the FX extensions' settings providers into the settings
         // manager registry (Swing SettingsManager registers each KeYGuiExtension.Settings
@@ -1093,6 +1109,14 @@ public final class MainWindowF {
                 NotificationManagerF.getInstance()
                         .notify("Viewport line width verification: " + lwReport,
                             lwReport.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+                // WP-3 (sequent): the sticky user-selection highlight + reprint persistence —
+                // pin, reprint, settings-change reprint, unpin (Swing
+                // recalculateUserSelectionRange / SequentViewInputListener.mouseClicked)
+                String userSelReport = sequentView.verifyUserSelection();
+                LOGGER.info("Sequent user selection verification: {}", userSelReport);
+                NotificationManagerF.getInstance()
+                        .notify("Sequent user selection verification: " + userSelReport,
+                            userSelReport.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
             }
             if (System.getProperty("key.fx.verify.heatmap") != null) {
                 // heatmap (WP-2): render the age heatmap into the sequent view — the four
@@ -1239,6 +1263,15 @@ public final class MainWindowF {
             }
             if (System.getProperty("key.fx.verify.goallist") != null) {
                 LOGGER.info("Goal list verification: {}", goalListView.verifyGoalList());
+                // WP-3 (goallist-strategy-info): the strategy preset combo / stash UI self test
+                // — entry list, stash/save/rename/delete round trip, preset write-through and
+                // the Apply-button gating (StrategySelectionViewF.verifyPresetCombo)
+                String presetReport = strategyView.verifyPresetCombo();
+                LOGGER.info("Strategy preset verification: {}", presetReport);
+                NotificationManagerF.getInstance()
+                        .notify("Strategy preset verification: " + presetReport,
+                            presetReport.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+                statusRight.setText(presetReport);
             }
             // joinmerge: run the join/merge dialog self test (key.fx.verify.joinmerge)
             if (System.getProperty("key.fx.verify.joinmerge") != null) {
@@ -2863,6 +2896,16 @@ public final class MainWindowF {
         pass &= statusControls.size() >= 2
                 && statusBar.getChildren().containsAll(statusControls);
 
+        // WP-3 — the parallel-prover status indicator: the Swing-parity "SC"/"MT Nx" button
+        // (left-click toggle through the real handler + the right-click worker-count menu)
+        KeYGuiExtensionF proverExtension = KeYGuiExtensionFacadeF.getExtensions().stream()
+                .filter(e -> e instanceof ParallelProverStatusIndicatorF).findFirst().orElse(null);
+        String proverReport = proverExtension instanceof ParallelProverStatusIndicatorF prover
+                ? prover.verifyProverMode()
+                : "MISSING";
+        sb.append(" proverMode=").append(proverReport);
+        pass &= proverReport.endsWith("PASS");
+
         MenuBar menuBar = buildMenuBar();
         boolean heatmapMenu =
             menuBar.getMenus().stream().anyMatch(m -> "Heatmap".equals(m.getText()));
@@ -4384,6 +4427,129 @@ public final class MainWindowF {
         logMenuParity("GoalBack", verifyGoalBackLabel());
         // P3b/B15: assert the Goal Back / Prune enablement of the menu items and toolbar buttons
         verifyGoalBackPruneEnablement();
+        // WP-3: the View-menu Pretty Print / Unicode toggles — the real CheckMenuItems flip the
+        // ViewSettings + the NotationInfo statics and re-render the sequent (Swing
+        // PrettyPrintToggleAction/UnicodeToggleAction); the leg asserts the visible effect
+        logMenuParity("PrettyUnicode", verifyPrettyUnicode());
+    }
+
+    /**
+     * WP-3: headless self test of the View-menu Pretty Print / Unicode toggles ({@code
+     * key.fx.verify.menuparity}): the items are wired to
+     * {@code ProofIndependentSettings...ViewSettings} exactly like the Swing actions (Swing
+     * PrettyPrintToggleAction.actionPerformed: set the {@code NotationInfo} static BEFORE the
+     * ViewSettings change, then {@code makePrettyView}; UnicodeToggleAction: disabled without
+     * pretty printing) — the leg fires the real {@code CheckMenuItem}s and asserts the mirrored
+     * state plus the visible effect on the printed sequent text. The previous state is restored
+     * afterwards.
+     *
+     * @return {@code "PASS - ..."} or {@code "FAIL - ..."}
+     */
+    private String verifyPrettyUnicode() {
+        ViewSettings viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        boolean originalPretty = viewSettings.isUsePretty();
+        boolean originalUnicode = viewSettings.isUseUnicode();
+        MenuBar bar = buildMenuBar();
+        Menu viewMenu = bar.getMenus().stream()
+                .filter(m -> "View".equals(m.getText())).findFirst().orElse(null);
+        CheckMenuItem pretty = findCheckMenuItem(viewMenu, "Pretty Print");
+        CheckMenuItem unicode = findCheckMenuItem(viewMenu, "Unicode Symbols");
+        if (pretty == null || unicode == null) {
+            return "FAIL - View menu lacks the Pretty Print/Unicode items";
+        }
+        List<String> problems = new ArrayList<>();
+        String text0 = sequentView.printedText();
+        try {
+            // pretty printing off: the settings, the NotationInfo static and the printed text
+            // must all follow (the item's onAction fires the same refreshPrettyViews path)
+            pretty.setSelected(false);
+            pretty.fire();
+            if (viewSettings.isUsePretty() || NotationInfo.DEFAULT_PRETTY_SYNTAX) {
+                problems.add("pretty=off not mirrored");
+            }
+            if (sequentView.printedText() == null) {
+                problems.add("pretty=off no reprint");
+            }
+            // the Unicode item is disabled without pretty printing (Swing setEnabled(usePretty))
+            if (!unicode.isDisable()) {
+                problems.add("unicode enabled without pretty");
+            }
+            // pretty printing on again
+            pretty.setSelected(true);
+            pretty.fire();
+            if (!viewSettings.isUsePretty() || !NotationInfo.DEFAULT_PRETTY_SYNTAX) {
+                problems.add("pretty=on not mirrored");
+            }
+            if (unicode.isDisable()) {
+                problems.add("unicode disabled with pretty");
+            }
+            // unicode off/on with pretty printing enabled. The visible-effect probe toggles to
+            // the OPPOSITE of the current state and back (a setSelected that keeps the current
+            // state is a no-op): the unicode symbols (forall/exists/and vs the ASCII escapes)
+            // differ for every proof, unlike the pretty-print layout — the demo sequent has no
+            // arithmetic, so its pretty/default notation is identical (Swing parity: the same
+            // text) and the pretty leg asserts the settings mirroring + the shared
+            // refreshPrettyViews reprint path instead.
+            unicode.setSelected(!unicode.isSelected());
+            unicode.fire();
+            if (viewSettings.isUseUnicode() == originalUnicode) {
+                problems.add("unicode toggle not mirrored");
+            }
+            String textOpposite = sequentView.printedText();
+            unicode.setSelected(!unicode.isSelected());
+            unicode.fire();
+            if (viewSettings.isUseUnicode() != originalUnicode) {
+                problems.add("unicode back not mirrored");
+            }
+            String textBack = sequentView.printedText();
+            boolean unicodeEffect = textOpposite != null && textBack != null
+                    && !textOpposite.equals(textBack) && text0 != null;
+            boolean ok = problems.isEmpty();
+            return (ok && unicodeEffect ? "PASS" : "FAIL") + " - pretty[" + originalPretty + "->"
+                + viewSettings.isUsePretty() + "] unicodeEffect=" + unicodeEffect
+                + (ok ? "" : " problems=" + problems);
+        } finally {
+            // restore the state the demo was loaded with
+            pretty.setSelected(originalPretty);
+            pretty.fire();
+            unicode.setSelected(originalUnicode);
+            unicode.fire();
+        }
+    }
+
+    /**
+     * WP-3 (settings-config): headless theme persistence round trip ({@code
+     * key.fx.verify.themepersist}={@code save}|{@code restore}) — two app runs. The save run
+     * applies the dark theme through the real {@link ThemeManager#setTheme} (the View menu's
+     * Dark Theme action routes through the same call) and asserts the choice was written to the
+     * persisted user preference. The restore run starts without the {@code key.fx.theme}
+     * override and asserts the dark theme was restored from the persisted preference at startup,
+     * then resets to light so the round trip is repeatable.
+     *
+     * @param phase the round-trip phase, {@code "save"} or {@code "restore"}
+     * @return a one-line report, {@code "... PASS"} if the phase's assertions hold
+     */
+    private String runThemePersistVerification(String phase) {
+        ThemeManager manager = ThemeManager.getInstance();
+        if ("save".equals(phase)) {
+            manager.setTheme(Theme.DARK);
+            boolean ok = manager.getTheme() == Theme.DARK
+                    && ThemeManager.persistedTheme() == Theme.DARK;
+            return "phase=save applied=" + manager.getTheme() + " persisted="
+                + ThemeManager.persistedTheme() + (ok ? " PASS" : " FAIL");
+        }
+        if ("restore".equals(phase)) {
+            boolean overrideAbsent = System.getProperty(ThemeManager.THEME_PROPERTY) == null;
+            Theme restored = manager.getTheme();
+            Theme persisted = ThemeManager.persistedTheme();
+            boolean ok = overrideAbsent && restored == Theme.DARK && persisted == Theme.DARK;
+            // leave the persisted state clean so the round trip is repeatable
+            manager.setTheme(Theme.LIGHT);
+            boolean resetOk = ThemeManager.persistedTheme() == Theme.LIGHT;
+            return "phase=restore restored=" + restored + " persisted=" + persisted + " reset="
+                + ThemeManager.persistedTheme() + (ok && resetOk ? " PASS" : " FAIL");
+        }
+        return "FAIL - unknown phase " + phase;
     }
 
     /**
@@ -4549,6 +4715,11 @@ public final class MainWindowF {
             }
         }
         return null;
+    }
+
+    private static CheckMenuItem findCheckMenuItem(Menu menu, String text) {
+        MenuItem item = findMenuItem(menu, text);
+        return item instanceof CheckMenuItem check ? check : null;
     }
 
     private void logMenuParity(String menuName, String report) {

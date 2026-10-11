@@ -69,6 +69,7 @@ import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
 import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.HideSequentPrintFilter;
@@ -189,13 +190,26 @@ public class SequentViewF extends BorderPane {
     public void setVisibleTermLabels(VisibleTermLabels labels) {
         visibleTermLabels = labels != null ? labels : NO_VISIBLE_TERM_LABELS;
         if (printer != null && selectedNode != null) {
-            printer = SequentViewLogicPrinter.positionPrinter(new NotationInfo(),
-                selectedNode.proof().getServices(), visibleTermLabels);
+            printer = createPrinter(selectedNode.proof().getServices());
             if (filter instanceof SearchSequentPrintFilter searchFilter) {
                 searchFilter.setLogicPrinter(printer);
             }
             printSequent();
         }
+    }
+
+    /**
+     * WP-3 (menuparity): creates the position printer with a {@link NotationInfo} refreshed from
+     * the persisted {@link ViewSettings} (Swing parity: the Swing views print through
+     * {@code mainWindow.getMediator().getNotationInfo()}, which is refreshed from the ViewSettings
+     * — a bare {@code new NotationInfo()} would print plain syntax regardless of the settings).
+     */
+    private SequentViewLogicPrinter createPrinter(Services services) {
+        NotationInfo notationInfo = new NotationInfo();
+        ViewSettings viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        notationInfo.refresh(services, viewSettings.isUsePretty(), viewSettings.isUseUnicode(),
+            viewSettings.isHidePackagePrefix());
+        return SequentViewLogicPrinter.positionPrinter(notationInfo, services, visibleTermLabels);
     }
 
     /**
@@ -246,6 +260,12 @@ public class SequentViewF extends BorderPane {
      * highlight), above the update highlights, behind the text.
      */
     private final Pane hoverOverlay = new Pane();
+    /**
+     * WP-3 (sequent): overlay pane for the sticky user-selection highlight (Swing
+     * {@code PERMANENT_HIGHLIGHT_COLOR} painter, SequentView.java:600-602), between the update
+     * highlights and the hover highlight.
+     */
+    private final Pane userSelectionOverlay = new Pane();
 
     /**
      * Overlay pane for the age-heatmap highlights (WP-2, Swing
@@ -280,6 +300,23 @@ public class SequentViewF extends BorderPane {
     private Node selectedNode;
     private String printed;
     private Range highlightedRange;
+
+    /**
+     * WP-3 (sequent): the sticky user-selection highlight (Swing
+     * {@code SequentView.userSelectionHighlight/userSelectionHighlightPis
+     * /userSelectionHighlightRange}, SequentView.java:148-150): the term the user pinned with a
+     * Ctrl+click or middle click (Swing {@code SequentViewInputListener.mouseClicked},
+     * SequentViewInputListener.java:135-145). Independent from the hover highlight; it survives
+     * reprints (Swing {@code recalculateUserSelectionRange}, SequentView.java:585-608 — the
+     * range is recomputed from the stored position against the reprint's position table) and is
+     * cleared when the displayed node changes (Swing keeps the stored position across node
+     * switches but visually loses it until the next resize reprint, re-highlighting possibly an
+     * unrelated formula at the same path — the FX port clears it instead, and Swing itself
+     * clears the selection when the sequent view instance is swapped, MainFrame.java:47/76).
+     */
+    private PosInSequent userSelectionPis;
+    /** the printed-character range of {@link #userSelectionPis} in the current printing. */
+    private Range userSelectionRange;
 
     /** Syntax highlighting on/off (Swing View menu, on by default). */
     private boolean syntaxHighlighting = true;
@@ -377,7 +414,12 @@ public class SequentViewF extends BorderPane {
         heatmapOverlay.getStyleClass().add("sequent-overlay");
         heatmapOverlay.setMouseTransparent(true);
         heatmapOverlay.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        StackPane content = new StackPane(heatmapOverlay, updateOverlay, hoverOverlay, textFlow);
+        userSelectionOverlay.getStyleClass().add("sequent-overlay");
+        userSelectionOverlay.setMouseTransparent(true);
+        userSelectionOverlay.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        StackPane content =
+            new StackPane(heatmapOverlay, updateOverlay, userSelectionOverlay, hoverOverlay,
+                textFlow);
         scrollPane.setContent(content);
         setCenter(scrollPane);
         textFlow.getStyleClass().add("sequent-view-flow");
@@ -666,6 +708,9 @@ public class SequentViewF extends BorderPane {
             return;
         }
         highlightedRange = null;
+        // WP-3 (sequent): the sticky user selection is cleared when the displayed node changes
+        // (see the userSelectionPis javadoc for the Swing deviation note)
+        removeUserSelectionHighlight();
         if (node == null) {
             proof = null;
             selectedNode = null;
@@ -677,8 +722,11 @@ public class SequentViewF extends BorderPane {
             proof = node.proof();
             // TODO(M2c): share the NotationInfo and the term label visibility with the mediator
             // lemmaorigin: use the installed label visibility (Swing SequentView printer setup)
-            printer = SequentViewLogicPrinter.positionPrinter(new NotationInfo(),
-                node.proof().getServices(), visibleTermLabels);
+            // WP-3 (menuparity): the printer carries the ViewSettings pretty/unicode/hide-prefix
+            // flags (Swing SequentView uses mainWindow.getMediator().getNotationInfo(), which
+            // MainWindow refreshes from the ViewSettings) — a bare NotationInfo would default to
+            // plain syntax regardless of the settings
+            printer = createPrinter(node.proof().getServices());
             if (filter instanceof SearchSequentPrintFilter searchFilter) {
                 // the search filters print single formulas through the view's printer (Swing
                 // SequentViewSearchBar.search refreshes it the same way)
@@ -714,12 +762,7 @@ public class SequentViewF extends BorderPane {
         if (printer == null || selectedNode == null) {
             return;
         }
-        ViewSettings viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
-        NotationInfo notationInfo = new NotationInfo();
-        notationInfo.refresh(selectedNode.proof().getServices(), viewSettings.isUsePretty(),
-            viewSettings.isUseUnicode(), viewSettings.isHidePackagePrefix());
-        printer = SequentViewLogicPrinter.positionPrinter(notationInfo,
-            selectedNode.proof().getServices(), visibleTermLabels);
+        printer = createPrinter(selectedNode.proof().getServices());
         if (filter instanceof SearchSequentPrintFilter searchFilter) {
             // the search filters print single formulas through the view's printer (Swing
             // SequentViewSearchBar.search refreshes it the same way)
@@ -755,6 +798,10 @@ public class SequentViewF extends BorderPane {
         rebuildRuns();
         updateHideWarning();
         rebuildOverlays();
+        // WP-3 (sequent): the user-selection highlight survives the reprint (Swing
+        // recalculateUserSelectionRange, invoked after every reprint by the
+        // SequentViewChangeListener, SequentViewChangeListener.java:47)
+        recalculateUserSelectionRange();
     }
 
     /**
@@ -815,6 +862,70 @@ public class SequentViewF extends BorderPane {
                 && (int) (viewportWidth / charWidth) >= width;
         return "viewport=" + (int) viewportWidth + " char=" + (int) charWidth + " lineWidth="
             + width + (pass ? " PASS" : " FAIL");
+    }
+
+    /**
+     * WP-3 (sequent): headless self test of the sticky user-selection highlight and its reprint
+     * persistence ({@code key.fx.verify.sequent}): pins a term through the same toggle the
+     * Ctrl+click handler drives (Swing SequentViewInputListener.mouseClicked), asserts the
+     * highlight rectangle is shown, reprints twice — a plain reprint and a pretty-view refresh
+     * (the settings-change reprint path) — and asserts the highlight was recalculated onto the
+     * same printed text both times (Swing recalculateUserSelectionRange), then removes it
+     * through the toggling click and asserts a reprint keeps it cleared.
+     *
+     * @return a one-line report, {@code "... PASS"} if every assertion holds
+     */
+    public String verifyUserSelection() {
+        if (!FxUtil.isFxThread()) {
+            return FxUtil.callAndWait(this::verifyUserSelection);
+        }
+        InitialPositionTable table = getInitialPositionTable();
+        if (printed == null || table == null) {
+            return "no printing";
+        }
+        // the target term: the first printed position resolving to a term with a non-empty range
+        PosInSequent target = null;
+        for (int i = 0; i < printed.length() && target == null; i++) {
+            PosInSequent pos = table.getPosInSequent(i, filter);
+            if (pos != null && !pos.isSequent() && pos.getPosInOccurrence() != null
+                    && pos.getBounds() != null && pos.getBounds().length() > 0) {
+                target = pos;
+            }
+        }
+        if (target == null) {
+            return "no term position";
+        }
+        Range expected = target.getBounds();
+        toggleUserSelection(target);
+        boolean pinned = userSelectionPis == target && userSelectionRange != null
+                && userSelectionOverlay.getChildren().size() == 1;
+        // a plain reprint: the highlight must survive, recalculated from the stored position
+        printSequent();
+        boolean survivedReprint = userSelectionPis != null
+                && userSelectionOverlay.getChildren().size() == 1
+                && userSelectionRange != null
+                && Objects.equals(textOfRange(userSelectionRange), textOfRange(expected));
+        // the settings-change reprint (the pretty-view refresh rebuilds the printer and prints)
+        refreshPrettyView();
+        boolean survivedSettings = userSelectionPis != null
+                && userSelectionOverlay.getChildren().size() == 1
+                && userSelectionRange != null
+                && Objects.equals(textOfRange(userSelectionRange), textOfRange(expected));
+        // the toggling click on the same term removes it; the reprint keeps it removed
+        toggleUserSelection(target);
+        boolean removed = userSelectionPis == null && userSelectionOverlay.getChildren().isEmpty();
+        printSequent();
+        boolean staysRemoved = userSelectionPis == null;
+        boolean pass = pinned && survivedReprint && survivedSettings && removed && staysRemoved;
+        return "term=[" + textOfRange(expected) + "] reprint=" + survivedReprint + " settings="
+            + survivedSettings + " toggle=" + removed + " " + (pass ? "PASS" : "FAIL");
+    }
+
+    /** the printed text of the given character range (report helper of the self tests). */
+    private String textOfRange(Range range) {
+        int start = Math.clamp(range.start(), 0, printed.length());
+        int end = Math.clamp(range.start() + range.length(), start, printed.length());
+        return printed.substring(start, end);
     }
 
     /**
@@ -908,6 +1019,23 @@ public class SequentViewF extends BorderPane {
         // selection drives the FX status line, see setOnPosSelected)
         if (event.isShiftDown()) {
             startFocussedAutoModeAt(pos);
+            return;
+        }
+        // WP-3 (sequent): Swing SequentViewInputListener.mouseClicked (SequentViewInputListener
+        // .java:135-145): a middle click or a Ctrl+left-click toggles the sticky user-selection
+        // highlight of the clicked term (clicking the selected term, empty space or the sequent
+        // removes it again). The FX Ctrl+click keeps the selection path (status line) it drives
+        // since the termmenu milestone; the middle click does not (Swing parity).
+        if (event.getButton() == MouseButton.MIDDLE
+                || (event.getButton() == MouseButton.PRIMARY && event.isControlDown())) {
+            lastClickedPos = pos; // lemmaorigin: remember the clicked term
+            toggleUserSelection(pos);
+            if (event.getButton() == MouseButton.PRIMARY) {
+                Range bounds = pos != null ? pos.getBounds() : null;
+                highlightedRange = bounds != null && bounds.length() > 0 ? bounds : null;
+                rebuildRuns();
+                onPosSelected.accept(pos);
+            }
             return;
         }
         if (event.getButton() == MouseButton.PRIMARY && !event.isControlDown()) {
@@ -1587,6 +1715,7 @@ public class SequentViewF extends BorderPane {
     private void rebuildOverlays() {
         rebuildHeatmapOverlays();
         rebuildUpdateOverlays();
+        rebuildUserSelectionOverlay();
         rebuildHoverOverlay();
     }
 
@@ -1956,6 +2085,102 @@ public class SequentViewF extends BorderPane {
             hoverOverlay.getChildren().add(rectForRange(start, end, "sequent-hover-highlight"));
         }
     }
+
+    // WP-3 (sequent): begin — the sticky user-selection highlight (Swing SequentView
+    // setUserSelectionHighlight/removeUserSelectionHighlight/recalculateUserSelectionRange,
+    // SequentView.java:585-660)
+
+    /**
+     * Toggles the user-selection highlight of the given position (Swing
+     * {@code SequentViewInputListener.mouseClicked}, SequentViewInputListener.java:138-141): a
+     * click on the currently selected term, on empty space or on the sequent itself removes the
+     * selection, any other position becomes the selection.
+     *
+     * @param pos the clicked position, may be {@code null}
+     */
+    private void toggleUserSelection(PosInSequent pos) {
+        if (pos == null || pos.isSequent() || isInUserSelectionHighlight(pos)) {
+            removeUserSelectionHighlight();
+            return;
+        }
+        setUserSelectionHighlight(pos);
+    }
+
+    /**
+     * @param pos the position to check, may be {@code null}
+     * @return whether the given position is the user's selection (Swing
+     *         {@code isInUserSelectionHighlight}, SequentView.java:643-651 — the FX port
+     *         compares the term positions instead of the mouse-point ranges)
+     */
+    private boolean isInUserSelectionHighlight(PosInSequent pos) {
+        return userSelectionPis != null && userSelectionRange != null && pos != null
+                && Objects.equals(userSelectionRange, pos.getBounds());
+    }
+
+    /**
+     * Highlights the given position as the user's selection (Swing
+     * {@code setUserSelectionHighlight(PosInSequent)}, SequentView.java:653-667).
+     *
+     * @param pis the term to select
+     */
+    private void setUserSelectionHighlight(PosInSequent pis) {
+        userSelectionPis = pis;
+        Range bounds = pis.getBounds();
+        userSelectionRange = bounds != null && bounds.length() > 0 ? bounds : null;
+        rebuildUserSelectionOverlay();
+    }
+
+    /**
+     * Removes the user selection (Swing {@code removeUserSelectionHighlight},
+     * SequentView.java:633-642). Called on the toggling click and when the displayed node
+     * changes (see the {@link #userSelectionPis} javadoc for the deviation note).
+     */
+    private void removeUserSelectionHighlight() {
+        userSelectionPis = null;
+        userSelectionRange = null;
+        userSelectionOverlay.getChildren().clear();
+    }
+
+    /**
+     * Recomputes the user-selection range against the current printing (Swing
+     * {@code recalculateUserSelectionRange}, SequentView.java:585-608: the range of the stored
+     * position is looked up in the reprint's position table via
+     * {@code pathForPosition}/{@code rangeForPath} — the +1 offset the Swing original applies
+     * ("Off-by-one: rangeForPath ist schuld") is not applied here, the FX position-table
+     * character indexes match the printed text exactly, like the update ranges). Called from
+     * every {@link #printSequent()} reprint.
+     */
+    private void recalculateUserSelectionRange() {
+        if (userSelectionPis == null) {
+            return;
+        }
+        if (printed == null || userSelectionPis.getPosInOccurrence() == null) {
+            removeUserSelectionHighlight();
+            return;
+        }
+        InitialPositionTable table = getInitialPositionTable();
+        ImmutableList<Integer> path = table == null ? null
+                : table.pathForPosition(userSelectionPis.getPosInOccurrence(), filter);
+        userSelectionRange = path == null ? null : table.rangeForPath(path);
+        rebuildUserSelectionOverlay();
+    }
+
+    /** Rebuilds the highlight rectangle of the sticky user selection. */
+    private void rebuildUserSelectionOverlay() {
+        userSelectionOverlay.getChildren().clear();
+        if (userSelectionRange == null || printed == null) {
+            return;
+        }
+        int start = Math.clamp(userSelectionRange.start(), 0, printed.length());
+        int end = Math.clamp(userSelectionRange.start() + userSelectionRange.length(), start,
+            printed.length());
+        if (end > start) {
+            userSelectionOverlay.getChildren()
+                    .add(rectForRange(start, end, "sequent-user-selection"));
+        }
+    }
+
+    // WP-3 (sequent): end
 
     /**
      * @return a filled path over the on-screen shape of the given character range (a per-line
@@ -2335,6 +2560,7 @@ public class SequentViewF extends BorderPane {
 
     private void printPlaceholder() {
         clearHover();
+        removeUserSelectionHighlight();
         updateHideWarning();
         textFlow.getChildren().clear();
         printed = null;

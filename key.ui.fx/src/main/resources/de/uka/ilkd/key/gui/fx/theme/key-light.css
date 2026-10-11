@@ -435,6 +435,23 @@
     -fx-text-fill: -key-text-secondary;
 }
 
+/* WP-3: strategy preset row (gear menu + combo + Apply) */
+.strategy-preset-row {
+    -fx-padding: 0 0 4 0;
+}
+
+.strategy-preset-delete {
+    -fx-text-fill: -key-text-secondary;
+}
+
+.strategy-preset-delete:hover {
+    -fx-text-fill: #cc3333;
+}
+
+.strategy-preset-menu {
+    -fx-font-size: 1.1em;
+}
+
 /* source view */
 /* M2, first read-only version; see SourceViewF */
 .source-view {
@@ -614,6 +631,12 @@
 /* hover highlight of the term under the mouse (Swing DEFAULT_HIGHLIGHT_COLOR) */
 .sequent-hover-highlight {
     -fx-fill: rgba(70, 100, 170, 0.3);
+}
+
+/* WP-3: sticky user-selection highlight (Swing PERMANENT_HIGHLIGHT_COLOR,
+   [currentGoal]permaHighlight light color) */
+.sequent-user-selection {
+    -fx-fill: rgba(110, 85, 181, 0.3);
 }
 
 /* warning banner while a search filter hides formulas (Swing SequentHideWarningBorder message) */

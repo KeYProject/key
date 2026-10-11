@@ -11,11 +11,20 @@ import java.util.Map;
 import java.util.Objects;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Spinner;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
@@ -36,6 +45,8 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.settings.StrategyPresetsSettings;
+import de.uka.ilkd.key.settings.StrategyPresetsSettings.StrategyPreset;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -81,11 +92,26 @@ import org.slf4j.LoggerFactory;
  * {@code .strategy-maxsteps-row}, {@code .strategy-maxsteps-label},
  * {@code .strategy-maxsteps-spinner}, {@code .strategy-section-title},
  * {@code .strategy-property-label}, {@code .strategy-property-values} (FlowPane of the buttons),
- * {@code .strategy-radio} (per value button), {@code .strategy-subproperty-row} and
+ * {@code .strategy-radio} (per value button), {@code .strategy-subproperty-row},
+ * {@code .strategy-preset-row}, {@code .strategy-preset-combo}, {@code .strategy-preset-menu},
+ * {@code .strategy-preset-apply} and
  * {@code .strategy-status} (driver status label, not part of this view).
  * <p>
- * Deliberately deferred: the strategy preset combo box (built-in and user-defined presets with
- * save/stash/rename) and the timeout setting (not shown by the Swing view either). The
+ * WP-3 (goallist-strategy-info parity): the strategy preset combo box is ported (Swing
+ * {@code StrategySelectionView.createDefaultPanel}, StrategySelectionView.java:456-499): the row
+ * {@code [gear] [combo] [Apply]} mirrors the Swing layout — the combo lists the built-in
+ * "Defaults" entry, the further built-in presets of the settings definition and the user-defined
+ * presets of {@link StrategyPresetsSettings} (user rows carry a trailing "✕" delete affordance
+ * like the Swing {@code PresetListCellRenderer}); selecting an entry applies it immediately, the
+ * Apply button re-applies the current selection and is disabled until the next widget edit
+ * (Swing {@code predefChanged}/{@code refreshDefaultButton}); the gear button offers
+ * "Save current as…", "Stash current" and "Rename selected…" (Swing {@code showPresetMenu},
+ * StrategySelectionView.java:635-661). Applying a preset writes the preset's maximum rule
+ * applications to the proof's strategy settings and its properties through
+ * {@link #updateStrategySettings} (Swing {@code applySelectedPreset},
+ * StrategySelectionView.java:572-585).
+ * <p>
+ * Deliberately deferred: the timeout setting (not shown by the Swing view either). The
  * parallel-prover merge lock and the auto-prove "go" button are implemented (strategy markers).
  */
 public class StrategySelectionViewF extends ScrollPane {
@@ -126,6 +152,51 @@ public class StrategySelectionViewF extends ScrollPane {
      * {@code AutoModeAction.autoModeStarted/autoModeStopped}, AutoModeAction.java:109-138).
      */
     private final Button goButton = new Button("Go");
+
+    /**
+     * WP-3 (goallist-strategy-info): the preset combo box (Swing
+     * {@code components.strategyPredefSettingsCmb}, StrategySelectionView.java:464-466): the
+     * built-in "Defaults" entry, the further built-in presets of the settings definition and the
+     * user-defined presets of {@link StrategyPresetsSettings}. Selecting an entry applies it
+     * immediately (Swing combo box action listener, StrategySelectionView.java:474-478).
+     */
+    private final ComboBox<PresetEntry> presetCombo = new ComboBox<>();
+
+    /**
+     * WP-3: the gear button beside the combo (Swing {@code createPresetMenuButton},
+     * StrategySelectionView.java:625-633): offers "Save current as…", "Stash current" and
+     * "Rename selected…".
+     */
+    private final Button presetMenuButton = new Button("⚙");
+
+    /**
+     * WP-3: the Apply button (Swing {@code defaultButton}, StrategySelectionView.java:459-462):
+     * re-applies the preset currently selected in the combo; disabled until the next widget edit
+     * after an application (Swing {@code predefChanged}/{@code refreshDefaultButton},
+     * StrategySelectionView.java:104/897-907).
+     */
+    private final Button applyButton = new Button("Apply");
+
+    /**
+     * WP-3: whether a chosen preset has been changed by a widget edit since; gates the Apply
+     * button enablement (Swing {@code predefChanged}, StrategySelectionView.java:100-104).
+     */
+    private boolean predefChanged = true;
+
+    /**
+     * Set only while {@link #verifyPresetCombo()} runs: the headless verify drives the
+     * parameterized core methods directly, so the modal alerts (built-in-name warning, overwrite
+     * confirmation) are suppressed — a {@code showAndWait()} with nobody to click would hang the
+     * app run.
+     */
+    private boolean verifyRun;
+
+    /**
+     * WP-3: set while the preset combo is rebuilt or reselected programmatically; guards the
+     * combo's action listener so it does not (re-)apply a preset in reaction to our own changes
+     * (Swing {@code adjustingPresetCombo}, StrategySelectionView.java:106-110).
+     */
+    private boolean adjustingPresetCombo;
 
     /**
      * Edits {@link StrategySettings#getMaxSteps()} ("Max. Rule Applications"), the
@@ -189,6 +260,34 @@ public class StrategySelectionViewF extends ScrollPane {
         goRow.getStyleClass().add("strategy-go-row");
         goRow.setAlignment(Pos.CENTER_LEFT);
         content.getChildren().add(goRow);
+
+        // WP-3: the preset row [gear][combo][Apply] (Swing createDefaultPanel,
+        // StrategySelectionView.java:456-499 — the row layout "presetMenuButton, combo,
+        // defaultButton" of the original)
+        presetMenuButton.getStyleClass().add("strategy-preset-menu");
+        presetMenuButton.setTooltip(new Tooltip("Save, stash or rename presets"));
+        presetMenuButton.setDisable(true);
+        presetMenuButton.setOnAction(e -> showPresetMenu());
+        presetCombo.getStyleClass().add("strategy-preset-combo");
+        presetCombo.setTooltip(new Tooltip("Predefined strategy settings"));
+        presetCombo.setDisable(true);
+        presetCombo.setCellFactory(lv -> new PresetCell());
+        presetCombo.setButtonCell(new PresetCell());
+        presetCombo.valueProperty().addListener((obs, old, entry) -> {
+            if (!adjustingPresetCombo && entry != null) {
+                applySelectedPreset();
+            }
+        });
+        applyButton.getStyleClass().add("strategy-preset-apply");
+        applyButton.setTooltip(new Tooltip("Apply the selected predefined settings"));
+        applyButton.setDisable(true);
+        applyButton.setOnAction(e -> applySelectedPreset());
+        HBox presetRow = new HBox(8, presetMenuButton, presetCombo, applyButton);
+        presetRow.getStyleClass().add("strategy-preset-row");
+        presetRow.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(presetCombo, Priority.ALWAYS);
+        content.getChildren().add(presetRow);
+        rebuildPresetCombo(null);
 
         // "Max. Rule Applications": label + spinner, the MaxRuleAppSlider of the Swing view
         Label maxStepsLabel = new Label(DEFINITION.getMaxRuleApplicationsLabel());
@@ -330,6 +429,454 @@ public class StrategySelectionViewF extends ScrollPane {
     }
     // strategy: end
 
+    // WP-3: begin — the strategy preset combo / stash UI (Swing StrategySelectionView.java
+    // :456-499, :515-585, :592-750)
+
+    /**
+     * A single entry of the preset combo box: either the built-in "Defaults", one of the
+     * profile's further built-in presets, or a user-defined preset (Swing {@code PresetEntry},
+     * StrategySelectionView.java:1008-1061). User-defined entries can be deleted and renamed;
+     * built-in entries cannot.
+     */
+    private static final class PresetEntry {
+
+        private final boolean userDefined;
+        private final StrategyPreset data;
+
+        private PresetEntry(String name, boolean userDefined, int maxSteps,
+                StrategyProperties properties) {
+            this(userDefined, new StrategyPreset(name, maxSteps, properties));
+        }
+
+        private PresetEntry(boolean userDefined, StrategyPreset preset) {
+            this.data = preset;
+            this.userDefined = userDefined;
+        }
+
+        static PresetEntry defaults() {
+            return new PresetEntry("Defaults", false, DEFINITION.getDefaultMaxRuleApplications(),
+                DEFINITION.getDefaultPropertiesFactory().createDefaultStrategyProperties());
+        }
+
+        static PresetEntry builtIn(StrategySettingsDefinition.StrategySettingEntry e) {
+            return new PresetEntry(e.name(), false, e.order(),
+                e.factory().createDefaultStrategyProperties());
+        }
+
+        static PresetEntry user(StrategyPreset preset) {
+            return new PresetEntry(true, preset);
+        }
+
+        String name() {
+            return data.name();
+        }
+
+        boolean userDefined() {
+            return userDefined;
+        }
+
+        int maxSteps() {
+            return data.maxSteps();
+        }
+
+        StrategyProperties properties() {
+            return data.properties();
+        }
+
+        @Override
+        public String toString() {
+            return data.name();
+        }
+    }
+
+    /**
+     * Renders the preset combo box rows (Swing {@code PresetListCellRenderer},
+     * StrategySelectionView.java:1063-1105): user-defined rows show a trailing "✕" delete
+     * affordance; built-in rows only the name.
+     */
+    private final class PresetCell extends ListCell<PresetEntry> {
+        private final Label nameLabel = new Label();
+        private final Label deleteLabel = new Label("✕");
+
+        PresetCell() {
+            HBox box = new HBox(6, nameLabel, deleteLabel);
+            box.setAlignment(Pos.CENTER_LEFT);
+            nameLabel.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(nameLabel, Priority.ALWAYS);
+            deleteLabel.getStyleClass().add("strategy-preset-delete");
+            deleteLabel.setTooltip(new Tooltip("Delete this preset"));
+            deleteLabel.setOnMouseClicked(e -> {
+                if (getItem() != null && getItem().userDefined()) {
+                    deleteUserPreset(getItem());
+                    e.consume();
+                }
+            });
+            setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+            setGraphic(box);
+        }
+
+        @Override
+        protected void updateItem(PresetEntry item, boolean empty) {
+            super.updateItem(item, empty);
+            nameLabel.setText(empty || item == null ? "" : item.name());
+            boolean showDelete = !empty && item != null && item.userDefined();
+            deleteLabel.setVisible(showDelete);
+            deleteLabel.setManaged(showDelete);
+        }
+    }
+
+    /**
+     * @return the proof-independent settings storing the user-defined strategy presets (Swing
+     *         {@code getPresetsSettings}, StrategySelectionView.java:515-517)
+     */
+    private static StrategyPresetsSettings getPresetsSettings() {
+        return ProofIndependentSettings.DEFAULT_INSTANCE.getStrategyPresetsSettings();
+    }
+
+    /**
+     * Builds the list of combo box entries: the built-in "Defaults", the further built-in
+     * presets defined by the profile, followed by the user-defined presets (Swing
+     * {@code buildPresetEntries}, StrategySelectionView.java:523-533).
+     */
+    private List<PresetEntry> buildPresetEntries() {
+        List<PresetEntry> entries = new ArrayList<>();
+        entries.add(PresetEntry.defaults());
+        for (StrategySettingsDefinition.StrategySettingEntry e : DEFINITION.getFurtherDefaults()) {
+            entries.add(PresetEntry.builtIn(e));
+        }
+        for (StrategyPreset p : getPresetsSettings().getPresets()) {
+            entries.add(PresetEntry.user(p));
+        }
+        return entries;
+    }
+
+    /**
+     * Rebuilds the preset combo model from the built-in and stored presets without touching the
+     * live strategy settings (Swing {@code rebuildPresetCombo},
+     * StrategySelectionView.java:542-567).
+     *
+     * @param selectName the name of the preset to select afterwards, or {@code null} to select
+     *        the first entry ("Defaults")
+     */
+    private void rebuildPresetCombo(String selectName) {
+        List<PresetEntry> entries = buildPresetEntries();
+        adjustingPresetCombo = true;
+        try {
+            presetCombo.getItems().setAll(entries);
+            PresetEntry toSelect = null;
+            if (selectName != null) {
+                for (PresetEntry e : entries) {
+                    if (e.name().equals(selectName)) {
+                        toSelect = e;
+                        break;
+                    }
+                }
+            }
+            if (toSelect == null && !entries.isEmpty()) {
+                toSelect = entries.get(0);
+            }
+            presetCombo.getSelectionModel().select(toSelect);
+        } finally {
+            adjustingPresetCombo = false;
+        }
+    }
+
+    /**
+     * Applies the preset currently selected in the combo box to the active proof (Swing
+     * {@code applySelectedPreset}, StrategySelectionView.java:572-585): the preset's maximum
+     * rule applications are written to the proof's strategy settings, the preset's properties
+     * become the active strategy, and the Apply button is disabled until the next widget edit.
+     */
+    private void applySelectedPreset() {
+        if (proof == null) {
+            return;
+        }
+        PresetEntry entry = presetCombo.getValue();
+        if (entry == null) {
+            return;
+        }
+        proof.getSettings().getStrategySettings().setMaxSteps(entry.maxSteps());
+        predefChanged = false;
+        updateStrategySettings(FACTORY.name().toString(), entry.properties());
+        refresh(proof);
+    }
+
+    /**
+     * @param name a candidate preset name
+     * @return {@code true} if the name is used by a built-in preset (and thus reserved) (Swing
+     *         {@code isBuiltInName}, StrategySelectionView.java:613-623)
+     */
+    private static boolean isBuiltInName(String name) {
+        if ("Defaults".equals(name)) {
+            return true;
+        }
+        for (StrategySettingsDefinition.StrategySettingEntry e : DEFINITION.getFurtherDefaults()) {
+            if (e.name().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Shows the gear menu (Swing {@code showPresetMenu}, StrategySelectionView.java:635-661):
+     * "Save current as…", "Stash current", separator, "Rename selected…" (enabled only for
+     * user-defined entries). The dialogs collect the name and then delegate to the parameterized
+     * core methods, which the headless {@code key.fx.verify.goallist} assertions drive directly.
+     */
+    private void showPresetMenu() {
+        PresetEntry selected = presetCombo.getValue();
+        ContextMenu menu = new ContextMenu();
+        MenuItem saveAs = new MenuItem("Save current as…");
+        saveAs.setOnAction(e -> {
+            TextInputDialog dialog = new TextInputDialog("");
+            dialog.setTitle("Save strategy preset");
+            dialog.setHeaderText("Preset name:");
+            String input = dialog.showAndWait().orElse(null);
+            saveCurrentAs(input);
+        });
+        MenuItem stash = new MenuItem("Stash current");
+        stash.setOnAction(e -> stashCurrent());
+        MenuItem rename = new MenuItem("Rename selected…");
+        rename.disableProperty().set(selected == null || !selected.userDefined());
+        rename.setOnAction(e -> {
+            TextInputDialog dialog = new TextInputDialog(
+                selected == null ? "" : selected.name());
+            dialog.setTitle("Rename strategy preset");
+            dialog.setHeaderText("New name:");
+            String input = dialog.showAndWait().orElse(null);
+            renameSelected(input);
+        });
+        menu.getItems().addAll(saveAs, stash, new SeparatorMenuItem(), rename);
+        menu.show(presetMenuButton, 0, presetMenuButton.getHeight());
+    }
+
+    /**
+     * Saves the given name as a new user preset capturing the current settings (Swing
+     * {@code saveCurrentAs}, StrategySelectionView.java:663-694): an empty name or a built-in
+     * name is rejected (a warning alert for built-in names), an existing preset is overwritten
+     * after a confirmation, and the rebuilt combo selects the saved entry.
+     *
+     * @param input the dialog input, may be {@code null} (cancelled dialog)
+     * @return {@code true} if the preset was saved
+     */
+    private boolean saveCurrentAs(String input) {
+        if (proof == null) {
+            return false;
+        }
+        String name = input == null ? "" : input.trim();
+        if (name.isEmpty()) {
+            return false;
+        }
+        if (isBuiltInName(name)) {
+            if (!verifyRun) {
+                new Alert(Alert.AlertType.WARNING, "\"" + name
+                    + "\" is the name of a built-in preset. Please choose another name.",
+                    ButtonType.OK).showAndWait();
+            }
+            return false;
+        }
+        StrategyPresetsSettings settings = getPresetsSettings();
+        if (settings.contains(name)) {
+            // the headless verify overwrites silently (a showAndWait has nobody to click)
+            if (verifyRun) {
+                settings.saveOrUpdate(
+                    new StrategyPreset(name, currentMaxSteps(), currentStrategyProperties()));
+                rebuildPresetCombo(name);
+                return true;
+            }
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "A preset named \"" + name + "\" already exists. Overwrite it?",
+                ButtonType.YES, ButtonType.NO);
+            if (confirm.showAndWait().orElse(ButtonType.NO) != ButtonType.YES) {
+                return false;
+            }
+        }
+        settings.saveOrUpdate(
+            new StrategyPreset(name, currentMaxSteps(), currentStrategyProperties()));
+        rebuildPresetCombo(name);
+        return true;
+    }
+
+    /**
+     * Saves the current settings to the reserved "Stash" preset (Swing {@code stashCurrent},
+     * StrategySelectionView.java:696-702) and selects it in the rebuilt combo.
+     */
+    private void stashCurrent() {
+        if (proof == null) {
+            return;
+        }
+        getPresetsSettings().stash(currentMaxSteps(), currentStrategyProperties());
+        rebuildPresetCombo(StrategyPresetsSettings.STASH_NAME);
+    }
+
+    /**
+     * Renames the selected user-defined preset (Swing {@code renameSelected},
+     * StrategySelectionView.java:704-733): an empty/same name aborts, built-in names and
+     * existing names are rejected with a warning alert, and the rebuilt combo selects the new
+     * name.
+     *
+     * @param input the dialog input, may be {@code null} (cancelled dialog)
+     * @return {@code true} if the preset was renamed
+     */
+    private boolean renameSelected(String input) {
+        PresetEntry selected = presetCombo.getValue();
+        if (selected == null || !selected.userDefined()) {
+            return false;
+        }
+        String newName = input == null ? "" : input.trim();
+        if (newName.isEmpty() || newName.equals(selected.name())) {
+            return false;
+        }
+        if (isBuiltInName(newName)) {
+            if (!verifyRun) {
+                new Alert(Alert.AlertType.WARNING, "\"" + newName
+                    + "\" is the name of a built-in preset. Please choose another name.",
+                    ButtonType.OK).showAndWait();
+            }
+            return false;
+        }
+        if (getPresetsSettings().contains(newName)) {
+            if (!verifyRun) {
+                new Alert(Alert.AlertType.WARNING,
+                    "A preset named \"" + newName + "\" already exists.", ButtonType.OK)
+                        .showAndWait();
+            }
+            return false;
+        }
+        getPresetsSettings().rename(selected.name(), newName);
+        rebuildPresetCombo(newName);
+        return true;
+    }
+
+    /**
+     * Deletes the given user-defined preset (Swing {@code deleteUserPreset},
+     * StrategySelectionView.java:735-750) and keeps the combo's selection when it was a
+     * different entry.
+     *
+     * @param entry the preset to delete, must be user-defined
+     * @return {@code true} if the preset was removed
+     */
+    private boolean deleteUserPreset(PresetEntry entry) {
+        if (entry == null || !entry.userDefined()) {
+            return false;
+        }
+        PresetEntry selected = presetCombo.getValue();
+        String keepSelected =
+            selected != null && !selected.name().equals(entry.name()) ? selected.name() : null;
+        getPresetsSettings().remove(entry.name());
+        rebuildPresetCombo(keepSelected);
+        return true;
+    }
+
+    /**
+     * WP-3 (goallist-strategy-info): headless self test of the preset UI ({@code
+     * key.fx.verify.goallist}): the entry list (Defaults + built-ins + user presets), the
+     * stash/save/rename/delete round trip over {@link StrategyPresetsSettings}, the write-through
+     * of the preset application (max steps + one strategy property read back from the proof's
+     * settings) and the Apply-button gating ({@code predefChanged}). The previous settings are
+     * restored and the created presets removed afterwards.
+     *
+     * @return a one-line report, {@code "... PASS"} if every assertion holds
+     */
+    public String verifyPresetCombo() {
+        if (!FxUtil.isFxThread()) {
+            return FxUtil.callAndWait(this::verifyPresetCombo);
+        }
+        if (proof == null) {
+            return "no proof";
+        }
+        verifyRun = true;
+        StrategySettings settings = proof.getSettings().getStrategySettings();
+        int originalSteps = settings.getMaxSteps();
+        StrategyProperties originalProperties = settings.getActiveStrategyProperties();
+        List<String> originalPresets =
+            getPresetsSettings().getPresets().stream().map(StrategyPreset::name).toList();
+        boolean pass = true;
+        int restored = -1;
+        try {
+            // entry list: Defaults first, then the built-ins, then the stored user presets
+            List<PresetEntry> entries = buildPresetEntries();
+            pass &= !entries.isEmpty() && entries.get(0).name().equals("Defaults");
+            pass &= entries.size() == 1 + DEFINITION.getFurtherDefaults().size()
+                    + originalPresets.size()
+                    && entries.get(1).name().equals(
+                        DEFINITION.getFurtherDefaults().get(0).name());
+
+            // stash round trip: the reserved "Stash" preset captures the current settings and
+            // is selected in the rebuilt combo
+            int maxStepsBefore = currentMaxSteps();
+            stashCurrent();
+            pass &= getPresetsSettings().contains(StrategyPresetsSettings.STASH_NAME);
+            pass &= presetCombo.getValue() != null
+                    && StrategyPresetsSettings.STASH_NAME.equals(presetCombo.getValue().name());
+
+            // save round trip via the parameterized core method (the menu action delegates to it)
+            boolean saved = saveCurrentAs("WP3-verify-preset");
+            pass &= saved && getPresetsSettings().contains("WP3-verify-preset")
+                    && presetCombo.getValue() != null
+                    && "WP3-verify-preset".equals(presetCombo.getValue().name());
+
+            // rename round trip
+            pass &= renameSelected("WP3-verify-preset-2");
+            pass &= getPresetsSettings().contains("WP3-verify-preset-2")
+                    && !getPresetsSettings().contains("WP3-verify-preset")
+                    && "WP3-verify-preset-2".equals(presetCombo.getValue().name());
+            pass &= !renameSelected("Defaults"); // built-in names are reserved
+            pass &= !renameSelected("WP3-verify-preset-2"); // same name aborts
+
+            // write-through: applying a preset writes its max steps (proof settings) and its
+            // properties into the proof's live settings and recreates the active strategy
+            PresetEntry defaults = buildPresetEntries().get(0);
+            adjustingPresetCombo = true;
+            try {
+                presetCombo.getSelectionModel().select(defaults);
+            } finally {
+                adjustingPresetCombo = false;
+            }
+            applySelectedPreset();
+            pass &= settings.getMaxSteps() == defaults.maxSteps()
+                    && Objects.equals(settings.getActiveStrategyProperties()
+                            .getProperty(StrategyProperties.SPLITTING_OPTIONS_KEY),
+                        defaults.properties().getProperty(StrategyProperties.SPLITTING_OPTIONS_KEY))
+                    && !predefChanged && applyButton.isDisable();
+
+            // the Apply button re-enables after the next widget edit (Swing predefChanged)
+            maxStepsSpinner.getValueFactory().setValue(
+                maxStepsSpinner.getValue() == VERIFY_MAX_STEPS ? VERIFY_MAX_STEPS + 1
+                        : VERIFY_MAX_STEPS);
+            pass &= predefChanged && !applyButton.isDisable();
+
+            // delete round trip via the combo's "✕" affordance handler
+            PresetEntry userEntry = presetCombo.getItems().stream()
+                    .filter(e -> "WP3-verify-preset-2".equals(e.name())).findFirst().orElse(null);
+            pass &= userEntry != null && deleteUserPreset(userEntry)
+                    && !getPresetsSettings().contains("WP3-verify-preset-2");
+        } finally {
+            verifyRun = false;
+            for (String name : getPresetsSettings().getPresets().stream()
+                    .map(StrategyPreset::name).toList()) {
+                if (!originalPresets.contains(name)) {
+                    getPresetsSettings().remove(name);
+                }
+            }
+            settings.setMaxSteps(originalSteps);
+            settings.setActiveStrategyProperties(originalProperties);
+            proof.setActiveStrategy(
+                getStrategy(proof.getActiveStrategy().name().toString(), originalProperties));
+            rebuildPresetCombo(null);
+            predefChanged = true;
+            restored = settings.getMaxSteps();
+            pass &= restored == originalSteps;
+        }
+        return "entries=" + presetCombo.getItems().size() + " stash/save/rename/delete="
+            + (pass ? "ok" : "broken") + " maxSteps=" + originalSteps + "->" + restored + " "
+            + (pass ? "PASS" : "FAIL");
+    }
+
+    // WP-3: end
+
+
     /**
      * Shows the strategy settings of the given proof, the counter-part of
      * {@code StrategySelectionView.refresh(Proof)}: the radio buttons reflect the proof's active
@@ -377,12 +924,37 @@ public class StrategySelectionViewF extends ScrollPane {
     }
 
     /**
+     * @return the maximal number of rule applications currently configured for the displayed
+     *         proof (Swing {@code currentMaxSteps}, StrategySelectionView.java:603-607)
+     */
+    private int currentMaxSteps() {
+        return proof.getSettings().getStrategySettings().getMaxSteps();
+    }
+
+    /**
      * Enables or disables all controls, mirroring {@code StrategySelectionView.enableAll}.
      *
      * @param enable {@code true} to enable the controls
      */
     private void enableAll(boolean enable) {
         content.setDisable(!enable);
+        presetCombo.setDisable(!enable);
+        presetMenuButton.setDisable(!enable);
+        refreshDefaultButton();
+    }
+
+    /**
+     * WP-3: updates the Apply button enablement (Swing {@code refreshDefaultButton},
+     * StrategySelectionView.java:897-907): enabled while a proof is selected and a chosen preset
+     * has been changed by a widget edit ({@code predefChanged}); without a proof the preset
+     * controls are disabled as well.
+     */
+    private void refreshDefaultButton() {
+        if (proof != null) {
+            applyButton.setDisable(!predefChanged);
+        } else {
+            applyButton.setDisable(true);
+        }
     }
 
     /**
@@ -460,6 +1032,10 @@ public class StrategySelectionViewF extends ScrollPane {
             return;
         }
         LOGGER.debug("Maximum rule applications changed to {}", steps);
+        // WP-3: a widget edit re-enables the preset Apply button (Swing
+        // MaxRuleAppSlider change listener, StrategySelectionView.java:262-265)
+        predefChanged = true;
+        refreshDefaultButton();
         if (proof != null) {
             proof.getSettings().getStrategySettings().setMaxSteps(steps);
         }
@@ -474,6 +1050,10 @@ public class StrategySelectionViewF extends ScrollPane {
         if (updating || proof == null) {
             return;
         }
+        // WP-3: a widget edit re-enables the preset Apply button (Swing newButton action
+        // listener, StrategySelectionView.java:406-411)
+        predefChanged = true;
+        refreshDefaultButton();
         updateStrategySettings();
     }
 
@@ -485,9 +1065,20 @@ public class StrategySelectionViewF extends ScrollPane {
      * #updateStrategySettings(String, StrategyProperties)}).
      */
     private void updateStrategySettings() {
-        StrategyProperties properties = currentStrategyProperties();
-        Strategy<Goal> strategy =
-            getStrategy(proof.getActiveStrategy().name().toString(), properties);
+        updateStrategySettings(proof.getActiveStrategy().name().toString(),
+            currentStrategyProperties());
+    }
+
+    /**
+     * Writes the given strategy properties through to the live strategy settings: they are
+     * stored in the global default settings as well as in the proof's settings, and the active
+     * strategy is recreated from the matching {@link StrategyFactory} (mirroring {@code
+     * StrategySelectionView.updateStrategySettings(String, StrategyProperties)},
+     * StrategySelectionView.java:976-989 — the Swing original additionally refreshes the
+     * widgets, which {@link #applySelectedPreset} does after the preset application).
+     */
+    private void updateStrategySettings(String strategyName, StrategyProperties properties) {
+        Strategy<Goal> strategy = getStrategy(strategyName, properties);
         LOGGER.debug("Writing strategy settings through ({} properties)", properties.size());
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setStrategy(strategy.name());
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings()

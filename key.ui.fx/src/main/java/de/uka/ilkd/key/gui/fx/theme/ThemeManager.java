@@ -5,7 +5,7 @@
 package de.uka.ilkd.key.gui.fx.theme;
 
 import java.util.concurrent.CopyOnWriteArrayList;
-
+import java.util.prefs.Preferences;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
@@ -22,6 +22,20 @@ import javafx.scene.Scene;
  */
 public final class ThemeManager {
 
+    /**
+     * WP-3 (settings-config "theme persistence"): the user preference node and key under which
+     * the chosen theme survives a restart (the JavaFX counterpart of Swing's
+     * {@code ViewSettings.LookAndFeel} persisted look and feel; {@code key.core} must not be
+     * touched, so the FX-specific theme lives in its own preference node, like the persisted
+     * keystrokes and the docking layout). Declared before the {@link #INSTANCE} singleton: the
+     * instance's constructor reads the persisted theme, so the preference node must already be
+     * initialized when the class initializes.
+     */
+    private static final Preferences PREFERENCES =
+        Preferences.userNodeForPackage(ThemeManager.class);
+    /** the preference key holding the persisted theme name. */
+    private static final String PREF_KEY = "theme";
+
     private static final ThemeManager INSTANCE = new ThemeManager();
 
     /** Property key under which the currently applied stylesheet URL is stored per scene. */
@@ -29,7 +43,9 @@ public final class ThemeManager {
 
     /**
      * System property selecting the initial theme ({@code "light"} or {@code "dark"}, default
-     * light). Also handy for UI tests running headless against Xvfb.
+     * light). Also handy for UI tests running headless against Xvfb. When set, it overrides the
+     * persisted theme (WP-3: the chosen theme survives restart via the user preference node
+     * above — the property stays the explicit one-off override of headless UI tests).
      */
     public static final String THEME_PROPERTY = "key.fx.theme";
 
@@ -43,12 +59,25 @@ public final class ThemeManager {
     }
 
     /**
-     * Determines the initial theme from the {@code key.fx.theme} system property ({@code "light"}
-     * or {@code "dark"}); defaults to light.
+     * Determines the initial theme from the persisted user preference (WP-3: the chosen theme
+     * survives a restart); the {@code key.fx.theme} system property overrides it (the one-off
+     * override of headless UI tests), and the default is light.
      */
     private static Theme initialTheme() {
         String property = System.getProperty(THEME_PROPERTY, "");
-        return Theme.DARK.name().equalsIgnoreCase(property) ? Theme.DARK : Theme.LIGHT;
+        if (!property.isEmpty()) {
+            return Theme.DARK.name().equalsIgnoreCase(property) ? Theme.DARK : Theme.LIGHT;
+        }
+        return persistedTheme();
+    }
+
+    /**
+     * WP-3: reads the persisted theme name; an unknown or missing entry falls back to light.
+     */
+    public static Theme persistedTheme() {
+        return Theme.DARK.name().equalsIgnoreCase(PREFERENCES.get(PREF_KEY, ""))
+                ? Theme.DARK
+                : Theme.LIGHT;
     }
 
     /**
@@ -92,12 +121,20 @@ public final class ThemeManager {
     }
 
     /**
-     * Switches the theme and updates all managed scenes.
+     * Switches the theme, updates all managed scenes and persists the choice (WP-3: the chosen
+     * theme survives a restart — the View menu's Light/Dark Theme items and any other switch
+     * route through this single choke point).
      *
      * @param theme the theme to activate
      */
     public void setTheme(Theme theme) {
         currentTheme.set(theme);
+        PREFERENCES.put(PREF_KEY, theme.name());
+        try {
+            PREFERENCES.flush();
+        } catch (java.util.prefs.BackingStoreException e) {
+            // best effort: the theme still applies for this session
+        }
         for (Scene scene : scenes) {
             updateScene(scene);
         }
