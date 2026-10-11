@@ -25,7 +25,7 @@ import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
 public class ScriptDoc extends AbstractDocGenerator {
 
     public static void main(String[] args) throws Exception {
-        new ScriptDoc().run(args);
+        new ScriptDoc().run(args[0], args[1]);
     }
 
     @Override

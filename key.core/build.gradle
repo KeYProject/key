@@ -77,11 +77,12 @@ tasks.register('generateVarcondDoc', JavaExec) {
     description = 'Generates the markdown documentation of all variable conditions (varconds).'
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'de.uka.ilkd.key.doc.VarcondDoc'
-    def outputFile = layout.buildDirectory.file("docs/keydocs/varconds.md")
-    outputs.file(outputFile)
-    outputs.file(layout.buildDirectory.file("docs/keydocs/varconds.json"))
+    def mdFile = layout.buildDirectory.file("docs/keydocs/varconds.md")
+    def jsonFile = layout.buildDirectory.file("docs/keydocs/varconds.json")
+    outputs.file(mdFile)
+    outputs.file(jsonFile)
     doFirst {
-        args = [outputFile.get().asFile.absolutePath]
+        args = [mdFile.get().asFile.absolutePath, jsonFile.get().asFile.absolutePath ]
     }
 }
 
@@ -92,11 +93,12 @@ tasks.register('generateScriptDoc', JavaExec) {
     description = 'Generates the markdown documentation of all proof script commands.'
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'de.uka.ilkd.key.doc.ScriptDoc'
-    def outputFile = layout.buildDirectory.file("docs/keydocs/script-commands.md")
-    outputs.file(outputFile)
-    outputs.file(layout.buildDirectory.file("docs/keydocs/script-commands.json"))
+    def mdFile = layout.buildDirectory.file("docs/keydocs/script-commands.md")
+    def jsonFile = layout.buildDirectory.file("docs/keydocs/script-commands.json")
+    outputs.file(mdFile)
+    outputs.file(jsonFile)
     doFirst {
-        args = [outputFile.get().asFile.absolutePath]
+        args = [mdFile.get().asFile.absolutePath, jsonFile.get().asFile.absolutePath ]
     }
 }
 
