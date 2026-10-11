@@ -153,12 +153,14 @@ import de.uka.ilkd.key.gui.fx.tasktree.TaskTreeF;
 import de.uka.ilkd.key.gui.fx.theme.Theme;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro;
 import de.uka.ilkd.key.macros.DefaultAutoMacro;
 import de.uka.ilkd.key.macros.FullAutoPilotProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ScriptAwareMacro;
 import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
@@ -352,6 +354,18 @@ public final class MainWindowF {
      * clicks drive the selection.
      */
     private final ProofTreeViewF proofTreeView = new ProofTreeViewF();
+
+    /**
+     * WP-5 — the proof tree view for the extension ports (the Swing extensions reach the tree
+     * via {@code MainWindow.getProofTreeView()}, e.g. the exploration extension's renderer
+     * registration and "Hide justification" filter routing, ExplorationExtension.java:128); the
+     * FX extension ports obtain it from their {@code init(MainWindowF, KeYMediatorF)} window.
+     *
+     * @return the proof tree view of the window
+     */
+    public ProofTreeViewF getProofTreeView() {
+        return proofTreeView;
+    }
 
     /**
      * The info view (first M2 version): shows the proof-level details (name, file, goal/node/
@@ -626,7 +640,8 @@ public final class MainWindowF {
         // KeYMediator.java:606/589). Built-in consumer proving the shape: the main window
         // itself is registered, so extensions that only receive the mediator (the facade's
         // init(null, mediator) startup hook) can still look the window up. WP-5's exploration
-        // port will register its ExplorationModeModel through the same seam.
+        // port registers its ExplorationModeModel through the same seam (verified by
+        // key.fx.verify.exploration).
         mediator.register(this, MainWindowF.class);
         // proofmgmt: self test hook (independent of the demo load; the verification loads its
         // own examples so that it also runs without key.fx.demo.sequent)
@@ -1317,6 +1332,14 @@ public final class MainWindowF {
             // back to the disabled placeholder without a position. One stdout report line.
             if (System.getProperty("key.fx.verify.extensions") != null) {
                 runExtensionVerification(env);
+            }
+            // exploration (WP-5): headless self test of the exploration extension parity — the
+            // model registered through the mediator registry (lookup), the renderer-styling hook
+            // drawing the purple exploration border on a real exploration step of the demo, the
+            // "Hide justification" toolbar toggle routing through the HIDE_INTERACTIVE_GOALS
+            // tree filter and the promptForTerm retry-loop accepting bad-then-good input
+            if (System.getProperty("key.fx.verify.exploration") != null) {
+                runExplorationVerification(env);
             }
             if (System.getProperty("key.fx.demo.autoprove.live") != null) {
                 startLiveAutoMode(env);
@@ -2891,6 +2914,186 @@ public final class MainWindowF {
             System.out.println("Extension verification: " + report);
             LOGGER.info("Extension verification: {}", report);
         });
+    }
+
+    /**
+     * exploration (WP-5): headless self test of the exploration extension parity ({@code
+     * key.fx.verify.exploration}), run after the demo load like the other proof-dependent verify
+     * hooks. {@code keyext.exploration.fx} is not on this module's compile classpath, so the
+     * assertions reach it reflectively (the same pattern as the Swing-class reads elsewhere).
+     * Asserts (a) the {@code ExplorationModeModel} is registered through the WP-1 mediator
+     * registry and look-up-able (Swing {@code mediator.register(model,
+     * ExplorationModeModel.class)}, ExplorationExtension.java:103), (b) the renderer-styling
+     * hook is registered on {@link ProofTreeViewF} and the node of a real exploration step
+     * (applied through {@code ProofExplorationService.soundAddition} on the selected demo goal)
+     * is styled with the purple exploration border, (c) the "Hide justification" toolbar toggle
+     * routes through the {@code HIDE_INTERACTIVE_GOALS} proof-tree filter (the persisted
+     * ViewSettings flag follows the toggle and enabling the filter shrinks the tree — the
+     * exploration cut's justification branch disappears; the state is restored), and (d) the
+     * {@code promptForTerm} retry-loop accepts bad-then-good input: malformed input and a sort
+     * mismatch re-prompt (the Swing parity), a cancel aborts. One stdout report line.
+     *
+     * @param env the environment of the loaded proof
+     */
+    private void runExplorationVerification(KeYEnvironment<DefaultUserInterfaceControl> env) {
+        StringBuilder sb = new StringBuilder();
+        boolean pass = true;
+        try {
+            Proof proof = env.getLoadedProof();
+            Goal goal = mediator.getSelectedGoal();
+
+            // (a) the model registered via the mediator registry and look-up-able
+            Class<?> modelClass = Class.forName("org.key_project.exploration.ExplorationModeModel");
+            Object model = mediator.lookup(modelClass);
+            boolean registered = model != null;
+            sb.append("modelRegistered=").append(registered);
+            pass &= registered;
+
+            // (b) the renderer-styling hook is registered on the proof tree (the exploration
+            // extension's init registered ExplorationRendererF); switch the exploration mode on
+            // so the step runs in the mode the user would use
+            int stylers = proofTreeView.getCellStylers().size();
+            sb.append(" cellStylers=").append(stylers);
+            pass &= stylers >= 1;
+            if (model != null) {
+                model.getClass().getMethod("setExplorationModeSelected", boolean.class)
+                        .invoke(model, true);
+            }
+
+            // apply a real exploration step on the demo goal (the "Add formula to antecedent"
+            // path): the cut registers ExplorationNodeData on the cut node and both branches
+            ProofTreeViewF.Style style = null;
+            if (goal != null) {
+                Services services = proof.getServices();
+                JTerm term = new KeyIO(services).parseExpression("lives(agatha)");
+                Class<?> serviceClass =
+                    Class.forName("org.key_project.exploration.ProofExplorationService");
+                Object service = serviceClass.getConstructor(Proof.class, Services.class)
+                        .newInstance(proof, services);
+                de.uka.ilkd.key.proof.Node explored = (de.uka.ilkd.key.proof.Node) serviceClass
+                        .getMethod("soundAddition", Goal.class, JTerm.class, boolean.class)
+                        .invoke(service, goal, term, true);
+                selectionModel.setSelectedNode(explored);
+                proofTreeView.refresh();
+                style = proofTreeView.stylerStyle(explored);
+            } else {
+                sb.append(" goal=NONE");
+            }
+            // the purple exploration border (Swing ExplorationRenderer.DARK_PURPLE_COLOR default
+            // rgb(112,17,191) = 0x7011bf) rendered through the styler's inline css
+            boolean styled = style != null && style.getBorder() != null
+                    && style.getBorder().toString().contains("0x7011bf")
+                    && style.css().contains("-fx-border-color")
+                    && "Exploration Action Performed".equals(style.getTooltipTitle());
+            sb.append(" explorationStyled=").append(styled);
+            pass &= styled;
+
+            // (c) the "Hide justification" toolbar toggle routes through the tree filter:
+            // fire the real checkbox (the extension handler setHideJustification runs), the
+            // persisted ViewSettings flag must follow and — with the filter on — the tree must
+            // shrink by the exploration cut's justification branch; restore the state after
+            ViewSettings viewSettings =
+                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+            CheckBox hideJustification = KeYGuiExtensionFacadeF.getToolbarControls(this, mediator)
+                    .stream()
+                    .filter(c -> c instanceof CheckBox cb
+                            && "Hide justification".equals(cb.getText()))
+                    .map(c -> (CheckBox) c).findFirst().orElse(null);
+            boolean routed = false;
+            if (hideJustification != null) {
+                boolean hideBefore = viewSettings.getHideInteractiveGoals();
+                int entriesBefore = nodeEntries(proofTreeView.verifyTreeStructure());
+                hideJustification.fire();
+                boolean hideAfter = viewSettings.getHideInteractiveGoals();
+                int entriesAfter = nodeEntries(proofTreeView.verifyTreeStructure());
+                routed = hideAfter == !hideBefore
+                        && (hideAfter ? entriesAfter < entriesBefore
+                                : entriesAfter == entriesBefore);
+                // restore the state found on entry
+                hideJustification.fire();
+                routed &= viewSettings.getHideInteractiveGoals() == hideBefore;
+            }
+            sb.append(" hideJustificationFilter=").append(routed);
+            pass &= routed;
+
+            // (d) the promptForTerm retry-loop (scripted handler, no dialogs): malformed input
+            // re-prompts ("Malformed input"), then a good term is accepted; a sort mismatch
+            // re-prompts ("Sort mismatch"); a cancel aborts
+            Class<?> menuClass =
+                Class.forName("org.key_project.exploration.fx.ExplorationSequentMenuF");
+            Class<?> handlerClass = Class.forName(
+                "org.key_project.exploration.fx.ExplorationSequentMenuF$PromptHandler");
+            java.lang.reflect.Method prompt =
+                menuClass.getDeclaredMethod("promptForTerm", Goal.class, JTerm.class,
+                    handlerClass);
+            prompt.setAccessible(true);
+
+            List<String> errors1 = new ArrayList<>();
+            Object handler1 = scriptedPromptHandler(List.of("(((", "lives(agatha)"), errors1);
+            Object term1 = prompt.invoke(null, goal, null, handler1);
+            boolean retryBadGood =
+                term1 instanceof JTerm && errors1.equals(List.of("Malformed input"));
+
+            List<String> errors2 = new ArrayList<>();
+            JTerm intTerm = new KeyIO(proof.getServices()).parseExpression("0");
+            Object handler2 = scriptedPromptHandler(List.of("lives(agatha)", "1"), errors2);
+            Object term2 = prompt.invoke(null, goal, intTerm, handler2);
+            boolean retrySortMismatch = term2 instanceof JTerm t2
+                    && t2.sort().equals(intTerm.sort())
+                    && errors2.equals(List.of("Sort mismatch"));
+
+            List<String> errors3 = new ArrayList<>();
+            Object handler3 = scriptedPromptHandler(List.of(), errors3);
+            boolean cancelAborts = prompt.invoke(null, goal, null, handler3) == null
+                    && errors3.isEmpty();
+
+            boolean retryOk = retryBadGood && retrySortMismatch && cancelAborts;
+            sb.append(" promptRetry=").append(retryOk);
+            pass &= retryOk;
+        } catch (Exception e) {
+            LOGGER.error("Exploration verification failed", e);
+            pass = false;
+            sb.append(" error=").append(e);
+        }
+        String report = (pass ? "PASS" : "FAIL") + " - " + sb;
+        System.out.println("Exploration verification: " + report);
+        LOGGER.info("Exploration verification: {}", report);
+        NotificationManagerF.getInstance()
+                .notify("Exploration verification: " + report,
+                    pass ? Kind.INFO : Kind.ERROR);
+        statusRight.setText(report);
+    }
+
+    /**
+     * Builds a reflective {@code ExplorationSequentMenuF.PromptHandler} proxy that feeds the
+     * given inputs and records the shown error titles ({@code null} inputs end the script — the
+     * cancel case).
+     */
+    private static Object scriptedPromptHandler(List<String> inputs, List<String> errors) {
+        Class<?> handlerClass;
+        try {
+            handlerClass =
+                Class.forName(
+                    "org.key_project.exploration.fx.ExplorationSequentMenuF$PromptHandler");
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
+        java.util.concurrent.atomic.AtomicInteger next =
+            new java.util.concurrent.atomic.AtomicInteger();
+        return java.lang.reflect.Proxy.newProxyInstance(handlerClass.getClassLoader(),
+            new Class<?>[] { handlerClass }, (proxy, method, args) -> {
+                if (args[1] != null) {
+                    errors.add((String) args[1]);
+                }
+                return next.get() < inputs.size() ? inputs.get(next.getAndIncrement()) : null;
+            });
+    }
+
+    /** @return the nodeEntries count reported by a {@code verifyTreeStructure} report line. */
+    private static int nodeEntries(String structureReport) {
+        java.util.regex.Matcher m =
+            java.util.regex.Pattern.compile("nodeEntries=(\\d+)").matcher(structureReport);
+        return m.find() ? Integer.parseInt(m.group(1)) : -1;
     }
 
     /** @return the direct sub menu of the given menu with the given text, or {@code null}. */
