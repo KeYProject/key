@@ -4,7 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.fx.settings;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
@@ -82,15 +84,39 @@ public class SMTSettingsProviderF extends SettingsPanelF implements SettingsProv
             addCheckBox("Store taclet translation to file", "", false);
         chkEnableOnLoad = addCheckBox("Enable SMT solvers when loading proofs", "", true);
 
-        // menu: KNOWN-DEFERRED — the remaining Swing options of SMTSettingsProvider /
-        // SolverOptions are not ported: the per-solver command/parameters/timeout and support
-        // panels (SolverOptions.java:36-50), the progress-dialog mode, the global timeout, the
-        // concurrent-process count, the int/seq/object/locset bounds, the "check for support"
-        // toggle and the store-translation file path panel (SMTSettingsProvider.java:105-158,
-        // 185-256). The four persisted toggles above and the solver selection are the
-        // functional core; the rest is left for the SMT milestone.
+        // menu: KNOWN-DEFERRED — the remaining Swing options of SMTSettingsProvider are not
+        // ported: the progress-dialog mode, the global timeout, the concurrent-process count,
+        // the int/seq/object/locset bounds and the store-translation file path panel
+        // (SMTSettingsProvider.java:105-158, 185-256). The per-solver command/parameters/timeout
+        // and support panels (Swing SolverOptions) are ported as child providers
+        // ({@link SolverOptionsF}, see children); the four persisted toggles above and the
+        // solver selection are the functional core; the rest is left for the SMT milestone.
 
         refreshFromSettings();
+
+        // menu: MP4 — one per-solver child panel per available solver type, like the Swing
+        // SMTSettingsProvider (SMTSettingsProvider.java:155-158): only those types that are
+        // actually theoretically available according to the settings (containsSolver).
+        children = new ArrayList<>();
+        ProofIndependentSMTSettings smtSettings =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings();
+        for (SolverType type : SolverTypes.getSolverTypes()) {
+            if (smtSettings.containsSolver(type)) {
+                children.add(new SolverOptionsF(type));
+            }
+        }
+    }
+
+    /**
+     * One {@link SolverOptionsF} child panel per solver type that the settings know
+     * (Swing {@code SMTSettingsProvider.getChildren}, SMTSettingsProvider.java:155-163), built
+     * in the constructor and shown as tree children in the settings dialog.
+     */
+    private List<SettingsProviderF> children;
+
+    @Override
+    public List<SettingsProviderF> getChildProviders() {
+        return children;
     }
 
     @Override
