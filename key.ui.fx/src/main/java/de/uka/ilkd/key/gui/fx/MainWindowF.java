@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EventObject;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.Event;
@@ -78,6 +80,7 @@ import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.core.fx.GUIListenerF;
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
@@ -510,6 +513,22 @@ public final class MainWindowF {
         // refreshGoalBackPrune cover the controls not yet built.
         mediator.autoModeRunningProperty()
                 .addListener((obs, old, running) -> refreshGoalBackPrune());
+        // WP-1: the auto-mode context API (KeYMediatorF.initiateAutoMode/finishAutoMode) runs
+        // auto modes on foreign (non-selected) proofs, e.g. the caching copy-on-dispose — the
+        // Swing ui.notifyAutoModeBeingStarted/notifyAutomodeStopped reach MainWindow's freeze
+        // via the ProverTaskListener dispatch (MainWindow.java:934/946). The FX observable
+        // property is the notification channel (the core AbstractProofControl.
+        // fireAutoModeStarted is protected and unreachable from the mediator), so the freeze
+        // follows the property as well; for the normal runs this is idempotent with the
+        // control-event-driven freeze of autoModeUiListener below.
+        mediator.autoModeRunningProperty()
+                .addListener((obs, was, running) -> {
+                    if (running) {
+                        freezeExceptAutoModeButton();
+                    } else {
+                        unfreezeExceptAutoModeButton();
+                    }
+                });
 
         buildDockables();
         workspace.setDefaultLayout(defaultLayout());
@@ -587,6 +606,28 @@ public final class MainWindowF {
         // proofmgmt: the Loaded Proofs view's clicks and the Proof Management dialog route the
         // active-proof switch through the selection model (the Swing mediator path)
         proofManager.setActivationHandler(this::activateProof);
+        // WP-1: the opened-proofs registry of the mediator (Swing: TaskTree.addProof adds every
+        // registered proof to mediator.getCurrentlyOpenedProofs(), TaskTree.java:117, and
+        // ProofTreeView removes the disposed ones, ProofTreeView.java:726). The ProofManagerF
+        // multi-proof state is the FX registration point (its addProof/removeProof cover the
+        // demo load, the proof-management loads and the abandon flow), so the mediator's live
+        // list mirrors it — the extension ports (WP-4 caching) feed the accessor.
+        proofManager.proofs().addListener((ListChangeListener<Proof>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    mediator.getCurrentlyOpenedProofs().addAll(change.getAddedSubList());
+                }
+                if (change.wasRemoved()) {
+                    mediator.getCurrentlyOpenedProofs().removeAll(change.getRemoved());
+                }
+            }
+        });
+        // WP-1: the extension-object registry (Swing KeYMediator.register/lookup,
+        // KeYMediator.java:606/589). Built-in consumer proving the shape: the main window
+        // itself is registered, so extensions that only receive the mediator (the facade's
+        // init(null, mediator) startup hook) can still look the window up. WP-5's exploration
+        // port will register its ExplorationModeModel through the same seam.
+        mediator.register(this, MainWindowF.class);
         // proofmgmt: self test hook (independent of the demo load; the verification loads its
         // own examples so that it also runs without key.fx.demo.sequent)
         if (System.getProperty("key.fx.verify.proofmgmt") != null) {
@@ -2612,6 +2653,12 @@ public final class MainWindowF {
      * TestExtensionF SEQUENT_VIEW shortcut fires a toast when a matching key event hits the
      * sequent view. One stdout report line; skips the term-menu sub-assertion gracefully when
      * no goal is loaded.
+     * <p>
+     * WP-1 adds the mediator-seam assertions: (j) the opened-proofs accessor contains the
+     * loaded demo proof, (k) the built-in window registration is look-up-able through the
+     * extension-object registry, (l) the register/lookup/deregister round trip of the
+     * registry, (m) the proof-load listener registry delivers the loaded proof, (n) the
+     * GUI-listener registry delivers the shutdown event.
      *
      * @param env the environment of the loaded proof
      */
@@ -2723,6 +2770,73 @@ public final class MainWindowF {
                 : KeYGuiExtensionFacadeF.getProofTreeContextItems(mediator, selNode).size();
         sb.append(" prooftreeExtensionItems=").append(proofTreeItems);
         pass &= proofTreeItems >= 1;
+
+        // WP-1 — the mediator seam assertions (see the javadoc): (j) the opened-proofs accessor
+        // reflects the demo load, (k) the built-in window registration is look-up-able, (l) the
+        // extension-object registry round trip, (m) the proof-load listener registry delivers
+        // the loaded proof, (n) the GUI-listener registry delivers the shutdown event
+        List<Proof> openedProofs = mediator.getCurrentlyOpenedProofs();
+        boolean openedProofsOk = !openedProofs.isEmpty()
+                && openedProofs.contains(env.getLoadedProof());
+        sb.append(" openedProofs=").append(openedProofs.size());
+        pass &= openedProofsOk;
+
+        boolean windowRegistered = mediator.lookup(MainWindowF.class) == this;
+        sb.append(" windowRegistered=").append(windowRegistered);
+        pass &= windowRegistered;
+
+        // registry round trip with a dedicated marker object (the window itself stays
+        // registered for the real extension consumers)
+        final class SeamMarker {
+        }
+        SeamMarker marker = new SeamMarker();
+        mediator.register(marker, SeamMarker.class);
+        boolean registryRoundTrip = mediator.lookup(SeamMarker.class) == marker;
+        mediator.deregister(marker, SeamMarker.class);
+        registryRoundTrip &= mediator.lookup(SeamMarker.class) == null;
+        sb.append(" registryRoundTrip=").append(registryRoundTrip);
+        pass &= registryRoundTrip;
+
+        // proof-load listener registry: the listener registered here observes the fired event
+        // (Swing KeYMediator.fireProofLoaded; the production firing site is
+        // WindowUserInterfaceControlF.registerProofAggregate, which ran before this hook for
+        // the demo load — the slicing port (WP-6) registers its tracker through this seam)
+        List<Proof> proofLoadEvents = new ArrayList<>();
+        mediator.registerProofLoadListener(proofLoadEvents::add);
+        mediator.fireProofLoaded(env.getLoadedProof());
+        boolean proofLoadOk = proofLoadEvents.size() == 1
+                && proofLoadEvents.get(0) == env.getLoadedProof();
+        sb.append(" proofLoadListener=").append(proofLoadOk);
+        pass &= proofLoadOk;
+
+        // GUI-listener registry: a test-level listener observes the shutdown event the exit
+        // flow fires (Swing ExitMainAction.java:83 → MainGUIListener.shutDown,
+        // MainWindow.java:1855); the listener is removed afterwards so no other consumer sees
+        // the synthetic event
+        List<EventObject> shutdownEvents = new ArrayList<>();
+        GUIListenerF guiListener = new GUIListenerF() {
+            @Override
+            public void modalDialogOpened(EventObject e) {
+                // not asserted here
+            }
+
+            @Override
+            public void modalDialogClosed(EventObject e) {
+                // not asserted here
+            }
+
+            @Override
+            public void shutDown(EventObject e) {
+                shutdownEvents.add(e);
+            }
+        };
+        mediator.addGUIListener(guiListener);
+        mediator.fireShutDown(new EventObject(this));
+        boolean shutdownOk =
+            shutdownEvents.size() == 1 && shutdownEvents.get(0).getSource() == this;
+        mediator.removeGUIListener(guiListener);
+        sb.append(" shutdownEvent=").append(shutdownOk);
+        pass &= shutdownOk;
 
         int toastsBefore = NotificationManagerF.getInstance().getVisibleToastCount();
         // Ctrl+Shift+F12 — the combination TestExtensionF registered for SEQUENT_VIEW
@@ -2982,10 +3096,17 @@ public final class MainWindowF {
      * covers the main area only — the menu bar, the toolbar (with the stop controls) and the
      * status bar stay interactive.
      * <p>
-     * KNOWN-SIMPLIFIED: Swing's glass pane covered the whole content pane and re-delivered
-     * events only to components marked {@code isAutoButton} (the automation/stop buttons and
-     * the status-line abort button); the FX overlay instead covers only the views area, so the
-     * menus stay clickable while frozen (their actions are disabled during auto mode anyway).
+     * Glass-pane scope decision (WP-1, KNOWN-SIMPLIFIED row {@code MainWindowF.java:2659},
+     * closed WONT-REPLICATE): Swing's glass pane covered the whole content pane and
+     * re-delivered events only to components marked {@code isAutoButton} (the automation/stop
+     * buttons and the status-line abort button), so the menu bar was blocked while frozen. The
+     * FX overlay keeps the menu bar, toolbar and status bar clickable — deliberately: their
+     * proof actions are disabled during auto mode anyway (the enablement binds to
+     * {@code mediator.autoModeRunningProperty()}), so blocking clicks on inert controls adds no
+     * protection; the automation macro items are enabled during auto mode by Swing parity so a
+     * click stops the run (MacroAutomationAction.java:48-61), and blocking them would regress
+     * that intent; and the status bar must stay live for the progress display. The stop
+     * controls the Swing glass pane kept live are the same controls the FX toolbar keeps live.
      */
     private void freezeExceptAutoModeButton() {
         inputBlocker.setVisible(true);
@@ -4256,11 +4377,19 @@ public final class MainWindowF {
      * alive after {@link Platform#exit()}.
      * <p>
      * KNOWN-SIMPLIFIED: the Swing mediator shutdown event ({@code fireShutDown} notifying the
-     * {@code GUIListener}s) has no FX seam — {@link KeYMediatorF} has no GUI listener registry,
-     * so the FX port omits the event.
+     * {@code GUIListener}s) was omitted because {@link KeYMediatorF} had no GUI listener
+     * registry — resolved in WP-1: the mediator now holds a {@link GUIListenerF} registry and
+     * the event is fired above.
      */
     private void exitApplicationWithoutInteraction() {
         recentFiles.save();
+        // WP-1: the mediator shutdown event (Swing
+        // ExitMainAction.exitMainWithoutInteraction, ExitMainAction.java:83 — the Swing
+        // MainGUIListener.shutDown of MainWindow.java:1855-1858 receives it). The
+        // KNOWN-SIMPLIFIED row MainWindowF.java:3721 is resolved: KeYMediatorF now has the
+        // GUI-listener registry (GUIListenerF); the FX window-hiding of the Swing listener is
+        // the Platform.exit below.
+        mediator.fireShutDown(new EventObject(this));
         LOGGER.info("Have a nice day.");
         Platform.exit();
         System.exit(0);
