@@ -12,16 +12,20 @@ priority = 10000)`).
 
 | Piece | Class | Notes |
 |---|---|---|
-| Extension provider | `ExplorationExtensionF` | holds the `ExplorationModeModel` directly (no mediator registry on the FX side); toggle + sequent menu + status entry; hides justification via `ViewSettings` |
+| Extension provider | `ExplorationExtensionF` | registers the `ExplorationModeModel` in the mediator registry (WP-5, Swing `mediator.register` parity) with the provider-held singleton as lookup fallback; toggle + sequent menu + status entry; hides justification through the `ProofTreeViewF` `HIDE_INTERACTIVE_GOALS` filter (WP-5) |
+| Proof-tree renderer | `ExplorationRendererF` | purple border/background + "Exploration Action Performed" tooltip on explored branches via the `ProofTreeViewF.CellStyler` hook (WP-5, Swing `ExplorationRenderer` parity); colors behind the shared `[proofTree]darkPurple`/`lightPurple` keys |
 | Exploration Steps panel | `ExplorationStepsPanelF` | west-drawer left panel (add/edit/hide steps, prune, live sequent integration) |
-| Sequent context menu | `ExplorationSequentMenuF` | "Generate Exploration Step" etc.; single-shot term prompt (Swing retry-loop simplified) |
+| Sequent context menu | `ExplorationSequentMenuF` | "Generate Exploration Step" etc.; `promptForTerm` modal retry-loop ported (WP-5, Swing `ExplorationAction.promptForTerm` parity; `PromptHandler` seam for headless tests) |
 | Status indicator | (in provider) | ikonli FontAwesome solid vs. regular compass mirrors the Swing `Icons.EXPLORE` |
 
 ## Verification
 
 In-app (needs a display): `key.fx.verify.extensions` expects the panel on the west drawer
-(`westDrawerItems=7`); toggle exploration mode from the toolbar/status entry, add an exploration
-step on the sequent and check the panel collects it.
+(`westDrawerItems=7`); `key.fx.verify.exploration` (WP-5) asserts the model registration via the
+mediator lookup, the purple renderer border on a real exploration step of the demo, the
+hide-justification tree-filter routing and the promptForTerm bad-then-good retry. Toggle
+exploration mode from the toolbar/status entry, add an exploration step on the sequent and check
+the panel collects it.
 
 ## Tests
 
