@@ -4,6 +4,10 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.core.fx;
 
+import java.util.EventObject;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Consumer;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 
@@ -25,6 +29,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.javafx.FxUtil;
+import org.key_project.util.lookup.Lookup;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -79,6 +84,45 @@ public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
      * the selected proof through {@link #setProof(Proof, Proof)}.
      */
     private AutoSaver autoSaver;
+
+    // ------------------------------------------------------------------
+    // WP-1 — the mediator seams of the Swing KeYMediator that the FX extension ports and
+    // the exit flow were missing (see KNOWN-SIMPLIFIED.md: caching CachingExtensionF.java:778,
+    // exploration ExplorationExtensionF.java:280, slicing SlicingExtensionF.java:49,
+    // MainWindowF.java:3721). Swing sources: de.uka.ilkd.key.core.KeYMediator.
+    // ------------------------------------------------------------------
+
+    /**
+     * WP-1 — the currently opened proofs (Swing {@code KeYMediator.currentlyOpenedProofs},
+     * KeYMediator.java:92-96, accessor :800-808): a live mutable list — Swing's {@code
+     * TaskTree.addProof} adds every registered proof (TaskTree.java:117) and
+     * {@code ProofTreeView} removes the disposed ones (ProofTreeView.java:726). In the FX UI the
+     * {@code ProofManagerF} multi-proof state is the single registration point; {@code
+     * MainWindowF} mirrors it into this list.
+     */
+    private final List<Proof> currentlyOpenedProofs = new CopyOnWriteArrayList<>();
+
+    /**
+     * WP-1 — registered proof load listeners (Swing {@code KeYMediator.proofLoadListeners},
+     * KeYMediator.java:99-104): called whenever a new proof is loaded, but before it is
+     * replayed, via {@link #fireProofLoaded(Proof)} (Swing
+     * {@code WindowUserInterfaceControl.registerProofAggregate}, WindowUserInterfaceControl.java
+     * :519-525). A listener MUST be able to accept the same proof twice.
+     */
+    private final List<Consumer<Proof>> proofLoadListeners = new CopyOnWriteArrayList<>();
+
+    /**
+     * WP-1 — the registered GUI listeners (Swing {@code KeYMediator.listenerList},
+     * KeYMediator.java:60).
+     */
+    private final List<GUIListenerF> guiListeners = new CopyOnWriteArrayList<>();
+
+    /**
+     * WP-1 — user-defined data / extension-object registry (Swing
+     * {@code KeYMediator.userData}, KeYMediator.java:585).
+     */
+    private @Nullable Lookup userData;
+
 
     /**
      * Observable auto mode state for the UI (buttons and menu items bind their enabled state to
@@ -257,6 +301,294 @@ public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
         if (proofControl != null && inAutoMode) {
             proofControl.stopAutoMode();
         }
+    }
+
+    // ------------------------------------------------------------------
+    // WP-1 — auto-mode context API for foreign proofs (Swing
+    // KeYMediator.initiateAutoMode/finishAutoMode, KeYMediator.java:535-566). Swing's caching
+    // port wraps the CopyReferenceResolver copy into these (CachingExtension.java:312-319);
+    // the FX port of CopyBeforeDispose needs the same seam for a proof that is not the
+    // selected one.
+    // ------------------------------------------------------------------
+
+    /**
+     * WP-1 — performs the standard preparations for starting an auto mode run on the given
+     * (possibly foreign) proof (Swing {@code KeYMediator.initiateAutoMode},
+     * KeYMediator.java:535-540): freezes the interface and marks the auto mode active
+     * ({@code fullStop}), flips the rule app index to the requested mode.
+     * <p>
+     * Swing {@code stopInterface(fullStop)} disables the UI via
+     * {@code ui.notifyAutoModeBeingStarted()} and sets {@code inAutoMode}; in the FX UI both the
+     * freeze ({@code MainWindowF}'s listener on the observable property) and the enabled state
+     * of every proof action are bound to {@link #autoModeRunningProperty()}, so publishing the
+     * property is the FX-side interface stop. Swing additionally fires
+     * {@code getUI().getProofControl().fireAutoModeStarted(...)} — the Swing-only method of
+     * {@code KeYMediatorProofControl}; the core {@code AbstractProofControl.fireAutoModeStarted}
+     * is protected and not reachable from the mediator, so the observable property is the FX
+     * notification channel.
+     *
+     * @param proof the {@link Proof} to be worked on (may differ from the selected proof)
+     * @param fullStop if a full freeze of the interface is requested
+     * @param interactive whether the needed taclet index is for interactive or automatic use
+     *        (normally {@code false})
+     */
+    public void initiateAutoMode(Proof proof, boolean fullStop, boolean interactive) {
+        if (fullStop) {
+            inAutoMode = true;
+            publishAutoModeRunning(true);
+        }
+        setInteractive(interactive);
+    }
+
+    /**
+     * WP-1 — performs the standard preparations for finishing an auto mode run on the given
+     * (possibly foreign) proof (Swing {@code KeYMediator.finishAutoMode}, KeYMediator.java
+     * :550-566): flips the rule app index back, unfreezes the interface ({@code fullStop}) and
+     * selects a node/proof by running the given selector (the default selection when
+     * {@code selection} is {@code null}).
+     *
+     * @param proof the {@link Proof} that was worked on
+     * @param fullStop if a full unfreeze of the interface is requested
+     * @param interactive whether the needed taclet index is for interactive or automatic use
+     *        (normally {@code true})
+     * @param selection a runnable that selects the correct node after unfreezing the interface,
+     *        may be {@code null}
+     */
+    public void finishAutoMode(Proof proof, boolean fullStop, boolean interactive,
+            @Nullable Runnable selection) {
+        setInteractive(interactive);
+        if (fullStop) {
+            inAutoMode = false;
+            publishAutoModeRunning(false);
+        }
+        if (selection == null) {
+            keySelectionModel.defaultSelection();
+        } else {
+            selection.run();
+        }
+    }
+
+    /**
+     * Swing {@code KeYMediator.setInteractive} (KeYMediator.java:476-484): switches the rule
+     * app index of the selected proof between interactive and automatic use.
+     *
+     * @param b {@code true} to switch to interactive mode
+     */
+    public void setInteractive(boolean b) {
+        Proof selectedProof = getSelectedProof();
+        if (selectedProof != null) {
+            if (b) {
+                selectedProof.setRuleAppIndexToInteractiveMode();
+            } else {
+                selectedProof.setRuleAppIndexToAutoMode();
+            }
+        }
+    }
+
+    /**
+     * WP-1 — publishes the auto-mode state on the observable property, marshalled to the FX
+     * thread (auto-mode events may originate from the prover thread — Swing's
+     * {@code stopInterface}/{@code startInterface} marshal via {@code ThreadUtilities}).
+     * <p>
+     * In a toolkit-free environment (the headless seam tests) {@code Platform.runLater} fails
+     * with an {@link IllegalStateException}; there the state is published directly, because no
+     * UI listeners are attached in that environment.
+     */
+    private void publishAutoModeRunning(boolean running) {
+        try {
+            FxUtil.runLater(() -> autoModeRunning.set(running));
+        } catch (IllegalStateException toolkitNotInitialized) {
+            LOGGER.debug("No JavaFX toolkit: publishing the auto-mode state directly");
+            autoModeRunning.set(running);
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // WP-1 — opened-proofs accessor, extension-object registry, GUI-listener and proof-load
+    // listener registries (Swing KeYMediator.java:129-134, 300-320, 403-421, 585-626,
+    // 800-808).
+    // ------------------------------------------------------------------
+
+    /**
+     * WP-1 — provides the list of currently opened proofs (Swing
+     * {@code KeYMediator.getCurrentlyOpenedProofs}, KeYMediator.java:800-808): the live list can
+     * be used directly inside components (Swing {@code TaskTree} adds, {@code ProofTreeView}
+     * removes).
+     *
+     * @return the live, mutable list of opened proofs
+     */
+    public List<Proof> getCurrentlyOpenedProofs() {
+        return currentlyOpenedProofs;
+    }
+
+    /**
+     * WP-1 — registers a proof load listener (Swing
+     * {@code KeYMediator.registerProofLoadListener}, KeYMediator.java:124-134): called whenever
+     * a new proof is loaded, but before it is replayed. The listener MUST be able to accept the
+     * same proof twice.
+     *
+     * @param listener the callback
+     */
+    public void registerProofLoadListener(Consumer<Proof> listener) {
+        proofLoadListeners.add(listener);
+    }
+
+    /**
+     * WP-1 — fires the proof-loaded event (Swing {@code KeYMediator.fireProofLoaded},
+     * KeYMediator.java:413-421): delivered to every registered proof load listener.
+     *
+     * @param p the proof that was just loaded and is about to be replayed ({@code null} is
+     *        ignored, like in Swing)
+     */
+    public void fireProofLoaded(Proof p) {
+        if (p == null) {
+            return;
+        }
+        for (Consumer<Proof> listener : proofLoadListeners) {
+            listener.accept(p);
+        }
+    }
+
+    /**
+     * WP-1 — adds a listener to GUI events (Swing {@code KeYMediator.addGUIListener},
+     * KeYMediator.java:306-309).
+     *
+     * @param listener the {@link GUIListenerF} to be added
+     */
+    public void addGUIListener(GUIListenerF listener) {
+        guiListeners.add(listener);
+    }
+
+    /**
+     * WP-1 — removes a listener from GUI events (Swing
+     * {@code KeYMediator.removeGUIListener}, KeYMediator.java:315-318).
+     *
+     * @param listener the {@link GUIListenerF} to be removed
+     */
+    public void removeGUIListener(GUIListenerF listener) {
+        guiListeners.remove(listener);
+    }
+
+    /**
+     * WP-1 — fires the request of a GUI component for modal access (Swing
+     * {@code KeYMediator.requestModalAccess}, KeYMediator.java:352-356); can be used to disable
+     * all views even if the GUI component has no built-in modal support.
+     *
+     * @param src the object asking for modal access
+     */
+    public void requestModalAccess(Object src) {
+        fireModalDialogOpened(new EventObject(src));
+    }
+
+    /**
+     * WP-1 — frees the modal access requested with {@link #requestModalAccess(Object)} (Swing
+     * {@code KeYMediator.freeModalAccess}, KeYMediator.java:359-363).
+     *
+     * @param src the object that requested modal access
+     */
+    public void freeModalAccess(Object src) {
+        fireModalDialogClosed(new EventObject(src));
+    }
+
+    /**
+     * WP-1 — fires that a GUI component asked for modal access (Swing
+     * {@code KeYMediator.fireModalDialogOpened}, KeYMediator.java:366-377).
+     *
+     * @param e the event
+     */
+    public void fireModalDialogOpened(EventObject e) {
+        for (GUIListenerF listener : guiListeners) {
+            listener.modalDialogOpened(e);
+        }
+    }
+
+    /**
+     * WP-1 — fires that the GUI component holding modal access has been closed, so views can be
+     * enabled again (Swing {@code KeYMediator.fireModalDialogClosed}, KeYMediator.java:382-393).
+     *
+     * @param e the event
+     */
+    public void fireModalDialogClosed(EventObject e) {
+        for (GUIListenerF listener : guiListeners) {
+            listener.modalDialogClosed(e);
+        }
+    }
+
+    /**
+     * WP-1 — fires the shut-down event (Swing {@code KeYMediator.fireShutDown},
+     * KeYMediator.java:400-410): the exit flow of the main window calls this so the
+     * {@link GUIListenerF}s perform their shutdown side effects (Swing
+     * {@code MainGUIListener.shutDown}, MainWindow.java:1855-1858).
+     *
+     * @param e the event
+     */
+    public void fireShutDown(EventObject e) {
+        for (GUIListenerF listener : guiListeners) {
+            listener.shutDown(e);
+        }
+    }
+
+    /**
+     * WP-1 — retrieves user-defined data (Swing {@code KeYMediator.lookup},
+     * KeYMediator.java:589-604): the first registered implementation of the service class, or
+     * {@code null} when none is registered (Swing swallows the {@link IllegalStateException} of
+     * the lookup in the same way).
+     *
+     * @param service the class for which the data were registered
+     * @param <T> any class
+     * @return the registered implementation or {@code null}
+     * @see #register(Object, Class)
+     */
+    public <T> @Nullable T lookup(Class<T> service) {
+        try {
+            if (userData == null) {
+                return null;
+            }
+            return userData.get(service);
+        } catch (IllegalStateException ignored) {
+            return null;
+        }
+    }
+
+    /**
+     * WP-1 — registers a user-defined data / extension object (Swing
+     * {@code KeYMediator.register}, KeYMediator.java:606-610; the Swing exploration port
+     * registers its model with {@code mediator.register(model, ExplorationModeModel.class)},
+     * ExplorationExtension.java:103).
+     *
+     * @param obj the object to register
+     * @param service the class under which it is registered
+     * @param <T> the service type
+     */
+    public <T> void register(T obj, Class<T> service) {
+        getUserData().register(obj, service);
+    }
+
+    /**
+     * WP-1 — removes a previously registered user-defined data (Swing
+     * {@code KeYMediator.deregister}, KeYMediator.java:612-622).
+     *
+     * @param obj the registered object
+     * @param service the class under which the data was registered
+     * @param <T> the service type
+     */
+    public <T> void deregister(T obj, Class<T> service) {
+        if (userData != null) {
+            userData.deregister(obj, service);
+        }
+    }
+
+    /**
+     * WP-1 — the associated lookup of user-defined data (Swing
+     * {@code KeYMediator.getUserData}, KeYMediator.java:625-631).
+     *
+     * @return the (lazily created) lookup
+     */
+    public Lookup getUserData() {
+        if (userData == null) {
+            userData = new Lookup();
+        }
+        return userData;
     }
 
     /**
@@ -474,13 +806,13 @@ public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
         public void autoModeStarted(ProofEvent e) {
             inAutoMode = true;
             resetNrGoalsClosedByHeuristics();
-            FxUtil.runLater(() -> autoModeRunning.set(true));
+            publishAutoModeRunning(true);
         }
 
         @Override
         public void autoModeStopped(ProofEvent e) {
             inAutoMode = false;
-            FxUtil.runLater(() -> autoModeRunning.set(false));
+            publishAutoModeRunning(false);
         }
     }
 }
