@@ -134,6 +134,24 @@ public final class ProofTreeVerifyF {
             notes.append(' ').append(macroReport[0]);
         }
 
+        // C23 (WP-10): the popup's "Apply Strategy" + "Prune Proof" actions — the popup is
+        // prepared on the clicked node (selection parked elsewhere first), the strategy must
+        // apply rule applications below the clicked node and the prune must remove them. Runs
+        // LAST: it mutates the proof (a real strategy run on the clicked node's subtree).
+        String[] strategyReport = { null };
+        runOnFx(() -> strategyReport[0] = view.verifyApplyStrategyAtNode());
+        if (strategyReport[0].startsWith("SKIP")) {
+            notes.append(" applyStrategy ").append(strategyReport[0]);
+        } else {
+            notes.append(' ').append(strategyReport[0]);
+            String result = view.verifyApplyStrategyAtNodeResult();
+            if (result.startsWith("PASS")) {
+                notes.append(' ').append(result);
+            } else {
+                problems.append("apply strategy: ").append(result).append("; ");
+            }
+        }
+
         notes.append(' ').append(autoModeReport);
 
         boolean pass = problems.length() == 0 && notes.toString().contains("PASS");
