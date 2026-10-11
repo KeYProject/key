@@ -84,13 +84,14 @@ public final class InformationWindowF extends Stage {
     /**
      * The counterexample model tabs (Swing {@code InformationWindow.initModel}, :88-101): for the
      * Z3 CE solver with a query model the window is retitled "Counterexample ..." and gets the
-     * model tree and the help tab.
+     * model tree and the help tab. Without a solver (the {@link #show(Window, String, List)}
+     * overload) no counterexample tabs are added.
      *
-     * @param solver the solver whose run is presented
+     * @param solver the solver whose run is presented; may be {@code null}
      * @param tabs the tab pane to extend
      */
     private void initModel(SMTSolver solver, TabPane tabs) {
-        if (solver.getType() != SolverTypes.Z3_CE_SOLVER) {
+        if (solver == null || solver.getType() != SolverTypes.Z3_CE_SOLVER) {
             return;
         }
         if (solver.getSocket().getQuery() == null) {
