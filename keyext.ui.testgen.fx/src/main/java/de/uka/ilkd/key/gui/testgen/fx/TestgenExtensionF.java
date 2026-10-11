@@ -18,12 +18,12 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
 
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.gui.fx.MainWindowF;
 import de.uka.ilkd.key.gui.fx.extension.api.KeYGuiExtensionF;
+import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsProviderF;
 
 import org.jspecify.annotations.NullMarked;
@@ -84,6 +84,13 @@ public final class TestgenExtensionF
 
     /** Swing CounterExampleAction.NAME. */
     private static final String NAME_COUNTEREXAMPLE = "Search for Counterexample";
+
+    /**
+     * action id of the TestGenMacro in the shared keystroke settings (the macro's real FQN —
+     * the Swing {@code KeyStrokeSettings.defineDefault} id, see {@code KeyStrokeManagerF}).
+     */
+    private static final String TESTGEN_MACRO_ACTION_ID =
+        "de.uka.ilkd.key.testgen.macros.TestGenMacro";
 
     /** Swing TestGenerationAction.TOOLTIP. */
     private static final String TOOLTIP_GENERATE = "Generate test cases for open goals";
@@ -178,12 +185,15 @@ public final class TestgenExtensionF
         if (menu == null) {
             Menu m = new Menu(MENU_LABEL);
             // Swing TestgenExtension.java:51-52 registers the TestGenMacro default shortcut via
-            // KeyStrokeSettings.defineDefault; the FX SPI has no keyboard-shortcut capability,
-            // so the accelerator lives on the menu item. KNOWN-SIMPLIFIED: the shortcut moves
-            // from the TestGen strategy macro (term context menu in Swing) to the menu item —
-            // the FX app has no macro-keybinding slot yet.
+            // KeyStrokeSettings.defineDefault (MULTI_KEY_MASK = Ctrl+Shift+T); the FX
+            // counterpart is the shared KeyStrokeManagerF default, which also drives the
+            // accelerator of the macro item in the proof macro menus
+            // (ProofMacroMenuF.itemFor). The main-menu item carries the manager binding and is
+            // registered for later rebindings (KeyStrokeManager.register).
+            KeyStrokeManagerF manager = KeyStrokeManagerF.getInstance();
             MenuItem generate = makeGenerateItem(null);
-            generate.setAccelerator(KeyCombination.keyCombination("SHORTCUT+T"));
+            manager.binding(TESTGEN_MACRO_ACTION_ID).ifPresent(generate::setAccelerator);
+            manager.register(generate, TESTGEN_MACRO_ACTION_ID);
             m.getItems().addAll(generate, makeCounterExampleItem(null));
             menu = m;
         }
