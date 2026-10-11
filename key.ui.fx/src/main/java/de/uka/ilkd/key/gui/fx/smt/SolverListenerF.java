@@ -607,7 +607,10 @@ public class SolverListenerF implements SolverLauncherListener {
     }
 
     private void showInformation(InternSMTProblemF problem) {
-        InformationWindowF.show(owner, "Information for " + problem, problem.getInformation());
+        // WP-7 — the solver is passed so the Z3 CE entries get the counterexample model tree and
+        // the help tab (Swing InformationWindow.initModel, InformationWindow.java:88-101)
+        InformationWindowF.show(owner, problem.solver, "Information for " + problem,
+            problem.getInformation());
     }
 
     private void stopEvent(SolverLauncher launcher) {
