@@ -67,6 +67,7 @@ import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
 import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.HideSequentPrintFilter;
@@ -184,13 +185,26 @@ public class SequentViewF extends BorderPane {
     public void setVisibleTermLabels(VisibleTermLabels labels) {
         visibleTermLabels = labels != null ? labels : NO_VISIBLE_TERM_LABELS;
         if (printer != null && selectedNode != null) {
-            printer = SequentViewLogicPrinter.positionPrinter(new NotationInfo(),
-                selectedNode.proof().getServices(), visibleTermLabels);
+            printer = createPrinter(selectedNode.proof().getServices());
             if (filter instanceof SearchSequentPrintFilter searchFilter) {
                 searchFilter.setLogicPrinter(printer);
             }
             printSequent();
         }
+    }
+
+    /**
+     * WP-3 (menuparity): creates the position printer with a {@link NotationInfo} refreshed from
+     * the persisted {@link ViewSettings} (Swing parity: the Swing views print through
+     * {@code mainWindow.getMediator().getNotationInfo()}, which is refreshed from the ViewSettings
+     * — a bare {@code new NotationInfo()} would print plain syntax regardless of the settings).
+     */
+    private SequentViewLogicPrinter createPrinter(Services services) {
+        NotationInfo notationInfo = new NotationInfo();
+        ViewSettings viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        notationInfo.refresh(services, viewSettings.isUsePretty(), viewSettings.isUseUnicode(),
+            viewSettings.isHidePackagePrefix());
+        return SequentViewLogicPrinter.positionPrinter(notationInfo, services, visibleTermLabels);
     }
 
     /**
@@ -687,8 +701,11 @@ public class SequentViewF extends BorderPane {
             proof = node.proof();
             // TODO(M2c): share the NotationInfo and the term label visibility with the mediator
             // lemmaorigin: use the installed label visibility (Swing SequentView printer setup)
-            printer = SequentViewLogicPrinter.positionPrinter(new NotationInfo(),
-                node.proof().getServices(), visibleTermLabels);
+            // WP-3 (menuparity): the printer carries the ViewSettings pretty/unicode/hide-prefix
+            // flags (Swing SequentView uses mainWindow.getMediator().getNotationInfo(), which
+            // MainWindow refreshes from the ViewSettings) — a bare NotationInfo would default to
+            // plain syntax regardless of the settings
+            printer = createPrinter(node.proof().getServices());
             if (filter instanceof SearchSequentPrintFilter searchFilter) {
                 // the search filters print single formulas through the view's printer (Swing
                 // SequentViewSearchBar.search refreshes it the same way)
@@ -724,12 +741,7 @@ public class SequentViewF extends BorderPane {
         if (printer == null || selectedNode == null) {
             return;
         }
-        ViewSettings viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
-        NotationInfo notationInfo = new NotationInfo();
-        notationInfo.refresh(selectedNode.proof().getServices(), viewSettings.isUsePretty(),
-            viewSettings.isUseUnicode(), viewSettings.isHidePackagePrefix());
-        printer = SequentViewLogicPrinter.positionPrinter(notationInfo,
-            selectedNode.proof().getServices(), visibleTermLabels);
+        printer = createPrinter(selectedNode.proof().getServices());
         if (filter instanceof SearchSequentPrintFilter searchFilter) {
             // the search filters print single formulas through the view's printer (Swing
             // SequentViewSearchBar.search refreshes it the same way)
