@@ -148,6 +148,10 @@ run {
     //    the FX progress dialog renders with fake solvers, cancellation works, the Info window
     //    opens; no real Isabelle installation is needed and the scala-isabelle backend stays
     //    unloaded)
+    //  * key.fx.verify.caching = any  (WP-4: run the proof-caching reference-search self test —
+    //    the FX ReferenceSearchDialogF renders the per-goal reference table of the demo proof,
+    //    a stub ClosedBy marks one row "reference available", the Apply button wiring fires the
+    //    dialog listener and disables the buttons; no real caching copy is run)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
@@ -164,7 +168,7 @@ run {
         "key.fx.verify.termmenu", "key.fx.verify.colors", "key.fx.verify.smt",
         "key.fx.verify.loadingexit", "key.fx.verify.shortcuts", "key.fx.verify.inputfreeze",
         "key.fx.verify.sequentmenu", "key.fx.verify.dialogs", "key.fx.verify.prooftree",
-        "key.fx.verify.selectionhistory", "key.fx.verify.isabelle"]
+        "key.fx.verify.selectionhistory", "key.fx.verify.isabelle", "key.fx.verify.caching"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {

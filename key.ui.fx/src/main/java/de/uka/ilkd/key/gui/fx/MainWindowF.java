@@ -1090,6 +1090,19 @@ public final class MainWindowF {
                             report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
                 statusRight.setText(report);
             }
+            // caching (WP-4): run the proof-caching reference-search self test — the FX
+            // ReferenceSearchDialogF renders the per-goal reference table of the demo proof, a
+            // stub ClosedBy marks one row "reference available", the Apply button wiring fires
+            // the dialog listener and disables the buttons (no real caching copy is run)
+            if (System.getProperty("key.fx.verify.caching") != null) {
+                String report =
+                    runCachingVerification(stage, selectionModel.getSelectedProof(), mediator);
+                LOGGER.info("Proof caching verification: {}", report);
+                NotificationManagerF.getInstance()
+                        .notify("Proof caching verification: " + report,
+                            report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+                statusRight.setText(report);
+            }
             // shortcuts (P1): Swing-parity defaults, no collisions, override round trip and the
             // sequent view key path (Ctrl+F shows the search bar)
             if (System.getProperty("key.fx.verify.shortcuts") != null) {
@@ -2436,6 +2449,30 @@ public final class MainWindowF {
         } catch (ReflectiveOperationException | RuntimeException e) {
             LOGGER.error("Isabelle solver-launch verification failed", e);
             return "Isabelle solver-launch verification FAIL (" + e + ")";
+        }
+    }
+
+    /**
+     * caching (WP-4): runs the proof-caching reference-search self test
+     * ({@code key.fx.verify.caching}, run after the demo load like the other proof-dependent
+     * verify hooks). The harness lives in the {@code keyext.caching.fx} extension module, which
+     * is not a compile dependency of key.ui.fx (the dependency direction is reversed), so it is
+     * invoked reflectively; the report string ends in {@code PASS} or {@code FAIL}.
+     */
+    private static String runCachingVerification(javafx.stage.Window owner, Proof proof,
+            KeYMediatorF mediator) {
+        try {
+            Class<?> verify =
+                Class.forName("de.uka.ilkd.key.gui.plugins.caching.fx.CachingVerifyF");
+            Object report = verify
+                    .getMethod("run", javafx.stage.Window.class, Proof.class, KeYMediatorF.class)
+                    .invoke(null, owner, proof, mediator);
+            return (String) report;
+        } catch (ClassNotFoundException e) {
+            return "Proof caching verification SKIP (keyext.caching.fx not on the classpath)";
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            LOGGER.error("Proof caching verification failed", e);
+            return "Proof caching verification FAIL (" + e + ")";
         }
     }
 
