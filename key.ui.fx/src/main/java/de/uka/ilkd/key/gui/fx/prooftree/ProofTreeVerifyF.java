@@ -150,6 +150,18 @@ public final class ProofTreeVerifyF {
             problems.append("branch editing: ").append(branchReport[0]).append("; ");
         }
 
+        // WP-2: the renderer surface — the leaf goal icons (Swing renderLeaf), the notes marker
+        // + tooltip notes (renderNonLeaf defaultIcon) and the NodeInfoVisualizer attachment
+        // (the registration switches the node's marker to the window icon and re-renders the
+        // tree). Runs before the apply-strategy test (which mutates the proof)
+        String[] surfaceReport = { null };
+        runOnFx(() -> surfaceReport[0] = view.verifyRendererSurface());
+        if (surfaceReport[0] == null || !surfaceReport[0].endsWith("PASS")) {
+            problems.append("renderer surface: ").append(surfaceReport[0]).append("; ");
+        } else {
+            notes.append(' ').append(surfaceReport[0]);
+        }
+
         // C23 (WP-10): the popup's "Apply Strategy" + "Prune Proof" actions — the popup is
         // prepared on the clicked node (selection parked elsewhere first), the strategy must
         // apply rule applications below the clicked node and the prune must remove them. Runs
