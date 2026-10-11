@@ -153,10 +153,13 @@ run {
     //    purple renderer border on a real exploration step of the demo branch, the "Hide
     //    justification" toggle routing through the HIDE_INTERACTIVE_GOALS tree filter and the
     //    promptForTerm retry-loop accepting bad-then-good input)
+    //  * key.fx.verify.caching = any  (WP-4: run the proof-caching reference-search self test —
+    //    the FX ReferenceSearchDialogF renders the per-goal reference table of the demo proof,
+    //    a stub ClosedBy marks one row "reference available", the Apply button wiring fires the
+    //    dialog listener and disables the buttons; no real caching copy is run)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
-        "key.fx.verify.search", "key.fx.verify.sequentsearch", "key.fx.verify.treefilters",
         "key.fx.verify.search", "key.fx.verify.sequentsearch", "key.fx.verify.treefilters",
         "key.fx.verify.sequentsearchmodes", "key.fx.verify.updatehighlight",
         "key.fx.verify.notifications",
@@ -170,7 +173,7 @@ run {
         "key.fx.verify.loadingexit", "key.fx.verify.shortcuts", "key.fx.verify.inputfreeze",
         "key.fx.verify.sequentmenu", "key.fx.verify.dialogs", "key.fx.verify.prooftree",
         "key.fx.verify.selectionhistory", "key.fx.verify.isabelle",
-        "key.fx.verify.exploration"]
+        "key.fx.verify.exploration", "key.fx.verify.caching"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {
