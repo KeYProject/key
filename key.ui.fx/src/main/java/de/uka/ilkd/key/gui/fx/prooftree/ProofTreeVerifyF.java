@@ -134,6 +134,22 @@ public final class ProofTreeVerifyF {
             notes.append(' ').append(macroReport[0]);
         }
 
+        // WP-2: branch-label editing — the Swing isCellEditable gate (branch nodes with a parent
+        // only), the F2 path (tree.edit starts/cancels the cell editor) and the commit seam
+        // (GUIProofTreeModel.valueForPathChanged → GUIBranchNode.setLabel). Runs before the
+        // apply-strategy test (which mutates the proof); SKIPs when the demo proof has no
+        // editable branch (a fresh single-node load)
+        String[] branchReport = { null };
+        runOnFx(() -> branchReport[0] = view.verifyBranchEditing());
+        if (branchReport[0] == null || branchReport[0].startsWith("SKIP")
+                || branchReport[0].equals("no proof")) {
+            notes.append(" branchEdit ").append(branchReport[0]);
+        } else if (branchReport[0].endsWith("PASS")) {
+            notes.append(" branchEdit ").append(branchReport[0]);
+        } else {
+            problems.append("branch editing: ").append(branchReport[0]).append("; ");
+        }
+
         // C23 (WP-10): the popup's "Apply Strategy" + "Prune Proof" actions — the popup is
         // prepared on the clicked node (selection parked elsewhere first), the strategy must
         // apply rule applications below the clicked node and the prune must remove them. Runs

@@ -411,6 +411,11 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
         tree.setCellFactory(view -> new ProofTreeCell());
         tree.getSelectionModel().selectedItemProperty()
                 .addListener((obs, oldItem, newItem) -> handleTreeSelection(newItem));
+        // WP-2: the Swing tree is editable and a cell editor denies editing on all nodes except
+        // branch nodes whose node has a parent (ProofTreeView.java:243-270, DefaultTreeCellEditor);
+        // the F2 key binding of the JTree is the JavaFX TreeViewBehavior default F2 →
+        // tree.edit(selectedItem), gated per cell by ProofTreeCell.setEditable
+        tree.setEditable(true);
         setCenter(tree);
 
         createSearchBar();
@@ -2252,6 +2257,130 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
     }
 
     /**
+     * WP-2 (branch editing): whether the given entry is editable like Swing's cell editor
+     * {@code isCellEditable} (ProofTreeView.java:243-270): only branch entries whose node has a
+     * parent — the root branch ("Proof Tree") is denied.
+     */
+    private static boolean isEditableBranchEntry(Entry entry) {
+        return entry != null && entry.isBranch() && entry.node != null
+                && entry.node.parent() != null;
+    }
+
+    /**
+     * WP-2 (branch editing): applies a branch label edit — the Swing commit path
+     * {@code GUIProofTreeModel.valueForPathChanged → GUIBranchNode.setLabel →
+     * NodeInfo.setBranchLabel} (GUIProofTreeModel.java:398-405, GUIBranchNode.java:146-154).
+     * The tree is rebuilt afterwards (Swing re-renders the model after the edit) so the branch
+     * folder picks up the stored label. A {@code null} value is ignored.
+     */
+    private void commitBranchLabel(Entry entry, String newValue) {
+        if (entry == null || !entry.isBranch() || newValue == null) {
+            return;
+        }
+        entry.node.getNodeInfo().setBranchLabel(newValue);
+        FxUtil.runLater(this::refresh);
+    }
+
+    /**
+     * WP-2 verification (branch editing): asserts the Swing {@code isCellEditable} parity (the
+     * root branch is denied, a real branch is editable), exercises the F2 path
+     * ({@code tree.edit} starts and cancels the cell editor), commits a rename through the
+     * {@link #commitBranchLabel} seam, asserts the stored label and the rebuilt entry text, then
+     * restores the original label.
+     *
+     * @return a one-line report, {@code "... PASS"} / {@code "SKIP ..."} when the proof has no
+     *         editable branch
+     */
+    public String verifyBranchEditing() {
+        if (proof == null || tree.getRoot() == null) {
+            return "no proof";
+        }
+        StringBuilder problems = new StringBuilder();
+        if (isEditableBranchEntry(tree.getRoot().getValue())) {
+            problems.append("root branch editable; ");
+        }
+        TreeItem<Entry> branch = findEditableBranchItem(tree.getRoot());
+        if (branch == null) {
+            return "SKIP (no editable branch)";
+        }
+        Node node = branch.getValue().node();
+        String original = node.getNodeInfo().getBranchLabel();
+        // F2 path: TreeViewBehavior F2 → tree.edit(selectedItem) → ProofTreeCell.startEdit
+        tree.getSelectionModel().select(branch);
+        int row = tree.getRow(branch);
+        tree.scrollTo(row);
+        tree.layout();
+        tree.edit(branch);
+        TreeCell<Entry> cell = cellForItem(branch);
+        if (tree.getEditingItem() != branch) {
+            problems.append("editing did not start; ");
+        } else if (cell == null || !cell.isEditing() || !(cell.getGraphic() instanceof TextField)) {
+            problems.append("cell editor not shown; ");
+        } else {
+            tree.edit(null);
+            if (tree.getEditingItem() != null || cell.isEditing()) {
+                problems.append("editing did not cancel; ");
+            }
+        }
+        // the Swing commit path: valueForPathChanged → GUIBranchNode.setLabel
+        commitBranchLabel(branch.getValue(), "WP2 verify branch");
+        refresh();
+        if (!"WP2 verify branch".equals(node.getNodeInfo().getBranchLabel())) {
+            problems.append("label not stored; ");
+        } else {
+            TreeItem<Entry> after = findItem(tree.getRoot(), node);
+            if (after == null || after.getValue() == null
+                    || !after.getValue().displayText().contains("WP2 verify branch")) {
+                problems.append("rebuilt entry text mismatch; ");
+            }
+        }
+        // restore the original label so the demo proof stays clean
+        commitBranchLabel(branch.getValue(), original);
+        refresh();
+        if (!original.equals(node.getNodeInfo().getBranchLabel())) {
+            problems.append("restore failed; ");
+        }
+        boolean pass = problems.length() == 0;
+        return "rootEditable=false labelEdit="
+            + (pass ? "PASS" : "FAIL problems=[" + problems + "]");
+    }
+
+    /**
+     * @return the first editable branch entry below (and including) the given item, or
+     *         {@code null}
+     */
+    private static TreeItem<Entry> findEditableBranchItem(TreeItem<Entry> item) {
+        if (item == null) {
+            return null;
+        }
+        if (isEditableBranchEntry(item.getValue())) {
+            return item;
+        }
+        for (TreeItem<Entry> child : item.getChildren()) {
+            TreeItem<Entry> result = findEditableBranchItem(child);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return the rendered cell of the given tree item, or {@code null} when the row is not
+     *         realized (virtual flow)
+     */
+    @SuppressWarnings("unchecked")
+    private TreeCell<Entry> cellForItem(TreeItem<Entry> item) {
+        for (javafx.scene.Node n : tree.lookupAll(".tree-cell")) {
+            if (n instanceof TreeCell<?> cell && cell.getIndex() >= 0
+                    && cell.getTreeItem() == item) {
+                return (TreeCell<Entry>) cell;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns the branch label of the given node, falling back to {@code Case <n>} and storing it
      * on the node like {@code GUIAbstractTreeNode.ensureBranchLabelIsSet}.
      */
@@ -2654,12 +2783,80 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
         private String stateClass;
         private boolean matched;
 
+        /** the branch-label editor (WP-2 branch editing, Swing {@code DefaultTreeCellEditor}). */
+        private TextField branchEditor;
+
         @Override
         protected void updateItem(Entry item, boolean empty) {
             super.updateItem(item, empty);
             if (!getStyleClass().contains("proof-tree-cell")) {
                 getStyleClass().add("proof-tree-cell");
             }
+            if (isEditing()) {
+                // keep the branch-label editor visible (the re-render triggered by the edit
+                // state must not replace it)
+                return;
+            }
+            // WP-2: Swing DefaultTreeCellEditor.isCellEditable (ProofTreeView.java:243-270) —
+            // only branch nodes whose node has a parent are editable; the per-cell editable flag
+            // makes TreeCell.startEdit (and therefore the F2 binding) deny the rest
+            setEditable(item != null && item.isBranch() && item.node != null
+                    && item.node.parent() != null);
+            renderStatic(item, empty);
+        }
+
+        @Override
+        public void startEdit() {
+            super.startEdit();
+            if (!isEditing()) {
+                // denied by the editable gate (Swing isCellEditable parity)
+                return;
+            }
+            if (branchEditor == null) {
+                branchEditor = new TextField();
+                branchEditor.setOnAction(event -> commitBranchEditor());
+                branchEditor.setOnKeyPressed(event -> {
+                    if (KeyCode.ESCAPE.equals(event.getCode())) {
+                        event.consume();
+                        cancelEdit();
+                    }
+                });
+                // Swing delegateView.setInvokesStopCellEditing(true): a focus loss commits
+                branchEditor.focusedProperty().addListener((obs, was, now) -> {
+                    if (!now && isEditing()) {
+                        commitBranchEditor();
+                    }
+                });
+            }
+            setText(null);
+            setTooltip(null);
+            branchEditor.setText(getItem() == null ? "" : getItem().displayText());
+            setGraphic(branchEditor);
+            branchEditor.selectAll();
+            branchEditor.requestFocus();
+        }
+
+        @Override
+        public void cancelEdit() {
+            super.cancelEdit();
+            // restore the static rendering (the edit state re-render keeps the static content)
+            renderStatic(getItem(), getItem() == null);
+        }
+
+        /**
+         * Ends the editing state and applies the typed label through the Swing commit seam
+         * ({@code GUIProofTreeModel.valueForPathChanged → GUIBranchNode.setLabel}).
+         */
+        private void commitBranchEditor() {
+            Entry entry = getItem();
+            String text = branchEditor.getText();
+            cancelEdit();
+            if (entry != null && entry.isBranch()) {
+                commitBranchLabel(entry, text);
+            }
+        }
+
+        private void renderStatic(Entry item, boolean empty) {
             if (stateClass != null) {
                 getStyleClass().remove(stateClass);
                 stateClass = null;
@@ -2671,6 +2868,7 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             if (empty || item == null) {
                 setText(null);
                 setTooltip(null);
+                setGraphic(null);
                 return;
             }
             setText(item.displayText());
@@ -2680,6 +2878,7 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             if (matched) {
                 getStyleClass().add("proof-tree-match");
             }
+            setGraphic(null);
             // menu: MP3a — proof-tree tooltips are gated by the shared ViewSettings flag "Show
             // Tooltips in Proof Tree" (Swing ProofTreeView.getToolTipText,
             // ProofTreeView.java:195-217 renders no tooltip unless isShowProofTreeTooltips()).
