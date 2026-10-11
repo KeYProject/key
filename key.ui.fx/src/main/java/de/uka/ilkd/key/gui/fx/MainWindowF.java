@@ -4108,6 +4108,89 @@ public final class MainWindowF {
         logMenuParity("GoalBack", verifyGoalBackLabel());
         // P3b/B15: assert the Goal Back / Prune enablement of the menu items and toolbar buttons
         verifyGoalBackPruneEnablement();
+        // WP-3: the View-menu Pretty Print / Unicode toggles — the real CheckMenuItems flip the
+        // ViewSettings + the NotationInfo statics and re-render the sequent (Swing
+        // PrettyPrintToggleAction/UnicodeToggleAction); the leg asserts the visible effect
+        logMenuParity("PrettyUnicode", verifyPrettyUnicode());
+    }
+
+    /**
+     * WP-3: headless self test of the View-menu Pretty Print / Unicode toggles ({@code
+     * key.fx.verify.menuparity}): the items are wired to
+     * {@code ProofIndependentSettings...ViewSettings} exactly like the Swing actions (Swing
+     * PrettyPrintToggleAction.actionPerformed: set the {@code NotationInfo} static BEFORE the
+     * ViewSettings change, then {@code makePrettyView}; UnicodeToggleAction: disabled without
+     * pretty printing) — the leg fires the real {@code CheckMenuItem}s and asserts the mirrored
+     * state plus the visible effect on the printed sequent text. The previous state is restored
+     * afterwards.
+     *
+     * @return {@code "PASS - ..."} or {@code "FAIL - ..."}
+     */
+    private String verifyPrettyUnicode() {
+        ViewSettings viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        boolean originalPretty = viewSettings.isUsePretty();
+        boolean originalUnicode = viewSettings.isUseUnicode();
+        MenuBar bar = buildMenuBar();
+        Menu viewMenu = bar.getMenus().stream()
+                .filter(m -> "View".equals(m.getText())).findFirst().orElse(null);
+        CheckMenuItem pretty = findCheckMenuItem(viewMenu, "Pretty Print");
+        CheckMenuItem unicode = findCheckMenuItem(viewMenu, "Unicode Symbols");
+        if (pretty == null || unicode == null) {
+            return "FAIL - View menu lacks the Pretty Print/Unicode items";
+        }
+        List<String> problems = new ArrayList<>();
+        String text0 = sequentView.printedText();
+        try {
+            // pretty printing off: the settings, the NotationInfo static and the printed text
+            // must all follow (the item's onAction fires the same refreshPrettyViews path)
+            pretty.setSelected(false);
+            pretty.fire();
+            if (viewSettings.isUsePretty() || NotationInfo.DEFAULT_PRETTY_SYNTAX) {
+                problems.add("pretty=off not mirrored");
+            }
+            String textPrettyOff = sequentView.printedText();
+            if (text0 == null || textPrettyOff == null || text0.equals(textPrettyOff)) {
+                problems.add("pretty=off no visible effect");
+            }
+            // the Unicode item is disabled without pretty printing (Swing setEnabled(usePretty))
+            if (!unicode.isDisable()) {
+                problems.add("unicode enabled without pretty");
+            }
+            // pretty printing on again
+            pretty.setSelected(true);
+            pretty.fire();
+            if (!viewSettings.isUsePretty() || !NotationInfo.DEFAULT_PRETTY_SYNTAX) {
+                problems.add("pretty=on not mirrored");
+            }
+            if (!unicode.isDisable()) {
+                problems.add("unicode still disabled with pretty");
+            }
+            // unicode off/on with pretty printing enabled
+            String textUnicodeOn = sequentView.printedText();
+            unicode.setSelected(false);
+            unicode.fire();
+            if (viewSettings.isUseUnicode() || NotationInfo.DEFAULT_UNICODE_ENABLED) {
+                problems.add("unicode=off not mirrored");
+            }
+            String textUnicodeOff = sequentView.printedText();
+            unicode.setSelected(true);
+            unicode.fire();
+            if (!viewSettings.isUseUnicode()) {
+                problems.add("unicode=on not mirrored");
+            }
+            boolean unicodeEffect = textUnicodeOn != null && textUnicodeOff != null
+                    && !textUnicodeOn.equals(textUnicodeOff);
+            boolean ok = problems.isEmpty();
+            return (ok && unicodeEffect ? "PASS" : "FAIL") + " - pretty[" + originalPretty + "->"
+                + viewSettings.isUsePretty() + "] unicodeEffect=" + unicodeEffect
+                + (ok ? "" : " problems=" + problems);
+        } finally {
+            // restore the state the demo was loaded with
+            pretty.setSelected(originalPretty);
+            pretty.fire();
+            unicode.setSelected(originalUnicode);
+            unicode.fire();
+        }
     }
 
     /**
@@ -4308,6 +4391,11 @@ public final class MainWindowF {
             }
         }
         return null;
+    }
+
+    private static CheckMenuItem findCheckMenuItem(Menu menu, String text) {
+        MenuItem item = findMenuItem(menu, text);
+        return item instanceof CheckMenuItem check ? check : null;
     }
 
     private void logMenuParity(String menuName, String report) {
