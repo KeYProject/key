@@ -108,6 +108,12 @@ public final class KeyStrokeManagerF {
         defineDefault("de.uka.ilkd.key.macros.UpdateSimplificationMacro", modifier() + "SHIFT+L");
         defineDefault("de.uka.ilkd.key.macros.IntegerSimplificationMacro", modifier() + "SHIFT+I");
         defineDefault("de.uka.ilkd.key.macros.SMTPreparationMacro", modifier() + "SHIFT+Y");
+        // testgen (WP-7): the Swing TestgenExtension defines the TestGenMacro default shortcut
+        // via KeyStrokeSettings.defineDefault with MULTI_KEY_MASK (Ctrl+Shift+T,
+        // TestgenExtension.java:51-52). The action id is the real macro FQN — the
+        // key.core.testgen services resource lists a stale FQN, the accelerator lookup in
+        // ProofMacroMenuF/SequentViewF uses macro.getClass().getName().
+        defineDefault("de.uka.ilkd.key.testgen.macros.TestGenMacro", modifier() + "SHIFT+T");
 
         defineDefault("de.uka.ilkd.key.gui.actions.SearchInProofTreeAction",
             modifier() + "SHIFT+F");

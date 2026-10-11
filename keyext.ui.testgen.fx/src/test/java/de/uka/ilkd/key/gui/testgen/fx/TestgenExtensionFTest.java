@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.gui.testgen.fx;
 
 import de.uka.ilkd.key.gui.fx.extension.api.KeYGuiExtensionF;
+import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
 
 import org.junit.jupiter.api.Test;
 
@@ -60,6 +61,18 @@ class TestgenExtensionFTest {
             "the two plain action buttons of the Swing JToolBar");
         assertInstanceOf(KeYGuiExtensionF.StartupF.class, extension,
             "Swing Startup hook: window capture at app startup");
+    }
+
+    @Test
+    void testGenMacroShortcutBinding() {
+        // WP-7: the Swing TestgenExtension default (KeyStrokeSettings.defineDefault with
+        // MULTI_KEY_MASK = Ctrl+Shift+T) is registered in the shared KeyStrokeManagerF under the
+        // real macro FQN; the exact combination may be overridden by the user's shared
+        // keystrokes.json, so only the presence is asserted here.
+        assertTrue(
+            KeyStrokeManagerF.getInstance()
+                    .binding("de.uka.ilkd.key.testgen.macros.TestGenMacro").isPresent(),
+            "the TestGenMacro default shortcut must be registered");
     }
 
     @Test
