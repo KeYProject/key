@@ -23,10 +23,10 @@ import org.slf4j.LoggerFactory;
  * — depending on the {@code ProofCachingSettings.prune} setting — the referenced steps are
  * copied into the caching proof.
  * <p>
- * <b>KNOWN-SIMPLIFIED:</b> the Swing original iterates {@code mediator.getCurrentlyOpenedProofs()}
- * (CachingPruneHandler.java:51); the FX port iterates the proofs tracked by the owning
- * {@link CachingExtensionF} instead (every proof selected at least once — the FX load path
- * selects each loaded proof, so this covers the currently opened proofs in practice). Proof
+ * The scanned proofs are the mediator's currently opened proofs (Swing parity,
+ * CachingPruneHandler.java:51 — RESOLVED WP-4, KNOWN-SIMPLIFIED
+ * {@code CachingPruneHandlerF.java:26}: {@link CachingExtensionF#openedProofs()} feeds
+ * {@code mediator.getCurrentlyOpenedProofs()}). Proof
  * mutations triggered by a prune are engine operations and run on the caller (prover) thread,
  * like in Swing.
  *
@@ -52,7 +52,7 @@ final class CachingPruneHandlerF implements ProofTreeListener {
     public void proofIsBeingPruned(ProofTreeEvent event) {
         Proof proofToBePruned = event.getSource();
         // check other proofs for any references to this proof
-        for (Proof p : extension.trackedProofsUnmodifiable()) {
+        for (Proof p : extension.openedProofs()) {
             for (Goal g : p.closedGoals()) {
                 ClosedBy c = g.node().lookup(ClosedBy.class);
                 if (c == null || c.proof() != proofToBePruned) {
