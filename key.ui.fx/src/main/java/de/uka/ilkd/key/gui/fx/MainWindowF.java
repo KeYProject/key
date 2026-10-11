@@ -513,6 +513,22 @@ public final class MainWindowF {
         // refreshGoalBackPrune cover the controls not yet built.
         mediator.autoModeRunningProperty()
                 .addListener((obs, old, running) -> refreshGoalBackPrune());
+        // WP-1: the auto-mode context API (KeYMediatorF.initiateAutoMode/finishAutoMode) runs
+        // auto modes on foreign (non-selected) proofs, e.g. the caching copy-on-dispose — the
+        // Swing ui.notifyAutoModeBeingStarted/notifyAutomodeStopped reach MainWindow's freeze
+        // via the ProverTaskListener dispatch (MainWindow.java:934/946). The FX observable
+        // property is the notification channel (the core AbstractProofControl.
+        // fireAutoModeStarted is protected and unreachable from the mediator), so the freeze
+        // follows the property as well; for the normal runs this is idempotent with the
+        // control-event-driven freeze of autoModeUiListener below.
+        mediator.autoModeRunningProperty()
+                .addListener((obs, was, running) -> {
+                    if (running) {
+                        freezeExceptAutoModeButton();
+                    } else {
+                        unfreezeExceptAutoModeButton();
+                    }
+                });
 
         buildDockables();
         workspace.setDefaultLayout(defaultLayout());
@@ -3073,10 +3089,17 @@ public final class MainWindowF {
      * covers the main area only — the menu bar, the toolbar (with the stop controls) and the
      * status bar stay interactive.
      * <p>
-     * KNOWN-SIMPLIFIED: Swing's glass pane covered the whole content pane and re-delivered
-     * events only to components marked {@code isAutoButton} (the automation/stop buttons and
-     * the status-line abort button); the FX overlay instead covers only the views area, so the
-     * menus stay clickable while frozen (their actions are disabled during auto mode anyway).
+     * Glass-pane scope decision (WP-1, KNOWN-SIMPLIFIED row {@code MainWindowF.java:2659},
+     * closed WONT-REPLICATE): Swing's glass pane covered the whole content pane and
+     * re-delivered events only to components marked {@code isAutoButton} (the automation/stop
+     * buttons and the status-line abort button), so the menu bar was blocked while frozen. The
+     * FX overlay keeps the menu bar, toolbar and status bar clickable — deliberately: their
+     * proof actions are disabled during auto mode anyway (the enablement binds to
+     * {@code mediator.autoModeRunningProperty()}), so blocking clicks on inert controls adds no
+     * protection; the automation macro items are enabled during auto mode by Swing parity so a
+     * click stops the run (MacroAutomationAction.java:48-61), and blocking them would regress
+     * that intent; and the status bar must stay live for the progress display. The stop
+     * controls the Swing glass pane kept live are the same controls the FX toolbar keeps live.
      */
     private void freezeExceptAutoModeButton() {
         inputBlocker.setVisible(true);
