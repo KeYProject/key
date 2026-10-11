@@ -13,6 +13,8 @@ import javafx.beans.property.ReadOnlyBooleanWrapper;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.gui.fx.UserActionListenerF;
+import de.uka.ilkd.key.gui.fx.actions.useractions.UserActionF;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -116,6 +118,12 @@ public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
      * KeYMediator.java:60).
      */
     private final List<GUIListenerF> guiListeners = new CopyOnWriteArrayList<>();
+
+    /**
+     * WP-7 — the registered user-action listeners (Swing {@code KeYMediator
+     * .userActionListeners}, KeYMediator.java:815-825).
+     */
+    private final List<UserActionListenerF> userActionListeners = new CopyOnWriteArrayList<>();
 
     /**
      * WP-1 — user-defined data / extension-object registry (Swing
@@ -467,6 +475,28 @@ public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
      */
     public void removeGUIListener(GUIListenerF listener) {
         guiListeners.remove(listener);
+    }
+
+    /**
+     * WP-7 — adds another listener for user actions (Swing
+     * {@code KeYMediator.addUserActionListener}, KeYMediator.java:815-818).
+     *
+     * @param listener the {@link UserActionListenerF} to be added
+     */
+    public void addUserActionListener(UserActionListenerF listener) {
+        userActionListeners.add(listener);
+    }
+
+    /**
+     * WP-7 — notifies all user action listeners about a performed action (Swing
+     * {@code KeYMediator.fireActionPerformed}, KeYMediator.java:824-827).
+     *
+     * @param action the user action
+     */
+    public void fireActionPerformed(UserActionF action) {
+        for (UserActionListenerF listener : userActionListeners) {
+            listener.actionPerformed(action);
+        }
     }
 
     /**
