@@ -112,6 +112,7 @@ import de.uka.ilkd.key.gui.fx.drawer.DrawerF;
 import de.uka.ilkd.key.gui.fx.drawer.DrawerItemF;
 import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
 import de.uka.ilkd.key.gui.fx.extension.api.KeYGuiExtensionF;
+import de.uka.ilkd.key.gui.fx.extension.contrib.ParallelProverStatusIndicatorF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.goallist.GoalListViewF;
 import de.uka.ilkd.key.gui.fx.help.HelpFacadeF;
@@ -2723,6 +2724,16 @@ public final class MainWindowF {
         // add more, so the assertion is a membership check on the built status bar
         pass &= statusControls.size() >= 2
                 && statusBar.getChildren().containsAll(statusControls);
+
+        // WP-3 — the parallel-prover status indicator: the Swing-parity "SC"/"MT Nx" button
+        // (left-click toggle through the real handler + the right-click worker-count menu)
+        KeYGuiExtensionF proverExtension = KeYGuiExtensionFacadeF.getExtensions().stream()
+                .filter(e -> e instanceof ParallelProverStatusIndicatorF).findFirst().orElse(null);
+        String proverReport = proverExtension instanceof ParallelProverStatusIndicatorF prover
+                ? prover.verifyProverMode()
+                : "MISSING";
+        sb.append(" proverMode=").append(proverReport);
+        pass &= proverReport.endsWith("PASS");
 
         MenuBar menuBar = buildMenuBar();
         boolean heatmapMenu =
