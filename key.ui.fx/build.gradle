@@ -148,6 +148,10 @@ run {
     //    the FX progress dialog renders with fake solvers, cancellation works, the Info window
     //    opens; no real Isabelle installation is needed and the scala-isabelle backend stays
     //    unloaded)
+    //  * key.fx.verify.heatmap = any  (WP-2: run the heatmap overlay self test — the four
+    //    ViewSettings modes of the age heatmap render heat rectangles behind the printed sequent,
+    //    the disabled mode shows none; needs a demo proof with rule applications, e.g.
+    //    strassen.auto.0.proof, and restores the persisted options afterwards)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
@@ -164,7 +168,7 @@ run {
         "key.fx.verify.termmenu", "key.fx.verify.colors", "key.fx.verify.smt",
         "key.fx.verify.loadingexit", "key.fx.verify.shortcuts", "key.fx.verify.inputfreeze",
         "key.fx.verify.sequentmenu", "key.fx.verify.dialogs", "key.fx.verify.prooftree",
-        "key.fx.verify.selectionhistory", "key.fx.verify.isabelle"]
+        "key.fx.verify.selectionhistory", "key.fx.verify.isabelle", "key.fx.verify.heatmap"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {

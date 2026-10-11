@@ -1058,6 +1058,18 @@ public final class MainWindowF {
                         .notify("Viewport line width verification: " + lwReport,
                             lwReport.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
             }
+            if (System.getProperty("key.fx.verify.heatmap") != null) {
+                // heatmap (WP-2): render the age heatmap into the sequent view — the four
+                // ViewSettings modes (sf/terms × age/newest) produce heat rectangles behind the
+                // printed text, disabled shows none; run with a demo proof that has rule
+                // applications (e.g. strassen.auto.0.proof)
+                String report = sequentView.verifyHeatmap();
+                LOGGER.info("Heatmap verification: {}", report);
+                NotificationManagerF.getInstance()
+                        .notify("Heatmap verification: " + report,
+                            report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+                statusRight.setText(report);
+            }
             if (System.getProperty("key.fx.verify.sequentsearch") != null
                     && System.getProperty("key.fx.demo.autoprove.live") == null) {
                 // without the live auto mode the sequent at load is final; with the live mode
