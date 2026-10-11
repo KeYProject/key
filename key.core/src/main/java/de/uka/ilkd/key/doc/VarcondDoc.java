@@ -31,7 +31,7 @@ import com.google.common.collect.Streams;
 public class VarcondDoc extends AbstractDocGenerator {
 
     public static void main(String[] args) throws Exception {
-        new VarcondDoc().run(args);
+        new VarcondDoc().run(args[0], args[1]);
     }
 
     @Override
