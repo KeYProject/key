@@ -50,6 +50,8 @@ import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
+import de.uka.ilkd.key.gui.fx.nodeinfo.NodeInfoVisualizerF;
+import de.uka.ilkd.key.gui.fx.nodeinfo.NodeInfoVisualizerListenerF;
 import de.uka.ilkd.key.gui.fx.nodeviews.ProofMacroMenuF;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -404,6 +406,35 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
     };
 
     /**
+     * WP-2 (NodeInfoVisualizer): updates the affected cells whenever a node-info visualizer
+     * (e.g. the origin-term-labels window) is registered or unregistered — Swing
+     * {@code ProofTreeView.nodeInfoVisListener} (ProofTreeView.java:150-171) re-renders the
+     * affected subtree via {@code delegateModel.updateTree(vis.getNode())}; the FX counterpart
+     * re-renders the visible cells (the marker icon of the affected rows re-evaluates
+     * {@code NodeInfoVisualizerF.hasInstances}).
+     */
+    private final NodeInfoVisualizerListenerF nodeInfoVisualizerListener =
+        new NodeInfoVisualizerListenerF() {
+            @Override
+            public void visualizerRegistered(NodeInfoVisualizerF vis) {
+                handleNodeInfoVisualizerChange(vis);
+            }
+
+            @Override
+            public void visualizerUnregistered(NodeInfoVisualizerF vis) {
+                handleNodeInfoVisualizerChange(vis);
+            }
+        };
+
+    private void handleNodeInfoVisualizerChange(NodeInfoVisualizerF vis) {
+        Node node = vis.getNode();
+        if (node == null || node.proof() == null || proof == null || node.proof() != proof) {
+            return;
+        }
+        FxUtil.runLater(tree::refresh);
+    }
+
+    /**
      * Creates an empty proof tree view.
      */
     public ProofTreeViewF() {
@@ -416,6 +447,10 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
         // the F2 key binding of the JTree is the JavaFX TreeViewBehavior default F2 →
         // tree.edit(selectedItem), gated per cell by ProofTreeCell.setEditable
         tree.setEditable(true);
+        // WP-2 (NodeInfoVisualizer): the Swing view registers the listener in the constructor and
+        // removes it in dispose (ProofTreeView.java:309/:458); the FX view lives for the whole
+        // application lifetime, so the listener stays registered
+        NodeInfoVisualizerF.addListener(nodeInfoVisualizerListener);
         setCenter(tree);
 
         createSearchBar();
@@ -2381,6 +2416,120 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
     }
 
     /**
+     * WP-2 verification (renderer surface): asserts the leaf goal icons (Swing
+     * {@code renderLeaf}), the notes marker ({@code renderNonLeaf} defaultIcon: the edit-file
+     * icon) with the tooltip notes, and the NodeInfoVisualizer attachment — registering a
+     * visualizer switches the node's marker to the window icon (Swing {@code WINDOW_ICON} via
+     * {@code NodeInfoVisualizer.hasInstances}), the icon is actually rendered into the cell, and
+     * {@code dispose()} clears the marker again. Restores the node state.
+     *
+     * @return a one-line report, {@code "... PASS"} if every check passes
+     */
+    public String verifyRendererSurface() {
+        if (proof == null || tree.getRoot() == null) {
+            return "no proof";
+        }
+        StringBuilder problems = new StringBuilder();
+        StringBuilder ok = new StringBuilder();
+
+        // the goal-state icons of the leaf rows (Swing renderLeaf: key hole variants)
+        int leafIcons = countLeafIcons(tree.getRoot());
+        if (leafIcons == 0) {
+            problems.append("no leaf goal icons; ");
+        } else {
+            ok.append("leafIcons=").append(leafIcons);
+        }
+
+        TreeItem<Entry> inner = findFirstNodeItem(tree.getRoot(), false);
+        if (inner == null) {
+            problems.append("no inner node row; ");
+        } else {
+            Node node = inner.getValue().node();
+            String originalNotes = node.getNodeInfo().getNotes();
+            try {
+                // the notes marker (Swing renderNonLeaf defaultIcon: editFile) + tooltip notes
+                node.getNodeInfo().setNotes("WP2 verify note");
+                tree.refresh();
+                TreeItem<Entry> refreshed = findItem(tree.getRoot(), node);
+                if (refreshed == null) {
+                    problems.append("node row lost; ");
+                } else {
+                    if (markerKey(refreshed.getValue()) != IconFactoryF.Key.EDIT) {
+                        problems.append("notes marker missing; ");
+                    }
+                    if (!notesOf(node).contains("WP2 verify note")) {
+                        problems.append("notes tooltip text missing; ");
+                    }
+                    // WP-2 (NodeInfoVisualizer): the visualizer registration switches the marker
+                    // to the window icon (Swing WINDOW_ICON), the listener re-renders the tree
+                    NodeInfoVisualizerF visualizer =
+                        new NodeInfoVisualizerF(node, "WP2 verify visualizer", "verify") {
+                        };
+                    if (markerKey(refreshed.getValue()) != IconFactoryF.Key.NODE_INFO_WINDOW) {
+                        problems.append("visualizer marker missing; ");
+                    }
+                    tree.refresh();
+                    TreeItem<Entry> reRefreshed = findItem(tree.getRoot(), node);
+                    TreeCell<Entry> cell = reRefreshed == null ? null : cellForItem(reRefreshed);
+                    if (cell == null || cell.getGraphic() == null) {
+                        problems.append("visualizer icon not rendered; ");
+                    } else {
+                        ok.append(" nodeInfoVisualizer=PASS");
+                    }
+                    visualizer.dispose();
+                    if (NodeInfoVisualizerF.hasInstances(node)) {
+                        problems.append("visualizer not unregistered; ");
+                    }
+                    if (markerKey(refreshed.getValue()) == IconFactoryF.Key.NODE_INFO_WINDOW) {
+                        problems.append("visualizer marker stale after dispose; ");
+                    }
+                }
+            } finally {
+                node.getNodeInfo().setNotes(originalNotes);
+                tree.refresh();
+            }
+        }
+        boolean pass = problems.length() == 0;
+        return ok + " " + (pass ? "PASS" : "FAIL problems=[" + problems + "]");
+    }
+
+    /** @return the number of leaf rows whose Swing-parity goal icon is rendered */
+    private int countLeafIcons(TreeItem<Entry> item) {
+        int count = 0;
+        if (item.getValue() != null && !item.getValue().isBranch() && !item.getValue().isOssChild()
+                && item.getValue().node.leaf() && markerKey(item.getValue()) != null) {
+            count++;
+        }
+        for (TreeItem<Entry> child : item.getChildren()) {
+            count += countLeafIcons(child);
+        }
+        return count;
+    }
+
+    /**
+     * @param wantLeaf {@code true} for the first leaf row, {@code false} for the first inner
+     *        (rule application) row
+     * @return the first matching node entry below (and including) the given item, or {@code null}
+     */
+    private static TreeItem<Entry> findFirstNodeItem(TreeItem<Entry> item, boolean wantLeaf) {
+        if (item == null) {
+            return null;
+        }
+        Entry entry = item.getValue();
+        if (entry != null && !entry.isBranch() && !entry.isOssChild()
+                && entry.node.leaf() == wantLeaf) {
+            return item;
+        }
+        for (TreeItem<Entry> child : item.getChildren()) {
+            TreeItem<Entry> result = findFirstNodeItem(child, wantLeaf);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Returns the branch label of the given node, falling back to {@code Case <n>} and storing it
      * on the node like {@code GUIAbstractTreeNode.ensureBranchLabelIsSet}.
      */
@@ -2773,6 +2922,118 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
 
     // -----------------------------------------------------------------------
 
+    // -----------------------------------------------------------------------
+    // WP-2: the renderer surface of the tree cells (Swing ProofTreeView renderer
+    // renderBranch/renderLeaf/renderNonLeaf, ProofTreeView.java:1280-1424): the goal-state
+    // icons, the marker icons (open node-info visualizer, notes, useless/interactive/script
+    // rule applications) and the tooltip notes
+    // -----------------------------------------------------------------------
+
+    /**
+     * @return the icon of the given entry (the Swing renderer's {@code style.icon}), or
+     *         {@code null}. Swing paints the state color into the icon images; the FX icons use
+     *         the neutral {@code key-icon} fill, the goal state is conveyed by the cell's text
+     *         color class. The goal-state glyphs mirror the Swing constants: closed goal →
+     *         {@code GOAL_CLOSED} (CHECK), cached-closed → LINK (Swing {@code closed-cached.png}),
+     *         linked/interactive/open key holes keep the existing FX key assignments.
+     */
+    private javafx.scene.Node markerIcon(Entry item) {
+        IconFactoryF.Key key = markerKey(item);
+        return key == null ? null : IconFactoryF.createIcon(key);
+    }
+
+    /**
+     * @return the marker icon key the Swing renderer would paint for the entry (the inverse gap:
+     *         {@code null} when Swing paints no icon), or the verification sentinel
+     */
+    IconFactoryF.Key markerKey(Entry item) {
+        if (item.isOssChild() || proof == null) {
+            return null;
+        }
+        Node node = item.node;
+        if (item.isBranch()) {
+            // Swing renderBranch: a branch folder with at least one linked open goal below
+            return hasLinkedGoalBelow(node) ? IconFactoryF.Key.LINKED_FOLDER : null;
+        }
+        if (node.leaf()) {
+            // Swing renderLeaf: getOpenGoal is a linear scan; a closed leaf has none, skip there
+            Goal goal = node.isClosed() ? null : proof.getOpenGoal(node);
+            if (goal == null || node.isClosed()) {
+                return node.lookup(ClosedBy.class) != null ? IconFactoryF.Key.NODE_INFO_WINDOW
+                        : IconFactoryF.Key.GOAL_CLOSED;
+            }
+            if (goal.isLinked()) {
+                return IconFactoryF.Key.KEY_HOLE_LINKED;
+            }
+            if (!goal.isAutomatic()) {
+                return IconFactoryF.Key.KEY_HOLE_INTERACTIVE;
+            }
+            return IconFactoryF.Key.KEY_HOLE;
+        }
+        // Swing renderNonLeaf defaultIcon priority: an open node-info visualizer, notes, a
+        // useless / interactive / script rule application
+        if (NodeInfoVisualizerF.hasInstances(node)) {
+            return IconFactoryF.Key.NODE_INFO_WINDOW;
+        }
+        if (node.getNodeInfo().getNotes() != null) {
+            return IconFactoryF.Key.EDIT;
+        }
+        if (node.getNodeInfo().isUselessApplication()) {
+            return IconFactoryF.Key.USELESS_APP;
+        }
+        if (node.getNodeInfo().getInteractiveRuleApplication()) {
+            return IconFactoryF.Key.INTERACTIVE_APP;
+        }
+        if (node.getNodeInfo().getScriptRuleApplication()) {
+            return IconFactoryF.Key.SCRIPT_APP;
+        }
+        return null;
+    }
+
+    /**
+     * Whether some open goal below {@code branchRoot} is linked (Swing
+     * {@code ProofTreeView.hasLinkedGoalBelow}, ProofTreeView.java:1311-1330: iterate the proof's
+     * open goals and walk the ancestors of the linked ones instead of a breadth-first search
+     * over the whole subtree).
+     */
+    private boolean hasLinkedGoalBelow(Node branchRoot) {
+        if (proof == null) {
+            return false;
+        }
+        for (Goal g : proof.openGoals()) {
+            if (g.isLinked() && isSelfOrAncestor(branchRoot, g.node())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** Whether {@code ancestor} equals {@code descendant} or is one of its transitive parents. */
+    private static boolean isSelfOrAncestor(Node ancestor, Node descendant) {
+        for (Node n = descendant; n != null; n = n.parent()) {
+            if (n == ancestor) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param node the node to check
+     * @return the notes of the node and its ancestors, formatted for the tooltip (Swing
+     *         {@code style.tooltip.addNotes})
+     */
+    private static String notesOf(Node node) {
+        StringBuilder notes = new StringBuilder();
+        for (Node n = node; n != null; n = n.parent()) {
+            String note = n.getNodeInfo().getNotes();
+            if (note != null && !note.isEmpty()) {
+                notes.append(notes.length() > 0 ? "\n" : "").append("Notes: ").append(note);
+            }
+        }
+        return notes.toString();
+    }
+
     /**
      * The tree cell rendering: text plus the goal-state style class (Swing colors map onto the
      * theme's CSS properties). Matching rows are highlighted while a search is active. The
@@ -2878,15 +3139,14 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             if (matched) {
                 getStyleClass().add("proof-tree-match");
             }
-            setGraphic(null);
+            // WP-2 (renderer surface): the goal-state and marker icons of the Swing renderer
+            // (ProofTreeView.renderLeaf/renderBranch/renderNonLeaf, ProofTreeView.java:1280-1424)
+            setGraphic(markerIcon(item));
             // menu: MP3a — proof-tree tooltips are gated by the shared ViewSettings flag "Show
             // Tooltips in Proof Tree" (Swing ProofTreeView.getToolTipText,
             // ProofTreeView.java:195-217 renders no tooltip unless isShowProofTreeTooltips()).
             // The cell re-consults the flag on every updateItem; the View-menu toggle triggers a
-            // refresh() (MainWindowF.buildViewMenu) so the change applies immediately. Minimal
-            // fidelity: the Swing renderer builds a rich styled tooltip (rule name, position in
-            // occurrence, notes, rendered by ProofTreeView.renderTooltip :1202-1219); the FX cell
-            // shows the node/rule name only.
+            // refresh() (MainWindowF.buildViewMenu) so the change applies immediately.
             if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                     .isShowProofTreeTooltips()) {
                 setTooltip(new Tooltip(tooltipText(item)));
@@ -2935,10 +3195,24 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             // applied rule, ProofTreeView.java:1389), falling back to the plain node serial.
             Node node = item.node;
             RuleApp appliedRule = node.getAppliedRuleApp();
+            StringBuilder text = new StringBuilder();
             if (appliedRule != null) {
-                return "Node " + node.serialNr() + ": " + appliedRule.rule().name();
+                text.append("Node ").append(node.serialNr()).append(": ")
+                        .append(appliedRule.rule().name());
+            } else {
+                text.append("Node ").append(node.serialNr());
             }
-            return "Node " + node.serialNr();
+            // WP-2 (renderer surface): the Swing tooltip carries the node's notes and the
+            // "useless application" analysis (ProofTreeView.renderLeaf/renderNonLeaf →
+            // style.tooltip.addNotes, ProofTreeView.java:1374-1377/:1400)
+            String notes = notesOf(node);
+            if (!notes.isEmpty()) {
+                text.append('\n').append(notes);
+            }
+            if (node.getNodeInfo().isUselessApplication()) {
+                text.append("\nAnalysis: Not required to close proof");
+            }
+            return text.toString();
         }
     }
 }

@@ -69,7 +69,15 @@ public final class IconFactoryF {
         WARNING_UNSOUND(FontAwesomeSolid.EXCLAMATION_TRIANGLE, "key-icon-error"),
         SEARCH_HIGHLIGHT(FontAwesomeSolid.HIGHLIGHTER),
         SEARCH_HIDE(FontAwesomeSolid.LOW_VISION),
-        SEARCH_REGROUP(FontAwesomeSolid.VIDEO);
+        SEARCH_REGROUP(FontAwesomeSolid.VIDEO),
+        // WP-2 (proof-tree renderer surface, Swing ProofTreeView renderLeaf/renderNonLeaf):
+        // the goal-state and marker icons of the tree cells
+        GOAL_CLOSED(FontAwesomeSolid.CHECK),
+        LINKED_FOLDER(FontAwesomeSolid.FOLDER),
+        NODE_INFO_WINDOW(FontAwesomeSolid.WINDOW_RESTORE),
+        USELESS_APP(FontAwesomeSolid.TIMES),
+        INTERACTIVE_APP(FontAwesomeSolid.HAND_POINT_RIGHT),
+        SCRIPT_APP(FontAwesomeSolid.SCROLL);
 
         private final IconFont glyph;
 
