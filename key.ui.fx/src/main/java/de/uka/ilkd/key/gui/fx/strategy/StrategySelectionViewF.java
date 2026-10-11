@@ -184,6 +184,14 @@ public class StrategySelectionViewF extends ScrollPane {
     private boolean predefChanged = true;
 
     /**
+     * Set only while {@link #verifyPresetCombo()} runs: the headless verify drives the
+     * parameterized core methods directly, so the modal alerts (built-in-name warning, overwrite
+     * confirmation) are suppressed — a {@code showAndWait()} with nobody to click would hang the
+     * app run.
+     */
+    private boolean verifyRun;
+
+    /**
      * WP-3: set while the preset combo is rebuilt or reselected programmatically; guards the
      * combo's action listener so it does not (re-)apply a preset in reaction to our own changes
      * (Swing {@code adjustingPresetCombo}, StrategySelectionView.java:106-110).
@@ -661,13 +669,22 @@ public class StrategySelectionViewF extends ScrollPane {
             return false;
         }
         if (isBuiltInName(name)) {
-            new Alert(Alert.AlertType.WARNING, "\"" + name
-                + "\" is the name of a built-in preset. Please choose another name.",
-                ButtonType.OK).showAndWait();
+            if (!verifyRun) {
+                new Alert(Alert.AlertType.WARNING, "\"" + name
+                    + "\" is the name of a built-in preset. Please choose another name.",
+                    ButtonType.OK).showAndWait();
+            }
             return false;
         }
         StrategyPresetsSettings settings = getPresetsSettings();
         if (settings.contains(name)) {
+            // the headless verify overwrites silently (a showAndWait has nobody to click)
+            if (verifyRun) {
+                settings.saveOrUpdate(
+                    new StrategyPreset(name, currentMaxSteps(), currentStrategyProperties()));
+                rebuildPresetCombo(name);
+                return true;
+            }
             Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
                 "A preset named \"" + name + "\" already exists. Overwrite it?",
                 ButtonType.YES, ButtonType.NO);
@@ -712,15 +729,19 @@ public class StrategySelectionViewF extends ScrollPane {
             return false;
         }
         if (isBuiltInName(newName)) {
-            new Alert(Alert.AlertType.WARNING, "\"" + newName
-                + "\" is the name of a built-in preset. Please choose another name.",
-                ButtonType.OK).showAndWait();
+            if (!verifyRun) {
+                new Alert(Alert.AlertType.WARNING, "\"" + newName
+                    + "\" is the name of a built-in preset. Please choose another name.",
+                    ButtonType.OK).showAndWait();
+            }
             return false;
         }
         if (getPresetsSettings().contains(newName)) {
-            new Alert(Alert.AlertType.WARNING,
-                "A preset named \"" + newName + "\" already exists.", ButtonType.OK)
-                    .showAndWait();
+            if (!verifyRun) {
+                new Alert(Alert.AlertType.WARNING,
+                    "A preset named \"" + newName + "\" already exists.", ButtonType.OK)
+                        .showAndWait();
+            }
             return false;
         }
         getPresetsSettings().rename(selected.name(), newName);
@@ -765,6 +786,7 @@ public class StrategySelectionViewF extends ScrollPane {
         if (proof == null) {
             return "no proof";
         }
+        verifyRun = true;
         StrategySettings settings = proof.getSettings().getStrategySettings();
         int originalSteps = settings.getMaxSteps();
         StrategyProperties originalProperties = settings.getActiveStrategyProperties();
@@ -831,6 +853,7 @@ public class StrategySelectionViewF extends ScrollPane {
             pass &= userEntry != null && deleteUserPreset(userEntry)
                     && !getPresetsSettings().contains("WP3-verify-preset-2");
         } finally {
+            verifyRun = false;
             for (String name : getPresetsSettings().getPresets().stream()
                     .map(StrategyPreset::name).toList()) {
                 if (!originalPresets.contains(name)) {
