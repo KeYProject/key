@@ -780,6 +780,19 @@ public final class MainWindowF {
     }
 
     /**
+     * WP-6 (slicing): read-only snapshot of the recent-files entries, most-recent-first — the
+     * assertion seam of the {@code key.fx.verify.slicing} hook, which checks that proof loads
+     * through {@link #loadProofFileDirect} do not change this list (Swing parity of the slicing
+     * extension's "we do not use UI.loadProblem here to avoid adding the slice to the recent
+     * files", SlicingLeftPanel.java:465). Must be called on the FX thread.
+     *
+     * @return an immutable copy of the current entries
+     */
+    public List<RecentFilesF.Entry> recentFileEntries() {
+        return recentFiles.getEntries();
+    }
+
+    /**
      * @return the sequent view docked in the main area
      */
     public SequentViewF getSequentView() {
@@ -1031,6 +1044,14 @@ public final class MainWindowF {
             // listener, NotificationManager.java:99-101; created in MainWindow.java:333)
             env.getProofControl().addAutoModeListener(
                 NotificationCenterF.getInstance().notificationListener());
+            // wp6 (slicing): fire the proof-loaded event for every load of the FX pipeline
+            // (Swing fires it synchronously from WindowUserInterfaceControl.
+            // registerProofAggregate during the load, before the replay,
+            // WindowUserInterfaceControl.java:522; the FX pipeline fires it here, after the
+            // loader finished and before the selection update — the consumers (the slicing
+            // extension's tracker registration, Swing SlicingExtension.java:120) observe every
+            // load either way)
+            mediator.fireProofLoaded(env.getLoadedProof());
             // route the proof through the selection model: setSelectedProof invokes the
             // mediator's setProof (listener swap, abbreviation rebind, OSS refresh) and then
             // selects the first open goal or a leaf, which the views observe.
@@ -1129,6 +1150,17 @@ public final class MainWindowF {
                         .notify("Proof caching verification: " + report,
                             report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
                 statusRight.setText(report);
+            }
+            // slicing (WP-6): run the proof-slicing self test (key.fx.verify.slicing) after the
+            // demo load: auto mode on the demo proof, then the DOT image render (graphviz
+            // binary, plus the documented no-graphviz fallback), the HTML statistics dialog with
+            // its four sort orders, the iterative fixed-point slicing run and the recent-files
+            // bypass of the direct slice loads. The harness lives in keyext.slicing.fx (the
+            // dependency direction is reversed) and is invoked reflectively; its long work runs
+            // on a background thread and logs its own final marker line. The demo guard keeps
+            // the fixed-point/slice loads of the harness itself from re-triggering the hook.
+            if (demo && System.getProperty("key.fx.verify.slicing") != null) {
+                runSlicingVerification(env.getLoadedProof());
             }
             // shortcuts (P1): Swing-parity defaults, no collisions, override round trip and the
             // sequent view key path (Ctrl+F shows the search bar)
@@ -1488,6 +1520,21 @@ public final class MainWindowF {
             options != null && options.singleJavaFile(),
             options != null ? options.additionalProfileOptions() : null);
         startProofLoad(file, false, null, options);
+    }
+
+    /**
+     * Loads the given file through the direct loader pipeline WITHOUT registering it in the
+     * recent-files list (Swing parity of the proof-slicing extension's slice load,
+     * SlicingLeftPanel.java:465-470: "we do not use UI.loadProblem here to avoid adding the
+     * slice to the recent files" — the Swing original creates the {@code ProblemLoader} via
+     * {@code mediator.getUI().getProblemLoader} and runs it asynchronously). Used by the slicing
+     * extension to load intermediate and final slices, and exercised by the
+     * {@code key.fx.verify.slicing} hook.
+     *
+     * @param file the proof file to load
+     */
+    public void loadProofFileDirect(Path file) {
+        startProofLoad(file, false);
     }
 
     /**
@@ -2488,6 +2535,7 @@ public final class MainWindowF {
     }
 
     /**
+    /**
      * caching (WP-4): runs the proof-caching reference-search self test
      * ({@code key.fx.verify.caching}, run after the demo load like the other proof-dependent
      * verify hooks). The harness lives in the {@code keyext.caching.fx} extension module, which
@@ -2508,6 +2556,26 @@ public final class MainWindowF {
         } catch (ReflectiveOperationException | RuntimeException e) {
             LOGGER.error("Proof caching verification failed", e);
             return "Proof caching verification FAIL (" + e + ")";
+        }
+    }
+
+    /**
+     * slicing (WP-6): dispatches the proof-slicing self test ({@code key.fx.verify.slicing}) to
+     * the {@code SlicingVerifyF} harness of the {@code keyext.slicing.fx} extension module,
+     * which is not a compile dependency of key.ui.fx (the dependency direction is reversed) —
+     * the same reflective pattern as {@link #runIsabelleVerification}. The harness runs its long
+     * work (auto mode, fixed-point slicing) on a background thread and logs its own final
+     * {@code key.fx.verify.slicing=PASS|FAIL} marker line.
+     */
+    private void runSlicingVerification(Proof proof) {
+        try {
+            Class<?> verify = Class.forName("org.key_project.slicing.fx.SlicingVerifyF");
+            verify.getMethod("run", MainWindowF.class, Proof.class).invoke(null, this, proof);
+            LOGGER.info("Slicing verification started (final marker on the background thread)");
+        } catch (ClassNotFoundException e) {
+            LOGGER.info("Slicing verification SKIP (keyext.slicing.fx not on the classpath)");
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            LOGGER.error("Slicing verification dispatch failed", e);
         }
     }
 

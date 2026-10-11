@@ -161,6 +161,11 @@ run {
     //    ViewSettings modes of the age heatmap render heat rectangles behind the printed sequent,
     //    the disabled mode shows none; needs a demo proof with rule applications, e.g.
     //    strassen.auto.0.proof, and restores the persisted options afterwards)
+    //  * key.fx.verify.slicing = any  (WP-6: run the proof-slicing self test after the demo
+    //    load — auto mode on the demo proof, then the graphviz DOT image render (plus the
+    //    documented no-graphviz fallback), the HTML statistics dialog with its four sort
+    //    orders, the iterative fixed-point slicing run and the recent-files bypass of the
+    //    direct slice loads)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
@@ -177,7 +182,7 @@ run {
         "key.fx.verify.loadingexit", "key.fx.verify.shortcuts", "key.fx.verify.inputfreeze",
         "key.fx.verify.sequentmenu", "key.fx.verify.dialogs", "key.fx.verify.prooftree",
         "key.fx.verify.selectionhistory", "key.fx.verify.isabelle", "key.fx.verify.heatmap",
-        "key.fx.verify.exploration", "key.fx.verify.caching"]
+        "key.fx.verify.exploration", "key.fx.verify.caching", "key.fx.verify.slicing"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {
