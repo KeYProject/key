@@ -22,6 +22,20 @@ import javafx.scene.Scene;
  */
 public final class ThemeManager {
 
+    /**
+     * WP-3 (settings-config "theme persistence"): the user preference node and key under which
+     * the chosen theme survives a restart (the JavaFX counterpart of Swing's
+     * {@code ViewSettings.LookAndFeel} persisted look and feel; {@code key.core} must not be
+     * touched, so the FX-specific theme lives in its own preference node, like the persisted
+     * keystrokes and the docking layout). Declared before the {@link #INSTANCE} singleton: the
+     * instance's constructor reads the persisted theme, so the preference node must already be
+     * initialized when the class initializes.
+     */
+    private static final Preferences PREFERENCES =
+        Preferences.userNodeForPackage(ThemeManager.class);
+    /** the preference key holding the persisted theme name. */
+    private static final String PREF_KEY = "theme";
+
     private static final ThemeManager INSTANCE = new ThemeManager();
 
     /** Property key under which the currently applied stylesheet URL is stored per scene. */
@@ -31,21 +45,9 @@ public final class ThemeManager {
      * System property selecting the initial theme ({@code "light"} or {@code "dark"}, default
      * light). Also handy for UI tests running headless against Xvfb. When set, it overrides the
      * persisted theme (WP-3: the chosen theme survives restart via the user preference node
-     * below — the property stays the explicit one-off override of headless UI tests).
+     * above — the property stays the explicit one-off override of headless UI tests).
      */
     public static final String THEME_PROPERTY = "key.fx.theme";
-
-    /**
-     * WP-3 (settings-config "theme persistence"): the user preference node and key under which
-     * the chosen theme survives a restart (the JavaFX counterpart of Swing's
-     * {@code ViewSettings.LookAndFeel} persisted look and feel; {@code key.core} must not be
-     * touched, so the FX-specific theme lives in its own preference node, like the persisted
-     * keystrokes and the docking layout).
-     */
-    private static final Preferences PREFERENCES =
-        Preferences.userNodeForPackage(ThemeManager.class);
-    /** the preference key holding the persisted theme name. */
-    private static final String PREF_KEY = "theme";
 
     private final ObservableList<Scene> scenes =
         FXCollections.observableList(new CopyOnWriteArrayList<>());
