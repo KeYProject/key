@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.gui.fx.extension.api.KeYGuiExtensionF;
 import de.uka.ilkd.key.gui.plugins.caching.settings.ProofCachingSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -95,5 +96,28 @@ class CachingExtensionFTest {
             assertThat(content)
                     .contains("de.uka.ilkd.key.gui.plugins.caching.fx.CachingExtensionF");
         }
+    }
+
+    @Test
+    void openedProofsComeFromTheMediatorSeam() {
+        // WP-4 (KNOWN-SIMPLIFIED CachingExtensionF.java:778 / CachingPruneHandlerF.java:26):
+        // the reference search and the prune handler scan the mediator's currently opened
+        // proofs (Swing parity, CachingExtension.java:172 / CachingPruneHandler.java:51) —
+        // the live WP-1 seam list, not the extension's own tracking set
+        KeYMediatorF mediator = new KeYMediatorF();
+        extension.bindMediator(mediator);
+        assertThat(extension.openedProofs()).isSameAs(mediator.getCurrentlyOpenedProofs());
+        // toolkit-free fallback: without a mediator the (empty) tracked proofs are scanned
+        assertThat(new CachingExtensionF().openedProofs()).isEmpty();
+    }
+
+    @Test
+    void copyBeforeDisposeTakesTheMediator() {
+        // WP-4 (KNOWN-SIMPLIFIED CopyBeforeDisposeF.java:25): the listener is constructed with
+        // the mediator so proofDisposing can wrap the copy into the auto-mode context API;
+        // the mediator may also be null (toolkit-free fallback without the context)
+        assertThatCode(() -> new CopyBeforeDisposeF(null, null, null)).doesNotThrowAnyException();
+        assertThatCode(() -> new CopyBeforeDisposeF(new KeYMediatorF(), null, null))
+                .doesNotThrowAnyException();
     }
 }

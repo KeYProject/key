@@ -216,8 +216,9 @@ public class CachingExtensionF
     /**
      * Proofs tracked for automatic reference search (Swing {@code trackedProofs},
      * CachingExtension.java:83-85: proofs seen by the selection listener are registered with the
-     * rule-app / dispose / prune listeners). Also the source for the "currently opened proofs"
-     * of {@link ReferenceSearcher#findPreviousProof}.
+     * rule-app / dispose / prune listeners). Only used to arm the per-proof listeners; the
+     * "currently opened proofs" scanned by the reference search come from the mediator seam
+     * (see {@link #openedProofs()}).
      */
     private final Set<Proof> trackedProofs = Collections.synchronizedSet(new HashSet<>());
 
@@ -338,6 +339,16 @@ public class CachingExtensionF
         // never resolves proofs: the extension pushes the selected proof into
         // CachingStatusButtonF.updateState)
         statusLineButton().setOnAction(e -> runReferenceSearchFromStatus());
+    }
+
+    /**
+     * Toolkit-free seam (unit tests): wires only the mediator, without constructing any JavaFX
+     * control (unlike {@link #attach}, which touches the status-line button).
+     *
+     * @param mediator the mediator to wire
+     */
+    void bindMediator(@Nullable KeYMediatorF mediator) {
+        this.mediator = mediator;
     }
 
     // ------------------------------------------------------------------
@@ -471,7 +482,7 @@ public class CachingExtensionF
         for (Node n : nodes) {
             ClosedBy c = null;
             try {
-                c = ReferenceSearcher.findPreviousProof(openProofs(), n);
+                c = ReferenceSearcher.findPreviousProof(openedProofs(), n);
             } catch (Exception exception) {
                 LOGGER.warn("error during reference search", exception);
             }
@@ -675,7 +686,7 @@ public class CachingExtensionF
         for (Goal goal : newGoals) {
             ClosedBy c = null;
             try {
-                c = ReferenceSearcher.findPreviousProof(openProofs(), goal.node());
+                c = ReferenceSearcher.findPreviousProof(openedProofs(), goal.node());
             } catch (Exception exception) {
                 LOGGER.warn("error during reference search", exception);
             }
@@ -683,7 +694,7 @@ public class CachingExtensionF
                 // stop automode from working on this goal
                 goal.setEnabled(false);
                 goal.node().register(c, ClosedBy.class);
-                c.proof().addProofDisposedListenerFirst(new CopyBeforeDisposeF(c.proof(), p));
+                c.proof().addProofDisposedListenerFirst(new CopyBeforeDisposeF(mediator, c.proof(), p));
             }
         }
     }
@@ -730,13 +741,10 @@ public class CachingExtensionF
      * The click handler of the status-line button (Swing
      * {@code ReferenceSearchButton.actionPerformed}, ReferenceSearchButton.java:63-80):
      * searches every open goal of the selected proof for references and closes the matches by
-     * registering the {@code ClosedBy} reference (with the copy-on-dispose listener).
-     * <p>
-     * <b>KNOWN-SIMPLIFIED:</b> the Swing original then opens the interactive
-     * {@code ReferenceSearchDialog} (a table of the per-goal results with an "Apply" button that
-     * copies the steps, ReferenceSearchDialog.java:25-171). The FX port shows a read-only
-     * summary {@link Alert} instead; the copy of the referenced steps stays available through
-     * the "Copy referenced proof steps here" context item.
+     * registering the {@code ClosedBy} reference (with the copy-on-dispose listener), then opens
+     * the interactive {@link ReferenceSearchDialogF} (the per-goal table with the "Apply" button
+     * that copies the referenced steps — Swing ReferenceSearchButton.java:77-79; ported in
+     * WP-4, KNOWN-SIMPLIFIED {@code CachingExtensionF.java:735}).
      */
     private void runReferenceSearchFromStatus() {
         KeYMediatorF m = mediator;
@@ -747,50 +755,46 @@ public class CachingExtensionF
         if (p == null) {
             return;
         }
-        int closed = 0;
         for (Goal goal : p.openEnabledGoals()) {
             ClosedBy c = null;
             try {
-                c = ReferenceSearcher.findPreviousProof(openProofs(), goal.node());
+                c = ReferenceSearcher.findPreviousProof(openedProofs(), goal.node());
             } catch (Exception exception) {
                 LOGGER.warn("error during reference search", exception);
             }
             if (c != null) {
                 p.closeGoal(goal);
                 goal.node().register(c, ClosedBy.class);
-                c.proof().addProofDisposedListenerFirst(new CopyBeforeDisposeF(c.proof(), p));
-                closed++;
+                c.proof().addProofDisposedListenerFirst(
+                    new CopyBeforeDisposeF(m, c.proof(), p));
             }
         }
         updateGUIState(p);
-        if (closed > 0) {
-            showInfoAlert("Successfully closed " + closed + " open goal(s) by cache. "
-                + "Use 'Copy referenced proof steps here' on the cached goals to copy the "
-                + "steps into this proof.");
+        MainWindowF owner = window;
+        if (owner != null) {
+            new ReferenceSearchDialogF(owner.getStage(), p, m,
+                new DefaultReferenceSearchDialogListenerF(m, owner.getStage())).show();
         }
     }
 
     /**
-     * The proofs to search in: the proofs tracked through the selection events (every proof
-     * that was selected at least once — the FX load path selects each loaded proof, so this
-     * covers the currently opened proofs in practice).
+     * The proofs to search in (Swing {@code mediator.getCurrentlyOpenedProofs()},
+     * CachingExtension.java:172): the WP-1 seam list, kept live by the {@code ProofManagerF}
+     * sync in {@code MainWindowF} (RESOLVED WP-4, KNOWN-SIMPLIFIED
+     * {@code CachingExtensionF.java:778}). The same list feeds the prune handler
+     * (Swing CachingPruneHandler.java:51).
      * <p>
-     * <b>KNOWN-SIMPLIFIED:</b> the Swing original feeds {@code mediator.getCurrentlyOpenedProofs()}
-     * to the reference search (CloseByReference.java:73, CachingExtension.java:172); the FX
-     * {@link KeYMediatorF} has no equivalent accessor, so the tracked proofs are used instead.
+     * Without a mediator (toolkit-free environments, unit tests) the proofs tracked through the
+     * selection events are used as a fallback.
      *
      * @return the non-null proof list
      */
-    private List<Proof> openProofs() {
-        List<Proof> proofs = trackedProofsUnmodifiable();
+    List<Proof> openedProofs() {
         KeYMediatorF m = mediator;
         if (m != null) {
-            Proof selected = m.getSelectedProof();
-            if (selected != null && !proofs.contains(selected)) {
-                proofs.add(selected);
-            }
+            return m.getCurrentlyOpenedProofs();
         }
-        return proofs;
+        return trackedProofsUnmodifiable();
     }
 
     /**
