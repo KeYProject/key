@@ -34,6 +34,13 @@ import org.key_project.util.javafx.FxUtil;
  */
 public class ContractConfiguratorF {
 
+    /**
+     * the most recently constructed dialog (verification harness seam: background drivers of the
+     * {@code key.fx.verify.*} hooks route the OK/Cancel to the dialog whose stage they found
+     * showing via {@link #lastInstance()}).
+     */
+    private static ContractConfiguratorF lastInstance;
+
     private final Stage stage = new Stage();
     private final ContractSelectionPanelF contractPanel;
     private boolean successful = false;
@@ -52,6 +59,7 @@ public class ContractConfiguratorF {
      */
     public ContractConfiguratorF(Services services, Contract[] contracts, String title,
             boolean allowMultipleContracts) {
+        lastInstance = this;
         contractPanel = new ContractSelectionPanelF(services, allowMultipleContracts);
         contractPanel.setContracts(contracts, title);
 
@@ -134,5 +142,18 @@ public class ContractConfiguratorF {
     /** Swing {@code getContract}: the selected (possibly combined) contract. */
     public Contract getContract() {
         return contractPanel.getContract();
+    }
+
+    /** @return the wrapped selection panel (verification harness) */
+    public ContractSelectionPanelF getContractPanel() {
+        return contractPanel;
+    }
+
+    /**
+     * @return the most recently constructed dialog (verification harness: background drivers
+     *         route the OK/Cancel to the dialog whose stage they found showing)
+     */
+    public static ContractConfiguratorF lastInstance() {
+        return lastInstance;
     }
 }
