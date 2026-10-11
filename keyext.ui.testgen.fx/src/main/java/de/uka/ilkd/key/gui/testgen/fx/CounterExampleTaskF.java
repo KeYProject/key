@@ -7,6 +7,9 @@ package de.uka.ilkd.key.gui.testgen.fx;
 import java.util.concurrent.atomic.AtomicReference;
 import javafx.concurrent.Task;
 
+import de.uka.ilkd.key.core.fx.KeYMediatorF;
+import de.uka.ilkd.key.proof.Proof;
+
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -18,12 +21,18 @@ import org.jspecify.annotations.NullMarked;
  * ({@link TestgenReflectionF#searchCounterExample}) in a {@link Task} and streams the SMT
  * statistics into the {@link LogSinkF} of the {@code CounterExampleResultsDialogF}.
  * <p>
+ * The auto-mode shell is the Swing {@code CEWorker.start/done} parity
+ * (CounterExampleAction.java:169-191): {@link #call()} performs
+ * {@code mediator.initiateAutoMode(proof, true, false)} before the search and the terminal-state
+ * hooks (the FX-thread counterparts of the Swing {@code done()}) perform
+ * {@code mediator.finishAutoMode(proof, true, true, null)} — also after a stop/failure, so the
+ * interface never stays frozen.
+ * <p>
  * <b>KNOWN-SIMPLIFIED:</b> the Swing {@code SolverListener} opens a modal progress dialog and a
  * results dialog showing the counterexample model (SolverListener.java); the FX port prints the
  * SMT statistics and the found/not-found outcome into the run dialog's log and leaves the model
- * inspection to the generated test data / subsequent runs. The auto-mode shell of the Swing
- * worker ({@code initiateAutoMode}/{@code finishAutoMode}, CounterExampleAction.java:169-191)
- * is dropped like in {@link TestGenerationTaskF}.
+ * inspection to the generated test data / subsequent runs (the C4 {@code SolverListenerF} route
+ * brings the dialogs back).
  */
 @NullMarked
 final class CounterExampleTaskF extends Task<Void> {
@@ -32,10 +41,13 @@ final class CounterExampleTaskF extends Task<Void> {
     private final Object ui;
 
     /** the proof of the selected goal (reflectively obtained). */
-    private final Object proof;
+    private final Proof proof;
 
     /** the sequent of the selected goal (reflectively obtained). */
     private final Object sequent;
+
+    /** the mediator for the auto-mode shell (Swing CEWorker.start/done). */
+    private final KeYMediatorF mediator;
 
     /** the log sink of the run dialog (events fire on this worker thread). */
     private final LogSinkF sink;
@@ -43,9 +55,11 @@ final class CounterExampleTaskF extends Task<Void> {
     /** the running {@code SolverLauncher} (reflectively obtained), for the Stop button. */
     private final AtomicReference<Object> launcher = new AtomicReference<>();
 
-    CounterExampleTaskF(Object ui, Object proof, Object sequent, LogSinkF sink) {
-        // ui/proof/sequent mirror the Swing worker's inputs (CounterExampleAction.actionPerformed,
-        // CounterExampleAction.java:106-120: node.proof() + node.sequent() of the selected goal).
+    CounterExampleTaskF(KeYMediatorF mediator, Object ui, Proof proof, Object sequent,
+            LogSinkF sink) {
+        // mediator/ui/proof/sequent mirror the Swing worker's inputs (CounterExampleAction
+        // .start, CounterExampleAction.java:169-172: the proof of the selected goal).
+        this.mediator = mediator;
         this.ui = ui;
         this.proof = proof;
         this.sequent = sequent;
@@ -54,8 +68,36 @@ final class CounterExampleTaskF extends Task<Void> {
 
     @Override
     protected Void call() throws Exception {
+        // Swing CEWorker.start(): initiateAutoMode before the search (CounterExampleAction
+        // .java:169-172; there on the EDT, here at the beginning of the worker body — the FX
+        // mediator's seam only flips flags and publishes the observable property).
+        mediator.initiateAutoMode(proof, true, false);
         TestgenReflectionF.searchCounterExample(ui, proof, sequent, sink, launcher);
         return null;
+    }
+
+    @Override
+    protected void succeeded() {
+        finishAutoMode();
+    }
+
+    @Override
+    protected void failed() {
+        finishAutoMode();
+    }
+
+    @Override
+    protected void cancelled() {
+        finishAutoMode();
+    }
+
+    /**
+     * Swing CEWorker.done(): {@code finishAutoMode(oldProof, true, true, null)}
+     * (CounterExampleAction.java:174-176) — runs on the FX thread (the state-change hooks), also
+     * after a stop or failure.
+     */
+    private void finishAutoMode() {
+        mediator.finishAutoMode(proof, true, true, null);
     }
 
     /**

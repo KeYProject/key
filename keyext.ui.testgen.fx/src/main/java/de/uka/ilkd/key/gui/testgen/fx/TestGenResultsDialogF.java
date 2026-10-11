@@ -10,6 +10,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
+import de.uka.ilkd.key.core.fx.KeYMediatorF;
+import de.uka.ilkd.key.proof.Proof;
+
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.geometry.Insets;
@@ -155,8 +158,8 @@ final class TestGenResultsDialogF extends Dialog<Void> {
             // panel (TestgenExtensionF); until then the run is validated on click.
             return;
         }
-        Object mediator = TestgenReflectionF.mediatorOf(captured);
-        Object proof = TestgenReflectionF.proofOf(mediator);
+        KeYMediatorF mediator = (KeYMediatorF) TestgenReflectionF.mediatorOf(captured);
+        Proof proof = (Proof) TestgenReflectionF.proofOf(mediator);
         if (proof == null) {
             append("No proof is loaded — annotated/open goals for the generation are missing.\n");
             return;
@@ -172,7 +175,7 @@ final class TestGenResultsDialogF extends Dialog<Void> {
         log.clear();
         generatedFiles.getItems().clear();
 
-        TestGenerationTaskF task = new TestGenerationTaskF(ui, proof, logger);
+        TestGenerationTaskF task = new TestGenerationTaskF(mediator, ui, proof, logger);
         runningTask = task;
         task.setOnSucceeded(e -> {
             running.set(false);

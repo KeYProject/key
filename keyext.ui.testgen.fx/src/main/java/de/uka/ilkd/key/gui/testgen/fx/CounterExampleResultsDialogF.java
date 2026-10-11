@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.testgen.fx;
 
+import de.uka.ilkd.key.core.fx.KeYMediatorF;
+import de.uka.ilkd.key.proof.Proof;
+
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.geometry.Insets;
@@ -35,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * <b>KNOWN-SIMPLIFIED:</b> the Swing flow shows the counterexample model in the modal
  * {@code SolverListener} result dialogs; the FX port only prints the SMT statistics and the
  * outcome (found/not found) into the log. The auto-mode shell around the search
- * (CounterExampleAction.java:169-191) is dropped, like in {@link TestGenResultsDialogF}. The
+ * (CounterExampleAction.java:169-191) lives in {@link CounterExampleTaskF}. The
  * window may be {@code null} when the extension has not been connected through the settings
  * dialog yet (see {@link TestgenExtensionF}) — the dialog then starts with a hint instead of a
  * search; the owner stage is resolved from the clicked status-line control.
@@ -132,13 +135,13 @@ final class CounterExampleResultsDialogF extends Dialog<Void> {
             // panel (TestgenExtensionF); until then the run is validated on click.
             return;
         }
-        Object mediator = TestgenReflectionF.mediatorOf(captured);
+        KeYMediatorF mediator = (KeYMediatorF) TestgenReflectionF.mediatorOf(captured);
         Object goal = TestgenReflectionF.goalOf(mediator);
         if (goal == null) {
             append("No open goal is selected — cannot search for a counterexample.\n");
             return;
         }
-        Object proof = TestgenReflectionF.proofOfGoal(goal);
+        Proof proof = (Proof) TestgenReflectionF.proofOfGoal(goal);
         Object sequent = TestgenReflectionF.sequentOfGoal(goal);
         Object ui = TestgenReflectionF.uiOf(captured);
         if (proof == null || sequent == null || ui == null) {
@@ -150,7 +153,7 @@ final class CounterExampleResultsDialogF extends Dialog<Void> {
         statusLabel.setText("Searching for counterexamples...");
         log.clear();
 
-        CounterExampleTaskF task = new CounterExampleTaskF(ui, proof, sequent, logger);
+        CounterExampleTaskF task = new CounterExampleTaskF(mediator, ui, proof, sequent, logger);
         runningTask = task;
         task.setOnSucceeded(e -> {
             running.set(false);
