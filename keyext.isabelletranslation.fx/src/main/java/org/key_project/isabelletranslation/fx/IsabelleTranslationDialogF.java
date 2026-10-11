@@ -56,15 +56,26 @@ final class IsabelleTranslationDialogF {
     }
 
     /**
-     * Shows the translations of all goals in a modal dialog.
+     * Shows the translations of all goals in a modal dialog with the default window title.
      *
      * @param owner the owner window, may be {@code null}
      * @param entries the translation entries (one per goal), non-null
      */
     static void show(@Nullable Window owner, List<Entry> entries) {
+        show(owner, "Isabelle Translation", entries);
+    }
+
+    /**
+     * Shows the given entries in a tab dialog.
+     *
+     * @param owner the owner window, may be {@code null}
+     * @param title the window title
+     * @param entries the entries to show, non-null
+     */
+    static void show(@Nullable Window owner, String title, List<Entry> entries) {
         if (entries == null || entries.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "No translations to show.");
-            alert.setTitle("Isabelle Translation");
+            alert.setTitle(title);
             if (owner != null) {
                 alert.initOwner(owner);
             }
@@ -78,7 +89,7 @@ final class IsabelleTranslationDialogF {
         if (owner != null) {
             stage.initOwner(owner);
         }
-        stage.setTitle("Isabelle Translation");
+        stage.setTitle(title);
         TabPane tabPane = new TabPane();
         for (Entry entry : entries) {
             TextArea area = new TextArea(entry.content());
