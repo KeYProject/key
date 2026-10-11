@@ -1189,6 +1189,13 @@ public final class MainWindowF {
             if (System.getProperty("key.fx.verify.menuparity") != null) {
                 verifyMenuParity();
             }
+            // menu: MP3b (WP-10) — Selection Back/Forward behavioral self test
+            // (key.fx.verify.selectionhistory): fires the View menu's Back/Forward items and
+            // asserts the selection history actually moves the mediator selection back/forward
+            // (needs a proof with at least two nodes — combine with key.fx.demo.autoprove)
+            if (System.getProperty("key.fx.verify.selectionhistory") != null) {
+                runSelectionHistoryVerification(env.getLoadedProof());
+            }
             // menu: MP7 — Minimize Interaction self test (key.fx.verify.minimizeinteraction):
             // flips the persisted taclet filter through the same apply helper the toggle uses and
             // asserts the proof control mirrors the flag in both directions
@@ -3968,6 +3975,104 @@ public final class MainWindowF {
         logMenuParity("GoalBackPrune",
             (ok ? "PASS" : "FAIL") + " - goalBack[" + (goalBackOk ? "enabled" : "wrong")
                 + "] prune[" + (pruneOk ? "enabled" : "wrong") + "]");
+    }
+
+    /**
+     * menu: MP3b (WP-10) — headless self test of the Selection Back/Forward binding ({@code
+     * key.fx.verify.selectionhistory}): the View menu's Back/Forward items (Swing
+     * SelectionBackAction / SelectionForwardAction over the SelectionHistory) must carry the
+     * KeyStrokeManagerF accelerators (Ctrl+Alt+Left/Right), follow the history-driven enablement
+     * and — fired through their real {@code onAction} — move the mediator selection to the
+     * previous/next selected node. Needs a proof with at least two nodes (combine with {@code
+     * key.fx.demo.autoprove}); with a single-node proof only the accelerator part runs and the
+     * navigation part is skipped.
+     *
+     * @param proof the loaded demo proof, may be {@code null}
+     */
+    private void runSelectionHistoryVerification(Proof proof) {
+        // the View menu's Back/Forward items of the freshly built menu bar, with their
+        // KeyStrokeManagerF accelerators
+        MenuBar bar = buildMenuBar();
+        Menu viewMenu = bar.getMenus().stream()
+                .filter(m -> "View".equals(m.getText())).findFirst().orElse(null);
+        MenuItem backItem = viewMenu == null ? null : findMenuItem(viewMenu, "Back");
+        MenuItem forwardItem = viewMenu == null ? null : findMenuItem(viewMenu, "Forward");
+        KeyStrokeManagerF manager = KeyStrokeManagerF.getInstance();
+        KeyCombination backBinding =
+            manager.binding("de.uka.ilkd.key.gui.actions.SelectionBackAction").orElse(null);
+        KeyCombination forwardBinding =
+            manager.binding("de.uka.ilkd.key.gui.actions.SelectionForwardAction").orElse(null);
+        List<String> problems = new ArrayList<>();
+        if (backItem == null || forwardItem == null) {
+            problems.add("the View menu has no Back/Forward items");
+        } else {
+            if (!backBinding.equals(backItem.getAccelerator())
+                    || !forwardBinding.equals(forwardItem.getAccelerator())) {
+                problems.add("accelerators " + backItem.getAccelerator() + "/"
+                    + forwardItem.getAccelerator() + " != " + backBinding + "/" + forwardBinding);
+            }
+        }
+        // the navigation part: two distinct nodes, then Back/Forward through the menu items
+        String navigation = "SKIPPED (single-node proof)";
+        if (proof != null && !proof.isDisposed() && !proof.root().leaf()
+                && backItem != null && forwardItem != null) {
+            de.uka.ilkd.key.proof.Node first = proof.root();
+            de.uka.ilkd.key.proof.Node second = first;
+            while (!second.leaf()) {
+                second = second.child(second.childrenCount() - 1);
+            }
+            if (second != first) {
+                selectionModel.setSelectedNode(first);
+                selectionModel.setSelectedNode(second);
+                boolean canBackBefore = selectionHistory.canGoBackProperty().get();
+                boolean backEnabled = !backItem.isDisable();
+                backItem.fire();
+                boolean backMoved = selectionModel.getSelectedNode() == first;
+                boolean canForward = selectionHistory.canGoForwardProperty().get();
+                forwardItem.fire();
+                boolean forwardMoved = selectionModel.getSelectedNode() == second;
+                if (!canBackBefore || !backEnabled) {
+                    problems.add("Back not enabled after two selections (canGoBack=" + canBackBefore
+                        + ", itemEnabled=" + backEnabled + ")");
+                }
+                if (!backMoved) {
+                    problems.add("Back did not move the selection to the previous node");
+                }
+                if (!canForward) {
+                    problems.add("Forward not enabled after Back");
+                }
+                if (!forwardMoved) {
+                    problems.add("Forward did not move the selection to the next node");
+                }
+                navigation = (backMoved && forwardMoved ? "moved " : "did not move ")
+                    + first.serialNr() + "->" + second.serialNr();
+            }
+        }
+        boolean ok = problems.isEmpty();
+        LOGGER.info("Selection history verification: {} (navigation: {})",
+            ok ? "PASS" : "FAIL - " + String.join("; ", problems), navigation);
+        NotificationManagerF.getInstance()
+                .notify("Selection history verification: " + (ok ? "PASS" : "FAIL"),
+                    ok ? Kind.INFO : Kind.ERROR);
+    }
+
+    /**
+     * @return the first menu item with the given text in the menu's (recursive) item list, or
+     *         {@code null}
+     */
+    private static MenuItem findMenuItem(Menu menu, String text) {
+        for (MenuItem item : menu.getItems()) {
+            if (text.equals(item.getText())) {
+                return item;
+            }
+            if (item instanceof Menu sub) {
+                MenuItem result = findMenuItem(sub, text);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
     }
 
     private void logMenuParity(String menuName, String report) {

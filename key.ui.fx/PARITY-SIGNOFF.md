@@ -39,14 +39,14 @@ marked `OPEN (unverified)` rather than assumed fixed.
 | ProofManagementDialog + TaskTree / Loaded Proofs dockable | `keyext.proofmanagement.fx` (MP9.6) + Loaded Proofs view | `key.fx.verify.proofmgmt` 1/2 | **RESOLVED** |
 | IssueDialog / error reporting | `IssueDialogF` (toasts + dialog) | `key.fx.verify.uicontrol` (exception leg) | **RESOLVED** |
 | Goal Back / Prune disable bindings; input freeze during auto mode | **RESOLVED** (P1: the auto mode blocking overlay — main area covered, mouse input blocked, keys swallowed except Escape, wait cursor; wired to the auto mode listener incl. the demo-live stop path; `key.fx.verify.inputfreeze` PASS) | — | **RESOLVED** |
-| Apply Strategy on node + Prune-at-node in the tree popup | right-click macro menu ported (`key.fx.verify.rightclickmacro`); Apply Strategy-at-node unverified | — | **PARTIAL** |
+| Apply Strategy on node + Prune-at-node in the tree popup | **RESOLVED** (WP-10: the popup's Apply Strategy / Prune actions run on the clicked node — the popup context is built from the clicked row like Swing `ProofTreeView.mousePressed` (`getPathForLocation` + `setSelectionPath`), not from the selection; `key.fx.verify.prooftree` asserts the real handlers: popup on the clicked node with the selection parked elsewhere, a capped strategy run grows the clicked node's subtree (nodes 1->21) and the prune removes it again (20->1) — "PASS - popup on clicked node … prune 20->1") | — | **RESOLVED** |
 
 P0 bugs from the audit:
 
 | Bug | Status |
 |---|---|
 | FX search stale on node switch | **RESOLVED** (search re-runs on reprint; sequent-leftovers milestone `18df960b35`) |
-| Proof-tree context menu acts on the selection, not the clicked node | `OPEN (unverified)` |
+| Proof-tree context menu acts on the selection, not the clicked node | **RESOLVED** (WP-10: the context-request handler resolves the clicked row from the event-target `TreeCell` — the FX counterpart of Swing's `JTree.getPathForLocation` — and selects it like Swing `setSelectionPath`; the clicked node, not the previous selection, becomes `ProofTreeContext.invokedNode`; `key.fx.verify.prooftree` PASS "popup on clicked node, parkedSelection=true") |
 | View-menu Pretty Print / Unicode inert placeholders | `OPEN` (placeholders remain) |
 | Recent-file clicks drop stored profile / single-java options | **RESOLVED** (P1: `openProofFile` registers the loading options with the entry like Swing `WindowUserInterfaceControl.loadProblem`; the recent-files menu restores profile (resolved via `DefaultProfileResolver`) / additional options / single-java like Swing `RecentFileAction`, `key.fx.verify.loadingexit` round trip PASS) |
 | Shortcut-default mismatches (`KeyStrokeManagerF`: tree search, sequent search, macro defaults) | **RESOLVED** (P1: the defaults match the Swing table now — macros and PrettyPrint/Unicode/ProofManagement/tree-search on Ctrl+Shift, sequent search on Ctrl+F instead of the bare F that hijacked typing; stale persisted old defaults heal on load; `key.fx.verify.shortcuts` PASS) |
@@ -59,7 +59,7 @@ P0 bugs from the audit:
 | Audit item | Status |
 |---|---|
 | Loading options (profile / ignore other Java files) | **RESOLVED** — load-options dialog ported (`key.fx.verify.profileloading` + `profileloadingdialog` PASS) |
-| Select Goal Above / Below + menu set (View 7) | **RESOLVED** at surface level (`key.fx.verify.menuparity` View 7); Selection Back/Forward binding `OPEN (unverified)` |
+| Select Goal Above / Below + menu set (View 7) | **RESOLVED** (WP-10: Selection Back/Forward verified — `key.fx.verify.selectionhistory` PASS: the View menu's Back/Forward items carry the KeyStrokeManagerF accelerators (Ctrl+Alt+Left/Right), follow the history-driven enablement and firing them moves the mediator selection back/forward over the `SelectionHistoryF` — "PASS (navigation: moved 0->148)"; the View-menu surface itself was already `key.fx.verify.menuparity` View 7 PASS) |
 | Automation submenu + macro invocation | **RESOLVED** (automation submenu MP2, macro menu in term menu); global toolbar dropdown `OPEN` |
 | Join / merge dialogs | **RESOLVED** for the merge/join flow (`key.fx.verify.joinmerge` PASS on gcd 32/0); `keyext.slicing.fx` SMT routing partial |
 | Strategy preset combo / stash UI | `OPEN` |
@@ -90,14 +90,16 @@ as open.
 1. Input freeze during auto mode (blocking glass pane port) — RESOLVED via P1
    `key.fx.verify.inputfreeze`; the menus stay clickable while frozen (Swing's glass pane
    covered everything except the `isAutoButton` stop controls) — KNOWN-SIMPLIFIED.
-2. Proof-tree: Apply Strategy on clicked node, Prune-at-node in the popup, renderer surface
+2. Proof-tree: Apply Strategy on clicked node, Prune-at-node in the popup (both RESOLVED via
+   WP-10 `key.fx.verify.prooftree`), renderer surface
    (tooltips, goal icons, linked/cache marks, notes, branch-label F2 editing), NodeInfoVisualizer.
 3. Sequent: multi-select highlight + reprint persistence, drag & drop, inner-node highlights +
    taclet info pane, source cross-highlight.
 4. Source view: symbex line highlights, click-to-jump into the proof tree, hover
    cursor/line highlight, multi-file tabs, branch status bar.
 5. Menus/actions: Pretty Print / Unicode wiring, term labels, tooltip toggles, selection
-   Back/Forward bindings, Edit Last File, Load User Taclets + Prove submenu, Run All Proofs
+   Back/Forward bindings (RESOLVED via WP-10 `key.fx.verify.selectionhistory`), Edit Last File,
+   Load User Taclets + Prove submenu, Run All Proofs
    (dialogs exist for several), EnableWhenProofLoaded analogue, toolbars 9 remaining buttons.
 6. Keyboard: shortcut-default regressions; dead bindings audit (RESOLVED via P1
    `key.fx.verify.shortcuts`; the Swing-persisted `keystrokes.json` stays the source of truth

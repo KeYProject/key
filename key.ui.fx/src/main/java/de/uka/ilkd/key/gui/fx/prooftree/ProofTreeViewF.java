@@ -32,6 +32,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -306,6 +307,28 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
     private Node popupNode;
 
     /**
+     * C23 (WP-10): the subtree node count captured before the apply-strategy self test started
+     * ({@link #verifyApplyStrategyAtNode()}); read back by the worker-thread continuation
+     * {@link #verifyApplyStrategyAtNodeResult()}.
+     */
+    private long applyStrategyNodesBefore;
+
+    /**
+     * C23 (WP-10): the strategy step budget of the demo proof, saved while the apply-strategy
+     * self test runs with a capped budget ({@link #APPLY_STRATEGY_MAX_STEPS}) and restored by
+     * {@link #verifyApplyStrategyAtNodeResult()}.
+     */
+    private int applyStrategySavedMaxSteps;
+
+    /**
+     * C23 (WP-10): the capped strategy step budget of the apply-strategy self test: enough rule
+     * applications to grow the clicked node's subtree, few enough to leave open goals below it
+     * for the prune part (the core pruner refuses/asserts on fully closed branches,
+     * ProofPruner.java:121 with the {@code -ea} runs).
+     */
+    private static final int APPLY_STRATEGY_MAX_STEPS = 20;
+
+    /**
      * P3b/B12: the "Strategy Macros" submenu of the context menu (Swing
      * {@code ProofTreePopupFactory.initMacroMenu}, ProofTreePopupFactory.java:98-103: a {@code
      * ProofMacroMenu} right after Prune, only when not empty). Persistent (built once in
@@ -401,20 +424,53 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
         // the filter toggles and the popup actions live in a right-click menu (Swing exposes
         // them in the dockable's "Settings" menu and the proof tree popup)
         tree.setOnContextMenuRequested(e -> {
-            TreeItem<Entry> selected = tree.getSelectionModel().getSelectedItem();
-            TreeItem<Entry> item = selected != null ? selected : tree.getRoot();
-            if (item != null) {
-                // Swing ProofTreeContext: the invoked node is the clicked entry's node, for node
-                // entries and branch entries alike; the branch item is its parent for node entries
-                popupNode = item.getValue().node();
-                if (!item.getValue().isBranch()) {
-                    item = item.getParent();
-                }
+            // Swing ProofTreeView.mousePressed (ProofTreeView.java:285-299): the popup is built
+            // from the CLICKED row — getPathForLocation(x, y), then setSelectionPath(selPath) —
+            // not from the current selection; nothing is shown when the click did not land on a
+            // row. The FX counterpart resolves the clicked cell from the event target (the row
+            // hit-test of getPathForLocation) and hands it to preparePopup.
+            TreeItem<Entry> clicked = clickedItem(e);
+            if (clicked != null) {
+                preparePopup(clicked);
+                contextMenu.show(tree, e.getScreenX(), e.getScreenY());
+                e.consume();
             }
-            popupBranchItem = item;
-            contextMenu.show(tree, e.getScreenX(), e.getScreenY());
-            e.consume();
         });
+    }
+
+    /**
+     * @return the tree item under the mouse of a context-request event (the FX counterpart of
+     *         Swing's {@code JTree.getPathForLocation(x, y)}): the cell the event targeted, or
+     *         {@code null} when the click did not land on a rendered row
+     */
+    private TreeItem<Entry> clickedItem(ContextMenuEvent e) {
+        if (e.getTarget() instanceof TreeCell<?> cell && cell.getTreeView() == tree
+                && cell.getIndex() >= 0) {
+            return tree.getTreeItem(cell.getIndex());
+        }
+        return null;
+    }
+
+    /**
+     * Opens the popup context for the clicked item (extracted from the context-request handler,
+     * also driven headlessly by {@link #verifyApplyStrategyAtNode()}): the invoked node is the
+     * clicked entry's node, for node entries and branch entries alike (Swing ProofTreeContext),
+     * the branch item is its parent for node entries, and — like Swing's
+     * {@code setSelectionPath(selPath)} — the selection moves to the clicked row so the popup
+     * acts on what the user actually clicked.
+     *
+     * @param clicked the tree item the popup was invoked on, not {@code null}
+     */
+    void preparePopup(TreeItem<Entry> clicked) {
+        if (tree.getSelectionModel().getSelectedItem() != clicked) {
+            tree.getSelectionModel().select(clicked);
+        }
+        popupNode = clicked.getValue().node();
+        TreeItem<Entry> item = clicked;
+        if (!item.getValue().isBranch()) {
+            item = item.getParent();
+        }
+        popupBranchItem = item;
     }
 
     /**
@@ -1855,6 +1911,160 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             return;
         }
         mediator.pruneNode(popupNode);
+    }
+
+    /**
+     * C23 (WP-10): headless self test of the tree popup's "Apply Strategy" and "Prune Proof"
+     * actions. The popup is prepared on the clicked item through the same {@link #preparePopup}
+     * seam the context-request handler drives (with the tree selection parked elsewhere first,
+     * so the clicked node — not the previous selection — becomes the popup node), then the real
+     * "Apply Strategy" action handler runs.
+     * <p>
+     * Must be called on the FX thread (from the {@code key.fx.verify.prooftree} harness's
+     * {@code runOnFx} block, like {@link #verifyStrategyMacros()}); the strategy runs
+     * asynchronously like in the real UI, the harness continues with
+     * {@link #verifyApplyStrategyAtNodeResult()} on its worker thread. Skipped (reported, not
+     * failed) without a proof / proof control / mediator, while a run is active, or when no
+     * enabled goal exists below the clicked node (e.g. a closed demo proof after a full auto
+     * mode).
+     *
+     * @return {@code "PASS..."} / {@code "FAIL - ..."} / {@code "SKIP - ..."} for the harness
+     */
+    public String verifyApplyStrategyAtNode() {
+        if (proof == null || proof.isDisposed() || mediator == null || proofControl == null) {
+            return "SKIP - no proof/mediator/proof control";
+        }
+        if (mediator.autoModeRunningProperty().get()) {
+            return "SKIP - auto mode running";
+        }
+        // the clicked node: the proof root (its subtree holds the enabled goals); the selection
+        // is parked on a different item when one exists, so the "acts on the clicked node" seam
+        // is exercised with selection != clicked node
+        Node clicked = proof.root();
+        if (proof.getSubtreeEnabledGoals(clicked).isEmpty()) {
+            return "SKIP - no enabled goals below the clicked node";
+        }
+        TreeItem<Entry> clickedItem = findItem(tree.getRoot(), clicked);
+        if (clickedItem == null) {
+            return "SKIP - the clicked node has no tree item";
+        }
+        applyStrategyNodesBefore = countNodesBelow(clicked);
+        TreeItem<Entry> parkItem = findOtherItem(tree.getRoot(), clickedItem);
+        if (parkItem != null) {
+            tree.getSelectionModel().select(parkItem);
+        }
+        boolean parked = tree.getSelectionModel().getSelectedItem() != clickedItem;
+        // the popup preparation seam: the invoked node must be the clicked node (Swing
+        // setSelectionPath(selPath) + ProofTreeContext from selPath), not the parked selection,
+        // and the selection follows the click like in Swing
+        preparePopup(clickedItem);
+        boolean popupNodeOk = popupNode == clicked
+                && tree.getSelectionModel().getSelectedItem() == clickedItem;
+        // cap the step budget for the self test's strategy run (open goals must remain below
+        // the clicked node for the prune part; restored by verifyApplyStrategyAtNodeResult)
+        applyStrategySavedMaxSteps = proof.getSettings().getStrategySettings().getMaxSteps();
+        proof.getSettings().getStrategySettings().setMaxSteps(APPLY_STRATEGY_MAX_STEPS);
+        if (popupNodeOk) {
+            // the real popup action: runs the strategy on the goals of the clicked node
+            runStrategyOnNode();
+        }
+        return (popupNodeOk ? "PASS" : "FAIL") + " - popup on clicked node, nodes before="
+            + applyStrategyNodesBefore + ", parkedSelection=" + parked;
+    }
+
+    /**
+     * Worker-thread continuation of {@link #verifyApplyStrategyAtNode()}: waits for the strategy
+     * run to change the proof below the clicked node, then runs the real "Prune Proof" popup
+     * action on the first child of the clicked node and asserts its subtree was removed (Swing
+     * {@code KeYMediator.setBack} → {@code Proof.pruneProof}).
+     *
+     * @return the PASS/FAIL detail for the harness report
+     */
+    public String verifyApplyStrategyAtNodeResult() {
+        if (proof == null || proof.isDisposed()) {
+            return "SKIP - no proof";
+        }
+        try {
+            return doVerifyApplyStrategyAtNodeResult();
+        } finally {
+            // restore the demo proof's step budget (capped for the self test's strategy run)
+            proof.getSettings().getStrategySettings().setMaxSteps(applyStrategySavedMaxSteps);
+        }
+    }
+
+    private String doVerifyApplyStrategyAtNodeResult() {
+        // wait until the strategy run applied rule applications below the clicked node (and
+        // stopped, max ~30 s — a no-op start fails the check on the timeout)
+        long deadline = System.currentTimeMillis() + 30_000;
+        while (System.currentTimeMillis() < deadline
+                && (mediator.autoModeRunningProperty().get()
+                        || countNodesBelow(proof.root()) <= applyStrategyNodesBefore)) {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return "FAIL - interrupted while waiting for the strategy run";
+            }
+        }
+        long after = countNodesBelow(proof.root());
+        if (after <= applyStrategyNodesBefore) {
+            return "FAIL - no rule applications below the clicked node ("
+                + applyStrategyNodesBefore + ")";
+        }
+        // the real prune action on an inner node below the clicked node: the capped strategy
+        // run leaves open goals, so the pruning conditions of Proof.pruneProof hold; lift
+        // noPruningClosed anyway in case the branch was closed by the (short) run
+        Node pruneTarget = proof.root().childrenCount() > 0 ? proof.root().child(0) : null;
+        if (pruneTarget == null) {
+            return "FAIL - no inner node to prune after the strategy run";
+        }
+        long prunable = countNodesBelow(pruneTarget);
+        boolean noPruningClosedSaved = GeneralSettings.noPruningClosed;
+        GeneralSettings.noPruningClosed = false;
+        try {
+            Boolean prunedOk = FxUtil.callAndWait(() -> {
+                TreeItem<Entry> pruneItem = findItem(tree.getRoot(), pruneTarget);
+                if (pruneItem == null) {
+                    return false;
+                }
+                preparePopup(pruneItem);
+                prunePopupNode();
+                return true;
+            });
+            long afterPrune = countNodesBelow(pruneTarget);
+            boolean pruned = prunedOk == Boolean.TRUE && afterPrune == 1;
+            return (pruned ? "PASS" : "FAIL") + " - applyStrategy nodes "
+                + applyStrategyNodesBefore + "->" + after + ", prune " + prunable + "->"
+                + afterPrune + (pruned ? "" : " (prune left " + afterPrune + " nodes)");
+        } finally {
+            GeneralSettings.noPruningClosed = noPruningClosedSaved;
+        }
+    }
+
+    /** @return the number of nodes in the subtree of the given node (the node itself included) */
+    private long countNodesBelow(Node node) {
+        long count = 1;
+        for (int i = 0; i < node.childrenCount(); i++) {
+            count += countNodesBelow(node.child(i));
+        }
+        return count;
+    }
+
+    /**
+     * @return the first tree item of the subtree rooted at {@code start} whose node differs from
+     *         {@code exclude}'s node, or {@code null} (the item to park the selection on)
+     */
+    private static TreeItem<Entry> findOtherItem(TreeItem<Entry> start, TreeItem<Entry> exclude) {
+        if (start.getValue() != null && start != exclude) {
+            return start;
+        }
+        for (TreeItem<Entry> child : start.getChildren()) {
+            TreeItem<Entry> result = findOtherItem(child, exclude);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
     }
 
     /**
