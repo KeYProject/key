@@ -254,8 +254,16 @@ public class SequentViewF extends BorderPane {
      */
     private final Pane heatmapOverlay = new Pane();
 
+    /**
+     * WP-3 (sequent): overlay pane for the sticky user-selection highlight (Swing
+     * {@code PERMANENT_HIGHLIGHT_COLOR} painter, SequentView.java:600-602), between the update
+     * highlights and the hover highlight.
+     */
+    private final Pane userSelectionOverlay = new Pane();
+
     /** number of heatmap rectangles of the current printing (verification, WP-2). */
     private int heatmapRectCount;
+    private final Pane userSelectionOverlay = new Pane();
 
     private final HBox searchBar = new HBox(4);
     private final TextField searchField = new TextField();
@@ -280,6 +288,23 @@ public class SequentViewF extends BorderPane {
     private Node selectedNode;
     private String printed;
     private Range highlightedRange;
+
+    /**
+     * WP-3 (sequent): the sticky user-selection highlight (Swing
+     * {@code SequentView.userSelectionHighlight/userSelectionHighlightPis
+     * /userSelectionHighlightRange}, SequentView.java:148-150): the term the user pinned with a
+     * Ctrl+click or middle click (Swing {@code SequentViewInputListener.mouseClicked},
+     * SequentViewInputListener.java:135-145). Independent from the hover highlight; it survives
+     * reprints (Swing {@code recalculateUserSelectionRange}, SequentView.java:585-608 — the
+     * range is recomputed from the stored position against the reprint's position table) and is
+     * cleared when the displayed node changes (Swing keeps the stored position across node
+     * switches but visually loses it until the next resize reprint, re-highlighting possibly an
+     * unrelated formula at the same path — the FX port clears it instead, and Swing itself
+     * clears the selection when the sequent view instance is swapped, MainFrame.java:47/76).
+     */
+    private PosInSequent userSelectionPis;
+    /** the printed-character range of {@link #userSelectionPis} in the current printing. */
+    private Range userSelectionRange;
 
     /** Syntax highlighting on/off (Swing View menu, on by default). */
     private boolean syntaxHighlighting = true;
@@ -1587,6 +1612,7 @@ public class SequentViewF extends BorderPane {
     private void rebuildOverlays() {
         rebuildHeatmapOverlays();
         rebuildUpdateOverlays();
+        rebuildUserSelectionOverlay();
         rebuildHoverOverlay();
     }
 
@@ -1599,13 +1625,11 @@ public class SequentViewF extends BorderPane {
     private static final double HEATMAP_START_OPACITY = 0.7;
 
     /**
-     * Rebuilds the heatmap highlight rectangles of the current printing (Swing
-     * {@code SequentView.updateHeatMapHighlights}): while the persisted
-     * {@link ViewSettings#isShowHeatmap()} flag is on, the sequent formulas (or terms) that were
-     * added or changed recently get translucent heat-colored rectangles behind the text, aged
-     * from the selected node up the proof tree. Swing renders these highlights into the sequent
-     * views only (called from {@code CurrentGoalView:197}/{@code InnerNodeView:241}) — the proof
-     * tree is not involved.
+     * Rebuilds the update-highlight rectangles of the current printing (Swing
+     * {@code CurrentGoalView.updateUpdateHighlights}): one translucent rectangle per update range
+     * of the position table, shaped with {@link TextFlow#getRangeShape}. Unlike the Swing view no
+     * +1 offset is applied — the character indexes of the position table match the TextFlow
+     * character model exactly.
      */
     private void rebuildHeatmapOverlays() {
         heatmapOverlay.getChildren().clear();
@@ -1956,6 +1980,146 @@ public class SequentViewF extends BorderPane {
             hoverOverlay.getChildren().add(rectForRange(start, end, "sequent-hover-highlight"));
         }
     }
+
+
+    /**
+     * Rebuilds the update-highlight rectangles of the current printing (Swing
+     * {@code CurrentGoalView.updateUpdateHighlights}): one translucent rectangle per update range
+     * of the position table, shaped with {@link TextFlow#getRangeShape}. Unlike the Swing view no
+     * +1 offset is applied — the character indexes of the position table match the TextFlow
+     * character model exactly.
+     */
+    private void rebuildUpdateOverlays() {
+        updateOverlay.getChildren().clear();
+        updateRectCount = 0;
+        InitialPositionTable table = getInitialPositionTable();
+        if (printed == null || table == null) {
+            return;
+        }
+        // make sure the text flow is laid out before asking for glyph shapes
+        textFlow.applyCss();
+        textFlow.layout();
+        for (Range range : table.getUpdateRanges()) {
+            int start = Math.clamp(range.start(), 0, printed.length());
+            int end = Math.clamp(range.end(), start, printed.length());
+            if (end <= start) {
+                continue;
+            }
+            updateOverlay.getChildren()
+                    .add(rectForRange(start, end, "sequent-update-highlight"));
+            updateRectCount++;
+        }
+    }
+
+    /** Rebuilds the highlight rectangle of the term under the mouse. */
+    private void rebuildHoverOverlay() {
+        hoverOverlay.getChildren().clear();
+        if (hoveredRange == null || printed == null) {
+            return;
+        }
+        int start = Math.clamp(hoveredRange.start(), 0, printed.length());
+        int end = Math.clamp(hoveredRange.start() + hoveredRange.length(), start,
+            printed.length());
+        if (end > start) {
+            hoverOverlay.getChildren().add(rectForRange(start, end, "sequent-hover-highlight"));
+        }
+    }
+
+    // WP-3 (sequent): begin — the sticky user-selection highlight (Swing SequentView
+    // setUserSelectionHighlight/removeUserSelectionHighlight/recalculateUserSelectionRange,
+    // SequentView.java:585-660)
+
+    /**
+     * Toggles the user-selection highlight of the given position (Swing
+     * {@code SequentViewInputListener.mouseClicked}, SequentViewInputListener.java:138-141): a
+     * click on the currently selected term, on empty space or on the sequent itself removes the
+     * selection, any other position becomes the selection.
+     *
+     * @param pos the clicked position, may be {@code null}
+     */
+    private void toggleUserSelection(PosInSequent pos) {
+        if (pos == null || pos.isSequent() || isInUserSelectionHighlight(pos)) {
+            removeUserSelectionHighlight();
+            return;
+        }
+        setUserSelectionHighlight(pos);
+    }
+
+    /**
+     * @param pos the position to check, may be {@code null}
+     * @return whether the given position is the user's selection (Swing
+     *         {@code isInUserSelectionHighlight}, SequentView.java:643-651 — the FX port
+     *         compares the term positions instead of the mouse-point ranges)
+     */
+    private boolean isInUserSelectionHighlight(PosInSequent pos) {
+        return userSelectionPis != null && userSelectionRange != null && pos != null
+                && Objects.equals(userSelectionRange, pos.getBounds());
+    }
+
+    /**
+     * Highlights the given position as the user's selection (Swing
+     * {@code setUserSelectionHighlight(PosInSequent)}, SequentView.java:653-667).
+     *
+     * @param pis the term to select
+     */
+    private void setUserSelectionHighlight(PosInSequent pis) {
+        userSelectionPis = pis;
+        Range bounds = pis.getBounds();
+        userSelectionRange = bounds != null && bounds.length() > 0 ? bounds : null;
+        rebuildUserSelectionOverlay();
+    }
+
+    /**
+     * Removes the user selection (Swing {@code removeUserSelectionHighlight},
+     * SequentView.java:633-642). Called on the toggling click and when the displayed node
+     * changes (see the {@link #userSelectionPis} javadoc for the deviation note).
+     */
+    private void removeUserSelectionHighlight() {
+        userSelectionPis = null;
+        userSelectionRange = null;
+        userSelectionOverlay.getChildren().clear();
+    }
+
+    /**
+     * Recomputes the user-selection range against the current printing (Swing
+     * {@code recalculateUserSelectionRange}, SequentView.java:585-608: the range of the stored
+     * position is looked up in the reprint's position table via
+     * {@code pathForPosition}/{@code rangeForPath} — the +1 offset the Swing original applies
+     * ("Off-by-one: rangeForPath ist schuld") is not applied here, the FX position-table
+     * character indexes match the printed text exactly, like the update ranges). Called from
+     * every {@link #printSequent()} reprint.
+     */
+    private void recalculateUserSelectionRange() {
+        if (userSelectionPis == null) {
+            return;
+        }
+        if (printed == null || userSelectionPis.getPosInOccurrence() == null) {
+            removeUserSelectionHighlight();
+            return;
+        }
+        InitialPositionTable table = getInitialPositionTable();
+        ImmutableList<Integer> path = table == null ? null
+                : table.pathForPosition(userSelectionPis.getPosInOccurrence(), filter);
+        userSelectionRange = path == null ? null : table.rangeForPath(path);
+        rebuildUserSelectionOverlay();
+    }
+
+    /** Rebuilds the highlight rectangle of the sticky user selection. */
+    private void rebuildUserSelectionOverlay() {
+        userSelectionOverlay.getChildren().clear();
+        if (userSelectionRange == null || printed == null) {
+            return;
+        }
+        int start = Math.clamp(userSelectionRange.start(), 0, printed.length());
+        int end = Math.clamp(userSelectionRange.start() + userSelectionRange.length(), start,
+            printed.length());
+        if (end > start) {
+            userSelectionOverlay.getChildren()
+                    .add(rectForRange(start, end, "sequent-user-selection"));
+        }
+    }
+
+    // WP-3 (sequent): end
 
     /**
      * @return a filled path over the on-screen shape of the given character range (a per-line

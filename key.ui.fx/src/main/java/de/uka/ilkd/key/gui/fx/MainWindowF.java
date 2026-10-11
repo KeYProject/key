@@ -1124,6 +1124,14 @@ public final class MainWindowF {
                 NotificationManagerF.getInstance()
                         .notify("Viewport line width verification: " + lwReport,
                             lwReport.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+                // WP-3 (sequent): the sticky user-selection highlight + reprint persistence —
+                // pin, reprint, settings-change reprint, unpin (Swing
+                // recalculateUserSelectionRange / SequentViewInputListener.mouseClicked)
+                String userSelReport = sequentView.verifyUserSelection();
+                LOGGER.info("Sequent user selection verification: {}", userSelReport);
+                NotificationManagerF.getInstance()
+                        .notify("Sequent user selection verification: " + userSelReport,
+                            userSelReport.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
             }
             if (System.getProperty("key.fx.verify.heatmap") != null) {
                 // heatmap (WP-2): render the age heatmap into the sequent view — the four
