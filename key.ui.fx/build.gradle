@@ -140,6 +140,10 @@ run {
     //    per-proof view states, linearized mode, OSS protocol rows, whole-tree expand/collapse,
     //    node-filter counting, notes + subtree statistics dialogs; combine with
     //    key.fx.demo.autoprove.live to exercise the auto-mode partial updates)
+    //  * key.fx.verify.selectionhistory = any  (WP-10: run the Selection Back/Forward self test
+    //    after the demo load — the View menu items' accelerators + enablement, then Back/Forward
+    //    through the real menu items; needs a proof with at least two nodes, combine with
+    //    key.fx.demo.autoprove)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
@@ -155,7 +159,8 @@ run {
         "key.fx.verify.profileloadingdialog", "key.fx.verify.javacsettings",
         "key.fx.verify.termmenu", "key.fx.verify.colors", "key.fx.verify.smt",
         "key.fx.verify.loadingexit", "key.fx.verify.shortcuts", "key.fx.verify.inputfreeze",
-        "key.fx.verify.sequentmenu", "key.fx.verify.dialogs", "key.fx.verify.prooftree"]
+        "key.fx.verify.sequentmenu", "key.fx.verify.dialogs", "key.fx.verify.prooftree",
+        "key.fx.verify.selectionhistory"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {
