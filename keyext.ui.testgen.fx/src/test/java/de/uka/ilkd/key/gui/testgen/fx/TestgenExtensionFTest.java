@@ -15,20 +15,20 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Headless unit test of the {@link TestgenExtensionF} provider (MP9.5): the {@code @Info}
+ * Headless unit test of the {@link TestgenExtensionF} provider (MP9.5, WP-7): the {@code @Info}
  * annotation, the compilable SPI capability surface ({@link KeYGuiExtensionF.MainMenuF} +
- * {@link KeYGuiExtensionF.SettingsF} + {@link KeYGuiExtensionF.StatusLineF}) and the
- * reflection-dispatched settings entry (a {@code SettingsProviderF} proxy whose
- * {@code getPanel/apply} forward the main window to the extension).
+ * {@link KeYGuiExtensionF.SettingsF} + {@link KeYGuiExtensionF.ToolbarF} +
+ * {@link KeYGuiExtensionF.StartupF}) and the reflection-dispatched settings entry (a {@code
+ * SettingsProviderF} proxy whose {@code getPanel/apply} forward the main window to the extension).
  * <p>
  * <b>KNOWN-SIMPLIFIED (headless):</b> every {@code javafx.scene.control.Control} triggers the FX
  * toolkit in its class initializer ("Toolkit not initialized"), and this module's
- * {@code build.gradle} exposes no headless toolkit to the tests — so the status-line {@code
- * MenuButton}/{@code Button}s, the "Test Case Generation" menu and the settings-panel {@code
- * CheckBox}/spinner widgets are built lazily inside the running app only, and the test asserts
- * the provider/capability surface instead of the control trees. Neither the provider construction
- * nor the capability asserts touch the JavaFX toolkit; the run dialogs and the generation workers
- * are deliberately not exercised here.
+ * {@code build.gradle} exposes no headless toolkit to the tests — so the toolbar {@code Button}s,
+ * the "Test Case Generation" menu and the settings-panel {@code CheckBox}/spinner widgets are
+ * built lazily inside the running app only, and the test asserts the provider/capability surface
+ * instead of the control trees. Neither the provider construction nor the capability asserts
+ * touch the JavaFX toolkit; the run dialogs and the generation workers are deliberately not
+ * exercised here.
  */
 class TestgenExtensionFTest {
 
@@ -49,16 +49,17 @@ class TestgenExtensionFTest {
     @Test
     void capabilitySurface() {
         KeYGuiExtensionF extension = new TestgenExtensionF();
-        // KNOWN-SIMPLIFIED: the ToolbarF/StartupF slots are not implemented (see
-        // TestgenExtensionF) — the Swing toolbar actions are expressed through the two plain
-        // status-line buttons; the control trees are built lazily in the app (they need the FX
-        // toolkit).
+        // WP-7 — the Swing capability set (main menu, toolbar, Startup hook, settings panel) is
+        // complete; the two toolbar Buttons and the control trees are built lazily in the app
+        // (they need the FX toolkit).
         assertInstanceOf(KeYGuiExtensionF.MainMenuF.class, extension,
-            "Test Generation menu with the two Swing menu actions + SHORTCUT+T");
+            "Test Generation menu with the two Swing menu actions");
         assertInstanceOf(KeYGuiExtensionF.SettingsF.class, extension,
             "TestgenOptionsPanel port");
-        assertInstanceOf(KeYGuiExtensionF.StatusLineF.class, extension,
-            "MenuButton + toolbar buttons in the status line");
+        assertInstanceOf(KeYGuiExtensionF.ToolbarF.class, extension,
+            "the two plain action buttons of the Swing JToolBar");
+        assertInstanceOf(KeYGuiExtensionF.StartupF.class, extension,
+            "Swing Startup hook: window capture at app startup");
     }
 
     @Test
