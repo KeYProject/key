@@ -2621,6 +2621,30 @@ public final class MainWindowF {
         }
     }
 
+
+    /**
+     * testgen (WP-7): runs the TestGen extension self test ({@code key.fx.verify.testgen}, run
+     * after the demo load like the other proof-dependent verify hooks). The harness lives in the
+     * {@code keyext.ui.testgen.fx} extension module, which is not a compile dependency of
+     * key.ui.fx (the dependency direction is reversed), so it is invoked reflectively; the report
+     * string ends in {@code PASS} or {@code FAIL}.
+     */
+    private static String runTestgenVerification(javafx.stage.Window owner, Proof proof,
+            KeYMediatorF mediator) {
+        try {
+            Class<?> verify = Class.forName("de.uka.ilkd.key.gui.testgen.fx.TestgenVerifyF");
+            Object report = verify
+                    .getMethod("run", javafx.stage.Window.class, Proof.class, KeYMediatorF.class)
+                    .invoke(null, owner, proof, mediator);
+            return (String) report;
+        } catch (ClassNotFoundException e) {
+            return "TestGen verification SKIP (keyext.ui.testgen.fx not on the classpath)";
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            LOGGER.error("TestGen verification failed", e);
+            return "TestGen verification FAIL (" + e + ")";
+        }
+    }
+
     /**
      * smt (P1): runs the FX SMT run UI end to end ({@code key.fx.verify.smt}), run after the
      * demo load like the other proof-dependent verify hooks: launches the first usable solver
