@@ -36,12 +36,13 @@ import org.slf4j.LoggerFactory;
  * {@link CounterExampleTaskF}.
  * <p>
  * <b>KNOWN-SIMPLIFIED:</b> the Swing flow shows the counterexample model in the modal
- * {@code SolverListener} result dialogs; the FX port only prints the SMT statistics and the
- * outcome (found/not found) into the log. The auto-mode shell around the search
- * (CounterExampleAction.java:169-191) lives in {@link CounterExampleTaskF}. The
- * window may be {@code null} when the extension has not been connected through the settings
- * dialog yet (see {@link TestgenExtensionF}) — the dialog then starts with a hint instead of a
- * search; the owner stage is resolved from the clicked status-line control.
+ * {@code SolverListener} result dialogs; the FX route goes through {@link SolverListenerF} (the
+ * same parity, WP-7) — this run dialog keeps the pipeline log (side proof, semantics blasting).
+ * The auto-mode shell around the search (CounterExampleAction.java:169-191) lives in
+ * {@link CounterExampleTaskF}. The window may be {@code null} when the extension has not been
+ * connected through the settings dialog yet (see {@link TestgenExtensionF}) — the dialog then
+ * starts with a hint instead of a search; the owner stage is resolved from the clicked
+ * status-line control.
  */
 @NullMarked
 final class CounterExampleResultsDialogF extends Dialog<Void> {
@@ -50,6 +51,8 @@ final class CounterExampleResultsDialogF extends Dialog<Void> {
         LoggerFactory.getLogger(CounterExampleResultsDialogF.class);
 
     private final @Nullable Object window;
+    /** the owner of the {@code SolverListenerF} progress dialog of the search (WP-7). */
+    private final @Nullable Stage owner;
     private final TextArea log = new TextArea();
     private final ProgressIndicator progress = new ProgressIndicator();
     private final Label statusLabel = new Label("Idle");
@@ -62,6 +65,7 @@ final class CounterExampleResultsDialogF extends Dialog<Void> {
 
     CounterExampleResultsDialogF(@Nullable Object window, @Nullable Stage owner) {
         this.window = window;
+        this.owner = owner;
         setTitle("Counterexample Search");
         if (owner != null) {
             initOwner(owner);
@@ -153,7 +157,8 @@ final class CounterExampleResultsDialogF extends Dialog<Void> {
         statusLabel.setText("Searching for counterexamples...");
         log.clear();
 
-        CounterExampleTaskF task = new CounterExampleTaskF(mediator, ui, proof, sequent, logger);
+        CounterExampleTaskF task =
+            new CounterExampleTaskF(mediator, owner, ui, proof, sequent, logger);
         runningTask = task;
         task.setOnSucceeded(e -> {
             running.set(false);
