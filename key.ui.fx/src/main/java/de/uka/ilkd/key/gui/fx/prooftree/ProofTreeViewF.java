@@ -2450,7 +2450,7 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
                 // the notes marker (Swing renderNonLeaf defaultIcon: editFile) + tooltip notes
                 node.getNodeInfo().setNotes("WP2 verify note");
                 tree.refresh();
-                TreeItem<Entry> refreshed = findItem(tree.getRoot(), node);
+                TreeItem<Entry> refreshed = findNodeEntryItem(tree.getRoot(), node);
                 if (refreshed == null) {
                     problems.append("node row lost; ");
                 } else {
@@ -2469,7 +2469,7 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
                         problems.append("visualizer marker missing; ");
                     }
                     tree.refresh();
-                    TreeItem<Entry> reRefreshed = findItem(tree.getRoot(), node);
+                    TreeItem<Entry> reRefreshed = findNodeEntryItem(tree.getRoot(), node);
                     TreeCell<Entry> cell = reRefreshed == null ? null : cellForItem(reRefreshed);
                     if (cell == null || cell.getGraphic() == null) {
                         problems.append("visualizer icon not rendered; ");
@@ -2491,6 +2491,25 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
         }
         boolean pass = problems.length() == 0;
         return ok + " " + (pass ? "PASS" : "FAIL problems=[" + problems + "]");
+    }
+
+    /**
+     * @param node the node to locate
+     * @return the NODE entry item of the given node (branch entries whose node is the same, e.g.
+     *         the root branch "Proof Tree", are skipped), or {@code null}
+     */
+    private static TreeItem<Entry> findNodeEntryItem(TreeItem<Entry> start, Node node) {
+        if (start.getValue() != null && !start.getValue().isBranch()
+                && !start.getValue().isOssChild() && start.getValue().node() == node) {
+            return start;
+        }
+        for (TreeItem<Entry> child : start.getChildren()) {
+            TreeItem<Entry> result = findNodeEntryItem(child, node);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
     }
 
     /** @return the number of leaf rows whose Swing-parity goal icon is rendered */
