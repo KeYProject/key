@@ -1183,6 +1183,15 @@ public final class MainWindowF {
             }
             if (System.getProperty("key.fx.verify.goallist") != null) {
                 LOGGER.info("Goal list verification: {}", goalListView.verifyGoalList());
+                // WP-3 (goallist-strategy-info): the strategy preset combo / stash UI self test
+                // — entry list, stash/save/rename/delete round trip, preset write-through and
+                // the Apply-button gating (StrategySelectionViewF.verifyPresetCombo)
+                String presetReport = strategyView.verifyPresetCombo();
+                LOGGER.info("Strategy preset verification: {}", presetReport);
+                NotificationManagerF.getInstance()
+                        .notify("Strategy preset verification: " + presetReport,
+                            presetReport.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+                statusRight.setText(presetReport);
             }
             // joinmerge: run the join/merge dialog self test (key.fx.verify.joinmerge)
             if (System.getProperty("key.fx.verify.joinmerge") != null) {

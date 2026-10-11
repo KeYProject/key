@@ -439,6 +439,23 @@
     -fx-text-fill: -key-text-secondary;
 }
 
+/* WP-3: strategy preset row (gear menu + combo + Apply) */
+.strategy-preset-row {
+    -fx-padding: 0 0 4 0;
+}
+
+.strategy-preset-delete {
+    -fx-text-fill: -key-text-secondary;
+}
+
+.strategy-preset-delete:hover {
+    -fx-text-fill: #cc3333;
+}
+
+.strategy-preset-menu {
+    -fx-font-size: 1.1em;
+}
+
 /* source view */
 /* M2, first read-only version; see SourceViewF */
 .source-view {
