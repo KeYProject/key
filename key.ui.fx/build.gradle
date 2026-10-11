@@ -148,6 +148,11 @@ run {
     //    the FX progress dialog renders with fake solvers, cancellation works, the Info window
     //    opens; no real Isabelle installation is needed and the scala-isabelle backend stays
     //    unloaded)
+    //  * key.fx.verify.exploration = any  (WP-5: run the exploration extension parity self test
+    //    after the demo load — the ExplorationModeModel registered in the mediator registry, the
+    //    purple renderer border on a real exploration step of the demo branch, the "Hide
+    //    justification" toggle routing through the HIDE_INTERACTIVE_GOALS tree filter and the
+    //    promptForTerm retry-loop accepting bad-then-good input)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
@@ -164,7 +169,8 @@ run {
         "key.fx.verify.termmenu", "key.fx.verify.colors", "key.fx.verify.smt",
         "key.fx.verify.loadingexit", "key.fx.verify.shortcuts", "key.fx.verify.inputfreeze",
         "key.fx.verify.sequentmenu", "key.fx.verify.dialogs", "key.fx.verify.prooftree",
-        "key.fx.verify.selectionhistory", "key.fx.verify.isabelle"]
+        "key.fx.verify.selectionhistory", "key.fx.verify.isabelle",
+        "key.fx.verify.exploration"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {

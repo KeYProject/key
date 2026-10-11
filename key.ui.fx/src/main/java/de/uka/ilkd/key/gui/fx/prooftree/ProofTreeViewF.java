@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import javafx.geometry.Insets;
@@ -41,6 +42,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
@@ -97,9 +99,8 @@ import org.slf4j.LoggerFactory;
  * cycle through the matches and select them in the selection model; the field gets an alert
  * styling while there is no match. Open with {@code Ctrl+Shift+F}, close with {@code Escape}.
  * <p>
- * Deliberately deferred to later M2/M3 chunks: the further filters ({@code
- * HIDE_CLOSED_SUBTREES}, {@code HIDE_INTERACTIVE_GOALS}), heatmap, notes/tooltips of the rich
- * Swing renderer, one-step-simplifier protocol children, lazy population for very large proofs
+ * Deliberately deferred to later chunks: heatmap, notes/tooltips of the rich
+ * Swing renderer, lazy population for very large proofs
  * (currently built eagerly), and incremental per-event tree model updates (live updates currently
  * coalesce into a full rebuild).
  */
@@ -185,6 +186,86 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
     }
 
     private final TreeView<Entry> tree = new TreeView<>();
+
+    // -----------------------------------------------------------------------
+    // WP-5 — renderer-styling hook (Swing Styler<GUIAbstractTreeNode> parity: the Swing proof
+    // tree's renderer holds a list of stylers, e.g. the exploration extension's
+    // ExplorationRenderer draws a purple border/background on nodes with ExplorationNodeData,
+    // ExplorationExtension.java:128-193). Extensions register a {@link CellStyler} through
+    // {@link #addCellStyler(CellStyler)}; the cells consult the stylers on every render.
+    // -----------------------------------------------------------------------
+
+    /**
+     * The accumulated style of one cell render (Swing {@code de.uka.ilkd.key.gui.prooftree.Style}
+     * parity: public fields for the border/background color and the tooltip title). The
+     * {@link CellStyler}s accumulate into one shared instance per render; the cell applies
+     * {@link #css()} as the inline style and replaces the tooltip text when a title was set.
+     */
+    public static final class Style {
+        private Color border;
+        private Color background;
+        private String tooltipTitle;
+
+        public Color getBorder() {
+            return border;
+        }
+
+        public void setBorder(Color border) {
+            this.border = border;
+        }
+
+        public Color getBackground() {
+            return background;
+        }
+
+        public void setBackground(Color background) {
+            this.background = background;
+        }
+
+        public String getTooltipTitle() {
+            return tooltipTitle;
+        }
+
+        public void setTooltipTitle(String tooltipTitle) {
+            this.tooltipTitle = tooltipTitle;
+        }
+
+        /**
+         * @return the accumulated style as an FX inline style (the Swing renderer draws the
+         *         border/background directly; the FX cell maps it onto CSS), empty when no
+         *         styler set anything
+         */
+        public String css() {
+            StringBuilder sb = new StringBuilder();
+            if (border != null) {
+                sb.append("-fx-border-color: ").append(cssColor(border))
+                        .append("; -fx-border-width: 1; ");
+            }
+            if (background != null) {
+                sb.append("-fx-background-color: ").append(cssColor(background)).append("; ");
+            }
+            return sb.toString();
+        }
+
+        private static String cssColor(Color color) {
+            return String.format("#%02x%02x%02x", (int) Math.round(color.getRed() * 255),
+                (int) Math.round(color.getGreen() * 255),
+                (int) Math.round(color.getBlue() * 255));
+        }
+    }
+
+    /**
+     * A cell styler of the proof tree (Swing {@code Styler<T>} parity): called for every
+     * rendered entry and may set the border/background colors and the tooltip title on the
+     * given {@link Style}.
+     */
+    public interface CellStyler {
+        void style(Style style, Entry entry);
+    }
+
+    /** the registered stylers (usually at most the one exploration styler; copy-on-write). */
+    private final List<CellStyler> cellStylers = new CopyOnWriteArrayList<>();
+
 
     private final HBox searchBar = new HBox(4);
     private final TextField searchField = new TextField();
@@ -624,6 +705,71 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             }
         }
         updateMatches();
+    }
+
+    // ------------------------------------------------------------------
+    // WP-5 — renderer-styling hook + filter routing (the seams the exploration port uses;
+    // Swing Styler registration: ExplorationExtension.init:128, filter routing:
+    // ExplorationModeModel.setShowInteractiveBranches → GUIProofTreeModel.setFilter)
+    // ------------------------------------------------------------------
+
+    /**
+     * WP-5 — registers a {@link CellStyler} (Swing {@code ProofTreeView.addRenderer} /
+     * {@code getRenderer().add(styler)} parity, ProofTreeView.java:1046-1053) and refreshes the
+     * tree, so the style applies to the already rendered rows immediately.
+     */
+    public void addCellStyler(CellStyler styler) {
+        cellStylers.add(styler);
+        FxUtil.runLater(this::refresh);
+    }
+
+    /**
+     * WP-5 — removes a previously registered {@link CellStyler}.
+     */
+    public void removeCellStyler(CellStyler styler) {
+        cellStylers.remove(styler);
+        FxUtil.runLater(this::refresh);
+    }
+
+    /**
+     * @return the registered cell stylers (live view; at most one in the shipped UI — the
+     *         exploration extension's renderer)
+     */
+    public List<CellStyler> getCellStylers() {
+        return Collections.unmodifiableList(cellStylers);
+    }
+
+    /**
+     * WP-5 — verification seam of the styling hook: applies the registered stylers to the entry
+     * of {@code node} and returns the accumulated style ({@code null} when no styler is
+     * registered). The rendered cells apply exactly this style in their {@code updateItem}.
+     */
+    public Style stylerStyle(Node node) {
+        if (cellStylers.isEmpty()) {
+            return null;
+        }
+        Style style = new Style();
+        for (CellStyler styler : cellStylers) {
+            styler.style(style, Entry.node(node));
+        }
+        return style;
+    }
+
+    /**
+     * WP-5 — routes the "Hide justification" toggle of the exploration extension through the
+     * {@code HIDE_INTERACTIVE_GOALS} filter (Swing parity:
+     * {@code ExplorationModeModel.setShowInteractiveBranches} calls
+     * {@code GUIProofTreeModel.setFilter(HIDE_INTERACTIVE_GOALS, …)}, ExplorationModeModel.java
+     * :109-114, which rebuilds the tree): the flag is persisted in the shared
+     * {@link ViewSettings} (the filter state the context-menu toggle reads back) and the tree is
+     * rebuilt with the filter active — hiding the exploration cuts' second (justification)
+     * branches whose goals are all interactive.
+     *
+     * @param active whether subtrees whose goals are all interactive are hidden
+     */
+    public void applyHideInteractiveGoals(boolean active) {
+        setHideInteractiveGoals(active);
+        refresh();
     }
 
     /**
@@ -2671,6 +2817,9 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             if (empty || item == null) {
                 setText(null);
                 setTooltip(null);
+                // clear the inline styles of a reused cell (the WP-5 stylers may have styled the
+                // entry that was shown before)
+                setStyle(null);
                 return;
             }
             setText(item.displayText());
@@ -2680,6 +2829,18 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             if (matched) {
                 getStyleClass().add("proof-tree-match");
             }
+            // WP-5: the extension stylers (Swing renderer stylers parity) accumulate their
+            // border/background colors and tooltip title; the css is applied inline and wins
+            // over the theme's goal-state classes, like the Swing renderer's last-writer style
+            Style style = null;
+            if (!cellStylers.isEmpty()) {
+                style = new Style();
+                for (CellStyler styler : cellStylers) {
+                    styler.style(style, item);
+                }
+            }
+            String css = style == null ? "" : style.css();
+            setStyle(css.isEmpty() ? null : css);
             // menu: MP3a — proof-tree tooltips are gated by the shared ViewSettings flag "Show
             // Tooltips in Proof Tree" (Swing ProofTreeView.getToolTipText,
             // ProofTreeView.java:195-217 renders no tooltip unless isShowProofTreeTooltips()).
@@ -2687,10 +2848,13 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             // refresh() (MainWindowF.buildViewMenu) so the change applies immediately. Minimal
             // fidelity: the Swing renderer builds a rich styled tooltip (rule name, position in
             // occurrence, notes, rendered by ProofTreeView.renderTooltip :1202-1219); the FX cell
-            // shows the node/rule name only.
+            // shows the node/rule name only — or the title a styler set (WP-5, Swing Style.tooltip
+            // parity).
             if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                     .isShowProofTreeTooltips()) {
-                setTooltip(new Tooltip(tooltipText(item)));
+                setTooltip(new Tooltip(
+                    style != null && style.getTooltipTitle() != null ? style.getTooltipTitle()
+                            : tooltipText(item)));
             } else {
                 setTooltip(null);
             }

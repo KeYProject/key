@@ -19,6 +19,7 @@ import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.gui.fx.MainWindowF;
 import de.uka.ilkd.key.gui.fx.extension.api.KeYGuiExtensionF;
+import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeViewF;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -54,16 +55,18 @@ import org.kordamp.ikonli.javafx.FontIcon;
  * <b>KNOWN-SIMPLIFIED</b> decisions of this port (each marked at the respective site):
  * <ul>
  * <li>The Swing provider registers the {@link ExplorationModeModel} into the Swing mediator
- * ({@code mediator.register(model, ExplorationModeModel.class)}) and the {@code
- * ExplorationRenderer} (a purple border/background on exploration nodes) into the Swing proof
- * tree. {@code KeYMediatorF} has no register/lookup seam and the FX {@code ProofTreeViewF} has no
- * renderer styling hook — both are dropped; the model is held directly by this provider.</li>
+ * ({@code mediator.register(model, ExplorationModeModel.class)}, ExplorationExtension.java:103)
+ * and the {@code ExplorationRenderer} (a purple border/background on exploration nodes) into the
+ * Swing proof tree (ExplorationExtension.java:128). The FX port registers the model through the
+ * {@code KeYMediatorF} register/lookup seam (WP-1/WP-5) — consumers obtain it via
+ * {@code mediator.lookup(ExplorationModeModel.class)}, the provider-held field stays as the
+ * fallback — and the {@link ExplorationRendererF} through the {@code ProofTreeViewF} cell-styler
+ * hook (WP-5).</li>
  * <li>The "Hide justification" toggle persists the {@code ViewSettings.hideInteractiveGoals}
  * flag and the exploration taclet-application state like the Swing
- * {@code ShowInteractiveBranchesAction}, but the actual proof-tree filter of the Swing original
- * ({@code ExplorationModeModel.setShowInteractiveBranches} → Swing
- * {@code GUIProofTreeModel.setFilter(HIDE_INTERACTIVE_GOALS, …)}) targets a Swing proof-tree seam
- * that does not exist in {@code key.ui.fx} (the filter is explicitly deferred there).</li>
+ * {@code ShowInteractiveBranchesAction}, and routes the tree update through the FX proof-tree
+ * filter ({@code ProofTreeViewF.applyHideInteractiveGoals} → the {@code HIDE_INTERACTIVE_GOALS}
+ * filter state Swing's {@code ExplorationModeModel.setShowInteractiveBranches} feeds, WP-5).</li>
  * <li>Icons: the Swing {@code Icons} class is AWT/Swing-bound — plain unicode markers are used
  * instead.</li>
  * </ul>
@@ -73,8 +76,9 @@ import org.kordamp.ikonli.javafx.FontIcon;
     description = "Author: Sarah Grebing <grebing@ira.uka.de>, Alexander Weigl "
         + "<weigl@ira.uka.de> — JavaFX port (MP9.2). Add, edit and hide formulas on the "
         + "sequent with sound-cut based exploration steps and collect them in the "
-        + "'Exploration Steps' panel. KNOWN-SIMPLIFIED: proof-tree styling and the hidden "
-        + "second-branch filter are deferred (no FX seam).",
+        + "'Exploration Steps' panel. Explored branches are styled purple in the proof tree "
+        + "and 'Hide justification' routes through the HIDE_INTERACTIVE_GOALS tree filter "
+        + "(WP-5).",
     experimental = true, optional = true, priority = 10000)
 public class ExplorationExtensionF implements KeYGuiExtensionF, KeYGuiExtensionF.ToolbarF,
         KeYGuiExtensionF.MainMenuF, KeYGuiExtensionF.StatusLineF, KeYGuiExtensionF.LeftPanelF,
@@ -277,10 +281,18 @@ public class ExplorationExtensionF implements KeYGuiExtensionF, KeYGuiExtensionF
             return;
         }
         this.mediator = mediator;
-        // KNOWN-SIMPLIFIED: the Swing original registers the model in the mediator registry
-        // (mediator.register(model, ExplorationModeModel.class)); KeYMediatorF has no
-        // register/lookup seam, so the FX provider holds the singleton model directly — no
-        // consumer of the Swing registration exists in the FX UI.
+        // WP-5: the Swing original registers the model in the mediator registry
+        // (mediator.register(model, ExplorationModeModel.class), ExplorationExtension.java:103);
+        // consumers obtain it via mediator.lookup(ExplorationModeModel.class) — the provider
+        // keeps holding the singleton as the fallback for consumers without a mediator.
+        mediator.register(model, ExplorationModeModel.class);
+        MainWindowF host = window;
+        if (host != null) {
+            // WP-5: the renderer-styling hook (the Swing init registers the ExplorationRenderer
+            // into the proof tree renderer, ExplorationExtension.java:128) as a ProofTreeViewF
+            // cell styler — the purple border/background on explored branches
+            host.getProofTreeView().addCellStyler(new ExplorationRendererF());
+        }
         ExplorationStepsPanelF panel = getLeftPanel();
         // the host builds status bar/drawer hosts during window construction, before this init
         // hook — re-seed the panel with the real window/mediator references
@@ -360,17 +372,24 @@ public class ExplorationExtensionF implements KeYGuiExtensionF, KeYGuiExtensionF
      * The "Hide justification" toggle, FX port of the Swing {@code
      * ShowInteractiveBranchesAction} (ShowInteractiveBranchesAction.java:21-69).
      * <p>
-     * KNOWN-SIMPLIFIED: the Swing action routes through
-     * {@code ExplorationModeModel.setShowInteractiveBranches}, which calls
-     * {@code MainWindow.getProofTreeView().getDelegateModel().setFilter(HIDE_INTERACTIVE_GOALS,
-     * …)} — a Swing proof-tree seam that does not exist in {@code key.ui.fx} (the FX
-     * {@code ProofTreeViewF} explicitly defers that filter). The FX port persists the same
-     * {@link ViewSettings#setHideInteractiveGoals(boolean)} flag the Swing filter reads and
-     * records the exploration-app state; the filter itself stays deferred.
+     * WP-5: the Swing action routes through {@code ExplorationModeModel.setShowInteractiveBranches},
+     * which calls {@code MainWindow.getProofTreeView().getDelegateModel().setFilter(
+     * HIDE_INTERACTIVE_GOALS, …)} (ExplorationModeModel.java:109-114) — the FX counterpart routes
+     * through {@link ProofTreeViewF#applyHideInteractiveGoals(boolean)}, which persists the same
+     * {@link ViewSettings#setHideInteractiveGoals(boolean)} flag the Swing filter reads (and
+     * which the FX tree filter {@code subtreeGoalsAllInteractive} honours) and rebuilds the tree
+     * with the filter active — hiding the exploration cuts' second (justification) branches.
      */
     private void setHideJustification(boolean hide) {
-        ViewSettings viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
-        viewSettings.setHideInteractiveGoals(hide);
+        MainWindowF host = window;
+        if (host != null) {
+            host.getProofTreeView().applyHideInteractiveGoals(hide);
+        } else {
+            // no window (headless/provider-not-yet-wired): persist the flag the tree filter
+            // reads — the toggle applies on the next tree build
+            ViewSettings viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+            viewSettings.setHideInteractiveGoals(hide);
+        }
         model.setExplorationTacletAppState(
             hide ? ExplorationModeModel.ExplorationState.SIMPLIFIED_APP
                     : ExplorationModeModel.ExplorationState.WHOLE_APP);

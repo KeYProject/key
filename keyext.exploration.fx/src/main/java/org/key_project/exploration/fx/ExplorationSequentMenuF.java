@@ -5,7 +5,6 @@
 package org.key_project.exploration.fx;
 
 import java.util.List;
-import java.util.Optional;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.parsing.BuildingException;
+import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
 
 import org.key_project.exploration.ProofExplorationService;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -45,15 +45,59 @@ import org.jspecify.annotations.Nullable;
  * The producers re-use the (Swing) {@link ProofExplorationService} with its
  * {@code soundAddition}/{@code applyChangeFormula}/{@code soundHide} operations.
  * <p>
- * <b>KNOWN-SIMPLIFIED:</b> the Swing {@code promptForTerm} retry-loop (a modal input dialog that
- * re-opened itself until a well-typed term was entered, {@code ExplorationAction.java:35-65}) is
- * a single-shot {@link TextInputDialog} — malformed input or a sort mismatch abort the action.
+ * The term prompt is a faithful port of the Swing {@code promptForTerm} retry-loop
+ * ({@code ExplorationAction.java:35-65}): the input dialog re-opens itself until a well-typed
+ * term of the required sort was entered — a sort mismatch shows the sort-mismatch dialog and
+ * re-prompts ({@code ExplorationAction.java:46-53}), malformed input shows the error and
+ * re-prompts ({@code ExplorationAction.java:54-57}); cancelling aborts the action. The dialog
+ * and error surfaces sit behind the {@link PromptHandler} seam so the loop stays headlessly
+ * unit-testable (the same pattern as {@code SequentMenuModelF}).
  */
 @NullMarked
 final class ExplorationSequentMenuF {
 
     private ExplorationSequentMenuF() {
     }
+
+    /**
+     * The input/error surface of the {@code promptForTerm} retry-loop (the Swing
+     * {@code JOptionPane.showInputDialog}/{@code JOptionPane.showMessageDialog} calls of
+     * {@code ExplorationAction.promptForTerm}, ExplorationAction.java:35-65): {@link #input}
+     * returns the next user input, or {@code null} to cancel; the error arguments carry the
+     * validation error of the previous input (both {@code null} on the first invocation), which
+     * the real handler shows before re-opening the dialog — Swing shows the "Sort mismatch" /
+     * "Malformed input" error dialog and re-opens the input dialog in the same order.
+     */
+    public interface PromptHandler {
+
+        /**
+         * Asks for the next formula input.
+         *
+         * @param initialValue the pre-filled input (the pretty-printed term being edited),
+         *        constant across the retries
+         * @param errorTitle the title of the previous input's error dialog ({@code null} on the
+         *        first ask)
+         * @param errorMessage the message of the previous input's error dialog ({@code null} on
+         *        the first ask)
+         * @return the entered text, or {@code null} to cancel the whole action
+         */
+        @Nullable
+        String input(@Nullable String initialValue, @Nullable String errorTitle,
+                @Nullable String errorMessage);
+    }
+
+    /** the production handler: shows the error alert, then opens the modal input dialog. */
+    private static final PromptHandler DIALOG_HANDLER = (initialValue, errorTitle,
+            errorMessage) -> {
+        if (errorTitle != null) {
+            showError(errorTitle, errorMessage);
+        }
+        TextInputDialog dialog = new TextInputDialog(initialValue == null ? "" : initialValue);
+        dialog.setTitle("Exploration");
+        dialog.setHeaderText("Input a formula:");
+        dialog.setContentText("Term:");
+        return dialog.showAndWait().orElse(null);
+    };
 
     /**
      * Builds the four exploration items for the given goal and clicked position.
@@ -143,45 +187,73 @@ final class ExplorationSequentMenuF {
     }
 
     /**
-     * Single-shot formula prompt, FX port of Swing {@code ExplorationAction.promptForTerm}
-     * (ExplorationAction.java:35-65). {@code null} aborts the action (cancel or malformed
-     * input).
+     * Formula prompt with the Swing retry-loop, FX port of Swing {@code
+     * ExplorationAction.promptForTerm} (ExplorationAction.java:35-65): the input dialog
+     * re-opens itself until a well-typed term of the required sort was entered — a sort mismatch
+     * shows the "Sort mismatch" dialog and re-prompts ({@code ExplorationAction.java:46-53}),
+     * malformed input shows the "Malformed input" dialog and re-prompts
+     * ({@code ExplorationAction.java:54-57}). {@code null} aborts the action (cancel).
      *
      * @param goal the goal whose services/namespaces the parse shall use
      * @param term the existing term to pre-fill (and sort-check), or {@code null} for a fresh
      *        addition
-     * @return the parsed term, or {@code null} when the user cancelled or the input was rejected
+     * @return the parsed term, or {@code null} when the user cancelled
      */
     private static @Nullable JTerm promptForTerm(Goal goal, @Nullable JTerm term) {
+        return promptForTerm(goal, term, DIALOG_HANDLER);
+    }
+
+    /**
+     * The {@code promptForTerm} retry-loop with a pluggable {@link PromptHandler} (the test seam;
+     * the production {@link #promptForTerm(Goal, JTerm)} uses the dialog handler): loops until
+     * the input parses and matches the required sort, feeding each validation error back to the
+     * handler, and returns {@code null} when the handler cancels.
+     *
+     * @param goal the goal whose services/namespaces the parse shall use
+     * @param term the existing term to sort-check against, or {@code null} for a fresh addition
+     * @param handler the input/error surface (dialog in production, scripted in the tests)
+     * @return the parsed term, or {@code null} when the user cancelled
+     */
+    static @Nullable JTerm promptForTerm(Goal goal, @Nullable JTerm term, PromptHandler handler) {
         Services services = goal.proof().getServices();
         final String initialValue =
             term == null ? "" : LogicPrinter.quickPrintTerm(term, services);
 
-        TextInputDialog dialog = new TextInputDialog(initialValue);
-        dialog.setTitle("Exploration");
-        dialog.setHeaderText("Input a formula:");
-        dialog.setContentText("Term:");
-        Optional<String> input = dialog.showAndWait();
-        if (input.isEmpty()) {
-            return null;
-        }
-
         KeyIO io = new KeyIO(services);
-        try {
-            JTerm result = io.parseExpression(input.get());
-            if (term != null && !result.sort().equals(term.sort())) {
-                // KNOWN-SIMPLIFIED: the Swing prompt showed the sort-mismatch dialog and re-opened
-                // the input dialog; the FX port is single-shot and aborts the action instead.
-                showError("Sort mismatch",
-                    String.format("%s is of sort %s, but we need a term of sort %s", result,
-                        result.sort(), term.sort()));
+        String errorTitle = null;
+        String errorMessage = null;
+        while (true) {
+            String input = handler.input(initialValue, errorTitle, errorMessage);
+            if (input == null) {
+                // cancelled: abort the whole action like the Swing prompt (result == null)
                 return null;
             }
-            return result;
-        } catch (BuildingException e) {
-            // KNOWN-SIMPLIFIED: single-shot prompt — a malformed input aborts instead of looping.
-            showError("Malformed input", e.getMessage());
-            return null;
+            errorTitle = null;
+            errorMessage = null;
+            try {
+                JTerm result = io.parseExpression(input);
+                if (term != null && !result.sort().equals(term.sort())) {
+                    // Swing parity: show the sort-mismatch dialog and re-open the input dialog
+                    // (ExplorationAction.java:46-53)
+                    errorTitle = "Sort mismatch";
+                    errorMessage = String.format("%s is of sort %s, but we need a term of sort %s",
+                        result, result.sort(), term.sort());
+                    continue;
+                }
+                return result;
+            } catch (BuildingException e) {
+                // Swing parity: show the malformed-input dialog and re-open the input dialog
+                // (ExplorationAction.java:54-57)
+                errorTitle = "Malformed input";
+                errorMessage = e.getMessage();
+            } catch (SyntaxErrorReporter.ParserException e) {
+                // FIXED-UPSTREAM: a syntactically malformed input raises the parser's
+                // RuntimeException, which the Swing loop does not catch (it would abort with an
+                // unhandled exception); the FX retry-loop treats it like any malformed input and
+                // re-prompts
+                errorTitle = "Malformed input";
+                errorMessage = e.getMessage();
+            }
         }
     }
 
