@@ -481,13 +481,17 @@ public class WindowUserInterfaceControlF extends DefaultUserInterfaceControl
      * ({@code registerProofAggregate}): registers the proof-disposed listeners (the super
      * implementation, AbstractUserInterfaceControl.java:300-304), records the aggregate for the
      * later TaskTree/"Loaded Proofs" dockable (Swing {@code mainWindow.addProblem}) and resets
-     * the status line (Swing {@code setStandardStatusLine}). The Swing {@code
-     * getMediator().fireProofLoaded} has no FX counterpart (the FX views observe the selection
-     * model).
+     * the status line (Swing {@code setStandardStatusLine}).
+     * <p>
+     * WP-1: the Swing {@code getMediator().fireProofLoaded(pa.getFirstProof())} (Swing
+     * WindowUserInterfaceControl.java:522) is now ported as well — fired synchronously here,
+     * like in Swing (the load runs before the replay), so the mediator's proof-load listeners
+     * (e.g. the slicing tracker, Swing SlicingExtension.java:120) observe every load.
      */
     @Override
     public void registerProofAggregate(ProofAggregate pa) {
         super.registerProofAggregate(pa);
+        mainWindow.getMediator().fireProofLoaded(pa.getFirstProof());
         FxUtil.runLater(() -> {
             proofAggregates.add(pa);
             mainWindow.resetStatusLine();
