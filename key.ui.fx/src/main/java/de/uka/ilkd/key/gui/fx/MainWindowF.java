@@ -681,6 +681,21 @@ public final class MainWindowF {
                     .notify("Colors verification: " + report,
                         report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
         }
+        // WP-3 (settings-config): theme persistence round trip (key.fx.verify.themepersist) —
+        // two app runs: "save" applies the dark theme through the real ThemeManager.setTheme
+        // (the View menu's Dark Theme action) and asserts the choice persisted; "restore"
+        // restarts the app without the key.fx.theme override and asserts the dark theme was
+        // restored from the persisted preference, then resets to light so the round trip is
+        // repeatable. Proof-independent, so it runs at startup like the other smalldialogs hooks.
+        if (System.getProperty("key.fx.verify.themepersist") != null) {
+            String report =
+                runThemePersistVerification(System.getProperty("key.fx.verify.themepersist"));
+            LOGGER.info("Theme persistence verification: {}", report);
+            NotificationManagerF.getInstance()
+                    .notify("Theme persistence verification: " + report,
+                        report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+            statusRight.setText(report);
+        }
 
         // extension: MP9.0 — register the FX extensions' settings providers into the settings
         // manager registry (Swing SettingsManager registers each KeYGuiExtension.Settings
@@ -4076,6 +4091,41 @@ public final class MainWindowF {
         logMenuParity("GoalBack", verifyGoalBackLabel());
         // P3b/B15: assert the Goal Back / Prune enablement of the menu items and toolbar buttons
         verifyGoalBackPruneEnablement();
+    }
+
+    /**
+     * WP-3 (settings-config): headless theme persistence round trip ({@code
+     * key.fx.verify.themepersist}={@code save}|{@code restore}) — two app runs. The save run
+     * applies the dark theme through the real {@link ThemeManager#setTheme} (the View menu's
+     * Dark Theme action routes through the same call) and asserts the choice was written to the
+     * persisted user preference. The restore run starts without the {@code key.fx.theme}
+     * override and asserts the dark theme was restored from the persisted preference at startup,
+     * then resets to light so the round trip is repeatable.
+     *
+     * @param phase the round-trip phase, {@code "save"} or {@code "restore"}
+     * @return a one-line report, {@code "... PASS"} if the phase's assertions hold
+     */
+    private String runThemePersistVerification(String phase) {
+        ThemeManager manager = ThemeManager.getInstance();
+        if ("save".equals(phase)) {
+            manager.setTheme(Theme.DARK);
+            boolean ok = manager.getTheme() == Theme.DARK
+                    && ThemeManager.persistedTheme() == Theme.DARK;
+            return "phase=save applied=" + manager.getTheme() + " persisted="
+                + ThemeManager.persistedTheme() + (ok ? " PASS" : " FAIL");
+        }
+        if ("restore".equals(phase)) {
+            boolean overrideAbsent = System.getProperty(ThemeManager.THEME_PROPERTY) == null;
+            Theme restored = manager.getTheme();
+            Theme persisted = ThemeManager.persistedTheme();
+            boolean ok = overrideAbsent && restored == Theme.DARK && persisted == Theme.DARK;
+            // leave the persisted state clean so the round trip is repeatable
+            manager.setTheme(Theme.LIGHT);
+            boolean resetOk = ThemeManager.persistedTheme() == Theme.LIGHT;
+            return "phase=restore restored=" + restored + " persisted=" + persisted + " reset="
+                + ThemeManager.persistedTheme() + (ok && resetOk ? " PASS" : " FAIL");
+        }
+        return "FAIL - unknown phase " + phase;
     }
 
     /**
