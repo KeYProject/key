@@ -22,6 +22,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javafx.animation.KeyFrame;
@@ -196,6 +198,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.javafx.FxUtil;
 
 import org.jspecify.annotations.Nullable;
@@ -1337,6 +1340,9 @@ public final class MainWindowF {
                 NotificationManagerF.getInstance()
                         .notify("Auto save verification: " + (ok ? "PASS" : "FAIL"),
                             ok ? Kind.INFO : Kind.ERROR);
+                // menu: MP7/WP-9 — real-flow leg: a capped auto-mode run with the saver armed at
+                // a small interval must actually write the intermediate proof files
+                verifyAutoSaveRealFlow(env.getProofControl(), env.getLoadedProof());
             }
             // extension: MP9.0 — extension SPI self test (key.fx.verify.extensions): asserts
             // the facade discovery (3 registered FX extensions), the two status-line controls
@@ -4738,6 +4744,99 @@ public final class MainWindowF {
             return null;
         }
     }
+
+    /**
+     * menu: MP7/WP-9 — auto-save real-flow self test (part of {@code key.fx.verify.autosave}):
+     * runs a capped auto-mode run with an {@link AutoSaver} armed at a small interval and proves
+     * the saver actually wrote its intermediate proof files. Swing parity: the armed saver
+     * receives the per-application {@code taskProgress(countApplied)} events through the UI
+     * control's ProverTaskListener chain (AbstractUserInterfaceControl.fireTaskProgress) and
+     * writes {@code <tmpdir>/.autosave.N.key} every {@code interval} applications
+     * (AutoSaver.java:117-124) plus the closed final proof to {@code .autosave.proof}
+     * (AutoSaver.java:139-141). The arming routes through the real {@link #applyAutoSave(int)}
+     * and the selection hand-off (mediator {@code setProof} → {@code AutoSaver.setProof}) like
+     * the synchronous leg in the load-success handler.
+     * <p>
+     * The auto-mode run blocks, so the leg runs on a worker thread and logs its own marker line.
+     * The {@code key.fx.demo.autoprove} run closes the demo proof before this leg can arm the
+     * saver — do not combine the two flags.
+     */
+    private void verifyAutoSaveRealFlow(ProofControl proofControl, Proof proof) {
+        if (proof.closed()) {
+            LOGGER.info("Auto save verification (real flow): SKIP (proof already closed — run "
+                + "key.fx.verify.autosave without key.fx.demo.autoprove)");
+            return;
+        }
+        final long startMs = System.currentTimeMillis();
+        Thread worker = new Thread(() -> {
+            GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+            int persistedPeriod = gs.autoSavePeriod();
+            int oldMaxSteps = proof.getSettings().getStrategySettings().getMaxSteps();
+            boolean ok = false;
+            List<String> written = new ArrayList<>();
+            try {
+                proof.getSettings().getStrategySettings()
+                        .setMaxSteps(AUTO_SAVE_REAL_FLOW_MAX_STEPS);
+                CountDownLatch armed = new CountDownLatch(1);
+                FxUtil.runLater(() -> {
+                    try {
+                        // arm a small interval through the real arming path and hand the loaded
+                        // proof to the saver via the real selection hand-off
+                        applyAutoSave(AUTO_SAVE_REAL_FLOW_INTERVAL);
+                        selectionModel.setSelectedProof(null);
+                        selectionModel.setSelectedProof(proof);
+                    } finally {
+                        armed.countDown();
+                    }
+                });
+                armed.await(10, TimeUnit.SECONDS);
+                LOGGER.info("Auto save verification (real flow): auto mode with interval {} armed",
+                    AUTO_SAVE_REAL_FLOW_INTERVAL);
+                proofControl.startAndWaitForAutoMode(proof);
+                // the saves run on their own threads (AutoSaver.save) — poll for the freshly
+                // written files (mtime after the leg started)
+                File tmpDir = IOUtil.getTempDirectory();
+                long deadline = System.currentTimeMillis() + 10_000;
+                while (System.currentTimeMillis() < deadline && written.isEmpty()) {
+                    File[] files = tmpDir.listFiles(
+                        (dir, name) -> name.startsWith(".autosave."));
+                    if (files != null) {
+                        for (File file : files) {
+                            if (file.lastModified() >= startMs) {
+                                written.add(file.getName() + " " + file.length() + "B");
+                            }
+                        }
+                    }
+                    Thread.sleep(200);
+                }
+                ok = !written.isEmpty();
+            } catch (Exception e) {
+                LOGGER.error("Auto save verification (real flow) failed", e);
+            } finally {
+                int saves = written.size();
+                List<String> saved = List.copyOf(written);
+                // restore: armed iff the persisted period is > 0 (the startup arming semantics)
+                FxUtil.runLater(() -> applyAutoSave(persistedPeriod));
+                proof.getSettings().getStrategySettings().setMaxSteps(oldMaxSteps);
+                String report = "Auto save verification (real flow): " + (ok ? "PASS" : "FAIL")
+                    + (saves == 0 ? ""
+                            : " (" + saves + " save(s) under " + IOUtil.getTempDirectory() + ": "
+                                + saved + ")");
+                LOGGER.info(report);
+                boolean reported = ok;
+                FxUtil.runLater(() -> NotificationManagerF.getInstance().notify(report,
+                    reported ? Kind.INFO : Kind.ERROR));
+            }
+        }, "fx-verify-autosave-realloc");
+        worker.setDaemon(true);
+        worker.start();
+    }
+
+    /** WP-9 real-flow auto save leg: the armed save interval (rule applications). */
+    private static final int AUTO_SAVE_REAL_FLOW_INTERVAL = 25;
+
+    /** WP-9 real-flow auto save leg: the capped maximum number of strategy applications. */
+    private static final int AUTO_SAVE_REAL_FLOW_MAX_STEPS = 1000;
 
     /** menu: MP4 — Swing {@code AutoSave.DEFAULT_PERIOD} (key.ui), see autoSaveProofsToggle(). */
     private static final int DEFAULT_AUTO_SAVE_PERIOD = 2000;
