@@ -6,12 +6,12 @@ package de.uka.ilkd.key.doc;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
 
-import com.github.javaparser.ParserConfiguration;
-import com.github.javaparser.StaticJavaParser;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -28,31 +28,30 @@ public abstract class AbstractDocGenerator {
     /// to that file together with a JSON dump ([#generateJsonData()]) next to it; otherwise the
     /// markdown is printed to stdout.
     ///
-    /// @param args an optional single argument with the path of the output file
+    /// @param mdFile an optional single argument with the path of the output file
+    /// @param jsonFile
     /// @throws IOException if the output file cannot be written
-    protected void run(@Nullable String... args) throws IOException {
-        var config = new ParserConfiguration();
-        config.setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_21);
-        StaticJavaParser.setConfiguration(config);
+    protected void run(String mdFile, String jsonFile) throws IOException {
+        Path mdPath = Path.of(mdFile);
+        if (mdPath.getParent() != null) {
+            Files.createDirectories(mdPath.getParent());
+        }
 
-        if (args != null && args.length > 0) {
-            Path mdFile = Path.of(args[0]);
-            if (mdFile.getParent() != null) {
-                Files.createDirectories(mdFile.getParent());
+        try (var out = new PrintStream(Files.newOutputStream(mdPath), false)) {
+            generateDocumentation(out);
+        }
+
+
+        Object data = generateJsonData();
+
+        if (data != null) {
+            Path jsonPath = Paths.get(jsonFile);
+            if (jsonPath.getParent() != null) {
+                Files.createDirectories(jsonPath.getParent());
             }
-            try (var out =
-                new PrintStream(Files.newOutputStream(mdFile), false, StandardCharsets.UTF_8)) {
-                generateDocumentation(out);
+            try (var out = new PrintWriter(Files.newOutputStream(jsonPath), false)) {
+                JsonWriter.toJson(data, out);
             }
-            Object data = generateJsonData();
-            if (data != null) {
-                Path jsonFile =
-                    mdFile.resolveSibling(mdFile.getFileName().toString().replaceFirst("\\.md$",
-                        "") + ".json");
-                Files.writeString(jsonFile, JsonWriter.toJson(data) + "\n");
-            }
-        } else {
-            generateDocumentation(System.out);
         }
     }
 
@@ -101,3 +100,103 @@ public abstract class AbstractDocGenerator {
         return spaces + it.replace("\n", "\n" + spaces);
     }
 }
+
+
+/**
+ * A minimal, dependency-free JSON serializer supporting the data structures used by the
+ * documentation generators: {@link Map}s, {@link Iterable}s, strings, numbers, booleans, and
+ * {@code null}. Other objects are serialized via their {@link Object#toString()}.
+ *
+ * @author Alexander Weigl
+ * @version 1 (10.10.26)
+ */
+final class JsonWriter {
+
+    private JsonWriter() {
+    }
+
+    /**
+     * Serializes the given value into a pretty-printed JSON string.
+     *
+     * @param value the value to serialize
+     * @param out target to write into
+     */
+    public static void toJson(@Nullable Object value, PrintWriter out) {
+        write(out, value, 0);
+    }
+
+    private static void write(PrintWriter sb, @Nullable Object value, int depth) {
+        switch (value) {
+            case null -> sb.append("null");
+            case String s -> writeString(sb, s);
+            case Boolean b -> sb.print(b);
+            case Number n -> sb.print(n);
+            case Map<?, ?> map -> writeObject(sb, map, depth);
+            case Iterable<?> iterable -> writeArray(sb, iterable, depth);
+            default -> writeString(sb, value.toString());
+        }
+    }
+
+    private static void writeObject(PrintWriter sb, Map<?, ?> map, int depth) {
+        sb.append("{\n");
+        var it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            var entry = it.next();
+            indent(sb, depth + 1);
+            writeString(sb, String.valueOf(entry.getKey()));
+            sb.append(": ");
+            write(sb, entry.getValue(), depth + 1);
+            if (it.hasNext()) {
+                sb.append(',');
+            }
+            sb.append('\n');
+        }
+        indent(sb, depth);
+        sb.append('}');
+    }
+
+    private static void writeArray(PrintWriter sb, Iterable<?> iterable, int depth) {
+        sb.append("[\n");
+        var it = iterable.iterator();
+        while (it.hasNext()) {
+            indent(sb, depth + 1);
+            write(sb, it.next(), depth + 1);
+            if (it.hasNext()) {
+                sb.append(',');
+            }
+            sb.append('\n');
+        }
+        indent(sb, depth);
+        sb.append(']');
+    }
+
+    private static void writeString(PrintWriter sb, String s) {
+        sb.append('"');
+        for (var i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            switch (c) {
+                case '"' -> sb.append("\\\"");
+                case '\\' -> sb.append("\\\\");
+                case '\n' -> sb.append("\\n");
+                case '\r' -> sb.append("\\r");
+                case '\t' -> sb.append("\\t");
+                case '\b' -> sb.append("\\b");
+                case '\f' -> sb.append("\\f");
+                default -> {
+                    if (c < 0x20) {
+                        sb.append("\\u%04x".formatted((int) c));
+                    } else {
+                        sb.append(c);
+                    }
+                }
+            }
+        }
+        sb.append('"');
+    }
+
+    private static void indent(PrintWriter sb, int depth) {
+        sb.append("  ".repeat(depth));
+    }
+}
+\newLocalVars(varDeclsSV: VARIABLE, updateBeforeSV: VARIABLE, updateFrameSV: VARIABLE, bodySV: VARIABLE)
+

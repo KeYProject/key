@@ -83,10 +83,6 @@ subprojects {
         implementation(libs.slf4j.api)
         testImplementation(libs.logback.classic)
 
-
-        // Therapi runtime javadoc
-        annotationProcessor 'com.github.therapi:therapi-runtime-javadoc-scribe:0.13.0'
-        implementation 'com.github.therapi:therapi-runtime-javadoc:0.13.0'
         compileOnly(libs.jspecify)
         testCompileOnly(libs.jspecify)
         compileOnly(libs.checkerframework.qual)
