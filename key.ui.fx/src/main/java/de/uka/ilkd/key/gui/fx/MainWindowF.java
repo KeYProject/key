@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EventObject;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -22,6 +23,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javafx.animation.KeyFrame;
@@ -86,6 +89,7 @@ import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.actions.QuickSaveF;
+import de.uka.ilkd.key.gui.fx.actions.useractions.UserActionF;
 import de.uka.ilkd.key.gui.fx.colors.ColorPaletteF;
 import de.uka.ilkd.key.gui.fx.colors.ColorSettingsF;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
@@ -2529,6 +2533,13 @@ public final class MainWindowF {
             // goals); snapshot + restore so the user's setting is not persisted
             ProgressMode previousMode = smtSettings.getModeOfProgressDialog();
             smtSettings.setModeOfProgressDialog(ProgressMode.CLOSE);
+            // WP-7: the auto-apply runs through the undoable SMTProofApplyUserActionF; record
+            // the fired user actions and the auto-mode freeze around the rule application
+            List<UserActionF> actions = Collections.synchronizedList(new ArrayList<>());
+            List<Boolean> autoModeEvents = Collections.synchronizedList(new ArrayList<>());
+            mediator.addUserActionListener(actions::add);
+            Platform.runLater(() -> mediator.autoModeRunningProperty()
+                    .addListener((obs, o, v) -> autoModeEvents.add(v)));
             SMTProblem problem = new SMTProblem(goal);
             SolverListenerF.launch(mediator, getStage(), proof, List.of(problem),
                 union.getTypes());
@@ -2549,8 +2560,46 @@ public final class MainWindowF {
                 // discard the still open modal dialog so the verify run does not stall
                 Platform.runLater(SolverListenerF::discardCurrentDialog);
             }
+            // WP-7 undo assert: the recorded action (name/canUndo), the freeze flag around the
+            // rule application and the undo (the goal is pruned back open)
+            String undoReport = "";
+            UserActionF recorded;
+            synchronized (actions) {
+                recorded = actions.isEmpty() ? null : actions.get(0);
+            }
+            if (recorded != null) {
+                String name = recorded.name();
+                boolean nameOk = name.startsWith("Close: ") && name.endsWith(" goals by SMT");
+                boolean canUndo = recorded.canUndo();
+                boolean freezeSeen =
+                    autoModeEvents.contains(Boolean.TRUE) && autoModeEvents.contains(Boolean.FALSE);
+                CountDownLatch undone = new CountDownLatch(1);
+                Platform.runLater(() -> {
+                    try {
+                        recorded.undo();
+                    } catch (RuntimeException e) {
+                        LOGGER.error("SMT verification undo failed", e);
+                    } finally {
+                        undone.countDown();
+                    }
+                });
+                boolean undoneInTime = false;
+                try {
+                    undoneInTime = undone.await(30, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                boolean reopened = undoneInTime && !goal.node().isClosed();
+                boolean undoOk = nameOk && canUndo && freezeSeen && reopened;
+                undoReport = (undoOk ? "PASS" : "FAIL") + " (name=" + name + ", canUndo=" + canUndo
+                    + ", freeze=" + freezeSeen + ", undone=" + undoneInTime + ", reopened="
+                    + reopened + ")";
+            }
             report = (closed ? "PASS" : "FAIL") + " (union=" + union + ", goalClosed=" + closed
                 + ")";
+            if (!undoReport.isEmpty()) {
+                report = report + "; apply/undo: " + undoReport;
+            }
             // restore the user's progress mode after the auto-apply settled
             try {
                 Thread.sleep(1000);
@@ -2564,7 +2613,7 @@ public final class MainWindowF {
             LOGGER.info("SMT verification: {}", finalReport);
             NotificationManagerF.getInstance()
                     .notify("SMT verification: " + finalReport,
-                        finalReport.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+                        finalReport.contains("PASS") ? Kind.INFO : Kind.ERROR);
         });
     }
 
