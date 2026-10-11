@@ -136,6 +136,8 @@ run {
     //    term menu + POPUP_DELAY guard, search prefill, shift+click focussed auto mode)
     //  * key.fx.verify.dialogs = any  (P2b: run the contract-completion registry + dialog
     //    skeletons — contract/auxiliary configurators, lemma selection dialog, item chooser)
+    //  * key.fx.verify.dialogs.contract = <file.key>  (P2b/WP-9: example for the contract E2E
+    //    leg of the dialogs self test; default heap/model_methods/CellTest_callSet.key)
     //  * key.fx.verify.prooftree = any  (P3a: run the proof tree C19-C23/C25/C27 self test —
     //    per-proof view states, linearized mode, OSS protocol rows, whole-tree expand/collapse,
     //    node-filter counting, notes + subtree statistics dialogs; combine with
@@ -176,7 +178,8 @@ run {
         "key.fx.verify.profileloadingdialog", "key.fx.verify.javacsettings",
         "key.fx.verify.termmenu", "key.fx.verify.colors", "key.fx.verify.smt",
         "key.fx.verify.loadingexit", "key.fx.verify.shortcuts", "key.fx.verify.inputfreeze",
-        "key.fx.verify.sequentmenu", "key.fx.verify.dialogs", "key.fx.verify.prooftree",
+        "key.fx.verify.sequentmenu", "key.fx.verify.dialogs", "key.fx.verify.dialogs.contract",
+        "key.fx.verify.prooftree",
         "key.fx.verify.selectionhistory", "key.fx.verify.isabelle",
         "key.fx.verify.exploration", "key.fx.verify.caching",
         "key.fx.verify.sourceconsistency", "key.fx.demo.sourceconsistency"]
