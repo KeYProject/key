@@ -45,8 +45,10 @@ import org.slf4j.LoggerFactory;
  * <p>
  * <b>KNOWN-SIMPLIFIED:</b> the Swing dialog embeds a live {@code TestgenOptionsPanel} on its
  * eastern edge (TGInfoDialog.java:126) so the options can be edited right before a run; the FX
- * port keeps the options exclusively in the Settings dialog (the global
- * {@link TestGenerationSettingsF} are re-read at run start). The "Close" button is disabled while
+ * dialog embeds the {@link TestgenOptionsPanelF} the same way (WP-7). Unlike the Swing original
+ * (whose embedded panel edits a working copy that is never applied from the run dialog, so the
+ * edits were lost) the FX panel writes into the global {@link TestGenerationSettingsF} live. The
+ * "Close" button is disabled while
  * a run is active like in Swing (TGInfoDialog.java:118). The generated-files list is a simple
  * recursive listing of the configured output folder (the Swing dialog only prints "Writing test
  * file" into the log). The window may be {@code null} when the extension has not been connected
@@ -70,6 +72,12 @@ final class TestGenResultsDialogF extends Dialog<Void> {
     private final Button btnStop = new Button("Stop");
     private final Button btnClose = new Button("Close");
     private final ReadOnlyBooleanWrapper running = new ReadOnlyBooleanWrapper(this, "running");
+    /**
+     * the embedded live options panel (the Swing {@code TGInfoDialog} embeds a
+     * {@code TestgenOptionsPanel} on its eastern edge, TGInfoDialog.java:126); edits write into
+     * the global {@link TestGenerationSettingsF} immediately (see {@link TestgenOptionsPanelF}).
+     */
+    private final TestgenOptionsPanelF optionsPanel = new TestgenOptionsPanelF(true);
 
     private TestGenerationTaskF runningTask;
 
@@ -102,6 +110,7 @@ final class TestGenResultsDialogF extends Dialog<Void> {
 
         BorderPane root = new BorderPane(center);
         root.setBottom(buttons);
+        root.setRight(optionsPanel.getNode());
         DialogPane pane = getDialogPane();
         pane.setPrefSize(900, 650);
         pane.setContent(root);
