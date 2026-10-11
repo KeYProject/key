@@ -45,6 +45,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.HLineTo;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -63,6 +64,7 @@ import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.MainWindowF;
+import de.uka.ilkd.key.gui.fx.colors.ColorPaletteF;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
 import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
@@ -91,10 +93,13 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
+import org.key_project.prover.sequent.FormulaChangeInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.javafx.FxUtil;
@@ -242,6 +247,16 @@ public class SequentViewF extends BorderPane {
      */
     private final Pane hoverOverlay = new Pane();
 
+    /**
+     * Overlay pane for the age-heatmap highlights (WP-2, Swing
+     * {@code SequentView.updateHeatMapHighlights}: the Swing highlighter paints the heat color
+     * behind the text with {@code DefaultHighlightPainter}s), below all other highlights.
+     */
+    private final Pane heatmapOverlay = new Pane();
+
+    /** number of heatmap rectangles of the current printing (verification, WP-2). */
+    private int heatmapRectCount;
+
     private final HBox searchBar = new HBox(4);
     private final TextField searchField = new TextField();
     private final ToggleButton regexToggle = new ToggleButton("RegExp");
@@ -357,7 +372,12 @@ public class SequentViewF extends BorderPane {
         hoverOverlay.getStyleClass().add("sequent-overlay");
         hoverOverlay.setMouseTransparent(true);
         hoverOverlay.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        StackPane content = new StackPane(updateOverlay, hoverOverlay, textFlow);
+        // heatmap (WP-2): the Swing highlighter paints the heat rectangles behind all other
+        // highlights (DefaultHighlighter paints in insertion order), so the pane sits first
+        heatmapOverlay.getStyleClass().add("sequent-overlay");
+        heatmapOverlay.setMouseTransparent(true);
+        heatmapOverlay.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        StackPane content = new StackPane(heatmapOverlay, updateOverlay, hoverOverlay, textFlow);
         scrollPane.setContent(content);
         setCenter(scrollPane);
         textFlow.getStyleClass().add("sequent-view-flow");
@@ -1565,8 +1585,333 @@ public class SequentViewF extends BorderPane {
 
     /** Rebuilds all overlay rectangles behind the text. */
     private void rebuildOverlays() {
+        rebuildHeatmapOverlays();
         rebuildUpdateOverlays();
         rebuildHoverOverlay();
+    }
+
+    // -----------------------------------------------------------------------
+    // Heatmap (WP-2, Swing SequentView.updateHeatMapHighlights +
+    // updateHeatmapSFHighlights/updateHeatmapTermHighlights, SequentView.java:569-961)
+    // -----------------------------------------------------------------------
+
+    /** maximum opacity of the heatmap color (Swing {@code HEATMAP_DEFAULT_START_OPACITY}). */
+    private static final double HEATMAP_START_OPACITY = 0.7;
+
+    /**
+     * Rebuilds the heatmap highlight rectangles of the current printing (Swing
+     * {@code SequentView.updateHeatMapHighlights}): while the persisted
+     * {@link ViewSettings#isShowHeatmap()} flag is on, the sequent formulas (or terms) that were
+     * added or changed recently get translucent heat-colored rectangles behind the text, aged
+     * from the selected node up the proof tree. Swing renders these highlights into the sequent
+     * views only (called from {@code CurrentGoalView:197}/{@code InnerNodeView:241}) — the proof
+     * tree is not involved.
+     */
+    private void rebuildHeatmapOverlays() {
+        heatmapOverlay.getChildren().clear();
+        heatmapRectCount = 0;
+        if (printed == null || selectedNode == null) {
+            return;
+        }
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        if (!vs.isShowHeatmap()) {
+            return;
+        }
+        InitialPositionTable table = getInitialPositionTable();
+        if (table == null) {
+            return;
+        }
+        // make sure the text flow is laid out before asking for glyph shapes
+        textFlow.applyCss();
+        textFlow.layout();
+        int maxAge = vs.getMaxAgeForHeatmap();
+        if (vs.isHeatmapSF()) {
+            rebuildHeatmapSFOverlays(table, maxAge, vs.isHeatmapNewest());
+        } else {
+            rebuildHeatmapTermOverlays(table, maxAge, vs.isHeatmapNewest());
+        }
+    }
+
+    /**
+     * Highlights sequent formulas according to their age (if {@code newest} is {@code false}), or
+     * the newest sequent formulas (Swing {@code SequentView.updateHeatmapSFHighlights}).
+     *
+     * @param table the position table of the current printing
+     * @param maxAge maximum age up to which formulas are highlighted, or number of recent formulas
+     *        to highlight
+     * @param newest whether the newest formulas are highlighted ({@code true}) or all up to
+     *        {@code maxAge} ({@code false})
+     */
+    private void rebuildHeatmapSFOverlays(InitialPositionTable table, int maxAge, boolean newest) {
+        List<SequentPrintFilterEntry> entryList = new ArrayList<>();
+        if (filter.getFilteredAntec() != null) {
+            filter.getFilteredAntec().forEach(entryList::add);
+        }
+        if (filter.getFilteredSucc() != null) {
+            filter.getFilteredSucc().forEach(entryList::add);
+        }
+        if (newest) {
+            List<SequentPrintFilterEntry> sorted = new ArrayList<>(entryList);
+            sorted.sort((o1, o2) -> Integer
+                    .compare(computeSeqFormulaAge(selectedNode, o1.getFilteredFormula(), 1000),
+                        computeSeqFormulaAge(selectedNode, o2.getFilteredFormula(), 1000)));
+            int index = 0;
+            for (SequentPrintFilterEntry entry : entryList) {
+                for (int j = 0; j < maxAge && j < sorted.size(); ++j) {
+                    if (sorted.get(j).equals(entry)) {
+                        paintHeatmapSF(table, index, computeHeatmapColor(maxAge, j));
+                    }
+                }
+                index++;
+            }
+        } else {
+            // all formulas below the maximum age are highlighted
+            int index = 0;
+            for (SequentPrintFilterEntry entry : entryList) {
+                SequentFormula form = entry.getFilteredFormula();
+                int age = computeSeqFormulaAge(selectedNode, form, maxAge + 2);
+                if (age < maxAge) {
+                    paintHeatmapSF(table, index, computeHeatmapColor(maxAge, age));
+                }
+                index++;
+            }
+        }
+    }
+
+    /**
+     * Highlights terms according to their age (if {@code newest} is {@code false}), or the newest
+     * terms (Swing {@code SequentView.updateHeatmapTermHighlights}): the {@link
+     * org.key_project.prover.sequent.SequentChangeInfo}s of the ancestor chain of the selected
+     * node report when formulas were added, modified or removed; modified positions are tracked
+     * down the chain like the Swing original.
+     *
+     * @param table the position table of the current printing
+     * @param maxAge maximum age up to which terms are highlighted, or number of recent terms to
+     *        highlight
+     * @param newest whether the newest terms are highlighted ({@code true}) or all up to
+     *        {@code maxAge} ({@code false})
+     */
+    private void rebuildHeatmapTermOverlays(InitialPositionTable table, int maxAge,
+            boolean newest) {
+        List<Node> nodeList = new ArrayList<>();
+        Node node = selectedNode;
+        nodeList.add(node);
+        while (node.parent() != null) {
+            node = node.parent();
+            nodeList.add(0, node);
+        }
+        List<PioAge> pioAgeList = new ArrayList<>();
+        int age = nodeList.size() - 1;
+        for (Node n : nodeList) {
+            SequentChangeInfo changeInfo = n.getNodeInfo().getSequentChangeInfo();
+            if (changeInfo != null) {
+                for (SequentFormula sf : changeInfo.addedFormulas(true)) {
+                    pioAgeList.add(
+                        new PioAge(new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), age));
+                }
+                for (SequentFormula sf : changeInfo.addedFormulas(false)) {
+                    pioAgeList.add(
+                        new PioAge(new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), age));
+                }
+                for (FormulaChangeInfo fci : changeInfo.modifiedFormulas()) {
+                    PosInOccurrence positionOfModification = fci.positionOfModification();
+                    pioAgeList.add(new PioAge(positionOfModification, age));
+                    for (PioAge pair : pioAgeList) {
+                        if (pair.pio.sequentFormula().equals(fci.getOriginalFormula())) {
+                            if (positionOfModification.posInTerm()
+                                    .isPrefixOf(pair.pio.posInTerm())) {
+                                pair.active = false;
+                            } else {
+                                pair.setPio(new PosInOccurrence(fci.newFormula(),
+                                    pair.pio.posInTerm(), pair.pio.isInAntec()));
+                            }
+                        }
+                    }
+                }
+                for (SequentFormula sf : changeInfo.removedFormulas(true)) {
+                    for (PioAge pair : pioAgeList) {
+                        if (pair.pio.sequentFormula().equals(sf) && pair.pio.isInAntec()) {
+                            pair.active = false;
+                        }
+                    }
+                }
+                for (SequentFormula sf : changeInfo.removedFormulas(false)) {
+                    for (PioAge pair : pioAgeList) {
+                        if (pair.pio.sequentFormula().equals(sf) && !pair.pio.isInAntec()) {
+                            pair.active = false;
+                        }
+                    }
+                }
+            }
+            age--;
+        }
+        pioAgeList.sort((o1, o2) -> o1.age >= o2.age ? 1 : -1);
+        if (newest) {
+            for (int j = 0; j < pioAgeList.size() && j < maxAge; ++j) {
+                PioAge pair = pioAgeList.get(j);
+                if (!pair.active) {
+                    continue;
+                }
+                while (j + 1 < pioAgeList.size() && pioAgeList.get(j + 1).pio.equals(pair.pio)) {
+                    pair = pioAgeList.get(j + 1);
+                    pioAgeList.remove(j);
+                }
+                paintHeatmapTerm(table, pair.pio, computeHeatmapColor(maxAge, j));
+            }
+        } else {
+            for (PioAge pair : pioAgeList) {
+                if (!pair.active || pair.age > maxAge) {
+                    continue;
+                }
+                paintHeatmapTerm(table, pair.pio, computeHeatmapColor(maxAge, pair.age));
+            }
+        }
+    }
+
+    /** Paints the heatmap rectangle of the filtered formula at the given entry index. */
+    private void paintHeatmapSF(InitialPositionTable table, int index, Color color) {
+        Range range = table.rangeForPath(ImmutableList.<Integer>nil().prepend(0).append(index));
+        if (range != null) {
+            addHeatmapRect(range, color);
+        }
+    }
+
+    /** Paints the heatmap rectangle at the position of the given term occurrence. */
+    private void paintHeatmapTerm(InitialPositionTable table, PosInOccurrence pio, Color color) {
+        ImmutableList<Integer> path = table.pathForPosition(pio, filter);
+        if (path == null) {
+            return;
+        }
+        Range range = table.rangeForPath(path);
+        if (range != null) {
+            addHeatmapRect(range, color);
+        }
+    }
+
+    /**
+     * Computes the heat color for a given age and maximum age (Swing
+     * {@code SequentView.computeColorForAge}): linear interpolation of the opacity of the
+     * configured base color ({@code [Heatmap]basecolor} of the shared {@code colors.json}, the
+     * FX counterpart is {@link ColorPaletteF#HEATMAP_BASE_COLOR}) starting at
+     * {@link #HEATMAP_START_OPACITY}.
+     */
+    private Color computeHeatmapColor(int maxAge, int age) {
+        Color base = ColorPaletteF.HEATMAP_BASE_COLOR.getCurrentColor();
+        double alpha = HEATMAP_START_OPACITY * (1 - (double) age / maxAge);
+        return new Color(base.getRed(), base.getGreen(), base.getBlue(), Math.clamp(alpha, 0, 1));
+    }
+
+    /**
+     * Computes the age of a given sequent formula, i.e., its distance to the root of the proof
+     * tree (Swing {@code SequentView.computeSeqFormulaAge}). If the formula is older than
+     * {@code maxAge}, the walk stops early — older formulas are not considered anyway.
+     */
+    private static int computeSeqFormulaAge(Node node, SequentFormula form, int maxAge) {
+        int age = -1;
+        while (age < maxAge && node != null && node.sequent().contains(form)) {
+            age++;
+            node = node.parent();
+        }
+        return age;
+    }
+
+    /** Adds one translucent heatmap rectangle behind the text (no Swing +1 offset here). */
+    private void addHeatmapRect(Range range, Color color) {
+        int start = Math.clamp(range.start(), 0, printed.length());
+        int end = Math.clamp(range.end(), start, printed.length());
+        if (end <= start) {
+            return;
+        }
+        Path rect = new Path(textFlow.getRangeShape(start, end, true));
+        rect.getStyleClass().add("sequent-heatmap-highlight");
+        rect.setFill(color);
+        rect.setManaged(false);
+        heatmapOverlay.getChildren().add(rect);
+        heatmapRectCount++;
+    }
+
+    /**
+     * Pair of a {@link PosInOccurrence} and its age (Swing {@code SequentView.PIO_age}), used for
+     * the term heatmap highlighting.
+     */
+    private static final class PioAge {
+        PosInOccurrence pio;
+        final int age;
+        boolean active = true;
+
+        PioAge(PosInOccurrence pio, int age) {
+            this.pio = pio;
+            this.age = age;
+        }
+
+        void setPio(PosInOccurrence pio) {
+            this.pio = pio;
+        }
+    }
+
+    /**
+     * WP-2 verification ({@code key.fx.verify.heatmap}): enables the heatmap over the ViewSettings
+     * in all four modes, asserts that the respective heat rectangles appear behind the printed
+     * text and disappear again when the flag is switched off, then restores the persisted options.
+     * The term modes report a count only when the proof carries {@code SequentChangeInfo}s (a
+     * replayed {@code .proof} load does not set them; a live rule application does).
+     *
+     * @return a self-test report ending in {@code PASS} or {@code FAIL}
+     */
+    public String verifyHeatmap() {
+        if (printed == null || selectedNode == null) {
+            return "SKIP (no sequent)";
+        }
+        ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        boolean oldShow = vs.isShowHeatmap();
+        boolean oldSf = vs.isHeatmapSF();
+        boolean oldNewest = vs.isHeatmapNewest();
+        int oldMaxAge = vs.getMaxAgeForHeatmap();
+        StringBuilder problems = new StringBuilder();
+        try {
+            int maxAge = Math.max(5, oldMaxAge);
+            int sfAge = heatRects(true, true, false, maxAge);
+            int sfNewest = heatRects(true, true, true, maxAge);
+            int off = heatRects(false, oldSf, oldNewest, oldMaxAge);
+            boolean hasChangeInfo = false;
+            for (Node n = selectedNode; n != null && !hasChangeInfo; n = n.parent()) {
+                hasChangeInfo = n.getNodeInfo().getSequentChangeInfo() != null;
+            }
+            int termsAge = -1;
+            int termsNewest = -1;
+            if (hasChangeInfo) {
+                termsAge = heatRects(true, false, false, maxAge);
+                termsNewest = heatRects(true, false, true, maxAge);
+                if (termsAge <= 0 || termsNewest <= 0) {
+                    problems.append("term modes without rectangles; ");
+                }
+            }
+            if (sfAge <= 0) {
+                problems.append("sf age mode without rectangles; ");
+            }
+            if (sfNewest <= 0) {
+                problems.append("sf newest mode without rectangles; ");
+            }
+            if (off != 0) {
+                problems.append("disabled heatmap still shows ").append(off).append(" rects; ");
+            }
+            boolean pass = problems.length() == 0;
+            return "sfAge=" + sfAge + " sfNewest=" + sfNewest + " termsAge=" + termsAge
+                + " termsNewest=" + termsNewest + " off=" + off
+                + (hasChangeInfo ? "" : " (no SequentChangeInfo — term modes skipped)") + " "
+                + (pass ? "PASS" : "FAIL" + " problems=[" + problems + "]");
+        } finally {
+            vs.setHeatmapOptions(oldShow, oldSf, oldNewest, oldMaxAge);
+            printSequent();
+        }
+    }
+
+    /** One heatmap verify step: applies the options, re-prints and counts the rectangles. */
+    private int heatRects(boolean show, boolean sf, boolean newest, int maxAge) {
+        ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
+                .setHeatmapOptions(show, sf, newest, maxAge);
+        printSequent();
+        return heatmapRectCount;
     }
 
     /**
