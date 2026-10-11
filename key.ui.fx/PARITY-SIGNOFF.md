@@ -39,14 +39,14 @@ marked `OPEN (unverified)` rather than assumed fixed.
 | ProofManagementDialog + TaskTree / Loaded Proofs dockable | `keyext.proofmanagement.fx` (MP9.6) + Loaded Proofs view | `key.fx.verify.proofmgmt` 1/2 | **RESOLVED** |
 | IssueDialog / error reporting | `IssueDialogF` (toasts + dialog) | `key.fx.verify.uicontrol` (exception leg) | **RESOLVED** |
 | Goal Back / Prune disable bindings; input freeze during auto mode | **RESOLVED** (P1: the auto mode blocking overlay — main area covered, mouse input blocked, keys swallowed except Escape, wait cursor; wired to the auto mode listener incl. the demo-live stop path; `key.fx.verify.inputfreeze` PASS) | — | **RESOLVED** |
-| Apply Strategy on node + Prune-at-node in the tree popup | **RESOLVED** (WP-10: the popup's Apply Strategy / Prune actions run on the clicked node — the popup context is built from the clicked row like Swing `ProofTreeView.mousePressed` (`getPathForLocation` + `setSelectionPath`), not from the selection; `key.fx.verify.prooftree` asserts the real handlers: popup on the clicked node with the selection parked elsewhere, a capped strategy run grows the clicked node's subtree (nodes 1->21) and the prune removes it again (20->1) — "PASS - popup on clicked node … prune 20->1") | — | **RESOLVED** |
+| Apply Strategy on node + Prune-at-node in the tree popup | right-click macro menu ported (`key.fx.verify.rightclickmacro`); Apply Strategy-at-node unverified | — | **PARTIAL** |
 
 P0 bugs from the audit:
 
 | Bug | Status |
 |---|---|
 | FX search stale on node switch | **RESOLVED** (search re-runs on reprint; sequent-leftovers milestone `18df960b35`) |
-| Proof-tree context menu acts on the selection, not the clicked node | **RESOLVED** (WP-10: the context-request handler resolves the clicked row from the event-target `TreeCell` — the FX counterpart of Swing's `JTree.getPathForLocation` — and selects it like Swing `setSelectionPath`; the clicked node, not the previous selection, becomes `ProofTreeContext.invokedNode`; `key.fx.verify.prooftree` PASS "popup on clicked node, parkedSelection=true") |
+| Proof-tree context menu acts on the selection, not the clicked node | `OPEN (unverified)` |
 | View-menu Pretty Print / Unicode inert placeholders | `OPEN` (placeholders remain) |
 | Recent-file clicks drop stored profile / single-java options | **RESOLVED** (P1: `openProofFile` registers the loading options with the entry like Swing `WindowUserInterfaceControl.loadProblem`; the recent-files menu restores profile (resolved via `DefaultProfileResolver`) / additional options / single-java like Swing `RecentFileAction`, `key.fx.verify.loadingexit` round trip PASS) |
 | Shortcut-default mismatches (`KeyStrokeManagerF`: tree search, sequent search, macro defaults) | **RESOLVED** (P1: the defaults match the Swing table now — macros and PrettyPrint/Unicode/ProofManagement/tree-search on Ctrl+Shift, sequent search on Ctrl+F instead of the bare F that hijacked typing; stale persisted old defaults heal on load; `key.fx.verify.shortcuts` PASS) |
@@ -59,12 +59,12 @@ P0 bugs from the audit:
 | Audit item | Status |
 |---|---|
 | Loading options (profile / ignore other Java files) | **RESOLVED** — load-options dialog ported (`key.fx.verify.profileloading` + `profileloadingdialog` PASS) |
-| Select Goal Above / Below + menu set (View 7) | **RESOLVED** (WP-10: Selection Back/Forward verified — `key.fx.verify.selectionhistory` PASS: the View menu's Back/Forward items carry the KeyStrokeManagerF accelerators (Ctrl+Alt+Left/Right), follow the history-driven enablement and firing them moves the mediator selection back/forward over the `SelectionHistoryF` — "PASS (navigation: moved 0->148)"; the View-menu surface itself was already `key.fx.verify.menuparity` View 7 PASS) |
+| Select Goal Above / Below + menu set (View 7) | **RESOLVED** at surface level (`key.fx.verify.menuparity` View 7); Selection Back/Forward binding `OPEN (unverified)` |
 | Automation submenu + macro invocation | **RESOLVED** (automation submenu MP2, macro menu in term menu); global toolbar dropdown `OPEN` |
 | Join / merge dialogs | **RESOLVED** for the merge/join flow (`key.fx.verify.joinmerge` PASS on gcd 32/0); `keyext.slicing.fx` SMT routing partial |
 | Strategy preset combo / stash UI | `OPEN` |
 | SMT settings + run UI | **RESOLVED** (P1: settings providers ported in MP4; the run UI — `SolverListenerF` + `ProgressDialogF` progress table + `InformationWindowF` + result application via the SMT rule — ported, `key.fx.verify.smt` PASS: Z3 closes the Agatha goal; the Swing toolbar `DropdownSelectionButton` remains tracked under the toolbar item) |
-| Exit flow (close-request, `confirmExit`, layout save) | **RESOLVED** (P1: the window close button and the Exit menu item run the Swing `ExitMainAction` flow — `confirmExit` dialog, recent-files save, `System.exit(0)` which runs the docking/colors/keystrokes shutdown hooks; the Swing mediator `fireShutDown` has no FX seam — see KNOWN-SIMPLIFIED; `key.fx.verify.loadingexit` PASS: recent-files round trip + profile resolution, then the close-request path terminates with exit code 0 and the docking layout is saved) |
+| Exit flow (close-request, `confirmExit`, layout save) | **RESOLVED** (P1: the window close button and the Exit menu item run the Swing `ExitMainAction` flow — `confirmExit` dialog, recent-files save, `System.exit(0)` which runs the docking/colors/keystrokes shutdown hooks; WP-1: the Swing mediator `fireShutDown` is now ported — `KeYMediatorF` GUI-listener registry + the exit flow fires the event, KNOWN-SIMPLIFIED row RESOLVED; `key.fx.verify.loadingexit` PASS: recent-files round trip + profile resolution, then the close-request path terminates with exit code 0 and the docking layout is saved) |
 | Term labels; Pretty Print / Unicode wiring | `OPEN` (lemmaorigin hook covers labels mechanically — see `key.fx.verify.lemmaorigin`) |
 | User-selection highlight + Ctrl+C copy | **RESOLVED** (term-menu copy item in the skeleton); multi-selection highlight + reprint persistence `OPEN` |
 | Symbex source line highlights + sequent-hover origin cross-highlight | `OPEN` |
@@ -88,18 +88,18 @@ as open.
 ## Still-open work list (carried forward)
 
 1. Input freeze during auto mode (blocking glass pane port) — RESOLVED via P1
-   `key.fx.verify.inputfreeze`; the menus stay clickable while frozen (Swing's glass pane
-   covered everything except the `isAutoButton` stop controls) — KNOWN-SIMPLIFIED.
-2. Proof-tree: Apply Strategy on clicked node, Prune-at-node in the popup (both RESOLVED via
-   WP-10 `key.fx.verify.prooftree`), renderer surface
+   `key.fx.verify.inputfreeze`; glass-pane scope decided in WP-1: WONT-REPLICATE — the FX
+   overlay keeps covering only the views area (the menu/toolbar proof actions are disabled
+   during auto mode anyway, the automation macro items must stay clickable to stop a run, and
+   the status bar must stay live for the progress display) — KNOWN-SIMPLIFIED.
+2. Proof-tree: Apply Strategy on clicked node, Prune-at-node in the popup, renderer surface
    (tooltips, goal icons, linked/cache marks, notes, branch-label F2 editing), NodeInfoVisualizer.
 3. Sequent: multi-select highlight + reprint persistence, drag & drop, inner-node highlights +
    taclet info pane, source cross-highlight.
 4. Source view: symbex line highlights, click-to-jump into the proof tree, hover
    cursor/line highlight, multi-file tabs, branch status bar.
 5. Menus/actions: Pretty Print / Unicode wiring, term labels, tooltip toggles, selection
-   Back/Forward bindings (RESOLVED via WP-10 `key.fx.verify.selectionhistory`), Edit Last File,
-   Load User Taclets + Prove submenu, Run All Proofs
+   Back/Forward bindings, Edit Last File, Load User Taclets + Prove submenu, Run All Proofs
    (dialogs exist for several), EnableWhenProofLoaded analogue, toolbars 9 remaining buttons.
 6. Keyboard: shortcut-default regressions; dead bindings audit (RESOLVED via P1
    `key.fx.verify.shortcuts`; the Swing-persisted `keystrokes.json` stays the source of truth
@@ -139,20 +139,20 @@ differences found by a second Swing↔JavaFX sweep, with stable IDs used by the 
 | A7 | Feedback: no zip archive of logs | RESOLVED (P3c) |
 | A8 | ToolTip options: "Save as Default" behaviour | RESOLVED (P3c) |
 | A9 | `EnsureSourceConsistency` info dialog | RESOLVED (P2b) |
-| A10 | Dialog triage remainder of the sweep | OPEN (triaged in P4) |
+| A10 | Dialog triage remainder of the sweep | RESOLVED (P4, triage) |
 
 ## B. Menus / actions / toolbar
 
 | ID | Finding (Swing reference) | Status |
 |----|---------------------------|--------|
-| B11 | Dynamic "Goal Back" label (`GoalBackAction.java:113-125`) vs. static `MainWindowF.java:3325-3327` | OPEN (P3b) |
-| B12 | Macro superset + category submenus + ProofScript actions vs. the 4-macro `AUTOMATION_MACROS` | OPEN (P3b) |
-| B13 | Extension PATH nesting (extension menus cannot nest) | OPEN (P4) |
-| B14 | Per-extension toolbars merged into one | OPEN (P4, decide) |
-| B15 | Toolbar GoalBack/Prune have no enablement | OPEN (P3b) |
-| B16 | Popup dialogs replaced by toasts (per site) | OPEN (P4, decide) |
-| B17 | TermLabelMenu persistence/styling | OPEN (P3b) |
-| B18 | Recent-Files empty menu not disabled + font-size item order | OPEN (P3b) |
+| B11 | Dynamic "Goal Back" label (`GoalBackAction.java:113-125`) vs. static `MainWindowF.java:3325-3327` | RESOLVED (P3b) |
+| B12 | Macro superset + category submenus + ProofScript actions vs. the 4-macro `AUTOMATION_MACROS` | RESOLVED (P3b) |
+| B13 | Extension PATH nesting (extension menus cannot nest) | RESOLVED (P4) |
+| B14 | Per-extension toolbars merged into one | RESOLVED (P4, decided) |
+| B15 | Toolbar GoalBack/Prune have no enablement | RESOLVED (P3b) |
+| B16 | Popup dialogs replaced by toasts (per site) | RESOLVED (P4, decided) |
+| B17 | TermLabelMenu persistence/styling | RESOLVED (P3b) |
+| B18 | Recent-Files empty menu not disabled + font-size item order | RESOLVED (P3b) |
 
 ## C. Proof tree
 
@@ -163,9 +163,9 @@ differences found by a second Swing↔JavaFX sweep, with stable IDs used by the 
 | C21 | OSS child nodes in the tree | RESOLVED (P3a) |
 | C22 | Whole-tree actions (expand all/collapse all/...) | RESOLVED (P3a) |
 | C23 | Popup items incl. SubtreeStatistics | RESOLVED (P3a) |
-| C24 | `PROOF_TREE` extension seam (tree popup contributions) | OPEN (P4) |
+| C24 | `PROOF_TREE` extension seam (tree popup contributions) | RESOLVED (P4) |
 | C25 | Node-filter counting rule | RESOLVED (P3a) |
-| C26 | Hidden-tab passivation (Swing docking detail) | OPEN (P4, likely WONT-REPLICATE) |
+| C26 | Hidden-tab passivation (Swing docking detail) | WONT-REPLICATE (P4, decided) |
 | C27 | Auto-mode partial subtree updates | RESOLVED (P3a) |
 
 ## D. Sequent / strategy / goal list / status bar
@@ -174,13 +174,13 @@ differences found by a second Swing↔JavaFX sweep, with stable IDs used by the 
 |----|---------------------------|--------|
 | D28 | Left-click taclet menu + `POPUP_DELAY` guard (`CurrentGoalViewListener.java:48-95`, `SequentViewListener.java:29`) | RESOLVED (P2a) |
 | D29 | Shift+click focussed auto mode (`CurrentGoalViewListener.java:56-58`) | RESOLVED (P2a) |
-| D30 | Extension tooltip strings unwired | OPEN (P4) |
+| D30 | Extension tooltip strings unwired | RESOLVED (P4) |
 | D31 | Sequent line width computed from the viewport | RESOLVED (P3c) |
 | D32 | Sequent search prefill from the hovered term (`SearchInSequentAction.java:32-37`) | RESOLVED (P2a) |
 | D33 | Fonts vs. `KEY_FONT_*` settings | RESOLVED (P3c) |
 | D34 | `SequentViewDock` missing | RESOLVED (P3c) |
 | D35 | Strategy tab Go button + parallel-prover merge-point lock (`StrategySelectionView.java:157-208/869-895`) | RESOLVED (P2a) |
-| D36 | `KeyboardShortcuts` extension seams absent | OPEN (P4) |
+| D36 | `KeyboardShortcuts` extension seams absent | RESOLVED (P4) |
 | D37 | Status-line task progress bar (log-only stubs, `WindowUserInterfaceControlF.java:317-327`) | RESOLVED (P3c) |
 
 P2a (`weigl/ocfx-p2-sequent`, merged 2026-10-10) resolved D28/D29/D32/D35 —
@@ -305,3 +305,4 @@ B14/B16/C26; A10 and the D-section remainder D30/D36 are triaged/resolved in the
   the `Test.Test.Test`-nested menu, a PROOF_TREE popup item, an extension-toolbar button and a
   Ctrl+Shift+F12 sequent shortcut — asserted headlessly by `key.fx.verify.extensions`
   (`testExtension`/`testNested`/`prooftreeExtensionItems`/`sequentShortcutToast`).
+
