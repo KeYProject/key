@@ -262,7 +262,7 @@ public class TacletBuilderManipulators {
             }
         };
     public static final AbstractConditionBuilder ENUM_TYPE =
-        new ConstructorBasedBuilder("reference", EnumTypeCondition.class, SV, SV, SV);
+        new ConstructorBasedBuilder("reference", EnumTypeCondition.class, SV);
     public static final AbstractConditionBuilder CONTAINS_ASSIGNMENT =
         new ConstructorBasedBuilder("containsAssignment", ContainsAssignmentCondition.class, SV);
     public static final AbstractConditionBuilder FIELD_TYPE =
