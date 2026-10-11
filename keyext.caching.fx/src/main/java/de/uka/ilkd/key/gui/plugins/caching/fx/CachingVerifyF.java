@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
+import de.uka.ilkd.key.settings.GeneralSettings;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -59,6 +60,12 @@ public final class CachingVerifyF {
         ReferenceSearchDialogF dialog = null;
         Node stubNode = null;
         ClosedBy stubReference = null;
+        Goal stubGoal = null;
+        // the closed-goal list is only maintained when pruning closed branches is allowed
+        // (GeneralSettings.noPruningClosed, default true — the core caching copy test
+        // TestCopyingReplayer also runs with the setting off); save and restore it
+        boolean oldNoPruningClosed = GeneralSettings.noPruningClosed;
+        GeneralSettings.noPruningClosed = false;
         try {
             // (1) opened-proofs seam (KNOWN-SIMPLIFIED CachingExtensionF.java:778): the
             // extension scans the mediator's live opened-proofs list
@@ -85,12 +92,18 @@ public final class CachingVerifyF {
             check(!dialog.isApplyEnabled(), "Apply disabled without a ClosedBy reference");
 
             // stub ClosedBy on the first open goal's node (self-reference — fake/stub data,
-            // like the Swing dialog tests; no real caching run)
+            // like the Swing dialog tests; no real caching run). The goal is closed and
+            // referenced exactly like the real close-by-reference flow does
+            // (CachingExtensionF.closeByReference: closeGoal + register ClosedBy), because the
+            // "Apply" button is only enabled for goals closed by reference (Swing
+            // ReferenceSearchDialog.java:98-100). The state is restored in the finally block.
             Goal goal = proof.openGoals().stream().findFirst().orElse(null);
             check(goal != null, "the demo proof has an open goal");
             if (goal != null) {
                 stubNode = goal.node();
+                stubGoal = goal;
                 stubReference = new ClosedBy(proof, stubNode, Set.of());
+                proof.closeGoal(goal);
                 stubNode.register(stubReference, ClosedBy.class);
                 // the table is a construction-time snapshot (Swing parity): rebuild the dialog
                 dialog.close();
@@ -137,8 +150,16 @@ public final class CachingVerifyF {
             LOGGER.error("Caching reference-search verify failed", e);
             return "Caching reference-search verify: FAIL (" + e + ")";
         } finally {
+            GeneralSettings.noPruningClosed = oldNoPruningClosed;
             if (stubNode != null && stubReference != null) {
                 stubNode.deregister(stubReference, ClosedBy.class);
+            }
+            if (stubGoal != null) {
+                // restore the demo proof state: re-open the goal closed for the stub reference
+                Goal closedGoal = proof.getClosedGoal(stubGoal.node());
+                if (closedGoal != null) {
+                    proof.reOpenGoal(closedGoal);
+                }
             }
             if (dialog != null) {
                 dialog.close();
