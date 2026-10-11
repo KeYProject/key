@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.fx;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -180,6 +181,9 @@ import de.uka.ilkd.key.proof.io.GZipProofSaver;
 import de.uka.ilkd.key.proof.io.ProofBundleSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.proof.io.consistency.SimpleFileRepo;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -692,6 +696,16 @@ public final class MainWindowF {
             NotificationManagerF.getInstance()
                     .notify("Javac settings verification: " + report,
                         report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+        }
+        // WP-9: EnsureSourceConsistency load-pipeline wiring self test
+        // (key.fx.verify.sourceconsistency): loads a JML example twice — with the flag armed
+        // (DiskFileRepo: the source-cache backend the Swing toggle arms,
+        // AbstractProblemLoader.createFileRepo:400-409) and disarmed (SimpleFileRepo) — and
+        // proves the loaded proof's repo serves the source through the same stream the source
+        // view reads (SourceViewF.readRepoFile, Swing SourceView.addFile:617-621). The flag is
+        // restored afterwards (the runs read the shared ~/.key/v3.1).
+        if (System.getProperty("key.fx.verify.sourceconsistency") != null) {
+            runSourceConsistencyVerification();
         }
         // colors: P1 parity close-out — Swing-parity palette count, mapped CSS variable wiring
         // and an override round trip (key.fx.verify.colors); proof-independent, so it runs at
@@ -5674,6 +5688,122 @@ public final class MainWindowF {
         Thread worker = new Thread(task, "fx-proofmgmt-loader");
         worker.setDaemon(true);
         worker.start();
+    }
+
+    /**
+     * WP-9: EnsureSourceConsistency real-flow self test ({@code key.fx.verify.sourceconsistency},
+     * proof-independent so it runs at startup like the other smalldialogs hooks). The Swing
+     * toggle arms the flag and its change becomes effective with the NEXT load
+     * (EnsureSourceConsistencyToggleAction.java:42-47); the core consumes the flag in
+     * {@code AbstractProblemLoader.createFileRepo} (DiskFileRepo = consistent source cache,
+     * SimpleFileRepo = pass-through). The leg loads a JML example with the flag armed and
+     * disarmed and asserts:
+     * <ol>
+     * <li>the armed load produces a {@link DiskFileRepo} (the cache the source view's consistent
+     * source display and the proof bundle saving rely on) and the disarmed one a
+     * {@link SimpleFileRepo};</li>
+     * <li>the armed repo serves the Java source through {@code getInputStream} — the exact read
+     * the source view performs (SourceViewF.readRepoFile, Swing SourceView.addFile:617-621) —
+     * with content identical to the on-disk file, caching it under the repo's temp directory.</li>
+     * </ol>
+     * The flag is restored afterwards (the app runs read the shared {@code ~/.key/v3.1}).
+     */
+    private void runSourceConsistencyVerification() {
+        GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+        boolean original = gs.isEnsureSourceConsistency();
+        Path location = proofMgmtExample(System.getProperty("key.fx.demo.sourceconsistency",
+            "heap/model_methods/CellTest_test2.key"));
+        Thread worker = new Thread(() -> {
+            String repoOn = null;
+            String repoOff = null;
+            String readVia = null;
+            String cacheDir = null;
+            boolean ok = false;
+            try {
+                gs.setEnsureSourceConsistency(true);
+                KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(location);
+                try {
+                    FileRepo repo = env.getLoadedProof().getInitConfig().getFileRepo();
+                    repoOn = repo.getClass().getSimpleName();
+                    ok = repo instanceof DiskFileRepo;
+                    cacheDir = repoTmpDir(repo);
+                    readVia = readSourceThroughRepo(repo, location);
+                    ok &= readVia != null;
+                } finally {
+                    env.dispose();
+                }
+                gs.setEnsureSourceConsistency(false);
+                KeYEnvironment<DefaultUserInterfaceControl> env2 = KeYEnvironment.load(location);
+                try {
+                    FileRepo repo = env2.getLoadedProof().getInitConfig().getFileRepo();
+                    repoOff = repo.getClass().getSimpleName();
+                    ok &= repo instanceof SimpleFileRepo;
+                } finally {
+                    env2.dispose();
+                }
+            } catch (Exception e) {
+                LOGGER.error("Source consistency verification failed", e);
+            } finally {
+                gs.setEnsureSourceConsistency(original);
+            }
+            boolean reported = ok;
+            String report = "Source consistency verification: " + (ok ? "PASS" : "FAIL")
+                + " (armed repo=" + repoOn + " disarmed repo=" + repoOff + "; source read via"
+                + " repo=" + readVia + "; cache dir=" + cacheDir + ")";
+            LOGGER.info(report);
+            FxUtil.runLater(() -> NotificationManagerF.getInstance().notify(report,
+                reported ? Kind.INFO : Kind.ERROR));
+        }, "fx-verify-sourceconsistency");
+        worker.setDaemon(true);
+        worker.start();
+    }
+
+    /** WP-9 source consistency leg: the DiskFileRepo cache directory, read reflectively. */
+    private static String repoTmpDir(FileRepo repo) {
+        try {
+            Field field = DiskFileRepo.class.getDeclaredField("tmpDir");
+            field.setAccessible(true);
+            Object dir = field.get(repo);
+            return dir == null ? null : dir.toString();
+        } catch (ReflectiveOperationException e) {
+            return null;
+        }
+    }
+
+    /**
+     * WP-9 source consistency leg: reads a Java source of the example through the proof's
+     * {@link FileRepo} (the source view's read path) and compares it with the on-disk content.
+     *
+     * @return a description of the first file read through the repo with matching content, or
+     *         {@code null} if no repo stream matched the disk content
+     */
+    private static String readSourceThroughRepo(FileRepo repo, Path location) {
+        Path src = location.getParent().resolve("src");
+        if (!Files.isDirectory(src)) {
+            return null;
+        }
+        try (java.util.stream.Stream<Path> files = Files.walk(src)) {
+            for (Path file : files.filter(p -> p.toString().endsWith(".java"))
+                    .sorted().collect(Collectors.toList())) {
+                try (InputStream is = repo.getInputStream(file.toUri().toURL())) {
+                    if (is == null) {
+                        continue;
+                    }
+                    String viaRepo = IOUtil.readFrom(is);
+                    String viaDisk = Files.readString(file);
+                    if (viaRepo.equals(viaDisk)) {
+                        return file.getFileName() + " ("
+                            + viaRepo.split("\n", -1).length + " lines)";
+                    }
+                } catch (IOException e) {
+                    LOGGER.debug("Source consistency verification: repo read failed for {}", file,
+                        e);
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.debug("Source consistency verification: cannot list sources of {}", src, e);
+        }
+        return null;
     }
 
     /**

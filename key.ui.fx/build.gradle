@@ -157,6 +157,11 @@ run {
     //    the FX ReferenceSearchDialogF renders the per-goal reference table of the demo proof,
     //    a stub ClosedBy marks one row "reference available", the Apply button wiring fires the
     //    dialog listener and disables the buttons; no real caching copy is run)
+    //  * key.fx.verify.sourceconsistency = any  (WP-9: run the EnsureSourceConsistency load-
+    //    pipeline self test — the flag decides DiskFileRepo vs SimpleFileRepo on the next load
+    //    and the repo serves the Java source through the source-view read path; the JML example
+    //    defaults to heap/model_methods/CellTest_test2.key, override with
+    //    key.fx.demo.sourceconsistency)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
@@ -173,7 +178,8 @@ run {
         "key.fx.verify.loadingexit", "key.fx.verify.shortcuts", "key.fx.verify.inputfreeze",
         "key.fx.verify.sequentmenu", "key.fx.verify.dialogs", "key.fx.verify.prooftree",
         "key.fx.verify.selectionhistory", "key.fx.verify.isabelle",
-        "key.fx.verify.exploration", "key.fx.verify.caching"]
+        "key.fx.verify.exploration", "key.fx.verify.caching",
+        "key.fx.verify.sourceconsistency", "key.fx.demo.sourceconsistency"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {
