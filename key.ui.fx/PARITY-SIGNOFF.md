@@ -64,7 +64,7 @@ P0 bugs from the audit:
 | Join / merge dialogs | **RESOLVED** for the merge/join flow (`key.fx.verify.joinmerge` PASS on gcd 32/0); `keyext.slicing.fx` SMT routing partial |
 | Strategy preset combo / stash UI | `OPEN` |
 | SMT settings + run UI | **RESOLVED** (P1: settings providers ported in MP4; the run UI — `SolverListenerF` + `ProgressDialogF` progress table + `InformationWindowF` + result application via the SMT rule — ported, `key.fx.verify.smt` PASS: Z3 closes the Agatha goal; the Swing toolbar `DropdownSelectionButton` remains tracked under the toolbar item) |
-| Exit flow (close-request, `confirmExit`, layout save) | **RESOLVED** (P1: the window close button and the Exit menu item run the Swing `ExitMainAction` flow — `confirmExit` dialog, recent-files save, `System.exit(0)` which runs the docking/colors/keystrokes shutdown hooks; the Swing mediator `fireShutDown` has no FX seam — see KNOWN-SIMPLIFIED; `key.fx.verify.loadingexit` PASS: recent-files round trip + profile resolution, then the close-request path terminates with exit code 0 and the docking layout is saved) |
+| Exit flow (close-request, `confirmExit`, layout save) | **RESOLVED** (P1: the window close button and the Exit menu item run the Swing `ExitMainAction` flow — `confirmExit` dialog, recent-files save, `System.exit(0)` which runs the docking/colors/keystrokes shutdown hooks; WP-1: the Swing mediator `fireShutDown` is now ported — `KeYMediatorF` GUI-listener registry + the exit flow fires the event, KNOWN-SIMPLIFIED row RESOLVED; `key.fx.verify.loadingexit` PASS: recent-files round trip + profile resolution, then the close-request path terminates with exit code 0 and the docking layout is saved) |
 | Term labels; Pretty Print / Unicode wiring | `OPEN` (lemmaorigin hook covers labels mechanically — see `key.fx.verify.lemmaorigin`) |
 | User-selection highlight + Ctrl+C copy | **RESOLVED** (term-menu copy item in the skeleton); multi-selection highlight + reprint persistence `OPEN` |
 | Symbex source line highlights + sequent-hover origin cross-highlight | `OPEN` |
@@ -88,8 +88,10 @@ as open.
 ## Still-open work list (carried forward)
 
 1. Input freeze during auto mode (blocking glass pane port) — RESOLVED via P1
-   `key.fx.verify.inputfreeze`; the menus stay clickable while frozen (Swing's glass pane
-   covered everything except the `isAutoButton` stop controls) — KNOWN-SIMPLIFIED.
+   `key.fx.verify.inputfreeze`; glass-pane scope decided in WP-1: WONT-REPLICATE — the FX
+   overlay keeps covering only the views area (the menu/toolbar proof actions are disabled
+   during auto mode anyway, the automation macro items must stay clickable to stop a run, and
+   the status bar must stay live for the progress display) — KNOWN-SIMPLIFIED.
 2. Proof-tree: Apply Strategy on clicked node, Prune-at-node in the popup, renderer surface
    (tooltips, goal icons, linked/cache marks, notes, branch-label F2 editing), NodeInfoVisualizer.
 3. Sequent: multi-select highlight + reprint persistence, drag & drop, inner-node highlights +
