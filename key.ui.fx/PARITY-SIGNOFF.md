@@ -200,11 +200,15 @@ completions (`FunctionalOperationContractCompletionF`, `DependencyContractComple
 `LoadUserTacletsDialogF` axiom panel/warning/help, `EnsureSourceConsistency` info dialog) are
 ported; `key.fx.verify.dialogs` PASS (registry + dialog skeletons) on Xvnc :99.
 
-Interactive end-to-end contract application (completing a use-operation-contract rule app on a
-spec-bearing method) is not headless-drivable without a JML-annotated example in
-`key.ui/examples`; it stays covered by the skeletons above plus the to-be-added example in a
-later batch. HTML-styled contract cells of the Swing configurator are plain text in the FX port
-(KNOWN-SIMPLIFIED, see the class javadocs).
+Interactive end-to-end contract application is RESOLVED (WP-9, `weigl/ocfx-wp9-integration`):
+the sixth leg of `key.fx.verify.dialogs` loads a real spec-bearing example off the main window
+(`heap/model_methods/CellTest_callSet.key`, override `key.fx.verify.dialogs.contract`), builds a
+`UseOperationContractRule` app on a succedent top-level goal position, completes it through the
+REAL `WindowUserInterfaceControlF.completeBuiltInRuleApp` dispatch (the modal
+`ContractConfiguratorF` is driven by a background watcher via the new `lastInstance` seam:
+select contract + OK) and applies the completed app via `ProofControl.applyInteractive`,
+growing the proof by exactly one node. HTML-styled contract cells of the Swing configurator
+remain plain text in the FX port (KNOWN-SIMPLIFIED, see the class javadocs).
 
 P3a (`weigl/ocfx-p3a-prooftree`, merged 2026-10-10) resolved C19/C20/C21/C22/C23/C25/C27 —
 `ProofTreeViewF`: the per-proof view-state cache (WeakHashMap<Proof, ViewState>, saved and
@@ -308,3 +312,44 @@ setProgress / taskProgress → bar, macro end → hide). `key.fx.verify.uicontro
 `key.fx.verify.menuparity` PASS (10 seam steps incl. the six P3c seams, menu counts
 File 16 / Proof 24 / Options 7 / View 12 / About 5) and `key.fx.verify.prooftree` +
 `key.fx.demo.autoprove` PASS on Xvnc :98. A10 stays open for P4 (dialog triage remainder).
+
+WP-9 (`weigl/ocfx-wp9-integration`) closed the four deferred integration-wiring asserts — each
+one a headless self test that drives the REAL wiring end to end instead of a seam stub:
+
+1. **AutoSave real flow** — `key.fx.verify.autosave` now arms the saver through the real
+   `applyAutoSave` + `KeYMediatorF` selection hand-off on the loaded demo proof and runs a
+   capped auto-mode application (interval 25, max 1000 steps) on a worker thread; the assert is
+   that the `AutoSaver` actually writes the intermediate `.autosave.N.key` files through the
+   `taskProgress` → `fireTaskProgress` chain and the final `.autosave.proof` — the writes are
+   isolated via `java.io.tmpdir` and the armed period/max steps are restored. PASS
+   (`/tmp/opencode/wp9/autosave.log`: "Auto save verification (real flow): PASS (6 save(s)
+   under /tmp/opencode/wp9/tmp …)").
+2. **Minimize-Interaction load pipeline** — `key.fx.verify.minimizeinteraction` proves the
+   load-success hand-off honors the persisted flag on the loaded demo: armed, an
+   auto-instantiable taclet app applies through the minimize branch of
+   `AbstractProofControl.selectedTaclet` without the taclet dialog (the applied node is pruned
+   back); disarmed, the same app opens the taclet dialog. The flag is restored. PASS
+   (`/tmp/opencode/wp9/minimize.log`: "Minimize interaction verification: PASS").
+3. **EnsureSourceConsistency load pipeline** — new `key.fx.verify.sourceconsistency` hook
+   (proof-independent): loads the JML example (`heap/model_methods/CellTest_test2.key`,
+   override `key.fx.demo.sourceconsistency`) twice — with the toggle armed (`DiskFileRepo`,
+   `AbstractProblemLoader.createFileRepo:400-409`) and disarmed (`SimpleFileRepo`) — and reads
+   the source through the repo stream the source view uses (`SourceViewF`'s
+   `readRepoFile` path, Swing `SourceView.addFile:617-621`), asserting content identical to
+   disk and the repo cache under the temp dir. The flag is restored. PASS
+   (`/tmp/opencode/wp9/sourceconsistency.log`: "Source consistency verification: PASS (armed
+   repo=DiskFileRepo disarmed repo=SimpleFileRepo; source read via repo=Cell.java (25 lines);
+   cache dir=…)").
+4. **Contract E2E** — the sixth leg of `key.fx.verify.dialogs` loads a real spec-bearing
+   example (`heap/model_methods/CellTest_callSet.key`, override
+   `key.fx.verify.dialogs.contract`) off the main window via `KeYEnvironment.load`; the PO
+   inlines the callee in a try/catch, so the harness first parks the strategy at the active
+   method call (METHOD_NONE strategy rebuild + one auto-mode run), builds a
+   `UseOperationContractRule` app and completes it through the REAL
+   `WindowUserInterfaceControlF.completeBuiltInRuleApp` dispatch — the modal
+   `ContractConfiguratorF` (opened by `FunctionalOperationContractCompletionF.complete`) is
+   driven by a background watcher via the new `lastInstance` seam (select contract + OK) —
+   then applies the completed app via `ProofControl.applyInteractive` (the proof grows: the
+   contract application splits the goal into child nodes). PASS
+   (`/tmp/opencode/wp9/dialogs-e2e.log`: "Contract e2e: applied JML operation contract 0 on
+   set (nodes 21 -> 25)" + "Dialogs verification: PASS: … contract apply E2E").
