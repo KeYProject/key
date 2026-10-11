@@ -32,21 +32,17 @@ import org.slf4j.LoggerFactory;
  * (IsabelleTranslationExtension.java:30-31, {@code Settings}, {@code ContextMenu},
  * {@code Startup}): the Isabelle settings panel, the SEQUENT_VIEW context-menu entries
  * ("Translate to Isabelle" / "Translate all goals to Isabelle") and the startup hook that
- * initializes {@link IsabelleTranslationSettings}.
- * <p>
- * <b>KNOWN-SIMPLIFIED:</b> the Swing actions ({@code IsabelleTranslationAction.solveGoals},
- * IsabelleTranslationAction.java:47-81) hand the generated theories to the external Isabelle
- * solver ({@code IsabelleLauncher}) and present a progress/model dialog. The FX port only runs
- * the sequent translation ({@code IsabelleTranslator.translateProblem}, shared with Swing) and
- * shows the resulting Isabelle theory in a plain dialog — the solver launch and its progress
- * window are omitted (the heavy Scala/Isabelle dependency of the backend is never loaded by this
- * provider).
+ * initializes {@link IsabelleTranslationSettings}. The generated theories are handed to the
+ * external Isabelle solver ({@code IsabelleLauncher}) on a background thread with a JavaFX
+ * progress dialog ({@link IsabelleLauncherProgressDialogMediatorF}, the port of Swing
+ * {@code IsabelleLauncherProgressDialogMediator}); the scala-isabelle backend classes load lazily
+ * inside {@code IsabelleLauncher.launch} only.
  */
 @NullMarked
 @KeYGuiExtensionF.Info(name = "Isabelle Translation", optional = true, experimental = false,
-    description = "Translate the sequent of the selected goal into an Isabelle theory. "
-        + "KNOWN-SIMPLIFIED (FX): the generated theory is shown in a dialog; launching the "
-        + "external Isabelle solver to check the translation is deferred.")
+    description = "Translate the sequent of the selected goal into an Isabelle theory and check "
+        + "the translation with the Isabelle solver (progress dialog; solved goals can be "
+        + "applied).")
 public class IsabelleTranslationExtensionF implements KeYGuiExtensionF,
         KeYGuiExtensionF.SettingsF, KeYGuiExtensionF.ContextMenuF, KeYGuiExtensionF.StartupF {
 

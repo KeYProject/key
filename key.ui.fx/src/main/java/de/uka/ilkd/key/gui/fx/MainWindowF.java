@@ -1078,6 +1078,18 @@ public final class MainWindowF {
             if (System.getProperty("key.fx.verify.smt") != null) {
                 runSmtVerification();
             }
+            // isabelle (WP-8): run the Isabelle solver-launch DRY-RUN self test — the FX progress
+            // dialog renders with fake solvers, the Stop cancellation path works and the
+            // scala-isabelle backend stays unloaded (IsabelleLauncher.launch is never called, so
+            // no real Isabelle installation is needed)
+            if (System.getProperty("key.fx.verify.isabelle") != null) {
+                String report = runIsabelleVerification(stage, selectionModel.getSelectedProof());
+                LOGGER.info("Isabelle solver-launch verification: {}", report);
+                NotificationManagerF.getInstance()
+                        .notify("Isabelle solver-launch verification: " + report,
+                            report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+                statusRight.setText(report);
+            }
             // shortcuts (P1): Swing-parity defaults, no collisions, override round trip and the
             // sequent view key path (Ctrl+F shows the search bar)
             if (System.getProperty("key.fx.verify.shortcuts") != null) {
@@ -2401,6 +2413,30 @@ public final class MainWindowF {
         NotificationManagerF.getInstance()
                 .notify("Update highlight verification: " + report,
                     report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+    }
+
+    /**
+     * isabelle (WP-8): runs the Isabelle solver-launch DRY-RUN self test
+     * ({@code key.fx.verify.isabelle}, run after the demo load like the other proof-dependent
+     * verify hooks). The harness lives in the {@code keyext.isabelletranslation.fx} extension
+     * module, which is not a compile dependency of key.ui.fx (the dependency direction is
+     * reversed), so it is invoked reflectively; the report string ends in {@code PASS} or
+     * {@code FAIL}.
+     */
+    private static String runIsabelleVerification(javafx.stage.Window owner, Proof proof) {
+        try {
+            Class<?> verify = Class.forName(
+                "org.key_project.isabelletranslation.fx.IsabelleVerifyF");
+            Object report = verify.getMethod("run", javafx.stage.Window.class, Proof.class)
+                    .invoke(null, owner, proof);
+            return (String) report;
+        } catch (ClassNotFoundException e) {
+            return "Isabelle solver-launch verification SKIP (keyext.isabelletranslation.fx not "
+                + "on the classpath)";
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            LOGGER.error("Isabelle solver-launch verification failed", e);
+            return "Isabelle solver-launch verification FAIL (" + e + ")";
+        }
     }
 
     /**
