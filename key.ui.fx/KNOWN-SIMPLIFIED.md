@@ -33,7 +33,7 @@ milestone, **FIXED-UPSTREAM** items differ from a Swing bug that the port delibe
 |---|---|---|---|
 | `extension/contrib/HeatmapF.java:28` | `HeatmapExt` renders the heat highlight into the proof tree / sequent | menu + toolbar toggle + persisted `ViewSettings` options only; proof-tree heat overlay deferred | OPEN |
 | `extension/contrib/HeatmapF.java:37` | — (doubles the `@Info` description) | same decision restated for the extension dialog | OPEN |
-| `extension/contrib/ParallelProverStatusIndicatorF.java:27` | toggle button "SC" / "MT N×" with left-click toggle and right-click worker-count menu | plain `Label` showing the live auto-mode state ("Auto"/"Manual"), left-click toggles `PARALLEL_PROVER_ENABLED`, reacts to property changes; worker-count picker and button styling out of scope | OPEN |
+| `extension/contrib/ParallelProverStatusIndicatorF.java:27` | toggle button "SC" / "MT N×" with left-click toggle and right-click worker-count menu | RESOLVED (WP-3): `Button` with the Swing "SC"/"MT Nx" text format, left-click toggles through the real `onAction` handler (Swing `ParallelProverStatusIndicator` action), right-click opens a `ContextMenu` with the Single-core radio + "Multi-core, N workers" items for the `TreeSet{2, 4, 8, cores}` counts (Swing ParallelProverStatusIndicator.java:92-121); the FX auto-mode state is folded into the tooltip ("Auto mode running."/"Idle." prefixes) | RESOLVED (WP-3) |
 
 ## `key.ui.fx` — SMT run UI + exit flow + input freeze (4)
 
