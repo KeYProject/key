@@ -2535,7 +2535,6 @@ public final class MainWindowF {
     }
 
     /**
-    /**
      * caching (WP-4): runs the proof-caching reference-search self test
      * ({@code key.fx.verify.caching}, run after the demo load like the other proof-dependent
      * verify hooks). The harness lives in the {@code keyext.caching.fx} extension module, which
