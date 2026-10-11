@@ -28,17 +28,17 @@ import org.jspecify.annotations.Nullable;
  * (Swing HeatmapExt.java:30-68): a separate "Heatmap" menu with the toggle and the settings
  * actions, a toolbar control and a {@link SettingsProviderF} with the intensity/age options.
  * <p>
- * <b>KNOWN-SIMPLIFIED:</b> the Swing extension renders the actual heat highlight into the
- * proof tree / sequent (HeatmapExt.java:41-62 delegates to the {@code HeatmapToggleAction} /
- * {@code HeatmapSettingsAction}); the FX port is a lightweight hook only — it provides the menu,
- * the toolbar toggle and the persisted {@link ViewSettings} options (the same settings the Swing
- * provider reads/writes, HeatmapExt.java:198-223), while the actual proof-tree heat overlay is
- * deferred to a later milestone.
+ * WP-2: the heat overlay is ported — the Swing original renders the highlight into the
+ * <em>sequent views</em> only ({@code SequentView.updateHeatMapHighlights}, called from
+ * {@code CurrentGoalView:197}/{@code InnerNodeView:241}; the proof tree is not touched), and the
+ * FX counterpart renders into {@code SequentViewF} from the same persisted {@link ViewSettings}
+ * options (see {@code SequentViewF#rebuildHeatmapOverlays}). The toggle re-prints the sequent
+ * like the Swing {@code HeatmapToggleAction}.
  */
 @KeYGuiExtensionF.Info(name = "Heatmap", optional = true,
     description = "Colorize the formulae on the sequent based on the most recent changes. "
-        + "KNOWN-SIMPLIFIED (FX): settings and toggle only — the proof-tree heat overlay is "
-        + "deferred.",
+        + "WP-2: the heat highlight is rendered into the sequent view from the persisted "
+        + "ViewSettings options.",
     experimental = false)
 public class HeatmapF
         implements KeYGuiExtensionF, KeYGuiExtensionF.MainMenuF, KeYGuiExtensionF.ToolbarF,
@@ -72,8 +72,14 @@ public class HeatmapF
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         CheckMenuItem toggle = new CheckMenuItem("Show Heatmap");
         toggle.setSelected(vs.isShowHeatmap());
-        toggle.setOnAction(e -> vs.setHeatmapOptions(!vs.isShowHeatmap(), vs.isHeatmapSF(),
-            vs.isHeatmapNewest(), vs.getMaxAgeForHeatmap()));
+        toggle.setOnAction(e -> {
+            vs.setHeatmapOptions(!vs.isShowHeatmap(), vs.isHeatmapSF(), vs.isHeatmapNewest(),
+                vs.getMaxAgeForHeatmap());
+            // WP-2: the overlay is ported — reprint the sequent so the heat highlight applies
+            // immediately (Swing HeatmapToggleAction.actionPerformed re-prints the sequent view
+            // after flipping the flag, HeatmapToggleAction.java:70-78)
+            reprintSequent(window);
+        });
         return toggle;
     }
 
@@ -94,11 +100,15 @@ public class HeatmapF
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         if (heatmapToggle == null) {
             ToggleButton toggle = new ToggleButton("Heatmap");
-            toggle.setTooltip(new Tooltip("Toggle the (deferred) heatmap overlay; the option is "
+            toggle.setTooltip(new Tooltip("Toggle the heatmap overlay; the option is "
                 + "persisted in the ViewSettings."));
             toggle.setSelected(vs.isShowHeatmap());
-            toggle.setOnAction(e -> vs.setHeatmapOptions(toggle.isSelected(), vs.isHeatmapSF(),
-                vs.isHeatmapNewest(), vs.getMaxAgeForHeatmap()));
+            toggle.setOnAction(e -> {
+                vs.setHeatmapOptions(toggle.isSelected(), vs.isHeatmapSF(), vs.isHeatmapNewest(),
+                    vs.getMaxAgeForHeatmap());
+                // WP-2: reprint like the Swing toolbar toggle (HeatmapToggleAction.actionPerformed)
+                reprintSequent(window);
+            });
             heatmapToggle = toggle;
         }
         if (heatmapSettingsButton == null) {
@@ -109,6 +119,17 @@ public class HeatmapF
             heatmapSettingsButton = settings;
         }
         return List.of(heatmapToggle, heatmapSettingsButton);
+    }
+
+    /**
+     * Re-prints the sequent view so the heatmap overlay follows the toggled option (Swing
+     * {@code HeatmapToggleAction.actionPerformed}: {@code sequentView.printSequent()} after the
+     * flag flip). A no-op when no sequent is displayed.
+     */
+    private void reprintSequent(MainWindowF window) {
+        if (window.getSequentView().getProof() != null) {
+            window.getSequentView().printSequent();
+        }
     }
 
     @Override

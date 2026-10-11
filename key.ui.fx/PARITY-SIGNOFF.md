@@ -19,7 +19,7 @@ marked `OPEN (unverified)` rather than assumed fixed.
 | Component (audit report) | Behaviors | Audit verdict | Resolution since | Current status |
 |---|---|---|---|---|
 | mainwindow | 62 | 13 PORTED / 24 PARTIAL / **17 MISSING** / 6 KNOWN-DEF | window shell, menu/toolbar/status parity, docking, drawers (MP1–MP10) | mostly resolved; open items below |
-| prooftree | 53 | 20 / 8 / **13 MISSING** / 5 KNOWN-DEF | core tree faithful; heatmap etc. deferred | heatmap/NodeInfoVisualizer/branch editing still OPEN |
+| prooftree | 53 | 20 / 8 / **13 MISSING** / 5 KNOWN-DEF | core tree faithful; P3a sweep items, WP-10 click-target + Apply-Strategy, WP-2 heatmap/NodeInfoVisualizer/branch editing | RESOLVED (remaining gaps documented in KNOWN-SIMPLIFIED) |
 | sequent | 45 | 14 / 10 / **15 MISSING** / 4 KNOWN-DEF | term context menu + taclet application + search (MP8) | context menu RESOLVED; remaining items below |
 | interactive-completion | 25 | 0 / 0 / **20 MISSING** | `WindowUserInterfaceControlF` seam + tacletmatch + join/merge | RESOLVED (was the top P0; evidence uicontrol + tacletmatch 9/9) |
 | goallist-strategy-info | 37 | goal list at parity; strategy preset UI missing; info view re-designed | — | preset combo + stats staleness OPEN |
@@ -72,8 +72,11 @@ P0 bugs from the audit:
 
 ## P2 sign-off
 
-Heatmap overlay (settings+toggle only, ledger `HeatmapF`), NodeInfoVisualizer, branch-label F2
-editing, info-view node-change refresh, notification framework depth, docking title
+Heatmap overlay (RESOLVED via WP-2 — the heat overlay is ported onto `SequentViewF` in the
+Swing-faithful scope: the Swing original `SequentView.updateHeatMapHighlights` renders into the
+sequent views only, never the proof tree), NodeInfoVisualizer + the proof-tree renderer surface
+and branch-label F2 editing (RESOLVED via WP-2, see carried-forward item 2),
+info-view node-change refresh, notification framework depth, docking title
 actions/layout slots/maximize (partially done — `key.fx.verify.docking` PASS; title actions
 exist as `DockTitleActionF`), join+mergerule dialogs (track MP9.x modules), lemmatagenerator
 (`key.fx.verify.lemmaorigin` PASS for the generator path), soundiness (`key.fx.verify.soundiness`
@@ -93,8 +96,23 @@ as open.
    during auto mode anyway, the automation macro items must stay clickable to stop a run, and
    the status bar must stay live for the progress display) — KNOWN-SIMPLIFIED.
 2. Proof-tree: Apply Strategy on clicked node, Prune-at-node in the popup (both RESOLVED via
-   WP-10 `key.fx.verify.prooftree`), renderer surface
-   (tooltips, goal icons, linked/cache marks, notes, branch-label F2 editing), NodeInfoVisualizer.
+   WP-10 `key.fx.verify.prooftree`), renderer surface, NodeInfoVisualizer, branch-label F2
+   editing — RESOLVED (WP-2): the renderer surface is ported (leaf goal icons — closed goal,
+   cached-closed, linked, interactive, open — as FontAwesome glyph stand-ins for the Swing
+   key-hole gifs, non-leaf marker icons in the Swing priority window/notes/useless/interactive/
+   script, the branch linked-folder icon, tooltip notes + useless-analysis lines, and the
+   `NodeInfoVisualizerListenerF` attachment that re-renders on register/unregister like Swing's
+   `nodeInfoVisListener`); branch-label F2 editing is ported with the Swing
+   `DefaultTreeCellEditor.isCellEditable` gate (only branch entries whose node has a parent —
+   the root branch is denied) and the commit seam mirroring
+   `GUIProofTreeModel.valueForPathChanged → GUIBranchNode.setLabel → NodeInfo.setBranchLabel`
+   plus the full rebuild; the heatmap heat overlay renders into the sequent view (the Swing
+   original touches the sequent views only). Documented deviations: the Swing key-hole gif
+   images have no FontAwesome glyph equivalents (state colors stay on the text classes, icons
+   use the neutral `key-icon` fill), and `key.fx.verify.prooftree` asserts the surface —
+   `branchEdit rootEditable=false labelEdit=PASS leafIcons=3 nodeInfoVisualizer=PASS PASS`
+   (`/tmp/opencode/wp2/prooftree-agatha3.log`) and the heatmap leg
+   `sfAge=1 sfNewest=5 termsAge=6 termsNewest=3 off=0 PASS` (`/tmp/opencode/wp2/heatmap1.log`).
 3. Sequent: multi-select highlight + reprint persistence, drag & drop, inner-node highlights +
    taclet info pane, source cross-highlight.
 4. Source view: symbex line highlights, click-to-jump into the proof tree, hover

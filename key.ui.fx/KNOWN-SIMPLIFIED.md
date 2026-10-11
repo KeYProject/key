@@ -31,8 +31,8 @@ milestone, **FIXED-UPSTREAM** items differ from a Swing bug that the port delibe
 
 | Site | Swing original | FX port | Status |
 |---|---|---|---|
-| `extension/contrib/HeatmapF.java:28` | `HeatmapExt` renders the heat highlight into the proof tree / sequent | menu + toolbar toggle + persisted `ViewSettings` options only; proof-tree heat overlay deferred | OPEN |
-| `extension/contrib/HeatmapF.java:37` | — (doubles the `@Info` description) | same decision restated for the extension dialog | OPEN |
+| `extension/contrib/HeatmapF.java:28` | `HeatmapExt` renders the heat highlight into the sequent views (`SequentView.updateHeatMapHighlights`, called from `CurrentGoalView:197`/`InnerNodeView:241` — the proof tree is NOT touched, the ledger's earlier "proof tree / sequent" wording was imprecise) | RESOLVED (WP-2): the age-heatmap renderer is ported onto `SequentViewF` (`rebuildHeatmapOverlays` + `updateHeatmapSFHighlights`/`updateHeatmapTermHighlights` parity — formula ages up the ancestor chain, `SequentChangeInfo`-based term ages, `computeColorForAge` opacity interpolation from `[Heatmap]basecolor` via `ColorPaletteF.HEATMAP_BASE_COLOR`); the menu/toolbar toggle re-prints the sequent like Swing `HeatmapToggleAction.actionPerformed`; `key.fx.verify.heatmap` PASS on `strassen.auto.0.proof` (sfAge=1 sfNewest=5 termsAge=6 termsNewest=3 off=0) | RESOLVED (WP-2) |
+| `extension/contrib/HeatmapF.java:37` | — (doubles the `@Info` description) | same surface as the row above — the extension dialog description no longer documents a deferral | RESOLVED (WP-2) |
 | `extension/contrib/ParallelProverStatusIndicatorF.java:27` | toggle button "SC" / "MT N×" with left-click toggle and right-click worker-count menu | plain `Label` showing the live auto-mode state ("Auto"/"Manual"), left-click toggles `PARALLEL_PROVER_ENABLED`, reacts to property changes; worker-count picker and button styling out of scope | OPEN |
 
 ## `key.ui.fx` — SMT run UI + exit flow + input freeze (4)
