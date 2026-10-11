@@ -140,6 +140,10 @@ run {
     //    per-proof view states, linearized mode, OSS protocol rows, whole-tree expand/collapse,
     //    node-filter counting, notes + subtree statistics dialogs; combine with
     //    key.fx.demo.autoprove.live to exercise the auto-mode partial updates)
+    //  * key.fx.verify.isabelle = any  (WP-8: run the Isabelle solver-launch DRY-RUN self test —
+    //    the FX progress dialog renders with fake solvers, cancellation works, the Info window
+    //    opens; no real Isabelle installation is needed and the scala-isabelle backend stays
+    //    unloaded)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
@@ -155,7 +159,8 @@ run {
         "key.fx.verify.profileloadingdialog", "key.fx.verify.javacsettings",
         "key.fx.verify.termmenu", "key.fx.verify.colors", "key.fx.verify.smt",
         "key.fx.verify.loadingexit", "key.fx.verify.shortcuts", "key.fx.verify.inputfreeze",
-        "key.fx.verify.sequentmenu", "key.fx.verify.dialogs", "key.fx.verify.prooftree"]
+        "key.fx.verify.sequentmenu", "key.fx.verify.dialogs", "key.fx.verify.prooftree",
+        "key.fx.verify.isabelle"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {
@@ -165,6 +170,10 @@ run {
 
     // enable assertions
     jvmArgs += "-ea"
+
+    // the key.fx.verify.isabelle DRY-RUN harness asserts the unloaded state of the scala-isabelle
+    // backend classes without loading them (ClassLoader.findLoadedClass via reflection)
+    jvmArgs += "--add-opens=java.base/java.lang=ALL-UNNAMED"
 
     // JavaFX 25 loads its native libraries (glass, prism) via restricted methods;
     // allow native access to silence the JDK warning (mandatory on future JDKs).
