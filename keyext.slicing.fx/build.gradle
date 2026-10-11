@@ -13,7 +13,10 @@ description = "JavaFX port of the keyext.slicing extension (MP9.4)"
 
 javafx {
     version = libs.versions.javafx.get()
-    modules = ['javafx.base', 'javafx.controls', 'javafx.graphics']
+    // wp6 (slicing): javafx.web hosts the WebView of the HTML dialog seam (HtmlDialogF /
+    // RuleStatisticsDialogF / SliceToFixedPointDialogF), the same seam SoundinessDialogF uses
+    // in key.ui.fx (Swing JEditorPane "text/html" counterpart)
+    modules = ['javafx.base', 'javafx.controls', 'javafx.graphics', 'javafx.web']
 }
 
 dependencies {

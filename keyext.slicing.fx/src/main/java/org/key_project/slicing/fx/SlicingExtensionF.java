@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
-
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
@@ -30,6 +29,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.SlicingSettingsProvider;
 import org.key_project.slicing.fx.ui.SlicingLeftPanelF;
+import org.key_project.slicing.fx.ui.PreviewDialogF;
 import org.key_project.slicing.graph.GraphNode;
 
 import org.jspecify.annotations.NullMarked;
@@ -46,11 +46,12 @@ import org.slf4j.LoggerFactory;
  * (the {@link DependencyTracker}, the dependency graph and the {@code SlicingProofReplayer}) is
  * reused unchanged from {@code keyext.slicing}.
  * <p>
- * <b>KNOWN-SIMPLIFIED:</b> the Swing provider additionally registers a proof-load listener
- * through the Swing mediator ({@code mediator.registerProofLoadListener}); the FX mediator has no
- * such registry, and every proof load routes through
- * {@code KeYSelectionModel.setSelectedProof} anyway, so the {@link KeYSelectionListener} below
- * covers both the "new proof loaded" and the "selected proof switched" cases.
+ * The Swing provider registers a proof-load listener through the Swing mediator; the FX provider
+ * registers the same {@code this::createTrackerForProof} callback through the WP-1
+ * {@link KeYMediatorF#registerProofLoadListener} registry (fired from
+ * {@code WindowUserInterfaceControlF.registerProofAggregate} like in Swing), so trackers are
+ * created for every loaded proof — the additional {@link KeYSelectionListener} covers the
+ * "selected proof switched" case like in Swing.
  *
  * @author Alexander Weigl
  * @author Arne Keller (port)
@@ -104,10 +105,22 @@ public class SlicingExtensionF implements KeYGuiExtensionF, KeYGuiExtensionF.Con
         return window;
     }
 
+    /**
+     * @return the left panel, if it was created (not created in unit tests); used by the
+     *         {@code key.fx.verify.slicing} harness to reach the panel's fixed-point dialog
+     *         entry point
+     */
+    public @Nullable SlicingLeftPanelF getLeftPanel() {
+        return leftPanel;
+    }
+
     @Override
     public void init(MainWindowF window, KeYMediatorF mediator) {
         this.window = window;
         mediator.getSelectionModel().addKeYSelectionListener(this);
+        // Swing SlicingExtension.init: trackers are created for every loaded proof, not only for
+        // proofs selected afterwards
+        mediator.registerProofLoadListener(this::createTrackerForProof);
         // Slicing is single-core only (Swing SlicingExtension.init): enabling the multi-core
         // prover suspends every DependencyTracker for the duration of each run, so it silently
         // misses the rules that run applies. Mark all existing trackers incomplete the instant
@@ -227,7 +240,7 @@ public class SlicingExtensionF implements KeYGuiExtensionF, KeYGuiExtensionF.Con
         GraphNode graphNode = tracker.getDependencyGraph()
                 .getGraphNode(currentProof, currentNode.getBranchLocation(), topLevel);
         if (graphNode != null) {
-            list.add(showGraphItem(tracker, graphNode));
+            list.add(showGraphItem(window, tracker, graphNode));
         }
         return list;
     }
@@ -245,16 +258,17 @@ public class SlicingExtensionF implements KeYGuiExtensionF, KeYGuiExtensionF.Con
     }
 
     /**
-     * The "Show dependency graph around this formula" item (Swing {@code ShowGraphAction});
-     * KNOWN-SIMPLIFIED: the Swing action renders the DOT excerpt through
-     * {@code PreviewDialog}; this port shows the DOT source in a text dialog instead (the
-     * graphviz image renderer is Swing-only).
+     * The "Show dependency graph around this formula" item (Swing {@code ShowGraphAction}):
+     * renders the DOT excerpt with the graphviz {@code dot} binary and shows it in the
+     * {@link PreviewDialogF} image dialog; if the render fails (graphviz missing), the DOT
+     * source is shown in the text dialog instead (the documented fallback).
      */
-    private static MenuItem showGraphItem(DependencyTracker tracker, GraphNode graphNode) {
+    private static MenuItem showGraphItem(MainWindowF window, DependencyTracker tracker,
+            GraphNode graphNode) {
         MenuItem item = new MenuItem("Show dependency graph around this formula");
         item.setOnAction(e -> {
-            String text = tracker.exportDotAround(false, false, graphNode);
-            SlicingLeftPanelF.showTextDialog("Dependency graph around this formula", text);
+            String dot = tracker.exportDotAround(false, false, graphNode);
+            PreviewDialogF.showDot(window != null ? window.getStage() : null, dot);
         });
         return item;
     }

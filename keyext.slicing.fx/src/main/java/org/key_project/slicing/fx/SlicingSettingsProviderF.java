@@ -26,11 +26,13 @@ import org.jspecify.annotations.NullMarked;
  * executable path, reading and writing the persisted {@link SlicingSettings} of the slicing
  * extension.
  * <p>
- * <b>KNOWN-SIMPLIFIED:</b> {@code SlicingSettings.setAggressiveDeduplicate} is package-private in
- * {@code org.key_project.slicing} and cannot be called from this module (which may not modify the
- * keyext.slicing sources); the toggle therefore reflects the current setting when the panel is
- * opened, but the FX dialog does not persist changes to it. The other two options persist
- * normally.
+ * <b>Decision (WP-6, WONT-REPLICATE):</b> {@code SlicingSettings.setAggressiveDeduplicate} is
+ * package-private in {@code org.key_project.slicing} and cannot be called from this module
+ * (which must not modify the keyext.slicing sources); reflection hacks are deliberately not
+ * used. The toggle therefore reflects the current setting when the panel is opened, but the FX
+ * dialog does not persist changes to it (the Swing dialog writes it in
+ * {@code applySettings}). Resolving this requires an upstream keyext.slicing change (making the
+ * setter public or adding a public delegator); the other two options persist normally.
  *
  * @author Alexander Weigl
  * @author Arne Keller (port)
@@ -141,9 +143,10 @@ public final class SlicingSettingsProviderF extends SettingsPanelF implements Se
         SlicingSettings ss = SlicingSettingsProvider.getSlicingSettings();
         ss.setAlwaysTrack(alwaysTrack.isSelected());
         ss.setDotExecutable(dotExecutable.getText());
-        // KNOWN-SIMPLIFIED: SlicingSettings.setAggressiveDeduplicate(boolean) is package-private
-        // in org.key_project.slicing, so this module (which must not modify keyext.slicing)
-        // can read the flag but not persist changes made in the dialog.
+        // WONT-REPLICATE (WP-6): SlicingSettings.setAggressiveDeduplicate(boolean) is
+        // package-private in org.key_project.slicing, so this module (which must not modify
+        // keyext.slicing) can read the flag but not persist changes made in the dialog. See the
+        // class javadoc for the upstream-patch requirement.
     }
 
     @Override

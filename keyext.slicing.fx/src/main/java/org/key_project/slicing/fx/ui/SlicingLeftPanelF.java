@@ -9,8 +9,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
@@ -25,6 +26,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
@@ -39,11 +41,12 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.slicing.DependencyTracker;
-import org.key_project.slicing.RuleStatistics.RuleStatisticEntry;
 import org.key_project.slicing.SlicingProofReplayer;
 import org.key_project.slicing.SlicingSettingsProvider;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.fx.SlicingExtensionF;
+import org.key_project.slicing.ui.HtmlFactory;
+import org.key_project.util.javafx.FxUtil;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -56,16 +59,23 @@ import org.slf4j.LoggerFactory;
  * analysis controls and the slicing buttons, rendered with pure JavaFX controls. The underlying
  * logic (dependency tracking, analysis, slicing) is reused from {@code keyext.slicing} unchanged.
  * <p>
- * <b>KNOWN-SIMPLIFIED</b> (compared to the Swing panel):
+ * Parity notes (compared to the Swing panel): "Show rendering of graph" renders the DOT through
+ * the graphviz {@code dot} binary and shows the image in the {@link PreviewDialogF} (with the
+ * DOT-source text dialog as the documented fallback when rendering fails); "Slice proof to fixed
+ * point" opens the iterative {@link SliceToFixedPointDialogF}; "Show rule statistics" renders
+ * the HTML table with the four sort buttons of the Swing original in the {@link HtmlDialogF}
+ * WebView seam; the execution timings are shown as an {@link HtmlFactory} HTML table like in the
+ * Swing panel. Remaining, deliberate simplifications:
  * <ul>
- * <li>"Show rendering of graph" renders the DOT through the Swing-only graphviz executor in the
- * original; this port shows the DOT source in a text dialog instead (no AWT/Swing imports).</li>
- * <li>"Slice proof to fixed point" opens the Swing-only iterative {@code SliceToFixedPointDialog}
- * in the original; this port performs a single slicing iteration (identical to "Slice proof").</li>
- * <li>"Show rule statistics" renders an HTML table with sort buttons in the original; this port
- * shows the plain-text statistics with the default "total applications, descending" sort.</li>
- * <li>The execution timings are shown as plain labels instead of an HTML table, and the 100 ms
- * update debounce of the graph labels is dropped ({@link FxUtil}-marshalled direct updates).</li>
+ * <li>the 100 ms update debounce of the graph labels is dropped ({@link FxUtil}-marshalled
+ * direct updates);</li>
+ * <li>the "Export as DOT" file chooser runs owner-less (the drawer panel has no dedicated
+ * window);</li>
+ * <li>the slice load uses the FX window's own user-interface control instead of the Swing
+ * headless {@code DefaultUserInterfaceControl} (both are {@code ProblemLoaderControl}s), so the
+ * loader callbacks stay FX-safe;</li>
+ * <li>the panel grey-out checks the parallel-prover setting directly instead of the Swing-only
+ * {@code SingleCoreFeatureGate}.</li>
  * </ul>
  *
  * @author Alexander Weigl
@@ -123,6 +133,13 @@ public class SlicingLeftPanelF extends ScrollPane
     private VBox timings = null;
     /** Titled section wrapping {@link #timings}, hidden until an analysis ran. */
     private TitledPane timingsPane = null;
+    /**
+     * The WebView rendering the {@link HtmlFactory} timings table (lazily created, reused across
+     * analyses to avoid spawning a WebKit instance per update).
+     */
+    private @Nullable WebView timingsView = null;
+    /** Whether the graphviz dot executable is available (checked once at panel build). */
+    private final boolean dotAvailable = GraphvizDotExecutorF.isDotInstalled();
 
     /** Number of nodes in the dependency graph. */
     private int graphNodesNr = 0;
@@ -179,6 +196,12 @@ public class SlicingLeftPanelF extends ScrollPane
         showGraphRendering = new Button("Show rendering of graph");
         showGraphRendering.setMaxWidth(Double.MAX_VALUE);
         showGraphRendering.setOnAction(e -> previewGraph());
+        if (!dotAvailable) {
+            // Swing SlicingLeftPanel.buildUI: graph rendering requires the graphviz dot binary
+            showGraphRendering.setDisable(true);
+            showGraphRendering.setTooltip(nativeTooltip(
+                "Install graphviz (dot) to enable graph rendering functionality."));
+        }
 
         graphNodes = new Label();
         graphEdges = new Label();
@@ -219,14 +242,11 @@ public class SlicingLeftPanelF extends ScrollPane
         sliceProof.setOnAction(e -> sliceProof());
         sliceProofFixedPoint = new Button("Slice proof to fixed point");
         sliceProofFixedPoint.setMaxWidth(Double.MAX_VALUE);
-        // KNOWN-SIMPLIFIED: the Swing original opens the iterative SliceToFixedPointDialog
-        // (slice -> analysis -> slice ...); this port performs a single slicing iteration.
-        sliceProofFixedPoint.setOnAction(e -> sliceProof());
+        sliceProofFixedPoint.setOnAction(e -> openSliceToFixedPointDialog());
         sliceProofFixedPoint.setTooltip(nativeTooltip(
             """
                     Slices the proof and analyzes the result; the process repeats until no more steps can
-                    be removed. KNOWN-SIMPLIFIED (FX): a single slicing iteration is performed, as with
-                    "Slice proof"."""));
+                    be removed."""));
 
         return titledPane("Proof slicing", List.of(sliceProof, sliceProofFixedPoint));
     }
@@ -292,20 +312,34 @@ public class SlicingLeftPanelF extends ScrollPane
         if (results == null) {
             return;
         }
-        // KNOWN-SIMPLIFIED: the Swing dialog renders an HTML table with four sort buttons; this
-        // port shows the plain-text rows with the default "total applications, descending" order.
-        List<? extends RuleStatisticEntry> entries = results.ruleStatistics.sortBy(
-            Comparator.comparing(RuleStatisticEntry::numberOfApplications).reversed());
-        StringBuilder text = new StringBuilder();
-        for (RuleStatisticEntry entry : entries) {
-            text.append(entry.ruleName()).append(": ").append(entry.numberOfApplications())
-                    .append(" applications, ").append(entry.numberOfUselessApplications())
-                    .append(" useless, ")
-                    .append(entry.numberOfInitialUselessApplications())
-                    .append(" initial useless\n");
+        // HTML table with the four sort buttons of the Swing RuleStatisticsDialog, rendered in
+        // the HtmlDialogF WebView seam
+        RuleStatisticsDialogF.show(ownerWindow(), results);
+    }
+
+    /** @return the window stage to own dialogs, or {@code null} if the panel is not attached */
+    private javafx.stage.@Nullable Window ownerWindow() {
+        MainWindowF window = extension.window();
+        return window != null ? window.getStage() : null;
+    }
+
+    /**
+     * Opens the "Slice proof to fixed point" dialog (Swing SlicingLeftPanel.java:229-235, the
+     * fixed-point button handler): the dialog iterates analyze/slice/load on the current proof
+     * until the fixed point is reached. Also the entry point of the
+     * {@code key.fx.verify.slicing} harness.
+     *
+     * @return the opened dialog, or {@code null} if no proof is loaded
+     */
+    public @Nullable SliceToFixedPointDialogF openSliceToFixedPointDialog() {
+        if (currentProof == null) {
+            return null;
         }
-        showTextDialog("Rule Statistics",
-            text.length() == 0 ? "No rule applications recorded." : text.toString());
+        SliceToFixedPointDialogF dialog =
+            new SliceToFixedPointDialogF(mediator, ownerWindow(), this::analyzeProof,
+                this::sliceProof);
+        dialog.start(currentProof);
+        return dialog;
     }
 
     /** Show the dependency graph excerpt of the current proof (Swing {@code previewGraph}). */
@@ -317,11 +351,12 @@ public class SlicingLeftPanelF extends ScrollPane
         if (tracker == null) {
             return;
         }
-        String text = tracker.exportDot(abbreviateFormulas.isSelected(),
+        String dot = tracker.exportDot(abbreviateFormulas.isSelected(),
             abbreviateChains.isSelected());
-        // KNOWN-SIMPLIFIED: the Swing original renders the DOT to a PNG via the Swing-only
-        // graphviz executor and shows an image dialog; this port shows the DOT source text.
-        showTextDialog("Dependency graph (DOT)", text);
+        // renders the DOT to a PNG with the graphviz dot binary and shows the image dialog; if
+        // the render fails (graphviz missing), the DOT source text dialog is shown instead (the
+        // documented fallback, see PreviewDialogF)
+        PreviewDialogF.showDot(ownerWindow(), dot);
     }
 
     /**
@@ -412,11 +447,11 @@ public class SlicingLeftPanelF extends ScrollPane
             }
         };
         task.setOnSucceeded(event -> {
-            // KNOWN-SIMPLIFIED: the Swing original loads the slice through the problem loader
-            // directly to keep it out of the recent-files list ({@code UI.loadProblem}); the FX
-            // port takes the public load pipeline of the main window, which registers the file
-            // in the recent-files list.
-            window.openProofFile(task.getValue());
+            // Swing parity (SlicingLeftPanel.java:465, "we do not use UI.loadProblem here to
+            // avoid adding the slice to the recent files"): the slice is loaded through the
+            // direct loader path, which — unlike openProofFile — does not register the file in
+            // the recent-files list.
+            window.loadProofFileDirect(task.getValue());
         });
         task.setOnFailed(event -> {
             Throwable error = task.getException() != null ? task.getException()
@@ -461,13 +496,33 @@ public class SlicingLeftPanelF extends ScrollPane
         usefulBranches.setText("Useful branches: " + results.usefulBranchesNr);
         showRuleStatistics.setDisable(false);
         timings.getChildren().clear();
-        // KNOWN-SIMPLIFIED: the Swing original renders an HTML table via HtmlFactory; this port
-        // shows one "Algorithm: time" line per measured activity.
-        List<String> lines = results.executionTime.executionTimes()
-                .map(action -> action.first + ": " + action.second + " ms")
+        // HtmlFactory timings table like the Swing panel (SlicingLeftPanel.java:500-511),
+        // rendered in the reused WebView
+        List<Collection<String>> rows = results.executionTime.executionTimes()
+                .map(action -> (Collection<String>) List.of(action.first,
+                    action.second + " ms"))
                 .collect(Collectors.toList());
-        lines.forEach(line -> timings.getChildren().add(new Label(line)));
-        timingsPane.setVisible(!lines.isEmpty());
+        String html = HtmlFactory.generateTable(
+            List.of("Algorithm", "Time"),
+            new boolean[] { false, false },
+            Optional.of(new String[] { null, "right" }),
+            rows,
+            null);
+        WebView view = timingsView();
+        timings.getChildren().add(view);
+        view.getEngine().loadContent(html, "text/html");
+        timingsPane.setVisible(!rows.isEmpty());
+    }
+
+    /**
+     * @return the lazily created WebView for the timings table (reused across analyses)
+     */
+    private WebView timingsView() {
+        if (timingsView == null) {
+            timingsView = new WebView();
+            timingsView.setPrefSize(240, 120);
+        }
+        return timingsView;
     }
 
     private void resetGraphLabels() {
@@ -559,8 +614,12 @@ public class SlicingLeftPanelF extends ScrollPane
         }
         dotExport.setDisable(noProofLoaded);
         dotExport.setTooltip(noProofLoaded ? nativeTooltip(NO_PROOF_SELECTED) : null);
-        showGraphRendering.setDisable(noProofLoaded);
-        showGraphRendering.setTooltip(noProofLoaded ? nativeTooltip(NO_PROOF_SELECTED) : null);
+        showGraphRendering.setDisable(noProofLoaded || !dotAvailable);
+        showGraphRendering.setTooltip(noProofLoaded ? nativeTooltip(NO_PROOF_SELECTED)
+                : !dotAvailable
+                        ? nativeTooltip(
+                            "Install graphviz (dot) to enable graph rendering functionality.")
+                        : null);
         runAnalysis.setDisable(noProofLoaded);
         runAnalysis.setTooltip(noProofLoaded ? nativeTooltip(NO_PROOF_SELECTED) : null);
         showRuleStatistics.setDisable(noProofLoaded);
@@ -615,8 +674,11 @@ public class SlicingLeftPanelF extends ScrollPane
     }
 
     /**
-     * Shows a read-only multi-line text dialog (KNOWN-SIMPLIFIED stand-in for the Swing
-     * {@code HtmlDialog}/{@code PreviewDialog}).
+     * Shows a read-only multi-line text dialog. This is now only the <em>fallback</em> seam of
+     * the port: the HTML dialogs ({@link HtmlDialogF}, {@link RuleStatisticsDialogF}) and the
+     * graph preview ({@link PreviewDialogF}) have Swing-parity counterparts, and this dialog is
+     * used when graphviz rendering fails (see {@link PreviewDialogF#showDot}) and by the
+     * context-menu DOT excerpt if the render fails.
      *
      * @param title the dialog title
      * @param text the text to display
