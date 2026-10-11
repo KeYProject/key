@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.testgen.fx;
 
+import de.uka.ilkd.key.core.fx.KeYMediatorF;
+import de.uka.ilkd.key.proof.Proof;
+
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.geometry.Insets;
@@ -33,12 +36,13 @@ import org.slf4j.LoggerFactory;
  * {@link CounterExampleTaskF}.
  * <p>
  * <b>KNOWN-SIMPLIFIED:</b> the Swing flow shows the counterexample model in the modal
- * {@code SolverListener} result dialogs; the FX port only prints the SMT statistics and the
- * outcome (found/not found) into the log. The auto-mode shell around the search
- * (CounterExampleAction.java:169-191) is dropped, like in {@link TestGenResultsDialogF}. The
- * window may be {@code null} when the extension has not been connected through the settings
- * dialog yet (see {@link TestgenExtensionF}) — the dialog then starts with a hint instead of a
- * search; the owner stage is resolved from the clicked status-line control.
+ * {@code SolverListener} result dialogs; the FX route goes through {@link SolverListenerF} (the
+ * same parity, WP-7) — this run dialog keeps the pipeline log (side proof, semantics blasting).
+ * The auto-mode shell around the search (CounterExampleAction.java:169-191) lives in
+ * {@link CounterExampleTaskF}. The window may be {@code null} when the extension has not been
+ * connected through the settings dialog yet (see {@link TestgenExtensionF}) — the dialog then
+ * starts with a hint instead of a search; the owner stage is resolved from the clicked toolbar
+ * control (WP-7).
  */
 @NullMarked
 final class CounterExampleResultsDialogF extends Dialog<Void> {
@@ -47,6 +51,8 @@ final class CounterExampleResultsDialogF extends Dialog<Void> {
         LoggerFactory.getLogger(CounterExampleResultsDialogF.class);
 
     private final @Nullable Object window;
+    /** the owner of the {@code SolverListenerF} progress dialog of the search (WP-7). */
+    private final @Nullable Stage owner;
     private final TextArea log = new TextArea();
     private final ProgressIndicator progress = new ProgressIndicator();
     private final Label statusLabel = new Label("Idle");
@@ -59,6 +65,7 @@ final class CounterExampleResultsDialogF extends Dialog<Void> {
 
     CounterExampleResultsDialogF(@Nullable Object window, @Nullable Stage owner) {
         this.window = window;
+        this.owner = owner;
         setTitle("Counterexample Search");
         if (owner != null) {
             initOwner(owner);
@@ -89,7 +96,7 @@ final class CounterExampleResultsDialogF extends Dialog<Void> {
 
         btnStart.setOnAction(e -> startSearch());
         btnStop.setOnAction(e -> requestStop());
-        btnClose.setOnAction(e -> close());
+        btnClose.setOnAction(e -> requestHide());
         btnClose.setDefaultButton(true);
         btnStart.disableProperty().bind(running);
         btnStop.disableProperty().bind(running.not());
@@ -132,13 +139,13 @@ final class CounterExampleResultsDialogF extends Dialog<Void> {
             // panel (TestgenExtensionF); until then the run is validated on click.
             return;
         }
-        Object mediator = TestgenReflectionF.mediatorOf(captured);
+        KeYMediatorF mediator = (KeYMediatorF) TestgenReflectionF.mediatorOf(captured);
         Object goal = TestgenReflectionF.goalOf(mediator);
         if (goal == null) {
             append("No open goal is selected — cannot search for a counterexample.\n");
             return;
         }
-        Object proof = TestgenReflectionF.proofOfGoal(goal);
+        Proof proof = (Proof) TestgenReflectionF.proofOfGoal(goal);
         Object sequent = TestgenReflectionF.sequentOfGoal(goal);
         Object ui = TestgenReflectionF.uiOf(captured);
         if (proof == null || sequent == null || ui == null) {
@@ -150,7 +157,8 @@ final class CounterExampleResultsDialogF extends Dialog<Void> {
         statusLabel.setText("Searching for counterexamples...");
         log.clear();
 
-        CounterExampleTaskF task = new CounterExampleTaskF(ui, proof, sequent, logger);
+        CounterExampleTaskF task =
+            new CounterExampleTaskF(mediator, owner, ui, proof, sequent, logger);
         runningTask = task;
         task.setOnSucceeded(e -> {
             running.set(false);
@@ -189,6 +197,19 @@ final class CounterExampleResultsDialogF extends Dialog<Void> {
             log.appendText(text);
         } else {
             Platform.runLater(() -> log.appendText(text));
+        }
+    }
+
+    /**
+     * Hides the dialog window: a plain {@link Dialog} without a cancel {@code ButtonType} refuses
+     * every {@link Dialog#close()} close request (the button bar lives in the custom content, so
+     * the pane has none — the Swing {@code JDialog.dispose} parity hides unconditionally).
+     */
+    private void requestHide() {
+        javafx.stage.Window window = getDialogPane().getScene() == null ? null
+                : getDialogPane().getScene().getWindow();
+        if (window != null) {
+            window.hide();
         }
     }
 }

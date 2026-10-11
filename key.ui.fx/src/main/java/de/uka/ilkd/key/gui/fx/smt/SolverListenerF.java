@@ -29,8 +29,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Window;
 import javafx.util.Duration;
 
-import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
+import de.uka.ilkd.key.gui.fx.actions.useractions.SMTProofApplyUserActionF;
 import de.uka.ilkd.key.gui.fx.colors.ColorPaletteF;
 import de.uka.ilkd.key.gui.fx.colors.ColorSettingsF;
 import de.uka.ilkd.key.gui.fx.smt.InformationWindowF.Information;
@@ -45,13 +45,11 @@ import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings.ProgressMode;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SMTFocusResults;
 import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTRule;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
@@ -63,8 +61,6 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 import org.key_project.logic.Term;
-import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,12 +74,9 @@ import org.slf4j.LoggerFactory;
  * the result coloring (green/red/orange/blue from the {@code [solverListener]} palette colors)
  * into the table cells.
  * <p>
- * KNOWN-SIMPLIFIED: the results are applied directly ({@code SMTRule} built-in rule application
- * with the unsat core if available) instead of through the Swing {@code SMTProofApplyUserAction}
- * history mechanism (no undo entry for the automatic CLOSE-mode application). Swing also stops
- * the interface ({@code stopInterface}) around the rule application; the FX application runs
- * synchronously on the FX thread, so a freeze would be unobservable (the auto mode freeze of
- * MainWindowF.freezeExceptAutoModeButton covers the long-running case).
+ * The results are applied through the undoable {@code SMTProofApplyUserActionF} (WP-7, the Swing
+ * {@code SMTProofApplyUserAction} history mechanism) with the interface frozen around the
+ * {@code SMTRule} built-in rule application.
  */
 public class SolverListenerF implements SolverLauncherListener {
 
@@ -533,38 +526,15 @@ public class SolverListenerF implements SolverLauncherListener {
     }
 
     /**
-     * Applies the results (Swing {@code SolverListener.applyResults}): every goal whose solver
-     * returned a valid result is closed with the {@code SMTRule} built-in rule application (with
-     * the unsat core if the solver provided one). The Swing original wraps this in a
-     * {@code SMTProofApplyUserAction} (undoable); the FX port applies directly.
+     * Applies the results (Swing {@code SolverListener.applyResults}, SolverListener.java:209-221):
+     * every goal whose solver returned a valid result is closed with the {@code SMTRule} built-in
+     * rule application (with the unsat core if the solver provided one), performed through the
+     * undoable {@link SMTProofApplyUserActionF} (WP-7 — the Swing {@code SMTProofApplyUserAction}
+     * history mechanism; the interface freeze and the default selection happen inside the
+     * action's apply).
      */
     private void applyResults() {
-        Set<Goal> goalsClosed = new HashSet<>();
-        for (InternSMTProblemF problem : problems) {
-            Goal goal = problem.problem.getGoal();
-            if (goalsClosed.contains(goal)
-                    || problem.solver.getFinalResult().isValid() != ThreeValuedTruth.VALID) {
-                continue;
-            }
-            goalsClosed.add(goal);
-            ImmutableList<PosInOccurrence> unsatCore =
-                SMTFocusResults.getUnsatCore(problem.problem);
-            IBuiltInRuleApp app;
-            if (unsatCore != null) {
-                app = SMTRule.INSTANCE.createApp(problem.solver.name(), unsatCore);
-            } else {
-                app = SMTRule.INSTANCE.createApp(problem.solver.name());
-            }
-            app = AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, false);
-            if (app == null) {
-                // should be unreachable under normal circumstances
-                throw new RuntimeException("Could not instantiate SMT Rule Application");
-            }
-            goal.apply(app);
-        }
-        // switch to new open goal (Swing: mediator.getSelectionModel().defaultSelection();
-        // the mediator.stopInterface/startInterface input freeze is not ported yet)
-        mediator.getSelectionModel().defaultSelection();
+        new SMTProofApplyUserActionF(mediator, smtProof, problems).actionPerformed();
     }
 
     /**
@@ -607,7 +577,10 @@ public class SolverListenerF implements SolverLauncherListener {
     }
 
     private void showInformation(InternSMTProblemF problem) {
-        InformationWindowF.show(owner, "Information for " + problem, problem.getInformation());
+        // WP-7 — the solver is passed so the Z3 CE entries get the counterexample model tree and
+        // the help tab (Swing InformationWindow.initModel, InformationWindow.java:88-101)
+        InformationWindowF.show(owner, problem.solver, "Information for " + problem,
+            problem.getInformation());
     }
 
     private void stopEvent(SolverLauncher launcher) {

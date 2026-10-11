@@ -170,6 +170,12 @@ run {
     //    app runs — "save" applies the dark theme through ThemeManager.setTheme and asserts the
     //    choice persisted; "restore" restarts without the key.fx.theme override and asserts the
     //    dark theme was restored from the persisted preference, then resets to light)
+    //  * key.fx.verify.testgen = any  (WP-7: run the TestGen extension self test — the extension
+    //    capability surface (toolbar buttons + Startup hook + "Test Case Generation" menu with
+    //    the macro accelerator), the options panel round trips (Settings mode + live mode), the
+    //    idle render of the two run dialogs (with the embedded live options panel), the CE model
+    //    tree of a stub SMT model in the InformationWindowF and the cooperative stop; no real
+    //    test generation or counterexample run — combine with key.fx.verify.smt for the real z3)
     ["key.fx.driver", "key.fx.theme", "key.fx.demo.sequent", "key.fx.verify.sequent",
         "key.fx.show", "key.fx.demo.autoprove", "key.fx.verify.tree",
         "key.fx.demo.autoprove.live", "key.fx.demo.maxsteps", "key.fx.verify.goallist",
@@ -187,7 +193,7 @@ run {
         "key.fx.verify.sequentmenu", "key.fx.verify.dialogs", "key.fx.verify.prooftree",
         "key.fx.verify.selectionhistory", "key.fx.verify.isabelle", "key.fx.verify.heatmap",
         "key.fx.verify.exploration", "key.fx.verify.caching", "key.fx.verify.slicing",
-        "key.fx.verify.themepersist"]
+        "key.fx.verify.themepersist", "key.fx.verify.testgen"]
         .each { name ->
         def value = System.getProperty(name)
         if (value != null) {

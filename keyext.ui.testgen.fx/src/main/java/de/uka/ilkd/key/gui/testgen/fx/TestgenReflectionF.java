@@ -4,14 +4,19 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.testgen.fx;
 
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 import javafx.stage.Stage;
+
+import de.uka.ilkd.key.smt.SolverLauncherListener;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -19,27 +24,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The reflective bridge to the {@code key.core} / {@code key.core.testgen} generation logic.
+ * The reflective bridge to the {@code key.core.testgen} generation logic.
  * <p>
- * <b>NOT part of the SPI:</b> neither key.core nor key.core.testgen is on the compile classpath
- * of this module (the frozen {@code build.gradle} only exposes {@code key.ui.fx} and the Swing
- * {@code keyext.ui.testgen}; the core modules arrive on the runtime classpath of the app), so all
- * calls into the proof tree, the SMT machinery and the test-case generators are dispatched through
- * plain reflection. The routed entry points mirror the ones the Swing extension uses:
+ * <b>NOT part of the SPI:</b> {@code key.core.testgen} is not on the compile classpath of this
+ * module (the frozen {@code build.gradle} only exposes {@code key.ui.fx}, the Swing
+ * {@code keyext.ui.testgen} and {@code key.core}; the testgen module arrives on the runtime
+ * classpath of the app), so all calls into the SMT/test-case generation machinery are dispatched
+ * through plain reflection — {@code key.core} types ({@code Proof}, {@code Sequent}, ...) are
+ * nameable and appear as typed parameters where the callers have them at hand. The routed entry
+ * points mirror the ones the Swing extension uses:
  * <ul>
- * <li>{@link #generateTestcases(Object, Object, LogSinkF)} — the headless CLI pipeline
- * {@code TestgenFacade.generateTestcases} (TestgenFacade.java:43-101): bounded symbolic
- * execution (FinishSymbolicExecution / TestGen macro), semantic blasting and the Z3 CE run with
- * JUnit test-suite generation. The Swing {@code TGWorker} drives the same steps through
- * {@code AbstractTestGenerator} (which needs a UI subclass that cannot be materialised without the
- * compile-time types); the facade is its headless counterpart that works off a plain
- * {@code KeYEnvironment}.</li>
- * <li>{@link #searchCounterExample(Object, Object, Object, LogSinkF, AtomicReference)} — the
- * counterexample search of {@code AbstractSideProofCounterExampleGenerator.searchCounterExample}
- * (side proof creation via {@code SideProofUtil}, {@code SemanticsBlastingMacro} on the side
- * proof, then Z3 CE via a {@code SolverLauncher}). The abstract generator's
- * {@code createSolverListener} hook is UI-specific; this port passes a reflective
- * {@code SolverLauncherListener} instead and reports the outcome into the {@link LogSinkF}.</li>
+ * <li>{@link #generateTestcases} — the pipeline of {@code TestgenFacade.generateTestcases}
+ * (TestgenFacade.java:37-101): bounded symbolic execution (FinishSymbolicExecution / TestGen
+ * macro), semantic blasting and the Z3 CE run with JUnit test-suite generation. Unlike the
+ * facade the {@code SolverLauncher} is created here and handed to the caller, so the Stop button
+ * can stop it like the Swing {@code TGWorker.stopSMTLauncher} (the Swing {@code TGWorker} drives
+ * the same steps through {@code AbstractTestGenerator}, which needs a UI subclass that cannot be
+ * materialised without the compile-time types; the facade is its headless counterpart, and its
+ * hidden launcher would leave the run unstoppable).</li>
+ * <li>{@link #searchCounterExample} — the counterexample search of
+ * {@code AbstractSideProofCounterExampleGenerator.searchCounterExample} (side proof creation via
+ * {@code SideProofUtil}, {@code SemanticsBlastingMacro} on the side proof, then Z3 CE via a
+ * {@code SolverLauncher}). The abstract generator's {@code createSolverListener} hook is
+ * UI-specific; the caller supplies the {@code SolverLauncherListener} (see
+ * {@link #searchCounterExample} for the C4 {@code SolverListenerF} route) and this class keeps
+ * the reflective log-only fallback.</li>
  * </ul>
  * Every reflective call is guarded: a missing class or a reflection error is logged through the
  * {@link LogSinkF} (and the module logger) instead of crashing the FX thread; a propagated
@@ -151,47 +160,122 @@ final class TestgenReflectionF {
     // ------------------------------------------------------------------ test-case generation
 
     /**
-     * Runs the test-case generation (Swing TGWorker.doInBackground, TGWorker.java:50-53). The
-     * routed pipeline is {@code TestgenFacade.generateTestcases}: bounded symbolic execution,
-     * testing with the TestGen macro, semantic blasting of the test data constraints and the
-     * final Z3 CE run that writes the JUnit test suite into the configured output folder
-     * (TestgenFacade.java:43-101).
-     * <p>
-     * <b>KNOWN-SIMPLIFIED:</b> the Swing {@code TGWorker} additionally wraps the run in the
-     * mediator's auto-mode machinery and supports an immediate stop through the
-     * {@code StopRequest}/{@code SolverLauncher} handles (TGWorker.java:42-71); the facade route
-     * has no launcher handle, so stopping the FX run interrupts the worker thread, which the
-     * macros honour between phases (the Z3 launch itself runs until it returns).
+     * Runs the test-case generation, the reflective counterpart of
+     * {@code TestgenFacade.generateTestcases} (TestgenFacade.java:37-101): bounded symbolic
+     * execution (if enabled), the {@code TestGenMacro}, semantic blasting and the final Z3 CE
+     * launch that writes the JUnit test suite into the configured output folder. Unlike the
+     * facade the {@code SolverLauncher} is created here and its handle handed to the caller
+     * ({@code launcherRef}), so the Stop button can stop it like the Swing
+     * {@code TGWorker.stopSMTLauncher} (TGWorker.java:70 — the facade hides its launcher). The
+     * phases are guarded by {@code shouldStop} (the Swing {@code StopRequest} parity,
+     * TGWorker.java:31-86); the auto-mode shell lives in {@link TestGenerationTaskF} (the Swing
+     * {@code TGWorker.start/done} placement).
      *
      * @param ui the UserInterfaceControl of the main window (reflected)
      * @param proof the selected proof (reflected)
+     * @param shouldStop the cooperative stop flag (checked between the phases and before the
+     *        launch)
      * @param sink the log sink of the run dialog
+     * @param launcherRef receives the running {@code SolverLauncher}
      * @throws InterruptedException when the run was interrupted (task cancelled)
      */
-    static void generateTestcases(Object ui, Object proof, LogSinkF sink)
+    static void generateTestcases(Object ui, Object proof, BooleanSupplier shouldStop,
+            LogSinkF sink, AtomicReference<@Nullable Object> launcherRef)
             throws InterruptedException {
         if (ui == null || proof == null) {
             sink.writeln("Test generation cancelled: no proof loaded.");
             return;
         }
+        if (!z3CeInstalled()) {
+            sink.writeln("Could not find the z3 SMT solver. Aborting.");
+            return;
+        }
         try {
-            Class<?> settingsClass = clazz("de.uka.ilkd.key.testgen.TestGenerationSettings");
-            Object settings = settingsClass.getMethod("getInstance").invoke(null);
-            Class<?> uiClass = clazz("de.uka.ilkd.key.control.UserInterfaceControl");
-            Class<?> initConfigClass = clazz("de.uka.ilkd.key.proof.init.InitConfig");
             Class<?> proofClass = clazz("de.uka.ilkd.key.proof.Proof");
-            Class<?> envClass = clazz("de.uka.ilkd.key.control.KeYEnvironment");
-            Class<?> listenerClass =
+            Class<?> settingsClass = clazz("de.uka.ilkd.key.testgen.TestGenerationSettings");
+            Class<?> lifecycleClass =
                 clazz("de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLifecycleListener");
+            Class<?> tgPhaseClass = clazz("de.uka.ilkd.key.testgen.smt.testgen.TGPhase");
+            Class<?> tgReporterClass = clazz("de.uka.ilkd.key.testgen.TGReporter");
+            Class<?> tgClass = clazz("de.uka.ilkd.key.testgen.TestCaseGenerator");
 
-            Object initConfig = invokeNullary(proof, "getInitConfig");
-            Object env = envClass.getConstructor(uiClass, initConfigClass).newInstance(ui,
-                initConfig);
-            Object listener = lifecycleListenerProxy(listenerClass, sink);
-            Class<?> facade = clazz("de.uka.ilkd.key.testgen.TestgenFacade");
-            Method generate = facade.getMethod("generateTestcases", envClass, proofClass,
-                settingsClass, listenerClass);
-            generate.invoke(null, env, proof, settings, listener);
+            // reporter + generator (TestgenFacade.java:33-34)
+            Object settings = settingsClass.getMethod("getInstance").invoke(null);
+            Object reporter = tgReporterClass.getConstructor(lifecycleClass)
+                    .newInstance(lifecycleListenerProxy(lifecycleClass, sink));
+            Object tg = tgClass.getConstructor(proofClass, settingsClass, tgReporterClass)
+                    .newInstance(proof, settings, reporter);
+
+            // SMT settings triple (TestgenFacade.java:36-47); the 10 s solver timeout is the
+            // facade default (TestgenFacade.java:46)
+            Class<?> newSettingsClass = clazz("de.uka.ilkd.key.settings.NewSMTTranslationSettings");
+            Class<?> pdClass = clazz("de.uka.ilkd.key.settings.ProofDependentSMTSettings");
+            Class<?> piClass = clazz("de.uka.ilkd.key.settings.ProofIndependentSMTSettings");
+            Object newSettings = newSettingsClass.getConstructor().newInstance();
+            Object pdSettings = pdClass.getMethod("getDefaultSettingsData").invoke(null);
+            Object piSettings = piClass.getMethod("getDefaultSettingsData").invoke(null);
+            piSettings.getClass().getMethod("setTimeout", int.class).invoke(piSettings, 10000);
+            Object smtSettings = clazz("de.uka.ilkd.key.settings.DefaultSMTSettings")
+                    .getConstructor(pdClass, piClass, newSettingsClass, proofClass)
+                    .newInstance(pdSettings, piSettings, newSettings, proof);
+
+            // own SolverLauncher (TestgenFacade.java:49) — the handle goes into launcherRef so
+            // the Stop button can stop it; the JUnit test-suite generation runs in the
+            // launcherStopped event (TestgenFacade.java:50-65)
+            Object launcher = clazz("de.uka.ilkd.key.smt.SolverLauncher")
+                    .getConstructor(clazz("de.uka.ilkd.key.smt.SMTSettings"))
+                    .newInstance(smtSettings);
+            launcherRef.set(launcher);
+            Class<?> launcherListenerClass = clazz("de.uka.ilkd.key.smt.SolverLauncherListener");
+            launcher.getClass().getMethod("addListener", launcherListenerClass).invoke(launcher,
+                testSuiteListenerProxy(launcherListenerClass, tg, tgReporterClass, reporter));
+
+            Object taskListener = invokeNullary(invokeNullary(ui, "getProofControl"),
+                "getDefaultProverTaskListener");
+            Object goals = invokeNullary(proof, "openEnabledGoals");
+
+            // phase 1: bounded symbolic execution (TestgenFacade.java:69-74)
+            if ((Boolean) settingsClass.getMethod("getApplySymbolicExecution").invoke(settings)) {
+                if (stopped(shouldStop)) {
+                    return;
+                }
+                invokeApplyTo(clazz("de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro")
+                        .getConstructor().newInstance(), ui, proof, goals, taskListener);
+            }
+
+            // phase 2: the TestGen macro (TestgenFacade.java:76-78)
+            if (stopped(shouldStop)) {
+                return;
+            }
+            Object tgMacro = clazz("de.uka.ilkd.key.testgen.macros.TestGenMacro")
+                    .getConstructor(int.class)
+                    .newInstance(settingsClass.getMethod("getMaximalUnwinds").invoke(settings));
+            invokeApplyTo(tgMacro, ui, proof, goals, taskListener);
+
+            // phase 3: semantic blasting (TestgenFacade.java:80-82)
+            if (stopped(shouldStop)) {
+                return;
+            }
+            invokeApplyTo(clazz("de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro")
+                    .getConstructor().newInstance(), ui, proof, goals, taskListener);
+
+            // phase 4: the synchronous Z3 CE launch (TestgenFacade.java:84-86)
+            if (stopped(shouldStop)) {
+                return;
+            }
+            Object z3 = Class.forName("de.uka.ilkd.key.smt.solvertypes.SolverTypes")
+                    .getField("Z3_CE_SOLVER").get(null);
+            Collection<?> problems = (Collection<?>) clazz("de.uka.ilkd.key.smt.SMTProblem")
+                    .getMethod("createSMTProblems", proofClass).invoke(null, proof);
+            launcher.getClass().getMethod("launch", Collection.class, Collection.class,
+                clazz("de.uka.ilkd.key.java.Services")).invoke(launcher, List.of(z3), problems,
+                invokeNullary(proof, "getServices"));
+
+            // finish events (TestgenFacade.java:88-89); the TGPhase.FINISHED goes through the
+            // TGReporter and fires sink.finished() via the lifecycle proxy
+            Object phase = tgPhaseClass.getField("FINISHED").get(null);
+            tgReporterClass.getMethod("phase", tgPhaseClass).invoke(reporter, phase);
+            tgReporterClass.getMethod("finish").invoke(reporter);
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
             if (cause instanceof InterruptedException ie) {
@@ -204,7 +288,44 @@ final class TestgenReflectionF {
         }
     }
 
+    /**
+     * The cooperative stop check between the phases (the Swing {@code StopRequest.shouldStop}
+     * plus the thread-interrupt backup, TGWorker.java:66-71 + AbstractTestGenerator.java:109).
+     *
+     * @return {@code true} when the run should stop
+     */
+    private static boolean stopped(BooleanSupplier shouldStop) {
+        return shouldStop.getAsBoolean() || Thread.currentThread().isInterrupted();
+    }
+
+    /**
+     * Invokes {@code macro.applyTo(ui, proof, goals, null, taskListener)} — the shared
+     * {@code ProofMacro.applyTo} signature of the three generation phases.
+     */
+    private static void invokeApplyTo(Object macro, Object ui, Object proof, Object goals,
+            Object taskListener) throws ReflectiveOperationException {
+        macro.getClass().getMethod("applyTo",
+            clazz("de.uka.ilkd.key.control.UserInterfaceControl"),
+            clazz("de.uka.ilkd.key.proof.Proof"),
+            clazz("org.key_project.util.collection.ImmutableList"),
+            clazz("de.uka.ilkd.key.logic.PosInOccurrence"),
+            clazz("org.key_project.prover.engine.ProverTaskListener")).invoke(macro, ui, proof,
+                goals, null, taskListener);
+    }
+
     // ------------------------------------------------------------------ counterexample search
+
+    /**
+     * The {@code SolverLauncherListener} factory of the counterexample search — the
+     * UI-specific {@code createSolverListener} hook of
+     * {@code AbstractSideProofCounterExampleGenerator} (AbstractSideProofCounterExampleGenerator
+     * .java:22-27): the {@code SolverLauncherListener} for the given {@code DefaultSMTSettings}
+     * (first argument) and side {@code Proof} (second argument).
+     */
+    @FunctionalInterface
+    interface SolverListenerFactoryF {
+        SolverLauncherListener create(Object settings, Object sideProof);
+    }
 
     /**
      * Searches a counterexample for the sequent of the selected goal (Swing
@@ -217,23 +338,24 @@ final class TestgenReflectionF {
      * {@code AbstractCounterExampleGenerator.searchCounterExample},
      * AbstractCounterExampleGenerator.java:67-100).
      * <p>
-     * <b>KNOWN-SIMPLIFIED:</b> the Swing {@code SolverListener} opens a modal progress dialog and
-     * a results dialog showing the counterexample model; the FX port prints the SMT statistics
-     * (solved/invalid/unknown path conditions) and the found/not-found outcome into the run
-     * dialog's log and leaves the model inspection to the generated test data. The auto-mode
-     * shell of the Swing worker (CounterExampleAction.java:169-191) is dropped like in
-     * {@link TestGenerationTaskF}.
+     * The {@code SolverLauncherListener} comes from {@code listenerFactory} (the
+     * {@code createSolverListener} parity hook): {@link CounterExampleTaskF} supplies a
+     * {@code SolverListenerF}, which opens the modal progress dialog and the results
+     * (counterexample model) like the Swing {@code SolverListener}.
      *
      * @param ui the UserInterfaceControl of the main window (reflected)
      * @param proof the proof of the selected goal (reflected)
      * @param sequent the sequent of the selected goal (reflected)
-     * @param sink the log sink of the run dialog
+     * @param sink the log sink of the run dialog (the pipeline messages)
      * @param launcherRef receives the running {@code SolverLauncher} so the Stop button can ask it
      *        to stop
+     * @param listenerFactory creates the {@code SolverLauncherListener} for the given
+     *        {@code DefaultSMTSettings} and side proof
      * @throws InterruptedException when the run was interrupted (task cancelled)
      */
     static void searchCounterExample(Object ui, Object proof, Object sequent, LogSinkF sink,
-            AtomicReference<@Nullable Object> launcherRef) throws InterruptedException {
+            AtomicReference<@Nullable Object> launcherRef, SolverListenerFactoryF listenerFactory)
+            throws InterruptedException {
         if (ui == null || proof == null || sequent == null) {
             sink.writeln("Counterexample search cancelled: no goal selected.");
             return;
@@ -301,15 +423,15 @@ final class TestgenReflectionF {
                         clazz("de.uka.ilkd.key.settings.NewSMTTranslationSettings"), proofClass)
                     .newInstance(pdSettings, piSettings, newSettings, sideProof);
 
-            // (4) launch Z3 CE with a reflective SolverLauncherListener
+            // (4) launch Z3 CE with the caller's SolverLauncherListener
             // (AbstractCounterExampleGenerator.java:93-99)
             Object launcher = clazz("de.uka.ilkd.key.smt.SolverLauncher")
                     .getConstructor(clazz("de.uka.ilkd.key.smt.SMTSettings"))
                     .newInstance(smtSettings);
             launcherRef.set(launcher);
-            Object listener = solverLauncherListenerProxy(sink);
             launcher.getClass().getMethod("addListener",
-                clazz("de.uka.ilkd.key.smt.SolverLauncherListener")).invoke(launcher, listener);
+                clazz("de.uka.ilkd.key.smt.SolverLauncherListener"))
+                    .invoke(launcher, listenerFactory.create(smtSettings, sideProof));
             Object z3 = Class.forName("de.uka.ilkd.key.smt.solvertypes.SolverTypes")
                     .getField("Z3_CE_SOLVER").get(null);
             Collection<?> problems = (Collection<?>) clazz("de.uka.ilkd.key.smt.SMTProblem")
@@ -379,26 +501,46 @@ final class TestgenReflectionF {
     }
 
     /**
-     * A {@code java.lang.reflect.Proxy} for {@code SolverLauncherListener} that streams the
-     * solver statistics of the counterexample search into the {@link LogSinkF}. The result
-     * summary mirrors {@code AbstractTestGenerator.filterSolverResultsAndShowSolverStatistics}
-     * (AbstractTestGenerator.java:383-428).
+     * A {@code java.lang.reflect.Proxy} for {@code SolverLauncherListener} that runs the JUnit
+     * test-suite generation on the finished solvers (the anonymous listener of
+     * {@code TestgenFacade.generateTestcases}, TestgenFacade.java:50-65: the first solver's
+     * exception is re-thrown, then {@code TestCaseGenerator.generateJUnitTestSuite} and the
+     * "Compile the generated files" hint; NoSuchElement/IO go to the reporter like in Swing).
      */
-    private static Object solverLauncherListenerProxy(LogSinkF sink)
-            throws ClassNotFoundException {
-        Class<?> listenerClass = clazz("de.uka.ilkd.key.smt.SolverLauncherListener");
+    private static Object testSuiteListenerProxy(Class<?> listenerClass, Object testGenerator,
+            Class<?> tgReporterClass, Object reporter) {
         return Proxy.newProxyInstance(listenerClass.getClassLoader(),
             new Class<?>[] { listenerClass }, (proxy, method, args) -> {
                 switch (method.getName()) {
-                    case "launcherStarted" -> {
-                        Object problems = args == null || args.length == 0 ? null : args[0];
-                        int count = problems instanceof Collection<?> c ? c.size() : 0;
-                        sink.writeln("Searching for counterexamples: " + count
-                            + " SMT problem(s)...");
-                    }
                     case "launcherStopped" -> {
                         Object solvers = args == null || args.length < 2 ? null : args[1];
-                        reportSolverResults(solvers, sink);
+                        Collection<?> finished = solvers instanceof Collection<?> c ? c
+                                : List.of();
+                        try {
+                            Object first = finished.iterator().next();
+                            Object exception = callNullary(first, "getException");
+                            if (exception != null) {
+                                throw new RuntimeException("Exception during SMT",
+                                    (Throwable) exception);
+                            }
+                            testGenerator.getClass()
+                                    .getMethod("generateJUnitTestSuite", Collection.class)
+                                    .invoke(testGenerator, finished);
+                            tgReporterClass.getMethod("writeln", String.class).invoke(reporter,
+                                "Compile the generated files using a Java compiler.");
+                        } catch (NoSuchElementException e) {
+                            reportException(tgReporterClass, reporter, e);
+                        } catch (InvocationTargetException e) {
+                            Throwable cause = e.getCause();
+                            if (cause instanceof NoSuchElementException
+                                    || cause instanceof IOException) {
+                                reportException(tgReporterClass, reporter, cause);
+                            } else {
+                                throw cause == null ? e : cause;
+                            }
+                        } catch (ReflectiveOperationException e) {
+                            LOGGER.warn("Could not generate the JUnit test suite", e);
+                        }
                     }
                     case "equals" -> {
                         return args != null && args.length == 1 && args[0] == proxy;
@@ -407,7 +549,7 @@ final class TestgenReflectionF {
                         return System.identityHashCode(proxy);
                     }
                     case "toString" -> {
-                        return "SolverLauncherListener(proxy)";
+                        return "SolverLauncherListener(testSuite proxy)";
                     }
                     default -> {
                     }
@@ -416,36 +558,15 @@ final class TestgenReflectionF {
             });
     }
 
-    private static void reportSolverResults(@Nullable Object finishedSolvers, LogSinkF sink) {
-        Collection<?> solvers = finishedSolvers instanceof Collection<?> c ? c : List.of();
-        int valid = 0;
-        int falsifiable = 0;
-        int unknown = 0;
-        for (Object solver : solvers) {
-            try {
-                Object result = invokeNullary(solver, "getFinalResult");
-                if (result != null) {
-                    Object truth = invokeNullary(result, "isValid");
-                    if (truth != null) {
-                        switch (truth.toString()) {
-                            case "VALID" -> valid++;
-                            case "FALSIFIABLE" -> falsifiable++;
-                            case "UNKNOWN" -> unknown++;
-                            default -> {
-                            }
-                        }
-                    }
-                }
-            } catch (ReflectiveOperationException | RuntimeException ex) {
-                sink.writeln("Solver exception: " + (ex.getMessage() == null
-                        ? ex.getClass().getSimpleName()
-                        : ex.getMessage()));
-            }
+    /** {@code TGReporter.reportException} (TestgenFacade.java:63-64). */
+    private static void reportException(Class<?> tgReporterClass, Object reporter,
+            Throwable throwable) {
+        try {
+            tgReporterClass.getMethod("reportException", Exception.class).invoke(reporter,
+                throwable);
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            LOGGER.warn("Could not report the test-generation exception", e);
         }
-        sink.writeln("--- SMT Solver Results ---\n" + " solved pathconditions:" + falsifiable
-            + "\n" + " invalid pre-/pathconditions:" + valid + "\n" + " unknown:" + unknown);
-        sink.writeln(falsifiable > 0 ? "Found " + falsifiable + " counterexample(s)."
-                : "No counterexample found for the selected goal.");
     }
 
     private static Throwable throwableOf(Object @Nullable [] args) {

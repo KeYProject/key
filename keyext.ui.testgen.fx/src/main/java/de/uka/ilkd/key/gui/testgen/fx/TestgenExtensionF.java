@@ -16,15 +16,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
-import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.KeyCombination;
 import javafx.stage.Stage;
 
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.gui.fx.MainWindowF;
 import de.uka.ilkd.key.gui.fx.extension.api.KeYGuiExtensionF;
+import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsProviderF;
 
 import org.jspecify.annotations.NullMarked;
@@ -40,55 +39,44 @@ import org.slf4j.LoggerFactory;
  * Swing original contributes two {@code Action}s ("Search for Counterexample", "Generate
  * Testcases...") to the main menu (grouped by the Swing facade into an "Extensions" menu), a
  * {@code JToolBar} with the same two actions, a {@code KeyStrokeSettings.defineDefault} shortcut
- * (Ctrl+T for the {@code TestGenMacro}) and the {@code TestgenOptionsPanel} settings provider; it
+ * (Ctrl+Shift+T ({@code MULTI_KEY_MASK}) for the {@code TestGenMacro}) and the {@code
+ * TestgenOptionsPanel} settings provider; it
  * also implements {@code KeyboardShortcuts} and {@code Startup} and registers selection/Z3
  * listeners so the actions are only enabled on an open proof with the Z3 CE solver installed.
  * <p>
- * The FX port implements the {@link KeYGuiExtensionF} SPI through three capabilities: the
- * settings entry ({@link KeYGuiExtensionF.SettingsF} → {@link TestgenSettingsProviderF}, a
- * reflective {@code SettingsProviderF} proxy), the main-menu entry
- * ({@link KeYGuiExtensionF.MainMenuF} → the "Test Case Generation" menu with the two items of the
- * Swing extension menu, the generate item carrying the SHORTCUT+T accelerator that replaces the
- * Swing {@code KeyStrokeSettings.defineDefault} default) and the status line
- * ({@link KeYGuiExtensionF.StatusLineF}): the same two items inside a {@link MenuButton} plus the
- * two plain action buttons of the Swing toolbar. The long-running generation and the
- * counterexample search run off the FX thread in {@link TestGenerationTaskF} /
+ * The FX port implements the {@link KeYGuiExtensionF} SPI through four capabilities: the settings
+ * entry ({@link KeYGuiExtensionF.SettingsF} → {@link TestgenSettingsProviderF}, a reflective
+ * {@code SettingsProviderF} proxy), the main-menu entry ({@link KeYGuiExtensionF.MainMenuF} → the
+ * "Test Case Generation" menu with the two items of the Swing extension menu), the toolbar
+ * ({@link KeYGuiExtensionF.ToolbarF} → the two plain action buttons of the Swing {@code JToolBar}
+ * in the host's extension toolbar) and the startup hook ({@link KeYGuiExtensionF.StartupF} →
+ * {@link #init(MainWindowF, KeYMediatorF)}, which hands the window to the extension at app
+ * startup exactly like the Swing {@code Startup} hook does — WP-7). The long-running generation
+ * and the counterexample search run off the FX thread in {@link TestGenerationTaskF} /
  * {@link CounterExampleTaskF} and report into the {@link TestGenResultsDialogF} /
  * {@link CounterExampleResultsDialogF}.
  * <p>
- * <b>KNOWN-SIMPLIFIED (capability reduction):</b> the Swing extension also implements
- * {@code Toolbar} and {@code Startup}, mirrored by the FX SPI as {@code ToolbarF} and
- * {@code StartupF}. The two toolbar actions are expressed through the two plain buttons of the
- * status-line slot (a real {@code ToolbarF} layout is not needed for two buttons, and plain
- * {@code Button}s stay constructible without the FX toolkit, which keeps the headless unit tests
- * toolkit-free), and the {@code StartupF} init hook is not implemented — the window is captured
- * lazily through the settings panel instead (next block). The menu slot is implemented in full:
- * unlike the initial revision, which could not name {@code MainWindowF}/{@code KeYMediatorF} in
- * SPI signatures (javac failed completing {@code MainWindowF} while {@code key.core} was missing
- * from the compile classpath), this module now declares {@code :key.core} like the other keyext
- * FX ports; every runtime window reference remains a plain {@code Object} resolved through
- * {@link TestgenReflectionF}.
- * <p>
- * <b>KNOWN-SIMPLIFIED (lazy window/mediator capture):</b> {@link KeYGuiExtensionF.StatusLineF}
- * does not receive the main window, and no {@code StartupF} hook is implemented, so the port
- * captures the window through the one SPI surface that does pass it — the settings panel
- * ({@link TestgenSettingsProviderF}, whose {@code getPanel/apply} forward the window to
- * {@link #captureWindow(Object)}) — and wires the enablement listeners on that first capture.
- * Until then the buttons stay clickable and validate on click (the run dialogs log the "open the
- * settings dialog once" hint instead of crashing), which mirrors the Swing actions' on-click
- * guards.
+ * WP-7 closes the former capability reduction: the extension now implements {@code ToolbarF} and
+ * {@code StartupF} like its Swing original. The status-line stand-in (the "Test Case Generation"
+ * {@code MenuButton} re-exposing the two menu items) is dropped with it — it existed only because
+ * the toolbar slot was missing, and Swing parity is exactly menu + toolbar. The window still
+ * arrives through the settings panel as a fallback (the reflective settings proxy forwards it to
+ * {@link #captureWindow(Object)}); with the {@code StartupF} hook in place it arrives at startup,
+ * so the enablement wiring (selection, auto-mode and SMT-settings listeners, the FX equivalent of
+ * the Swing action-infrastructure updates) runs from the start instead of on the first settings
+ * dialog visit.
  */
 @KeYGuiExtensionF.Info(name = "Test case generation", experimental = false,
     description = "key.testgen (JavaFX port): generate JUnit test cases from the current proof, "
         + "or search for a counterexample, using the Z3 CE solver.")
 @NullMarked
 public final class TestgenExtensionF
-        implements KeYGuiExtensionF, KeYGuiExtensionF.SettingsF, KeYGuiExtensionF.StatusLineF,
-        KeYGuiExtensionF.MainMenuF {
+        implements KeYGuiExtensionF, KeYGuiExtensionF.SettingsF, KeYGuiExtensionF.ToolbarF,
+        KeYGuiExtensionF.StartupF, KeYGuiExtensionF.MainMenuF {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TestgenExtensionF.class);
 
-    /** Label of the status-line extension area (the Swing "Extensions" menu label equivalent). */
+    /** Label of the extension's main-menu area (the Swing "Extensions" menu label equivalent). */
     private static final String MENU_LABEL = "Test Case Generation";
 
     /** Swing TestGenerationAction.NAME. */
@@ -96,6 +84,13 @@ public final class TestgenExtensionF
 
     /** Swing CounterExampleAction.NAME. */
     private static final String NAME_COUNTEREXAMPLE = "Search for Counterexample";
+
+    /**
+     * action id of the TestGenMacro in the shared keystroke settings (the macro's real FQN —
+     * the Swing {@code KeyStrokeSettings.defineDefault} id, see {@code KeyStrokeManagerF}).
+     */
+    private static final String TESTGEN_MACRO_ACTION_ID =
+        "de.uka.ilkd.key.testgen.macros.TestGenMacro";
 
     /** Swing TestGenerationAction.TOOLTIP. */
     private static final String TOOLTIP_GENERATE = "Generate test cases for open goals";
@@ -107,31 +102,24 @@ public final class TestgenExtensionF
     /** the TestgenOptionsPanel port; a reflective {@code SettingsProviderF} proxy (see class). */
     private final SettingsProviderF settingsProvider = TestgenSettingsProviderF.create(this);
 
-    /** status-line: the anchor menu button with the two extension-menu items. */
-    private @Nullable MenuButton menuButton;
-
-    /** status-line: the two plain toolbar buttons (Swing JToolBar entries). */
+    /** toolbar: the two plain buttons of the Swing JToolBar (Swing TestgenExtension.getToolbar). */
     private @Nullable Button generateButton;
     private @Nullable Button counterExampleButton;
 
-    /**
-     * every created "Generate Testcases..." item (status MenuButton + main menu), for enablement.
-     */
+    /** every created "Generate Testcases..." main-menu item, for enablement. */
     private final List<MenuItem> generateItems = new ArrayList<>();
 
-    /**
-     * every created "Search for Counterexample" item (status MenuButton + main menu), for
-     * enablement.
-     */
+    /** every created "Search for Counterexample" main-menu item, for enablement. */
     private final List<MenuItem> counterExampleItems = new ArrayList<>();
 
     /** main-menu: the "Test Case Generation" menu ({@link KeYGuiExtensionF.MainMenuF}). */
     private @Nullable Menu menu;
 
     /**
-     * the main window, captured lazily through the settings panel (see the class comment for the
-     * {@code KNOWN-SIMPLIFIED} reasoning): {@code null} until the user opens the settings dialog.
-     * Kept as a plain {@code Object} — {@code MainWindowF} is not nameable in this module.
+     * the main window, captured at startup through the {@code StartupF}/{@code ToolbarF} hooks
+     * (WP-7) or as a fallback through the settings panel (the reflective settings proxy): it was
+     * {@code null} until the user opened the settings dialog before WP-7. Kept as a plain
+     * {@code Object} — {@code MainWindowF} is not nameable in this module.
      */
     private @Nullable Object window;
 
@@ -146,21 +134,19 @@ public final class TestgenExtensionF
         return settingsProvider;
     }
 
-    // ------------------------------------------------------------------ StatusLineF
+    // ------------------------------------------------------------------ ToolbarF
 
     @Override
-    public List<Control> getStatusLineControls() {
-        // extension: MP9.5 — Swing TestgenExtension.java:43-61: the two actions live in the
-        // main menu ("Test Case Generation", see getMenus) and in the JToolBar. The FX port
-        // expresses the Swing toolbar through this status-line slot (KNOWN-SIMPLIFIED, class
-        // comment): the "Test Case Generation" MenuButton re-exposes the two menu items for
-        // quick access, the two plain buttons mirror the toolbar.
-        if (menuButton == null) {
-            MenuButton anchor = new MenuButton(MENU_LABEL);
-            // no accelerator here — the SHORTCUT+T binding lives on the main-menu generate
-            // item (getMenus) so the two surfaces do not double-fire it
-            anchor.getItems().addAll(makeGenerateItem(anchor), makeCounterExampleItem(anchor));
-
+    public List<Control> getToolbarControls(MainWindowF window, KeYMediatorF mediator) {
+        // WP-7 — Swing TestgenExtension.getToolbar (TestgenExtension.java:55-61): the JToolBar
+        // with the two actions; the FX host appends the contributed controls to its single
+        // extension toolbar (MainWindowF.buildTop). The window also arrives here (the toolbar is
+        // built after the mediator is set), so the enablement wiring starts like through the
+        // StartupF hook below.
+        if (window != null) {
+            captureWindow(window);
+        }
+        if (generateButton == null) {
             // Swing TestGenerationAction/CounterExampleAction SMALL_ICONs (FontAwesome)
             Button generate = new Button(NAME_GENERATE, new FontIcon(FontAwesomeSolid.FLASK));
             generate.setTooltip(new Tooltip(TOOLTIP_GENERATE));
@@ -169,12 +155,22 @@ public final class TestgenExtensionF
                 new FontIcon(FontAwesomeSolid.EXCLAMATION_TRIANGLE));
             counterExample.setTooltip(new Tooltip(TOOLTIP_COUNTEREXAMPLE));
             counterExample.setOnAction(e -> searchCounterExample(counterExample));
-
-            menuButton = anchor;
             generateButton = generate;
             counterExampleButton = counterExample;
         }
-        return List.of(menuButton, generateButton, counterExampleButton);
+        refresh();
+        return List.of(generateButton, counterExampleButton);
+    }
+
+    // ------------------------------------------------------------------ StartupF
+
+    @Override
+    public void init(MainWindowF window, KeYMediatorF mediator) {
+        // WP-7 — Swing TestgenExtension.init (TestgenExtension.java:48-53): the Startup hook
+        // hands the window to the extension at app startup. The window capture enables the
+        // enablement listeners (captureWindow) instead of the former lazy capture through the
+        // settings panel.
+        captureWindow(window);
     }
 
     // ------------------------------------------------------------------ MainMenuF
@@ -189,12 +185,15 @@ public final class TestgenExtensionF
         if (menu == null) {
             Menu m = new Menu(MENU_LABEL);
             // Swing TestgenExtension.java:51-52 registers the TestGenMacro default shortcut via
-            // KeyStrokeSettings.defineDefault; the FX SPI has no keyboard-shortcut capability,
-            // so the accelerator lives on the menu item. KNOWN-SIMPLIFIED: the shortcut moves
-            // from the TestGen strategy macro (term context menu in Swing) to the menu item —
-            // the FX app has no macro-keybinding slot yet.
+            // KeyStrokeSettings.defineDefault (MULTI_KEY_MASK = Ctrl+Shift+T); the FX
+            // counterpart is the shared KeyStrokeManagerF default, which also drives the
+            // accelerator of the macro item in the proof macro menus
+            // (ProofMacroMenuF.itemFor). The main-menu item carries the manager binding and is
+            // registered for later rebindings (KeyStrokeManager.register).
+            KeyStrokeManagerF manager = KeyStrokeManagerF.getInstance();
             MenuItem generate = makeGenerateItem(null);
-            generate.setAccelerator(KeyCombination.keyCombination("SHORTCUT+T"));
+            manager.binding(TESTGEN_MACRO_ACTION_ID).ifPresent(generate::setAccelerator);
+            manager.register(generate, TESTGEN_MACRO_ACTION_ID);
             m.getItems().addAll(generate, makeCounterExampleItem(null));
             menu = m;
         }
@@ -204,10 +203,10 @@ public final class TestgenExtensionF
     // ------------------------------------------------------------------ window capture
 
     /**
-     * Hands the main window to the extension — the only SPI surface of this module that receives
-     * it (the {@code SettingsProviderF} panel/apply, forwarded by
-     * {@link TestgenSettingsProviderF}).
-     * Used to bind the enablement listeners once (the reflection-only counterpart of the Swing
+     * Hands the main window to the extension — called from the {@code StartupF}/{@code ToolbarF}
+     * hooks (WP-7) and, as a fallback, from the settings panel (the
+     * {@code SettingsProviderF} panel/apply forwarded by {@link TestgenSettingsProviderF}).
+     * Wires the enablement listeners once (the reflection-only counterpart of the Swing
      * {@code Startup} hook).
      *
      * @param window the main window handed in by the settings dialog
@@ -250,8 +249,9 @@ public final class TestgenExtensionF
     }
 
     /**
-     * The {@link Stage} owning the given node (the status-line controls live in the main
-     * window's scene), used as the run dialogs' owner.
+     * The {@link Stage} owning the given node (the toolbar button lives in the main window's
+     * scene; main-menu {@link MenuItem}s have none and return {@code null}), used as the run
+     * dialogs' owner.
      */
     private static @Nullable Stage stageOf(@Nullable Node source) {
         if (source == null) {
@@ -332,16 +332,16 @@ public final class TestgenExtensionF
     }
 
     /**
-     * Re-computes the enablement of the status-line controls: like the Swing actions the
-     * extension is enabled only when Z3 CE is installed, a proof is selected and no auto-mode /
-     * generation run is active (Swing TestGenerationAction.checkZ3CE,
+     * Re-computes the enablement of the toolbar buttons and main-menu items: like the Swing
+     * actions the extension is enabled only when Z3 CE is installed, a proof is selected and no
+     * auto-mode / generation run is active (Swing TestGenerationAction.checkZ3CE,
      * TestGenerationAction.java:101-111); the counterexample action additionally requires the
      * selected node to be an open leaf (CounterExampleAction.selectedNodeChanged,
      * CounterExampleAction.java:67-84). The selection and SMT-settings events can fire on any
      * thread, so the refresh is marshalled to the FX thread.
      * <p>
      * Without a captured window the controls stay enabled and the run dialogs validate on click
-     * (the class comment's {@code KNOWN-SIMPLIFIED} lazy capture).
+     * (the fallback capture through the settings panel, see the class comment).
      */
     private void refresh() {
         Object connected = window;
