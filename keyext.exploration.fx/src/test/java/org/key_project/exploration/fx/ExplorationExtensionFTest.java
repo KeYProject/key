@@ -17,8 +17,10 @@ import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
 import javafx.scene.control.Tab;
 
+import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.gui.fx.extension.api.KeYGuiExtensionF;
 
+import org.key_project.exploration.ExplorationModeModel;
 import org.key_project.util.javafx.FxUtil;
 
 import org.junit.jupiter.api.Assumptions;
@@ -89,6 +91,20 @@ class ExplorationExtensionFTest {
             ExplorationExtensionF extension = new ExplorationExtensionF();
             // the startup hook without a mediator (headless runs) must not crash
             extension.init(null, null);
+        });
+    }
+
+    @Test
+    void initRegistersModelInMediatorRegistry() {
+        Assumptions.assumeTrue(toolkitAvailable);
+        FxUtil.runAndWait(() -> {
+            ExplorationExtensionF extension = new ExplorationExtensionF();
+            KeYMediatorF mediator = new KeYMediatorF();
+            // WP-5: the provider registers its model like the Swing original
+            // (mediator.register(model, ExplorationModeModel.class),
+            // ExplorationExtension.java:103) — consumers obtain it via the lookup
+            extension.init(null, mediator);
+            assertThat(mediator.lookup(ExplorationModeModel.class)).isNotNull();
         });
     }
 
