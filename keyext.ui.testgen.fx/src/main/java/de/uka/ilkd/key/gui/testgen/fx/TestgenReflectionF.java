@@ -16,6 +16,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 import javafx.stage.Stage;
 
+import de.uka.ilkd.key.smt.SolverLauncherListener;
+
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -314,6 +316,18 @@ final class TestgenReflectionF {
     // ------------------------------------------------------------------ counterexample search
 
     /**
+     * The {@code SolverLauncherListener} factory of the counterexample search — the
+     * UI-specific {@code createSolverListener} hook of
+     * {@code AbstractSideProofCounterExampleGenerator} (AbstractSideProofCounterExampleGenerator
+     * .java:22-27): the {@code SolverLauncherListener} for the given {@code DefaultSMTSettings}
+     * (first argument) and side {@code Proof} (second argument).
+     */
+    @FunctionalInterface
+    interface SolverListenerFactoryF {
+        SolverLauncherListener create(Object settings, Object sideProof);
+    }
+
+    /**
      * Searches a counterexample for the sequent of the selected goal (Swing
      * {@code CounterExampleAction.CEWorker.doInBackground},
      * CounterExampleAction.java:175-181). The steps mirror
@@ -324,23 +338,24 @@ final class TestgenReflectionF {
      * {@code AbstractCounterExampleGenerator.searchCounterExample},
      * AbstractCounterExampleGenerator.java:67-100).
      * <p>
-     * <b>KNOWN-SIMPLIFIED:</b> the Swing {@code SolverListener} opens a modal progress dialog and
-     * a results dialog showing the counterexample model; this port (the C4 route hands the
-     * caller's {@code SolverLauncherListener}) keeps a reflective log-only listener here and
-     * prints the SMT statistics (solved/invalid/unknown path conditions) and the found/not-found
-     * outcome into the run dialog's log. The auto-mode shell of the Swing worker
-     * (CounterExampleAction.java:169-191) lives in {@link CounterExampleTaskF}.
+     * The {@code SolverLauncherListener} comes from {@code listenerFactory} (the
+     * {@code createSolverListener} parity hook): {@link CounterExampleTaskF} supplies a
+     * {@code SolverListenerF}, which opens the modal progress dialog and the results
+     * (counterexample model) like the Swing {@code SolverListener}.
      *
      * @param ui the UserInterfaceControl of the main window (reflected)
      * @param proof the proof of the selected goal (reflected)
      * @param sequent the sequent of the selected goal (reflected)
-     * @param sink the log sink of the run dialog
+     * @param sink the log sink of the run dialog (the pipeline messages)
      * @param launcherRef receives the running {@code SolverLauncher} so the Stop button can ask it
      *        to stop
+     * @param listenerFactory creates the {@code SolverLauncherListener} for the given
+     *        {@code DefaultSMTSettings} and side proof
      * @throws InterruptedException when the run was interrupted (task cancelled)
      */
     static void searchCounterExample(Object ui, Object proof, Object sequent, LogSinkF sink,
-            AtomicReference<@Nullable Object> launcherRef) throws InterruptedException {
+            AtomicReference<@Nullable Object> launcherRef, SolverListenerFactoryF listenerFactory)
+            throws InterruptedException {
         if (ui == null || proof == null || sequent == null) {
             sink.writeln("Counterexample search cancelled: no goal selected.");
             return;
@@ -408,15 +423,15 @@ final class TestgenReflectionF {
                         clazz("de.uka.ilkd.key.settings.NewSMTTranslationSettings"), proofClass)
                     .newInstance(pdSettings, piSettings, newSettings, sideProof);
 
-            // (4) launch Z3 CE with a reflective SolverLauncherListener
+            // (4) launch Z3 CE with the caller's SolverLauncherListener
             // (AbstractCounterExampleGenerator.java:93-99)
             Object launcher = clazz("de.uka.ilkd.key.smt.SolverLauncher")
                     .getConstructor(clazz("de.uka.ilkd.key.smt.SMTSettings"))
                     .newInstance(smtSettings);
             launcherRef.set(launcher);
-            Object listener = solverLauncherListenerProxy(sink);
             launcher.getClass().getMethod("addListener",
-                clazz("de.uka.ilkd.key.smt.SolverLauncherListener")).invoke(launcher, listener);
+                clazz("de.uka.ilkd.key.smt.SolverLauncherListener"))
+                    .invoke(launcher, listenerFactory.create(smtSettings, sideProof));
             Object z3 = Class.forName("de.uka.ilkd.key.smt.solvertypes.SolverTypes")
                     .getField("Z3_CE_SOLVER").get(null);
             Collection<?> problems = (Collection<?>) clazz("de.uka.ilkd.key.smt.SMTProblem")
@@ -552,76 +567,6 @@ final class TestgenReflectionF {
         } catch (ReflectiveOperationException | RuntimeException e) {
             LOGGER.warn("Could not report the test-generation exception", e);
         }
-    }
-
-    /**
-     * A {@code java.lang.reflect.Proxy} for {@code SolverLauncherListener} that streams the
-     * solver statistics of the counterexample search into the {@link LogSinkF}. The result
-     * summary mirrors {@code AbstractTestGenerator.filterSolverResultsAndShowSolverStatistics}
-     * (AbstractTestGenerator.java:383-428).
-     */
-    private static Object solverLauncherListenerProxy(LogSinkF sink)
-            throws ClassNotFoundException {
-        Class<?> listenerClass = clazz("de.uka.ilkd.key.smt.SolverLauncherListener");
-        return Proxy.newProxyInstance(listenerClass.getClassLoader(),
-            new Class<?>[] { listenerClass }, (proxy, method, args) -> {
-                switch (method.getName()) {
-                    case "launcherStarted" -> {
-                        Object problems = args == null || args.length == 0 ? null : args[0];
-                        int count = problems instanceof Collection<?> c ? c.size() : 0;
-                        sink.writeln("Searching for counterexamples: " + count
-                            + " SMT problem(s)...");
-                    }
-                    case "launcherStopped" -> {
-                        Object solvers = args == null || args.length < 2 ? null : args[1];
-                        reportSolverResults(solvers, sink);
-                    }
-                    case "equals" -> {
-                        return args != null && args.length == 1 && args[0] == proxy;
-                    }
-                    case "hashCode" -> {
-                        return System.identityHashCode(proxy);
-                    }
-                    case "toString" -> {
-                        return "SolverLauncherListener(proxy)";
-                    }
-                    default -> {
-                    }
-                }
-                return null;
-            });
-    }
-
-    private static void reportSolverResults(@Nullable Object finishedSolvers, LogSinkF sink) {
-        Collection<?> solvers = finishedSolvers instanceof Collection<?> c ? c : List.of();
-        int valid = 0;
-        int falsifiable = 0;
-        int unknown = 0;
-        for (Object solver : solvers) {
-            try {
-                Object result = invokeNullary(solver, "getFinalResult");
-                if (result != null) {
-                    Object truth = invokeNullary(result, "isValid");
-                    if (truth != null) {
-                        switch (truth.toString()) {
-                            case "VALID" -> valid++;
-                            case "FALSIFIABLE" -> falsifiable++;
-                            case "UNKNOWN" -> unknown++;
-                            default -> {
-                            }
-                        }
-                    }
-                }
-            } catch (ReflectiveOperationException | RuntimeException ex) {
-                sink.writeln("Solver exception: " + (ex.getMessage() == null
-                        ? ex.getClass().getSimpleName()
-                        : ex.getMessage()));
-            }
-        }
-        sink.writeln("--- SMT Solver Results ---\n" + " solved pathconditions:" + falsifiable
-            + "\n" + " invalid pre-/pathconditions:" + valid + "\n" + " unknown:" + unknown);
-        sink.writeln(falsifiable > 0 ? "Found " + falsifiable + " counterexample(s)."
-                : "No counterexample found for the selected goal.");
     }
 
     private static Throwable throwableOf(Object @Nullable [] args) {
