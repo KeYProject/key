@@ -198,6 +198,7 @@ run {
         "key.fx.verify.termmenu", "key.fx.verify.colors", "key.fx.verify.smt",
         "key.fx.verify.loadingexit", "key.fx.verify.shortcuts", "key.fx.verify.inputfreeze",
         "key.fx.verify.sequentmenu", "key.fx.verify.dialogs", "key.fx.verify.dialogs.contract",
+        "key.fx.verify.autosave", "key.fx.verify.minimizeinteraction",
         "key.fx.verify.prooftree",
         "key.fx.verify.selectionhistory", "key.fx.verify.isabelle", "key.fx.verify.heatmap",
         "key.fx.verify.exploration", "key.fx.verify.caching", "key.fx.verify.slicing",
