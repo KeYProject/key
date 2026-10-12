@@ -1,15 +1,23 @@
 name: UI verify sweep (key.ui.fx)
 
-# Nightly full per-flag regression sweep of the JavaFX UI (WP-11 deliverable): every
+# Full per-flag regression sweep of the JavaFX UI (WP-11 deliverable): every
 # -Dkey.fx.verify.* hook of key.ui.fx runs headlessly against real example proofs inside an
-# Xvfb display (software rendering). The 41 flags are sharded across parallel matrix jobs
-# (~30-45 min per shard instead of ~4h sequential; see key.ui.fx/ci/verify-sweep.sh).
-# Thematic constraints of the sharding: themepersist save+restore share a shard (the restore
-# leg reads the preference persisted by the save leg); the long/special runs (xdotool key
-# dismissal, real-z3 SMT, natural-exit loadingexit) share a shard.
+# Xvfb display (software rendering). Maximum parallelization: ONE matrix job per flag
+# (recipes in key.ui.fx/ci/verify-sweep.sh); the themepersist save+restore pair and the
+# special runs (xdotool key dismissal, real-z3 SMT, natural-exit loadingexit) are single
+# matrix entries with multiple runs inside. Logs are uploaded per flag.
 on:
-  schedule:
-    - cron: "0 2 * * *" # nightly, 02:00 UTC
+  push:
+    branches: [ "main", "weigl/ocfx", "weigl/ocfx-wp11-endgame" ]
+    paths:
+      - "key.ui.fx/**"
+      - "keyext.caching.fx/**"
+      - "keyext.exploration.fx/**"
+      - "keyext.isabelletranslation.fx/**"
+      - "keyext.proofmanagement.fx/**"
+      - "keyext.slicing.fx/**"
+      - "keyext.ui.testgen.fx/**"
+      - ".github/workflows/ui-verify.yml"
   workflow_dispatch:
 
 permissions:
@@ -18,11 +26,18 @@ permissions:
 jobs:
   sweep:
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
-        shard: [ shard1, shard2, shard3, shard4, shard5, shard6, shard7 ]
+        flag: [ sequent, tree, goallist, notifications, docking, help, soundiness,
+                profileloading, javacsettings, termmenu, colors, shortcuts, sequentmenu,
+                dialogs, search, sequentsearch, sequentsearchmodes, treefilters,
+                tacletmatch, inputfreeze, updatehighlight, lemmaorigin, joinmerge,
+                joinmerge-gcd, proofmgmt-all, extensions, exploration, caching, prooftree,
+                slicing, testgen, heatmap, isabelle, sourceconsistency, autosave,
+                minimizeinteraction, themepersist, profileloadingdialog, smt, loadingexit,
+                proofdiff, drawer, drawerlayout, rightclickmacro ]
     steps:
       - uses: actions/checkout@v7
 
@@ -46,14 +61,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends xvfb xdotool graphviz
 
-      - name: Run the UI verify sweep (${{ matrix.shard }})
-        run: bash key.ui.fx/ci/verify-sweep.sh ${{ matrix.shard }}
+      - name: Run the UI verify sweep (${{ matrix.flag }})
+        run: bash key.ui.fx/ci/verify-sweep.sh ${{ matrix.flag }}
 
-      - name: Upload sweep logs (${{ matrix.shard }})
+      - name: Upload sweep logs (${{ matrix.flag }})
         uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: ui-verify-logs-${{ matrix.shard }}
+          name: ui-verify-${{ matrix.flag }}
           path: |
             build/ui-verify/*.log
             build/ui-verify/RESULTS.md
