@@ -54,6 +54,16 @@ JAVA_TOOL_OPTIONS="-Xmx6g -Dprism.order=sw -Dkey.fx.verify.<flag>=<v> -Dkey.fx.d
 
 A trailing `BUILD FAILED`/exit-143 is the runner's intentional pkill after the markers appear.
 
+### Full sweep in CI
+
+The complete per-flag regression sweep runs nightly in the
+[UI verify sweep workflow](../.github/workflows/ui-verify.yml) (02:00 UTC, also
+`workflow_dispatch`): `key.ui.fx/ci/verify-sweep.sh` starts an `Xvfb` display, runs every
+flag sequentially (one app at a time, real z3 from `keyproject/setup-smt`, graphviz for the
+slicing DOT render, `xdotool` for the modal-dialog key dismissal) and fails the job when a
+flag reports `FAIL`; per-flag logs are uploaded as artifacts. Locally, the same script can
+be run by hand: `bash key.ui.fx/ci/verify-sweep.sh` (logs in `build/ui-verify/`).
+
 > **Packaging note (M0):** a JavaFX application does not assemble into a plain fat jar by
 > shading bytecode — the platform-specific native runtime comes from classifier jars and must be
 > bundled with jlink/jpackage. Until that milestone, run via `./gradlew :key.ui.fx:run`.
