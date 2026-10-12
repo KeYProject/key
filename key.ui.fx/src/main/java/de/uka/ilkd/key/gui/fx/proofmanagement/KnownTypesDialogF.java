@@ -39,6 +39,8 @@ public final class KnownTypesDialogF extends javafx.stage.Stage {
         TabPane tabbedPane = new TabPane();
         ScrollPane scroll = new ScrollPane(new ClassTreeF(false, false, proof.getServices()));
         scroll.setFitToWidth(true);
+        // reviewer request: the type tree grows vertically with the dialog
+        scroll.setFitToHeight(true);
         tabbedPane.getTabs().add(new Tab("Package view", scroll));
 
         Button okButton = new Button("OK");
