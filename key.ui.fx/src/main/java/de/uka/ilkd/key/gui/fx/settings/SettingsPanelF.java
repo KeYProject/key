@@ -10,6 +10,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -83,9 +84,14 @@ public abstract class SettingsPanelF extends BorderPane {
         // help icon (fixed, right)
         ColumnConstraints titles = new ColumnConstraints();
         titles.setHalignment(HPos.RIGHT);
+        // reviewer request: the labels stay visible when the dialog is shrunk — only the
+        // editing components shrink, the title column keeps its preferred (widest label) width
+        titles.setMinWidth(Region.USE_PREF_SIZE);
         ColumnConstraints inputs = new ColumnConstraints();
         inputs.setHgrow(Priority.ALWAYS);
         inputs.setFillWidth(true);
+        // reviewer request: the input column gives its space away first
+        inputs.setMinWidth(0);
         ColumnConstraints helps = new ColumnConstraints();
         helps.setMinWidth(24);
         helps.setPrefWidth(24);
@@ -373,6 +379,9 @@ public abstract class SettingsPanelF extends BorderPane {
     protected void addRowWithHelp(String info, Node... components) {
         int row = pCenter.getRowCount();
         Node title = components.length > 0 ? components[0] : new Label();
+        // reviewer request: labels of multi-row entries (e.g. "Heatmap Mode" with its combo +
+        // description input) align to the top of the row
+        GridPane.setValignment(title, VPos.TOP);
         pCenter.add(title, 0, row);
         Node input;
         if (components.length == 2) {
