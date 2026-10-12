@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.fx;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -25,6 +26,7 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javafx.animation.KeyFrame;
@@ -182,7 +184,11 @@ import de.uka.ilkd.key.proof.io.GZipProofSaver;
 import de.uka.ilkd.key.proof.io.ProofBundleSaver;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
+import de.uka.ilkd.key.proof.io.consistency.DiskFileRepo;
+import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.proof.io.consistency.SimpleFileRepo;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
@@ -199,8 +205,12 @@ import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.java.IOUtil;
 import org.key_project.util.javafx.FxUtil;
 
 import org.jspecify.annotations.Nullable;
@@ -689,6 +699,16 @@ public final class MainWindowF {
             NotificationManagerF.getInstance()
                     .notify("Javac settings verification: " + report,
                         report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+        }
+        // WP-9: EnsureSourceConsistency load-pipeline wiring self test
+        // (key.fx.verify.sourceconsistency): loads a JML example twice — with the flag armed
+        // (DiskFileRepo: the source-cache backend the Swing toggle arms,
+        // AbstractProblemLoader.createFileRepo:400-409) and disarmed (SimpleFileRepo) — and
+        // proves the loaded proof's repo serves the source through the same stream the source
+        // view reads (SourceViewF.readRepoFile, Swing SourceView.addFile:617-621). The flag is
+        // restored afterwards (the runs read the shared ~/.key/v3.1).
+        if (System.getProperty("key.fx.verify.sourceconsistency") != null) {
+            runSourceConsistencyVerification();
         }
         // colors: P1 parity close-out — Swing-parity palette count, mapped CSS variable wiring
         // and an override round trip (key.fx.verify.colors); proof-independent, so it runs at
@@ -1388,6 +1408,10 @@ public final class MainWindowF {
                 NotificationManagerF.getInstance()
                         .notify("Minimize interaction verification: " + (ok ? "PASS" : "FAIL"),
                             ok ? Kind.INFO : Kind.ERROR);
+                // menu: MP7/WP-9 — real-flow leg: with the setting armed the interactive
+                // application of an auto-instantiable taclet must enter the minimize flow
+                // (applied without the taclet dialog) and with the flag off the dialog must open
+                verifyMinimizeInteractionRealFlow(env.getProofControl(), env.getLoadedProof());
             }
             // menu: MP7 — right-click macro popup self test (key.fx.verify.rightclickmacro):
             // builds the popup through the SequentViewF seam with the flag ON and OFF and asserts
@@ -1431,6 +1455,9 @@ public final class MainWindowF {
                 NotificationManagerF.getInstance()
                         .notify("Auto save verification: " + (ok ? "PASS" : "FAIL"),
                             ok ? Kind.INFO : Kind.ERROR);
+                // menu: MP7/WP-9 — real-flow leg: a capped auto-mode run with the saver armed at
+                // a small interval must actually write the intermediate proof files
+                verifyAutoSaveRealFlow(env.getProofControl(), env.getLoadedProof());
             }
             // extension: MP9.0 — extension SPI self test (key.fx.verify.extensions): asserts
             // the facade discovery (3 registered FX extensions), the two status-line controls
@@ -5085,6 +5112,99 @@ public final class MainWindowF {
         }
     }
 
+    /**
+     * menu: MP7/WP-9 — auto-save real-flow self test (part of {@code key.fx.verify.autosave}):
+     * runs a capped auto-mode run with an {@link AutoSaver} armed at a small interval and proves
+     * the saver actually wrote its intermediate proof files. Swing parity: the armed saver
+     * receives the per-application {@code taskProgress(countApplied)} events through the UI
+     * control's ProverTaskListener chain (AbstractUserInterfaceControl.fireTaskProgress) and
+     * writes {@code <tmpdir>/.autosave.N.key} every {@code interval} applications
+     * (AutoSaver.java:117-124) plus the closed final proof to {@code .autosave.proof}
+     * (AutoSaver.java:139-141). The arming routes through the real {@link #applyAutoSave(int)}
+     * and the selection hand-off (mediator {@code setProof} → {@code AutoSaver.setProof}) like
+     * the synchronous leg in the load-success handler.
+     * <p>
+     * The auto-mode run blocks, so the leg runs on a worker thread and logs its own marker line.
+     * The {@code key.fx.demo.autoprove} run closes the demo proof before this leg can arm the
+     * saver — do not combine the two flags.
+     */
+    private void verifyAutoSaveRealFlow(ProofControl proofControl, Proof proof) {
+        if (proof.closed()) {
+            LOGGER.info("Auto save verification (real flow): SKIP (proof already closed — run "
+                + "key.fx.verify.autosave without key.fx.demo.autoprove)");
+            return;
+        }
+        final long startMs = System.currentTimeMillis();
+        Thread worker = new Thread(() -> {
+            GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+            int persistedPeriod = gs.autoSavePeriod();
+            int oldMaxSteps = proof.getSettings().getStrategySettings().getMaxSteps();
+            boolean ok = false;
+            List<String> written = new ArrayList<>();
+            try {
+                proof.getSettings().getStrategySettings()
+                        .setMaxSteps(AUTO_SAVE_REAL_FLOW_MAX_STEPS);
+                CountDownLatch armed = new CountDownLatch(1);
+                FxUtil.runLater(() -> {
+                    try {
+                        // arm a small interval through the real arming path and hand the loaded
+                        // proof to the saver via the real selection hand-off
+                        applyAutoSave(AUTO_SAVE_REAL_FLOW_INTERVAL);
+                        selectionModel.setSelectedProof(null);
+                        selectionModel.setSelectedProof(proof);
+                    } finally {
+                        armed.countDown();
+                    }
+                });
+                armed.await(10, TimeUnit.SECONDS);
+                LOGGER.info("Auto save verification (real flow): auto mode with interval {} armed",
+                    AUTO_SAVE_REAL_FLOW_INTERVAL);
+                proofControl.startAndWaitForAutoMode(proof);
+                // the saves run on their own threads (AutoSaver.save) — poll for the freshly
+                // written files (mtime after the leg started)
+                File tmpDir = IOUtil.getTempDirectory();
+                long deadline = System.currentTimeMillis() + 10_000;
+                while (System.currentTimeMillis() < deadline && written.isEmpty()) {
+                    File[] files = tmpDir.listFiles(
+                        (dir, name) -> name.startsWith(".autosave."));
+                    if (files != null) {
+                        for (File file : files) {
+                            if (file.lastModified() >= startMs) {
+                                written.add(file.getName() + " " + file.length() + "B");
+                            }
+                        }
+                    }
+                    Thread.sleep(200);
+                }
+                ok = !written.isEmpty();
+            } catch (Exception e) {
+                LOGGER.error("Auto save verification (real flow) failed", e);
+            } finally {
+                int saves = written.size();
+                List<String> saved = List.copyOf(written);
+                // restore: armed iff the persisted period is > 0 (the startup arming semantics)
+                FxUtil.runLater(() -> applyAutoSave(persistedPeriod));
+                proof.getSettings().getStrategySettings().setMaxSteps(oldMaxSteps);
+                String report = "Auto save verification (real flow): " + (ok ? "PASS" : "FAIL")
+                    + (saves == 0 ? ""
+                            : " (" + saves + " save(s) under " + IOUtil.getTempDirectory() + ": "
+                                + saved + ")");
+                LOGGER.info(report);
+                boolean reported = ok;
+                FxUtil.runLater(() -> NotificationManagerF.getInstance().notify(report,
+                    reported ? Kind.INFO : Kind.ERROR));
+            }
+        }, "fx-verify-autosave-realloc");
+        worker.setDaemon(true);
+        worker.start();
+    }
+
+    /** WP-9 real-flow auto save leg: the armed save interval (rule applications). */
+    private static final int AUTO_SAVE_REAL_FLOW_INTERVAL = 25;
+
+    /** WP-9 real-flow auto save leg: the capped maximum number of strategy applications. */
+    private static final int AUTO_SAVE_REAL_FLOW_MAX_STEPS = 1000;
+
     /** menu: MP4 — Swing {@code AutoSave.DEFAULT_PERIOD} (key.ui), see autoSaveProofsToggle(). */
     private static final int DEFAULT_AUTO_SAVE_PERIOD = 2000;
 
@@ -5131,6 +5251,193 @@ public final class MainWindowF {
         boolean flag = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
                 .getTacletFilter();
         pc.setMinimizeInteraction(flag);
+    }
+
+    /**
+     * menu: MP7/WP-9 — Minimize Interaction real-flow self test (part of
+     * {@code key.fx.verify.minimizeinteraction}): the load-success hand-off applies the persisted
+     * flag to the freshly attached proof control; the leg proves the core actually <em>honors</em>
+     * it on the loaded demo: with the flag armed, the interactive application of an
+     * auto-instantiable (incomplete, but complete-except-skolem-constants) taclet goes through the
+     * minimize branch of {@code AbstractProofControl.selectedTaclet} (AbstractProofControl.java
+     * :211-240 — the single app is auto-instantiated and {@code applyInteractive}d without the
+     * taclet dialog), while with the flag off the same application opens the
+     * {@code TacletMatchDialogF}. The applied node is pruned back afterwards.
+     * <p>
+     * The rule applications may open the modal dialog on the FX thread, so the leg runs on a
+     * worker thread (the same pattern as the lemma-dialog leg of {@code DialogsVerifyF}) and
+     * logs its own marker line.
+     */
+    private void verifyMinimizeInteractionRealFlow(ProofControl proofControl, Proof proof) {
+        GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+        boolean original = gs.getTacletFilter();
+        Thread worker = new Thread(() -> {
+            boolean armedNoDialog = false;
+            String appliedTaclet = "<none>";
+            boolean unarmedDialog = false;
+            boolean unarmedUnapplied = false;
+            try {
+                // the wired path: the load-success hand-off mirrored the persisted flag into the
+                // loaded proof control (Swing MinimizeInteraction.updateMainWindow)
+                boolean wired = proofControl.isMinimizeInteraction() == original;
+                if (!wired) {
+                    throw new IllegalStateException("proof control does not mirror the persisted"
+                        + " flag (isMinimizeInteraction=" + proofControl.isMinimizeInteraction()
+                        + ", tacletFilter=" + original + ")");
+                }
+                // flag armed: the auto-instantiable app applies without the dialog
+                FxUtil.runLater(() -> {
+                    gs.setTacletFilter(true);
+                    applyMinimizeInteraction(proofControl);
+                });
+                TacletApp candidate = findMinimizeCandidate(proof);
+                if (candidate == null) {
+                    throw new IllegalStateException("no auto-instantiable taclet application on"
+                        + " the demo goal");
+                }
+                appliedTaclet = candidate.taclet().name().toString();
+                Object[] leg = applyTacletExpecting(proofControl, proof, candidate, true);
+                armedNoDialog = (Boolean) leg[0];
+                unarmedDialog = (Boolean) leg[1]; // dialog detection of the armed leg (must be no)
+                // flag off: the same application must open the taclet dialog instead
+                FxUtil.runLater(() -> {
+                    gs.setTacletFilter(false);
+                    applyMinimizeInteraction(proofControl);
+                });
+                TacletApp candidate2 = findMinimizeCandidate(proof);
+                if (candidate2 != null) {
+                    Object[] leg2 = applyTacletExpecting(proofControl, proof, candidate2, false);
+                    unarmedDialog = (Boolean) leg2[0];
+                    unarmedUnapplied = (Boolean) leg2[1];
+                }
+            } catch (Exception e) {
+                LOGGER.error("Minimize interaction verification (real flow) failed", e);
+            } finally {
+                // restore the persisted flag through the same apply helper the toggle uses
+                FxUtil.runLater(() -> {
+                    gs.setTacletFilter(original);
+                    applyMinimizeInteraction(proofControl);
+                });
+                boolean ok = armedNoDialog && unarmedDialog && unarmedUnapplied;
+                String report = "Minimize interaction verification (real flow): " + (ok ? "PASS"
+                        : "FAIL")
+                    + " (armed: " + appliedTaclet + " auto-applied without dialog="
+                    + armedNoDialog + "; unarmed: dialog=" + unarmedDialog + " unapplied="
+                    + unarmedUnapplied + ")";
+                LOGGER.info(report);
+                boolean reported = ok;
+                FxUtil.runLater(() -> NotificationManagerF.getInstance().notify(report,
+                    reported ? Kind.INFO : Kind.ERROR));
+            }
+        }, "fx-verify-minimize-realloc");
+        worker.setDaemon(true);
+        worker.start();
+    }
+
+    /**
+     * WP-9 minimize real-flow leg: applies the candidate through the real interactive path
+     * ({@code AbstractProofControl.selectedTaclet}) and watches, from the worker thread, whether
+     * the taclet dialog opens ("Choose Taclet Instantiation") and whether the rule application
+     * reaches the proof (node count).
+     *
+     * @param expectDialog whether the taclet dialog is expected to open
+     * @return {@code {dialogOpened, nodeApplied}} (the caller asserts them against the flag)
+     */
+    private Object[] applyTacletExpecting(ProofControl proofControl, Proof proof,
+            TacletApp candidate, boolean expectDialog) throws InterruptedException {
+        Goal goal = proof.openEnabledGoals().head();
+        de.uka.ilkd.key.proof.Node originalNode = goal.node();
+        int nodesBefore = proof.countNodes();
+        AtomicBoolean dialogOpened = new AtomicBoolean(false);
+        // watcher: detects the taclet dialog the unarmed leg must open (and must NOT open on the
+        // armed leg); closes it so the worker cannot hang on the modal loop
+        Thread watcher = new Thread(() -> {
+            long deadline = System.currentTimeMillis() + 20_000;
+            while (System.currentTimeMillis() < deadline) {
+                Stage dialog = javafx.stage.Window.getWindows().stream()
+                        .filter(w -> w instanceof Stage s && s.isShowing()
+                                && "Choose Taclet Instantiation".equals(s.getTitle()))
+                        .map(w -> (Stage) w).findFirst().orElse(null);
+                if (dialog != null) {
+                    dialogOpened.set(true);
+                    FxUtil.runLater(dialog::close);
+                    return;
+                }
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    return;
+                }
+            }
+        }, "fx-verify-minimize-watcher");
+        watcher.setDaemon(true);
+        watcher.start();
+        try {
+            proofControl.selectedTaclet(candidate.taclet(), goal,
+                candidate.posInOccurrence());
+        } finally {
+            watcher.join(21_000);
+        }
+        boolean nodeApplied = proof.countNodes() == nodesBefore + 1;
+        if (nodeApplied) {
+            // restore the demo proof (the applied node is removed again)
+            proof.pruneProof(originalNode);
+        }
+        return new Object[] { expectDialog == dialogOpened.get(), nodeApplied };
+    }
+
+    /**
+     * WP-9 minimize real-flow leg helper: finds a taclet application on the open demo goal for
+     * which the flag decides between auto-apply and dialog (the single-app case of
+     * {@code AbstractProofControl.selectedTaclet}: incomplete app, no {@code \assumes}, unique at
+     * its position, auto-instantiable to complete-except-skolem-constants but never to
+     * {@code complete}).
+     */
+    private static TacletApp findMinimizeCandidate(Proof proof) {
+        Goal goal = proof.openEnabledGoals().head();
+        Services services = goal.proof().getServices();
+        List<TacletApp> candidates = new ArrayList<>();
+        goal.ruleAppIndex().getNoFindTaclet(TacletFilter.TRUE, services)
+                .forEach(candidates::add);
+        var seq = goal.sequent();
+        for (int i = 1; i <= seq.size(); i++) {
+            PosInOccurrence pio = PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
+            goal.ruleAppIndex().getTacletAppAtAndBelow(TacletFilter.TRUE, pio, services)
+                    .forEach(candidates::add);
+        }
+        for (TacletApp raw : candidates) {
+            if (raw.complete() || raw.posInOccurrence() == null) {
+                continue; // complete apps apply without the dialog under both flags
+            }
+            Taclet taclet = raw.taclet();
+            if (!taclet.assumesSequent().isEmpty()) {
+                continue; // the if-sequent interaction overrides the minimize decision
+            }
+            // the single-app branch of selectedTaclet: the taclet must have exactly one
+            // application at the position
+            long same = candidates.stream()
+                    .filter(a -> a.taclet().name().equals(taclet.name())
+                            && Objects.equals(a.posInOccurrence(), raw.posInOccurrence()))
+                    .count();
+            if (same != 1) {
+                continue;
+            }
+            // mirror the armed-flag auto-instantiation of selectedTaclet
+            TacletApp inst = raw;
+            try {
+                TacletApp tmp = raw.tryToInstantiate(
+                    services.getOverlay(goal.getLocalNamespaces()));
+                if (tmp != null) {
+                    inst = tmp;
+                }
+            } catch (Exception e) {
+                continue; // not auto-instantiable → the armed flag would still open the dialog
+            }
+            if (inst.completeExceptSkolemConstants() && !inst.complete()) {
+                return raw;
+            }
+        }
+        return null;
     }
 
     /**
@@ -5725,6 +6032,122 @@ public final class MainWindowF {
         Thread worker = new Thread(task, "fx-proofmgmt-loader");
         worker.setDaemon(true);
         worker.start();
+    }
+
+    /**
+     * WP-9: EnsureSourceConsistency real-flow self test ({@code key.fx.verify.sourceconsistency},
+     * proof-independent so it runs at startup like the other smalldialogs hooks). The Swing
+     * toggle arms the flag and its change becomes effective with the NEXT load
+     * (EnsureSourceConsistencyToggleAction.java:42-47); the core consumes the flag in
+     * {@code AbstractProblemLoader.createFileRepo} (DiskFileRepo = consistent source cache,
+     * SimpleFileRepo = pass-through). The leg loads a JML example with the flag armed and
+     * disarmed and asserts:
+     * <ol>
+     * <li>the armed load produces a {@link DiskFileRepo} (the cache the source view's consistent
+     * source display and the proof bundle saving rely on) and the disarmed one a
+     * {@link SimpleFileRepo};</li>
+     * <li>the armed repo serves the Java source through {@code getInputStream} — the exact read
+     * the source view performs (SourceViewF.readRepoFile, Swing SourceView.addFile:617-621) —
+     * with content identical to the on-disk file, caching it under the repo's temp directory.</li>
+     * </ol>
+     * The flag is restored afterwards (the app runs read the shared {@code ~/.key/v3.1}).
+     */
+    private void runSourceConsistencyVerification() {
+        GeneralSettings gs = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+        boolean original = gs.isEnsureSourceConsistency();
+        Path location = proofMgmtExample(System.getProperty("key.fx.demo.sourceconsistency",
+            "heap/model_methods/CellTest_test2.key"));
+        Thread worker = new Thread(() -> {
+            String repoOn = null;
+            String repoOff = null;
+            String readVia = null;
+            String cacheDir = null;
+            boolean ok = false;
+            try {
+                gs.setEnsureSourceConsistency(true);
+                KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(location);
+                try {
+                    FileRepo repo = env.getLoadedProof().getInitConfig().getFileRepo();
+                    repoOn = repo.getClass().getSimpleName();
+                    ok = repo instanceof DiskFileRepo;
+                    cacheDir = repoTmpDir(repo);
+                    readVia = readSourceThroughRepo(repo, location);
+                    ok &= readVia != null;
+                } finally {
+                    env.dispose();
+                }
+                gs.setEnsureSourceConsistency(false);
+                KeYEnvironment<DefaultUserInterfaceControl> env2 = KeYEnvironment.load(location);
+                try {
+                    FileRepo repo = env2.getLoadedProof().getInitConfig().getFileRepo();
+                    repoOff = repo.getClass().getSimpleName();
+                    ok &= repo instanceof SimpleFileRepo;
+                } finally {
+                    env2.dispose();
+                }
+            } catch (Exception e) {
+                LOGGER.error("Source consistency verification failed", e);
+            } finally {
+                gs.setEnsureSourceConsistency(original);
+            }
+            boolean reported = ok;
+            String report = "Source consistency verification: " + (ok ? "PASS" : "FAIL")
+                + " (armed repo=" + repoOn + " disarmed repo=" + repoOff + "; source read via"
+                + " repo=" + readVia + "; cache dir=" + cacheDir + ")";
+            LOGGER.info(report);
+            FxUtil.runLater(() -> NotificationManagerF.getInstance().notify(report,
+                reported ? Kind.INFO : Kind.ERROR));
+        }, "fx-verify-sourceconsistency");
+        worker.setDaemon(true);
+        worker.start();
+    }
+
+    /** WP-9 source consistency leg: the DiskFileRepo cache directory, read reflectively. */
+    private static String repoTmpDir(FileRepo repo) {
+        try {
+            Field field = DiskFileRepo.class.getDeclaredField("tmpDir");
+            field.setAccessible(true);
+            Object dir = field.get(repo);
+            return dir == null ? null : dir.toString();
+        } catch (ReflectiveOperationException e) {
+            return null;
+        }
+    }
+
+    /**
+     * WP-9 source consistency leg: reads a Java source of the example through the proof's
+     * {@link FileRepo} (the source view's read path) and compares it with the on-disk content.
+     *
+     * @return a description of the first file read through the repo with matching content, or
+     *         {@code null} if no repo stream matched the disk content
+     */
+    private static String readSourceThroughRepo(FileRepo repo, Path location) {
+        Path src = location.getParent().resolve("src");
+        if (!Files.isDirectory(src)) {
+            return null;
+        }
+        try (java.util.stream.Stream<Path> files = Files.walk(src)) {
+            for (Path file : files.filter(p -> p.toString().endsWith(".java"))
+                    .sorted().collect(Collectors.toList())) {
+                try (InputStream is = repo.getInputStream(file.toUri().toURL())) {
+                    if (is == null) {
+                        continue;
+                    }
+                    String viaRepo = IOUtil.readFrom(is);
+                    String viaDisk = Files.readString(file);
+                    if (viaRepo.equals(viaDisk)) {
+                        return file.getFileName() + " ("
+                            + viaRepo.split("\n", -1).length + " lines)";
+                    }
+                } catch (IOException e) {
+                    LOGGER.debug("Source consistency verification: repo read failed for {}", file,
+                        e);
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.debug("Source consistency verification: cannot list sources of {}", src, e);
+        }
+        return null;
     }
 
     /**

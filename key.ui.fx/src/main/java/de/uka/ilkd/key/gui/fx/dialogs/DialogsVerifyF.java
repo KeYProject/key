@@ -4,13 +4,18 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.fx.dialogs;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import javafx.application.Platform;
 import javafx.stage.Window;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.gui.fx.InteractiveRuleApplicationCompletionF;
 import de.uka.ilkd.key.gui.fx.WindowUserInterfaceControlF;
 import de.uka.ilkd.key.gui.fx.contractcompletions.BlockContractExternalCompletionF;
@@ -23,10 +28,26 @@ import de.uka.ilkd.key.gui.fx.contractcompletions.LoopInvariantRuleCompletionF;
 import de.uka.ilkd.key.gui.fx.mergerule.MergeRuleCompletionF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.rule.ContractRuleApp;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.UseOperationContractRule.Instantiation;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.strategy.StrategyFactory;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.slf4j.Logger;
@@ -52,7 +73,13 @@ import org.slf4j.LoggerFactory;
  * returns exactly them;</li>
  * <li>checks the {@link InvariantConfiguratorF} singleton and the abbreviation-map wiring is in
  * place (the modal invariant editor itself needs an interactive loop application — not
- * headless-drivable, see the P2b note in PARITY-SIGNOFF.md).</li>
+ * headless-drivable, see the P2b note in PARITY-SIGNOFF.md);</li>
+ * <li>runs the contract end to end (WP-9): a real example proof is loaded through
+ * {@link KeYEnvironment#load}, a succedent top-level position becomes a
+ * {@link UseOperationContractRule} app, the app is completed via the REAL
+ * {@link WindowUserInterfaceControlF#completeBuiltInRuleApp} dispatch (the modal
+ * {@link ContractConfiguratorF} is driven by a background watcher through the
+ * {@code lastInstance} seam) and applied interactively.</li>
  * </ol>
  */
 public final class DialogsVerifyF {
@@ -98,12 +125,14 @@ public final class DialogsVerifyF {
         verifyAuxiliaryContractConfigurator(proof, problems);
         verifyLemmaSelectionDialog(proof, problems);
         verifyInvariantConfiguratorWiring(problems);
+        verifyContractApplyE2E(ui, problems);
 
         if (problems.length() > 0) {
             return "FAIL: " + problems;
         }
         return "PASS: registry (6 completions), item chooser, contract configurator, auxiliary"
-            + " configurator, lemma selection dialog, invariant configurator wiring";
+            + " configurator, lemma selection dialog, invariant configurator wiring,"
+            + " contract apply E2E";
     }
 
     /** Step 1: the interactive-completion registry of the FX user interface control. */
@@ -307,6 +336,170 @@ public final class DialogsVerifyF {
         }
         if (InvariantConfiguratorF.getAbbrevMap() == null) {
             problems.append("invariant configurator: abbrev map not wired; ");
+        }
+    }
+
+    /**
+     * Step 6 (WP-9): the contract end to end. A real example proof (default
+     * {@code heap/model_methods/CellTest_callSet.key}, override with
+     * {@code key.fx.verify.dialogs.contract}) is loaded off the main window
+     * ({@link KeYEnvironment#load}, the decoupled path of the Swing problem loader). The
+     * operation-contract PO inlines the callee inside a try/catch, so the harness first stops
+     * the strategy at the active method call (method treatment METHOD_NONE + one auto-mode run
+     * — the state the interactive GUI offers the rule from), turns a succedent top-level
+     * position into a {@link UseOperationContractRule} app ({@code createApp}, like
+     * {@code AbstractProofControl.selectedBuiltInRule} builds it), and completes the app
+     * through the REAL {@link WindowUserInterfaceControlF#completeBuiltInRuleApp} dispatch:
+     * the {@link FunctionalOperationContractCompletionF} opens the modal
+     * {@link ContractConfiguratorF} ({@code showAndWait} blocks the FX thread in its nested
+     * event loop) while a background driver finds the dialog via the {@code lastInstance} seam,
+     * selects a contract and presses OK. The completed app is applied the way the GUI applies
+     * it ({@code ProofControl.applyInteractive}) and the proof must grow (the contract
+     * application splits the goal into child nodes).
+     */
+    private static void verifyContractApplyE2E(WindowUserInterfaceControlF ui,
+            StringBuilder problems) {
+        String example = System.getProperty("key.fx.verify.dialogs.contract",
+            "heap/model_methods/CellTest_callSet.key");
+        Path path = Path.of(example);
+        if (!path.isAbsolute()) {
+            path = Path.of(System.getProperty("key.examples.dir", "key.ui/examples"), example);
+        }
+        if (!Files.isRegularFile(path)) {
+            problems.append("contract e2e: example not found: ").append(path).append("; ");
+            return;
+        }
+        KeYEnvironment<DefaultUserInterfaceControl> env = null;
+        try {
+            env = KeYEnvironment.load(path, null, null, null, null);
+            Proof proof = env.getLoadedProof();
+            if (proof == null) {
+                problems.append("contract e2e: no proof loaded from ").append(path).append("; ");
+                return;
+            }
+            Services services = proof.getServices();
+
+            // The operation-contract PO inlines the callee's body inside a try/catch, so the
+            // rule is not applicable on the initial goal. With METHOD_NONE the strategy unwinds
+            // the assumption implication and the try/catch and gets stuck exactly at the active
+            // method call — the state the interactive GUI offers "Use Operation Contract" from.
+            StrategyProperties strategyProperties =
+                (StrategyProperties) proof.getSettings().getStrategySettings()
+                        .getActiveStrategyProperties().clone();
+            strategyProperties.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
+                StrategyProperties.METHOD_NONE);
+            Profile profile = services.getProfile();
+            Name strategyName = proof.getSettings().getStrategySettings().getStrategy();
+            StrategyFactory strategyFactory = profile.supportsStrategyFactory(strategyName)
+                    ? profile.getStrategyFactory(strategyName)
+                    : profile.getDefaultStrategyFactory();
+            proof.setActiveStrategy(strategyFactory.create(proof, strategyProperties));
+            env.getProofControl().startAndWaitForAutoMode(proof);
+
+            // an open goal with a succedent top-level position the contract rule applies to
+            // (the positions the rule itself offers: UseOperationContractRule.isApplicable —
+            // top level, succedent, instantiation succeeds, contracts available)
+            Goal goal = null;
+            PosInOccurrence pio = null;
+            Instantiation inst = null;
+            outer: for (Goal open : proof.openGoals()) {
+                Sequent sequent = open.sequent();
+                for (int i = 0; i < sequent.succedent().size(); i++) {
+                    SequentFormula sf = sequent.succedent().get(i);
+                    Instantiation candidate = UseOperationContractRule
+                            .computeInstantiation((JTerm) sf.formula(), services);
+                    if (candidate != null) {
+                        goal = open;
+                        pio = new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
+                        inst = candidate;
+                        break outer;
+                    }
+                }
+            }
+            if (goal == null) {
+                problems.append("contract e2e: no operation-contract position on any open goal")
+                        .append(" (").append(proof.openGoals().size()).append(" goal(s)) of ")
+                        .append(path.getFileName()).append("; ");
+                return;
+            }
+            final Goal e2eGoal = goal;
+            ImmutableSet<FunctionalOperationContract> contracts =
+                UseOperationContractRule.getApplicableContracts(inst, services);
+            if (contracts.isEmpty()) {
+                problems.append("contract e2e: no applicable contracts for ")
+                        .append(inst.pm().getFullName()).append("; ");
+                return;
+            }
+            FunctionalOperationContract chosen = contracts.iterator().next();
+
+            // complete the app through the REAL dispatch; the completion shows the dialog
+            // modally on the FX thread and the background driver selects + confirms it
+            ContractRuleApp app = UseOperationContractRule.INSTANCE.createApp(pio);
+            AtomicReference<IBuiltInRuleApp> completed = new AtomicReference<>();
+            Thread driver = new Thread(() -> {
+                // only the instance the dispatch is about to construct (the steps 3a/3b
+                // dialogs above also pass through lastInstance, but their stages are closed)
+                ContractConfiguratorF previous = ContractConfiguratorF.lastInstance();
+                long deadline = System.currentTimeMillis() + 20_000;
+                while (System.currentTimeMillis() < deadline) {
+                    ContractConfiguratorF dialog = ContractConfiguratorF.lastInstance();
+                    if (dialog != null && dialog != previous && dialog.getStage().isShowing()) {
+                        Platform.runLater(() -> {
+                            dialog.getContractPanel().selectContract(chosen);
+                            dialog.requestOk();
+                        });
+                        return;
+                    }
+                    try {
+                        Thread.sleep(25);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return;
+                    }
+                }
+                LOGGER.warn("Contract e2e: dialog driver timed out");
+            }, "fx-verify-dialogs-contract-driver");
+            driver.setDaemon(true);
+            driver.start();
+            runOnFx(() -> completed.set(ui.completeBuiltInRuleApp(app, e2eGoal, false)));
+            try {
+                driver.join(25_000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            IBuiltInRuleApp result = completed.get();
+            if (!(result instanceof ContractRuleApp completedApp)) {
+                problems.append("contract e2e: dispatch did not return a ContractRuleApp (")
+                        .append(result).append("); ");
+                return;
+            }
+            if (!completedApp.complete()) {
+                problems.append("contract e2e: returned app not complete; ");
+            }
+            if (completedApp.getInstantiation() != chosen) {
+                problems.append("contract e2e: the selected contract was not applied to the app; ");
+            }
+
+            // apply the completed app the way the GUI applies it (the contract application
+            // splits the goal into several child nodes — assert the proof grew)
+            var proofControl = env.getProofControl();
+            int before = proof.countNodes();
+            ContractRuleApp toApply = completedApp;
+            runOnFx(() -> proofControl.applyInteractive(toApply, e2eGoal));
+            int after = proof.countNodes();
+            if (after <= before) {
+                problems.append("contract e2e: applyInteractive did not grow the proof (")
+                        .append(before).append(" -> ").append(after).append("); ");
+            }
+            LOGGER.info("Contract e2e: applied {} on {} (nodes {} -> {})",
+                chosen.getDisplayName(), inst.pm().getFullName(), before, after);
+        } catch (Throwable e) {
+            LOGGER.warn("Contract e2e: failed", e);
+            problems.append("contract e2e: ").append(e).append("; ");
+        } finally {
+            if (env != null) {
+                env.dispose();
+            }
         }
     }
 
