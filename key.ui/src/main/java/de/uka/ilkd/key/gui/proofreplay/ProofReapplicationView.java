@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.proofreplay;
 
 import java.awt.*;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.StreamSupport;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -21,11 +23,9 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.io.IntermediatePresentationProofFileParser;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
@@ -39,7 +39,6 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 import org.key_project.logic.PosInTerm;
-import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -67,8 +66,6 @@ public class ProofReapplicationView extends JPanel implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofReapplicationView.class);
 
     private final MainWindow mainWindow;
-    /// The proof currently loaded
-    private Proof proof;
 
     /// The tree model for the proof tree
     private final DefaultTreeModel treeModel =
@@ -93,12 +90,15 @@ public class ProofReapplicationView extends JPanel implements TabPanel {
         intermProofTree.getSelectionModel()
                 .setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         intermProofTree.setCellRenderer(new ProofTreeNodeRenderer());
-        intermProofTree.addTreeSelectionListener(e -> onNodeSelected());
         intermProofTree.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    int row = intermProofTree.getClosestRowForLocation(e.getX(), e.getY());
+                    int row = intermProofTree.getRowForLocation(e.getX(), e.getY());
+                    if (row == -1) {
+                        // right-click on empty space: show no context menu
+                        return;
+                    }
                     intermProofTree.setSelectionRow(row);
                     showContextMenu(e.getComponent(), e.getX(), e.getY());
                 }
@@ -151,12 +151,31 @@ public class ProofReapplicationView extends JPanel implements TabPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    replaySingleRule();
-                } catch (IntermediateProofReplayer.TacletAppConstructionException ex) {
-                    // TODO: error reporting
-                    throw new RuntimeException(ex);
-                }
+                // Constructing the rule application (in particular for SMT rules) may launch
+                // external solvers which can block for a long time. Replay off the EDT and only
+                // touch the UI again in done().
+                final var worker = new SwingWorker<Void, Void>() {
+                    @Override
+                    protected Void doInBackground() {
+                        replaySingleRule();
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        try {
+                            get();
+                        } catch (InterruptedException ex) {
+                            Thread.currentThread().interrupt();
+                        } catch (ExecutionException ex) {
+                            JOptionPane.showMessageDialog(ProofReapplicationView.this,
+                                "Error replaying rule:\n" + ex.getCause().getMessage(),
+                                "Replay Error", JOptionPane.ERROR_MESSAGE);
+                            LOGGER.warn("Error replaying rule", ex);
+                        }
+                    }
+                };
+                worker.execute();
             }
         };
     }
@@ -178,7 +197,7 @@ public class ProofReapplicationView extends JPanel implements TabPanel {
                     "Parse Errors", JOptionPane.ERROR_MESSAGE);
             }
 
-            System.out.println(r.status());
+            LOGGER.debug("Proof replay parse status: {}", r.status());
 
             // Build the tree representation
             rebuildProofTree(r.parsedResult());
@@ -194,15 +213,6 @@ public class ProofReapplicationView extends JPanel implements TabPanel {
                 "Error", JOptionPane.ERROR_MESSAGE);
             LOGGER.warn("", ex);
         }
-    }
-
-    /// Counts the number of nodes in the proof tree.
-    private int countNodes(Node node) {
-        int count = 1;
-        for (Node child : node.children()) {
-            count += countNodes(child);
-        }
-        return count;
     }
 
     /// Rebuilds the proof tree visualization.
@@ -248,11 +258,6 @@ public class ProofReapplicationView extends JPanel implements TabPanel {
         }
     }
 
-    /// Handles node selection in the tree.
-    private void onNodeSelected() {
-        TreePath path = intermProofTree.getSelectionPath();
-    }
-
     /// Shows the context menu at the specified location.
     private void showContextMenu(Component invoker, int x, int y) {
         JPopupMenu popup = new JPopupMenu();
@@ -275,206 +280,115 @@ public class ProofReapplicationView extends JPanel implements TabPanel {
     }
 
     /*
-     * /// Replays the subtree starting from the selected node.
-     * private void replaySubtree(TreeNode node) {
-     * if (proof == null) {
-     * JOptionPane.showMessageDialog(this,
-     * "No proof loaded.",
-     * "No Proof", JOptionPane.WARNING_MESSAGE);
-     * return;
-     * }
-     *
-     * try {
-     * // Collect all rule applications from the subtree
-     * List<RuleApp> ruleApps = collectRuleApps(selectedNode);
-     *
-     * // Prune the proof to the parent of the selected node
-     * Node parent = selectedNode.parent();
-     * if (parent != null) {
-     * proof.pruneProof(parent);
-     *
-     * // Reapply all rules from the collected subtree
-     * Goal currentGoal = proof.getOpenGoal(parent);
-     * if (currentGoal != null && !ruleApps.isEmpty()) {
-     * // Skip the first rule (it was at the pruned position) and apply the rest
-     * for (int i = 1; i < ruleApps.size(); i++) {
-     * RuleApp app = ruleApps.get(i);
-     * tryReplayRuleAtGoal(currentGoal, app);
-     * // Move to next goal after application
-     * if (!currentGoal.node().isClosed()) {
-     * var nextGoal = proof.getOpenGoal(currentGoal.node());
-     * if (nextGoal != null) {
-     * currentGoal = nextGoal;
-     * }
-     * }
-     * }
-     * }
-     *
-     * // Refresh the tree
-     * rebuildProofTree(r.parsedResult());
-     * statusLabel.setText("Subtree replayed from node " + selectedNode.serialNr());
-     * }
-     * } catch (Exception e) {
-     * JOptionPane.showMessageDialog(this,
-     * "Error replaying subtree: " + e.getMessage(),
-     * "Replay Error", JOptionPane.ERROR_MESSAGE);
-     * statusLabel.setText("Subtree replay failed");
-     * }
-     * }
+     * Replay subtree / prune interactions are planned but not yet implemented (see PR #3897).
      */
 
-    /// Collects all rule applications from a node and its descendants.
-    private List<RuleApp> collectRuleApps(Node node) {
-        List<RuleApp> result = new ArrayList<>();
-        RuleApp app = node.getAppliedRuleApp();
-        if (app != null) {
-            result.add(app);
-        }
-        for (Node child : node.children()) {
-            result.addAll(collectRuleApps(child));
-        }
-        return result;
-    }
+    /// Replays a single rule stored at the selected node of the loaded (.proof) tree onto the
+    /// currently selected node of the interactive proof.
+    ///
+    /// Runs on the SwingWorker thread started by {@link #createReplayRuleAction()}; all UI
+    /// updates are marshalled to the EDT.
+    private void replaySingleRule() {
 
-    /// Replays a single rule at the selected node.
-    private void replaySingleRule()
-            throws IntermediateProofReplayer.TacletAppConstructionException {
-
-        proof = mediator.getSelectedProof();
+        Proof proof = mediator.getSelectedProof();
         if (proof == null) {
-            JOptionPane.showMessageDialog(this,
-                "No proof loaded.",
-                "No Proof", JOptionPane.WARNING_MESSAGE);
+            SwingUtilities
+                    .invokeLater(() -> JOptionPane.showMessageDialog(ProofReapplicationView.this,
+                        "No proof loaded.", "No Proof", JOptionPane.WARNING_MESSAGE));
+            return;
+        }
+
+        // obtain selected node from the loaded (.proof) tree
+        TreeNodeIntermediate<?> selectedNode =
+            (TreeNodeIntermediate<?>) intermProofTree.getLastSelectedPathComponent();
+        if (selectedNode == null) {
+            // nothing selected, e.g. right-click in empty space
+            return;
+        }
+        if (!(selectedNode.data instanceof AppNodeIntermediate currInterm)) {
+            // branch markers are not replayable
             return;
         }
 
         Node currNode = mediator.getSelectedNode();
         Goal currGoal = mediator.getSelectedGoal();
-
-        // obtain selected node from intermProofTree
-        TreeNodeIntermediate<?> selectedNode =
-            (TreeNodeIntermediate<?>) intermProofTree.getLastSelectedPathComponent();
-        NodeIntermediate currNodeInterm = selectedNode.data;
-
-        /*
-         * if (n instanceof AppNodeIntermediate nApp) {
-         * app = nApp.getIntermediateRuleApp();
-         * } else if (n instanceof BranchNodeIntermediate nBranch) {
-         *
-         * }
-         * } else {
-         * // not a replayable rule
-         * return;
-         * }
-         */
-
-        if (currNodeInterm instanceof BranchNodeIntermediate) {
-            // not a replayable rule
+        if (currNode == null || currGoal == null) {
+            // only open goals (leaves) of the interactive proof are valid replay targets
+            SwingUtilities
+                    .invokeLater(() -> JOptionPane.showMessageDialog(ProofReapplicationView.this,
+                        "Select an open goal in the active proof to replay this rule onto.",
+                        "No Goal Selected", JOptionPane.WARNING_MESSAGE));
             return;
-        } else if (currNodeInterm instanceof AppNodeIntermediate currInterm) {
+        }
 
-            currNode.getNodeInfo().setNotes(currInterm.getNotes());
+        // Register name proposals
+        proof.getServices().getNameRecorder()
+                .setProposals(currInterm.getIntermediateRuleApp().getNewNames());
 
-            // Register name proposals
-            proof.getServices().getNameRecorder()
-                    .setProposals(currInterm.getIntermediateRuleApp().getNewNames());
+        if (currInterm.getIntermediateRuleApp() instanceof TacletAppIntermediate appInterm) {
 
-            if (currInterm.getIntermediateRuleApp() instanceof TacletAppIntermediate appInterm) {
-
-                // try {
+            try {
                 TacletApp tacletApp = constructTacletApp(proof, appInterm, currGoal);
                 currGoal.apply(tacletApp);
 
-                /*
-                 * final Iterator<Node> children = currNode.childrenIterator();
-                 * final LinkedList<NodeIntermediate> intermChildren =
-                 * currInterm.getChildren();
-                 *
-                 * addChildren(children, intermChildren);
-                 */
-
-                // set information about SUCCESSFUL rule application
-                currNode.getNodeInfo().setInteractiveRuleApplication(
-                    currInterm.isInteractiveRuleApplication());
-                currNode.getNodeInfo()
-                        .setScriptRuleApplication(currInterm.isScriptRuleApplication());
-
-                /*
-                 * } catch (Exception | AssertionError e) {
-                 * reportError("Error loading proof.\n Line " + appInterm.getLineNr()
-                 * + ", goal " + currGoal.node().serialNr() + ", rule "
-                 * + appInterm.getRuleName() + NOT_APPLICABLE, e);
-                 * }
-                 */
-                selectedNode.applied = true;
-
-            } else if (currInterm
-                    .getIntermediateRuleApp() instanceof BuiltInAppIntermediate appInterm) {
-
-                try {
-                    IBuiltInRuleApp app = constructBuiltinApp(proof, appInterm, currGoal);
-                    if (!app.complete()) {
-                        app = app.tryToInstantiate(currGoal);
-                    }
-                    currGoal.apply(app);
-
-                    /*
-                     * final Iterator<Node> children = currNode.childrenIterator();
-                     * LinkedList<NodeIntermediate> intermChildren =
-                     * currInterm.getChildren();
-                     *
-                     * addChildren(children, intermChildren);
-                     */
-                    // } catch (IntermediateProofReplayer.SkipSMTRuleException e) {
-                    // silently continue; status will be reported via polling
-                } catch (IntermediateProofReplayer.BuiltInConstructionException | AssertionError
-                        | RuntimeException e) {
-                    // TODO: error reporting
-                    selectedNode.errored = true;
-                    throw new RuntimeException("Error loading proof: Line " + appInterm.getLineNr()
-                        + ", goal " + currGoal.node().serialNr() + ", rule "
-                        + appInterm.getRuleName() + " not applicable.", e);
-                    /*
-                     * reportError(ERROR_LOADING_PROOF_LINE + "Line "
-                     * + appInterm.getLineNr() + ", goal " + currGoal.node().serialNr()
-                     * + ", rule " + appInterm.getRuleName() + NOT_APPLICABLE, e);
-                     */
-                }
-                selectedNode.applied = true;
+                copyStoredNodeInfo(currNode, currInterm);
+                markApplied(selectedNode, true);
+            } catch (IntermediateProofReplayer.TacletAppConstructionException | RuntimeException
+                    | AssertionError e) {
+                markApplied(selectedNode, false);
+                throw new RuntimeException(
+                    "Replay of rule '" + appInterm.getRuleName() + "' (line "
+                        + appInterm.getLineNr() + ") failed: " + e.getMessage(),
+                    e);
             }
+        } else if (currInterm
+                .getIntermediateRuleApp() instanceof BuiltInAppIntermediate appInterm) {
 
-            /*
-             * RuleApp originalApp = selectedNode.getAppliedRuleApp();
-             * if (originalApp == null) {
-             * JOptionPane.showMessageDialog(this,
-             * "Selected node has no applied rule.",
-             * "No Rule", JOptionPane.WARNING_MESSAGE);
-             * return;
-             * }
-             *
-             * try {
-             * // Prune to the selected node's parent
-             * Node parent = selectedNode.parent();
-             * if (parent != null) {
-             * proof.pruneProof(parent);
-             * Goal goal = proof.getOpenGoal(parent);
-             *
-             * if (goal != null) {
-             * tryReplayRuleAtGoal(goal, originalApp);
-             * }
-             *
-             * rebuildProofTree(r.parsedResult());
-             * statusLabel.setText("Rule '" + originalApp.rule().name()
-             * + "' replayed at node " + parent.serialNr());
-             * }
-             * } catch (Exception e) {
-             * JOptionPane.showMessageDialog(this,
-             * "Error replaying rule: " + e.getMessage(),
-             * "Replay Error", JOptionPane.ERROR_MESSAGE);
-             * statusLabel.setText("Rule replay failed");
-             * }
-             */
+            try {
+                IBuiltInRuleApp app = constructBuiltinApp(proof, appInterm, currGoal);
+                if (!app.complete()) {
+                    app = app.tryToInstantiate(currGoal);
+                }
+                currGoal.apply(app);
+                markApplied(selectedNode, true);
+            } catch (IntermediateProofReplayer.BuiltInConstructionException | AssertionError
+                    | RuntimeException e) {
+                markApplied(selectedNode, false);
+                throw new RuntimeException(
+                    "Replay of rule '" + appInterm.getRuleName() + "' (line "
+                        + appInterm.getLineNr() + ") failed: " + e.getMessage(),
+                    e);
+            }
         }
+    }
+
+    /// Copies stored annotations (notes, interactive/script application flags) to the node of the
+    /// interactive proof that the rule was replayed onto. Only invoked after a successful rule
+    /// application, and existing notes are never cleared.
+    private void copyStoredNodeInfo(Node replayedNode, AppNodeIntermediate storedNode) {
+        String notes = storedNode.getNotes();
+        SwingUtilities.invokeLater(() -> {
+            if (notes != null) {
+                replayedNode.getNodeInfo().setNotes(notes);
+            }
+            replayedNode.getNodeInfo().setInteractiveRuleApplication(
+                storedNode.isInteractiveRuleApplication());
+            replayedNode.getNodeInfo()
+                    .setScriptRuleApplication(storedNode.isScriptRuleApplication());
+        });
+    }
+
+    /// Marks a node of the stored-proof tree as successfully replayed (green) or failed (red)
+    /// and repaints it. Safe to call from any thread; the actual tree update runs on the EDT.
+    private void markApplied(TreeNodeIntermediate<?> node, boolean ok) {
+        SwingUtilities.invokeLater(() -> {
+            if (ok) {
+                node.applied = true;
+            } else {
+                node.errored = true;
+            }
+            treeModel.nodeChanged(node);
+        });
     }
 
     // TODO: taken and adapted from IntermediateProofReplayer. Should be refactored instead there!
@@ -543,10 +457,13 @@ public class ProofReapplicationView extends JPanel implements TabPanel {
             if (!ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().isEnableOnLoad()) {
                 // TODO
                 // status = SMT_NOT_RUN;
-                throw new RuntimeException();
+                throw new RuntimeException(
+                    "SMT rules can only be replayed if 'SMT solver on load' is enabled.");
             }
             boolean error = false;
             final SMTProblem smtProblem = new SMTProblem(currGoal);
+            // default to Z3 because this one most likely was used when saving the proof
+            String smtSolver = "Z3";
             try {
                 DefaultSMTSettings settings = new DefaultSMTSettings(
                     proof.getSettings().getSMTSettings(),
@@ -558,10 +475,9 @@ public class ProofReapplicationView extends JPanel implements TabPanel {
                         .getSMTSettings();
                 SolverTypeCollection active = smtSettings.computeActiveSolverUnion();
                 SMTAppIntermediate smtAppIntermediate = (SMTAppIntermediate) currInterm;
-                String smtSolver = smtAppIntermediate.getSolver();
-                if (smtSolver == null || smtSolver.isEmpty()) {
-                    // default to Z3 because this one most likely was used when saving the proof
-                    smtSolver = "Z3";
+                String storedSolver = smtAppIntermediate.getSolver();
+                if (storedSolver != null && !storedSolver.isEmpty()) {
+                    smtSolver = storedSolver;
                 }
                 // try to find the solver that closed the proof
                 for (SolverTypeCollection su : smtSettings.getSolverUnions(true)) {
@@ -583,7 +499,8 @@ public class ProofReapplicationView extends JPanel implements TabPanel {
                     .isValid() != SMTSolverResult.ThreeValuedTruth.VALID) {
                 // TODO
                 // status = SMT_NOT_RUN;
-                throw new RuntimeException();
+                throw new RuntimeException(
+                    "SMT solver '" + smtSolver + "' did not validate the goal.");
             } else {
                 String name = smtProblem.getSuccessfulSolver().name();
                 ImmutableList<PosInOccurrence> unsatCore =
@@ -683,74 +600,6 @@ public class ProofReapplicationView extends JPanel implements TabPanel {
         }
 
         return result;
-    }
-
-    /// Attempts to replay a rule at the given goal.
-    private void tryReplayRuleAtGoal(Goal goal, RuleApp originalApp) {
-        Services services = goal.proof().getServices();
-
-        if (originalApp instanceof TacletApp tacletApp) {
-            // Find matching taclet applications using the TacletIndex
-            TacletIndex tacletIndex = goal.indexOfTaclets();
-
-            // Get all applicable taclets and find matching one
-            var allApps = tacletIndex.allNoPosTacletApps();
-            NoPosTacletApp matchingApp = null;
-
-            for (NoPosTacletApp candidate : allApps) {
-                if (candidate.rule().name().equals(tacletApp.rule().name())) {
-                    matchingApp = candidate;
-                    break;
-                }
-            }
-
-            if (matchingApp != null) {
-                // Try to match the position if needed
-                PosInOccurrence pos = tacletApp.posInOccurrence();
-                if (pos != null) {
-                    // Find the matching app with position
-                    ImmutableList<TacletApp> appsWithPos =
-                        ImmutableList.nil();
-                    for (TacletApp app : appsWithPos) {
-                        if (app.rule().name().equals(tacletApp.rule().name())) {
-                            goal.apply(app);
-                            return;
-                        }
-                    }
-                } else {
-                    goal.apply(matchingApp);
-                    return;
-                }
-            }
-
-            throw new RuntimeException("Could not find matching taclet: "
-                + tacletApp.rule().name());
-        } else if (originalApp instanceof IBuiltInRuleApp builtinApp) {
-            // Find matching built-in rule applications
-            PosInOccurrence pos = builtinApp.posInOccurrence();
-
-            // Collect all built-in rule apps at the position
-            ImmutableList<IBuiltInRuleApp> apps =
-                goal.ruleAppIndex().getBuiltInRules(goal, pos);
-
-            IBuiltInRuleApp matchingApp = null;
-            for (IBuiltInRuleApp app : apps) {
-                if (app.rule().name().equals(builtinApp.rule().name())) {
-                    matchingApp = app;
-                    break;
-                }
-            }
-
-            if (matchingApp != null) {
-                goal.apply(matchingApp);
-            } else {
-                throw new RuntimeException("Could not find matching built-in rule: "
-                    + builtinApp.rule().name());
-            }
-        } else {
-            throw new RuntimeException("Unsupported rule type: "
-                + originalApp.getClass().getName());
-        }
     }
 }
 
