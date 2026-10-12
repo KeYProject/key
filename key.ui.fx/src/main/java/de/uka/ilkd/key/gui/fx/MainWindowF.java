@@ -105,6 +105,7 @@ import de.uka.ilkd.key.gui.fx.contractcompletions.DependencyContractCompletionF;
 import de.uka.ilkd.key.gui.fx.contractcompletions.FunctionalOperationContractCompletionF;
 import de.uka.ilkd.key.gui.fx.contractcompletions.InvariantConfiguratorF;
 import de.uka.ilkd.key.gui.fx.contractcompletions.LoopInvariantRuleCompletionF;
+import de.uka.ilkd.key.gui.fx.dialogs.AboutDialogF;
 import de.uka.ilkd.key.gui.fx.dialogs.DialogsVerifyF;
 import de.uka.ilkd.key.gui.fx.dialogs.FeedbackDialogF;
 import de.uka.ilkd.key.gui.fx.dialogs.LemmaSelectionDialogF;
@@ -6110,12 +6111,10 @@ public final class MainWindowF {
     }
 
     private void showAbout() {
-        // B16 (P3c): "About KeY" stays an information toast (an invisible-at-a-glance info
-        // styled message) instead of becoming a modal dialog; the toast is enriched with the
-        // Swing AboutAction content (copyright, WWW, version) to keep the parity information.
-        NotificationManagerF.getInstance().notify(KeYConstants.COPYRIGHT
-            + "\n\nWWW: http://key-project.org/\n\nVersion " + KeYConstants.VERSION,
-            Kind.INFO);
+        // reviewer request: "About KeY" is a real (modal) dialog, not a notification toast;
+        // the dialog shows the Swing AboutAction content (copyright, WWW, version,
+        // AboutAction.java:33-39, titled "The KeY Project")
+        AboutDialogF.show(stage);
     }
 
     private void notYetImplemented() {
