@@ -106,7 +106,6 @@ import de.uka.ilkd.key.gui.fx.contractcompletions.FunctionalOperationContractCom
 import de.uka.ilkd.key.gui.fx.contractcompletions.InvariantConfiguratorF;
 import de.uka.ilkd.key.gui.fx.contractcompletions.LoopInvariantRuleCompletionF;
 import de.uka.ilkd.key.gui.fx.dialogs.AboutDialogF;
-import de.uka.ilkd.key.gui.fx.dialogs.DialogsVerifyF;
 import de.uka.ilkd.key.gui.fx.dialogs.FeedbackDialogF;
 import de.uka.ilkd.key.gui.fx.dialogs.LemmaSelectionDialogF;
 import de.uka.ilkd.key.gui.fx.dialogs.LicenseDialogF;
@@ -128,7 +127,6 @@ import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.goallist.GoalListViewF;
 import de.uka.ilkd.key.gui.fx.help.HelpFacadeF;
 import de.uka.ilkd.key.gui.fx.infoview.InfoViewF;
-import de.uka.ilkd.key.gui.fx.join.JoinMergeVerifyF;
 import de.uka.ilkd.key.gui.fx.keyshortcuts.KeyStrokeManagerF;
 import de.uka.ilkd.key.gui.fx.mergerule.MergeRuleCompletionF;
 import de.uka.ilkd.key.gui.fx.nodeviews.SequentMenuModelF;
@@ -148,7 +146,6 @@ import de.uka.ilkd.key.gui.fx.proofdiff.ProofDiffFrameF;
 import de.uka.ilkd.key.gui.fx.proofmanagement.KnownTypesDialogF;
 import de.uka.ilkd.key.gui.fx.proofmanagement.ProofManagementDialogF;
 import de.uka.ilkd.key.gui.fx.proofmanagement.ProofManagerF;
-import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeVerifyF;
 import de.uka.ilkd.key.gui.fx.prooftree.ProofTreeViewF;
 import de.uka.ilkd.key.gui.fx.recentfiles.RecentFilesF;
 import de.uka.ilkd.key.gui.fx.settings.ActiveSettingsDialogF;
@@ -160,7 +157,6 @@ import de.uka.ilkd.key.gui.fx.soundiness.SoundinessAnalyzer;
 import de.uka.ilkd.key.gui.fx.soundiness.SoundinessDialogF;
 import de.uka.ilkd.key.gui.fx.sourceview.SourceViewF;
 import de.uka.ilkd.key.gui.fx.strategy.StrategySelectionViewF;
-import de.uka.ilkd.key.gui.fx.tacletmatch.TacletMatchVerifyF;
 import de.uka.ilkd.key.gui.fx.tasktree.TaskTreeF;
 import de.uka.ilkd.key.gui.fx.theme.Theme;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
@@ -1309,8 +1305,11 @@ public final class MainWindowF {
             // completeness + the contract/auxiliary configurator and lemma selection dialog
             // skeletons + the item chooser semantics
             if (System.getProperty("key.fx.verify.dialogs") != null) {
-                String report = DialogsVerifyF.run(stage, selectionModel.getSelectedProof(),
-                    userInterface);
+                String report = (String) runVerifyHarness(
+                    "de.uka.ilkd.key.gui.fx.dialogs.DialogsVerifyF", "run",
+                    new Class<?>[] { javafx.stage.Window.class, Proof.class,
+                        WindowUserInterfaceControlF.class },
+                    stage, selectionModel.getSelectedProof(), userInterface);
                 statusRight.setText(report);
             }
             if (System.getProperty("key.fx.verify.prooftree") != null
@@ -1321,8 +1320,11 @@ public final class MainWindowF {
                 // auto-prover runs in parallel (the auto-mode-stop dispatch below verifies the
                 // final tree instead — running the self test against a proof the prover is
                 // still mutating would race with the structural events)
-                String report = ProofTreeVerifyF.run(stage, selectionModel.getSelectedProof(),
-                    proofTreeView);
+                String report = (String) runVerifyHarness(
+                    "de.uka.ilkd.key.gui.fx.prooftree.ProofTreeVerifyF", "run",
+                    new Class<?>[] { javafx.stage.Window.class, Proof.class,
+                        ProofTreeViewF.class },
+                    stage, selectionModel.getSelectedProof(), proofTreeView);
                 statusRight.setText(report);
             }
             // loadingexit (P1): recent-files round trip with loading options + profile
@@ -1409,9 +1411,12 @@ public final class MainWindowF {
             // after the demo load; termmenu/S4 passes the seam so the dispatch path
             // (WindowUserInterfaceControlF.completeAndApplyTacletMatch) is covered
             if (System.getProperty("key.fx.verify.tacletmatch") != null) {
-                TacletMatchVerifyF.runTacletMatchVerification(env.getLoadedProof(),
-                    env.getProofControl(), stage, mediator.getNotationInfo(),
-                    getUserInterfaceControl());
+                runVerifyHarness("de.uka.ilkd.key.gui.fx.tacletmatch.TacletMatchVerifyF",
+                    "runTacletMatchVerification",
+                    new Class<?>[] { Proof.class, ProofControl.class, javafx.stage.Stage.class,
+                        NotationInfo.class, WindowUserInterfaceControlF.class },
+                    env.getLoadedProof(), env.getProofControl(), stage,
+                    mediator.getNotationInfo(), getUserInterfaceControl());
             }
             // lemmaorigin: begin — term labels / origin visualizer / lemma generator self test
             if (System.getProperty("key.fx.verify.lemmaorigin") != null) {
@@ -2417,8 +2422,11 @@ public final class MainWindowF {
                         // prooftree (P3a): re-run the C19-C23/C25/C27 self test after a live
                         // auto mode — the tree listeners already applied the C27 partial subtree
                         // updates on the auto mode stop, so the counter report shows them
-                        String report = ProofTreeVerifyF.run(stage,
-                            selectionModel.getSelectedProof(), proofTreeView);
+                        String report = (String) runVerifyHarness(
+                            "de.uka.ilkd.key.gui.fx.prooftree.ProofTreeVerifyF", "run",
+                            new Class<?>[] { javafx.stage.Window.class, Proof.class,
+                                ProofTreeViewF.class },
+                            stage, selectionModel.getSelectedProof(), proofTreeView);
                         LOGGER.info("Proof tree verification (after live auto mode): {}", report);
                     }
                     String report = proofTreeView.verifyTreeStructure() + " "
@@ -3587,7 +3595,8 @@ public final class MainWindowF {
 
     /**
      * Runs the join/merge dialog self test ({@code key.fx.verify.joinmerge}); the dialogs are
-     * constructed directly with the loaded proof, see {@link JoinMergeVerifyF}.
+     * constructed directly with the loaded proof, see the JoinMergeVerifyF harness
+     * (test source set).
      *
      * @param env the environment of the loaded proof
      */
@@ -3599,7 +3608,9 @@ public final class MainWindowF {
     // sequent-view context menu (Swing JoinMenuItem via CurrentGoalViewMenu.java:235-238).
     // joinmerge: keep this hook minimal, all logic lives in JoinMergeVerifyF
     private void runJoinMergeVerification(KeYEnvironment<DefaultUserInterfaceControl> env) {
-        JoinMergeVerifyF.run(stage, env.getLoadedProof(), env.getProofControl());
+        runVerifyHarness("de.uka.ilkd.key.gui.fx.join.JoinMergeVerifyF", "run",
+            new Class<?>[] { javafx.stage.Window.class, Proof.class, ProofControl.class },
+            stage, env.getLoadedProof(), env.getProofControl());
     }
 
     /**
@@ -4424,6 +4435,34 @@ public final class MainWindowF {
             mediator.stopAutoMode(); // Swing: proofControl.stopAutoMode()
         } else if (lastEnvironment != null) {
             lastEnvironment.getProofControl().runMacro(mediator.getSelectedNode(), macro, null);
+        }
+    }
+
+    /**
+     * Invokes a verify harness reflectively (reviewer request: the harness classes live in the
+     * test source sets — test code must not ship in the main sources — so {@code main} cannot
+     * reference them statically; the {@code run} task puts the test outputs on the runtime
+     * classpath, see the key.ui.fx build file). Locates the static method by parameter types
+     * and invokes it.
+     *
+     * @param className the fully qualified harness class name
+     * @param methodName the static method to invoke
+     * @param types the exact parameter types of the method
+     * @param args the arguments
+     * @return the harness result (a report string; {@code null} for {@code void} harnesses or
+     *         when the harness class is not on the classpath)
+     */
+    private static Object runVerifyHarness(String className, String methodName, Class<?>[] types,
+            Object... args) {
+        try {
+            Class<?> harness = Class.forName(className);
+            return harness.getMethod(methodName, types).invoke(null, args);
+        } catch (ClassNotFoundException e) {
+            LOGGER.warn("Verify harness {} not on the classpath (test source set)", className);
+            return null;
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            LOGGER.error("Verify harness {} failed", className, e);
+            return "FAIL (" + e + ")";
         }
     }
 

@@ -29,3 +29,16 @@ dependencies {
     implementation libs.ikonli.javafx
     implementation libs.ikonli.fontawesome6
 }
+// reviewer request: the verify harness (de.uka.ilkd.key.gui.plugins.caching.fx.CachingVerifyF) lives in the test source set (test code must
+// not ship in the main sources) and is published for the key.ui.fx run task via the
+// "testArtifacts" configuration (MainWindowF invokes it reflectively on the run classpath).
+configurations {
+    testArtifacts
+}
+tasks.register('testJar', Jar) {
+    archiveClassifier = 'test'
+    from sourceSets.test.output
+}
+artifacts {
+    testArtifacts testJar
+}
