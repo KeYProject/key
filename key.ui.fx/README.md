@@ -15,18 +15,58 @@ rewritten.
 
 ## Running
 
+`key.ui.fx` is the **documented default entry point** of KeY (WP-11 endgame switchover); the
+legacy Swing UI (`key.ui`, `de.uka.ilkd.key.core.Main`) stays available until its retirement
+decision — see `SWING-RETIREMENT.md`:
+
 ```sh
-./gradlew :key.ui.fx:run        # the full application (MainEx)
+./gradlew :key.ui.fx:run        # the full application (MainEx, default entry point)
 ./gradlew :key.ui.fx:runExperimental
 ./gradlew :key.ui.fx:runDebug
+
+./gradlew :key.ui:run           # legacy Swing UI (de.uka.ilkd.key.core.Main)
 ```
 
+`-DmainClass` ergonomics: the root project's generic `execute`/`executeInTests` tasks take a
+main class via `-DmainClass` — `-DmainClass=de.uka.ilkd.key.core.fx.MainEx
+./gradlew :key.ui.fx:execute` for the FX UI, `-DmainClass=de.uka.ilkd.key.core.Main
+./gradlew :key.ui:execute` for the legacy Swing UI. Prefer the dedicated `run` tasks: they set
+`key.examples.dir` and forward the whitelisted `key.fx.*` properties.
+
 Additional Gradle tasks come from the `application` plugin; `key.fx.*` system properties are
-forwarded to the application JVM by the `run` task (whitelist) or via `JAVA_TOOL_OPTIONS` (see
-below).
+forwarded to the application JVM by the `run` task **whitelist** (the `["key.fx.driver", …]`
+array in `build.gradle`, currently 53 properties — including all demo/verify flags below); any
+other property must be passed via `JAVA_TOOL_OPTIONS`. The second table below lists exactly the
+flags that are read by `MainWindowF` but *not* on the whitelist (harness-injected only).
 
 JavaFX 25 silently drops machines without a graphical environment; for headless runs use a
 virtual display (Xvnc/Xvfb), e.g. `DISPLAY=:99`, and `-Dprism.order=sw`.
+
+### Headless verify recipe (virtual display)
+
+Per-flag isolated run on Xvnc (`DISPLAY=:99`) — the convention of all regression sweeps; run
+the hooks one flag at a time, sequential, one app at a time:
+
+```sh
+JAVA_TOOL_OPTIONS="-Xmx6g -Dprism.order=sw -Dkey.fx.verify.<flag>=<v> -Dkey.fx.demo.sequent=<demo>" \
+  ./gradlew --no-daemon --max-workers=1 :key.ui.fx:run
+```
+
+A trailing `BUILD FAILED`/exit-143 is the runner's intentional pkill after the markers appear.
+
+### Full sweep in CI
+
+The complete per-flag regression sweep runs in the
+[UI verify sweep workflow](../.github/workflows/ui-verify.yml) — on every push touching the
+UI modules and on demand (`workflow_dispatch`). `key.ui.fx/ci/verify-sweep.sh` executes one
+matrix job per flag for maximum parallelization (each job starts its own `Xvfb` display,
+runs its flag with software rendering, real z3 from `keyproject/setup-smt`, graphviz for
+the slicing DOT render, `xdotool` for the modal-dialog key dismissal) and fails the job
+when the flag reports `FAIL`; per-flag logs are uploaded as artifacts. The themepersist
+save+restore pair shares one job (restore reads the preference persisted by save). Locally,
+the same script can be run by hand — all flags sequentially
+(`bash key.ui.fx/ci/verify-sweep.sh`) or a selection
+(`bash key.ui.fx/ci/verify-sweep.sh sequent smt`; logs in `build/ui-verify/`).
 
 > **Packaging note (M0):** a JavaFX application does not assemble into a plain fat jar by
 > shading bytecode — the platform-specific native runtime comes from classifier jars and must be
@@ -77,8 +117,19 @@ regression-tested on a virtual display. Demo proof paths default into
 | `key.fx.verify.loadingexit` | loading/exit: recent-files store round trip with loading options + profile resolution (snapshot/restore), then the window close button path — the process must terminate with exit code 0 |
 | `key.fx.verify.shortcuts` | shortcuts: Swing-parity defaults, no binding collisions, an override round trip, and the sequent view Ctrl+F key path |
 | `key.fx.verify.inputfreeze` | input freeze: the auto-mode blocking overlay — direct freeze/unfreeze with key blocking, then an auto-mode-driven run |
+| `key.fx.verify.selectionhistory` | Selection Back/Forward (WP-10): View-menu accelerators + enablement, then Back/Forward through the real menu items (combine with `key.fx.demo.autoprove`) |
+| `key.fx.verify.heatmap` | age-heatmap overlay on the sequent views (WP-2), four ViewSettings modes; needs a proof with rule applications, e.g. `strassen.auto.0.proof` |
+| `key.fx.verify.exploration` | exploration extension parity (WP-5): mediator registry, purple renderer border, Hide-justification filter, promptForTerm retry loop |
+| `key.fx.verify.caching` | caching reference-search dialog (WP-4): per-goal table render + Apply wiring (stub, no real caching copy) |
+| `key.fx.verify.slicing` | slicing (WP-6): graphviz DOT image render (+ fallback), HTML statistics with sort orders, iterative fixed point, recent-files bypass |
+| `key.fx.verify.isabelle` | Isabelle solver-launch DRY-RUN (WP-8): progress dialog with fake solvers; no real Isabelle installation needed |
+| `key.fx.verify.themepersist=save\|restore` | theme persistence round trip (WP-3), two app runs — save applies + persists dark, restore asserts it is restored |
+| `key.fx.verify.testgen` | TestGen extension self test (WP-7): capability surface, options panel round trip, run-dialog renders, CE model tree, cooperative stop; combine with `key.fx.verify.smt` for a real z3 run |
+| `key.fx.verify.sourceconsistency` | EnsureSourceConsistency load pipeline (WP-9): `DiskFileRepo` vs `SimpleFileRepo` on the next load + source read via the repo (`key.fx.demo.sourceconsistency` overrides the example) |
+| `key.fx.verify.autosave` | AutoSave real flow (WP-9): the saver armed through `applyAutoSave` writes intermediate `.autosave` files during a capped auto-mode run |
+| `key.fx.verify.minimizeinteraction` | Minimize-Interaction load pipeline (WP-9): the persisted flag decides taclet-dialog vs. auto-apply on the loaded demo |
 
-Harness-injected flags (read in `MainWindowF` but not on the `run`-task whitelist; the
+Harness-injected flags (read in `MainWindowF` but **not** on the `run`-task whitelist; the
 verification harness sets them via `JAVA_TOOL_OPTIONS`):
 
 | Flag | What it verifies |
@@ -88,8 +139,6 @@ verification harness sets them via `JAVA_TOOL_OPTIONS`):
 | `key.fx.verify.drawer` | drawer switch/move interactions |
 | `key.fx.verify.menuparity` | menu parity counts (File 16 / Proof 24 / Options 12 / View 7 / About 5) |
 | `key.fx.verify.rightclickmacro` | right-click macro menu |
-| `key.fx.verify.minimizeinteraction` | minimize-interaction toggle |
-| `key.fx.verify.autosave` | auto saver |
 | `key.fx.verify.proofdiff` | proof-diff frame |
 
 **Regression practice (S5/MP10 mode):** run the hooks **per flag** — a combined multi-flag run
@@ -145,3 +194,6 @@ contract; capability interfaces: `MainMenuF`, `ToolbarF`, `StatusLineF`, `Contex
   originals (all `KNOWN-SIMPLIFIED` markers, one row per site).
 * `PARITY-SIGNOFF.md` — sign-off of the 2026-10-08 parity audit (~490 behaviors) against the
   delivered application, and the list of still-open items.
+* `SWING-RETIREMENT.md` — the staged removal plan for `key.ui` + the Swing `keyext.*` modules
+  (WP-11: documented, not executed; the Swing UI keeps shipping until the maintainer decision).
+* `WORK-PACKAGES.md` — the WP-1…WP-11 work-package definitions of the migration endgame.
