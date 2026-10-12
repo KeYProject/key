@@ -25,6 +25,17 @@ The status column is for the close-out tracking: **OPEN** items are candidates f
 milestone, **FIXED-UPSTREAM** items differ from a Swing bug that the port deliberately corrects,
 **WONT-REPLICATE** items depend on Swing-only machinery with no FX counterpart.
 
+**Ledger status (WP-11 close-out, 2026-10-12):** no row is OPEN. Every row ends RESOLVED (with
+its batch/WP reference), WONT-REPLICATE or FIXED-UPSTREAM; the rows marked "—" record deliberate
+simplifications that never needed close-out tracking (faithful-port notes, test-design notes,
+site-specific decisions like the owner-less file chooser). The marker-count table above reflects
+the original audit inventory; as rows were resolved during the P-batches and WP-1…WP-10, some
+per-site markers were consolidated into summary javadoc blocks (e.g. `ExplorationExtensionF`),
+so a raw `grep` count today is lower than the original 68. The behaviour-level counterpart of
+this ledger is `PARITY-SIGNOFF.md` (closed, incl. the deliberate per-feature deferrals such as
+the SMT select menu, WP-7); the module-level removal plan for the Swing side is
+`SWING-RETIREMENT.md`.
+
 ---
 
 ## `key.ui.fx` — built-in contrib extensions (3)

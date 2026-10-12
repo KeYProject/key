@@ -22,8 +22,8 @@ marked `OPEN (unverified)` rather than assumed fixed.
 | prooftree | 53 | 20 / 8 / **13 MISSING** / 5 KNOWN-DEF | core tree faithful; P3a sweep items, WP-10 click-target + Apply-Strategy, WP-2 heatmap/NodeInfoVisualizer/branch editing | RESOLVED (remaining gaps documented in KNOWN-SIMPLIFIED) |
 | sequent | 45 | 14 / 10 / **15 MISSING** / 4 KNOWN-DEF | term context menu + taclet application + search (MP8); multi-selection highlight + reprint persistence (WP-3) | context menu RESOLVED; user-selection highlight + reprint persistence RESOLVED (WP-3 `key.fx.verify.sequent`); remaining items below |
 | interactive-completion | 25 | 0 / 0 / **20 MISSING** | `WindowUserInterfaceControlF` seam + tacletmatch + join/merge | RESOLVED (was the top P0; evidence uicontrol + tacletmatch 9/9) |
-| goallist-strategy-info | 37 | goal list at parity; strategy preset UI missing; info view re-designed | strategy preset combo / stash UI ported (WP-3: the Swing `StrategySelectionView.createDefaultPanel` [⚙][combo][Apply] row with Defaults + built-ins + user presets, save/stash/rename/delete over `StrategyPresetsSettings`, Apply writes maxSteps + properties like Swing :572-585; `key.fx.verify.goallist` preset round trip PASS) | stats staleness OPEN |
-| source-search-filechooser | 74 | 30 / 5 / **28 MISSING** | search bars + loading-options dialog ported | source-view interaction (symbex highlights, cross-highlight) OPEN |
+| goallist-strategy-info | 37 | goal list at parity; strategy preset UI missing; info view re-designed | strategy preset combo / stash UI ported (WP-3: the Swing `StrategySelectionView.createDefaultPanel` [⚙][combo][Apply] row with Defaults + built-ins + user presets, save/stash/rename/delete over `StrategyPresetsSettings`, Apply writes maxSteps + properties like Swing :572-585; `key.fx.verify.goallist` preset round trip PASS) | stats staleness KNOWN-DEFERRED (deliberate): `InfoViewF` observes `selectedProofChanged` only (`InfoViewF.java:94-99`) — the statistics go stale after interactive rule applications until the next proof change/auto-mode stop (Swing `InfoView.java:83-111` refreshes on node changes too); per-feature deferral, outside the WP-1…WP-10 scope |
+| source-search-filechooser | 74 | 30 / 5 / **28 MISSING** | search bars + loading-options dialog ported | source-view interaction (symbex highlights, cross-highlight) KNOWN-DEFERRED (deliberate, documented at `SourceViewF.java:64-66/:110/:237` — the tab-per-file UI, the proof-node ↔ source-line symbex highlights and the sequent-hover origin cross-highlight stay deferred; per-feature deferral, outside the WP-1…WP-10 scope) |
 | menus-actions | 57 leaves | ~25 MISSING | menu parity 5/5 (File 16 / Proof 24 / Options 12 / View 7 / About 5) plus automation submenu | RESOLVED at surface level; a few behaviours below |
 | settings-config | 117 | 83 / 8 / 11 MISSING / 13 KNOWN-DEF | settings framework + providers + colors mechanics + search; theme persistence (WP-3: `ThemeManager` persists the choice to the user preference node, restore at startup, `key.fx.theme` stays the one-off override; `key.fx.verify.themepersist` save/restore round trip PASS) | color definitions + SMT run UI RESOLVED (P1); theme persistence RESOLVED (WP-3) |
 | unported-dialogs | 18 | 13 MISSING / 2 PARTIAL | proofmgmt, tacletmatch, IssueDialog, notification, Loaded Proofs | RESOLVED where noted below; join/mergerule/lemmatagenerator/etc. track their MP9.x modules |
@@ -60,15 +60,15 @@ P0 bugs from the audit:
 |---|---|
 | Loading options (profile / ignore other Java files) | **RESOLVED** — load-options dialog ported (`key.fx.verify.profileloading` + `profileloadingdialog` PASS) |
 | Select Goal Above / Below + menu set (View 7) | **RESOLVED** (WP-10: Selection Back/Forward verified — `key.fx.verify.selectionhistory` PASS: the View menu's Back/Forward items carry the KeyStrokeManagerF accelerators (Ctrl+Alt+Left/Right), follow the history-driven enablement and firing them moves the mediator selection back/forward over the `SelectionHistoryF` — "PASS (navigation: moved 0->148)"; the View-menu surface itself was already `key.fx.verify.menuparity` View 7 PASS) |
-| Automation submenu + macro invocation | **RESOLVED** (automation submenu MP2, macro menu in term menu); global toolbar dropdown `OPEN` |
+| Automation submenu + macro invocation | **RESOLVED** (automation submenu MP2, macro menu in term menu); global toolbar dropdown KNOWN-DEFERRED (deliberate): with B14 the FX keeps ONE merged extension toolbar and the Swing `DropdownSelectionButton` macro-dropdown has no dedicated slot — macros run from the Automation submenu and the sequent/tree macro menus (B12); a toolbar dropdown control remains a possible small follow-up |
 | Join / merge dialogs | **RESOLVED** for the merge/join flow (`key.fx.verify.joinmerge` PASS on gcd 32/0); `keyext.slicing.fx` SMT routing partial |
 | Strategy preset combo / stash UI | **RESOLVED** (WP-3: the Swing `StrategySelectionView.createDefaultPanel` [⚙][combo][Apply] row ported — Defaults first, then the built-in presets, then the stored user presets with the "✕" delete affordance; save/stash/rename via the gear menu's parameterized core methods over `StrategyPresetsSettings` (Swing :663-750), Apply writes maxSteps + properties into the proof's live settings and gates on `predefChanged` like Swing `applySelectedPreset` :572-585; `key.fx.verify.goallist` asserts the entry list + stash/save/rename/delete round trip + write-through + Apply gating — "PASS - entries=3 stash/save/rename/delete=ok maxSteps=10000->10000") |
-| SMT settings + run UI | **RESOLVED** (P1: settings providers ported in MP4; the run UI — `SolverListenerF` + `ProgressDialogF` progress table + `InformationWindowF` + result application via the SMT rule — ported, `key.fx.verify.smt` PASS: Z3 closes the Agatha goal; the Swing toolbar `DropdownSelectionButton` remains tracked under the toolbar item; WP-7: the per-solver command/parameters/timeout/support panels are ported as `SolverOptionsF` child providers of the SMT settings entry (Swing `SolverOptions` parity, KNOWN-DEFERRED: `updateSMTSelectMenu` refresh + progress mode/global timeout/bounds/store path) and the result application is the undoable `SMTProofApplyUserActionF` with the undoable-apply assert in `key.fx.verify.smt`) |
+| SMT settings + run UI | **RESOLVED** (P1: settings providers ported in MP4; the run UI — `SolverListenerF` + `ProgressDialogF` progress table + `InformationWindowF` + result application via the SMT rule — ported, `key.fx.verify.smt` PASS: Z3 closes the Agatha goal; the Swing toolbar `DropdownSelectionButton` remains tracked under the toolbar item (KNOWN-DEFERRED, see the P1 automation row); WP-7: the per-solver command/parameters/timeout/support panels are ported as `SolverOptionsF` child providers of the SMT settings entry (Swing `SolverOptions` parity, KNOWN-DEFERRED — deliberate per-feature deferral of WP-7, sites `SolverOptionsF.java:35/:130`: `updateSMTSelectMenu` refresh + progress mode/global timeout/bounds/store path, the FX main window has no SMT select-menu counterpart yet) and the result application is the undoable `SMTProofApplyUserActionF` with the undoable-apply assert in `key.fx.verify.smt`) |
 | Exit flow (close-request, `confirmExit`, layout save) | **RESOLVED** (P1: the window close button and the Exit menu item run the Swing `ExitMainAction` flow — `confirmExit` dialog, recent-files save, `System.exit(0)` which runs the docking/colors/keystrokes shutdown hooks; WP-1: the Swing mediator `fireShutDown` is now ported — `KeYMediatorF` GUI-listener registry + the exit flow fires the event, KNOWN-SIMPLIFIED row RESOLVED; `key.fx.verify.loadingexit` PASS: recent-files round trip + profile resolution, then the close-request path terminates with exit code 0 and the docking layout is saved) |
 | Term labels; Pretty Print / Unicode wiring | **RESOLVED** for the wiring (WP-3: the View-menu toggles drive the ViewSettings + NotationInfo statics + the `refreshPrettyViews` re-render, and the initial printer honors the settings like Swing — see the P0 row; visible effect via `key.fx.verify.menuparity` PrettyUnicode PASS). Term labels stay covered mechanically by the `key.fx.verify.lemmaorigin` hook |
 | User-selection highlight + Ctrl+C copy | **RESOLVED** (term-menu copy item in the skeleton); multi-selection highlight + reprint persistence **RESOLVED** (WP-3: sticky Ctrl+click / middle-click toggle in the `userSelectionOverlay` pane with the Swing `PERMANENT_HIGHLIGHT_COLOR` colors (light rgba(110,85,181,0.3), dark rgba(210,185,201,0.78), SequentViewInputListener.java:135-145); the highlight survives plain reprints and settings-change re-renders via `recalculateUserSelectionRange` over `table.pathForPosition`/`rangeForPath` (Swing SequentView.java:585-660, without the Swing +1 offset — the FX position table indexes match the printed text); cleared on node switch (documented deviation — Swing keeps the stored position across node switches but also loses it visually when the view instance swaps); `key.fx.verify.sequent` PASS — reprint=true settings=true toggle=true) |
-| Symbex source line highlights + sequent-hover origin cross-highlight | `OPEN` |
-| KeyStroke default wiring next to the registry | `OPEN (unverified)` |
+| Symbex source line highlights + sequent-hover origin cross-highlight | KNOWN-DEFERRED (deliberate, per-feature deferral documented at the source sites: `SourceViewF.java:64-66` — "the tab-per-file UI … deliberately deferred", `:110` — "deferred: the Swing view updates the symbolic execution highlights here", `:237`; outside the WP-1…WP-10 scope) |
+| KeyStroke default wiring next to the registry | **RESOLVED** (P1: `key.fx.verify.shortcuts` PASS — Swing-parity defaults, no binding collisions, an override round trip and the sequent-view Ctrl+F key path; the defaults table lives inside the FX registry `KeyStrokeManagerF` (`defineDefault`), so "wiring next to the registry" is exactly what the hook asserts) |
 
 ## P2 sign-off
 
@@ -139,6 +139,30 @@ as open.
     (`IssueDialogF`); the `NotificationTask`/action framework remains partial.
 11. Docking: remaining title actions, layout-slot keys F10–F12 (named slots exist).
 12. Upstream (Swing) flags: `LoopApplyHeadCompletion`/`LoopContract*` dead code, seed-clobber.
+
+### Close-out status (WP-11, 2026-10-12)
+
+Of the carried-forward list above, items 1, 2, 6, 7, 8 and 9 are RESOLVED with the evidence
+cited inline (P1…P4 batches and the WP-1…WP-10 merges; per-WP evidence logs under
+`/tmp/opencode/wp*/`). Item 5 is resolved in its main parts: term labels (`key.fx.verify.lemmaorigin`),
+the Load-User-Taclets dialog (P2b `LoadUserTacletsDialogF`), the Prove submenu
+(`buildProveSubmenu`, `MainWindowF.java:482`) and Run All Proofs (`RunAllProofsF`, behind the
+Swing-parity feature flag, `MainWindowF.java:241`) are ported; the remainder of item 5 and the
+other per-feature tails are deliberate KNOWN-DEFERRED deferrals of the FX port, each documented
+at its source site or in the tables above: the sequent drag & drop and inner-node
+highlights/taclet info pane (item 3), the source-view family (item 4,
+`SourceViewF.java:64-66/:110/:237`), Edit Last File, tooltip toggles, the
+EnableWhenProofLoaded analogue and the toolbar buttons beyond the merged bar (item 5), the
+global toolbar macro dropdown (P1 automation row), the info-view node-change statistics
+refresh (`InfoViewF.java:94-99`), the notification `NotificationTask`/action-framework depth
+(item 10) and the docking title-action/layout-slot remainder (item 11, named slots F10–F12
+exist). Item 12 flags upstream Swing defects ("Not our defect" — `key.ui`/`key.core` cleanup,
+unchanged by this migration).
+
+**No row of this sign-off remains OPEN or unmarked.** Every entry ends RESOLVED,
+WONT-REPLICATE (with its reason) or a clearly marked deliberate KNOWN-DEFERRED per-feature
+deferral with its batch/WP reference and source site. The module-removal counterpart of this
+close-out is `SWING-RETIREMENT.md`.
 
 The KNOWN-SIMPLIFIED ledger mirrors the module-level subset of this list with per-site
 file:line markers and statuses (`OPEN` / `FIXED-UPSTREAM` / `WONT-REPLICATE`). This sign-off is
@@ -376,3 +400,32 @@ one a headless self test that drives the REAL wiring end to end instead of a sea
    contract application splits the goal into child nodes). PASS
    (`/tmp/opencode/wp9/dialogs-e2e.log`: "Contract e2e: applied JML operation contract 0 on
    set (nodes 21 -> 25)" + "Dialogs verification: PASS: … contract apply E2E").
+
+# WP-11 close-out (2026-10-12)
+
+The sign-off is closed as part of WP-11 (endgame, `weigl/ocfx-wp11-endgame`):
+
+* **Ledger state.** Every row above ends RESOLVED, WONT-REPLICATE (with reason) or a clearly
+  marked deliberate KNOWN-DEFERRED per-feature deferral with its batch/WP reference and the
+  source site (see the close-out paragraph after the carried-forward list). No OPEN row
+  remains. `KNOWN-SIMPLIFIED.md` carries the module-level marker ledger with the same
+  statuses.
+* **Evidence.** The per-WP evidence logs cited inline (P0…P4 batches under `/tmp/opencode/`,
+  WP-1…WP-10 under `/tmp/opencode/wp*/`, e.g. `/tmp/opencode/wp2/prooftree-agatha3.log`,
+  `/tmp/opencode/wp9/autosave|minimize|sourceconsistency|dialogs-e2e.log`) stay the reference
+  for the individual resolutions. The **full regression sweep over all `key.fx.verify.*`
+  flags is WP-11 deliverable 1 and is run/recorded by the parent session — this document does
+  not restate its results.**
+* **Deliberate per-feature deferrals (final state, tracked here):** SMT select-menu refresh +
+  progress mode/global timeout/bounds/store path (WP-7, `SolverOptionsF.java:35/:130`),
+  source-view symbex/tab-per-file/cross-highlight family (`SourceViewF.java:64-66/:110/:237`),
+  info-view node-change statistics refresh (`InfoViewF.java:94-99`), global toolbar macro
+  dropdown (B14 decision), sequent drag & drop + inner-node highlights/taclet info pane,
+  Edit Last File, tooltip toggles, EnableWhenProofLoaded analogue, toolbar buttons beyond the
+  merged bar, notification `NotificationTask`/action-framework depth, docking title-action and
+  layout-slot remainder. These are documented simplifications of the delivered FX port, not
+  open work of WP-1…WP-10.
+* **Process.** Docs default → FX (root README, settings.gradle, `key.ui.fx/README.md` with the
+  `key.fx.*` whitelist and the headless recipe), the Swing retirement checklist
+  (`SWING-RETIREMENT.md`) and this close-out are WP-11 deliverables 2–4; the plan file's
+  Status header is refreshed by the parent session.
