@@ -190,9 +190,13 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                 }
             }
             case AUTOMODE_TIME -> {
-                try {
-                    proof.addAutoModeTime(Long.parseLong(str));
-                } catch (NumberFormatException ignore) {
+                // the proof may be null when the parser is used to inspect a stored proof
+                // without an interactive proof loaded (see ProofReapplicationView)
+                if (proof != null) {
+                    try {
+                        proof.addAutoModeTime(Long.parseLong(str));
+                    } catch (NumberFormatException ignore) {
+                    }
                 }
             }
             case MERGE_PROCEDURE -> // merge procedure
