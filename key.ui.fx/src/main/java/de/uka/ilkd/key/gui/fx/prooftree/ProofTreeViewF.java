@@ -68,6 +68,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ViewSettings;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
@@ -362,6 +363,51 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
      * {@code TreeSearchFilter.containsMatchCache}); cleared on proof and query changes.
      */
     private final Map<Node, Boolean> containsMatchCache = new HashMap<>();
+
+    /**
+     * The registered proof tree filters (reviewer request: factored out of the tree — the
+     * context-menu toggles are derived from this list, and a new filter is added with one
+     * {@code add(...)} line in {@link #createBuiltinFilters()}). The collapsible search is a
+     * different filter type that stays inside the view (it needs the query state).
+     * <p>
+     * The list is initialized with the built-in filters at field initialization time, because the
+     * {@link #contextMenu} field initializer builds the menu (and its filter toggles) from this
+     * list before the constructor body runs.
+     */
+    private final List<ProofTreeFilterF> filters = createBuiltinFilters();
+
+    /**
+     * The built-in filter registrations — adding a filter means adding a new
+     * {@link ProofTreeFilterF} class and one {@code add(...)} line here.
+     *
+     * @return the list with the built-in filters (Swing ProofTreeViewFilter checkboxes)
+     */
+    private static List<ProofTreeFilterF> createBuiltinFilters() {
+        List<ProofTreeFilterF> list = new ArrayList<>();
+        list.add(new ViewSettingsFilterF("Hide Intermediate Proofsteps",
+            ViewSettings::getHideIntermediateProofsteps,
+            ViewSettings::setHideIntermediateProofsteps, ViewSettingsFilterF.NODE_FILTER_GROUP));
+        list.add(new ViewSettingsFilterF("Hide Non-interactive Proofsteps",
+            ViewSettings::getHideAutomodeProofsteps, ViewSettings::setHideAutomodeProofsteps,
+            ViewSettingsFilterF.NODE_FILTER_GROUP));
+        list.add(new ViewSettingsFilterF("Hide Closed Subtrees",
+            ViewSettings::getHideClosedSubtrees, ViewSettings::setHideClosedSubtrees, null));
+        list.add(new ViewSettingsFilterF("Hide Subtrees Whose Goals are Interactive",
+            ViewSettings::getHideInteractiveGoals, ViewSettings::setHideInteractiveGoals, null));
+        return list;
+    }
+
+    /**
+     * Registers a proof tree filter at runtime (adding a filter = adding a
+     * {@link ProofTreeFilterF} class and one registration line).
+     *
+     * @param filter the filter to register
+     * @return this view (fluent)
+     */
+    public ProofTreeViewF addFilter(ProofTreeFilterF filter) {
+        filters.add(filter);
+        return this;
+    }
 
     /**
      * The context menu shown on right click: the filter toggles (Swing keeps these checkboxes in
@@ -1649,40 +1695,32 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
      * (feature-flagged) and the macro submenu (B12, P3b) are not yet ported.
      */
     private ContextMenu createContextMenu() {
-        CheckMenuItem hideIntermediateItem = new CheckMenuItem("Hide Intermediate Proofsteps");
-        hideIntermediateItem.setSelected(hideIntermediateSteps());
-        CheckMenuItem onlyInteractiveItem = new CheckMenuItem("Hide Non-interactive Proofsteps");
-        onlyInteractiveItem.setSelected(hideAutomodeSteps());
-        // Swing keeps only one node filter active: activating one deactivates the other
-        hideIntermediateItem.setOnAction(e -> {
-            setHideIntermediateSteps(hideIntermediateItem.isSelected());
-            if (hideIntermediateItem.isSelected() && hideAutomodeSteps()) {
-                setHideAutomodeSteps(false);
-                onlyInteractiveItem.setSelected(false);
-            }
-            refresh();
-        });
-        onlyInteractiveItem.setOnAction(e -> {
-            setHideAutomodeSteps(onlyInteractiveItem.isSelected());
-            if (onlyInteractiveItem.isSelected() && hideIntermediateSteps()) {
-                setHideIntermediateSteps(false);
-                hideIntermediateItem.setSelected(false);
-            }
-            refresh();
-        });
-        CheckMenuItem hideClosedItem = new CheckMenuItem("Hide Closed Subtrees");
-        hideClosedItem.setSelected(hideClosedSubtrees());
-        hideClosedItem.setOnAction(e -> {
-            setHideClosedSubtrees(hideClosedItem.isSelected());
-            refresh();
-        });
-        CheckMenuItem hideInteractiveItem =
-            new CheckMenuItem("Hide Subtrees Whose Goals are Interactive");
-        hideInteractiveItem.setSelected(hideInteractiveGoals());
-        hideInteractiveItem.setOnAction(e -> {
-            setHideInteractiveGoals(hideInteractiveItem.isSelected());
-            refresh();
-        });
+        // reviewer request: the filter toggles are built from the registered filters
+        // (addFilter), not hard-coded — the two node filters exclude each other (Swing keeps
+        // only one node filter active)
+        List<CheckMenuItem> filterItems = new ArrayList<>(filters.size());
+        for (ProofTreeFilterF filter : filters) {
+            CheckMenuItem item = new CheckMenuItem(filter.name());
+            item.setSelected(filter.isActive());
+            item.setOnAction(e -> {
+                filter.setActive(item.isSelected());
+                if (item.isSelected()) {
+                    for (int j = 0; j < filters.size(); j++) {
+                        if (filters.get(j) != filter && filter.isExclusiveWith(filters.get(j))
+                                && filters.get(j).isActive()) {
+                            filters.get(j).setActive(false);
+                            filterItems.get(j).setSelected(false);
+                        }
+                    }
+                }
+                refresh();
+            });
+            filterItems.add(item);
+        }
+        CheckMenuItem hideIntermediateItem = filterItems.get(0);
+        CheckMenuItem onlyInteractiveItem = filterItems.get(1);
+        CheckMenuItem hideClosedItem = filterItems.get(2);
+        CheckMenuItem hideInteractiveItem = filterItems.get(3);
         // C20/C21 (P3a): the linearized mode and the OSS expansion toggles (Swing
         // ProofTreeSettingsMenuFactory creates both as checkboxes of the "Settings" gear menu)
         CheckMenuItem linearizeItem = new CheckMenuItem("Linearize Proof Tree");
@@ -1745,10 +1783,9 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             new SeparatorMenuItem(), subtreeStatsItem, openNodeItem);
         menu.setOnShowing(e -> {
             // pick up changes made elsewhere (e.g. by the classic UI sharing the settings)
-            hideIntermediateItem.setSelected(hideIntermediateSteps());
-            onlyInteractiveItem.setSelected(hideAutomodeSteps());
-            hideClosedItem.setSelected(hideClosedSubtrees());
-            hideInteractiveItem.setSelected(hideInteractiveGoals());
+            for (int i = 0; i < filters.size(); i++) {
+                filterItems.get(i).setSelected(filters.get(i).isActive());
+            }
             linearizeItem.setSelected(linearizedMode);
             expandOssItem.setSelected(expandOSSNodes);
             // C23: enablement mirrors the Swing popup — Apply Strategy needs a proof, Prune only
