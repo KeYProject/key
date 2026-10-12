@@ -22,7 +22,9 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Toggle;
@@ -205,6 +207,17 @@ public class StrategySelectionViewF extends ScrollPane {
     private final Spinner<Integer> maxStepsSpinner = new Spinner<>(1, MAX_STEPS_BOUND, 10_000, 100);
 
     /**
+     * The logarithmic max-steps slider, the FX counterpart of the Swing
+     * {@code MaxRuleAppSlider} (reviewer request): position p maps to the value
+     * {@code (p % 9 + 1) * 10^(p / 9)}, i.e. one decade every 9 units, and it is kept in sync
+     * with the {@link #maxStepsSpinner}.
+     */
+    private final Slider maxStepsSlider = new Slider();
+
+    /** One decade per 9 slider units, the Swing {@code MaxRuleAppSlider.MAX_RULE_APPS_LOG10}. */
+    private static final int MAX_RULE_APPS_LOG10 = 6;
+
+    /**
      * Maps a strategy property key to the {@link ToggleGroup} which defines the value, mirroring
      * {@code StrategySelectionComponents.propertyGroups}.
      */
@@ -289,20 +302,44 @@ public class StrategySelectionViewF extends ScrollPane {
         content.getChildren().add(presetRow);
         rebuildPresetCombo(null);
 
-        // "Max. Rule Applications": label + spinner, the MaxRuleAppSlider of the Swing view
+        // "Max. Rule Applications": label + logarithmic slider + spinner, the FX counterpart
+        // of the Swing MaxRuleAppSlider (reviewer request: a slider for selecting the maximum
+        // number of rule applications). The slider position maps to the value like the Swing
+        // original: pos p -> (p % 9 + 1) * 10^(p / 9), tick labels 1, 10, 100, 1k, ..., 1M.
         Label maxStepsLabel = new Label(DEFINITION.getMaxRuleApplicationsLabel());
         maxStepsLabel.getStyleClass().add("strategy-maxsteps-label");
         maxStepsSpinner.getStyleClass().add("strategy-maxsteps-spinner");
         maxStepsSpinner.setEditable(true);
         maxStepsSpinner.valueProperty()
                 .addListener((obs, oldValue, newValue) -> handleMaxStepsChange());
-        HBox maxStepsRow = new HBox(8, maxStepsLabel, maxStepsSpinner);
+        configureMaxStepsSlider();
+        maxStepsSlider.valueProperty().addListener((obs, oldValue, newValue) -> {
+            int pos = (int) Math.round(maxStepsSlider.getValue());
+            int value = (pos % 9 + 1) * (int) Math.pow(10, pos / 9);
+            Integer current = maxStepsSpinner.getValue();
+            if (current == null || current != value) {
+                // writes the settings via the spinner's change listener (Swing
+                // MaxRuleAppSlider change listener -> mediator.setMaxAutomaticSteps)
+                maxStepsSpinner.getValueFactory().setValue(value);
+            }
+        });
+        maxStepsSpinner.valueProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue != null) {
+                maxStepsSlider.setValue(sliderPos(newValue));
+            }
+        });
+        maxStepsSlider.setValue(sliderPos(maxStepsSpinner.getValue()));
+        HBox maxStepsRow = new HBox(8, maxStepsLabel, maxStepsSlider, maxStepsSpinner);
         maxStepsRow.getStyleClass().add("strategy-maxsteps-row");
         maxStepsRow.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(maxStepsSlider, Priority.ALWAYS);
         content.getChildren().add(maxStepsRow);
 
         // Generated strategy property groups ("JavaDL Options")
         if (!DEFINITION.getProperties().isEmpty()) {
+            // reviewer request: visual section separators between the setting groups (like the
+            // section separators of the Swing view)
+            content.getChildren().add(new Separator());
             Label title = new Label(DEFINITION.getPropertiesTitle());
             title.getStyleClass().add("strategy-section-title");
             content.getChildren().add(title);
@@ -312,6 +349,52 @@ public class StrategySelectionViewF extends ScrollPane {
         }
 
         enableAll(false);
+    }
+
+    /**
+     * Configures the logarithmic max-steps slider (the Swing {@code MaxRuleAppSlider} setup:
+     * range {@code [0, 54]}, one decade every 9 units, tick marks and the decade labels 1, 10,
+     * 100, 1k, 10k, 100k, 1M).
+     */
+    private void configureMaxStepsSlider() {
+        maxStepsSlider.getStyleClass().add("strategy-maxsteps-slider");
+        maxStepsSlider.setMin(0);
+        maxStepsSlider.setMax(MAX_RULE_APPS_LOG10 * 9);
+        maxStepsSlider.setMajorTickUnit(9);
+        maxStepsSlider.setMinorTickCount(8);
+        maxStepsSlider.setShowTickMarks(true);
+        maxStepsSlider.setShowTickLabels(true);
+        maxStepsSlider.setSnapToTicks(false);
+        maxStepsSlider.setLabelFormatter(new javafx.util.StringConverter<>() {
+            @Override
+            public String toString(Double pos) {
+                int p = (int) Math.round(pos);
+                int value = (p % 9 + 1) * (int) Math.pow(10, p / 9);
+                return value >= 10000 ? value >= 1000000 ? (value / 1000000) + "M"
+                        : (value / 1000) + "k" : String.valueOf(value);
+            }
+
+            @Override
+            public Double fromString(String string) {
+                return null;
+            }
+        });
+    }
+
+    /**
+     * Maps a max-rule-applications value to the slider position (Swing
+     * {@code MaxRuleAppSlider.setPos}).
+     *
+     * @param maxRuleApps the value, may be {@code null} (then 0)
+     * @return the slider position in {@code [0, 54]}
+     */
+    private static int sliderPos(Integer maxRuleApps) {
+        if (maxRuleApps == null || maxRuleApps <= 0) {
+            return 0;
+        }
+        int major = (int) (Math.log(maxRuleApps) / Math.log(10));
+        int minor = maxRuleApps / (int) Math.pow(10, major) - 1;
+        return Math.max(0, Math.min(MAX_RULE_APPS_LOG10 * 9, major * 9 + minor));
     }
 
     /**
