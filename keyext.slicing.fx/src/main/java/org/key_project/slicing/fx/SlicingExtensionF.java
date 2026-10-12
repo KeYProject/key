@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
+
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
@@ -28,8 +29,8 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.SlicingSettingsProvider;
-import org.key_project.slicing.fx.ui.SlicingLeftPanelF;
 import org.key_project.slicing.fx.ui.PreviewDialogF;
+import org.key_project.slicing.fx.ui.SlicingLeftPanelF;
 import org.key_project.slicing.graph.GraphNode;
 
 import org.jspecify.annotations.NullMarked;

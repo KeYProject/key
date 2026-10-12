@@ -1,5 +1,5 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2,
+ * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.testgen.fx;
@@ -9,7 +9,6 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -38,20 +37,20 @@ import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
+import de.uka.ilkd.key.smt.ModelExtractor;
+import de.uka.ilkd.key.smt.ProblemTypeInformation;
+import de.uka.ilkd.key.smt.SMTObjTranslator;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
+import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.model.Heap;
 import de.uka.ilkd.key.smt.model.Location;
 import de.uka.ilkd.key.smt.model.LocationSet;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
 import de.uka.ilkd.key.smt.model.Sequence;
-import de.uka.ilkd.key.smt.ProblemTypeInformation;
-import de.uka.ilkd.key.smt.ModelExtractor;
-import de.uka.ilkd.key.smt.SMTObjTranslator;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
-import de.uka.ilkd.key.smt.lang.SMTSort;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -171,7 +170,8 @@ public final class TestgenVerifyF {
             // the maximal-unwinds spinner starts at 3 (the concurrent-process spinner at 1);
             // editing it must write into the global settings immediately (the FX change)
             Spinner<?> unwinds = spinners.stream()
-                    .filter(sp -> ((Number) sp.getValue()).intValue() == 3).findFirst().orElse(null);
+                    .filter(sp -> ((Number) sp.getValue()).intValue() == 3).findFirst()
+                    .orElse(null);
             check(unwinds != null, "the maximal-unwinds spinner is present");
             if (unwinds != null) {
                 @SuppressWarnings("unchecked")
@@ -314,8 +314,8 @@ public final class TestgenVerifyF {
 
     /** whether the mediator reports a running auto mode (the buttons are then disabled). */
     private static boolean isAutoMode(KeYMediatorF mediator) {
-        return TestgenReflectionF.autoModePropertyOf(mediator)
-                instanceof javafx.beans.property.ReadOnlyBooleanProperty p && p.get();
+        return TestgenReflectionF.autoModePropertyOf(
+            mediator) instanceof javafx.beans.property.ReadOnlyBooleanProperty p && p.get();
     }
 
     private static TestgenExtensionF findExtension() {

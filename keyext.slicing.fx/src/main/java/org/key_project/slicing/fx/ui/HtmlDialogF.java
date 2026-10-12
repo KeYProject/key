@@ -1,14 +1,14 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2,
+ * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.slicing.fx.ui;
 
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.layout.BorderPane;
-import javafx.geometry.Insets;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Window;

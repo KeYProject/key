@@ -240,7 +240,8 @@ final class TestgenReflectionF {
                     return;
                 }
                 invokeApplyTo(clazz("de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro")
-                        .getConstructor().newInstance(), ui, proof, goals, taskListener);
+                        .getConstructor().newInstance(),
+                    ui, proof, goals, taskListener);
             }
 
             // phase 2: the TestGen macro (TestgenFacade.java:76-78)
@@ -257,7 +258,8 @@ final class TestgenReflectionF {
                 return;
             }
             invokeApplyTo(clazz("de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro")
-                    .getConstructor().newInstance(), ui, proof, goals, taskListener);
+                    .getConstructor().newInstance(),
+                ui, proof, goals, taskListener);
 
             // phase 4: the synchronous Z3 CE launch (TestgenFacade.java:84-86)
             if (stopped(shouldStop)) {
@@ -269,7 +271,7 @@ final class TestgenReflectionF {
                     .getMethod("createSMTProblems", proofClass).invoke(null, proof);
             launcher.getClass().getMethod("launch", Collection.class, Collection.class,
                 clazz("de.uka.ilkd.key.java.Services")).invoke(launcher, List.of(z3), problems,
-                invokeNullary(proof, "getServices"));
+                    invokeNullary(proof, "getServices"));
 
             // finish events (TestgenFacade.java:88-89); the TGPhase.FINISHED goes through the
             // TGReporter and fires sink.finished() via the lifecycle proxy
