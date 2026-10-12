@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.gui.fx.extension.contrib;
 
 import java.util.List;
-import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.Toggle;
 
@@ -76,10 +75,9 @@ final class HeatmapSettingsProviderF extends SettingsPanelF implements SettingsP
 
     HeatmapSettingsProviderF() {
         setHeaderText("Heatmap Options");
-
-        Label intro = new Label(INTRO_LABEL);
-        intro.setWrapText(true);
-        pCenter.add(intro, 0, pCenter.getRowCount(), 3, 1);
+        // reviewer request: the "Heatmaps can be used to highlight ..." description belongs
+        // into the (left aligned) subtitle line of the panel, not into a form row
+        setSubHeaderText(INTRO_LABEL);
 
         // extension: MP9.0 — Swing HeatmapExt.java:160-184: the five mode radios (with the
         // separator groupings) and the max-age spinner; the FX SettingsPanelF renders one
