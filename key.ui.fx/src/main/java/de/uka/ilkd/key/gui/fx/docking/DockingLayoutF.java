@@ -14,6 +14,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SplitPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -85,6 +86,18 @@ public final class DockingLayoutF {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 workspace.saveLayout(store);
+                // reviewer request: the main SplitPane separator positions are persisted to
+                // restore the layout accurately (Swing persisted the CControl splitters)
+                SplitPane mainSplit = window.getMainSplit();
+                if (mainSplit != null) {
+                    double[] positions = mainSplit.getDividerPositions();
+                    if (positions.length >= 2) {
+                        store.saveMainSplitDividers(positions[0], positions[1]);
+                    } else if (positions.length == 1) {
+                        store.saveMainSplitDividers(positions[0],
+                            DockLayoutStore.DEFAULT_EAST_DIVIDER);
+                    }
+                }
                 LOGGER.info("Docking layout saved to {}", store.file());
             } catch (Throwable t) {
                 // the shutdown save must never abort the JVM exit; logback may already be down
