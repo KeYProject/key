@@ -3433,7 +3433,7 @@ public final class MainWindowF {
         pass &= south.getDockingSide() == Side.BOTTOM;
 
         // default expansions: Proof Tree + Goal List share the west split in button order
-        ObservableList<Node> westContent = west.getContentArea().getChildren();
+        ObservableList<Node> westContent = west.getContentArea().hostedItems();
         sb.append(" expanded=").append(westContent.size());
         pass &= westContent.size() == 2 && westContent.get(0) == west.getItems().get(0)
                 && westContent.get(1) == west.getItems().get(1);
@@ -3459,7 +3459,7 @@ public final class MainWindowF {
             DrawerItemF first = west.getItems().get(0);
             west.moveItem(0, 2);
             reorderOk = west.getItems().get(2) == first
-                    && west.getContentArea().getChildren().contains(first);
+                    && west.getContentArea().containsItem(first);
             west.moveItem(2, 0);
             reorderOk &= west.getItems().get(0) == first;
         }
