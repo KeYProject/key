@@ -87,6 +87,13 @@ public final class SlicingVerifyF {
         // the finally block like the other user settings the harness touches
         boolean previousNoPruningClosed = de.uka.ilkd.key.settings.GeneralSettings.noPruningClosed;
         de.uka.ilkd.key.settings.GeneralSettings.noPruningClosed = false;
+        // slicing is single-core only: no dependency tracker is attached while the multi-core
+        // prover is enabled (SlicingExtensionF.createTrackerForProof) — force single-core for
+        // the verify regardless of the persisted setting, restore in the finally block
+        boolean previousParallelProver = de.uka.ilkd.key.settings.ProofIndependentSettings.DEFAULT_INSTANCE
+                .getGeneralSettings().isParallelProverEnabled();
+        de.uka.ilkd.key.settings.ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                .setParallelProverEnabled(false);
         try {
             ok = checkExtensionAndProof(window, proof, report)
                     & checkDotRender(proof, report)
@@ -103,6 +110,8 @@ public final class SlicingVerifyF {
             ok = false;
         } finally {
             de.uka.ilkd.key.settings.GeneralSettings.noPruningClosed = previousNoPruningClosed;
+            de.uka.ilkd.key.settings.ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                    .setParallelProverEnabled(previousParallelProver);
         }
         String verdict = (ok ? "PASS" : "FAIL") + " (" + report + ")";
         LOGGER.info("key.fx.verify.slicing={}", verdict);
