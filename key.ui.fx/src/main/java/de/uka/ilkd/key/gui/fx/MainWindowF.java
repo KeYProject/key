@@ -32,7 +32,9 @@ import java.util.stream.Collectors;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -59,6 +61,7 @@ import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
@@ -479,6 +482,20 @@ public final class MainWindowF {
     private javafx.scene.control.MenuItem pruneMenuItem;
     private javafx.scene.control.Button goalBackToolbarButton;
     private javafx.scene.control.Button pruneToolbarButton;
+
+    /**
+     * Reviewer request (toolbar rewrite): the automation control (Swing
+     * {@code DropdownSelectionButton} with the four {@link #AUTOMATION_MACROS}); the main part
+     * runs the selected macro / stops a running automation, the dropdown selects the macro.
+     */
+    private javafx.scene.control.SplitMenuButton automationToolbarButton;
+
+    /**
+     * Reviewer request (toolbar rewrite): the SMT control (Swing {@code DropdownSelectionButton}
+     * with the usable solver unions); the main part launches the selected union, the dropdown
+     * selects it and makes it the active solver union of the settings.
+     */
+    private javafx.scene.control.SplitMenuButton smtToolbarButton;
 
 
     /**
@@ -5586,22 +5603,106 @@ public final class MainWindowF {
     }
 
     private ToolBar buildProofToolBar() {
-        // reviewer request: toolbar buttons show their text beside the icon (they were
-        // icon-only with a tooltip before)
-        javafx.scene.control.Button startAuto =
-            toolbarButton("Start Auto", "Start Automatic Proof (Ctrl+Space)",
-                IconFactoryF.Key.AUTO_MODE_START, mediator::startAutoMode);
-        startAuto.disableProperty().bind(mediator.autoModeRunningProperty());
-        javafx.scene.control.Button stopAuto =
-            toolbarButton("Stop Auto", "Stop Automatic Proof (Escape)",
-                IconFactoryF.Key.AUTO_MODE_STOP, mediator::stopAutoMode);
-        stopAuto.disableProperty().bind(mediator.autoModeRunningProperty().not());
-        // P3b/B11+B15: the buttons keep the static Swing tooltips (GoalBackAction
+        // reviewer request: the automation + SMT controls are SplitMenuButtons (Swing
+        // DropdownSelectionButton: MainWindow.createAutomationComponent:836-862 and
+        // createSMTComponent:697-779); the automation dropdown lists the shared
+        // {@link #AUTOMATION_MACROS} (the same four macros as the Proof > Automation menu,
+        // Swing MainWindow.createAutomationActions:814-827, same order); selecting a dropdown
+        // item makes it the main-button macro (Swing DropdownSelectionButton with identity
+        // reducer + maxChoiceAmount 1). The main click stops auto mode while it runs,
+        // otherwise runs the selected macro ({@link #runMacro(ProofMacro)}, the Swing
+        // MacroAutomationAction.actionPerformed behavior; ProofControl.runMacro starts its own
+        // MacroThread). Enablement binds to proofLoaded -- deliberately NO auto-mode lock (a
+        // click while running stops it).
+        automationToolbarButton = new SplitMenuButton();
+        automationToolbarButton.getStyleClass().add("key-toolbar-split-button");
+        automationToolbarButton.setText("Automation");
+        automationToolbarButton
+                .setGraphic(IconFactoryF.createIcon(IconFactoryF.Key.AUTO_MODE_START));
+        automationToolbarButton.setTooltip(new Tooltip(
+            "Run the selected automation strategy; click while it runs to stop (the default macro is also bound to Ctrl+Space)"));
+        ObjectProperty<ProofMacro> selectedMacro = new SimpleObjectProperty<>();
+        selectedMacro.set(AUTOMATION_MACROS.get(0));
+        for (ProofMacro macro : AUTOMATION_MACROS) {
+            CheckMenuItem item = new CheckMenuItem(macro.getName());
+            item.setSelected(macro == selectedMacro.get());
+            item.setOnAction(ev -> {
+                selectedMacro.set(macro);
+                for (MenuItem other : automationToolbarButton.getItems()) {
+                    if (other instanceof CheckMenuItem check) {
+                        check.setSelected(other == item);
+                    }
+                }
+            });
+            automationToolbarButton.getItems().add(item);
+        }
+        automationToolbarButton.setOnAction(e -> {
+            if (mediator.isInAutoMode()) {
+                mediator.stopAutoMode();
+            } else {
+                runMacro(selectedMacro.get());
+            }
+        });
+        automationToolbarButton.disableProperty().bind(proofLoaded.not());
+        // while auto mode runs the main part shows the stop action (Swing AutoModeAction swaps
+        // the button icon to the stop glyph while the automation runs)
+        mediator.autoModeRunningProperty().addListener((obs, was, running) -> {
+            if (running) {
+                automationToolbarButton.setText("Stop");
+                automationToolbarButton
+                        .setGraphic(IconFactoryF.createIcon(IconFactoryF.Key.AUTO_MODE_STOP));
+            } else {
+                automationToolbarButton.setText("Automation");
+                automationToolbarButton
+                        .setGraphic(IconFactoryF.createIcon(IconFactoryF.Key.AUTO_MODE_START));
+            }
+        });
+
+        // smt: the dropdown lists the usable solver unions (Swing MainWindow.updateSMTSelectMenu
+        // :1180-1210 creates an SMTInvokeAction per union); selecting an item makes it the
+        // active union (Swing sets ProofIndependentSettings activeSolverUnion in the change
+        // listener) and the main click launches it on all open goals in a background thread
+        // (Swing SMTInvokeAction.actionPerformed:65-84 -> SolverListenerF.launchOnProof). There
+        // is no SMT glyph in IconFactoryF.Key, so the configure icon stands in (Swing shows a
+        // solver image).
+        smtToolbarButton = new SplitMenuButton();
+        smtToolbarButton.getStyleClass().add("key-toolbar-split-button");
+        smtToolbarButton.setText("SMT");
+        smtToolbarButton.setGraphic(IconFactoryF.createIcon(IconFactoryF.Key.CONFIGURE));
+        smtToolbarButton
+                .setTooltip(new Tooltip(
+                    "Run the selected SMT solver union on all open goals (choose solvers under Options | SMT Solvers)"));
+        ObjectProperty<SolverTypeCollection> selectedUnion = new SimpleObjectProperty<>();
+        Collection<SolverTypeCollection> unions =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().getUsableSolverUnions();
+        for (SolverTypeCollection union : unions) {
+            CheckMenuItem item = new CheckMenuItem(union.name());
+            item.setSelected(union == selectedUnion.get());
+            item.setOnAction(ev -> {
+                selectedUnion.set(union);
+                // Swing SMTInvokeAction selection listener: the chosen union becomes the
+                // active solver union of the settings
+                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings()
+                        .setActiveSolverUnion(union);
+                for (MenuItem other : smtToolbarButton.getItems()) {
+                    if (other instanceof CheckMenuItem check) {
+                        check.setSelected(other == item);
+                    }
+                }
+            });
+            smtToolbarButton.getItems().add(item);
+        }
+        smtToolbarButton.setOnAction(e -> launchSmt(selectedUnion.get()));
+        smtToolbarButton.disableProperty().bind(proofLoaded.not());
+
+        // P3b/B11+B15: goal back + prune keep the static Swing tooltips (GoalBackAction
         // SHORT_DESCRIPTION "Undo the last rule application.", PruneProofAction
         // SHORT_DESCRIPTION "Prune the tree below the selected node."; the Swing toolbar
         // actions are created with longName=false, MainWindow.java:696) and their enablement
         // is driven by refreshGoalBackPrune (B15) like the corresponding Proof menu items --
-        // NOT by static bindings.
+        // NOT by static bindings. The Start/Stop Automatic Proof toolbar buttons are replaced
+        // by the automation SplitMenuButton (Swing parity: the proof control toolbar has no
+        // separate start/stop buttons, MainWindow.java:686-706).
         goalBackToolbarButton = toolbarButton("Goal Back", "Undo the last rule application.",
             IconFactoryF.Key.GOAL_BACK, mediator::goalBack);
         pruneToolbarButton =
@@ -5609,22 +5710,24 @@ public final class MainWindowF {
                 IconFactoryF.Key.PRUNE, mediator::pruneProof);
         ToolBar bar = new ToolBar();
         bar.getStyleClass().add("key-proof-tool-bar");
-        bar.getItems().addAll(startAuto, stopAuto, goalBackToolbarButton, pruneToolbarButton);
+        bar.getItems()
+                .addAll(automationToolbarButton, smtToolbarButton, goalBackToolbarButton,
+                    pruneToolbarButton);
         return bar;
     }
 
     /**
      * Launches the selected solver union on all open goals (Swing SMTInvokeAction
-     * .actionPerformed:65-84): warns when no union is selected or no proof is loaded, otherwise
-     * starts the solver run in a background thread ({@link SolverListenerF#launchOnProof}
-     * blocks its thread until every solver finished).
+     * .actionPerformed:65-84): warns when no union is selected or no proof is loaded,
+     * otherwise starts the solver run in a background thread
+     * ({@link SolverListenerF#launchOnProof} blocks its thread until every solver finished).
      *
      * @param union the solver union to run, {@code null} when nothing is selected
      */
     private void launchSmt(SolverTypeCollection union) {
         if (union == null) {
             NotificationManagerF.getInstance()
-                    .notify("No SMT solver union selected — pick one in the dropdown"
+                    .notify("No SMT solver union selected -- pick one in the dropdown"
                         + " (configure solvers under Options | SMT Solvers).", Kind.WARNING);
             return;
         }
