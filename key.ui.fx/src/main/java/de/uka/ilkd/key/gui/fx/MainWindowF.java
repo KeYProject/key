@@ -1193,6 +1193,7 @@ public final class MainWindowF {
                         .notify("Proof caching verification: " + report,
                             report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
                 statusRight.setText(report);
+            }
             // slicing (WP-6): run the proof-slicing self test (key.fx.verify.slicing) after the
             // demo load: auto mode on the demo proof, then the DOT image render (graphviz
             // binary, plus the documented no-graphviz fallback), the HTML statistics dialog with
@@ -1203,6 +1204,19 @@ public final class MainWindowF {
             // the fixed-point/slice loads of the harness itself from re-triggering the hook.
             if (demo && System.getProperty("key.fx.verify.slicing") != null) {
                 runSlicingVerification(env.getLoadedProof());
+            }
+            // testgen (WP-7): run the TestGen extension self test — the extension capability
+            // surface (toolbar + Startup hook + macro accelerator), the options panel round
+            // trips, the two run dialogs' idle modes, the CE model tree of a stub SMT model and
+            // the cooperative stop (no real generation run; the real SMT run is key.fx.verify.smt)
+            if (System.getProperty("key.fx.verify.testgen") != null) {
+                String report =
+                    runTestgenVerification(stage, selectionModel.getSelectedProof(), mediator);
+                LOGGER.info("TestGen verification: {}", report);
+                NotificationManagerF.getInstance()
+                        .notify("TestGen verification: " + report,
+                            report.endsWith("PASS") ? Kind.INFO : Kind.ERROR);
+                statusRight.setText(report);
             }
             // shortcuts (P1): Swing-parity defaults, no collisions, override round trip and the
             // sequent view key path (Ctrl+F shows the search bar)
@@ -1571,6 +1585,21 @@ public final class MainWindowF {
             options != null && options.singleJavaFile(),
             options != null ? options.additionalProfileOptions() : null);
         startProofLoad(file, false, null, options);
+    }
+
+    /**
+     * Loads the given file through the direct loader pipeline WITHOUT registering it in the
+     * recent-files list (Swing parity of the proof-slicing extension's slice load,
+     * SlicingLeftPanel.java:465-470: "we do not use UI.loadProblem here to avoid adding the
+     * slice to the recent files" — the Swing original creates the {@code ProblemLoader} via
+     * {@code mediator.getUI().getProblemLoader} and runs it asynchronously). Used by the slicing
+     * extension to load intermediate and final slices, and exercised by the
+     * {@code key.fx.verify.slicing} hook.
+     *
+     * @param file the proof file to load
+     */
+    public void loadProofFileDirect(Path file) {
+        startProofLoad(file, false);
     }
 
     /**
@@ -2621,7 +2650,6 @@ public final class MainWindowF {
         }
     }
 
-
     /**
      * testgen (WP-7): runs the TestGen extension self test ({@code key.fx.verify.testgen}, run
      * after the demo load like the other proof-dependent verify hooks). The harness lives in the
@@ -2680,6 +2708,13 @@ public final class MainWindowF {
             List<UserActionF> actions = Collections.synchronizedList(new ArrayList<>());
             List<Boolean> autoModeEvents = Collections.synchronizedList(new ArrayList<>());
             mediator.addUserActionListener(actions::add);
+            // the apply+undo round trip needs closed goals to be tracked: core maintains the
+            // closedGoals list only while GeneralSettings.noPruningClosed is false (closeGoal,
+            // Proof.java) — and the undo prunes closed branches only in that mode. Toggled for
+            // the whole verify (like the WP-4/WP-6 harnesses, cf. CachingVerifyF), restored
+            // after the undo assert below.
+            boolean oldNoPruningClosed = GeneralSettings.noPruningClosed;
+            GeneralSettings.noPruningClosed = false;
             Platform.runLater(() -> mediator.autoModeRunningProperty()
                     .addListener((obs, o, v) -> autoModeEvents.add(v)));
             SMTProblem problem = new SMTProblem(goal);
@@ -2721,6 +2756,8 @@ public final class MainWindowF {
                         recorded.undo();
                     } catch (RuntimeException e) {
                         LOGGER.error("SMT verification undo failed", e);
+                    } catch (AssertionError e) {
+                        LOGGER.error("SMT verification undo failed (assertion)", e);
                     } finally {
                         undone.countDown();
                     }
@@ -2736,6 +2773,7 @@ public final class MainWindowF {
                 undoReport = (undoOk ? "PASS" : "FAIL") + " (name=" + name + ", canUndo=" + canUndo
                     + ", freeze=" + freezeSeen + ", undone=" + undoneInTime + ", reopened="
                     + reopened + ")";
+                GeneralSettings.noPruningClosed = oldNoPruningClosed;
             }
             report = (closed ? "PASS" : "FAIL") + " (union=" + union + ", goalClosed=" + closed
                 + ")";
