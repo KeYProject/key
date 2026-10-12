@@ -352,6 +352,10 @@ public final class SettingsManagerF {
             // the placeholder must be in place before buildTree shows the first panel
             panelArea.setContent(panelHolder);
             panelArea.setFitToWidth(true);
+            // reviewer request (Javac Options panel): the panel grows vertically with the
+            // dialog — with fitToHeight the short panels stretch to the full viewport height
+            // and the form of a tall panel scrolls instead of being squeezed/clipped
+            panelArea.setFitToHeight(true);
             panelArea.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
             panelHolder.getStyleClass().add("settings-panel-holder");
             panelHolder.getChildren().add(new Label("empty"));
