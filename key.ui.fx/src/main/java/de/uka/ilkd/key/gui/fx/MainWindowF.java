@@ -59,6 +59,7 @@ import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
@@ -566,11 +567,32 @@ public final class MainWindowF {
         BorderPane root = new BorderPane();
         root.setTop(buildTop());
         // drawer: MP10 — the workspace (the sequent) stays the centre of the main area; the
-        // west/east/south drawers host the panels that previously lived in the docking areas
+        // west/east/south drawers host the panels that previously lived in the docking areas.
+        // Reviewer request: the drawers are resizable — the west drawer and the workspace share
+        // a horizontal SplitPane (divider drag adjusts the drawer width; the east drawer hosts
+        // the Source panel the same way), and the expanded/collapsed state of the drawers
+        // adjusts their dividers (collapsed = only the button bar width).
+        SplitPane mainSplit = new SplitPane();
+        mainSplit.getItems().addAll(westDrawer, workspace.getRoot(), eastDrawer);
+        Platform.runLater(() -> mainSplit.setDividerPositions(0.18, 0.86));
+        // collapsed drawer = button bar only: pull the divider to the bar width; expanding a
+        // panel opens the divider again (0.18 west / 0.86 east of the main area)
+        westDrawer.expandedCountProperty().addListener((obs, was, is) -> Platform.runLater(() -> {
+            double[] positions = mainSplit.getDividerPositions();
+            if (positions.length > 0) {
+                positions[0] = is.intValue() == 0 ? 0.04 : 0.18;
+                mainSplit.setDividerPositions(positions);
+            }
+        }));
+        eastDrawer.expandedCountProperty().addListener((obs, was, is) -> Platform.runLater(() -> {
+            double[] positions = mainSplit.getDividerPositions();
+            if (positions.length > 1) {
+                positions[1] = is.intValue() == 0 ? 0.96 : 0.86;
+                mainSplit.setDividerPositions(positions);
+            }
+        }));
         BorderPane mainArea = new BorderPane();
-        mainArea.setCenter(workspace.getRoot());
-        mainArea.setLeft(westDrawer);
-        mainArea.setRight(eastDrawer);
+        mainArea.setCenter(mainSplit);
         mainArea.setBottom(southDrawer);
         StackPane center = new StackPane(mainArea);
         // inputfreeze (P1): the blocking overlay covers the main area (workspace + drawers) for
