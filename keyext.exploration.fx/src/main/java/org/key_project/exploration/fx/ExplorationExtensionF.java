@@ -372,7 +372,8 @@ public class ExplorationExtensionF implements KeYGuiExtensionF, KeYGuiExtensionF
      * The "Hide justification" toggle, FX port of the Swing {@code
      * ShowInteractiveBranchesAction} (ShowInteractiveBranchesAction.java:21-69).
      * <p>
-     * WP-5: the Swing action routes through {@code ExplorationModeModel.setShowInteractiveBranches},
+     * WP-5: the Swing action routes through
+     * {@code ExplorationModeModel.setShowInteractiveBranches},
      * which calls {@code MainWindow.getProofTreeView().getDelegateModel().setFilter(
      * HIDE_INTERACTIVE_GOALS, …)} (ExplorationModeModel.java:109-114) — the FX counterpart routes
      * through {@link ProofTreeViewF#applyHideInteractiveGoals(boolean)}, which persists the same

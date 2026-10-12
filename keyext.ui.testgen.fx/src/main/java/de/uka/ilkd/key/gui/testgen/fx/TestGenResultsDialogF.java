@@ -10,9 +10,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
-import de.uka.ilkd.key.core.fx.KeYMediatorF;
-import de.uka.ilkd.key.proof.Proof;
-
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.geometry.Insets;
@@ -29,6 +26,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import de.uka.ilkd.key.core.fx.KeYMediatorF;
+import de.uka.ilkd.key.proof.Proof;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;

@@ -1,5 +1,5 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2,
+ * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.slicing.fx;
@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-
 import javafx.application.Platform;
 import javafx.scene.web.WebView;
 
@@ -90,8 +89,9 @@ public final class SlicingVerifyF {
         // slicing is single-core only: no dependency tracker is attached while the multi-core
         // prover is enabled (SlicingExtensionF.createTrackerForProof) — force single-core for
         // the verify regardless of the persisted setting, restore in the finally block
-        boolean previousParallelProver = de.uka.ilkd.key.settings.ProofIndependentSettings.DEFAULT_INSTANCE
-                .getGeneralSettings().isParallelProverEnabled();
+        boolean previousParallelProver =
+            de.uka.ilkd.key.settings.ProofIndependentSettings.DEFAULT_INSTANCE
+                    .getGeneralSettings().isParallelProverEnabled();
         de.uka.ilkd.key.settings.ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
                 .setParallelProverEnabled(false);
         try {
@@ -379,8 +379,10 @@ public final class SlicingVerifyF {
         return holder.get(0);
     }
 
-    /** Runs auto mode on the demo proof through the window's proof control (Swing parity of the
-     * {@code key.fx.demo.autoprove} load-task run). */
+    /**
+     * Runs auto mode on the demo proof through the window's proof control (Swing parity of the
+     * {@code key.fx.demo.autoprove} load-task run).
+     */
     private static final class ProofControlAccess {
         static void runAutoMode(MainWindowF window) {
             window.getUserInterfaceControl().getProofControl()

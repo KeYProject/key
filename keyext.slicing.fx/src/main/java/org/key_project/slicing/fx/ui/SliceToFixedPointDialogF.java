@@ -1,5 +1,5 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2,
+ * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.slicing.fx.ui;
@@ -16,12 +16,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.layout.BorderPane;
-import javafx.geometry.Insets;
 import javafx.scene.web.WebView;
 
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
@@ -148,7 +147,8 @@ public class SliceToFixedPointDialogF extends javafx.stage.Stage
     private Supplier<@Nullable AnalysisResults> wrapAnalysisCallback(
             Supplier<@Nullable AnalysisResults> callback) {
         return () -> {
-            @Nullable AnalysisResults results;
+            @Nullable
+            AnalysisResults results;
             try {
                 results = callback.get();
             } catch (Exception e) {
@@ -240,7 +240,8 @@ public class SliceToFixedPointDialogF extends javafx.stage.Stage
         iterationCount++;
         return new SliceToFixedPointWorkerF(proof, proofToDispose, analyzeCallback, sliceCallback,
             () -> {
-                LOGGER.info("Slice to fixed point: converged after {} iteration(s)", iterationCount);
+                LOGGER.info("Slice to fixed point: converged after {} iteration(s)",
+                    iterationCount);
                 converged = true;
             });
     }

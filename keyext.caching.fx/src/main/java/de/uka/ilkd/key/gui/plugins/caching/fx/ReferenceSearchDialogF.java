@@ -1,5 +1,5 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2,
+ * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.plugins.caching.fx;
@@ -204,7 +204,8 @@ final class ReferenceSearchDialogF {
      */
     boolean incrementProgress() {
         progressValue++;
-        progressBar.setProgress(progressMaximum <= 0 ? 1 : (double) progressValue / progressMaximum);
+        progressBar
+                .setProgress(progressMaximum <= 0 ? 1 : (double) progressValue / progressMaximum);
         if (progressValue == progressMaximum) {
             progressLabel.setText("Finished.");
             return true;

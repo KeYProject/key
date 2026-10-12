@@ -694,7 +694,8 @@ public class CachingExtensionF
                 // stop automode from working on this goal
                 goal.setEnabled(false);
                 goal.node().register(c, ClosedBy.class);
-                c.proof().addProofDisposedListenerFirst(new CopyBeforeDisposeF(mediator, c.proof(), p));
+                c.proof().addProofDisposedListenerFirst(
+                    new CopyBeforeDisposeF(mediator, c.proof(), p));
             }
         }
     }

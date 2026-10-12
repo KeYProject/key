@@ -1,12 +1,10 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2,
+ * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.slicing.fx.ui;
 
-import java.nio.file.Path;
 import java.util.function.Supplier;
-
 import javafx.concurrent.Task;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -78,7 +76,8 @@ final class SliceToFixedPointWorkerF {
             protected Void call() {
                 LOGGER.info("analyzing proof {} (ID: {})", proof.name(),
                     System.identityHashCode(proof));
-                @Nullable AnalysisResults results;
+                @Nullable
+                AnalysisResults results;
                 try {
                     results = analyzeCallback.get();
                 } catch (Exception e) {
