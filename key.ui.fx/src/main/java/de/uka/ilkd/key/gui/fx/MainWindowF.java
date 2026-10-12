@@ -480,6 +480,7 @@ public final class MainWindowF {
     private javafx.scene.control.Button goalBackToolbarButton;
     private javafx.scene.control.Button pruneToolbarButton;
 
+
     /**
      * Last directory of the open/save dialogs (Swing {@code OpenFileAction.lastSelectedPath}).
      */
@@ -5560,22 +5561,24 @@ public final class MainWindowF {
     private ToolBar buildFileToolBar() {
         ToolBar bar = new ToolBar();
         bar.getStyleClass().add("key-file-tool-bar");
+        // reviewer request: the buttons show text beside the icon
         javafx.scene.control.Button openFile =
-            toolbarButton("Browse and load problem or proof files",
+            toolbarButton("Open", "Browse and load problem or proof files",
                 IconFactoryF.Key.OPEN_KEY_FILE, this::openFileChooser);
         openFile.disableProperty().bind(mediator.autoModeRunningProperty());
         javafx.scene.control.Button reload =
-            toolbarButton("Reload last opened file", IconFactoryF.Key.OPEN_MOST_RECENT,
+            toolbarButton("Reload", "Reload last opened file", IconFactoryF.Key.OPEN_MOST_RECENT,
                 this::reloadLastFile);
         reload.disableProperty()
                 .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
         javafx.scene.control.Button saveFile =
-            toolbarButton("Save current proof", IconFactoryF.Key.SAVE_FILE, this::saveProofFile);
+            toolbarButton("Save", "Save current proof", IconFactoryF.Key.SAVE_FILE,
+                this::saveProofFile);
         saveFile.disableProperty()
                 .bind(mediator.autoModeRunningProperty().or(proofLoaded.not()));
         // proofmgmt: Swing file toolbar has the Proof Management button as well
         javafx.scene.control.Button proofManagement =
-            toolbarButton("Proof Management", IconFactoryF.Key.PROOF_MANAGEMENT,
+            toolbarButton("Proof Mgmt", "Proof Management", IconFactoryF.Key.PROOF_MANAGEMENT,
                 this::openProofManagement);
         proofManagement.disableProperty().bind(mediator.autoModeRunningProperty());
         bar.getItems().addAll(openFile, reload, saveFile, proofManagement);
@@ -5583,33 +5586,59 @@ public final class MainWindowF {
     }
 
     private ToolBar buildProofToolBar() {
+        // reviewer request: toolbar buttons show their text beside the icon (they were
+        // icon-only with a tooltip before)
         javafx.scene.control.Button startAuto =
-            toolbarButton("Start Automatic Proof (Ctrl+Space)", IconFactoryF.Key.AUTO_MODE_START,
-                mediator::startAutoMode);
+            toolbarButton("Start Auto", "Start Automatic Proof (Ctrl+Space)",
+                IconFactoryF.Key.AUTO_MODE_START, mediator::startAutoMode);
         startAuto.disableProperty().bind(mediator.autoModeRunningProperty());
         javafx.scene.control.Button stopAuto =
-            toolbarButton("Stop Automatic Proof (Escape)", IconFactoryF.Key.AUTO_MODE_STOP,
-                mediator::stopAutoMode);
+            toolbarButton("Stop Auto", "Stop Automatic Proof (Escape)",
+                IconFactoryF.Key.AUTO_MODE_STOP, mediator::stopAutoMode);
         stopAuto.disableProperty().bind(mediator.autoModeRunningProperty().not());
-        // P3b/B11+B15: the buttons keep the static Swing tooltips (GoalBackAction SHORT_DESCRIPTION
-        // "Undo the last rule application.", PruneProofAction SHORT_DESCRIPTION "Prune the tree
-        // below the selected node."; the Swing toolbar actions are created with longName=false,
-        // MainWindow.java:696) and their enablement is driven by refreshGoalBackPrune (B15) like
-        // the corresponding Proof menu items — NOT by static bindings.
-        goalBackToolbarButton = toolbarButton("Undo the last rule application.",
+        // P3b/B11+B15: the buttons keep the static Swing tooltips (GoalBackAction
+        // SHORT_DESCRIPTION "Undo the last rule application.", PruneProofAction
+        // SHORT_DESCRIPTION "Prune the tree below the selected node."; the Swing toolbar
+        // actions are created with longName=false, MainWindow.java:696) and their enablement
+        // is driven by refreshGoalBackPrune (B15) like the corresponding Proof menu items --
+        // NOT by static bindings.
+        goalBackToolbarButton = toolbarButton("Goal Back", "Undo the last rule application.",
             IconFactoryF.Key.GOAL_BACK, mediator::goalBack);
-        pruneToolbarButton = toolbarButton("Prune the tree below the selected node.",
-            IconFactoryF.Key.PRUNE, mediator::pruneProof);
+        pruneToolbarButton =
+            toolbarButton("Prune Proof", "Prune the tree below the selected node.",
+                IconFactoryF.Key.PRUNE, mediator::pruneProof);
         ToolBar bar = new ToolBar();
         bar.getStyleClass().add("key-proof-tool-bar");
         bar.getItems().addAll(startAuto, stopAuto, goalBackToolbarButton, pruneToolbarButton);
         return bar;
     }
 
-    private javafx.scene.control.Button toolbarButton(String tooltip, IconFactoryF.Key icon,
-            Runnable action) {
+    /**
+     * Launches the selected solver union on all open goals (Swing SMTInvokeAction
+     * .actionPerformed:65-84): warns when no union is selected or no proof is loaded, otherwise
+     * starts the solver run in a background thread ({@link SolverListenerF#launchOnProof}
+     * blocks its thread until every solver finished).
+     *
+     * @param union the solver union to run, {@code null} when nothing is selected
+     */
+    private void launchSmt(SolverTypeCollection union) {
+        if (union == null) {
+            NotificationManagerF.getInstance()
+                    .notify("No SMT solver union selected — pick one in the dropdown"
+                        + " (configure solvers under Options | SMT Solvers).", Kind.WARNING);
+            return;
+        }
+        Proof proof = mediator.getSelectedProof();
+        if (proof == null) {
+            return;
+        }
+        SolverListenerF.launchOnProof(mediator, stage, proof, union);
+    }
+
+    private javafx.scene.control.Button toolbarButton(String text, String tooltip,
+            IconFactoryF.Key icon, Runnable action) {
         javafx.scene.control.Button button =
-            new javafx.scene.control.Button(null, IconFactoryF.createIcon(icon));
+            new javafx.scene.control.Button(text, IconFactoryF.createIcon(icon));
         button.setTooltip(new Tooltip(tooltip));
         button.setOnAction(e -> action.run());
         return button;
