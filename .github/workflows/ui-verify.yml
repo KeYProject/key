@@ -2,8 +2,11 @@ name: UI verify sweep (key.ui.fx)
 
 # Nightly full per-flag regression sweep of the JavaFX UI (WP-11 deliverable): every
 # -Dkey.fx.verify.* hook of key.ui.fx runs headlessly against real example proofs inside an
-# Xvfb display (software rendering, one app at a time; ~4h, hence nightly rather than per-PR).
-# The sweep script is key.ui.fx/ci/verify-sweep.sh; per-flag logs are uploaded as artifacts.
+# Xvfb display (software rendering). The 41 flags are sharded across parallel matrix jobs
+# (~30-45 min per shard instead of ~4h sequential; see key.ui.fx/ci/verify-sweep.sh).
+# Thematic constraints of the sharding: themepersist save+restore share a shard (the restore
+# leg reads the preference persisted by the save leg); the long/special runs (xdotool key
+# dismissal, real-z3 SMT, natural-exit loadingexit) share a shard.
 on:
   schedule:
     - cron: "0 2 * * *" # nightly, 02:00 UTC
@@ -15,7 +18,11 @@ permissions:
 jobs:
   sweep:
     runs-on: ubuntu-latest
-    timeout-minutes: 330
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [ shard1, shard2, shard3, shard4, shard5, shard6, shard7 ]
     steps:
       - uses: actions/checkout@v7
 
@@ -39,14 +46,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends xvfb xdotool graphviz
 
-      - name: Run the UI verify sweep
-        run: bash key.ui.fx/ci/verify-sweep.sh
+      - name: Run the UI verify sweep (${{ matrix.shard }})
+        run: bash key.ui.fx/ci/verify-sweep.sh ${{ matrix.shard }}
 
-      - name: Upload sweep logs
+      - name: Upload sweep logs (${{ matrix.shard }})
         uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: ui-verify-logs
+          name: ui-verify-logs-${{ matrix.shard }}
           path: |
             build/ui-verify/*.log
             build/ui-verify/RESULTS.md
