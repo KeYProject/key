@@ -808,8 +808,8 @@ public final class MainWindowF {
     }
 
     /**
-     * @return the west (left) drawer host of the main window — Proof Tree, Goal List, Loaded
-     *         Proofs, Info, Strategy plus the extension left-panel items (used by the drawer
+     * @return the west (left) drawer host of the main window — Loaded Proofs, Proof Tree, Goal
+     *         List, Info, Strategy plus the extension left-panel items (used by the drawer
      *         layout verification and the extension verification)
      */
     public DrawerF getWestDrawer() {
@@ -3473,11 +3473,12 @@ public final class MainWindowF {
         pass &= east.getDockingSide() == Side.RIGHT && east.isMultiselect();
         pass &= south.getDockingSide() == Side.BOTTOM;
 
-        // default expansions: Proof Tree + Goal List share the west split in button order
+        // default expansions: Proof Tree + Goal List are the expanded items and share the west
+        // split in button order (button order now starts with "Loaded Proofs", reviewer request)
         ObservableList<Node> westContent = west.getContentArea().hostedItems();
         sb.append(" expanded=").append(westContent.size());
-        pass &= westContent.size() == 2 && westContent.get(0) == west.getItems().get(0)
-                && westContent.get(1) == west.getItems().get(1);
+        pass &= westContent.size() == 2 && westContent.get(0) == west.getItems().get(1)
+                && westContent.get(1) == west.getItems().get(2);
 
         // cross-port transfer round trip: Strategy panel west->east, then east->west
         boolean movedEast = false;
@@ -3754,9 +3755,10 @@ public final class MainWindowF {
      */
     private void buildDrawerHosts() {
         westDrawer = new DrawerF(Side.LEFT, true);
+        // reviewer request: "Loaded Proofs" is the first item in the drawer (button order)
+        westDrawer.item("Loaded Proofs", loadedProofs);
         westDrawer.item("Proof Tree", proofTreeView, true);
         westDrawer.item("Goal List", goalListView, true);
-        westDrawer.item("Loaded Proofs", loadedProofs);
         westDrawer.item("Info", infoView);
         westDrawer.item("Strategy", strategyView);
         // extension: MP10 — the extension left-panel tabs become west drawer items (Swing
