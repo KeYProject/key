@@ -23,7 +23,11 @@ include "key.core.testgen"
 
 include "key.core.example"
 
+// The Swing UI (de.uka.ilkd.key.core.Main) is the legacy UI — it keeps shipping until the
+// retirement decision documented in key.ui.fx/SWING-RETIREMENT.md (WP-11).
 include "key.ui"
+// The JavaFX UI (de.uka.ilkd.key.core.fx.MainEx) is the documented default entry point;
+// see key.ui.fx/README.md for run tasks and the key.fx.* property whitelist.
 include "key.ui.fx"
 
 include "keyext.ui.testgen"

@@ -380,9 +380,9 @@ subprojects {
 
 
 tasks.register('start'){
-    description = "Use :key.ui:run instead"
+    description = "Use :key.ui.fx:run (JavaFX UI, default) or :key.ui:run (legacy Swing UI) instead"
     doFirst {
-        println "Use :key.ui:run instead"
+        println "Use :key.ui.fx:run (JavaFX UI, default) or :key.ui:run (legacy Swing UI) instead"
     }
 }
 
