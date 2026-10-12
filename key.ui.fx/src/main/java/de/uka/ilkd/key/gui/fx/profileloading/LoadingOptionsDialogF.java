@@ -177,7 +177,9 @@ public final class LoadingOptionsDialogF extends javafx.stage.Stage {
                 """), 2, 0);
         grid.add(lblProfileInfo, 1, 1, 2, 1);
         GridPane.setHgrow(lblProfileInfo, Priority.ALWAYS);
-        grid.add(lblSingleJava, 0, 2, 2, 1);
+        // reviewer request: the checkbox aligns with the editing components (column 1) instead
+        // of the far-left label column
+        grid.add(lblSingleJava, 1, 2);
         grid.add(optionPanelHost, 1, 3, 2, 1);
 
         updateProfileInfo();
@@ -199,6 +201,8 @@ public final class LoadingOptionsDialogF extends javafx.stage.Stage {
         });
         ButtonBar buttonBar = new ButtonBar();
         buttonBar.getButtons().addAll(cancelButton, loadButton);
+        // reviewer request: the buttons keep a distance to the frame border
+        BorderPane.setMargin(buttonBar, new javafx.geometry.Insets(12));
 
         BorderPane root = new BorderPane(grid, null, null, buttonBar, null);
         Scene scene = new Scene(root, 520, 380);
