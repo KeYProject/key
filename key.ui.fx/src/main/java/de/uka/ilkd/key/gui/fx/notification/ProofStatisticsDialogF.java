@@ -107,7 +107,9 @@ public final class ProofStatisticsDialogF extends javafx.stage.Stage {
 
         ScrollPane scroll = new ScrollPane(statsBox);
         scroll.setFitToWidth(true);
-        scroll.setPrefViewportHeight(Math.min(240, 40 + 22 * statsBox.getChildren().size()));
+        // reviewer request: the statistics grow vertically with the dialog — the scroll pane
+        // takes all remaining height instead of a fixed preferred viewport height
+        VBox.setVgrow(scroll, Priority.ALWAYS);
 
         VBox root = new VBox(12, new Label("Proof " + proof.name()), scroll, buttons);
         root.getStyleClass().add("notification-dialog");
