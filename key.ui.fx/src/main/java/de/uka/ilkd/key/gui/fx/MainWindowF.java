@@ -4161,7 +4161,12 @@ public final class MainWindowF {
             selectionHistory::navigateForward);
         selectionForward.disableProperty().bind(selectionHistory.canGoForwardProperty().not());
 
-        view.getItems().addAll(prettyPrint, unicode, syntaxHighlighting);
+        view.getItems().addAll(
+            // reviewer request: the sequent dockable is closable but could not be restored —
+            // this entry reselects it in the workspace (MP10 keeps only the sequent dockable,
+            // so a single restore entry covers every closable view)
+            menuItem("Show Sequent", () -> workspace.select(dockables.get(ID_SEQUENT))),
+            prettyPrint, unicode, syntaxHighlighting);
         // lemmaorigin: begin — term labels + origin tracking view controls (Swing TermLabelMenu /
         // HidePackagePrefixToggleAction / OriginTermLabelsExt MainMenu items)
         // menu: MP3a — moved to the Swing position right after Syntax Highlighting
