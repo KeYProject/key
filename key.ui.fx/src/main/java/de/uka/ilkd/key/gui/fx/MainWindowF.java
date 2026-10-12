@@ -2609,7 +2609,7 @@ public final class MainWindowF {
     }
 
     /**
-    /**
+     * /**
      * slicing (WP-6): dispatches the proof-slicing self test ({@code key.fx.verify.slicing}) to
      * the {@code SlicingVerifyF} harness of the {@code keyext.slicing.fx} extension module,
      * which is not a compile dependency of key.ui.fx (the dependency direction is reversed) —
@@ -2687,6 +2687,13 @@ public final class MainWindowF {
             List<UserActionF> actions = Collections.synchronizedList(new ArrayList<>());
             List<Boolean> autoModeEvents = Collections.synchronizedList(new ArrayList<>());
             mediator.addUserActionListener(actions::add);
+            // the apply+undo round trip needs closed goals to be tracked: core maintains the
+            // closedGoals list only while GeneralSettings.noPruningClosed is false (closeGoal,
+            // Proof.java) — and the undo prunes closed branches only in that mode. Toggled for
+            // the whole verify (like the WP-4/WP-6 harnesses, cf. CachingVerifyF), restored
+            // after the undo assert below.
+            boolean oldNoPruningClosed = GeneralSettings.noPruningClosed;
+            GeneralSettings.noPruningClosed = false;
             Platform.runLater(() -> mediator.autoModeRunningProperty()
                     .addListener((obs, o, v) -> autoModeEvents.add(v)));
             SMTProblem problem = new SMTProblem(goal);
@@ -2728,6 +2735,8 @@ public final class MainWindowF {
                         recorded.undo();
                     } catch (RuntimeException e) {
                         LOGGER.error("SMT verification undo failed", e);
+                    } catch (AssertionError e) {
+                        LOGGER.error("SMT verification undo failed (assertion)", e);
                     } finally {
                         undone.countDown();
                     }
@@ -2743,6 +2752,7 @@ public final class MainWindowF {
                 undoReport = (undoOk ? "PASS" : "FAIL") + " (name=" + name + ", canUndo=" + canUndo
                     + ", freeze=" + freezeSeen + ", undone=" + undoneInTime + ", reopened="
                     + reopened + ")";
+                GeneralSettings.noPruningClosed = oldNoPruningClosed;
             }
             report = (closed ? "PASS" : "FAIL") + " (union=" + union + ", goalClosed=" + closed
                 + ")";
