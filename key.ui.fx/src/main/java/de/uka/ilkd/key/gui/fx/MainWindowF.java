@@ -448,6 +448,13 @@ public final class MainWindowF {
     private DrawerF southDrawer;
 
     /**
+     * Reviewer request (drawer resizability + divider persistence): the horizontal SplitPane
+     * hosting the west drawer, the workspace and the east drawer. The shutdown layout
+     * persistence ({@link DockingLayoutF}) stores its divider positions in the layout store.
+     */
+    private SplitPane mainSplit;
+
+    /**
      * proofmgmt: the environment of the most recent load; the Proof Management dialog (Swing
      * {@code ProofManagementDialog}, opened from the File menu) operates on its init config and
      * starts proofs via its user interface control.
@@ -573,21 +580,25 @@ public final class MainWindowF {
         // the Source panel the same way), and the expanded/collapsed state of the drawers
         // adjusts their dividers (collapsed = only the button bar width).
         SplitPane mainSplit = new SplitPane();
+        this.mainSplit = mainSplit;
         mainSplit.getItems().addAll(westDrawer, workspace.getRoot(), eastDrawer);
-        Platform.runLater(() -> mainSplit.setDividerPositions(0.18, 0.86));
+        // reviewer request: the separator position is stored and restored accurately — the
+        // factory default is west 0.18 / east 0.86, a previously saved layout wins
+        double[] dividers = layoutStore.loadMainSplitDividers();
+        Platform.runLater(() -> mainSplit.setDividerPositions(dividers[0], dividers[1]));
         // collapsed drawer = button bar only: pull the divider to the bar width; expanding a
-        // panel opens the divider again (0.18 west / 0.86 east of the main area)
+        // panel opens the divider to the last saved (or default) expanded position
         westDrawer.expandedCountProperty().addListener((obs, was, is) -> Platform.runLater(() -> {
             double[] positions = mainSplit.getDividerPositions();
             if (positions.length > 0) {
-                positions[0] = is.intValue() == 0 ? 0.04 : 0.18;
+                positions[0] = is.intValue() == 0 ? 0.04 : dividers[0];
                 mainSplit.setDividerPositions(positions);
             }
         }));
         eastDrawer.expandedCountProperty().addListener((obs, was, is) -> Platform.runLater(() -> {
             double[] positions = mainSplit.getDividerPositions();
             if (positions.length > 1) {
-                positions[1] = is.intValue() == 0 ? 0.96 : 0.86;
+                positions[1] = is.intValue() == 0 ? 0.96 : dividers[1];
                 mainSplit.setDividerPositions(positions);
             }
         }));
@@ -786,6 +797,14 @@ public final class MainWindowF {
      */
     public DockLayoutStore getLayoutStore() {
         return layoutStore;
+    }
+
+    /**
+     * @return the main-area SplitPane (west drawer | workspace | east drawer), whose divider
+     *         positions the {@link DockingLayoutF} shutdown persistence stores
+     */
+    public SplitPane getMainSplit() {
+        return mainSplit;
     }
 
     /**

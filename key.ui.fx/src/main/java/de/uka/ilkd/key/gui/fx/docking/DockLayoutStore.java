@@ -14,14 +14,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Persists the docking layout (which dockables are open in which {@link DockLocation role}) in a
  * plain {@link Properties} file inside the KeY configuration directory.
  * <p>
  * Counter-part of the Docking Frames {@code layout.xml} persistence of the Swing module
  * {@code key.ui}; the file format is deliberately simple and self-contained. The actual
- * sequence of "which dockable belongs to which role" is the persisted content; divider positions
- * and floating windows are not persisted (yet).
+ * sequence of "which dockable belongs to which role" is the persisted content; the divider
+ * positions of the main-area SplitPane are persisted as well (reviewer request: the separator
+ * position is restored accurately), floating windows are not persisted (yet).
  * <p>
  * Beyond the plain (last-state) layout the store keeps <em>named layout slots</em> — the counter
  * part of the Swing {@code DockingLayout} arrangements {@code Default}/{@code Slot 1}/{@code
@@ -31,6 +35,17 @@ import java.util.Properties;
  * {@code dock.slot.<name>.}.
  */
 public final class DockLayoutStore {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DockLayoutStore.class);
+
+    /** The factory default west divider position of the main-area SplitPane. */
+    public static final double DEFAULT_WEST_DIVIDER = 0.18;
+
+    /** The factory default east divider position of the main-area SplitPane. */
+    public static final double DEFAULT_EAST_DIVIDER = 0.86;
+
+    private static final String MAIN_SPLIT_WEST_KEY = "main.split.westDivider";
+    private static final String MAIN_SPLIT_EAST_KEY = "main.split.eastDivider";
 
     /**
      * The name of the properties file inside the config directory.
@@ -134,6 +149,60 @@ public final class DockLayoutStore {
             return Optional.empty();
         }
         return Optional.of(parse(properties, KEY_PREFIX + SLOT_PREFIX + name + "."));
+    }
+
+    /**
+     * Stores the divider positions of the main-area SplitPane (reviewer request: the separator
+     * position is stored to restore the layout accurately — Swing persisted the full
+     * {@code CControl} layout XML including the splitter positions). The keys share the layout
+     * properties file; missing entries fall back to the factory default positions.
+     *
+     * @param west the west divider position (the fraction of the main area left of the west
+     *        divider)
+     * @param east the east divider position (the fraction of the main area left of the east
+     *        divider)
+     * @throws IOException on I/O errors
+     */
+    public void saveMainSplitDividers(double west, double east) throws IOException {
+        Properties properties = readProperties();
+        properties.setProperty(MAIN_SPLIT_WEST_KEY, Double.toString(west));
+        properties.setProperty(MAIN_SPLIT_EAST_KEY, Double.toString(east));
+        writeProperties(properties);
+    }
+
+    /**
+     * Loads the divider positions of the main-area SplitPane, falling back to the factory
+     * defaults (west {@code 0.18}, east {@code 0.86}) when the entries are missing or
+     * malformed.
+     *
+     * @return the west and east divider positions in the range {@code [0, 1]}
+     */
+    public double[] loadMainSplitDividers() {
+        Properties properties = new Properties();
+        try {
+            if (Files.isRegularFile(file)) {
+                try (var in = Files.newInputStream(file)) {
+                    properties.load(in);
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Failed to read the main split divider positions", e);
+            return new double[] { DEFAULT_WEST_DIVIDER, DEFAULT_EAST_DIVIDER };
+        }
+        try {
+            double west = Double.parseDouble(properties.getProperty(MAIN_SPLIT_WEST_KEY,
+                Double.toString(DEFAULT_WEST_DIVIDER)));
+            double east = Double.parseDouble(properties.getProperty(MAIN_SPLIT_EAST_KEY,
+                Double.toString(DEFAULT_EAST_DIVIDER)));
+            west = Math.max(0.0, Math.min(1.0, west));
+            east = Math.max(0.0, Math.min(1.0, east));
+            if (east < west) {
+                return new double[] { DEFAULT_WEST_DIVIDER, DEFAULT_EAST_DIVIDER };
+            }
+            return new double[] { west, east };
+        } catch (NumberFormatException e) {
+            return new double[] { DEFAULT_WEST_DIVIDER, DEFAULT_EAST_DIVIDER };
+        }
     }
 
     private Map<DockLocation, List<String>> parse(Properties properties, String keyPrefix) {
