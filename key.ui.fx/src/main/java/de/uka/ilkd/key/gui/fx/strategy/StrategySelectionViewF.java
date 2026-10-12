@@ -648,7 +648,10 @@ public class StrategySelectionViewF extends ScrollPane {
             renameSelected(input);
         });
         menu.getItems().addAll(saveAs, stash, new SeparatorMenuItem(), rename);
-        menu.show(presetMenuButton, 0, presetMenuButton.getHeight());
+        // reviewer request (bug): the menu opened at screen coordinates (0, buttonHeight) —
+        // i.e. the left top corner of the desktop (PopupWindow.show(Node, x, y) expects SCREEN
+        // coordinates); the side-based show places it below the gear button
+        menu.show(presetMenuButton, javafx.geometry.Side.BOTTOM, 0, 0);
     }
 
     /**
