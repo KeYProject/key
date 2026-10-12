@@ -55,7 +55,9 @@ public final class NotificationManagerF {
         // prevent the stack pane from stretching the box to the full width, which would push
         // the toasts to the left edge
         toastBox.setMaxWidth(420);
-        toastBox.setAlignment(Pos.TOP_RIGHT);
+        // reviewer request: the notifications appear in the right lower corner (they popped up
+        // in the top right corner before)
+        toastBox.setAlignment(Pos.BOTTOM_RIGHT);
     }
 
     /**
@@ -75,9 +77,11 @@ public final class NotificationManagerF {
     public void attach(Pane overlay) {
         if (!overlay.getChildren().contains(toastBox)) {
             overlay.getChildren().add(toastBox);
-            StackPane.setAlignment(toastBox, Pos.TOP_RIGHT);
+            StackPane.setAlignment(toastBox, Pos.BOTTOM_RIGHT);
+            // inset from the right edge and above the status bar (negative Y = up from the
+            // bottom edge)
             toastBox.setTranslateX(-12);
-            toastBox.setTranslateY(40);
+            toastBox.setTranslateY(-40);
         }
     }
 
