@@ -59,10 +59,11 @@ import javafx.scene.layout.Pane;
  * </ul>
  *
  * <p>
- * Documented deviations from the Kotlin original: the content area is a plain {@code VBox} with
- * equal vertical growth (as in the original — not a divider-based SplitPane); the context menu
- * exposes the original's "Floating drawers" and "Multiselect" entry; titles are plain
- * {@link String}s (no {@code ObservableValue} binding).
+ * Documented deviations from the Kotlin original: the content area is a divider-based
+ * {@link javafx.scene.control.SplitPane} (the original uses a plain VBox with equal vertical
+ * growth — the reviewer asked for resizable proportions between multiple expanded items); the
+ * context menu exposes the original's "Floating drawers" and "Multiselect" entry; titles are
+ * plain {@link String}s (no {@code ObservableValue} binding).
  */
 public class DrawerF extends BorderPane {
 
@@ -106,6 +107,14 @@ public class DrawerF extends BorderPane {
     private final DrawerContentAreaF contentArea = new DrawerContentAreaF();
     private final ObservableList<DrawerItemF> items = FXCollections.observableArrayList();
     private final ContextMenu contextMenu = new ContextMenu();
+
+    /**
+     * Reviewer request (drawer resizability): the number of currently expanded items — the
+     * frame host observes it to adjust the frame SplitPane divider when the drawer expands or
+     * collapses its last item.
+     */
+    private final javafx.beans.property.IntegerProperty expandedCount =
+        new javafx.beans.property.SimpleIntegerProperty();
 
     // drag-and-drop visual cue state
     private Node indicatedNode;
@@ -245,35 +254,36 @@ public class DrawerF extends BorderPane {
 
     void updateExpanded(DrawerItemF item) {
         if (item.isExpanded()) {
-            if (!contentArea.getChildren().contains(item)) {
+            if (!contentArea.containsItem(item)) {
                 if (!isMultiselect()) {
-                    for (Node child : contentArea.getChildren().toArray(new Node[0])) {
-                        ((DrawerItemF) child).getButton().setSelected(false);
+                    for (int i = 0; i < contentArea.itemCount(); i++) {
+                        ((DrawerItemF) contentArea.itemAt(i)).getButton().setSelected(false);
                     }
                 }
                 // insert into the content area in the order of the buttons
                 int itemIndex = items.indexOf(item);
                 boolean inserted = false;
-                for (int i = 0; i < contentArea.getChildren().size(); i++) {
-                    DrawerItemF child = (DrawerItemF) contentArea.getChildren().get(i);
+                for (int i = 0; i < contentArea.itemCount(); i++) {
+                    DrawerItemF child = (DrawerItemF) contentArea.itemAt(i);
                     if (items.indexOf(child) > itemIndex) {
-                        contentArea.getChildren().add(i, item);
+                        contentArea.addItem(i, item);
                         inserted = true;
                         break;
                     }
                 }
                 if (!inserted) {
-                    contentArea.getChildren().add(item);
+                    contentArea.addItem(-1, item);
                 }
             }
         } else {
-            contentArea.getChildren().remove(item);
+            contentArea.removeItem(item);
         }
         updateContentArea();
     }
 
     private void updateContentArea() {
-        if (contentArea.getChildren().isEmpty()) {
+        expandedCount.set(contentArea.itemCount());
+        if (contentArea.isEmpty()) {
             setCenter(null);
             getChildren().remove(contentArea);
         } else {
@@ -324,6 +334,9 @@ public class DrawerF extends BorderPane {
     }
 
     private void configureDockingSide() {
+        // reviewer request: the content area is a SplitPane whose orientation follows the
+        // docking side (vertical stack for LEFT/RIGHT drawers, horizontal for TOP/BOTTOM)
+        contentArea.configureFor(getDockingSide());
         switch (getDockingSide()) {
             case LEFT -> {
                 setLeft(buttonArea);
@@ -366,8 +379,8 @@ public class DrawerF extends BorderPane {
     private void enforceMultiSelect() {
         multiselectProperty.addListener((obs, oldValue, newValue) -> {
             if (!newValue) {
-                for (int i = 1; i < contentArea.getChildren().size(); i++) {
-                    ((DrawerItemF) contentArea.getChildren().get(i)).getButton()
+                for (int i = 1; i < contentArea.itemCount(); i++) {
+                    ((DrawerItemF) contentArea.itemAt(i)).getButton()
                             .setSelected(false);
                 }
             }
@@ -388,7 +401,7 @@ public class DrawerF extends BorderPane {
     @Override
     protected void layoutChildren() {
         super.layoutChildren();
-        if (isFloatingDrawers() && !contentArea.getChildren().isEmpty()) {
+        if (isFloatingDrawers() && !contentArea.isEmpty()) {
             Bounds buttonBounds = buttonArea.getLayoutBounds();
             if (getDockingSide() == Side.RIGHT) {
                 contentArea.resizeRelocate(
@@ -561,12 +574,12 @@ public class DrawerF extends BorderPane {
     private void resyncContentOrder() {
         List<DrawerItemF> expanded = new ArrayList<>();
         for (DrawerItemF item : items) {
-            if (item.isExpanded() && contentArea.getChildren().contains(item)) {
+            if (item.isExpanded() && contentArea.containsItem(item)) {
                 expanded.add(item);
             }
         }
-        if (expanded.size() == contentArea.getChildren().size()) {
-            contentArea.getChildren().setAll(expanded);
+        if (expanded.size() == contentArea.itemCount()) {
+            contentArea.resync(expanded);
         }
     }
 
@@ -574,6 +587,11 @@ public class DrawerF extends BorderPane {
 
     public ObjectProperty<Side> dockingSideProperty() {
         return dockingSideProperty;
+    }
+
+    /** @return the number of currently expanded items (0 = only the button bar is shown) */
+    public javafx.beans.property.IntegerProperty expandedCountProperty() {
+        return expandedCount;
     }
 
     public Side getDockingSide() {
@@ -674,8 +692,8 @@ public class DrawerF extends BorderPane {
             d.item("C");
             a.getButton().setSelected(true);
             b.getButton().setSelected(true);
-            checks.add("exclusive=" + (d.getContentArea().getChildren().size() == 1
-                    && d.getContentArea().getChildren().contains(b) ? "PASS" : "FAIL"));
+            checks.add("exclusive=" + (d.getContentArea().hostedItems().size() == 1
+                    && d.getContentArea().containsItem(b) ? "PASS" : "FAIL"));
 
             // side placement and bar orientation
             d.setDockingSide(Side.RIGHT);
@@ -692,9 +710,9 @@ public class DrawerF extends BorderPane {
             m.item("B", new Label("b-content"));
             DrawerItemF mB = m.item("C", new Label("c-content"));
             mB.getButton().setSelected(true);
-            checks.add("multiOrder=" + (m.getContentArea().getChildren().size() == 2
-                    && m.getContentArea().getChildren().get(0) == m.getItems().get(0)
-                    && m.getContentArea().getChildren().get(1) == mB ? "PASS" : "FAIL"));
+            checks.add("multiOrder=" + (m.getContentArea().hostedItems().size() == 2
+                    && m.getContentArea().itemAt(0) == m.getItems().get(0)
+                    && m.getContentArea().itemAt(1) == mB ? "PASS" : "FAIL"));
             checks.add("multiHeader=" + (mB.getHeader() != null ? "PASS" : "FAIL"));
 
             // reorder: move item 1 (B) to the bar front; bar and content follow the new order
@@ -705,21 +723,21 @@ public class DrawerF extends BorderPane {
             checks.add("reorder=" + (m.getItems().get(0).getButton().getText().equals("B")
                     && bar0.getChildren().get(0) == m.getItems().get(0).getButton()
                     && bar2.getChildren().get(0) == mB.getButton()
-                    && m.getContentArea().getChildren().get(0) == m.getItems().get(1)
-                    && m.getContentArea().getChildren().get(1) == m.getItems().get(2)
+                    && m.getContentArea().itemAt(0) == m.getItems().get(1)
+                    && m.getContentArea().itemAt(1) == m.getItems().get(2)
                             ? "PASS"
                             : "FAIL"));
 
             // switching multiselect off collapses all but the first expanded item
             m.setMultiselect(false);
-            checks.add("collapse=" + (m.getContentArea().getChildren().size() == 1 ? "PASS"
+            checks.add("collapse=" + (m.getContentArea().itemCount() == 1 ? "PASS"
                     : "FAIL"));
 
             // transfer to a different drawer (different port)
             DrawerF t = new DrawerF(Side.RIGHT, true);
             m.transferItem(m.getItems().get(1), t);
             checks.add("transfer=" + (m.getItems().size() == 2 && t.getItems().size() == 1
-                    && t.getContentArea().getChildren().contains(t.getItems().get(0))
+                    && t.getContentArea().containsItem(t.getItems().get(0))
                     && t.getItems().get(0).isExpanded() ? "PASS" : "FAIL"));
         } catch (RuntimeException ex) {
             checks.add("EXCEPTION=" + ex);
