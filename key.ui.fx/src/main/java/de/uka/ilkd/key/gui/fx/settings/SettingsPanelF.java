@@ -74,6 +74,8 @@ public abstract class SettingsPanelF extends BorderPane {
     protected SettingsPanelF() {
         lblHead.getStyleClass().add("settings-panel-title");
         lblSubhead.getStyleClass().add("settings-panel-subtitle");
+        // the subtitle carries the panel description (e.g. the heatmap intro), so it wraps
+        lblSubhead.setWrapText(true);
 
         VBox header = new VBox(2, lblHead, lblSubhead, new Separator());
         header.getStyleClass().add("settings-panel-header");
