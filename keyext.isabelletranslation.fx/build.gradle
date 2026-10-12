@@ -25,3 +25,16 @@ dependencies {
     // provider therefore needs key.core on its own compile classpath. (Scaffold adjustment.)
     implementation project(":key.core")
 }
+// reviewer request: the verify harness (org.key_project.isabelletranslation.fx.IsabelleVerifyF) lives in the test source set (test code must
+// not ship in the main sources) and is published for the key.ui.fx run task via the
+// "testArtifacts" configuration (MainWindowF invokes it reflectively on the run classpath).
+configurations {
+    testArtifacts
+}
+tasks.register('testJar', Jar) {
+    archiveClassifier = 'test'
+    from sourceSets.test.output
+}
+artifacts {
+    testArtifacts testJar
+}

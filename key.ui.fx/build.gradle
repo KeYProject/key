@@ -56,10 +56,28 @@ dependencies {
     runtimeOnly project(":keyext.slicing.fx")
     runtimeOnly project(":keyext.ui.testgen.fx")
     runtimeOnly project(":keyext.proofmanagement.fx")
+
+    // reviewer request: the verify harnesses (CachingVerifyF, IsabelleVerifyF, SlicingVerifyF,
+    // TestgenVerifyF) live in the test source sets of their modules (test code must not ship in
+    // the main sources); MainWindowF invokes them reflectively, so their test outputs must be on
+    // the run classpath (published via each module's "testArtifacts" configuration).
+    runtimeOnly project(path: ":keyext.caching.fx", configuration: "testArtifacts")
+    runtimeOnly project(path: ":keyext.isabelletranslation.fx", configuration: "testArtifacts")
+    runtimeOnly project(path: ":keyext.slicing.fx", configuration: "testArtifacts")
+    runtimeOnly project(path: ":keyext.ui.testgen.fx", configuration: "testArtifacts")
 }
 
 application {
     mainClass.set("de.uka.ilkd.key.core.fx.MainEx")
+}
+
+// reviewer request: the verify harnesses (ProofTreeVerifyF, DialogsVerifyF, JoinMergeVerifyF,
+// TacletMatchVerifyF) live in this module's test source set (test code must not ship in the main
+// sources) and are invoked reflectively from MainWindowF -- the run task therefore carries the
+// compiled test classes on the runtime classpath (they are inert without the key.fx.verify.*
+// system properties).
+run {
+    classpath += sourceSets.test.output
 }
 
 run {

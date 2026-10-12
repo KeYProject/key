@@ -38,3 +38,16 @@ dependencies {
     // wiring the key.ui.fx scaffold documents). No Swing type is used in this module's code.
     implementation project(":key.ui")
 }
+// reviewer request: the verify harness (org.key_project.slicing.fx.SlicingVerifyF) lives in the test source set (test code must
+// not ship in the main sources) and is published for the key.ui.fx run task via the
+// "testArtifacts" configuration (MainWindowF invokes it reflectively on the run classpath).
+configurations {
+    testArtifacts
+}
+tasks.register('testJar', Jar) {
+    archiveClassifier = 'test'
+    from sourceSets.test.output
+}
+artifacts {
+    testArtifacts testJar
+}
