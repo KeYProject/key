@@ -91,11 +91,12 @@ public final class DockingLayoutF {
                 SplitPane mainSplit = window.getMainSplit();
                 if (mainSplit != null) {
                     double[] positions = mainSplit.getDividerPositions();
+                    // reviewer request: a drawer without an expanded component is removed from
+                    // the split (its divider vanishes), so the position count drops below two;
+                    // a lone remaining divider cannot be attributed to west or east — keep the
+                    // previously stored pair in that case
                     if (positions.length >= 2) {
                         store.saveMainSplitDividers(positions[0], positions[1]);
-                    } else if (positions.length == 1) {
-                        store.saveMainSplitDividers(positions[0],
-                            DockLayoutStore.DEFAULT_EAST_DIVIDER);
                     }
                 }
                 LOGGER.info("Docking layout saved to {}", store.file());
