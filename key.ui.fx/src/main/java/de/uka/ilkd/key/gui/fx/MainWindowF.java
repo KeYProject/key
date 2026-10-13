@@ -3774,7 +3774,18 @@ public final class MainWindowF {
         // registrations are gone, so DockLayoutStore was bumped to version 2: older persisted
         // layouts referencing the removed dockables are discarded (they were the pre-MP10
         // arrangement) and the workspace falls back to the factory default — the sequent only.
-        dockables.put(ID_SEQUENT, new SimpleDockable(ID_SEQUENT, "Sequent", sequentView));
+        dockables.put(ID_SEQUENT, sequentDockable(ID_SEQUENT, "Sequent", sequentView));
+    }
+
+    /**
+     * Creates a dockable that cannot be closed by the user (reviewer request: the sequent is the
+     * main view — it has no close button in the tab header; the View menu's "Show Sequent" entry
+     * still brings it to front when it is merely not visible).
+     */
+    private SimpleDockable sequentDockable(String id, String title, javafx.scene.Node content) {
+        SimpleDockable dockable = new SimpleDockable(id, title, content);
+        dockable.setClosable(false);
+        return dockable;
     }
 
     /**
