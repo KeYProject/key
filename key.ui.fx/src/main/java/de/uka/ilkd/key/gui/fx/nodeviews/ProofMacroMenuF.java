@@ -122,6 +122,10 @@ public final class ProofMacroMenuF {
         Label label = new Label(macro.getName());
         Tooltip.install(label, new Tooltip(macro.getDescription()));
         CustomMenuItem item = new CustomMenuItem(label);
+        // reviewer request: the popup must close when a macro is picked — CustomMenuItem defaults
+        // to hideOnClick=false, which leaves the (blocking-looking) popup open after the click;
+        // Swing closes the popup on every item activation (JMenuItem behavior)
+        item.setHideOnClick(true);
         item.setOnAction(e -> proofControl.runMacro(node, macro, pio));
         // shortcuts (P1): macro accelerators on the menu items for global applications (Swing
         // ProofMacroMenu.createMenuItem, ProofMacroMenu.java:146-148: "currently only for global
