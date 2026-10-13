@@ -134,10 +134,12 @@ public final class TestgenVerifyF {
             check(toolbar.size() == 2, "the toolbar carries the two action buttons");
             Button generateButton = (Button) toolbar.get(0);
             Button counterExampleButton = (Button) toolbar.get(1);
-            check("Generate Testcases...".equals(generateButton.getText()),
-                "generate button carries the Swing TestGenerationAction name");
-            check("Search for Counterexample".equals(counterExampleButton.getText()),
-                "counterexample button carries the Swing CounterExampleAction name");
+            check("Generate Testcases...".equals(generateButton.getAccessibleText()),
+                "generate button carries the Swing TestGenerationAction name (icon-only button, "
+                    + "reviewer request: the accessible name replaces the visible text)");
+            check("Search for Counterexample".equals(counterExampleButton.getAccessibleText()),
+                "counterexample button carries the Swing CounterExampleAction name (icon-only "
+                    + "button, reviewer request: the accessible name replaces the visible text)");
             check(!TestgenReflectionF.z3CeInstalled() || isAutoMode(mediator)
                     || !generateButton.isDisabled(),
                 "generate button enabled for the loaded proof when z3 is installed "
