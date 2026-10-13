@@ -632,6 +632,18 @@ public final class MainWindowF {
         NotificationManagerF.getInstance().attach(center);
         root.setCenter(center);
         root.setBottom(buildStatusBar());
+        // reviewer report ("mouse clicks on the toolbar are ignored, keyboard activation works"):
+        // the top area grows after the root's first layout pass (the icon fonts and theme styles
+        // settle late and raise the toolbar row's preferred height) while the BorderPane keeps
+        // the center pane at the stale top height; the transparent center pane then covers the
+        // toolbar row — the buttons stay visible but every mouse press picks the center pane
+        // instead of the buttons (key events are unaffected). Forward late size changes of the
+        // top/bottom areas to the root's layout so the regions re-stack.
+        root.getTop().layoutBoundsProperty().addListener((obs, was, is) -> root.requestLayout());
+        root.getBottom().layoutBoundsProperty().addListener((obs, was, is) -> root.requestLayout());
+        // if the growth already happened within the first layout pass, no later height change is
+        // observable — re-stack once after the first pulses as well
+        Platform.runLater(root::requestLayout);
 
         Scene scene = new Scene(root, 1100, 800);
         ThemeManager.getInstance().manage(scene);
