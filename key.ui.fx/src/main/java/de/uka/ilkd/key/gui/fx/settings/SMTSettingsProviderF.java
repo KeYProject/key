@@ -12,6 +12,7 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 
 import de.uka.ilkd.key.gui.fx.MainWindowF;
+import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
@@ -100,12 +101,37 @@ public class SMTSettingsProviderF extends SettingsPanelF implements SettingsProv
         children = new ArrayList<>();
         ProofIndependentSMTSettings smtSettings =
             ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings();
-        for (SolverType type : SolverTypes.getSolverTypes()) {
+        // reviewer request: the SMT translation option panels are ported as tree children like
+        // the Swing provider adds them before the per-solver panels (SMTSettingsProvider.java
+        // :140-144); with the feature flag off, the options of the experimental solvers are
+        // hidden as well (SMTSettingsProvider.java:145-147)
+        children.add(new TacletTranslationOptionsF());
+        children.add(new NewTranslationOptionsF());
+        java.util.List<SolverType> solverTypes =
+            new ArrayList<>(SolverTypes.getSolverTypes());
+        if (FeatureSettings.isFeatureActivated(FEATURE_SMT_TRANSLATION_OPTIONS)) {
+            children.add(new TranslationOptionsF());
+        } else {
+            solverTypes.removeAll(SolverTypes.getExperimentalSolvers());
+        }
+        for (SolverType type : solverTypes) {
             if (smtSettings.containsSolver(type)) {
                 children.add(new SolverOptionsF(type));
             }
         }
     }
+
+    /**
+     * The feature flag that unhides the old-translation options panel (Swing
+     * {@code SMTSettingsProvider.FEATURE_SMT_TRANSLATION_OPTIONS}, SMTSettingsProvider.java
+     * :105-106); the feature is registered here unless a Swing port already enrolled it (the
+     * {@link FeatureSettings.Feature} record constructor adds every created feature to the
+     * registry).
+     */
+    private static final FeatureSettings.Feature FEATURE_SMT_TRANSLATION_OPTIONS =
+        FeatureSettings.Feature.FEATURES.stream()
+                .filter(f -> "SMT_TRANS_OPTIONS".equals(f.id())).findFirst()
+                .orElseGet(() -> FeatureSettings.createFeature("SMT_TRANS_OPTIONS"));
 
     /**
      * One {@link SolverOptionsF} child panel per solver type that the settings know

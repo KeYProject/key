@@ -36,6 +36,10 @@ import de.uka.ilkd.key.gui.fx.plugins.javac.JavacSettingsProviderF;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ChoiceSettings;
+import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
+import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.slf4j.Logger;
@@ -111,6 +115,11 @@ public final class SettingsManagerF {
             INSTANCE.add(SMT_SETTINGS);
             INSTANCE.add(TACLET_OPTIONS_SETTINGS);
             INSTANCE.add(JAVAC_SETTINGS);
+            // reviewer request: the missing Swing providers are ported — the feature flags and
+            // the single/multi-core prover choice (Swing SettingsManager.java:65-66 registers
+            // FEATURE_SETTINGS_PANEL and PARALLEL_PROVER_SETTINGS after the taclet options)
+            INSTANCE.add(new FeatureSettingsProviderF());
+            INSTANCE.add(new ParallelProverSettingsProviderF());
         }
         return INSTANCE;
     }
@@ -137,6 +146,47 @@ public final class SettingsManagerF {
             return settings;
         }
         return ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+    }
+
+    /**
+     * The proof-dependent SMT settings of the given window: the settings of the selected proof
+     * if one is loaded, otherwise the global default settings (Swing
+     * {@code SettingsManager.getSmtPdSettings}, SettingsManager.java:71-79). The taclet
+     * translation options edit a copy of them.
+     *
+     * @param window the main window
+     * @return the proof-dependent SMT settings
+     */
+    public static ProofDependentSMTSettings getSmtPdSettings(MainWindowF window) {
+        Proof proof = window.getMediator().getSelectedProof();
+        if (proof == null) {
+            return ProofSettings.DEFAULT_SETTINGS.getSMTSettings();
+        }
+        return proof.getSettings().getSMTSettings();
+    }
+
+    /**
+     * The settings of the new SMT translation of the given window: the selected proof's
+     * settings if a proof is loaded, otherwise the global defaults (Swing
+     * {@code SettingsManager.getNewSmtSettings}, SettingsManager.java:81-89).
+     *
+     * @param window the main window
+     * @return the new SMT translation settings
+     */
+    public static NewSMTTranslationSettings getNewSmtSettings(MainWindowF window) {
+        Proof proof = window.getMediator().getSelectedProof();
+        if (proof == null) {
+            return ProofSettings.DEFAULT_SETTINGS.getNewSMTSettings();
+        }
+        return proof.getSettings().getNewSMTSettings();
+    }
+
+    /**
+     * @return the proof-independent SMT settings (Swing
+     *         {@code SettingsManager.getSmtPiSettings}, SettingsManager.java:91-93)
+     */
+    public static ProofIndependentSMTSettings getSmtPiSettings() {
+        return ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings();
     }
 
     /**
