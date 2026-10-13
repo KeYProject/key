@@ -12,8 +12,8 @@ import javafx.stage.Window;
 import de.uka.ilkd.key.control.InstantiationFileHandler;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
-import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
-import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
+import de.uka.ilkd.key.gui.fx.IssueDialogF;
+import de.uka.ilkd.key.gui.fx.MainWindowF;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -113,14 +113,33 @@ public abstract class ApplyTacletDialogF extends Stage {
     }
 
     /**
-     * reports a failed application attempt (Swing {@code IssueDialog.showExceptionDialog}): the
-     * exception is logged and surfaced as an error toast; the classic dialog additionally focuses
-     * the offending input (see {@code TacletMatchCompletionDialogF}).
+     * reports a failed application attempt (Swing {@code IssueDialog.showExceptionDialog}):
+     * the exception is logged, the message (e.g. the multi-line "Missing Sort … the sort can be
+     * given manually using an expression like "id:sort"" hint) is presented in the dialog's
+     * status line with its warning glyph + full-text tooltip, and a modal issue dialog shows the
+     * details (Swing {@code TacletMatchDialog.ButtonListener}, TacletMatchDialog.java:367-372).
+     * The classic dialog additionally focuses the offending input (see {@code
+     * TacletMatchCompletionDialogF}).
      */
     protected void onApplyException(Exception exc) {
         LOGGER.error("Taclet application failed", exc);
-        NotificationManagerF.getInstance()
-                .notify("Taclet application failed: " + exc.getMessage(), Kind.ERROR);
+        setStatus(exc.getMessage() != null ? exc.getMessage() : exc.toString());
+        IssueDialogF.showExceptionDialog(issueDialogOwner(), exc);
+    }
+
+    /**
+     * the owner window of the issue dialog: the instantiation dialog's owner if it has one,
+     * otherwise the main window's stage (Swing passes the dialog itself).
+     */
+    private Window issueDialogOwner() {
+        Window owner = getOwner();
+        if (owner == null) {
+            MainWindowF main = MainWindowF.getInstance();
+            if (main != null) {
+                owner = main.getStage();
+            }
+        }
+        return owner;
     }
 
     /** Swing {@code closeDialog()}: frees the mediator and disposes the dialog. */
