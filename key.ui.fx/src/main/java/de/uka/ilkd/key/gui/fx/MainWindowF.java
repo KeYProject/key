@@ -3522,15 +3522,25 @@ public final class MainWindowF {
         sb.append(" transferRoundTrip=").append(movedEast && movedBack ? "PASS" : "FAIL");
         pass &= movedEast && movedBack;
 
-        // button reorder: move the first west button behind the third; bar + split follow
+        // button reorder: move the first expanded west item behind the next one; bar + split
+        // follow. The content area hosts only expanded items, so the assertion uses an expanded
+        // item ("Loaded Proofs" leads the bar collapsed by default, item 0 would have no content
+        // area entry)
         boolean reorderOk = false;
-        if (west.getItems().size() > 2) {
-            DrawerItemF first = west.getItems().get(0);
-            west.moveItem(0, 2);
-            reorderOk = west.getItems().get(2) == first
+        int from = -1;
+        for (int i = 0; i < west.getItems().size(); i++) {
+            if (west.getItems().get(i).isExpanded()) {
+                from = i;
+                break;
+            }
+        }
+        if (from >= 0 && west.getItems().size() > from + 1) {
+            DrawerItemF first = west.getItems().get(from);
+            west.moveItem(from, from + 1);
+            reorderOk = west.getItems().get(from + 1) == first
                     && west.getContentArea().containsItem(first);
-            west.moveItem(2, 0);
-            reorderOk &= west.getItems().get(0) == first;
+            west.moveItem(from + 1, from);
+            reorderOk &= west.getItems().get(from) == first;
         }
         sb.append(" reorder=").append(reorderOk ? "PASS" : "FAIL");
         pass &= reorderOk;
