@@ -19,6 +19,7 @@ import de.uka.ilkd.key.gui.fx.settings.SettingsProviderF;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -188,6 +189,21 @@ public interface KeYGuiExtensionF {
          * @return non-null, emptiable list of menu items
          */
         default List<MenuItem> getProofTreeContextItems(KeYMediatorF mediator, Node node) {
+            return List.of();
+        }
+
+        /**
+         * The menu items contributed to the context menu of a proof in the Loaded Proofs view
+         * (Swing {@code KeYGuiExtensionFacade.createContextMenu} with
+         * {@code ContextMenuKind.PROOF_LIST}, invoked by {@code TaskTree.checkPopup},
+         * TaskTree.java:306-307; the built-in items come from the extensions alone). The empty
+         * list is the default — currently only the soundiness extension serves this slot.
+         *
+         * @param mediator the mediator of the window
+         * @param proof the right-clicked proof
+         * @return non-null, emptiable list of menu items
+         */
+        default List<MenuItem> getProofListContextItems(KeYMediatorF mediator, Proof proof) {
             return List.of();
         }
     }

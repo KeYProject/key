@@ -5,19 +5,25 @@
 package de.uka.ilkd.key.gui.fx.tasktree;
 
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import javafx.collections.ListChangeListener;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.BorderPane;
 
+import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.core.fx.KeYSelectionEvent;
 import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
+import de.uka.ilkd.key.gui.fx.MainWindowF;
+import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
 import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.proofmanagement.ProofManagementDialogF.StatusKind;
 import de.uka.ilkd.key.gui.fx.proofmanagement.ProofManagerF;
@@ -118,6 +124,39 @@ public class TaskTreeF extends BorderPane {
                 proofManager.setActive(proof);
             }
         });
+        // extension: MP9.0 — the proof-list context menu (Swing TaskTree.checkPopup,
+        // TaskTree.java:290-314): a right-click on a proof row first selects it (Swing sets the
+        // selection path, so the menu actions see the clicked proof as the selected one) and
+        // then shows the extension-contributed menu items; a click on an environment group or
+        // empty space shows nothing (Swing checks selPath for a BasicTask), and the menu is
+        // dropped when no extension contributes an item.
+        tree.setOnContextMenuRequested(e -> {
+            TreeItem<Object> clicked = clickedRow(e);
+            if (clicked == null || !(clicked.getValue() instanceof Proof proof)) {
+                return;
+            }
+            if (!tree.getSelectionModel().getSelectedItems().contains(clicked)) {
+                updatingSelection = true;
+                try {
+                    tree.getSelectionModel().select(clicked);
+                } finally {
+                    updatingSelection = false;
+                }
+            }
+            KeYMediatorF mediator = null;
+            MainWindowF window = MainWindowF.getInstance();
+            if (window != null) {
+                mediator = window.getMediator();
+            }
+            List<MenuItem> items = KeYGuiExtensionFacadeF.getProofListContextItems(mediator,
+                proof);
+            if (items.isEmpty()) {
+                return;
+            }
+            ContextMenu menu = new ContextMenu(items.toArray(MenuItem[]::new));
+            menu.show(tree, e.getScreenX(), e.getScreenY());
+            e.consume();
+        });
         Label placeholder = new Label("No proofs loaded.");
         placeholder.getStyleClass().add("loaded-proofs-empty");
         setCenter(tree);
@@ -135,6 +174,27 @@ public class TaskTreeF extends BorderPane {
                 }
             }
         });
+    }
+
+    /**
+     * Resolves the tree row a context-request event targeted: the cell under the mouse (the
+     * event target is often a child of the cell, so the parent chain is walked up), or null when
+     * the click did not land on a rendered row.
+     *
+     * @param e the context-request event
+     * @return the tree item of the clicked row, or null
+     */
+    private TreeItem<Object> clickedRow(javafx.scene.input.ContextMenuEvent e) {
+        if (!(e.getTarget() instanceof javafx.scene.Node node)) {
+            return null;
+        }
+        for (javafx.scene.Node n = node; n != null; n = n.getParent()) {
+            if (n instanceof TreeCell<?> cell && cell.getTreeView() == tree
+                    && cell.getIndex() >= 0) {
+                return tree.getTreeItem(cell.getIndex());
+            }
+        }
+        return null;
     }
 
     /**
