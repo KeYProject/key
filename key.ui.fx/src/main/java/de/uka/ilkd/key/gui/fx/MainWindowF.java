@@ -601,22 +601,16 @@ public final class MainWindowF {
         // factory default is west 0.18 / east 0.86, a previously saved layout wins
         double[] dividers = layoutStore.loadMainSplitDividers();
         Platform.runLater(() -> mainSplit.setDividerPositions(dividers[0], dividers[1]));
-        // collapsed drawer = button bar only: pull the divider to the bar width; expanding a
-        // panel opens the divider to the last saved (or default) expanded position
-        westDrawer.expandedCountProperty().addListener((obs, was, is) -> Platform.runLater(() -> {
-            double[] positions = mainSplit.getDividerPositions();
-            if (positions.length > 0) {
-                positions[0] = is.intValue() == 0 ? 0.04 : dividers[0];
-                mainSplit.setDividerPositions(positions);
-            }
-        }));
-        eastDrawer.expandedCountProperty().addListener((obs, was, is) -> Platform.runLater(() -> {
-            double[] positions = mainSplit.getDividerPositions();
-            if (positions.length > 1) {
-                positions[1] = is.intValue() == 0 ? 0.96 : dividers[1];
-                mainSplit.setDividerPositions(positions);
-            }
-        }));
+        // reviewer request: a drawer that shows no component (nothing expanded) must not keep a
+        // split divider — the drawer leaves the split entirely, so the slider vanishes with the
+        // empty region; expanding an item re-inserts the drawer and restores the saved (or
+        // default) expanded position
+        westDrawer.expandedCountProperty().addListener((obs, was, is) -> Platform.runLater(
+            () -> syncDrawerPresence(mainSplit, westDrawer, true, dividers[0])));
+        eastDrawer.expandedCountProperty().addListener((obs, was, is) -> Platform.runLater(
+            () -> syncDrawerPresence(mainSplit, eastDrawer, false, dividers[1])));
+        syncDrawerPresence(mainSplit, westDrawer, true, dividers[0]);
+        syncDrawerPresence(mainSplit, eastDrawer, false, dividers[1]);
         BorderPane mainArea = new BorderPane();
         mainArea.setCenter(mainSplit);
         mainArea.setBottom(southDrawer);
@@ -819,6 +813,57 @@ public final class MainWindowF {
      */
     public SplitPane getMainSplit() {
         return mainSplit;
+    }
+
+    /**
+     * Reviewer request: a drawer that shows no component must not keep a split divider. Adds or
+     * removes a drawer in the main-area split so that it is a split member exactly while one of
+     * its items is expanded; the divider position of a re-inserted drawer is restored to the
+     * saved (or default) expanded position. Must run on the FX thread.
+     *
+     * @param split the main-area split containing the workspace
+     * @param drawer the drawer to show or hide in the split
+     * @param west whether the drawer is the west (first) member of the split
+     * @param expandedDivider the divider position to restore when the drawer is re-inserted
+     */
+    private void syncDrawerPresence(SplitPane split, DrawerF drawer, boolean west,
+            double expandedDivider) {
+        boolean present = split.getItems().contains(drawer);
+        boolean wanted = drawer.expandedCountProperty().get() > 0;
+        if (wanted && !present) {
+            if (west) {
+                split.getItems().add(0, drawer);
+            } else {
+                split.getItems().add(drawer);
+            }
+            restoreSplitDividers(split, expandedDivider);
+        } else if (!wanted && present) {
+            split.getItems().remove(drawer);
+        }
+    }
+
+    /**
+     * Re-applies the stored divider positions to the dividers that exist after a drawer was
+     * (re-)inserted: with both drawers present the first divider is the west one and the second
+     * the east one; with a single drawer present the lone divider belongs to that drawer.
+     */
+    private void restoreSplitDividers(SplitPane split, double westDivider) {
+        int members = split.getItems().size();
+        if (members == 3) {
+            split.setDividerPosition(0, westDivider);
+            split.setDividerPosition(1, eastDividerDefault());
+        } else if (members == 2) {
+            split.setDividerPosition(0,
+                split.getItems().get(0) instanceof DrawerF ? westDivider : eastDividerDefault());
+        }
+    }
+
+    /**
+     * @return the stored (or default) east divider position of the main-area split
+     */
+    private double eastDividerDefault() {
+        double[] dividers = layoutStore.loadMainSplitDividers();
+        return dividers[1];
     }
 
     /**
