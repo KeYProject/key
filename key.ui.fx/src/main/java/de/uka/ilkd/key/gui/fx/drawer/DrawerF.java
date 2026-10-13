@@ -18,6 +18,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Side;
 import javafx.scene.Group;
@@ -25,6 +26,7 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.input.ClipboardContent;
@@ -104,6 +106,16 @@ public class DrawerF extends BorderPane {
 
     private final String id;
     private final ToolBar buttonArea = new ToolBar();
+
+    /**
+     * The scroll wrapper of the button bar: the strip scrolls instead of showing the ToolBar's
+     * overflow button, which would hide toggles (reviewer request: every toggle button must stay
+     * reachable). Chrome-free, so the strip keeps its tool-bar look.
+     */
+    private final ScrollPane buttonAreaScroller = new ScrollPane(buttonArea);
+
+    /** Width allowance for the strip's scrollbar in the collapsed drawer. */
+    private static final double SCROLLBAR_ALLOWANCE = 12.0;
     private final DrawerContentAreaF contentArea = new DrawerContentAreaF();
     private final ObservableList<DrawerItemF> items = FXCollections.observableArrayList();
     private final ContextMenu contextMenu = new ContextMenu();
@@ -139,6 +151,17 @@ public class DrawerF extends BorderPane {
         multiselectProperty.set(multiselect);
         floatingDrawersProperty.set(floatingDrawers);
         buttonArea.setStyle("-fx-spacing: 0; -fx-padding: 0;");
+        // the scroll wrapper is chrome-free, so the strip keeps its tool-bar look
+        buttonAreaScroller.setStyle(
+            "-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0;");
+        // the bar's preferred width is only measurable after the first layout pass (the rotated
+        // buttons' groups report zero bounds before) — while collapsed, re-clamp the drawer as
+        // soon as the strip's laid-out width becomes known
+        buttonArea.widthProperty().addListener((obs, was, is) -> {
+            if (collapsedToBar) {
+                clampToButtonBar();
+            }
+        });
 
         configureDockingSide();
         configureContextMenu();
@@ -336,13 +359,14 @@ public class DrawerF extends BorderPane {
 
     /**
      * Reviewer request: the drawer's toggle buttons must never vanish. Collapses this drawer to
-     * its button bar: the drawer's width is bound to the live width of the strip with the toggle
-     * buttons, so the strip stays visible and clickable while no item is expanded (the main
-     * window's split pane then hugs the strip). Vertical (LEFT/RIGHT) drawers only.
+     * its button bar: min and max width are clamped to the bar's preferred width (content-driven,
+     * so clamping cannot feed back into the layout) plus a small allowance for the strip's
+     * scrollbar; the main window's split pane then hugs the strip. Vertical (LEFT/RIGHT) drawers
+     * only.
      */
     public void collapseToButtonBar() {
-        minWidthProperty().bind(buttonArea.widthProperty());
-        maxWidthProperty().bind(buttonArea.widthProperty());
+        collapsedToBar = true;
+        clampToButtonBar();
     }
 
     /**
@@ -350,13 +374,40 @@ public class DrawerF extends BorderPane {
      * again).
      */
     public void expandFromButtonBar() {
-        minWidthProperty().unbind();
-        maxWidthProperty().unbind();
+        collapsedToBar = false;
         setMinWidth(USE_COMPUTED_SIZE);
         setMaxWidth(USE_COMPUTED_SIZE);
     }
 
+    /** Whether the drawer is currently collapsed to its button bar. */
+    private boolean collapsedToBar;
+
+    private void clampToButtonBar() {
+        double width = buttonArea.prefWidth(-1) + SCROLLBAR_ALLOWANCE;
+        setMinWidth(width);
+        setMaxWidth(width);
+    }
+
+    /**
+     * @return the scroll wrapper of the button bar, configured for the docking side: a vertical
+     *         strip scrolls vertically, a horizontal bar horizontally (the ToolBar's own overflow
+     *         button would hide toggles instead)
+     */
+    private Node buttonAreaNode() {
+        boolean vertical = getDockingSide() == Side.LEFT || getDockingSide() == Side.RIGHT;
+        buttonAreaScroller.setFitToWidth(vertical);
+        buttonAreaScroller.setFitToHeight(!vertical);
+        buttonAreaScroller.setHbarPolicy(
+            vertical ? ScrollPane.ScrollBarPolicy.NEVER : ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        buttonAreaScroller.setVbarPolicy(
+            vertical ? ScrollPane.ScrollBarPolicy.AS_NEEDED : ScrollPane.ScrollBarPolicy.NEVER);
+        return buttonAreaScroller;
+    }
+
     private void configureRotation(ToggleButton button) {
+        // trim the chrome: the rotated extent of a button is its unrotated width, so paddings
+        // directly consume strip space (the strip scrolls instead of overflowing)
+        button.setPadding(new Insets(2, 6, 2, 6));
         button.setRotate(switch (getDockingSide()) {
             case LEFT -> -90.0;
             case RIGHT -> 90.0;
@@ -370,7 +421,7 @@ public class DrawerF extends BorderPane {
         contentArea.configureFor(getDockingSide());
         switch (getDockingSide()) {
             case LEFT -> {
-                setLeft(buttonArea);
+                setLeft(buttonAreaNode());
                 setRight(null);
                 setBottom(null);
                 setTop(null);
@@ -378,7 +429,7 @@ public class DrawerF extends BorderPane {
             }
             case RIGHT -> {
                 setLeft(null);
-                setRight(buttonArea);
+                setRight(buttonAreaNode());
                 setBottom(null);
                 setTop(null);
                 buttonArea.setOrientation(Orientation.VERTICAL);
@@ -386,7 +437,7 @@ public class DrawerF extends BorderPane {
             case BOTTOM -> {
                 setLeft(null);
                 setRight(null);
-                setBottom(buttonArea);
+                setBottom(buttonAreaNode());
                 setTop(null);
                 buttonArea.setOrientation(Orientation.HORIZONTAL);
             }
@@ -394,7 +445,7 @@ public class DrawerF extends BorderPane {
                 setLeft(null);
                 setRight(null);
                 setBottom(null);
-                setTop(buttonArea);
+                setTop(buttonAreaNode());
                 buttonArea.setOrientation(Orientation.HORIZONTAL);
             }
         }
