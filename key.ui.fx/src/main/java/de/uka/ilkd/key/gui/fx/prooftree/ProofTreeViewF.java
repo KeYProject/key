@@ -608,12 +608,19 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
     /**
      * @return the tree item under the mouse of a context-request event (the FX counterpart of
      *         Swing's {@code JTree.getPathForLocation(x, y)}): the cell the event targeted, or
-     *         {@code null} when the click did not land on a rendered row
+     *         {@code null} when the click did not land on a rendered row. The target of the
+     *         event is often a child of the cell (the row's icon/label overlays), so the parent
+     *         chain is walked up to the owning cell.
      */
     private TreeItem<Entry> clickedItem(ContextMenuEvent e) {
-        if (e.getTarget() instanceof TreeCell<?> cell && cell.getTreeView() == tree
-                && cell.getIndex() >= 0) {
-            return tree.getTreeItem(cell.getIndex());
+        if (!(e.getTarget() instanceof javafx.scene.Node node)) {
+            return null;
+        }
+        for (javafx.scene.Node n = node; n != null; n = n.getParent()) {
+            if (n instanceof TreeCell<?> cell && cell.getTreeView() == tree
+                    && cell.getIndex() >= 0) {
+                return tree.getTreeItem(cell.getIndex());
+            }
         }
         return null;
     }
