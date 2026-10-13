@@ -3499,12 +3499,13 @@ public final class MainWindowF {
         pass &= east.getDockingSide() == Side.RIGHT && east.isMultiselect();
         pass &= south.getDockingSide() == Side.BOTTOM;
 
-        // default expansions: Proof Tree + Goal List are the expanded items and share the west
-        // split in button order (button order now starts with "Loaded Proofs", reviewer request)
+        // default expansions: "Loaded Proofs" + Proof Tree are the expanded items and share the
+        // west split in button order (reviewer request: the start layout shows Loaded Proofs and
+        // Proof Tree, not the Goal List)
         ObservableList<Node> westContent = west.getContentArea().hostedItems();
         sb.append(" expanded=").append(westContent.size());
-        pass &= westContent.size() == 2 && westContent.get(0) == west.getItems().get(1)
-                && westContent.get(1) == west.getItems().get(2);
+        pass &= westContent.size() == 2 && westContent.get(0) == west.getItems().get(0)
+                && westContent.get(1) == west.getItems().get(1);
 
         // cross-port transfer round trip: Strategy panel west->east, then east->west
         boolean movedEast = false;
@@ -3805,10 +3806,11 @@ public final class MainWindowF {
      */
     private void buildDrawerHosts() {
         westDrawer = new DrawerF(Side.LEFT, true);
-        // reviewer request: "Loaded Proofs" is the first item in the drawer (button order)
-        westDrawer.item("Loaded Proofs", loadedProofs);
+        // reviewer request: "Loaded Proofs" is the first item in the drawer (button order) and,
+        // together with the Proof Tree, expanded at startup — the Goal List stays collapsed
+        westDrawer.item("Loaded Proofs", loadedProofs, true);
         westDrawer.item("Proof Tree", proofTreeView, true);
-        westDrawer.item("Goal List", goalListView, true);
+        westDrawer.item("Goal List", goalListView);
         westDrawer.item("Info", infoView);
         westDrawer.item("Strategy", strategyView);
         // extension: MP10 — the extension left-panel tabs become west drawer items (Swing
