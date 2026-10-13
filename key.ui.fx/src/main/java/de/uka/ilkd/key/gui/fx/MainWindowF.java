@@ -601,16 +601,18 @@ public final class MainWindowF {
         // factory default is west 0.18 / east 0.86, a previously saved layout wins
         double[] dividers = layoutStore.loadMainSplitDividers();
         Platform.runLater(() -> mainSplit.setDividerPositions(dividers[0], dividers[1]));
-        // reviewer request: a drawer that shows no component (nothing expanded) must not keep a
-        // split divider — the drawer leaves the split entirely, so the slider vanishes with the
-        // empty region; expanding an item re-inserts the drawer and restores the saved (or
-        // default) expanded position
+        // reviewer request: the drawer toggle buttons must never vanish — the drawers stay
+        // split members permanently; a drawer with no expanded item collapses to its button
+        // bar (the toggle strip stays visible and clickable) and the split pane hugs the strip;
+        // expanding an item restores the saved (or default) expanded divider position. The
+        // earlier behaviour removed the empty drawer from the split entirely, which also
+        // removed its toggle bar.
         westDrawer.expandedCountProperty().addListener((obs, was, is) -> Platform.runLater(
-            () -> syncDrawerPresence(mainSplit, westDrawer, true, dividers[0])));
+            () -> syncDrawerCollapsed(mainSplit, westDrawer, true, dividers[0])));
         eastDrawer.expandedCountProperty().addListener((obs, was, is) -> Platform.runLater(
-            () -> syncDrawerPresence(mainSplit, eastDrawer, false, dividers[1])));
-        syncDrawerPresence(mainSplit, westDrawer, true, dividers[0]);
-        syncDrawerPresence(mainSplit, eastDrawer, false, dividers[1]);
+            () -> syncDrawerCollapsed(mainSplit, eastDrawer, false, dividers[1])));
+        syncDrawerCollapsed(mainSplit, westDrawer, true, dividers[0]);
+        syncDrawerCollapsed(mainSplit, eastDrawer, false, dividers[1]);
         BorderPane mainArea = new BorderPane();
         mainArea.setCenter(mainSplit);
         mainArea.setBottom(southDrawer);
@@ -828,54 +830,29 @@ public final class MainWindowF {
     }
 
     /**
-     * Reviewer request: a drawer that shows no component must not keep a split divider. Adds or
-     * removes a drawer in the main-area split so that it is a split member exactly while one of
-     * its items is expanded; the divider position of a re-inserted drawer is restored to the
-     * saved (or default) expanded position. Must run on the FX thread.
+     * Reviewer request: the drawer's toggle buttons must never vanish. The drawers stay split
+     * members permanently; a drawer that shows no expanded item collapses to its button bar
+     * ({@link DrawerF#collapseToButtonBar()}), so the strip with the toggle buttons remains
+     * visible and clickable and the split pane clamps the divider at the strip width (no slider
+     * for an empty region); expanding an item restores the saved (or default) expanded divider
+     * position. Must run on the FX thread.
      *
-     * @param split the main-area split containing the workspace
-     * @param drawer the drawer to show or hide in the split
+     * @param split the main-area split containing the workspace and both drawers
+     * @param drawer the drawer to collapse or expand
      * @param west whether the drawer is the west (first) member of the split
-     * @param expandedDivider the divider position to restore when the drawer is re-inserted
+     * @param expandedDivider the divider position to restore when an item is expanded
      */
-    private void syncDrawerPresence(SplitPane split, DrawerF drawer, boolean west,
+    private void syncDrawerCollapsed(SplitPane split, DrawerF drawer, boolean west,
             double expandedDivider) {
-        boolean present = split.getItems().contains(drawer);
-        boolean wanted = drawer.expandedCountProperty().get() > 0;
-        if (wanted && !present) {
-            if (west) {
-                split.getItems().add(0, drawer);
-            } else {
-                split.getItems().add(drawer);
-            }
-            restoreSplitDividers(split, expandedDivider);
-        } else if (!wanted && present) {
-            split.getItems().remove(drawer);
+        int dividerIndex = west ? 0 : 1;
+        if (drawer.expandedCountProperty().get() == 0) {
+            // the split pane clamps the drawer at its (bound) button-bar width, so the divider
+            // visually hugs the toggle strip without moving the stored position
+            drawer.collapseToButtonBar();
+        } else {
+            drawer.expandFromButtonBar();
+            split.setDividerPosition(dividerIndex, expandedDivider);
         }
-    }
-
-    /**
-     * Re-applies the stored divider positions to the dividers that exist after a drawer was
-     * (re-)inserted: with both drawers present the first divider is the west one and the second
-     * the east one; with a single drawer present the lone divider belongs to that drawer.
-     */
-    private void restoreSplitDividers(SplitPane split, double westDivider) {
-        int members = split.getItems().size();
-        if (members == 3) {
-            split.setDividerPosition(0, westDivider);
-            split.setDividerPosition(1, eastDividerDefault());
-        } else if (members == 2) {
-            split.setDividerPosition(0,
-                split.getItems().get(0) instanceof DrawerF ? westDivider : eastDividerDefault());
-        }
-    }
-
-    /**
-     * @return the stored (or default) east divider position of the main-area split
-     */
-    private double eastDividerDefault() {
-        double[] dividers = layoutStore.loadMainSplitDividers();
-        return dividers[1];
     }
 
     /**
