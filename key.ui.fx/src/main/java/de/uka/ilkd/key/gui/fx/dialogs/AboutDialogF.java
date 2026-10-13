@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
@@ -61,9 +62,14 @@ public final class AboutDialogF {
         copyright.setWrapText(true);
         copyright.getStyleClass().add("about-text");
 
-        Label version = new Label("Version " + KeYConstants.VERSION);
-        version.setWrapText(true);
+        // reviewer request: the version must be selectable so it can be copied into bug
+        // reports — a read-only borderless text field replaces the label (the about-text look
+        // is kept via the style class)
+        TextField version = new TextField("Version " + KeYConstants.VERSION);
+        version.setEditable(false);
         version.getStyleClass().add("about-text");
+        version.setStyle("-fx-background-color: transparent; -fx-padding: 0;");
+        version.setPrefColumnCount(version.getText().length());
 
         VBox center = new VBox(6, title, copyright, www, version);
         center.setPadding(new Insets(16));
