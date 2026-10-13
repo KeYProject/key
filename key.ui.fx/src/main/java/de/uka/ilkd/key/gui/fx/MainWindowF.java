@@ -5930,9 +5930,12 @@ public final class MainWindowF {
         HBox bar = new HBox();
         bar.getStyleClass().add("status-bar");
         bar.setPadding(new Insets(2, 8, 2, 8));
+        // reviewer request: the status bar components align by their text baseline, so labels and
+        // taller buttons sit on one shared text line instead of being center-stacked
+        bar.setAlignment(Pos.BASELINE_LEFT);
         // both labels must never drive the bar's size: a Label's min size defaults to its text
         // size, and a long (multi-line) term text would blow the bar up and squeeze the workspace
-        statusLeft.setAlignment(Pos.CENTER_LEFT);
+        statusLeft.setAlignment(Pos.BASELINE_LEFT);
         statusLeft.setTextOverrun(OverrunStyle.ELLIPSIS);
         statusLeft.setMinWidth(0);
         statusLeft.setMinHeight(0);
@@ -5947,7 +5950,7 @@ public final class MainWindowF {
         HBox.setHgrow(statusLeft, Priority.ALWAYS);
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        statusRight.setAlignment(Pos.CENTER_RIGHT);
+        statusRight.setAlignment(Pos.BASELINE_RIGHT);
         statusRight.setTextOverrun(OverrunStyle.ELLIPSIS);
         statusRight.setMinWidth(0);
         statusRight.setMinHeight(0);
