@@ -777,12 +777,13 @@ public class DrawerF extends BorderPane {
             checks.add("exclusive=" + (d.getContentArea().hostedItems().size() == 1
                     && d.getContentArea().containsItem(b) ? "PASS" : "FAIL"));
 
-            // side placement and bar orientation
+            // side placement and bar orientation (the bar is wrapped in the chrome-free scroll
+            // pane: the strip scrolls instead of the ToolBar's overflow button hiding toggles)
             d.setDockingSide(Side.RIGHT);
-            checks.add("sideRight=" + (d.getRight() == d.getButtonArea()
+            checks.add("sideRight=" + (d.getRight() == d.buttonAreaNode()
                     && d.buttonArea.getOrientation() == Orientation.VERTICAL ? "PASS" : "FAIL"));
             d.setDockingSide(Side.BOTTOM);
-            checks.add("sideBottom=" + (d.getBottom() == d.getButtonArea()
+            checks.add("sideBottom=" + (d.getBottom() == d.buttonAreaNode()
                     && d.buttonArea.getOrientation() == Orientation.HORIZONTAL ? "PASS" : "FAIL"));
             checks.add("centerHost=" + (d.getCenter() == d.getContentArea() ? "PASS" : "FAIL"));
 
