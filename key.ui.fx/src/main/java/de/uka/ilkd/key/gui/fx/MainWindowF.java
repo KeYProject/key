@@ -846,8 +846,9 @@ public final class MainWindowF {
             double expandedDivider) {
         int dividerIndex = west ? 0 : 1;
         if (drawer.expandedCountProperty().get() == 0) {
-            // the split pane clamps the drawer at its (bound) button-bar width, so the divider
-            // visually hugs the toggle strip without moving the stored position
+            // the split pane clamps the drawer at its collapsed (bar width + scrollbar
+            // allowance) size, so the divider visually hugs the toggle strip without moving the
+            // stored position
             drawer.collapseToButtonBar();
         } else {
             drawer.expandFromButtonBar();
