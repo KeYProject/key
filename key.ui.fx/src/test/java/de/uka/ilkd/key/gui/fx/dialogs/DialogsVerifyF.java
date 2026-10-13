@@ -359,8 +359,12 @@ public final class DialogsVerifyF {
      */
     private static void verifyContractApplyE2E(WindowUserInterfaceControlF ui,
             StringBuilder problems) {
-        String example = System.getProperty("key.fx.verify.dialogs.contract",
-            "heap/model_methods/CellTest_callSet.key");
+        // the sweep recipes pass the property as "=1" to request the default demo; an actual
+        // (absolute or relative) path overrides the example
+        String contractProperty = System.getProperty("key.fx.verify.dialogs.contract", "");
+        String example = "1".equals(contractProperty) || contractProperty.isBlank()
+                ? "heap/model_methods/CellTest_callSet.key"
+                : contractProperty;
         Path path = Path.of(example);
         if (!path.isAbsolute()) {
             path = Path.of(System.getProperty("key.examples.dir", "key.ui/examples"), example);
