@@ -173,6 +173,12 @@ public class TaskTreeF extends BorderPane {
         envItem.getChildren().add(proofItem);
         envItem.setExpanded(true);
         proofItems.put(proof, proofItem);
+        // the proof may already be the active one (a load activates the proof before it is
+        // registered here, so the selection sync at that time found no row to highlight yet) —
+        // re-sync the highlight now that the row exists
+        if (selectionModel != null && selectionModel.getSelectedProof() == proof) {
+            syncSelection(proof);
+        }
 
         // observe structural changes of the proof (Swing TaskTreeProofTreeListener repaints the
         // affected row, TaskTree.java:318-345; here the cell re-renders on tree refresh)
