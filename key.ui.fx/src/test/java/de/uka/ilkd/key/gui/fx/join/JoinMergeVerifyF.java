@@ -72,11 +72,26 @@ public final class JoinMergeVerifyF {
     private static final Logger LOGGER = LoggerFactory.getLogger(JoinMergeVerifyF.class);
 
     /** Strategy step limit for the preparation auto mode run (key.fx.verify.joinmerge.maxsteps). */
-    private static final int MAX_STEPS = Integer
-            .parseInt(System.getProperty("key.fx.verify.joinmerge.maxsteps", "40"));
+    private static final int MAX_STEPS = parseMaxSteps(
+        System.getProperty("key.fx.verify.joinmerge.maxsteps", "40"));
 
     /** Seconds each dialog stays open for screenshots. */
     static final int SCREENSHOT_WINDOW_SECONDS = 14;
+
+    /**
+     * Parses the step limit; blank or malformed values fall back to the default (the sweep
+     * recipes pass the property with an empty value to request the default).
+     */
+    private static int parseMaxSteps(String value) {
+        if (value == null || value.isBlank()) {
+            return 40;
+        }
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException e) {
+            return 40;
+        }
+    }
 
     private JoinMergeVerifyF() {
     }
