@@ -16,6 +16,7 @@ import javafx.scene.control.Tooltip;
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.gui.fx.MainWindowF;
 import de.uka.ilkd.key.gui.fx.extension.api.KeYGuiExtensionF;
+import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsManagerF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsProviderF;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -99,7 +100,13 @@ public class HeatmapF
         // membership by identity, so a fresh instance per call would break those checks.
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         if (heatmapToggle == null) {
-            ToggleButton toggle = new ToggleButton("Heatmap");
+            // reviewer request: the toolbar buttons are icon-only (Swing shows the toggle
+            // icon-only as well, HeatmapExt.getToolbar setHideActionText(true); the glyph is the
+            // Swing IconFactory.HEATMAP_ACTIVATE/DEACTIVATE shoe prints) — the tooltip and the
+            // accessible name keep the discoverability
+            ToggleButton toggle =
+                new ToggleButton(null, IconFactoryF.createIcon(IconFactoryF.Key.HEATMAP));
+            toggle.setAccessibleText("Heatmap");
             toggle.setTooltip(new Tooltip("Toggle the heatmap overlay; the option is "
                 + "persisted in the ViewSettings."));
             toggle.setSelected(vs.isShowHeatmap());
@@ -112,7 +119,9 @@ public class HeatmapF
             heatmapToggle = toggle;
         }
         if (heatmapSettingsButton == null) {
-            Button settings = new Button("Heatmap Settings…");
+            Button settings =
+                new Button(null, IconFactoryF.createIcon(IconFactoryF.Key.CONFIGURE));
+            settings.setAccessibleText("Heatmap Settings…");
             settings.setTooltip(new Tooltip("Open the heatmap options in the settings dialog."));
             settings.setOnAction(e -> SettingsManagerF.getInstance()
                     .showSettingsDialog(window, heatmapSettingsProvider));

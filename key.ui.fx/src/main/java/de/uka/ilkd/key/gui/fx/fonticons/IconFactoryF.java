@@ -70,6 +70,8 @@ public final class IconFactoryF {
         SEARCH_HIGHLIGHT(FontAwesomeSolid.HIGHLIGHTER),
         SEARCH_HIDE(FontAwesomeSolid.LOW_VISION),
         SEARCH_REGROUP(FontAwesomeSolid.VIDEO),
+        HEATMAP(FontAwesomeSolid.SHOE_PRINTS),
+        PROOF_CACHING(FontAwesomeSolid.DATABASE),
         // WP-2 (proof-tree renderer surface, Swing ProofTreeView renderLeaf/renderNonLeaf):
         // the goal-state and marker icons of the tree cells
         GOAL_CLOSED(FontAwesomeSolid.CHECK),
