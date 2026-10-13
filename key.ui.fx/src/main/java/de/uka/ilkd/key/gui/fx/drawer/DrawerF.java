@@ -325,6 +325,28 @@ public class DrawerF extends BorderPane {
         }
     }
 
+    /**
+     * Reviewer request: the drawer's toggle buttons must never vanish. Collapses this drawer to
+     * its button bar: the drawer's width is bound to the live width of the strip with the toggle
+     * buttons, so the strip stays visible and clickable while no item is expanded (the main
+     * window's split pane then hugs the strip). Vertical (LEFT/RIGHT) drawers only.
+     */
+    public void collapseToButtonBar() {
+        minWidthProperty().bind(buttonArea.widthProperty());
+        maxWidthProperty().bind(buttonArea.widthProperty());
+    }
+
+    /**
+     * Restores the automatic sizing after {@link #collapseToButtonBar()} (an item was expanded
+     * again).
+     */
+    public void expandFromButtonBar() {
+        minWidthProperty().unbind();
+        maxWidthProperty().unbind();
+        setMinWidth(USE_COMPUTED_SIZE);
+        setMaxWidth(USE_COMPUTED_SIZE);
+    }
+
     private void configureRotation(ToggleButton button) {
         button.setRotate(switch (getDockingSide()) {
             case LEFT -> -90.0;
