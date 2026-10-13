@@ -3846,22 +3846,34 @@ public final class MainWindowF {
     private void buildDrawerHosts() {
         westDrawer = new DrawerF(Side.LEFT, true);
         // reviewer request: "Loaded Proofs" is the first item in the drawer (button order) and,
-        // together with the Proof Tree, expanded at startup — the Goal List stays collapsed
-        westDrawer.item("Loaded Proofs", loadedProofs, true);
-        westDrawer.item("Proof Tree", proofTreeView, true);
-        westDrawer.item("Goal List", goalListView);
-        westDrawer.item("Info", infoView);
-        westDrawer.item("Strategy", strategyView);
+        // together with the Proof Tree, expanded at startup — the Goal List stays collapsed.
+        // Reviewer request: the toggle buttons show icons — the glyphs mirror the tab icons of
+        // the Swing panels (ProofTreeView.getIcon PROOF_TREE, GoalList GOAL_LIST_ICON
+        // FLAG_CHECKERED, InfoView INFO_ICON INFO_CIRCLE,
+        // StrategySelectionView.getIcon PROOF_SEARCH_STRATEGY; the proof list has no Swing tab
+        // icon and gets a semantic list glyph).
+        westDrawer.item("Loaded Proofs", IconFactoryF.createIcon(IconFactoryF.Key.PROOF_LIST),
+            loadedProofs, true);
+        westDrawer.item("Proof Tree", IconFactoryF.createIcon(IconFactoryF.Key.PROOF_TREE),
+            proofTreeView, true);
+        westDrawer.item("Goal List", IconFactoryF.createIcon(IconFactoryF.Key.GOAL_LIST),
+            goalListView, false);
+        westDrawer.item("Info", IconFactoryF.createIcon(IconFactoryF.Key.INFO_VIEW), infoView,
+            false);
+        westDrawer.item("Strategy",
+            IconFactoryF.createIcon(IconFactoryF.Key.PROOF_SEARCH_STRATEGY), strategyView, false);
         // extension: MP10 — the extension left-panel tabs become west drawer items (Swing
         // KeYGuiExtension.LeftPanel returns tabs for the left JTabbedPane,
         // KeYGuiExtension.java:127-143): a button per tab in the west bar toggles the panel,
         // drag and drop can move it to another port; without LeftPanelF providers this appends
-        // nothing.
+        // nothing. The tab's own graphic (if the extension provides one) becomes the toggle
+        // button icon.
         for (Tab tab : KeYGuiExtensionFacadeF.getLeftPanelTabs(this, mediator)) {
-            westDrawer.item(tab.getText(), tab.getContent());
+            westDrawer.item(tab.getText(), tab.getGraphic(), tab.getContent(), false);
         }
         eastDrawer = new DrawerF(Side.RIGHT, true);
-        eastDrawer.item("Source", buildSourceViewContent());
+        eastDrawer.item("Source", IconFactoryF.createIcon(IconFactoryF.Key.SOURCE_VIEW),
+            buildSourceViewContent(), false);
         southDrawer = new DrawerF(Side.BOTTOM, true);
     }
 

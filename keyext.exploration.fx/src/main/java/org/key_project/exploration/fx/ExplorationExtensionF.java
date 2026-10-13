@@ -234,6 +234,10 @@ public class ExplorationExtensionF implements KeYGuiExtensionF, KeYGuiExtensionF
         // (MainWindowF.buildDrawerHosts), exactly one tab like the Swing singleton panel.
         ExplorationStepsPanelF panel = getLeftPanel();
         Tab tab = new Tab(panel.getTitle(), panel);
+        // the tab graphic becomes the west drawer toggle button's icon (the compass mirrors the
+        // exploration identity of the toolbar/menubar items, Swing ToggleExplorationAction
+        // Icons.EXPLORE)
+        tab.setGraphic(new FontIcon(FontAwesomeSolid.COMPASS));
         tab.setClosable(false);
         return List.of(tab);
     }

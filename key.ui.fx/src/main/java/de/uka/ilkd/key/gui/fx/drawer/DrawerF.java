@@ -225,7 +225,16 @@ public class DrawerF extends BorderPane {
      * header is shown by default when the drawer is in multiselect mode (TornadoFX default).
      */
     public DrawerItemF item(String title, Node content, boolean expanded) {
-        DrawerItemF item = new DrawerItemF(this, title, null, isMultiselect());
+        return item(title, null, content, expanded);
+    }
+
+    /**
+     * Creates a new item with the given title, an optional toggle-button icon, optional content
+     * and initial expanded state. The icon is shown inside the rotated toggle button, next to
+     * the rotated title (reviewer request: the drawer buttons need icons).
+     */
+    public DrawerItemF item(String title, Node graphic, Node content, boolean expanded) {
+        DrawerItemF item = new DrawerItemF(this, title, graphic, isMultiselect());
         if (content != null) {
             item.getChildren().add(content);
         }

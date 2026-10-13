@@ -30,6 +30,10 @@ dependencies {
     // key.core itself `api`-exposes key.util, key.ncore and key.ncore.calculus
     // (org.key_project.prover.sequent.PosInOccurrence), so a single implementation dep suffices.
     implementation project(":key.core")
+    // MP10 icon review: ikonli FontAwesome glyph for the left-panel tab (the graphic becomes the
+    // west drawer toggle button's icon, mirroring the Swing SlicingLeftPanel SLICE_ICON)
+    implementation libs.ikonli.javafx
+    implementation libs.ikonli.fontawesome6
 
     // The slicing settings singleton lives behind the Swing SlicingSettingsProvider
     // (SlicingSettingsProvider.getSlicingSettings) and the reused slicing logic reads it

@@ -62,6 +62,16 @@ public final class IconFactoryF {
         PROOF_TREE(FontAwesomeSolid.SITEMAP),
         INFO_VIEW(FontAwesomeSolid.INFO_CIRCLE),
         PROOF_SEARCH_STRATEGY(FontAwesomeSolid.COG),
+        // drawer toggle buttons (reviewer request: the drawer buttons need icons; the glyphs
+        // mirror the tab icons of the Swing panels — GoalList.java FLAG_CHECKERED, Swing
+        // SlicingLeftPanel SLICE_ICON ALIGN_JUSTIFY — and the extension identities for the
+        // exploration compass; the proof list and the source view have no Swing tab icon and
+        // get semantic list/code glyphs)
+        GOAL_LIST(FontAwesomeSolid.FLAG_CHECKERED),
+        SLICE(FontAwesomeSolid.ALIGN_JUSTIFY),
+        PROOF_LIST(FontAwesomeSolid.LIST_ALT),
+        EXPLORATION_STEPS(FontAwesomeSolid.COMPASS),
+        SOURCE_VIEW(FontAwesomeSolid.FILE_CODE),
         KEY_HOLE(FontAwesomeSolid.KEY),
         KEY_HOLE_INTERACTIVE(FontAwesomeSolid.HAND_PAPER),
         KEY_HOLE_LINKED(FontAwesomeSolid.LINK),

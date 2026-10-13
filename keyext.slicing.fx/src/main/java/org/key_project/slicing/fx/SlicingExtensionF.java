@@ -35,6 +35,8 @@ import org.key_project.slicing.graph.GraphNode;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.kordamp.ikonli.fontawesome6.FontAwesomeSolid;
+import org.kordamp.ikonli.javafx.FontIcon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -199,6 +201,10 @@ public class SlicingExtensionF implements KeYGuiExtensionF, KeYGuiExtensionF.Con
             mediator.getSelectionModel().addKeYSelectionListener(leftPanel);
             leftPanelTab = new Tab();
             leftPanelTab.setText(getPanelTitle());
+            // the tab graphic becomes the west drawer toggle button's icon (Swing
+            // SlicingLeftPanel.getIcon returns IconFactory.SLICE_ICON, ALIGN_JUSTIFY,
+            // SlicingLeftPanel.java:67)
+            leftPanelTab.setGraphic(new FontIcon(FontAwesomeSolid.ALIGN_JUSTIFY));
             leftPanelTab.setClosable(false);
             leftPanelTab.setContent(leftPanel);
         }
