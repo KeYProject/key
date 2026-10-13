@@ -18,6 +18,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
@@ -359,7 +360,6 @@ public final class SettingsManagerF {
             panelArea.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
             panelHolder.getStyleClass().add("settings-panel-holder");
             panelHolder.getChildren().add(new Label("empty"));
-            setCenter(panelArea);
 
             treeSettingsPanels.setShowRoot(true);
             treeSettingsPanels.setCellFactory(this::createCell);
@@ -370,7 +370,14 @@ public final class SettingsManagerF {
             VBox westPanel = new VBox(6, searchRow, treeSettingsPanels);
             westPanel.getStyleClass().add("settings-tree-panel");
             VBox.setVgrow(treeSettingsPanels, javafx.scene.layout.Priority.ALWAYS);
-            setLeft(westPanel);
+            // reviewer request: the provider tree resizes with the dialog — the tree and the
+            // panel area share a SplitPane (Swing SettingsUi uses a JSplitPane with divider
+            // location 0.3, SettingsUi.java:87+107), so both sides scale when the dialog resizes
+            // and the divider stays draggable
+            westPanel.setMinWidth(200);
+            SplitPane root = new SplitPane(westPanel, panelArea);
+            root.setDividerPositions(0.3);
+            setCenter(root);
 
             treeSettingsPanels.getSelectionModel().selectedItemProperty()
                     .addListener((obs, old, item) -> {
