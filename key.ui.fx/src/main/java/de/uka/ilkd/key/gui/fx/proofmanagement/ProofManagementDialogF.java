@@ -15,11 +15,13 @@ import java.util.stream.Stream;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
@@ -366,22 +368,23 @@ public final class ProofManagementDialogF {
     }
 
     /**
-     * Builds one tab's content: the selection list on the left, the contract panel on the right
-     * (Swing BoxLayout list panels, ProofManagementDialog.java:149-192).
+     * Builds one tab's content: a split pane separating the selection list (the contract targets
+     * / proofs) on the left from the contract panel on the right — reviewer request: the
+     * regions must be resizable by a divider (Swing BoxLayout list panels,
+     * ProofManagementDialog.java:149-192, side by side at fixed widths).
      */
-    private BorderPane buildTabContent(javafx.scene.control.Control list,
+    private Node buildTabContent(javafx.scene.control.Control list,
             ContractSelectionPanelF contractPanel) {
-        BorderPane pane = new BorderPane();
-        pane.setPadding(new Insets(8));
         Label heading = new Label(list == proofList ? "Proofs" : "Contract Targets");
         heading.getStyleClass().add("dialog-section-title");
         VBox left = new VBox(2, heading, list);
         VBox.setVgrow(list, Priority.ALWAYS);
+        left.setMinWidth(160);
         left.setPrefWidth(330);
-        pane.setCenter(left);
-        pane.setRight(contractPanel);
-        BorderPane.setMargin(contractPanel, new Insets(0, 0, 0, 8));
-        return pane;
+        SplitPane split = new SplitPane(left, contractPanel);
+        split.setDividerPositions(0.4);
+        split.setPadding(new Insets(8));
+        return split;
     }
 
     // ------------------------------------------------------------------
