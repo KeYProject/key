@@ -242,14 +242,19 @@ public class WindowUserInterfaceControlF extends DefaultUserInterfaceControl
             return;
         }
         // the redesigned dialog is the default; the classic one is offered as a migration
-        // fallback (Swing parity, WindowUserInterfaceControl.java:332-337)
+        // fallback (Swing parity, WindowUserInterfaceControl.java:332-337). The constructors
+        // build a Stage and show() the dialog — both require the FX thread. Core callers may
+        // run on a worker (the verify harnesses drive selectedTaclet off the FX thread), so the
+        // construction hops over with runAndWait: on the FX thread this is the direct call, off
+        // it blocks until the dialog is up (the interactive apply flow continues inside the
+        // dialog, Swing's modal loop is its EDT pendant).
         if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                 .isUseClassicTacletDialog()) {
-            new TacletMatchCompletionDialogF(owner, models, goal, services, notationInfo,
-                getProofControl());
+            FxUtil.runAndWait(() -> new TacletMatchCompletionDialogF(owner, models, goal,
+                services, notationInfo, getProofControl()));
         } else {
-            new TacletMatchDialogF(owner, models, goal, getProofControl(), services,
-                notationInfo);
+            FxUtil.runAndWait(() -> new TacletMatchDialogF(owner, models, goal,
+                getProofControl(), services, notationInfo));
         }
     }
 
