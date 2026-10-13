@@ -1924,10 +1924,15 @@ public final class MainWindowF {
             }
         };
         // KeY mode: the system taclets always get proof obligations (Swing passes the literal
-        // true, LemmaGenerationAction.java:163-165)
-        runTacletSoundnessLoader(tacletLoader,
-            tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment(), true, true,
-            listener);
+        // true, LemmaGenerationAction.java:163-165). The proof environment of the system taclets
+        // is built off the FX thread — getProofEnvForTaclets loads and prepares the profile's
+        // taclet files and blocked the UI for seconds when run inline (the loader itself already
+        // runs on its own thread; reviewer request: load the KeY taclets asynchronously).
+        Thread loaderThread = new Thread(() -> {
+            InitConfig config = tacletLoader.getProofEnvForTaclets().getInitConfigForEnvironment();
+            runTacletSoundnessLoader(tacletLoader, config, true, true, listener);
+        }, "Load KeY Taclets");
+        loaderThread.start();
     }
 
     /**
