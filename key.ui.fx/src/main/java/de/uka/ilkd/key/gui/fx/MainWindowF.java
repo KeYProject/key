@@ -6088,13 +6088,21 @@ public final class MainWindowF {
                 && html.contains("1. General KeY Soundiness")
                 && html.contains("2. Taclet Option Soundiness")
                 && html.contains("3. Proof Tree Analysis");
+        // extension: MP9.0 — the proof-list context menu: the soundiness extension contributes
+        // the "Show Soundiness Report" item for the loaded proof (Swing TaskTree.checkPopup +
+        // SoundinessExtension.getContextActions with ContextMenuKind.PROOF_LIST)
+        java.util.List<javafx.scene.control.MenuItem> proofListItems =
+            KeYGuiExtensionFacadeF.getProofListContextItems(mediator, proof);
+        boolean proofListOk = proofListItems.size() == 1
+                && "Show Soundiness Report".equals(proofListItems.get(0).getText());
         String report = "chars=" + html.length() + " sections=" + sectionsOk
-            + (sectionsOk ? " PASS" : " FAIL");
+            + " proofList=" + proofListOk
+            + (sectionsOk && proofListOk ? " PASS" : " FAIL");
         LOGGER.info("Soundiness verification: {}", report);
         NotificationManagerF.getInstance()
                 .notify("Soundiness verification: " + report,
-                    sectionsOk ? Kind.INFO : Kind.ERROR);
-        if (sectionsOk) {
+                    sectionsOk && proofListOk ? Kind.INFO : Kind.ERROR);
+        if (sectionsOk && proofListOk) {
             new SoundinessDialogF(stage, proof).showCenteredOnOwner();
         }
     }

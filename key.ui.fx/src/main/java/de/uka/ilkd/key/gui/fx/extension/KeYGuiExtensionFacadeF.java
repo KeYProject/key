@@ -333,6 +333,28 @@ public final class KeYGuiExtensionFacadeF {
     }
 
     /**
+     * The context menu items contributed by every {@link KeYGuiExtensionF.ContextMenuF} provider
+     * for a proof of the Loaded Proofs view (Swing {@code KeYGuiExtensionFacade.createContextMenu}
+     * with {@code ContextMenuKind.PROOF_LIST}, TaskTree.java:306-307 — the proof-list popup is
+     * built entirely from the extension contributions). The host shows them when the popup
+     * trigger lands on a proof row and drops the menu when nothing is contributed.
+     *
+     * @param mediator the mediator of the window
+     * @param proof the right-clicked proof
+     * @return non-null, emptiable list of menu items
+     */
+    public static List<MenuItem> getProofListContextItems(KeYMediatorF mediator,
+            de.uka.ilkd.key.proof.Proof proof) {
+        List<MenuItem> items = new ArrayList<>();
+        for (KeYGuiExtensionF extension : getExtensions()) {
+            if (extension instanceof KeYGuiExtensionF.ContextMenuF contextMenu) {
+                items.addAll(contextMenu.getProofListContextItems(mediator, proof));
+            }
+        }
+        return items;
+    }
+
+    /**
      * The settings providers contributed by every {@link KeYGuiExtensionF.SettingsF} provider
      * (Swing {@code KeYGuiExtensionFacade.getSettingsProvider},
      * KeYGuiExtensionFacade.java:335-337); the host registers them into the
