@@ -5733,7 +5733,9 @@ public final class MainWindowF {
     private ToolBar buildFileToolBar() {
         ToolBar bar = new ToolBar();
         bar.getStyleClass().add("key-file-tool-bar");
-        // reviewer request: the buttons show text beside the icon
+        // reviewer request: the toolbar buttons are icon-only (Swing shows the same buttons
+        // without their action text, JToolBar.add(Action) sets hideActionText for icon actions);
+        // the tooltips and the accessible names keep the discoverability
         javafx.scene.control.Button openFile =
             toolbarButton("Open", "Browse and load problem or proof files",
                 IconFactoryF.Key.OPEN_KEY_FILE, this::openFileChooser);
@@ -5771,7 +5773,8 @@ public final class MainWindowF {
         // click while running stops it).
         automationToolbarButton = new SplitMenuButton();
         automationToolbarButton.getStyleClass().add("key-toolbar-split-button");
-        automationToolbarButton.setText("Automation");
+        // reviewer request: icon-only toolbar controls — the graphic swaps between the start
+        // and stop glyphs (see the auto-mode listener below); the tooltip explains the action
         automationToolbarButton
                 .setGraphic(IconFactoryF.createIcon(IconFactoryF.Key.AUTO_MODE_START));
         automationToolbarButton.setTooltip(new Tooltip(
@@ -5803,11 +5806,9 @@ public final class MainWindowF {
         // the button icon to the stop glyph while the automation runs)
         mediator.autoModeRunningProperty().addListener((obs, was, running) -> {
             if (running) {
-                automationToolbarButton.setText("Stop");
                 automationToolbarButton
                         .setGraphic(IconFactoryF.createIcon(IconFactoryF.Key.AUTO_MODE_STOP));
             } else {
-                automationToolbarButton.setText("Automation");
                 automationToolbarButton
                         .setGraphic(IconFactoryF.createIcon(IconFactoryF.Key.AUTO_MODE_START));
             }
@@ -5822,7 +5823,8 @@ public final class MainWindowF {
         // solver image).
         smtToolbarButton = new SplitMenuButton();
         smtToolbarButton.getStyleClass().add("key-toolbar-split-button");
-        smtToolbarButton.setText("SMT");
+        // reviewer request: icon-only toolbar controls (the configure glyph stands in for the
+        // solver image; the dropdown items carry the union names)
         smtToolbarButton.setGraphic(IconFactoryF.createIcon(IconFactoryF.Key.CONFIGURE));
         smtToolbarButton
                 .setTooltip(new Tooltip(
@@ -5895,8 +5897,11 @@ public final class MainWindowF {
 
     private javafx.scene.control.Button toolbarButton(String text, String tooltip,
             IconFactoryF.Key icon, Runnable action) {
+        // reviewer request: the toolbar buttons are icon-only — the text is kept as the
+        // accessible name and in the tooltip prefix instead of the button label
         javafx.scene.control.Button button =
-            new javafx.scene.control.Button(text, IconFactoryF.createIcon(icon));
+            new javafx.scene.control.Button((String) null, IconFactoryF.createIcon(icon));
+        button.setAccessibleText(text);
         button.setTooltip(new Tooltip(tooltip));
         button.setOnAction(e -> action.run());
         return button;
