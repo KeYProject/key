@@ -668,8 +668,7 @@ public final class MainWindowF {
 
         restoreLayout();
 
-        ThemeManager.getInstance().themeProperty().addListener((obs, old, theme) -> updateStatus());
-        updateStatus();
+        updateProofStatus();
 
         wireSequentView();
         recentFiles.setOnChange(this::updateRecentFilesMenu);
@@ -5886,7 +5885,7 @@ public final class MainWindowF {
         statusRight.setMinHeight(0);
         bar.getChildren().addAll(statusLeft, statusProgress, spacer, statusRight);
         // extension: MP9.0 — the status-line controls contributed by the FX extensions are
-        // appended at the right end of the status bar, after the theme/font-size label (Swing
+        // appended at the right end of the status bar (Swing
         // MainWindow.createStatusBar / KeYGuiExtensionFacade.getStatusLineComponents,
         // KeYGuiExtensionFacade.java:325-333); shown only when an extension contributes
         // controls.
@@ -5895,14 +5894,6 @@ public final class MainWindowF {
             bar.getChildren().addAll(extensionStatusControls);
         }
         return bar;
-    }
-
-    private void updateStatus() {
-        Theme theme = ThemeManager.getInstance().getTheme();
-        int sizeIndex = ConfigF.DEFAULT.sizeIndex();
-        updateProofStatus();
-        statusRight.setText("Theme: " + theme.name().toLowerCase() + " · Font size: "
-            + ConfigF.SIZES[sizeIndex]);
     }
 
     /**
