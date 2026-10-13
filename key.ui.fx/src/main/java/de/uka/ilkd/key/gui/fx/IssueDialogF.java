@@ -298,6 +298,26 @@ public final class IssueDialogF {
     }
 
     /**
+     * Opens a non-critical issue list for pre-collected entries, e.g. the javac diagnostics of
+     * the Java Compiler Check extension (Swing {@code IssueDialog} constructed by
+     * {@code JavacExtension} with a sorted set of {@code PositionedIssueString}s,
+     * JavacExtension.java:100-108).
+     *
+     * @param owner the owner of the dialog (will be blocked)
+     * @param title the dialog title
+     * @param head the explaining text above the list
+     * @param issueSet the issues to display, will be sorted by location
+     */
+    public static void showIssuesDialog(Window owner, String title, String head,
+            Collection<IssueEntry> issueSet) {
+        if (!Platform.isFxApplicationThread()) {
+            Platform.runLater(() -> showIssuesDialog(owner, title, head, issueSet));
+            return;
+        }
+        new IssueDialogF(owner, title, head, new ArrayList<>(issueSet), false).showAndWait();
+    }
+
+    /**
      * Shows the issue dialog for arbitrary issues with the "critical" styling (Swing
      * {@code WindowUserInterfaceControl.showIssueDialog}, {@code :633-641}).
      *
