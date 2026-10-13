@@ -147,12 +147,15 @@ public final class TestgenExtensionF
             captureWindow(window);
         }
         if (generateButton == null) {
-            // Swing TestGenerationAction/CounterExampleAction SMALL_ICONs (FontAwesome)
-            Button generate = new Button(NAME_GENERATE, new FontIcon(FontAwesomeSolid.FLASK));
+            // Swing TestGenerationAction/CounterExampleAction SMALL_ICONs (FontAwesome);
+            // reviewer request: icon-only toolbar controls
+            Button generate = new Button(null, new FontIcon(FontAwesomeSolid.FLASK));
+            generate.setAccessibleText(NAME_GENERATE);
             generate.setTooltip(new Tooltip(TOOLTIP_GENERATE));
             generate.setOnAction(e -> generateTestcases(generate));
-            Button counterExample = new Button(NAME_COUNTEREXAMPLE,
+            Button counterExample = new Button(null,
                 new FontIcon(FontAwesomeSolid.EXCLAMATION_TRIANGLE));
+            counterExample.setAccessibleText(NAME_COUNTEREXAMPLE);
             counterExample.setTooltip(new Tooltip(TOOLTIP_COUNTEREXAMPLE));
             counterExample.setOnAction(e -> searchCounterExample(counterExample));
             generateButton = generate;

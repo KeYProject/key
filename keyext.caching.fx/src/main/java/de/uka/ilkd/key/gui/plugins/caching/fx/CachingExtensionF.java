@@ -177,9 +177,11 @@ public class CachingExtensionF
     private ToggleButton toolbarToggleButton() {
         ToggleButton button = toggleButton;
         if (button == null) {
-            // MP9.1 icon review: Swing CachingToggleAction.cached icon — database glyph
-            button = new ToggleButton("Proof Caching");
-            button.setGraphic(new FontIcon(FontAwesomeSolid.DATABASE));
+            // MP9.1 icon review: Swing CachingToggleAction.cached icon — database glyph;
+            // reviewer request: icon-only toolbar controls (tooltip + accessible name keep the
+            // discoverability)
+            button = new ToggleButton(null, new FontIcon(FontAwesomeSolid.DATABASE));
+            button.setAccessibleText("Proof Caching");
             button.selectedProperty().bindBidirectional(toggle);
             button.disableProperty().bind(multiCoreActive);
             toggleButton = button;
