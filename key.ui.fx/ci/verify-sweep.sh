@@ -141,7 +141,10 @@ flag_recipe() {
     # loadingexit: app must terminate ITSELF with exit code 0 (no pkill allowed)
     loadingexit)
       pkill -f '[d]e.uka.ilkd.key.core.fx.MainEx' 2>/dev/null; sleep 2
-      export JAVA_TOOL_OPTIONS="-Xmx6g -Dprism.order=sw -Djava.io.tmpdir=$OUT/tmp -Dkey.fx.verify.loadingexit=1"
+      # the hook runs in the demo-load callback (like the other proof-dependent verify hooks),
+      # so the demo must be passed — without it the app never reaches the exit flow and the
+      # wait below runs into the job timeout
+      export JAVA_TOOL_OPTIONS="-Xmx6g -Dprism.order=sw -Djava.io.tmpdir=$OUT/tmp -Dkey.fx.verify.loadingexit=1 -Dkey.fx.demo.sequent=$AGATHA"
       ./gradlew --no-daemon --max-workers=1 :key.ui.fx:run > "$OUT/loadingexit.log" 2>&1 &
       GPID=$!; wait "$GPID"; rc=$?
       echo "loadingexit exit-code=$rc" >> "$OUT/RESULTS.md"
