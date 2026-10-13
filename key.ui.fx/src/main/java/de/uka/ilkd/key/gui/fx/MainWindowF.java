@@ -5401,30 +5401,28 @@ public final class MainWindowF {
                         + " flag (isMinimizeInteraction=" + proofControl.isMinimizeInteraction()
                         + ", tacletFilter=" + original + ")");
                 }
-                // flag armed: the auto-instantiable app applies without the dialog
-                FxUtil.runLater(() -> {
-                    gs.setTacletFilter(true);
-                    applyMinimizeInteraction(proofControl);
-                });
+                // flag armed: the auto-instantiable app applies without the dialog. The flag
+                // change must have run on the FX thread before the worker calls selectedTaclet
+                // (the core decides the minimize branch on the calling thread) — the latch joins
+                // the two, a plain runLater raced the leg (the unarmed leg then still ran armed)
+                setMinimizeInteraction(gs, proofControl, true);
                 TacletApp candidate = findMinimizeCandidate(proof);
                 if (candidate == null) {
                     throw new IllegalStateException("no auto-instantiable taclet application on"
                         + " the demo goal");
                 }
                 appliedTaclet = candidate.taclet().name().toString();
-                Object[] leg = applyTacletExpecting(proofControl, proof, candidate, true);
-                armedNoDialog = (Boolean) leg[0];
-                unarmedDialog = (Boolean) leg[1]; // dialog detection of the armed leg (must be no)
+                Object[] leg = applyTacletExpecting(proofControl, proof, candidate, false);
+                // armed leg: no dialog AND the application was made
+                armedNoDialog = (Boolean) leg[0] && (Boolean) leg[1];
                 // flag off: the same application must open the taclet dialog instead
-                FxUtil.runLater(() -> {
-                    gs.setTacletFilter(false);
-                    applyMinimizeInteraction(proofControl);
-                });
+                setMinimizeInteraction(gs, proofControl, false);
                 TacletApp candidate2 = findMinimizeCandidate(proof);
                 if (candidate2 != null) {
-                    Object[] leg2 = applyTacletExpecting(proofControl, proof, candidate2, false);
+                    Object[] leg2 = applyTacletExpecting(proofControl, proof, candidate2, true);
                     unarmedDialog = (Boolean) leg2[0];
-                    unarmedUnapplied = (Boolean) leg2[1];
+                    // the dialog holds the application (cancel closes it without applying)
+                    unarmedUnapplied = !((Boolean) leg2[1]);
                 }
             } catch (Exception e) {
                 LOGGER.error("Minimize interaction verification (real flow) failed", e);
@@ -5451,6 +5449,26 @@ public final class MainWindowF {
     }
 
     /**
+     * menu: MP7/WP-9 — applies the given Minimize Interaction flag through the same helpers the
+     * toggle uses and blocks the caller until the change has run on the FX thread (the real-flow
+     * legs call {@code selectedTaclet} on the worker and the core reads the flag there — a plain
+     * {@code runLater} raced the leg so the unarmed leg still ran armed).
+     */
+    private void setMinimizeInteraction(GeneralSettings gs, ProofControl proofControl,
+            boolean value) throws InterruptedException {
+        CountDownLatch applied = new CountDownLatch(1);
+        FxUtil.runLater(() -> {
+            gs.setTacletFilter(value);
+            applyMinimizeInteraction(proofControl);
+            applied.countDown();
+        });
+        if (!applied.await(10, TimeUnit.SECONDS)) {
+            throw new IllegalStateException("the minimize flag change did not run on the FX"
+                + " thread within 10 s");
+        }
+    }
+
+    /**
      * WP-9 minimize real-flow leg: applies the candidate through the real interactive path
      * ({@code AbstractProofControl.selectedTaclet}) and watches, from the worker thread, whether
      * the taclet dialog opens ("Choose Taclet Instantiation") and whether the rule application
@@ -5470,10 +5488,13 @@ public final class MainWindowF {
         Thread watcher = new Thread(() -> {
             long deadline = System.currentTimeMillis() + 20_000;
             while (System.currentTimeMillis() < deadline) {
-                Stage dialog = javafx.stage.Window.getWindows().stream()
-                        .filter(w -> w instanceof Stage s && s.isShowing()
-                                && "Choose Taclet Instantiation".equals(s.getTitle()))
-                        .map(w -> (Stage) w).findFirst().orElse(null);
+                // Window.getWindows() is FX-thread restricted (JavaFX 25) — poll through
+                // callAndWait; the FX thread is alive and the dialog runs its own callbacks
+                Stage dialog = FxUtil
+                        .callAndWait(() -> javafx.stage.Window.getWindows().stream()
+                                .filter(w -> w instanceof Stage s && s.isShowing()
+                                        && "Choose Taclet Instantiation".equals(s.getTitle()))
+                                .map(w -> (Stage) w).findFirst().orElse(null));
                 if (dialog != null) {
                     dialogOpened.set(true);
                     FxUtil.runLater(dialog::close);
