@@ -106,7 +106,6 @@
 
 .sequent-term-highlight {
     -fx-fill: -key-accent;
-    -fx-font-weight: bold;
 }
 
 .sequent-placeholder {
@@ -187,7 +186,6 @@
 
 .sequent-search-match-current {
     -fx-fill: -key-accent;
-    -fx-font-weight: bold;
 }
 
 /* proof tree (M2 first version) */
