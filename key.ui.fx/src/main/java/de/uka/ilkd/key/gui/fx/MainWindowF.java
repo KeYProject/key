@@ -3968,7 +3968,8 @@ public final class MainWindowF {
     }
 
     private Menu buildFileMenu() {
-        Menu file = new Menu("File");
+        // the five built-in menus carry Swing-parity mnemonics (MainWindow.java:993 VK_F)
+        Menu file = new Menu("_File");
         MenuItem openFile = menuItem("Open File…", "de.uka.ilkd.key.gui.actions.OpenFileAction",
             IconFactoryF.Key.OPEN_KEY_FILE, this::openFileChooser);
         openFile.disableProperty().bind(mediator.autoModeRunningProperty());
@@ -4099,7 +4100,8 @@ public final class MainWindowF {
     }
 
     private Menu buildViewMenu() {
-        Menu view = new Menu("View");
+        // Swing parity: View menu mnemonic VK_V (MainWindow.java:1035)
+        Menu view = new Menu("_View");
         // menu: MP3a — Pretty Print toggle (Swing PrettyPrintToggleAction,
         // PrettyPrintToggleAction.java:45-59): updateSelectedState mirrors the settings into the
         // NotationInfo static and the selected state; actionPerformed sets the static BEFORE the
@@ -4343,7 +4345,8 @@ public final class MainWindowF {
             new AutoPilotPrepareProofMacro(), new ScriptAwareMacro());
 
     private Menu buildProofMenu() {
-        Menu proof = new Menu("Proof");
+        // Swing parity: Proof menu mnemonic VK_P (MainWindow.java:1084)
+        Menu proof = new Menu("_Proof");
         Menu automation = new Menu("Automation");
         MenuItem startAuto =
             menuItem("Start Automatic Proof", "de.uka.ilkd.key.gui.actions.AutoModeAction",
@@ -4754,7 +4757,7 @@ public final class MainWindowF {
         boolean originalUnicode = viewSettings.isUseUnicode();
         MenuBar bar = buildMenuBar();
         Menu viewMenu = bar.getMenus().stream()
-                .filter(m -> "View".equals(m.getText())).findFirst().orElse(null);
+                .filter(m -> "View".equals(menuDisplayText(m))).findFirst().orElse(null);
         CheckMenuItem pretty = findCheckMenuItem(viewMenu, "Pretty Print");
         CheckMenuItem unicode = findCheckMenuItem(viewMenu, "Unicode Symbols");
         if (pretty == null || unicode == null) {
@@ -4872,7 +4875,7 @@ public final class MainWindowF {
             return "FAIL - no Goal Back item";
         }
         Menu proofMenu = bar.getMenus().stream()
-                .filter(m -> "Proof".equals(m.getText())).findFirst().orElse(null);
+                .filter(m -> "Proof".equals(menuDisplayText(m))).findFirst().orElse(null);
         if (proofMenu != null && proofMenu.getOnShowing() != null) {
             proofMenu.getOnShowing().handle(null);
         } else {
@@ -4939,7 +4942,7 @@ public final class MainWindowF {
         // KeyStrokeManagerF accelerators
         MenuBar bar = buildMenuBar();
         Menu viewMenu = bar.getMenus().stream()
-                .filter(m -> "View".equals(m.getText())).findFirst().orElse(null);
+                .filter(m -> "View".equals(menuDisplayText(m))).findFirst().orElse(null);
         MenuItem backItem = viewMenu == null ? null : findMenuItem(viewMenu, "Back");
         MenuItem forwardItem = viewMenu == null ? null : findMenuItem(viewMenu, "Forward");
         KeyStrokeManagerF manager = KeyStrokeManagerF.getInstance();
@@ -4999,6 +5002,15 @@ public final class MainWindowF {
         NotificationManagerF.getInstance()
                 .notify("Selection history verification: " + (ok ? "PASS" : "FAIL"),
                     ok ? Kind.INFO : Kind.ERROR);
+    }
+
+    /**
+     * @return the menu's display text without the mnemonic marker; the built-in menus carry
+     *         Swing-parity mnemonics ("_File", MainWindow.java:993), so lookups must compare the
+     *         display text
+     */
+    private static String menuDisplayText(Menu menu) {
+        return menu.getText().replace("_", "");
     }
 
     /**
@@ -5126,7 +5138,8 @@ public final class MainWindowF {
     }
 
     private Menu buildOptionsMenu() {
-        Menu options = new Menu("Options");
+        // Swing parity: Options menu mnemonic VK_O (MainWindow.java:1146)
+        Menu options = new Menu("_Options");
         // menu: MP4 — Swing MainWindow.createOptionsMenu :1144-1161: Settings, SMT Solvers…
         // (SMTOptionsAction → settings dialog on the SMT panel), separator, then the five check
         // items; the FX-only "Reset Dock Layout" extra is kept between two separators (Settings,
@@ -5700,7 +5713,8 @@ public final class MainWindowF {
      * {@code SendFeedbackAction}.
      */
     private Menu buildAboutMenu() {
-        Menu about = new Menu("About");
+        // Swing parity: About menu mnemonic VK_A (MainWindow.java:1165, help menu)
+        Menu about = new Menu("_About");
         about.getItems().addAll(
             menuItem("About KeY…", "de.uka.ilkd.key.gui.actions.AboutAction", this::showAbout),
             menuItem("KeY Homepage",
