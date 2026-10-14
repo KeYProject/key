@@ -672,7 +672,20 @@ public final class MainWindowF {
             exitApplication();
         });
         stage.setScene(scene);
+        // reviewer request: JavaFX shows a black window for a short fraction of time when the
+        // stage appears — the window becomes visible before the first rendered frame is
+        // composited (also JDK-8088179). Showing the stage visually transparent and fading it
+        // in after the first rendered frame removes the flash at startup. The opacity must be
+        // small but NOT zero: a stage with opacity 0 is never rendered/presented, the window
+        // would stay black. The flash while resizing is the Glass/GTK exposed-area handling of
+        // the window system and cannot be removed from the application side; the accelerated
+        // prism pipeline (default, no -Dprism.order=sw) renders the resized frame fast enough
+        // to make it barely visible.
+        stage.setOpacity(0.01);
         stage.show();
+        // two runLater hops: the first executes after the pulse that rendered the scene, the
+        // second after that frame was presented to the window system
+        Platform.runLater(() -> Platform.runLater(() -> stage.setOpacity(1)));
 
         restoreLayout();
 
