@@ -77,6 +77,9 @@ public final class IconFactoryF {
         KEY_HOLE_LINKED(FontAwesomeSolid.LINK),
         WARNING_INCOMPLETE(FontAwesomeSolid.EXCLAMATION_TRIANGLE, "key-icon-warning"),
         WARNING_UNSOUND(FontAwesomeSolid.EXCLAMATION_TRIANGLE, "key-icon-error"),
+        // the flask marker of experimental extensions (Swing IconFactory
+        // EXPERIMENTAL_EXTENSION, shown by the ExtensionManager settings panel)
+        EXPERIMENTAL_EXTENSION(FontAwesomeSolid.FLASK),
         SEARCH_HIGHLIGHT(FontAwesomeSolid.HIGHLIGHTER),
         SEARCH_HIDE(FontAwesomeSolid.LOW_VISION),
         SEARCH_REGROUP(FontAwesomeSolid.VIDEO),

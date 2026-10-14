@@ -32,6 +32,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import de.uka.ilkd.key.gui.fx.MainWindowF;
+import de.uka.ilkd.key.gui.fx.extension.ExtensionManagerF;
 import de.uka.ilkd.key.gui.fx.plugins.javac.JavacSettingsProviderF;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
 import de.uka.ilkd.key.proof.Proof;
@@ -113,6 +114,10 @@ public final class SettingsManagerF {
             // menu: MP4 — SMT between the standard UI and the taclet options, like the Swing
             // SettingsManager registration order (SettingsManager.java:59-63)
             INSTANCE.add(SMT_SETTINGS);
+            // the "Extension Settings" panel with the enable/disable checkboxes per discovered
+            // extension (Swing SettingsManager.java:62 registers EXTENSION_MANAGER right after
+            // the SMT provider; the FX panel is ExtensionManagerF)
+            INSTANCE.add(new ExtensionManagerF());
             INSTANCE.add(TACLET_OPTIONS_SETTINGS);
             INSTANCE.add(JAVAC_SETTINGS);
             // reviewer request: the missing Swing providers are ported — the feature flags and
