@@ -26,6 +26,7 @@ import javafx.scene.Node;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
@@ -114,8 +115,22 @@ public class DrawerF extends BorderPane {
      */
     private final ScrollPane buttonAreaScroller = new ScrollPane(buttonArea);
 
-    /** Width allowance for the strip's scrollbar in the collapsed drawer. */
-    private static final double SCROLLBAR_ALLOWANCE = 12.0;
+    /**
+     * Width allowance for the strip's scrollbar in the collapsed drawer; matches the slim
+     * scrollbar width ({@link #SLIM_SCROLLBAR}) plus a small margin.
+     */
+    private static final double SCROLLBAR_ALLOWANCE = 8.0;
+
+    /** Width of the slim strip scrollbar, set on the bars at skin time and styled by the themes. */
+    private static final double SLIM_SCROLLBAR = 6.0;
+
+    /**
+     * The strip wrapper's scrollbars; resolved once the wrapper's skin is applied (its nodes
+     * exist only then). Their visibility decides whether the collapsed strip needs the scrollbar
+     * allowance (see {@link #clampToButtonBar()}).
+     */
+    private ScrollBar stripVbar;
+    private ScrollBar stripHbar;
     private final DrawerContentAreaF contentArea = new DrawerContentAreaF();
     private final ObservableList<DrawerItemF> items = FXCollections.observableArrayList();
     private final ContextMenu contextMenu = new ContextMenu();
@@ -151,9 +166,14 @@ public class DrawerF extends BorderPane {
         multiselectProperty.set(multiselect);
         floatingDrawersProperty.set(floatingDrawers);
         buttonArea.setStyle("-fx-spacing: 0; -fx-padding: 0;");
+        buttonArea.getStyleClass().add("drawer-button-bar");
         // the scroll wrapper is chrome-free, so the strip keeps its tool-bar look
         buttonAreaScroller.setStyle(
             "-fx-background-color: transparent; -fx-border-color: transparent; -fx-padding: 0;");
+        // the strip's scrollbar is styled from the theme stylesheets (section "Drawer") — the
+        // scroll bars live in the scroller's skin, not inside the tool bar, so the scroller
+        // needs its own style class for the descendant selectors
+        buttonAreaScroller.getStyleClass().add("drawer-strip");
         // the bar's preferred width is only measurable after the first layout pass (the rotated
         // buttons' groups report zero bounds before) — while collapsed, re-clamp the drawer as
         // soon as the strip's laid-out width becomes known
@@ -161,7 +181,11 @@ public class DrawerF extends BorderPane {
             if (collapsedToBar) {
                 clampToButtonBar();
             }
+            updateStripSize();
         });
+        // the wrapper's scrollbar nodes exist once its skin is applied; watching their
+        // visibility keeps the collapsed strip sized exactly (see clampToButtonBar)
+        buttonAreaScroller.skinProperty().addListener((obs, was, skin) -> watchStripScrollbars());
 
         configureDockingSide();
         configureContextMenu();
@@ -382,8 +406,81 @@ public class DrawerF extends BorderPane {
     /** Whether the drawer is currently collapsed to its button bar. */
     private boolean collapsedToBar;
 
+    /**
+     * Resolves the strip wrapper's scrollbar nodes (they exist once the wrapper's skin is
+     * applied) and re-clamps the drawer when a scrollbar's visibility changes.
+     */
+    /**
+     * Sizes the strip wrapper explicitly: exactly as wide as the strip's tool bar plus the slim
+     * scrollbar while that is visible (height for top/bottom docking). The wrapper's own
+     * preferred-size computation derives from the scroll bars' laid widths, which still report
+     * the modena size when the first layout pass reads it — that stale allowance showed as a
+     * permanent dead column between the toggles and the shown component (reviewer report,
+     * round 5).
+     */
+    private void updateStripSize() {
+        boolean vbar = stripVbar != null && stripVbar.isVisible();
+        boolean hbar = stripHbar != null && stripHbar.isVisible();
+        switch (getDockingSide()) {
+            case LEFT, RIGHT -> {
+                double size = buttonArea.prefWidth(-1) + (vbar ? SLIM_SCROLLBAR : 0);
+                // the minimum matters as much as the preference: the scroller's computed minimum
+                // still carries the modena bar allowance and would otherwise win the layout
+                buttonAreaScroller.setPrefWidth(size);
+                buttonAreaScroller.setMinWidth(size);
+            }
+            case TOP, BOTTOM -> {
+                double size = buttonArea.prefHeight(-1) + (hbar ? SLIM_SCROLLBAR : 0);
+                buttonAreaScroller.setPrefHeight(size);
+                buttonAreaScroller.setMinHeight(size);
+            }
+        }
+    }
+
+    private void watchStripScrollbars() {
+        if (stripVbar != null && stripHbar != null) {
+            return; // resolved already — the skin is applied once
+        }
+        for (Node node : buttonAreaScroller.lookupAll(".scroll-bar")) {
+            if (!(node instanceof ScrollBar bar)) {
+                continue;
+            }
+            boolean barVertical = bar.getOrientation() == Orientation.VERTICAL;
+            if ((barVertical ? stripVbar : stripHbar) != null) {
+                continue; // this scrollbar is tracked already
+            }
+            if (barVertical) {
+                stripVbar = bar;
+            } else {
+                stripHbar = bar;
+            }
+            // slim strip scrollbar: the theme stylesheets restyle the bar ("Drawer" section),
+            // but the size must also be set here in code — the scroller's preferred width is
+            // derived from the bars' current widths, and a CSS-only change races the first
+            // layout pass (the scroller then keeps the modena bar width as a permanent dead
+            // column between the toggles and the shown component, reviewer report round 5)
+            if (barVertical) {
+                bar.setPrefWidth(SLIM_SCROLLBAR);
+            } else {
+                bar.setPrefHeight(SLIM_SCROLLBAR);
+            }
+            bar.visibleProperty().addListener((obs, was, is) -> {
+                if (collapsedToBar) {
+                    clampToButtonBar();
+                }
+                updateStripSize();
+            });
+        }
+    }
+
     private void clampToButtonBar() {
-        double width = buttonArea.prefWidth(-1) + SCROLLBAR_ALLOWANCE;
+        // the scrollbar allowance applies only while the strip's scrollbar is actually visible:
+        // an unconditional allowance leaves a permanent dead column between the strip and the
+        // shown components (reviewer report, round 5)
+        ScrollBar scroll =
+            buttonArea.getOrientation() == Orientation.VERTICAL ? stripVbar : stripHbar;
+        double width = buttonArea.prefWidth(-1)
+                + (scroll != null && scroll.isVisible() ? SCROLLBAR_ALLOWANCE : 0);
         setMinWidth(width);
         setMaxWidth(width);
     }
