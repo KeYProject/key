@@ -1044,3 +1044,93 @@
 .axioms-list {
     -fx-background-color: -key-surface;
 }
+
+/* ==========================================================================
+ * Drawer: the rotated toggle strip (de.uka.ilkd.key.gui.fx.drawer.DrawerF,
+ * class "drawer-button-bar" on the strip's ToolBar).
+ * ========================================================================== */
+
+/* The toggles are flat (TornadoFX DrawerStyles.buttonArea, DrawerStyles.kt):
+ * a plain column of icon + rotated title without the modena bevel — no
+ * gradient, border or shadow. */
+.drawer-button-bar {
+    /* the strip's tool bar itself stays chrome-free: modena paints the vertical tool bar with
+       a gradient plus an outer border, which reads as a beveled slab column behind the toggles */
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+.drawer-button-bar .toggle-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+/* subtle hover feedback on the flat toggles */
+.drawer-button-bar .toggle-button:hover {
+    -fx-background-color: derive(-key-border, 60%);
+}
+
+/* All strip painting stays strictly inside the button's layout bounds: modena
+ * paints the base shadow 1px below the bounds (insets "0 0 -1 0") and, when
+ * focused, the focus ring plus a faint glow outside the bounds (insets
+ * -0.2/-1.4). The strip's toggles have zero spacing and the strip's full
+ * width, so the protrusion bleeds over the neighboring toggles and is clipped
+ * at the strip edges (reviewer report: focus/select made a toggle look larger
+ * and misaligned the strip). The focus indication is a ring inside the button,
+ * like Swing's inner focus rectangle. */
+.drawer-button-bar .toggle-button:focused {
+    -fx-background-color: -fx-focus-color, transparent;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 3, 2;
+}
+.drawer-button-bar .toggle-button:selected {
+    /* TornadoFX DrawerStyles.buttonArea toggleButton:selected (DrawerStyles.kt) */
+    -fx-background-color: #818181;
+    -fx-background-insets: 0;
+    -fx-background-radius: 3;
+    -fx-text-fill: white;
+}
+.drawer-button-bar .toggle-button:selected:focused {
+    /* the focus ring painted above the flat selection, inside the bounds */
+    -fx-background-color: -fx-focus-color, #818181;
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 3, 2;
+}
+
+/* The strip's scrollbar: slim and chrome-free. The modena scrollbar is ~15px
+ * wide and, since the toggles can overflow the strip height, it otherwise
+ * reads as a dead column between the toggle buttons and the shown component
+ * (reviewer report). The thumb alone is visible on the transparent track. */
+.drawer-strip .scroll-bar:vertical {
+    -fx-pref-width: 6px;
+    -fx-background-color: transparent;
+    -fx-padding: 1 0 1 0;
+}
+.drawer-strip .scroll-bar:horizontal {
+    -fx-pref-height: 6px;
+    -fx-background-color: transparent;
+    -fx-padding: 0 1 0 1;
+}
+.drawer-strip .scroll-bar .track {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+}
+.drawer-strip .scroll-bar .increment-button,
+.drawer-strip .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+.drawer-strip .scroll-bar .increment-arrow,
+.drawer-strip .scroll-bar .decrement-arrow {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-pref-width: 0px;
+    -fx-pref-height: 0px;
+}
+.drawer-strip .scroll-bar .thumb {
+    -fx-background-color: derive(-key-border, 30%);
+    -fx-background-radius: 2;
+    -fx-background-insets: 1 2 1 2;
+}

@@ -70,20 +70,16 @@ public class DrawerItemF extends VBox {
             header.setCollapsible(false);
             getChildren().add(header);
         }
-        applySelectedStyle(button.isSelected());
+        // the selected look (#818181 background, white text — TornadoFX DrawerStyles.buttonArea,
+        // DrawerStyles.kt) is styled by the theme stylesheets (key-light.css/key-dark.css,
+        // section "drawer"): there the background and the focus ring paint strictly inside the
+        // button's bounds, while inline or modena styling protrudes over the neighboring
+        // toggles in the rotated strip (reviewer report: focus/select made the toggle look
+        // larger and misaligned the strip)
         button.selectedProperty().addListener((obs, wasSelected, isSelected) -> {
-            applySelectedStyle(isSelected);
             this.drawer.updateExpanded(this);
         });
         DrawerF.register(this);
-    }
-
-    private void applySelectedStyle(boolean selected) {
-        // TornadoFX DrawerStyles.buttonArea toggleButton:selected -> #818181 background,
-        // white text (DrawerStyles.kt).
-        button.setStyle(selected
-                ? "-fx-background-color: #818181; -fx-text-fill: white;"
-                : "");
     }
 
     /** @return the drawer currently owning this item */
