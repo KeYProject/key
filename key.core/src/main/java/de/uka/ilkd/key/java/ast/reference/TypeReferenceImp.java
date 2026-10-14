@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.java.ast.reference;
 
 import de.uka.ilkd.key.java.ast.*;
-import de.uka.ilkd.key.java.ast.Annotation;
+import de.uka.ilkd.key.java.ast.annotation.Annotation;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -42,7 +42,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     protected final ProgramElementName name;
 
     /**
-     * Annotations.
+     * Java Annotations (like @NonNull or @Rep)
      */
     protected final ImmutableList<Annotation> annotations;
 
@@ -251,9 +251,8 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement pe = source.getSource();
 
-        if (pe instanceof TypeReference tr
-                && tr.getDimensions() == getDimensions()
-                && tr.getAnnotations().equals(getAnnotations())) {
+        if (!(pe instanceof TypeReference tr)
+                || tr.getDimensions() != getDimensions()) {
             return null;
         }
 

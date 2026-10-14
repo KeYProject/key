@@ -4,7 +4,7 @@
 package de.uka.ilkd.key.java.visitor;
 
 import de.uka.ilkd.key.java.ast.*;
-import de.uka.ilkd.key.java.ast.Annotation;
+import de.uka.ilkd.key.java.ast.annotation.Annotation;
 import de.uka.ilkd.key.java.ast.ccatch.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.expression.*;

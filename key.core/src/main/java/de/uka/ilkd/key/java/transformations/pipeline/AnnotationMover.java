@@ -16,7 +16,6 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.AnnotationExpr;
-import com.github.javaparser.ast.expr.ArrayInitializerExpr;
 import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.type.Type;
@@ -25,7 +24,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This transformation moves type annotations to their type from the corresponding declaration.
+ * Java Annotations can be attached to different constructs, such as 
+ * type uses or variable declarations. This means that when parsing 
+ * an annotated declaration like <code> @NonNull Object o; <code/>
+ * it is ambigous wether @NonNull should be attached to the type 
+ * Object or to the whole declaration.
+ *
+ * The solution for this are @Target meta annotations, that specify 
+ * the construct the annotation gets attached to. The @Target annotations 
+ * are not read by the parser though. Which means that all annotations 
+ * are attached to the declaration even if the type would have been 
+ * the target.
+ *
+ * This Transformation tries to find the annotation declaration 
+ * and moves the annotation from the declaration to the type 
+ * if the declaration has the correct @Target annotation.
  *
  * @author Daniel Grévent
  */
@@ -72,9 +85,12 @@ public class AnnotationMover extends JavaTransformerAbstract {
         Iterator<AnnotationExpr> iter = declList.iterator();
         while (iter.hasNext()) {
             AnnotationExpr annot = iter.next();
-            if (!isTypeAnnotation(annot))
+            if (!isTypeAnnotation(annot)) {
                 continue;
+            }
 
+            // remove the annotation from the declaration 
+            // and move it to the type
             iter.remove();
             annot.setParentNode(type);
             type.annotations().add(annot);
@@ -82,7 +98,7 @@ public class AnnotationMover extends JavaTransformerAbstract {
     }
 
     private boolean isTypeAnnotation(AnnotationExpr annot) {
-        String name = annot.getNameAsString();
+        String name = annot.getNameAsString(); // 
         if (typeAnnotationMap.containsKey(name)) {
             return typeAnnotationMap.get(name);
         }
@@ -102,19 +118,17 @@ public class AnnotationMover extends JavaTransformerAbstract {
 
         var decl = (AnnotationDeclaration) resolved.toAst().get();
         for (AnnotationExpr subAnnot : decl.annotations()) {
-            if (!subAnnot.getNameAsString().equals("Target"))
+            if (!subAnnot.getNameAsString().equals("Target")) {
                 continue;
+            }
 
-            if (!(subAnnot instanceof SingleMemberAnnotationExpr))
+            if (!(subAnnot instanceof SingleMemberAnnotationExpr)) {
                 return false;
+            }
 
-            var array = ((SingleMemberAnnotationExpr) subAnnot).getMemberValue();
-            if (!(array instanceof ArrayInitializerExpr))
-                return false;
-
-            for (var value : ((ArrayInitializerExpr) array).getValues()) {
-                if (value.toString().equals("ElementType.TYPE_USE"))
-                    return true;
+            var value = ((SingleMemberAnnotationExpr) subAnnot).getMemberValue();
+            if (value.toString().contains("TYPE_USE")) {
+                return true;
             }
 
             break;

@@ -6,7 +6,8 @@ package de.uka.ilkd.key.rule.conditions;
 import java.util.Arrays;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.Annotation;
+import de.uka.ilkd.key.java.ast.annotation.Annotation;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.annotation.MarkerAnnotation;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
@@ -100,6 +101,12 @@ public final class AddAnnotation implements VariableCondition {
         Object inst = svInst.getInstantiation(read);
 
         Annotation annotation = build((Services) logicServices);
+
+        // the annotation type does not exist, so the rule should not be applicable
+        if (annotation == null) {
+            return null;
+        }
+
         if (inst instanceof ProgramVariable variable) {
             TypeReference tRef = addAnnotation(variable.getTypeReference(), annotation);
             LocationVariable replacement = newFromTypeRef(
@@ -119,7 +126,8 @@ public final class AddAnnotation implements VariableCondition {
     }
 
     private Annotation build(Services services) {
-        return new MarkerAnnotation(services.getJavaInfo().getTypeByName(annot));
+        KeYJavaType annotType = services.getJavaInfo().getTypeByName(annot);
+        return annotType == null ? null : new MarkerAnnotation(annotType);
     }
 
     private static TypeReference addAnnotation(TypeReference tRef, Annotation annotation) {

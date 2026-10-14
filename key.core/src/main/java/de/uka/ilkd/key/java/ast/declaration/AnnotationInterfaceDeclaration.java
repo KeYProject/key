@@ -17,6 +17,11 @@ import org.key_project.util.collection.ImmutableList;
 import org.jspecify.annotations.NonNull;
 
 
+/**
+ * Declaration of an annotation interface (starting with @interface).
+ *
+ * @author Daniel Grévent
+ */
 public class AnnotationInterfaceDeclaration extends TypeDeclaration {
     public AnnotationInterfaceDeclaration(
             PositionInfo pi, List<Comment> comments,
@@ -29,7 +34,8 @@ public class AnnotationInterfaceDeclaration extends TypeDeclaration {
     }
 
     /**
-     * returns the local declared supertypes
+     * returns the local declared supertypes (in this case there are none as this is an 
+     * annotation interface).
      */
     public ImmutableList<KeYJavaType> getSupertypes() {
         return ImmutableList.of();

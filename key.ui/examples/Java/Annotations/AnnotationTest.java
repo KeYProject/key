@@ -10,6 +10,9 @@ import java.lang.annotation.Target;
 final class AnnotationTest {
   public @Unsound Object o;
 
+  // this goal is not soundly closable, but can be closed using
+  // the `unsoundFieldClose` rule defined in `unsound.key`
+  
   /*@ requires o != null;
     @ ensures false; */
   public void dummy() { }

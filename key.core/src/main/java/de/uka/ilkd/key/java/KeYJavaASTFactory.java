@@ -6,7 +6,7 @@ package de.uka.ilkd.key.java;
 import java.util.List;
 
 import de.uka.ilkd.key.java.ast.*;
-import de.uka.ilkd.key.java.ast.Annotation;
+import de.uka.ilkd.key.java.ast.annotation.Annotation;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;

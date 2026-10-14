@@ -10,6 +10,12 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.util.collection.ImmutableArray;
 
+/**
+ * The Members (written as methods) inside {@link AnnotationInterfaceDeclaration}s. They 
+ * correspond to the arguments of the Annotations when they are used.
+ *
+ * @author Daniel Grévent
+ */
 public class AnnotationInterfaceMemberDeclaration extends JavaDeclaration
         implements MemberDeclaration {
     private final TypeReference typeRef;

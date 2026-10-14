@@ -7,7 +7,7 @@ package de.uka.ilkd.key.java.ast.reference;
 
 import java.util.Objects;
 
-import de.uka.ilkd.key.java.ast.Annotation;
+import de.uka.ilkd.key.java.ast.annotation.Annotation;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
@@ -23,9 +23,8 @@ public class TypeRef extends TypeReferenceImp {
     /**
      * creates a type reference for the given KeYJavaType with dimension 0 and creates a suitable
      * package reference prefix from the KeYJavaType. If this is not desired use the constructor
-     * TypeRef(ProgramElementName, ImmutableList<AnnotationExpression>, int, ReferencePrefix,
-     * KeYJavaType) and take null as last
-     * argument.
+     * TypeRef(ProgramElementName, ImmutableList<Annotation>, int, ReferencePrefix, KeYJavaType) 
+     * and take null as last argument.
      */
     public TypeRef(@NonNull KeYJavaType kjt) {
         this(kjt, ImmutableList.of(), 0);
@@ -34,9 +33,8 @@ public class TypeRef extends TypeReferenceImp {
     /**
      * creates a type reference for the given KeYJavaType and the given dimension and creates a
      * suitable package reference prefix from the KeYJavaType. If this is not desired use the
-     * constructor TypeRef(ProgramElementName, ImmutableList<AnnotationExpression>, int,
-     * ReferencePrefix, KeYJavaType) and take null as
-     * last argument.
+     * constructor TypeRef(ProgramElementName, ImmutableList<Annotation>, int, ReferencePrefix, 
+     * KeYJavaType) and take null as last argument.
      */
     public TypeRef(@NonNull KeYJavaType kjt, ImmutableList<Annotation> annotations,
             int dim) {

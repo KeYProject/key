@@ -6,6 +6,12 @@ package de.uka.ilkd.key.java.ast.annotation;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 
+/**
+ * This corresponds to a Java {@link Annotation} without arguments, 
+ * like @Override or @NonNull.
+ *
+ * @author Daniel Grévent
+ */
 public class MarkerAnnotation extends Annotation {
     public MarkerAnnotation(KeYJavaType type) {
         super(type);

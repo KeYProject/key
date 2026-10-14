@@ -5,7 +5,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Arrays;
 
-import de.uka.ilkd.key.java.ast.Annotation;
+import de.uka.ilkd.key.java.ast.annotation.Annotation;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
@@ -50,11 +50,11 @@ public final class RemoveAnnotation implements VariableCondition {
      */
     public RemoveAnnotation(SchemaVariable store, SchemaVariable read, String annot) {
         if (!store.sort().equals(read.sort())) {
-            throw new RuntimeException("Expected left and right to have the same sort!");
+            throw new IllegalArgumentException("Expected left and right to have the same sort!");
         }
 
         if (!Arrays.stream(ALLOWED).anyMatch(read.sort()::equals)) {
-            throw new RuntimeException(
+            throw new IllegalArgumentException(
                 "Unsupported sort: " + read.sort() + ", supported: " +
                     Arrays.stream(ALLOWED).map(s -> s.toString()).reduce("",
                         (a, b) -> a + " " + b));
@@ -112,6 +112,6 @@ public final class RemoveAnnotation implements VariableCondition {
 
     @Override
     public String toString() {
-        return "\\addAnnotation(" + store + ", " + read + ", " + annot + ")";
+        return "\\removeAnnotation(" + store + ", " + read + ", " + annot + ")";
     }
 }
