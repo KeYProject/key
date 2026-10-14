@@ -66,6 +66,10 @@ public final class KeYGuiExtensionFacadeF {
             extensions = ServiceLoader.load(KeYGuiExtensionF.class).stream()
                     .map(ServiceLoader.Provider::get)
                     .filter(Objects::nonNull)
+                    // Swing loadExtensions filters forbidden extensions at discovery
+                    // (KeYGuiExtensionFacade.java:279-283): the static block list and the
+                    // `-P<fqn>=false` system property
+                    .filter(extension -> isNotForbidden(extension.getClass()))
                     .sorted(Comparator.comparingInt(KeYGuiExtensionFacadeF::priorityOf))
                     .collect(Collectors.toList());
             LOGGER.info("Extension discovery: {} FX extension(s) loaded: {}",
@@ -92,6 +96,121 @@ public final class KeYGuiExtensionFacadeF {
     }
 
     /**
+     * The persisted enable/disable state of the extensions (Swing
+     * {@code ExtensionManager.EXTENSION_SETTINGS} + {@code getExtensionSettings},
+     * ExtensionManager.java:34+54-57): registered into the proof-independent settings here, so
+     * the disabled class names persist like in the Swing app (same "Extensions"/"disabled"
+     * section, see {@link ExtensionSettingsF}).
+     */
+    private static final ExtensionSettingsF EXTENSION_SETTINGS = createExtensionSettings();
+
+    private static ExtensionSettingsF createExtensionSettings() {
+        ExtensionSettingsF settings = new ExtensionSettingsF();
+        de.uka.ilkd.key.settings.ProofIndependentSettings.DEFAULT_INSTANCE.addSettings(settings);
+        return settings;
+    }
+
+    /** @return the extension settings (Swing {@code ExtensionManager.getExtensionSettings}) */
+    public static ExtensionSettingsF getExtensionSettings() {
+        return EXTENSION_SETTINGS;
+    }
+
+    /** class names that must never load (Swing {@code forbiddenPlugins}, facade line 37) */
+    private static final java.util.Set<String> forbiddenPlugins = new java.util.HashSet<>();
+
+    /**
+     * Disables the given class from further loading (Swing
+     * {@code KeYGuiExtensionFacade.forbidClass}, KeYGuiExtensionFacade.java:429-434).
+     *
+     * @param clazz a fqdn of a class
+     */
+    public static void forbidClass(String clazz) {
+        forbiddenPlugins.add(clazz);
+        if (extensions != null) {
+            extensions = extensions.stream()
+                    .filter(it -> !it.getClass().getName().equals(clazz))
+                    .collect(Collectors.toList());
+        }
+    }
+
+    /**
+     * Determines if the given extension class is completely disabled (Swing
+     * {@code KeYGuiExtensionFacade.isNotForbidden}, KeYGuiExtensionFacade.java:309-315): either
+     * on the static block list or switched off by the {@code -P[fqn]=false} command line.
+     */
+    private static boolean isNotForbidden(Class<?> clazz) {
+        if (forbiddenPlugins.contains(clazz.getName())) {
+            return false;
+        }
+        String sys = System.getProperty(clazz.getName());
+        return !"false".equalsIgnoreCase(sys);
+    }
+
+    /**
+     * The extensions whose contributions the host consumes (Swing
+     * {@code KeYGuiExtensionFacade.getExtensionsStream} filters {@code isDisabled()},
+     * KeYGuiExtensionFacade.java:290-294): user-disabled extensions (the checkbox panel of the
+     * settings dialog, "applied on next restart") contribute nothing until re-enabled. Unlike
+     * the Swing original the experimental-feature gating of {@code Extension.isDisabled}
+     * (Extension.java:57-63) is not applied — the FX port contributes every discovered
+     * extension unconditionally (the {@code key.fx.verify.extensions} self test pins the
+     * discovered providers); the settings panel marks experimental extensions with the flask
+     * instead.
+     *
+     * @return the discovered extensions minus the user-disabled ones
+     */
+    private static List<KeYGuiExtensionF> contributingExtensions() {
+        java.util.Collection<String> disabled = EXTENSION_SETTINGS.getForbiddenClasses();
+        return getExtensions().stream()
+                .filter(extension -> !disabled.contains(extension.getClass().getName()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * @return the display name of the extension (Swing {@code Extension.getName},
+     *         Extension.java:44-46): the {@link KeYGuiExtensionF.Info#name() Info name} or the
+     *         class name
+     */
+    public static String nameOf(KeYGuiExtensionF extension) {
+        KeYGuiExtensionF.Info info =
+            extension.getClass().getAnnotation(KeYGuiExtensionF.Info.class);
+        return info == null ? extension.getClass().getName() : info.name();
+    }
+
+    /**
+     * @return whether the extension can be disabled by the user (Swing
+     *         {@code Extension.isOptional}, Extension.java:48-51, without the experimental
+     *         feature-activation term the FX port does not enforce)
+     */
+    public static boolean isOptionalOf(KeYGuiExtensionF extension) {
+        KeYGuiExtensionF.Info info =
+            extension.getClass().getAnnotation(KeYGuiExtensionF.Info.class);
+        return info != null && info.optional();
+    }
+
+    /**
+     * @return whether the extension is marked experimental (Swing
+     *         {@code Extension.isExperimental}, Extension.java:74-76; the FX
+     *         {@link KeYGuiExtensionF.Info#experimental() Info} defaults to {@code true} like
+     *         the Swing annotation)
+     */
+    public static boolean isExperimentalOf(KeYGuiExtensionF extension) {
+        KeYGuiExtensionF.Info info =
+            extension.getClass().getAnnotation(KeYGuiExtensionF.Info.class);
+        return info == null || info.experimental();
+    }
+
+    /**
+     * @return the description of the extension (Swing {@code Extension.getDescription},
+     *         Extension.java:104-106)
+     */
+    public static String descriptionOf(KeYGuiExtensionF extension) {
+        KeYGuiExtensionF.Info info =
+            extension.getClass().getAnnotation(KeYGuiExtensionF.Info.class);
+        return info == null ? "" : info.description();
+    }
+
+    /**
      * The menus contributed by every {@link KeYGuiExtensionF.MainMenuF} provider, in provider
      * order (Swing {@code KeYGuiExtensionFacade.getMainMenuActions},
      * KeYGuiExtensionFacade.java:63-76). The host appends these to the menu bar as separate
@@ -105,7 +224,7 @@ public final class KeYGuiExtensionFacadeF {
      */
     public static List<Menu> getMenus(MainWindowF window, KeYMediatorF mediator) {
         List<Menu> menus = new ArrayList<>();
-        for (KeYGuiExtensionF extension : getExtensions()) {
+        for (KeYGuiExtensionF extension : contributingExtensions()) {
             if (extension instanceof KeYGuiExtensionF.MainMenuF mainMenu) {
                 menus.addAll(mainMenu.getMenus(window, mediator));
             }
@@ -137,7 +256,7 @@ public final class KeYGuiExtensionFacadeF {
      */
     public static void installMenus(MainWindowF window, MenuBar menuBar,
             KeYMediatorF mediator) {
-        for (KeYGuiExtensionF extension : getExtensions()) {
+        for (KeYGuiExtensionF extension : contributingExtensions()) {
             if (!(extension instanceof KeYGuiExtensionF.MainMenuF mainMenu)) {
                 continue;
             }
@@ -244,7 +363,7 @@ public final class KeYGuiExtensionFacadeF {
      */
     public static List<Control> getToolbarControls(MainWindowF window, KeYMediatorF mediator) {
         List<Control> controls = new ArrayList<>();
-        for (KeYGuiExtensionF extension : getExtensions()) {
+        for (KeYGuiExtensionF extension : contributingExtensions()) {
             if (extension instanceof KeYGuiExtensionF.ToolbarF toolbar) {
                 controls.addAll(toolbar.getToolbarControls(window, mediator));
             }
@@ -261,7 +380,7 @@ public final class KeYGuiExtensionFacadeF {
      */
     public static List<Control> getStatusLineControls() {
         List<Control> controls = new ArrayList<>();
-        for (KeYGuiExtensionF extension : getExtensions()) {
+        for (KeYGuiExtensionF extension : contributingExtensions()) {
             if (extension instanceof KeYGuiExtensionF.StatusLineF statusLine) {
                 controls.addAll(statusLine.getStatusLineControls());
             }
@@ -279,7 +398,7 @@ public final class KeYGuiExtensionFacadeF {
      */
     public static List<Tab> getLeftPanelTabs(MainWindowF window, KeYMediatorF mediator) {
         List<Tab> tabs = new ArrayList<>();
-        for (KeYGuiExtensionF extension : getExtensions()) {
+        for (KeYGuiExtensionF extension : contributingExtensions()) {
             if (extension instanceof KeYGuiExtensionF.LeftPanelF leftPanel) {
                 tabs.addAll(leftPanel.getLeftPanelTabs(window, mediator));
             }
@@ -301,7 +420,7 @@ public final class KeYGuiExtensionFacadeF {
     public static List<MenuItem> getSequentContextItems(KeYMediatorF mediator, Goal goal,
             PosInSequent pos) {
         List<MenuItem> items = new ArrayList<>();
-        for (KeYGuiExtensionF extension : getExtensions()) {
+        for (KeYGuiExtensionF extension : contributingExtensions()) {
             if (extension instanceof KeYGuiExtensionF.ContextMenuF contextMenu) {
                 items.addAll(contextMenu.getSequentContextItems(mediator, goal, pos));
             }
@@ -324,7 +443,7 @@ public final class KeYGuiExtensionFacadeF {
     public static List<MenuItem> getProofTreeContextItems(KeYMediatorF mediator,
             de.uka.ilkd.key.proof.Node node) {
         List<MenuItem> items = new ArrayList<>();
-        for (KeYGuiExtensionF extension : getExtensions()) {
+        for (KeYGuiExtensionF extension : contributingExtensions()) {
             if (extension instanceof KeYGuiExtensionF.ContextMenuF contextMenu) {
                 items.addAll(contextMenu.getProofTreeContextItems(mediator, node));
             }
@@ -346,7 +465,7 @@ public final class KeYGuiExtensionFacadeF {
     public static List<MenuItem> getProofListContextItems(KeYMediatorF mediator,
             de.uka.ilkd.key.proof.Proof proof) {
         List<MenuItem> items = new ArrayList<>();
-        for (KeYGuiExtensionF extension : getExtensions()) {
+        for (KeYGuiExtensionF extension : contributingExtensions()) {
             if (extension instanceof KeYGuiExtensionF.ContextMenuF contextMenu) {
                 items.addAll(contextMenu.getProofListContextItems(mediator, proof));
             }
@@ -364,7 +483,7 @@ public final class KeYGuiExtensionFacadeF {
      */
     public static List<SettingsProviderF> getSettingsProviders() {
         List<SettingsProviderF> providers = new ArrayList<>();
-        for (KeYGuiExtensionF extension : getExtensions()) {
+        for (KeYGuiExtensionF extension : contributingExtensions()) {
             if (extension instanceof KeYGuiExtensionF.SettingsF settings) {
                 providers.add(settings.getSettings());
             }
@@ -383,7 +502,7 @@ public final class KeYGuiExtensionFacadeF {
      */
     public static List<String> getTooltipStrings(KeYMediatorF mediator, PosInSequent pos) {
         List<String> strings = new ArrayList<>();
-        for (KeYGuiExtensionF extension : getExtensions()) {
+        for (KeYGuiExtensionF extension : contributingExtensions()) {
             if (extension instanceof KeYGuiExtensionF.TooltipF tooltip) {
                 strings.addAll(tooltip.getTooltipStrings(mediator, pos));
             }
@@ -404,7 +523,7 @@ public final class KeYGuiExtensionFacadeF {
      */
     public static void installKeyboardShortcuts(KeYMediatorF mediator, Node node,
             String componentId) {
-        for (KeYGuiExtensionF extension : getExtensions()) {
+        for (KeYGuiExtensionF extension : contributingExtensions()) {
             if (!(extension instanceof KeYGuiExtensionF.KeyboardShortcutsF shortcuts)) {
                 continue;
             }
@@ -435,7 +554,7 @@ public final class KeYGuiExtensionFacadeF {
      * @param mediator the mediator of the window
      */
     public static void initAll(MainWindowF window, KeYMediatorF mediator) {
-        for (KeYGuiExtensionF extension : getExtensions()) {
+        for (KeYGuiExtensionF extension : contributingExtensions()) {
             if (extension instanceof KeYGuiExtensionF.StartupF startup) {
                 startup.init(window, mediator);
             }
