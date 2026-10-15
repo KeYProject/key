@@ -315,9 +315,9 @@ saved immediately.
 
 ## 10. Storage
 
-User-defined prompts and skills are stored as JSON files in the KeY configuration directory
-(`llm/prompts` and `llm/skills`), e.g. `~/.key/llm/prompts/<name>.json` when no custom config
-directory is set. The chat history and selected models are part of the proof session and are not
+User-defined prompts and skills are stored as JSON files in the versioned KeY configuration
+directory (`llm/prompts` and `llm/skills`), e.g. `~/.key/v3.1/llm/prompts/<name>.json` for
+KeY 3.1. The chat history and selected models are part of the proof session and are not
 persisted as files.
 
 ---
