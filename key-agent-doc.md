@@ -42,6 +42,8 @@ local commands such as `/skills` (see [Input markup](#4-input-markup)).
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
+![The KeY-Agent panel, docked as a tab in the lower left of the main window](docs/images/agent/llm-panel.png)
+
 - **Sending.** `Ctrl+Enter` sends the current input (there is no send button). `Shift+Enter` and
   plain Enter insert a line break.
 - **Running a turn.** While a turn is running, the *Stop* button cancels it. Only one turn runs at
@@ -247,6 +249,8 @@ LLM Settings
 └── Skills     skill library editor
 ```
 
+![The LLM Settings page of the settings dialog](docs/images/agent/llm-settings.png)
+
 The main *LLM Settings* panel holds the sections below; **Tools**, **Prompts** and **Skills**
 are edited in their own panels.
 
@@ -289,6 +293,8 @@ max model listing entries `1000`.
 | Blocked shell patterns | built-in blocklist, one regex per line |
 
 ### Tools (sub-panel: LLM Settings → Tools)
+
+![Tool approval settings: one permission row per tool](docs/images/agent/llm-settings-tools.png)
 One row per tool with a short explanation and a radio group selecting its permission:
 **Default** (the tool's own behavior, `auto` or `ask`), **With approval** (always ask),
 **Without approval (always)** or **Disabled** (not sent to the model). Read-only tools default to
