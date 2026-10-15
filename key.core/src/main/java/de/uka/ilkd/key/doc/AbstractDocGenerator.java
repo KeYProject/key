@@ -198,5 +198,4 @@ final class JsonWriter {
         sb.append("  ".repeat(depth));
     }
 }
-\newLocalVars(varDeclsSV: VARIABLE, updateBeforeSV: VARIABLE, updateFrameSV: VARIABLE, bodySV: VARIABLE)
 
