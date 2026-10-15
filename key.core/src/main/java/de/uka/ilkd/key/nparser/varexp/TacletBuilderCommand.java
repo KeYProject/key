@@ -28,6 +28,9 @@ public interface TacletBuilderCommand {
      */
     boolean isSuitableFor(@NonNull String name);
 
+    /// Returns information about this command.
+    TacletBuilderCommandInfo getInformation();
+
     /**
      * Defines the amount and type of expected arguments. For example, if you want describe a
      * sub-type test (instanceOf) you would need two sorts {@code new ArgumentType[]{SORT,SORT} } as
@@ -39,7 +42,9 @@ public interface TacletBuilderCommand {
      *
      * @see ArgumentType
      */
-    ArgumentType[] getArgumentTypes();
+    default ArgumentType[] getArgumentTypes() {
+        return getInformation().argumentTypes();
+    }
 
     /**
      * Applying this command on the given taclet builder.

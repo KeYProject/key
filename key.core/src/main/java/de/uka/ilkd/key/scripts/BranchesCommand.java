@@ -176,6 +176,10 @@ public class BranchesCommand extends AbstractCommand {
         throw new ScriptException();
     }
 
+    @Documentation(category = "Auxiliary", value = """
+            Selects or removes a branch in the proof tree, or restricts the automatic strategy
+            to a selected branch.
+            """)
     public static class Parameters {
         @Argument
         @Documentation("The operation mode: 'push', 'pop', 'select', or 'single'")

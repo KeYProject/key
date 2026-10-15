@@ -6,10 +6,16 @@ package de.uka.ilkd.key.scripts.meta;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
 
+import com.github.therapi.runtimejavadoc.ClassJavadoc;
+import com.github.therapi.runtimejavadoc.CommentFormatter;
+import com.github.therapi.runtimejavadoc.RuntimeJavadoc;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -81,7 +87,7 @@ public final class ArgumentsLifter {
     }
 
     public static String extractDocumentation(String command, Class<?> commandClazz,
-            Class<?> parameterClazz) {
+            @Nullable Class<?> parameterClazz) {
         StringBuilder sb = new StringBuilder();
 
         Deprecated dep = commandClazz.getAnnotation(Deprecated.class);
@@ -90,9 +96,16 @@ public final class ArgumentsLifter {
                 "**Caution! This proof script command is deprecated, and may be removed soon!**\n\n");
         }
 
+        ClassJavadoc jdocCommand = RuntimeJavadoc.getJavadoc(commandClazz);
+
         Documentation docCommand = commandClazz.getAnnotation(Documentation.class);
         if (docCommand != null) {
             sb.append(docCommand.value());
+            sb.append("\n\n");
+        } else if (jdocCommand != null && jdocCommand.getComment() != null) {
+            // the javadoc is only available if the class was compiled with a JDK that
+            // understands the doc comment style used in the source (e.g., JDK 23+ for ///)
+            sb.append(jdocCommand.getComment());
             sb.append("\n\n");
         }
 
@@ -100,11 +113,17 @@ public final class ArgumentsLifter {
             return sb.toString();
         }
 
+        ClassJavadoc jdocParams = RuntimeJavadoc.getJavadoc(parameterClazz);
+
         Documentation docAn = parameterClazz.getAnnotation(Documentation.class);
         if (docAn != null) {
             sb.append(docAn.value());
             sb.append("\n\n");
+        } else if (jdocParams != null && jdocParams.getComment() != null) {
+            sb.append(jdocParams.getComment());
+            sb.append("\n\n");
         }
+
 
         sb.append("#### Usage: \n`").append(generateCommandUsage(command, parameterClazz))
                 .append("`\n\n");
@@ -114,13 +133,23 @@ public final class ArgumentsLifter {
         sb.append("#### Parameters:\n");
         for (ProofScriptArgument meta : args) {
             sb.append("\n\n");
+
+            var documentation = meta.getDocumentation();
+            if (documentation.isEmpty() && jdocParams != null) {
+                documentation = jdocParams.getFields().stream()
+                        .filter(it -> it.getName().equals(meta.getField().getName()))
+                        .findFirst()
+                        .map(field -> new CommentFormatter().format(field.getComment()))
+                        .orElse("");
+            }
+
             if (meta.isPositional()) {
                 sb.append("* `%s` *(%s%s positional argument, type %s)*:<br>%s".formatted(
                     meta.getName(),
                     meta.isRequired() ? "" : "optional ",
                     ordinalStr(meta.getArgumentPosition() + 1),
                     meta.getField().getType().getSimpleName(),
-                    meta.getDocumentation()));
+                    documentation));
             }
 
             if (meta.isOption()) {
@@ -128,28 +157,28 @@ public final class ArgumentsLifter {
                     meta.getName(),
                     meta.isRequired() ? "" : "optional ",
                     meta.getField().getType().getSimpleName(),
-                    meta.getDocumentation()));
+                    documentation));
             }
 
             if (meta.isFlag()) {
                 sb.append("* `%s` *(flag)*:<br>%s".formatted(
                     meta.getName(),
-                    meta.getDocumentation()));
+                    documentation));
             }
 
             if (meta.isPositionalVarArgs()) {
-                sb.append("* `%s...` (%s): %s".formatted(
+                sb.append("* `%s...` (%s): %s<br>%s".formatted(
                     meta.getName(),
                     meta.getPositionalVarargs().as(),
                     meta.getPositionalVarargs().startIndex(),
-                    meta.getDocumentation()));
+                    documentation));
             }
 
             if (meta.isOptionalVarArgs()) {
                 sb.append("* `%s...`: *(options prefixed by `%s`, type %s)*:<br>%s".formatted(
                     meta.getName(), meta.getOptionalVarArgs().prefix(),
                     meta.getOptionalVarArgs().as().getSimpleName(),
-                    meta.getDocumentation()));
+                    documentation));
             }
 
         }
@@ -189,39 +218,6 @@ public final class ArgumentsLifter {
 
     private static @NonNull List<ProofScriptArgument> getSortedProofScriptArguments(
             Class<?> parameterClazz) {
-        // Comparator<ProofScriptArgument> optional =
-        // Comparator.comparing(ProofScriptArgument::isOption);
-        // Comparator<ProofScriptArgument> positional =
-        // Comparator.comparing(ProofScriptArgument::isPositional);
-        // Comparator<ProofScriptArgument> flagal =
-        // Comparator.comparing(ProofScriptArgument::isFlag);
-        // Comparator<ProofScriptArgument> allargsal =
-        // Comparator.comparing(ProofScriptArgument::isPositionalVarArgs);
-        // Comparator<ProofScriptArgument> byRequired =
-        // Comparator.comparing(ProofScriptArgument::isRequired);
-        // Comparator<ProofScriptArgument> byName =
-        // Comparator.comparing(ProofScriptArgument::getName);
-        //
-        // Comparator<ProofScriptArgument> byPos = Comparator.comparing(it -> {
-        // if (it.isPositionalVarArgs()) {
-        // it.getPositionalVarargs().startIndex();
-        // }
-        // if (it.isPositional()) {
-        // it.getArgument().value();
-        // }
-        //
-        // return -1;
-        // });
-        //
-        //
-        // var comp = optional
-        // .thenComparing(flagal)
-        // .thenComparing(positional)
-        // .thenComparing(allargsal)
-        // .thenComparing(byRequired)
-        // .thenComparing(byPos)
-        // .thenComparing(byName);
-
         var args = Arrays.stream(parameterClazz.getDeclaredFields())
                 .map(ProofScriptArgument::new)
                 .sorted(Comparator.comparing(ProofScriptArgument::orderString))
