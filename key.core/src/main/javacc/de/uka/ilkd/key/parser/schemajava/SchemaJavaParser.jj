@@ -847,11 +847,11 @@ PackageSpecification PackageDeclaration() :
   	annotations.trimToSize();
   }
     "package"
-	{
-	    result = factory.createPackageSpecification();
-	    setPrefixInfo(result);
-          result.setAnnotations(annotations);
-	}
+    {
+	result = factory.createPackageSpecification();
+	setPrefixInfo(result);
+	result.setAnnotations(annotations);
+    }
     qn = Name() ";"
     {
 	result.setPackageReference(qn.toPackageReference());
@@ -3453,28 +3453,32 @@ TypeOperator AllocationExpression() :
     ClassDeclaration cd = null;
     NewArray na;
     ASTList<TypeArgumentDeclaration> typeArgs;
+    ASTList<AnnotationUseSpecification> annotations = new ASTArrayList<AnnotationUseSpecification>();
+    AnnotationUseSpecification annot;
 }
 {
+    "new"
+    (annot = AnnotationUse() { 
+	annot.makeParentRoleValid();
+	annotations.add(annot); 
+     })*
     (
      LOOKAHEAD(2)
-     ( "new"
+     (
+       (tr = PrimitiveType()  | tr = TypeMC())
      {
 	 na = factory.createNewArray();
 	 setPrefixInfo(na);
-     }
-       (tr = PrimitiveType()  | tr = TypeMC())
-     {
 	 na.setTypeReference(tr);
      }
        result = ArrayDimsAndInits(na)
        )
      | (
-	"new"
-     {
+	(qn = TypedName() | tr = TypeSV())
+     {    
 	 result = factory.createNew();
 	 setPrefixInfo(result);
      }
-	(qn = TypedName() | tr = TypeSV())
   [typeArgs = NonWildcardTypeArguments() { qn.setTypeArguments(typeArgs); } ]
 	(
 	 ( args = Arguments()
@@ -3511,6 +3515,8 @@ TypeOperator AllocationExpression() :
 	)
      )
 	{
+	    result.setAnnotations(annotations);
+	    result.makeParentRoleValid();
 	    checkConstruction(result);
 	    return result;
 	}
@@ -3792,25 +3798,8 @@ Statement BlockStatement() :
 {
     (LOOKAHEAD((AnnotationUse())* [ "final" ]<TYPEOF> "(" <SVIDENTIFIER> ")")
      result = SVLocalVariableDeclaration() ";"
-     |  LOOKAHEAD((AnnotationUse())* [ "final" | "ghost" ] <SVIDENTIFIER> <SVIDENTIFIER> ";" ,
-	 {
-	     isLocalVariable((getToken(1).kind == FINAL || getToken(1).kind == GHOST ? getToken(3) : getToken(2)).toString())
-	 })
-     result = SVLocalVariableDeclaration() ";"
-     |  LOOKAHEAD((AnnotationUse())* [ "final" | "ghost" ] <SVIDENTIFIER> <SVIDENTIFIER> "=" <SVIDENTIFIER> ,
-	 {
-	     isLocalVariable((getToken(1).kind == FINAL || getToken(1).kind == GHOST ? getToken(3) : getToken(2)).toString())
-	 })
-     result = SVLocalVariableDeclaration() ";"
-     |  LOOKAHEAD((AnnotationUse())* [ "final" | "ghost" ] Type() <SVIDENTIFIER> ";" ,
-	 {
-	     isLocalVariable((getToken(1).kind == FINAL || getToken(1).kind == GHOST ? getToken(3) : getToken(2)).toString())
-	 })
-     result = SVLocalVariableDeclaration() ";"
-     |  LOOKAHEAD((AnnotationUse())* [ "final" | "ghost" ] Type() <SVIDENTIFIER> "=" <SVIDENTIFIER> ,
-	 {
-	     isLocalVariable((getToken(1).kind == FINAL || getToken(1).kind == GHOST ? getToken(3) : getToken(2)).toString())
-	 })
+     |  LOOKAHEAD((AnnotationUse())* [ "final" | "ghost" ] (<SVIDENTIFIER> | Type()) 
+	 LOOKAHEAD(<SVIDENTIFIER> (";" | "=" <SVIDENTIFIER> ), { isLocalVariable(getToken(1).toString()) }))
      result = SVLocalVariableDeclaration() ";"
      |
      LOOKAHEAD((AnnotationUse())* [ "final" ] Type() <IDENTIFIER>)
@@ -3876,7 +3865,9 @@ LocalVariableDeclaration SVLocalVariableDeclaration() :
 {
     LocalVariableDeclaration result;
     ASTList<VariableSpecification> vl = new ASTArrayList<VariableSpecification>(1);
+    ASTList<DeclarationSpecifier> sl = new ASTArrayList<DeclarationSpecifier>();
     TypeReference tr;
+    AnnotationUseSpecification annot;
     VariableSpecification var;
 }
 {
@@ -3884,23 +3875,25 @@ LocalVariableDeclaration SVLocalVariableDeclaration() :
 	result = factory.createLocalVariableDeclaration();
 	setPrefixInfo(result);
     }
+    (annot = AnnotationUse() { sl.add(annot); })*
     [ "final"
     {
 	Final fi = factory.createFinal();
 	setPrefixInfo(fi);
-	result.setDeclarationSpecifiers(new ASTArrayList<DeclarationSpecifier>(fi));
+	sl.add(fi);
     }
     |
       "ghost"
     {
     	Ghost g = new Ghost();
     	setPrefixInfo(g);
-    	result.setDeclarationSpecifiers(new ASTArrayList<DeclarationSpecifier>(g));
+	sl.add(g);
     }
     ]
 	(tr = TypeMC() | tr = TypeSV() | tr = Type() )
 	var = SVVariableDeclarator(false) {vl.add(var);}
     {
+	result.setDeclarationSpecifiers(sl);
 	result.setTypeReference(tr);
 	result.setVariableSpecifications(vl);
 	checkConstruction(result);

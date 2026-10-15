@@ -399,7 +399,7 @@ public class JP2KeYTypeConverter {
             baseTypeRef = new TypeRef(baseType);
         } else {
             baseTypeRef = new TypeRef(new ProgramElementName(baseType.getSort().name().toString()),
-                0, null, baseType);
+                ImmutableList.of(), 0, null, baseType);
         }
 
         ExtList members = new ExtList();
@@ -422,7 +422,7 @@ public class JP2KeYTypeConverter {
         var superArrayType = new KeYJavaType();
         var specLength =
             new FieldSpecification(new LocationVariable(new ProgramElementName("length"),
-                integerType, superArrayType, false, false, false, true));
+                new TypeRef(integerType), superArrayType, false, false, false, true));
         var f = new FieldDeclaration(createModifierList(ModifierKind.PUBLIC, ModifierKind.FINAL),
             new TypeRef(integerType), new FieldSpecification[] { specLength }, false);
         superArrayType.setJavaType(new SuperArrayDeclaration(f));
@@ -443,7 +443,7 @@ public class JP2KeYTypeConverter {
         int dimension = base instanceof ArrayType ? ((ArrayType) base).getDimension() + 1 : 1;
         TypeRef parentReference =
             new TypeRef(new ProgramElementName(String.valueOf(parent.getSort().name())),
-                dimension, null, parent);
+                ImmutableList.of(), dimension, null, parent);
 
         // add methods
         // the only situation where base can be null is in case of a
