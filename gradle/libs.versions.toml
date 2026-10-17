@@ -36,6 +36,9 @@ docking-frames = "1.1.3p1"
 # External tools
 scala-isabelle = "0.4.5"
 
+# JVM bytecode reading/analyzing (KeY/JVM transpiler)
+asm = "9.7.1"
+
 
 [libraries]
 # SLF4J and logging
@@ -91,6 +94,12 @@ picocli = { module = "info.picocli:picocli", version.ref = "picocli" }
 
 # External tools
 scala-isabelle = { module = "de.unruh:scala-isabelle_2.13", version.ref = "scala-isabelle" }
+
+# JVM bytecode reading/analyzing (KeY/JVM transpiler)
+asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
+asm-tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
+asm-commons = { module = "org.ow2.asm:asm-commons", version.ref = "asm" }
+asm-analysis = { module = "org.ow2.asm:asm-analysis", version.ref = "asm" }
 
 [bundles]
 # Common testing dependencies
