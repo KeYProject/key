@@ -38,8 +38,10 @@ package jvm;
  * KeY's Java math mode ({@code intRules: javaSemantics}); the generated {@code .key} files set
  * this. Division, remainder, bitwise and shift operations have no contracts (KeY's first-order
  * int theory has no bitwise operators, and division needs an exceptional case); they are unused
- * by the M1 fixtures. Long, float and double (category-2) stacks are added in M3, ahead of
- * objects/arrays in M2.
+ * by the M1 fixtures. M2 adds reference-typed stack operations ({@link #push(Object)},
+ * {@link #popRef()}, {@link #topRef()}, reference comparisons/branches); the ghost
+ * {@code \seq} holds {@code any}-sorted elements, so int and reference values share one stack.
+ * Long/float/double (category-2) stacks and arrays are M2/M3 follow-ups.
  */
 public class Local {
 
@@ -95,6 +97,87 @@ public class Local {
       @*/
     public int top() {
         return 0;
+    }
+
+    // -- reference-typed stack operations (M2) ------------------------------------------
+    //
+    // The ghost \seq stores any-sorted elements, so int and reference values share one stack;
+    // well-typed bytecode never mixes them at one slot. push(new_obj)/push(field) widen to
+    // push(Object); ASTORE/aread introduce the real Java cast ((T) stk.popRef()) whose
+    // checkcast obligation KeY discharges from the static type.
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   ensures size == \old(size) + 1;
+      @   ensures contents == \seq_concat(\seq(v), \old(contents));
+      @*/
+    public void push(Object v) {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures \result == \seq_get(\old(contents), 0);
+      @   ensures size == \old(size) - 1;
+      @   ensures contents == \seq_sub(\old(contents), 1, \old(size));
+      @*/
+    public Object popRef() {
+        return null;
+    }
+
+    /*@ public normal_behavior
+      @   assignable \nothing;
+      @   requires size > 0;
+      @   ensures \result == \seq_get(contents, 0);
+      @*/
+    public Object topRef() {
+        return null;
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures \result == ((Object)\seq_get(\old(contents), 0) == null);
+      @   ensures size == \old(size) - 1;
+      @   ensures contents == \seq_sub(\old(contents), 1, \old(size));
+      @*/
+    public boolean if_null() {
+        return false;
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures \result == ((Object)\seq_get(\old(contents), 0) != null);
+      @   ensures size == \old(size) - 1;
+      @   ensures contents == \seq_sub(\old(contents), 1, \old(size));
+      @*/
+    public boolean if_nonnull() {
+        return false;
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size >= 2;
+      @   ensures \result ==
+      @           ((Object)\seq_get(\old(contents), 1) == (Object)\seq_get(\old(contents), 0));
+      @   ensures size == \old(size) - 2;
+      @   ensures contents == \seq_sub(\old(contents), 2, \old(size));
+      @*/
+    public boolean if_acmpeq() {
+        return false;
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size >= 2;
+      @   ensures \result ==
+      @           ((Object)\seq_get(\old(contents), 1) != (Object)\seq_get(\old(contents), 0));
+      @   ensures size == \old(size) - 2;
+      @   ensures contents == \seq_sub(\old(contents), 2, \old(size));
+      @*/
+    public boolean if_acmpne() {
+        return false;
     }
 
     // -- int arithmetic (value2 op value1 per the JVM spec; result pushed) ------------
