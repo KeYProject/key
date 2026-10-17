@@ -1,0 +1,24 @@
+plugins {
+    id 'application'
+}
+
+description = "JVM bytecode support for KeY: transpile .class/.jar into compilable Java with a " +
+    "JML-formalized runtime, and built-in rules for the (unstructured) goto"
+
+dependencies {
+    api(project(":key.core"))
+
+    api(libs.asm)
+    api(libs.asm.tree)
+    api(libs.asm.commons)
+    api(libs.asm.analysis)
+
+    implementation(libs.picocli)
+
+    testImplementation(testFixtures(project(":key.core")))
+}
+
+application {
+    // entry point of the transpiler CLI, set up in M0/M1 (see cli/TranspileCli)
+    mainClass.set("org.key_project.jvm.cli.TranspileCli")
+}
