@@ -38,22 +38,14 @@ final class Congruence {
     /** Union-find parent map over the terms merged by the assumed equalities. */
     private final Map<JTerm, JTerm> parent = new HashMap<>();
 
-    /** The (cached) factory used to rebuild normalised terms. */
-    private final TermFactory tf;
-
-    /** Access to the theory operators, passed to the theory supports on each veto check. */
-    private final Services services;
-
     /**
      * @param assumedLiterals the literals assumed true on the sequent
-     * @param services access to the term factory and the theory operators
+     * @param services the services providing access to theories, termfactory etc.
      */
     Congruence(ImmutableSet<JTerm> assumedLiterals, Services services) {
-        this.services = services;
-        this.tf = services.getTermFactory();
         for (final JTerm lit : assumedLiterals) {
             if (lit.op() == Equality.EQUALS) {
-                union(lit.sub(0), lit.sub(1));
+                union(lit.sub(0), lit.sub(1), services);
             }
         }
     }
@@ -92,15 +84,15 @@ final class Congruence {
      * the flipped direction is tried, and if that is rejected too the equality does not take part
      * in the congruence.
      */
-    private void union(JTerm a, JTerm b) {
+    private void union(JTerm a, JTerm b, Services services) {
         final JTerm ra = find(a);
         final JTerm rb = find(b);
         if (ra.equals(rb)) {
             return;
         }
-        if (allowed(ra, rb)) {
+        if (allowed(ra, rb, services)) {
             parent.put(ra, rb);
-        } else if (allowed(rb, ra)) {
+        } else if (allowed(rb, ra, services)) {
             parent.put(rb, ra);
         }
     }
@@ -118,9 +110,10 @@ final class Congruence {
      *
      * @param from the class representative that would point to {@code to}
      * @param to the term that would become the representative of the merged class
+     * @param services access to the theory operators
      * @return whether the rewrite is well sorted and no theory support vetoes it
      */
-    private boolean allowed(JTerm from, JTerm to) {
+    private boolean allowed(JTerm from, JTerm to, Services services) {
         if (to.sort() != from.sort() && !to.sort().extendsTrans(from.sort())) {
             return false;
         }
@@ -137,9 +130,10 @@ final class Congruence {
      * subterms are left untouched.
      *
      * @param t a term to normalise
+     * @param tf the factory that rebuilds a rewritten term
      * @return the congruence-normal form of {@code t}
      */
-    JTerm normalize(JTerm t) {
+    JTerm normalize(JTerm t, TermFactory tf) {
         if (parent.isEmpty() || !t.boundVars().isEmpty()) {
             return t;
         }
@@ -149,19 +143,19 @@ final class Congruence {
         if (memo != null) {
             return memo;
         }
-        final JTerm result = normalizeUncached(t);
+        final JTerm result = normalizeUncached(t, tf);
         normalized.put(t, result);
         return result;
     }
 
-    private JTerm normalizeUncached(JTerm t) {
+    private JTerm normalizeUncached(JTerm t, TermFactory tf) {
         if (t.arity() == 0) {
             return find(t);
         }
         final JTerm[] subs = new JTerm[t.arity()];
         boolean changed = false;
         for (int i = 0; i < t.arity(); i++) {
-            subs[i] = normalize(t.sub(i));
+            subs[i] = normalize(t.sub(i), tf);
             if (subs[i] != t.sub(i)) {
                 changed = true;
             }

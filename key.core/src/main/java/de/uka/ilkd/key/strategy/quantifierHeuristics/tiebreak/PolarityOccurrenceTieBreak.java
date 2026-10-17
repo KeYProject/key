@@ -21,7 +21,6 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Modality;
@@ -131,7 +130,7 @@ abstract class PolarityOccurrenceTieBreak implements QuantifierInstantiationTieB
     private static final int FROZEN_BASE = 4;
 
     /** The formula count per operator and the proving-polarity formula count per operator. */
-    private record SequentCounts(Proof proof, Sequent seq, Map<Operator, Integer> opCounts,
+    private record SequentCounts(Sequent seq, Map<Operator, Integer> opCounts,
             Map<Operator, Integer> goalCounts, Map<Term, Integer> compoundCounts) {
     }
 
@@ -157,15 +156,9 @@ abstract class PolarityOccurrenceTieBreak implements QuantifierInstantiationTieB
      * (succedent at relative {@code +1}, antecedent at relative {@code -1}).
      */
     private static SequentCounts sequentCounts(Sequent seq, Services services) {
-        final Proof proof = services.getProof();
         final SequentCounts cached = lastCounts.get();
         if (cached != null && cached.seq() == seq) {
             return cached;
-        }
-        if (cached != null && proof != cached.proof()) {
-            // The memo belongs to another proof. Drop it before computing, so the other
-            // proof's sequent stays reachable only while this entry is in use.
-            lastCounts.remove();
         }
         final Map<Operator, Integer> counts = new HashMap<>();
         final Map<Operator, Integer> goal = new HashMap<>();
@@ -184,7 +177,7 @@ abstract class PolarityOccurrenceTieBreak implements QuantifierInstantiationTieB
             }
         }
         final SequentCounts result =
-            new SequentCounts(proof, seq, counts, goal, new LinkedHashMap<>());
+            new SequentCounts(seq, counts, goal, new LinkedHashMap<>());
         lastCounts.set(result);
         return result;
     }
