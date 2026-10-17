@@ -13,6 +13,7 @@ import java.util.TreeSet;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.IincInsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
@@ -21,25 +22,34 @@ import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 /**
  * Transpiles a single method from bytecode into compilable Java source over the {@code jvm.Local}
- * runtime (M1, int subset).
+ * runtime (M1 int subset + M2 references/fields/calls).
  * <p>
  * The output is the <em>canonical linear layout</em>: parameters and JVM local variables become
  * <em>plain Java locals</em> (no {@code iload}/{@code istore}/{@code setLocal*} calls in the
  * output), and the JVM operand stack becomes one {@code jvm.Local} instance whose JML contracts
  * model the stack as a {@code \seq} ghost:
- * {@code stk.push(a);} ({@code iload}), {@code x = stk.pop();} ({@code istore}),
+ * {@code stk.push(a);} ({@code iload}/{@code aload}), {@code x = stk.pop();} /
+ * {@code x = (T) stk.popRef();} ({@code istore}/{@code astore}),
  * {@code stk.iadd();} (binary ops), {@code if (stk.if_icmplt()) { jvm.Local.goto_(pc); }}
- * (conditional jumps), {@code return stk.top();} ({@code ireturn}).
+ * (conditional jumps), {@code return stk.top();} ({@code ireturn}/{@code areturn}).
  * <p>
  * Every branch target {@code pc} becomes a Java label
  * {@code L<pc>: { if (false) { break L<pc>; } ... }} whose guard keeps KeY's {@code unusedLabel}
  * taclet away; forward/backward jumps become {@code jvm.Local.goto_(pc);}. Mid-layout
- * {@code return}/{@code ireturn} are wrapped in {@code if (true) { ... }} for javac reachability.
+ * {@code return} is wrapped in {@code if (true) { ... }} for javac reachability.
  * Unsupported instructions abort loudly.
+ * <p>
+ * Object model (M2): {@code new}+{@code dup}+{@code invokespecial <init>} is fused into
+ * {@code T $tN = new T(args); stk.push($tN);} (the real allocation is a Java expression, the
+ * stack only carries a reference), fields are real Java field accesses around
+ * {@code popRef}/{@code push}, and instance calls are {@code stk.push($o.method(args))}. The
+ * reference type of every JVM local slot comes from the {@code LocalVariableTable} (fixtures are
+ * compiled with {@code -g}); a reference slot without debug type aborts loudly.
  */
 public final class MethodTranspiler {
 
@@ -53,12 +63,17 @@ public final class MethodTranspiler {
     private final Map<LabelNode, Integer> labelIndex = new HashMap<>();
     private final Set<Integer> targets = new HashSet<>();
     private int lastOpcodeIndex = -1;
-    /** Fresh temporary variable counter for popped call arguments. */
+    /** Fresh temporary variable counter for popped arguments/receivers/allocation temps. */
     private int nextTemp = 0;
 
     private final StringBuilder body = new StringBuilder();
-    /** JVM slots used for plain int local variables (parameters are excluded). */
+    /** JVM slots used for plain Java local variables (parameters and {@code this} excluded). */
     private final Set<Integer> localSlots = new TreeSet<>();
+    /**
+     * Java type name of each JVM local slot (paremeters, {@code this}, and locals from the
+     * {@code LocalVariableTable}).
+     */
+    private final Map<Integer, String> slotTypes = new HashMap<>();
     /** The name of the runtime operand-stack variable in the emitted method. */
     private String stackVar = "stk";
 
@@ -92,6 +107,11 @@ public final class MethodTranspiler {
             }
         }
         localSlots.removeAll(paramSlots());
+        if (!isStatic) {
+            // `this` lives in slot 0 of instance methods; it is implicit, never declared.
+            localSlots.remove(0);
+        }
+        indexSlotTypes();
     }
 
     private static boolean isSlotOpcode(int opcode) {
@@ -101,7 +121,28 @@ public final class MethodTranspiler {
         };
     }
 
-    /** The JVM slots occupied by the (int) parameters. */
+    /**
+     * Registers the Java type of every local slot: {@code this}, parameters, then the
+     * {@code LocalVariableTable} (fixtures compiled with {@code -g}).
+     */
+    private void indexSlotTypes() {
+        if (!isStatic) {
+            slotTypes.put(0, jvmTypeName(Type.getObjectType(className)));
+        }
+        Type[] args = Type.getArgumentTypes(method.desc);
+        int slot = isStatic ? 0 : 1;
+        for (Type arg : args) {
+            slotTypes.put(slot, jvmTypeName(arg));
+            slot += arg.getSize();
+        }
+        if (method.localVariables != null) {
+            for (LocalVariableNode lv : method.localVariables) {
+                slotTypes.putIfAbsent(lv.index, jvmTypeName(Type.getType(lv.desc)));
+            }
+        }
+    }
+
+    /** The JVM slots occupied by the parameters. */
     private Set<Integer> paramSlots() {
         Set<Integer> slots = new TreeSet<>();
         Type[] args = Type.getArgumentTypes(method.desc);
@@ -117,16 +158,23 @@ public final class MethodTranspiler {
     public String transpile() {
         if (instructionCount == 0) {
             throw new UnsupportedOperationException(
-                "Method without bytecode code is not supported in M1: " + method.name);
+                "Method without bytecode code is not supported in M1/M2: " + method.name);
         }
         pickStackVar();
         StringBuilder sb = new StringBuilder();
-        sb.append("    ").append(modifier()).append(type()).append(method.name)
-                .append(parameterList()).append(" {\n");
+        sb.append("    ").append(modifier()).append(methodHeader()).append(" {\n");
         sb.append(prologue());
         emit();
         sb.append(body).append("    }\n");
         return sb.toString();
+    }
+
+    private String methodHeader() {
+        if (method.name.equals("<init>")) {
+            return simpleName(className) + parameterList();
+        }
+        String retType = type();
+        return retType + method.name + parameterList();
     }
 
     /** Avoids a name clash between the runtime stack variable and a source-level parameter. */
@@ -183,6 +231,9 @@ public final class MethodTranspiler {
 
     /** The Java name of the plain local variable holding JVM local slot {@code slot}. */
     private String localName(int slot) {
+        if (slot == 0 && !isStatic) {
+            return "this";
+        }
         Integer[] params = paramSlots().toArray(new Integer[0]);
         for (int i = 0; i < params.length; i++) {
             if (params[i] == slot) {
@@ -192,23 +243,37 @@ public final class MethodTranspiler {
         return "local_" + slot;
     }
 
-    private static String jvmTypeName(Type t) {
+    /** The Java type name of JVM local slot {@code slot} (defaults to {@code int}). */
+    private String slotType(int slot) {
+        return slotTypes.getOrDefault(slot, "int");
+    }
+
+    /** JVM type descriptor → Java source type (arrays as {@code T[]}, objects as simple name). */
+    public static String jvmTypeName(Type t) {
         if (t.getSort() == Type.ARRAY) {
             return jvmTypeName(t.getElementType()) + "[]".repeat(t.getDimensions());
         }
         if (t.getSort() == Type.OBJECT) {
-            String internal = t.getInternalName();
-            int slash = internal.lastIndexOf('/');
-            return internal.substring(slash + 1);
+            return simpleName(t.getInternalName());
         }
         // primitives
         return t.getClassName();
     }
 
+    private static String simpleName(String internalName) {
+        int slash = internalName.lastIndexOf('/');
+        return slash < 0 ? internalName : internalName.substring(slash + 1);
+    }
+
     private String prologue() {
         StringBuilder sb = new StringBuilder();
         for (int slot : localSlots) {
-            sb.append("        int ").append(localName(slot)).append(";\n");
+            String t = slotType(slot);
+            if (t.equals("long") || t.equals("double")) {
+                throw new UnsupportedOperationException(
+                    "Category-2 local in method " + method.name + " is not supported in M2");
+            }
+            sb.append("        ").append(t).append(' ').append(localName(slot)).append(";\n");
         }
         sb.append("        jvm.Local ").append(stackVar).append(" = new jvm.Local();\n");
         return sb.toString();
@@ -217,16 +282,53 @@ public final class MethodTranspiler {
     private void emit() {
         int index = 0;
         boolean inLabeled = false;
+        String pendingNew = null;
+        boolean skippedDup = false;
         for (AbstractInsnNode insn = method.instructions.getFirst(); insn != null; insn =
             insn.getNext(), index++) {
             if (targets.contains(index)) {
+                if (pendingNew != null) {
+                    throw new UnsupportedOperationException(
+                        "Jump target inside a new+<init> pattern in method " + method.name);
+                }
                 if (inLabeled) {
                     line("        }");
                 }
                 line("        L" + index + ": { if (false) { break L" + index + "; }");
                 inLabeled = true;
             }
+            if (insn.getOpcode() == Opcodes.NEW) {
+                if (pendingNew != null) {
+                    throw new UnsupportedOperationException(
+                        "Nested allocation in " + method.name + " is not supported in M2");
+                }
+                pendingNew = ((TypeInsnNode) insn).desc;
+                skippedDup = false;
+                continue; // no push: the fused <init> emits the object
+            }
+            if (insn.getOpcode() == Opcodes.DUP && pendingNew != null && !skippedDup) {
+                skippedDup = true;
+                continue; // the pattern's dup: consumed by the fusion
+            }
+            if (insn instanceof MethodInsnNode call && pendingNew != null
+                    && call.name.equals("<init>") && call.owner.equals(pendingNew)) {
+                emitAllocation(call);
+                pendingNew = null;
+                continue;
+            }
+            if (pendingNew != null) {
+                // instructions between dup and <init> must be pure argument pushes
+                if (!isConstructorArgumentPush(insn)) {
+                    throw new UnsupportedOperationException(
+                        "Unsupported instruction inside new+<init> pattern in method "
+                            + method.name + ": " + mnemonic(insn.getOpcode()));
+                }
+            }
             emitInstruction(insn, index);
+        }
+        if (pendingNew != null) {
+            throw new UnsupportedOperationException(
+                "new without matching <init> in method " + method.name);
         }
         if (inLabeled) {
             line("        }");
@@ -236,6 +338,20 @@ public final class MethodTranspiler {
             // `return <zero>;`. The guard is never taken (constant false), so KeY never reaches it.
             line("        return " + zeroValue(Type.getReturnType(method.desc).getSort()) + ";");
         }
+    }
+
+    /** Instructions that may appear inside a new+<init> pattern: argument pushes only. */
+    private static boolean isConstructorArgumentPush(AbstractInsnNode insn) {
+        return switch (insn.getOpcode()) {
+            case Opcodes.ILOAD, Opcodes.ALOAD, Opcodes.LDC, Opcodes.ICONST_M1, Opcodes.ICONST_0,
+                    Opcodes.ICONST_1, Opcodes.ICONST_2, Opcodes.ICONST_3, Opcodes.ICONST_4,
+                    Opcodes.ICONST_5, Opcodes.BIPUSH, Opcodes.SIPUSH, Opcodes.ACONST_NULL,
+                    Opcodes.GETFIELD, Opcodes.GETSTATIC, Opcodes.INVOKEVIRTUAL,
+                    Opcodes.INVOKESPECIAL,
+                    Opcodes.INVOKEINTERFACE, Opcodes.INVOKESTATIC ->
+                true;
+            default -> false;
+        };
     }
 
     /** A dead return value for a method whose body ends inside a guard-labeled block. */
@@ -282,12 +398,21 @@ public final class MethodTranspiler {
                     unsupported(insn);
                 }
             }
-            case Opcodes.ILOAD ->
+            case Opcodes.ILOAD, Opcodes.ALOAD ->
                 line("        " + stackVar + ".push(" + localName(((VarInsnNode) insn).var)
                     + ");");
             case Opcodes.ISTORE ->
                 line("        " + localName(((VarInsnNode) insn).var) + " = " + stackVar
                     + ".pop();");
+            case Opcodes.ASTORE -> {
+                int slot = ((VarInsnNode) insn).var;
+                String t = slotType(slot);
+                if (t.equals("int")) {
+                    throw new UnsupportedOperationException(
+                        "Reference store to an int-typed slot " + slot + " in " + method.name);
+                }
+                line("        " + localName(slot) + " = (" + t + ") " + stackVar + ".popRef();");
+            }
             case Opcodes.IINC -> {
                 IincInsnNode inc = (IincInsnNode) insn;
                 String name = localName(inc.var);
@@ -296,7 +421,7 @@ public final class MethodTranspiler {
             case Opcodes.GOTO ->
                 line("        jvm.Local.goto_(" + targetOffset((JumpInsnNode) insn) + ");");
             case Opcodes.IF_ICMPEQ, Opcodes.IF_ICMPNE, Opcodes.IF_ICMPLT, Opcodes.IF_ICMPGE,
-                    Opcodes.IF_ICMPGT, Opcodes.IF_ICMPLE -> {
+                    Opcodes.IF_ICMPGT, Opcodes.IF_ICMPLE, Opcodes.IF_ACMPEQ, Opcodes.IF_ACMPNE -> {
                 int target = targetOffset((JumpInsnNode) insn);
                 line("        if (" + stackVar + "." + mnemonic(op) + "()) { "
                     + "jvm.Local.goto_(" + target + "); }");
@@ -307,26 +432,44 @@ public final class MethodTranspiler {
                 line("        if (" + stackVar + "." + mnemonic(op) + "()) { "
                     + "jvm.Local.goto_(" + target + "); }");
             }
+            case Opcodes.IFNULL, Opcodes.IFNONNULL -> {
+                int target = targetOffset((JumpInsnNode) insn);
+                String predicate = op == Opcodes.IFNULL ? "if_null" : "if_nonnull";
+                line("        if (" + stackVar + "." + predicate + "()) { "
+                    + "jvm.Local.goto_(" + target + "); }");
+            }
             case Opcodes.IADD, Opcodes.ISUB, Opcodes.IMUL, Opcodes.IDIV, Opcodes.IREM, Opcodes.INEG,
                     Opcodes.IAND, Opcodes.IOR, Opcodes.IXOR, Opcodes.ISHL, Opcodes.ISHR,
                     Opcodes.IUSHR ->
                 line("        " + stackVar + "." + mnemonic(op) + "();");
             case Opcodes.INVOKESTATIC -> emitStaticCall((MethodInsnNode) insn);
+            case Opcodes.INVOKEVIRTUAL, Opcodes.INVOKESPECIAL, Opcodes.INVOKEINTERFACE ->
+                emitInstanceCall((MethodInsnNode) insn);
+            case Opcodes.GETFIELD -> emitGetField((FieldInsnNode) insn);
+            case Opcodes.PUTFIELD -> emitPutField((FieldInsnNode) insn);
             case Opcodes.IRETURN ->
-                line(index == lastOpcodeIndex ? "        return " + stackVar + ".top();"
-                        : "        if (true) { return " + stackVar + ".top(); }");
+                line(returnStatement(index, "return " + stackVar + ".top();"));
+            case Opcodes.ARETURN ->
+                line(returnStatement(index,
+                    "return (" + jvmTypeName(Type.getReturnType(method.desc)) + ") " + stackVar
+                        + ".topRef();"));
             case Opcodes.RETURN ->
-                line(index == lastOpcodeIndex ? "        return;"
-                        : "        if (true) { return; }");
+                line(returnStatement(index, "return;"));
+            case Opcodes.ACONST_NULL ->
+                line("        " + stackVar + ".push((Object) null);");
             case Opcodes.POP ->
                 line("        " + stackVar + ".pop();");
             case Opcodes.DUP ->
                 line("        " + stackVar + ".dup();");
             case Opcodes.SWAP ->
                 line("        " + stackVar + ".swap();");
-            case Opcodes.ACONST_NULL, Opcodes.ALOAD, Opcodes.ASTORE -> unsupported(insn);
             default -> unsupported(insn);
         }
+    }
+
+    /** Wraps a mid-layout return statement for javac reachability (JLS 14.22). */
+    private String returnStatement(int index, String statement) {
+        return index == lastOpcodeIndex ? statement : "if (true) { " + statement + " }";
     }
 
     private void pushLiteral(int value) {
@@ -340,22 +483,117 @@ public final class MethodTranspiler {
      */
     private void emitStaticCall(MethodInsnNode call) {
         Type ret = Type.getReturnType(call.desc);
-        Type[] args = Type.getArgumentTypes(call.desc);
         if (ret.getSort() != Type.INT) {
-            unsupported(call);
+            unsupportedCall(call);
         }
-        String[] temps = new String[args.length];
-        for (int i = args.length - 1; i >= 0; i--) {
-            if (args[i].getSort() != Type.INT) {
-                unsupported(call);
-            }
-            temps[i] = "$v" + (nextTemp++);
-            line("        int " + temps[i] + " = " + stackVar + ".pop();");
-        }
+        String[] temps = popArguments(call, "$v");
         String target = className.equals(call.owner)
                 ? call.name
-                : call.owner.substring(call.owner.lastIndexOf('/') + 1) + "." + call.name;
+                : simpleName(call.owner) + "." + call.name;
         line("        " + stackVar + ".push(" + target + "(" + String.join(", ", temps) + "));");
+    }
+
+    /** Pops the method's arguments (top first, i.e. reverse declaration order) into typed temps. */
+    private String[] popArguments(MethodInsnNode call, String prefix) {
+        Type[] args = Type.getArgumentTypes(call.desc);
+        String[] temps = new String[args.length];
+        for (int i = args.length - 1; i >= 0; i--) {
+            temps[i] = freshTemp(prefix);
+            line("        " + declaredTemp(args[i], temps[i]) + ";");
+        }
+        return temps;
+    }
+
+    /** Pops the receiver of an instance call off the stack. */
+    private String popReceiver(MethodInsnNode call) {
+        String recv = freshTemp("$o");
+        line("        " + jvmTypeName(Type.getObjectType(call.owner)) + " " + recv + " = ("
+            + jvmTypeName(Type.getObjectType(call.owner)) + ") " + stackVar + ".popRef();");
+        return recv;
+    }
+
+    /**
+     * Emits an instance call (invokevirtual/invokespecial-non-init/invokeinterface): pops
+     * receiver and arguments off the operand stack (top first), calls the method on the receiver
+     * (a real Java expression) and pushes a non-void result back on the stack.
+     */
+    private void emitInstanceCall(MethodInsnNode call) {
+        String[] args = popArguments(call, "$a");
+        String recv = popReceiver(call);
+        String target = className.equals(call.owner)
+                ? call.name
+                : simpleName(call.owner) + "." + call.name;
+        String invocation = recv + "." + target + "(" + String.join(", ", args) + ")";
+        if (Type.getReturnType(call.desc).getSort() == Type.VOID) {
+            line("        " + invocation + ";");
+        } else {
+            line("        " + stackVar + ".push(" + invocation + ");");
+        }
+    }
+
+    /** getfield: pops the receiver and pushes the field value (depth unchanged). */
+    private void emitGetField(FieldInsnNode field) {
+        String recv = freshTemp("$o");
+        String owner = jvmTypeName(Type.getObjectType(field.owner));
+        line("        " + owner + " " + recv + " = (" + owner + ") " + stackVar + ".popRef();");
+        line("        " + stackVar + ".push(" + recv + "." + field.name + ");");
+    }
+
+    /** putfield: pops the value (on top), then the receiver, and assigns the real field. */
+    private void emitPutField(FieldInsnNode field) {
+        String value = freshTemp("$v");
+        line("        " + declaredTemp(Type.getType(field.desc), value) + ";");
+        String recv = freshTemp("$o");
+        String owner = jvmTypeName(Type.getObjectType(field.owner));
+        line("        " + owner + " " + recv + " = (" + owner + ") " + stackVar + ".popRef();");
+        line("        " + recv + "." + field.name + " = " + value + ";");
+    }
+
+    /**
+     * The {@code new T}; {@code dup}; {@code <args>}; {@code invokespecial T.<init>} fusion: the
+     * argument temps were already popped (reverse order) while emitting... no -- the argument
+     * pushes were emitted before this point, so pop them off the stack now, then emit the real
+     * allocation {@code T $tN = new T(args); stk.push($tN);}. The stack depth must be one higher
+     * afterwards (the single copy of the initialized reference), exactly like the JVM.
+     */
+    private void emitAllocation(MethodInsnNode init) {
+        String[] args = popArguments(init, "$c");
+        String obj = freshTemp("$t");
+        String owner = jvmTypeName(Type.getObjectType(init.owner));
+        line("        " + owner + " " + obj + " = new " + owner + "("
+            + String.join(", ", args) + ");");
+        line("        " + stackVar + ".push(" + obj + ");");
+    }
+
+    /**
+     * Declaration of a temp for a JVM descriptor: int sorts via {@code pop}, refs via
+     * {@code popRef} with the real Java cast (checkcast obligation from the static type).
+     */
+    private String declaredTemp(Type type, String name) {
+        String t = jvmTypeName(type);
+        switch (type.getSort()) {
+            case Type.BOOLEAN, Type.BYTE, Type.CHAR, Type.SHORT, Type.INT -> {
+                return "int " + name + " = " + stackVar + ".pop()";
+            }
+            case Type.LONG, Type.FLOAT, Type.DOUBLE ->
+                throw new UnsupportedOperationException(
+                    "Category-2 argument/return in method " + method.name + " is not supported");
+            case Type.OBJECT, Type.ARRAY -> {
+                return t + " " + name + " = (" + t + ") " + stackVar + ".popRef()";
+            }
+            default -> throw new UnsupportedOperationException(
+                "Unsupported type sort " + type.getSort());
+        }
+    }
+
+    private String freshTemp(String prefix) {
+        return prefix + (nextTemp++);
+    }
+
+    private void unsupportedCall(MethodInsnNode call) {
+        throw new UnsupportedOperationException(
+            "Unsupported method call shape in " + method.name + ": " + call.owner + "." + call.name
+                + call.desc);
     }
 
     private int targetOffset(JumpInsnNode jump) {
@@ -368,7 +606,7 @@ public final class MethodTranspiler {
 
     private void unsupported(AbstractInsnNode insn) {
         throw new UnsupportedOperationException(
-            "Unsupported bytecode instruction in M1 (method " + method.name + "): "
+            "Unsupported bytecode instruction in " + method.name + ": "
                 + mnemonic(insn.getOpcode()));
     }
 
