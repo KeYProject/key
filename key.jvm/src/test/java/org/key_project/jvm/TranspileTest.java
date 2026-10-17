@@ -96,6 +96,68 @@ class TranspileTest {
         assertThat(rc).as("javac must compile the transpiled recursive output").isZero();
     }
 
+    /**
+     * M2 object slice: the emitted code for allocations, fields and instance calls must have the
+     * canonical shape (real Java fields, fused {@code new+init}, instance calls on the receiver
+     * expression without any class qualifier) and round-trip through {@code javac}. The golden
+     * twins of this shape live in {@code golden/Point.java} + {@code golden/Shapes.java}
+     * (carrying the JML contracts ASM cannot retain); the proof-side characterization of these
+     * fixtures is {@code rule.ObjectProofTest}.
+     */
+    @Test
+    void transpiledObjectCodeHasCanonicalLayoutAndCompiles() throws Exception {
+        Path src = writeFixture("Point.java");
+        writeFixture("Shapes.java");
+        Path classes = tmpDir.resolve("classes-object");
+
+        int rcFix = compile(
+            List.of(src.resolve("fixtures").resolve("Point.java"),
+                src.resolve("fixtures").resolve("Shapes.java")),
+            classes);
+        Assumptions.assumeTrue(rcFix == 0 && Files.exists(classes.resolve("Point.class"))
+                && Files.exists(classes.resolve("Shapes.class")),
+            "fixture compile failed (rc=" + rcFix + "); javac unavailable?");
+
+        Path out = tmpDir.resolve("out-object");
+        List<Path> emitted = Transpiler.transpile(
+            List.of(classes.resolve("Point.class"), classes.resolve("Shapes.class")), out);
+
+        Path pointJava =
+            emitted.stream().filter(p -> p.getFileName().toString().equals("Point.java"))
+                    .findFirst().orElseThrow(() -> new AssertionError("no Point.java emitted"));
+        Path shapesJava =
+            emitted.stream().filter(p -> p.getFileName().toString().equals("Shapes.java"))
+                    .findFirst().orElseThrow(() -> new AssertionError("no Shapes.java emitted"));
+
+        // real Java fields, explicit ctor, super-<init> dropped (implicit in Java)
+        String p = Files.readString(pointJava, StandardCharsets.UTF_8);
+        assertThat(p).contains("public int x;").contains("public int y;")
+                .contains("public Point(int a, int b) {")
+                // field accesses are real Java on the receiver popped off the reference stack
+                .contains("$o1.x = $v0;").contains("$o3.y = $v2;")
+                .contains("stk.push($o0.x);").contains("stk.iadd();")
+                // the Object.<init> super call in the ctor is dropped; receiver popped
+                .containsPattern("stk\\.push\\(this\\);\n        stk\\.popRef\\(\\);")
+                .doesNotContain("Object.<init>");
+
+        // new+dup+invokespecial<init> fused; args popped before the constructor call
+        String s = Files.readString(shapesJava, StandardCharsets.UTF_8);
+        assertThat(s).contains("Point $t2 = new Point($c1, $c0);").contains("stk.push($t2);")
+                // astore/aload of a reference local through the stack
+                .contains("local_0 = (Point) stk.popRef();").contains("stk.push(local_0);")
+                // instance call on the receiver, no class qualifier
+                .contains("stk.push($o3.sum());").doesNotContain(".Point.sum")
+                // field reads through the reference stack with the typed cast
+                .contains("stk.push($o0.x);");
+
+        // javac round-trip of both emitted classes together with the copied runtime.
+        Path roundTripClasses = tmpDir.resolve("roundtrip-object");
+        int rc = compile(
+            List.of(pointJava, shapesJava, out.resolve("jvm").resolve("Local.java")),
+            roundTripClasses);
+        assertThat(rc).as("javac must compile the transpiled object output").isZero();
+    }
+
     // -- helpers -----------------------------------------------------------------
 
     private Path writeFixture() throws IOException {
@@ -127,6 +189,23 @@ class TranspileTest {
         }
         return compiler.run(null, null, err, "-d", classesDir.toString(), "--release", "17", "-g",
             javaFile.toString());
+    }
+
+    private int compile(List<Path> sources, Path classesDir) throws IOException {
+        var compiler = ToolProvider.getSystemJavaCompiler();
+        Assumptions.assumeTrue(compiler != null, "no system javac available; skipping round-trip");
+        Files.createDirectories(classesDir);
+        ByteArrayOutputStream err = new ByteArrayOutputStream();
+        String[] args = new String[sources.size() + 5];
+        args[0] = "-d";
+        args[1] = classesDir.toString();
+        args[2] = "--release";
+        args[3] = "17";
+        args[4] = "-g";
+        for (int i = 0; i < sources.size(); i++) {
+            args[i + 5] = sources.get(i).toString();
+        }
+        return compiler.run(null, null, err, args);
     }
 
     private void assertCanonicalLayout(Path emitted) throws IOException {
