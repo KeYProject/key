@@ -722,7 +722,15 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
     public void removeProofs(Proof[] ps) {
         for (final Proof p : ps) {
-            viewStates.remove(p);
+            // remove (indirect) references to proofs from view states and delegateModel
+            // when abandoning one
+            final ProofTreeViewState state = viewStates.remove(p);
+            if (state != null) {
+                state.model.clear();
+            }
+            if (p == proof && delegateModel != null) {
+                delegateModel.clear();
+            }
             mediator.getCurrentlyOpenedProofs().remove(p);
         }
     }
@@ -788,7 +796,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * Collapse all subtrees that are closed
      */
     protected void collapseClosedNodes() {
-        collapseClosedNodesHelp(new TreePath(delegateModel.getRoot()));
+        final Object root = delegateModel.getRoot();
+        if (root != null) {
+            collapseClosedNodesHelp(new TreePath(root));
+        }
     }
 
     private void collapseClosedNodesHelp(TreePath path) {
@@ -815,7 +826,10 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * Collapse all branches which are not below <tt>path</tt>
      */
     protected void collapseOthers(TreePath path) {
-        collapseOthersHelp(new TreePath(delegateModel.getRoot()), path);
+        final Object root = delegateModel.getRoot();
+        if (root != null) {
+            collapseOthersHelp(new TreePath(root), path);
+        }
     }
 
     private void collapseOthersHelp(TreePath start, TreePath stop) {
