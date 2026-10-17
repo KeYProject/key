@@ -125,7 +125,9 @@ the surrounding method), and one `jvm.Local` stack frame for the operand stack:
 | Bytecode | Emission | Contract style |
 |---|---|---|
 | `iconst_1`, `bipush 5`, `sipush` | `stk.push(1);`, `stk.push(5);` | singletize + concat (top-first) |
+| `aconst_null` | `stk.push((Object) null);` | push constant reference (M2a) |
 | `iload 1` / `istore 2` | `stk.push(a);` / `a = stk.pop();` | local `int` ↔ stack top |
+| `aload 1` / `astore 2` | `stk.push(o);` / `o = (Foo) stk.popRef();` | local reference ↔ typed cast off `popRef` (M2a; `LocalVariableTable` types the slot) |
 | `iinc 3, 1` | `c += 1;` | plain local update |
 | `iadd`, `isub`, `imul`, `ineg`, `dup`, `swap`, … | `stk.iadd();` … | one contract per mnemonic |
 | `ifeq`, `if_icmplt`, … | `if (stk.if_icmplt()) { jvm.Local.goto_(pc); }` (branch-taken predicate) | pops operand(s), returns `boolean` |
@@ -133,15 +135,34 @@ the surrounding method), and one `jvm.Local` stack frame for the operand stack:
 | `ireturn`, `areturn`, `return` | `return stk.top();` … / plain `return;` | pops top |
 | `idiv`, `irem`, bitwise, shifts | `stk.idiv();` … | *contractless* stubs (unused by M1 fixtures; would body-expand) |
 | `ldc` (int/String/float/class) | `stk.push(7);`, `stk.push("…")` | push constant |
-| `new`+`dup`+`invokespecial <init>` | `Foo f = new Foo($1, $2);` + push (fused; pattern validated) | constructor contract applies |
-| `get/putfield`, `get/putstatic` | real Java field access around pops/pushes (P2) | — |
-| `anewarray`, `iaload`, `aastore`, … | real Java array ops around pops/pushes | exceptions from Java semantics |
-| `checkcast`, `instanceof` | real Java cast / `instanceof` | `ClassCastException` from Java semantics |
+| `new`+`dup`+`invokespecial <init>` | `Foo f = new Foo($1, $2);` + push (fused; pattern validated) | constructor contract applies (M2a) |
+| `get/putfield` | real Java field access: `(T) popRef` receiver + `recv.f`, `recv.f = v` (M2a ✓) | — |
+| `get/putstatic` | real Java static access | — (M2 follow-up) |
+| `anewarray`, `iaload`, `aastore`, … | real Java array ops around pops/pushes | exceptions from Java semantics (M2 follow-up) |
+| `checkcast`, `instanceof` | real Java cast / `instanceof` | `ClassCastException` from Java semantics (M2 follow-up) |
+| `invokevirtual/special/interface` | pop receiver+args into temps, real call on the receiver, push result (M2a ✓) | callee contract applies |
 | `invokedynamic`, `jsr`, `ret` | **unsupported → abort** (M4+: `makeConcatWithConstants`) | — |
 
 `goto` is a reserved Java word → method name `goto_`. `return` as a mnemonic is spelled by the
 surrounding Java `return` statement. Jumps target the **bytecode pc**; `goto_(7)` matches label
 `L7` (§3.4, §5.2).
+
+**M2a status (objects & calls, shipped on `weigl/jvm`):** typed reference locals
+(`aload`/`astore`; the slot type comes from the `LocalVariableTable`, and slot 0 of instance
+methods is the implicit `this`), `aconst_null`, `areturn`, `getfield`/`putfield` (real Java
+field access on the receiver popped off the reference stack), the `new`+`dup`+`invokespecial
+<init>` fusion (`Point $t2 = new Point($c1, $c0);` — args popped between `dup` and `<init>`
+must be pure argument pushes, otherwise the transpiler aborts loudly), and
+`invokevirtual`/`invokespecial`(non-init)/`invokeinterface` (receiver and arguments popped
+into typed temps, the call emitted on the *receiver expression*, e.g. `stk.push($o3.sum());`),
+plus `ifnull`/`ifnonnull`/`if_acmp*` on the reference predicates. Explicit constructors are
+emitted on the class (the canonical trivial javac default ctor, 3 ops, is skipped so M1 output
+stays byte-stable); the implicit `super()` call is dropped, and an explicit non-Object
+`super(args)` aborts loudly (the frame prologue would precede it, violating "super first").
+The emitted shape is asserted by
+`TranspileTest#transpiledObjectCodeHasCanonicalLayoutAndCompiles` and round-tripped through
+`javac --release 17`. Static fields, `checkcast`/`instanceof`, `int[]` arrays and stub
+generation remain M2 follow-ups.
 
 ### 3.4 Control flow: linear blocks, Java labels, `goto_`
 
@@ -576,7 +597,7 @@ A closed proof of the transpiled method's contract establishes, modulo:
 | Unit | CFG/typing/structuring on synthetic `.class` fixtures | `key.jvm/src/test` |
 | Golden | transpile → `javac` compiles output (hard invariant) | every transpile test |
 | Differential | run transpiled vs. original bytecode on random inputs | M3 |
-| Proof | `KeYEnvironment` + `.key` fixtures: max, max2 (M1, closed); recursion-by-contract (M1, closes under arithmetic int rules, see §9.1); sum (both modes), factorial, goto-heavy control flow, exceptions (M2/M3) | `key.jvm/src/test` |
+| Proof | `KeYEnvironment` + `.key` fixtures: max, max2 (M1, closed); recursion-by-contract (M1, closes under arithmetic int rules, see §9.1); sum (both modes), factorial, goto-heavy control flow, exceptions (M2/M3); object slice (M2, golden Point/Shapes: layout + javac round-trip, residual-shape pin per §9.1) | `key.jvm/src/test` |
 | Rule | `GotoSpliceRule`/`GotoRestoreRule`/`IfLiteralRule` unit tests incl. negative cases (missing label → loud abort) | `key.jvm/src/test` |
 | Regression | RunAllProofs proof collection once stable | `key.ui/examples` |
 
@@ -611,6 +632,17 @@ same math mode KeY's own recursion reference (`key.ui/examples/standard_key/java
 uses. Proving the *transpiled stack-model* `Fact` additionally needs the fresh-`jvm.Local`
 createdness residuals that the default strategy leaves open in auto mode (see below).
 
+**M2a status (on `weigl/jvm`):** the object-call slice of the transpiler is shipped and
+fidelity-tested — reference ops on `jvm.Local`, slot typing from the `LocalVariableTable`
+(implicit `this`), field access, `new`+init fusion and instance calls (§3.3), checked by
+`TranspileTest#transpiledObjectCodeHasCanonicalLayoutAndCompiles` (canonical shapes +
+`javac --release 17` round-trip) against the golden twins `golden/Point.java` +
+`golden/Shapes.java`. The *proof* side is blocked by the KeY-side fresh-object residual of
+§9.1 (2): any Object-typed stack op leaves `created(pre, frame)` goals open in auto mode, so
+the object fixtures are pinned as a characterization (`ObjectProofTest`) rather than as
+closing gates. Next M2 slice: `get/putstatic`, `checkcast`/`instanceof`, `int[]` arrays,
+stub generation — followed by the §9.1 follow-ups that unlock closing object proofs.
+
 ### 9.1 Known limitations (M1)
 
 Two KeY-side strategy gaps bound what auto mode can close under the `java-jvm` profile. Both
@@ -636,6 +668,21 @@ KeY-side improvement is noticed and converted deliberately.
    `Fact`. Follow-ups: an interactive script in the vein of `triangular.proof` that applies
    the reduction once, or a KeY change making the high-cost heap simplifications available to
    auto mode.
+   <p>
+   **M2 finding — the discriminator is Object-typed stack traffic.** Experimental isolation
+   (`probe` runs against minimal methods, varying one stack op at a time) shows that
+   *int-only* flows — all of M1 — never materialize the residual, while *any* Object-typed
+   operation (`push(Object)`, `popRef()`, `topRef()`) does, closing-independent of
+   `intRules` (arithmetic semantics does not help: the goals are heap facts, not arithmetic,
+   and M1's recursion workaround therefore does not carry over). Consequence: no object-slice
+   method contract closes under `DefaultAutoMacro` today — including the M2 fixtures
+   (`Point::sum`, `Shapes::total`, `Shapes::make`). `ObjectProofTest`
+   (`objectSliceLeavesFreshObjectCreatednessResidualsOpenInAutoMode`) pins the residual goal
+   shape against the golden `Shapes::make`. Replacing the constructor-contract initialization
+   by a body-expanded allocation + an `initialize()` *method* contract was experimentally
+   ruled out too: without the constructor contract's anon-post, even int-only flows stop
+   closing (the strategy cannot push the `create`-update's createdness out of the pre-heap).
+   The object proof story therefore waits on the same two follow-ups listed above.
 
 Unrelated to the above, `JvmProfile` does *not* change the underlying strategy — the three
 appended rules fire at cost 0; the `max`/`max2` gates close under the full M1 settings
