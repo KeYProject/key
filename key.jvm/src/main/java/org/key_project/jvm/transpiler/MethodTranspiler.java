@@ -443,18 +443,25 @@ public final class MethodTranspiler {
                     Opcodes.IUSHR ->
                 line("        " + stackVar + "." + mnemonic(op) + "();");
             case Opcodes.INVOKESTATIC -> emitStaticCall((MethodInsnNode) insn);
-            case Opcodes.INVOKEVIRTUAL, Opcodes.INVOKESPECIAL, Opcodes.INVOKEINTERFACE ->
-                emitInstanceCall((MethodInsnNode) insn);
+            case Opcodes.INVOKEVIRTUAL, Opcodes.INVOKESPECIAL, Opcodes.INVOKEINTERFACE -> {
+                MethodInsnNode call = (MethodInsnNode) insn;
+                if (call.name.equals("<init>")) {
+                    // not consumed by the new+<init> fusion: an explicit super(...) call
+                    handleSuperInit(call);
+                } else {
+                    emitInstanceCall(call);
+                }
+            }
             case Opcodes.GETFIELD -> emitGetField((FieldInsnNode) insn);
             case Opcodes.PUTFIELD -> emitPutField((FieldInsnNode) insn);
             case Opcodes.IRETURN ->
-                line(returnStatement(index, "return " + stackVar + ".top();"));
+                line("        " + returnStatement(index, "return " + stackVar + ".top();"));
             case Opcodes.ARETURN ->
-                line(returnStatement(index,
+                line("        " + returnStatement(index,
                     "return (" + jvmTypeName(Type.getReturnType(method.desc)) + ") " + stackVar
                         + ".topRef();"));
             case Opcodes.RETURN ->
-                line(returnStatement(index, "return;"));
+                line("        " + returnStatement(index, "return;"));
             case Opcodes.ACONST_NULL ->
                 line("        " + stackVar + ".push((Object) null);");
             case Opcodes.POP ->
@@ -520,15 +527,29 @@ public final class MethodTranspiler {
     private void emitInstanceCall(MethodInsnNode call) {
         String[] args = popArguments(call, "$a");
         String recv = popReceiver(call);
-        String target = className.equals(call.owner)
-                ? call.name
-                : simpleName(call.owner) + "." + call.name;
-        String invocation = recv + "." + target + "(" + String.join(", ", args) + ")";
+        String invocation = recv + "." + call.name + "(" + String.join(", ", args) + ")";
         if (Type.getReturnType(call.desc).getSort() == Type.VOID) {
             line("        " + invocation + ";");
         } else {
             line("        " + stackVar + ".push(" + invocation + ");");
         }
+    }
+
+    /**
+     * A constructor invocation left over from the fusion: an explicit {@code super(...)} call in
+     * a transpiled {@code <init>}. The Java compiler inserts {@code super()} implicitly, so the
+     * canonical {@code super()} of {@code java.lang.Object} is dropped (its receiver, {@code this},
+     * is popped). Any other super-call (e.g. {@code super(x, y)} of a non-Object superclass) is
+     * M2-unsupported: the emitted constructor starts with the runtime frame, so Java's
+     * "super must be the first statement" rule cannot be satisfied.
+     */
+    private void handleSuperInit(MethodInsnNode call) {
+        if (call.owner.equals("java/lang/Object")
+                && Type.getArgumentTypes(call.desc).length == 0) {
+            line("        " + stackVar + ".popRef();");
+            return;
+        }
+        unsupportedCall(call);
     }
 
     /** getfield: pops the receiver and pushes the field value (depth unchanged). */
