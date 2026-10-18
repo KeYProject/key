@@ -158,6 +158,56 @@ class TranspileTest {
         assertThat(rc).as("javac must compile the transpiled object output").isZero();
     }
 
+    /**
+     * M2 static-field slice: getstatic/putstatic read and write the real Java static field
+     * around int pops / typed reference popRefs; the emitted code round-trips through javac.
+     * The golden twin of this shape is {@code golden/Counter.java}; no closing proof gate exists
+     * (Object-typed ops, see {@code rule.ObjectProofTest} and docs §9.1(2)).
+     */
+    @Test
+    void transpiledStaticFieldAccessHasCanonicalShape() throws Exception {
+        Path src = writeFixture("Point.java");
+        writeFixture("Counter.java");
+        Path classes = tmpDir.resolve("classes-static");
+
+        int rcFix = compile(
+            List.of(src.resolve("fixtures").resolve("Point.java"),
+                src.resolve("fixtures").resolve("Counter.java")),
+            classes);
+        Assumptions.assumeTrue(rcFix == 0 && Files.exists(classes.resolve("Counter.class"))
+                && Files.exists(classes.resolve("Point.class")),
+            "fixture compile failed (rc=" + rcFix + "); javac unavailable?");
+
+        Path out = tmpDir.resolve("out-static");
+        List<Path> emitted = Transpiler.transpile(
+            List.of(classes.resolve("Counter.class"), classes.resolve("Point.class")), out);
+
+        Path counterJava = emitted.stream()
+                .filter(p -> p.getFileName().toString().equals("Counter.java")).findFirst()
+                .orElseThrow(() -> new AssertionError("no Counter.java emitted"));
+        String s = Files.readString(counterJava, StandardCharsets.UTF_8);
+
+        // int static field: getstatic pushes the real field, putstatic pops into a temp
+        assertThat(s).contains("stk.push(Counter.calls);").contains("int $v0 = stk.pop();")
+                .contains("Counter.calls = $v0;").contains("return stk.top();");
+
+        // reference static field: getstatic pushes the real field (Object overload), areturn
+        // casts topRef to the declared return type
+        assertThat(s).contains("stk.push(Counter.mark);").contains("return (Point) stk.topRef();");
+
+        // void method header is spelled correctly (void-returning methods have no return slot)
+        assertThat(s).contains("public static void remember(Point p) {")
+                .doesNotContain("voidremember");
+
+        // javac round-trip of both emitted classes with the runtime
+        Path roundTripClasses = tmpDir.resolve("roundtrip-static");
+        int rc = compile(List.of(counterJava, emitted.stream()
+                .filter(p -> p.getFileName().toString().equals("Point.java")).findFirst()
+                .orElseThrow(),
+            out.resolve("jvm").resolve("Local.java")), roundTripClasses);
+        assertThat(rc).as("javac must compile the transpiled static-field output").isZero();
+    }
+
     // -- helpers -----------------------------------------------------------------
 
     private Path writeFixture() throws IOException {
