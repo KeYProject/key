@@ -461,10 +461,10 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
 
     /**
      * Put back into the queue every parked base that a formula changed since the previous round
-     * could match; see {@link ParkedBases#drainWoken()}.
+     * could match; see {@link ParkedBases#getAndClearWokenApplications()}.
      */
     private void wakeParkedBases() {
-        final Collection<RuleAppContainer> woken = parking.drainWoken();
+        final Collection<RuleAppContainer> woken = parking.getAndClearWokenApplications();
         if (!woken.isEmpty()) {
             var time = System.nanoTime();
             try {
