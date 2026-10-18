@@ -8,10 +8,10 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.TriggerSupport;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.tiebreak.QuantifierInstantiationTieBreak;
 
@@ -63,13 +63,9 @@ class Instantiation {
     /** How much this instantiation is told about the theories. */
     private final TriggerTreatment treatment;
 
-    /** The services, kept for the tie-break view. */
-    private final Services services;
-
     private Instantiation(Term allterm, Sequent seq, Services services,
             TriggerTreatment treatment) {
         this.sequent = seq;
-        this.services = services;
         firstVar = allterm.varsBoundHere(0).get(0);
         matrix = TriggerUtils.discardQuantifiers(allterm);
         /* Terms bound in every formula on <code>goal</code> */
@@ -77,7 +73,7 @@ class Instantiation {
         triggersSet = TriggersSet.create((JTerm) allterm, services, treatment.isClassic());
         assumedLiterals = initAssertLiterals(seq, services);
         congruence = new Congruence(assumedLiterals, services);
-        assumedLiterals = normalizeAll(assumedLiterals);
+        assumedLiterals = normalizeAll(assumedLiterals, services);
         addInstances(sequentToTerms(seq), services);
         if (treatment.admits(Origin.THEORY_DIRECT)) {
             addTheoryInstances((JTerm) matrix,
@@ -116,7 +112,7 @@ class Instantiation {
         }
     }
 
-    private record Cached(Proof proof, Term qf, Sequent seq, TriggerTreatment treatment,
+    private record Cached(Term qf, Sequent seq, TriggerTreatment treatment,
             Instantiation result) {
     }
 
@@ -130,19 +126,13 @@ class Instantiation {
 
     static Instantiation create(Term qf, Sequent seq, Services services,
             TriggerTreatment treatment) {
-        final Proof proof = services.getProof();
         final Cached cached = lastCreate.get();
         if (cached != null && qf == cached.qf() && seq == cached.seq()
                 && treatment == cached.treatment()) {
             return cached.result();
         }
-        if (cached != null && proof != cached.proof()) {
-            // The memo belongs to another proof. Drop it before computing, so the other
-            // proof's sequent stays reachable only while this entry is in use.
-            lastCreate.remove();
-        }
         final Instantiation result = new Instantiation(qf, seq, services, treatment);
-        lastCreate.set(new Cached(proof, qf, seq, treatment, result));
+        lastCreate.set(new Cached(qf, seq, treatment, result));
         return result;
     }
 
@@ -257,13 +247,14 @@ class Instantiation {
 
 
     /** Normalizes every literal by the congruence, so equal atoms coincide. */
-    private ImmutableSet<JTerm> normalizeAll(ImmutableSet<JTerm> lits) {
+    private ImmutableSet<JTerm> normalizeAll(ImmutableSet<JTerm> lits, Services services) {
         if (congruence.isTrivial()) {
             return lits;
         }
+        final TermFactory tf = services.getTermFactory();
         ImmutableSet<JTerm> res = DefaultImmutableSet.nil();
         for (final JTerm l : lits) {
-            res = res.add(congruence.normalize(l));
+            res = res.add(congruence.normalize(l, tf));
         }
         return res;
     }
@@ -299,10 +290,10 @@ class Instantiation {
      */
     static RuleAppCost computeCost(Term inst, Term form, Sequent seq, Services services,
             TriggerTreatment treatment) {
-        return create(form, seq, services, treatment).computeCostHelp(inst);
+        return create(form, seq, services, treatment).computeCostHelp(inst, services);
     }
 
-    private RuleAppCost computeCostHelp(Term inst) {
+    private RuleAppCost computeCostHelp(Term inst, Services services) {
         final InstanceTable.Entry entry = instances.entryOf(inst, services);
         if (entry == null) {
             return TopRuleAppCost.INSTANCE;
@@ -327,7 +318,7 @@ class Instantiation {
     static RuleAppCost computeTieBreak(Term inst, Term form, Sequent seq,
             Goal goal, Services services, TriggerTreatment treatment,
             QuantifierInstantiationTieBreak strategy) {
-        return create(form, seq, services, treatment).tieBreak(inst, goal, strategy);
+        return create(form, seq, services, treatment).tieBreak(inst, goal, services, strategy);
     }
 
     /**
@@ -335,7 +326,7 @@ class Instantiation {
      * facts are prepared once on the first request and reused; a change of strategy re-prepares
      * them.
      */
-    private RuleAppCost tieBreak(Term inst, Goal goal,
+    private RuleAppCost tieBreak(Term inst, Goal goal, Services services,
             QuantifierInstantiationTieBreak strategy) {
         if (scorer == null || scorerStrategy != strategy) {
             scorer = strategy.prepare(new QuantifierInstantiationTieBreak.View(

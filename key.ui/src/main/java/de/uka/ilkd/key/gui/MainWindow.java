@@ -1342,6 +1342,9 @@ public final class MainWindow extends JFrame {
                 }
             }
         }
+        if (newSequentView != currentGoalView) {
+            currentGoalView.resetPrinter();
+        }
 
         Runnable sequentUpdater = () -> {
             mainFrame.setSequentView(newSequentView);
