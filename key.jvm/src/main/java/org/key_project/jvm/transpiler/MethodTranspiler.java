@@ -196,7 +196,7 @@ public final class MethodTranspiler {
     private String type() {
         Type t = Type.getReturnType(method.desc);
         if (t.getSort() == Type.VOID) {
-            return "void";
+            return "void ";
         }
         return jvmTypeName(t) + " ";
     }
@@ -454,6 +454,8 @@ public final class MethodTranspiler {
             }
             case Opcodes.GETFIELD -> emitGetField((FieldInsnNode) insn);
             case Opcodes.PUTFIELD -> emitPutField((FieldInsnNode) insn);
+            case Opcodes.GETSTATIC -> emitGetStatic((FieldInsnNode) insn);
+            case Opcodes.PUTSTATIC -> emitPutStatic((FieldInsnNode) insn);
             case Opcodes.IRETURN ->
                 line("        " + returnStatement(index, "return " + stackVar + ".top();"));
             case Opcodes.ARETURN ->
@@ -568,6 +570,50 @@ public final class MethodTranspiler {
         String owner = jvmTypeName(Type.getObjectType(field.owner));
         line("        " + owner + " " + recv + " = (" + owner + ") " + stackVar + ".popRef();");
         line("        " + recv + "." + field.name + " = " + value + ";");
+    }
+
+    /** getstatic: pushes the static field value (real Java static access). */
+    private void emitGetStatic(FieldInsnNode field) {
+        line("        " + stackVar + ".push(" + staticValueExpression(field) + ");");
+    }
+
+    /**
+     * putstatic: pops the value (on top) and writes the real static field. A boolean field is
+     * materialized from the JVM's 0/1 representation; category-2 static values abort loudly.
+     */
+    private void emitPutStatic(FieldInsnNode field) {
+        Type type = Type.getType(field.desc);
+        if (type.getSort() == Type.BOOLEAN) {
+            String value = freshTemp("$v");
+            line("        int " + value + " = " + stackVar + ".pop();");
+            line("        " + staticAccess(field) + " = " + value + " != 0;");
+            return;
+        }
+        if (type.getSort() != Type.INT && type.getSort() != Type.OBJECT
+                && type.getSort() != Type.ARRAY) {
+            throw new UnsupportedOperationException(
+                "Unsupported putstatic value type in " + method.name + ": " + field.desc);
+        }
+        String value = freshTemp("$v");
+        line("        " + declaredTemp(type, value) + ";");
+        line("        " + staticAccess(field) + " = " + value + ";");
+    }
+
+    /** The static field read, int-normalized for {@code push} ({@code boolean} → 0/1). */
+    private String staticValueExpression(FieldInsnNode field) {
+        Type type = Type.getType(field.desc);
+        String access = staticAccess(field);
+        return switch (type.getSort()) {
+            case Type.BOOLEAN -> "(" + access + " ? 1 : 0)";
+            case Type.INT, Type.BYTE, Type.SHORT, Type.CHAR, Type.OBJECT, Type.ARRAY -> access;
+            default -> throw new UnsupportedOperationException(
+                "Unsupported getstatic value type in " + method.name + ": " + field.desc);
+        };
+    }
+
+    /** Static field access expression {@code Owner.field}. */
+    private static String staticAccess(FieldInsnNode field) {
+        return jvmTypeName(Type.getObjectType(field.owner)) + "." + field.name;
     }
 
     /**
