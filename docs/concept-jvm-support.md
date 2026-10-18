@@ -142,6 +142,7 @@ the surrounding method), and one `jvm.Local` stack frame for the operand stack:
 | `newarray`, `iaload`, `iastore`, `arraylength` | real `int[]` ops: `int[] $a = new int[stk.pop()]; stk.push($a);`, `int $i = stk.pop(); int[] $a = (int[]) stk.popRef(); stk.push($a[$i]);`, `$a[$i] = $v;`, `stk.push($a.length);` (M2 ✓; only `T_INT`, other atypes abort) | Java array semantics |
 | `checkcast`, `instanceof` | real Java cast / `instanceof`: `T $o = (T) stk.popRef(); stk.push($o);` resp. `stk.push($o instanceof T ? 1 : 0);` (M2 ✓) | `ClassCastException` from Java semantics |
 | `invokevirtual/special/interface` | pop receiver+args into temps, real call on the receiver, push result (M2a ✓) | callee contract applies |
+| external types (stubs) | default-package stub class per referenced-but-not-transpiled non-JDK type, carrying exactly the accessed members with default bodies (`StubGenerator`; M2 ✓) | method contracts of the original type (later spec-stubbing) |
 | `invokedynamic`, `jsr`, `ret` | **unsupported → abort** (M4+: `makeConcatWithConstants`) | — |
 
 `goto` is a reserved Java word → method name `goto_`. `return` as a mnemonic is spelled by the
@@ -173,8 +174,14 @@ every proof assumes (pinned by
 `classify` shape additionally exercises the constrained-goto mid-layout return wrapper).
 `int[]` arrays are shipped too (`newarray`/`iaload`/`iastore`/`arraylength`, M2): real Java
 `int[]` operations with typed `popRef` casts of the array reference (`golden/Arrays.java` +
-`TranspileTest#transpiledIntArrayOpsHaveCanonicalShape`). Stub generation remains an M2
-follow-up.
+`TranspileTest#transpiledIntArrayOpsHaveCanonicalShape`). Finally, referenced-but-not-
+transpiled types get **stub classes** (`StubGenerator`): a default-package class per external
+type carrying exactly the members the output accesses, with default-valued bodies so the
+output compiles (`golden/Guard.java` + `TranspileTest#transpiledExternalTypeReferenceEmitsStub`
+— `Gadget` is stubbed with the `score` field, `size()`, `kind`, `defaultScore()` and the
+no-arg constructor while only `Guard` is transpiled). That completes the M2 transpiler
+slices; the §9.1 proof follow-ups that unlock closing object proofs remain above the
+transpiler.
 
 ### 3.4 Control flow: linear blocks, Java labels, `goto_`
 
@@ -648,14 +655,15 @@ createdness residuals that the default strategy leaves open in auto mode (see be
 fidelity-tested — reference ops on `jvm.Local`, slot typing from the `LocalVariableTable`
 (implicit `this`), field access, `new`+init fusion and instance calls (§3.3), and static
 fields (`get/putstatic`, `<clinit>` dropped), casts/type tests (`checkcast`/`instanceof`) and
-`int[]` arrays (`newarray`/`iaload`/`iastore`/`arraylength`), checked by `TranspileTest`
-(canonical shapes + `javac --release 17` round-trip) against the golden twins
-`golden/Point.java` + `golden/Shapes.java` + `golden/Counter.java` + `golden/Caster.java` +
-`golden/Arrays.java`. The *proof* side is blocked by the KeY-side fresh-object residual of
-§9.1 (2): any Object-typed stack op leaves `created(pre, frame)` goals open in auto mode, so
-the object fixtures are pinned as a characterization (`ObjectProofTest`) rather than as
-closing gates. Next M2 slice: stub generation — followed by the §9.1 follow-ups that unlock
-closing object proofs.
+`int[]` arrays (`newarray`/`iaload`/`iastore`/`arraylength`), and stubs for external
+types (`StubGenerator`), checked by `TranspileTest` (canonical shapes + `javac --release 17`
+round-trip) against the golden twins `golden/Point.java` + `golden/Shapes.java` +
+`golden/Counter.java` + `golden/Caster.java` + `golden/Arrays.java` + `golden/Guard.java`.
+The *proof* side is blocked by the KeY-side fresh-object residual of §9.1 (2): any
+Object-typed stack op leaves `created(pre, frame)` goals open in auto mode, so the object
+fixtures are pinned as a characterization (`ObjectProofTest`) rather than as closing gates.
+The M2 transpiler slices are complete; the §9.1 follow-ups that unlock closing object proofs
+remain.
 
 ### 9.1 Known limitations (M1)
 
