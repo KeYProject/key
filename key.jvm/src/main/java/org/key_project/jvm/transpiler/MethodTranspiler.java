@@ -458,6 +458,10 @@ public final class MethodTranspiler {
             case Opcodes.PUTSTATIC -> emitPutStatic((FieldInsnNode) insn);
             case Opcodes.CHECKCAST -> emitCheckCast((TypeInsnNode) insn);
             case Opcodes.INSTANCEOF -> emitInstanceOf((TypeInsnNode) insn);
+            case Opcodes.NEWARRAY -> emitNewArray((IntInsnNode) insn);
+            case Opcodes.IALOAD -> emitIaload();
+            case Opcodes.IASTORE -> emitIastore();
+            case Opcodes.ARRAYLENGTH -> emitArrayLength();
             case Opcodes.IRETURN ->
                 line("        " + returnStatement(index, "return " + stackVar + ".top();"));
             case Opcodes.ARETURN ->
@@ -646,6 +650,48 @@ public final class MethodTranspiler {
         String t = jvmTypeName(Type.getObjectType(insn.desc));
         line("        Object " + obj + " = (Object) " + stackVar + ".popRef();");
         line("        " + stackVar + ".push(" + obj + " instanceof " + t + " ? 1 : 0);");
+    }
+
+    /**
+     * newarray: pops the length and pushes the real allocation. The M2 arrays slice covers
+     * {@code int[]} ({@code T_INT}) only; every other element type aborts loudly.
+     */
+    private void emitNewArray(IntInsnNode insn) {
+        if (insn.operand != Opcodes.T_INT) {
+            throw new UnsupportedOperationException(
+                "newarray with atype " + insn.operand + " in " + method.name
+                    + ": only int[] (T_INT) is supported in M2");
+        }
+        String arr = freshTemp("$a");
+        line("        int[] " + arr + " = new int[" + stackVar + ".pop()];");
+        line("        " + stackVar + ".push(" + arr + ");");
+    }
+
+    /** iaload: pops index then array reference and pushes the real {@code a[i]} read. */
+    private void emitIaload() {
+        String idx = freshTemp("$i");
+        String arr = freshTemp("$a");
+        line("        int " + idx + " = " + stackVar + ".pop();");
+        line("        int[] " + arr + " = (int[]) " + stackVar + ".popRef();");
+        line("        " + stackVar + ".push(" + arr + "[" + idx + "]);");
+    }
+
+    /** iastore: pops value, index and array reference and performs the real {@code a[i] = v}. */
+    private void emitIastore() {
+        String val = freshTemp("$v");
+        String idx = freshTemp("$i");
+        String arr = freshTemp("$a");
+        line("        int " + val + " = " + stackVar + ".pop();");
+        line("        int " + idx + " = " + stackVar + ".pop();");
+        line("        int[] " + arr + " = (int[]) " + stackVar + ".popRef();");
+        line("        " + arr + "[" + idx + "] = " + val + ";");
+    }
+
+    /** arraylength: pops the array reference and pushes its {@code .length}. */
+    private void emitArrayLength() {
+        String arr = freshTemp("$a");
+        line("        int[] " + arr + " = (int[]) " + stackVar + ".popRef();");
+        line("        " + stackVar + ".push(" + arr + ".length);");
     }
 
     /**

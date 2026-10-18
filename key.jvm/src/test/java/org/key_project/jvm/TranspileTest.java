@@ -255,6 +255,51 @@ class TranspileTest {
         assertThat(rc).as("javac must compile the transpiled cast output").isZero();
     }
 
+    /**
+     * M2 arrays slice: newarray pops the length and pushes the real allocation (int[] only),
+     * iaload/iastore read and write the real int[], arraylength pushes {@code .length}.
+     * javac round-trip must compile. The golden twin of this shape is
+     * {@code golden/Arrays.java}; no closing proof gate exists (Object-typed ops, see
+     * {@code rule.ObjectProofTest} and docs §9.1(2)).
+     */
+    @Test
+    void transpiledIntArrayOpsHaveCanonicalShape() throws Exception {
+        Path src = writeFixture("Arrays.java");
+        Path classes = tmpDir.resolve("classes-arrays");
+        int rcFix = compile(src.resolve("fixtures").resolve("Arrays.java"), classes);
+        Assumptions.assumeTrue(rcFix == 0 && Files.exists(classes.resolve("Arrays.class")),
+            "fixture compile failed (rc=" + rcFix + "); javac unavailable?");
+
+        Path out = tmpDir.resolve("out-arrays");
+        List<Path> emitted =
+            Transpiler.transpile(List.of(classes.resolve("Arrays.class")), out);
+        Path arraysJava = emitted.stream()
+                .filter(p -> p.getFileName().toString().equals("Arrays.java")).findFirst()
+                .orElseThrow(() -> new AssertionError("no Arrays.java emitted"));
+        String s = Files.readString(arraysJava, StandardCharsets.UTF_8);
+
+        // arraylength: pops the array reference, pushes .length
+        assertThat(s).contains("int[] $a0 = (int[]) stk.popRef();")
+                .contains("stk.push($a0.length);");
+
+        // iaload: index on top, then the array reference
+        assertThat(s).contains("int $i0 = stk.pop();").contains("int[] $a1 = (int[]) stk.popRef();")
+                .contains("stk.push($a1[$i0]);");
+
+        // iastore: value, index, then the array reference (the real store)
+        assertThat(s).contains("int $v0 = stk.pop();").contains("int $i1 = stk.pop();")
+                .contains("int[] $a2 = (int[]) stk.popRef();").contains("$a2[$i1] = $v0;");
+
+        // newarray: pops the length, pushes the real allocation; params typed int[]
+        assertThat(s).contains("int[] $a0 = new int[stk.pop()];").contains("stk.push($a0);")
+                .contains("public static int[] make(int n) {")
+                .contains("return (int[]) stk.topRef();");
+
+        int rc = compile(List.of(arraysJava, out.resolve("jvm").resolve("Local.java")),
+            tmpDir.resolve("roundtrip-arrays"));
+        assertThat(rc).as("javac must compile the transpiled array output").isZero();
+    }
+
     // -- helpers -----------------------------------------------------------------
 
     private Path writeFixture() throws IOException {
