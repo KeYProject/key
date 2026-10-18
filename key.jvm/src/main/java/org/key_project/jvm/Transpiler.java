@@ -13,8 +13,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.key_project.jvm.transpiler.MethodTranspiler;
+import org.key_project.jvm.transpiler.StubGenerator;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
@@ -77,16 +80,35 @@ public final class Transpiler {
 
             List<Map<String, String>> specsByClass = specSources.stream().map(Transpiler::readSpecs)
                     .toList();
-            List<Path> emitted = new ArrayList<>();
-            for (Path input : inputs) {
-                byte[] bytes = Files.readAllBytes(input);
-                ClassNode classNode = new ClassNode();
-                new ClassReader(bytes).accept(classNode, 0);
 
+            // read all inputs up front so stub generation can see the full transpiled set
+            List<ClassNode> classNodes = inputs.stream().map(input -> {
+                try {
+                    byte[] bytes = Files.readAllBytes(input);
+                    ClassNode classNode = new ClassNode();
+                    new ClassReader(bytes).accept(classNode, 0);
+                    return classNode;
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }).toList();
+            Set<String> transpiledInternalNames =
+                classNodes.stream().map(c -> c.name).collect(Collectors.toSet());
+            Map<String, StubGenerator.StubSpec> stubs =
+                StubGenerator.collect(classNodes, transpiledInternalNames);
+
+            List<Path> emitted = new ArrayList<>();
+            for (ClassNode classNode : classNodes) {
                 String simpleName = simpleName(classNode.name);
                 String source = emitClass(classNode, specsByClass);
                 Path out = outputDir.resolve(simpleName + ".java");
                 Files.writeString(out, source);
+                emitted.add(out);
+            }
+            for (StubGenerator.StubSpec stub : stubs.values()) {
+                Path out = outputDir.resolve(
+                    MethodTranspiler.jvmTypeName(Type.getObjectType(stub.internalName)) + ".java");
+                Files.writeString(out, StubGenerator.emitSource(stub));
                 emitted.add(out);
             }
             return emitted;
