@@ -300,6 +300,52 @@ class TranspileTest {
         assertThat(rc).as("javac must compile the transpiled array output").isZero();
     }
 
+    /**
+     * M2 stub slice: transpiling a class that references an external (not transpiled) type must
+     * emit a stub class carrying exactly the members the output accesses — instance field
+     * {@code score} (get/putfield), instance method {@code size()} (invokevirtual), static
+     * field {@code kind} (getstatic), static method {@code defaultScore()} (invokestatic) and
+     * the no-arg constructor (new+init fusion) — with default-valued bodies so the output
+     * compiles. The golden twin of the transpiled class is {@code golden/Guard.java}.
+     */
+    @Test
+    void transpiledExternalTypeReferenceEmitsStub() throws Exception {
+        Path src = writeFixture("Gadget.java");
+        writeFixture("Guard.java");
+        Path classes = tmpDir.resolve("classes-stub");
+        int rcFix = compile(
+            List.of(src.resolve("fixtures").resolve("Gadget.java"),
+                src.resolve("fixtures").resolve("Guard.java")),
+            classes);
+        Assumptions.assumeTrue(rcFix == 0 && Files.exists(classes.resolve("Guard.class"))
+                && Files.exists(classes.resolve("Gadget.class")),
+            "fixture compile failed (rc=" + rcFix + "); javac unavailable?");
+
+        // only Guard is transpiled; Gadget is the external type the stub must cover
+        Path out = tmpDir.resolve("out-stub");
+        List<Path> emitted =
+            Transpiler.transpile(List.of(classes.resolve("Guard.class")), out);
+        Path stub = emitted.stream()
+                .filter(p -> p.getFileName().toString().equals("Gadget.java")).findFirst()
+                .orElseThrow(() -> new AssertionError("no Blueprint stub Gadget.java emitted"));
+        String s = Files.readString(stub, StandardCharsets.UTF_8);
+
+        // the stub carries exactly the accessed members with default bodies
+        assertThat(s).contains("public class Gadget {").contains("public int score;")
+                .contains("public int size() { return 0; }")
+                .contains("public static int kind;")
+                .contains("public static int defaultScore() { return 0; }")
+                .contains("public Gadget() { }");
+
+        // the transpiled Guard compiles against the stub and the runtime
+        Path guardJava = emitted.stream()
+                .filter(p -> p.getFileName().toString().equals("Guard.java")).findFirst()
+                .orElseThrow(() -> new AssertionError("no Guard.java emitted"));
+        int rc = compile(List.of(guardJava, stub, out.resolve("jvm").resolve("Local.java")),
+            tmpDir.resolve("roundtrip-stub"));
+        assertThat(rc).as("javac must compile the transpiled class against its stubs").isZero();
+    }
+
     // -- helpers -----------------------------------------------------------------
 
     private Path writeFixture() throws IOException {
