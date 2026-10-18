@@ -139,7 +139,7 @@ the surrounding method), and one `jvm.Local` stack frame for the operand stack:
 | `get/putfield` | real Java field access: `(T) popRef` receiver + `recv.f`, `recv.f = v` (M2a ✓) | — |
 | `get/putstatic` | real Java static access: `stk.push(Counter.calls);` / `int $v0 = stk.pop(); Counter.calls = $v0;` (M2 ✓) | — |
 | `anewarray`, `iaload`, `aastore`, … | real Java array ops around pops/pushes | exceptions from Java semantics (M2 follow-up) |
-| `checkcast`, `instanceof` | real Java cast / `instanceof` | `ClassCastException` from Java semantics (M2 follow-up) |
+| `checkcast`, `instanceof` | real Java cast / `instanceof`: `T $o = (T) stk.popRef(); stk.push($o);` resp. `stk.push($o instanceof T ? 1 : 0);` (M2 ✓) | `ClassCastException` from Java semantics |
 | `invokevirtual/special/interface` | pop receiver+args into temps, real call on the receiver, push result (M2a ✓) | callee contract applies |
 | `invokedynamic`, `jsr`, `ret` | **unsupported → abort** (M4+: `makeConcatWithConstants`) | — |
 
@@ -167,7 +167,10 @@ to 0/1, and `<clinit>` initializers are dropped — static fields start at their
 (0 / null), which is exactly what the `initialisation: disableStaticInitialisation` choice of
 every proof assumes (pinned by
 `TranspileTest#transpiledStaticFieldAccessHasCanonicalShape` against `golden/Counter.java`).
-`checkcast`/`instanceof`, `int[]` arrays and stub generation remain M2 follow-ups.
+`checkcast`/`instanceof` emit real Java casts / type tests with the JVM's int 0/1 result
+(`golden/Caster.java` + `TranspileTest#transpiledCastAndInstanceofHaveCanonicalShape`; the
+`classify` shape additionally exercises the constrained-goto mid-layout return wrapper).
+`int[]` arrays and stub generation remain M2 follow-ups.
 
 ### 3.4 Control flow: linear blocks, Java labels, `goto_`
 
@@ -640,14 +643,14 @@ createdness residuals that the default strategy leaves open in auto mode (see be
 **M2a status (on `weigl/jvm`):** the object-call slice of the transpiler is shipped and
 fidelity-tested — reference ops on `jvm.Local`, slot typing from the `LocalVariableTable`
 (implicit `this`), field access, `new`+init fusion and instance calls (§3.3), and static
-fields (`get/putstatic`, `<clinit>` dropped), checked by
-`TranspileTest` (canonical shapes + `javac --release 17` round-trip) against the golden twins
-`golden/Point.java` + `golden/Shapes.java` + `golden/Counter.java`. The *proof* side is
-blocked by the KeY-side fresh-object residual of §9.1 (2): any Object-typed stack op leaves
-`created(pre, frame)` goals open in auto mode, so the object fixtures are pinned as a
-characterization (`ObjectProofTest`) rather than as closing gates. Next M2 slice:
-`checkcast`/`instanceof`, `int[]` arrays, stub generation — followed by the §9.1 follow-ups
-that unlock closing object proofs.
+fields (`get/putstatic`, `<clinit>` dropped) and casts/type tests (`checkcast`/`instanceof`),
+checked by `TranspileTest` (canonical shapes + `javac --release 17` round-trip) against the
+golden twins `golden/Point.java` + `golden/Shapes.java` + `golden/Counter.java` +
+`golden/Caster.java`. The *proof* side is blocked by the KeY-side fresh-object residual of
+§9.1 (2): any Object-typed stack op leaves `created(pre, frame)` goals open in auto mode, so
+the object fixtures are pinned as a characterization (`ObjectProofTest`) rather than as
+closing gates. Next M2 slice: `int[]` arrays, stub generation — followed by the §9.1
+follow-ups that unlock closing object proofs.
 
 ### 9.1 Known limitations (M1)
 

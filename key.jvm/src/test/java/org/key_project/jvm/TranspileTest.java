@@ -208,6 +208,53 @@ class TranspileTest {
         assertThat(rc).as("javac must compile the transpiled static-field output").isZero();
     }
 
+    /**
+     * M2 cast slice: checkcast pops and re-pushes the real cast (Point), instanceof pops and
+     * pushes the JVM int 0/1 result as a real instanceof expression; the classify method also
+     * exercises the constrained-goto mid-layout return wrapper. javac round-trip must compile.
+     * The golden twin of this shape is {@code golden/Caster.java}; no closing proof gate exists
+     * (Object-typed ops, see {@code rule.ObjectProofTest} and docs §9.1(2)).
+     */
+    @Test
+    void transpiledCastAndInstanceofHaveCanonicalShape() throws Exception {
+        Path src = writeFixture("Point.java");
+        writeFixture("Caster.java");
+        Path classes = tmpDir.resolve("classes-caster");
+        int rcFix = compile(
+            List.of(src.resolve("fixtures").resolve("Point.java"),
+                src.resolve("fixtures").resolve("Caster.java")),
+            classes);
+        Assumptions.assumeTrue(rcFix == 0 && Files.exists(classes.resolve("Caster.class"))
+                && Files.exists(classes.resolve("Point.class")),
+            "fixture compile failed (rc=" + rcFix + "); javac unavailable?");
+
+        Path out = tmpDir.resolve("out-caster");
+        List<Path> emitted = Transpiler.transpile(
+            List.of(classes.resolve("Caster.class"), classes.resolve("Point.class")), out);
+        Path casterJava = emitted.stream()
+                .filter(p -> p.getFileName().toString().equals("Caster.java")).findFirst()
+                .orElseThrow(() -> new AssertionError("no Caster.java emitted"));
+        String s = Files.readString(casterJava, StandardCharsets.UTF_8);
+
+        // checkcast: pops a reference, performs the real cast, pushes the typed reference back
+        assertThat(s).contains("Point $o0 = (Point) stk.popRef();").contains("stk.push($o0);")
+                .contains("return (Point) stk.topRef();");
+
+        // instanceof: pops the reference, pushes the int result of the real instanceof
+        assertThat(s).contains("Object $o0 = (Object) stk.popRef();")
+                .contains("stk.push($o0 instanceof Point ? 1 : 0);");
+
+        // the instanceof branch is consumed by a constrained goto (mid-layout return wrapper)
+        assertThat(s).contains("if (stk.ifeq()) { jvm.Local.goto_(9); }")
+                .contains("if (true) { return stk.top(); }");
+
+        int rc = compile(List.of(casterJava, emitted.stream()
+                .filter(p -> p.getFileName().toString().equals("Point.java")).findFirst()
+                .orElseThrow(),
+            out.resolve("jvm").resolve("Local.java")), tmpDir.resolve("roundtrip-caster"));
+        assertThat(rc).as("javac must compile the transpiled cast output").isZero();
+    }
+
     // -- helpers -----------------------------------------------------------------
 
     private Path writeFixture() throws IOException {

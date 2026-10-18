@@ -456,6 +456,8 @@ public final class MethodTranspiler {
             case Opcodes.PUTFIELD -> emitPutField((FieldInsnNode) insn);
             case Opcodes.GETSTATIC -> emitGetStatic((FieldInsnNode) insn);
             case Opcodes.PUTSTATIC -> emitPutStatic((FieldInsnNode) insn);
+            case Opcodes.CHECKCAST -> emitCheckCast((TypeInsnNode) insn);
+            case Opcodes.INSTANCEOF -> emitInstanceOf((TypeInsnNode) insn);
             case Opcodes.IRETURN ->
                 line("        " + returnStatement(index, "return " + stackVar + ".top();"));
             case Opcodes.ARETURN ->
@@ -614,6 +616,36 @@ public final class MethodTranspiler {
     /** Static field access expression {@code Owner.field}. */
     private static String staticAccess(FieldInsnNode field) {
         return jvmTypeName(Type.getObjectType(field.owner)) + "." + field.name;
+    }
+
+    /**
+     * checkcast: pops the reference, casts it to the target type (a real Java cast — its
+     * ClassCastException obligation is the point of the instruction, ruled out by
+     * {@code runtimeExceptions:ban} in proofs) and pushes the typed reference back.
+     * Array casts belong to the arrays slice and abort loudly.
+     */
+    private void emitCheckCast(TypeInsnNode cast) {
+        if (cast.desc.startsWith("[")) {
+            unsupported(new TypeInsnNode(Opcodes.CHECKCAST, cast.desc));
+        }
+        String obj = freshTemp("$o");
+        String t = jvmTypeName(Type.getObjectType(cast.desc));
+        line("        " + t + " " + obj + " = (" + t + ") " + stackVar + ".popRef();");
+        line("        " + stackVar + ".push(" + obj + ");");
+    }
+
+    /**
+     * instanceof: pops the reference and pushes the JVM's int result (0/1) of the real
+     * {@code instanceof} expression ({@code null} is never an instance, matching the JVM).
+     */
+    private void emitInstanceOf(TypeInsnNode insn) {
+        if (insn.desc.startsWith("[")) {
+            unsupported(insn);
+        }
+        String obj = freshTemp("$o");
+        String t = jvmTypeName(Type.getObjectType(insn.desc));
+        line("        Object " + obj + " = (Object) " + stackVar + ".popRef();");
+        line("        " + stackVar + ".push(" + obj + " instanceof " + t + " ? 1 : 0);");
     }
 
     /**
