@@ -138,7 +138,8 @@ the surrounding method), and one `jvm.Local` stack frame for the operand stack:
 | `new`+`dup`+`invokespecial <init>` | `Foo f = new Foo($1, $2);` + push (fused; pattern validated) | constructor contract applies (M2a) |
 | `get/putfield` | real Java field access: `(T) popRef` receiver + `recv.f`, `recv.f = v` (M2a ✓) | — |
 | `get/putstatic` | real Java static access: `stk.push(Counter.calls);` / `int $v0 = stk.pop(); Counter.calls = $v0;` (M2 ✓) | — |
-| `anewarray`, `iaload`, `aastore`, … | real Java array ops around pops/pushes | exceptions from Java semantics (M2 follow-up) |
+| `anewarray`, `aastore`, `aaload`, … | `aastore`/`aaload` on object arrays, multidim | exceptions from Java semantics (M3 follow-up: real Java array ops around pops/pushes, same pattern as `int[]`) |
+| `newarray`, `iaload`, `iastore`, `arraylength` | real `int[]` ops: `int[] $a = new int[stk.pop()]; stk.push($a);`, `int $i = stk.pop(); int[] $a = (int[]) stk.popRef(); stk.push($a[$i]);`, `$a[$i] = $v;`, `stk.push($a.length);` (M2 ✓; only `T_INT`, other atypes abort) | Java array semantics |
 | `checkcast`, `instanceof` | real Java cast / `instanceof`: `T $o = (T) stk.popRef(); stk.push($o);` resp. `stk.push($o instanceof T ? 1 : 0);` (M2 ✓) | `ClassCastException` from Java semantics |
 | `invokevirtual/special/interface` | pop receiver+args into temps, real call on the receiver, push result (M2a ✓) | callee contract applies |
 | `invokedynamic`, `jsr`, `ret` | **unsupported → abort** (M4+: `makeConcatWithConstants`) | — |
@@ -170,7 +171,10 @@ every proof assumes (pinned by
 `checkcast`/`instanceof` emit real Java casts / type tests with the JVM's int 0/1 result
 (`golden/Caster.java` + `TranspileTest#transpiledCastAndInstanceofHaveCanonicalShape`; the
 `classify` shape additionally exercises the constrained-goto mid-layout return wrapper).
-`int[]` arrays and stub generation remain M2 follow-ups.
+`int[]` arrays are shipped too (`newarray`/`iaload`/`iastore`/`arraylength`, M2): real Java
+`int[]` operations with typed `popRef` casts of the array reference (`golden/Arrays.java` +
+`TranspileTest#transpiledIntArrayOpsHaveCanonicalShape`). Stub generation remains an M2
+follow-up.
 
 ### 3.4 Control flow: linear blocks, Java labels, `goto_`
 
@@ -643,14 +647,15 @@ createdness residuals that the default strategy leaves open in auto mode (see be
 **M2a status (on `weigl/jvm`):** the object-call slice of the transpiler is shipped and
 fidelity-tested — reference ops on `jvm.Local`, slot typing from the `LocalVariableTable`
 (implicit `this`), field access, `new`+init fusion and instance calls (§3.3), and static
-fields (`get/putstatic`, `<clinit>` dropped) and casts/type tests (`checkcast`/`instanceof`),
-checked by `TranspileTest` (canonical shapes + `javac --release 17` round-trip) against the
-golden twins `golden/Point.java` + `golden/Shapes.java` + `golden/Counter.java` +
-`golden/Caster.java`. The *proof* side is blocked by the KeY-side fresh-object residual of
+fields (`get/putstatic`, `<clinit>` dropped), casts/type tests (`checkcast`/`instanceof`) and
+`int[]` arrays (`newarray`/`iaload`/`iastore`/`arraylength`), checked by `TranspileTest`
+(canonical shapes + `javac --release 17` round-trip) against the golden twins
+`golden/Point.java` + `golden/Shapes.java` + `golden/Counter.java` + `golden/Caster.java` +
+`golden/Arrays.java`. The *proof* side is blocked by the KeY-side fresh-object residual of
 §9.1 (2): any Object-typed stack op leaves `created(pre, frame)` goals open in auto mode, so
 the object fixtures are pinned as a characterization (`ObjectProofTest`) rather than as
-closing gates. Next M2 slice: `int[]` arrays, stub generation — followed by the §9.1
-follow-ups that unlock closing object proofs.
+closing gates. Next M2 slice: stub generation — followed by the §9.1 follow-ups that unlock
+closing object proofs.
 
 ### 9.1 Known limitations (M1)
 
