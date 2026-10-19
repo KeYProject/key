@@ -20,8 +20,10 @@ import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.LocalVariableNode;
+import org.objectweb.asm.tree.LookupSwitchInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TableSwitchInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
@@ -95,6 +97,18 @@ public final class MethodTranspiler {
             insn.getNext(), nodeIdx++) {
             if (insn instanceof JumpInsnNode jump) {
                 targets.add(labelIndex.get(jump.label));
+            }
+            if (insn instanceof TableSwitchInsnNode ts) {
+                targets.add(labelIndex.get(ts.dflt));
+                for (LabelNode label : ts.labels) {
+                    targets.add(labelIndex.get(label));
+                }
+            }
+            if (insn instanceof LookupSwitchInsnNode ls) {
+                targets.add(labelIndex.get(ls.dflt));
+                for (LabelNode label : ls.labels) {
+                    targets.add(labelIndex.get(label));
+                }
             }
             if (insn.getOpcode() != -1) {
                 lastOpcodeIndex = nodeIdx;
@@ -438,6 +452,8 @@ public final class MethodTranspiler {
                 line("        if (" + stackVar + "." + predicate + "()) { "
                     + "jvm.Local.goto_(" + target + "); }");
             }
+            case Opcodes.TABLESWITCH -> emitTableSwitch((TableSwitchInsnNode) insn);
+            case Opcodes.LOOKUPSWITCH -> emitLookupSwitch((LookupSwitchInsnNode) insn);
             case Opcodes.IADD, Opcodes.ISUB, Opcodes.IMUL, Opcodes.IDIV, Opcodes.IREM, Opcodes.INEG,
                     Opcodes.IAND, Opcodes.IOR, Opcodes.IXOR, Opcodes.ISHL, Opcodes.ISHR,
                     Opcodes.IUSHR ->
@@ -692,6 +708,35 @@ public final class MethodTranspiler {
         String arr = freshTemp("$a");
         line("        int[] " + arr + " = (int[]) " + stackVar + ".popRef();");
         line("        " + stackVar + ".push(" + arr + ".length);");
+    }
+
+    /**
+     * tableswitch (M3): pops the selector and dispatches on its value as an if-chain of
+     * {@code if (sel == key) { jvm.Local.goto_(pc); }} over the dense key range, followed by an
+     * unconditional {@code goto_(dflt)}. Every case/default label is a {@code L<pc>} target the
+     * {@code GotoSpliceRule} resolves, so the canonical linear layout is preserved.
+     */
+    private void emitTableSwitch(TableSwitchInsnNode insn) {
+        String sel = freshTemp("$s");
+        line("        int " + sel + " = " + stackVar + ".pop();");
+        int key = insn.min;
+        for (LabelNode label : insn.labels) {
+            line("        if (" + sel + " == " + key + ") { jvm.Local.goto_("
+                + labelIndex.get(label) + "); }");
+            key++;
+        }
+        line("        jvm.Local.goto_(" + labelIndex.get(insn.dflt) + ");");
+    }
+
+    /** lookupswitch: as {@link #emitTableSwitch}, but over the sparse key list. */
+    private void emitLookupSwitch(LookupSwitchInsnNode insn) {
+        String sel = freshTemp("$s");
+        line("        int " + sel + " = " + stackVar + ".pop();");
+        for (int i = 0; i < insn.keys.size(); i++) {
+            line("        if (" + sel + " == " + insn.keys.get(i) + ") { jvm.Local.goto_("
+                + labelIndex.get(insn.labels.get(i)) + "); }");
+        }
+        line("        jvm.Local.goto_(" + labelIndex.get(insn.dflt) + ");");
     }
 
     /**
