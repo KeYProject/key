@@ -132,6 +132,7 @@ the surrounding method), and one `jvm.Local` stack frame for the operand stack:
 | `iadd`, `isub`, `imul`, `ineg`, `dup`, `swap`, … | `stk.iadd();` … | one contract per mnemonic |
 | `ifeq`, `if_icmplt`, … | `if (stk.if_icmplt()) { jvm.Local.goto_(pc); }` (branch-taken predicate) | pops operand(s), returns `boolean` |
 | `goto L` | `jvm.Local.goto_(7);` | *no contract* — goto rules (§5), int pc target |
+| `tableswitch`, `lookupswitch` | `int $s0 = stk.pop();` then `if ($s0 == k) { jvm.Local.goto_(casePc); }` per key and an unconditional `jvm.Local.goto_(dfltPc);` (M3 ✓) | selector int-only; case/default labels are guarded `L<pc>` blocks (§3.4) |
 | `ireturn`, `areturn`, `return` | `return stk.top();` … / plain `return;` | pops top |
 | `idiv`, `irem`, bitwise, shifts | `stk.idiv();` … | *contractless* stubs (unused by M1 fixtures; would body-expand) |
 | `ldc` (int/String/float/class) | `stk.push(7);`, `stk.push("…")` | push constant |
@@ -665,6 +666,19 @@ fixtures are pinned as a characterization (`ObjectProofTest`) rather than as clo
 The M2 transpiler slices are complete; the §9.1 follow-ups that unlock closing object proofs
 remain.
 
+**M3 status (first slice, on `weigl/jvm`):** `tableswitch`/`lookupswitch` are shipped. The
+selector is popped into a plain `int` temp (`int $s0 = stk.pop();`) and dispatched as an
+`if ($s0 == k) { jvm.Local.goto_(pc); }` chain over the dense key range (tableswitch) resp.
+the sparse key list (lookupswitch), followed by an unconditional `jvm.Local.goto_(dflt)`;
+every case/default label is a guarded `L<pc>` block with mid-layout or trailing returns —
+the canonical linear layout is preserved and `javac --release 17` accepts the output
+(`golden/SwitchClass.java` + `TranspileTest#transpiledSwitchHasCanonicalShape`). The
+*proof* side is **pinned as a characterization** (`SwitchProofTest`) rather than closing:
+the switch flow necessarily carries constants (branch tests against literal keys, literal
+pushes into `jvm.Local`), and a probe bisect showed that <em>any</em> constant in the stack
+flow leaves the fresh-`jvm.Local` residual of §9.1(2) open in auto mode, while
+variable-only flows (`max2`, a bare `pop` into a local) close — see §9.1(2).
+
 ### 9.1 Known limitations (M1)
 
 Two KeY-side strategy gaps bound what auto mode can close under the `java-jvm` profile. Both
@@ -691,20 +705,30 @@ KeY-side improvement is noticed and converted deliberately.
    the reduction once, or a KeY change making the high-cost heap simplifications available to
    auto mode.
    <p>
-   **M2 finding — the discriminator is Object-typed stack traffic.** Experimental isolation
-   (`probe` runs against minimal methods, varying one stack op at a time) shows that
-   *int-only* flows — all of M1 — never materialize the residual, while *any* Object-typed
-   operation (`push(Object)`, `popRef()`, `topRef()`) does, closing-independent of
-   `intRules` (arithmetic semantics does not help: the goals are heap facts, not arithmetic,
-   and M1's recursion workaround therefore does not carry over). Consequence: no object-slice
-   method contract closes under `DefaultAutoMacro` today — including the M2 fixtures
-   (`Point::sum`, `Shapes::total`, `Shapes::make`). `ObjectProofTest`
-   (`objectSliceLeavesFreshObjectCreatednessResidualsOpenInAutoMode`) pins the residual goal
-   shape against the golden `Shapes::make`. Replacing the constructor-contract initialization
-   by a body-expanded allocation + an `initialize()` *method* contract was experimentally
-   ruled out too: without the constructor contract's anon-post, even int-only flows stop
-   closing (the strategy cannot push the `create`-update's createdness out of the pre-heap).
-   The object proof story therefore waits on the same two follow-ups listed above.
+   **M2 finding — Object-typed stack traffic materializes the residual; M3 sharpens it.**
+   Experimental isolation (probe runs against minimal methods, varying one stack op at a time)
+   shows that *int-only* flows over pure *variables* — `max`, `max2`, a bare `pop` into a
+   local — never materialize the residual, while *any* Object-typed operation
+   (`push(Object)`, `popRef()`, `topRef()`) does, independent of `intRules` (arithmetic
+   semantics does not help: the goals are heap facts, not arithmetic, and M1's recursion
+   workaround therefore does not carry over). The M3 switch bisect sharpened the
+   discriminator: the residual also opens for **int-only flows that carry constants** —
+   branch tests against literals (the switch key chain) or literal pushes into `jvm.Local` —
+   while structurally identical variable-only flows close. The open goals then show the
+   residual as `¬(branch condition) ∨ created(heap,self) ∨ self=null ∨ inRangeInt(literal)`
+   succedent disjuncts (origin `ensures @ file Local.java`): the fresh-object obligations
+   plus trivial-but-unreduced literal range lemmas. Emission-shape workarounds were
+   empirically ruled out (stack-based `if_icmpeq` dispatch chains, `ifne`-style one-operand
+   branches, constant pushes all reproduce the residual — `SwitchProofTest`), so every
+   realistic method contract — the M2 object fixtures (`Point::sum`, `Shapes::total`,
+   `Shapes::make`) and the M3 switch fixtures alike — stays open under `DefaultAutoMacro`
+   today. Consequence: the proofs wait on the two follow-ups listed above (an interactive
+   script in the vein of `triangular.proof`, or a KeY change making the high-cost heap
+   simplifications / `inRangeInt` literal reductions available to auto mode).
+   Replacing the constructor-contract initialization by a body-expanded allocation + an
+   `initialize()` *method* contract was experimentally ruled out too: without the constructor
+   contract's anon-post, even int-only flows stop closing (the strategy cannot push the
+   `create`-update's createdness out of the pre-heap).
 
 Unrelated to the above, `JvmProfile` does *not* change the underlying strategy — the three
 appended rules fire at cost 0; the `max`/`max2` gates close under the full M1 settings
