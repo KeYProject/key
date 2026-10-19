@@ -325,7 +325,8 @@ public class RenamingTermProperty implements Property<Term> {
      * @param term the term to compute the hash code for
      * @param nameAbstractionList the list of bound variables that is used to abstract from the
      *        variable names
-     * @param belowModality boolean indicating whether {@code term} occurs below a modality
+     * @param belowModality boolean indicates whether on the descended path
+     *        to {@code term} a modality has been passed (e.g. {@code < p > phi(term) })
      * @param hashCode the accumulated hash code (should be 1 for the first call)
      * @return the hash code
      */
@@ -400,7 +401,8 @@ public class RenamingTermProperty implements Property<Term> {
      * @param term the term to compute the hash code for
      * @param nameAbstractionList the list of bound variables that is used to abstract from the
      *        variable names
-     * @param belowModality boolean indicating whether {@code term} occurs below a modality
+     * @param belowModality boolean indicates whether on the recursive descend path
+     *        to the {@code term} a modality has been passed (e.g. {@code < p > phi(term) })
      * @param hashCode the accumulated hash code
      * @return the hash code
      */

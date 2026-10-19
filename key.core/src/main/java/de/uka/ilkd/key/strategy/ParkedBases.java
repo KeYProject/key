@@ -118,6 +118,7 @@ final class ParkedBases {
     /// Minimum number of parks before the first sweep, so small proofs never sweep.
     private static final int SWEEP_FLOOR = 64;
 
+
     /// The wake kind describes the structure of the wake key and with that its precision. Below,
     /// _core_ means the formula after its update chain has been removed, and
     /// _descriptor_ refers to an operator family as defined by the matcher
@@ -144,10 +145,15 @@ final class ParkedBases {
     /// `inAntecedent` describes whether the assumes formula occurs in the antecedent or
     /// succedent, the descriptor `head` of the (core) formula's top operator (its operator
     /// family, see above), and `datum` holds one extra value whose meaning depends on the kind
-    /// (see [WakeKind]). A parked base is stored under the most precise key its
+    /// (see [WakeKind]).
+    ///
+    /// A parked base is stored under the most precise key its
     /// `\assumes` shape allows ([#parkKeys]). All possible keys for a new or changed
     /// formula are built in [#recordWakeKeysOf] such that a parked rule application is woken
     /// exactly when a new or changed formula produces a key equal to one the base is stored under.
+    ///
+    /// Note: If the class gets refactored and tested again (please use differential testing),
+    /// this record can be made more type safe by a sealed interface.
     record WakeKey(WakeKind kind, boolean inAntecedent, Object head, @Nullable Object datum) {
     }
 
