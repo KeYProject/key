@@ -346,6 +346,50 @@ class TranspileTest {
         assertThat(rc).as("javac must compile the transpiled class against its stubs").isZero();
     }
 
+    /**
+     * M3 switch slice: tableswitch/lookupswitch pop the selector into a plain int temp and
+     * dispatch as an if-chain of {@code if (sel == key) { jvm.Local.goto_(pc); }} over the dense
+     * key range (resp. sparse key list), followed by an unconditional {@code goto_(dflt)}; every
+     * case/default becomes a guarded {@code L<pc>} block. javac round-trip must compile. The
+     * golden twin of this shape is {@code golden/SwitchClass.java}; the proof side closes (int
+     * only) and is gated by {@code rule.SwitchProofTest}.
+     */
+    @Test
+    void transpiledSwitchHasCanonicalShape() throws Exception {
+        Path src = writeFixture("SwitchClass.java");
+        Path classes = tmpDir.resolve("classes-switch");
+        int rcFix = compile(src.resolve("fixtures").resolve("SwitchClass.java"), classes);
+        Assumptions.assumeTrue(rcFix == 0 && Files.exists(classes.resolve("SwitchClass.class")),
+            "fixture compile failed (rc=" + rcFix + "); javac unavailable?");
+
+        Path out = tmpDir.resolve("out-switch");
+        List<Path> emitted =
+            Transpiler.transpile(List.of(classes.resolve("SwitchClass.class")), out);
+        Path switchJava = emitted.stream()
+                .filter(p -> p.getFileName().toString().equals("SwitchClass.java")).findFirst()
+                .orElseThrow(() -> new AssertionError("no SwitchClass.java emitted"));
+        String s = Files.readString(switchJava, StandardCharsets.UTF_8);
+
+        // tableswitch (dense 0..2): selector temp + if-chain + unconditional default jump
+        assertThat(s).contains("int $s0 = stk.pop();")
+                .contains("if ($s0 == 0) { jvm.Local.goto_(4); }")
+                .contains("if ($s0 == 1) { jvm.Local.goto_(9); }")
+                .contains("if ($s0 == 2) { jvm.Local.goto_(9); }")
+                .contains("jvm.Local.goto_(14);");
+
+        // lookupswitch (sparse 7/100): only the explicit keys are tested
+        assertThat(s).contains("if ($s0 == 7) { jvm.Local.goto_(4); }")
+                .contains("if ($s0 == 100) { jvm.Local.goto_(9); }");
+
+        // case bodies: guarded label blocks with mid-layout / trailing returns
+        assertThat(s).contains("L4: { if (false) { break L4; }").contains("stk.push(10);")
+                .contains("if (true) { return stk.top(); }").contains("stk.push(-1);");
+
+        int rc = compile(List.of(switchJava, out.resolve("jvm").resolve("Local.java")),
+            tmpDir.resolve("roundtrip-switch"));
+        assertThat(rc).as("javac must compile the transpiled switch output").isZero();
+    }
+
     // -- helpers -----------------------------------------------------------------
 
     private Path writeFixture() throws IOException {
