@@ -390,6 +390,44 @@ class TranspileTest {
         assertThat(rc).as("javac must compile the transpiled switch output").isZero();
     }
 
+    /**
+     * M3 stack-shuffle slice: the runtime rearrangement calls the transpiler emits for
+     * javac-17's real bytecode — {@code stk.dup();} for {@code (x = y) + x} and
+     * {@code stk.dup2();} for the int-array compound {@code a[i] += v}. The golden twin is
+     * {@code golden/Shuffle.java}; {@code dupReuse} is variable-only int and closes
+     * ({@code rule.ShuffleProofTest}), {@code dup2A} carries the §9.1(2) residual.
+     */
+    @Test
+    void transpiledStackShufflesHaveCanonicalShape() throws Exception {
+        Path src = writeFixture("Shuffle.java");
+        Path classes = tmpDir.resolve("classes-shuffle");
+        int rcFix = compile(src.resolve("fixtures").resolve("Shuffle.java"), classes);
+        Assumptions.assumeTrue(rcFix == 0 && Files.exists(classes.resolve("Shuffle.class")),
+            "fixture compile failed (rc=" + rcFix + "); javac unavailable?");
+
+        Path out = tmpDir.resolve("out-shuffle");
+        List<Path> emitted =
+            Transpiler.transpile(List.of(classes.resolve("Shuffle.class")), out);
+        Path shuffleJava = emitted.stream()
+                .filter(p -> p.getFileName().toString().equals("Shuffle.java")).findFirst()
+                .orElseThrow(() -> new AssertionError("no Shuffle.java emitted"));
+        String s = Files.readString(shuffleJava, StandardCharsets.UTF_8);
+
+        // (x = y) + x: push(y); dup; pop into x; re-push; iadd -- all int
+        assertThat(s).contains("stk.push(y);").contains("stk.dup();")
+                .contains("x = stk.pop();").contains("stk.push(x);")
+                .contains("stk.iadd();");
+        // a[i] += v: dup2 of array base + index before the load/store pair
+        assertThat(s).contains("stk.push(a);").contains("stk.push(i);")
+                .contains("stk.dup2();");
+        // no constant leaked into the stack machine of dupReuse (variable-only)
+        assertThat(s).doesNotContain("stk.push(0);").doesNotContain("stk.push(1);");
+
+        int rc = compile(List.of(shuffleJava, out.resolve("jvm").resolve("Local.java")),
+            tmpDir.resolve("roundtrip-shuffle"));
+        assertThat(rc).as("javac must compile the transpiled shuffle output").isZero();
+    }
+
     // -- helpers -----------------------------------------------------------------
 
     private Path writeFixture() throws IOException {
