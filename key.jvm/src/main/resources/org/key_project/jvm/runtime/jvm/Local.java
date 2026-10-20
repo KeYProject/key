@@ -253,6 +253,78 @@ public class Local {
     public void swap() {
     }
 
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size >= 2;
+      @   ensures size == \old(size) + 1;
+      @   ensures contents ==
+      @           \seq_concat(\seq((int)\seq_get(\old(contents), 0)),
+      @               \seq_concat(\seq((int)\seq_get(\old(contents), 1)),
+      @                   \seq_concat(\seq((int)\seq_get(\old(contents), 0)),
+      @                               \seq_sub(\old(contents), 2, \old(size)))));
+      @*/
+    public void dup_x1() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size >= 3;
+      @   ensures size == \old(size) + 1;
+      @   ensures contents ==
+      @           \seq_concat(\seq((int)\seq_get(\old(contents), 0)),
+      @               \seq_concat(\seq((int)\seq_get(\old(contents), 2)),
+      @                   \seq_concat(\seq((int)\seq_get(\old(contents), 1)),
+      @                       \seq_concat(\seq((int)\seq_get(\old(contents), 0)),
+      @                                   \seq_sub(\old(contents), 3, \old(size))))));
+      @*/
+    public void dup_x2() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size >= 2;
+      @   ensures size == \old(size) + 2;
+      @   ensures contents ==
+      @           \seq_concat(\seq((int)\seq_get(\old(contents), 0)),
+      @               \seq_concat(\seq((int)\seq_get(\old(contents), 1)),
+      @                   \seq_concat(\seq((int)\seq_get(\old(contents), 0)),
+      @                       \seq_concat(\seq((int)\seq_get(\old(contents), 1)),
+      @                                   \seq_sub(\old(contents), 2, \old(size))))));
+      @*/
+    public void dup2() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size >= 3;
+      @   ensures size == \old(size) + 2;
+      @   ensures contents ==
+      @           \seq_concat(\seq((int)\seq_get(\old(contents), 1)),
+      @               \seq_concat(\seq((int)\seq_get(\old(contents), 0)),
+      @                   \seq_concat(\seq((int)\seq_get(\old(contents), 2)),
+      @                       \seq_concat(\seq((int)\seq_get(\old(contents), 1)),
+      @                           \seq_concat(\seq((int)\seq_get(\old(contents), 0)),
+      @                                       \seq_sub(\old(contents), 3, \old(size)))))));
+      @*/
+    public void dup2_x1() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size >= 4;
+      @   ensures size == \old(size) + 2;
+      @   ensures contents ==
+      @           \seq_concat(\seq((int)\seq_get(\old(contents), 1)),
+      @               \seq_concat(\seq((int)\seq_get(\old(contents), 0)),
+      @                   \seq_concat(\seq((int)\seq_get(\old(contents), 3)),
+      @                       \seq_concat(\seq((int)\seq_get(\old(contents), 2)),
+      @                           \seq_concat(\seq((int)\seq_get(\old(contents), 1)),
+      @                               \seq_concat(\seq((int)\seq_get(\old(contents), 0)),
+      @                                           \seq_sub(\old(contents), 4, \old(size))))))));
+      @*/
+    public void dup2_x2() {
+    }
+
     // -- branch predicates (pop their operands from the stack; value2 op value1) ---------
 
     /*@ public normal_behavior
