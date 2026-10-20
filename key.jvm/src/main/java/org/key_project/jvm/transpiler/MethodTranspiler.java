@@ -494,6 +494,16 @@ public final class MethodTranspiler {
                 line("        " + stackVar + ".dup();");
             case Opcodes.SWAP ->
                 line("        " + stackVar + ".swap();");
+            case Opcodes.DUP_X1 ->
+                line("        " + stackVar + ".dup_x1();");
+            case Opcodes.DUP_X2 ->
+                line("        " + stackVar + ".dup_x2();");
+            case Opcodes.DUP2 ->
+                line("        " + stackVar + ".dup2();");
+            case Opcodes.DUP2_X1 ->
+                line("        " + stackVar + ".dup2_x1();");
+            case Opcodes.DUP2_X2 ->
+                line("        " + stackVar + ".dup2_x2();");
             default -> unsupported(insn);
         }
     }

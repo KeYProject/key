@@ -129,7 +129,8 @@ the surrounding method), and one `jvm.Local` stack frame for the operand stack:
 | `iload 1` / `istore 2` | `stk.push(a);` / `a = stk.pop();` | local `int` ↔ stack top |
 | `aload 1` / `astore 2` | `stk.push(o);` / `o = (Foo) stk.popRef();` | local reference ↔ typed cast off `popRef` (M2a; `LocalVariableTable` types the slot) |
 | `iinc 3, 1` | `c += 1;` | plain local update |
-| `iadd`, `isub`, `imul`, `ineg`, `dup`, `swap`, … | `stk.iadd();` … | one contract per mnemonic |
+| `iadd`, `isub`, `imul`, `ineg`, … | `stk.iadd();` … | one contract per mnemonic |
+| `dup`, `swap`, `dup_x1`, `dup_x2`, `dup2`, `dup2_x1`, `dup2_x2` | `stk.dup(); stk.swap();` … (M3 ✓) | seq-prefix contracts: `dup`/`swap` (M1), full 7-op family (M3); javac-17 emits `dup` (`(x = y) + x`) and `dup2` (`a[i] += v`); the _x1/_x2/2× variants have contracts + emission but no real-bytecode gate in the int subset (they matter for category-2 later) |
 | `ifeq`, `if_icmplt`, … | `if (stk.if_icmplt()) { jvm.Local.goto_(pc); }` (branch-taken predicate) | pops operand(s), returns `boolean` |
 | `goto L` | `jvm.Local.goto_(7);` | *no contract* — goto rules (§5), int pc target |
 | `tableswitch`, `lookupswitch` | `int $s0 = stk.pop();` then `if ($s0 == k) { jvm.Local.goto_(casePc); }` per key and an unconditional `jvm.Local.goto_(dfltPc);` (M3 ✓) | selector int-only; case/default labels are guarded `L<pc>` blocks (§3.4) |
@@ -678,6 +679,19 @@ the switch flow necessarily carries constants (branch tests against literal keys
 pushes into `jvm.Local`), and a probe bisect showed that <em>any</em> constant in the stack
 flow leaves the fresh-`jvm.Local` residual of §9.1(2) open in auto mode, while
 variable-only flows (`max2`, a bare `pop` into a local) close — see §9.1(2).
+
+**M3 status (second slice, on `weigl/jvm`):** the full stack-shuffle family is shipped.
+`dup`/`swap` existed since M1; `dup_x1`, `dup_x2`, `dup2`, `dup2_x1`, `dup2_x2` now carry
+seq-prefix contracts (`Local.java`) and transpiler emission. Real javac-17 bytecode in the
+int subset only produces `dup` (`(x = y) + x` compiles the inner-assignment result via
+`dup`) and `dup2` (the int-array compound `a[i] += v` duplicates base + index; the
+`_x1`/`_x2`/`2_*` variants appear only for category-2 work that M3's long/double slice will
+add) — `golden/Shuffle.java` + `TranspileTest#transpiledStackShufflesHaveCanonicalShape`.
+The *proof* side delivers the **first genuinely closing M3 gate**: `dupReuse` is a
+variable-only int flow (no constant reaches the `\seq`), so per the §9.1(2) bisect boundary
+it closes under `DefaultAutoMacro` — `ShuffleProofTest#dupReuseShuffleProofCloses` asserts
+the closure, while the array-based `dup2A` twin remains in the pinned residual family
+(an `int[]` is Object-typed traffic).
 
 ### 9.1 Known limitations (M1)
 
