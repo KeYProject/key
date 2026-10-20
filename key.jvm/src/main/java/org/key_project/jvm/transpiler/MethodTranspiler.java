@@ -4,8 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.jvm.transpiler;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -24,6 +28,7 @@ import org.objectweb.asm.tree.LookupSwitchInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TableSwitchInsnNode;
+import org.objectweb.asm.tree.TryCatchBlockNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
@@ -63,6 +68,8 @@ public final class MethodTranspiler {
     private final int instructionCount;
     /** Bytecode offsets (among all nodes, incl. line numbers) of jump targets. */
     private final Map<LabelNode, Integer> labelIndex = new HashMap<>();
+    /** Every node (labels, line numbers, frames and real instructions) by index. */
+    private final List<AbstractInsnNode> nodes = new ArrayList<>();
     private final Set<Integer> targets = new HashSet<>();
     private int lastOpcodeIndex = -1;
     /** Fresh temporary variable counter for popped arguments/receivers/allocation temps. */
@@ -79,6 +86,16 @@ public final class MethodTranspiler {
     /** The name of the runtime operand-stack variable in the emitted method. */
     private String stackVar = "stk";
 
+    /**
+     * Exception regions recovered from the exception table (M3): one entry per {@code try}
+     * range, in javac's source order; {@code handlers} lists the catch clauses (table order, a
+     * {@code null} type is the catch-all used by synchronized/finally inlining).
+     */
+    private final List<Region> tryRegions = new ArrayList<>();
+
+    /** Indexes of the handler instructions, emitted inside the catch clauses, not linearly. */
+    private final Set<Integer> consumed = new HashSet<>();
+
     public MethodTranspiler(MethodNode method, boolean isStatic, String className) {
         this.method = method;
         this.isStatic = isStatic;
@@ -87,6 +104,7 @@ public final class MethodTranspiler {
         int off = 0;
         for (AbstractInsnNode insn = method.instructions.getFirst(); insn != null; insn =
             insn.getNext(), off++) {
+            nodes.add(insn);
             if (insn instanceof LabelNode labelNode) {
                 labelIndex.put(labelNode, off);
             }
@@ -126,6 +144,7 @@ public final class MethodTranspiler {
             localSlots.remove(0);
         }
         indexSlotTypes();
+        analyzeTryCatch();
     }
 
     private static boolean isSlotOpcode(int opcode) {
@@ -179,11 +198,27 @@ public final class MethodTranspiler {
         }
         pickStackVar();
         StringBuilder sb = new StringBuilder();
-        sb.append("    ").append(modifier()).append(methodHeader()).append(" {\n");
+        sb.append("    ").append(modifier()).append(methodHeader()).append(throwsClause())
+                .append(" {\n");
         sb.append(prologue());
         emit();
         sb.append(body).append("    }\n");
         return sb.toString();
+    }
+
+    /**
+     * An {@code athrow} can raise any {@code Throwable}, and emitting it as a real Java
+     * {@code throw} of a {@code Throwable}-typed expression is a checked-exception throw
+     * (JLS 11.2.2). Methods that may throw declare it so the transpiled sources compile.
+     */
+    private String throwsClause() {
+        for (AbstractInsnNode insn = method.instructions.getFirst(); insn != null; insn =
+            insn.getNext()) {
+            if (insn.getOpcode() == Opcodes.ATHROW) {
+                return " throws Throwable";
+            }
+        }
+        return "";
     }
 
     private String methodHeader() {
@@ -282,6 +317,23 @@ public final class MethodTranspiler {
         return slash < 0 ? internalName : internalName.substring(slash + 1);
     }
 
+    /** A Java string literal body for the constant (backslash, quotes and line breaks escaped). */
+    private static String escapeJavaString(String s) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            switch (c) {
+                case '\\' -> sb.append("\\\\");
+                case '"' -> sb.append("\\\"");
+                case '\n' -> sb.append("\\n");
+                case '\r' -> sb.append("\\r");
+                case '\t' -> sb.append("\\t");
+                default -> sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
     private String prologue() {
         StringBuilder sb = new StringBuilder();
         for (int slot : localSlots) {
@@ -292,6 +344,147 @@ public final class MethodTranspiler {
         return sb.toString();
     }
 
+    /** A try range with its catch clauses, recovered from the exception table (M3). */
+    private record Region(int start, int end, List<Handler> handlers) {
+    }
+
+    /**
+     * One catch clause. {@code index} is the bytecode index of the handler's leading
+     * {@code astore} (consumed: the clause binds that slot), {@code end} is the first index
+     * after the handler body, {@code type} the caught class (simple name, {@code Throwable}
+     * for the catch-all used by finally inlining).
+     */
+    private record Handler(int index, int slot, String type, int end) {
+    }
+
+    /**
+     * Recovers the exception regions (M3) from the exception table. Each {@code try} range
+     * becomes one {@link Region} in javac's source order; the handler instructions are
+     * consumed into the catch clause — their leading {@code astore} binds the catch variable,
+     * which therefore gets no own local declaration. A handler runs from its first instruction
+     * up to the next jump target, the next region start, or the end of the method.
+     */
+    private void analyzeTryCatch() {
+        if (method.tryCatchBlocks == null || method.tryCatchBlocks.isEmpty()) {
+            return;
+        }
+        // group table entries by try range; javac lists the catch clauses of one try in order
+        Map<List<Integer>, List<TryCatchBlockNode>> byRange = new LinkedHashMap<>();
+        for (TryCatchBlockNode block : method.tryCatchBlocks) {
+            Integer start = labelIndex.get(block.start);
+            Integer end = labelIndex.get(block.end);
+            if (start == null || end == null || labelIndex.get(block.handler) == null) {
+                throw new IllegalStateException(
+                    "exception table label without index in " + method.name);
+            }
+            if (start >= end) {
+                throw new IllegalStateException("empty try range in " + method.name);
+            }
+            byRange.computeIfAbsent(List.of(start, end), k -> new ArrayList<>()).add(block);
+        }
+        Set<Integer> regionStarts =
+            new HashSet<>(byRange.keySet().stream().map(r -> r.get(0)).toList());
+        List<Region> regions = new ArrayList<>();
+        for (Map.Entry<List<Integer>, List<TryCatchBlockNode>> entry : byRange.entrySet()) {
+            int start = entry.getKey().get(0);
+            int end = entry.getKey().get(1);
+            List<Handler> handlers = new ArrayList<>();
+            List<Integer> handlerRange = new ArrayList<>();
+            for (TryCatchBlockNode block : entry.getValue()) {
+                int entryIdx = labelIndex.get(block.handler);
+                int firstInsn = entryIdx;
+                while (firstInsn < instructionCount && nodes.get(firstInsn).getOpcode() == -1) {
+                    firstInsn++;
+                }
+                if (firstInsn >= instructionCount
+                        || nodes.get(firstInsn).getOpcode() != Opcodes.ASTORE) {
+                    throw new UnsupportedOperationException(
+                        "exception handler in " + method.name + " must start with astore");
+                }
+                int handlerEnd = handlerExtent(firstInsn, regionStarts);
+                int slot = ((VarInsnNode) nodes.get(firstInsn)).var;
+                // the catch clause binds the slot: no separate local declaration
+                localSlots.remove(slot);
+                String type = block.type == null ? "Throwable" : simpleName(block.type);
+                handlers.add(new Handler(firstInsn, slot, type, handlerEnd));
+                for (int i = firstInsn; i < handlerEnd; i++) {
+                    handlerRange.add(i);
+                }
+            }
+            // handler instructions must not overlap the try body or an earlier handler range
+            for (int i = start; i < end; i++) {
+                if (handlerRange.contains(i) || consumed.contains(i)) {
+                    throw new UnsupportedOperationException(
+                        "handler overlapping a try body in " + method.name
+                            + " is not supported in M3");
+                }
+            }
+            regions.add(new Region(start, end, handlers));
+            consumed.addAll(handlerRange);
+        }
+        regions.sort(Comparator.comparingInt(Region::start).thenComparingInt(Region::end));
+        tryRegions.addAll(regions);
+        // handlers themselves must be straight-line (no target lands inside one)
+        for (int idx : consumed) {
+            if (targets.contains(idx)) {
+                throw new UnsupportedOperationException(
+                    "branch target inside an exception handler in " + method.name
+                        + " is not supported in M3");
+            }
+        }
+    }
+
+    /** The handler body [from, end) ends at the next jump target, region start, or end. */
+    private int handlerExtent(int from, Set<Integer> regionStarts) {
+        for (int i = from; i < instructionCount; i++) {
+            if (targets.contains(i) || regionStarts.contains(i)) {
+                return i;
+            }
+        }
+        return instructionCount;
+    }
+
+    /** Emits {@code } catch (T v) { body } ... } for the region's catch clauses. */
+    private void emitCatchClauses(Region region) {
+        for (Handler handler : region.handlers()) {
+            line("        } catch ("
+                + handler.type() + " " + localName(handler.slot()) + ") {");
+            emitHandlerBody(handler);
+        }
+        line("        }");
+    }
+
+    /** Emits the instructions of a catch clause's body (the handler without its astore). */
+    private void emitHandlerBody(Handler handler) {
+        boolean inLabeled = false;
+        for (int i = handler.index() + 1; i < handler.end(); i++) {
+            AbstractInsnNode insn = nodes.get(i);
+            if (targets.contains(i)) {
+                if (inLabeled) {
+                    line("        }");
+                }
+                line("        L" + i + ": { if (false) { break L" + i + "; }");
+                inLabeled = true;
+            }
+            if (insn.getOpcode() != -1) {
+                emitInstruction(insn, i);
+            }
+        }
+        if (inLabeled) {
+            line("        }");
+        }
+    }
+
+    /** The exception regions whose {@code try} starts at bytecode index {@code index}. */
+    private List<Region> regionsStartingAt(int index) {
+        return tryRegions.stream().filter(r -> r.start() == index).toList();
+    }
+
+    /** The exception regions whose {@code try} ends at (exclusive) bytecode index {@code index}. */
+    private List<Region> regionsEndingAt(int index) {
+        return tryRegions.stream().filter(r -> r.end() == index).toList();
+    }
+
     private void emit() {
         int index = 0;
         boolean inLabeled = false;
@@ -299,6 +492,23 @@ public final class MethodTranspiler {
         boolean skippedDup = false;
         for (AbstractInsnNode insn = method.instructions.getFirst(); insn != null; insn =
             insn.getNext(), index++) {
+            // M3: enter every try region that starts at this index
+            for (Region region : regionsStartingAt(index)) {
+                line("        try {");
+            }
+            // M3: handler instructions were emitted inside their catch clause
+            if (consumed.contains(index)) {
+                continue;
+            }
+            // M3: close every try region that ends at (exclusive) this index, before the next
+            // instruction. A guard-labeled span crossing the boundary is closed first.
+            if (!regionsEndingAt(index).isEmpty() && inLabeled) {
+                line("        }");
+                inLabeled = false;
+            }
+            for (Region region : regionsEndingAt(index)) {
+                emitCatchClauses(region);
+            }
             if (targets.contains(index)) {
                 if (pendingNew != null) {
                     throw new UnsupportedOperationException(
@@ -339,6 +549,14 @@ public final class MethodTranspiler {
             }
             emitInstruction(insn, index);
         }
+        // M3: try regions whose end is the end of the method
+        for (Region region : regionsEndingAt(instructionCount)) {
+            if (inLabeled) {
+                line("        }");
+                inLabeled = false;
+            }
+            emitCatchClauses(region);
+        }
         if (pendingNew != null) {
             throw new UnsupportedOperationException(
                 "new without matching <init> in method " + method.name);
@@ -350,6 +568,17 @@ public final class MethodTranspiler {
             // inside such a block would otherwise report "missing return statement". Append a dead
             // `return <zero>;`. The guard is never taken (constant false), so KeY never reaches it.
             line("        return " + zeroValue(Type.getReturnType(method.desc).getSort()) + ";");
+        }
+        // A mid-layout return/throw that ended up as the method's very last statement must lose
+        // its `if (true) { }` wrapper: with nothing following, the wrapper would only make javac's
+        // flow fall off the end of a non-void method ("missing return statement"). This happens
+        // around try/catch regions, whose close resets the label-span tracking. The wrapper's only
+        // job is keeping code after the statement reachable — there is none here.
+        if (lastLine != null && (lastLine.startsWith("        if (true) { return ")
+                || lastLine.startsWith("        if (true) { throw ")) && lastLine.endsWith("; }")) {
+            body.setLength(body.length() - lastLine.length() - 1);
+            line("        " + lastLine.substring("        if (true) { ".length(),
+                lastLine.length() - " }".length()));
         }
     }
 
@@ -414,6 +643,8 @@ public final class MethodTranspiler {
                     line("        " + stackVar + ".pushD(" + v + ");");
                 } else if (cst instanceof Float v) {
                     line("        " + stackVar + ".pushF(" + v + "f);");
+                } else if (cst instanceof String v) {
+                    line("        " + stackVar + ".push(\"" + escapeJavaString(v) + "\");");
                 } else {
                     unsupported(insn);
                 }
@@ -528,6 +759,9 @@ public final class MethodTranspiler {
             case Opcodes.LALOAD -> emitLaload();
             case Opcodes.LASTORE -> emitLastore();
             case Opcodes.ARRAYLENGTH -> emitArrayLength();
+            case Opcodes.ATHROW ->
+                line("        " + returnStatement(index,
+                    "throw (Throwable) " + stackVar + ".popRef();"));
             case Opcodes.IRETURN ->
                 line("        " + returnStatement(index, "return " + stackVar + ".top();"));
             case Opcodes.LRETURN ->
@@ -888,7 +1122,11 @@ public final class MethodTranspiler {
 
     private void line(String text) {
         body.append(text).append('\n');
+        lastLine = text;
     }
+
+    /** The raw text of the most recently appended body line (for tail post-processing). */
+    private String lastLine = null;
 
     private static String mnemonic(int opcode) {
         for (var field : Opcodes.class.getFields()) {
