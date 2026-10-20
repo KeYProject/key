@@ -637,8 +637,8 @@ A closed proof of the transpiled method's contract establishes, modulo:
 * **T2** JVM verifier soundness: verification types used for the typed stacks are consistent
   along executions (documented meta-lemma; future in-system lemma).
 * **T3** Transpiler faithfulness: instruction-by-instruction mapping argument (§3.2) +
-  differential execution tests (transpiled vs. original bytecode, M3) + the
-  output-compileability invariant.
+  differential execution tests (transpiled vs. original bytecode, shipped in M3:
+  `DifferentialTest`, §9) + the output-compileability invariant.
 * **T4** `Local` contracts faithfully encode JVMS: implementation-verification proofs (M4) +
   cross-check against the JVM Specification.
 * **T5** The goto rules implement jump semantics (forward splice; backward restore from the
@@ -652,7 +652,7 @@ A closed proof of the transpiled method's contract establishes, modulo:
 |---|---|---|
 | Unit | CFG/typing/structuring on synthetic `.class` fixtures | `key.jvm/src/test` |
 | Golden | transpile → `javac` compiles output (hard invariant) | every transpile test |
-| Differential | run transpiled vs. original bytecode on random inputs | M3 |
+| Differential | run transpiled vs. original bytecode on random inputs — M3, shipped (`DifferentialTest`, goto-free subset, §9) | `key.jvm/src/test` |
 | Proof | `KeYEnvironment` + `.key` fixtures: max, max2 (M1, closed); recursion-by-contract (M1, closes under arithmetic int rules, see §9.1); sum (both modes), factorial, goto-heavy control flow, exceptions (M2/M3); object slice (M2, golden Point/Shapes: layout + javac round-trip, residual-shape pin per §9.1); switch (M3, pinned per §9.1(2)); shuffles (M3: `dupReuse` closes); long/float/double (M3: `back`/`flt` close, `ladd`/`conv`/`lcmpish`/`ternary`/`lconst` pinned per §9.1); exceptions (M3: `thrower` closes, `guarded`/`finallyFlow` pinned per §9.1(2)) | `key.jvm/src/test` |
 | Rule | `GotoSpliceRule`/`GotoRestoreRule`/`IfLiteralRule` unit tests incl. negative cases (missing label → loud abort) | `key.jvm/src/test` |
 | Regression | RunAllProofs proof collection once stable | `key.ui/examples` |
@@ -774,6 +774,28 @@ the constants and the Object-typed traffic — while `thrower` **closes**: its
 the `LDC` `String` and the `new+<init>` String argument on the dead path) to prove cleanly.
 `thrower` is the exceptions slice's closing gate, like `dupReuse` (shuffles) and
 `back`/`flt` (category-2).
+
+**M3 status (fifth slice — differential harness, trust T3):** `DifferentialTest` executes the
+*original bytecode* and the *transpiled output* of the same fixtures on identical random
+inputs and asserts bit-exact behavioral equality (return values and exceptional-outcome
+types). The transpiled code runs against a test-only *executable* `jvm.Local`
+(`src/test/java/jvm/Local.java`) — a real top-first stack machine (element 0 = top, matching
+the proof runtime's JML contracts) with Java bodies — while the packaged proof runtime
+(`src/main/resources/.../runtime/jvm/Local.java`) keeps its empty bodies untouched (it is
+proved, never executed; KeY's `modularOnly` never expands them). Scope is the *goto-free*
+subset: the transpiler models jumps as `jvm.Local.goto_(pc)` calls whose semantics live only
+in the profile's `goto` rules (Java cannot jump), so methods containing them cannot execute
+and are excluded — `Category2`'s `ladd, lconst, conv, back, dbl, mix, flt, larray` and
+`Shuffle`'s `dupReuse, dup2A` (`lcmpish`/`ternary` branch and are out). That still covers the
+full int/long/double/float arithmetic (long overflow wraps identically), the conversions
+(`i2l`, `l2i`, `i2d`), `dup`/`dup2` and the `laload`/`lastore` + `iaload`/`iastore`
+compounds; array fixtures draw a separate array instance per side (both sides mutate their
+arrays, so a shared instance would leak the first mutation into the second run) with
+identical contents from the seeded `Random`; `Double.compare`/`Float.compare` give bit-exact
+NaN and `±0.0` equality. ~1,950 draws across the 10 methods pass. The remaining
+un-executable surface (any method reaching `goto_`) is exactly the surface whose proof is
+carried by the `goto` rules — the differential harness and the proofs are complementary, not
+overlapping, evidence.
 
 ### 9.1 Known limitations (M1)
 
