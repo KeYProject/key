@@ -428,6 +428,54 @@ class TranspileTest {
         assertThat(rc).as("javac must compile the transpiled shuffle output").isZero();
     }
 
+    /**
+     * M3 category-2 slice: long/double/float stack ops, conversions, lcmp and long arrays as
+     * emitted for javac-17's real bytecode. The golden twin is {@code golden/Category2.java};
+     * {@code back} ({@code l2i}) and {@code flt} (pure float) close
+     * ({@code rule.Category2ProofTest}), the long-arithmetic and literal-carrying flows are
+     * pinned per §9.1(2). JVM booleans are pushed as int 0/1 — never boxed into
+     * {@code push(Object)}.
+     */
+    @Test
+    void transpiledCategory2OpsHaveCanonicalShape() throws Exception {
+        Path src = writeFixture("Category2.java");
+        Path classes = tmpDir.resolve("classes-cat2");
+        int rcFix = compile(src.resolve("fixtures").resolve("Category2.java"), classes);
+        Assumptions.assumeTrue(rcFix == 0 && Files.exists(classes.resolve("Category2.class")),
+            "fixture compile failed (rc=" + rcFix + "); javac unavailable?");
+
+        Path out = tmpDir.resolve("out-cat2");
+        List<Path> emitted =
+            Transpiler.transpile(List.of(classes.resolve("Category2.class")), out);
+        Path cat2 = emitted.stream()
+                .filter(p -> p.getFileName().toString().equals("Category2.java")).findFirst()
+                .orElseThrow(() -> new AssertionError("no Category2.java emitted"));
+        String s = Files.readString(cat2, StandardCharsets.UTF_8);
+
+        // long arithmetic + constants (ldc2_w)
+        assertThat(s).contains("stk.pushL(a);").contains("stk.pushL(b);")
+                .contains("stk.ladd();").contains("return stk.topL();")
+                .contains("stk.pushL(42L);");
+        // lcmp feeding the sign branch; conversions i2l / l2i
+        assertThat(s).contains("stk.lcmp();").contains("if (stk.ifge())");
+        assertThat(s).contains("stk.i2l();").contains("stk.l2i();");
+        // doubles + floats (+ldc2_w literals, i2d)
+        assertThat(s).contains("stk.pushD(a);").contains("stk.pushD(2.0);")
+                .contains("stk.dmul();").contains("return stk.topD();")
+                .contains("stk.i2d();").contains("stk.pushD(0.5);")
+                .contains("stk.pushF(a);").contains("stk.pushF(b);")
+                .contains("stk.fmul();").contains("return stk.topF();");
+        // boolean selector: int 0/1, never boxed
+        assertThat(s).contains("stk.push((c ? 1 : 0));").doesNotContain("stk.push(c);");
+        // long-array compound: dup2 of base+index, laload/lastore
+        assertThat(s).contains("stk.dup2();").contains("long[] $a1 = (long[]) stk.popRef();")
+                .contains("stk.pushL($a1[$i0]);").contains("long $v2 = stk.popL();");
+
+        int rc = compile(List.of(cat2, out.resolve("jvm").resolve("Local.java")),
+            tmpDir.resolve("roundtrip-cat2"));
+        assertThat(rc).as("javac must compile the transpiled category-2 output").isZero();
+    }
+
     // -- helpers -----------------------------------------------------------------
 
     private Path writeFixture() throws IOException {
