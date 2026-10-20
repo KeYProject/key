@@ -476,6 +476,54 @@ class TranspileTest {
         assertThat(rc).as("javac must compile the transpiled category-2 output").isZero();
     }
 
+    /**
+     * M3 exceptions slice: javac-17's real try/catch bytecode must come out as structured Java
+     * {@code try/catch} blocks recovered from the exception table, not linear handler code. The
+     * try range {@code [start,end)} of the table becomes {@code try { }}, each handler is
+     * consumed into a real catch clause (its leading {@code astore} binds the catch variable
+     * {@code local_<slot>} instead of declaring a local), the finally-inlined catch-all handler
+     * rethrows the bound exception, and {@code athrow} becomes a real
+     * {@code throw (Throwable) ...} (hence {@code throws Throwable} on methods that may throw).
+     * {@code LDC} of a {@code String} is a plain push. Golden twin:
+     * {@code golden/Exceptions.java}; proof characterization {@code rule.ExceptionsProofTest}.
+     */
+    @Test
+    void transpiledExceptionsHaveCanonicalShape() throws Exception {
+        Path src = writeFixture("Exceptions.java");
+        Path classes = tmpDir.resolve("classes-exc");
+        int rcFix = compile(src.resolve("fixtures").resolve("Exceptions.java"), classes);
+        Assumptions.assumeTrue(rcFix == 0 && Files.exists(classes.resolve("Exceptions.class")),
+            "fixture compile failed (rc=" + rcFix + "); javac unavailable?");
+
+        Path out = tmpDir.resolve("out-exc");
+        List<Path> emitted =
+            Transpiler.transpile(List.of(classes.resolve("Exceptions.class")), out);
+        Path exc = emitted.stream()
+                .filter(p -> p.getFileName().toString().equals("Exceptions.java")).findFirst()
+                .orElseThrow(() -> new AssertionError("no Exceptions.java emitted"));
+        String s = Files.readString(exc, StandardCharsets.UTF_8);
+
+        // structured try/catch from the exception table; handler entry binds the catch var
+        assertThat(s).contains("        try {")
+                .contains("} catch (IllegalArgumentException local_1) {")
+                .contains("} catch (Throwable local_2) {");
+        // the athrow is a real throw; methods that may throw declare it
+        assertThat(s).contains("throws Throwable")
+                .contains("if (true) { throw (Throwable) stk.popRef(); }");
+        // the finally-inlined catch-all rethrows the bound exception variable
+        assertThat(s).contains("stk.push(local_2);");
+        // LDC String + new+<init> fusion with a String argument
+        assertThat(s).contains("stk.push(\"boom\");")
+                .contains("String $c0 = (String) stk.popRef();")
+                .contains("IllegalArgumentException $t1 = new IllegalArgumentException($c0);");
+        // the handler instructions are not linearly emitted (the catch consumes them)
+        assertThat(s).doesNotContain("stk.popRef();\n        stk.push(x);");
+
+        int rc = compile(List.of(exc, out.resolve("jvm").resolve("Local.java")),
+            tmpDir.resolve("roundtrip-exc"));
+        assertThat(rc).as("javac must compile the transpiled exceptions output").isZero();
+    }
+
     // -- helpers -----------------------------------------------------------------
 
     private Path writeFixture() throws IOException {
