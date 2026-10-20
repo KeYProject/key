@@ -9,7 +9,6 @@ import java.io.File;
 import java.nio.file.Path;
 import javax.swing.*;
 
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.KeYFileChooserLoadingOptions;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -25,14 +24,14 @@ public class OpenFileAction extends MainWindowAction {
         setName("Load...");
         setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Browse and load problem or proof files.");
-        lastSelectedPath = Main.getWorkingDir().toFile();
+        lastSelectedPath =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().getLastUsedPath();
     }
 
     public void actionPerformed(ActionEvent e) {
-        KeYFileChooser fc = new KeYFileChooser(lastSelectedPath);
+        KeYFileChooser fc =
+            KeYFileChooser.getFileChooser("Select file to load proof or problem", lastSelectedPath);
         fc.setDialogTitle("Select file to load proof or problem");
-        fc.setSelectedFile(KeYFileChooser.getFileChooser("Select file to load proof or problem")
-                .getSelectedFile());
         KeYFileChooserLoadingOptions options = fc.addLoadingOptions();
         fc.addBookmarkPanel();
         fc.prepare();
@@ -43,6 +42,8 @@ public class OpenFileAction extends MainWindowAction {
         if (result == JFileChooser.APPROVE_OPTION) {
             Path file = fc.getSelectedFile().toPath();
             lastSelectedPath = fc.getSelectedFile();
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                    .setLastUsedPath(lastSelectedPath);
 
             // special case proof bundles -> allow to select the proof to load
             if (ProofSelectionDialog.isProofBundle(file)) {
