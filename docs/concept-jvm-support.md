@@ -67,8 +67,8 @@ public class JvmProfile extends JavaProfile {
     @Override protected ImmutableList<BuiltInRule> initBuiltInRules() {
         // APPEND at the tail: UseOperationContractRule must stay FIRST (ProofMgt invariant)
         return super.initBuiltInRules()
-                .append(GotoSpliceRule.INSTANCE)      // forward jumps, cost 0
-                .append(GotoRestoreRule.INSTANCE)     // backward jumps, interactive
+                .append(GotoSpliceRule.INSTANCE)      // forward jumps (target label ahead)
+                .append(GotoRestoreRule.INSTANCE)     // backward jumps (target label consumed)
                 .append(IfLiteralRule.INSTANCE);      // if(true)/if(false) unwrapping
     }
     // + ident()/displayName()/description() overrides, cf. WdProfile
@@ -525,22 +525,33 @@ Application:
 Semantics: this is **semantic loop unrolling** — each application executes one more iteration;
 reaching the backward `goto_` again re-applies the rule. Sound per application. Consequences:
 
-* **Not auto-mode friendly**: unbounded loops would be unrolled forever. The rule therefore
-  gets no cost-0 treatment — it is applied interactively, or (Phase 3) only when a
-  specification is attached to the target label. For javac-shaped loops the transpiler's
-  structured emission (§3.4) avoids the situation entirely by producing real `while` loops
-  with native JML `loop_invariant` handling.
+* **Auto-mode friendly (empirically, M3)**: the rule carries a finite strategy cost, so auto mode
+  applies it and unrolls *bounded* loops to termination (see `LoopProofTest`
+  #boundedDoWhileLoopTerminatesMainLineUnderAuto and the restore audit
+  #restoreRuleUnrollsTheLabelSuffixOnTheLiveLoop — the draft claim that the rule was
+  "interactive-only" was wrong). Un<em>bounded</em> unrolling is pruned by KeY's repeated-state
+  anti-looping: when a restored iteration re-enters a goal state that already exists in the
+  proof, the branch is linked to the earlier node instead of re-expanded, so an unbounded loop
+  leaves the proof open on its residual goals rather than looping forever
+  (#infiniteLoopRestoreLeavesTheProofOpen). A wrong (non-terminating) loop contract therefore
+  cannot close.
 * **Phase 3 — invariant-based application**: KeY already extracts block contracts from
   `LabeledStatement` (`JMLSpecExtractor.extractBlockContracts`); a JML spec on the target
   label can drive an invariant-style application of `GotoRestoreRule` (establish/preserve/use
-  split à la `LoopInvariantRule`) instead of unrolling.
-* Auto-mode gating mechanism (settings/choice vs. strategy cost) — spike S5.
+  split à la `LoopInvariantRule`) instead of unrolling. Still conditional: unbounded
+  unrolling-via-restore already keeps such loops honestly open, so the invariant application is
+  a *performance* improvement (deep loops with one shot) rather than a soundness necessity —
+  reopened whenever loop-shaped goals prove impractical.
+* Auto-mode gating mechanism (settings/choice vs. strategy cost) — spike S5: concluded that
+  no gating is needed; the restore rule's finite cost plus anti-looping is the terminating
+  mechanism (see the LoopProofTest pins).
 
 ### 5.5 Registration and justification
 
 All three rules are registered by `JvmProfile.initBuiltInRules()` (appended after
 `UseOperationContractRule`, which must stay first). Forward splice + literal unwrap: cost 0.
-Backward restore: interactive/high cost. Soundness of the three program transformations is
+Backward restore: auto-applied with finite cost; unbounded unrolling is truncated by KeY's
+repeated-state anti-looping (see §5.4). Soundness of the three program transformations is
 small, well-scoped, and reviewable; a meta-lemma proof is future work. The rules abort loudly
 (`RuleAbortException`) on any shape the transpiler would never produce.
 
@@ -611,8 +622,9 @@ with a native JML `loop_invariant` (e.g. over the plain-Java locals `s`/`i`).
 
 Execution applies `GotoSpliceRule` at pc 4 (fall-through entry: guard stripped by
 `IfLiteralRule`), splices at the conditional exit, and applies `GotoRestoreRule` at the
-backward `goto_(4)` — one unrolling step per iteration (interactive, or Phase-3 label
-invariant).
+backward `goto_(4)` — one unrolling step per iteration. Auto mode applies the restore rule
+itself (finite cost; unbounded unrolling truncated by repeated-state anti-looping, §5.4); the
+Phase-3 label-invariant application remains an optimization for deep loops.
 
 ### 6.3 Driving a proof
 
@@ -658,7 +670,7 @@ A closed proof of the transpiled method's contract establishes, modulo:
 | Unit | CFG/typing/structuring on synthetic `.class` fixtures | `key.jvm/src/test` |
 | Golden | transpile → `javac` compiles output (hard invariant) | every transpile test |
 | Differential | run transpiled vs. original bytecode on random inputs — M3, shipped (`DifferentialTest`, goto-free subset, §9) | `key.jvm/src/test` |
-| Proof | `KeYEnvironment` + `.key` fixtures: max, max2 (M1, closed); recursion-by-contract (M1, closes under arithmetic int rules, see §9.1); sum (both modes), factorial, goto-heavy control flow, exceptions (M2/M3); object slice (M2, golden Point/Shapes: layout + javac round-trip, residual-shape pin per §9.1); switch (M3, pinned per §9.1(2)); shuffles (M3: `dupReuse` closes); long/float/double (M3: `back`/`flt` close, `ladd`/`conv`/`lcmpish`/`ternary`/`lconst` pinned per §9.1); exceptions (M3: `thrower` closes, `guarded`/`finallyFlow` pinned per §9.1(2)) | `key.jvm/src/test` |
+| Proof | `KeYEnvironment` + `.key` fixtures: max, max2 (M1, closed); recursion-by-contract (M1, closes under arithmetic int rules, see §9.1); sum (both modes), factorial, goto-heavy control flow, exceptions (M2/M3); object slice (M2, golden Point/Shapes: layout + javac round-trip, residual-shape pin per §9.1); switch (M3, pinned per §9.1(2)); shuffles (M3: `dupReuse` closes); long/float/double (M3: `back`/`flt` close, `ladd`/`conv`/`lcmpish`/`ternary`/`lconst` pinned per §9.1); exceptions (M3: `thrower` closes, `guarded`/`finallyFlow` pinned per §9.1(2)); loops (M3: `Three` bounded `do{}while` main line terminates via restore, `Sum`/`Restore` end modality-free — `LoopProofTest`) | `key.jvm/src/test` |
 | Rule | `GotoSpliceRule`/`GotoRestoreRule`/`IfLiteralRule` unit tests incl. negative cases (missing label → loud abort) | `key.jvm/src/test` |
 | Regression | RunAllProofs proof collection once stable | `key.ui/examples` |
 
@@ -681,7 +693,8 @@ appends the three goto rules; the transpiler emits the golden shape (asserted by
 proofs close** (`GotoProofTest` under the auto strategy — the forward-goto `max` and the
 mid-layout-return + goto `max2`). Blockers resolved: the `\seq` ghost defaulting to `null`,
 read-only ops missing `assignable \nothing`, and the `ScriptAwareMacro` stall (§4.2, §6.3).
-In flight: backward-jump/loop fixtures (Mode L + `GotoRestoreRule`), `sum`/`factorial`.
+Shipped on `weigl/jvm`: `sum`/`factorial` (Mode L + `GotoRestoreRule`, §5.4, §8/§9 M3 status;
+`LoopProofTest`).
 
 **Recursion (item 2) is shipped in two halves.** (a) The transpiler emits the recursive
 self-call faithfully — the popped argument into a temp followed by a *real* call
@@ -805,6 +818,45 @@ un-executable surface (any method reaching `goto_`) is exactly the surface whose
 carried by the `goto` rules — the differential harness and the proofs are complementary, not
 overlapping, evidence.
 
+**M3 status (sixth slice — backward loops, the M3 tail on `weigl/jvm`):** loops are shipped
+as *linear* code with the forward/backward `goto_` split of §5.1 — the transpiler does not
+structure them (no Relooper; §3.4's structured emission stays an optimization). Two loop
+shapes are pinned by canonical-shape gates (`TranspileTest`): Sum's `while` — a header split
+whose body end is a backward `goto_(8)` inside the L8 block — and Restore's infinite
+`do {} while (true)` — straight-line body ending in a backward `goto_(4)` with no branch.
+Transpiling correctly *models* the restart jump; proving through it is the tail slice:
+
+- **`GotoRestoreRule` engages in auto mode.** The draft claim that the rule was
+  "interactive-only" is refuted empirically on `weigl/jvm`: the strategy applies it during
+  `DefaultAutoMacro` (census-verified on live proofs), unrolling the L8/L4 suffix for one
+  iteration per application without any head-of-method `if`-split being required.
+- **Bounded loops terminate; wrong loop contracts cannot close.** `golden/Three.java`'s
+  bounded `do {} while` (`sum3` → `\result == 3`) runs its body three times via restore and
+  exits through the straight-line return; the main-line modality empties
+  (`emptyModality`/`blockReturn` observable). Its proof does *not* close only because of the
+  §9.1(2) createdness residuals of repeated `jvm.Local` contract applications — the same
+  family the switch/literal/category-2 pins document — so `LoopProofTest`
+  #boundedDoWhileLoopTerminatesMainLineUnderAuto pins termination of the main line instead of
+  `closed()`. Unbounded loops (Restore) stay open: KeY's repeated-state anti-looping links a
+  restored iteration back to the already-seen goal state instead of re-expanding, so the
+  proof does not unroll forever and any residual goal keeps the proof open
+  (#infiniteLoopRestoreLeavesTheProofOpen). A spurious "terminating" contract for a
+  non-terminating loop therefore cannot close. Auto mode also never leaves a jump active:
+  #autoModeDrivesThroughLoopsWithoutLeavingAnActiveJump pins Sum (and Restore) end with only
+  modality-free residuals and no active `goto_` — correcting the earlier doc's "auto stops at
+  the backward goto_" claim.
+- **Restore mechanics pinned shape-wise.** #restoreRuleUnrollsTheLabelSuffixOnTheLiveLoop
+  audits the single restore application in Three's proof: the premise sequent has the
+  backward `jvm.Local.goto_(8)` active; the conclusion re-enters the L8 suffix (loop body
+  with both increments + condition + `goto_(8)`) with the `if (false)` guard spliced away.
+- **Phase-3 label-invariant application is a performance optimization, not a soundness
+  necessity** (§5.4): unroll-via-restore already keeps unbounded loops honestly open, so the
+  JML-label-invariant establish/preserve/use split is deferred (deep loops with many
+  iterations would still benefit; revisit when such fixtures land). The §9.1(2) residual
+  family — which no transpiled proof can close without a `key.core` band change — bounds
+  every proof gate, loop or not; the backward-loop boundary is otherwise complete and
+  pinned.
+
 ### 9.1 Known limitations (M1)
 
 Two KeY-side strategy gaps bound what auto mode can close under the `java-jvm` profile. Both
@@ -871,7 +923,9 @@ KeY-side improvement is noticed and converted deliberately.
    All are pinned in `Category2ProofTest`.
 
 Unrelated to the above, `JvmProfile` does *not* change the underlying strategy — the three
-appended rules fire at cost 0; the `max`/`max2` gates close under the full M1 settings
+appended rules fire under auto mode (empirically: `GotoSpliceRule` at cost 0; `GotoRestoreRule`
+is applied by the strategy as well, bounded by KeY's repeated-state anti-looping, §5.4); the
+`max`/`max2` gates close under the full M1 settings
 (§4.2) including `intRules: javaSemantics`.
 
 ## 10. Risks, Open Questions, Spikes
@@ -894,6 +948,9 @@ appended rules fire at cost 0; the `max`/`max2` gates close under the full M1 se
 * **S5 (M1/M2)** Auto-mode gating of `GotoRestoreRule` without touching `key.core`:
   strategy cost requires `SymExCost`/`StaticFeatureCollection` (core); module-local
   alternative: rule consults a setting/choice (`OneStepSimplifier` precedent) or spec presence.
+  *(resolved on `weigl/jvm`, M3: no gating needed — the rule is auto-applied and KeY's
+  repeated-state anti-looping bounds unbounded unrolling, keeping non-terminating loops open
+  honestly; see §5.4 and the LoopProofTest pins.)*
 * **R1** Proof size grows with instruction count (one contract application per instruction).
   Mitigations: structured emission, later Mode B (SSA lowering).
 * **R2** A missed goto rule application would change semantics silently (fall-through).

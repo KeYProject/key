@@ -138,7 +138,11 @@ class GotoProofTest {
         }
     }
 
-    private static void writeKeyFile(Path keyFile, String className, String signature)
+    /**
+     * Shared by the proof gates in this package: writes a {@code java-jvm} key file for the
+     * given method contract obligation.
+     */
+    static void writeKeyFile(Path keyFile, String className, String signature)
             throws IOException {
         String settings = """
                 "Choice" : {

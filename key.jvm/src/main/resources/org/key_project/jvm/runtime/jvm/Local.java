@@ -910,12 +910,17 @@ public class Local {
     // -- jumps ------------------------------------------------------------------------
 
     /**
-     * Deliberately has no JML contract: jumps are the concern of GotoSpliceRule and
-     * GotoRestoreRule, not of operation contracts. The target is a constant int bytecode offset
-     * (string literals are abbreviated by KeY's symbolic engine, int constants survive). It is
-     * static: the transpiler emits {@code jvm.Local.goto_(pc);} and the operand stack is
-     * untouched.
+     * Deliberately has no JML contract <em>and no Java body</em> ({@code native}): jumps are the
+     * concern of GotoSpliceRule and GotoRestoreRule, not of operation contracts, and an empty
+     * body must not silently become a no-op — under {@code methodExpansion} the strategy would
+     * inline such a body, modeling a backward {@code goto_} as falling through (unsound: the
+     * proof could then "close" with the jump dropped). Native keeps the expansion inapplicable,
+     * so a {@code goto_} that neither rule resolves leaves the goal loudly stuck instead. The
+     * target is a constant int bytecode offset (string literals are abbreviated by KeY's
+     * symbolic engine, int constants survive). It is static: the transpiler emits
+     * {@code jvm.Local.goto_(pc);} and the operand stack is untouched. The test-only executable
+     * twin {@code src/test/java/jvm/Local.java} keeps a real Java body for the differential
+     * harness; methods containing {@code goto_} there are excluded from execution anyway.
      */
-    public static void goto_(int pc) {
-    }
+    public static native void goto_(int pc);
 }
