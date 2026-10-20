@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.scripts;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.PosTacletApp;
@@ -19,6 +20,8 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
+
+import static de.uka.ilkd.key.proof.RuleAppIndexMode.AUTO;
 
 /// The `expand` command applies expansion rules to definitions and class invariants.
 /// It expands occurrences of definition axioms or class invariant axioms in the current sequent.
@@ -82,15 +85,15 @@ public class ExpandDefCommand extends AbstractCommand {
         Proof proof = state.getProof();
 
         ImmutableList<TacletApp> apps = ImmutableList.of();
+        final Services services = proof.getServices();
         for (SequentFormula anteForm : g.sequent().antecedent()) {
             apps = apps.prepend(g.ruleAppIndex().getTacletAppAtAndBelow(FILTER,
-                new PosInOccurrence(anteForm, PosInTerm.getTopLevel(), true), proof.getServices()));
+                new PosInOccurrence(anteForm, PosInTerm.getTopLevel(), true), services, AUTO));
         }
 
         for (SequentFormula succForm : g.sequent().succedent()) {
             apps = apps.prepend(g.ruleAppIndex().getTacletAppAtAndBelow(FILTER,
-                new PosInOccurrence(succForm, PosInTerm.getTopLevel(), false),
-                proof.getServices()));
+                new PosInOccurrence(succForm, PosInTerm.getTopLevel(), false), services, AUTO));
         }
 
         if (p.on != null) {

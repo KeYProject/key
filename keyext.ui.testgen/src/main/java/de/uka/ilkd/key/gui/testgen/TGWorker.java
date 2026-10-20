@@ -41,7 +41,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
 
     public void start() {
         final KeYMediator mediator = getMediator();
-        mediator.initiateAutoMode(originalProof, true, false);
+        mediator.initiateAutoMode(originalProof, true);
         mediator.addInterruptedListener(this);
         execute();
     }
@@ -57,7 +57,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
      */
     @Override
     public void done() {
-        getMediator().finishAutoMode(originalProof, true, true, null);
+        getMediator().finishAutoMode(originalProof, true, null);
         getMediator().removeInterruptedListener(this);
         originalProof = null;
     }
@@ -162,7 +162,6 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
      */
     @Override
     protected void handleAllProofsPerformed(UserInterfaceControl ui) {
-        mediator.setInteractive(true);
         mediator.startInterface(true);
     }
 

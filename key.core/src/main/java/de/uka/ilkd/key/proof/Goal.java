@@ -47,6 +47,8 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
+import static de.uka.ilkd.key.proof.RuleAppIndexMode.INTERACTIVE;
+
 /**
  * A proof is represented as a tree of nodes containing sequents. The initial proof consists of just
  * one node -- the root -- that has to be proved. Therefor it is divided up into several sub goals
@@ -857,7 +859,6 @@ public final class Goal implements ProofGoal<Goal> {
 
     public List<TacletApp> getAllTacletApps(Services services) {
         RuleAppIndex index = ruleAppIndex();
-        index.autoModeStopped();
         List<TacletApp> allApps = new LinkedList<>();
         TacletFilter filter = new TacletFilter() {
             @Override
@@ -867,13 +868,13 @@ public final class Goal implements ProofGoal<Goal> {
         };
         for (SequentFormula sf : node().sequent().antecedent()) {
             ImmutableList<TacletApp> tacletAppAtAndBelow = index.getTacletAppAtAndBelow(filter,
-                new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services);
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services, INTERACTIVE);
             tacletAppAtAndBelow.forEach(allApps::add);
         }
 
         for (SequentFormula sf : node().sequent().succedent()) {
             ImmutableList<TacletApp> tacletAppAtAndBelow = index.getTacletAppAtAndBelow(filter,
-                new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services);
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services, INTERACTIVE);
             tacletAppAtAndBelow.forEach(allApps::add);
         }
         return allApps;

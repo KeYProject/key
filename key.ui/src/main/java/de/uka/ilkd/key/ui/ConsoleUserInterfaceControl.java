@@ -245,9 +245,6 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     void finish(Proof proof) {
-        // setInteractive(false) has to be called because the ruleAppIndex
-        // has to be notified that we work in auto mode (CS)
-        mediator.setInteractive(false);
         getProofControl().startAndWaitForAutoMode(proof);
         LOGGER.debug("{}", proof.getStatistics());
     }
