@@ -900,9 +900,14 @@ KeY-side improvement is noticed and converted deliberately.
    branches, constant pushes all reproduce the residual — `SwitchProofTest`), so every
    realistic method contract — the M2 object fixtures (`Point::sum`, `Shapes::total`,
    `Shapes::make`) and the M3 switch fixtures alike — stays open under `DefaultAutoMacro`
-   today. Consequence: the proofs wait on the two follow-ups listed above (an interactive
-   script in the vein of `triangular.proof`, or a KeY change making the high-cost heap
-   simplifications / `inRangeInt` literal reductions available to auto mode).
+   today. The opening follow-up — a `key.core` change making the high-cost heap
+   simplifications / `inRangeInt` literal reductions available to auto mode — was proposed
+   as a single well-scoped strategy-band softening (`simplify_heap_high_costs` bound
+   finitely on program-free goals, mirroring the `javaIntegerSemantics` pattern) but is
+   <em>currently declined</em> (M3 decision, on `weigl/jvm`): the residual family stays
+   pinned-open by deliberate policy and the closing-gate milestone is deferred. The band
+   change remains the recommended path whenever closing gates are wanted; an interactive
+   script in the vein of `triangular.proof` remains the module-local alternative.
    Replacing the constructor-contract initialization by a body-expanded allocation + an
    `initialize()` *method* contract was experimentally ruled out too: without the constructor
    contract's anon-post, even int-only flows stop closing (the strategy cannot push the
