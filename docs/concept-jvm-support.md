@@ -268,10 +268,15 @@ try {
 * `athrow` is a real Java `throw (Throwable) stk.popRef();` (wrapped `if (true) { … }` when
   mid-layout). Because `Throwable` is checked, a method containing an `athrow` gets a matching
   `throws Throwable` (transpiler output and golden twins carry it).
-* Structural constraints enforced loudly: a handler must start with `astore`, handlers must be
-  straight-line (a branch target landing inside a handler aborts), handler instructions must
-  not overlap any try body, and regions must not overlap other regions' try bodies — javac's
-  nested ranges nest naturally. The pc-tracked fallback for non-nested/overlapping ranges
+* Structural constraints enforced loudly: a handler must start with `astore`, handler
+  instructions must not overlap a try body (or a region's try body the other way — the
+  `unstructured overlaps` case — a loud abort), and regions must not overlap other regions'
+  try bodies — javac's nested ranges nest naturally. A branch target landing inside a handler's
+  linear span does *not* abort: the handler extent is truncated at the first target, so the
+  emitted catch body is straight-line by construction, and the target's code becomes an
+  ordinary guarded `L<t>` block after the catch — any handler code past the target that still
+  references the catch-bound slot then fails the javac round-trip loudly (both shapes pinned
+  in `S4ExceptionShapeTest`). The pc-tracked fallback for non-nested/overlapping ranges
   remains M3 spike S4. Jumps out of/into try regions are ordinary `L<pc>` blocks emitted in
   place (allowed).
 * `try { }` regions whose end is the end of the method are closed after the linear pass, and a
@@ -759,8 +764,11 @@ inlining (a catch-all `Throwable` handler whose body rethrows the bound variable
 extra machinery; the mid-layout `throw` and handler-internal returns compile through the
 `if (true) { }` reachability blessing, and a wrapper that lands on the method's last
 statement is unwrapped again (javac would otherwise report "missing return statement"). The
-failure mode for the exotic shapes that remain (branch targets inside handlers, handler
-ranges overlapping try bodies — spike S4) is a loud abort.
+failure mode for the exotic shapes that remain: handler ranges overlapping try bodies
+(unstructured overlaps, spike S4) abort loudly, and a branch target landing inside a
+handler's span truncates the handler at the target (straight-line catch by construction;
+handler code past the target that still touches the catch-bound slot fails the javac
+round-trip) — both pinned in `S4ExceptionShapeTest`.
 `TranspileTest#transpiledExceptionsHaveCanonicalShape` round-trips
 `golden/Exceptions.java` through javac (fixture `fixtures/Exceptions.java`: `guarded` — a
 typed catch behind a negative guard; `finallyFlow` — the inlined finally; `thrower` — an
@@ -880,7 +888,9 @@ appended rules fire at cost 0; the `max`/`max2` gates close under the full M1 se
   *(resolved on `weigl/jvm`: `IfLiteralRule` handles both shapes; the `if (false)` guards are
   emitted for every goto target and are dropped together with the splice/restore).*
 * **S4 (M3)** Jumps out of `try` regions and overlapping exception ranges (restore vs. break
-  vs. pc-tracking).
+  vs. pc-tracking). *Status: overlap ranges abort loudly (pinned); branch targets inside a
+  handler truncate at the target (pinned, `S4ExceptionShapeTest`) — the pc-tracked fallback
+  remains open for the residual semantics of those shapes.*
 * **S5 (M1/M2)** Auto-mode gating of `GotoRestoreRule` without touching `key.core`:
   strategy cost requires `SymExCost`/`StaticFeatureCollection` (core); module-local
   alternative: rule consults a setting/choice (`OneStepSimplifier` precedent) or spec presence.
