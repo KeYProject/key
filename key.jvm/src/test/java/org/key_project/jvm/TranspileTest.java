@@ -524,6 +524,118 @@ class TranspileTest {
         assertThat(rc).as("javac must compile the transpiled exceptions output").isZero();
     }
 
+    /**
+     * Loops are <em>not</em> structured by the transpiler: the javac-style {@code while} in
+     * {@code fixtures/Sum.java} compiles to a backward {@code goto} in bytecode, which the
+     * transpiler keeps as a backward {@code jvm.Local.goto_(8)} call (target label {@code L8}
+     * precedes it in the linear layout). The backward jump is what {@code GotoRestoreRule} /
+     * the Phase-3 label-invariant application respond to on the proof side ({@code LoopProofTest}).
+     */
+    @Test
+    void transpiledLoopKeepsBackwardGotoCanonicalShape() throws Exception {
+        Path src = writeFixture("Sum.java");
+        Path classes = tmpDir.resolve("classes-sum");
+        int rcFix = compile(src.resolve("fixtures").resolve("Sum.java"), classes);
+        Assumptions.assumeTrue(rcFix == 0 && Files.exists(classes.resolve("Sum.class")),
+            "fixture compile failed (rc=" + rcFix + "); javac unavailable?");
+
+        Path out = tmpDir.resolve("out-sum");
+        List<Path> emitted = Transpiler.transpile(List.of(classes.resolve("Sum.class")), out);
+        Path sum = emitted.stream()
+                .filter(p -> p.getFileName().toString().equals("Sum.java")).findFirst()
+                .orElseThrow(() -> new AssertionError("no Sum.java emitted"));
+        String s = Files.readString(sum, StandardCharsets.UTF_8);
+
+        // the loop is fully linear: a guarded L8 block whose tail jumps *back* to L8
+        assertThat(s).contains("L8: { if (false) { break L8; }")
+                .contains("jvm.Local.goto_(8);");
+        // the loop exit is the forward jump out of L8
+        assertThat(s).contains("if (stk.if_icmpge()) { jvm.Local.goto_(27); }")
+                .contains("L27: { if (false) { break L27; }");
+        // backward label precedes the backward goto in the linear layout
+        int backwardGoto = s.indexOf("jvm.Local.goto_(8);");
+        assertThat(s.substring(0, backwardGoto)).contains("L8: { if (false)");
+
+        int rc = compile(List.of(sum, out.resolve("jvm").resolve("Local.java")),
+            tmpDir.resolve("roundtrip-sum"));
+        assertThat(rc).as("javac must compile the transpiled loop output").isZero();
+    }
+
+    /**
+     * The infinite {@code do {} while (true)} loop compiles to straight-line code with a
+     * <em>backward</em> {@code goto} (loop restart) and no branch — the transpiler keeps it as
+     * {@code jvm.Local.goto_(4)} inside the L4 block. This shape is what auto mode actually
+     * descends into (no header split), turning the backward {@code goto_} into the active
+     * statement — the exact situation {@code GotoRestoreRule} restores ({@code LoopProofTest}).
+     */
+    @Test
+    void transpiledInfiniteLoopKeepsBackwardGotoCanonicalShape() throws Exception {
+        Path src = writeFixture("Restore.java");
+        Path classes = tmpDir.resolve("classes-restore");
+        int rcFix = compile(src.resolve("fixtures").resolve("Restore.java"), classes);
+        Assumptions.assumeTrue(rcFix == 0 && Files.exists(classes.resolve("Restore.class")),
+            "fixture compile failed (rc=" + rcFix + "); javac unavailable?");
+
+        Path out = tmpDir.resolve("out-restore");
+        List<Path> emitted =
+            Transpiler.transpile(List.of(classes.resolve("Restore.class")), out);
+        Path restore = emitted.stream()
+                .filter(p -> p.getFileName().toString().equals("Restore.java")).findFirst()
+                .orElseThrow(() -> new AssertionError("no Restore.java emitted"));
+        String s = Files.readString(restore, StandardCharsets.UTF_8);
+
+        // straight-line loop body in a guarded L4 block, ending in the backward jump
+        assertThat(s).contains("L4: { if (false) { break L4; }")
+                .contains("stk.push(local_0);")
+                .contains("stk.iadd();")
+                .contains("jvm.Local.goto_(4);");
+        // the backward label precedes the backward goto in the linear layout
+        assertThat(s.indexOf("jvm.Local.goto_(4);"))
+                .isGreaterThan(s.indexOf("L4: { if (false)"));
+
+        int rc = compile(List.of(restore, out.resolve("jvm").resolve("Local.java")),
+            tmpDir.resolve("roundtrip-restore"));
+        assertThat(rc).as("javac must compile the transpiled infinite-loop output").isZero();
+    }
+
+    /**
+     * A bounded javac-style {@code do {} while} loop: the body and the bottom-of-loop condition
+     * compile to straight-line code whose restart is a <em>backward</em> {@code goto} (kept as
+     * {@code jvm.Local.goto_(8)} inside the L8 block), with the exit path inside the same block
+     * after the conditional jump. This shape is the one auto mode drives to termination purely
+     * through {@code GotoRestoreRule} unrolling ({@code LoopProofTest}).
+     */
+    @Test
+    void transpiledBoundedLoopKeepsBackwardGotoCanonicalShape() throws Exception {
+        Path src = writeFixture("Three.java");
+        Path classes = tmpDir.resolve("classes-three");
+        int rcFix = compile(src.resolve("fixtures").resolve("Three.java"), classes);
+        Assumptions.assumeTrue(rcFix == 0 && Files.exists(classes.resolve("Three.class")),
+            "fixture compile failed (rc=" + rcFix + "); javac unavailable?");
+
+        Path out = tmpDir.resolve("out-three");
+        List<Path> emitted =
+            Transpiler.transpile(List.of(classes.resolve("Three.class")), out);
+        Path three = emitted.stream()
+                .filter(p -> p.getFileName().toString().equals("Three.java")).findFirst()
+                .orElseThrow(() -> new AssertionError("no Three.java emitted"));
+        String s = Files.readString(three, StandardCharsets.UTF_8);
+
+        // loop body + bottom-of-loop condition in a guarded L8 block, conditional backward jump
+        assertThat(s).contains("L8: { if (false) { break L8; }")
+                .contains("stk.push(local_1);")
+                .contains("stk.iadd();")
+                .contains("if (stk.if_icmplt()) { jvm.Local.goto_(8); }")
+                .contains("return stk.top();");
+        // the backward label precedes the backward goto in the linear layout
+        assertThat(s.indexOf("jvm.Local.goto_(8);"))
+                .isGreaterThan(s.indexOf("L8: { if (false)"));
+
+        int rc = compile(List.of(three, out.resolve("jvm").resolve("Local.java")),
+            tmpDir.resolve("roundtrip-three"));
+        assertThat(rc).as("javac must compile the transpiled bounded-loop output").isZero();
+    }
+
     // -- helpers -----------------------------------------------------------------
 
     private Path writeFixture() throws IOException {
