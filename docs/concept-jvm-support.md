@@ -104,7 +104,7 @@ public class JvmProfile extends JavaProfile {
   are reused verbatim; `Local` only mediates the stack (M2+):
   * `getfield Foo.f` → `stk.pushRef(((Foo) stk.popRef()).f);`
   * `putfield Foo.f` → `{$1 = stk.popInt(); $2 = stk.popRef(); $2.f = $1;}`
-  * `athrow` → `throw ((Throwable) stk.popRef());`
+  * `athrow` → `throw (Throwable) stk.popRef();` (with `throws Throwable` on the method — M3)
   * `invokevirtual/static/special` → pops into temps, real call, push result.
   Java's left-to-right evaluation order is made explicit with fresh temporaries (`$1, $2, …`,
   assigned immediately before use), so stack effects are unambiguous.
@@ -238,22 +238,48 @@ remaining gotos (e.g., merge points of structured diamonds) are not emitted at a
 
 ### 3.5 Exceptions
 
-Exception tables are reconstructed as nested `try/catch` (ranges nest for javac output):
+**Shipped (M3):** the exception table is reconstructed as *structured* Java `try/catch`
+blocks. Each try range `[start,end)` of the table (multiset of `TryCatchBlockNode`s grouped by
+range, in javac's source order) becomes one `try { }` whose catch clauses come from the
+range's handler entries:
 
 ```java
 try {
-    …protected instructions…
-    jvm.Local.goto_(pc);                    // normal path skips handlers (spliced)
-} catch (Throwable $e) {
-    stk.$caught($e);            // contract: resets machine state, stack := [$e]
-    jvm.Local.goto_(pc);                    // or structured dispatch
+    stk.push(x);
+    if (stk.ifge()) { jvm.Local.goto_(8); }     // normal path leaves the region
+    IllegalArgumentException $t0 = new IllegalArgumentException();
+    stk.push($t0);
+    if (true) { throw (Throwable) stk.popRef(); }
+    L8: { if (false) { break L8; } stk.push(x); }
+} catch (IllegalArgumentException local_1) {    // handler's leading astore binds the catch var
+    stk.push(1);
+    stk.iadd();
+    return stk.top();
 }
 ```
 
-`athrow` is a real Java `throw` (P2). Handler entry resets the machine (JVM discards the
-operand stack; handler enters with `stack = [exception]`). Non-nested/overlapping handler
-ranges → pc-tracked fallback (`stk.setPc(pc)` + dispatch chain) — M3, spike S4. Modern
-`finally` (inlined bytecode + catch-`Throwable` entries) needs no extra machinery;
+* The handler's leading `astore <slot>` *binds* the catch variable — the clause is emitted as
+  `catch (T local_<slot>)` (the slot is removed from the local declarations so nothing is
+  redeclared) and the handler's remaining instructions live inside the clause, *consumed* from
+  the linear pass. `T` is the table's caught type (simple name) resp. `Throwable` for the
+  catch-all (`type == null`) that javac's finally inlining produces; the rethrow is
+  `stk.push(local_2); throw (Throwable) stk.popRef();` — a real Java throw of the bound
+  variable inside the clause, no `finally` synthesis.
+* `athrow` is a real Java `throw (Throwable) stk.popRef();` (wrapped `if (true) { … }` when
+  mid-layout). Because `Throwable` is checked, a method containing an `athrow` gets a matching
+  `throws Throwable` (transpiler output and golden twins carry it).
+* Structural constraints enforced loudly: a handler must start with `astore`, handlers must be
+  straight-line (a branch target landing inside a handler aborts), handler instructions must
+  not overlap any try body, and regions must not overlap other regions' try bodies — javac's
+  nested ranges nest naturally. The pc-tracked fallback for non-nested/overlapping ranges
+  remains M3 spike S4. Jumps out of/into try regions are ordinary `L<pc>` blocks emitted in
+  place (allowed).
+* `try { }` regions whose end is the end of the method are closed after the linear pass, and a
+  mid-layout `return`/`throw` that turns out to be the method's *last* statement loses its
+  `if (true) { }` wrapper (the wrapper only exists for javac's reachability of following code;
+  at the tail it would make the method "fall off the end" — "missing return statement").
+
+Modern `finally` (inlined bytecode + catch-`Throwable` entries) needs no extra machinery;
 `jsr`/`ret` is unsupported.
 
 ### 3.6 Compileability
@@ -262,9 +288,12 @@ ranges → pc-tracked fallback (`stk.setPc(pc)` + dispatch chain) — M3, spike 
   calls/statements, the linear layout itself never creates unreachable code — but a
   mid-layout `return`/`throw` does. Every `return`/`throw` that is not the last statement of
   the body is wrapped: `if (true) { return stk.top(); }` (JLS 14.22 blessing), unwrapped by
-  `IfLiteralRule` (§5.3). A value-returning body additionally ends in a dummy `return 0;`
-  that is only reachable through the `if (false) { break L; }` guards of the label blocks
-  (javac reachability otherwise flags it); the dummy never executes semantically.
+  `IfLiteralRule` (§5.3). A wrapped statement that turns out to be the *last* one is
+  unwrapped again in the emitter (§3.5) — with nothing following, the wrapper only makes
+  javac's flow "fall off the end" of a non-void method. A value-returning body additionally
+  ends in a dummy `return 0;` that is only reachable through the `if (false) { break L; }`
+  guards of the label blocks (javac reachability otherwise flags it); the dummy never
+  executes semantically.
 * The JVM verifier guarantees the final block ends in `return`/`athrow` (validated), so a
   value-returning body never "falls off the end".
 * Temporaries `$1, $2, …`, `stk`, and parameter names (from `LocalVariableTable` if
@@ -624,7 +653,7 @@ A closed proof of the transpiled method's contract establishes, modulo:
 | Unit | CFG/typing/structuring on synthetic `.class` fixtures | `key.jvm/src/test` |
 | Golden | transpile → `javac` compiles output (hard invariant) | every transpile test |
 | Differential | run transpiled vs. original bytecode on random inputs | M3 |
-| Proof | `KeYEnvironment` + `.key` fixtures: max, max2 (M1, closed); recursion-by-contract (M1, closes under arithmetic int rules, see §9.1); sum (both modes), factorial, goto-heavy control flow, exceptions (M2/M3); object slice (M2, golden Point/Shapes: layout + javac round-trip, residual-shape pin per §9.1); switch (M3, pinned per §9.1(2)); shuffles (M3: `dupReuse` closes); long/float/double (M3: `back`/`flt` close, `ladd`/`conv`/`lcmpish`/`ternary`/`lconst` pinned per §9.1) | `key.jvm/src/test` |
+| Proof | `KeYEnvironment` + `.key` fixtures: max, max2 (M1, closed); recursion-by-contract (M1, closes under arithmetic int rules, see §9.1); sum (both modes), factorial, goto-heavy control flow, exceptions (M2/M3); object slice (M2, golden Point/Shapes: layout + javac round-trip, residual-shape pin per §9.1); switch (M3, pinned per §9.1(2)); shuffles (M3: `dupReuse` closes); long/float/double (M3: `back`/`flt` close, `ladd`/`conv`/`lcmpish`/`ternary`/`lconst` pinned per §9.1); exceptions (M3: `thrower` closes, `guarded`/`finallyFlow` pinned per §9.1(2)) | `key.jvm/src/test` |
 | Rule | `GotoSpliceRule`/`GotoRestoreRule`/`IfLiteralRule` unit tests incl. negative cases (missing label → loud abort) | `key.jvm/src/test` |
 | Regression | RunAllProofs proof collection once stable | `key.ui/examples` |
 
@@ -719,6 +748,32 @@ the sum overflows), and every literal — `−1/0/1` from `lcmp`, `1/0` from the
 selector, `42L` — re-opens the `inRangeInt`/createdness family. The boolean-transpiler fix
 is worth noting for M1's `max`-style fixtures too: any future boolean-typed parameter must
 use the `(c ? 1 : 0)` extraction.
+
+**M3 status (fourth slice — exceptions, the M3 headline, on `weigl/jvm`):** try/catch/finally
+is shipped. The exception table is reconstructed into *structured* Java `try/catch` blocks
+(§3.5): each try range becomes `try { }`, each handler's leading `astore` binds the catch
+variable (`catch (T local_<slot>)`, the slot removed from the local declarations), the handler
+body is consumed into the clause, and `athrow` is a real `throw (Throwable) stk.popRef();` —
+so methods that may throw declare `throws Throwable` (checked `Throwable`). javac's finally
+inlining (a catch-all `Throwable` handler whose body rethrows the bound variable) needs no
+extra machinery; the mid-layout `throw` and handler-internal returns compile through the
+`if (true) { }` reachability blessing, and a wrapper that lands on the method's last
+statement is unwrapped again (javac would otherwise report "missing return statement"). The
+failure mode for the exotic shapes that remain (branch targets inside handlers, handler
+ranges overlapping try bodies — spike S4) is a loud abort.
+`TranspileTest#transpiledExceptionsHaveCanonicalShape` round-trips
+`golden/Exceptions.java` through javac (fixture `fixtures/Exceptions.java`: `guarded` — a
+typed catch behind a negative guard; `finallyFlow` — the inlined finally; `thrower` — an
+uncaught throw carrying a `String` message; the fixtures avoid `idiv`/array indexing on
+purpose, since those are contractless/`runtimeExceptions`-banned). Proof boundary
+(`ExceptionsProofTest`, the same §9.1(2) family as the switch pins): `guarded` and
+`finallyFlow` stay open on the fresh-`jvm.Local` createdness residual — their catch paths
+push literals, an exception allocation and a `String`, so the residual family holds for both
+the constants and the Object-typed traffic — while `thrower` **closes**: its
+`requires x >= 0` refutes the throwing branch, leaving the variable-only normal path (with
+the `LDC` `String` and the `new+<init>` String argument on the dead path) to prove cleanly.
+`thrower` is the exceptions slice's closing gate, like `dupReuse` (shuffles) and
+`back`/`flt` (category-2).
 
 ### 9.1 Known limitations (M1)
 
