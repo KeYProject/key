@@ -18,7 +18,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// This class contains the pahts where the core of KeY looks for certain files and directories.
+/// This class contains the paths where the core of KeY looks for certain files and directories.
 ///
 /// By default, all KeY configurations are stored in a directory named `.key` inside the user's home
 /// directory, determined by the system property `System.getProperty("user.home")`.
@@ -64,7 +64,7 @@ public final class PathConfig {
     public static final String KEY_CONFIG_PROPERTY = "key.config";
 
     /// The default name of the directory that contains KeY settings.
-    public static final String KEY_DIRECTORY_NAME = ".key";
+    public static final String KEY_DIRECTORY_NAME = ".key-fsav26";
 
     public static final Comparator<Path> VERSION_COMPARATOR = (v1, v2) -> {
         String s1 = v1.getFileName().toString().substring(1);

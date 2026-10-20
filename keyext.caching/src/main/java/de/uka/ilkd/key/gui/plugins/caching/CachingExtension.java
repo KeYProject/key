@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
  */
 @KeYGuiExtension.Info(name = "Proof Caching", optional = true,
     description = "Functionality related to reusing previous proof results in similar proofs",
-    experimental = false)
+    experimental = true)
 @HelpInfo(path = "/user/ProofCaching/")
 public class CachingExtension
         implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.ContextMenu,
