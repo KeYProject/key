@@ -424,14 +424,12 @@ public final class MethodTranspiler {
         }
         regions.sort(Comparator.comparingInt(Region::start).thenComparingInt(Region::end));
         tryRegions.addAll(regions);
-        // handlers themselves must be straight-line (no target lands inside one)
-        for (int idx : consumed) {
-            if (targets.contains(idx)) {
-                throw new UnsupportedOperationException(
-                    "branch target inside an exception handler in " + method.name
-                        + " is not supported in M3");
-            }
-        }
+        // A goto_ target landing inside a handler body is resolved by truncation, not an abort:
+        // handlerExtent stops the consumed span at the first target, so the emitted catch body
+        // is straight-line by construction (targets ∩ consumed is empty — no dead guard needed),
+        // the target's code becomes an ordinary guarded L<t> block outside the catch, and any
+        // handler-body code referencing the catch-bound slot after the target fails the javac
+        // round-trip loudly. Both shapes are pinned in S4ExceptionShapeTest.
     }
 
     /** The handler body [from, end) ends at the next jump target, region start, or end. */
