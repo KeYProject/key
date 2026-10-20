@@ -130,6 +130,12 @@ the surrounding method), and one `jvm.Local` stack frame for the operand stack:
 | `aload 1` / `astore 2` | `stk.push(o);` / `o = (Foo) stk.popRef();` | local reference ↔ typed cast off `popRef` (M2a; `LocalVariableTable` types the slot) |
 | `iinc 3, 1` | `c += 1;` | plain local update |
 | `iadd`, `isub`, `imul`, `ineg`, … | `stk.iadd();` … | one contract per mnemonic |
+| `lload/lstore`, `dload/dstore`, `fload/fstore` | `stk.pushL(a);` / `a = stk.popL();` (and `D`/`F` twins) | local `long`/`double`/`float` ↔ stack top; one logical seq element per category-2 value, the two JVM slots only matter for LVT numbering (M3 ✓) |
+| `ladd`…, `dadd`…, `fadd`…, `i2l`, `l2i`, `l2d`, `d2l`, `i2d`, `d2i`, `f2d`, `d2f`, `i2f`, `f2i`, `l2f`, `f2l` | `stk.ladd();` … (mnemonic = runtime method) | arithmetic value2 op value1; conversions replace the top element (M3 ✓) |
+| `lcmp` | `stk.lcmp();` then the following `ifge`/`iflt`/… reads the pushed sign | pushes 1/0/−1 (M3 ✓; `dcmpg`/`dcmpl`/`fcmpg`/`fcmpl` contractless stubs) |
+| `ldc2_w` (long/double), `ldc` (float) | `stk.pushL(42L);`, `stk.pushD(2.0);`, `stk.pushF(0.5f);` (M3 ✓) | push constant (as with `ldc` int) |
+| `iload` of a boolean-typed slot | `stk.push((c ? 1 : 0));` (M3 ✓) | JVM booleans are ints 0/1; a bare `push(c)` would box into `push(Object)` and corrupt the `\seq` int semantics; `istore` into a boolean slot emits `c = (stk.pop() != 0);` |
+| `laload`, `lastore` | real `long[]` access: `long[] $a = (long[]) stk.popRef(); stk.pushL($a[$i]);` / `$a[$i] = $v;` with `long $v = stk.popL();` (M3 ✓) | Java array semantics (M2's `int[]` pattern, long-typed value) |
 | `dup`, `swap`, `dup_x1`, `dup_x2`, `dup2`, `dup2_x1`, `dup2_x2` | `stk.dup(); stk.swap();` … (M3 ✓) | seq-prefix contracts: `dup`/`swap` (M1), full 7-op family (M3); javac-17 emits `dup` (`(x = y) + x`) and `dup2` (`a[i] += v`); the _x1/_x2/2× variants have contracts + emission but no real-bytecode gate in the int subset (they matter for category-2 later) |
 | `ifeq`, `if_icmplt`, … | `if (stk.if_icmplt()) { jvm.Local.goto_(pc); }` (branch-taken predicate) | pops operand(s), returns `boolean` |
 | `goto L` | `jvm.Local.goto_(7);` | *no contract* — goto rules (§5), int pc target |
@@ -618,7 +624,7 @@ A closed proof of the transpiled method's contract establishes, modulo:
 | Unit | CFG/typing/structuring on synthetic `.class` fixtures | `key.jvm/src/test` |
 | Golden | transpile → `javac` compiles output (hard invariant) | every transpile test |
 | Differential | run transpiled vs. original bytecode on random inputs | M3 |
-| Proof | `KeYEnvironment` + `.key` fixtures: max, max2 (M1, closed); recursion-by-contract (M1, closes under arithmetic int rules, see §9.1); sum (both modes), factorial, goto-heavy control flow, exceptions (M2/M3); object slice (M2, golden Point/Shapes: layout + javac round-trip, residual-shape pin per §9.1) | `key.jvm/src/test` |
+| Proof | `KeYEnvironment` + `.key` fixtures: max, max2 (M1, closed); recursion-by-contract (M1, closes under arithmetic int rules, see §9.1); sum (both modes), factorial, goto-heavy control flow, exceptions (M2/M3); object slice (M2, golden Point/Shapes: layout + javac round-trip, residual-shape pin per §9.1); switch (M3, pinned per §9.1(2)); shuffles (M3: `dupReuse` closes); long/float/double (M3: `back`/`flt` close, `ladd`/`conv`/`lcmpish`/`ternary`/`lconst` pinned per §9.1) | `key.jvm/src/test` |
 | Rule | `GotoSpliceRule`/`GotoRestoreRule`/`IfLiteralRule` unit tests incl. negative cases (missing label → loud abort) | `key.jvm/src/test` |
 | Regression | RunAllProofs proof collection once stable | `key.ui/examples` |
 
@@ -693,6 +699,27 @@ it closes under `DefaultAutoMacro` — `ShuffleProofTest#dupReuseShuffleProofClo
 the closure, while the array-based `dup2A` twin remains in the pinned residual family
 (an `int[]` is Object-typed traffic).
 
+**M3 status (third slice, on `weigl/jvm`):** the category-2 slice (long/float/double) is
+shipped. The runtime models a long/double/float as one logical `\seq` element (the two JVM
+slots only matter for LVT numbering, mirrored in plain-Java locals — javac never splits a
+category-2 value), with `pushL/popL/topL`, `pushD/popD/topD`, `pushF/popF/topF`, the
+arithmetic mnemonics, `lcmp` (pushes the comparison sign for the trailing one-operand
+branch), all 12 JVM conversions, `ldc2_w`/`ldc` for long/double/float literals, and
+`laload`/`lastore`; boolean-typed slots are pushed as int 0/1 (`stk.push((c ? 1 : 0));`),
+never boxed through `push(Object)` (which would put a `Boolean` object into the `\seq` and
+break the int read-backs). `TranspileTest#transpiledCategory2OpsHaveCanonicalShape`
+round-trips `golden/Category2.java` through javac. Proof boundary (sharpening §9.1(2)):
+variable-only flows whose result is read back *without* long arithmetic close — `back`
+(`l2i`, pure cast) and `flt` (pure float multiply) are asserted closed in
+`Category2ProofTest` — while long *arithmetic* (`ladd`: `+`), int→long widening (`conv`),
+the `lcmp` sign literal (`lcmpish`), the double `ternary`'s boolean selector literals, and
+the literal `lconst` all pin residuals: long reads through `topL()`'s any→long cast wrap in
+`moduloLong`, which auto mode never normalizes (`moduloLong(add(a,b))` ≠ `add(a,b)` when
+the sum overflows), and every literal — `−1/0/1` from `lcmp`, `1/0` from the boolean
+selector, `42L` — re-opens the `inRangeInt`/createdness family. The boolean-transpiler fix
+is worth noting for M1's `max`-style fixtures too: any future boolean-typed parameter must
+use the `(c ? 1 : 0)` extraction.
+
 ### 9.1 Known limitations (M1)
 
 Two KeY-side strategy gaps bound what auto mode can close under the `java-jvm` profile. Both
@@ -743,6 +770,20 @@ KeY-side improvement is noticed and converted deliberately.
    `initialize()` *method* contract was experimentally ruled out too: without the constructor
    contract's anon-post, even int-only flows stop closing (the strategy cannot push the
    `create`-update's createdness out of the pre-heap).
+   <p>
+   **M3 category-2 finding — the bisect boundary extends to long/float arithmetic.**
+   Variable-only <em>long</em> and <em>float/double</em> flows close when the result is read
+   back without wrapping casts: pure casts (`back`: `l2i`) and pure float arithmetic
+   (`flt`: `fmul` — floats never wrap) close under auto, but long <em>arithmetic</em>
+   (`ladd`: `+`) and int→long widening (`conv` := `i2l`) do not — the any→long cast that
+   `topL()`'s read performs wraps its result in `moduloLong` and auto mode never normalizes
+   `moduloLong(add(a,b))` to `add(a,b)` (legitimately unprovable when the sum overflows, so
+   a strategy band change is the honest fix, not just a missing reduction). Two further
+   literal sources re-open the general family: `lcmp` materializes the comparison sign
+   −1/0/1 onto the stack (the trailing `ifge` then reads a literal and sticks on
+   `moduloInt(Z(neglit(1)))` normalization), and every boolean operand is pushed as the
+   literal split `(c ? 1 : 0)` (KeY symbolic-executes the conditional into 1/0 branches).
+   All are pinned in `Category2ProofTest`.
 
 Unrelated to the above, `JvmProfile` does *not* change the underlying strategy — the three
 appended rules fire at cost 0; the `max`/`max2` gates close under the full M1 settings

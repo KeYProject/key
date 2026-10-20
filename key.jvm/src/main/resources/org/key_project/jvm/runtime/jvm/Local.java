@@ -40,8 +40,10 @@ package jvm;
  * int theory has no bitwise operators, and division needs an exceptional case); they are unused
  * by the M1 fixtures. M2 adds reference-typed stack operations ({@link #push(Object)},
  * {@link #popRef()}, {@link #topRef()}, reference comparisons/branches); the ghost
- * {@code \seq} holds {@code any}-sorted elements, so int and reference values share one stack.
- * Long/float/double (category-2) stacks and arrays are M2/M3 follow-ups.
+ * {@code \seq} holds {@code any}-sorted elements, so int and reference values share one stack;
+ * M3 adds long/float/double (category-2): a long/double/float is one logical element per stack
+ * entry (the two JVM slots a category-2 value occupies only number the {@code LocalVariableTable}
+ * slots, which the transpiler mirrors in plain-Java locals), plus the JVM conversion mnemonics.
  */
 public class Local {
 
@@ -227,6 +229,385 @@ public class Local {
       @                       \seq_sub(\old(contents), 1, \old(size)));
       @*/
     public void ineg() {
+    }
+
+    // -- long / float / double (category-2; the ghost \seq models one logical value per stack
+    //    element, so lload/lstore/ladd treat a long as a single entry -- the two JVM slots a
+    //    category-2 value occupies only matter for the LocalVariableTable slot numbering, which
+    //    the transpiler mirrors in its plain-Java locals; javac never splits a category-2 value,
+    //    so the element granularity is faithful) ----------------------------------------------
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   ensures size == \old(size) + 1;
+      @   ensures contents == \seq_concat(\seq(v), \old(contents));
+      @*/
+    public void pushL(long v) {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures \result == (long)\seq_get(\old(contents), 0);
+      @   ensures size == \old(size) - 1;
+      @   ensures contents == \seq_sub(\old(contents), 1, \old(size));
+      @*/
+    public long popL() {
+        return 0L;
+    }
+
+    /*@ public normal_behavior
+      @   assignable \nothing;
+      @   requires size > 0;
+      @   ensures \result == (long)\seq_get(contents, 0);
+      @*/
+    public long topL() {
+        return 0L;
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   ensures size == \old(size) + 1;
+      @   ensures contents == \seq_concat(\seq(v), \old(contents));
+      @*/
+    public void pushD(double v) {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures \result == (double)\seq_get(\old(contents), 0);
+      @   ensures size == \old(size) - 1;
+      @   ensures contents == \seq_sub(\old(contents), 1, \old(size));
+      @*/
+    public double popD() {
+        return 0.0;
+    }
+
+    /*@ public normal_behavior
+      @   assignable \nothing;
+      @   requires size > 0;
+      @   ensures \result == (double)\seq_get(contents, 0);
+      @*/
+    public double topD() {
+        return 0.0;
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   ensures size == \old(size) + 1;
+      @   ensures contents == \seq_concat(\seq(v), \old(contents));
+      @*/
+    public void pushF(float v) {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures \result == (float)\seq_get(\old(contents), 0);
+      @   ensures size == \old(size) - 1;
+      @   ensures contents == \seq_sub(\old(contents), 1, \old(size));
+      @*/
+    public float popF() {
+        return 0.0f;
+    }
+
+    /*@ public normal_behavior
+      @   assignable \nothing;
+      @   requires size > 0;
+      @   ensures \result == (float)\seq_get(contents, 0);
+      @*/
+    public float topF() {
+        return 0.0f;
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size >= 2;
+      @   ensures size == \old(size) - 1;
+      @   ensures contents ==
+      @           \seq_concat(\seq((long)\seq_get(\old(contents), 1)
+      @                           + (long)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 2, \old(size)));
+      @*/
+    public void ladd() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size >= 2;
+      @   ensures size == \old(size) - 1;
+      @   ensures contents ==
+      @           \seq_concat(\seq((long)\seq_get(\old(contents), 1)
+      @                           - (long)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 2, \old(size)));
+      @*/
+    public void lsub() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size >= 2;
+      @   ensures size == \old(size) - 1;
+      @   ensures contents ==
+      @           \seq_concat(\seq((long)\seq_get(\old(contents), 1)
+      @                           * (long)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 2, \old(size)));
+      @*/
+    public void lmul() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures size == \old(size);
+      @   ensures contents ==
+      @           \seq_concat(\seq(-(long)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 1, \old(size)));
+      @*/
+    public void lneg() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size >= 2;
+      @   ensures size == \old(size) - 1;
+      @   ensures contents ==
+      @           \seq_concat(\seq((double)\seq_get(\old(contents), 1)
+      @                           + (double)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 2, \old(size)));
+      @*/
+    public void dadd() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size >= 2;
+      @   ensures size == \old(size) - 1;
+      @   ensures contents ==
+      @           \seq_concat(\seq((double)\seq_get(\old(contents), 1)
+      @                           - (double)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 2, \old(size)));
+      @*/
+    public void dsub() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size >= 2;
+      @   ensures size == \old(size) - 1;
+      @   ensures contents ==
+      @           \seq_concat(\seq((double)\seq_get(\old(contents), 1)
+      @                           * (double)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 2, \old(size)));
+      @*/
+    public void dmul() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures size == \old(size);
+      @   ensures contents ==
+      @           \seq_concat(\seq(-(double)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 1, \old(size)));
+      @*/
+    public void dneg() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size >= 2;
+      @   ensures size == \old(size) - 1;
+      @   ensures contents ==
+      @           \seq_concat(\seq((float)\seq_get(\old(contents), 1)
+      @                           + (float)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 2, \old(size)));
+      @*/
+    public void fadd() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size >= 2;
+      @   ensures size == \old(size) - 1;
+      @   ensures contents ==
+      @           \seq_concat(\seq((float)\seq_get(\old(contents), 1)
+      @                           - (float)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 2, \old(size)));
+      @*/
+    public void fsub() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size >= 2;
+      @   ensures size == \old(size) - 1;
+      @   ensures contents ==
+      @           \seq_concat(\seq((float)\seq_get(\old(contents), 1)
+      @                           * (float)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 2, \old(size)));
+      @*/
+    public void fmul() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures size == \old(size);
+      @   ensures contents ==
+      @           \seq_concat(\seq(-(float)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 1, \old(size)));
+      @*/
+    public void fneg() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size >= 2;
+      @   ensures size == \old(size) - 1;
+      @   ensures contents ==
+      @           \seq_concat(\seq((long)\seq_get(\old(contents), 1)
+      @                           > (long)\seq_get(\old(contents), 0) ? 1
+      @                       : ((long)\seq_get(\old(contents), 1)
+      @                           < (long)\seq_get(\old(contents), 0) ? -1 : 0)),
+      @                       \seq_sub(\old(contents), 2, \old(size)));
+      @*/
+    public void lcmp() {
+    }
+
+    // -- conversions (replace the top stack element by its converted value) ---------------
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures size == \old(size);
+      @   ensures contents ==
+      @           \seq_concat(\seq((long)(int)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 1, \old(size)));
+      @*/
+    public void i2l() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures size == \old(size);
+      @   ensures contents ==
+      @           \seq_concat(\seq((int)(long)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 1, \old(size)));
+      @*/
+    public void l2i() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures size == \old(size);
+      @   ensures contents ==
+      @           \seq_concat(\seq((float)(int)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 1, \old(size)));
+      @*/
+    public void i2f() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures size == \old(size);
+      @   ensures contents ==
+      @           \seq_concat(\seq((int)(float)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 1, \old(size)));
+      @*/
+    public void f2i() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures size == \old(size);
+      @   ensures contents ==
+      @           \seq_concat(\seq((double)(float)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 1, \old(size)));
+      @*/
+    public void f2d() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures size == \old(size);
+      @   ensures contents ==
+      @           \seq_concat(\seq((float)(double)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 1, \old(size)));
+      @*/
+    public void d2f() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures size == \old(size);
+      @   ensures contents ==
+      @           \seq_concat(\seq((double)(int)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 1, \old(size)));
+      @*/
+    public void i2d() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures size == \old(size);
+      @   ensures contents ==
+      @           \seq_concat(\seq((int)(double)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 1, \old(size)));
+      @*/
+    public void d2i() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures size == \old(size);
+      @   ensures contents ==
+      @           \seq_concat(\seq((float)(long)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 1, \old(size)));
+      @*/
+    public void l2f() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures size == \old(size);
+      @   ensures contents ==
+      @           \seq_concat(\seq((long)(float)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 1, \old(size)));
+      @*/
+    public void f2l() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures size == \old(size);
+      @   ensures contents ==
+      @           \seq_concat(\seq((double)(long)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 1, \old(size)));
+      @*/
+    public void l2d() {
+    }
+
+    /*@ public normal_behavior
+      @   assignable contents, size;
+      @   requires size > 0;
+      @   ensures size == \old(size);
+      @   ensures contents ==
+      @           \seq_concat(\seq((long)(double)\seq_get(\old(contents), 0)),
+      @                       \seq_sub(\old(contents), 1, \old(size)));
+      @*/
+    public void d2l() {
     }
 
     // -- stack rearrangement ------------------------------------------------------------
@@ -490,6 +871,40 @@ public class Local {
     }
 
     public void iushr() {
+    }
+
+    // category-2 counterparts of the contractless int stubs (division needs an exceptional
+    // case, the float/double comparison mnemonics differ only in their NaN convention, which
+    // KeY's float theory does not expose in JML; none of the long/float/double fixtures use
+    // them, so they are emitted for round-trip completeness and never relied on in proofs)
+    public void ldiv() {
+    }
+
+    public void lrem() {
+    }
+
+    public void ddiv() {
+    }
+
+    public void drem() {
+    }
+
+    public void fdiv() {
+    }
+
+    public void frem() {
+    }
+
+    public void dcmpg() {
+    }
+
+    public void dcmpl() {
+    }
+
+    public void fcmpg() {
+    }
+
+    public void fcmpl() {
     }
 
     // -- jumps ------------------------------------------------------------------------

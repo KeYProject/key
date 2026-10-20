@@ -130,7 +130,10 @@ public final class MethodTranspiler {
 
     private static boolean isSlotOpcode(int opcode) {
         return switch (opcode) {
-            case Opcodes.ILOAD, Opcodes.ISTORE, Opcodes.ALOAD, Opcodes.ASTORE -> true;
+            case Opcodes.ILOAD, Opcodes.ISTORE, Opcodes.ALOAD, Opcodes.ASTORE, Opcodes.LLOAD,
+                    Opcodes.LSTORE, Opcodes.DLOAD, Opcodes.DSTORE, Opcodes.FLOAD,
+                    Opcodes.FSTORE ->
+                true;
             default -> false;
         };
     }
@@ -282,12 +285,8 @@ public final class MethodTranspiler {
     private String prologue() {
         StringBuilder sb = new StringBuilder();
         for (int slot : localSlots) {
-            String t = slotType(slot);
-            if (t.equals("long") || t.equals("double")) {
-                throw new UnsupportedOperationException(
-                    "Category-2 local in method " + method.name + " is not supported in M2");
-            }
-            sb.append("        ").append(t).append(' ').append(localName(slot)).append(";\n");
+            sb.append("        ").append(slotType(slot)).append(' ').append(localName(slot))
+                    .append(";\n");
         }
         sb.append("        jvm.Local ").append(stackVar).append(" = new jvm.Local();\n");
         return sb.toString();
@@ -357,7 +356,8 @@ public final class MethodTranspiler {
     /** Instructions that may appear inside a new+<init> pattern: argument pushes only. */
     private static boolean isConstructorArgumentPush(AbstractInsnNode insn) {
         return switch (insn.getOpcode()) {
-            case Opcodes.ILOAD, Opcodes.ALOAD, Opcodes.LDC, Opcodes.ICONST_M1, Opcodes.ICONST_0,
+            case Opcodes.ILOAD, Opcodes.ALOAD, Opcodes.LLOAD, Opcodes.DLOAD, Opcodes.FLOAD,
+                    Opcodes.LDC, Opcodes.ICONST_M1, Opcodes.ICONST_0,
                     Opcodes.ICONST_1, Opcodes.ICONST_2, Opcodes.ICONST_3, Opcodes.ICONST_4,
                     Opcodes.ICONST_5, Opcodes.BIPUSH, Opcodes.SIPUSH, Opcodes.ACONST_NULL,
                     Opcodes.GETFIELD, Opcodes.GETSTATIC, Opcodes.INVOKEVIRTUAL,
@@ -408,16 +408,58 @@ public final class MethodTranspiler {
                 Object cst = ((LdcInsnNode) insn).cst;
                 if (cst instanceof Integer v) {
                     pushLiteral(v);
+                } else if (cst instanceof Long v) {
+                    line("        " + stackVar + ".pushL(" + v + "L);");
+                } else if (cst instanceof Double v) {
+                    line("        " + stackVar + ".pushD(" + v + ");");
+                } else if (cst instanceof Float v) {
+                    line("        " + stackVar + ".pushF(" + v + "f);");
                 } else {
                     unsupported(insn);
                 }
             }
-            case Opcodes.ILOAD, Opcodes.ALOAD ->
+            case Opcodes.ILOAD -> {
+                VarInsnNode var = (VarInsnNode) insn;
+                String name = localName(var.var);
+                if (slotType(var.var).equals("boolean")) {
+                    // JVM booleans are ints (0/1) on the operand stack; a boolean-typed local
+                    // slot must be extracted, never boxed into push(Object)
+                    line("        " + stackVar + ".push((" + name + " ? 1 : 0));");
+                } else {
+                    line("        " + stackVar + ".push(" + name + ");");
+                }
+            }
+            case Opcodes.ALOAD ->
                 line("        " + stackVar + ".push(" + localName(((VarInsnNode) insn).var)
                     + ");");
-            case Opcodes.ISTORE ->
+            case Opcodes.LLOAD ->
+                line("        " + stackVar + ".pushL(" + localName(((VarInsnNode) insn).var)
+                    + ");");
+            case Opcodes.DLOAD ->
+                line("        " + stackVar + ".pushD(" + localName(((VarInsnNode) insn).var)
+                    + ");");
+            case Opcodes.FLOAD ->
+                line("        " + stackVar + ".pushF(" + localName(((VarInsnNode) insn).var)
+                    + ");");
+            case Opcodes.ISTORE -> {
+                VarInsnNode var = (VarInsnNode) insn;
+                String name = localName(var.var);
+                if (slotType(var.var).equals("boolean")) {
+                    // store the int 0/1 back into a boolean-typed slot
+                    line("        " + name + " = (" + stackVar + ".pop() != 0);");
+                } else {
+                    line("        " + name + " = " + stackVar + ".pop();");
+                }
+            }
+            case Opcodes.LSTORE ->
                 line("        " + localName(((VarInsnNode) insn).var) + " = " + stackVar
-                    + ".pop();");
+                    + ".popL();");
+            case Opcodes.DSTORE ->
+                line("        " + localName(((VarInsnNode) insn).var) + " = " + stackVar
+                    + ".popD();");
+            case Opcodes.FSTORE ->
+                line("        " + localName(((VarInsnNode) insn).var) + " = " + stackVar
+                    + ".popF();");
             case Opcodes.ASTORE -> {
                 int slot = ((VarInsnNode) insn).var;
                 String t = slotType(slot);
@@ -456,7 +498,13 @@ public final class MethodTranspiler {
             case Opcodes.LOOKUPSWITCH -> emitLookupSwitch((LookupSwitchInsnNode) insn);
             case Opcodes.IADD, Opcodes.ISUB, Opcodes.IMUL, Opcodes.IDIV, Opcodes.IREM, Opcodes.INEG,
                     Opcodes.IAND, Opcodes.IOR, Opcodes.IXOR, Opcodes.ISHL, Opcodes.ISHR,
-                    Opcodes.IUSHR ->
+                    Opcodes.IUSHR, Opcodes.LADD, Opcodes.LSUB, Opcodes.LMUL, Opcodes.LDIV,
+                    Opcodes.LREM, Opcodes.LNEG, Opcodes.LCMP, Opcodes.DADD, Opcodes.DSUB,
+                    Opcodes.DMUL, Opcodes.DDIV, Opcodes.DREM, Opcodes.DNEG, Opcodes.DCMPG,
+                    Opcodes.DCMPL, Opcodes.FADD, Opcodes.FSUB, Opcodes.FMUL, Opcodes.FDIV,
+                    Opcodes.FREM, Opcodes.FNEG, Opcodes.FCMPG, Opcodes.FCMPL, Opcodes.I2L,
+                    Opcodes.L2I, Opcodes.I2F, Opcodes.F2I, Opcodes.F2D, Opcodes.D2F, Opcodes.I2D,
+                    Opcodes.D2I, Opcodes.L2F, Opcodes.F2L, Opcodes.L2D, Opcodes.D2L ->
                 line("        " + stackVar + "." + mnemonic(op) + "();");
             case Opcodes.INVOKESTATIC -> emitStaticCall((MethodInsnNode) insn);
             case Opcodes.INVOKEVIRTUAL, Opcodes.INVOKESPECIAL, Opcodes.INVOKEINTERFACE -> {
@@ -477,9 +525,17 @@ public final class MethodTranspiler {
             case Opcodes.NEWARRAY -> emitNewArray((IntInsnNode) insn);
             case Opcodes.IALOAD -> emitIaload();
             case Opcodes.IASTORE -> emitIastore();
+            case Opcodes.LALOAD -> emitLaload();
+            case Opcodes.LASTORE -> emitLastore();
             case Opcodes.ARRAYLENGTH -> emitArrayLength();
             case Opcodes.IRETURN ->
                 line("        " + returnStatement(index, "return " + stackVar + ".top();"));
+            case Opcodes.LRETURN ->
+                line("        " + returnStatement(index, "return " + stackVar + ".topL();"));
+            case Opcodes.DRETURN ->
+                line("        " + returnStatement(index, "return " + stackVar + ".topD();"));
+            case Opcodes.FRETURN ->
+                line("        " + returnStatement(index, "return " + stackVar + ".topF();"));
             case Opcodes.ARETURN ->
                 line("        " + returnStatement(index,
                     "return (" + jvmTypeName(Type.getReturnType(method.desc)) + ") " + stackVar
@@ -710,6 +766,26 @@ public final class MethodTranspiler {
         line("        int " + val + " = " + stackVar + ".pop();");
         line("        int " + idx + " = " + stackVar + ".pop();");
         line("        int[] " + arr + " = (int[]) " + stackVar + ".popRef();");
+        line("        " + arr + "[" + idx + "] = " + val + ";");
+    }
+
+    /** laload: pops index then array reference and pushes the real {@code a[i]} long read. */
+    private void emitLaload() {
+        String idx = freshTemp("$i");
+        String arr = freshTemp("$a");
+        line("        int " + idx + " = " + stackVar + ".pop();");
+        line("        long[] " + arr + " = (long[]) " + stackVar + ".popRef();");
+        line("        " + stackVar + ".pushL(" + arr + "[" + idx + "]);");
+    }
+
+    /** lastore: pops value, index and array reference and performs the real {@code a[i] = v}. */
+    private void emitLastore() {
+        String val = freshTemp("$v");
+        String idx = freshTemp("$i");
+        String arr = freshTemp("$a");
+        line("        long " + val + " = " + stackVar + ".popL();");
+        line("        int " + idx + " = " + stackVar + ".pop();");
+        line("        long[] " + arr + " = (long[]) " + stackVar + ".popRef();");
         line("        " + arr + "[" + idx + "] = " + val + ";");
     }
 
