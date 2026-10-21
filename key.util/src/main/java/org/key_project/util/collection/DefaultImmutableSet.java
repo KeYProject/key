@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.util.collection;
 
 import java.util.*;
@@ -63,7 +64,17 @@ public class DefaultImmutableSet<T extends @Nullable Object> implements Immutabl
     }
 
     public static <T> ImmutableSet<T> fromCollection(Collection<T> seq) {
-        return new DefaultImmutableSet<>(ImmutableList.fromList(seq));
+        if (seq instanceof Set<T> set) {
+            return fromSet(set);
+        } else {
+            // ensure set property "each element only once"
+            return seq.isEmpty() ? nil() : fromImmutableList(ImmutableList.fromList(seq));
+        }
+    }
+
+    public static <T> ImmutableSet<T> fromSet(Set<T> set) {
+        // we can rely on the set property here
+        return set.isEmpty() ? nil() : new DefaultImmutableSet<>(ImmutableList.fromList(set));
     }
 
     // private static HashSet<String> previousComplains = new HashSet<>();

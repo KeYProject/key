@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
 import java.util.Collection;
@@ -35,7 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Checks the runtime cycle of {@link ParkedBases} with real taclet applications: a base parked
- * under its derived keys is returned by {@link ParkedBases#drainWoken()} exactly once when a
+ * under its derived keys is returned by {@link ParkedBases#getAndClearWokenApplications()} exactly
+ * once when a
  * matching formula is recorded, leaves the parked map through the key recomputation of the
  * unindexing, and the woken bases of one round come out one {@link WakeKind} at a time in the
  * fixed wake order, which the queue turns into the proof-relevant insertion order. The key
@@ -72,14 +74,14 @@ public class ParkedBasesRuntimeTest {
 
         final JTerm completer = tb.equals(tb.zTerm("42"), tb.zTerm("7"));
         parking.recordWakeKeysOf(completer, key.inAntecedent());
-        final Collection<RuleAppContainer> woken = parking.drainWoken();
+        final Collection<RuleAppContainer> woken = parking.getAndClearWokenApplications();
         assertEquals(1, woken.size(), "the parked base must be woken");
         assertSame(base, woken.iterator().next(), "the woken base is the parked one");
         assertTrue(parking.parkedMapForTests().isEmpty(),
             "unindexing recomputes the base's keys and releases it from the map");
 
         parking.recordWakeKeysOf(completer, key.inAntecedent());
-        assertTrue(parking.drainWoken().isEmpty(),
+        assertTrue(parking.getAndClearWokenApplications().isEmpty(),
             "with nothing parked a second change wakes nothing");
     }
 
@@ -93,7 +95,8 @@ public class ParkedBasesRuntimeTest {
         parking.recordWakeKeysOf(tb.equals(tb.zTerm("42"), tb.zTerm("7")), !key.inAntecedent());
         parking.recordWakeKeysOf(tb.equals(tb.add(tb.zTerm("4"), tb.zTerm("2")), tb.zTerm("7")),
             key.inAntecedent());
-        assertTrue(parking.drainWoken().isEmpty(), "no recorded change matches the parked key");
+        assertTrue(parking.getAndClearWokenApplications().isEmpty(),
+            "no recorded change matches the parked key");
         assertEquals(1, parking.parkedMapForTests().size(), "the base stays parked");
     }
 
@@ -115,7 +118,7 @@ public class ParkedBasesRuntimeTest {
 
         parking.recordWakeKeysOf(tb.equals(tb.zTerm("42"), tb.zTerm("7")), argKey.inAntecedent());
         parking.recordWakeKeysOf(phi, wholeKey.inAntecedent());
-        final Collection<RuleAppContainer> woken = parking.drainWoken();
+        final Collection<RuleAppContainer> woken = parking.getAndClearWokenApplications();
         assertEquals(2, woken.size(), "both bases must wake");
         final Iterator<RuleAppContainer> it = woken.iterator();
         assertSame(argHashBase, it.next(), "the ARG_HASH kind is collected first");

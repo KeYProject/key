@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 
@@ -60,7 +61,7 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
      * an exception otherwise
      */
     protected void checkBoundInIfAndFind() {
-        final BoundUniquenessChecker ch = new BoundUniquenessChecker(ifSequent());
+        final BoundUniquenessChecker ch = new BoundUniquenessChecker(assumesSequent());
         if (!ch.correct()) {
             throw new TacletBuilderException(this, "A bound SchemaVariable occurs twice in if.");
         }
@@ -79,5 +80,19 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
     public NoFindTaclet getTaclet() {
         checkBoundInIfAndFind();
         return getNoFindTaclet();
+    }
+
+    @Override
+    public NoFindTacletBuilder copy() {
+        var rb = new NoFindTacletBuilder();
+        rb.setAnnotations(tacletAnnotations);
+        rb.setAssumesSequent(assumesSeq);
+        rb.setChoices(choices);
+        rb.setDisplayName(attrs.displayName());
+        rb.setName(name);
+        rb.setTacletGoalTemplates(goals);
+        rb.setTrigger(attrs.trigger());
+        rb.setRuleSets(ruleSets);
+        return rb;
     }
 }

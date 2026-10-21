@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -21,13 +22,12 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * a second monomial.
  *
  * <p>
- * The value is determined by the compared instantiation terms alone: the atom ordering consists of
- * the number-literal distinction, the term-only {@link de.uka.ilkd.key.logic.LexPathOrdering}, and
- * the introduction time of basis symbols, which is a constant for every operator a cost evaluation
- * can encounter (the argument is given at
- * {@link AbstractMonomialSmallerThanFeature#introductionTime}). Hence {@link StableCost} -- the
- * same classification, for the same reason, as {@link MonomialsSmallerThanFeature}, which orders
- * whole monomials by the same ingredients.
+ * The value is determined by the compared instantiation terms alone: the atom ordering consists
+ * of the number-literal distinction, the term-only {@link de.uka.ilkd.key.logic.LexPathOrdering},
+ * and the introduction time of definitional skolem symbols, which is a constant of the symbol
+ * (see {@link AbstractMonomialSmallerThanFeature#introductionTime}). Hence {@link StableCost} --
+ * the same classification, for the same reason, as {@link MonomialsSmallerThanFeature}, which
+ * orders whole monomials by the same ingredients.
  * </p>
  */
 @StableCost
@@ -73,7 +73,7 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
             }
         }
 
-        final int v = introductionTime(t2.op(), goal) - introductionTime(t1.op(), goal);
+        final int v = introductionTime(t2.op()) - introductionTime(t1.op());
         if (v < 0) {
             return true;
         }

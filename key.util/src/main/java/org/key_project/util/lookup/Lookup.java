@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.util.lookup;
 
 import java.lang.ref.WeakReference;
@@ -102,6 +103,24 @@ public class Lookup {
         } else {
             return t.get(0);
         }
+    }
+
+    /**
+     * The first implementation registered for {@code service}, here or in a parent lookup, or
+     * {@code null} if there is none. Unlike {@link #get(Class)} this does not throw in case of
+     * a miss.
+     *
+     * @param service the requested service class
+     * @param <T> the service type
+     * @return the first registered implementation, or {@code null}
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends @Nullable Object> @Nullable T getOrNull(Class<T> service) {
+        LinkedList<?> t = serviceMap.get(service);
+        if (t != null && !t.isEmpty()) {
+            return (T) t.getFirst();
+        }
+        return parent != null ? parent.getOrNull(service) : null;
     }
 
     /**

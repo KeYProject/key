@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.parser;
 
 import java.io.File;
@@ -64,7 +65,7 @@ public class TestParser {
         String content = """
                 \\sorts { \\generic gen; }\s
 
-                \\rules { SomeRule { \\find(instance<[gen]>(0)) \\replacewith(false) }; }
+                \\rules { SomeRule { \\find(instance<gen>(0)) \\replacewith(false) }; }
                 \\problem { true }""";
 
         Services services = TacletForTests.services();

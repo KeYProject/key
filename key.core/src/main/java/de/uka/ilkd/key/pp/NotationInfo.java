@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.pp;
 
 import java.util.HashMap;
@@ -322,6 +323,8 @@ public final class NotationInfo {
 
         // set operators
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+        tbl.put(((ParametricFunctionInstance) setLDT.getPair()).getBase(),
+            new Notation.PairNotation());
         tbl.put(setLDT.getSingleton(), new Notation.SingletonNotation());
         tbl.put(setLDT.getUnion(),
             new Notation.Infix("\\cup", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));

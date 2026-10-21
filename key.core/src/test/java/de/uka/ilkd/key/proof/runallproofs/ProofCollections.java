@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.runallproofs;
 
 
@@ -12,7 +13,7 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 
 /**
- * This class configuress the "runAllProofs" test runs.
+ * This class configures the "runAllProofs" test runs.
  *
  * The ProofCollection objects are created and configured in the two methods
  * #automaticJavaDL() and #automaticInfFlow(). You can add new files
@@ -212,9 +213,10 @@ public class ProofCollections {
          * If the fork mode is not set to noFork, the launched subprocesses
          * get the specified amount of heap memory.
          *
-         * Heap memory for subprocesses (like 500m or 2G)
+         * Heap memory for subprocesses (like 500m or 3G)
          */
-        // forkMemory = 1000m
+        settings.setForkMemory("3g");
+
 
         /*
          * To run the forked JVM in debug mode, set the TCP port to listen to here.
@@ -296,6 +298,11 @@ public class ProofCollections {
             "performance-test/GhostFrame(GhostFrame__foo_08()).JML_operation_contract.0.key");
         performance.provable(
             "performance-test/Modelfield(Modelfield__foo_08()).JML_operation_contract.0.key");
+        performance.provable("performance-test/updateSimplification/heap_array_25.key");
+        performance.provable("performance-test/updateSimplification/heap_array_50.key");
+        performance.provable("performance-test/updateSimplification/heap_array_100.key");
+        performance.provable("performance-test/updateSimplification/heap_array_200.key");
+        performance.provable("performance-test/updateSimplification/heap_array_400.key");
 
         // Test performance of PO construction
         var performancePOConstruction = c.group("performancePOConstruction");
@@ -518,6 +525,8 @@ public class ProofCollections {
         g.provable("heap/BoyerMoore/BM.count.accessible.key");
         g.provable("heap/BoyerMoore/BM.count.key");
         g.provable("heap/BoyerMoore/BM.monoLemma.key");
+        g.provable("heap/Adjacency/project.key");
+        g.provable("heap/Adjacency/distinct.key");
 
         g = c.group("quicksort");
         g.setDirectory("heap/quicksort");
@@ -899,6 +908,10 @@ public class ProofCollections {
         g.provable("standard_key/quantifiers/normalisation12.key");
         g.provable("standard_key/quantifiers/normalisation13.key");
         g.provable("standard_key/quantifiers/triggers0.key");
+        g.provable("standard_key/quantifiers/affineArrayIndices.key");
+        g.provable("standard_key/quantifiers/issue3972MVE.key");
+        g.provable("standard_key/quantifiers/affineSeqIndices.key");
+        g.provable("standard_key/quantifiers/affineSeqSub.key");
 
 
         g = c.group("strings");
@@ -1206,6 +1219,14 @@ public class ProofCollections {
 
         g.loadable("Java/Records/Use.key");
         g.loadable("Java/Records/Constructor.key");
+
+        g = c.group("StipuLa");
+        g.provable("case-studies/stipula/behavior_run_bet.key");
+        g.provable("case-studies/stipula/behavior_run_bike.key");
+        g.provable("case-studies/stipula/behavior_run_donation.key");
+        g.provable("case-studies/stipula/behavior_run_license.key");
+        g.provable("case-studies/stipula/behavior_run_loanForUse.key");
+
 
         // use for debugging purposes.
         // c.keep("VSTTE10");

@@ -1,9 +1,11 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -55,6 +57,27 @@ public class KeYProgModelInfo {
     private final KeYJPMapping mapping;
     private final JP2KeYTypeConverter typeConverter;
     private final Map<KeYJavaType, Map<String, IProgramMethod>> implicits = new LinkedHashMap<>();
+
+    /**
+     * Caches subtype lookup. First it is a general win, but second JavaParser pretty prints AST
+     * nodes
+     * on every as part of checking assignability, which causes a lot of String creations.
+     * The cache is invalidated if the backing Java models number of types changes
+     * {@code subtypeCachedSize}.
+     */
+    private final Map<KeYJavaType, List<ResolvedReferenceTypeDeclaration>> subtypeCache =
+        new HashMap<>();
+
+    /** Size of the type model {@link #subtypeCache} was computed from. */
+    private int subtypeCachedSize = -1;
+
+    /**
+     * Caches locally declared fields; does not need to be invalidated as
+     * an existing class declaration is immutable
+     */
+    private final Map<KeYJavaType, ImmutableList<Field>> localDeclaredFields =
+        new ConcurrentHashMap<>();
+
 
     public KeYProgModelInfo(JavaService service) {
         this.typeConverter = service.getTypeConverter();
@@ -441,13 +464,19 @@ public class KeYProgModelInfo {
      * @param ct the class type whose fields are returned
      * @return the list of field members of the given type.
      */
-    public List<Field> getAllFieldsLocallyDeclaredIn(KeYJavaType ct) {
-        if (ct.getJavaType() instanceof ArrayType) {
-            return getVisibleArrayFields(ct);
+    public ImmutableList<Field> getAllFieldsLocallyDeclaredIn(KeYJavaType ct) {
+        ImmutableList<Field> fields = localDeclaredFields.get(ct);
+        if (fields == null) {
+            if (ct.getJavaType() instanceof ArrayType) {
+                fields = ImmutableList.fromList(getVisibleArrayFields(ct));
+            } else {
+                fields = ImmutableList.fromList(getReferenceType(ct)
+                        .map(r -> asKeYFieldsR(r.getDeclaredFields().stream()))
+                        .orElseGet(ArrayList::new));
+            }
+            localDeclaredFields.put(ct, fields);
         }
-        return getReferenceType(ct)
-                .map(r -> asKeYFieldsR(r.getDeclaredFields().stream()))
-                .orElseGet(ArrayList::new);
+        return fields;
     }
 
 
@@ -507,8 +536,38 @@ public class KeYProgModelInfo {
 
     /**
      * returns all proper subtypes of class <code>ct</code> (i.e. without <code>ct</code> itself)
+     *
+     * @return an unmodifiable list of all proper subtypes
      */
     private List<ResolvedReferenceTypeDeclaration> getAllRecoderSubtypes(KeYJavaType ct) {
+        final int size = rec2key().elemsRec().size();
+        synchronized (subtypeCache) {
+            if (size != subtypeCachedSize) {
+                subtypeCache.clear();
+                subtypeCachedSize = size;
+            }
+            List<ResolvedReferenceTypeDeclaration> hit = subtypeCache.get(ct);
+            if (hit != null) {
+                return hit;
+            }
+        }
+        // Computed outside the lock: this is the expensive part and it only reads the model.
+        final List<ResolvedReferenceTypeDeclaration> res =
+            Collections.unmodifiableList(computeAllRecoderSubtypes(ct));
+        synchronized (subtypeCache) {
+            // check if the number of known types has changed and invalidate cache if so
+            // assumes: no changes to existing types happen
+            if (rec2key().elemsRec().size() == subtypeCachedSize) {
+                subtypeCache.put(ct, res);
+            }
+        }
+        return res;
+    }
+
+    /**
+     * computes all proper subtypes of class <code>ct</code> (i.e. without <code>ct</code> itself)
+     */
+    private List<ResolvedReferenceTypeDeclaration> computeAllRecoderSubtypes(KeYJavaType ct) {
         final ResolvedType rt = getJavaParserType(ct);
         final ResolvedReferenceTypeDeclaration rtAsTypeDecl =
             rt.asReferenceType().getTypeDeclaration().get();

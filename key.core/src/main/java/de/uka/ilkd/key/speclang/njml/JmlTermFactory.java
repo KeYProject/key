@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang.njml;
 
 import java.util.*;
@@ -163,7 +164,7 @@ public final class JmlTermFactory {
             final JTerm sub1 = getFields(t.sub(1));
             return tb.union(sub0, sub1);
         } else if (t.op().equals(locSetLDT.getSingleton())) {
-            return tb.allObjects(t.sub(1));
+            return tb.allObjects(t.sub(0).sub(1));
         } else {
             throw exc.createException0("Inacceptable field expression: " + t);
         }

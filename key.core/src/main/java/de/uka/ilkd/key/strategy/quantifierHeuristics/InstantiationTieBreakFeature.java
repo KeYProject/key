@@ -1,11 +1,15 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.tiebreak.GenPolTieBreak;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.tiebreak.PolarityTieBreak;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.tiebreak.QuantifierInstantiationTieBreak;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
@@ -66,13 +70,13 @@ public class InstantiationTieBreakFeature implements Feature {
 
         final de.uka.ilkd.key.proof.Goal jgoal = (de.uka.ilkd.key.proof.Goal) goal;
         if (strategy == null) {
-            // classic orders instances by their position in the sequent alone
+            // the classic treatment orders instances by their position in the sequent alone
             return NumberRuleAppCost.getZeroCost();
         }
 
         final Term formula = pos.sequentFormula().formula();
         final Term instance = varInst.toTerm(app, pos, jgoal, mState);
         return Instantiation.computeTieBreak(instance, formula, goal.sequent(), jgoal,
-            (Services) goal.proof().getServices(), false, strategy);
+            (Services) goal.proof().getServices(), TriggerTreatment.BEST, strategy);
     }
 }

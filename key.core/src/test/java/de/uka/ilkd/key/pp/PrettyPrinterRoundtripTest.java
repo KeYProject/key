@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.pp;
 
 import java.net.URISyntaxException;
@@ -68,11 +69,11 @@ public class PrettyPrinterRoundtripTest {
     private static final String[] HEAP_CASES = {
         "self.f",
         "sub.f",
-        "select<[int]>(heap, sub, C::#f)",
-        "final<[int]>(self, C::#f)",
-        "\\forall Field f; select<[int]>(heap, self, C::#f) = 0",
+        "select<int>(heap, sub, C::#f)",
+        "final<int>(self, C::#f)",
+        "\\forall Field f; select<int>(heap, self, C::#f) = 0",
         "\\forall Field fvar; self.fvar = 0",
-        "\\forall Field fvar; final<[any]>(self, fvar) = 0",
+        "\\forall Field fvar; final<any>(self, fvar) = 0",
         "self.finf"
     };
 

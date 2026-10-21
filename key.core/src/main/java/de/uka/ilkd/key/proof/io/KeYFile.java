@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.FileNotFoundException;
@@ -256,7 +257,7 @@ public class KeYFile implements EnvInput {
         if (!bootClassPathFile.isAbsolute()) {
             // convert to absolute by resolving against the parent path of the parsed file
             Path parentDirectory = file.file().getParent();
-            bootClassPathFile = parentDirectory.resolve(bootClassPathFile);
+            bootClassPathFile = parentDirectory.resolve(bootClassPathFile).normalize();
         }
         if (!Files.isDirectory(bootClassPathFile)) {
             // Report the missing directory at the \bootclasspath declaration in the .key file,
@@ -297,7 +298,7 @@ public class KeYFile implements EnvInput {
             } else {
                 var f = Paths.get(normalizeStoredPath(cp));
                 if (!f.isAbsolute()) {
-                    f = parentDirectory.resolve(f);
+                    f = parentDirectory.resolve(f).normalize();
                 }
                 if (!Files.exists(f)) {
                     // Point at the \classpath declaration in the .key file instead of letting the
@@ -321,7 +322,10 @@ public class KeYFile implements EnvInput {
             if (!absFile.isAbsolute()) {
                 // convert to absolute by resolving against the parent path of the parsed file
                 Path parent = file.file().getParent();
-                absFile = parent.resolve(javaPath);
+                if (parent == null) {
+                    parent = Path.of(".");
+                }
+                absFile = parent.resolve(javaPath).normalize();
             }
             if (!Files.exists(absFile)) {
                 throw new ProofInputException(String.format(

@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.util.collection;
 
 import java.lang.reflect.Array;
@@ -111,6 +112,8 @@ public interface ImmutableList<T extends @Nullable Object>
     /// @param list the list to wrap
     /// @return an ImmutableList containing the elements of the input list
     static <T extends @Nullable Object> ImmutableList<T> fromList(List<T> list) {
+        // Used constructor is public one which copies list into an ArrayList, so
+        // no copy needed here
         return new ImmutableListList<>(list);
     }
 
@@ -123,9 +126,8 @@ public interface ImmutableList<T extends @Nullable Object>
     /// @param array the array to wrap
     /// @return an ImmutableList containing the elements of the input array
     static <T extends @Nullable Object> ImmutableList<T> fromArray(T[] array) {
-        return new ImmutableListArray<>(array);
+        return new ImmutableListArray<>(array.clone());
     }
-
 
     /// Return an empty immutable list.
     ///
@@ -161,7 +163,10 @@ public interface ImmutableList<T extends @Nullable Object>
             return of(es[0]);
         }
 
-        return new ImmutableListArray<>(es);
+        // we need to make a copy here since es can be an array that can be modified from the
+        // outside
+        // see ImmutableListArrayTest#immutability3
+        return new ImmutableListArray<>(es.clone());
     }
 
     /// the empty list
@@ -246,7 +251,10 @@ public interface ImmutableList<T extends @Nullable Object>
     /// @param array the array to prepend
     /// @return a new list with the array's elements at the beginning
     default ImmutableList<T> prepend(T... array) {
-        return new ImmutableListConcat<>(ImmutableList.fromArray(array), this);
+        // weigl: here we can use the leaky version
+        // ulbrich: no, we cannot. See TestIm
+        // see ImmutableListArrayTest#immutability4
+        return new ImmutableListConcat<>(new ImmutableListArray<>(array.clone()), this);
     }
 
     /// Appends a single element to this list.

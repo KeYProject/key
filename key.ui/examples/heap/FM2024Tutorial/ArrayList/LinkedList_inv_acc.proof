@@ -117,7 +117,7 @@
                (rule "andRight" (formula "8"))
                (branch "Case 1"
                   (rule "subsetSingletonLeft" (formula "8"))
-                  (rule "pullOutSelect" (formula "8") (term "2") (inst "selectSK=List_footprint_0"))
+                  (rule "pullOutSelect" (formula "8") (term "1") (inst "selectSK=List_footprint_0"))
                   (rule "simplifySelectOfAnon" (formula "1"))
                    (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "8")) (ifInst ""  (formula "4")))
                   (rule "elementOfSetMinus" (formula "1") (term "0,0"))
@@ -153,12 +153,12 @@
                   (rule "subsetSingletonLeft" (formula "8"))
                   (rule "replace_known_left" (formula "1") (term "0,0") (ifseqformula "8"))
                    (builtin "One Step Simplification" (formula "1"))
-                  (rule "applyEqReverse" (formula "16") (term "2") (ifseqformula "1"))
+                  (rule "applyEqReverse" (formula "16") (term "1") (ifseqformula "1"))
                   (rule "close" (formula "16") (ifseqformula "7"))
                )
                (branch "Case 2"
                   (rule "subsetSingletonLeft" (formula "8"))
-                  (rule "pullOutSelect" (formula "8") (term "2") (inst "selectSK=List_footprint_0"))
+                  (rule "pullOutSelect" (formula "8") (term "1") (inst "selectSK=List_footprint_0"))
                   (rule "simplifySelectOfAnon" (formula "1"))
                    (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "8")) (ifInst ""  (formula "4")))
                   (rule "elementOfSetMinus" (formula "1") (term "0,0"))
@@ -194,7 +194,7 @@
                   (rule "subsetSingletonLeft" (formula "8"))
                   (rule "replace_known_left" (formula "1") (term "0,0") (ifseqformula "8"))
                    (builtin "One Step Simplification" (formula "1"))
-                  (rule "applyEqReverse" (formula "16") (term "2") (ifseqformula "1"))
+                  (rule "applyEqReverse" (formula "16") (term "1") (ifseqformula "1"))
                   (rule "close" (formula "16") (ifseqformula "8"))
                )
             )
@@ -615,15 +615,15 @@
                      (rule "andLeft" (formula "7"))
                      (rule "andLeft" (formula "7"))
                      (rule "andLeft" (formula "7"))
-                     (rule "eqTermCut" (formula "16") (term "0,0,1") (inst "s=select<[Seq]>(heap, self, List::#seq)") (userinteraction))
+                     (rule "eqTermCut" (formula "16") (term "0,0,1") (inst "s=select<Seq>(heap, self, List::#seq)") (userinteraction))
                      (branch "Assume self.seq@heap[anon(allLocs setMinus self.footprint, anon_heap<<anonHeapFunction>>)] = self.seq"
                         (rule "applyEq" (formula "17") (term "0,0,1") (ifseqformula "1") (userinteraction))
-                        (rule "eqTermCut" (formula "17") (term "0,0,1,0") (inst "s=select<[Seq]>(heap, self, LinkedList::#nodeseq)") (userinteraction))
+                        (rule "eqTermCut" (formula "17") (term "0,0,1,0") (inst "s=select<Seq>(heap, self, LinkedList::#nodeseq)") (userinteraction))
                         (branch "Assume self.nodeseq@heap[anon(allLocs setMinus self.footprint, anon_heap<<anonHeapFunction>>)] = self.nodeseq"
                            (rule "applyEq" (formula "18") (term "0,0,1,0") (ifseqformula "1") (userinteraction))
                            (rule "instAll" (formula "18") (term "1,0,1,0") (ifseqformula "12") (userinteraction))
-                           (rule "eqTermCut" (formula "19") (term "0") (inst "s=select<[int]>(heap,
-            (Node)(seqGet<[any]>(select<[Seq]>(heap,
+                           (rule "eqTermCut" (formula "19") (term "0") (inst "s=select<int>(heap,
+            (Node)(seqGet<any>(select<Seq>(heap,
                                            self,
                                            LinkedList::#nodeseq),
                                i_0)),
@@ -893,7 +893,7 @@
                                     (rule "subsetSingletonLeft" (formula "12"))
                                     (rule "castedGetAny" (formula "20") (term "1,0"))
                                     (rule "castedGetAny" (formula "15") (term "0,0,0,0,0,1,0"))
-                                    (rule "castedGetAny" (formula "1") (term "0"))
+                                    (rule "castedGetAny" (formula "1") (term "0,0"))
                                     (rule "castedGetAny" (formula "16") (term "2,0"))
                                     (rule "castedGetAny" (formula "22") (term "1,1"))
                                     (rule "castedGetAny" (formula "22") (term "0"))
@@ -1323,9 +1323,9 @@
                                     (rule "andLeft" (formula "1") (userinteraction))
                                     (rule "notLeft" (formula "1") (userinteraction))
                                     (rule "notLeft" (formula "1") (userinteraction))
-                                    (rule "int_induction" (inst "b=(   lt(nv, select<[int]>(heap, self, LinkedList::#size))<<origin(\"User_Interaction @ node 41230 (int_induction)\",\"[]\")>>
- -> (  select<[boolean]>(heap,
-                       (Node)(seqGet<[any]>(select<[Seq]>(heap,
+                                    (rule "int_induction" (inst "b=(   lt(nv, select<int>(heap, self, LinkedList::#size))<<origin(\"User_Interaction @ node 41230 (int_induction)\",\"[]\")>>
+ -> (  select<boolean>(heap,
+                       (Node)(seqGet<any>(select<Seq>(heap,
                                                       self,
                                                       LinkedList::#nodeseq),
                                           nv)),
@@ -2416,7 +2416,7 @@
                                               (builtin "One Step Simplification" (formula "17"))
                                              (rule "commute_or_2" (formula "17") (term "0"))
                                              (rule "allLeft" (formula "15") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::#size))"))
+    select<int>(heap, self, LinkedList::#size))"))
                                              (rule "inEqSimp_homoInEq1" (formula "15") (term "1"))
                                              (rule "polySimp_mulComm0" (formula "15") (term "1,0,1"))
                                              (rule "polySimp_rightDist" (formula "15") (term "1,0,1"))
@@ -3539,7 +3539,7 @@
                    (builtin "One Step Simplification" (formula "15"))
                   (rule "commute_or_2" (formula "15") (term "0"))
                   (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::#size))"))
+    select<int>(heap, self, LinkedList::#size))"))
                   (rule "inEqSimp_homoInEq0" (formula "13") (term "1,0"))
                   (rule "polySimp_mulComm0" (formula "13") (term "1,0,1,0"))
                   (rule "polySimp_rightDist" (formula "13") (term "1,0,1,0"))
@@ -3583,7 +3583,7 @@
                    (builtin "One Step Simplification" (formula "13"))
                   (rule "notLeft" (formula "13"))
                   (rule "allLeft" (formula "14") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::#size))"))
+    select<int>(heap, self, LinkedList::#size))"))
                   (rule "eqSymm" (formula "14") (term "1"))
                   (rule "inEqSimp_homoInEq1" (formula "14") (term "1,0"))
                   (rule "polySimp_mulComm0" (formula "14") (term "1,0,1,0"))
@@ -3684,9 +3684,9 @@
                )
             )
             (branch "Case 2"
-               (rule "int_induction" (inst "b=(   lt(nv, select<[int]>(heap, self, LinkedList::#size))<<origin(\"User_Interaction @ node 9607 (int_induction)\",\"[]\")>>
- -> (  select<[boolean]>(heap,
-                       (Node)(seqGet<[any]>(select<[Seq]>(heap,
+               (rule "int_induction" (inst "b=(   lt(nv, select<int>(heap, self, LinkedList::#size))<<origin(\"User_Interaction @ node 9607 (int_induction)\",\"[]\")>>
+ -> (  select<boolean>(heap,
+                       (Node)(seqGet<any>(select<Seq>(heap,
                                                       self,
                                                       LinkedList::#nodeseq),
                                           nv)),
@@ -3733,7 +3733,7 @@
                   (rule "elementOfSetMinus" (formula "1") (term "0,0,0"))
                    (builtin "One Step Simplification" (formula "1"))
                   (rule "pullOutSelect" (formula "13") (term "0,2,0") (inst "selectSK=LinkedList_nodeseq_0"))
-                  (rule "applyEq" (formula "2") (term "0,0,0,0,0,0") (ifseqformula "1"))
+                  (rule "applyEq" (formula "2") (term "0,0,0,0,0,0,0") (ifseqformula "1"))
                   (rule "applyEq" (formula "2") (term "0,0,0,0,1,0,0") (ifseqformula "1"))
                   (rule "applyEq" (formula "2") (term "0,1,2,0") (ifseqformula "1"))
                   (rule "applyEq" (formula "2") (term "0,1,0,0,1,1,0,0") (ifseqformula "1"))
@@ -3874,7 +3874,7 @@
                   (rule "applyEqReverse" (formula "21") (term "0,2,0") (ifseqformula "1"))
                   (rule "applyEqReverse" (formula "2") (term "0,1,0,0,1,1,0,0") (ifseqformula "1"))
                   (rule "applyEqReverse" (formula "2") (term "0,1,1,0") (ifseqformula "1"))
-                  (rule "applyEqReverse" (formula "2") (term "0,0,0,0,0,0") (ifseqformula "1"))
+                  (rule "applyEqReverse" (formula "2") (term "0,0,0,0,0,0,0") (ifseqformula "1"))
                   (rule "applyEqReverse" (formula "2") (term "0,0,0,0,1,0,0") (ifseqformula "1"))
                   (rule "applyEqReverse" (formula "2") (term "0,1,2,0") (ifseqformula "1"))
                   (rule "hideAuxiliaryEq" (formula "1"))
@@ -4511,7 +4511,7 @@
                   (rule "polySimp_elimOne" (formula "17") (term "1,1,1,0,0,1,0"))
                   (rule "elementOfUnionEQ" (formula "3") (term "0,0") (ifseqformula "17"))
                    (builtin "One Step Simplification" (formula "3"))
-                  (rule "applyEqReverse" (formula "1") (term "0,0,0,0,0,0") (ifseqformula "3"))
+                  (rule "applyEqReverse" (formula "1") (term "0,0,0,0,0,0,0") (ifseqformula "3"))
                   (rule "applyEqReverse" (formula "1") (term "0,1,0,0,1,1,0,0") (ifseqformula "3"))
                   (rule "applyEqReverse" (formula "1") (term "0,1,2,0") (ifseqformula "3"))
                   (rule "applyEqReverse" (formula "1") (term "0,1,1,0") (ifseqformula "3"))
@@ -5850,7 +5850,7 @@
                         (rule "qeq_literals" (formula "3") (term "0,1"))
                          (builtin "One Step Simplification" (formula "3"))
                         (rule "allLeft" (formula "4") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::#size))"))
+    select<int>(heap, self, LinkedList::#size))"))
                         (rule "inEqSimp_homoInEq1" (formula "4") (term "1"))
                         (rule "polySimp_mulComm0" (formula "4") (term "1,0,1"))
                         (rule "polySimp_rightDist" (formula "4") (term "1,0,1"))
@@ -5993,7 +5993,7 @@
                         (rule "qeq_literals" (formula "4") (term "0,1"))
                          (builtin "One Step Simplification" (formula "4"))
                         (rule "allLeft" (formula "5") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::#size))"))
+    select<int>(heap, self, LinkedList::#size))"))
                         (rule "inEqSimp_homoInEq1" (formula "5") (term "1"))
                         (rule "polySimp_mulComm0" (formula "5") (term "1,0,1"))
                         (rule "polySimp_rightDist" (formula "5") (term "1,0,1"))

@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.taclettranslation.assumptions;
 
 import java.util.*;
@@ -459,7 +460,7 @@ public final class SupportedTaclets {
             "reachAddOne2", "reachUniquePathSameObject", "reachDependenciesStoreSimple",
             "reachDoesNotDependOnCreatedness", "reachDependenciesStore", "reachDependenciesAnon",
             "reachDependenciesAnonCoarse", "only_created_objects_are_reachable",
-            "reach_does_not_depend_on_fresh_locs", "reach_does_not_depend_on_fresh_locs_EQ"
+            "reach_does_not_depend_on_fresh_locs", "reach_does_not_depend_on_fresh_locsEQ"
 
         );
 

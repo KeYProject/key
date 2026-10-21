@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang;
 
 import java.nio.file.Path;
@@ -90,7 +91,7 @@ public class ContractFactoryTest {
                 @  signals_only RuntimeException;
                 @*/""";
         JTerm woLabels = calculateCombinedModifiableWOLabels(contract);
-        assertEquals("empty", woLabels.toString());
+        assertEquals("empty<Pair<java.lang.Object,Field>>", woLabels.toString());
     }
 
     /**
@@ -117,7 +118,7 @@ public class ContractFactoryTest {
                 @  signals_only RuntimeException;
                 @*/""";
         JTerm woLabels = calculateCombinedModifiableWOLabels(contract);
-        assertEquals("empty<<impl>>", woLabels.toString());
+        assertEquals("empty<Pair<java.lang.Object,Field>><<impl>>", woLabels.toString());
     }
 
     /**
@@ -144,9 +145,10 @@ public class ContractFactoryTest {
                 @  signals_only RuntimeException;
                 @*/""";
         JTerm woLabels = calculateCombinedModifiableWOLabels(contract);
-        assertEquals("intersect(if-then-else(equals(a,Z(5(#))),empty,allLocs),"
-            + "if-then-else(not(equals(a,Z(5(#)))),singleton(self,testPackage.TestClass::#l),"
-            + "allLocs))",
+        assertEquals(
+            "intersect<Pair<java.lang.Object,Field>>(if-then-else(equals(a,Z(5(#))),empty<Pair<java.lang.Object,Field>>,allLocs),"
+                + "if-then-else(not(equals(a,Z(5(#)))),singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(self,testPackage.TestClass::#l)),"
+                + "allLocs))",
             woLabels.toString());
     }
 

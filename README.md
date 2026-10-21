@@ -2,6 +2,7 @@
 
 [![Tests](https://github.com/KeYProject/key/actions/workflows/tests.yml/badge.svg)](https://github.com/KeYProject/key/actions/workflows/tests.yml) [![CodeQuality](https://github.com/KeYProject/key/actions/workflows/code_quality.yml/badge.svg)](https://github.com/KeYProject/key/actions/workflows/code_quality.yml)
 
+![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Fcentral.sonatype.com%2Frepository%2Fmaven-snapshots%2Forg%2Fkey-project%2Fkey.core%2Fmaven-metadata.xml&label=maven%20snapshots)
 ![Maven metadata URL](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo1.maven.org%2Fmaven2%2Forg%2Fkey-project%2Fkey.core%2Fmaven-metadata.xml&label=maven%20central)
 
 
@@ -17,7 +18,7 @@ For more information, refer to
   * [Verification of `java.util.IdentityHashMap`](https://doi.org/10.1007/978-3-031-07727-2_4),
   * [Google Award for analysing a bug in `LinkedList`](https://www.key-project.org/2023/07/23/cwi-researchers-win-google-award-for-finding-a-bug-in-javas-linkedlist-using-key/)
 
-The current version of KeY is 3.1.0-dev, licensed under GPL v2.
+The current version of KeY is 3.1.0-dev, licensed under GPL v2 or later.
 
 
 Feel free to use the project templates to get started using KeY:
@@ -29,7 +30,7 @@ Feel free to use the project templates to get started using KeY:
 
 * Hardware: >=2 GB RAM
 * Operating System: Linux/Unix, MacOSX, Windows
-* Java 21 or newer
+* Java 17 or newer
 * Optionally, KeY can make use of the following binaries:
   * SMT Solvers:
     * [Z3](https://github.com/Z3Prover/z3#z3)
@@ -74,6 +75,12 @@ Assuming you are in the directory of this README file, you can create a runnable
    ./gradlew :key.ui:shadowJar
    ```
    The file is generated in `key.ui/build/libs/key-*-exe.jar`.
+   A slim variant without the optional keyext extensions and the bundled examples is created with
+   ```sh
+   ./gradlew :key.ui:slimJar
+   ```
+   The file is generated in `key.ui/build/libs/key-*-slim-exe.jar`.
+   Both jars are also built as part of `./gradlew assemble`.
 
 5. A distribution is build with
    ```sh
@@ -120,6 +127,6 @@ Copyright (C) 2011-2026 Karlsruhe Institute of Technology, Germany
 						Technical University Darmstadt, Germany
 						Chalmers University of Technology, Sweden
 
-The KeY system is protected by the GNU General Public License.
+The KeY system is protected by the GNU General Public License, Version 2 or (at your option) any later version.
 See LICENSE.TXT for details.
 ```

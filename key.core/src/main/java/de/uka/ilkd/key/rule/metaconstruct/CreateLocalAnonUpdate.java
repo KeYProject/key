@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
@@ -16,6 +17,8 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableSet;
+
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
 /**
  * Expects a loop body and creates the anonymizing update
@@ -69,7 +72,8 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
     private static Function anonConstForPV(ProgramVariable pv, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
-        final Function anonFunc = new JFunction(anonFuncName, pv.sort(), true);
+        final Function anonFunc =
+            new JFunction(anonFuncName, pv.sort(), SKOLEM);
         services.getNamespaces().functions().addSafely(anonFunc);
 
         return anonFunc;

@@ -1,10 +1,14 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.JavaStrategy;
+import de.uka.ilkd.key.strategy.RuleAppCostCollector;
+import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
@@ -35,10 +39,20 @@ public abstract class FilterStrategy implements JavaStrategy {
     public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pio,
             G goal, MutableState mState) {
-        if (!isApprovedApp(app, pio, (de.uka.ilkd.key.proof.Goal) goal)) {
+        if (assumesMatched(app) && !isApprovedApp(app, pio, (de.uka.ilkd.key.proof.Goal) goal)) {
             return TopRuleAppCost.INSTANCE;
         }
         return delegate.computeCost(app, pio, goal, mState);
+    }
+
+    /**
+     * Checks that the assumes clause of a taclet is empty or instantiated
+     *
+     * @param app the rule application being costed
+     * @return whether a taclet application has its assumes clause matched
+     */
+    private static boolean assumesMatched(RuleApp app) {
+        return !(app instanceof TacletApp tacletApp) || tacletApp.assumesInstantionsComplete();
     }
 
     @Override

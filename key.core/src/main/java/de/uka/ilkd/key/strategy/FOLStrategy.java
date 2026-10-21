@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashSet;
@@ -32,6 +33,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.ComponentStrategy;
+import org.key_project.prover.strategy.costbased.CostBand;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
@@ -43,6 +45,7 @@ import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.strategy.FOLCost.*;
 import static de.uka.ilkd.key.strategy.StaticFeatureCollection.*;
 
 /// Strategy for general FOL rules. This does not consider other
@@ -69,7 +72,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
     public FOLStrategy(Proof proof, StrategyProperties strategyProperties) {
         super(proof);
 
-        this.strategyProperties = (StrategyProperties) strategyProperties.clone();
+        this.strategyProperties = strategyProperties.clone();
 
         this.tf = new JavaArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
@@ -85,7 +88,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
 
     private Feature setUpGlobalF(RuleSetDispatchFeature d) {
         final Feature oneStepSimplificationF =
-            oneStepSimplificationFeature(longConst(-11000));
+            oneStepSimplificationFeature(CostBand.REWRITE.cost());
         return add(d, oneStepSimplificationF);
     }
 
@@ -98,20 +101,20 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
     private RuleSetDispatchFeature setupCostComputationF() {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
-        bindRuleSet(d, "closure", -15000);
-        bindRuleSet(d, "alpha", -7000);
-        bindRuleSet(d, "delta", -6000);
-        bindRuleSet(d, "simplify_boolean", -200);
+        bindRuleSet(d, "closure", CostBand.CLOSE.cost());
+        bindRuleSet(d, "alpha", CostBand.DECOMPOSE.cost());
+        bindRuleSet(d, "delta", CostBand.TYPE.cost());
+        bindRuleSet(d, "simplify_boolean", CostBand.PREFER.at(300));
 
         final Feature findDepthFeature =
             FindDepthFeature.getInstance();
 
         bindRuleSet(d, "concrete",
-            add(longConst(-11000),
+            add(CostBand.REWRITE.cost(),
                 ScaleFeature.createScaled(findDepthFeature, 10.0)));
-        bindRuleSet(d, "simplify", -4500);
-        bindRuleSet(d, "simplify_enlarging", -2000);
-        bindRuleSet(d, "simplify_ENLARGING", -1900);
+        bindRuleSet(d, "simplify", CostBand.SIMPLIFY.cost());
+        bindRuleSet(d, "simplify_enlarging", CostBand.ENLARGE.cost());
+        bindRuleSet(d, "simplify_ENLARGING", CostBand.ENLARGE.at(100));
 
         // always give infinite cost to obsolete rules
         bindRuleSet(d, "obsolete", inftyConst());
@@ -124,46 +127,54 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
                 StaticFeatureCollection::eq))));
 
         bindRuleSet(d, "update_elim",
-            add(longConst(-8000), ScaleFeature.createScaled(findDepthFeature, 10.0)));
+            add(CostBand.ELIMINATE.cost(),
+                ScaleFeature.createScaled(findDepthFeature, 10.0)));
         bindRuleSet(d, "update_apply_on_update",
-            add(longConst(-7000), ScaleFeature.createScaled(findDepthFeature, 10.0)));
-        bindRuleSet(d, "update_join", -4600);
-        bindRuleSet(d, "update_apply", -4500);
+            add(CostBand.DECOMPOSE.cost(),
+                ScaleFeature.createScaled(findDepthFeature, 10.0)));
+        bindRuleSet(d, "update_join", CostBand.SIMPLIFY.at(-100));
+        bindRuleSet(d, "update_apply", CostBand.SIMPLIFY.cost());
 
         setupSplitting(d);
 
         bindRuleSet(d, "gamma", add(not(isInstantiated("t")),
-            ifZero(allowQuantifierSplitting(), longConst(0), longConst(50))));
+            ifZero(allowQuantifierSplitting(), CostBand.DEFAULT.cost(),
+                CostBand.DEFAULT.at(50))));
         bindRuleSet(d, "gamma_destructive", inftyConst());
 
-        bindRuleSet(d, "triggered", add(not(isTriggerVariableInstantiated()), longConst(500)));
+        bindRuleSet(d, "triggered",
+            add(not(isTriggerVariableInstantiated()), CostBand.DEFER.cost()));
 
         bindRuleSet(d, "comprehension_split",
             add(applyTF(FocusFormulaProjection.INSTANCE, ff.notContainsExecutable),
-                ifZero(allowQuantifierSplitting(), longConst(2500), longConst(5000))));
+                ifZero(allowQuantifierSplitting(), CostBand.DEFER.at(2000),
+                    CostBand.DEFER.at(4500))));
 
         setupReplaceKnown(d);
 
         setupEquationReasoning(d);
 
         bindRuleSet(d, "order_terms",
-            add(termSmallerThan("commEqLeft", "commEqRight"), longConst(-5000)));
+            add(termSmallerThan("commEqLeft", "commEqRight"),
+                CostBand.NORMALIZE.cost()));
 
         bindRuleSet(d, "simplify_instanceof_static",
-            add(EqNonDuplicateAppFeature.INSTANCE, longConst(-500)));
+            add(EqNonDuplicateAppFeature.INSTANCE, CostBand.PREFER.cost()));
 
-        bindRuleSet(d, "evaluate_instanceof", longConst(-500));
+        bindRuleSet(d, "evaluate_instanceof", CostBand.PREFER.cost());
 
         bindRuleSet(d, "instanceof_to_exists", TopLevelFindFeature.ANTEC);
 
         bindRuleSet(d, "try_apply_subst",
-            add(EqNonDuplicateAppFeature.INSTANCE, longConst(-10000)));
+            add(EqNonDuplicateAppFeature.INSTANCE, CostBand.SUBST.cost()));
 
         // delete cast
         bindRuleSet(d, "cast_deletion",
-            ifZero(implicitCastNecessary(instOf("castedTerm")), longConst(-5000), inftyConst()));
+            ifZero(implicitCastNecessary(instOf("castedTerm")),
+                CostBand.NORMALIZE.cost(),
+                inftyConst()));
 
-        bindRuleSet(d, "type_hierarchy_def", -6500);
+        bindRuleSet(d, "type_hierarchy_def", CostBand.TYPE.at(-500));
 
         bindRuleSet(d, "cut", not(isInstantiated("cutFormula")));
 
@@ -284,28 +295,24 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
 
     protected void setupFormulaNormalisation(RuleSetDispatchFeature d) {
         bindRuleSet(d, "negationNormalForm", add(BelowBinderFeature.getInstance(),
-            longConst(-500),
+            CostBand.PREFER.cost(),
             ScaleFeature.createScaled(FindDepthFeature.getInstance(), 10.0)));
 
         bindRuleSet(d, "moveQuantToLeft",
-            add(quantifiersMightSplit() ? longConst(0)
+            add(quantifiersMightSplit() ? CostBand.DEFAULT.cost()
                     : applyTF(FocusFormulaProjection.INSTANCE, ff.quantifiedPureLitConjDisj),
-                longConst(-550)));
+                CostBand.PREFER.at(-50)));
 
         bindRuleSet(d, "conjNormalForm",
             ifZero(
                 add(or(FocusInAntecFeature.getInstance(), notBelowQuantifier()),
                     NotInScopeOfModalityFeature.INSTANCE),
-                add(longConst(-150),
+                add(longConst(CombinationCost.CNF_CONVERSION),
                     ScaleFeature.createScaled(FindDepthFeature.getInstance(), 20)),
                 inftyConst()));
 
-        bindRuleSet(d, "setEqualityBlastingRight", longConst(-100));
-
-
-
-        bindRuleSet(d, "elimQuantifier", -1000);
-        bindRuleSet(d, "elimQuantifierWithCast", 50);
+        bindRuleSet(d, "elimQuantifier", CostBand.PREFER.at(-500));
+        bindRuleSet(d, "elimQuantifierWithCast", CostBand.DEFAULT.at(50));
 
         final TermBuffer left = new TermBuffer();
         final TermBuffer right = new TermBuffer();
@@ -313,7 +320,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
             add(let(left, instOf("applyEqLeft"),
                 let(right, instOf("applyEqRight"),
                     TermSmallerThanFeature.create(right, left))),
-                longConst(-150)));
+                longConst(CombinationCost.CNF_CONVERSION)));
 
         bindRuleSet(d, "distrQuantifier",
             add(or(
@@ -325,28 +332,30 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
                     ifZero(FocusInAntecFeature.getInstance(),
                         applyTF(FocusProjection.INSTANCE, sub(ff.andF)),
                         applyTF(FocusProjection.INSTANCE, sub(ff.orF))))),
-                longConst(-300)));
+                longConst(QUANTIFIER_DISTRIBUTION)));
 
         bindRuleSet(d, "swapQuantifiers",
             add(applyTF(FocusProjection.INSTANCE, add(ff.quantifiedClauseSet,
                 EliminableQuantifierTF.INSTANCE, sub(not(EliminableQuantifierTF.INSTANCE)))),
-                longConst(-300)));
+                longConst(QUANTIFIER_DISTRIBUTION)));
 
         // category "conjunctive normal form"
 
         bindRuleSet(d, "cnf_orAssoc",
             SumFeature.createSum(applyTF("assoc0", ff.clause),
-                applyTF("assoc1", ff.clause), applyTF("assoc2", ff.literal), longConst(-80)));
+                applyTF("assoc1", ff.clause), applyTF("assoc2", ff.literal),
+                longConst(CNF_RESTRUCTURE - 45)));
 
         bindRuleSet(d, "cnf_andAssoc",
             SumFeature.createSum(applyTF("assoc0", ff.clauseSet),
-                applyTF("assoc1", ff.clauseSet), applyTF("assoc2", ff.clause), longConst(-10)));
+                applyTF("assoc1", ff.clauseSet), applyTF("assoc2", ff.clause),
+                longConst(CNF_RESTRUCTURE + 25)));
 
         bindRuleSet(d, "cnf_dist",
             SumFeature.createSum(applyTF("distRight0", ff.clauseSet),
                 applyTF("distRight1", ff.clauseSet), ifZero(applyTF("distLeft", ff.clause),
-                    longConst(-15), applyTF("distLeft", ff.clauseSet)),
-                longConst(-35)));
+                    longConst(CNF_RESTRUCTURE + 20), applyTF("distLeft", ff.clauseSet)),
+                longConst(CNF_RESTRUCTURE)));
 
         final TermBuffer superFor = new TermBuffer();
         final Feature onlyBelowQuanAndOr =
@@ -368,13 +377,16 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
             add(isBelow(OperatorClassTF.create(Quantifier.class)), onlyBelowQuanAndOr, applyTF(
                 FocusProjection.create(0), sub(ff.quantifiedClauseSet, ff.quantifiedClauseSet)));
 
-        bindRuleSet(d, "pullOutQuantifierUnifying", -20);
+        bindRuleSet(d, "pullOutQuantifierUnifying", PULL_OUT_QUANTIFIER);
 
         bindRuleSet(d, "pullOutQuantifierAll", add(pullOutQuantifierAllowed,
-            ifZero(FocusInAntecFeature.getInstance(), longConst(-20), longConst(-40))));
+            ifZero(FocusInAntecFeature.getInstance(), longConst(PULL_OUT_QUANTIFIER),
+                longConst(PULL_OUT_QUANTIFIER_REVERSE))));
 
         bindRuleSet(d, "pullOutQuantifierEx", add(pullOutQuantifierAllowed,
-            ifZero(FocusInAntecFeature.getInstance(), longConst(-40), longConst(-20))));
+            ifZero(FocusInAntecFeature.getInstance(),
+                longConst(PULL_OUT_QUANTIFIER_REVERSE),
+                longConst(PULL_OUT_QUANTIFIER))));
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -389,7 +401,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
         if (quantifierInstantiatedEnabled()) {
             final TermBuffer varInst = new TermBuffer();
             final Feature branchPrediction = InstantiationCostScalerFeature
-                    .create(InstantiationCost.create(varInst, classicTriggers()),
+                    .create(InstantiationCost.create(varInst, triggerTreatment()),
                         allowQuantifierSplitting());
 
             bindRuleSet(d, "gamma",
@@ -398,9 +410,10 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
                         add(ff.quantifiedClauseSet,
                             instQuantifiersWithQueries() ? longTermConst(0)
                                     : ff.notContainsExecutable)),
-                    forEach(varInst, HeuristicInstantiation.forOption(classicTriggers()),
+                    forEach(varInst, HeuristicInstantiation.forOption(triggerTreatment()),
                         add(instantiate("t", varInst),
-                            add(branchPrediction, longConst(10),
+                            add(branchPrediction,
+                                CostBand.DEFAULT.at(10),
                                 // orders candidates of one predicted-cost band by their
                                 // connection to the sequent instead of formula position
                                 InstantiationTieBreakFeature.create(varInst,
@@ -409,8 +422,8 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
 
             bindRuleSet(d, "triggered",
                 SumFeature.createSum(forEach(splitInst, TriggeredInstantiations.create(true),
-                    add(instantiateTriggeredVariable(splitInst), longConst(500))),
-                    longConst(1500)));
+                    add(instantiateTriggeredVariable(splitInst), CostBand.DEFER.cost())),
+                    CostBand.DEFER.at(1000)));
 
         } else {
             bindRuleSet(d, "gamma", inftyConst());
@@ -423,10 +436,10 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
             final TermBuffer varInst = new TermBuffer();
 
             bindRuleSet(d, "gamma", add(isInstantiated("t"),
-                not(sum(varInst, HeuristicInstantiation.forOption(classicTriggers()),
+                not(sum(varInst, HeuristicInstantiation.forOption(triggerTreatment()),
                     not(StaticFeatureCollection.eq(instOf("t"), varInst)))),
                 InstantiationCostScalerFeature.create(
-                    InstantiationCost.create(instOf("t"), classicTriggers()),
+                    InstantiationCost.create(instOf("t"), triggerTreatment()),
                     longConst(0))));
 
             final TermBuffer splitInst = new TermBuffer();
@@ -457,15 +470,18 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
     private void setupReplaceKnown(RuleSetDispatchFeature d) {
         final Feature commonF =
             add(ifZero(MatchedAssumesFeature.INSTANCE, DiffFindAndIfFeature.INSTANCE),
-                longConst(-5000),
+                CostBand.NORMALIZE.cost(),
                 add(DiffFindAndReplacewithFeature.INSTANCE,
                     ScaleFeature.createScaled(CountMaxDPathFeature.INSTANCE, 10.0)));
 
         bindRuleSet(d, "replace_known_left", commonF);
 
         bindRuleSet(d, "replace_known_right",
-            add(commonF, ifZero(directlyBelowSymbolAtIndex(Junctor.IMP, 1), longConst(100),
-                ifZero(directlyBelowSymbolAtIndex(Equality.EQV, -1), longConst(100)))));
+            add(commonF,
+                ifZero(directlyBelowSymbolAtIndex(Junctor.IMP, 1),
+                    longConst(REPLACE_KNOWN_UNDER_CONNECTIVE),
+                    ifZero(directlyBelowSymbolAtIndex(Equality.EQV, -1),
+                        longConst(REPLACE_KNOWN_UNDER_CONNECTIVE)))));
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -482,9 +498,10 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
             sum(subFor, AllowedCutPositionsGenerator.INSTANCE, not(applyTF(subFor, ff.cutAllowed)));
         bindRuleSet(d, "beta",
             SumFeature.createSum(noCutsAllowed,
-                ifZero(PurePosDPathFeature.INSTANCE, longConst(-200)),
+                ifZero(PurePosDPathFeature.INSTANCE, CostBand.PREFER.at(300)),
                 ScaleFeature.createScaled(CountPosDPathFeature.INSTANCE, -3.0),
-                ScaleFeature.createScaled(CountMaxDPathFeature.INSTANCE, 10.0), longConst(20)));
+                ScaleFeature.createScaled(CountMaxDPathFeature.INSTANCE, 10.0),
+                CostBand.DEFAULT.at(20)));
         TermBuffer superF = new TermBuffer();
         final ProjectionToTerm<Goal> splitCondition = sub(FocusProjection.INSTANCE, 0);
         bindRuleSet(d, "split_cond", add(// do not split over formulas containing auxiliary
@@ -500,7 +517,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
             sum(superF, SuperTermGenerator.upwards(any(), getServices()),
                 applyTF(superF, not(ff.elemUpdate))),
             ifZero(applyTF(FocusProjection.INSTANCE, ContainsExecutableCodeTermFeature.PROGRAMS),
-                longConst(-100), longConst(25))));
+                CostBand.DEFAULT.at(-100), CostBand.DEFAULT.at(25))));
         ProjectionToTerm<Goal> cutFormula = instOf("cutFormula");
         Feature countOccurrencesInSeq =
             ScaleFeature.createAffine(countOccurrences(cutFormula), -10, 10);
@@ -516,13 +533,14 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
                                     // auxiliary variables
                                     rec(any(), not(selectSkolemConstantTermFeature())))),
                                 countOccurrencesInSeq, // standard costs
-                                longConst(100)),
+                                longConst(CUT_DIRECT_STANDARD)),
                             SumFeature // check for cuts below quantifiers
                                     .createSum(applyTF(cutFormula, ff.cutAllowedBelowQuantifier),
                                         applyTF(FocusFormulaProjection.INSTANCE,
                                             ff.quantifiedClauseSet),
-                                        ifZero(allowQuantifierSplitting(), longConst(0),
-                                            longConst(100))))));
+                                        ifZero(allowQuantifierSplitting(),
+                                            CostBand.DEFAULT.cost(),
+                                            longConst(CUT_DIRECT_STANDARD))))));
     }
 
     private void setupSplittingApproval(RuleSetDispatchFeature d) {
@@ -571,7 +589,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
                             let(left, sub(equation, 0),
                                 let(right, sub(equation, 1),
                                     TermSmallerThanFeature.create(right, left))))))),
-                longConst(-4000)));
+                longConst(CombinationCost.ORDERED_REWRITING)));
 
         bindRuleSet(d, "insert_eq_nonrigid",
             applyTF(FocusProjection.create(0), IsNonRigidTermFeature.INSTANCE));
@@ -614,9 +632,9 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
         return strategyProperties.getProperty(StrategyProperties.TRIGGERS_OPTIONS_KEY);
     }
 
-    /** whether the classic trigger selection is in effect for this strategy */
-    private boolean classicTriggers() {
-        return StrategyProperties.TRIGGERS_CLASSIC.equals(triggersOption());
+    /** how much the quantifier heuristic is told about the theories in this strategy */
+    private TriggerTreatment triggerTreatment() {
+        return TriggerTreatment.forOption(triggersOption());
     }
 
     private boolean quantifierInstantiatedEnabled() {

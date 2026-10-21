@@ -3,5 +3,5 @@ contains:
 expected: VALID
 keySrc: |-
   \problem {
-     instance<[any]>(FALSE) = TRUE
+     instance<any>(FALSE) = TRUE
   }

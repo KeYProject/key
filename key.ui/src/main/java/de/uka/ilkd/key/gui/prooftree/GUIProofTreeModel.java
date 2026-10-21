@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.util.*;
@@ -17,6 +18,7 @@ import de.uka.ilkd.key.proof.*;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +41,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(GUIProofTreeModel.class);
 
     private static final long serialVersionUID = 4253914848471158358L;
-    private final Proof proof;
+    private @Nullable Proof proof;
     private final ProofTreeListener proofTreeListener;
     private NodeFilter activeNodeFilter = null;
 
@@ -86,6 +88,22 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
         };
 
         proof.openGoals().forEach(g -> g.addGoalListener(goalListener));
+    }
+
+    /**
+     * Cleanup after a proof is disposed/abandoned to avoid memory leaks
+     */
+    public synchronized void clear() {
+        if (proof != null) {
+            proof.removeProofTreeListener(proofTreeListener);
+        }
+        proofTreeNodes.values().forEach(GUIAbstractTreeNode::flushCache);
+        proofTreeNodes.clear();
+        synchronized (branchNodes) {
+            branchNodes.values().forEach(GUIAbstractTreeNode::flushCache);
+            branchNodes.clear();
+        }
+        proof = null;
     }
 
     class ProofTreeListener extends ProofTreeAdapter {
@@ -172,11 +190,15 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * changes in the proof tree anymore.
      */
     public void unregister() {
-        proof.removeProofTreeListener(proofTreeListener);
+        if (proof != null) {
+            proof.removeProofTreeListener(proofTreeListener);
+        }
     }
 
     public void register() {
-        proof.addProofTreeListener(proofTreeListener);
+        if (proof != null) {
+            proof.addProofTreeListener(proofTreeListener);
+        }
     }
 
 
@@ -185,7 +207,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      */
     public synchronized void setAttentive(boolean b) {
         LOGGER.debug("setAttentive: {}", b);
-        if (b != attentive && !proof.isDisposed()) {
+        if (b != attentive && proof != null && !proof.isDisposed()) {
             if (b) {
                 proof.addProofTreeListener(proofTreeListener);
                 // updateTree(null);
@@ -368,8 +390,8 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * @return the root of the tree
      */
     @Override
-    public synchronized Object getRoot() {
-        return getBranchNode(proof.root(), "Proof Tree");
+    public synchronized @Nullable Object getRoot() {
+        return proof == null ? null : getBranchNode(proof.root(), "Proof Tree");
     }
 
     /**
@@ -409,6 +431,9 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * @param trn tree node to update.
      */
     private synchronized void updateTree(GUIAbstractTreeNode trn) {
+        if (proof == null) {
+            return;
+        }
 
         // The proof may have changed; drop the search filter's memoized match information so the
         // collapsing search reflects the new proof state. A changed match anywhere can also change

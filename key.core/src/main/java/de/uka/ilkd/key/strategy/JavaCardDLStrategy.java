@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashSet;
@@ -8,7 +9,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.QueryExpand;
@@ -19,6 +20,8 @@ import de.uka.ilkd.key.strategy.termfeature.*;
 import de.uka.ilkd.key.strategy.termgenerator.HeapGenerator;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
+import org.key_project.logic.op.Function;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.IBuiltInRule;
@@ -26,14 +29,20 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.ComponentStrategy;
+import org.key_project.prover.strategy.costbased.CostBand;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
+import org.key_project.prover.strategy.costbased.termfeature.TermPredicateTermFeature;
+import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGenerator;
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.strategy.HeapSelectCost.*;
+import static de.uka.ilkd.key.strategy.JavaCardDLCost.*;
 import static de.uka.ilkd.key.strategy.StaticFeatureCollection.*;
 
 /// This strategy is the catch-all for Java related features that are either
@@ -130,7 +139,8 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         final SetRuleFilter depFilter = new SetRuleFilter();
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
         if (depProp.equals(StrategyProperties.DEP_ON)) {
-            depSpecF = ConditionalFeature.createConditional(depFilter, longConst(250));
+            depSpecF = ConditionalFeature.createConditional(depFilter,
+                longConst(DEPENDENCY_CONTRACT));
         } else {
             depSpecF = ConditionalFeature.createConditional(depFilter, inftyConst());
         }
@@ -153,15 +163,38 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
 
+    /**
+     * @return the minimal length before the heap term is pulled out in an eequation
+     *         length <code>0</code> means no pull out happens at all
+     */
+    private int getHeapSizeBound() {
+        return switch (strategyProperties.getProperty(
+            StrategyProperties.HEAP_REDUCTION_OPTIONS_KEY,
+            StrategyProperties.HEAP_REDUCTION_NORMAL)) {
+            case StrategyProperties.HEAP_REDUCTION_NORMAL ->
+                StrategyProperties.HEAP_REDUCTION_NORMAL_BOUND;
+            case StrategyProperties.HEAP_REDUCTION_DELAYED ->
+                StrategyProperties.HEAP_REDUCTION_DELAYED_BOUND;
+            default -> 0;
+        };
+    }
+
     private RuleSetDispatchFeature setupCostComputationF() {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
         bindRuleSet(d, "semantics_blasting", inftyConst());
+
+        final int pullOutHeapSize = getHeapSizeBound();
+        bindRuleSet(d, "pull_out_heap",
+            pullOutHeapSize <= 0 ? inftyConst() : pullOutHeap(pullOutHeapSize));
+        bindRuleSet(d, "derive_inequality", longConst(DERIVE_INEQUALITY));
         bindRuleSet(d, "simplify_heap_high_costs", inftyConst());
 
         bindRuleSet(d, "javaIntegerSemantics",
-            ifZero(sequentContainsNoPrograms(), longConst(-5000), ifZero(
-                leq(CountBranchFeature.INSTANCE, longConst(1)), longConst(-5000), inftyConst())));
+            ifZero(sequentContainsNoPrograms(), longConst(JAVA_INTEGER_SEMANTICS),
+                ifZero(
+                    leq(CountBranchFeature.INSTANCE, longConst(1)),
+                    longConst(JAVA_INTEGER_SEMANTICS), inftyConst())));
 
         setupSelectSimplification(d);
 
@@ -170,35 +203,25 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         bindRuleSet(d, "test_gen_quan", inftyConst());
         bindRuleSet(d, "test_gen_quan_num", inftyConst());
 
-        // This is moved here instead of FOLStrategy, because it deals only w/ loc sets
-        if (!StrategyProperties.QUANTIFIERS_NONE
-                .equals(
-                    strategyProperties.getProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY))) {
-            final LocSetLDT locSetLDT = getServices().getTypeConverter().getLocSetLDT();
-            bindRuleSet(d, "cnf_setComm",
-                add(SetsSmallerThanFeature.create(instOf("commRight"), instOf("commLeft"),
-                    locSetLDT),
-                    NotInScopeOfModalityFeature.INSTANCE, longConst(-800)));
-        } else {
-            bindRuleSet(d, "cnf_setComm", inftyConst());
-        }
-
         bindRuleSet(d, "simplify_literals",
             // ifZero ( ConstraintStrengthenFeatureUC.create(proof),
             // longConst ( 0 ),
-            longConst(-8000));
+            CostBand.ELIMINATE.cost());
 
         bindRuleSet(d, "nonDuplicateAppCheckEq", EqNonDuplicateAppFeature.INSTANCE);
 
         // TODO: rename rule set?
         bindRuleSet(d, "comprehensions",
-            add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(-50)));
+            add(NonDuplicateAppModPositionFeature.INSTANCE,
+                longConst(COMPREHENSION)));
 
         bindRuleSet(d, "comprehensions_high_costs",
-            add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(10000)));
+            add(NonDuplicateAppModPositionFeature.INSTANCE,
+                longConst(COMPREHENSION_ENLARGE)));
 
         bindRuleSet(d, "comprehensions_low_costs",
-            add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(-5000)));
+            add(NonDuplicateAppModPositionFeature.INSTANCE,
+                longConst(COMPREHENSION_SIMPLIFY)));
 
         // features influenced by the strategy options
         /*
@@ -210,13 +233,13 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
             strategyProperties.getProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY);
         switch (queryAxProp) {
             case StrategyProperties.QUERYAXIOM_ON ->
-                bindRuleSet(d, "query_axiom", longConst(-3000));
+                bindRuleSet(d, "query_axiom", CostBand.SOLVE.cost());
             case StrategyProperties.QUERYAXIOM_OFF -> bindRuleSet(d, "query_axiom", inftyConst());
             default -> throw new RuntimeException("Unexpected strategy property " + queryAxProp);
         }
 
         if (classAxiomApplicationEnabled()) {
-            bindRuleSet(d, "classAxiom", longConst(-250));
+            bindRuleSet(d, "classAxiom", longConst(CLASS_AXIOM));
         } else {
             bindRuleSet(d, "classAxiom", inftyConst());
         }
@@ -227,15 +250,18 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
 
         // partial inv axiom
         bindRuleSet(d, "partialInvAxiom",
-            add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(10000)));
+            add(NonDuplicateAppModPositionFeature.INSTANCE,
+                CostBand.DEFER_STRONG.cost()));
 
         // inReachableState
         bindRuleSet(d, "inReachableStateImplication",
-            add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(100)));
+            add(NonDuplicateAppModPositionFeature.INSTANCE,
+                longConst(IN_REACHABLE_STATE)));
 
         // limit observer (must have better priority than "classAxiom")
         bindRuleSet(d, "limitObserver",
-            add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(-200)));
+            add(NonDuplicateAppModPositionFeature.INSTANCE,
+                longConst(LIMIT_OBSERVER)));
 
         setupUserTaclets(d);
 
@@ -243,7 +269,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
 
         // chrisg: The following rule, if active, must be applied delta rules.
         if (autoInductionEnabled()) {
-            bindRuleSet(d, "auto_induction", -6500); // chrisg
+            bindRuleSet(d, "auto_induction", AUTO_INDUCTION); // chrisg
         } else {
             bindRuleSet(d, "auto_induction", inftyConst()); // chrisg
         }
@@ -251,12 +277,12 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         // chrisg: The following rule is a beta rule that, if active, must have
         // a higher priority than other beta rules.
         if (autoInductionLemmaEnabled()) {
-            bindRuleSet(d, "auto_induction_lemma", -300);
+            bindRuleSet(d, "auto_induction_lemma", AUTO_INDUCTION_LEMMA);
         } else {
             bindRuleSet(d, "auto_induction_lemma", inftyConst());
         }
 
-        bindRuleSet(d, "information_flow_contract_appl", longConst(1000000));
+        bindRuleSet(d, "information_flow_contract_appl", CostBand.LAST_RESORT.cost());
 
         if (strategyProperties.contains(StrategyProperties.AUTO_INDUCTION_ON)
                 || strategyProperties.contains(StrategyProperties.AUTO_INDUCTION_LEMMA_ON)) {
@@ -279,8 +305,9 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
             // function symbol)
             add(applyTF("h",
                 not(or(PrimitiveHeapTermFeature.create(heapLDT), anonHeapTermFeature()))),
-                ifZero(applyTF(FocusFormulaProjection.INSTANCE, ff.update), longConst(-4200),
-                    longConst(-1900)),
+                ifZero(applyTF(FocusFormulaProjection.INSTANCE, ff.update),
+                    longConst(PULL_OUT_SELECT_BELOW_UPDATE),
+                    longConst(PULL_OUT_SELECT)),
                 NonDuplicateAppModPositionFeature.INSTANCE));
         bindRuleSet(d, "apply_select_eq",
             // replace non-simplified select by the skolem constant
@@ -288,9 +315,9 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
             // needs to be not simplified yet; additional restrictions
             // in isApproved()
             ifZero(applyTF("s", not(rec(any(), SimplifiedSelectTermFeature.create(heapLDT)))),
-                // together with the costs of apply_equations the
-                // resulting costs are about -5700
-                longConst(-1700)));
+                // the applyEq taclet also carries apply_equations, so the dispatch sums the
+                // bindings; the tuned sum is CombinationCost.APPLY_SELECT_EQ_EFFECTIVE
+                longConst(APPLY_SELECT_EQ)));
         bindRuleSet(d, "simplify_select",
             // simplify_select term in pulled out equation (right hand
             // side has to be a skolem constant which has been
@@ -300,25 +327,32 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
             add(isSelectSkolemConstantTerm("sk"),
                 applyTF(sub(FocusProjection.INSTANCE, 0),
                     not(SimplifiedSelectTermFeature.create(heapLDT))),
-                longConst(-5600)));
+                longConst(SIMPLIFY_SELECT)));
         bindRuleSet(d, "simplify_select_concrete", longConst(-6000));
         bindRuleSet(d, "simplify_select_elim_store", longConst(-7000));
         bindRuleSet(d, "apply_auxiliary_eq",
-            // replace skolem constant by it's computed value
-            add(isSelectSkolemConstantTerm("t1"), longConst(-5500)));
+            // replace a skolem constant by its computed value
+            add(isSelectSkolemConstantTerm("t1"), longConst(APPLY_AUXILIARY_EQ)));
+        // hide an auxiliary equation once the skolem constant has been replaced by its value
+        final Feature hideReplacedAuxiliaryEq = add(isSelectSkolemConstantTerm("auxiliarySK"),
+            applyTF("result",
+                rec(any(),
+                    add(SimplifiedSelectTermFeature.create(heapLDT), not(ff.ifThenElse)))),
+            not(ContainsTermFeature.create(instOf("result"), instOf("auxiliarySK"))));
+
+        final int pullOutHeapBound = getHeapSizeBound();
         bindRuleSet(d, "hide_auxiliary_eq",
-            // hide auxiliary equation after the skolem constants have
-            // been replaced by it's computed value
-            add(isSelectSkolemConstantTerm("auxiliarySK"),
-                applyTF("result",
-                    rec(any(),
-                        add(SimplifiedSelectTermFeature.create(heapLDT), not(ff.ifThenElse)))),
-                not(ContainsTermFeature.create(instOf("result"), instOf("auxiliarySK"))),
-                longConst(-5400)));
+            pullOutHeapBound <= 0 ? add(hideReplacedAuxiliaryEq, longConst(-5400))
+                    : ifZero(hideReplacedAuxiliaryEq, longConst(HIDE_AUXILIARY_EQ),
+                        ifZero(isTermAPulledOutHeap(),
+                            ifZero(isSkolemConstantUsedElsewhereInSequent(), longConst(-5400),
+                                longConst(HIDE_DEFERRAL_COST)),
+                            inftyConst())));
         bindRuleSet(d, "hide_auxiliary_eq_const",
-            // hide auxiliary equation after the skolem constatns have
-            // been replaced by it's computed value
-            add(isSelectSkolemConstantTerm("auxiliarySK"), longConst(-500)));
+            // hide an auxiliary equation once the skolem constant has been replaced by its
+            // value
+            add(isSelectSkolemConstantTerm("auxiliarySK"),
+                longConst(HIDE_AUXILIARY_EQ_CONST)));
     }
 
     private void setupUserTaclets(RuleSetDispatchFeature d) {
@@ -326,13 +360,72 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
             final String userTacletsProbs =
                 strategyProperties.getProperty(StrategyProperties.userTacletsOptionsKey(i));
             if (StrategyProperties.USER_TACLETS_LOW.equals(userTacletsProbs)) {
-                bindRuleSet(d, "userTaclets" + i, 10000);
+                bindRuleSet(d, "userTaclets" + i, USER_TACLET_LOW_PRIORITY);
             } else if (StrategyProperties.USER_TACLETS_HIGH.equals(userTacletsProbs)) {
-                bindRuleSet(d, "userTaclets" + i, -50);
+                bindRuleSet(d, "userTaclets" + i, USER_TACLET_HIGH_PRIORITY);
             } else {
                 bindRuleSet(d, "userTaclets" + i, inftyConst());
             }
         }
+    }
+
+    private Feature pullOutHeap(int minHeapSizeForPullout) {
+        final TermFeature chain =
+            TermPredicateTermFeature.create(
+                t -> getHeapTermSize(t, minHeapSizeForPullout) >= minHeapSizeForPullout);
+        final Feature updateValue = applyTF(FocusProjection.create(1), ff.elemUpdate);
+        return add(applyTF(FocusProjection.INSTANCE, chain), updateValue, longConst(-30000));
+    }
+
+
+    /**
+     * @param t a term describing a heap
+     * @param bound the heap length at which a pullout will be performed (and we can stop counting)
+     * @return the number of nested heap operations (max value is that of <code>bound</code>)
+     */
+    private int getHeapTermSize(Term t, int bound) {
+        int length = 0;
+        while (length < bound && t.arity() > 0
+                && (t.op() == heapLDT.getStore() || t.op() == heapLDT.getCreate()
+                        || t.op() == heapLDT.getAnon())) {
+            length++;
+            t = t.sub(0);
+        }
+        return length;
+    }
+
+    /**
+     * Defers application of hiding equations. It is realised as a finite cost so that
+     * the rule is deferred and not abandoned in the approval stage.
+     */
+    private static final long HIDE_DEFERRAL_COST = 30000;
+
+    /**
+     * cheap check if the equation to be hidden is of the required shape
+     * this check is cheap and run before the more expensive check whether the skolem constant still
+     * occurs in the sequent
+     *
+     * @return we only want to hid equations that describe a heap and were the result of a former
+     *         pullout
+     */
+    private Feature isTermAPulledOutHeap() {
+        return add(applyTF("result", op(heapLDT.getStore())),
+            applyTF("auxiliarySK", add(constantTermFeature(),
+                TermPredicateTermFeature.create(t -> t.op() instanceof Function f
+                        && f.isSkolemConstant()))));
+    }
+
+    /**
+     * expensive check ensuring that the Skolem constant of teh equation to be hidden is no longer
+     * in the
+     * sequent
+     */
+    private Feature isSkolemConstantUsedElsewhereInSequent() {
+        final TermBuffer sf = new TermBuffer();
+        return add(sequentContainsNoPrograms(),
+            sum(sf, SequentFormulasGenerator.sequent(),
+                or(eq(sf, FocusFormulaProjection.INSTANCE),
+                    not(ContainsTermFeature.create(sf, instOf("auxiliarySK"))))));
     }
 
     private void setupSystemInvariantSimp(RuleSetDispatchFeature d) {
@@ -393,7 +486,8 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
         if (depProp.equals(StrategyProperties.DEP_ON)) {
             depSpecF = ConditionalFeature.createConditional(depFilter,
-                ifZero(new DependencyContractFeature(), longConst(250), inftyConst()));
+                ifZero(new DependencyContractFeature(),
+                    longConst(DEPENDENCY_CONTRACT), inftyConst()));
         } else {
             depSpecF = ConditionalFeature.createConditional(depFilter, inftyConst());
         }
@@ -404,9 +498,29 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
     private RuleSetDispatchFeature setupApprovalDispatcher() {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
 
+        // Only derive a disequality that is not known yet. The same disequality follows from
+        // every location the two objects read differently, so a duplicate-application check does
+        // not recognise those derivations as duplicates: their instantiations differ while their
+        // conclusion does not. Comparing the conclusion against the succedent does.
+        final TermBuffer succedentFormula = new TermBuffer();
+        final TermBuffer firstObject = new TermBuffer();
+        final TermBuffer secondObject = new TermBuffer();
+        bindRuleSet(d, "derive_inequality",
+            let(firstObject, instOf("o"), let(secondObject, instOf("o2"),
+                sum(succedentFormula, SequentFormulasGenerator.succedent(),
+                    not(applyTF(succedentFormula,
+                        or(opSub(Equality.EQUALS, eq(firstObject), eq(secondObject)),
+                            opSub(Equality.EQUALS, eq(secondObject), eq(firstObject)))))))));
         bindRuleSet(d, "inReachableStateImplication", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "limitObserver", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "partialInvAxiom", NonDuplicateAppModPositionFeature.INSTANCE);
+
+        final int pullOutHeapBound = getHeapSizeBound();
+        if (pullOutHeapBound > 0) {
+            bindRuleSet(d, "hide_auxiliary_eq",
+                ifZero(isSelectSkolemConstantTerm("auxiliarySK"), longConst(0),
+                    isSkolemConstantUsedElsewhereInSequent()));
+        }
 
         setupClassAxiomApproval(d);
 

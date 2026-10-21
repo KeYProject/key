@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.LinkedHashMap;
@@ -16,12 +17,9 @@ import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.declaration.*;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.ast.expression.*;
 import de.uka.ilkd.key.java.ast.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqConcat;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.SeqSingleton;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
@@ -39,6 +37,10 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
+
+import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.COPY;
+import static de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator.LogicFunction.SeqConcat;
+import static de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator.LogicFunction.SeqSingleton;
 
 /**
  *
@@ -253,7 +255,8 @@ public class EnhancedForElimination extends ProgramTransformer {
         data.setValuesVariable(KeYJavaASTFactory.localVariable(services, VALUES, seqType));
 
         // ghost \seq values = \seq_empty
-        final Statement valuesInit = KeYJavaASTFactory.declare(new Ghost(), data.valuesVariable(),
+        final Statement valuesInit = KeYJavaASTFactory.declare(
+            new Modifier(ModifierKind.JML_GHOST), data.valuesVariable(),
             EmptySeqLiteral.INSTANCE, seqType);
 
         // Iterator itVar = expression.iterator();
@@ -305,9 +308,11 @@ public class EnhancedForElimination extends ProgramTransformer {
         final IProgramVariable element = var.getProgramVariable();
         assert element instanceof ProgramVariable
                 : "Since this is a concrete program, the spec must not be schematic";
-        final Expression seqSingleton = new SeqSingleton((ProgramVariable) element);
-        final Expression seqConcat = new SeqConcat(valuesVar, seqSingleton);
-        return new CopyAssignment(valuesVar, seqConcat);
+        final Expression seqSingleton =
+            new LogicFunctionalOperator(SeqSingleton, (ProgramVariable) element);
+        final Expression seqConcat =
+            new LogicFunctionalOperator(SeqConcat, valuesVar, seqSingleton);
+        return new BinaryAssignment(COPY, valuesVar, seqConcat);
     }
 
     /**

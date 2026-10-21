@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.util.collection;
 
 import java.util.NoSuchElementException;
@@ -29,6 +30,41 @@ class ImmutableListArrayTest {
         return IntStream.range(1, i + 1).boxed().toArray(Integer[]::new);
     }
 
+    @Test
+    void immutability1() {
+        Integer[] array = { 0, 1, 4 };
+        // constructor does not copy the array, so changes to the array are reflected in the list
+        // While this seems dangerous, the constructor is package-private and thus considered safe.
+        ImmutableListArray<Integer> list = new ImmutableListArray<>(array);
+        assertThat(list.get(2)).isEqualTo(4);
+        array[2] = 2;
+        assertThat(list.get(2)).isEqualTo(2);
+    }
+
+    @Test
+    void immutability2() {
+        Integer[] array = { 0, 1, 4 };
+        ImmutableList<Integer> list = ImmutableList.fromArray(array);
+        array[2] = 2;
+        assertThat(list.get(2)).isEqualTo(4);
+    }
+
+    @Test
+    void immutability3() {
+        Integer[] array = { 0, 1, 4 };
+        ImmutableList<Integer> list = ImmutableList.of(array);
+        array[2] = 2;
+        assertThat(list.get(2)).isEqualTo(4);
+    }
+
+    @Test
+    void immutability4() {
+        Integer[] array = { 0, 1, 4 };
+        ImmutableList<Integer> list = ImmutableList.of(-1, -2, -3).prepend(array);
+        assertThat(list.get(2)).isEqualTo(4);
+        array[2] = 2;
+        assertThat(list.get(2)).isEqualTo(4);
+    }
 
     @Test
     void size() {

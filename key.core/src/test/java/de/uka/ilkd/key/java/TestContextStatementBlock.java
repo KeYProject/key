@@ -1,12 +1,13 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java;
 
 
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.ast.expression.operator.PostIncrement;
+import de.uka.ilkd.key.java.ast.expression.UnaryAssignment;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.rule.TacletForTests;
@@ -50,7 +51,8 @@ public class TestContextStatementBlock {
             "Prefix should end with an assignment");
         PosInProgram suffixStart = PosInProgram.TOP.down(2);
         assertTrue(
-            PosInProgram.getProgramAt(suffixStart, blockOne.program()) instanceof PostIncrement,
+            PosInProgram.getProgramAt(suffixStart, blockOne.program()) instanceof UnaryAssignment uo
+                    && uo.getKind() == UnaryAssignment.UnaryAssignmentKind.POST_INCREMENT,
             "Suffix should start with an ++");
         for (int i = size - 2; i >= 1; i--) {
             statementList.add(stContainer.getChildAt(i));

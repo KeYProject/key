@@ -1,9 +1,11 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.util.collection;
 
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.Objects;
 
 import org.key_project.util.Strings;
@@ -24,6 +26,21 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     @SuppressWarnings("unchecked")
     public static <S, T> DefaultImmutableMap<S, T> nilMap() {
         return (DefaultImmutableMap<S, T>) EMPTY_MAP;
+    }
+
+    /**
+     * Creates an immutable map from the given map maintaining the order from the given {@code map}
+     * (if the given {@code map} supports stable ordering)
+     *
+     * @param map the map whose entries the result is to hold
+     * @return the persistent map holding exactly the entries of {@code map}
+     */
+    public static <S, T> ImmutableMap<S, T> fromMap(java.util.Map<S, T> map) {
+        DefaultImmutableMap<S, T> result = nilMap();
+        for (Entry<S, T> e : map.entrySet()) {
+            result = new DefaultImmutableMap<>(new MapEntry<>(e.getKey(), e.getValue()), result);
+        }
+        return result;
     }
 
     /**
@@ -71,6 +88,7 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     public ImmutableMap<S, T> put(S key, T value) {
         return new DefaultImmutableMap<>(new MapEntry<>(key, value), this.remove(key));
     }
+
 
     /**
      * Retrieves the value mapped to key in this map.
@@ -259,7 +277,8 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     public int hashCode() {
         int hashCode = 1;
         for (ImmutableMapEntry<S, T> stImmutableMapEntry : this) {
-            hashCode += 7 * stImmutableMapEntry.hashCode();
+            hashCode += (Objects.hashCode(stImmutableMapEntry.key()) ^
+                    Objects.hashCode(stImmutableMapEntry.value()));
         }
         return hashCode;
     }

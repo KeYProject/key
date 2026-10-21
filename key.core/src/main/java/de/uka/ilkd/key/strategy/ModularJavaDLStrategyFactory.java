@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
 import java.util.ArrayList;
@@ -25,7 +26,9 @@ import org.jspecify.annotations.NonNull;
 public class ModularJavaDLStrategyFactory implements StrategyFactory {
     private final List<StrategyFactory> componentFactories =
         Arrays.asList(new JFOLStrategyFactory(),
-            new IntegerStrategyFactory(), new SymExStrategyFactory(), new StringStrategyFactory(),
+            new IntegerStrategyFactory(),
+            new SetStrategyFactory(), new LocSetStrategyFactory(),
+            new SymExStrategyFactory(), new StringStrategyFactory(),
             new JavaCardDLStrategyFactory());
 
     /**

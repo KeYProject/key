@@ -1,9 +1,12 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.fonticons;
 
 import java.awt.*;
+import java.awt.font.GlyphVector;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.ArrayList;
@@ -158,6 +161,8 @@ public final class IconFactory {
         new IconFontProvider(FontAwesomeSolid.ARROW_LEFT);
     public static final IconFontProvider ORIGIN_LABELS =
         new IconFontProvider(FontAwesomeSolid.ROUTE);
+    public static final IconFontProvider GOTO_NODE =
+        new IconFontProvider(FontAwesomeSolid.CROSSHAIRS);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IconFactory.class);
 
@@ -169,7 +174,7 @@ public final class IconFactory {
     private static final Image keyLogo = getImage("images/key-color.png");
     private static final Image keyLogoShadow = getImage("images/key-shadow.png");
     // The following should be updated with every major version step.
-    private static final Image keyVersionLogo = getImage("images/key-shadow-2.12.png");
+    private static final Image keyVersionLogo = getImage("images/key-shadow-3.0.png");
     private static final Image keyLogoSmall = getImage("images/key-color-icon-square.gif");
     private static final Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
 
@@ -189,7 +194,7 @@ public final class IconFactory {
      * Additional horizontal space in pixels reserved for the overlay letter in
      * toolbar automation icons created by {@link #automationWithOverlay(int, String)}.
      */
-    public static final int TOOLBAR_INDICATOR_EXTRA_SPACE = 5;
+    public static final int TOOLBAR_INDICATOR_EXTRA_SPACE = 7;
     /**
      * Additional horizontal space in pixels for wider auto buttons.
      */
@@ -414,19 +419,21 @@ public final class IconFactory {
 
         // Draw letter overlay
         g2d.setColor(Color.BLACK);
-        Font font = new Font(Font.SANS_SERIF, Font.BOLD | Font.ITALIC,
+        Font font = new Font(Font.MONOSPACED, Font.BOLD | Font.ITALIC,
             (int) (baseIcon.getIconHeight() * 0.9f));
         g2d.setFont(font);
 
-        FontMetrics fm = g2d.getFontMetrics();
-        int textWidth = fm.stringWidth(letter);
-        int textHeight = fm.getAscent() - fm.getDescent();
+        GlyphVector glyphVector = font.createGlyphVector(g2d.getFontRenderContext(), letter);
+        Rectangle2D tightBounds = glyphVector.getVisualBounds();
 
-        // Position letter in bottom-right corner
-        int x = baseIcon.getIconWidth() - textWidth;
+        int overlayRight = TOOLBAR_EXTRA_WIDTH + TOOLBAR_INDICATOR_EXTRA_SPACE
+                + baseIcon.getIconWidth() - 1;
+        int overlayBottom = baseIcon.getIconHeight() - 1;
 
-        g2d.drawString(letter, x + TOOLBAR_INDICATOR_EXTRA_SPACE + TOOLBAR_EXTRA_WIDTH,
-            baseIcon.getIconHeight());
+        int baselineX = overlayRight - (int) Math.ceil(tightBounds.getMaxX());
+        int baselineY = overlayBottom - (int) Math.ceil(tightBounds.getMaxY());
+
+        g2d.drawString(letter, baselineX, baselineY);
         g2d.dispose();
 
         return new ImageIcon(image);

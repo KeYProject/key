@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.awt.Color;
@@ -9,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.swing.Icon;
 
-import de.uka.ilkd.key.pp.LogicPrinter;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -19,8 +20,7 @@ import org.jspecify.annotations.Nullable;
  * @version 1 (20.05.19)
  */
 public class Style {
-    /** the text of this node */
-    public String text;
+    private String text;
 
     /** the tooltip */
     public @Nullable Tooltip tooltip;
@@ -36,6 +36,15 @@ public class Style {
 
     /** icon of the node */
     public @Nullable Icon icon;
+
+    /** the text of this node */
+    public String text() {
+        return text;
+    }
+
+    public void setText(String s) {
+        this.text = s;
+    }
 
     /** Wrapper class for the tooltip */
     public static class Tooltip {
@@ -68,7 +77,7 @@ public class Style {
          * @param value the value
          * @param block whether this should be rendered as a block
          */
-        public void addAdditionalInfo(@NonNull String key, @NonNull String value, boolean block) {
+        public void addAdditionalInfo(@NonNull String key, @NonNull Object value, boolean block) {
             additionalInfo.add(new Fragment(key, value, block));
         }
 
@@ -90,13 +99,8 @@ public class Style {
             addAdditionalInfo("Rule", rule, false);
         }
 
-        /**
-         * Adds applied on infos
-         *
-         * @param on the info
-         */
-        public void addAppliedOn(@NonNull String on) {
-            addAdditionalInfo("Applied on", LogicPrinter.escapeHTML(on, true), true);
+        public void addPosInOccurrence(@NonNull PosInOccurrence pio) {
+            addAdditionalInfo("Applied on", pio, true);
         }
 
         /**
@@ -111,11 +115,11 @@ public class Style {
             /** key */
             public final String key;
             /** value */
-            public final String value;
+            public final Object value;
             /** whether this is a block */
             public final boolean block;
 
-            public Fragment(String key, String value, boolean block) {
+            public Fragment(String key, Object value, boolean block) {
                 this.key = key;
                 this.value = value;
                 this.block = block;

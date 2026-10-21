@@ -1,0 +1,46 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
+package org.key_project.util.parsing;
+
+
+/**
+ * A simple checked exception which holds an location.
+ *
+ * @author Alexander Weigl
+ * @version 1 (6/21/21)
+ */
+public class LocatableException extends RuntimeException implements HasLocation {
+    private final Location location;
+
+    public LocatableException(Location location) {
+        this.location = location;
+    }
+
+    public LocatableException(String message, Location location) {
+        super(message);
+        this.location = location;
+    }
+
+    public LocatableException(String message, Throwable cause, Location location) {
+        super(message, cause);
+        this.location = location;
+    }
+
+    public LocatableException(Throwable cause, Location location) {
+        super(cause);
+        this.location = location;
+    }
+
+    public LocatableException(String message, Throwable cause, boolean enableSuppression,
+            boolean writableStackTrace, Location location) {
+        super(message, cause, enableSuppression, writableStackTrace);
+        this.location = location;
+    }
+
+    @Override
+    public Location getLocation() {
+        return location;
+    }
+}

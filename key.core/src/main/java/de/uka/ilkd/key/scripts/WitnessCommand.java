@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.scripts;
 
 import java.util.NoSuchElementException;
@@ -101,10 +102,9 @@ public class WitnessCommand extends AbstractCommand {
             true, services);
         app = app.addInstantiation(getSV(schemaVars, "b"), match.second.formula().sub(0), true,
             services);
-        app = app.createSkolemConstant(params.as, getSV(schemaVars, "sk"),
-            match.second.formula().boundVars().get(0).sort(), true, services);
-
         Goal g = state.getFirstOpenAutomaticGoal();
+        app = app.createSkolemConstant(params.as, getSV(schemaVars, "sk"),
+            match.second.formula().boundVars().get(0).sort(), true, g);
         g.apply(app);
     }
 

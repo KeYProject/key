@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.init;
 
 import java.util.ArrayDeque;
@@ -15,15 +16,16 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.ast.expression.Assignment;
+import de.uka.ilkd.key.java.ast.expression.BinaryAssignment;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.util.parsing.LocatableException;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.IdentityHashSet;
+import org.key_project.util.parsing.LocatableException;
 import org.key_project.util.parsing.Location;
 
 /**
@@ -249,10 +251,13 @@ class FinalFieldCodeValidator {
      */
     private void validateAssignment(Assignment assignment) {
         SyntaxElement assignee = assignment.getChild(0);
-        SyntaxElement value = assignment.getChild(1);
-        if (value instanceof ThisReference) {
-            throw new FinalViolationException("'this' is leaked to a field or variable.",
-                assignment);
+        if (assignment instanceof BinaryAssignment) {
+            SyntaxElement value = assignment.getChild(1);
+            if (value instanceof ThisReference) {
+                throw new FinalViolationException("'this' is leaked to a field or variable.",
+                    assignment);
+            }
+            validateProgramElement(value);
         }
         if (assignee instanceof FieldReference fr) {
             // it is ok to assign to this.finalfield!
@@ -260,7 +265,6 @@ class FinalFieldCodeValidator {
         } else {
             validateProgramElement(assignee);
         }
-        validateProgramElement(value);
     }
 
     /*

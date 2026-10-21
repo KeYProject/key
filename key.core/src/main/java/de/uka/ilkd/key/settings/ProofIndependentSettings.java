@@ -1,16 +1,14 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.settings;
 
 import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import de.uka.ilkd.key.pp.NotationInfo;
 
@@ -59,6 +57,7 @@ public class ProofIndependentSettings {
     private final ViewSettings viewSettings = new ViewSettings();
     private final TermLabelSettings termLabelSettings = new TermLabelSettings();
     private final FeatureSettings featureSettings = new FeatureSettings();
+    private final StrategyPresetsSettings strategyPresetsSettings = new StrategyPresetsSettings();
 
     private File filename;
 
@@ -75,6 +74,7 @@ public class ProofIndependentSettings {
         addSettings(generalSettings);
         addSettings(viewSettings);
         addSettings(featureSettings);
+        addSettings(strategyPresetsSettings);
     }
 
     private ProofIndependentSettings(File filename) {
@@ -193,6 +193,10 @@ public class ProofIndependentSettings {
         return featureSettings;
     }
 
+    public StrategyPresetsSettings getStrategyPresetsSettings() {
+        return strategyPresetsSettings;
+    }
+
     /**
      * Checks if pretty printing is enabled or not.
      *
@@ -211,5 +215,14 @@ public class ProofIndependentSettings {
     public static void setUsePrettyPrinting(boolean usePrettyPrinting) {
         DEFAULT_INSTANCE.getViewSettings().setUsePretty(usePrettyPrinting);
         NotationInfo.DEFAULT_PRETTY_SYNTAX = usePrettyPrinting;
+    }
+
+    /// Returns the current proof settings as a configuration object
+    public Configuration asConfiguration() {
+        Configuration result = new Configuration();
+        for (Settings s : settings) {
+            s.writeSettings(result);
+        }
+        return result;
     }
 }

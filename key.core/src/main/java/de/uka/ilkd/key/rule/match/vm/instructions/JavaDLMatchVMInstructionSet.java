@@ -1,12 +1,15 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
+import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -104,6 +107,16 @@ public final class JavaDLMatchVMInstructionSet {
     public static SimilarParametricFunctionInstruction getSimilarParametricFunctionInstruction(
             ParametricFunctionInstance psi) {
         return new SimilarParametricFunctionInstruction(psi);
+    }
+
+    public static MatchInstruction getMatchInstructionForSortArgument(GenericArgument arg) {
+        // ensures that dispatch does not happen in matching code
+        return switch (arg.sort()) {
+            case GenericSort gs -> new MatchGenericSortInstruction(gs);
+            case ParametricSortInstance psi when psi.containsGenericSort() ->
+                new MatchParametricSortInstruction(psi);
+            default -> new MatchBySortIdentityInstruction(arg.sort());
+        };
     }
 
     public static MatchIdentityInstruction getMatchIdentityInstruction(

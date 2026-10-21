@@ -34,3 +34,10 @@ seqEmpty + seqEmpty
 ∅ ⊆ \emptyset
 \emptyset ∖ \emptyset
 (∅ ∊ ∅) & true
+# The following are test cases for the type parameter syntax and challenges around ">"
+a < b < c > >
+a < b > = c
+a<b<c>>
+a<b>=c
+a >= 0
+a<<label>>

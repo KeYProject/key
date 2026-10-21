@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.init;
 
 import java.util.*;
@@ -80,6 +81,7 @@ public class InitConfig {
 
     /** HashMap for quick lookups taclet name->taclet */
     private Map<Name, Taclet> activatedTacletCache = null;
+    private boolean defaultsComputed;
 
     /** the fileRepo which is responsible for consistency between source code and proof */
     private FileRepo fileRepo;
@@ -104,6 +106,9 @@ public class InitConfig {
     /// combines the found choices in KeY files, together with the current settings.
     /// The namespace of choices has to be filled.
     public void computeDefaults(ChoiceInformation ci) {
+        if (defaultsComputed) {
+            return;
+        }
         var currentDefaultChoices =
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
 
@@ -145,6 +150,8 @@ public class InitConfig {
             }
             settings.getChoiceSettings().setDefaultChoices(defaults);
         }
+        activatedTacletCache = null;
+        defaultsComputed = true;
     }
 
     /**
@@ -200,6 +207,14 @@ public class InitConfig {
      */
     public Map<Taclet, TacletBuilder<? extends Taclet>> getTaclet2Builder() {
         return taclet2Builder;
+    }
+
+
+    /**
+     * @return an immutable mapping from a category to its default choice
+     */
+    public @NonNull Map<String, Choice> getCategory2DefaultChoices() {
+        return Collections.unmodifiableMap(category2DefaultChoice);
     }
 
 
@@ -448,6 +463,7 @@ public class InitConfig {
         ic.header = header;
         ic.justifInfo = justifInfo.copy();
         ic.fileRepo = fileRepo; // TODO: copy instead? delete via dispose method?
+        ic.defaultsComputed = defaultsComputed;
         return ic;
     }
 

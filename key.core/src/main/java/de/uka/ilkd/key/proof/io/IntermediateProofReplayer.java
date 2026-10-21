@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.io;
 
 import java.io.StringReader;
@@ -1075,7 +1076,7 @@ public class IntermediateProofReplayer {
             final ProgramElement pe = app.getProgramElement(value, psv, services);
             result = app.addCheckedInstantiation(sv, pe, services, true);
         } else if (sv instanceof SkolemTermSV skolemSv) {
-            result = app.createSkolemConstant(value, skolemSv, true, services);
+            result = app.createSkolemConstant(value, skolemSv, true, targetGoal);
         } else if (sv instanceof ModalOperatorSV msv) {
             result = app.addInstantiation(
                 app.instantiations().add(msv, JModality.JavaModalityKind.getKind(value), services),

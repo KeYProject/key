@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.settings;
 
 import java.beans.PropertyChangeListener;
@@ -229,7 +230,7 @@ public class ProofSettings {
                     loadSettingsFromJSONStream(in);
                 }
             } catch (Exception e) {
-                LOGGER.warn("No proof-settings could be loaded, using defaults", e);
+                LOGGER.warn("No proof settings could be loaded, using defaults");
             }
         }
     }
@@ -313,4 +314,14 @@ public class ProofSettings {
         for (Settings setting : settings)
             setting.readSettings(c);
     }
+
+    /// Returns the current proof settings as a configuration object
+    public Configuration asConfiguration() {
+        Configuration result = new Configuration();
+        for (Settings s : settings) {
+            s.writeSettings(result);
+        }
+        return result;
+    }
+
 }

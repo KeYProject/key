@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.informationflow.rule;
 
 import java.util.Iterator;
@@ -52,6 +53,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.Nullable;
+
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
 /**
  * <p>
@@ -115,8 +118,7 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
             final JTerm contextUpdate,
             final JTerm remembranceUpdate, final ImmutableSet<LocationVariable> localOutVariables,
             final GoalsConfigurator configurator, final Services services) {
-        final ImmutableList<Goal> result = goal.split(3);
-        return result;
+        return goal.split(3);
     }
 
     @Override
@@ -305,7 +307,7 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
 
         final JTerm heapAtPre = tb.var(variables.remembranceHeaps.get(baseHeap));
         final Name heapAtPostName = new Name(tb.newName("heap_After_BLOCK"));
-        final JTerm heapAtPost = tb.func(new JFunction(heapAtPostName, heapAtPre.sort(), true));
+        final JTerm heapAtPost = tb.func(new JFunction(heapAtPostName, heapAtPre.sort(), SKOLEM));
         final JTerm selfAtPre = hasSelf ? tb.var(variables.self) : tb.NULL();
         final JTerm selfAtPost = hasSelf ? buildAfterVar(selfAtPre, "BLOCK", services) : tb.NULL();
 

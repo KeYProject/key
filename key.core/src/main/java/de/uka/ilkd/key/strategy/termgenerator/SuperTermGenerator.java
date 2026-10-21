@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.Iterator;
@@ -20,6 +21,7 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
@@ -28,11 +30,13 @@ import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableArray;
 
-// Generates the find's ANCESTOR terms (upwards from the find position). The connectives along the
-// find path are stable for a surviving application, but a generated ancestor term as a whole also
-// carries the siblings of that path, which an independent rewrite can change while the find subterm
-// survives. So a feature summing over these ancestors is fixed only while the find FORMULA is
-// unchanged -- weakly stable, not fully stable.
+/**
+ * Generates the terms upward a given (usually the find-)position and
+ * allows to iterate over those in order to check e.g. whether the
+ * position is below an update or quantifier.
+ *
+ * As it only looks upwards, the computed cost is weak stable
+ */
 @WeakStableCost
 public abstract class SuperTermGenerator implements TermGenerator<Goal> {
 
@@ -82,16 +86,8 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
         return !(cond.compute(t, mState, services) instanceof TopRuleAppCost);
     }
 
-    // same data flow as the enclosing class: ancestors of the focus position
     @WeakStableCost
     abstract static class SuperTermWithIndexGenerator extends SuperTermGenerator {
-        // Both are fixed at construction from the proof's services (one generator is built per
-        // proof and shared by all goals). They used to be lazily filled by generate(), which runs
-        // during proof search: under the multi-core prover several workers raced that lazy write,
-        // and binFunc is a freshly created operator, so a worker could read a half-initialised or
-        // foreign operator. Computing them once in the constructor removes the race; the value is
-        // unchanged, since goal.proof().getServices() is the same services the strategy was built
-        // with.
         private final Services services;
         private final Operator binFunc;
 
@@ -183,28 +179,38 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
     }
 
     class UpwardsIterator implements Iterator<Term> {
-        private PosInOccurrence currentPos;
+        private final Term[] ancestors;
+        private final int[] childIndices;
+        private int next;
         private final MutableState mState;
         private final Services services;
 
         private UpwardsIterator(PosInOccurrence startPos, MutableState mState, Services services) {
-            this.currentPos = startPos;
             this.mState = mState;
             this.services = services;
+            final int depth = startPos.depth();
+            this.ancestors = new Term[depth];
+            this.childIndices = new int[depth];
+            final PIOPathIterator it = startPos.iterator();
+            int i = depth;
+            while (it.next() != -1) {
+                i--;
+                ancestors[i] = it.getSubTerm();
+                childIndices[i] = it.getChild();
+            }
         }
 
         @Override
         public boolean hasNext() {
-            return currentPos != null && !currentPos.isTopLevel();
+            return next < ancestors.length;
         }
 
         @Override
         public Term next() {
-            final int child = currentPos.getIndex();
-            currentPos = currentPos.up();
-            final Term res = generateOneTerm(currentPos.subTerm(), child);
+            final Term res = generateOneTerm(ancestors[next], childIndices[next]);
+            next++;
             if (!generateFurther(res, mState, services)) {
-                currentPos = null;
+                next = ancestors.length;
             }
             return res;
         }

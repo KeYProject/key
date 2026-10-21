@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
@@ -103,7 +104,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
             // transformation; such symbols are smaller than other symbols (and
             // the smaller the later they were introduced)
 
-            final int v = introductionTime(t2.op(), goal) - introductionTime(t1.op(), goal);
+            final int v = introductionTime(t2.op()) - introductionTime(t1.op());
             if (v < 0) {
                 return true;
             }
@@ -141,7 +142,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
             atoms1 = atoms1.tail();
             atoms2 = atoms2.tail();
 
-            final int c = introductionTime(t2.op(), goal) - introductionTime(t1.op(), goal);
+            final int c = introductionTime(t2.op()) - introductionTime(t1.op());
             if (c != 0) {
                 return c;
             }

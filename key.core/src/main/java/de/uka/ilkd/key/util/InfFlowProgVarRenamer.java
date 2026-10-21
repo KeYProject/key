@@ -1,9 +1,9 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
@@ -54,7 +54,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         this.postfix = postfix;
         this.goalForVariableRegistration = goalForVariableRegistration;
         if (preInitialisedReplaceMap == null) {
-            this.replaceMap = new HashMap<>();
+            this.replaceMap = new LinkedHashMap<>();
         } else {
             this.replaceMap = preInitialisedReplaceMap;
         }
@@ -162,7 +162,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         final Name newName =
             VariableNameProposer.DEFAULT.getNewName(services, new Name(f.name() + postfix));
         final Function renamedF = new JFunction(newName, f.sort(), f.argSorts(),
-            f.whereToBind(), f.isUnique(), f.isSkolemConstant());
+            f.whereToBind(), f.isUnique(), f.kind(), f.introductionTime());
         services.getNamespaces().functions().addSafely(renamedF);
         final JTerm fTerm = label(func(renamedF), term.getLabels());
         replaceMap.put(term, fTerm);
@@ -241,7 +241,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private Map<LocationVariable, LocationVariable> restrictToProgramVariables(
             Map<JTerm, JTerm> replaceMap) {
         Map<LocationVariable, LocationVariable> progVarReplaceMap =
-            new HashMap<>();
+            new LinkedHashMap<>();
         for (final JTerm t : replaceMap.keySet()) {
             if (t.op() instanceof LocationVariable lv) {
                 progVarReplaceMap.put(lv,

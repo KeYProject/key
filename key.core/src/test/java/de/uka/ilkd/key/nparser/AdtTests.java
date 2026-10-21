@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.nparser;
 
 import java.io.IOException;
@@ -31,7 +32,7 @@ public class AdtTests {
             DT_Nat#Dec_pred#succ#EQ {
             \\assumes ([equals(succ(pred_sv),pred_x)]==>[])\s
             \\find(pred(pred_x))
-            \\sameUpdateLevel\\replacewith(pred_sv)\s
+            \\replacewith(pred_sv)\s
             \\heuristics(simplify)
             Choices: true}""";
 

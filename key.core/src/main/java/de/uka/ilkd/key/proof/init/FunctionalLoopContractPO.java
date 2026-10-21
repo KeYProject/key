@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.init;
 
 import java.util.LinkedHashMap;
@@ -33,6 +34,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
+
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
 /**
  * A proof obligation for a {@link FunctionalLoopContract}.
@@ -322,7 +325,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
             final String anonymisationName =
                 tb.newName(AuxiliaryContractBuilders.ANON_IN_PREFIX + heap.name());
             final Function anonymisationFunction =
-                new JFunction(new Name(anonymisationName), heap.sort(), true);
+                new JFunction(new Name(anonymisationName), heap.sort(), SKOLEM);
             services.getNamespaces().functions().addSafely(anonymisationFunction);
             anonInHeaps.put(heap, anonymisationFunction);
         }
@@ -346,7 +349,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
                 final String anonymisationName =
                     tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + heap.name());
                 final Function anonymisationFunction =
-                    new JFunction(new Name(anonymisationName), heap.sort(), true);
+                    new JFunction(new Name(anonymisationName), heap.sort(), SKOLEM);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 anonOutHeaps.put(heap, anonymisationFunction);
             }

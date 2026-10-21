@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -78,17 +79,24 @@ class MainStatusLine extends JPanel {
 
     /**
      * Set the range of values the progress bar can display (see <code>setMaximum</code> of
-     * <code>ProgressBar</code>). A non-positive maximum means "unknown workload" -- the parallel
-     * prover reports no per-step progress -- and switches the bar to indeterminate ("busy") mode so
+     * <code>ProgressBar</code>). A negative <code>value</code> means
+     * "unknown workload", e.g. the parallel prover reports
+     * no per-step progress and switches the bar to indeterminate ("busy") mode so
      * it animates instead of sitting frozen at zero.
+     * The <code>value</code> 0 means no bar and positive number describes the maximum workload.
      */
     public void setProgressBarMaximum(int value) {
-        if (value <= 0) {
+        if (value < 0) {
             progressBar.setIndeterminate(true);
+            progressBar.setStringPainted(false);
         } else {
             progressBar.setIndeterminate(false);
-            progressBar.setMaximum(value);
+            progressBar.setStringPainted(true);
+            if (value > 0) {
+                progressBar.setMaximum(value);
+            }
         }
+        progressBar.setEnabled(value != 0);
     }
 
     /**

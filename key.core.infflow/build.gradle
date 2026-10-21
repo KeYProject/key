@@ -1,3 +1,4 @@
+description = "Information-Flow / Non-interference calculus for Java using the KeY theorem prover"
 
 
 dependencies {

@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.util.collection;
 
 import java.util.*;
@@ -101,7 +102,7 @@ abstract class ImmutableSLList<T extends @Nullable Object> implements ImmutableL
         ImmutableList<T> list = this;
         for (int i = 0; i < elems; i++) {
             seq.add(list.head());
-            list = tail();
+            list = list.tail();
         }
         return ImmutableList.fromList(seq);
     }

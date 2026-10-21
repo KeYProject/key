@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.io.consistency;
 
 import java.io.*;
@@ -12,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.stream.Stream;
 
 import de.uka.ilkd.key.settings.GeneralSettings;
 
@@ -342,17 +344,15 @@ public final class DiskFileRepo extends AbstractFileRepo {
      */
     private void deleteDiskContent() throws IOException {
         if (!isDisposed() && !GeneralSettings.keepFileRepos) {
-            try (var s = Files.walk(tmpDir)) {
-                s.sorted(Comparator.reverseOrder())
-                        // .map(Path::toFile)
-                        .forEach(path -> {
-                            try {
-                                Files.delete(path);
-                                // path.delete();
-                            } catch (IOException e) {
-                                LOGGER.info("Failed to delete file", e);
-                            }
-                        });
+            try (Stream<Path> s = Files.walk(tmpDir).sorted(Comparator.reverseOrder())) {
+                s.forEach(path -> {
+                    try {
+                        Files.deleteIfExists(path);
+                        // path.delete();
+                    } catch (IOException e) {
+                        LOGGER.info("Could not clean up temp directory {}", path);
+                    }
+                });
             }
         }
     }

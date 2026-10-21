@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.nparser.builder;
 
 import java.io.IOException;
@@ -354,7 +355,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         if (ctx.GREATER() != null) {
             op_name = "gt";
         }
-        if (ctx.GREATEREQUAL() != null) {
+        if (ctx.GREATEREQUAL() != null || ctx.GREATER_CONTD() != null) {
             op_name = "geq";
         }
         return binaryLDTSpecificTerm(ctx, ctx.b, op_name, termL, termR);

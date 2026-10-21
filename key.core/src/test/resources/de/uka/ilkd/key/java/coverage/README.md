@@ -39,7 +39,6 @@ the feature under test (verified by loading each and inspecting the error):
 | `record-pattern` | `Unsupported element: TypePatternExpr` (record pattern via `instanceof`) |
 | `switch-enum-unqualified` | KeY cannot resolve the **unqualified** `case RED` label (the enum is declared in the file, so this is the label form, not a missing type) |
 | `module-declaration` | `module-info` currently triggers an internal error (`IndexOutOfBoundsException`) |
-| `var-reference-type` | a `var` with a `String` initializer currently triggers an internal `NullPointerException` |
 
 Because the host construct is otherwise supported (a `switch` statement,
 `instanceof`, a normal class), the failure lands on the tested feature, not on

@@ -10,7 +10,7 @@ public class SortPerm {
       @ ensures (\forall int i;start<=i && i<a.length; a[\result] >= a[i]);
       @ ensures start <= \result && \result < a.length;
       @*/
-    int /*@ strictly_pure @*/ max(int start) {
+    /*@ strictly_pure @*/ int max(int start) {
         int counter = start;
         int idx = start;
         /*@ loop_invariant start<=counter && counter<=a.length

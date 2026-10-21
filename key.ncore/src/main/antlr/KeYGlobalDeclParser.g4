@@ -43,9 +43,9 @@ schema_var_decls
    ;
 
 formal_sort_param_decls
-: OPENTYPEPARAMS
+: LESS // OPENTYPEPARAMS
       formal_sort_param_decl (COMMA formal_sort_param_decl)*
-      CLOSETYPEPARAMS
+      GREATER // CLOSETYPEPARAMS
 ;
 
 formal_sort_param_decl

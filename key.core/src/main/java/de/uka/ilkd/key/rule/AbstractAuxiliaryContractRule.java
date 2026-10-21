@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.JavaTools;
@@ -26,6 +27,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
 /**
  * <p>
@@ -123,7 +126,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         for (LocationVariable pv : localOuts) {
             final Name anonFuncName = new Name(tb.newName(pv.name().toString()));
-            final Function anonFunc = new JFunction(anonFuncName, pv.sort(), true);
+            final Function anonFunc = new JFunction(anonFuncName, pv.sort(), SKOLEM);
             services.getNamespaces().functions().addSafely(anonFunc);
             final JTerm elemUpd = tb.elementary(pv, tb.func(anonFunc));
             if (anonUpdate == null) {

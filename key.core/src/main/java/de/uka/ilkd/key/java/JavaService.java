@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java;
 
 import java.io.*;
@@ -913,7 +914,7 @@ public class JavaService {
         }
         var f = JavaBlock
                 .createJavaBlock((StatementBlock) getConverter(allowSchemaJava).process(sb));
-        JavaLogger.print(block, f);
+        // JavaLogger.print(block, f);
         return f;
     }
 
@@ -1005,7 +1006,7 @@ public class JavaService {
     }
 
     @NonNull
-    private JavaSymbolSolver getSymbolResolver() {
+    public JavaSymbolSolver getSymbolResolver() {
         return programFactory.getSymbolSolver();
     }
 

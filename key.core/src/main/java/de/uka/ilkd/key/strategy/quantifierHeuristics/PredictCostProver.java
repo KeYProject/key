@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
@@ -10,7 +11,9 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.TheoryReasoning;
 
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -107,9 +110,10 @@ public class PredictCostProver {
         final Congruence congruence = new Congruence(assertList, services);
         ImmutableSet<JTerm> normalized = assertList;
         if (!congruence.isTrivial()) {
+            final TermFactory tf = services.getTermFactory();
             ImmutableSet<JTerm> res = DefaultImmutableSet.nil();
             for (final JTerm lit : assertList) {
-                res = res.add(congruence.normalize(lit));
+                res = res.add(congruence.normalize(lit, tf));
             }
             normalized = res;
         }
@@ -195,14 +199,14 @@ public class PredictCostProver {
             negated = !negated;
             pro = pro.sub(0);
         }
-        for (final QuantifierTheorySupport support : TriggersSet.THEORY_SUPPORTS) {
-            QuantifierTheorySupport.LiteralDecision decision =
+        for (final TheoryReasoning support : services.getProfile().getTheorySupports(false)) {
+            TheoryReasoning.LiteralDecision decision =
                 support.decideStrippedSelf(pro, services);
-            if (decision != QuantifierTheorySupport.LiteralDecision.UNKNOWN) {
+            if (decision != TheoryReasoning.LiteralDecision.UNKNOWN) {
                 if (negated) {
                     decision = decision.negate();
                 }
-                return decision == QuantifierTheorySupport.LiteralDecision.PROVED ? trueT : falseT;
+                return decision == TheoryReasoning.LiteralDecision.PROVED ? trueT : falseT;
             }
         }
         return problem;
@@ -218,11 +222,11 @@ public class PredictCostProver {
      *         the problem's negation, and <code>problem</code> if undecided
      */
     private JTerm provedByAnother(JTerm problem, JTerm axiom) {
-        for (final QuantifierTheorySupport support : TriggersSet.THEORY_SUPPORTS) {
-            final QuantifierTheorySupport.LiteralDecision decision =
+        for (final TheoryReasoning support : services.getProfile().getTheorySupports(false)) {
+            final TheoryReasoning.LiteralDecision decision =
                 support.decideFromAxiom(problem, axiom, services);
-            if (decision != QuantifierTheorySupport.LiteralDecision.UNKNOWN) {
-                return decision == QuantifierTheorySupport.LiteralDecision.PROVED ? trueT : falseT;
+            if (decision != TheoryReasoning.LiteralDecision.UNKNOWN) {
+                return decision == TheoryReasoning.LiteralDecision.PROVED ? trueT : falseT;
             }
         }
         return problem;
@@ -240,7 +244,7 @@ public class PredictCostProver {
      *         and the literal itself if neither
      */
     private JTerm proveLiteral(JTerm problem, Iterable<? extends JTerm> assertLits) {
-        final JTerm normProblem = congruence.normalize(problem);
+        final JTerm normProblem = congruence.normalize(problem, services.getTermFactory());
         JTerm res = provedBySelf(normProblem);
         if (TriggerUtils.isTrueOrFalse(res)) {
             return res;
@@ -267,7 +271,7 @@ public class PredictCostProver {
         }
         ImmutableSet<JTerm> res = DefaultImmutableSet.nil();
         for (final JTerm l : lits) {
-            res = res.add(congruence.normalize(l));
+            res = res.add(congruence.normalize(l, services.getTermFactory()));
         }
         return res;
     }

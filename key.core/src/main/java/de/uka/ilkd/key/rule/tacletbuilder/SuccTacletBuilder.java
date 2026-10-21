@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import de.uka.ilkd.key.logic.JTerm;
@@ -89,5 +90,34 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
      */
     public SuccTaclet getTaclet() {
         return getSuccTaclet();
+    }
+
+    @Override
+    public SuccTacletBuilder copy() {
+        var rb = new SuccTacletBuilder().setFind((Sequent) getFind());
+        rb.setAnnotations(tacletAnnotations);
+        rb.setApplicationRestriction(applicationRestriction);
+        rb.setAssumesSequent(assumesSeq);
+        rb.setChoices(choices);
+        rb.setDisplayName(attrs.displayName());
+        rb.setName(name);
+        rb.setTacletGoalTemplates(goals);
+        rb.setTrigger(attrs.trigger());
+        rb.setRuleSets(ruleSets);
+        for (var vc : variableConditions) {
+            rb.addVariableCondition(vc);
+        }
+        rb.addVarsNew(varsNew);
+        rb.addVarsNotFreeIn(varsNotFreeIn);
+        for (var vc : varsNewDependingOn) {
+            rb.addVarsNewDependingOn(vc.first(), vc.second());
+        }
+        rb.setFind((Sequent) find);
+        rb.setChoices(choices);
+        if (goal2Choices != null)
+            rb.goal2Choices =
+                (java.util.HashMap<TacletGoalTemplate, org.key_project.logic.ChoiceExpr>) goal2Choices
+                        .clone();
+        return rb;
     }
 }

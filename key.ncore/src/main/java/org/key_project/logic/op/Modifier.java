@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.logic.op;
 
 import java.util.Map;
@@ -24,11 +25,14 @@ public class Modifier implements Named {
     /// A rigid (non-flexible) function.
     public static final Modifier RIGID = create("rigid", 1);
 
-    /// A skolem function.
+    /// A skolem symbol.
     public static final Modifier SKOLEM = create("skolem", 1 << 1);
 
     /// A unique function.
     public static final Modifier UNIQUE = create("unique", 1 << 2);
+
+    /// A skolem symbol that abbreviates a term through a defining equation. Implies [#SKOLEM].
+    public static final Modifier DEFINITIONAL_SKOLEM = create("definitionalSkolem", 1 << 3);
 
     static Modifier create(String name, int bitMask) {
         var mod = MODIFIERS.get(bitMask);

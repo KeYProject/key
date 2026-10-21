@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic.op;
 
 import java.util.HashMap;
@@ -15,11 +16,15 @@ import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
+import org.key_project.util.Strings;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.WeakValueInterner;
 
 import org.jspecify.annotations.NonNull;
+
+import static org.key_project.logic.op.Function.FunctionKind.ORDINARY;
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
 /// A concrete instance of a [ParametricFunctionDecl].
 public class ParametricFunctionInstance extends JFunction {
@@ -51,8 +56,8 @@ public class ParametricFunctionInstance extends JFunction {
     private ParametricFunctionInstance(ParametricFunctionDecl base,
             ImmutableList<GenericArgument> args, ImmutableArray<Sort> argSorts, Sort sort) {
         super(makeName(base, args), sort, argSorts, base.getWhereToBind(), base.isUnique(),
-            base.isRigid(),
-            base.isSkolemConstant());
+            base.isRigid(), base.isSkolemConstant() ? SKOLEM : ORDINARY,
+            UNRECORDED);
         this.base = base;
         this.args = args;
     }
@@ -67,8 +72,7 @@ public class ParametricFunctionInstance extends JFunction {
 
     private static Name makeName(ParametricFunctionDecl base,
             ImmutableList<GenericArgument> parameters) {
-        // The [ ] are produced by the list's toString method.
-        return new Name(base.name() + "<" + parameters + ">");
+        return new Name(base.name() + Strings.formatAsList(parameters, "<", ",", ">"));
     }
 
     /// Instantiates the arguments of `base` with the instantiations for the generic sorts in

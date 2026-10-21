@@ -1,12 +1,14 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
 import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElementWithKind;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.SuperArrayDeclaration;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
@@ -239,6 +241,13 @@ public class EqualityModuloProofIrrelevancy {
         if (_this.getClass() != that.getClass()) {
             return false;
         }
+
+        if (_this instanceof ProgramElementWithKind<?> _thisWithKind &&
+                that instanceof ProgramElementWithKind<?> thatWithKind &&
+                _thisWithKind.getKind() != thatWithKind.getKind()) {
+            return false;
+        }
+
         if (_this instanceof TypeRef thisRef) {
             final TypeRef thatRef = (TypeRef) that;
             return thisRef.getDimensions() == thatRef.getDimensions() &&
@@ -482,6 +491,13 @@ public class EqualityModuloProofIrrelevancy {
             return false;
         }
 
+        if (_this instanceof FindTaclet _thisFind) {
+            final FindTaclet thatFind = (FindTaclet) that;
+            if (!_thisFind.find().equalsModProperty(thatFind.find(), PROOF_IRRELEVANCY_PROPERTY)) {
+                return false;
+            }
+        }
+
         if ((_this.assumesSequent() == null && that.assumesSequent() != null)
                 || (_this.assumesSequent() != null && that.assumesSequent() == null)) {
             return false;
@@ -515,8 +531,16 @@ public class EqualityModuloProofIrrelevancy {
      * @return the hash code modulo proof irrelevancy for the given argument
      */
     public static int hashCodeModProofIrrelevancy(org.key_project.prover.rules.Taclet taclet) {
-        Sequent sequentFormulas = taclet.assumesSequent();
-        return hashCodeModProofIrrelevancy(sequentFormulas.getFormulaByNr(1));
+        int hashCode = 17;
+        hashCode += 17 * (taclet.getChoices().hashCode() + 17 * taclet.goalTemplates().size());
+        if (taclet instanceof final FindTaclet find) {
+            hashCode += 17 * PROOF_IRRELEVANCY_PROPERTY.hashCodeModThisProperty(find.find());
+        }
+        final Sequent assumesSequent = taclet.assumesSequent();
+        if (assumesSequent != null && !assumesSequent.isEmpty()) {
+            hashCode += 17 * hashCodeModProofIrrelevancy(assumesSequent.getFormulaByNr(1));
+        }
+        return hashCode;
     }
 
 

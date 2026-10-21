@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.pp;
 
 import java.util.List;
@@ -43,12 +44,12 @@ public class FinalPrinterTest {
 
     @ParameterizedTest(name = "{0} => {1}")
     @CsvSource(delimiter = ';', textBlock = """
-            select<[int]>(heap, self, C::#f); self.f
-            select<[int]>(heap, self, C::#finf); select<[int]>(heap, self, C::#finf)
-            final<[int]>(sub, Csub::#finf); sub.finf
-            final<[int]>(sub, C::#finf); sub.(C::finf)
-            final<[int]>(self, C::#finf); self.finf
-            final<[int]>(sub, C::#finf); sub.(C::finf)
+            select<int>(heap, self, C::#f); self.f
+            select<int>(heap, self, C::#finf); select<int>(heap, self, C::#finf)
+            final<int>(sub, Csub::#finf); sub.finf
+            final<int>(sub, C::#finf); sub.(C::finf)
+            final<int>(self, C::#finf); self.finf
+            final<int>(sub, C::#finf); sub.(C::finf)
             """)
     public void testPPWithFinal(String termString, String expected) throws Exception {
         services.getProof().getSettings().getChoiceSettings()
@@ -63,11 +64,11 @@ public class FinalPrinterTest {
 
     @ParameterizedTest(name = "{0} => {1}")
     @CsvSource(delimiter = ';', textBlock = """
-            final<[int]>(sub, Csub::#finf); sub.finf
-            final<[int]>(sub, C::#finf); sub.(C::finf)
-            final<[int]>(self, C::#finf); self.finf
-            select<[int]>(heap, self, C::#f); self.f
-            select<[int]>(heap, self, C::#finf); self.finf
+            final<int>(sub, Csub::#finf); sub.finf
+            final<int>(sub, C::#finf); sub.(C::finf)
+            final<int>(self, C::#finf); self.finf
+            select<int>(heap, self, C::#f); self.f
+            select<int>(heap, self, C::#finf); self.finf
             """)
     public void testPPWithoutFinal(String termString, String expected) throws Exception {
         services.getProof().getSettings().getChoiceSettings()

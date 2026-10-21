@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui;
 
 import java.awt.*;
@@ -332,7 +333,14 @@ public final class MainWindow extends JFrame {
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(this);
         // Postpone load for faster UI creation.
-        SwingUtilities.invokeLater(recentFileMenu::loadEntries);
+        SwingUtilities.invokeLater(() -> {
+            recentFileMenu.loadEntries();
+            // otherwise open most recent cannot be used with a fresh started KeY
+            if (openMostRecentFileAction != null) {
+                // should always be the case, but better safe than sorry
+                openMostRecentFileAction.updateEnabledStatus();
+            }
+        });
 
         proofTreeView = new ProofTreeView(mediator);
         infoView = new InfoView(mediator);
@@ -813,10 +821,10 @@ public final class MainWindow extends JFrame {
                 IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "S")),
             new MacroAutomationAction(this,
                 new de.uka.ilkd.key.macros.AutoPilotPrepareProofMacro(),
-                IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "P"))
-        // when it is finished ... new MacroAutomationAction(this ... ScriptMacro ... "J" (*J*ML
-        // scripts)
-        );
+                IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "P")),
+            new MacroAutomationAction(this,
+                new de.uka.ilkd.key.macros.ScriptAwareMacro(),
+                IconFactory.automationWithOverlay(TOOLBAR_ICON_SIZE, "J")));
     }
 
     /**
@@ -899,14 +907,14 @@ public final class MainWindow extends JFrame {
 
     private void setStatusLineImmediately(String str, int max) {
         statusLine.setStatusText(str);
-        // A non-positive maximum means "unknown workload" -- the parallel prover (whose workers
-        // commit concurrently) and symbolic-execution stop conditions report no per-step progress.
+        // A negative maximum means "unknown workload", e.g. the parallel prover (whose workers
+        // commit concurrently).
         // Show the progress panel and let setProgressBarMaximum switch the bar to indeterminate
         // ("busy") mode so it animates, instead of hiding it and sitting frozen. A positive maximum
         // drives the normal determinate bar. (The panel is hidden again at task end via reset() /
-        // hideStatusProgress().)
+        // hideStatusProgress().) A maximum of 0 hides the bar
         getStatusLine().setProgressBarMaximum(max);
-        statusLine.setProgressPanelVisible(true);
+        statusLine.setProgressPanelVisible(max != 0);
         statusLine.validate();
         statusLine.paintImmediately(0, 0, statusLine.getWidth(), statusLine.getHeight());
     }
@@ -1111,6 +1119,7 @@ public final class MainWindow extends JFrame {
         if (selected == null) {
             proof.addSeparator();
             proof.add(new SearchInProofTreeAction(this));
+            proof.add(new GotoNodeAction(this));
             proof.add(new SearchInSequentAction(this, sequentViewSearchBar));
             proof.add(new SearchNextAction(this, sequentViewSearchBar));
             proof.add(new SearchPreviousAction(this, sequentViewSearchBar));
@@ -1332,6 +1341,9 @@ public final class MainWindow extends JFrame {
                     newSequentView.printSequent();
                 }
             }
+        }
+        if (newSequentView != currentGoalView) {
+            currentGoalView.resetPrinter();
         }
 
         Runnable sequentUpdater = () -> {

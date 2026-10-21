@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.ldt;
 
 import java.util.Arrays;
@@ -179,7 +180,7 @@ public final class HeapLDT extends LDT {
      */
     public static @Nullable SplitFieldName trySplitFieldName(Named symbol) {
         if (symbol instanceof ParametricFunctionInstance pfi) {
-            // e.g., $classErroneous<[A]>
+            // e.g., $classErroneous<A>
             return new SplitFieldName(pfi.getArgs().head().sort().toString(),
                 pfi.getBase().name().toString());
         }
@@ -269,7 +270,7 @@ public final class HeapLDT extends LDT {
      * Check if the given operator is an instance of the "final" function to access final fields.
      *
      * @param op the operator to check
-     * @return true if the operator is an instance of the {@code final<[X]>} parametric function
+     * @return true if the operator is an instance of the {@code final<X>} parametric function
      */
     public boolean isFinalOp(org.key_project.logic.op.Operator op) {
         return op instanceof ParametricFunctionInstance pfi

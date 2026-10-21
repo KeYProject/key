@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
@@ -282,7 +283,7 @@ public class TestApplyUpdateOnRigidCondition {
         }
 
         return ((de.uka.ilkd.key.rule.MatchConditions) mc).getInstantiations()
-                .getTermInstantiation(result, null, TacletForTests.services());
+                .getTermInstantiation(result, TacletForTests.services());
     }
 
 }

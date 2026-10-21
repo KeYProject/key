@@ -1,15 +1,18 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
-import de.uka.ilkd.key.java.ast.expression.operator.adt.*;
+import de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator;
+import de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator.LogicFunction;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
@@ -68,6 +71,16 @@ public final class SeqLDT extends LDT {
     public ParametricFunctionInstance getSeqGet(Sort instanceSort, TermServices services) {
         return ParametricFunctionInstance.get(seqGet,
             ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
+    }
+
+    /**
+     * Whether the operator is an instance of {@code seqGet}, for any element sort.
+     *
+     * @param op an operator
+     * @return whether {@code op} reads a sequence element
+     */
+    public boolean isSeqGetOp(org.key_project.logic.op.Operator op) {
+        return op instanceof ParametricFunctionInstance pfi && pfi.getBase() == seqGet;
     }
 
 
@@ -134,9 +147,14 @@ public final class SeqLDT extends LDT {
     @Override
     public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
-        return op instanceof SeqSingleton || op instanceof SeqConcat || op instanceof SeqSub
-                || op instanceof SeqReverse || op instanceof SeqIndexOf || op instanceof SeqGet
-                || op instanceof SeqLength || op instanceof SeqPut;
+        if (!(op instanceof LogicFunctionalOperator lfo)) {
+            return false;
+        }
+        final LogicFunction lf = lfo.getFunction();
+        return (lf.returnType == PrimitiveType.JAVA_SEQ
+                || lf == LogicFunction.SeqGet
+                || lf == LogicFunction.SeqIndexOf
+                || lf == LogicFunction.SeqLength);
     }
 
 
@@ -149,15 +167,19 @@ public final class SeqLDT extends LDT {
 
     @Override
     public Function getFunctionFor(Operator op, Services serv, ExecutionContext ec) {
-        return switch (op) {
-            case SeqSingleton ignored -> seqSingleton;
-            case SeqConcat ignored -> seqConcat;
-            case SeqSub ignored -> seqSub;
-            case SeqReverse ignored -> seqReverse;
-            case SeqPut ignored -> seqUpd;
-            case SeqIndexOf ignored -> seqIndexOf;
-            case SeqGet ignored -> getSeqGet(op.getKeYJavaType(serv, ec).getSort(), serv);
-            case SeqLength ignored -> seqLen;
+        if (!(op instanceof LogicFunctionalOperator lfo)) {
+            throw new IllegalArgumentException("Not a logical functional");
+        }
+
+        return switch (lfo.getFunction()) {
+            case SeqSingleton -> seqSingleton;
+            case SeqConcat -> seqConcat;
+            case SeqSub -> seqSub;
+            case SeqReverse -> seqReverse;
+            case SeqPut -> seqUpd;
+            case SeqIndexOf -> seqIndexOf;
+            case SeqGet -> getSeqGet(op.getKeYJavaType(serv, ec).getSort(), serv);
+            case SeqLength -> seqLen;
             default -> throw new AssertionError();
         };
     }

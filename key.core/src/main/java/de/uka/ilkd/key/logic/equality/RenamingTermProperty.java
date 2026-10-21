@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic.equality;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
@@ -80,7 +81,7 @@ public class RenamingTermProperty implements Property<Term> {
     @Override
     public int hashCodeModThisProperty(Term term) {
         // Labels can be completely ignored
-        return hashTermHelper(term, ImmutableList.nil(), 1);
+        return hashTermHelper(term, ImmutableList.nil(), false, 1);
     }
 
     // equals modulo renaming logic
@@ -231,7 +232,8 @@ public class RenamingTermProperty implements Property<Term> {
      * Moved here from {@link JavaBlock} while refactoring equalsModRenaming in {@link Term}.
      * As the implementation of equalsModRenaming in {@link JavaBlock} was only used in
      * {@link RenamingTermProperty#handleJava(JavaBlock, JavaBlock, NameAbstractionTable)}
-     * and the deprecated class de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint,
+     * and the deprecated class
+     * de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.EqualityConstraint,
      * it is now only a helper method in {@link RenamingTermProperty}.
      *
      * @param jb1 the first {@link JavaBlock}
@@ -318,16 +320,18 @@ public class RenamingTermProperty implements Property<Term> {
      * Helps to compute the hash code of a term modulo bound renaming.
      * <p>
      * This method takes care of the top level of the term and calls the recursive helper method
-     * {@link #recursiveHelper(Term, ImmutableList, int)} to take care of the subterms.
+     * {@link #recursiveHelper(Term, ImmutableList, boolean, int)} to take care of the subterms.
      *
      * @param term the term to compute the hash code for
      * @param nameAbstractionList the list of bound variables that is used to abstract from the
      *        variable names
+     * @param belowModality boolean indicates whether on the descended path
+     *        to {@code term} a modality has been passed (e.g. {@code < p > phi(term) })
      * @param hashCode the accumulated hash code (should be 1 for the first call)
      * @return the hash code
      */
     private int hashTermHelper(Term term, ImmutableList<QuantifiableVariable> nameAbstractionList,
-            int hashCode) {
+            boolean belowModality, int hashCode) {
         // mirrors the implementation of unifyHelp that is responsible for equality modulo renaming
         hashCode = 17 * hashCode + term.sort().hashCode();
         hashCode = 17 * hashCode + term.arity();
@@ -339,10 +343,15 @@ public class RenamingTermProperty implements Property<Term> {
             hashCode = 17 * hashCode + mod.kind().hashCode();
             hashCode = 17 * hashCode + hashJavaBlock(mod);
         } else if (op instanceof ProgramVariable pv) {
-            hashCode = 17 * hashCode + pv.hashCodeModProperty(RENAMING_SOURCE_ELEMENT_PROPERTY);
+            hashCode = 17 * hashCode + (belowModality
+                    ? pv.hashCodeModProperty(RENAMING_SOURCE_ELEMENT_PROPERTY)
+                    : pv.name().hashCode());
+        } else {
+            hashCode = 17 * hashCode + op.name().hashCode();
         }
 
-        return recursiveHelper(term, nameAbstractionList, hashCode);
+        return recursiveHelper(term, nameAbstractionList,
+            belowModality || op instanceof JModality, hashCode);
     }
 
     /**
@@ -387,16 +396,18 @@ public class RenamingTermProperty implements Property<Term> {
      * Recursively computes the hash code of a term modulo bound renaming.
      * <p>
      * This method iterates over the subterms of the given term and calls
-     * {@link #hashTermHelper(Term, ImmutableList, int)} for each subterm.
+     * {@link #hashTermHelper(Term, ImmutableList, boolean, int)} for each subterm.
      *
      * @param term the term to compute the hash code for
      * @param nameAbstractionList the list of bound variables that is used to abstract from the
      *        variable names
+     * @param belowModality boolean indicates whether on the recursive descend path
+     *        to the {@code term} a modality has been passed (e.g. {@code < p > phi(term) })
      * @param hashCode the accumulated hash code
      * @return the hash code
      */
     private int recursiveHelper(Term term, ImmutableList<QuantifiableVariable> nameAbstractionList,
-            int hashCode) {
+            boolean belowModality, int hashCode) {
         for (int i = 0; i < term.arity(); i++) {
             ImmutableList<QuantifiableVariable> subBoundVars = nameAbstractionList;
 
@@ -406,7 +417,7 @@ public class RenamingTermProperty implements Property<Term> {
                 subBoundVars = subBoundVars.prepend(qVar);
             }
 
-            hashCode = hashTermHelper(term.sub(i), subBoundVars, hashCode);
+            hashCode = hashTermHelper(term.sub(i), subBoundVars, belowModality, hashCode);
         }
         return hashCode;
     }

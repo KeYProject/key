@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
@@ -16,7 +17,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
 /**
- * Creates an <tt>instance<[Type]>(..)</tt> term for the component type of the array. The component
+ * Creates an <tt>instance<Type>(..)</tt> term for the component type of the array. The component
  * type has to be a reference type.
  */
 public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
@@ -26,7 +27,7 @@ public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
     }
 
     /**
-     * returns an <tt>instance<[G]>(term.sub(1))</tt> term for the element sort of the given array .
+     * returns an <tt>instance<G>(term.sub(1))</tt> term for the element sort of the given array .
      * It is assumed that <tt>term.sub(0)</tt> is either a term of reference array sort or a term
      * with an <tt>exactInstance</tt> symbol as top level depending on a reference array sort.
      */

@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.strategy;
 
 import org.key_project.ldt.IIntLdt;
@@ -129,6 +130,7 @@ public class ArithTermFeatures extends StaticFeatureCollection {
         monomialEquation = opSub(eq, add(intF, nonNegMonomial), add(intF, monomial));
         intInEquation = add(or(leqF, geqF), sub(nonNegMonomial, polynomial));
         linearInEquation = add(or(leqF, geqF), sub(linearMonomial, polynomial));
+        intRelationOp = add(or(leqF, geqF, eqF), sub(intF, intF));
         intRelation = add(or(leqF, geqF, eqF), sub(add(intF, nonNegMonomial), polynomial));
 
         notContainsProduct = rec(any(), ifZero(mulF, not(sub(not(literal), not(literal)))));

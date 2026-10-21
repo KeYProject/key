@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic;
 
 import java.util.List;
@@ -127,15 +128,11 @@ public final class TermFactory {
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
         if (cache != null && !newTerm.containsJavaBlockRecursive()) {
-            JTerm term;
-            synchronized (cache) {
-                term = cache.get(newTerm);
-            }
+            JTerm term = cache.get(newTerm);
             if (term == null) {
-                term = newTerm.checked();
-                synchronized (cache) {
-                    cache.put(term, term);
-                }
+                final JTerm checked = newTerm.checked();
+                final JTerm previous = cache.putIfAbsent(checked, checked);
+                term = previous != null ? previous : checked;
             }
             return term;
         } else {

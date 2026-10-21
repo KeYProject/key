@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
 import java.util.List;
@@ -97,7 +98,7 @@ public class QueueRuleApplicationManagerWakeKeyTest {
     /**
      * The defect that motivated descriptors, pinned directly: the park key of
      * {@code referencedObjectIsCreatedRight} must use the base function of the
-     * {@code select<[deltaObject]>} instance, not the instance itself.
+     * {@code select<deltaObject>} instance, not the instance itself.
      */
     @Test
     void parametricAssumesFirstArgumentIsKeyedByItsBase() throws Exception {

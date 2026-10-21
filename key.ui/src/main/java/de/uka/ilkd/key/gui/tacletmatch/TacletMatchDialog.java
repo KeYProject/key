@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.tacletmatch;
 
 import java.awt.*;
@@ -162,7 +163,7 @@ public class TacletMatchDialog extends ApplyTacletDialog {
 
         alternatives = new JTabbedPane();
         for (int i = 0; i < model.length; i++) {
-            alternatives.addTab("Match " + (i + 1) + " of " + model.length, buildAlternative(i));
+            alternatives.addTab("Match " + (i + 1), buildAlternative(i));
         }
         alternatives.addChangeListener(e -> refreshStatus(current()));
         return alternatives;
@@ -181,8 +182,8 @@ public class TacletMatchDialog extends ApplyTacletDialog {
         ButtonListener listener = new ButtonListener();
         cancelButton.addActionListener(listener);
         applyButton.addActionListener(listener);
-        buttons.add(cancelButton);
         buttons.add(applyButton);
+        buttons.add(cancelButton);
         footer.add(buttons, BorderLayout.EAST);
 
         setStatus(model[current()].getStatusString());

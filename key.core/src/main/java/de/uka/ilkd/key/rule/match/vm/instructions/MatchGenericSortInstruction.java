@@ -1,10 +1,10 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
 import de.uka.ilkd.key.logic.GenericArgument;
-import de.uka.ilkd.key.logic.op.QualifierWrapper;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -63,11 +63,6 @@ public class MatchGenericSortInstruction implements MatchInstruction {
         if (actualElement instanceof GenericArgument(Sort sort)) {
             return matchSorts(sort, mc, services);
         }
-        if (actualElement instanceof QualifierWrapper<?> w
-                && w.getQualifier() instanceof Sort sort) {
-            return matchSorts(sort, mc, services);
-        }
         return null;
     }
-
 }

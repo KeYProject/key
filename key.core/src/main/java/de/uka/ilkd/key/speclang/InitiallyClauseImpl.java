@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
@@ -9,7 +10,7 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.TermServices;
@@ -42,7 +43,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     /**
      * The visibility of the initially clause (null for default visibility).
      */
-    private final VisibilityModifier visibility;
+    private final ModifierKind visibility;
     /**
      * The invariant from which the initially clause is derived.
      */
@@ -73,7 +74,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
      * @param originalSpec
      */
     public InitiallyClauseImpl(String name, String displayName, KeYJavaType kjt,
-            VisibilityModifier visibility, JTerm inv, LocationVariable selfVar,
+            ModifierKind visibility, JTerm inv, LocationVariable selfVar,
             LabeledParserRuleContext originalSpec) {
         assert name != null && !name.isEmpty();
         assert displayName != null && !displayName.isEmpty();
@@ -149,7 +150,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     }
 
     @Override
-    public VisibilityModifier getVisibility() {
+    public ModifierKind getVisibility() {
         return visibility;
     }
 

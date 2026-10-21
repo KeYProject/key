@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.*;
@@ -85,7 +86,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                     if (!assumptions.isEmpty()
                             && Objects.equals(appRestr, ApplicationRestriction.NONE)) {
                         // any restriction is fine. The polarity switches are equiv
-                        // to"inSequentState" in this respect.
+                        // to "inSequentState" in this respect.
                         failureOccurred("The given taclet " + taclet.name()
                             + " has \\ignoreUpdateLevel set or is not set to \\inSequentState.");
                     }
@@ -140,8 +141,6 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         if (instantiation == null) {
             instantiation = createInstantiation(owner, var, services);
             mapping.put(var, instantiation);
-
-
         }
         return instantiation;
     }

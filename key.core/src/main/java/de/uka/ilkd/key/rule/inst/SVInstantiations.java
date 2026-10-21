@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.inst;
 
 import java.util.Iterator;
@@ -383,8 +384,7 @@ public class SVInstantiations
      * @return the Object the SchemaVariable will be instantiated with, null if no instantiation is
      *         stored
      */
-    public JTerm getTermInstantiation(SchemaVariable sv, ExecutionContext ec,
-            LogicServices services) {
+    public JTerm getTermInstantiation(SchemaVariable sv, LogicServices services) {
         final Object inst = getInstantiation(sv);
         if (inst == null) {
             return null;
@@ -392,7 +392,7 @@ public class SVInstantiations
             return term;
         } else if (inst instanceof ProgramElement) {
             return ((Services) services).getTypeConverter()
-                    .convertToLogicElement((ProgramElement) inst, ec);
+                    .convertToLogicElement((ProgramElement) inst, getExecutionContext());
         } else {
             throw CONVERT_INSTANTIATION_EXCEPTION;
         }

@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.parser;
 
 
@@ -9,34 +10,37 @@ public abstract class SchemaVariableModifierSet {
     private boolean strict = false;
     private boolean rigid = false;
     private boolean list = false;
-
+    private boolean definitional = false;
 
     public boolean rigid() {
         return rigid;
     }
 
-
     protected boolean rigidEnabled() {
         return false;
     }
-
 
     public boolean strict() {
         return strict;
     }
 
-
     protected boolean strictEnabled() {
         return false;
     }
-
 
     public boolean list() {
         return list;
     }
 
-
     protected boolean listEnabled() {
+        return false;
+    }
+
+    public boolean definitional() {
+        return definitional;
+    }
+
+    protected boolean definitionalEnabled() {
         return false;
     }
 
@@ -46,15 +50,13 @@ public abstract class SchemaVariableModifierSet {
      *         of schema variables
      */
     public boolean addModifier(String option) {
-        if ("strict".equals(option)) {
-            return addStrict();
-        } else if ("rigid".equals(option)) {
-            return addRigid();
-        } else if ("list".equals(option)) {
-            return addList();
-        }
-
-        return false;
+        return switch (option) {
+            case "strict" -> addStrict();
+            case "rigid" -> addRigid();
+            case "list" -> addList();
+            case "definitional" -> addDefinitional();
+            case null, default -> false;
+        };
     }
 
     public boolean addRigid() {
@@ -70,6 +72,11 @@ public abstract class SchemaVariableModifierSet {
     public boolean addList() {
         this.list = true;
         return listEnabled();
+    }
+
+    public boolean addDefinitional() {
+        this.definitional = true;
+        return definitionalEnabled();
     }
 
     public static class ProgramSV extends SchemaVariableModifierSet {
@@ -102,6 +109,9 @@ public abstract class SchemaVariableModifierSet {
     }
 
     public static class SkolemTermSV extends SchemaVariableModifierSet {
+        protected boolean definitionalEnabled() {
+            return true;
+        }
     }
 
     public static class FreshProgVarSV extends SchemaVariableModifierSet {

@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
@@ -199,6 +200,9 @@ public class TestApplyTaclet {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         TacletApp rApp = rApplist.head();
         rApp = rApp.tryToInstantiate(TacletForTests.services());
+        assertTrue(rApp.completeExceptSkolemConstants(),
+            "Rule App should be applicable, the skolem constants are created on application");
+        rApp = rApp.createSkolemConstants(goal);
         assertTrue(rApp.complete(), "Rule App should be complete");
         ImmutableList<Goal> goals = rApp.rule().getExecutor().apply(goal, rApp);
         assertEquals(1, goals.size(), "Too many or zero goals for all-right.");

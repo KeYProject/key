@@ -24,12 +24,9 @@ de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition#STD_FURTHER_DEFAU
 de.uka.ilkd.key.rule.merge.MergeProcedure#CONCRETE_RULES                       # assigned once in a static block (immutable list); merges run single-core only
 
 # --- all reads and writes hold a lock ---
-de.uka.ilkd.key.logic.op.QualifierWrapper#INSTANCES                            # accessed exclusively inside the synchronized static get()
 de.uka.ilkd.key.proof.calculus.JavaDLSequentKit#INSTANCE                       # assigned once at class-init; reads via synchronized getInstance()
 de.uka.ilkd.key.proof.init.JavaProfile#defaultInstance                         # lazy singleton; every access inside synchronized getDefaultInstance()
 de.uka.ilkd.key.proof.init.JavaProfile#defaultInstancePermissions              # lazy singleton; every access inside synchronized getDefaultInstance()
-de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint#joinCache     # every read/write inside synchronized(joinCacheMonitor)
-de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint#joinCacheOld  # every read/write inside synchronized(joinCacheMonitor)
 
 # --- written only during single-threaded setup/loading, never by proof-search workers ---
 de.uka.ilkd.key.logic.sort.ArraySort#aSH                                       # mutated only via getArraySort during type modeling at load time; NOT safe for callers during proving

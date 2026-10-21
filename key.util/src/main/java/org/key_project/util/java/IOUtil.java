@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.util.java;
 
 import java.io.*;
@@ -908,11 +909,11 @@ public final class IOUtil {
     public static String safePathRelativeTo(Path source, Path basePath) {
         if (Objects.equals(source.getRoot(), basePath.getRoot())) {
             // required on Windows
-            var abs = source.toAbsolutePath();
+            var abs = source.toAbsolutePath().normalize();
             return safePath(basePath.relativize(abs));
         } else {
             // fallback: return absolute path
-            return safePath(source.toAbsolutePath());
+            return safePath(source.toAbsolutePath().normalize());
         }
     }
 }

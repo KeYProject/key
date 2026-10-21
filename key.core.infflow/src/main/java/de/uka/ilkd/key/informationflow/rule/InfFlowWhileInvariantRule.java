@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.informationflow.rule;
 
 import java.util.Iterator;
@@ -45,6 +46,8 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NullMarked;
+
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
 @NullMarked
 public class InfFlowWhileInvariantRule extends WhileInvariantRule {
@@ -178,7 +181,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         Name heapAtPreName = new Name(tb.newName(baseHeap + "_Before_LOOP"));
         final Function heapAtPreFunc =
-            new JFunction(heapAtPreName, heapLDT.targetSort(), true);
+            new JFunction(heapAtPreName, heapLDT.targetSort(), SKOLEM);
         services.getNamespaces().functions().addSafely(heapAtPreFunc);
         final JTerm heapAtPre = tb.func(heapAtPreFunc);
 

@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.GenericParameter;
@@ -16,7 +17,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-/// The abstract declaration of a parametric function, e.g., `append<[E]>(List<[E]>, List<[E]>)`.
+/// The abstract declaration of a parametric function, e.g., `append<E>(List<E>, List<E>)`.
 ///
 /// To get an instantiated instance, use [ParametricFunctionInstance#get(ParametricFunctionDecl,
 /// ImmutableList, de.uka.ilkd.key.java.Services)].

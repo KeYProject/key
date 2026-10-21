@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.control.instantiation_model;
 
 import java.io.StringReader;
@@ -383,8 +384,7 @@ public class TacletFindModel extends AbstractTableModel {
                         // sv instanceof SkolemTermSV
                         final Named n = namespaces().lookupLogicSymbol(new Name(idd.name()));
                         if (n == null) {
-                            result = result.createSkolemConstant(idd.name(), sv, sort, true,
-                                services);
+                            result = result.createSkolemConstant(idd.name(), sv, sort, true, goal);
                         } else {
                             throw new SVInstantiationParserException(idd.name(),
                                 createPosition(irow),

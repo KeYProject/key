@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
@@ -52,16 +53,11 @@ public class Polynomial {
         polyTerm = TermLabelManager.removeIrrelevantLabels((JTerm) polyTerm,
             services);
 
-        Polynomial res;
-        synchronized (cache) {
-            res = cache.get(polyTerm);
-        }
+        Polynomial res = cache.get(polyTerm);
 
         if (res == null) {
             res = createHelp(polyTerm, services);
-            synchronized (cache) {
-                cache.put(polyTerm, res);
-            }
+            cache.put(polyTerm, res);
         }
         return res;
     }

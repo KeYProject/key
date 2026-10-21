@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.Collection;
@@ -50,7 +51,6 @@ public class ProofObligationCreator {
      */
     public ProofAggregate create(ImmutableSet<Taclet> taclets, InitConfig[] initConfigs,
             ImmutableSet<Taclet> axioms, Collection<LoaderListener> listeners) {
-
         ProofAggregate[] singleProofs = new ProofAggregate[taclets.size()];
 
         for (LoaderListener listener : listeners) {

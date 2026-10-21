@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -40,6 +42,20 @@ dependencies {
     runtimeOnly project(":keyext.isabelletranslation")
 }
 
+// Slim runtime classpath: the full runtimeClasspath minus the optional keyext
+// extension modules. Used to produce the slim shadowJar (see task "slimJar").
+configurations {
+    slimRuntimeClasspath {
+        extendsFrom runtimeClasspath
+        exclude group: 'org.key-project', module: 'keyext.ui.testgen'
+        exclude group: 'org.key-project', module: 'keyext.caching'
+        exclude group: 'org.key-project', module: 'keyext.exploration'
+        exclude group: 'org.key-project', module: 'keyext.slicing'
+        exclude group: 'org.key-project', module: 'keyext.proofmanagement'
+        exclude group: 'org.key-project', module: 'keyext.isabelletranslation'
+    }
+}
+
 tasks.register('createExamplesZip', Zip) {
     description = 'Create "examples.zip" containing all KeY examples'
     destinationDirectory = layout.buildDirectory.dir("resources/main/").getOrNull()
@@ -58,6 +74,31 @@ shadowJar {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE // needed for mergeServices
     }
     mergeServiceFiles()
+}
+
+// A slim variant of the shadowJar that omits the optional KeY extension
+// modules and the bundled examples.zip. Produces "key-slim-exe.jar".
+tasks.register('slimJar', ShadowJar) {
+    group = "shadow"
+    description = "Create a slim executable jar 'key-slim-exe.jar' without the KeY extensions"
+    archiveClassifier.set("slim-exe")
+    archiveBaseName.set("key")
+
+    from(sourceSets.named('main').map { it.output })
+    configurations = project.configurations.named('slimRuntimeClasspath').map { [it] }
+
+    manifest {
+        attributes 'Main-Class': 'de.uka.ilkd.key.core.Main'
+    }
+
+    filesMatching("META-INF/services/**") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE // needed for mergeServices
+    }
+    mergeServiceFiles()
+}
+
+tasks.named('assemble') {
+    dependsOn tasks.named('slimJar')
 }
 
 distZip {

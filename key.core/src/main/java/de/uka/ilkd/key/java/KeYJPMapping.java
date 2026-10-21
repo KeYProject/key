@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java;
 
 import java.util.*;
@@ -247,9 +248,9 @@ public class KeYJPMapping {
     }
 
     /**
-     * Equals and hashcode of resolved types do not consider the fully qualified name or the
-     * position in the AST
-     * Hence, classes with same name that occur in different packages are not distinguished.
+     * Equals and hashcode of {@link ResolvedType}s do not consider the fully qualified name or the
+     * position in the AST and may even fail in some cases for equivalent types.
+     * Hence, here we only use the fully qualified names to distinguish between reference types.
      */
     private static final class ResolvedTypeWrapper {
         private final ResolvedType resolvedType;
@@ -261,24 +262,25 @@ public class KeYJPMapping {
         @Override
         public boolean equals(Object o) {
             if (o instanceof ResolvedTypeWrapper other) {
-                final boolean eq = resolvedType.equals(other.resolvedType);
-                if (eq && resolvedType.isReferenceType()) {
+                if (resolvedType.isReferenceType()) {
                     if (!other.resolvedType.isReferenceType()) {
-                        return false; // should not be reachable as then eq is false, but ...
+                        return false;
                     }
+
                     return resolvedType.asReferenceType().getQualifiedName()
                             .equals(other.resolvedType.asReferenceType().getQualifiedName());
                 }
-                return eq;
+
+                return resolvedType.equals(other.resolvedType);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return resolvedType.hashCode() + (resolvedType.isReferenceType()
+            return resolvedType.isReferenceType()
                     ? resolvedType.asReferenceType().getQualifiedName().hashCode()
-                    : 0);
+                    : resolvedType.hashCode();
         }
 
     }

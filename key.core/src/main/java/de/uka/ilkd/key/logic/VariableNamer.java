@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic;
 
 import java.util.*;
@@ -12,8 +13,8 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.statement.EmptyStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
@@ -598,7 +599,8 @@ public abstract class VariableNamer implements InstantiationProposer {
                             app.instantiations(), services);
                         name = ProofSaver.printProgramElement(rhs);
                         break;
-                    } else if (c.getStatementAt(1) instanceof CopyAssignment p2) {
+                    } else if (c.getStatementAt(1) instanceof Assignment p2
+                            && JavaAstUtils.isCopyAssignment(p2)) {
                         Expression lhs = p2.getExpressionAt(0);
                         if (lhs.equals(sv)) {
                             SchemaVariable rhs = (SchemaVariable) p2.getExpressionAt(1);

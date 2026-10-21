@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
 import java.util.LinkedHashMap;
@@ -12,7 +13,6 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.expression.*;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.Throw;
@@ -45,6 +45,9 @@ import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+
+import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.*;
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
 /**
  * Implements the rule which inserts operation contracts for a method call.
@@ -109,7 +112,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
                 && ((New) activeStatement).getTypeDeclarationCount() == 0) {
             actualResult = null;
             mr = (New) activeStatement;
-        } else if (activeStatement instanceof CopyAssignment ca) {
+        } else if (activeStatement instanceof Assignment ca && JavaAstUtils.isCopyAssignment(ca)) {
             final Expression lhs = ca.getExpressionAt(0);
             final Expression rhs = ca.getExpressionAt(1);
             if ((rhs instanceof MethodReference
@@ -276,7 +279,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name methodHeapName = new Name(tb.newName(heap + "After_" + pm.getName()));
         final Function methodHeapFunc =
-            new JFunction(methodHeapName, heapLDT.targetSort(), true);
+            new JFunction(methodHeapName, heapLDT.targetSort(), SKOLEM);
         services.getNamespaces().functions().addSafely(methodHeapFunc);
         final JTerm methodHeap = tb.func(methodHeapFunc);
         final Name anonHeapName = new Name(tb.newName("anon_" + heap + "_" + pm.getName()));
@@ -347,7 +350,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
 
             pe = curPrefix.getFirstActiveChildPos().getProgram(curPrefix);
 
-            assert pe instanceof CopyAssignment || pe instanceof MethodReference
+            assert JavaAstUtils.isCopyAssignment(pe) || pe instanceof MethodReference
                     || pe instanceof New;
 
             int i = length - 1;
@@ -360,7 +363,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             } while (i >= 0);
 
         } else {
-            assert pe instanceof CopyAssignment || pe instanceof MethodReference
+            assert JavaAstUtils.isCopyAssignment(pe) || pe instanceof MethodReference
                     || pe instanceof New;
         }
         return result;
@@ -947,7 +950,9 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             if (inst.actualResult == null) {
                 resultAssign = new StatementBlock();
             } else {
-                final CopyAssignment ca = new CopyAssignment(inst.actualResult, resultVar);
+                final Assignment ca =
+                    new BinaryAssignment(COPY, inst.actualResult,
+                        resultVar);
                 resultAssign = new StatementBlock(ca);
             }
             final StatementBlock postSB = replaceStatement(jb, resultAssign);

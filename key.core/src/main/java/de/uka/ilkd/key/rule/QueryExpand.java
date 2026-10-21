@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
 import java.util.*;
@@ -11,7 +12,8 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
+import de.uka.ilkd.key.java.ast.expression.BinaryAssignment;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.MethodReference;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
@@ -46,6 +48,8 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.COPY;
 
 
 /**
@@ -209,7 +213,7 @@ public class QueryExpand implements BuiltInRule {
 
         stmnt.add(KeYJavaASTFactory.declare(result, progResultType));
 
-        final CopyAssignment assignment = new CopyAssignment(result, mr);
+        final Assignment assignment = new BinaryAssignment(COPY, result, mr);
 
         stmnt.add(assignment);
 

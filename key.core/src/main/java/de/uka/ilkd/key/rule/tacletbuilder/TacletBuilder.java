@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.HashMap;
@@ -274,7 +275,7 @@ public abstract class TacletBuilder<T extends Taclet> {
         ruleSets = rs;
     }
 
-    public Sequent ifSequent() {
+    public Sequent assumesSequent() {
         return assumesSeq;
     }
 
@@ -301,6 +302,8 @@ public abstract class TacletBuilder<T extends Taclet> {
      * IllegalStateException.
      */
     public abstract T getTaclet();
+
+    public abstract TacletBuilder<T> copy();
 
     public T getTacletWithoutInactiveGoalTemplates(Set<Choice> active) {
         if (goal2Choices == null || goals.isEmpty()) {

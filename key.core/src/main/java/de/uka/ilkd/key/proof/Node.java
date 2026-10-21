@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
@@ -796,14 +797,7 @@ public class Node implements Iterable<Node> {
      * @see #register(Object, Class)
      */
     public <T> @Nullable T lookup(Class<T> service) {
-        try {
-            if (userData == null) {
-                return null;
-            }
-            return userData.get(service);
-        } catch (IllegalStateException ignored) {
-            return null;
-        }
+        return userData == null ? null : userData.getOrNull(service);
     }
 
     /**

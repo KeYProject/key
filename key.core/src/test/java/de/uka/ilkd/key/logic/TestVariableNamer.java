@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic;
 
 import java.util.Collections;
@@ -9,7 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.expression.operator.PostIncrement;
+import de.uka.ilkd.key.java.ast.expression.UnaryAssignment;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
@@ -28,11 +29,14 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.prover.sequent.*;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.Test;
 
+import static de.uka.ilkd.key.java.ast.expression.UnaryAssignment.UnaryAssignmentKind.POST_INCREMENT;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -68,7 +72,7 @@ public class TestVariableNamer {
     }
 
     private SequentFormula constructFormula(ProgramVariable containedVar) {
-        Statement statement = new PostIncrement(containedVar);
+        Statement statement = new UnaryAssignment(POST_INCREMENT, containedVar);
         StatementBlock statementBlock = new StatementBlock(statement);
         JavaBlock javaBlock = JavaBlock.createJavaBlock(statementBlock);
 
@@ -115,7 +119,7 @@ public class TestVariableNamer {
 
         SchemaVariable sv = SchemaVariableFactory.createProgramSV(new ProgramElementName("sv"),
             ProgramSVSort.STATEMENT, false);
-        Statement statement = new PostIncrement(containedVar);
+        Statement statement = new UnaryAssignment(POST_INCREMENT, containedVar);
         app = (NoPosTacletApp) app.addCheckedInstantiation(sv, statement,
             goal.proof().getServices(), false);
 
@@ -132,8 +136,9 @@ public class TestVariableNamer {
             SVInstantiations insts = noPosTacletApp.instantiations();
             for (var e : insts.getInstantiationMap()) {
                 Object inst = e.value().getInstantiation();
-                if (inst instanceof PostIncrement postIncrement
-                        && postIncrement.getFirstElement() == containedVar) {
+                if (inst instanceof UnaryAssignment uo
+                        && uo.getKind() == POST_INCREMENT
+                        && uo.getFirstElement() == containedVar) {
                     return true;
                 }
             }

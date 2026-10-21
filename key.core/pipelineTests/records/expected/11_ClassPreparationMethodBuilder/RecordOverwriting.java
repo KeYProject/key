@@ -12,7 +12,7 @@ final class MyRecord extends Record {
       @*/
     @javax.annotation.processing.Generated("RecordClassBuilder")
     public MyRecord(String test) {
-        //Created by RecordClassBuilder.java:131
+        //Created by RecordClassBuilder.java:132
         this.test = test;
     }
 
@@ -56,7 +56,7 @@ final class MyRecord extends Record {
 
     public void $init(String test) {
         super.$init();
-        //Created by RecordClassBuilder.java:131
+        //Created by RecordClassBuilder.java:132
         this.test = test;
     }
 

@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.nparser.builder;
 
 import java.util.List;
@@ -114,8 +115,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                 }
                 if (genericParams == null) {
                     Function fn =
-                        new JFunction(new Name(argName), argSort, new Sort[] { sort }, null,
-                            false, false);
+                        new JFunction(new Name(argName), argSort, new Sort[] { sort }, null, false);
                     dtFnNamespace.add(fn);
                 } else {
                     var fn = new ParametricFunctionDecl(new Name(argName), genericParams,
@@ -124,7 +124,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                 }
             }
             if (genericParams == null) {
-                var fn = new JFunction(name, sort, args, null, true, false);
+                var fn = new JFunction(name, sort, args, null, true);
                 functions().addSafely(fn);
                 docsSpace().setDocumentation(fn, doc);
             } else {

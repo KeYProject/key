@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang;
 
 import java.util.ArrayList;
@@ -10,8 +11,7 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Private;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
@@ -107,8 +107,8 @@ public final class QueryAxiom extends ClassAxiom {
 
 
     @Override
-    public VisibilityModifier getVisibility() {
-        return new Private();
+    public ModifierKind getVisibility() {
+        return ModifierKind.PRIVATE;
     }
 
 
@@ -175,6 +175,13 @@ public final class QueryAxiom extends ClassAxiom {
         // get real implementation of program method
         final IProgramMethod targetImpl =
             services.getJavaInfo().getProgramMethod(kjt, target.getName(), sig, kjt);
+
+        if (targetImpl.getMethodDeclaration().getBody() == null) {
+            // no method implementation available so using a query axiom
+            // that requires inlining of the body is not sensible.
+            return DefaultImmutableSet.nil();
+        }
+
         final MethodBodyStatement mbs = new MethodBodyStatement(targetImpl, selfProgSV,
             resultProgSV, new ImmutableArray<>(paramProgSVs));
         final StatementBlock sb = new StatementBlock(mbs);

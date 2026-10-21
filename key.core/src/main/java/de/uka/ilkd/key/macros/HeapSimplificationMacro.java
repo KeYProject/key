@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.macros;
 
 import java.util.Set;
@@ -74,7 +75,7 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
 
         "allFieldsEq", "subsetSingletonLeft", "subsetSingletonLeftEQ", "subsetSingletonRight",
         "subsetSingletonRightEQ", "subsetUnionLeft", "subsetUnionLeftEQ",
-        "subsetOfIntersectWithItSelfEQ1", "subsetOfIntersectWithItSelfEQ2", "allFieldsSubsetOf",
+        "subsetOfIntersectWithItSelf1EQ", "subsetOfIntersectWithItSelf2EQ", "allFieldsSubsetOf",
         "disjointAllFields", "disjointAllObjects", "disjointInfiniteUnion",
         "disjointInfiniteUnion_2", "intersectAllFieldsFreshLocs", "disjointWithSingleton1",
         "disjointWithSingleton2", "sortsDisjointModuloNull",

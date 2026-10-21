@@ -952,7 +952,7 @@
             (rule "replace_known_left" (formula "26") (term "1") (ifseqformula "15"))
             (builtin "One Step Simplification" (formula "26"))
             (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
             (rule "inEqSimp_homoInEq1" (formula "11") (term "1"))
             (rule "polySimp_mulComm0" (formula "11") (term "1,0,1"))
             (rule "polySimp_rightDist" (formula "11") (term "1,0,1"))
@@ -1115,7 +1115,7 @@
             (builtin "One Step Simplification" (formula "13"))
             (rule "notLeft" (formula "13"))
             (rule "allLeft" (formula "16") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
             (rule "inEqSimp_homoInEq1" (formula "16") (term "1"))
             (rule "polySimp_mulComm0" (formula "16") (term "1,0,1"))
             (rule "polySimp_rightDist" (formula "16") (term "1,0,1"))
@@ -1224,7 +1224,7 @@
             (rule "qeq_literals" (formula "25") (term "0,1,0"))
             (builtin "One Step Simplification" (formula "25"))
             (rule "allLeft" (formula "21") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
             (rule "inEqSimp_homoInEq1" (formula "21") (term "1,0,0,0,0"))
             (rule "polySimp_mulComm0" (formula "21") (term "1,0,1,0,0,0,0"))
             (rule "polySimp_rightDist" (formula "21") (term "1,0,1,0,0,0,0"))
@@ -3423,7 +3423,7 @@
                                                                                     (builtin "One Step Simplification" (formula "44"))
                                                                                     (rule "shift_paren_or" (formula "34") (term "0,0,0,0,0"))
                                                                                     (rule "allLeft" (formula "17") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                     (rule "replace_known_left" (formula "17") (term "0,0,0") (ifseqformula "26"))
                                                                                     (builtin "One Step Simplification" (formula "17"))
                                                                                     (rule "inEqSimp_homoInEq1" (formula "17") (term "1"))
@@ -4360,7 +4360,7 @@
                                                                                     (builtin "One Step Simplification" (formula "1"))
                                                                                     (rule "true_left" (formula "1"))
                                                                                     (rule "allLeft" (formula "17") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                     (rule "replace_known_left" (formula "17") (term "0,0,0") (ifseqformula "26"))
                                                                                     (builtin "One Step Simplification" (formula "17"))
                                                                                     (rule "inEqSimp_homoInEq0" (formula "17") (term "0"))
@@ -7077,7 +7077,7 @@
                                                                                     (rule "leq_literals" (formula "21") (term "0,1"))
                                                                                     (builtin "One Step Simplification" (formula "21"))
                                                                                     (rule "allLeft" (formula "17") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                     (rule "inEqSimp_homoInEq0" (formula "17") (term "1,0"))
                                                                                     (rule "polySimp_mulComm0" (formula "17") (term "1,0,1,0"))
                                                                                     (rule "polySimp_rightDist" (formula "17") (term "1,0,1,0"))
@@ -7136,7 +7136,7 @@
                                                                                     (rule "leq_literals" (formula "18") (term "0,1"))
                                                                                     (builtin "One Step Simplification" (formula "18"))
                                                                                     (rule "allLeft" (formula "19") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                     (rule "inEqSimp_homoInEq1" (formula "19") (term "1"))
                                                                                     (rule "polySimp_mulComm0" (formula "19") (term "1,0,1"))
                                                                                     (rule "polySimp_rightDist" (formula "19") (term "1,0,1"))
@@ -7215,7 +7215,7 @@
                                                                                     (rule "elementOfSingleton" (formula "38") (term "0,0,0"))
                                                                                     (builtin "One Step Simplification" (formula "38"))
                                                                                     (rule "allLeft" (formula "39") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                     (rule "inEqSimp_homoInEq1" (formula "39") (term "1"))
                                                                                     (rule "polySimp_mulComm0" (formula "39") (term "1,0,1"))
                                                                                     (rule "polySimp_rightDist" (formula "39") (term "1,0,1"))
@@ -9288,7 +9288,7 @@
                                                                                  (builtin "One Step Simplification" (formula "27"))
                                                                                  (rule "true_left" (formula "27"))
                                                                                  (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                  (rule "replace_known_left" (formula "13") (term "0,0,0") (ifseqformula "22"))
                                                                                  (builtin "One Step Simplification" (formula "13"))
                                                                                  (rule "inEqSimp_homoInEq1" (formula "13") (term "1"))
@@ -10798,7 +10798,7 @@
                                                                                  (builtin "One Step Simplification" (formula "43"))
                                                                                  (rule "shift_paren_or" (formula "30") (term "0,0,0,0,0"))
                                                                                  (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                  (rule "replace_known_left" (formula "13") (term "0,0,0") (ifseqformula "22"))
                                                                                  (builtin "One Step Simplification" (formula "13"))
                                                                                  (rule "inEqSimp_homoInEq0" (formula "13") (term "0"))
@@ -11638,7 +11638,7 @@
                                                                                  (builtin "One Step Simplification" (formula "13"))
                                                                                  (rule "true_left" (formula "13"))
                                                                                  (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                  (rule "inEqSimp_homoInEq0" (formula "13") (term "1,0"))
                                                                                  (rule "polySimp_mulComm0" (formula "13") (term "1,0,1,0"))
                                                                                  (rule "polySimp_rightDist" (formula "13") (term "1,0,1,0"))
@@ -11685,7 +11685,7 @@
                                                                                  (rule "leq_literals" (formula "14") (term "0,1"))
                                                                                  (builtin "One Step Simplification" (formula "14"))
                                                                                  (rule "allLeft" (formula "15") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                  (rule "inEqSimp_homoInEq1" (formula "15") (term "1"))
                                                                                  (rule "polySimp_mulComm0" (formula "15") (term "1,0,1"))
                                                                                  (rule "polySimp_rightDist" (formula "15") (term "1,0,1"))
@@ -11825,7 +11825,7 @@
                                                                                  (rule "hideAuxiliaryEq" (formula "34"))
                                                                                  (rule "eqSymm" (formula "34"))
                                                                                  (rule "allLeft" (formula "35") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                  (rule "inEqSimp_homoInEq0" (formula "35") (term "1,0"))
                                                                                  (rule "polySimp_mulComm0" (formula "35") (term "1,0,1,0"))
                                                                                  (rule "polySimp_rightDist" (formula "35") (term "1,0,1,0"))
@@ -13010,7 +13010,7 @@
                                                                               (rule "commute_and" (formula "33") (term "0,0,1,1,0,0,0,0,0"))
                                                                               (rule "shift_paren_or" (formula "16") (term "0,0,0,0,0"))
                                                                               (rule "allLeft" (formula "27") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                               (rule "replace_known_left" (formula "27") (term "0,0,0") (ifseqformula "20"))
                                                                               (builtin "One Step Simplification" (formula "27"))
                                                                               (rule "inEqSimp_homoInEq0" (formula "27") (term "0"))
@@ -13420,7 +13420,7 @@
                                                                               (rule "commute_and" (formula "33") (term "0,0,1,1,0,0,0,0,0"))
                                                                               (rule "shift_paren_or" (formula "16") (term "0,0,0,0,0"))
                                                                               (rule "allLeft" (formula "27") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                               (rule "replace_known_left" (formula "27") (term "0,0,0") (ifseqformula "20"))
                                                                               (builtin "One Step Simplification" (formula "27"))
                                                                               (rule "inEqSimp_homoInEq0" (formula "27") (term "0"))
@@ -14689,7 +14689,7 @@
                                                                            (rule "shift_paren_or" (formula "27") (term "0,0,0,0,0"))
                                                                            (rule "commute_and" (formula "28") (term "0,0,1,1,0,0,0,0,0"))
                                                                            (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                            (rule "replace_known_left" (formula "11") (term "0,0,0") (ifseqformula "20"))
                                                                            (builtin "One Step Simplification" (formula "11"))
                                                                            (rule "inEqSimp_homoInEq0" (formula "11") (term "0"))
@@ -15106,7 +15106,7 @@
                                                                            (rule "commute_and" (formula "29") (term "0,0,1,1,0,0,0,0,0"))
                                                                            (rule "shift_paren_or" (formula "12") (term "0,0,0,0,0"))
                                                                            (rule "allLeft" (formula "23") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                            (rule "replace_known_left" (formula "23") (term "0,0,0") (ifseqformula "16"))
                                                                            (builtin "One Step Simplification" (formula "23"))
                                                                            (rule "inEqSimp_homoInEq1" (formula "23") (term "1"))
@@ -18800,7 +18800,7 @@
                                                                                              (builtin "One Step Simplification" (formula "29"))
                                                                                              (rule "true_left" (formula "29"))
                                                                                              (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                              (rule "replace_known_left" (formula "13") (term "0,0,0") (ifseqformula "22"))
                                                                                              (builtin "One Step Simplification" (formula "13"))
                                                                                              (rule "inEqSimp_homoInEq1" (formula "13") (term "1"))
@@ -19488,7 +19488,7 @@
                                                                                              (builtin "One Step Simplification" (formula "29"))
                                                                                              (rule "true_left" (formula "29"))
                                                                                              (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                              (rule "replace_known_left" (formula "13") (term "0,0,0") (ifseqformula "22"))
                                                                                              (builtin "One Step Simplification" (formula "13"))
                                                                                              (rule "inEqSimp_homoInEq1" (formula "13") (term "1"))
@@ -24925,7 +24925,7 @@
                                                                                                 (rule "true_left" (formula "30"))
                                                                                                 (rule "commute_and" (formula "33") (term "0,0,1,1,0,0,0,0,0"))
                                                                                                 (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                                 (rule "replace_known_left" (formula "13") (term "0,0,0") (ifseqformula "22"))
                                                                                                 (builtin "One Step Simplification" (formula "13"))
                                                                                                 (rule "inEqSimp_homoInEq0" (formula "13") (term "0"))
@@ -36476,7 +36476,7 @@
                                                                                                 (rule "polySimp_elimOne" (formula "27") (term "1,1"))
                                                                                                 (rule "shift_paren_or" (formula "13") (term "0,0,0,0,0"))
                                                                                                 (rule "allLeft" (formula "31") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                                 (rule "replace_known_left" (formula "31") (term "0,0,0") (ifseqformula "17"))
                                                                                                 (builtin "One Step Simplification" (formula "31"))
                                                                                                 (rule "inEqSimp_homoInEq1" (formula "31") (term "1"))
@@ -36530,7 +36530,7 @@
                                                                                                 (rule "mul_literals" (formula "1") (term "1,1,0,0"))
                                                                                                 (rule "shift_paren_or" (formula "14") (term "0,0,0,0,0"))
                                                                                                 (rule "allLeft" (formula "29") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                                 (rule "replace_known_left" (formula "29") (term "0,0,0") (ifseqformula "18"))
                                                                                                 (builtin "One Step Simplification" (formula "29"))
                                                                                                 (rule "inEqSimp_homoInEq1" (formula "29") (term "1"))
@@ -36883,7 +36883,7 @@
                                                                                              (rule "true_left" (formula "25"))
                                                                                              (rule "shift_paren_or" (formula "13") (term "0,0,0,0,0"))
                                                                                              (rule "allLeft" (formula "27") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                              (rule "replace_known_left" (formula "27") (term "0,0,0") (ifseqformula "17"))
                                                                                              (builtin "One Step Simplification" (formula "27"))
                                                                                              (rule "inEqSimp_homoInEq1" (formula "27") (term "1"))
@@ -40487,7 +40487,7 @@
                                                                            (rule "commute_or_2" (formula "33") (term "0,0,0,0"))
                                                                            (rule "shift_paren_or" (formula "33") (term "0,0,0,0,0"))
                                                                            (rule "allLeft" (formula "17") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                            (rule "replace_known_left" (formula "17") (term "0,0,0") (ifseqformula "26"))
                                                                            (builtin "One Step Simplification" (formula "17"))
                                                                            (rule "inEqSimp_homoInEq0" (formula "17") (term "0"))
@@ -40904,7 +40904,7 @@
                                                                            (rule "commute_or_2" (formula "33") (term "0,0,0,0"))
                                                                            (rule "shift_paren_or" (formula "33") (term "0,0,0,0,0"))
                                                                            (rule "allLeft" (formula "17") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                            (rule "replace_known_left" (formula "17") (term "0,0,0") (ifseqformula "26"))
                                                                            (builtin "One Step Simplification" (formula "17"))
                                                                            (rule "inEqSimp_homoInEq1" (formula "17") (term "1"))
@@ -41744,7 +41744,7 @@
                                                                            (builtin "One Step Simplification" (formula "7"))
                                                                            (rule "true_left" (formula "7"))
                                                                            (rule "allLeft" (formula "17") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                            (rule "inEqSimp_homoInEq0" (formula "17") (term "1,0"))
                                                                            (rule "polySimp_mulComm0" (formula "17") (term "1,0,1,0"))
                                                                            (rule "polySimp_rightDist" (formula "17") (term "1,0,1,0"))
@@ -41790,7 +41790,7 @@
                                                                            (builtin "One Step Simplification" (formula "17"))
                                                                            (rule "notLeft" (formula "17"))
                                                                            (rule "allLeft" (formula "18") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                            (rule "inEqSimp_homoInEq0" (formula "18") (term "1,0"))
                                                                            (rule "polySimp_mulComm0" (formula "18") (term "1,0,1,0"))
                                                                            (rule "polySimp_rightDist" (formula "18") (term "1,0,1,0"))
@@ -42382,7 +42382,7 @@
                                                                         (rule "shift_paren_or" (formula "29") (term "0,0,0,0,0"))
                                                                         (rule "commute_and" (formula "30") (term "0,0,1,1,0,0,0,0,0"))
                                                                         (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                         (rule "replace_known_left" (formula "13") (term "0,0,0") (ifseqformula "22"))
                                                                         (builtin "One Step Simplification" (formula "13"))
                                                                         (rule "inEqSimp_homoInEq1" (formula "13") (term "1"))
@@ -42808,7 +42808,7 @@
                                                                         (rule "commute_and" (formula "31") (term "0,0,1,1,0,0,0,0,0"))
                                                                         (rule "shift_paren_or" (formula "14") (term "0,0,0,0,0"))
                                                                         (rule "allLeft" (formula "25") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                         (rule "replace_known_left" (formula "25") (term "0,0,0") (ifseqformula "18"))
                                                                         (builtin "One Step Simplification" (formula "25"))
                                                                         (rule "inEqSimp_homoInEq0" (formula "25") (term "0"))
@@ -43088,7 +43088,7 @@
                                                                         (builtin "One Step Simplification" (formula "25"))
                                                                         (rule "notLeft" (formula "25"))
                                                                         (rule "allLeft" (formula "27") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                         (rule "inEqSimp_homoInEq0" (formula "27") (term "1,0"))
                                                                         (rule "polySimp_mulComm0" (formula "27") (term "1,0,1,0"))
                                                                         (rule "polySimp_rightDist" (formula "27") (term "1,0,1,0"))
@@ -43184,7 +43184,7 @@
                                                                         (builtin "One Step Simplification" (formula "29"))
                                                                         (rule "eqSymm" (formula "29") (term "1,0,0,0,0"))
                                                                         (rule "allLeft" (formula "25") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                         (rule "inEqSimp_homoInEq0" (formula "25") (term "1,0"))
                                                                         (rule "polySimp_mulComm0" (formula "25") (term "1,0,1,0"))
                                                                         (rule "polySimp_rightDist" (formula "25") (term "1,0,1,0"))
@@ -44136,7 +44136,7 @@
                                                                               (builtin "One Step Simplification" (formula "4"))
                                                                               (rule "true_left" (formula "4"))
                                                                               (rule "allLeft" (formula "25") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                               (rule "replace_known_left" (formula "25") (term "0,0,0") (ifseqformula "19"))
                                                                               (builtin "One Step Simplification" (formula "25"))
                                                                               (rule "inEqSimp_homoInEq0" (formula "25") (term "0"))
@@ -44542,7 +44542,7 @@
                                                                                  (builtin "One Step Simplification" (formula "5"))
                                                                                  (rule "true_left" (formula "5"))
                                                                                  (rule "allLeft" (formula "26") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                  (rule "replace_known_left" (formula "26") (term "0,0,0") (ifseqformula "20"))
                                                                                  (builtin "One Step Simplification" (formula "26"))
                                                                                  (rule "inEqSimp_homoInEq0" (formula "26") (term "0"))
@@ -44597,7 +44597,7 @@
                                                                                  (builtin "One Step Simplification" (formula "5"))
                                                                                  (rule "true_left" (formula "5"))
                                                                                  (rule "allLeft" (formula "26") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                  (rule "replace_known_left" (formula "26") (term "0,0,0") (ifseqformula "20"))
                                                                                  (builtin "One Step Simplification" (formula "26"))
                                                                                  (rule "inEqSimp_homoInEq0" (formula "26") (term "0"))
@@ -45273,7 +45273,7 @@
                                                                               (builtin "One Step Simplification" (formula "1"))
                                                                               (rule "true_left" (formula "1"))
                                                                               (rule "allLeft" (formula "25") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                               (rule "replace_known_left" (formula "25") (term "0,0,0") (ifseqformula "19"))
                                                                               (builtin "One Step Simplification" (formula "25"))
                                                                               (rule "inEqSimp_homoInEq0" (formula "25") (term "0"))
@@ -45675,7 +45675,7 @@
                                                                                  (builtin "One Step Simplification" (formula "5"))
                                                                                  (rule "true_left" (formula "5"))
                                                                                  (rule "allLeft" (formula "26") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                  (rule "replace_known_left" (formula "26") (term "0,0,0") (ifseqformula "20"))
                                                                                  (builtin "One Step Simplification" (formula "26"))
                                                                                  (rule "inEqSimp_homoInEq1" (formula "26") (term "1"))
@@ -45726,7 +45726,7 @@
                                                                                  (builtin "One Step Simplification" (formula "5"))
                                                                                  (rule "true_left" (formula "5"))
                                                                                  (rule "allLeft" (formula "26") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                                  (rule "replace_known_left" (formula "26") (term "0,0,0") (ifseqformula "20"))
                                                                                  (builtin "One Step Simplification" (formula "26"))
                                                                                  (rule "inEqSimp_homoInEq1" (formula "26") (term "1"))
@@ -48568,7 +48568,7 @@
                                                                            (builtin "One Step Simplification" (formula "1"))
                                                                            (rule "true_left" (formula "1"))
                                                                            (rule "allLeft" (formula "21") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                            (rule "replace_known_left" (formula "21") (term "0,0,0") (ifseqformula "15"))
                                                                            (builtin "One Step Simplification" (formula "21"))
                                                                            (rule "inEqSimp_homoInEq1" (formula "21") (term "1"))
@@ -48768,7 +48768,7 @@
                                                                               (rule "eqSymm" (formula "39"))
                                                                               (rule "applyEq" (formula "39") (term "1") (ifseqformula "25"))
                                                                               (rule "allLeft" (formula "22") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                               (rule "replace_known_left" (formula "22") (term "0,0,0") (ifseqformula "16"))
                                                                               (builtin "One Step Simplification" (formula "22"))
                                                                               (rule "inEqSimp_homoInEq1" (formula "22") (term "1"))
@@ -48811,7 +48811,7 @@
                                                                               (builtin "One Step Simplification" (formula "36"))
                                                                               (rule "notRight" (formula "36"))
                                                                               (rule "allLeft" (formula "22") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                               (rule "replace_known_left" (formula "22") (term "0,0,0") (ifseqformula "16"))
                                                                               (builtin "One Step Simplification" (formula "22"))
                                                                               (rule "inEqSimp_homoInEq0" (formula "22") (term "0"))
@@ -49782,7 +49782,7 @@
                                                                            (builtin "One Step Simplification" (formula "1"))
                                                                            (rule "true_left" (formula "1"))
                                                                            (rule "allLeft" (formula "21") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                            (rule "replace_known_left" (formula "21") (term "0,0,0") (ifseqformula "15"))
                                                                            (builtin "One Step Simplification" (formula "21"))
                                                                            (rule "inEqSimp_homoInEq0" (formula "21") (term "0"))
@@ -49978,7 +49978,7 @@
                                                                               (rule "eqSymm" (formula "40"))
                                                                               (rule "applyEq" (formula "40") (term "1") (ifseqformula "25"))
                                                                               (rule "allLeft" (formula "22") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                               (rule "replace_known_left" (formula "22") (term "0,0,0") (ifseqformula "16"))
                                                                               (builtin "One Step Simplification" (formula "22"))
                                                                               (rule "inEqSimp_homoInEq0" (formula "22") (term "0"))
@@ -50017,7 +50017,7 @@
                                                                               (builtin "One Step Simplification" (formula "36"))
                                                                               (rule "notRight" (formula "36"))
                                                                               (rule "allLeft" (formula "22") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                                               (rule "replace_known_left" (formula "22") (term "0,0,0") (ifseqformula "16"))
                                                                               (builtin "One Step Simplification" (formula "22"))
                                                                               (rule "inEqSimp_homoInEq1" (formula "22") (term "1"))
@@ -53617,7 +53617,7 @@
                                                       (rule "commute_and" (formula "31") (term "0,0,1,1,0,0,0,0,0"))
                                                       (rule "shift_paren_or" (formula "14") (term "0,0,0,0,0"))
                                                       (rule "allLeft" (formula "25") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                       (rule "replace_known_left" (formula "25") (term "0,0,0") (ifseqformula "18"))
                                                       (builtin "One Step Simplification" (formula "25"))
                                                       (rule "inEqSimp_homoInEq0" (formula "25") (term "0"))
@@ -54028,7 +54028,7 @@
                                                       (rule "commute_and" (formula "31") (term "0,0,1,1,0,0,0,0,0"))
                                                       (rule "shift_paren_or" (formula "14") (term "0,0,0,0,0"))
                                                       (rule "allLeft" (formula "25") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                       (rule "replace_known_left" (formula "25") (term "0,0,0") (ifseqformula "18"))
                                                       (builtin "One Step Simplification" (formula "25"))
                                                       (rule "inEqSimp_homoInEq1" (formula "25") (term "1"))
@@ -54915,7 +54915,7 @@
                                                       (builtin "One Step Simplification" (formula "25"))
                                                       (rule "notLeft" (formula "25"))
                                                       (rule "allLeft" (formula "25") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                       (rule "inEqSimp_homoInEq0" (formula "25") (term "1,0"))
                                                       (rule "polySimp_mulComm0" (formula "25") (term "1,0,1,0"))
                                                       (rule "polySimp_rightDist" (formula "25") (term "1,0,1,0"))
@@ -55024,7 +55024,7 @@
                                                       (builtin "One Step Simplification" (formula "27"))
                                                       (rule "eqSymm" (formula "27") (term "1,0,0,0"))
                                                       (rule "allLeft" (formula "28") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                       (rule "inEqSimp_homoInEq1" (formula "28") (term "1"))
                                                       (rule "polySimp_mulComm0" (formula "28") (term "1,0,1"))
                                                       (rule "polySimp_rightDist" (formula "28") (term "1,0,1"))
@@ -55608,7 +55608,7 @@
                                                    (rule "commute_and" (formula "27") (term "0,0,1,1,0,0,0,0,0"))
                                                    (rule "shift_paren_or" (formula "10") (term "0,0,0,0,0"))
                                                    (rule "allLeft" (formula "21") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                    (rule "replace_known_left" (formula "21") (term "0,0,0") (ifseqformula "14"))
                                                    (builtin "One Step Simplification" (formula "21"))
                                                    (rule "inEqSimp_homoInEq0" (formula "21") (term "0"))
@@ -55822,7 +55822,7 @@
                                                    (rule "commute_and" (formula "27") (term "0,0,1,1,0,0,0,0,0"))
                                                    (rule "shift_paren_or" (formula "10") (term "0,0,0,0,0"))
                                                    (rule "allLeft" (formula "21") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                    (rule "replace_known_left" (formula "21") (term "0,0,0") (ifseqformula "14"))
                                                    (builtin "One Step Simplification" (formula "21"))
                                                    (rule "inEqSimp_homoInEq1" (formula "21") (term "1"))
@@ -56257,7 +56257,7 @@
                                                    (builtin "One Step Simplification" (formula "21"))
                                                    (rule "notLeft" (formula "21"))
                                                    (rule "allLeft" (formula "21") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq1" (formula "21") (term "1"))
                                                    (rule "polySimp_mulComm0" (formula "21") (term "1,0,1"))
                                                    (rule "polySimp_rightDist" (formula "21") (term "1,0,1"))
@@ -56346,7 +56346,7 @@
                                                    (rule "hideAuxiliaryEq" (formula "23"))
                                                    (rule "eqSymm" (formula "23"))
                                                    (rule "allLeft" (formula "24") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq1" (formula "24") (term "1"))
                                                    (rule "polySimp_mulComm0" (formula "24") (term "1,0,1"))
                                                    (rule "polySimp_rightDist" (formula "24") (term "1,0,1"))
@@ -69339,7 +69339,7 @@
                                              (rule "commute_or" (formula "29") (term "0,0"))
                                              (rule "commute_or_2" (formula "30") (term "0,0,0,0"))
                                              (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                              (rule "replace_known_left" (formula "3") (term "0,0,0") (ifseqformula "24"))
                                              (builtin "One Step Simplification" (formula "3"))
                                              (rule "inEqSimp_homoInEq0" (formula "3") (term "0"))
@@ -69761,7 +69761,7 @@
                                                 (rule "applyEqReverse" (formula "47") (term "0") (ifseqformula "7"))
                                                 (rule "hideAuxiliaryEq" (formula "7"))
                                                 (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                 (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
                                                 (rule "polySimp_mulComm0" (formula "3") (term "1,0,1,0"))
                                                 (rule "polySimp_rightDist" (formula "3") (term "1,0,1,0"))
@@ -69803,7 +69803,7 @@
                                                 (builtin "One Step Simplification" (formula "3"))
                                                 (rule "true_left" (formula "3"))
                                                 (rule "allLeft" (formula "18") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                 (rule "replace_known_left" (formula "18") (term "0,0,0") (ifseqformula "27"))
                                                 (builtin "One Step Simplification" (formula "18"))
                                                 (rule "inEqSimp_homoInEq0" (formula "18") (term "0"))
@@ -70196,7 +70196,7 @@
                                              (rule "commute_or" (formula "29") (term "0,0"))
                                              (rule "commute_or_2" (formula "30") (term "0,0,0,0"))
                                              (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                              (rule "replace_known_left" (formula "3") (term "0,0,0") (ifseqformula "24"))
                                              (builtin "One Step Simplification" (formula "3"))
                                              (rule "inEqSimp_homoInEq1" (formula "3") (term "1"))
@@ -70623,7 +70623,7 @@
                                                 (rule "applyEqReverse" (formula "49") (term "0") (ifseqformula "7"))
                                                 (rule "hideAuxiliaryEq" (formula "7"))
                                                 (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                 (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
                                                 (rule "polySimp_mulComm0" (formula "3") (term "1,0,1,0"))
                                                 (rule "polySimp_rightDist" (formula "3") (term "1,0,1,0"))
@@ -70667,7 +70667,7 @@
                                                 (rule "true_left" (formula "3"))
                                                 (rule "shift_paren_or" (formula "33") (term "0,0,0,0,0"))
                                                 (rule "allLeft" (formula "18") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                 (rule "replace_known_left" (formula "18") (term "0,0,0") (ifseqformula "27"))
                                                 (builtin "One Step Simplification" (formula "18"))
                                                 (rule "inEqSimp_homoInEq0" (formula "18") (term "0"))
@@ -71463,7 +71463,7 @@
                                                 (rule "applyEqReverse" (formula "49") (term "0") (ifseqformula "7"))
                                                 (rule "hideAuxiliaryEq" (formula "7"))
                                                 (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                 (rule "inEqSimp_homoInEq1" (formula "3") (term "1"))
                                                 (rule "polySimp_mulComm0" (formula "3") (term "1,0,1"))
                                                 (rule "polySimp_rightDist" (formula "3") (term "1,0,1"))
@@ -72316,7 +72316,7 @@
                                                 (rule "applyEqReverse" (formula "49") (term "0") (ifseqformula "7"))
                                                 (rule "hideAuxiliaryEq" (formula "7"))
                                                 (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                                 (rule "inEqSimp_homoInEq1" (formula "3") (term "1"))
                                                 (rule "polySimp_mulComm0" (formula "3") (term "1,0,1"))
                                                 (rule "polySimp_rightDist" (formula "3") (term "1,0,1"))
@@ -72814,7 +72814,7 @@
                                           (rule "commute_or" (formula "25") (term "0,0"))
                                           (rule "commute_or_2" (formula "26") (term "0,0,0,0"))
                                           (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                           (rule "replace_known_left" (formula "3") (term "0,0,0") (ifseqformula "20"))
                                           (builtin "One Step Simplification" (formula "3"))
                                           (rule "inEqSimp_homoInEq1" (formula "3") (term "1"))
@@ -73000,7 +73000,7 @@
                                           (rule "applyEqReverse" (formula "41") (term "0") (ifseqformula "5"))
                                           (rule "hideAuxiliaryEq" (formula "5"))
                                           (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                           (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
                                           (rule "polySimp_mulComm0" (formula "3") (term "1,0,1,0"))
                                           (rule "polySimp_rightDist" (formula "3") (term "1,0,1,0"))
@@ -73125,7 +73125,7 @@
                                              (rule "commute_or" (formula "28") (term "0,0"))
                                              (rule "commute_or_2" (formula "29") (term "0,0,0,0"))
                                              (rule "allLeft" (formula "14") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                              (rule "replace_known_left" (formula "14") (term "0,0,0") (ifseqformula "23"))
                                              (builtin "One Step Simplification" (formula "14"))
                                              (rule "inEqSimp_homoInEq1" (formula "14") (term "1"))
@@ -73649,7 +73649,7 @@
                                              (rule "applyEqReverse" (formula "46") (term "0") (ifseqformula "7"))
                                              (rule "hideAuxiliaryEq" (formula "7"))
                                              (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                              (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
                                              (rule "polySimp_mulComm0" (formula "3") (term "1,0,1,0"))
                                              (rule "polySimp_rightDist" (formula "3") (term "1,0,1,0"))
@@ -73709,7 +73709,7 @@
                                              (rule "inEqSimp_sepPosMonomial0" (formula "1") (term "1,0,0"))
                                              (rule "mul_literals" (formula "1") (term "1,1,0,0"))
                                              (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                              (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
                                              (rule "polySimp_mulComm0" (formula "3") (term "1,0,1,0"))
                                              (rule "polySimp_rightDist" (formula "3") (term "1,0,1,0"))
@@ -74012,7 +74012,7 @@
                                           (rule "commute_or" (formula "25") (term "0,0"))
                                           (rule "commute_or_2" (formula "26") (term "0,0,0,0"))
                                           (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                           (rule "replace_known_left" (formula "3") (term "0,0,0") (ifseqformula "20"))
                                           (builtin "One Step Simplification" (formula "3"))
                                           (rule "inEqSimp_homoInEq0" (formula "3") (term "0"))
@@ -74286,7 +74286,7 @@
                                              (rule "applyEqReverse" (formula "46") (term "0") (ifseqformula "7"))
                                              (rule "hideAuxiliaryEq" (formula "7"))
                                              (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                              (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
                                              (rule "polySimp_mulComm0" (formula "3") (term "1,0,1,0"))
                                              (rule "polySimp_rightDist" (formula "3") (term "1,0,1,0"))
@@ -74322,7 +74322,7 @@
                                              (builtin "One Step Simplification" (formula "3"))
                                              (rule "notLeft" (formula "3"))
                                              (rule "allLeft" (formula "14") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                              (rule "replace_known_left" (formula "14") (term "0,0,0") (ifseqformula "23"))
                                              (builtin "One Step Simplification" (formula "14"))
                                              (rule "inEqSimp_homoInEq1" (formula "14") (term "1"))
@@ -74911,7 +74911,7 @@
                                              (rule "applyEqReverse" (formula "48") (term "0") (ifseqformula "7"))
                                              (rule "hideAuxiliaryEq" (formula "7"))
                                              (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, IntLinkedList::$size))"))
+    select<int>(heap, self, IntLinkedList::$size))"))
                                              (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
                                              (rule "polySimp_mulComm0" (formula "3") (term "1,0,1,0"))
                                              (rule "polySimp_rightDist" (formula "3") (term "1,0,1,0"))

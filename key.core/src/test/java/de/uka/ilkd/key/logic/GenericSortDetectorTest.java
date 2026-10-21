@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic;
 
 import java.util.List;
@@ -57,8 +58,8 @@ class GenericSortDetectorTest {
 
     /**
      * The case that a plain {@code instanceof GenericSort} check would miss: a sort that is not
-     * itself a generic sort but <em>contains</em> one, like {@code List<[G1]>} (the same situation
-     * arises for {@code select<[E]>(...)}). Detection must rely on
+     * itself a generic sort but <em>contains</em> one, like {@code List<G1>} (the same situation
+     * arises for {@code select<E>(...)}). Detection must rely on
      * {@link Sort#containsGenericSort()}.
      */
     @Test
@@ -80,7 +81,7 @@ class GenericSortDetectorTest {
 
         List<Sort> found = GenericSortDetector.findIn(t);
         assertEquals(List.of(listOfG1), found,
-            "a generic sort nested in a parametric sort (List<[G1]>) must be detected, even "
+            "a generic sort nested in a parametric sort (List<G1>) must be detected, even "
                 + "though the term's sort is not itself a GenericSort");
         assertTrue(found.get(0).containsGenericSort());
         assertFalse(found.get(0) instanceof GenericSort,

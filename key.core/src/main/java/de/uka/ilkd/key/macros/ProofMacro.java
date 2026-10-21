@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -245,9 +246,9 @@ public interface ProofMacro {
             String suffix = getMessageSuffix();
             // info.size() <= 0 means the inner prover reports an unknown workload: the
             // parallel prover commits concurrently and emits no per-step progress. Propagate
-            // it so the bar goes indeterminate ("busy") instead of a determinate one frozen
-            // at 0%. A positive inner size keeps the normal determinate bar (single-core).
-            int size = info.size() <= 0 ? 0 : numberGoals * numberSteps;
+            // -1 so the bar goes indeterminate ("busy"). A positive inner size keeps the
+            // normal determinate bar (single-core).
+            int size = info.size() <= 0 ? -1 : numberGoals * numberSteps;
             super.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, info.message() + suffix,
                 size));
             if (size > 0) {
@@ -256,7 +257,7 @@ public interface ProofMacro {
         }
 
         protected String getMessageSuffix() {
-            return " [" + (completedGoals + 1) + "/" + numberGoals + "]";
+            return numberGoals <= 1 ? "" : "[" + (completedGoals + 1) + "/" + numberGoals + "]";
         }
 
         @Override

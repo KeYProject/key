@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic;
 
 import java.util.ArrayList;
@@ -27,8 +28,8 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * A sort is reported when {@link Sort#containsGenericSort()} holds. This catches a generic sort
  * even
- * when it is nested inside a parametric sort (e.g. {@code List<[E]>}, or the result sort of
- * {@code select<[E]>(...)}), not only when a term's own sort is itself a generic sort.
+ * when it is nested inside a parametric sort (e.g. {@code List<E>}, or the result sort of
+ * {@code select<E>(...)}), not only when a term's own sort is itself a generic sort.
  *
  * @author KeY developers
  */

@@ -1,3 +1,5 @@
+description = "Pattern Matchern New core KeY theorem prover"
+
 repositories {
     mavenCentral()
 }

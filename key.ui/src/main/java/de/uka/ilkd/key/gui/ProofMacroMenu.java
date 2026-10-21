@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui;
 
 import java.util.*;
@@ -12,10 +13,12 @@ import de.uka.ilkd.key.gui.actions.ProofScriptInputAction;
 import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.FeatureSettings;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
@@ -82,8 +85,10 @@ public class ProofMacroMenu extends JMenu {
 
         int count = 0;
         Node node = mediator.getSelectedNode();
+        final ImmutableList<Goal> goals =
+            node == null ? null : node.proof().getSubtreeEnabledGoals(node);
         for (ProofMacro macro : REGISTERED_MACROS) {
-            boolean applicable = node != null && macro.canApplyTo(node, posInOcc);
+            boolean applicable = goals != null && macro.canApplyTo(node.proof(), goals, posInOcc);
 
             if (applicable) {
                 JMenuItem menuItem = createMenuItem(macro, mediator, posInOcc);

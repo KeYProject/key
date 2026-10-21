@@ -54,6 +54,7 @@
             "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
             "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_DELAYED",
             "DEP_OPTIONS_KEY" : "DEP_ON",
+            "HEAP_REDUCTION_OPTIONS_KEY" : "HEAP_REDUCTION_NORMAL",
             "LOOP_OPTIONS_KEY" : "LOOP_SCOPE_INV_TACLET",
             "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
             "MPS_OPTIONS_KEY" : "MPS_MERGE",
@@ -66,6 +67,7 @@
             "STOPMODE_OPTIONS_KEY" : "STOPMODE_DEFAULT",
             "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER",
             "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF",
+            "TRIGGERS_OPTIONS_KEY" : "TRIGGERS_BEST",
             "USER_TACLETS_OPTIONS_KEY1" : "USER_TACLETS_OFF",
             "USER_TACLETS_OPTIONS_KEY2" : "USER_TACLETS_OFF",
             "USER_TACLETS_OPTIONS_KEY3" : "USER_TACLETS_OFF",
@@ -94,8 +96,9 @@
 (keyLog "5" (keyUser "Julian" ) (keyVersion "44c2a312eb"))
 (keyLog "6" (keyUser "bubel" ) (keyVersion "cacb625f9caeb9baf0b0ea63b8484f8c5b766f85"))
 (keyLog "7" (keyUser "daniel" ) (keyVersion "118d7b9475817cd96facb2d4a3b1e69032a50457"))
+(keyLog "8" (keyUser "daniel" ) (keyVersion "3e5e375a5961f774f564a01b1e406905665f8f19"))
 
-(autoModeTime "164275")
+(autoModeTime "165090")
 
 (branch "dummy ID"
  (builtin "One Step Simplification" (formula "1") (newnames "heapAtPre,o,f"))
@@ -409,12 +412,10 @@
             (rule "polySimp_elimOne" (formula "16") (term "1,1"))
             (rule "polySimp_mulComm0" (formula "16") (term "0,1"))
             (rule "newSym_eq" (formula "16") (inst "l=l_0") (inst "newSymDef=add(mul(result_next, Z(0(#))),
-    mul(seqGet<[int]>(select<[Seq]>(heap,
-                                    self,
-                                    Perm::#c),
-                      select<[int]>(anon_heap_LOOP_0<<anonHeapFunction>>,
-                                    self,
-                                    Perm::#pIdx)),
+    mul(seqGet<int>(select<Seq>(heap, self, Perm::#c),
+                    select<int>(anon_heap_LOOP_0<<anonHeapFunction>>,
+                                self,
+                                Perm::#pIdx)),
         Z(0(#))))"))
             (rule "times_zero_1" (formula "16") (term "1,1,1"))
             (rule "times_zero_1" (formula "16") (term "0,1,1"))
@@ -918,8 +919,8 @@
                    (builtin "One Step Simplification" (formula "1"))
                   (rule "eqSymm" (formula "37"))
                   (rule "elementOfSingleton" (formula "1") (term "0,0,0,0"))
-                  (rule "replace_known_right" (formula "1") (term "0,0,0,0") (ifseqformula "35"))
-                   (builtin "One Step Simplification" (formula "1"))
+                   (builtin "One Step Simplification" (formula "9"))
+                   (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "35")))
                   (rule "inEqSimp_exactShadow3" (formula "4") (ifseqformula "17"))
                   (rule "mul_literals" (formula "4") (term "0,0"))
                   (rule "add_zero_left" (formula "4") (term "0"))
@@ -929,19 +930,428 @@
                   (rule "leq_literals" (formula "25") (term "0"))
                    (builtin "One Step Simplification" (formula "25"))
                   (rule "true_left" (formula "25"))
-                  (rule "pullOutSelect" (formula "1") (term "0,0,1,0,0") (inst "selectSK=java_lang_Object_created__1:boolean"))
+                  (rule "selectCreatedOfAnonAsFormula" (formula "1") (term "0,1,0,0"))
+                  (rule "pullOutSelect" (formula "1") (term "2,0") (inst "selectSK=f_0_1:any"))
                   (rule "simplifySelectOfAnon" (formula "1"))
                    (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "37")))
-                  (rule "applyEqReverse" (formula "2") (term "0,0,1,0,0") (ifseqformula "1"))
-                  (rule "hideAuxiliaryEq" (formula "1"))
-                  (rule "replace_known_right" (formula "1") (term "0,0") (ifseqformula "36"))
-                   (builtin "One Step Simplification" (formula "1"))
-                  (rule "simplifySelectOfAnon" (formula "1"))
-                   (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "36")))
                   (rule "elementOfSingleton" (formula "1") (term "0,0,0"))
-                  (rule "replace_known_right" (formula "1") (term "0,0,0") (ifseqformula "35"))
-                   (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "37")))
-                  (rule "closeFalse" (formula "1"))
+                   (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "36")))
+                  (rule "applyEqReverse" (formula "2") (term "2,0") (ifseqformula "1"))
+                  (rule "hideAuxiliaryEq" (formula "1"))
+                  (rule "expand_moduloInteger" (formula "7") (term "0,1,0"))
+                  (rule "replace_int_MIN" (formula "7") (term "0,0,1,0"))
+                  (rule "replace_int_HALFRANGE" (formula "7") (term "0,0,1,0,1,0"))
+                  (rule "replace_int_RANGE" (formula "7") (term "1,1,0,1,0"))
+                  (rule "polySimp_homoEq" (formula "7") (term "1,0"))
+                  (rule "polySimp_mulComm0" (formula "7") (term "1,0,1,0"))
+                  (rule "polySimp_rightDist" (formula "7") (term "1,0,1,0"))
+                  (rule "mul_literals" (formula "7") (term "0,1,0,1,0"))
+                  (rule "polySimp_addAssoc" (formula "7") (term "0,1,0"))
+                  (rule "polySimp_addComm0" (formula "7") (term "0,0,1,0"))
+                  (rule "mod_axiom" (formula "7") (term "0,1,0,1,0"))
+                  (rule "polySimp_mulLiterals" (formula "7") (term "1,0,1,0,1,0"))
+                  (rule "polySimp_mulComm0" (formula "7") (term "1,0,1,0"))
+                  (rule "polySimp_rightDist" (formula "7") (term "1,0,1,0"))
+                  (rule "polySimp_mulLiterals" (formula "7") (term "1,1,0,1,0"))
+                  (rule "polySimp_rightDist" (formula "7") (term "0,1,0,1,0"))
+                  (rule "mul_literals" (formula "7") (term "0,0,1,0,1,0"))
+                  (rule "polySimp_addAssoc" (formula "7") (term "0,1,0"))
+                  (rule "polySimp_addAssoc" (formula "7") (term "0,0,1,0"))
+                  (rule "polySimp_addComm1" (formula "7") (term "0,0,0,1,0"))
+                  (rule "add_literals" (formula "7") (term "0,0,0,0,1,0"))
+                  (rule "add_zero_left" (formula "7") (term "0,0,0,1,0"))
+                  (rule "polySimp_sepPosMonomial" (formula "7") (term "1,0"))
+                  (rule "polySimp_mulComm0" (formula "7") (term "1,1,0"))
+                  (rule "polySimp_rightDist" (formula "7") (term "1,1,0"))
+                  (rule "polySimp_mulLiterals" (formula "7") (term "1,1,1,0"))
+                  (rule "polySimp_elimOne" (formula "7") (term "1,1,1,0"))
+                  (rule "polySimp_mulComm0" (formula "7") (term "0,1,1,0"))
+                  (rule "expand_moduloInteger" (formula "8") (term "1,1,0"))
+                  (rule "replace_int_MIN" (formula "8") (term "0,1,1,0"))
+                  (rule "replace_int_HALFRANGE" (formula "8") (term "0,0,1,1,1,0"))
+                  (rule "replace_int_RANGE" (formula "8") (term "1,1,1,1,0"))
+                  (rule "mod_axiom" (formula "8") (term "1,1,1,0"))
+                  (rule "polySimp_mulLiterals" (formula "8") (term "1,1,1,1,0"))
+                  (rule "polySimp_addAssoc" (formula "8") (term "1,1,0"))
+                  (rule "polySimp_addAssoc" (formula "8") (term "0,1,1,0"))
+                  (rule "add_literals" (formula "8") (term "0,0,1,1,0"))
+                  (rule "add_zero_left" (formula "8") (term "0,1,1,0"))
+                  (rule "nnf_imp2or" (formula "28") (term "0"))
+                  (rule "nnf_imp2or" (formula "6") (term "0"))
+                  (rule "nnf_imp2or" (formula "29") (term "0"))
+                  (rule "nnf_imp2or" (formula "8") (term "0"))
+                  (rule "nnf_notAnd" (formula "25") (term "0,0"))
+                  (rule "inEqSimp_notGeq" (formula "25") (term "0,0,0"))
+                  (rule "mul_literals" (formula "25") (term "1,0,0,0,0,0"))
+                  (rule "add_literals" (formula "25") (term "0,0,0,0,0"))
+                  (rule "inEqSimp_sepPosMonomial0" (formula "25") (term "0,0,0"))
+                  (rule "mul_literals" (formula "25") (term "1,0,0,0"))
+                  (rule "inEqSimp_notLeq" (formula "25") (term "1,0,0"))
+                  (rule "polySimp_rightDist" (formula "25") (term "1,0,0,1,0,0"))
+                  (rule "mul_literals" (formula "25") (term "0,1,0,0,1,0,0"))
+                  (rule "polySimp_addAssoc" (formula "25") (term "0,0,1,0,0"))
+                  (rule "add_literals" (formula "25") (term "0,0,0,1,0,0"))
+                  (rule "add_zero_left" (formula "25") (term "0,0,1,0,0"))
+                  (rule "inEqSimp_sepPosMonomial1" (formula "25") (term "1,0,0"))
+                  (rule "polySimp_mulLiterals" (formula "25") (term "1,1,0,0"))
+                  (rule "polySimp_elimOne" (formula "25") (term "1,1,0,0"))
+                  (rule "nnf_notAnd" (formula "29") (term "0,0"))
+                  (rule "inEqSimp_notGeq" (formula "29") (term "0,0,0"))
+                  (rule "mul_literals" (formula "29") (term "1,0,0,0,0,0"))
+                  (rule "add_literals" (formula "29") (term "0,0,0,0,0"))
+                  (rule "inEqSimp_sepPosMonomial0" (formula "29") (term "0,0,0"))
+                  (rule "mul_literals" (formula "29") (term "1,0,0,0"))
+                  (rule "inEqSimp_notLeq" (formula "29") (term "1,0,0"))
+                  (rule "polySimp_rightDist" (formula "29") (term "1,0,0,1,0,0"))
+                  (rule "mul_literals" (formula "29") (term "0,1,0,0,1,0,0"))
+                  (rule "polySimp_addAssoc" (formula "29") (term "0,0,1,0,0"))
+                  (rule "add_literals" (formula "29") (term "0,0,0,1,0,0"))
+                  (rule "add_zero_left" (formula "29") (term "0,0,1,0,0"))
+                  (rule "inEqSimp_sepPosMonomial1" (formula "29") (term "1,0,0"))
+                  (rule "polySimp_mulLiterals" (formula "29") (term "1,1,0,0"))
+                  (rule "polySimp_elimOne" (formula "29") (term "1,1,0,0"))
+                  (rule "expand_moduloInteger" (formula "7") (term "0,0,1,1,0"))
+                  (rule "replace_int_MIN" (formula "7") (term "0,0,0,1,1,0"))
+                  (rule "replace_int_HALFRANGE" (formula "7") (term "0,0,1,0,0,1,1,0"))
+                  (rule "replace_int_RANGE" (formula "7") (term "1,1,0,0,1,1,0"))
+                  (rule "polySimp_mulComm0" (formula "7") (term "0,1,1,0"))
+                  (rule "polySimp_rightDist" (formula "7") (term "0,1,1,0"))
+                  (rule "mul_literals" (formula "7") (term "0,0,1,1,0"))
+                  (rule "mod_axiom" (formula "7") (term "0,1,0,1,1,0"))
+                  (rule "polySimp_mulLiterals" (formula "7") (term "1,0,1,0,1,1,0"))
+                  (rule "polySimp_mulComm0" (formula "7") (term "1,0,1,1,0"))
+                  (rule "polySimp_rightDist" (formula "7") (term "1,0,1,1,0"))
+                  (rule "polySimp_mulLiterals" (formula "7") (term "1,1,0,1,1,0"))
+                  (rule "polySimp_rightDist" (formula "7") (term "0,1,0,1,1,0"))
+                  (rule "mul_literals" (formula "7") (term "0,0,1,0,1,1,0"))
+                  (rule "polySimp_addAssoc" (formula "7") (term "0,1,1,0"))
+                  (rule "polySimp_addAssoc" (formula "7") (term "0,0,1,1,0"))
+                  (rule "add_literals" (formula "7") (term "0,0,0,1,1,0"))
+                  (rule "add_zero_left" (formula "7") (term "0,0,1,1,0"))
+                  (rule "nnf_notAnd" (formula "27") (term "0,0"))
+                  (rule "inEqSimp_notGeq" (formula "27") (term "0,0,0"))
+                  (rule "mul_literals" (formula "27") (term "1,0,0,0,0,0"))
+                  (rule "add_literals" (formula "27") (term "0,0,0,0,0"))
+                  (rule "inEqSimp_sepPosMonomial0" (formula "27") (term "0,0,0"))
+                  (rule "mul_literals" (formula "27") (term "1,0,0,0"))
+                  (rule "inEqSimp_notLeq" (formula "27") (term "1,0,0"))
+                  (rule "polySimp_rightDist" (formula "27") (term "1,0,0,1,0,0"))
+                  (rule "mul_literals" (formula "27") (term "0,1,0,0,1,0,0"))
+                  (rule "polySimp_addAssoc" (formula "27") (term "0,0,1,0,0"))
+                  (rule "add_literals" (formula "27") (term "0,0,0,1,0,0"))
+                  (rule "add_zero_left" (formula "27") (term "0,0,1,0,0"))
+                  (rule "inEqSimp_sepPosMonomial1" (formula "27") (term "1,0,0"))
+                  (rule "polySimp_mulLiterals" (formula "27") (term "1,1,0,0"))
+                  (rule "polySimp_elimOne" (formula "27") (term "1,1,0,0"))
+                  (rule "nnf_notAnd" (formula "6") (term "0,0"))
+                  (rule "inEqSimp_notGeq" (formula "6") (term "0,0,0"))
+                  (rule "mul_literals" (formula "6") (term "1,0,0,0,0,0"))
+                  (rule "add_literals" (formula "6") (term "0,0,0,0,0"))
+                  (rule "inEqSimp_sepPosMonomial0" (formula "6") (term "0,0,0"))
+                  (rule "mul_literals" (formula "6") (term "1,0,0,0"))
+                  (rule "inEqSimp_notLeq" (formula "6") (term "1,0,0"))
+                  (rule "polySimp_rightDist" (formula "6") (term "1,0,0,1,0,0"))
+                  (rule "mul_literals" (formula "6") (term "0,1,0,0,1,0,0"))
+                  (rule "polySimp_addAssoc" (formula "6") (term "0,0,1,0,0"))
+                  (rule "add_literals" (formula "6") (term "0,0,0,1,0,0"))
+                  (rule "add_zero_left" (formula "6") (term "0,0,1,0,0"))
+                  (rule "inEqSimp_sepPosMonomial1" (formula "6") (term "1,0,0"))
+                  (rule "polySimp_mulLiterals" (formula "6") (term "1,1,0,0"))
+                  (rule "polySimp_elimOne" (formula "6") (term "1,1,0,0"))
+                  (rule "nnf_notAnd" (formula "28") (term "0,0"))
+                  (rule "inEqSimp_notGeq" (formula "28") (term "0,0,0"))
+                  (rule "mul_literals" (formula "28") (term "1,0,0,0,0,0"))
+                  (rule "add_literals" (formula "28") (term "0,0,0,0,0"))
+                  (rule "inEqSimp_sepPosMonomial0" (formula "28") (term "0,0,0"))
+                  (rule "mul_literals" (formula "28") (term "1,0,0,0"))
+                  (rule "inEqSimp_notLeq" (formula "28") (term "1,0,0"))
+                  (rule "polySimp_rightDist" (formula "28") (term "1,0,0,1,0,0"))
+                  (rule "mul_literals" (formula "28") (term "0,1,0,0,1,0,0"))
+                  (rule "polySimp_addAssoc" (formula "28") (term "0,0,1,0,0"))
+                  (rule "add_literals" (formula "28") (term "0,0,0,1,0,0"))
+                  (rule "add_zero_left" (formula "28") (term "0,0,1,0,0"))
+                  (rule "inEqSimp_sepPosMonomial1" (formula "28") (term "1,0,0"))
+                  (rule "polySimp_mulLiterals" (formula "28") (term "1,1,0,0"))
+                  (rule "polySimp_elimOne" (formula "28") (term "1,1,0,0"))
+                  (rule "nnf_imp2or" (formula "7") (term "0"))
+                  (rule "nnf_notAnd" (formula "7") (term "0,0"))
+                  (rule "inEqSimp_notGeq" (formula "7") (term "0,0,0"))
+                  (rule "mul_literals" (formula "7") (term "1,0,0,0,0,0"))
+                  (rule "add_literals" (formula "7") (term "0,0,0,0,0"))
+                  (rule "inEqSimp_sepPosMonomial0" (formula "7") (term "0,0,0"))
+                  (rule "mul_literals" (formula "7") (term "1,0,0,0"))
+                  (rule "inEqSimp_notLeq" (formula "7") (term "1,0,0"))
+                  (rule "polySimp_rightDist" (formula "7") (term "1,0,0,1,0,0"))
+                  (rule "mul_literals" (formula "7") (term "0,1,0,0,1,0,0"))
+                  (rule "polySimp_addAssoc" (formula "7") (term "0,0,1,0,0"))
+                  (rule "add_literals" (formula "7") (term "0,0,0,1,0,0"))
+                  (rule "add_zero_left" (formula "7") (term "0,0,1,0,0"))
+                  (rule "inEqSimp_sepPosMonomial1" (formula "7") (term "1,0,0"))
+                  (rule "polySimp_mulLiterals" (formula "7") (term "1,1,0,0"))
+                  (rule "polySimp_elimOne" (formula "7") (term "1,1,0,0"))
+                  (rule "commute_and" (formula "33"))
+                  (rule "commute_and" (formula "25") (term "1,1,0"))
+                  (rule "commute_and" (formula "29") (term "1,1,0"))
+                  (rule "commute_and" (formula "6") (term "1,1,0"))
+                  (rule "Class_invariant_axiom_for_Perm" (formula "14") (inst "i=i") (inst "i_0=i_0") (inst "i_1=i_1") (inst "i_2=i_2") (inst "i_3=i_3") (inst "sk=sk_2") (ifseqformula "11"))
+                  (branch "Use Axiom"
+                      (builtin "One Step Simplification" (formula "14") (ifInst ""  (formula "31")) (ifInst ""  (formula "23")) (ifInst ""  (formula "24")) (ifInst ""  (formula "26")) (ifInst ""  (formula "30")))
+                     (rule "expandInRangeInt" (formula "14") (term "1,1,0,1,0,0,0"))
+                     (rule "expandInRangeInt" (formula "14") (term "1,1,0,1"))
+                     (rule "replace_int_MAX" (formula "14") (term "1,0,1,1,0,1,0,0,0"))
+                     (rule "replace_int_MIN" (formula "14") (term "0,1,1,1,0,1,0,0,0"))
+                     (rule "replace_int_MAX" (formula "14") (term "1,0,1,1,0,1"))
+                     (rule "replace_int_MIN" (formula "14") (term "0,1,1,1,0,1"))
+                     (rule "andLeft" (formula "14"))
+                     (rule "andLeft" (formula "14"))
+                     (rule "andLeft" (formula "14"))
+                     (rule "andLeft" (formula "14"))
+                     (rule "andLeft" (formula "14"))
+                     (rule "andLeft" (formula "14"))
+                     (rule "eqSymm" (formula "19") (term "1,0"))
+                     (rule "eqSymm" (formula "18") (term "1,0"))
+                     (rule "eqSymm" (formula "16"))
+                     (rule "castedGetAny" (formula "20") (term "0,0,1,1,0"))
+                     (rule "castedGetAny" (formula "20") (term "1,1,1,1,0"))
+                     (rule "castedGetAny" (formula "17") (term "0,0,1,1,0"))
+                     (rule "castedGetAny" (formula "17") (term "1,1,1,1,0"))
+                     (rule "castedGetAny" (formula "19") (term "0,0,1,0"))
+                     (rule "eqSymm" (formula "19") (term "1,0"))
+                     (rule "castedGetAny" (formula "18") (term "0,0,1,0"))
+                     (rule "castedGetAny" (formula "18") (term "0,1,1,0"))
+                     (rule "lenOfSeqDefEQ" (formula "17") (term "1,1,0,0") (ifseqformula "16"))
+                     (rule "polySimp_elimSub" (formula "17") (term "1,1,1,0,0"))
+                     (rule "mul_literals" (formula "17") (term "1,1,1,1,0,0"))
+                     (rule "add_zero_right" (formula "17") (term "1,1,1,0,0"))
+                     (rule "castedGetAny" (formula "18") (term "1,0,0,1,0"))
+                     (rule "inEqSimp_ltToLeq" (formula "20") (term "1,0,0"))
+                     (rule "polySimp_mulComm0" (formula "20") (term "1,0,0,1,0,0"))
+                     (rule "inEqSimp_ltToLeq" (formula "19") (term "1,0,0"))
+                     (rule "polySimp_mulComm0" (formula "19") (term "1,0,0,1,0,0"))
+                     (rule "inEqSimp_ltToLeq" (formula "18") (term "1,0,0"))
+                     (rule "polySimp_mulComm0" (formula "18") (term "1,0,0,1,0,0"))
+                     (rule "inEqSimp_ltToLeq" (formula "17") (term "1,0,0"))
+                     (rule "polySimp_mulComm0" (formula "17") (term "1,0,0,1,0,0"))
+                     (rule "inEqSimp_commuteLeq" (formula "20") (term "0,0,0"))
+                     (rule "inEqSimp_commuteLeq" (formula "19") (term "0,0,0"))
+                     (rule "inEqSimp_commuteLeq" (formula "18") (term "0,0,0"))
+                     (rule "inEqSimp_commuteLeq" (formula "17") (term "0,0,0"))
+                     (rule "inEqSimp_commuteLeq" (formula "14"))
+                     (rule "inEqSimp_commuteLeq" (formula "20") (term "1,1,1,0"))
+                     (rule "inEqSimp_commuteLeq" (formula "17") (term "1,1,1,0"))
+                     (rule "inEqSimp_commuteLeq" (formula "17") (term "0,0,1,0,0,1,0,0"))
+                     (rule "applyEq" (formula "14") (term "0") (ifseqformula "13"))
+                     (rule "qeq_literals" (formula "14"))
+                     (rule "true_left" (formula "14"))
+                     (rule "applyEq" (formula "14") (term "0") (ifseqformula "13"))
+                     (rule "inEqSimp_commuteLeq" (formula "14"))
+                     (rule "replace_known_left" (formula "16") (term "0,0,1,0,0,1,0,0") (ifseqformula "14"))
+                      (builtin "One Step Simplification" (formula "16"))
+                     (rule "applyEq" (formula "18") (term "0,1,0,0,1,0,0") (ifseqformula "35"))
+                     (rule "applyEq" (formula "17") (term "0,1,0,0,1,0,0") (ifseqformula "35"))
+                     (rule "applyEq" (formula "19") (term "0,1,0,0,1,0,0") (ifseqformula "35"))
+                     (rule "inEqSimp_sepPosMonomial0" (formula "16") (term "1,0,0"))
+                     (rule "polySimp_mulComm0" (formula "16") (term "1,1,0,0"))
+                     (rule "polySimp_rightDist" (formula "16") (term "1,1,0,0"))
+                     (rule "mul_literals" (formula "16") (term "0,1,1,0,0"))
+                     (rule "polySimp_mulLiterals" (formula "16") (term "1,1,1,0,0"))
+                     (rule "polySimp_elimOne" (formula "16") (term "1,1,1,0,0"))
+                     (rule "inEqSimp_sepPosMonomial0" (formula "18") (term "1,0,0"))
+                     (rule "polySimp_mulComm0" (formula "18") (term "1,1,0,0"))
+                     (rule "polySimp_rightDist" (formula "18") (term "1,1,0,0"))
+                     (rule "mul_literals" (formula "18") (term "0,1,1,0,0"))
+                     (rule "polySimp_mulLiterals" (formula "18") (term "1,1,1,0,0"))
+                     (rule "polySimp_elimOne" (formula "18") (term "1,1,1,0,0"))
+                     (rule "inEqSimp_sepPosMonomial0" (formula "17") (term "1,0,0"))
+                     (rule "polySimp_mulComm0" (formula "17") (term "1,1,0,0"))
+                     (rule "polySimp_rightDist" (formula "17") (term "1,1,0,0"))
+                     (rule "mul_literals" (formula "17") (term "0,1,1,0,0"))
+                     (rule "polySimp_mulLiterals" (formula "17") (term "1,1,1,0,0"))
+                     (rule "polySimp_elimOne" (formula "17") (term "1,1,1,0,0"))
+                     (rule "inEqSimp_sepPosMonomial0" (formula "19") (term "1,0,0"))
+                     (rule "polySimp_mulComm0" (formula "19") (term "1,1,0,0"))
+                     (rule "polySimp_rightDist" (formula "19") (term "1,1,0,0"))
+                     (rule "mul_literals" (formula "19") (term "0,1,1,0,0"))
+                     (rule "polySimp_mulLiterals" (formula "19") (term "1,1,1,0,0"))
+                     (rule "polySimp_elimOne" (formula "19") (term "1,1,1,0,0"))
+                     (rule "inEqSimp_subsumption1" (formula "14") (ifseqformula "4"))
+                     (rule "leq_literals" (formula "14") (term "0"))
+                      (builtin "One Step Simplification" (formula "14"))
+                     (rule "true_left" (formula "14"))
+                     (rule "eqSeqDef2" (formula "14") (inst "iv=iv") (ifseqformula "14"))
+                      (builtin "One Step Simplification" (formula "14"))
+                     (rule "true_left" (formula "14"))
+                     (rule "expand_moduloInteger" (formula "16") (term "1,1,0"))
+                     (rule "replace_int_MIN" (formula "16") (term "0,1,1,0"))
+                     (rule "replace_int_HALFRANGE" (formula "16") (term "0,0,1,1,1,0"))
+                     (rule "replace_int_RANGE" (formula "16") (term "1,1,1,1,0"))
+                     (rule "mod_axiom" (formula "16") (term "1,1,1,0"))
+                     (rule "polySimp_mulLiterals" (formula "16") (term "1,1,1,1,0"))
+                     (rule "polySimp_addAssoc" (formula "16") (term "1,1,0"))
+                     (rule "polySimp_addAssoc" (formula "16") (term "0,1,1,0"))
+                     (rule "add_literals" (formula "16") (term "0,0,1,1,0"))
+                     (rule "add_zero_left" (formula "16") (term "0,1,1,0"))
+                     (rule "expand_moduloInteger" (formula "15") (term "1,1,0"))
+                     (rule "replace_int_MIN" (formula "15") (term "0,1,1,0"))
+                     (rule "replace_int_HALFRANGE" (formula "15") (term "0,0,1,1,1,0"))
+                     (rule "replace_int_RANGE" (formula "15") (term "1,1,1,1,0"))
+                     (rule "mod_axiom" (formula "15") (term "1,1,1,0"))
+                     (rule "polySimp_mulLiterals" (formula "15") (term "1,1,1,1,0"))
+                     (rule "polySimp_addAssoc" (formula "15") (term "1,1,0"))
+                     (rule "polySimp_addAssoc" (formula "15") (term "0,1,1,0"))
+                     (rule "add_literals" (formula "15") (term "0,0,1,1,0"))
+                     (rule "add_zero_left" (formula "15") (term "0,1,1,0"))
+                     (rule "expand_moduloInteger" (formula "15") (term "0,1,0"))
+                     (rule "replace_int_MIN" (formula "15") (term "0,0,1,0"))
+                     (rule "replace_int_HALFRANGE" (formula "15") (term "0,0,1,0,1,0"))
+                     (rule "replace_int_RANGE" (formula "15") (term "1,1,0,1,0"))
+                     (rule "polySimp_homoEq" (formula "15") (term "1,0"))
+                     (rule "polySimp_mulComm0" (formula "15") (term "1,0,1,0"))
+                     (rule "polySimp_rightDist" (formula "15") (term "1,0,1,0"))
+                     (rule "mul_literals" (formula "15") (term "0,1,0,1,0"))
+                     (rule "polySimp_addAssoc" (formula "15") (term "0,1,0"))
+                     (rule "polySimp_addComm1" (formula "15") (term "0,0,1,0"))
+                     (rule "polySimp_addComm0" (formula "15") (term "0,0,0,1,0"))
+                     (rule "mod_axiom" (formula "15") (term "0,1,0,1,0"))
+                     (rule "polySimp_mulLiterals" (formula "15") (term "1,0,1,0,1,0"))
+                     (rule "polySimp_mulComm0" (formula "15") (term "1,0,1,0"))
+                     (rule "polySimp_rightDist" (formula "15") (term "1,0,1,0"))
+                     (rule "polySimp_mulLiterals" (formula "15") (term "1,1,0,1,0"))
+                     (rule "polySimp_rightDist" (formula "15") (term "0,1,0,1,0"))
+                     (rule "mul_literals" (formula "15") (term "0,0,1,0,1,0"))
+                     (rule "polySimp_addAssoc" (formula "15") (term "0,1,0"))
+                     (rule "polySimp_addAssoc" (formula "15") (term "0,0,1,0"))
+                     (rule "polySimp_addComm1" (formula "15") (term "0,0,0,1,0"))
+                     (rule "polySimp_addComm1" (formula "15") (term "0,0,0,0,1,0"))
+                     (rule "add_literals" (formula "15") (term "0,0,0,0,0,1,0"))
+                     (rule "add_zero_left" (formula "15") (term "0,0,0,0,1,0"))
+                     (rule "polySimp_sepPosMonomial" (formula "15") (term "1,0"))
+                     (rule "polySimp_mulComm0" (formula "15") (term "1,1,0"))
+                     (rule "polySimp_rightDist" (formula "15") (term "1,1,0"))
+                     (rule "polySimp_mulLiterals" (formula "15") (term "1,1,1,0"))
+                     (rule "polySimp_elimOne" (formula "15") (term "1,1,1,0"))
+                     (rule "polySimp_rightDist" (formula "15") (term "0,1,1,0"))
+                     (rule "polySimp_mulLiterals" (formula "15") (term "1,0,1,1,0"))
+                     (rule "polySimp_mulComm0" (formula "15") (term "0,0,1,1,0"))
+                     (rule "nnf_imp2or" (formula "14") (term "0"))
+                     (rule "nnf_imp2or" (formula "17") (term "0"))
+                     (rule "nnf_imp2or" (formula "16") (term "0"))
+                     (rule "nnf_imp2or" (formula "15") (term "0"))
+                     (rule "nnf_notAnd" (formula "14") (term "0,0"))
+                     (rule "inEqSimp_notGeq" (formula "14") (term "0,0,0"))
+                     (rule "mul_literals" (formula "14") (term "1,0,0,0,0,0"))
+                     (rule "add_literals" (formula "14") (term "0,0,0,0,0"))
+                     (rule "inEqSimp_sepPosMonomial0" (formula "14") (term "0,0,0"))
+                     (rule "mul_literals" (formula "14") (term "1,0,0,0"))
+                     (rule "inEqSimp_notLeq" (formula "14") (term "1,0,0"))
+                     (rule "polySimp_rightDist" (formula "14") (term "1,0,0,1,0,0"))
+                     (rule "mul_literals" (formula "14") (term "0,1,0,0,1,0,0"))
+                     (rule "polySimp_addAssoc" (formula "14") (term "0,0,1,0,0"))
+                     (rule "add_literals" (formula "14") (term "0,0,0,1,0,0"))
+                     (rule "add_zero_left" (formula "14") (term "0,0,1,0,0"))
+                     (rule "inEqSimp_sepPosMonomial1" (formula "14") (term "1,0,0"))
+                     (rule "polySimp_mulLiterals" (formula "14") (term "1,1,0,0"))
+                     (rule "polySimp_elimOne" (formula "14") (term "1,1,0,0"))
+                     (rule "nnf_notAnd" (formula "17") (term "0,0"))
+                     (rule "inEqSimp_notGeq" (formula "17") (term "0,0,0"))
+                     (rule "mul_literals" (formula "17") (term "1,0,0,0,0,0"))
+                     (rule "add_literals" (formula "17") (term "0,0,0,0,0"))
+                     (rule "inEqSimp_sepPosMonomial0" (formula "17") (term "0,0,0"))
+                     (rule "mul_literals" (formula "17") (term "1,0,0,0"))
+                     (rule "inEqSimp_notLeq" (formula "17") (term "1,0,0"))
+                     (rule "polySimp_rightDist" (formula "17") (term "1,0,0,1,0,0"))
+                     (rule "mul_literals" (formula "17") (term "0,1,0,0,1,0,0"))
+                     (rule "polySimp_addAssoc" (formula "17") (term "0,0,1,0,0"))
+                     (rule "add_literals" (formula "17") (term "0,0,0,1,0,0"))
+                     (rule "add_zero_left" (formula "17") (term "0,0,1,0,0"))
+                     (rule "inEqSimp_sepPosMonomial1" (formula "17") (term "1,0,0"))
+                     (rule "polySimp_mulLiterals" (formula "17") (term "1,1,0,0"))
+                     (rule "polySimp_elimOne" (formula "17") (term "1,1,0,0"))
+                     (rule "nnf_notAnd" (formula "16") (term "0,0"))
+                     (rule "inEqSimp_notGeq" (formula "16") (term "0,0,0"))
+                     (rule "mul_literals" (formula "16") (term "1,0,0,0,0,0"))
+                     (rule "add_literals" (formula "16") (term "0,0,0,0,0"))
+                     (rule "inEqSimp_sepPosMonomial0" (formula "16") (term "0,0,0"))
+                     (rule "mul_literals" (formula "16") (term "1,0,0,0"))
+                     (rule "inEqSimp_notLeq" (formula "16") (term "1,0,0"))
+                     (rule "polySimp_rightDist" (formula "16") (term "1,0,0,1,0,0"))
+                     (rule "mul_literals" (formula "16") (term "0,1,0,0,1,0,0"))
+                     (rule "polySimp_addAssoc" (formula "16") (term "0,0,1,0,0"))
+                     (rule "add_literals" (formula "16") (term "0,0,0,1,0,0"))
+                     (rule "add_zero_left" (formula "16") (term "0,0,1,0,0"))
+                     (rule "inEqSimp_sepPosMonomial1" (formula "16") (term "1,0,0"))
+                     (rule "polySimp_mulLiterals" (formula "16") (term "1,1,0,0"))
+                     (rule "polySimp_elimOne" (formula "16") (term "1,1,0,0"))
+                     (rule "nnf_notAnd" (formula "15") (term "0,0"))
+                     (rule "inEqSimp_notGeq" (formula "15") (term "0,0,0"))
+                     (rule "mul_literals" (formula "15") (term "1,0,0,0,0,0"))
+                     (rule "add_literals" (formula "15") (term "0,0,0,0,0"))
+                     (rule "inEqSimp_sepPosMonomial0" (formula "15") (term "0,0,0"))
+                     (rule "mul_literals" (formula "15") (term "1,0,0,0"))
+                     (rule "inEqSimp_notLeq" (formula "15") (term "1,0,0"))
+                     (rule "polySimp_rightDist" (formula "15") (term "1,0,0,1,0,0"))
+                     (rule "mul_literals" (formula "15") (term "0,1,0,0,1,0,0"))
+                     (rule "polySimp_addAssoc" (formula "15") (term "0,0,1,0,0"))
+                     (rule "add_literals" (formula "15") (term "0,0,0,1,0,0"))
+                     (rule "add_zero_left" (formula "15") (term "0,0,1,0,0"))
+                     (rule "inEqSimp_sepPosMonomial1" (formula "15") (term "1,0,0"))
+                     (rule "polySimp_mulLiterals" (formula "15") (term "1,1,0,0"))
+                     (rule "polySimp_elimOne" (formula "15") (term "1,1,0,0"))
+                     (rule "commute_or_2" (formula "29") (term "0"))
+                     (rule "cnf_rightDist" (formula "26") (term "0"))
+                     (rule "cnf_rightDist" (formula "30") (term "0"))
+                     (rule "cnf_rightDist" (formula "6") (term "0"))
+                     (rule "div_axiom" (formula "21") (term "0") (inst "quotient=quotient_0"))
+                     (rule "equal_literals" (formula "21") (term "0"))
+                      (builtin "One Step Simplification" (formula "21"))
+                     (rule "qeq_literals" (formula "21") (term "0,1"))
+                      (builtin "One Step Simplification" (formula "21"))
+                     (rule "mul_literals" (formula "21") (term "1,1,1"))
+                     (rule "andLeft" (formula "21"))
+                     (rule "andLeft" (formula "21"))
+                     (rule "polySimp_addAssoc" (formula "23") (term "0,1"))
+                     (rule "add_literals" (formula "23") (term "0,0,1"))
+                     (rule "polySimp_addComm1" (formula "23") (term "1"))
+                     (rule "add_literals" (formula "23") (term "0,1"))
+                     (rule "inEqSimp_homoInEq0" (formula "22"))
+                     (rule "polySimp_mulLiterals" (formula "22") (term "1,0"))
+                     (rule "polySimp_addComm1" (formula "22") (term "0"))
+                     (rule "inEqSimp_homoInEq1" (formula "23"))
+                     (rule "polySimp_mulLiterals" (formula "23") (term "1,0"))
+                     (rule "polySimp_addComm1" (formula "23") (term "0"))
+                     (rule "applyEq" (formula "24") (term "0") (ifseqformula "21"))
+                     (rule "applyEq" (formula "22") (term "0,1,0,0") (ifseqformula "24"))
+                     (rule "mul_literals" (formula "22") (term "1,0,0"))
+                     (rule "add_literals" (formula "22") (term "0,0"))
+                     (rule "applyEq" (formula "23") (term "0,1,0,0") (ifseqformula "24"))
+                     (rule "mul_literals" (formula "23") (term "1,0,0"))
+                     (rule "add_literals" (formula "23") (term "0,0"))
+                     (rule "applyEq" (formula "21") (term "1") (ifseqformula "24"))
+                     (rule "inEqSimp_sepPosMonomial1" (formula "22"))
+                     (rule "mul_literals" (formula "22") (term "1"))
+                     (rule "inEqSimp_sepPosMonomial0" (formula "23"))
+                     (rule "mul_literals" (formula "23") (term "1"))
+                     (rule "ifthenelse_split" (formula "1") (term "0"))
+                     (branch " !o_0 = null & !( select<boolean>(heap, o_0, java.lang.Object::#$created) = TRUE | select<boolean>(anon_heap_LOOP_0<<anonHeapFunction>>, o_0, java.lang.Object::#$created) = TRUE) TRUE"
+                        (rule "andLeft" (formula "1"))
+                        (rule "notLeft" (formula "2"))
+                        (rule "notLeft" (formula "1"))
+                        (rule "orRight" (formula "36"))
+                        (rule "applyEqReverse" (formula "42") (term "1") (ifseqformula "1"))
+                        (rule "hideAuxiliaryEq" (formula "1"))
+                        (rule "eqSymm" (formula "41"))
+                        (rule "replace_known_right" (formula "40") (term "0,0") (ifseqformula "34"))
+                         (builtin "One Step Simplification" (formula "40") (ifInst ""  (formula "35")))
+                        (rule "closeTrue" (formula "40"))
+                     )
+                     (branch " !o_0 = null & !( select<boolean>(heap, o_0, java.lang.Object::#$created) = TRUE | select<boolean>(anon_heap_LOOP_0<<anonHeapFunction>>, o_0, java.lang.Object::#$created) = TRUE) FALSE"
+                        (rule "close" (formula "40") (ifseqformula "1"))
+                     )
+                  )
+                  (branch "Show Axiom Satisfiability"
+                      (builtin "One Step Simplification" (formula "31") (ifInst ""  (formula "32")) (ifInst ""  (formula "23")) (ifInst ""  (formula "24")) (ifInst ""  (formula "26")) (ifInst ""  (formula "30")) (ifInst ""  (formula "32")) (ifInst ""  (formula "23")) (ifInst ""  (formula "24")) (ifInst ""  (formula "26")) (ifInst ""  (formula "30")))
+                     (rule "closeTrue" (formula "31"))
+                  )
                )
                (branch "Show Axiom Satisfiability"
                    (builtin "One Step Simplification" (formula "29"))
@@ -1009,13 +1419,13 @@
                    (builtin "One Step Simplification" (formula "1"))
                    (builtin "One Step Simplification" (formula "15"))
                   (rule "eqTermCut" (formula "2") (term "0") (inst "s=bsum{int i;}(Z(0(#)),
-             select<[int]>(anon_heap_LOOP_0<<anonHeapFunction>>,
-                           self,
-                           Perm::#pIdx),
-             cast<[int]>(seqGet<[any]>(select<[Seq]>(heap,
-                                                     self,
-                                                     Perm::#c),
-                                       i))):int") (userinteraction))
+             select<int>(anon_heap_LOOP_0<<anonHeapFunction>>,
+                         self,
+                         Perm::#pIdx),
+             cast<int>(seqGet<any>(select<Seq>(heap,
+                                               self,
+                                               Perm::#c),
+                                   i))):int") (userinteraction))
                   (branch "Assume bsum{int i;}(0, self.pIdx@anon_heap_LOOP_0<<anonHeapFunction>>, moduloInt((int)self.c[i])) = bsum{int i;}(0, self.pIdx@anon_heap_LOOP_0<<anonHeapFunction>>, (int)(self.c[i]))"
                      (rule "applyEq" (formula "3") (term "0") (ifseqformula "2") (userinteraction))
                      (rule "applyEqReverse" (formula "16") (term "1") (ifseqformula "3") (userinteraction))
@@ -3070,9 +3480,9 @@
                                           (rule "closeFalse" (formula "1"))
                                        )
                                        (branch "Case 2"
-                                          (rule "eqTermCut" (formula "32") (term "1,0,1") (inst "s=select<[int]>(anon_heap_LOOP_0<<anonHeapFunction>>,
-              self,
-              Perm::#pIdx):int") (userinteraction))
+                                          (rule "eqTermCut" (formula "32") (term "1,0,1") (inst "s=select<int>(anon_heap_LOOP_0<<anonHeapFunction>>,
+            self,
+            Perm::#pIdx):int") (userinteraction))
                                           (branch "Assume self.a@heap[anon({(self, Perm::#pIdx)}, anon_heap_LOOP_0<<anonHeapFunction>>)].length = self.pIdx@anon_heap_LOOP_0<<anonHeapFunction>>"
                                              (rule "replaceKnownSelect_taclet1_2" (formula "33") (term "0,1,0,1") (userinteraction))
                                              (rule "applyEqReverse" (formula "33") (term "1,0,0") (ifseqformula "1") (userinteraction))
@@ -6670,10 +7080,8 @@
                            (rule "polySimp_mulLiterals" (formula "2") (term "0"))
                            (rule "polySimp_elimOne" (formula "2") (term "0"))
                            (rule "elimGcdEq" (formula "30") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))") (inst "elimGcdLeftDiv=div(add(Z(8(4(6(3(8(4(7(4(1(2(#))))))))))),
-        seqGet<[int]>(select<[Seq]>(heap,
-                                    self,
-                                    Perm::#c),
-                      i_0)),
+        seqGet<int>(select<Seq>(heap, self, Perm::#c),
+                    i_0)),
     Z(6(9(2(7(6(9(4(9(2(4(#))))))))))))") (inst "elimGcdRightDiv=Z(0(#))"))
                             (builtin "One Step Simplification" (formula "30"))
                            (rule "add_zero_left" (formula "30") (term "0,0,1"))
@@ -6727,14 +7135,12 @@
                            (rule "mul_literals" (formula "31") (term "1"))
                            (rule "polySimp_mulLiterals" (formula "31") (term "0"))
                            (rule "elimGcdEq" (formula "31") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))") (inst "elimGcdLeftDiv=bsum{int i;}(Z(0(#)),
-             length(select<[int[]]>(heap,
-                                    self,
-                                    Perm::#a)),
+             length(select<int[]>(heap, self, Perm::#a)),
              div(add(Z(8(4(6(3(8(4(7(4(1(2(#))))))))))),
-                     seqGet<[int]>(select<[Seq]>(heap,
-                                                 self,
-                                                 Perm::#c),
-                                   i)),
+                     seqGet<int>(select<Seq>(heap,
+                                             self,
+                                             Perm::#c),
+                                 i)),
                  Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))))") (inst "elimGcdRightDiv=Z(0(#))"))
                             (builtin "One Step Simplification" (formula "31"))
                            (rule "add_zero_left" (formula "31") (term "0,0,0"))
@@ -6822,14 +7228,12 @@
                            (rule "replace_known_left" (formula "35") (term "0") (ifseqformula "18"))
                             (builtin "One Step Simplification" (formula "35"))
                            (rule "elimGcdEq" (formula "35") (inst "elimGcd=Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))") (inst "elimGcdLeftDiv=bsum{int i;}(Z(0(#)),
-             length(select<[int[]]>(heap,
-                                    self,
-                                    Perm::#a)),
+             length(select<int[]>(heap, self, Perm::#a)),
              div(add(Z(8(4(6(3(8(4(7(4(1(2(#))))))))))),
-                     seqGet<[int]>(select<[Seq]>(heap,
-                                                 self,
-                                                 Perm::#c),
-                                   i)),
+                     seqGet<int>(select<Seq>(heap,
+                                             self,
+                                             Perm::#c),
+                                 i)),
                  Z(6(9(2(7(6(9(4(9(2(4(#)))))))))))))") (inst "elimGcdRightDiv=Z(0(#))"))
                             (builtin "One Step Simplification" (formula "35") (ifInst ""  (formula "34")))
                            (rule "add_zero_left" (formula "35") (term "0,1,0"))
@@ -7052,33 +7456,33 @@
                               (rule "qeq_literals" (formula "39") (term "0,0"))
                                (builtin "One Step Simplification" (formula "39"))
                               (rule "newSym_eq" (formula "39") (inst "l=l_0") (inst "newSymDef=add(add(quotient_2,
-        mul(seqGet<[int]>(select<[Seq]>(heap,
-                                        self,
-                                        Perm::#c),
-                          i_1),
+        mul(seqGet<int>(select<Seq>(heap,
+                                    self,
+                                    Perm::#c),
+                        i_1),
             Z(0(#)))),
-    mul(\\if (  geq(seqGet<[int]>(select<[Seq]>(heap,
-                                               self,
-                                               Perm::#perm),
-                                 i_1),
+    mul(\\if (  geq(seqGet<int>(select<Seq>(heap,
+                                           self,
+                                           Perm::#perm),
+                               i_1),
                    Z(0(#)))
-             & leq(seqGet<[int]>(select<[Seq]>(heap,
-                                               self,
-                                               Perm::#perm),
-                                 i_1),
+             & leq(seqGet<int>(select<Seq>(heap,
+                                           self,
+                                           Perm::#perm),
+                               i_1),
                    add(Z(neglit(1(#))),
-                       length(select<[int[]]>(heap,
-                                              self,
-                                              Perm::#a)))))
-            \\then (select<[int]>(heap,
-                                 select<[int[]]>(heap,
-                                                 self,
-                                                 Perm::#a),
-                                 arr(seqGet<[int]>(select<[Seq]>(heap,
-                                                                 self,
-                                                                 Perm::#perm),
-                                                   i_1))))
-            \\else (cast<[int]>(seqGetOutside)),
+                       length(select<int[]>(heap,
+                                            self,
+                                            Perm::#a)))))
+            \\then (select<int>(heap,
+                               select<int[]>(heap,
+                                             self,
+                                             Perm::#a),
+                               arr(seqGet<int>(select<Seq>(heap,
+                                                           self,
+                                                           Perm::#perm),
+                                               i_1))))
+            \\else (cast<int>(seqGetOutside)),
         Z(0(#))))"))
                               (rule "times_zero_1" (formula "39") (term "1,1,1"))
                               (rule "times_zero_1" (formula "39") (term "1,0,1,1"))
@@ -7193,33 +7597,33 @@
                               (rule "qeq_literals" (formula "41") (term "0,0"))
                                (builtin "One Step Simplification" (formula "41"))
                               (rule "newSym_eq" (formula "41") (inst "l=l_1") (inst "newSymDef=add(add(quotient_0,
-        mul(seqGet<[int]>(select<[Seq]>(heap,
-                                        self,
-                                        Perm::#c),
-                          j_0),
+        mul(seqGet<int>(select<Seq>(heap,
+                                    self,
+                                    Perm::#c),
+                        j_0),
             Z(0(#)))),
-    mul(\\if (  geq(seqGet<[int]>(select<[Seq]>(heap,
-                                               self,
-                                               Perm::#perm),
-                                 j_0),
+    mul(\\if (  geq(seqGet<int>(select<Seq>(heap,
+                                           self,
+                                           Perm::#perm),
+                               j_0),
                    Z(0(#)))
-             & leq(seqGet<[int]>(select<[Seq]>(heap,
-                                               self,
-                                               Perm::#perm),
-                                 j_0),
+             & leq(seqGet<int>(select<Seq>(heap,
+                                           self,
+                                           Perm::#perm),
+                               j_0),
                    add(Z(neglit(1(#))),
-                       length(select<[int[]]>(heap,
-                                              self,
-                                              Perm::#a)))))
-            \\then (select<[int]>(heap,
-                                 select<[int[]]>(heap,
-                                                 self,
-                                                 Perm::#a),
-                                 arr(seqGet<[int]>(select<[Seq]>(heap,
-                                                                 self,
-                                                                 Perm::#perm),
-                                                   j_0))))
-            \\else (cast<[int]>(seqGetOutside)),
+                       length(select<int[]>(heap,
+                                            self,
+                                            Perm::#a)))))
+            \\then (select<int>(heap,
+                               select<int[]>(heap,
+                                             self,
+                                             Perm::#a),
+                               arr(seqGet<int>(select<Seq>(heap,
+                                                           self,
+                                                           Perm::#perm),
+                                               j_0))))
+            \\else (cast<int>(seqGetOutside)),
         Z(0(#))))"))
                               (rule "times_zero_1" (formula "41") (term "1,1,1"))
                               (rule "times_zero_1" (formula "41") (term "1,0,1,1"))

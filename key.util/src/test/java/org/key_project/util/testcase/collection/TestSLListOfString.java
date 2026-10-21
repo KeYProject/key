@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.util.testcase.collection;
 
 import java.util.Iterator;
@@ -215,6 +216,20 @@ public class TestSLListOfString {
             newList = newList.append(aStr);
         }
         assertEquals("[Dies,ist,ein,Test]", newList.toString());
+    }
+
+    @Test
+    public void testTake() {
+        ImmutableList<String> newList = ImmutableList.nil();
+
+        for (int i = str.length - 1; i >= 0; i--) {
+            newList = newList.prepend(str[i]);
+        }
+
+        ImmutableList<String> expected = ImmutableList.of(str[0], str[1], str[2]);
+        ImmutableList<String> actual = newList.take(3);
+        assertEquals(3, actual.size());
+        assertEquals(expected, actual);
     }
 
 

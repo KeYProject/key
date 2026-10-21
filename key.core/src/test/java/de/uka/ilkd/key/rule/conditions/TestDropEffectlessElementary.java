@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Set;
@@ -207,7 +208,7 @@ public class TestDropEffectlessElementary {
             return term;
         }
 
-        return mc.getInstantiations().getTermInstantiation(result, null, TacletForTests.services());
+        return mc.getInstantiations().getTermInstantiation(result, TacletForTests.services());
     }
 
 }

@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.control;
 
 import java.util.HashSet;
@@ -195,7 +196,7 @@ public abstract class AbstractProofControl implements ProofControl {
     public boolean selectedTaclet(Taclet taclet, Goal goal,
             PosInOccurrence pos) {
         ImmutableSet<TacletApp> applics = getAppsForName(goal, taclet.name().toString(), pos);
-        if (applics.size() == 0) {
+        if (applics.isEmpty()) {
             return false;
         }
         return selectedTaclet(applics, goal);
@@ -207,7 +208,7 @@ public abstract class AbstractProofControl implements ProofControl {
         if (applics.size() == 1) {
             TacletApp firstApp = it.next();
             boolean ifSeqInteraction = !firstApp.taclet().assumesSequent().isEmpty();
-            if (isMinimizeInteraction() && !firstApp.complete()) {
+            if (isMinimizeInteraction() && !firstApp.completeExceptSkolemConstants()) {
                 ImmutableList<TacletApp> ifSeqCandidates =
                     firstApp.findIfFormulaInstantiations(goal.sequent(), services);
 
@@ -229,7 +230,8 @@ public abstract class AbstractProofControl implements ProofControl {
                 }
 
             }
-            if (ifSeqInteraction || !firstApp.complete()) {
+            if (ifSeqInteraction || !firstApp.completeExceptSkolemConstants() ||
+                    (!isMinimizeInteraction() && !firstApp.complete())) {
                 LinkedList<TacletApp> l = new LinkedList<>();
                 l.add(firstApp);
                 TacletInstantiationModel[] models = completeAndApplyApp(l, goal);

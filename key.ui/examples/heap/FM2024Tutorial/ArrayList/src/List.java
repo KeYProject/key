@@ -5,7 +5,7 @@ public interface List {
 
     //@ public instance invariant \subset(\singleton(this.seq), footprint);
     //@ public instance invariant \subset(\singleton(this.footprint), footprint);
-    //@ public accessible \inv: footprint;
+    //@ accessible \inv: footprint;
 
     /*@ public normal_behaviour
       @   requires 0 <= index && index < seq.length;

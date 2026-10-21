@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Services;
@@ -9,7 +10,8 @@ import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.DoubleLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
-import de.uka.ilkd.key.java.ast.expression.operator.Negative;
+import de.uka.ilkd.key.java.ast.expression.operator.UnaryOperator;
+import de.uka.ilkd.key.java.ast.expression.operator.UnaryOperatorKind;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
@@ -142,7 +144,8 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     public boolean isResponsible(Operator op, JTerm sub,
             TermServices services, ExecutionContext ec) {
         if (sub != null && sub.sort().extendsTrans(targetSort())) {
-            return op instanceof Negative;
+            return op instanceof UnaryOperator uo
+                    && uo.getKind() == UnaryOperatorKind.NEGATIVE;
         }
         return false;
     }
@@ -187,7 +190,8 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     public Function getFunctionFor(Operator op,
             Services services,
             ExecutionContext ec) {
-        if (op instanceof Negative) {
+        if (op instanceof UnaryOperator u
+                && u.getKind() == UnaryOperatorKind.NEGATIVE) {
             return getJavaUnaryMinus();
         } else {
             return null;

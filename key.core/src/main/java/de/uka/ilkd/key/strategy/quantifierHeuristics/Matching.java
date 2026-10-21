@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
@@ -22,8 +23,9 @@ class Matching {
      * @param targetTerm a gound term
      * @return all substitution found from this matching
      */
-    public static ImmutableSet<Substitution> basicMatching(Trigger trigger, Term targetTerm) {
-        return BasicMatching.getSubstitutions(trigger.getTriggerTerm(), targetTerm);
+    public static ImmutableSet<Substitution> basicMatching(Trigger trigger, Term targetTerm,
+            Services services) {
+        return BasicMatching.getSubstitutions(trigger.getTriggerTerm(), targetTerm, services);
     }
 
     public static ImmutableSet<Substitution> twoSidedMatching(UniTrigger trigger, Term targetTerm,

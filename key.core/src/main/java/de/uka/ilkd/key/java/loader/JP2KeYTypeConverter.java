@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.loader;
 
 import java.util.Objects;
@@ -11,8 +12,7 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.ResolvedLogicalType;
 import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.declaration.*;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Final;
-import de.uka.ilkd.key.java.ast.declaration.modifier.Public;
+import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
@@ -46,6 +46,8 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static de.uka.ilkd.key.java.ast.declaration.Modifier.createModifierList;
 
 /**
  * provide means to convert recoder types to the corresponding KeY type structures.
@@ -109,7 +111,7 @@ public class JP2KeYTypeConverter {
                     this.__serializableType = kjt;
                     found += 1;
                     break;
-                default:;
+                default:
             }
             if (found == 3) {
                 break;
@@ -358,8 +360,7 @@ public class JP2KeYTypeConverter {
         if (ct.isClass()) {
             var ast = ct.asClass().toAst();
             if (ast.isPresent()
-                    && ast.get() instanceof com.github.javaparser.ast.body.TypeDeclaration<?>) {
-                var td = (com.github.javaparser.ast.body.TypeDeclaration<?>) ast.get();
+                    && ast.get() instanceof com.github.javaparser.ast.body.TypeDeclaration<?> td) {
                 isAbstract =
                     td.hasModifier(com.github.javaparser.ast.Modifier.DefaultKeyword.ABSTRACT);
             }
@@ -422,7 +423,7 @@ public class JP2KeYTypeConverter {
         var specLength =
             new FieldSpecification(new LocationVariable(new ProgramElementName("length"),
                 integerType, superArrayType, false, false, false, true));
-        var f = new FieldDeclaration(new Modifier[] { new Public(), new Final() },
+        var f = new FieldDeclaration(createModifierList(ModifierKind.PUBLIC, ModifierKind.FINAL),
             new TypeRef(integerType), new FieldSpecification[] { specLength }, false);
         superArrayType.setJavaType(new SuperArrayDeclaration(f));
         return superArrayType;

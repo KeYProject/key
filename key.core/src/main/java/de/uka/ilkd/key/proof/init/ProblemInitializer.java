@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.init;
 
 import java.io.*;
@@ -23,6 +24,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.nparser.ChoiceInformation;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
@@ -392,11 +394,14 @@ public final class ProblemInitializer {
         }
     }
 
-    // what is the purpose of this method?
+    /**
+     * Updates the global settings the taclet options that declared in
+     * {@code optionDeclaration.key}.
+     * A proof created afterwards inherits these settings unless it overwrites it.
+     */
     private InitConfig determineEnvironment(ProofOblInput po, InitConfig initConfig) {
-        // TODO: what does this actually do?
         ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().updateChoices(initConfig.choiceNS(),
-            false);
+            initConfig.getCategory2DefaultChoices(), false);
         return initConfig;
     }
 
@@ -505,7 +510,7 @@ public final class ProblemInitializer {
         var warnings = ic.getProfile()
                 .prepareInitConfig(ic, additionalProfileOptions);
         addWarnings(warnings);
-
+        ic.computeDefaults(new ChoiceInformation());
         return ic;
     }
 

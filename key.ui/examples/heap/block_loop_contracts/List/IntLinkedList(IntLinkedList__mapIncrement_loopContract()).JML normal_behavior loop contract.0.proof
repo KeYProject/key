@@ -829,7 +829,7 @@
          (rule "hideAuxiliaryEq" (formula "8"))
          (rule "eqSymm" (formula "7"))
          (rule "allLeft" (formula "6") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
          (rule "inEqSimp_homoInEq0" (formula "6") (term "1,0"))
@@ -861,7 +861,7 @@
          (builtin "One Step Simplification" (formula "6"))
          (rule "notLeft" (formula "6"))
          (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
          (rule "inEqSimp_homoInEq0" (formula "8") (term "1,0"))
@@ -912,14 +912,14 @@
          (builtin "One Step Simplification" (formula "4"))
          (rule "true_left" (formula "4"))
          (rule "allLeft" (formula "4") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
          (rule "typeEqDerived" (formula "4") (term "0,0,0") (ifseqformula "9"))
          (builtin "One Step Simplification" (formula "4"))
          (rule "true_left" (formula "4"))
          (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
          (rule "inEqSimp_homoInEq1" (formula "3") (term "1"))
@@ -989,7 +989,7 @@
          (rule "applyEqReverse" (formula "14") (term "0,0") (ifseqformula "13"))
          (rule "hideAuxiliaryEq" (formula "13"))
          (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
          (rule "inEqSimp_homoInEq0" (formula "11") (term "1,0,0,0,0,0"))
@@ -2251,7 +2251,7 @@
          (rule "hideAuxiliaryEq" (formula "8"))
          (rule "eqSymm" (formula "7"))
          (rule "allLeft" (formula "6") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
          (rule "inEqSimp_homoInEq1" (formula "6") (term "1"))
@@ -2283,7 +2283,7 @@
          (builtin "One Step Simplification" (formula "6"))
          (rule "notLeft" (formula "6"))
          (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
          (rule "inEqSimp_homoInEq1" (formula "8") (term "1"))
@@ -2334,14 +2334,14 @@
          (builtin "One Step Simplification" (formula "4"))
          (rule "true_left" (formula "4"))
          (rule "allLeft" (formula "4") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
          (rule "typeEqDerived" (formula "4") (term "0,0,0") (ifseqformula "9"))
          (builtin "One Step Simplification" (formula "4"))
          (rule "true_left" (formula "4"))
          (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
          (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
@@ -2442,7 +2442,7 @@
          (rule "applyEqReverse" (formula "17") (term "0,0") (ifseqformula "16"))
          (rule "hideAuxiliaryEq" (formula "16"))
          (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
          (rule "inEqSimp_homoInEq0" (formula "13") (term "1,0,0,0,0,0"))
@@ -5202,7 +5202,7 @@
                                                          (rule "leq_literals" (formula "12") (term "0,1"))
                                                          (builtin "One Step Simplification" (formula "12"))
                                                          (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq1" (formula "13") (term "1"))
@@ -5245,7 +5245,7 @@
                                                          (builtin "One Step Simplification" (formula "10"))
                                                          (rule "true_left" (formula "10"))
                                                          (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "10") (term "1,0"))
@@ -5736,7 +5736,7 @@
                                                          (rule "qeq_literals" (formula "12") (term "0,1"))
                                                          (builtin "One Step Simplification" (formula "12"))
                                                          (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq1" (formula "13") (term "1"))
@@ -5773,7 +5773,7 @@
                                                          (rule "hideAuxiliaryEq" (formula "14"))
                                                          (rule "eqSymm" (formula "13"))
                                                          (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "11") (term "1,0"))
@@ -5901,7 +5901,7 @@
                                                          (builtin "One Step Simplification" (formula "7"))
                                                          (rule "true_left" (formula "7"))
                                                          (rule "allLeft" (formula "7") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "7") (term "1,0"))
@@ -5927,7 +5927,7 @@
                                                          (builtin "One Step Simplification" (formula "7"))
                                                          (rule "true_left" (formula "7"))
                                                          (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "typeEqDerived" (formula "8") (term "0,0,0") (ifseqformula "13"))
@@ -6012,7 +6012,7 @@
                                                          (builtin "One Step Simplification" (formula "17"))
                                                          (rule "commute_or_2" (formula "17") (term "0"))
                                                          (rule "allLeft" (formula "18") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq1" (formula "18") (term "1,0,0,0,0"))
@@ -6484,7 +6484,7 @@
                                                             (builtin "One Step Simplification" (formula "34"))
                                                             (rule "false_right" (formula "34"))
                                                             (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "10") (term "1,0"))
@@ -6557,7 +6557,7 @@
                                                             (rule "qeq_literals" (formula "11") (term "0,1"))
                                                             (builtin "One Step Simplification" (formula "11"))
                                                             (rule "allLeft" (formula "12") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "12") (term "1"))
@@ -6809,7 +6809,7 @@
                                                             (builtin "One Step Simplification" (formula "9"))
                                                             (rule "true_left" (formula "9"))
                                                             (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "9") (term "1"))
@@ -6846,7 +6846,7 @@
                                                             (builtin "One Step Simplification" (formula "9"))
                                                             (rule "true_left" (formula "9"))
                                                             (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "typeEqDerived" (formula "10") (term "0,0,0") (ifseqformula "16"))
@@ -6944,7 +6944,7 @@
                                                             (rule "qeq_literals" (formula "22") (term "0,1,0,0,0,0"))
                                                             (builtin "One Step Simplification" (formula "22"))
                                                             (rule "allLeft" (formula "23") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "23") (term "1,0,0,0,0,0"))
@@ -8061,7 +8061,7 @@
                                                             (builtin "One Step Simplification" (formula "11"))
                                                             (rule "notLeft" (formula "11"))
                                                             (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "11") (term "1,0"))
@@ -8163,7 +8163,7 @@
                                                             (rule "leq_literals" (formula "13") (term "0,1"))
                                                             (builtin "One Step Simplification" (formula "13"))
                                                             (rule "allLeft" (formula "14") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "14") (term "1,0"))
@@ -8356,7 +8356,7 @@
                                                                (rule "add_literals" (formula "19") (term "1,0,1,0,0"))
                                                                (builtin "One Step Simplification" (formula "19"))
                                                                (rule "allLeft" (formula "20") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq0" (formula "20") (term "1,0,0,0,0,0"))
@@ -8393,7 +8393,7 @@
                                                                (rule "add_zero_left" (formula "20") (term "1,0,1,0"))
                                                                (builtin "One Step Simplification" (formula "20"))
                                                                (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "typeEqDerived" (formula "9") (term "0,0,0") (ifseqformula "15"))
@@ -8409,7 +8409,7 @@
                                                                (builtin "One Step Simplification" (formula "9"))
                                                                (rule "true_left" (formula "9"))
                                                                (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq0" (formula "8") (term "1,0"))
@@ -8583,7 +8583,7 @@
                                                                (rule "add_literals" (formula "19") (term "1,0,1,0,0"))
                                                                (builtin "One Step Simplification" (formula "19"))
                                                                (rule "allLeft" (formula "20") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq0" (formula "20") (term "1,0,0,0,0,0"))
@@ -8907,7 +8907,7 @@
                                                                (builtin "One Step Simplification" (formula "10"))
                                                                (rule "notLeft" (formula "10"))
                                                                (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq0" (formula "10") (term "1,0"))
@@ -9029,7 +9029,7 @@
                                                                (rule "qeq_literals" (formula "15") (term "0,1"))
                                                                (builtin "One Step Simplification" (formula "15"))
                                                                (rule "allLeft" (formula "16") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq0" (formula "16") (term "1,0"))
@@ -9358,7 +9358,7 @@
                                                       (builtin "One Step Simplification" (formula "20"))
                                                       (rule "true_left" (formula "20"))
                                                       (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                       (rule "inEqSimp_homoInEq0" (formula "9") (term "1,0"))
@@ -9466,7 +9466,7 @@
                                                       (rule "qeq_literals" (formula "15") (term "0,1"))
                                                       (builtin "One Step Simplification" (formula "15"))
                                                       (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                       (rule "inEqSimp_homoInEq0" (formula "8") (term "1,0"))
@@ -9508,14 +9508,14 @@
                                                       (builtin "One Step Simplification" (formula "8"))
                                                       (rule "true_left" (formula "8"))
                                                       (rule "allLeft" (formula "6") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                       (rule "typeEqDerived" (formula "6") (term "0,0,0") (ifseqformula "10"))
                                                       (builtin "One Step Simplification" (formula "6"))
                                                       (rule "true_left" (formula "6"))
                                                       (rule "allLeft" (formula "5") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                       (rule "inEqSimp_homoInEq1" (formula "5") (term "1"))
@@ -10324,7 +10324,7 @@
                                                          (builtin "One Step Simplification" (formula "8"))
                                                          (rule "notLeft" (formula "8"))
                                                          (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq1" (formula "8") (term "1"))
@@ -10403,7 +10403,7 @@
                                                          (builtin "One Step Simplification" (formula "12"))
                                                          (rule "commute_or_2" (formula "12") (term "0"))
                                                          (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "10") (term "1,0"))
@@ -10658,7 +10658,7 @@
                                                             (rule "hideAuxiliaryEq" (formula "11"))
                                                             (rule "eqSymm" (formula "10"))
                                                             (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "11") (term "1,0"))
@@ -10736,7 +10736,7 @@
                                                             (builtin "One Step Simplification" (formula "34"))
                                                             (rule "false_right" (formula "34"))
                                                             (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "8") (term "1"))
@@ -10852,7 +10852,7 @@
                                                             (rule "inEqSimp_sepPosMonomial0" (formula "20") (term "1"))
                                                             (rule "mul_literals" (formula "20") (term "1,1"))
                                                             (rule "allLeft" (formula "16") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "16") (term "1,0,0,0,0"))
@@ -10928,7 +10928,7 @@
                                                             (builtin "One Step Simplification" (formula "5"))
                                                             (rule "true_left" (formula "5"))
                                                             (rule "allLeft" (formula "5") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "5") (term "1"))
@@ -10961,7 +10961,7 @@
                                                             (builtin "One Step Simplification" (formula "5"))
                                                             (rule "true_left" (formula "5"))
                                                             (rule "allLeft" (formula "6") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "typeEqDerived" (formula "6") (term "0,0,0") (ifseqformula "11"))
@@ -11098,7 +11098,7 @@
                                                             (builtin "One Step Simplification" (formula "10"))
                                                             (rule "commute_or_2" (formula "10") (term "0"))
                                                             (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "8") (term "1,0"))
@@ -11255,7 +11255,7 @@
                                                             (rule "hideAuxiliaryEq" (formula "13"))
                                                             (rule "eqSymm" (formula "12"))
                                                             (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "13") (term "1"))
@@ -11881,7 +11881,7 @@
                                                          (builtin "One Step Simplification" (formula "11"))
                                                          (rule "true_left" (formula "11"))
                                                          (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "11") (term "1,0"))
@@ -11970,7 +11970,7 @@
                                                          (rule "qeq_literals" (formula "12") (term "0,1"))
                                                          (builtin "One Step Simplification" (formula "12"))
                                                          (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "13") (term "1,0"))
@@ -12484,7 +12484,7 @@
                                                          (rule "qeq_literals" (formula "12") (term "0,1"))
                                                          (builtin "One Step Simplification" (formula "12"))
                                                          (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "13") (term "1,0"))
@@ -12572,7 +12572,7 @@
                                                          (builtin "One Step Simplification" (formula "37"))
                                                          (rule "false_right" (formula "37"))
                                                          (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "10") (term "1,0"))
@@ -12644,7 +12644,7 @@
                                                          (builtin "One Step Simplification" (formula "12"))
                                                          (rule "true_left" (formula "12"))
                                                          (rule "allLeft" (formula "7") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq1" (formula "7") (term "1"))
@@ -12677,7 +12677,7 @@
                                                          (builtin "One Step Simplification" (formula "7"))
                                                          (rule "true_left" (formula "7"))
                                                          (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "typeEqDerived" (formula "8") (term "0,0,0") (ifseqformula "13"))
@@ -12744,7 +12744,7 @@
                                                          (rule "qeq_literals" (formula "20") (term "0,1,0"))
                                                          (builtin "One Step Simplification" (formula "20"))
                                                          (rule "allLeft" (formula "16") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq1" (formula "16") (term "1,0,0,0,0"))
@@ -13247,7 +13247,7 @@
                                                             (builtin "One Step Simplification" (formula "35"))
                                                             (rule "false_right" (formula "35"))
                                                             (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "10") (term "1"))
@@ -13320,7 +13320,7 @@
                                                             (rule "leq_literals" (formula "11") (term "0,1"))
                                                             (builtin "One Step Simplification" (formula "11"))
                                                             (rule "allLeft" (formula "12") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "12") (term "1,0"))
@@ -13567,7 +13567,7 @@
                                                             (builtin "One Step Simplification" (formula "10"))
                                                             (rule "true_left" (formula "10"))
                                                             (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "typeEqDerived" (formula "10") (term "0,0,0") (ifseqformula "16"))
@@ -13585,7 +13585,7 @@
                                                             (builtin "One Step Simplification" (formula "9"))
                                                             (rule "true_left" (formula "9"))
                                                             (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "9") (term "1"))
@@ -13707,7 +13707,7 @@
                                                             (rule "qeq_literals" (formula "22") (term "0,1,0,0,0,0"))
                                                             (builtin "One Step Simplification" (formula "22"))
                                                             (rule "allLeft" (formula "23") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "23") (term "1,0,0,0,0,0"))
@@ -14896,7 +14896,7 @@
                                                             (rule "qeq_literals" (formula "13") (term "0,1"))
                                                             (builtin "One Step Simplification" (formula "13"))
                                                             (rule "allLeft" (formula "14") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "14") (term "1"))
@@ -14933,7 +14933,7 @@
                                                             (rule "hideAuxiliaryEq" (formula "15"))
                                                             (rule "eqSymm" (formula "14"))
                                                             (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "11") (term "1,0"))
@@ -15130,7 +15130,7 @@
                                                                (rule "add_literals" (formula "19") (term "1,0,1,0,0"))
                                                                (builtin "One Step Simplification" (formula "19"))
                                                                (rule "allLeft" (formula "20") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq0" (formula "20") (term "1,0,0,0,0,0"))
@@ -15180,7 +15180,7 @@
                                                                (builtin "One Step Simplification" (formula "9"))
                                                                (rule "true_left" (formula "9"))
                                                                (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "typeEqDerived" (formula "9") (term "0,0,0") (ifseqformula "15"))
@@ -15198,7 +15198,7 @@
                                                                (builtin "One Step Simplification" (formula "8"))
                                                                (rule "true_left" (formula "8"))
                                                                (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq1" (formula "8") (term "1"))
@@ -15376,7 +15376,7 @@
                                                                (rule "add_literals" (formula "20") (term "1,0,1,0,0"))
                                                                (builtin "One Step Simplification" (formula "20"))
                                                                (rule "allLeft" (formula "21") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq0" (formula "21") (term "1,0,0,0,0,0"))
@@ -15608,7 +15608,7 @@
                                                                (builtin "One Step Simplification" (formula "10"))
                                                                (rule "notLeft" (formula "10"))
                                                                (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq1" (formula "10") (term "1"))
@@ -15715,7 +15715,7 @@
                                                                (rule "leq_literals" (formula "12") (term "0,1"))
                                                                (builtin "One Step Simplification" (formula "12"))
                                                                (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq1" (formula "13") (term "1"))
@@ -15926,7 +15926,7 @@
                                                                (rule "applyEqReverse" (formula "27") (term "0,0") (ifseqformula "26"))
                                                                (rule "hideAuxiliaryEq" (formula "26"))
                                                                (rule "allLeft" (formula "21") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq1" (formula "21") (term "1,0,0,0,0"))
@@ -16284,7 +16284,7 @@
                                                       (builtin "One Step Simplification" (formula "20"))
                                                       (rule "true_left" (formula "20"))
                                                       (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                       (rule "inEqSimp_homoInEq1" (formula "9") (term "1"))
@@ -16381,7 +16381,7 @@
                                                       (builtin "One Step Simplification" (formula "5"))
                                                       (rule "true_left" (formula "5"))
                                                       (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                       (rule "inEqSimp_homoInEq1" (formula "8") (term "1"))
@@ -16423,7 +16423,7 @@
                                                       (builtin "One Step Simplification" (formula "8"))
                                                       (rule "true_left" (formula "8"))
                                                       (rule "allLeft" (formula "5") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                       (rule "inEqSimp_homoInEq0" (formula "5") (term "1,0"))
@@ -16449,7 +16449,7 @@
                                                       (builtin "One Step Simplification" (formula "5"))
                                                       (rule "true_left" (formula "5"))
                                                       (rule "allLeft" (formula "6") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                       (rule "typeEqDerived" (formula "6") (term "0,0,0") (ifseqformula "10"))
@@ -17261,7 +17261,7 @@
                                                          (builtin "One Step Simplification" (formula "11"))
                                                          (rule "commute_or_2" (formula "11") (term "0"))
                                                          (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq1" (formula "9") (term "1"))
@@ -17349,7 +17349,7 @@
                                                          (builtin "One Step Simplification" (formula "11"))
                                                          (rule "notLeft" (formula "11"))
                                                          (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "11") (term "1,0"))
@@ -17492,7 +17492,7 @@
                                                             (rule "replace_known_left" (formula "33") (term "1") (ifseqformula "13"))
                                                             (builtin "One Step Simplification" (formula "33"))
                                                             (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "9") (term "1"))
@@ -17650,7 +17650,7 @@
                                                             (rule "hideAuxiliaryEq" (formula "11"))
                                                             (rule "eqSymm" (formula "10"))
                                                             (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "11") (term "1,0"))
@@ -17801,7 +17801,7 @@
                                                             (rule "add_literals" (formula "16") (term "1,0,1,0,0"))
                                                             (builtin "One Step Simplification" (formula "16"))
                                                             (rule "allLeft" (formula "17") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "17") (term "1,0,0,0,0,0"))
@@ -17845,7 +17845,7 @@
                                                             (builtin "One Step Simplification" (formula "5"))
                                                             (rule "true_left" (formula "5"))
                                                             (rule "allLeft" (formula "5") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "5") (term "1,0"))
@@ -17886,7 +17886,7 @@
                                                             (builtin "One Step Simplification" (formula "6"))
                                                             (rule "true_left" (formula "6"))
                                                             (rule "allLeft" (formula "6") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "typeEqDerived" (formula "6") (term "0,0,0") (ifseqformula "11"))
@@ -17965,7 +17965,7 @@
                                                             (rule "replace_known_right" (formula "34") (term "0,0,0") (ifseqformula "28"))
                                                             (builtin "One Step Simplification" (formula "34"))
                                                             (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "8") (term "1,0"))
@@ -18071,7 +18071,7 @@
                                                             (rule "hideAuxiliaryEq" (formula "13"))
                                                             (rule "eqSymm" (formula "12"))
                                                             (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "13") (term "1,0"))
@@ -18810,7 +18810,7 @@
                                                       (builtin "One Step Simplification" (formula "9"))
                                                       (rule "true_left" (formula "9"))
                                                       (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                       (rule "inEqSimp_homoInEq0" (formula "9") (term "1,0"))
@@ -18860,7 +18860,7 @@
                                                       (rule "leq_literals" (formula "11") (term "0,1"))
                                                       (builtin "One Step Simplification" (formula "11"))
                                                       (rule "allLeft" (formula "12") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                       (rule "inEqSimp_homoInEq1" (formula "12") (term "1"))
@@ -19505,7 +19505,7 @@
                                                          (rule "leq_literals" (formula "12") (term "0,1"))
                                                          (builtin "One Step Simplification" (formula "12"))
                                                          (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "13") (term "1,0"))
@@ -19593,7 +19593,7 @@
                                                          (builtin "One Step Simplification" (formula "10"))
                                                          (rule "true_left" (formula "10"))
                                                          (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq1" (formula "10") (term "1"))
@@ -19676,14 +19676,14 @@
                                                          (builtin "One Step Simplification" (formula "8"))
                                                          (rule "true_left" (formula "8"))
                                                          (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "typeEqDerived" (formula "8") (term "0,0,0") (ifseqformula "13"))
                                                          (builtin "One Step Simplification" (formula "8"))
                                                          (rule "true_left" (formula "8"))
                                                          (rule "allLeft" (formula "7") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "7") (term "1,0"))
@@ -19843,7 +19843,7 @@
                                                          (rule "add_literals" (formula "20") (term "1,0,1,0,0"))
                                                          (builtin "One Step Simplification" (formula "20"))
                                                          (rule "allLeft" (formula "21") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "21") (term "1,0,0,0,0,0"))
@@ -20288,7 +20288,7 @@
                                                             (rule "replace_known_right" (formula "15") (term "0") (ifseqformula "30"))
                                                             (builtin "One Step Simplification" (formula "15"))
                                                             (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "10") (term "1"))
@@ -20361,7 +20361,7 @@
                                                             (rule "qeq_literals" (formula "11") (term "0,1"))
                                                             (builtin "One Step Simplification" (formula "11"))
                                                             (rule "allLeft" (formula "12") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "12") (term "1,0"))
@@ -20576,14 +20576,14 @@
                                                             (builtin "One Step Simplification" (formula "9"))
                                                             (rule "true_left" (formula "9"))
                                                             (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "typeEqDerived" (formula "10") (term "0,0,0") (ifseqformula "16"))
                                                             (builtin "One Step Simplification" (formula "10"))
                                                             (rule "true_left" (formula "10"))
                                                             (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "9") (term "1"))
@@ -20703,7 +20703,7 @@
                                                             (rule "leq_literals" (formula "21") (term "0,1,0,0,0,0"))
                                                             (builtin "One Step Simplification" (formula "21"))
                                                             (rule "allLeft" (formula "22") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "22") (term "1,0,0,0,0,0"))
@@ -21790,7 +21790,7 @@
                                                             (builtin "One Step Simplification" (formula "11"))
                                                             (rule "notLeft" (formula "11"))
                                                             (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "11") (term "1,0"))
@@ -21881,7 +21881,7 @@
                                                             (rule "leq_literals" (formula "13") (term "0,1"))
                                                             (builtin "One Step Simplification" (formula "13"))
                                                             (rule "allLeft" (formula "14") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "14") (term "1"))
@@ -22067,7 +22067,7 @@
                                                                (rule "add_literals" (formula "19") (term "1,0,1,0,0"))
                                                                (builtin "One Step Simplification" (formula "19"))
                                                                (rule "allLeft" (formula "20") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq0" (formula "20") (term "1,0,0,0,0,0"))
@@ -22117,7 +22117,7 @@
                                                                (builtin "One Step Simplification" (formula "9"))
                                                                (rule "true_left" (formula "9"))
                                                                (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "typeEqDerived" (formula "9") (term "0,0,0") (ifseqformula "15"))
@@ -22131,7 +22131,7 @@
                                                                (builtin "One Step Simplification" (formula "8"))
                                                                (rule "true_left" (formula "8"))
                                                                (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq0" (formula "8") (term "1,0"))
@@ -22282,7 +22282,7 @@
                                                                (rule "qeq_literals" (formula "24") (term "0,1,0"))
                                                                (builtin "One Step Simplification" (formula "24"))
                                                                (rule "allLeft" (formula "19") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq1" (formula "19") (term "1,0,0,0,0"))
@@ -22358,7 +22358,7 @@
                                                                (builtin "One Step Simplification" (formula "7"))
                                                                (rule "true_left" (formula "7"))
                                                                (rule "allLeft" (formula "7") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq1" (formula "7") (term "1"))
@@ -22407,7 +22407,7 @@
                                                                (builtin "One Step Simplification" (formula "8"))
                                                                (rule "true_left" (formula "8"))
                                                                (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "typeEqDerived" (formula "8") (term "0,0,0") (ifseqformula "14"))
@@ -22663,7 +22663,7 @@
                                                                (builtin "One Step Simplification" (formula "10"))
                                                                (rule "notLeft" (formula "10"))
                                                                (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq0" (formula "10") (term "1,0"))
@@ -22785,7 +22785,7 @@
                                                                (rule "leq_literals" (formula "15") (term "0,1"))
                                                                (builtin "One Step Simplification" (formula "15"))
                                                                (rule "allLeft" (formula "16") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq0" (formula "16") (term "1,0"))
@@ -23165,7 +23165,7 @@
                                                       (rule "qeq_literals" (formula "14") (term "0,1"))
                                                       (builtin "One Step Simplification" (formula "14"))
                                                       (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                       (rule "inEqSimp_homoInEq1" (formula "11") (term "1"))
@@ -23211,7 +23211,7 @@
                                                       (builtin "One Step Simplification" (formula "6"))
                                                       (rule "true_left" (formula "6"))
                                                       (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                       (rule "inEqSimp_homoInEq0" (formula "8") (term "1,0"))
@@ -24085,7 +24085,7 @@
                                                          (builtin "One Step Simplification" (formula "8"))
                                                          (rule "notLeft" (formula "8"))
                                                          (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq1" (formula "8") (term "1"))
@@ -24156,7 +24156,7 @@
                                                          (builtin "One Step Simplification" (formula "7"))
                                                          (rule "true_left" (formula "7"))
                                                          (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "10") (term "1,0"))
@@ -24353,7 +24353,7 @@
                                                             (builtin "One Step Simplification" (formula "12"))
                                                             (rule "commute_or_2" (formula "12") (term "0"))
                                                             (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "9") (term "1,0"))
@@ -24466,7 +24466,7 @@
                                                             (builtin "One Step Simplification" (formula "9"))
                                                             (rule "true_left" (formula "9"))
                                                             (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "11") (term "1"))
@@ -24617,7 +24617,7 @@
                                                             (rule "add_literals" (formula "16") (term "1,0,1,0,0"))
                                                             (builtin "One Step Simplification" (formula "16"))
                                                             (rule "allLeft" (formula "17") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "17") (term "1,0,0,0,0"))
@@ -24654,7 +24654,7 @@
                                                             (rule "add_zero_left" (formula "17") (term "1,0,1,0"))
                                                             (builtin "One Step Simplification" (formula "17"))
                                                             (rule "allLeft" (formula "6") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "typeEqDerived" (formula "6") (term "0,0,0") (ifseqformula "11"))
@@ -24683,7 +24683,7 @@
                                                             (builtin "One Step Simplification" (formula "6"))
                                                             (rule "true_left" (formula "6"))
                                                             (rule "allLeft" (formula "5") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "5") (term "1"))
@@ -24847,7 +24847,7 @@
                                                             (rule "replace_known_right" (formula "36") (term "0,0,0") (ifseqformula "29"))
                                                             (builtin "One Step Simplification" (formula "36"))
                                                             (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "8") (term "1,0"))
@@ -24953,7 +24953,7 @@
                                                             (rule "hideAuxiliaryEq" (formula "13"))
                                                             (rule "eqSymm" (formula "12"))
                                                             (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "13") (term "1,0"))
@@ -25085,7 +25085,7 @@
                                                             (rule "add_literals" (formula "18") (term "1,0,1,0,0"))
                                                             (builtin "One Step Simplification" (formula "18"))
                                                             (rule "allLeft" (formula "19") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "19") (term "1,0,0,0,0"))
@@ -25765,7 +25765,7 @@
                                                          (rule "leq_literals" (formula "15") (term "0,1"))
                                                          (builtin "One Step Simplification" (formula "15"))
                                                          (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "11") (term "1,0"))
@@ -25843,7 +25843,7 @@
                                                          (rule "qeq_literals" (formula "12") (term "0,1"))
                                                          (builtin "One Step Simplification" (formula "12"))
                                                          (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq1" (formula "13") (term "1"))
@@ -26330,7 +26330,7 @@
                                                          (rule "leq_literals" (formula "12") (term "0,1"))
                                                          (builtin "One Step Simplification" (formula "12"))
                                                          (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "13") (term "1,0"))
@@ -26418,7 +26418,7 @@
                                                          (builtin "One Step Simplification" (formula "10"))
                                                          (rule "true_left" (formula "10"))
                                                          (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "10") (term "1,0"))
@@ -26501,14 +26501,14 @@
                                                          (builtin "One Step Simplification" (formula "7"))
                                                          (rule "true_left" (formula "7"))
                                                          (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "typeEqDerived" (formula "8") (term "0,0,0") (ifseqformula "13"))
                                                          (builtin "One Step Simplification" (formula "8"))
                                                          (rule "true_left" (formula "8"))
                                                          (rule "allLeft" (formula "7") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq1" (formula "7") (term "1"))
@@ -26650,7 +26650,7 @@
                                                          (rule "add_literals" (formula "19") (term "1,0,1,0,0"))
                                                          (builtin "One Step Simplification" (formula "19"))
                                                          (rule "allLeft" (formula "20") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "20") (term "1,0,0,0,0,0"))
@@ -27113,7 +27113,7 @@
                                                             (rule "replace_known_right" (formula "15") (term "0") (ifseqformula "30"))
                                                             (builtin "One Step Simplification" (formula "15"))
                                                             (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "10") (term "1"))
@@ -27186,7 +27186,7 @@
                                                             (rule "qeq_literals" (formula "11") (term "0,1"))
                                                             (builtin "One Step Simplification" (formula "11"))
                                                             (rule "allLeft" (formula "12") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "12") (term "1,0"))
@@ -27399,7 +27399,7 @@
                                                             (builtin "One Step Simplification" (formula "9"))
                                                             (rule "true_left" (formula "9"))
                                                             (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "9") (term "1,0"))
@@ -27434,7 +27434,7 @@
                                                             (builtin "One Step Simplification" (formula "10"))
                                                             (rule "true_left" (formula "10"))
                                                             (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "typeEqDerived" (formula "10") (term "0,0,0") (ifseqformula "16"))
@@ -27536,7 +27536,7 @@
                                                             (rule "qeq_literals" (formula "22") (term "0,1,0,0,0,0"))
                                                             (builtin "One Step Simplification" (formula "22"))
                                                             (rule "allLeft" (formula "23") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "23") (term "1,0,0,0,0,0"))
@@ -28660,7 +28660,7 @@
                                                             (builtin "One Step Simplification" (formula "11"))
                                                             (rule "notLeft" (formula "11"))
                                                             (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "11") (term "1"))
@@ -28813,7 +28813,7 @@
                                                             (rule "leq_literals" (formula "13") (term "0,1"))
                                                             (builtin "One Step Simplification" (formula "13"))
                                                             (rule "allLeft" (formula "14") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "14") (term "1"))
@@ -28980,7 +28980,7 @@
                                                                (builtin "One Step Simplification" (formula "23"))
                                                                (rule "true_left" (formula "23"))
                                                                (rule "allLeft" (formula "19") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq1" (formula "19") (term "1,0,0,0,0"))
@@ -29059,7 +29059,7 @@
                                                                (builtin "One Step Simplification" (formula "8"))
                                                                (rule "true_left" (formula "8"))
                                                                (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq0" (formula "8") (term "1,0"))
@@ -29090,7 +29090,7 @@
                                                                (builtin "One Step Simplification" (formula "8"))
                                                                (rule "true_left" (formula "8"))
                                                                (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "typeEqDerived" (formula "9") (term "0,0,0") (ifseqformula "15"))
@@ -29222,7 +29222,7 @@
                                                                (rule "qeq_literals" (formula "24") (term "0,1,0"))
                                                                (builtin "One Step Simplification" (formula "24"))
                                                                (rule "allLeft" (formula "19") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq0" (formula "19") (term "1,0,0,0,0,0"))
@@ -29297,7 +29297,7 @@
                                                                (builtin "One Step Simplification" (formula "8"))
                                                                (rule "true_left" (formula "8"))
                                                                (rule "allLeft" (formula "7") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq0" (formula "7") (term "1,0"))
@@ -29339,7 +29339,7 @@
                                                                (builtin "One Step Simplification" (formula "7"))
                                                                (rule "true_left" (formula "7"))
                                                                (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "typeEqDerived" (formula "8") (term "0,0,0") (ifseqformula "14"))
@@ -29533,7 +29533,7 @@
                                                                (builtin "One Step Simplification" (formula "10"))
                                                                (rule "notLeft" (formula "10"))
                                                                (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq0" (formula "10") (term "1,0"))
@@ -29691,7 +29691,7 @@
                                                                (rule "qeq_literals" (formula "15") (term "0,1"))
                                                                (builtin "One Step Simplification" (formula "15"))
                                                                (rule "allLeft" (formula "16") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                                (rule "inEqSimp_homoInEq1" (formula "16") (term "1"))
@@ -30035,7 +30035,7 @@
                                                       (builtin "One Step Simplification" (formula "20"))
                                                       (rule "true_left" (formula "20"))
                                                       (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                       (rule "inEqSimp_homoInEq0" (formula "9") (term "1,0"))
@@ -30143,7 +30143,7 @@
                                                       (builtin "One Step Simplification" (formula "5"))
                                                       (rule "true_left" (formula "5"))
                                                       (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                       (rule "inEqSimp_homoInEq0" (formula "8") (term "1,0"))
@@ -30185,7 +30185,7 @@
                                                       (builtin "One Step Simplification" (formula "8"))
                                                       (rule "true_left" (formula "8"))
                                                       (rule "allLeft" (formula "5") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                       (rule "inEqSimp_homoInEq0" (formula "5") (term "1,0"))
@@ -30211,7 +30211,7 @@
                                                       (builtin "One Step Simplification" (formula "5"))
                                                       (rule "true_left" (formula "5"))
                                                       (rule "allLeft" (formula "6") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                       (rule "typeEqDerived" (formula "6") (term "0,0,0") (ifseqformula "10"))
@@ -31028,7 +31028,7 @@
                                                          (builtin "One Step Simplification" (formula "11"))
                                                          (rule "commute_or_2" (formula "11") (term "0"))
                                                          (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq1" (formula "9") (term "1"))
@@ -31116,7 +31116,7 @@
                                                          (builtin "One Step Simplification" (formula "11"))
                                                          (rule "notLeft" (formula "11"))
                                                          (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                          (rule "inEqSimp_homoInEq0" (formula "11") (term "1,0"))
@@ -31289,7 +31289,7 @@
                                                             (builtin "One Step Simplification" (formula "11"))
                                                             (rule "commute_or_2" (formula "11") (term "0"))
                                                             (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "9") (term "1,0"))
@@ -31417,7 +31417,7 @@
                                                             (rule "hideAuxiliaryEq" (formula "11"))
                                                             (rule "eqSymm" (formula "10"))
                                                             (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "11") (term "1,0"))
@@ -31556,7 +31556,7 @@
                                                             (rule "hideAuxiliaryEq" (formula "20"))
                                                             (rule "eqSymm" (formula "20") (term "0"))
                                                             (rule "allLeft" (formula "16") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "16") (term "1,0,0,0,0"))
@@ -31605,7 +31605,7 @@
                                                             (rule "add_literals" (formula "17") (term "1,0,1,0,0"))
                                                             (builtin "One Step Simplification" (formula "17"))
                                                             (rule "allLeft" (formula "5") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "5") (term "1"))
@@ -31657,7 +31657,7 @@
                                                             (builtin "One Step Simplification" (formula "6"))
                                                             (rule "true_left" (formula "6"))
                                                             (rule "allLeft" (formula "6") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "typeEqDerived" (formula "6") (term "0,0,0") (ifseqformula "11"))
@@ -31831,7 +31831,7 @@
                                                             (builtin "One Step Simplification" (formula "11"))
                                                             (rule "commute_or_2" (formula "11") (term "0"))
                                                             (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq0" (formula "8") (term "1,0"))
@@ -31937,7 +31937,7 @@
                                                             (rule "hideAuxiliaryEq" (formula "13"))
                                                             (rule "eqSymm" (formula "12"))
                                                             (rule "allLeft" (formula "13") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                             (rule "inEqSimp_homoInEq1" (formula "13") (term "1"))
@@ -34614,7 +34614,7 @@
                                                    (rule "leq_literals" (formula "13") (term "0,1"))
                                                    (builtin "One Step Simplification" (formula "13"))
                                                    (rule "allLeft" (formula "14") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "14") (term "1,0"))
@@ -34665,7 +34665,7 @@
                                                    (rule "hideAuxiliaryEq" (formula "16"))
                                                    (rule "eqSymm" (formula "15"))
                                                    (rule "allLeft" (formula "12") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "12") (term "1,0"))
@@ -34705,7 +34705,7 @@
                                                    (rule "replace_known_right" (formula "22") (term "0") (ifseqformula "35"))
                                                    (builtin "One Step Simplification" (formula "22"))
                                                    (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "9") (term "1,0"))
@@ -34748,7 +34748,7 @@
                                                    (builtin "One Step Simplification" (formula "10"))
                                                    (rule "true_left" (formula "10"))
                                                    (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "typeEqDerived" (formula "10") (term "0,0,0") (ifseqformula "15"))
@@ -34815,7 +34815,7 @@
                                                    (rule "inEqSimp_contradInEq1" (formula "20") (term "1,0") (ifseqformula "29"))
                                                    (rule "qeq_literals" (formula "20") (term "0,1,0"))
                                                    (builtin "One Step Simplification" (formula "20"))
-                                                   (rule "allLeft" (formula "21") (inst "t=select<[int]>(anonIn_heap<<anonHeapFunction>>,
+                                                   (rule "allLeft" (formula "21") (inst "t=select<int>(anonIn_heap<<anonHeapFunction>>,
             anonIn_current,
             IntNode::$data)"))
                                                    (rule "pullOutSelect" (formula "21") (term "0,0,0") (inst "selectSK=IntNode_next_3"))
@@ -34874,7 +34874,7 @@
                                                    (builtin "One Step Simplification" (formula "18"))
                                                    (rule "commute_or_2" (formula "18") (term "0"))
                                                    (rule "allLeft" (formula "19") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "19") (term "1,0,0,0,0,0"))
@@ -35240,7 +35240,7 @@
                                                    (rule "qeq_literals" (formula "13") (term "0,1"))
                                                    (builtin "One Step Simplification" (formula "13"))
                                                    (rule "allLeft" (formula "12") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq1" (formula "12") (term "1"))
@@ -35272,7 +35272,7 @@
                                                    (builtin "One Step Simplification" (formula "12"))
                                                    (rule "notLeft" (formula "12"))
                                                    (rule "allLeft" (formula "14") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "14") (term "1,0"))
@@ -35344,7 +35344,7 @@
                                                    (builtin "One Step Simplification" (formula "9"))
                                                    (rule "true_left" (formula "9"))
                                                    (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq1" (formula "9") (term "1"))
@@ -35374,7 +35374,7 @@
                                                    (builtin "One Step Simplification" (formula "10"))
                                                    (rule "true_left" (formula "10"))
                                                    (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "typeEqDerived" (formula "10") (term "0,0,0") (ifseqformula "15"))
@@ -35440,7 +35440,7 @@
                                                    (builtin "One Step Simplification" (formula "21"))
                                                    (rule "applyEqReverse" (formula "22") (term "0,0,0") (ifseqformula "21"))
                                                    (rule "hideAuxiliaryEq" (formula "21"))
-                                                   (rule "allLeft" (formula "22") (inst "t=select<[int]>(anonIn_heap<<anonHeapFunction>>,
+                                                   (rule "allLeft" (formula "22") (inst "t=select<int>(anonIn_heap<<anonHeapFunction>>,
             anonIn_current,
             IntNode::$data)"))
                                                    (rule "pullOutSelect" (formula "22") (term "0,0,0") (inst "selectSK=IntNode_next_4"))
@@ -35496,7 +35496,7 @@
                                                    (builtin "One Step Simplification" (formula "18"))
                                                    (rule "commute_or_2" (formula "18") (term "0"))
                                                    (rule "allLeft" (formula "19") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "19") (term "1,0,0,0,0,0"))
@@ -35837,7 +35837,7 @@
                                                    (builtin "One Step Simplification" (formula "7"))
                                                    (rule "cnf_rightDist" (formula "7") (term "0,0,0,0,0,1,0,0,0,0"))
                                                    (rule "allLeft" (formula "12") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq1" (formula "12") (term "1"))
@@ -35902,7 +35902,7 @@
                                                    (rule "qeq_literals" (formula "13") (term "0,1"))
                                                    (builtin "One Step Simplification" (formula "13"))
                                                    (rule "allLeft" (formula "14") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq1" (formula "14") (term "1"))
@@ -35970,7 +35970,7 @@
                                                    (builtin "One Step Simplification" (formula "9"))
                                                    (rule "true_left" (formula "9"))
                                                    (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "9") (term "1,0"))
@@ -35996,7 +35996,7 @@
                                                    (builtin "One Step Simplification" (formula "9"))
                                                    (rule "true_left" (formula "9"))
                                                    (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "typeEqDerived" (formula "10") (term "0,0,0") (ifseqformula "15"))
@@ -36061,7 +36061,7 @@
                                                    (rule "inEqSimp_contradInEq1" (formula "20") (term "1,0") (ifseqformula "29"))
                                                    (rule "qeq_literals" (formula "20") (term "0,1,0"))
                                                    (builtin "One Step Simplification" (formula "20"))
-                                                   (rule "allLeft" (formula "21") (inst "t=select<[int]>(anonIn_heap<<anonHeapFunction>>,
+                                                   (rule "allLeft" (formula "21") (inst "t=select<int>(anonIn_heap<<anonHeapFunction>>,
             anonIn_current,
             IntNode::$data)"))
                                                    (rule "pullOutSelect" (formula "21") (term "0,0,0") (inst "selectSK=IntNode_next_3"))
@@ -36126,7 +36126,7 @@
                                                    (builtin "One Step Simplification" (formula "18"))
                                                    (rule "commute_or_2" (formula "18") (term "0"))
                                                    (rule "allLeft" (formula "19") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "19") (term "1,0,0,0,0,0"))
@@ -36462,7 +36462,7 @@
                                                    (builtin "One Step Simplification" (formula "7"))
                                                    (rule "cnf_rightDist" (formula "7") (term "0,0,0,0,1,0,0,0,0,0"))
                                                    (rule "allLeft" (formula "12") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq1" (formula "12") (term "1"))
@@ -36527,7 +36527,7 @@
                                                    (rule "qeq_literals" (formula "13") (term "0,1"))
                                                    (builtin "One Step Simplification" (formula "13"))
                                                    (rule "allLeft" (formula "14") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq1" (formula "14") (term "1"))
@@ -36587,7 +36587,7 @@
                                                    (builtin "One Step Simplification" (formula "22"))
                                                    (rule "commute_or" (formula "7") (term "0,0,0,0,0,0,0,1,0,0,0,0"))
                                                    (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "typeEqDerived" (formula "10") (term "0,0,0") (ifseqformula "15"))
@@ -36601,7 +36601,7 @@
                                                    (builtin "One Step Simplification" (formula "9"))
                                                    (rule "true_left" (formula "9"))
                                                    (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq1" (formula "9") (term "1"))
@@ -36686,7 +36686,7 @@
                                                    (rule "inEqSimp_contradInEq1" (formula "20") (term "1,0") (ifseqformula "29"))
                                                    (rule "qeq_literals" (formula "20") (term "0,1,0"))
                                                    (builtin "One Step Simplification" (formula "20"))
-                                                   (rule "allLeft" (formula "21") (inst "t=select<[int]>(anonIn_heap<<anonHeapFunction>>,
+                                                   (rule "allLeft" (formula "21") (inst "t=select<int>(anonIn_heap<<anonHeapFunction>>,
             anonIn_current,
             IntNode::$data)"))
                                                    (rule "pullOutSelect" (formula "21") (term "0,0,0") (inst "selectSK=IntNode_next_3"))
@@ -36751,7 +36751,7 @@
                                                    (rule "leq_literals" (formula "16") (term "0,1"))
                                                    (builtin "One Step Simplification" (formula "16"))
                                                    (rule "allLeft" (formula "19") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq1" (formula "19") (term "1,0,0,0,0"))
@@ -42413,7 +42413,7 @@
                                  (rule "commute_or" (formula "8") (term "0,1,1,0"))
                                  (rule "shift_paren_or" (formula "8") (term "0,1,0,1,0"))
                                  (rule "ifthenelse_split" (formula "4") (term "0"))
-                                 (branch " ¬f_0 = java.lang.Object::#$created ∧ ( ¬ select<[boolean]>(heap, null, java.lang.Object::#$created) = TRUE ∨ ¬f_0 = java.lang.Object::#$created) TRUE"
+                                 (branch " ¬f_0 = java.lang.Object::#$created ∧ ( ¬ select<boolean>(heap, null, java.lang.Object::#$created) = TRUE ∨ ¬f_0 = java.lang.Object::#$created) TRUE"
                                     (rule "andLeft" (formula "4"))
                                     (rule "notLeft" (formula "4"))
                                     (rule "applyEqReverse" (formula "35") (term "1") (ifseqformula "5"))
@@ -42913,7 +42913,7 @@
                                                 (builtin "One Step Simplification" (formula "3"))
                                                 (rule "true_left" (formula "3"))
                                                 (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                 (rule "inEqSimp_homoInEq1" (formula "3") (term "1"))
@@ -43334,7 +43334,7 @@
                                        )
                                     )
                                  )
-                                 (branch " ¬f_0 = java.lang.Object::#$created ∧ ( ¬ select<[boolean]>(heap, null, java.lang.Object::#$created) = TRUE ∨ ¬f_0 = java.lang.Object::#$created) FALSE"
+                                 (branch " ¬f_0 = java.lang.Object::#$created ∧ ( ¬ select<boolean>(heap, null, java.lang.Object::#$created) = TRUE ∨ ¬f_0 = java.lang.Object::#$created) FALSE"
                                     (rule "applyEqReverse" (formula "34") (term "1") (ifseqformula "4"))
                                     (rule "applyEqReverse" (formula "3") (term "2,0") (ifseqformula "4"))
                                     (rule "hideAuxiliaryEq" (formula "4"))
@@ -44573,7 +44573,7 @@
                                                    (builtin "One Step Simplification" (formula "3"))
                                                    (rule "true_left" (formula "3"))
                                                    (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
@@ -45248,7 +45248,7 @@
                                                    (rule "shift_paren_or" (formula "21") (term "0"))
                                                    (rule "commute_or" (formula "20") (term "0,0"))
                                                    (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
@@ -45751,7 +45751,7 @@
                                                    (builtin "One Step Simplification" (formula "3"))
                                                    (rule "true_left" (formula "3"))
                                                    (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
@@ -46227,7 +46227,7 @@
                                                    (builtin "One Step Simplification" (formula "3"))
                                                    (rule "true_left" (formula "3"))
                                                    (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
@@ -46503,7 +46503,7 @@
                                  (rule "shift_paren_or" (formula "16") (term "0,1,0,1,0"))
                                  (rule "commute_or_2" (formula "8") (term "0,0,1,0,1,0"))
                                  (rule "ifthenelse_split" (formula "4") (term "0"))
-                                 (branch " ¬f_0 = java.lang.Object::#$created ∧ ( ¬ select<[boolean]>(heap, null, java.lang.Object::#$created) = TRUE ∨ ¬f_0 = java.lang.Object::#$created) TRUE"
+                                 (branch " ¬f_0 = java.lang.Object::#$created ∧ ( ¬ select<boolean>(heap, null, java.lang.Object::#$created) = TRUE ∨ ¬f_0 = java.lang.Object::#$created) TRUE"
                                     (rule "andLeft" (formula "4"))
                                     (rule "notLeft" (formula "4"))
                                     (rule "applyEqReverse" (formula "36") (term "1") (ifseqformula "5"))
@@ -47001,7 +47001,7 @@
                                                 (builtin "One Step Simplification" (formula "3"))
                                                 (rule "true_left" (formula "3"))
                                                 (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                 (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
@@ -47470,7 +47470,7 @@
                                        )
                                     )
                                  )
-                                 (branch " ¬f_0 = java.lang.Object::#$created ∧ ( ¬ select<[boolean]>(heap, null, java.lang.Object::#$created) = TRUE ∨ ¬f_0 = java.lang.Object::#$created) FALSE"
+                                 (branch " ¬f_0 = java.lang.Object::#$created ∧ ( ¬ select<boolean>(heap, null, java.lang.Object::#$created) = TRUE ∨ ¬f_0 = java.lang.Object::#$created) FALSE"
                                     (rule "applyEqReverse" (formula "3") (term "2,0") (ifseqformula "4"))
                                     (rule "applyEqReverse" (formula "35") (term "1") (ifseqformula "4"))
                                     (rule "hideAuxiliaryEq" (formula "4"))
@@ -48701,7 +48701,7 @@
                                                    (builtin "One Step Simplification" (formula "3"))
                                                    (rule "true_left" (formula "3"))
                                                    (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq1" (formula "3") (term "1"))
@@ -49302,7 +49302,7 @@
                                                 (rule "commute_or" (formula "8") (term "0,0"))
                                                 (rule "commute_or_2" (formula "9") (term "0,0,0,0"))
                                                 (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                 (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
@@ -49795,7 +49795,7 @@
                                                    (builtin "One Step Simplification" (formula "3"))
                                                    (rule "true_left" (formula "3"))
                                                    (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
@@ -50237,7 +50237,7 @@
                                                 (builtin "One Step Simplification" (formula "3"))
                                                 (rule "true_left" (formula "3"))
                                                 (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                 (rule "inEqSimp_homoInEq1" (formula "3") (term "1"))
@@ -50607,7 +50607,7 @@
                                  (rule "inEqSimp_sepPosMonomial0" (formula "10") (term "0,0,0,1,0"))
                                  (rule "mul_literals" (formula "10") (term "1,0,0,0,1,0"))
                                  (rule "ifthenelse_split" (formula "4") (term "0"))
-                                 (branch " ¬f_0 = java.lang.Object::#$created ∧ ( ¬ select<[boolean]>(heap, null, java.lang.Object::#$created) = TRUE ∨ ¬f_0 = java.lang.Object::#$created) TRUE"
+                                 (branch " ¬f_0 = java.lang.Object::#$created ∧ ( ¬ select<boolean>(heap, null, java.lang.Object::#$created) = TRUE ∨ ¬f_0 = java.lang.Object::#$created) TRUE"
                                     (rule "andLeft" (formula "4"))
                                     (rule "notLeft" (formula "4"))
                                     (rule "applyEqReverse" (formula "37") (term "1") (ifseqformula "5"))
@@ -51008,7 +51008,7 @@
                                                 (builtin "One Step Simplification" (formula "3"))
                                                 (rule "true_left" (formula "3"))
                                                 (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                 (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
@@ -51433,7 +51433,7 @@
                                        )
                                     )
                                  )
-                                 (branch " ¬f_0 = java.lang.Object::#$created ∧ ( ¬ select<[boolean]>(heap, null, java.lang.Object::#$created) = TRUE ∨ ¬f_0 = java.lang.Object::#$created) FALSE"
+                                 (branch " ¬f_0 = java.lang.Object::#$created ∧ ( ¬ select<boolean>(heap, null, java.lang.Object::#$created) = TRUE ∨ ¬f_0 = java.lang.Object::#$created) FALSE"
                                     (rule "applyEqReverse" (formula "3") (term "2,0") (ifseqformula "4"))
                                     (rule "applyEqReverse" (formula "36") (term "1") (ifseqformula "4"))
                                     (rule "hideAuxiliaryEq" (formula "4"))
@@ -52359,7 +52359,7 @@
                                                    (builtin "One Step Simplification" (formula "3"))
                                                    (rule "true_left" (formula "3"))
                                                    (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
@@ -52843,7 +52843,7 @@
                                                    (builtin "One Step Simplification" (formula "3"))
                                                    (rule "true_left" (formula "3"))
                                                    (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
@@ -53548,7 +53548,7 @@
                                                    (builtin "One Step Simplification" (formula "3"))
                                                    (rule "true_left" (formula "3"))
                                                    (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
@@ -54223,7 +54223,7 @@
                                                    (rule "shift_paren_or" (formula "21") (term "0"))
                                                    (rule "commute_or" (formula "20") (term "0,0"))
                                                    (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
@@ -54573,7 +54573,7 @@
                                  (rule "polySimp_mulLiterals" (formula "11") (term "1,1,1"))
                                  (rule "polySimp_elimOne" (formula "11") (term "1,1,1"))
                                  (rule "ifthenelse_split" (formula "4") (term "0"))
-                                 (branch " ¬f_0 = java.lang.Object::#$created ∧ ( ¬ select<[boolean]>(heap, null, java.lang.Object::#$created) = TRUE ∨ ¬f_0 = java.lang.Object::#$created) TRUE"
+                                 (branch " ¬f_0 = java.lang.Object::#$created ∧ ( ¬ select<boolean>(heap, null, java.lang.Object::#$created) = TRUE ∨ ¬f_0 = java.lang.Object::#$created) TRUE"
                                     (rule "andLeft" (formula "4"))
                                     (rule "notLeft" (formula "4"))
                                     (rule "applyEqReverse" (formula "3") (term "2,0") (ifseqformula "5"))
@@ -55245,7 +55245,7 @@
                                        )
                                     )
                                  )
-                                 (branch " ¬f_0 = java.lang.Object::#$created ∧ ( ¬ select<[boolean]>(heap, null, java.lang.Object::#$created) = TRUE ∨ ¬f_0 = java.lang.Object::#$created) FALSE"
+                                 (branch " ¬f_0 = java.lang.Object::#$created ∧ ( ¬ select<boolean>(heap, null, java.lang.Object::#$created) = TRUE ∨ ¬f_0 = java.lang.Object::#$created) FALSE"
                                     (rule "applyEqReverse" (formula "37") (term "1") (ifseqformula "4"))
                                     (rule "applyEqReverse" (formula "3") (term "2,0") (ifseqformula "4"))
                                     (rule "hideAuxiliaryEq" (formula "4"))
@@ -56215,7 +56215,7 @@
                                                    (builtin "One Step Simplification" (formula "3"))
                                                    (rule "true_left" (formula "3"))
                                                    (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq0" (formula "3") (term "1,0"))
@@ -56654,7 +56654,7 @@
                                                 (rule "commute_or" (formula "8") (term "0,0"))
                                                 (rule "commute_or_2" (formula "9") (term "0,0,0,0"))
                                                 (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                 (rule "inEqSimp_homoInEq1" (formula "3") (term "1"))
@@ -57361,7 +57361,7 @@
                                                    (builtin "One Step Simplification" (formula "3"))
                                                    (rule "true_left" (formula "3"))
                                                    (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                    (rule "inEqSimp_homoInEq1" (formula "3") (term "1"))
@@ -57964,7 +57964,7 @@
                                                 (builtin "One Step Simplification" (formula "3"))
                                                 (rule "true_left" (formula "3"))
                                                 (rule "allLeft" (formula "3") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(anonIn_heap<<anonHeapFunction>>,
+    select<int>(anonIn_heap<<anonHeapFunction>>,
                 self,
                 IntLinkedList::$size))"))
                                                 (rule "inEqSimp_homoInEq1" (formula "3") (term "1"))

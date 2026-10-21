@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.prooftree;
 
 import javax.swing.tree.TreeNode;
@@ -53,13 +54,14 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
         return true;
     }
 
+    /**
+     * The node's label without the applied on information.
+     * The term is shown in the tooltip and can still be
+     * searched through {@link #getSearchString()}.
+     */
     @Override
     public String toString() {
-        // For prettyprinting
-        Services services = parent.getNode().proof().getServices();
-        String prettySubTerm =
-            LogicPrinter.quickPrintTerm((JTerm) app.posInOccurrence().subTerm(), services);
-        return app.rule().name() + " ON " + prettySubTerm;
+        return app.rule().name().toString();
     }
 
     public RuleApp getRuleApp() {
@@ -77,6 +79,9 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
 
     @Override
     public @NonNull String getSearchString() {
-        return toString();
+        Services services = parent.getNode().proof().getServices();
+        String prettySubTerm =
+            LogicPrinter.quickPrintTerm((JTerm) app.posInOccurrence().subTerm(), services);
+        return app.rule().name() + " ON " + prettySubTerm;
     }
 }

@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.ConvertException;
@@ -55,7 +56,7 @@ public final class CharListLDT extends LDT {
     // -------------------------------------------------------------------------
 
     public CharListLDT(TermServices services) {
-        super(NAME, services.getNamespaces().sorts().lookup(SeqLDT.NAME), services);
+        super(NAME, services.getNamespaces().sorts().lookup(SeqLDT.NAME));
         clIndexOfChar = addFunction(services, "clIndexOfChar");
         clIndexOfCl = addFunction(services, "clIndexOfCl");
         clLastIndexOfChar = addFunction(services, "clLastIndexOfChar");

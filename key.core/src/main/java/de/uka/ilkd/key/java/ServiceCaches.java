@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java;
 
 import java.util.Collections;
@@ -18,14 +19,14 @@ import de.uka.ilkd.key.proof.TermTacletAppIndex;
 import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
+import de.uka.ilkd.key.strategy.CostReuse;
 import de.uka.ilkd.key.strategy.IfInstantiationCachePool;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature.TermInfo;
 import de.uka.ilkd.key.strategy.feature.AppliedRuleAppsNameCache;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesGraph;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.Metavariable;
 
-import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.proof.SessionCaches;
 import org.key_project.prover.rules.Taclet;
@@ -80,11 +81,8 @@ import org.key_project.util.collection.Pair;
  * whose
  * value could be recomputed to something different, after an eviction, under a different access
  * order; for those, approximate or striped eviction was observed to change proofs. Caches whose
- * value does not depend on access order do not need this (for example
- * {@link #introductionTimeCache},
- * whose value is the depth at which an operator was introduced below the proof root and is the same
- * for every goal beneath that point). The weak-keyed caches instead stay wrapped in
- * {@link Collections#synchronizedMap}.
+ * value does not depend on access order do not need this. The weak-keyed caches instead stay
+ * wrapped in {@link Collections#synchronizedMap}.
  * </p>
  *
  * @author Martin Hentschel
@@ -112,13 +110,6 @@ public class ServiceCaches implements SessionCaches {
 
 
     /**
-     * the introduction time cache used by {@code AbstractMonomialSmallerThanFeature} for Skolem
-     * constants
-     */
-    private final Map<Operator, Integer> introductionTimeCache =
-        new ConcurrentLruCache<>(10000);
-
-    /**
      * Per-proof cache for {@code CostReuse}'s feature-locality classification (taclet -> its
      * reuse-eligibility verdict). Held here, like the other proof-scoped caches, so it is freed
      * with
@@ -126,7 +117,8 @@ public class ServiceCaches implements SessionCaches {
      * this class (a {@code CostReuse.Eligibility}, or its ineligible sentinel) to keep this package
      * independent of the strategy package.
      */
-    private final Map<Taclet, Object> costReuseClassificationCache = new ConcurrentHashMap<>();
+    private final Map<Taclet, CostReuse.ConditionalEligibility> costReuseClassificationCache =
+        new ConcurrentHashMap<>();
 
     private final Map<org.key_project.logic.Term, Monomial> monomialCache =
         new ConcurrentLruCache<>(2000);
@@ -235,15 +227,7 @@ public class ServiceCaches implements SessionCaches {
         return betaCandidates;
     }
 
-    /**
-     * returns the introduction time cache used by {@code AbstractMonomialSmallerThanFeature} for
-     * Skolem constants
-     */
-    public final Map<Operator, Integer> getIntroductionTimeCache() {
-        return introductionTimeCache;
-    }
-
-    public final Map<Taclet, Object> getCostReuseClassificationCache() {
+    public final Map<Taclet, CostReuse.ConditionalEligibility> getCostReuseClassificationCache() {
         return costReuseClassificationCache;
     }
 

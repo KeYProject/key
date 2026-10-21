@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.scripts;
 
 import java.util.HashMap;
@@ -13,9 +14,11 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.impl.AutoProvers;
 import de.uka.ilkd.key.scripts.meta.*;
+import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.prover.strategy.Strategy;
@@ -109,14 +112,21 @@ public class AutoCommand extends AbstractCommand {
 
         // start actual autoprove
         try {
-            for (Goal goal : goals) {
-                applyStrategy.start(state().getProof(), ImmutableList.<Goal>singleton(goal));
-
-                // only now reraise the interruption exception
-                if (applyStrategy.hasBeenInterrupted()) {
-                    throw new InterruptedException();
-                }
-
+            final Proof proof = state().getProof();
+            final ProofSearchInformation<Proof, Goal> result;
+            if (arguments.onAllOpenGoals) {
+                final StrategySettings strategySettings = proof.getSettings().getStrategySettings();
+                result = applyStrategy.startEach(proof, goals, strategySettings.getMaxSteps(),
+                    strategySettings.getTimeout());
+            } else {
+                result = applyStrategy.start(proof, goals);
+            }
+            if (result.isError()) {
+                throw new ScriptException("Proof search failed: " + result.getException(),
+                    result.getException());
+            }
+            if (applyStrategy.hasBeenInterrupted()) {
+                throw new InterruptedException();
             }
         } finally {
             state().setMaxAutomaticSteps(oldNumberOfSteps);

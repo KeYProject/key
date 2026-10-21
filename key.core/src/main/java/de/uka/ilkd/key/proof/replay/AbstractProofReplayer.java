@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.replay;
 
 import java.util.ArrayList;
@@ -203,6 +204,18 @@ public abstract class AbstractProofReplayer {
         return ourApp;
     }
 
+    private NoPosTacletApp lookupIntroducedTaclet(TacletApp app, Goal goal) {
+        for (Node n = goal.node(); n != null; n = n.parent()) {
+            for (NoPosTacletApp introduced : n.getLocalIntroducedRules()) {
+                if (EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(introduced,
+                    app)) {
+                    return introduced;
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * Construct a new taclet application based on a step in the original proof
      *
@@ -228,16 +241,21 @@ public abstract class AbstractProofReplayer {
             // find the correct taclet
             for (NoPosTacletApp partialApp : currGoal.indexOfTaclets()
                     .getPartialInstantiatedApps()) {
-                System.out.println();
                 if (EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(partialApp,
                     originalTacletApp)) {
                     ourApp = partialApp;
                     break;
                 }
             }
+
+            if (ourApp == null) {
+                ourApp = lookupIntroducedTaclet(originalTacletApp, currGoal);
+            }
+
             if (ourApp == null) {
                 ourApp = currGoal.indexOfTaclets().lookup(tacletName);
             }
+
             if (ourApp == null) {
                 throw new IllegalStateException(
                     "proof replayer failed to find dynamically added taclet at original node "

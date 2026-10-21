@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.parser;
 
 import java.io.IOException;
@@ -32,24 +33,24 @@ public class TestTermParserSorts extends AbstractTestTermParser {
     @Test
     public void testParseSequencePrettySyntax() throws Exception {
         /*
-         * Test seqGet<[any]>(s,i)
+         * Test seqGet<any>(s,i)
          */
         String pp = "s[i]";
-        JTerm expected = parseTerm("seqGet<[any]>(s,i)");
+        JTerm expected = parseTerm("seqGet<any>(s,i)");
         JTerm actual = parseTerm(pp);
         assertEquals(expected, actual); // test parsing
         assertEqualsIgnoreWhitespaces(pp, printTerm(expected)); // test pretty-printing
 
         /*
-         * Test seqGet<[int]>(s,i) Notice that pretty-printing of seqGet<[int]>(s,i) results in:
-         * (int)s[i] But parsing of (int)s[i] results in: cast<[int]>(seqGet<[any]>(s,i)
+         * Test seqGet<int>(s,i) Notice that pretty-printing of seqGet<int>(s,i) results in:
+         * (int)s[i] But parsing of (int)s[i] results in: cast<int>(seqGet<any>(s,i)
          */
         pp = "(int)s[i]";
-        expected = parseTerm("cast<[int]>(seqGet<[any]>(s,i))");
+        expected = parseTerm("cast<int>(seqGet<any>(s,i))");
         actual = parseTerm(pp);
         assertEquals(expected, actual); // test parsing
         // test pretty-printing
-        assertEqualsIgnoreWhitespaces(printTerm(parseTerm("seqGet<[int]>(s,i)")), pp);
+        assertEqualsIgnoreWhitespaces(printTerm(parseTerm("seqGet<int>(s,i)")), pp);
 
         // test parsing of pretty-printed seqLen
         comparePrettySyntaxAgainstVerboseSyntax("s.length", "seqLen(s)");

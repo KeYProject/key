@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -96,7 +97,14 @@ public class SchemaVariableFactory {
      * creates a SchemaVariable representing a skolem term
      */
     public static SkolemTermSV createSkolemTermSV(Name name, Sort s) {
-        return new SkolemTermSV(name, s);
+        return new SkolemTermSV(name, s, false);
+    }
+
+    /**
+     * @param definitional whether the created constants are definitional symbols
+     */
+    public static SkolemTermSV createSkolemTermSV(Name name, Sort s, boolean definitional) {
+        return new SkolemTermSV(name, s, definitional);
     }
 
     /**

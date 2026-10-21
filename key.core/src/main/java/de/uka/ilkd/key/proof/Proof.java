@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof;
 
 import java.beans.PropertyChangeListener;
@@ -1074,9 +1075,9 @@ public class Proof implements ProofObject<Goal>, Named {
      */
     private static ImmutableList<Goal> getGoalsBelow(Node node, ImmutableList<Goal> fromGoals) {
         ImmutableList<Goal> result = ImmutableList.nil();
-        List<Node> leaves = node.getLeaves();
+        final Set<Node> leaves = Collections.newSetFromMap(new IdentityHashMap<>());
+        leaves.addAll(node.getLeaves());
         for (final Goal goal : fromGoals) {
-            // if list contains node, remove it to make the list faster later
             if (leaves.remove(goal.node())) {
                 result = result.prepend(goal);
             }

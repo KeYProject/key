@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.util.collection;
 
 import java.lang.reflect.Array;
@@ -22,7 +23,14 @@ import org.jspecify.annotations.Nullable;
 final class ImmutableListArray<T extends @Nullable Object> implements ImmutableList<T> {
     private final T[] data;
 
-    public ImmutableListArray(T[] data) {
+    /**
+     * Caution: This constructor does *not* the argument array but refers to it directly.
+     * Do not call it but from contexts where you know that data remains unmodified.
+     *
+     * @see ImmutableList#fromArray(Object[])
+     * @param data the array data
+     */
+    ImmutableListArray(T[] data) {
         this.data = data;
     }
 
@@ -156,6 +164,19 @@ final class ImmutableListArray<T extends @Nullable Object> implements ImmutableL
             throw new IndexOutOfBoundsException();
         }
         return data[idx];
+    }
+
+    @Override
+    public String toString() {
+        var sb = new StringBuilder().append('[');
+        for (int i = 0; i < size(); ++i) {
+            if (i > 0) {
+                sb.append(',');
+            }
+            sb.append(get(i));
+        }
+        sb.append(']');
+        return sb.toString();
     }
 
     @Override

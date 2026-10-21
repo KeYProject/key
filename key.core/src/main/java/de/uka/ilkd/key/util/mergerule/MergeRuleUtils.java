@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util.mergerule;
 
 import java.io.StringReader;
@@ -54,6 +55,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
+import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
 /**
  * This class encapsulates static methods used in the MergeRule implementation. The methods are
@@ -417,7 +419,7 @@ public class MergeRuleUtils {
 
         do {
             newName = services.getTermBuilder().newName(prefix);
-            result = new JFunction(new Name(newName), sort, true);
+            result = new JFunction(new Name(newName), sort, SKOLEM);
             services.getNamespaces().functions().add(result);
         } while (newName.equals(prefix));
 
@@ -1381,7 +1383,7 @@ public class MergeRuleUtils {
      */
     private static Function rename(Name newName, Function old) {
         return new JFunction(newName, old.sort(), old.argSorts(), old.whereToBind(),
-            old.isUnique(), old.isSkolemConstant());
+            old.isUnique(), old.kind(), old.introductionTime());
     }
 
     /**

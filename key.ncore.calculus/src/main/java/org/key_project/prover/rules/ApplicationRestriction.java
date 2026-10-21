@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.rules;
 
 /// Restricts where a taclet may be applied. Any combination of these restrictions in possible.
@@ -74,6 +75,25 @@ public record ApplicationRestriction(int value) {
         String res = "";
         if (matches(SAME_UPDATE_LEVEL)) {
             res += "\\sameUpdateLevel";
+        }
+        if (matches(IN_SEQUENT_STATE)) {
+            res += "\\inSequentState";
+        }
+        if (matches(ANTECEDENT_POLARITY)) {
+            res += "\\antecedentPolarity";
+        }
+        if (matches(SUCCEDENT_POLARITY)) {
+            res += "\\succedentPolarity";
+        }
+        return res;
+    }
+
+    public String toString(boolean needsSameUpdateLevel) {
+        String res = "";
+        if (!needsSameUpdateLevel && matches(SAME_UPDATE_LEVEL)) {
+            res += "\\sameUpdateLevel";
+        } else if (needsSameUpdateLevel && !matches(SAME_UPDATE_LEVEL)) {
+            res += "\\ignoreUpdateLevel";
         }
         if (matches(IN_SEQUENT_STATE)) {
             res += "\\inSequentState";

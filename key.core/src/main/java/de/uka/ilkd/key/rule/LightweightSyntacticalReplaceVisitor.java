@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
 import java.util.Stack;
@@ -211,8 +212,7 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
         if (visitedOp instanceof SchemaVariable visitedSV && visitedOp.arity() == 0
                 && svInst.isInstantiated(visitedSV)
                 && (!(visitedOp instanceof ProgramSV visitedPSV && visitedPSV.isListSV()))) {
-            final JTerm newTerm = svInst.getTermInstantiation(visitedSV,
-                svInst.getExecutionContext(), services);
+            final JTerm newTerm = svInst.getTermInstantiation(visitedSV, services);
             pushNew(newTerm);
         } else {
             // instantiation of java block

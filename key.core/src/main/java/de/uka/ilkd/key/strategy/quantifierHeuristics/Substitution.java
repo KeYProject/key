@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
@@ -31,8 +32,26 @@ public class Substitution {
 
     private final ImmutableMap<QuantifiableVariable, Term> varMap;
 
+    /**
+     * Whether a theory solved a position where the two terms disagreed to obtain this
+     * substitution. The instance is then a term the matched term does not contain.
+     */
+    private final boolean solvedByTheory;
+
     public Substitution(ImmutableMap<QuantifiableVariable, Term> map) {
-        varMap = map;
+        this(map, false);
+    }
+
+    public Substitution(ImmutableMap<QuantifiableVariable, Term> map, boolean solvedByTheory) {
+        this.varMap = map;
+        this.solvedByTheory = solvedByTheory;
+    }
+
+    /**
+     * @return whether a theory solved a disagreeing position to obtain this substitution
+     */
+    public boolean isSolvedByTheory() {
+        return solvedByTheory;
     }
 
     public ImmutableMap<QuantifiableVariable, Term> getVarMap() {

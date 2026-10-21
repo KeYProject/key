@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
@@ -24,16 +25,16 @@ public class InstantiationCost implements Feature {
 
     final private ProjectionToTerm<Goal> varInst;
 
-    /** whether the prediction runs with the classic trigger selection */
-    private final boolean classicTriggers;
+    /** how much the prediction is told about the theories */
+    private final TriggerTreatment treatment;
 
-    private InstantiationCost(ProjectionToTerm<Goal> var, boolean classicTriggers) {
+    private InstantiationCost(ProjectionToTerm<Goal> var, TriggerTreatment treatment) {
         varInst = var;
-        this.classicTriggers = classicTriggers;
+        this.treatment = treatment;
     }
 
-    public static Feature create(ProjectionToTerm<Goal> varInst, boolean classicTriggers) {
-        return new InstantiationCost(varInst, classicTriggers);
+    public static Feature create(ProjectionToTerm<Goal> varInst, TriggerTreatment treatment) {
+        return new InstantiationCost(varInst, treatment);
     }
 
     /**
@@ -49,6 +50,6 @@ public class InstantiationCost implements Feature {
         final var instance = varInst.toTerm(app, pos, jgoal, mState);
 
         return Instantiation.computeCost(instance, formula, goal.sequent(),
-            (Services) goal.proof().getServices(), classicTriggers);
+            (Services) goal.proof().getServices(), treatment);
     }
 }

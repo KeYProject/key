@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic;
 
 import java.math.BigInteger;
@@ -27,7 +28,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.Metavariable;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -854,14 +855,18 @@ public class TermBuilder {
     // ------------------------------
 
     public JTerm pair(JTerm first, JTerm second) {
-        final Namespace<Function> funcNS = services.getNamespaces().functions();
-        final Function f = funcNS.lookup(new Name("pair"));
+        final Namespace<ParametricFunctionDecl> funcNS =
+            services.getNamespaces().parametricFunctions();
+        final ParametricFunctionDecl f = funcNS.lookup(new Name("pair"));
         if (f == null) {
             throw new RuntimeException("LDT: Function pair not found.\n"
                 + "It seems that there are definitions missing from the .key files.");
         }
 
-        return func(f, first, second);
+        return func(ParametricFunctionInstance.get(f,
+            ImmutableList.fromList(
+                List.of(new GenericArgument(first.sort()), new GenericArgument(second.sort()))),
+            services), first, second);
 
     }
 
@@ -1387,7 +1392,13 @@ public class TermBuilder {
     }
 
     public JTerm singleton(JTerm o, JTerm f) {
-        return func(services.getTypeConverter().getLocSetLDT().getSingleton(), o, f);
+        LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        return func(locSetLDT.getSingleton(), locSetPair(o, f));
+    }
+
+    public JTerm locSetPair(JTerm o, JTerm f) {
+        LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        return func(locSetLDT.getPair(), o, f);
     }
 
     public JTerm union(JTerm s1, JTerm s2) {
@@ -1494,7 +1505,7 @@ public class TermBuilder {
         if (s.op() == ldt.getEmpty()) {
             return ff();
         } else {
-            return func(ldt.getElementOf(), o, f, s);
+            return func(ldt.getElementOf(), locSetPair(o, f), s);
         }
     }
 

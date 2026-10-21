@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
@@ -18,8 +19,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 /**
  * This class describes the relation between different clauses in a CNF. If two clauses have the
- * same existential quantifiable variable, we say they are connected. And this property is
- * transitive.
+ * same existential quantifiable variable, they are connected. Connectedness is transitive.
  */
 public class ClausesGraph {
     private final ImmutableSet<QuantifiableVariable> exVars;

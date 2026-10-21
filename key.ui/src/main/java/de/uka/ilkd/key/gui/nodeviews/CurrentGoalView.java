@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.*;
@@ -223,6 +224,13 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      */
     public void setPrinter(Goal goal) {
         getFilter().setSequent(goal.sequent());
+        setLogicPrinter(SequentViewLogicPrinter.positionPrinter(getMediator().getNotationInfo(),
+            mediator.getServices(), getVisibleTermLabels()));
+    }
+
+    public void resetPrinter() {
+        // set a printer for the currently selected proof or just a default printer with no services
+        // avoids a memory leak by the printer holding services for an abandoned proof
         setLogicPrinter(SequentViewLogicPrinter.positionPrinter(getMediator().getNotationInfo(),
             mediator.getServices(), getVisibleTermLabels()));
     }

@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.engine;
 
 import org.key_project.prover.proof.ProofGoal;
@@ -116,4 +117,11 @@ public interface ProofSearchInformation<P extends ProofObject<G>, G extends @Nul
     /// @return the number of rule applications performed
     int getNumberOfAppliedRuleApps();
 
+    /// join several ProofSearchInformation into an aggregate
+    /// needed for batch runs (messages becomes a generic message)
+    /// counters are summed and in case of error and non-closeable goal
+    /// the first current one is kept
+    /// @param other the ProofSearchInformation<P,G> to combine with
+    /// @return the aggregated ProofSearchInformation<P,G>
+    ProofSearchInformation<P, G> join(ProofSearchInformation<P, G> other);
 }

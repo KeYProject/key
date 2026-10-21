@@ -465,7 +465,7 @@
                (rule "qeq_literals" (formula "14") (term "0,0"))
                (builtin "One Step Simplification" (formula "14"))
                (rule "allLeft" (formula "15") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                (rule "inEqSimp_homoInEq0" (formula "15") (term "0,0"))
                (rule "polySimp_mulComm0" (formula "15") (term "1,0,0,0"))
                (rule "polySimp_rightDist" (formula "15") (term "1,0,0,0"))
@@ -520,7 +520,7 @@
                      (builtin "One Step Simplification" (formula "9"))
                      (rule "true_left" (formula "9"))
                      (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                      (rule "inEqSimp_homoInEq0" (formula "9") (term "0,0"))
                      (rule "polySimp_mulComm0" (formula "9") (term "1,0,0,0"))
                      (rule "polySimp_rightDist" (formula "9") (term "1,0,0,0"))
@@ -550,7 +550,7 @@
                      (builtin "One Step Simplification" (formula "9"))
                      (rule "notLeft" (formula "9"))
                      (rule "allLeft" (formula "10") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                      (rule "typeEqDerived" (formula "10") (term "0,1") (ifseqformula "16"))
                      (builtin "One Step Simplification" (formula "10"))
                      (rule "true_left" (formula "10"))
@@ -578,7 +578,7 @@
                      (builtin "One Step Simplification" (formula "12"))
                      (rule "notLeft" (formula "12"))
                      (rule "allLeft" (formula "12") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                      (rule "inEqSimp_homoInEq1" (formula "12") (term "1,0"))
                      (rule "polySimp_mulComm0" (formula "12") (term "1,0,1,0"))
                      (rule "polySimp_rightDist" (formula "12") (term "1,0,1,0"))
@@ -3414,7 +3414,7 @@
                                           (builtin "One Step Simplification" (formula "29"))
                                           (rule "true_left" (formula "29"))
                                           (rule "allLeft" (formula "29") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                           (rule "inEqSimp_homoInEq1" (formula "29") (term "1,0"))
                                           (rule "polySimp_mulComm0" (formula "29") (term "1,0,1,0"))
                                           (rule "polySimp_rightDist" (formula "29") (term "1,0,1,0"))
@@ -3711,7 +3711,7 @@
                                           (builtin "One Step Simplification" (formula "29"))
                                           (rule "notLeft" (formula "29"))
                                           (rule "allLeft" (formula "29") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                           (rule "inEqSimp_homoInEq1" (formula "29") (term "1,0"))
                                           (rule "polySimp_mulComm0" (formula "29") (term "1,0,1,0"))
                                           (rule "polySimp_rightDist" (formula "29") (term "1,0,1,0"))
@@ -4619,7 +4619,7 @@
                                                 (rule "qeq_literals" (formula "29") (term "0,0"))
                                                 (builtin "One Step Simplification" (formula "29"))
                                                 (rule "allLeft" (formula "37") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                 (rule "polySimp_homoEq" (formula "37") (term "1,0,0"))
                                                 (rule "polySimp_mulComm0" (formula "37") (term "1,0,1,0,0"))
                                                 (rule "polySimp_rightDist" (formula "37") (term "1,0,1,0,0"))
@@ -4703,7 +4703,7 @@
                                                 (builtin "One Step Simplification" (formula "21"))
                                                 (rule "notLeft" (formula "21"))
                                                 (rule "allLeft" (formula "43") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                 (rule "eqSymm" (formula "43") (term "1,0,0"))
                                                 (rule "eqSymm" (formula "43") (term "0,1,0"))
                                                 (rule "inEqSimp_homoInEq1" (formula "43") (term "1,0,0,0"))
@@ -11881,7 +11881,7 @@
                                                 (builtin "One Step Simplification" (formula "34"))
                                                 (rule "commute_or_2" (formula "34") (term "0,0"))
                                                 (rule "allLeft" (formula "31") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                 (rule "polySimp_homoEq" (formula "31") (term "1,0,0"))
                                                 (rule "polySimp_mulComm0" (formula "31") (term "1,0,1,0,0"))
                                                 (rule "polySimp_rightDist" (formula "31") (term "1,0,1,0,0"))
@@ -11936,7 +11936,7 @@
                                                 (builtin "One Step Simplification" (formula "36"))
                                                 (rule "commute_or_2" (formula "36") (term "0,0"))
                                                 (rule "allLeft" (formula "37") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                 (rule "eqSymm" (formula "37") (term "1,0,0"))
                                                 (rule "eqSymm" (formula "37") (term "0,1,0"))
                                                 (rule "inEqSimp_homoInEq0" (formula "37") (term "1,0,0,0,0"))
@@ -12185,7 +12185,7 @@
                                     (builtin "One Step Simplification" (formula "25"))
                                     (rule "notLeft" (formula "25"))
                                     (rule "allLeft" (formula "25") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                     (rule "inEqSimp_homoInEq1" (formula "25") (term "1,0"))
                                     (rule "polySimp_mulComm0" (formula "25") (term "1,0,1,0"))
                                     (rule "polySimp_rightDist" (formula "25") (term "1,0,1,0"))
@@ -12418,7 +12418,7 @@
                                     (builtin "One Step Simplification" (formula "2"))
                                     (rule "true_left" (formula "2"))
                                     (rule "allLeft" (formula "28") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                     (rule "inEqSimp_homoInEq1" (formula "28") (term "1,0"))
                                     (rule "polySimp_mulComm0" (formula "28") (term "1,0,1,0"))
                                     (rule "polySimp_rightDist" (formula "28") (term "1,0,1,0"))
@@ -12664,7 +12664,7 @@
                      (builtin "One Step Simplification" (formula "11"))
                      (rule "true_left" (formula "11"))
                      (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                      (rule "typeEqDerived" (formula "11") (term "0,1") (ifseqformula "17"))
                      (builtin "One Step Simplification" (formula "11"))
                      (rule "true_left" (formula "11"))
@@ -12721,7 +12721,7 @@
                (rule "qeq_literals" (formula "13") (term "0,0"))
                (builtin "One Step Simplification" (formula "13"))
                (rule "allLeft" (formula "14") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                (rule "inEqSimp_homoInEq0" (formula "14") (term "0,0"))
                (rule "polySimp_mulComm0" (formula "14") (term "1,0,0,0"))
                (rule "polySimp_rightDist" (formula "14") (term "1,0,0,0"))
@@ -12783,7 +12783,7 @@
                      (builtin "One Step Simplification" (formula "11"))
                      (rule "notLeft" (formula "11"))
                      (rule "allLeft" (formula "11") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                      (rule "inEqSimp_homoInEq0" (formula "11") (term "0,0"))
                      (rule "polySimp_mulComm0" (formula "11") (term "1,0,0,0"))
                      (rule "polySimp_rightDist" (formula "11") (term "1,0,0,0"))
@@ -12822,7 +12822,7 @@
                      (builtin "One Step Simplification" (formula "8"))
                      (rule "notLeft" (formula "8"))
                      (rule "allLeft" (formula "8") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                      (rule "inEqSimp_homoInEq1" (formula "8") (term "1,0"))
                      (rule "polySimp_mulComm0" (formula "8") (term "1,0,1,0"))
                      (rule "polySimp_rightDist" (formula "8") (term "1,0,1,0"))
@@ -12870,7 +12870,7 @@
                      (builtin "One Step Simplification" (formula "9"))
                      (rule "true_left" (formula "9"))
                      (rule "allLeft" (formula "9") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                      (rule "typeEqDerived" (formula "9") (term "0,1") (ifseqformula "15"))
                      (builtin "One Step Simplification" (formula "9"))
                      (rule "true_left" (formula "9"))
@@ -13530,7 +13530,7 @@
                                                 (rule "applyEq" (formula "44") (term "0") (ifseqformula "2"))
                                                 (rule "applyEq" (formula "5") (term "1,0") (ifseqformula "2"))
                                                 (rule "allLeft" (formula "36") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                 (rule "replace_known_left" (formula "36") (term "0,1") (ifseqformula "17"))
                                                 (builtin "One Step Simplification" (formula "36"))
                                                 (rule "inEqSimp_homoInEq0" (formula "36") (term "0"))
@@ -23258,7 +23258,7 @@
                                                       (rule "inEqSimp_commuteLeq" (formula "50") (term "0,0,0,0,0,1,0,0,0,0"))
                                                       (rule "inEqSimp_sepPosMonomial0" (formula "50") (term "1,0,0,0,1,1,1,0,1,0,0,0"))
                                                       (rule "cut_direct" (formula "50") (term "1,0,0,0,0") (userinteraction))
-                                                      (branch "CUT: infiniteUnion{int _var52;}(if ( _var52 >= 0 & 1 + select<[int]>(store(store(store(store(store(store(heap, m_0, next, null), self, last, m_0), self, seq, seqConcat(seqSub(self.seq, 0, -1 + i_1), seqSub(self.seq, 1 + i_1, -1 + self.size))), self, nodeseq, seqConcat(seqSub(self.nodeseq, 0, -1 + i_1), seqSub(self.nodeseq, 1 + i_1, -1 + self.size))), self, footprint, self.footprint setMinus allFields(n_0)), self, size, -1 + self.size), self, size) * -1 + _var52 <= 0) then (allFields((Node)(any::seqGet(Seq::select(store(store(store(store(store(store(heap, m_0, next, null), self, last, m_0), self, seq, seqConcat(seqSub(self.seq, 0, -1 + i_1), seqSub(self.seq, 1 + i_1, -1 + self.size))), self, nodeseq, seqConcat(seqSub(self.nodeseq, 0, -1 + i_1), seqSub(self.nodeseq, 1 + i_1, -1 + self.size))), self, footprint, self.footprint setMinus allFields(n_0)), self, size, -1 + self.size), self, nodeseq), _var52)))) else ({})) cup allFields(self) = LocSet::select(store(store(store(store(store(store(heap, m_0, next, null), self, last, m_0), self, seq, seqConcat(seqSub(self.seq, 0, -1 + i_1), seqSub(self.seq, 1 + i_1, -1 + self.size))), self, nodeseq, seqConcat(seqSub(self.nodeseq, 0, -1 + i_1), seqSub(self.nodeseq, 1 + i_1, -1 + self.size))), self, footprint, self.footprint setMinus allFields(n_0)), self, size, -1 + self.size), self, footprint) TRUE"
+                                                      (branch "CUT: infiniteUnion{int _var52;}(if ( _var52 >= 0 & 1 + select<int>(store(store(store(store(store(store(heap, m_0, next, null), self, last, m_0), self, seq, seqConcat(seqSub(self.seq, 0, -1 + i_1), seqSub(self.seq, 1 + i_1, -1 + self.size))), self, nodeseq, seqConcat(seqSub(self.nodeseq, 0, -1 + i_1), seqSub(self.nodeseq, 1 + i_1, -1 + self.size))), self, footprint, self.footprint setMinus allFields(n_0)), self, size, -1 + self.size), self, size) * -1 + _var52 <= 0) then (allFields((Node)(any::seqGet(Seq::select(store(store(store(store(store(store(heap, m_0, next, null), self, last, m_0), self, seq, seqConcat(seqSub(self.seq, 0, -1 + i_1), seqSub(self.seq, 1 + i_1, -1 + self.size))), self, nodeseq, seqConcat(seqSub(self.nodeseq, 0, -1 + i_1), seqSub(self.nodeseq, 1 + i_1, -1 + self.size))), self, footprint, self.footprint setMinus allFields(n_0)), self, size, -1 + self.size), self, nodeseq), _var52)))) else ({})) cup allFields(self) = LocSet::select(store(store(store(store(store(store(heap, m_0, next, null), self, last, m_0), self, seq, seqConcat(seqSub(self.seq, 0, -1 + i_1), seqSub(self.seq, 1 + i_1, -1 + self.size))), self, nodeseq, seqConcat(seqSub(self.nodeseq, 0, -1 + i_1), seqSub(self.nodeseq, 1 + i_1, -1 + self.size))), self, footprint, self.footprint setMinus allFields(n_0)), self, size, -1 + self.size), self, footprint) TRUE"
                                                          (rule "concrete_and_3" (formula "51") (term "0,0,0,0"))
                                                          (rule "polySimp_mulComm0" (formula "51") (term "1,1,0,0,0,1,1,1,0,1,0,0,0"))
                                                          (rule "polySimp_rightDist" (formula "51") (term "1,1,0,0,0,1,1,1,0,1,0,0,0"))
@@ -28297,7 +28297,7 @@
                                                                      (rule "concrete_and_2" (formula "27") (term "0,0"))
                                                                      (rule "concrete_or_2" (formula "27") (term "0"))
                                                                      (rule "allLeft" (formula "34") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                      (rule "eqSymm" (formula "34") (term "0,1,0"))
                                                                      (rule "eqSymm" (formula "34") (term "1,0,0"))
                                                                      (rule "inEqSimp_homoInEq0" (formula "34") (term "1,0,0,0,0"))
@@ -32104,7 +32104,7 @@
                                                             )
                                                          )
                                                       )
-                                                      (branch "CUT: infiniteUnion{int _var52;}(if ( _var52 >= 0 & 1 + select<[int]>(store(store(store(store(store(store(heap, m_0, next, null), self, last, m_0), self, seq, seqConcat(seqSub(self.seq, 0, -1 + i_1), seqSub(self.seq, 1 + i_1, -1 + self.size))), self, nodeseq, seqConcat(seqSub(self.nodeseq, 0, -1 + i_1), seqSub(self.nodeseq, 1 + i_1, -1 + self.size))), self, footprint, self.footprint setMinus allFields(n_0)), self, size, -1 + self.size), self, size) * -1 + _var52 <= 0) then (allFields((Node)(any::seqGet(Seq::select(store(store(store(store(store(store(heap, m_0, next, null), self, last, m_0), self, seq, seqConcat(seqSub(self.seq, 0, -1 + i_1), seqSub(self.seq, 1 + i_1, -1 + self.size))), self, nodeseq, seqConcat(seqSub(self.nodeseq, 0, -1 + i_1), seqSub(self.nodeseq, 1 + i_1, -1 + self.size))), self, footprint, self.footprint setMinus allFields(n_0)), self, size, -1 + self.size), self, nodeseq), _var52)))) else ({})) cup allFields(self) = LocSet::select(store(store(store(store(store(store(heap, m_0, next, null), self, last, m_0), self, seq, seqConcat(seqSub(self.seq, 0, -1 + i_1), seqSub(self.seq, 1 + i_1, -1 + self.size))), self, nodeseq, seqConcat(seqSub(self.nodeseq, 0, -1 + i_1), seqSub(self.nodeseq, 1 + i_1, -1 + self.size))), self, footprint, self.footprint setMinus allFields(n_0)), self, size, -1 + self.size), self, footprint) FALSE"
+                                                      (branch "CUT: infiniteUnion{int _var52;}(if ( _var52 >= 0 & 1 + select<int>(store(store(store(store(store(store(heap, m_0, next, null), self, last, m_0), self, seq, seqConcat(seqSub(self.seq, 0, -1 + i_1), seqSub(self.seq, 1 + i_1, -1 + self.size))), self, nodeseq, seqConcat(seqSub(self.nodeseq, 0, -1 + i_1), seqSub(self.nodeseq, 1 + i_1, -1 + self.size))), self, footprint, self.footprint setMinus allFields(n_0)), self, size, -1 + self.size), self, size) * -1 + _var52 <= 0) then (allFields((Node)(any::seqGet(Seq::select(store(store(store(store(store(store(heap, m_0, next, null), self, last, m_0), self, seq, seqConcat(seqSub(self.seq, 0, -1 + i_1), seqSub(self.seq, 1 + i_1, -1 + self.size))), self, nodeseq, seqConcat(seqSub(self.nodeseq, 0, -1 + i_1), seqSub(self.nodeseq, 1 + i_1, -1 + self.size))), self, footprint, self.footprint setMinus allFields(n_0)), self, size, -1 + self.size), self, nodeseq), _var52)))) else ({})) cup allFields(self) = LocSet::select(store(store(store(store(store(store(heap, m_0, next, null), self, last, m_0), self, seq, seqConcat(seqSub(self.seq, 0, -1 + i_1), seqSub(self.seq, 1 + i_1, -1 + self.size))), self, nodeseq, seqConcat(seqSub(self.nodeseq, 0, -1 + i_1), seqSub(self.nodeseq, 1 + i_1, -1 + self.size))), self, footprint, self.footprint setMinus allFields(n_0)), self, size, -1 + self.size), self, footprint) FALSE"
                                                          (rule "hide_right" (formula "51") (userinteraction))
                                                          (rule "selectOfStore" (formula "50") (term "1"))
                                                          (rule "eqClose" (formula "50") (term "0,0,0,1"))
@@ -33571,7 +33571,7 @@
                                                                         (rule "eqClose" (formula "39") (term "0,0,0,0"))
                                                                         (rule "ifthenelse_true_for" (formula "39") (term "0,0,0"))
                                                                         (rule "allLeft" (formula "40") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                         (rule "eqSymm" (formula "40") (term "0,1,0"))
                                                                         (rule "eqSymm" (formula "40") (term "1,0,0"))
                                                                         (rule "inEqSimp_homoInEq0" (formula "40") (term "1,0,0,0,0"))
@@ -33671,7 +33671,7 @@
                                                                         (rule "concrete_or_2" (formula "18"))
                                                                         (rule "notLeft" (formula "18"))
                                                                         (rule "allLeft" (formula "37") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                         (rule "replace_known_left" (formula "37") (term "0,1") (ifseqformula "47"))
                                                                         (rule "concrete_not_1" (formula "37") (term "1"))
                                                                         (rule "concrete_or_4" (formula "37"))
@@ -34296,7 +34296,7 @@
                                                                         (rule "eqClose" (formula "41") (term "0,0,0,0"))
                                                                         (rule "ifthenelse_true_for" (formula "41") (term "0,0,0"))
                                                                         (rule "allLeft" (formula "42") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                         (rule "eqSymm" (formula "42") (term "0,1,0"))
                                                                         (rule "eqSymm" (formula "42") (term "1,0,0"))
                                                                         (rule "inEqSimp_homoInEq1" (formula "42") (term "1,0,0,0"))
@@ -34351,7 +34351,7 @@
                                                                         (rule "concrete_or_2" (formula "18"))
                                                                         (rule "notLeft" (formula "18"))
                                                                         (rule "allLeft" (formula "37") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                         (rule "replace_known_left" (formula "37") (term "0,1") (ifseqformula "47"))
                                                                         (rule "concrete_not_1" (formula "37") (term "1"))
                                                                         (rule "concrete_or_4" (formula "37"))
@@ -36209,7 +36209,7 @@
                                                                         (rule "concrete_or_3" (formula "5"))
                                                                         (rule "true_left" (formula "5"))
                                                                         (rule "allLeft" (formula "32") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                         (rule "eqSymm" (formula "32") (term "0,1,0"))
                                                                         (rule "eqSymm" (formula "32") (term "1,0,0"))
                                                                         (rule "inEqSimp_homoInEq0" (formula "32") (term "1,0,0,0,0"))
@@ -36362,7 +36362,7 @@
                                                                         (rule "concrete_or_2" (formula "35"))
                                                                         (rule "notLeft" (formula "35"))
                                                                         (rule "allLeft" (formula "34") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                         (rule "replace_known_left" (formula "34") (term "0,1") (ifseqformula "43"))
                                                                         (rule "concrete_not_1" (formula "34") (term "1"))
                                                                         (rule "concrete_or_4" (formula "34"))
@@ -36843,7 +36843,7 @@
                                                                         (rule "concrete_or_4" (formula "34") (term "0,0,0"))
                                                                         (rule "commute_or_2" (formula "34") (term "0,0"))
                                                                         (rule "allLeft" (formula "35") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                         (rule "eqSymm" (formula "35") (term "1,0,0"))
                                                                         (rule "eqSymm" (formula "35") (term "0,1,0"))
                                                                         (rule "inEqSimp_homoInEq0" (formula "35") (term "1,0,0,0,0"))
@@ -36949,7 +36949,7 @@
                                                                         (rule "concrete_or_2" (formula "35"))
                                                                         (rule "notLeft" (formula "35"))
                                                                         (rule "allLeft" (formula "34") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                         (rule "replace_known_left" (formula "34") (term "0,1") (ifseqformula "43"))
                                                                         (rule "concrete_not_1" (formula "34") (term "1"))
                                                                         (rule "concrete_or_4" (formula "34"))
@@ -40492,7 +40492,7 @@
                                                                               (rule "qeq_literals" (formula "27") (term "0,0,0"))
                                                                               (builtin "One Step Simplification" (formula "27"))
                                                                               (rule "allLeft" (formula "34") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                               (rule "eqSymm" (formula "34") (term "1,0,0"))
                                                                               (rule "eqSymm" (formula "34") (term "0,1,0"))
                                                                               (rule "inEqSimp_homoInEq0" (formula "34") (term "1,0,0,0,0"))
@@ -40661,7 +40661,7 @@
                                                                               (builtin "One Step Simplification" (formula "36"))
                                                                               (rule "commute_or_2" (formula "36") (term "0,0"))
                                                                               (rule "allLeft" (formula "37") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                               (rule "eqSymm" (formula "37") (term "0,1,0"))
                                                                               (rule "eqSymm" (formula "37") (term "1,0,0"))
                                                                               (rule "inEqSimp_homoInEq1" (formula "37") (term "1,0,0,0"))
@@ -40996,7 +40996,7 @@
                                                                               (builtin "One Step Simplification" (formula "35"))
                                                                               (rule "commute_or_2" (formula "35") (term "0,0"))
                                                                               (rule "allLeft" (formula "36") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                               (rule "eqSymm" (formula "36") (term "0,1,0"))
                                                                               (rule "eqSymm" (formula "36") (term "1,0,0"))
                                                                               (rule "inEqSimp_homoInEq1" (formula "36") (term "1,0,0,0"))
@@ -41629,7 +41629,7 @@
                                                                               (rule "qeq_literals" (formula "29") (term "0,0"))
                                                                               (builtin "One Step Simplification" (formula "29"))
                                                                               (rule "allLeft" (formula "36") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                               (rule "eqSymm" (formula "36") (term "0,1,0"))
                                                                               (rule "eqSymm" (formula "36") (term "1,0,0"))
                                                                               (rule "inEqSimp_homoInEq0" (formula "36") (term "1,0,0,0,0"))
@@ -41967,7 +41967,7 @@
                                                                         (builtin "One Step Simplification" (formula "33"))
                                                                         (rule "commute_or_2" (formula "33") (term "0,0"))
                                                                         (rule "allLeft" (formula "34") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                         (rule "eqSymm" (formula "34") (term "0,1,0"))
                                                                         (rule "eqSymm" (formula "34") (term "1,0,0"))
                                                                         (rule "inEqSimp_homoInEq1" (formula "34") (term "1,0,0,0"))
@@ -45866,7 +45866,7 @@
                                                                                           (rule "concrete_and_2" (formula "41") (term "0,0"))
                                                                                           (rule "concrete_or_2" (formula "41") (term "0"))
                                                                                           (rule "allLeft" (formula "49") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                                           (rule "eqSymm" (formula "49") (term "0,1,0"))
                                                                                           (rule "eqSymm" (formula "49") (term "1,0,0"))
                                                                                           (rule "inEqSimp_homoInEq0" (formula "49") (term "1,0,0,0,0"))
@@ -46297,7 +46297,7 @@
                                                                                           (rule "concrete_and_2" (formula "39") (term "0,0"))
                                                                                           (rule "concrete_or_2" (formula "39") (term "0"))
                                                                                           (rule "allLeft" (formula "48") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                                           (rule "eqSymm" (formula "48") (term "0,1,0"))
                                                                                           (rule "eqSymm" (formula "48") (term "1,0,0"))
                                                                                           (rule "inEqSimp_homoInEq1" (formula "48") (term "1,0,0,0"))
@@ -47359,7 +47359,7 @@
                                                                                           (rule "concrete_and_2" (formula "42") (term "0,0"))
                                                                                           (rule "concrete_or_2" (formula "42") (term "0"))
                                                                                           (rule "allLeft" (formula "51") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                                           (rule "eqSymm" (formula "51") (term "0,1,0"))
                                                                                           (rule "eqSymm" (formula "51") (term "1,0,0"))
                                                                                           (rule "inEqSimp_homoInEq1" (formula "51") (term "1,0,0,0"))
@@ -47629,7 +47629,7 @@
                                                                                           (rule "concrete_and_2" (formula "43") (term "0,0"))
                                                                                           (rule "concrete_or_2" (formula "43") (term "0"))
                                                                                           (rule "allLeft" (formula "54") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                                           (rule "eqSymm" (formula "54") (term "0,1,0"))
                                                                                           (rule "eqSymm" (formula "54") (term "1,0,0"))
                                                                                           (rule "inEqSimp_homoInEq0" (formula "54") (term "1,0,0,0,0"))
@@ -48634,7 +48634,7 @@
                                                                                              (rule "concrete_and_2" (formula "39") (term "1,0,0,0"))
                                                                                              (rule "concrete_or_4" (formula "39") (term "0,0,0"))
                                                                                              (rule "allLeft" (formula "40") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                                              (rule "eqSymm" (formula "40") (term "0,1,0"))
                                                                                              (rule "eqSymm" (formula "40") (term "1,0,0"))
                                                                                              (rule "inEqSimp_homoInEq1" (formula "40") (term "1,0,0,0"))
@@ -50973,7 +50973,7 @@
                                                                                              (rule "concrete_and_2" (formula "40") (term "1,0,0,0"))
                                                                                              (rule "concrete_or_4" (formula "40") (term "0,0,0"))
                                                                                              (rule "allLeft" (formula "41") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                                              (rule "eqSymm" (formula "41") (term "0,1,0"))
                                                                                              (rule "eqSymm" (formula "41") (term "1,0,0"))
                                                                                              (rule "inEqSimp_homoInEq1" (formula "41") (term "1,0,0,0"))
@@ -51932,7 +51932,7 @@
                                                                            (builtin "One Step Simplification" (formula "35"))
                                                                            (rule "commute_or_2" (formula "35") (term "0,0"))
                                                                            (rule "allLeft" (formula "36") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                            (rule "eqSymm" (formula "36") (term "1,0,0"))
                                                                            (rule "eqSymm" (formula "36") (term "0,1,0"))
                                                                            (rule "inEqSimp_homoInEq0" (formula "36") (term "1,0,0,0,0"))
@@ -53039,7 +53039,7 @@
                                                                            (rule "inEqSimp_sepPosMonomial0" (formula "32") (term "0"))
                                                                            (rule "mul_literals" (formula "32") (term "1,0"))
                                                                            (rule "allLeft" (formula "53") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                            (rule "inEqSimp_homoInEq0" (formula "53") (term "0,0"))
                                                                            (rule "polySimp_mulComm0" (formula "53") (term "1,0,0,0"))
                                                                            (rule "polySimp_rightDist" (formula "53") (term "1,0,0,0"))
@@ -53132,7 +53132,7 @@
                                                                            (rule "concrete_or_4" (formula "39") (term "0,0,0"))
                                                                            (rule "commute_or_2" (formula "39") (term "0,0"))
                                                                            (rule "allLeft" (formula "40") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                            (rule "eqSymm" (formula "40") (term "1,0,0"))
                                                                            (rule "eqSymm" (formula "40") (term "0,1,0"))
                                                                            (rule "inEqSimp_homoInEq1" (formula "40") (term "1,0,0,0"))
@@ -54282,7 +54282,7 @@
                                                                            (rule "concrete_and_2" (formula "30") (term "0,0"))
                                                                            (rule "concrete_or_2" (formula "30") (term "0"))
                                                                            (rule "allLeft" (formula "36") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                            (rule "eqSymm" (formula "36") (term "0,1,0"))
                                                                            (rule "eqSymm" (formula "36") (term "1,0,0"))
                                                                            (rule "inEqSimp_homoInEq1" (formula "36") (term "1,0,0,0"))
@@ -54329,7 +54329,7 @@
                                                                            (rule "concrete_and_2" (formula "26") (term "0,0"))
                                                                            (rule "concrete_or_2" (formula "26") (term "0"))
                                                                            (rule "allLeft" (formula "54") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                            (rule "inEqSimp_homoInEq0" (formula "54") (term "0,0"))
                                                                            (rule "polySimp_mulComm0" (formula "54") (term "1,0,0,0"))
                                                                            (rule "polySimp_rightDist" (formula "54") (term "1,0,0,0"))
@@ -55220,7 +55220,7 @@
                                                                                     (rule "concrete_and_2" (formula "39") (term "0,0"))
                                                                                     (rule "concrete_or_2" (formula "39") (term "0"))
                                                                                     (rule "allLeft" (formula "40") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                                                     (rule "polySimp_homoEq" (formula "40") (term "1,0,0"))
                                                                                     (rule "polySimp_mulComm0" (formula "40") (term "1,0,1,0,0"))
                                                                                     (rule "polySimp_rightDist" (formula "40") (term "1,0,1,0,0"))
@@ -56981,7 +56981,7 @@
                                                       (builtin "One Step Simplification" (formula "31"))
                                                       (rule "commute_or_2" (formula "31") (term "0,0"))
                                                       (rule "allLeft" (formula "32") (inst "t=add(Z(neglit(1(#))),
-    select<[int]>(heap, self, LinkedList::$size))"))
+    select<int>(heap, self, LinkedList::$size))"))
                                                       (rule "eqSymm" (formula "32") (term "1,0,0"))
                                                       (rule "eqSymm" (formula "32") (term "0,1,0"))
                                                       (rule "inEqSimp_homoInEq0" (formula "32") (term "1,0,0,0,0"))

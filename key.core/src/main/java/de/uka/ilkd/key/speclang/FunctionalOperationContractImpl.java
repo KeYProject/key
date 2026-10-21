@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang;
 
 import java.util.*;
@@ -11,9 +12,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
+import de.uka.ilkd.key.java.ast.expression.BinaryAssignment;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.ast.reference.MethodReference;
 import de.uka.ilkd.key.java.ast.statement.CatchAllStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -979,7 +980,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         if (originalResultVar == null) {
             callStatement = mr;
         } else {
-            callStatement = new CopyAssignment(originalResultVar, mr);
+            callStatement =
+                new BinaryAssignment(BinaryAssignment.BinaryAssignmentKind.COPY, originalResultVar,
+                    mr);
         }
         final CatchAllStatement cas = new CatchAllStatement(new StatementBlock(callStatement),
             originalExcVar);
@@ -1446,7 +1449,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
-    public VisibilityModifier getVisibility() {
+    public ModifierKind getVisibility() {
         assert false; // this is currently not applicable for contracts
         return null;
     }

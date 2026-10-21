@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.java.Services;
@@ -184,11 +185,21 @@ public class RewriteTaclet extends FindTaclet {
         return polarity;
     }
 
-
     @Override
     protected StringBuffer toStringFind(StringBuffer sb) {
         StringBuffer res = super.toStringFind(sb);
-        return res.append(applicationRestriction().toString());
+        return res.append(applicationRestriction().toString(needsSameUpdateLevel()));
+    }
+
+    private boolean needsSameUpdateLevel() {
+        if (!assumesSequent.isEmpty()) {
+            return true;
+        }
+        for (var tgt : goalTemplates) {
+            if (!tgt.sequent().isEmpty())
+                return true;
+        }
+        return false;
     }
 
     public SequentFormula getRewriteResult(Goal goal, TermLabelState termLabelState,

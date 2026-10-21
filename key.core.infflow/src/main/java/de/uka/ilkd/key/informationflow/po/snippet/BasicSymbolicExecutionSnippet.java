@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
@@ -12,9 +13,10 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.Modifier;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.expression.Assignment;
+import de.uka.ilkd.key.java.ast.expression.BinaryAssignment;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.ast.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
@@ -123,7 +125,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
                 formalArray.toArray(new Expression[formalArray.size()]);
             KeYJavaType forClass = (KeYJavaType) d.get(BasicSnippetData.Key.FOR_CLASS);
             final New n = new New(formalArray2, new TypeRef(forClass), null);
-            final CopyAssignment ca = new CopyAssignment(selfVar, n);
+            final Assignment ca = new BinaryAssignment(selfVar, n);
             sb = new StatementBlock(ca);
         } else {
             final MethodBodyStatement call =
@@ -136,19 +138,17 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         final TypeReference excTypeRef = javaInfo.createTypeReference(eType);
 
         // create try statement
-        final CopyAssignment nullStat = new CopyAssignment(exceptionVar, NullLiteral.NULL);
+        final Assignment nullStat = new BinaryAssignment(exceptionVar, NullLiteral.NULL);
         final VariableSpecification eSpec = new VariableSpecification(eVar);
         final ParameterDeclaration excDecl =
             new ParameterDeclaration(new Modifier[0], excTypeRef, eSpec, false);
-        final CopyAssignment assignStat = new CopyAssignment(exceptionVar, eVar);
+        final Assignment assignStat = new BinaryAssignment(exceptionVar, eVar);
         final Catch catchStat = new Catch(excDecl, new StatementBlock(assignStat));
         final Try tryStat = new Try(sb, new Branch[] { catchStat });
         final StatementBlock sb2 = new StatementBlock(nullStat, tryStat);
 
         // create java block
-        JavaBlock result = JavaBlock.createJavaBlock(sb2);
-
-        return result;
+        return JavaBlock.createJavaBlock(sb2);
     }
 
 

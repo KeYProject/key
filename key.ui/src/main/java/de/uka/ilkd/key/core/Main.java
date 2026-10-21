@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.core;
 
 import java.io.File;
@@ -12,6 +13,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Callable;
+import java.util.prefs.Preferences;
 import javax.xml.parsers.ParserConfigurationException;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
@@ -131,6 +133,9 @@ public final class Main implements Callable<Integer> {
 
     @Option(names = "--debug", description = "start KeY in debug mode")
     private boolean debug = false;
+
+    @Option(names = "--clear-prefs", description = "clear the GUI preferences")
+    private boolean clearPrefs = false;
 
     @Option(names = "--macro", paramLabel = "STRING", description = "apply automatic proof macro")
     private @Nullable String macro = null;
@@ -256,6 +261,17 @@ public final class Main implements Callable<Integer> {
             LOGGER.info("Assertion evaluation is disabled.");
         } catch (AssertionError e) {
             LOGGER.info("Assertion evaluation is enabled.");
+        }
+
+        if (clearPrefs) {
+            try {
+                var prefs = Preferences.userNodeForPackage(MainWindow.class);
+                if (prefs != null) {
+                    prefs.clear();
+                }
+            } finally {
+                // nothing to do
+            }
         }
 
         if (tacletDir != null) {

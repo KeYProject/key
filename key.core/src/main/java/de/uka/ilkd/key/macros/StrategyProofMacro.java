@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.macros;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.JavaStrategy;
 
 import org.key_project.prover.engine.GoalChooser;
+import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -111,7 +113,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         //
         // The observer to handle the progress bar
         final ProofMacroListener pml =
-            new ProgressBarListener(goals.size(), getMaxSteps(proof), listener);
+            new ProgressBarListener(1, getMaxSteps(proof), listener);
         applyStrategy.addProverTaskObserver(pml);
         // add a focus manager if there is a focus
         if (posInOcc != null) {
@@ -133,7 +135,11 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         try {
             // find the relevant goals
             // and start
-            applyStrategy.start(proof, goals);
+            final ProofSearchInformation<Proof, Goal> result = applyStrategy.start(proof, goals);
+            if (result.isError()) {
+                throw new RuntimeException("Proof search failed: " + result.getException(),
+                    result.getException());
+            }
             synchronized (applyStrategy) { // wait for applyStrategy to finish its last rule
                                            // application
                 if (applyStrategy.hasBeenInterrupted()) { // reraise interrupted exception if

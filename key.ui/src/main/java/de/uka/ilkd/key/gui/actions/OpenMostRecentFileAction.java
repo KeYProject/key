@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -27,9 +28,13 @@ public final class OpenMostRecentFileAction extends MainWindowAction
         setName("Reload");
         setIcon(IconFactory.openMostRecent(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Reload last opened file.");
+        updateEnabledStatus();
+        mainWindow.getMediator().addKeYSelectionListener(this);
+    }
+
+    public void updateEnabledStatus() {
         setEnabled(mainWindow.getRecentFiles() != null
                 && mainWindow.getRecentFiles().getMostRecent() != null);
-        mainWindow.getMediator().addKeYSelectionListener(this);
     }
 
     public void actionPerformed(ActionEvent e) {

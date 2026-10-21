@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.scripts;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -65,7 +66,9 @@ public class ExpandDefCommand extends AbstractCommand {
 
         TacletApp app = completions.head();
         app = app.tryToInstantiate(g.proof().getServices().getOverlay(g.getLocalNamespaces()));
-        if (app == null || !app.complete()) {
+        // the skolem constants of an application are created when the goal applies it, so an
+        // instantiated application is complete except for them
+        if (app == null || !app.completeExceptSkolemConstants()) {
             throw new ScriptException("Cannot complete the rule app");
         }
 

@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof;
 
 import java.util.LinkedHashMap;
@@ -348,7 +349,7 @@ public class OpReplacer {
         for (int i = 0, n = vars.size(); i < n; i++) {
             QuantifiableVariable qv = vars.get(i);
             QuantifiableVariable newQv = (QuantifiableVariable) replace(qv);
-            result[i++] = newQv;
+            result[i] = newQv;
             if (newQv != qv) {
                 changed = true;
             }
