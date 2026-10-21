@@ -45,7 +45,7 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
         ParsableVariable, ReferenceSuffix, ProgramInLogic {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramVariable.class);
 
-    private final KeYJavaType type;
+    private final TypeReference type;
     private final boolean isStatic;
     private final boolean isModel;
     private final boolean isGhost;
@@ -55,10 +55,10 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
     // the program variable denotes a field
     private final KeYJavaType containingType;
 
-    protected ProgramVariable(ProgramElementName name, Sort s, KeYJavaType t,
+    protected ProgramVariable(ProgramElementName name, Sort s, TypeReference t,
             KeYJavaType containingType, boolean isStatic, boolean isModel, boolean isGhost,
             boolean isFinal) {
-        super(name, s == null ? t.getSort() : s, false);
+        super(name, s == null ? t.getKeYJavaType().getSort() : s, false);
         this.type = t;
         this.containingType = containingType;
         this.isStatic = isStatic;
@@ -71,7 +71,7 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
         assert sort() != JavaDLTheory.UPDATE;
     }
 
-    protected ProgramVariable(ProgramElementName name, Sort s, KeYJavaType t,
+    protected ProgramVariable(ProgramElementName name, Sort s, TypeReference t,
             KeYJavaType containingType, boolean isStatic, boolean isModel, boolean isGhost) {
         this(name, s, t, containingType, isStatic, isModel, isGhost, false);
     }
@@ -176,10 +176,14 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
         return PositionInfo.UNDEFINED;
     }
 
+    @Override
+    public TypeReference getTypeReference() {
+        return type;
+    }
 
     @Override
     public KeYJavaType getKeYJavaType() {
-        return type;
+        return type != null ? type.getKeYJavaType() : null;
     }
 
 
@@ -188,21 +192,14 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
         return getKeYJavaType();
     }
 
-
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         return getKeYJavaType();
     }
 
-
-    /**
-     * We do not have a prefix, so fake it! This way we implement ReferencePrefix
-     *
-     * @author VK
-     */
     @Override
     public ReferencePrefix getReferencePrefix() {
-        return null;
+        return type.getReferencePrefix();
     }
 
     @Override
@@ -216,14 +213,14 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
 
 
     public String proofToString() {
-        final Type javaType = type.getJavaType();
+        final Type javaType = getKeYJavaType().getJavaType();
         final String typeName;
         if (javaType instanceof ArrayType) {
             typeName = ((ArrayType) javaType).getAlternativeNameRepresentation();
         } else if (javaType != null) {
             typeName = javaType.getFullName();
         } else {
-            typeName = type.getSort().name().toString();
+            typeName = getKeYJavaType().getSort().name().toString();
         }
         return typeName + " " + name() + ";\n";
     }
