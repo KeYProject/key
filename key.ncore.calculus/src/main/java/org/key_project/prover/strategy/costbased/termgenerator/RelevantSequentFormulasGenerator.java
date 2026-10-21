@@ -2,16 +2,15 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy.termgenerator;
+package org.key_project.prover.strategy.costbased.termgenerator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.proof.Goal;
-
 import org.key_project.logic.Term;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
@@ -20,7 +19,6 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.VolatileCost;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
-import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.ImmutableList;
 
@@ -28,7 +26,8 @@ import org.key_project.util.collection.ImmutableList;
  * Enumerates the formulas of the sequent that satisfy a term feature.
  */
 @VolatileCost
-public final class RelevantSequentFormulasGenerator implements TermGenerator<Goal> {
+public final class RelevantSequentFormulasGenerator<G extends ProofGoal<G>>
+        implements TermGenerator<G> {
 
     /** Specifies whether to iterate over all formulas or only one of those of one semisequent */
     private enum SequentScope {
@@ -51,7 +50,7 @@ public final class RelevantSequentFormulasGenerator implements TermGenerator<Goa
     /**
      * Caching of selected formulas to be iterated over (second key for cache is in Selection)
      */
-    private final Map<Goal, Selection> selections = new ConcurrentLruCache<>(200);
+    private final Map<G, Selection> selections = new ConcurrentLruCache<>(200);
 
     private RelevantSequentFormulasGenerator(SequentScope part, TermFeature accepted) {
         this.part = part;
@@ -62,24 +61,27 @@ public final class RelevantSequentFormulasGenerator implements TermGenerator<Goa
      * @param filter the TermFeature used to filter the formulas of the sequent
      * @return the formulas of the sequent the feature accepts
      */
-    public static RelevantSequentFormulasGenerator sequent(TermFeature filter) {
-        return new RelevantSequentFormulasGenerator(SequentScope.SEQUENT, filter);
+    public static <G extends ProofGoal<G>> RelevantSequentFormulasGenerator<G> sequent(
+            TermFeature filter) {
+        return new RelevantSequentFormulasGenerator<>(SequentScope.SEQUENT, filter);
     }
 
     /**
      * @param filter the TermFeature used to filter the formulas of the sequent
      * @return the formulas of the antecedent the feature accepts
      */
-    public static RelevantSequentFormulasGenerator antecedent(TermFeature filter) {
-        return new RelevantSequentFormulasGenerator(SequentScope.ANTECEDENT, filter);
+    public static <G extends ProofGoal<G>> RelevantSequentFormulasGenerator<G> antecedent(
+            TermFeature filter) {
+        return new RelevantSequentFormulasGenerator<>(SequentScope.ANTECEDENT, filter);
     }
 
     /**
      * @param filter the TermFeature used to filter the formulas of the sequent
      * @return the formulas of the succedent the feature accepts
      */
-    public static RelevantSequentFormulasGenerator succedent(TermFeature filter) {
-        return new RelevantSequentFormulasGenerator(SequentScope.SUCCEDENT, filter);
+    public static <G extends ProofGoal<G>> RelevantSequentFormulasGenerator<G> succedent(
+            TermFeature filter) {
+        return new RelevantSequentFormulasGenerator<>(SequentScope.SUCCEDENT, filter);
     }
 
     /**
@@ -91,7 +93,7 @@ public final class RelevantSequentFormulasGenerator implements TermGenerator<Goa
      * @param mState the state the filter is evaluated in
      * @return the accepted formulas
      */
-    public ImmutableList<Term> selection(Goal goal, MutableState mState) {
+    public ImmutableList<Term> selection(G goal, MutableState mState) {
         final Sequent sequent = goal.sequent();
         final Selection cached = selections.get(goal);
         if (cached != null && cached.sequent() == sequent) {
@@ -103,12 +105,12 @@ public final class RelevantSequentFormulasGenerator implements TermGenerator<Goa
     }
 
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, G goal,
             MutableState mState) {
         return selection(goal, mState).iterator();
     }
 
-    private List<Term> select(Goal goal, MutableState mState) {
+    private List<Term> select(G goal, MutableState mState) {
         final var services = goal.proof().getServices();
         final List<Term> formulas = new ArrayList<>();
         final Iterable<SequentFormula> source = switch (part) {

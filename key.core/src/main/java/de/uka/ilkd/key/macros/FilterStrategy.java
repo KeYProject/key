@@ -7,8 +7,6 @@ package de.uka.ilkd.key.macros;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.JavaStrategy;
-import de.uka.ilkd.key.strategy.RuleAppCostCollector;
-import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;

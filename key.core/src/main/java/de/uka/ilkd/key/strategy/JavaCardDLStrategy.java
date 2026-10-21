@@ -424,7 +424,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         final TermBuffer sf = new TermBuffer();
         return add(sequentContainsNoPrograms(),
             sum(sf, SequentFormulasGenerator.sequent(),
-                or(eq(sf, FocusFormulaProjection.INSTANCE),
+                or(StaticFeatureCollection.eq(sf, FocusFormulaProjection.INSTANCE),
                     not(ContainsTermFeature.create(sf, instOf("auxiliarySK"))))));
     }
 
@@ -509,8 +509,10 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
             let(firstObject, instOf("o"), let(secondObject, instOf("o2"),
                 sum(succedentFormula, SequentFormulasGenerator.succedent(),
                     not(applyTF(succedentFormula,
-                        or(opSub(Equality.EQUALS, eq(firstObject), eq(secondObject)),
-                            opSub(Equality.EQUALS, eq(secondObject), eq(firstObject)))))))));
+                        or(opSub(Equality.EQUALS, StaticFeatureCollection.eq(firstObject),
+                            StaticFeatureCollection.eq(secondObject)),
+                            opSub(Equality.EQUALS, StaticFeatureCollection.eq(secondObject),
+                                StaticFeatureCollection.eq(firstObject)))))))));
         bindRuleSet(d, "inReachableStateImplication", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "limitObserver", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "partialInvAxiom", NonDuplicateAppModPositionFeature.INSTANCE);
@@ -691,7 +693,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
     }
 
     @Override
-    public boolean isResponsibleFor(IBuiltInRule rule) {
+    public boolean isResponsibleFor(IBuiltInRule<Goal> rule) {
         return rule instanceof QueryExpand || rule instanceof UseDependencyContractRule;
     }
 }

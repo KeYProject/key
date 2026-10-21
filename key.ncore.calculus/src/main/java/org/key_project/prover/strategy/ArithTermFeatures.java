@@ -65,6 +65,7 @@ public class ArithTermFeatures extends StaticFeatureCollection {
     final public TermFeature intInEquation;
     final TermFeature linearInEquation;
     final TermFeature intRelation;
+    final TermFeature intRelationOp;
 
     final public TermFeature notContainsProduct;
     public TermFeature notContainsDivMod;

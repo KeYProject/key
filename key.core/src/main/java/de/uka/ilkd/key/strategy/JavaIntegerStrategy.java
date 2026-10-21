@@ -28,6 +28,7 @@ import org.key_project.prover.strategy.ArithTermFeatures;
 import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.IFormulaTermFeatures;
 import org.key_project.prover.strategy.IntegerStrategy;
+import org.key_project.prover.strategy.costbased.DivModCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
@@ -90,21 +91,20 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
 
     protected void setupDefOpsPrimaryCategories(RuleSetDispatchFeature d) {
         super.setupDefOpsPrimaryCategories(d);
-        if (arith == ArithTreatment.DEF_OPS) {
+        if (arith != ArithTreatment.BASIC) {
             bindRuleSet(d, "defOps_jdiv",
                 SumFeature.createSum(NonDuplicateAppModPositionFeature.INSTANCE,
                     applyTF("divNum", tf.polynomial), applyTF("divDenom", tf.polynomial),
                     applyTF("divNum", tf.notContainsDivMod),
                     applyTF("divDenom", tf.notContainsDivMod),
-                    ifZero(isBelow(ff.modalOperator()), longConst(200))));
+                    ifZero(isBelow(ff.modalOperator()), longConst(DivModCost.BELOW_MODALITY))));
 
             bindRuleSet(d, "defOps_jdiv_inline", add(applyTF("divNum", tf.literal),
-                applyTF("divDenom", tf.polynomial), longConst(-5000)));
+                applyTF("divDenom", tf.polynomial), longConst(DivModCost.INLINE)));
         } else {
             bindRuleSet(d, "defOps_jdiv", inftyConst());
-
             bindRuleSet(d, "defOps_jdiv_inline", add(applyTF("divNum", tf.literal),
-                applyTF("divDenom", tf.literal), longConst(-4000)));
+                applyTF("divDenom", tf.literal), longConst(DivModCost.MOD)));
         }
     }
 
@@ -169,8 +169,8 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
     @Override
     protected Feature createExactlyBoundedInEquationMultFeature(
             ProjectionToTerm<Goal> mult1Candidate, ProjectionToTerm<Goal> mult2Candidate,
-            ProjectionToTerm<Goal> targetCandidate) {
-        return InEquationMultFeature.exactlyBounded(mult1Candidate, mult2Candidate,
+            TermFeature targetCandidate) {
+        return new IsBoundedByInequationFeature(mult1Candidate, mult2Candidate,
             targetCandidate);
     }
 

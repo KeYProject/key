@@ -33,10 +33,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.ComponentStrategy;
-import org.key_project.prover.strategy.costbased.CostBand;
-import org.key_project.prover.strategy.costbased.MutableState;
-import org.key_project.prover.strategy.costbased.RuleAppCost;
-import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.*;
 import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
@@ -45,8 +42,8 @@ import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 
 import org.jspecify.annotations.NonNull;
 
-import static de.uka.ilkd.key.strategy.FOLCost.*;
 import static de.uka.ilkd.key.strategy.StaticFeatureCollection.*;
+import static org.key_project.prover.strategy.costbased.FOLCost.*;
 
 /// Strategy for general FOL rules. This does not consider other
 /// theories like integers or Java-specific functions.

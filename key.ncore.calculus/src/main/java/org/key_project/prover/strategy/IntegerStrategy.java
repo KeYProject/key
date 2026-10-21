@@ -7,11 +7,6 @@ package org.key_project.prover.strategy;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.feature.*;
-import de.uka.ilkd.key.strategy.termProjection.*;
-import de.uka.ilkd.key.strategy.termgenerator.RelevantSequentFormulasGenerator;
-
 import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
@@ -22,15 +17,13 @@ import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.strategy.costbased.CostBand;
-import org.key_project.prover.strategy.costbased.MutableState;
-import org.key_project.prover.strategy.costbased.RuleAppCost;
-import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.costbased.*;
 import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.termProjection.AssumptionProjection;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
+import org.key_project.prover.strategy.costbased.termgenerator.RelevantSequentFormulasGenerator;
 import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGenerator;
 import org.key_project.prover.strategy.costbased.termgenerator.SubtermGenerator;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
@@ -839,7 +832,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
         final Feature intRelation = applyTF(intRel, tf.intRelation);
         final var relevantSequentFormulas =
-            RelevantSequentFormulasGenerator.sequent(tf.intRelationOp);
+            RelevantSequentFormulasGenerator.<G>sequent(tf.intRelationOp);
 
         final Feature totallyBounded = not(sum(intRel, relevantSequentFormulas,
             not(add(
@@ -934,49 +927,52 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
         // category "handling of non-linear inequations"
 
-        final TermBuffer divisor = new TermBuffer();
-        final TermBuffer dividend = new TermBuffer();
+        final TermBuffer<G> divisor = new TermBuffer<>();
+        final TermBuffer<G> dividend = new TermBuffer<>();
 
         bindRuleSet(d, "inEqSimp_nonLin_divide", SumFeature.createSum(
             applyTF("divProd", tf.nonCoeffMonomial),
             applyTFNonStrict("divProdBoundNonPos", tf.nonPosLiteral),
             applyTFNonStrict("divProdBoundNonNeg", tf.nonNegLiteral),
-            ifZero(MatchedAssumesFeature.INSTANCE,
+            ifZero(featureConstants.matchedAssumesFeature(),
                 let(divisor, instOf("divX"), let(dividend, instOf("divProd"),
                     SumFeature.createSum(applyTF(divisor, tf.nonCoeffMonomial),
                         not(eq(dividend, divisor)), applyTFNonStrict("divXBoundPos", tf.posLiteral),
                         applyTFNonStrict("divXBoundNeg", tf.negLiteral),
-                        ReducibleMonomialsFeature.createReducible(dividend, divisor), instantiate(
-                            "divY", ReduceMonomialsProjection.create(dividend, divisor))))))));
+                        createReducibleMonomialFeature(dividend, divisor), instantiate(
+                            "divY", createReduceMonomialsProjection(dividend, divisor))))))));
 
         setupNonLinTermIsPosNeg(d, "inEqSimp_nonLin_pos", true);
         setupNonLinTermIsPosNeg(d, "inEqSimp_nonLin_neg", false);
     }
 
     private void setupNonLinTermIsPosNeg(RuleSetDispatchFeature d, String ruleSet, boolean pos) {
-        final TermBuffer divisor = new TermBuffer();
-        final TermBuffer dividend = new TermBuffer();
-        final TermBuffer quotient = new TermBuffer();
-        final TermBuffer antecFor = new TermBuffer();
+        final TermBuffer<G> divisor = new TermBuffer<>();
+        final TermBuffer<G> dividend = new TermBuffer<>();
+        final TermBuffer<G> quotient = new TermBuffer<>();
+        final TermBuffer<G> antecFor = new TermBuffer<>();
 
         bindRuleSet(d, ruleSet,
             SumFeature
                     .createSum(applyTF("divProd", tf.nonCoeffMonomial),
                         applyTFNonStrict("divProdBoundPos", tf.posLiteral),
                         applyTFNonStrict("divProdBoundNeg", tf.negLiteral),
-                        ifZero(MatchedAssumesFeature.INSTANCE,
+                        ifZero(featureConstants.matchedAssumesFeature(),
                             let(divisor, instOf("divX"), let(dividend, instOf("divProd"),
                                 SumFeature.createSum(applyTF(divisor, tf.nonCoeffMonomial),
-                                    not(applyTF(dividend, eq(divisor))),
+                                    not(applyTF(dividend, createEqTermFeature(divisor))),
                                     applyTFNonStrict("divXBoundNonPos", tf.nonPosLiteral),
                                     applyTFNonStrict("divXBoundNonNeg", tf.nonNegLiteral),
-                                    ReducibleMonomialsFeature.createReducible(dividend, divisor),
+                                    createReducibleMonomialFeature(dividend, divisor),
                                     let(quotient,
-                                        ReduceMonomialsProjection.create(dividend, divisor), add(
+                                        createReduceMonomialsProjection(dividend, divisor), add(
                                             sum(antecFor, SequentFormulasGenerator.antecedent(),
                                                 not(applyTF(antecFor,
-                                                    pos ? opSub(tf.geq, eq(quotient), tf.posLiteral)
-                                                            : opSub(tf.leq, eq(quotient),
+                                                    pos ? opSub(tf.geq,
+                                                        createEqTermFeature(quotient),
+                                                        tf.posLiteral)
+                                                            : opSub(tf.leq,
+                                                                createEqTermFeature(quotient),
                                                                 tf.negLiteral)))),
                                             instantiate("divY", quotient)))))))));
     }
@@ -1082,17 +1078,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                     applyTF("divDenom", tf.notContainsDivMod),
                     ifZero(isBelow(ff.modalOperator()), longConst(DivModCost.BELOW_MODALITY))));
 
-            // TODO: remove
-            bindRuleSet(d, "defOps_jdiv",
-                SumFeature.createSum(NonDuplicateAppModPositionFeature.INSTANCE,
-                    applyTF("divNum", tf.polynomial), applyTF("divDenom", tf.polynomial),
-                    applyTF("divNum", tf.notContainsDivMod),
-                    applyTF("divDenom", tf.notContainsDivMod),
-                    ifZero(isBelow(ff.modalOperator()), longConst(DivModCost.BELOW_MODALITY))));
-
-            bindRuleSet(d, "defOps_jdiv_inline", add(applyTF("divNum", tf.literal),
-                applyTF("divDenom", tf.polynomial), longConst(DivModCost.INLINE)));
-
             setupDefOpsExpandMod(d);
 
             bindRuleSet(d, "defOps_expandRanges", DivModCost.EXPAND_RANGES);
@@ -1100,10 +1085,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
             bindRuleSet(d, "defOps_modHomoEq", DivModCost.MOD_HOMO_EQ);
         } else {
             bindRuleSet(d, "defOps_div", inftyConst());
-            // TODO remove
-            bindRuleSet(d, "defOps_jdiv", inftyConst());
-            bindRuleSet(d, "defOps_jdiv_inline", add(applyTF("divNum", tf.literal),
-                applyTF("divDenom", tf.literal), longConst(DivModCost.MOD)));
 
             bindRuleSet(d, "defOps_mod", add(applyTF("divNum", tf.literal),
                 applyTF("divDenom", tf.literal), longConst(DivModCost.MOD)));
@@ -1149,74 +1130,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         setupInEqSimpInstantiationWithoutRetry(d);
     }
 
-    // For taclets that need instantiation, but where the instantiation is
-    // deterministic and does not have to be repeated at a later point, we
-    // setup the same feature terms as in the instantiation method. The
-    // definitions in <code>setupInstantiationWithoutRetry</code> should
-    // give cost infinity to those incomplete rule applications that will
-    // never be instantiated (so that these applications can be removed from
-    // the queue and do not have to be considered again).
-    private void setupInEqSimpInstantiationWithoutRetry(RuleSetDispatchFeature d) {
-        // category "direct inequations"
-
-        setupPullOutGcd(d, "inEqSimp_pullOutGcd_leq", false);
-        setupPullOutGcd(d, "inEqSimp_pullOutGcd_geq", true);
-
-        // more efficient (but not confluent) versions for the antecedent
-        bindRuleSet(d, "inEqSimp_pullOutGcd_antec", -10);
-
-        // category "handling of non-linear inequations"
-
-        final TermBuffer<G> divisor = new TermBuffer<>();
-        final TermBuffer<G> dividend = new TermBuffer<>();
-
-        bindRuleSet(d, "inEqSimp_nonLin_divide", SumFeature.createSum(
-            applyTF("divProd", tf.nonCoeffMonomial),
-            applyTFNonStrict("divProdBoundNonPos", tf.nonPosLiteral),
-            applyTFNonStrict("divProdBoundNonNeg", tf.nonNegLiteral),
-            ifZero(featureConstants.matchedAssumesFeature(),
-                let(divisor, instOf("divX"), let(dividend, instOf("divProd"),
-                    SumFeature.createSum(applyTF(divisor, tf.nonCoeffMonomial),
-                        not(eq(dividend, divisor)), applyTFNonStrict("divXBoundPos", tf.posLiteral),
-                        applyTFNonStrict("divXBoundNeg", tf.negLiteral),
-                        createReducibleMonomialFeature(dividend, divisor), instantiate(
-                            "divY", createReduceMonomialsProjection(dividend, divisor))))))));
-
-        setupNonLinTermIsPosNeg(d, "inEqSimp_nonLin_pos", true);
-        setupNonLinTermIsPosNeg(d, "inEqSimp_nonLin_neg", false);
-    }
-
-    private void setupNonLinTermIsPosNeg(RuleSetDispatchFeature d, String ruleSet, boolean pos) {
-        final TermBuffer<G> divisor = new TermBuffer<>();
-        final TermBuffer<G> dividend = new TermBuffer<>();
-        final TermBuffer<G> quotient = new TermBuffer<>();
-        final TermBuffer<G> antecFor = new TermBuffer<>();
-
-        bindRuleSet(d, ruleSet,
-            SumFeature
-                    .createSum(applyTF("divProd", tf.nonCoeffMonomial),
-                        applyTFNonStrict("divProdBoundPos", tf.posLiteral),
-                        applyTFNonStrict("divProdBoundNeg", tf.negLiteral),
-                        ifZero(featureConstants.matchedAssumesFeature(),
-                            let(divisor, instOf("divX"), let(dividend, instOf("divProd"),
-                                SumFeature.createSum(applyTF(divisor, tf.nonCoeffMonomial),
-                                    not(applyTF(dividend, createEqTermFeature(divisor))),
-                                    applyTFNonStrict("divXBoundNonPos", tf.nonPosLiteral),
-                                    applyTFNonStrict("divXBoundNonNeg", tf.nonNegLiteral),
-                                    createReducibleMonomialFeature(dividend, divisor),
-                                    let(quotient,
-                                        createReduceMonomialsProjection(dividend, divisor), add(
-                                            sum(antecFor, SequentFormulasGenerator.antecedent(),
-                                                not(applyTF(antecFor,
-                                                    pos ? opSub(tf.geq,
-                                                        createEqTermFeature(quotient),
-                                                        tf.posLiteral)
-                                                            : opSub(tf.leq,
-                                                                createEqTermFeature(quotient),
-                                                                tf.negLiteral)))),
-                                            instantiate("divY", quotient)))))))));
-    }
-
     protected abstract Feature createReducibleMonomialFeature(ProjectionToTerm<G> dividend,
             ProjectionToTerm<G> divisor);
 
@@ -1247,7 +1160,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
     protected abstract Feature createExactlyBoundedInEquationMultFeature(
             ProjectionToTerm<G> mult1Candidate, ProjectionToTerm<G> mult2Candidate,
-            ProjectionToTerm<G> targetCandidate);
+            TermFeature targetCandidate);
 
     protected abstract Feature createTotalyBoundedInEquationMultFeature(
             ProjectionToTerm<G> mult1Candidate, ProjectionToTerm<G> mult2Candidate,

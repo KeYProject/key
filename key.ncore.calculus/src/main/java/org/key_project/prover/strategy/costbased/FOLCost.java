@@ -2,7 +2,7 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy;
+package org.key_project.prover.strategy.costbased;
 
 /**
  * FOL-theory-internal ordering costs, used by {@link FOLStrategy}. These are the fine, within-FOL
@@ -12,18 +12,18 @@ package de.uka.ilkd.key.strategy;
  *
  * <p>
  * Values are byte-identical to the literals they replace. They position FOL rules within the shared
- * {@link org.key_project.prover.strategy.costbased.CostBand} ladder, so changing one shifts the
+ * {@link CostBand} ladder, so changing one shifts the
  * cross-theory search — verify with a full runAllProofs and a Model-Search node-for-node comparison
- * (as for {@code CostBand}).
+ * (as for {@link CostBand}).
  * </p>
  */
-final class FOLCost {
+final public class FOLCost {
     private FOLCost() {}
 
     /**
      * Distribution / swapping of quantifiers ({@code distrQuantifier}, {@code swapQuantifiers}).
      */
-    static final long QUANTIFIER_DISTRIBUTION = -300;
+    static public final long QUANTIFIER_DISTRIBUTION = -300;
 
     /**
      * Restructuring of CNF clauses by associativity / distribution ({@code cnf_orAssoc},
@@ -32,7 +32,7 @@ final class FOLCost {
      * {@link CombinationCost#CNF_CONVERSION} level via the dual rule-set tags of the
      * {@code conjNormalForm} taclets.
      */
-    static final long CNF_RESTRUCTURE = -35;
+    static public final long CNF_RESTRUCTURE = -35;
 
     /**
      * Defer {@code replace_known_right} when its target is in the consequent of an implication or
@@ -40,14 +40,14 @@ final class FOLCost {
      * available as a known-true fact). Deliberately <em>not</em> applied to
      * {@code replace_known_left}, whose antecedent-true facts stay valid across the decomposition.
      */
-    static final long REPLACE_KNOWN_UNDER_CONNECTIVE = 100;
+    static public final long REPLACE_KNOWN_UNDER_CONNECTIVE = 100;
 
     /** Standard cost of a direct cut ({@code cut_direct}). */
-    static final long CUT_DIRECT_STANDARD = 100;
+    static public final long CUT_DIRECT_STANDARD = 100;
 
     /** Preferred direction of the {@code pullOutQuantifier*} rules. */
-    static final long PULL_OUT_QUANTIFIER = -20;
+    static public final long PULL_OUT_QUANTIFIER = -20;
 
     /** Dispreferred direction of the {@code pullOutQuantifier*} rules. */
-    static final long PULL_OUT_QUANTIFIER_REVERSE = -40;
+    static public final long PULL_OUT_QUANTIFIER_REVERSE = -40;
 }
