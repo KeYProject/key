@@ -28,7 +28,6 @@ import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGe
 import org.key_project.prover.strategy.costbased.termgenerator.SubtermGenerator;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NonNull;
 
 /// This strategy implements reasoning for integer arithmetics. In particular,
@@ -51,9 +50,9 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
     /// The features defining the three phases: cost computation, approval,
     /// additionalInstanceCreationAndEvaluation
-    private @MonotonicNonNull RuleSetDispatchFeature costComputationDispatcher;
-    private @MonotonicNonNull RuleSetDispatchFeature approvalDispatcher;
-    private @MonotonicNonNull RuleSetDispatchFeature instantiationDispatcher;
+    private final RuleSetDispatchFeature costComputationDispatcher = new RuleSetDispatchFeature();
+    private final RuleSetDispatchFeature approvalDispatcher = new RuleSetDispatchFeature();
+    private final RuleSetDispatchFeature instantiationDispatcher = new RuleSetDispatchFeature();
 
     /// Useful [TermFeature] collections
     protected final ArithTermFeatures tf;
@@ -77,7 +76,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
     private final IIntLdt numbers;
 
-    FeatureConstants<G> featureConstants;
+    final FeatureConstants<G> featureConstants;
 
     public IntegerStrategy(ArithTermFeatures tf, IFormulaTermFeatures ff,
             boolean nonLinearArithmeticEnabled, boolean divAndModuloReasoningEnabled,
@@ -102,15 +101,14 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
     protected void init() {
         // setup cost computations
-        costComputationDispatcher = setupCostComputationF();
-        approvalDispatcher = setupApprovalDispatcher();
-        instantiationDispatcher = setupInstantiationF();
+        setupCostComputationF(costComputationDispatcher);
+        setupApprovalDispatcher(approvalDispatcher);
+        setupInstantiationF(instantiationDispatcher);
     }
 
-    private RuleSetDispatchFeature setupInstantiationF() {
+    private void setupInstantiationF(RuleSetDispatchFeature d) {
         enableInstantiate();
 
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
         setupArithPrimaryCategories(d);
         setupDefOpsPrimaryCategories(d);
         setupInstantiationWithoutRetry(d);
@@ -128,13 +126,10 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                     : inftyConst());
 
         disableInstantiate();
-        return d;
     }
 
 
-    protected RuleSetDispatchFeature setupApprovalDispatcher() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-
+    protected void setupApprovalDispatcher(RuleSetDispatchFeature d) {
         if (arith != ArithTreatment.BASIC) {
             // The InEquationMultFeature bounding enforced here is what prevents
             // cross-multiplication from running in circles: only products that are
@@ -169,8 +164,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         if (arith == ArithTreatment.MODEL_SEARCH) {
             setupInEqCaseDistinctionsApproval(d);
         }
-
-        return d;
     }
 
     @Override
@@ -183,9 +176,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         return stopAtFirstNonCloseableGoal;
     }
 
-    private RuleSetDispatchFeature setupCostComputationF() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-
+    private void setupCostComputationF(RuleSetDispatchFeature d) {
         bindRuleSet(d, "simplify_int", inftyConst());
 
         setupArithPrimaryCategories(d);
@@ -240,8 +231,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         // never be instantiated (so that these applications can be removed from
         // the queue and do not have to be considered again).
         setupInstantiationWithoutRetry(d);
-
-        return d;
     }
 
     @Override

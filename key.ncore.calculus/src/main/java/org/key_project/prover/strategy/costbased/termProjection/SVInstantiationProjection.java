@@ -11,11 +11,12 @@ import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 
 /// Projection of taclet apps to the instantiation of a schema variable. The projection can either
-/// be
-/// partial and undefined for those apps that do not instantiate the schema variable in question, or
-/// it can raise an error for such applications
+/// be partial and undefined for those apps that do not instantiate the schema variable in
+/// question, or it can raise an error for such applications
+@StableCost
 public class SVInstantiationProjection<G extends ProofGoal<G>> implements ProjectionToTerm<G> {
 
     private final Name svName;

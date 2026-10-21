@@ -13,8 +13,8 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 import org.key_project.prover.strategy.costbased.termProjection.SVInstantiationProjection;
 
 /// Feature that returns zero iff a certain schema variable is instantiated. If the schemavariable
-/// is
-/// not instantiated schema variable or does not occur in the taclet infinity costs are returned.
+/// is not instantiated schema variable or does not occur in the taclet infinity costs are returned.
+@StableCost
 public class InstantiatedSVFeature<G extends ProofGoal<G>> extends BinaryTacletAppFeature<G> {
 
     private final ProjectionToTerm<G> instProj;

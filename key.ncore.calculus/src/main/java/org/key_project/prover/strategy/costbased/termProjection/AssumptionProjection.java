@@ -10,9 +10,11 @@ import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
 
 /// Term projection that delivers the assumptions of a taclet application (the formulas that the
 /// \assumes clause of the taclet refers to).
+@StableCost
 public class AssumptionProjection<G extends ProofGoal<G>> implements ProjectionToTerm<G> {
 
     private final int no;

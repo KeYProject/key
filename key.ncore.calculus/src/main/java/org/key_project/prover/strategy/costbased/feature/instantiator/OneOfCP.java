@@ -18,9 +18,6 @@ import org.jspecify.annotations.NonNull;
 public class OneOfCP implements Feature {
     private final Feature[] features;
 
-    private int theChosenOne;
-    private final ChoicePoint cp = new CP();
-
     private OneOfCP(Feature[] features) {
         this.features = features;
     }
@@ -35,11 +32,17 @@ public class OneOfCP implements Feature {
             Goal goal,
             MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();
-        manager.passChoicePoint(cp, this);
-        return features[theChosenOne].computeCost(app, pos, goal, mState);
+        manager.passChoicePoint(new CP(mState), this);
+        return features[mState.getChoicePointIndex(this)].computeCost(app, pos, goal, mState);
     }
 
     private final class CP implements ChoicePoint {
+        private final MutableState mState;
+
+        private CP(MutableState mState) {
+            this.mState = mState;
+        }
+
         private final class BranchIterator implements Iterator<CPBranch> {
             private int num = 0;
             private final RuleApp oldApp;
@@ -59,7 +62,7 @@ public class OneOfCP implements Feature {
                 return new CPBranch() {
                     @Override
                     public void choose() {
-                        theChosenOne = chosen;
+                        mState.setChoicePointIndex(OneOfCP.this, chosen);
                     }
 
                     @Override

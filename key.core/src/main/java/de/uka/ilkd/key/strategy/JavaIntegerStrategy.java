@@ -72,12 +72,10 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
     }
 
     @Override
-    protected RuleSetDispatchFeature setupApprovalDispatcher() {
-        final RuleSetDispatchFeature d = super.setupApprovalDispatcher();
+    protected void setupApprovalDispatcher(RuleSetDispatchFeature d) {
+        super.setupApprovalDispatcher(d);
 
         bindRuleSet(d, "defOps_jdiv", NonDuplicateAppModPositionFeature.INSTANCE);
-
-        return d;
     }
 
     // //////////////////////////////////////////////////////////////////////////
