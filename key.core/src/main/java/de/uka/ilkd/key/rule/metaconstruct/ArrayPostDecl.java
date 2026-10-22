@@ -24,6 +24,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author N/A
  */
+@TransformerMeta(name = "array-post-declaration")
 public class ArrayPostDecl extends ProgramTransformer {
 
     public ArrayPostDecl(SchemaVariable sv) {

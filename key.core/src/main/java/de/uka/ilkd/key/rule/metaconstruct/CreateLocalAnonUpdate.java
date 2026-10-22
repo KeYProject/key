@@ -27,6 +27,7 @@ import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
  *
  * @author Dominic Steinhoefel
  */
+@TransformerMeta(name = "#createLocalAnonUpdate")
 public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
 
     public CreateLocalAnonUpdate() {

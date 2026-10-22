@@ -42,6 +42,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * This meta construct delivers the creation expression
  */
+@TransformerMeta(name = "init-array-creation")
 public class InitArrayCreation extends InitArray {
 
     private final SchemaVariable newObjectSV;

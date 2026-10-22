@@ -32,6 +32,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  *
  * @author Dominic Steinhoefel
  */
+@TransformerMeta(name = "#createFrameCond")
 public final class CreateFrameCond extends AbstractTermTransformer {
 
     public CreateFrameCond() {

@@ -30,6 +30,7 @@ import org.key_project.util.collection.ImmutableArray;
  * Replaces the MethodBodyStatement shortcut with the full body, performs prefix adjustments in the
  * body (execution context).
  */
+@TransformerMeta(name = "expand-method-body")
 public class ExpandMethodBody extends ProgramTransformer {
 
     public ExpandMethodBody(SchemaVariable sv) {

@@ -61,6 +61,17 @@ public class NewLocalVarsCondition implements VariableCondition {
      */
     private final SchemaVariable bodySV;
 
+    /**
+     * Instantiates a new local-variables condition.
+     *
+     * @param varDeclsSV the schema variable to which the variable declarations for the "before"
+     *        versions of the variables written by the loop are bound
+     * @param updateBeforeSV the schema variable to which the update
+     *        {@code {...||i_before := i||...}} is bound
+     * @param updateFrameSV the schema variable to which the reverse update
+     *        {@code {...||i := i_before||...}} is bound
+     * @param bodySV the schema variable holding the loop body
+     */
     public NewLocalVarsCondition(SchemaVariable varDeclsSV, SchemaVariable updateBeforeSV,
             SchemaVariable updateFrameSV, SchemaVariable bodySV) {
         this.varDeclsSV = varDeclsSV;

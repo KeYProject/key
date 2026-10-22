@@ -33,6 +33,7 @@ import org.key_project.util.collection.ImmutableArray;
  * to an implict method called <code>&lt;init&gt;</code> that is mainly the constructor but in its
  * normalform.
  */
+@TransformerMeta(name = "constructor-call")
 public class ConstructorCall extends ProgramTransformer {
 
     private static final String CONSTRUCTOR_CALL = "constructor-call";

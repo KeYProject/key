@@ -38,6 +38,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author N/A
  */
+@TransformerMeta(name = "#evaluate-arguments")
 public class EvaluateArgs extends ProgramTransformer {
 
     /**

@@ -54,6 +54,7 @@ import static de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperat
  *
  */
 
+@TransformerMeta(name = "enhancedfor-elim")
 public class EnhancedForElimination extends ProgramTransformer {
 
     /**
