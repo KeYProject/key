@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.ldt.IntegerLDT;
 
+
+import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
@@ -15,7 +16,7 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
 
     private final Function mul;
 
-    protected AbstractMonomialSmallerThanFeature(IntegerLDT numbers) {
+    protected AbstractMonomialSmallerThanFeature(IIntLdt numbers) {
         this.mul = numbers.getMul();
     }
 

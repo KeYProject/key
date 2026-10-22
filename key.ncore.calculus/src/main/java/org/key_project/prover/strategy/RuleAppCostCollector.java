@@ -2,7 +2,7 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy;
+package org.key_project.prover.strategy;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.strategy.costbased.RuleAppCost;

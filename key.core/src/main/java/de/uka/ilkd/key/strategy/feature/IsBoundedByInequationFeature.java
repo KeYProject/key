@@ -13,7 +13,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
-import de.uka.ilkd.key.strategy.termgenerator.RelevantSequentFormulasGenerator;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -21,6 +20,7 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.VolatileCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
+import org.key_project.prover.strategy.costbased.termgenerator.RelevantSequentFormulasGenerator;
 import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.ImmutableList;
 

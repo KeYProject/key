@@ -12,6 +12,8 @@ package de.uka.ilkd.key.strategy;
  * that split and moves with it).
  */
 
+import org.key_project.prover.strategy.costbased.CombinationCost;
+
 /**
  * JavaCardDL-theory-internal ordering costs, used by {@link JavaCardDLStrategy} (the axiom /
  * observer / comprehension / induction reasoning; the heap/select pipeline has its own
@@ -87,7 +89,7 @@ final class JavaCardDLCost {
  * <p>
  * <b>Combination-relevant, not purely local:</b> this ladder is tuned <em>relative to</em> the
  * demodulation cost {@link CombinationCost#ORDERED_REWRITING}: {@link #APPLY_SELECT_EQ} is the
- * JavaCardDL-side remainder of the tuned sum {@link CombinationCost#APPLY_SELECT_EQ_EFFECTIVE}
+ * JavaCardDL-side remainder of the tuned sum {@link APPLY_SELECT_EQ_EFFECTIVE}
  * (the {@code applyEq} taclet carries both rule sets, so the dispatch sums the contributions).
  * </p>
  *
@@ -106,14 +108,23 @@ final class HeapSelectCost {
     static final long PULL_OUT_SELECT = -1900;
 
     /**
+     * Effective cost of replacing a select term via the {@code applyEq} taclet: the taclet carries
+     * BOTH {@code apply_equations} (FOL/Integer, {@link CombinationCost#ORDERED_REWRITING}) and
+     * {@code apply_select_eq} (JavaCardDL, {@link HeapSelectCost#APPLY_SELECT_EQ}), so the
+     * dispatch sums the two contributions. This constant is the tuned target of that sum;
+     * {@link HeapSelectCost#APPLY_SELECT_EQ} is derived from it.
+     */
+    static public final long APPLY_SELECT_EQ_EFFECTIVE = -5700;
+
+    /**
      * {@code apply_select_eq}: replace a not-yet-simplified select by the skolem constant of its
      * pull-out. The {@code applyEq} taclet carries both {@code apply_equations} and
      * {@code apply_select_eq}, so the effective cost is the SUM of the two bindings; the tuned
-     * quantity is {@link CombinationCost#APPLY_SELECT_EQ_EFFECTIVE} and this constant is the
+     * quantity is {@link APPLY_SELECT_EQ_EFFECTIVE} and this constant is the
      * JavaCardDL-side remainder (currently −1700).
      */
     static final long APPLY_SELECT_EQ =
-        CombinationCost.APPLY_SELECT_EQ_EFFECTIVE - CombinationCost.ORDERED_REWRITING;
+        APPLY_SELECT_EQ_EFFECTIVE - CombinationCost.ORDERED_REWRITING;
 
     /** {@code simplify_select}: simplify the select term in the pulled-out equation. */
     static final long SIMPLIFY_SELECT = -5600;

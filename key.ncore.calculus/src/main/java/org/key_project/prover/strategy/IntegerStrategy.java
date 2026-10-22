@@ -2,53 +2,41 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy;
+package org.key_project.prover.strategy;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.strategy.feature.*;
-import de.uka.ilkd.key.strategy.termProjection.*;
-import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.RelevantSequentFormulasGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.RootsGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
-
+import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.strategy.costbased.CostBand;
-import org.key_project.prover.strategy.costbased.MutableState;
-import org.key_project.prover.strategy.costbased.RuleAppCost;
-import org.key_project.prover.strategy.costbased.TopRuleAppCost;
-import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.prover.strategy.costbased.feature.FocusInAntecFeature;
-import org.key_project.prover.strategy.costbased.feature.ScaleFeature;
-import org.key_project.prover.strategy.costbased.feature.SumFeature;
+import org.key_project.prover.strategy.costbased.*;
+import org.key_project.prover.strategy.costbased.feature.*;
+import org.key_project.prover.strategy.costbased.termProjection.AssumptionProjection;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
+import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
+import org.key_project.prover.strategy.costbased.termgenerator.RelevantSequentFormulasGenerator;
 import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGenerator;
 import org.key_project.prover.strategy.costbased.termgenerator.SubtermGenerator;
+import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// This strategy implements reasoning for integer arithmetics. In particular,
 /// it supports linear integer arithmetics via Gaussian elimination,
 /// Fourier-Motzkin; and non-linear integer reasoning via cross-multiplication
 /// and Gröbner basis.
-///
-/// Do not create directly, instead use [IntegerStrategyFactory].
-public class IntegerStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
+public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFeatureStrategy<G>
+        implements ComponentStrategy<G> {
 
     /// Reads better than a bare boolean at the call sites of [#setupMultiplyInequations].
     private static final boolean AT_APPROVAL = true;
@@ -59,24 +47,20 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
     /// Magic constants
     private static final int IN_EQ_SIMP_NON_LIN_COST = 1000;
 
-    /// Caps how often a cross multiplication is applied on a branch.
-    /// Justified by empirical measurements. Candidate to be exposed in
-    /// a settings strategy pane (not the strategy pane)
-    private static final int BRANCH_MULT_CAP = 8;
     private static final int POLY_DIVISION_COST = -2250;
 
     /// The features defining the three phases: cost computation, approval,
     /// additionalInstanceCreationAndEvaluation
-    private final RuleSetDispatchFeature costComputationDispatcher;
-    private final RuleSetDispatchFeature approvalDispatcher;
-    private final RuleSetDispatchFeature instantiationDispatcher;
+    private final RuleSetDispatchFeature costComputationDispatcher = new RuleSetDispatchFeature();
+    private final RuleSetDispatchFeature approvalDispatcher = new RuleSetDispatchFeature();
+    private final RuleSetDispatchFeature instantiationDispatcher = new RuleSetDispatchFeature();
 
     /// Useful [TermFeature] collections
-    private final ArithTermFeatures tf;
-    private final FormulaTermFeatures ff;
+    protected final ArithTermFeatures tf;
+    protected final IFormulaTermFeatures ff;
 
     /// enum for the different arithmetic treatments
-    private enum ArithTreatment {
+    protected enum ArithTreatment {
         /// Non-linear arithmetic switched off.
         BASIC,
         /// Inequations are cross-multiplied but only in a bound and capped manner.
@@ -88,45 +72,44 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
     }
 
     /// configuration options extracted from [StrategyProperties]
-    private final ArithTreatment arith;
+    protected final ArithTreatment arith;
     private final boolean stopAtFirstNonCloseableGoal;
 
-    public IntegerStrategy(Proof proof, StrategyProperties strategyProperties) {
-        super(proof);
-        this.tf = new ArithTermFeatures(proof.getServices().getTypeConverter().getIntegerLDT());
-        this.ff = new FormulaTermFeatures(this.tf);
+    private final IIntLdt numbers;
 
+    final FeatureConstants<G> featureConstants;
+
+    public IntegerStrategy(ArithTermFeatures tf, IFormulaTermFeatures ff,
+            boolean nonLinearArithmeticEnabled, boolean divAndModuloReasoningEnabled,
+            boolean stopAtFirstNonCloseableGoal, FeatureConstants<G> featureConstants,
+            IIntLdt numbers) {
+        this.tf = tf;
+        this.ff = ff;
         // determine configuration
-        final String nonLinArith =
-            strategyProperties.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY);
-        if (StrategyProperties.NON_LIN_ARITH_COMPLETION.equals(nonLinArith)) {
+        if (nonLinearArithmeticEnabled) {
             arith = ArithTreatment.MODEL_SEARCH;
-        } else if (StrategyProperties.NON_LIN_ARITH_DEF_OPS.equals(nonLinArith)) {
+        } else if (divAndModuloReasoningEnabled) {
             arith = ArithTreatment.DEF_OPS;
         } else {
             arith = ArithTreatment.BASIC;
         }
+        this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal;
 
-        stopAtFirstNonCloseableGoal =
-            strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
-                    .equals(StrategyProperties.STOPMODE_NONCLOSE);
+        this.featureConstants = featureConstants;
 
+        this.numbers = numbers;
+    }
+
+    protected void init() {
         // setup cost computations
-        costComputationDispatcher = setupCostComputationF();
-        approvalDispatcher = setupApprovalDispatcher();
-        instantiationDispatcher = setupInstantiationF();
-
+        setupCostComputationF(costComputationDispatcher);
+        setupApprovalDispatcher(approvalDispatcher);
+        setupInstantiationF(instantiationDispatcher);
     }
 
-    @Override
-    public boolean isResponsibleFor(RuleSet rs) {
-        return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null;
-    }
-
-    private RuleSetDispatchFeature setupInstantiationF() {
+    private void setupInstantiationF(RuleSetDispatchFeature d) {
         enableInstantiate();
 
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
         setupArithPrimaryCategories(d);
         setupDefOpsPrimaryCategories(d);
         setupInstantiationWithoutRetry(d);
@@ -144,22 +127,17 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                     : inftyConst());
 
         disableInstantiate();
-        return d;
     }
 
-    private RuleSetDispatchFeature setupApprovalDispatcher() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-        final IntegerLDT numbers = getServices().getTypeConverter().getIntegerLDT();
 
+    protected void setupApprovalDispatcher(RuleSetDispatchFeature d) {
         if (arith != ArithTreatment.BASIC) {
-            // Two things keep cross-multiplication from running in circles. The
-            // InEquationMultFeature bounding admits only products bounded by the left side
-            // of an inequation already in the sequent, which caps the monomials that are
-            // derivable at all. In DefOps mode that check is stricter, exact match only,
-            // and a further limit applies: a branch that already carries BRANCH_MULT_CAP
-            // multiplications takes no more. Both are enforced here rather than where costs
-            // are computed, because a candidate's cost is computed when it enters the queue
-            // while the sequent and the branch keep growing until it is applied.
+            // The InEquationMultFeature bounding enforced here is what prevents
+            // cross-multiplication from running in circles: only products that are
+            // bounded by the left side of an inequation already present in the
+            // sequent are approved, so the derivable monomials are capped. In
+            // DefOps mode the check is stricter (exact match only) to avoid the
+            // saturation blow-up acceptable for Model Search.
             // baseCost is zero on the approval dispatcher: approval only distinguishes
             // finite (approved) from infinite (rejected), so the base cost is irrelevant
             // here and left out to keep the approval decision identical to stock.
@@ -180,24 +158,26 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
          *
          * bindRuleSet ( d, "inEqSimp_signCases", isInstantiated ( "signCasesLeft" ) );
          */
-
         setupNewSymApproval(d, numbers);
 
-
-        bindRuleSet(d, "defOps_div", NonDuplicateAppModPositionFeature.INSTANCE);
-        bindRuleSet(d, "defOps_jdiv", NonDuplicateAppModPositionFeature.INSTANCE);
+        bindRuleSet(d, "defOps_div", featureConstants.nonDuplicateAppModPositionFeature());
 
         if (arith == ArithTreatment.MODEL_SEARCH) {
             setupInEqCaseDistinctionsApproval(d);
         }
-
-        return d;
     }
 
-    private RuleSetDispatchFeature setupCostComputationF() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-        final IntegerLDT numbers = getServices().getTypeConverter().getIntegerLDT();
+    @Override
+    public boolean isResponsibleFor(RuleSet rs) {
+        return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null;
+    }
 
+    @Override
+    public boolean isStopAtFirstNonCloseableGoal() {
+        return stopAtFirstNonCloseableGoal;
+    }
+
+    private void setupCostComputationF(RuleSetDispatchFeature d) {
         bindRuleSet(d, "simplify_int", inftyConst());
 
         setupArithPrimaryCategories(d);
@@ -208,39 +188,40 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
 
         bindRuleSet(d, "order_terms",
             add(applyTF("commEqRight", tf.monomial), applyTF("commEqLeft", tf.polynomial),
-                monSmallerThan("commEqLeft", "commEqRight", numbers),
+                createMonomialSmallerThan("commEqLeft", "commEqRight", numbers),
                 CostBand.NORMALIZE.cost()));
 
-        final TermBuffer equation = new TermBuffer();
-        final TermBuffer left = new TermBuffer();
-        final TermBuffer right = new TermBuffer();
+        final TermBuffer<G> equation = new TermBuffer<>();
+        final TermBuffer<G> left = new TermBuffer<>();
+        final TermBuffer<G> right = new TermBuffer<>();
         bindRuleSet(d, "apply_equations",
             SumFeature.createSum(
-                add(applyTF(FocusProjection.create(0), tf.monomial),
-                    ScaleFeature.createScaled(FindRightishFeature.create(numbers), 5.0)),
-                ifZero(MatchedAssumesFeature.INSTANCE,
-                    add(CheckApplyEqFeature.INSTANCE, let(equation, AssumptionProjection.create(0),
-                        add(not(applyTF(equation, ff.update)),
-                            // there might be updates in
-                            // front of the assumption
-                            // formula; in this case we wait
-                            // until the updates have
-                            // been applied
-                            let(left, sub(equation, 0),
-                                let(right, sub(equation, 1),
-                                    add(applyTF(left, tf.nonNegOrNonCoeffMonomial),
-                                        applyTF(right, tf.polynomial),
-                                        MonomialsSmallerThanFeature.create(right, left,
-                                            numbers)))))))),
+                add(applyTF(featureConstants.focusProjection(0), tf.monomial),
+                    ScaleFeature.createScaled(featureConstants.findRightishFeature(numbers), 5.0)),
+                ifZero(featureConstants.matchedAssumesFeature(),
+                    add(featureConstants.checkApplyEqFeature(),
+                        let(equation, AssumptionProjection.create(0),
+                            add(not(applyTF(equation, ff.update())),
+                                // there might be updates in
+                                // front of the assumption
+                                // formula; in this case we wait
+                                // until the updates have
+                                // been applied
+                                let(left, sub(equation, 0),
+                                    let(right, sub(equation, 1),
+                                        add(applyTF(left, tf.nonNegOrNonCoeffMonomial),
+                                            applyTF(right, tf.polynomial),
+                                            createMonomialsSmallerThanFeature(right, left,
+                                                numbers)))))))),
                 longConst(CombinationCost.ORDERED_REWRITING)));
 
-        final TermBuffer l = new TermBuffer();
-        final TermBuffer r = new TermBuffer();
+        final TermBuffer<G> l = new TermBuffer<>();
+        final TermBuffer<G> r = new TermBuffer<>();
         bindRuleSet(d, "apply_equations_andOr",
             add(let(l, instOf("applyEqLeft"),
                 let(r, instOf("applyEqRight"),
                     add(applyTF(l, tf.nonNegOrNonCoeffMonomial), applyTF(r, tf.polynomial),
-                        MonomialsSmallerThanFeature.create(r, l, numbers)))),
+                        createMonomialsSmallerThanFeature(r, l, numbers)))),
                 longConst(CombinationCost.CNF_CONVERSION)));
 
         // For taclets that need instantiation, but where the instantiation is
@@ -251,15 +232,84 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         // never be instantiated (so that these applications can be removed from
         // the queue and do not have to be considered again).
         setupInstantiationWithoutRetry(d);
-
-        return d;
     }
 
     @Override
-    public boolean isStopAtFirstNonCloseableGoal() {
-        return stopAtFirstNonCloseableGoal;
+    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, Goal goal, MutableState mState) {
+        return this.costComputationDispatcher.computeCost(app, pos, goal, mState);
     }
 
+    @Override
+    public boolean isResponsibleFor(IBuiltInRule<G> rule) {
+        return false;
+    }
+
+    @Override
+    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
+        var set = new HashSet<RuleSet>();
+        set.addAll(getDispatcher(aspect).ruleSets());
+        return set;
+    }
+
+    @Override
+    public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, G goal) {
+        return !(approvalDispatcher.computeCost(app, pio, goal,
+            new MutableState()) == TopRuleAppCost.INSTANCE);
+
+    }
+
+    @Override
+    public RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, G goal,
+            MutableState mState) {
+        return instantiationDispatcher.computeCost(app, pio, goal, mState);
+    }
+
+    @Override
+    public Name name() {
+        return NAME;
+    }
+
+    @Override
+    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
+        return switch (aspect) {
+            case StrategyAspect.Cost -> costComputationDispatcher;
+            case StrategyAspect.Instantiation -> instantiationDispatcher;
+            case StrategyAspect.Approval -> approvalDispatcher;
+        };
+    }
+
+    private void setupInEqCaseDistinctionsApproval(RuleSetDispatchFeature d) {
+        final TermBuffer<G> atom = new TermBuffer<>();
+        final TermBuffer<G> literal = new TermBuffer<>();
+        final TermBuffer<G> intRel = new TermBuffer<>();
+        final TermBuffer<G> rootInf = new TermBuffer<>();
+
+        bindRuleSet(d, "inEqSimp_signCases", add(isInstantiated("signCasesLeft"),
+            let(atom, instOf("signCasesLeft"), allowPosNegCaseDistinction(atom))));
+
+        // this is somewhat ugly. we should introduce some concept of "tagging"
+        // rule application so that they can be recognised again later
+        bindRuleSet(d, "cut",
+            add(isInstantiated("cutFormula"), or(
+                not(sum(intRel, SequentFormulasGenerator.antecedent(),
+                    ifZero(isRootInferenceProducer(intRel),
+                        sum(rootInf, createRootsGenerator(intRel),
+                            not(eq(instOf("cutFormula"), rootInf)))))),
+                ifZero(applyTF("cutFormula", opSub(tf.eq, tf.atom, tf.literal)),
+                    let(atom, sub(StaticFeatureCollection.<G>instOf("cutFormula"), 0), let(literal,
+                        sub(StaticFeatureCollection.<G>instOf("cutFormula"), 1),
+                        allowInEqStrengthening(atom, literal)))))));
+    }
+
+    private Feature allowInEqStrengthening(TermBuffer<G> atom, TermBuffer<G> literal) {
+        final TermBuffer<G> antecFor = new TermBuffer<>();
+
+        return add(not(succIntEquationExists()),
+            not(sum(antecFor, SequentFormulasGenerator.antecedent(),
+                not(applyTF(antecFor, add(or(tf.leqF, tf.geqF),
+                    sub(createEqTermFeature(atom), createEqTermFeature(literal))))))));
+    }
 
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
@@ -300,8 +350,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         bindRuleSet(d, "polyDivision", DivModCost.POLY_DIVISION);
     }
 
-    private void setupPolySimp(RuleSetDispatchFeature d, IntegerLDT numbers) {
-
+    private void setupPolySimp(RuleSetDispatchFeature d, IIntLdt numbers) {
         // category "expansion" (normalising polynomial terms)
 
         bindRuleSet(d, "polySimp_elimSubNeg", longConst(PolynomialCost.EXPAND));
@@ -309,7 +358,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         bindRuleSet(d, "polySimp_homo",
             add(applyTF("homoRight", add(not(tf.zeroLiteral), tf.polynomial)),
                 or(applyTF("homoLeft", or(tf.addF, tf.negMonomial)),
-                    not(monSmallerThan("homoRight", "homoLeft", numbers))),
+                    not(createMonomialSmallerThan("homoRight", "homoLeft", numbers))),
                 longConst(PolynomialCost.EXPAND)));
 
         bindRuleSet(d, "polySimp_pullOutFactor", add(applyTFNonStrict("pullOutLeft", tf.literal),
@@ -321,7 +370,8 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
 
         bindRuleSet(d, "polySimp_mulOrder", add(applyTF("commRight", tf.monomial), or(
             applyTF("commLeft", tf.addF),
-            add(applyTF("commLeft", tf.atom), atomSmallerThan("commLeft", "commRight", numbers))),
+            add(applyTF("commLeft", tf.atom),
+                createAtomSmallerThanFeature("commLeft", "commRight", numbers))),
             longConst(PolynomialCost.MUL_ORDER)));
 
         bindRuleSet(d, "polySimp_mulAssoc",
@@ -332,7 +382,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         bindRuleSet(d, "polySimp_addOrder",
             SumFeature.createSum(applyTF("commLeft", tf.monomial),
                 applyTF("commRight", tf.polynomial),
-                monSmallerThan("commRight", "commLeft", numbers),
+                createMonomialSmallerThan("commRight", "commLeft", numbers),
                 longConst(PolynomialCost.ADD_ORDER)));
 
         bindRuleSet(d, "polySimp_addAssoc",
@@ -354,10 +404,10 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                     .createSum(applyTF("sepResidue", tf.polynomial),
                         ifZero(isInstantiated("sepPosMono"),
                             add(applyTF("sepPosMono", tf.nonNegMonomial),
-                                monSmallerThan("sepResidue", "sepPosMono", numbers))),
+                                createMonomialSmallerThan("sepResidue", "sepPosMono", numbers))),
                         ifZero(isInstantiated("sepNegMono"),
                             add(applyTF("sepNegMono", tf.negMonomial),
-                                monSmallerThan("sepResidue", "sepNegMono", numbers))),
+                                createMonomialSmallerThan("sepResidue", "sepNegMono", numbers))),
                         longConst(LinearEquationCost.BALANCE)));
 
         bindRuleSet(d, "polySimp_normalise", add(applyTF("invertRight", tf.zeroLiteral),
@@ -366,23 +416,26 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         // application of equations: some specialised rules that handle
         // monomials and their coefficients properly
 
-        final TermBuffer eqLeft = new TermBuffer();
-        final TermBuffer focus = new TermBuffer();
+        final TermBuffer<G> eqLeft = new TermBuffer<>();
+        final TermBuffer<G> focus = new TermBuffer<>();
 
         final TermFeature atLeastTwoLCEquation =
-            opSub(Equality.EQUALS, opSub(tf.mul, tf.atom, tf.atLeastTwoLiteral), tf.intF);
+            opSub(tf.eq, opSub(tf.mul, tf.atom, tf.atLeastTwoLiteral), tf.intF);
 
-        final Feature validEqApplication = add(not(eq(eqLeft, focus)),
+        final Feature validEqApplication = add(not(eq(eqLeft, focus, this::createEqTermFeature)),
             // otherwise, the normal equation rules can and should
             // be used
-            ifZero(applyTF(AssumptionProjection.create(0), atLeastTwoLCEquation),
+            ifZero(
+                StaticFeatureCollection.<G>applyTF(AssumptionProjection.create(0),
+                    atLeastTwoLCEquation),
                 add(FocusInAntecFeature.getInstance(),
-                    applyTF(FocusFormulaProjection.INSTANCE, atLeastTwoLCEquation))),
-            ReducibleMonomialsFeature.createReducible(focus, eqLeft));
+                    applyTF(featureConstants.focusFormulaProjection(), atLeastTwoLCEquation))),
+            createReducibleMonomialFeature(focus, eqLeft));
 
         final Feature eqMonomialFeature = add(not(directlyBelowSymbolAtIndex(tf.mul, -1)),
-            ifZero(MatchedAssumesFeature.INSTANCE, let(focus, FocusProjection.create(0),
-                let(eqLeft, sub(AssumptionProjection.create(0), 0), validEqApplication))));
+            ifZero(featureConstants.matchedAssumesFeature(),
+                let(focus, featureConstants.focusProjection(0),
+                    let(eqLeft, sub(AssumptionProjection.<G>create(0), 0), validEqApplication))));
 
         bindRuleSet(d, "polySimp_applyEq",
             add(eqMonomialFeature, longConst(LinearEquationCost.APPLY_EQ_MONOMIAL_TIEBREAK)));
@@ -392,53 +445,58 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
 
         //
         bindRuleSet(d, "defOps_expandModulo",
-            add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(DivModCost.EXPAND_MODULO)));
+            add(featureConstants.nonDuplicateAppModPositionFeature(),
+                longConst(DivModCost.EXPAND_MODULO)));
 
         // category "saturate"
 
         bindRuleSet(d, "polySimp_critPair",
-            ifZero(MatchedAssumesFeature.INSTANCE,
-                add(monSmallerThan("cpLeft1", "cpLeft2", numbers),
-                    not(TrivialMonomialLCRFeature.create(instOf("cpLeft1"), instOf("cpLeft2"))))));
+            ifZero(featureConstants.matchedAssumesFeature(),
+                add(createMonomialSmallerThan("cpLeft1", "cpLeft2", numbers),
+                    not(createTrivialMonomialLCRFeature(instOf("cpLeft1"), instOf("cpLeft2"))))));
     }
 
     private void setupDivModDivision(RuleSetDispatchFeature d) {
-
-        final TermBuffer denomLC = new TermBuffer();
-        final TermBuffer numTerm = new TermBuffer();
-        final TermBuffer divCoeff = new TermBuffer();
+        final TermBuffer<G> denomLC = new TermBuffer<>();
+        final TermBuffer<G> numTerm = new TermBuffer<>();
+        final TermBuffer<G> divCoeff = new TermBuffer<>();
 
         // exact polynomial division
 
         final Feature checkNumTerm = ifZero(
             add(not(applyTF(numTerm, tf.addF)),
-                ReducibleMonomialsFeature.createReducible(numTerm, denomLC)),
-            add(instantiate("polyDivCoeff", ReduceMonomialsProjection.create(numTerm, denomLC)),
+                createReducibleMonomialFeature(numTerm, denomLC)),
+            add(instantiate("polyDivCoeff", createReduceMonomialsProjection(numTerm, denomLC)),
                 inftyConst()));
 
         final Feature isReduciblePoly =
-            sum(numTerm, SubtermGenerator.rightTraverse(instOf("divNum"), tf.addF), checkNumTerm);
+            sum(numTerm, SubtermGenerator.rightTraverse(StaticFeatureCollection.<G>instOf("divNum"),
+                tf.addF), checkNumTerm);
 
         // polynomial division modulo equations of the antecedent
 
-        final Feature checkCoeffE = ifZero(contains(divCoeff, FocusProjection.create(0)),
+        final Feature checkCoeffE = ifZero(
+            contains(divCoeff, featureConstants.focusProjection(0), this::createEqTermFeature),
             // do not apply if the result contains the original term
             longConst(0), add(instantiate("polyDivCoeff", divCoeff), inftyConst()));
 
         final Feature isReduciblePolyE =
-            sum(numTerm, SubtermGenerator.rightTraverse(instOf("divNum"), tf.addF),
+            sum(numTerm,
+                SubtermGenerator.rightTraverse(StaticFeatureCollection.<G>instOf("divNum"),
+                    tf.addF),
                 ifZero(applyTF(numTerm, tf.addF), longConst(0), sum(divCoeff,
-                    MultiplesModEquationsGenerator.create(numTerm, denomLC), checkCoeffE)));
+                    createMultiplesModEquationsGenerator(numTerm, denomLC), checkCoeffE)));
 
         bindRuleSet(d, "defOps_divModPullOut",
             SumFeature.createSum(
                 not(add(applyTF("divNum", tf.literal), applyTF("divDenom", tf.literal))),
                 applyTF("divNum", tf.polynomial), applyTF("divDenom", tf.polynomial),
                 ifZero(applyTF("divDenom", tf.addF),
-                    let(denomLC, sub(instOf("divDenom"), 1), not(isReduciblePoly)),
+                    let(denomLC, sub(StaticFeatureCollection.<G>instOf("divDenom"), 1),
+                        not(isReduciblePoly)),
                     let(denomLC, instOf("divDenom"), ifZero(isReduciblePoly,
                         // no possible division has been found so far
-                        add(NotInScopeOfModalityFeature.INSTANCE, ifZero(isReduciblePolyE,
+                        add(featureConstants.notInScopeOfModalityFeature(), ifZero(isReduciblePolyE,
                             // try again later
                             longConst(-DivModCost.POLY_DIVISION)))))),
                 CostBand.DEFAULT.at(100)));
@@ -454,8 +512,6 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
     // never be instantiated (so that these applications can be removed from
     // the queue and do not have to be considered again).
     private void setupPolySimpInstantiationWithoutRetry(RuleSetDispatchFeature d) {
-        final IntegerLDT numbers = getServices().getTypeConverter().getIntegerLDT();
-
         // category "direct equations"
 
         setupPullOutGcd(d, "polySimp_pullOutGcd", false);
@@ -471,65 +527,64 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
             ifZero(not(isInstantiated("newSymDef")), SumFeature.createSum(
                 applyTF("newSymLeft", tf.atom), applyTF("newSymLeftCoeff", tf.atLeastTwoLiteral),
                 applyTF("newSymRight", tf.polynomial), instantiate("newSymDef",
-                    MonomialColumnOp.create(instOf("newSymLeftCoeff"), instOf("newSymRight"))))));
+                    createMonomialColumnOp(instOf("newSymLeftCoeff"), instOf("newSymRight"))))));
 
-        final TermBuffer divisor = new TermBuffer();
-        final TermBuffer dividend = new TermBuffer();
+        final TermBuffer<G> divisor = new TermBuffer<>();
+        final TermBuffer<G> dividend = new TermBuffer<>();
 
         bindRuleSet(d, "polySimp_applyEqPseudo",
             add(applyTF("aePseudoTargetLeft", tf.monomial),
                 applyTF("aePseudoTargetRight", tf.polynomial),
-                ifZero(MatchedAssumesFeature.INSTANCE,
-                    SumFeature.createSum(DiffFindAndIfFeature.INSTANCE,
+                ifZero(featureConstants.matchedAssumesFeature(),
+                    SumFeature.createSum(featureConstants.diffFindAndIfFeature(),
                         applyTF("aePseudoLeft", add(tf.nonCoeffMonomial, not(tf.atom))),
                         applyTF("aePseudoLeftCoeff", tf.atLeastTwoLiteral),
                         applyTF("aePseudoRight", tf.polynomial),
-                        MonomialsSmallerThanFeature.create(instOf("aePseudoRight"),
+                        createMonomialsSmallerThanFeature(instOf("aePseudoRight"),
                             instOf("aePseudoLeft"), numbers),
-                        let(divisor, instOf("aePseudoLeft"),
-                            let(dividend, instOf("aePseudoTargetLeft"),
-                                add(ReducibleMonomialsFeature.createReducible(dividend, divisor),
+                        let(divisor, StaticFeatureCollection.instOf("aePseudoLeft"),
+                            let(dividend, StaticFeatureCollection.instOf("aePseudoTargetLeft"),
+                                add(createReducibleMonomialFeature(dividend, divisor),
                                     instantiate("aePseudoTargetFactor",
-                                        ReduceMonomialsProjection.create(dividend, divisor)))))))));
+                                        createReduceMonomialsProjection(dividend, divisor)))))))));
     }
 
-    private void setupNewSymApproval(RuleSetDispatchFeature d, IntegerLDT numbers) {
-        final TermBuffer antecFor = new TermBuffer();
+    private void setupNewSymApproval(RuleSetDispatchFeature d, IIntLdt numbers) {
+        final TermBuffer<G> antecFor = new TermBuffer<>();
         final Feature columnOpEq = applyTF(antecFor,
             opSub(tf.eq, opSub(tf.mul, tf.atom, tf.atLeastTwoLiteral), tf.polynomial));
         final Feature biggerLeftSide =
-            MonomialsSmallerThanFeature.create(instOf("newSymLeft"),
+            createMonomialsSmallerThanFeature(instOf("newSymLeft"),
                 subAt(antecFor, PosInTerm.getTopLevel().down(0).down(0)), numbers);
         bindRuleSet(d, "polySimp_newSym", add(isInstantiated("newSymDef"), sum(antecFor,
             SequentFormulasGenerator.antecedent(), not(add(columnOpEq, biggerLeftSide)))));
     }
 
     private void setupPullOutGcd(RuleSetDispatchFeature d, String ruleSet, boolean roundingUp) {
-        final TermBuffer gcd = new TermBuffer();
+        final TermBuffer<G> gcd = new TermBuffer<>();
 
         final Feature instantiateDivs;
         if (roundingUp) {
             instantiateDivs = add(
                 instantiate("elimGcdLeftDiv",
-                    DividePolynomialsProjection.createRoundingUp(gcd, instOf("elimGcdLeft"))),
+                    createRoundingUpDividePolynomialsProjection(gcd, instOf("elimGcdLeft"))),
                 instantiate("elimGcdRightDiv",
-                    DividePolynomialsProjection.createRoundingUp(gcd, instOf("elimGcdRight"))));
+                    createRoundingUpDividePolynomialsProjection(gcd, instOf("elimGcdRight"))));
         } else {
             instantiateDivs = add(
                 instantiate("elimGcdLeftDiv",
-                    DividePolynomialsProjection.createRoundingDown(gcd, instOf("elimGcdLeft"))),
+                    createRoundingDownDividePolynomialsProjection(gcd, instOf("elimGcdLeft"))),
                 instantiate("elimGcdRightDiv",
-                    DividePolynomialsProjection.createRoundingDown(gcd, instOf("elimGcdRight"))));
+                    createRoundingDownDividePolynomialsProjection(gcd, instOf("elimGcdRight"))));
         }
         bindRuleSet(d, ruleSet,
             add(applyTF("elimGcdLeft", tf.nonNegMonomial), applyTF("elimGcdRight", tf.polynomial),
-                let(gcd, CoeffGcdProjection.create(instOf("elimGcdLeft"), instOf("elimGcdRight")),
+                let(gcd, createCoeffGcdProjection(instOf("elimGcdLeft"), instOf("elimGcdRight")),
                     add(applyTF(gcd, tf.atLeastTwoLiteral), instantiate("elimGcd", gcd),
                         instantiateDivs))));
     }
 
-    private void setupInEqSimp(RuleSetDispatchFeature d, IntegerLDT numbers) {
-
+    private void setupInEqSimp(RuleSetDispatchFeature d, IIntLdt numbers) {
         // category "expansion" (normalising inequations)
 
         bindRuleSet(d, "inEqSimp_moveLeft", LinearInequationCost.MOVE_LEFT);
@@ -539,14 +594,14 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         bindRuleSet(d, "inEqSimp_commute",
             SumFeature.createSum(applyTF("commRight", tf.monomial),
                 applyTF("commLeft", tf.polynomial),
-                monSmallerThan("commLeft", "commRight", numbers),
+                createMonomialSmallerThan("commLeft", "commRight", numbers),
                 longConst(LinearInequationCost.COMMUTE)));
 
         // this is copied from "polySimp_homo"
         bindRuleSet(d, "inEqSimp_homo",
             add(applyTF("homoRight", add(not(tf.zeroLiteral), tf.polynomial)),
                 or(applyTF("homoLeft", or(tf.addF, tf.negMonomial)),
-                    not(monSmallerThan("homoRight", "homoLeft", numbers)))));
+                    not(createMonomialSmallerThan("homoRight", "homoLeft", numbers)))));
 
         // category "direct inequations"
 
@@ -555,9 +610,9 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
             add(applyTF("sepResidue", tf.polynomial),
                 ifZero(isInstantiated("sepPosMono"),
                     add(applyTF("sepPosMono", tf.nonNegMonomial),
-                        monSmallerThan("sepResidue", "sepPosMono", numbers))),
+                        createMonomialSmallerThan("sepResidue", "sepPosMono", numbers))),
                 ifZero(isInstantiated("sepNegMono"), add(applyTF("sepNegMono", tf.negMonomial),
-                    monSmallerThan("sepResidue", "sepNegMono", numbers)))));
+                    createMonomialSmallerThan("sepResidue", "sepNegMono", numbers)))));
 
         // this is copied from "polySimp_normalise"
         bindRuleSet(d, "inEqSimp_normalise",
@@ -570,45 +625,47 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         bindRuleSet(d, "inEqSimp_exactShadow",
             SumFeature.createSum(applyTF("esLeft", tf.nonCoeffMonomial),
                 applyTFNonStrict("esCoeff2", tf.nonNegLiteral), applyTF("esRight2", tf.polynomial),
-                ifZero(MatchedAssumesFeature.INSTANCE,
+                ifZero(featureConstants.matchedAssumesFeature(),
                     SumFeature.createSum(applyTFNonStrict("esCoeff1", tf.nonNegLiteral),
                         applyTF("esRight1", tf.polynomial),
-                        not(PolynomialValuesCmpFeature.leq(instOf("esRight2"), instOf("esRight1"),
+                        not(createLeqPolynomialValuesCmpFeature(instOf("esRight2"),
+                            instOf("esRight1"),
                             instOfNonStrict("esCoeff1"), instOfNonStrict("esCoeff2")))))));
 
         // category "propagation"
 
         bindRuleSet(d, "inEqSimp_contradInEqs",
             add(applyTF("contradLeft", tf.monomial),
-                ifZero(MatchedAssumesFeature.INSTANCE,
-                    SumFeature.createSum(DiffFindAndIfFeature.INSTANCE,
+                ifZero(featureConstants.matchedAssumesFeature(),
+                    SumFeature.createSum(featureConstants.diffFindAndIfFeature(),
                         applyTF("contradRightSmaller", tf.polynomial),
                         applyTF("contradRightBigger", tf.polynomial),
                         applyTFNonStrict("contradCoeffSmaller", tf.posLiteral),
                         applyTFNonStrict("contradCoeffBigger", tf.posLiteral),
-                        PolynomialValuesCmpFeature.lt(instOf("contradRightSmaller"),
+                        createLtPolynomialValuesCmpFeature(instOf("contradRightSmaller"),
                             instOf("contradRightBigger"), instOfNonStrict("contradCoeffBigger"),
                             instOfNonStrict("contradCoeffSmaller"))))));
 
         bindRuleSet(d, "inEqSimp_contradEqs",
             add(applyTF("contradLeft", tf.monomial),
-                ifZero(MatchedAssumesFeature.INSTANCE,
+                ifZero(featureConstants.matchedAssumesFeature(),
                     SumFeature.createSum(applyTF("contradRightSmaller", tf.polynomial),
-                        applyTF("contradRightBigger", tf.polynomial), PolynomialValuesCmpFeature
-                                .lt(instOf("contradRightSmaller"), instOf("contradRightBigger")))),
+                        applyTF("contradRightBigger", tf.polynomial),
+                        createLtPolynomialValuesCmpFeature(instOf("contradRightSmaller"),
+                            instOf("contradRightBigger")))),
                 longConst(LinearInequationCost.CONTRAD)));
 
         bindRuleSet(d, "inEqSimp_strengthen", longConst(LinearInequationCost.STRENGTHEN));
 
         bindRuleSet(d, "inEqSimp_subsumption",
             add(applyTF("subsumLeft", tf.monomial),
-                ifZero(MatchedAssumesFeature.INSTANCE,
-                    SumFeature.createSum(DiffFindAndIfFeature.INSTANCE,
+                ifZero(featureConstants.matchedAssumesFeature(),
+                    SumFeature.createSum(featureConstants.diffFindAndIfFeature(),
                         applyTF("subsumRightSmaller", tf.polynomial),
                         applyTF("subsumRightBigger", tf.polynomial),
                         applyTFNonStrict("subsumCoeffSmaller", tf.posLiteral),
                         applyTFNonStrict("subsumCoeffBigger", tf.posLiteral),
-                        PolynomialValuesCmpFeature.leq(instOf("subsumRightSmaller"),
+                        createLeqPolynomialValuesCmpFeature(instOf("subsumRightSmaller"),
                             instOf("subsumRightBigger"), instOfNonStrict("subsumCoeffBigger"),
                             instOfNonStrict("subsumCoeffSmaller"))))));
 
@@ -620,7 +677,8 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                 AT_COST);
 
             bindRuleSet(d, "inEqSimp_split_eq",
-                add(TopLevelFindFeature.SUCC, longConst(NonlinearArithmeticCost.SPLIT_EQ)));
+                add(featureConstants.topLevelFindSucc(),
+                    longConst(NonlinearArithmeticCost.SPLIT_EQ)));
 
             bindRuleSet(d, "inEqSimp_signCases", not(isInstantiated("signCasesLeft")));
         } else if (arith == ArithTreatment.DEF_OPS) {
@@ -646,25 +704,25 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         bindRuleSet(d, "inEqSimp_and_contradInEqs",
             SumFeature.createSum(applyTF("contradLeft", tf.monomial),
                 applyTF("contradRightSmaller", tf.polynomial),
-                applyTF("contradRightBigger", tf.polynomial), PolynomialValuesCmpFeature
-                        .lt(instOf("contradRightSmaller"), instOf("contradRightBigger"))));
+                applyTF("contradRightBigger", tf.polynomial), createLtPolynomialValuesCmpFeature(
+                    instOf("contradRightSmaller"), instOf("contradRightBigger"))));
 
         bindRuleSet(d, "inEqSimp_andOr_subsumption",
             SumFeature.createSum(applyTF("subsumLeft", tf.monomial),
                 applyTF("subsumRightSmaller", tf.polynomial),
-                applyTF("subsumRightBigger", tf.polynomial), PolynomialValuesCmpFeature
-                        .leq(instOf("subsumRightSmaller"), instOf("subsumRightBigger"))));
+                applyTF("subsumRightBigger", tf.polynomial), createLeqPolynomialValuesCmpFeature(
+                    instOf("subsumRightSmaller"), instOf("subsumRightBigger"))));
 
         bindRuleSet(d, "inEqSimp_and_subsumptionEq",
             SumFeature.createSum(applyTF("subsumLeft", tf.monomial),
                 applyTF("subsumRightSmaller", tf.polynomial),
-                applyTF("subsumRightBigger", tf.polynomial), PolynomialValuesCmpFeature
-                        .lt(instOf("subsumRightSmaller"), instOf("subsumRightBigger"))));
+                applyTF("subsumRightBigger", tf.polynomial), createLtPolynomialValuesCmpFeature(
+                    instOf("subsumRightSmaller"), instOf("subsumRightBigger"))));
 
-        final Term tOne = getServices().getTermBuilder().zTerm("1");
-        final TermBuffer one = new TermBuffer() {
+        final Term tOne = zTerm("1");
+        final TermBuffer<G> one = new TermBuffer<>() {
             @Override
-            public void setContent(Term term, MutableState mState) {}
+            public void setContent(@Nullable Term term, MutableState mState) {}
 
             @Override
             public @NonNull Term getContent(MutableState mState) {
@@ -673,16 +731,16 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
 
             @Override
             public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos,
-                    Goal goal, MutableState mState) {
+                    G goal, MutableState mState) {
                 return tOne;
             }
 
         };
 
-        final JTerm tTwo = getServices().getTermBuilder().zTerm("2");
-        final TermBuffer two = new TermBuffer() {
+        final Term tTwo = zTerm("2");
+        final TermBuffer<G> two = new TermBuffer<>() {
             @Override
-            public void setContent(Term term, MutableState mState) {}
+            public void setContent(@Nullable Term term, MutableState mState) {}
 
             @Override
             public @NonNull Term getContent(MutableState mState) {
@@ -691,7 +749,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
 
             @Override
             public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos,
-                    Goal goal, MutableState mState) {
+                    G goal, MutableState mState) {
                 return tTwo;
             }
 
@@ -701,14 +759,14 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
             SumFeature.createSum(applyTF("tautLeft", tf.monomial),
                 applyTF("tautRightSmaller", tf.polynomial),
                 applyTF("tautRightBigger", tf.polynomial),
-                PolynomialValuesCmpFeature.leq(instOf("tautRightSmaller"),
+                createLeqPolynomialValuesCmpFeature(instOf("tautRightSmaller"),
                     opTerm(numbers.getAdd(), one, instOf("tautRightBigger")))));
 
         bindRuleSet(d, "inEqSimp_or_weaken",
             SumFeature.createSum(applyTF("weakenLeft", tf.monomial),
                 applyTF("weakenRightSmaller", tf.polynomial),
                 applyTF("weakenRightBigger", tf.polynomial),
-                PolynomialValuesCmpFeature.eq(
+                createEqPolynomialValuesCmpFeature(
                     opTerm(numbers.getAdd(), one, instOf("weakenRightSmaller")),
                     instOf("weakenRightBigger"))));
 
@@ -716,7 +774,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
             SumFeature.createSum(applyTF("antiSymmLeft", tf.monomial),
                 applyTF("antiSymmRightSmaller", tf.polynomial),
                 applyTF("antiSymmRightBigger", tf.polynomial),
-                PolynomialValuesCmpFeature.eq(
+                createEqPolynomialValuesCmpFeature(
                     opTerm(numbers.getAdd(), two, instOf("antiSymmRightSmaller")),
                     instOf("antiSymmRightBigger"))));
 
@@ -754,7 +812,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         // The branch limit exists to stop DefOps saturating; Model Search is expected to
         // saturate and keeps its unlimited behaviour.
         final boolean capBranch = atApproval && arith == ArithTreatment.DEF_OPS;
-        final TermBuffer intRel = new TermBuffer();
+        final TermBuffer<G> intRel = new TermBuffer<>();
 
         /*
          * final Feature partiallyBounded = not ( sum ( intRel, SequentFormulasGenerator.sequent (),
@@ -764,13 +822,14 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
 
         final Feature intRelation = applyTF(intRel, tf.intRelation);
         final var relevantSequentFormulas =
-            RelevantSequentFormulasGenerator.sequent(tf.intRelationOp);
+            RelevantSequentFormulasGenerator.<G>sequent(tf.intRelationOp);
 
         final Feature totallyBounded = not(sum(intRel, relevantSequentFormulas,
-            not(add(InEquationMultFeature
-                    .totallyBounded(instOf("multLeft"), instOf("multFacLeft"), sub(intRel, 0)),
+            not(add(
+                createTotalyBoundedInEquationMultFeature(instOf("multLeft"), instOf("multFacLeft"),
+                    sub(intRel, 0)),
                 intRelation))));
-        final Feature exactlyBounded = new IsBoundedByInequationFeature(
+        final Feature exactlyBounded = createExactlyBoundedInEquationMultFeature(
             instOf("multLeft"), instOf("multFacLeft"), tf.intRelation);
 
         // this is a bit hackish
@@ -788,7 +847,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
             baseCost,
             applyTF("multLeft", tf.nonNegMonomial),
             applyTF("multRight", tf.polynomial),
-            ifZero(MatchedAssumesFeature.INSTANCE,
+            ifZero(featureConstants.matchedAssumesFeature(),
                 SumFeature.createSum(
                     applyTF("multFacLeft", tf.nonNegMonomial),
                     ifZero(applyTF("multRight", tf.literal), CostBand.DEFAULT.at(-100)),
@@ -800,7 +859,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                      * "multRight", tf.polynomial ) ), ifZero ( applyTF ( "multFacRight", tf.literal
                      * ), longConst ( -100 ), applyTF ( "multFacRight", tf.polynomial ) ),
                      */
-                    not(TermSmallerThanFeature.create(FocusProjection.create(0),
+                    not(createTermSmallerThanFeature(featureConstants.focusProjection(0),
                         AssumptionProjection.create(0))),
                     onlyExactlyBounded
                             ? ifZero(add(applyTF("multLeft", tf.linearMonomial),
@@ -809,8 +868,8 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                             : longConst(0),
 
                     capBranch
-                            ? ifZero(BranchMultiplicationCountFeature.atMost("multiply_2_inEq",
-                                BRANCH_MULT_CAP), longConst(0), notAllowedF)
+                            ? ifZero(getBranchCountFeatureFor("multiply_2_inEq"), longConst(0),
+                                notAllowedF)
                             : longConst(0),
                     ifZero(exactlyBounded, CostBand.DEFAULT.cost(),
                         onlyExactlyBounded ? notAllowedF
@@ -826,6 +885,8 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                  */
                 ), notAllowedF)));
     }
+
+    protected abstract Feature getBranchCountFeatureFor(String prefix);
 
     private void setupInEqSimpInstantiation(RuleSetDispatchFeature d) {
         // category "handling of non-linear inequations"
@@ -856,60 +917,64 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
 
         // category "handling of non-linear inequations"
 
-        final TermBuffer divisor = new TermBuffer();
-        final TermBuffer dividend = new TermBuffer();
+        final TermBuffer<G> divisor = new TermBuffer<>();
+        final TermBuffer<G> dividend = new TermBuffer<>();
 
         bindRuleSet(d, "inEqSimp_nonLin_divide", SumFeature.createSum(
             applyTF("divProd", tf.nonCoeffMonomial),
             applyTFNonStrict("divProdBoundNonPos", tf.nonPosLiteral),
             applyTFNonStrict("divProdBoundNonNeg", tf.nonNegLiteral),
-            ifZero(MatchedAssumesFeature.INSTANCE,
+            ifZero(featureConstants.matchedAssumesFeature(),
                 let(divisor, instOf("divX"), let(dividend, instOf("divProd"),
                     SumFeature.createSum(applyTF(divisor, tf.nonCoeffMonomial),
                         not(eq(dividend, divisor)), applyTFNonStrict("divXBoundPos", tf.posLiteral),
                         applyTFNonStrict("divXBoundNeg", tf.negLiteral),
-                        ReducibleMonomialsFeature.createReducible(dividend, divisor), instantiate(
-                            "divY", ReduceMonomialsProjection.create(dividend, divisor))))))));
+                        createReducibleMonomialFeature(dividend, divisor), instantiate(
+                            "divY", createReduceMonomialsProjection(dividend, divisor))))))));
 
         setupNonLinTermIsPosNeg(d, "inEqSimp_nonLin_pos", true);
         setupNonLinTermIsPosNeg(d, "inEqSimp_nonLin_neg", false);
     }
 
     private void setupNonLinTermIsPosNeg(RuleSetDispatchFeature d, String ruleSet, boolean pos) {
-        final TermBuffer divisor = new TermBuffer();
-        final TermBuffer dividend = new TermBuffer();
-        final TermBuffer quotient = new TermBuffer();
-        final TermBuffer antecFor = new TermBuffer();
+        final TermBuffer<G> divisor = new TermBuffer<>();
+        final TermBuffer<G> dividend = new TermBuffer<>();
+        final TermBuffer<G> quotient = new TermBuffer<>();
+        final TermBuffer<G> antecFor = new TermBuffer<>();
 
         bindRuleSet(d, ruleSet,
             SumFeature
                     .createSum(applyTF("divProd", tf.nonCoeffMonomial),
                         applyTFNonStrict("divProdBoundPos", tf.posLiteral),
                         applyTFNonStrict("divProdBoundNeg", tf.negLiteral),
-                        ifZero(MatchedAssumesFeature.INSTANCE,
+                        ifZero(featureConstants.matchedAssumesFeature(),
                             let(divisor, instOf("divX"), let(dividend, instOf("divProd"),
                                 SumFeature.createSum(applyTF(divisor, tf.nonCoeffMonomial),
-                                    not(applyTF(dividend, eq(divisor))),
+                                    not(applyTF(dividend, createEqTermFeature(divisor))),
                                     applyTFNonStrict("divXBoundNonPos", tf.nonPosLiteral),
                                     applyTFNonStrict("divXBoundNonNeg", tf.nonNegLiteral),
-                                    ReducibleMonomialsFeature.createReducible(dividend, divisor),
+                                    createReducibleMonomialFeature(dividend, divisor),
                                     let(quotient,
-                                        ReduceMonomialsProjection.create(dividend, divisor), add(
+                                        createReduceMonomialsProjection(dividend, divisor), add(
                                             sum(antecFor, SequentFormulasGenerator.antecedent(),
                                                 not(applyTF(antecFor,
-                                                    pos ? opSub(tf.geq, eq(quotient), tf.posLiteral)
-                                                            : opSub(tf.leq, eq(quotient),
+                                                    pos ? opSub(tf.geq,
+                                                        createEqTermFeature(quotient),
+                                                        tf.posLiteral)
+                                                            : opSub(tf.leq,
+                                                                createEqTermFeature(quotient),
                                                                 tf.negLiteral)))),
                                             instantiate("divY", quotient)))))))));
     }
 
     private void setupSquaresAreNonNegative(RuleSetDispatchFeature d) {
-        final TermBuffer intRel = new TermBuffer();
-        final TermBuffer product = new TermBuffer();
-        final TermBuffer factor = new TermBuffer();
+        final TermBuffer<G> intRel = new TermBuffer<>();
+        final TermBuffer<G> product = new TermBuffer<>();
+        final TermBuffer<G> factor = new TermBuffer<>();
 
         final Feature productContainsSquare =
-            applyTF(sub(product, 0), or(eq(factor), opSub(tf.mul, any(), eq(factor))));
+            applyTF(sub(product, 0),
+                or(createEqTermFeature(factor), opSub(tf.mul, any(), createEqTermFeature(factor))));
         final Feature productIsProduct = applyTF(product, opSub(tf.mul, any(), not(tf.mulF)));
 
         bindRuleSet(d, "inEqSimp_nonNegSquares",
@@ -921,9 +986,9 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
     }
 
     private void setupInEqCaseDistinctions(RuleSetDispatchFeature d) {
-        final TermBuffer intRel = new TermBuffer();
-        final TermBuffer atom = new TermBuffer();
-        final TermBuffer rootInf = new TermBuffer();
+        final TermBuffer<G> intRel = new TermBuffer<>();
+        final TermBuffer<G> atom = new TermBuffer<>();
+        final TermBuffer<G> rootInf = new TermBuffer<>();
 
         final Feature posNegSplitting = forEach(intRel, SequentFormulasGenerator.antecedent(),
             add(applyTF(intRel, tf.intRelation),
@@ -950,11 +1015,11 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
 
         final Feature rootInferences = forEach(intRel, SequentFormulasGenerator.antecedent(),
             add(isRootInferenceProducer(intRel),
-                forEach(rootInf, RootsGenerator.create(intRel, getServices()),
+                forEach(rootInf, createRootsGenerator(intRel),
                     add(instantiate("cutFormula", rootInf),
-                        ifZero(applyTF(rootInf, op(Junctor.OR)),
+                        ifZero(applyTF(rootInf, op(or())),
                             CostBand.DEFAULT.at(50)),
-                        ifZero(applyTF(rootInf, op(Junctor.AND)),
+                        ifZero(applyTF(rootInf, op(and())),
                             CostBand.DEFAULT.at(20)))),
                 longConst(NonlinearArithmeticCost.MULTIPLY)));
 
@@ -962,13 +1027,13 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         bindRuleSet(d, "cut", oneOf(new Feature[] { strengthening, rootInferences }));
     }
 
-    private Feature isRootInferenceProducer(TermBuffer intRel) {
+    private Feature isRootInferenceProducer(TermBuffer<G> intRel) {
         return applyTF(intRel, add(tf.intRelation, sub(tf.nonCoeffMonomial, tf.literal)));
     }
 
-    private Feature allowPosNegCaseDistinction(TermBuffer atom) {
-        final TermBuffer antecFor = new TermBuffer();
-        final TermFeature eqAtom = eq(atom);
+    private Feature allowPosNegCaseDistinction(TermBuffer<G> atom) {
+        final TermBuffer<G> antecFor = new TermBuffer<>();
+        final TermFeature eqAtom = createEqTermFeature(atom);
 
         return add(not(succIntEquationExists()),
             sum(antecFor, SequentFormulasGenerator.antecedent(),
@@ -976,41 +1041,11 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                     opSub(tf.leq, eqAtom, tf.negLiteral), opSub(tf.geq, eqAtom, tf.posLiteral))))));
     }
 
-    private Feature allowInEqStrengthening(TermBuffer atom, TermBuffer literal) {
-        final TermBuffer antecFor = new TermBuffer();
-
-        return add(not(succIntEquationExists()),
-            not(sum(antecFor, SequentFormulasGenerator.antecedent(),
-                not(applyTF(antecFor, add(or(tf.leqF, tf.geqF), sub(eq(atom), eq(literal))))))));
-    }
-
     private Feature succIntEquationExists() {
-        final TermBuffer succFor = new TermBuffer();
+        final TermBuffer<G> succFor = new TermBuffer<>();
 
         return not(sum(succFor, RelevantSequentFormulasGenerator.succedent(tf.intEquation),
             not(applyTF(succFor, tf.intEquation))));
-    }
-
-    private void setupInEqCaseDistinctionsApproval(RuleSetDispatchFeature d) {
-        final TermBuffer atom = new TermBuffer();
-        final TermBuffer literal = new TermBuffer();
-        final TermBuffer intRel = new TermBuffer();
-        final TermBuffer rootInf = new TermBuffer();
-
-        bindRuleSet(d, "inEqSimp_signCases", add(isInstantiated("signCasesLeft"),
-            let(atom, instOf("signCasesLeft"), allowPosNegCaseDistinction(atom))));
-
-        // this is somewhat ugly. we should introduce some concept of "tagging"
-        // rule application so that they can be recognised again later
-        bindRuleSet(d, "cut",
-            add(isInstantiated("cutFormula"), or(
-                not(sum(intRel, SequentFormulasGenerator.antecedent(),
-                    ifZero(isRootInferenceProducer(intRel),
-                        sum(rootInf, RootsGenerator.create(intRel, getServices()),
-                            not(eq(instOf("cutFormula"), rootInf)))))),
-                ifZero(applyTF("cutFormula", opSub(tf.eq, tf.atom, tf.literal)),
-                    let(atom, sub(instOf("cutFormula"), 0), let(literal,
-                        sub(instOf("cutFormula"), 1), allowInEqStrengthening(atom, literal)))))));
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -1022,27 +1057,16 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
 
-    private void setupDefOpsPrimaryCategories(RuleSetDispatchFeature d) {
-
+    protected void setupDefOpsPrimaryCategories(RuleSetDispatchFeature d) {
         if (arith != ArithTreatment.BASIC) {
             // the axiom defining division only has to be inserted once, because
             // it adds equations to the antecedent
             bindRuleSet(d, "defOps_div",
-                SumFeature.createSum(NonDuplicateAppModPositionFeature.INSTANCE,
+                SumFeature.createSum(featureConstants.nonDuplicateAppModPositionFeature(),
                     applyTF("divNum", tf.polynomial), applyTF("divDenom", tf.polynomial),
                     applyTF("divNum", tf.notContainsDivMod),
                     applyTF("divDenom", tf.notContainsDivMod),
-                    ifZero(isBelow(ff.modalOperator), longConst(DivModCost.BELOW_MODALITY))));
-
-            bindRuleSet(d, "defOps_jdiv",
-                SumFeature.createSum(NonDuplicateAppModPositionFeature.INSTANCE,
-                    applyTF("divNum", tf.polynomial), applyTF("divDenom", tf.polynomial),
-                    applyTF("divNum", tf.notContainsDivMod),
-                    applyTF("divDenom", tf.notContainsDivMod),
-                    ifZero(isBelow(ff.modalOperator), longConst(DivModCost.BELOW_MODALITY))));
-
-            bindRuleSet(d, "defOps_jdiv_inline", add(applyTF("divNum", tf.literal),
-                applyTF("divDenom", tf.polynomial), longConst(DivModCost.INLINE)));
+                    ifZero(isBelow(ff.modalOperator()), longConst(DivModCost.BELOW_MODALITY))));
 
             setupDefOpsExpandMod(d);
 
@@ -1051,10 +1075,6 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
             bindRuleSet(d, "defOps_modHomoEq", DivModCost.MOD_HOMO_EQ);
         } else {
             bindRuleSet(d, "defOps_div", inftyConst());
-            bindRuleSet(d, "defOps_jdiv", inftyConst());
-
-            bindRuleSet(d, "defOps_jdiv_inline", add(applyTF("divNum", tf.literal),
-                applyTF("divDenom", tf.literal), longConst(DivModCost.MOD)));
 
             bindRuleSet(d, "defOps_mod", add(applyTF("divNum", tf.literal),
                 applyTF("divDenom", tf.literal), longConst(DivModCost.MOD)));
@@ -1063,20 +1083,19 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
             bindRuleSet(d, "defOps_expandJNumericOp", inftyConst());
             bindRuleSet(d, "defOps_modHomoEq", inftyConst());
         }
-
     }
 
     private void setupDefOpsExpandMod(RuleSetDispatchFeature d) {
-        final TermBuffer superTerm = new TermBuffer();
+        final TermBuffer<G> superTerm = new TermBuffer<>();
 
         final Feature subsumedModulus =
             add(applyTF(superTerm, sub(opSub(tf.mod, any(), tf.literal), tf.zeroLiteral)),
-                PolynomialValuesCmpFeature.divides(instOf("divDenom"), sub(sub(superTerm, 0), 1)));
+                createDividesPolynomialValuesCmpFeature(instOf("divDenom"),
+                    sub(sub(superTerm, 0), 1)));
 
         final Feature exSubsumedModulus = add(applyTF("divDenom", tf.literal),
             not(sum(superTerm,
-                SuperTermGenerator.upwardsWithIndex(sub(or(tf.addF, tf.mulF), any()),
-                    getServices()),
+                upwardsWithIndexSuperGenerator(sub(or(tf.addF, tf.mulF), any())),
                 not(subsumedModulus))));
 
         bindRuleSet(d, "defOps_mod",
@@ -1084,67 +1103,111 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
                 longConst(DivModCost.MOD),
                 SumFeature.createSum(applyTF("divNum", tf.polynomial),
                     applyTF("divDenom", tf.polynomial),
-                    ifZero(isBelow(ff.modalOperator), exSubsumedModulus,
+                    ifZero(isBelow(ff.modalOperator()), exSubsumedModulus,
                         or(add(applyTF("divNum", tf.notContainsDivMod),
                             applyTF("divDenom", tf.notContainsDivMod)), exSubsumedModulus)),
                     longConst(DivModCost.MOD_EXPAND))));
     }
 
-    /**
-     * For taclets that need instantiation, but where the instantiation is deterministic and does
-     * not have to be repeated at a later point, we setup the same feature terms both in the cost
-     * computation method and in the instantiation method. The definitions in
-     * <code>setupInstantiationWithoutRetry</code> should give cost infinity to those incomplete
-     * rule applications that will never be instantiated (so that these applications can be removed
-     * from the queue and do not have to be considered again).
-     */
+    /// For taclets that need instantiation, but where the instantiation is deterministic and does
+    /// not have to be repeated at a later point, we set up the same feature terms both in the cost
+    /// computation method and in the instantiation method. The definitions in
+    /// `setupInstantiationWithoutRetry` should give cost infinity to those incomplete
+    /// rule applications that will never be instantiated (so that these applications can be removed
+    /// from the queue and do not have to be considered again).
     private void setupInstantiationWithoutRetry(RuleSetDispatchFeature d) {
         setupPolySimpInstantiationWithoutRetry(d);
         setupInEqSimpInstantiationWithoutRetry(d);
     }
 
-    @Override
-    public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-        return !(approvalDispatcher.computeCost(app, pio, goal,
-            new MutableState()) == TopRuleAppCost.INSTANCE);
+    protected abstract Feature createReducibleMonomialFeature(ProjectionToTerm<G> dividend,
+            ProjectionToTerm<G> divisor);
 
-    }
+    protected abstract Feature createTrivialMonomialLCRFeature(ProjectionToTerm<G> a,
+            ProjectionToTerm<G> b);
 
-    @Override
-    public RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-            MutableState mState) {
-        return instantiationDispatcher.computeCost(app, pio, goal, mState);
-    }
+    protected abstract ProjectionToTerm<G> createReduceMonomialsProjection(
+            ProjectionToTerm<G> dividend, ProjectionToTerm<G> divisor);
 
-    @Override
-    public Name name() {
-        return NAME;
-    }
+    protected abstract ProjectionToTerm<G> createMonomialColumnOp(
+            ProjectionToTerm<G> leftCoefficient,
+            ProjectionToTerm<G> polynomial);
 
-    @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
-        return this.costComputationDispatcher.computeCost(app, pos, goal, mState);
-    }
+    protected abstract Feature createMonomialsSmallerThanFeature(ProjectionToTerm<G> left,
+            ProjectionToTerm<G> right, IIntLdt numbers);
 
-    @Override
-    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
-        var set = new HashSet<RuleSet>();
-        set.addAll(getDispatcher(aspect).ruleSets());
-        return set;
-    }
+    protected abstract Feature createAtomSmallerThanFeature(String left, String right,
+            IIntLdt numbers);
 
-    @Override
-    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
-        return switch (aspect) {
-            case StrategyAspect.Cost -> costComputationDispatcher;
-            case StrategyAspect.Instantiation -> instantiationDispatcher;
-            case StrategyAspect.Approval -> approvalDispatcher;
-        };
-    }
+    protected abstract ProjectionToTerm<G> createRoundingUpDividePolynomialsProjection(
+            ProjectionToTerm<G> leftCoefficient, ProjectionToTerm<G> polynomial);
 
-    @Override
-    public boolean isResponsibleFor(BuiltInRule rule) {
-        return false;
+    protected abstract ProjectionToTerm<G> createRoundingDownDividePolynomialsProjection(
+            ProjectionToTerm<G> leftCoefficient, ProjectionToTerm<G> polynomial);
+
+    protected abstract ProjectionToTerm<G> createCoeffGcdProjection(
+            ProjectionToTerm<G> monomialLeft, ProjectionToTerm<G> monomialRight);
+
+    protected abstract Feature createExactlyBoundedInEquationMultFeature(
+            ProjectionToTerm<G> mult1Candidate, ProjectionToTerm<G> mult2Candidate,
+            TermFeature targetCandidate);
+
+    protected abstract Feature createTotalyBoundedInEquationMultFeature(
+            ProjectionToTerm<G> mult1Candidate, ProjectionToTerm<G> mult2Candidate,
+            ProjectionToTerm<G> targetCandidate);
+
+    protected abstract Feature createLtPolynomialValuesCmpFeature(ProjectionToTerm<G> left,
+            ProjectionToTerm<G> right);
+
+    protected abstract Feature createLtPolynomialValuesCmpFeature(ProjectionToTerm<G> left,
+            ProjectionToTerm<G> right, ProjectionToTerm<G> leftCoeff,
+            ProjectionToTerm<G> rightCoeff);
+
+    protected abstract Feature createLeqPolynomialValuesCmpFeature(ProjectionToTerm<G> left,
+            ProjectionToTerm<G> right);
+
+    protected abstract Feature createLeqPolynomialValuesCmpFeature(ProjectionToTerm<G> left,
+            ProjectionToTerm<G> right, ProjectionToTerm<G> leftCoeff,
+            ProjectionToTerm<G> rightCoeff);
+
+    protected abstract Feature createEqPolynomialValuesCmpFeature(ProjectionToTerm<G> left,
+            ProjectionToTerm<G> right);
+
+    protected abstract Feature createEqPolynomialValuesCmpFeature(ProjectionToTerm<G> left,
+            ProjectionToTerm<G> right, ProjectionToTerm<G> leftCoeff,
+            ProjectionToTerm<G> rightCoeff);
+
+    protected abstract Feature createDividesPolynomialValuesCmpFeature(ProjectionToTerm<G> left,
+            ProjectionToTerm<G> right);
+
+    protected abstract TermFeature createEqTermFeature(TermBuffer<G> t);
+
+    protected abstract Feature directlyBelowSymbolAtIndex(Operator symbol, int index);
+
+    protected abstract TermGenerator<G> createMultiplesModEquationsGenerator(
+            ProjectionToTerm<G> source, ProjectionToTerm<G> target);
+
+    protected abstract Term zTerm(String num);
+
+    protected abstract ProjectionToTerm<G> opTerm(Operator op, ProjectionToTerm<G> subTerm0,
+            ProjectionToTerm<G> subTerm1);
+
+    protected abstract Feature createTermSmallerThanFeature(ProjectionToTerm<G> left,
+            ProjectionToTerm<G> right);
+
+    protected abstract Feature createMonomialSmallerThan(String left, String right,
+            IIntLdt numbers);
+
+    protected abstract TermGenerator<G> createRootsGenerator(ProjectionToTerm<G> powerRelation);
+
+    protected abstract Operator or();
+
+    protected abstract Operator and();
+
+    protected abstract TermGenerator<G> upwardsWithIndexSuperGenerator(TermFeature cond);
+
+    protected Feature eq(ProjectionToTerm<G> t1, ProjectionToTerm<G> t2) {
+        final TermBuffer<G> buf = new TermBuffer<>();
+        return let(buf, t1, applyTF(t2, createEqTermFeature(buf)));
     }
 }

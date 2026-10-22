@@ -18,6 +18,7 @@ import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.strategy.ComponentStrategy;
 
 import org.jspecify.annotations.NonNull;
 
@@ -128,9 +129,10 @@ public class ModularJavaDLStrategyFactory implements StrategyFactory {
     }
 
     @Override
-    public Strategy<@NonNull Goal> create(Proof proof, StrategyProperties strategyProperties) {
-        List<ComponentStrategy> componentStrategies = componentFactories.stream()
-                .map(f -> (ComponentStrategy) f.create(proof, strategyProperties))
+    public org.key_project.prover.strategy.Strategy<@NonNull Goal> create(Proof proof,
+            StrategyProperties strategyProperties) {
+        List<ComponentStrategy<Goal>> componentStrategies = componentFactories.stream()
+                .map(f -> (ComponentStrategy<Goal>) f.create(proof, strategyProperties))
                 .collect(Collectors.toList());
         return new ModularJavaDLStrategy(proof, componentStrategies, strategyProperties);
     }

@@ -8,22 +8,27 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.ldt.SetLDT;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.feature.MatchedAssumesFeature;
-import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.SetsSmallerThanFeature;
+import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.AbstractFeatureStrategy;
+import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.CostBand;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import org.jspecify.annotations.NonNull;
@@ -34,17 +39,18 @@ import static de.uka.ilkd.key.strategy.SetCosts.DIST;
 
 /// Strategy for the sort generic theory of sets.
 /// Do not create directly; use [SetStrategyFactory] instead.
-public class SetStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
+public class SetStrategy extends AbstractFeatureStrategy<Goal> implements ComponentStrategy<Goal> {
     public static final Name NAME = new Name("Set Strategy");
 
     private final RuleSetDispatchFeature costComputationDispatcher;
 
     private final boolean stopAtFirstNonCloseableGoal;
     private final SetTermFeatures stf;
+    private final Proof proof;
 
     public SetStrategy(Proof proof, StrategyProperties strategyProperties) {
-        super(proof);
-        stf = new SetTermFeatures(getServices().getTypeConverter().getLDT(SetLDT.class));
+        this.proof = proof;
+        stf = new SetTermFeatures(proof.getServices().getTypeConverter().getLDT(SetLDT.class));
         costComputationDispatcher = setupCostComputationF();
 
         stopAtFirstNonCloseableGoal =
@@ -125,7 +131,27 @@ public class SetStrategy extends AbstractFeatureStrategy implements ComponentStr
     }
 
     @Override
-    public boolean isResponsibleFor(BuiltInRule rule) {
+    public boolean isResponsibleFor(IBuiltInRule<Goal> rule) {
         return false;
+    }
+
+    // TODO: Unify in class?
+    @Override
+    protected RuleSet getHeuristic(String p_name) {
+        final NamespaceSet nss = proof.getNamespaces();
+        final Namespace<@NonNull RuleSet> ns = nss.ruleSets();
+        final RuleSet h = ns.lookup(new Name(p_name));
+
+        assert h != null : "Did not find the rule set " + p_name;
+
+        return h;
+    }
+
+    @Override
+    protected Feature isBelow(TermFeature t) {
+        final de.uka.ilkd.key.strategy.termProjection.TermBuffer superTerm =
+            new de.uka.ilkd.key.strategy.termProjection.TermBuffer();
+        return not(sum(superTerm, SuperTermGenerator.upwards(any(), proof.getServices()),
+            not(applyTF(superTerm, t))));
     }
 }

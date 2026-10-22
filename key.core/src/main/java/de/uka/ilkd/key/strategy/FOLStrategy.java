@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
@@ -29,13 +28,12 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
+import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.strategy.costbased.CostBand;
-import org.key_project.prover.strategy.costbased.MutableState;
-import org.key_project.prover.strategy.costbased.RuleAppCost;
-import org.key_project.prover.strategy.costbased.TopRuleAppCost;
+import org.key_project.prover.strategy.ComponentStrategy;
+import org.key_project.prover.strategy.costbased.*;
 import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
@@ -44,7 +42,8 @@ import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 
 import org.jspecify.annotations.NonNull;
 
-import static de.uka.ilkd.key.strategy.FOLCost.*;
+import static de.uka.ilkd.key.strategy.StaticFeatureCollection.*;
+import static org.key_project.prover.strategy.costbased.FOLCost.*;
 
 /// Strategy for general FOL rules. This does not consider other
 /// theories like integers or Java-specific functions.
@@ -52,7 +51,7 @@ import static de.uka.ilkd.key.strategy.FOLCost.*;
 /// In particular, instantiation of quantifiers is not supported by this
 /// strategy, as the current E-matching depends on the theory of integers.
 /// For that reason, instantiation can be found [JFOLStrategy].
-public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
+public class FOLStrategy extends JavaAbstractFeatureStrategy implements ComponentStrategy<Goal> {
     public static final Name NAME = new Name("FOL Strategy");
 
     protected final StrategyProperties strategyProperties;
@@ -64,7 +63,7 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
     private final Feature approvalF;
     private final Feature instantiationF;
 
-    protected final ArithTermFeatures tf;
+    protected final JavaArithTermFeatures tf;
     protected final FormulaTermFeatures ff;
 
     public FOLStrategy(Proof proof, StrategyProperties strategyProperties) {
@@ -72,7 +71,7 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
 
         this.strategyProperties = strategyProperties.clone();
 
-        this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
+        this.tf = new JavaArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
 
         costComputationDispatcher = setupCostComputationF();
@@ -121,7 +120,8 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
             ifZero(MatchedAssumesFeature.INSTANCE, NoSelfApplicationFeature.INSTANCE));
 
         bindRuleSet(d, "find_term_not_in_assumes", ifZero(MatchedAssumesFeature.INSTANCE,
-            not(contains(AssumptionProjection.create(0), FocusProjection.INSTANCE))));
+            not(contains(AssumptionProjection.create(0), FocusProjection.INSTANCE,
+                StaticFeatureCollection::eq))));
 
         bindRuleSet(d, "update_elim",
             add(CostBand.ELIMINATE.cost(),
@@ -434,7 +434,7 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
 
             bindRuleSet(d, "gamma", add(isInstantiated("t"),
                 not(sum(varInst, HeuristicInstantiation.forOption(triggerTreatment()),
-                    not(eq(instOf("t"), varInst)))),
+                    not(StaticFeatureCollection.eq(instOf("t"), varInst)))),
                 InstantiationCostScalerFeature.create(
                     InstantiationCost.create(instOf("t"), triggerTreatment()),
                     longConst(0))));
@@ -443,7 +443,7 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
             bindRuleSet(d, "triggered",
                 add(isTriggerVariableInstantiated(),
                     not(sum(splitInst, TriggeredInstantiations.create(false),
-                        not(eq(instOfTriggerVariable(), splitInst))))));
+                        not(StaticFeatureCollection.eq(instOfTriggerVariable(), splitInst))))));
         } else {
             bindRuleSet(d, "gamma", inftyConst());
             bindRuleSet(d, "triggered", inftyConst());
@@ -658,7 +658,7 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
     }
 
     @Override
-    public boolean isResponsibleFor(BuiltInRule rule) {
+    public boolean isResponsibleFor(IBuiltInRule rule) {
         return rule instanceof OneStepSimplifier;
     }
 }

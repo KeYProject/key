@@ -16,12 +16,12 @@ import de.uka.ilkd.key.prover.impl.AutoProvers;
 import de.uka.ilkd.key.scripts.meta.*;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.FocussedBreakpointRuleApplicationManager;
-import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.strategy.RuleApplicationManager;
+import org.key_project.prover.strategy.Strategy;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
@@ -97,7 +97,7 @@ public class AutoCommand extends AbstractCommand {
 
         SetCommand.updateStrategySettings(state(), activeStrategyProperties);
 
-        final Strategy originalStrategy = state.getProof().getActiveStrategy();
+        final Strategy<Goal> originalStrategy = state.getProof().getActiveStrategy();
         if (arguments.additionalRules != null) {
             state.getProof().setActiveStrategy(
                 new AdditionalRulesStrategy(originalStrategy, arguments.additionalRules, false));
