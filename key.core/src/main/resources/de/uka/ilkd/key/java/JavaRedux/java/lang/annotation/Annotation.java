@@ -6,5 +6,5 @@ package java.lang.annotation;
 public interface Annotation
 {
 
-   public java.lang.Class annotationType();
+    public java.lang.Class annotationType();
 }

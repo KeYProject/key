@@ -218,6 +218,11 @@ public class ImplicitFieldAdder extends JavaTransformerAbstract {
     }
 
     public void apply(TypeDeclaration<?> td) {
+        if (td.isAnnotationDeclaration()) {
+            // Annotations cannot have fields
+            return;
+        }
+
         addImplicitFields(td);
         addFieldsForFinalVars(td);
 
