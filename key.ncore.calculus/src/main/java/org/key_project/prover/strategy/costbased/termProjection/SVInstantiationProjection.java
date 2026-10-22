@@ -13,6 +13,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 
+import org.jspecify.annotations.Nullable;
+
 /// Projection of taclet apps to the instantiation of a schema variable. The projection can either
 /// be partial and undefined for those apps that do not instantiate the schema variable in
 /// question, or it can raise an error for such applications
@@ -33,14 +35,18 @@ public class SVInstantiationProjection<G extends ProofGoal<G>> implements Projec
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, G goal, MutableState mutableState) {
+    public @Nullable Term toTerm(RuleApp app, PosInOccurrence pos, G goal,
+            MutableState mutableState) {
         if (!(app instanceof final ITacletApp tapp)) {
             throw new IllegalArgumentException(
                 "Projections can only be applied to taclet applications, not to " + app);
         }
         final Object instObj = tapp.instantiations().lookupValue(svName);
         if (!(instObj instanceof Term instantiation)) {
-            assert !demandInst;
+            if (demandInst) {
+                throw new IllegalArgumentException("Did not find schema variable " + svName
+                    + " that I was supposed to examine" + " (taclet " + tapp.taclet().name() + ")");
+            }
             return null;
         }
         return instantiation;

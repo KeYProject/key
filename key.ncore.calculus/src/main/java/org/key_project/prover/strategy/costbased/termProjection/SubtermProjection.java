@@ -32,6 +32,8 @@ public class SubtermProjection<G extends ProofGoal<G>> implements ProjectionToTe
 
     @Override
     public Term toTerm(RuleApp app, PosInOccurrence pos, G goal, MutableState mState) {
-        return pit.getSubTerm(completeTerm.toTerm(app, pos, goal, mState));
+        final Term completeTermInst = completeTerm.toTerm(app, pos, goal, mState);
+        assert completeTermInst != null : "@AssumeAssertion(nullness): Term should not be null";
+        return pit.getSubTerm(completeTermInst);
     }
 }

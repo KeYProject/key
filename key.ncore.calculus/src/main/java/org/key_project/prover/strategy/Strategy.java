@@ -11,6 +11,7 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
@@ -60,6 +61,6 @@ public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, 
 
     default RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio,
             Goal goal, MutableState mState) {
-        return null;
+        return TopRuleAppCost.INSTANCE;
     }
 }

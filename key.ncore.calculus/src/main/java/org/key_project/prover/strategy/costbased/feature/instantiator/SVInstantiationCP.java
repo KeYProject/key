@@ -12,6 +12,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.rules.Trigger;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
@@ -22,13 +23,14 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// Feature representing a `ChoicePoint` for instantiating a schema variable of a taclet
 /// with the term that is returned by a `ProjectionToTerm`. This feature is useful in
 /// particular combined with `ForEachCP`. Although the feature formally is a choice point,
 /// it will always have exactly one branch
 public class SVInstantiationCP<G extends ProofGoal<G>> implements Feature {
-    private final Name svToInstantiate;
+    private final @Nullable Name svToInstantiate;
     private final ProjectionToTerm<G> value;
 
     public static <G extends ProofGoal<G>> Feature create(Name svToInstantiate,
@@ -41,7 +43,7 @@ public class SVInstantiationCP<G extends ProofGoal<G>> implements Feature {
     }
 
 
-    private SVInstantiationCP(Name svToInstantiate, ProjectionToTerm<G> value) {
+    private SVInstantiationCP(@Nullable Name svToInstantiate, ProjectionToTerm<G> value) {
         this.svToInstantiate = svToInstantiate;
         this.value = value;
     }
@@ -57,7 +59,9 @@ public class SVInstantiationCP<G extends ProofGoal<G>> implements Feature {
 
     private SchemaVariable findSVWithName(ITacletApp app) {
         if (svToInstantiate == null) {
-            return app.taclet().getTrigger().triggerVar();
+            final Trigger trigger = app.taclet().getTrigger();
+            assert trigger != null : "@AssumeAssertion(nullness): Trigger should not be null";
+            return trigger.triggerVar();
         }
 
         final ImmutableSet<SchemaVariable> vars = app.uninstantiatedVars();
@@ -67,11 +71,10 @@ public class SVInstantiationCP<G extends ProofGoal<G>> implements Feature {
             }
         }
 
-        // Debug.fail("Did not find schema variable " + svToInstantiate
-        // + " that I was supposed to instantiate\n" + "(taclet " + app.taclet().name() + ")\n"
-        // + "Either the name of the variable is wrong, or the variable\n"
-        // + "has already been instantiated.");
-        return null;
+        throw new IllegalArgumentException("Did not find schema variable " + svToInstantiate
+            + " that I was supposed to instantiate\n" + "(taclet " + app.taclet().name() + ")\n"
+            + "Either the name of the variable is wrong, or the variable\n"
+            + "has already been instantiated.");
     }
 
 
@@ -101,6 +104,7 @@ public class SVInstantiationCP<G extends ProofGoal<G>> implements Feature {
 
             final SchemaVariable sv = findSVWithName(tapp);
             final Term instTerm = value.toTerm(app, pos, goal, mState);
+            assert instTerm != null : "@AssumeAssertion(nullness): Term should not be null";
 
             final RuleApp newApp =
                 tapp.addCheckedInstantiation(sv, instTerm,

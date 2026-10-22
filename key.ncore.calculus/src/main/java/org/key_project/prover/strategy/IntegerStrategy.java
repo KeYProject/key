@@ -29,6 +29,7 @@ import org.key_project.prover.strategy.costbased.termgenerator.SubtermGenerator;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// This strategy implements reasoning for integer arithmetics. In particular,
 /// it supports linear integer arithmetics via Gaussian elimination,
@@ -721,7 +722,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         final Term tOne = zTerm("1");
         final TermBuffer<G> one = new TermBuffer<>() {
             @Override
-            public void setContent(Term term, MutableState mState) {}
+            public void setContent(@Nullable Term term, MutableState mState) {}
 
             @Override
             public @NonNull Term getContent(MutableState mState) {
@@ -739,7 +740,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         final Term tTwo = zTerm("2");
         final TermBuffer<G> two = new TermBuffer<>() {
             @Override
-            public void setContent(Term term, MutableState mState) {}
+            public void setContent(@Nullable Term term, MutableState mState) {}
 
             @Override
             public @NonNull Term getContent(MutableState mState) {
