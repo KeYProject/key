@@ -70,6 +70,7 @@ PURE: 'pure';
 RETURN_BEHAVIOR: 'return_' BEHAVIOR;
 FINAL: 'final';
 MODEL: 'model'/*  -> pushMode(expr)*/;
+LEMMA: 'lemma' -> pushMode(expr);
 
 fragment Pred: '_redundantly'?; //suffix
 fragment Pfree: '_free'?;       //suffix
@@ -139,6 +140,7 @@ SEPARATES: 'separates' -> pushMode(expr);
 SET: 'set' -> pushMode(expr);
 SIGNALS: ('signals' Pred | 'exsures' Pred) -> pushMode(expr);
 SIGNALS_ONLY: 'signals_only' Pred -> pushMode(expr);
+USE_LEMMA: 'use_lemma' -> pushMode(expr);
 VAR: 'var';
 WHEN: 'when' Pred -> pushMode(expr);
 WORKING_SPACE: 'working_space' Pred -> pushMode(expr);
