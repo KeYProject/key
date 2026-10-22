@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.keyshortcuts;
 
 import java.awt.event.InputEvent;
@@ -99,6 +100,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         // defineDefault(TacletOptionsAction.class, KeyEvent.VK_T, SHORTCUT_KEY_MASK);
         defineDefault(OpenFileAction.class, KeyEvent.VK_O, SHORTCUT_KEY_MASK);
         defineDefault(SearchInSequentAction.class, KeyEvent.VK_F, SHORTCUT_KEY_MASK);
+        defineDefault(GotoNodeAction.class, KeyEvent.VK_G, SHORTCUT_KEY_MASK);
 
         // "special" keystrokes
         defineDefault(SearchNextAction.class, KeyEvent.VK_F3, 0);

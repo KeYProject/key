@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.core;
 
 import java.util.ArrayList;
@@ -114,6 +115,27 @@ public class KeYSelectionModel {
         selectedSequent = selectedNode.sequent();
         selectedRuleApp = selectedNode.getAppliedRuleApp();
         fireSelectedNodeChanged(previousSelectedNode);
+    }
+
+    /// Selects the node with the given serial number, if it exists in the current proof.
+    /// @param serialNr the serial number of the node to select
+    /// @return true if the node was found and selected, false otherwise
+    public synchronized boolean setSelectedNodeBySerialNr(int serialNr) {
+        final Node previousSelectedNode = selectedNode;
+        if (proof == null) {
+            return false;
+        }
+        Node node = proof.findAny(n -> n.serialNr() == serialNr);
+        if (node == null) {
+            return false;
+        }
+        goalIsValid = false;
+        selectedNode = node;
+        selectedSequent = selectedNode.sequent();
+        selectedRuleApp = selectedNode.getAppliedRuleApp();
+        setSelectedNode(node);
+        fireSelectedNodeChanged(previousSelectedNode);
+        return true;
     }
 
     /**

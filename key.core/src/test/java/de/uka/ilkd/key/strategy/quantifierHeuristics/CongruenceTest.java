@@ -1,11 +1,13 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.SortImpl;
@@ -34,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class CongruenceTest {
 
     private static final Services SERVICES = TacletForTests.services();
+    private static final TermFactory TF = SERVICES.getTermFactory();
     private static final TermBuilder TB = SERVICES.getTermBuilder();
 
     private static ImmutableSet<JTerm> literals(JTerm... lits) {
@@ -55,10 +58,10 @@ public class CongruenceTest {
 
         final Congruence c = new Congruence(literals(TB.equals(ta, tb)), SERVICES);
         assertFalse(c.isTrivial());
-        assertEquals(tb, c.normalize(ta), "the left side rewrites to the right side");
-        assertEquals(TB.func(f, tb), c.normalize(TB.func(f, ta)),
+        assertEquals(tb, c.normalize(ta, TF), "the left side rewrites to the right side");
+        assertEquals(TB.func(f, tb), c.normalize(TB.func(f, ta), TF),
             "occurrences below an operator rewrite as well");
-        assertEquals(tb, c.normalize(tb), "the representative stays itself");
+        assertEquals(tb, c.normalize(tb, TF), "the representative stays itself");
     }
 
     @Test
@@ -73,13 +76,13 @@ public class CongruenceTest {
         // Written with the narrow term on the left: reading it left to right would put the
         // wide-sorted term into positions requiring the narrow sort, so the direction flips.
         final Congruence c = new Congruence(literals(TB.equals(td, to)), SERVICES);
-        assertEquals(td, c.normalize(to),
+        assertEquals(td, c.normalize(to, TF),
             "the wide term rewrites to the narrow one, not the other way around");
-        assertEquals(td, c.normalize(td));
+        assertEquals(td, c.normalize(td, TF));
 
         // Written with the wide term on the left, the sequent orientation is already narrowing.
         final Congruence c2 = new Congruence(literals(TB.equals(to, td)), SERVICES);
-        assertEquals(td, c2.normalize(to));
+        assertEquals(td, c2.normalize(to, TF));
     }
 
     @Test
@@ -90,9 +93,9 @@ public class CongruenceTest {
         final JTerm five = TB.zTerm(5);
 
         final Congruence left = new Congruence(literals(TB.equals(ta, five)), SERVICES);
-        assertEquals(five, left.normalize(ta), "a = 5 rewrites a to 5");
+        assertEquals(five, left.normalize(ta, TF), "a = 5 rewrites a to 5");
         final Congruence right = new Congruence(literals(TB.equals(five, ta)), SERVICES);
-        assertEquals(five, right.normalize(ta),
+        assertEquals(five, right.normalize(ta, TF),
             "5 = a also rewrites a to 5: the theory refuses a literal that rewrites away");
     }
 
@@ -108,7 +111,7 @@ public class CongruenceTest {
         final Congruence c =
             new Congruence(literals(TB.equals(TB.func(a), TB.func(b))), SERVICES);
         final JTerm quantified = TB.all(x, TB.func(p, TB.func(a)));
-        assertSame(quantified, c.normalize(quantified),
+        assertSame(quantified, c.normalize(quantified, TF),
             "a term binding variables is returned as it is");
     }
 
@@ -117,6 +120,6 @@ public class CongruenceTest {
         final Congruence c = new Congruence(DefaultImmutableSet.nil(), SERVICES);
         assertTrue(c.isTrivial());
         final JTerm t = TB.tt();
-        assertSame(t, c.normalize(t), "the trivial congruence is the identity");
+        assertSame(t, c.normalize(t, TF), "the trivial congruence is the identity");
     }
 }

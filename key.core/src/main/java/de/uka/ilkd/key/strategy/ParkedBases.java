@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
 import java.util.ArrayList;
@@ -29,188 +30,157 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-/**
- * Candidates of a {@link QueueRuleApplicationManager} that are currently set aside, grouped by
- * the formula they are waiting for.
- *
- * <p>
- * Some vocabulary. A rule of KeY is called a <em>taclet</em>. A taclet may carry an
- * {@code \assumes} part: one or more formulas that must already be present in the sequent for
- * the rule to be applicable. A candidate whose {@code \assumes} formula is not present yet is
- * called a <em>base</em> here: it cannot be applied now, but it may become applicable in a
- * later round once such a formula appears. Deciding a taclet's applicability means
- * <em>matching</em> its formulas against the sequent, where a schema variable in the taclet
- * (a placeholder) stands for an arbitrary concrete term. Matching a taclet against the whole
- * sequent every round is the expensive operation this class avoids.
- *
- * <p>
- * Measurements on a large proof: almost every candidate returned by the queue is a base whose
- * {@code \assumes} still does not match (about 96.8%), and re-matching it almost never
- * produces a new applicable rule (about 97 to 99.6% of the time it produces nothing). So
- * instead of returning such a base every round only to match and discard it, it is held back.
- * Setting a base aside is called <em>parking</em> it ({@link #park}); putting it back into the
- * queue is called <em>waking</em> it. A parked base is stored under one or more {@link WakeKey}s
- * that describe the formula it is waiting for ({@link #parkKeys}), and is woken as soon as a
- * formula matching such a key is added to or changed in the sequent
- * ({@link #recordWakeKeysOf}, {@link #drainWoken}).
- *
- * <p>
- * This is intended to find the same proof as returning every base every round. A base that
- * is woken too eagerly does no harm: it is returned, fails to match, and is parked again,
- * exactly as an un-parked base would have behaved that round. A base that is woken too late
- * would change the proof, because the rule application it produces would be created, and so
- * aged (see the comment on {@link QueueRuleApplicationManager}), in a later round. The
- * following points show that a wake is never late.
- * <ul>
- * <li>A base is parked only if the top operator (the outermost function or connective) of each
- * of its {@code \assumes} formulas is either concrete or a schema variable that the rule's
- * main match already fixed to a concrete term (see {@link #parkKeys}). If some top operator is
- * an unfixed schema variable, the formula would match anything, so the base is not parked and
- * stays in the queue as before. What a pattern could accept is stated by the taclet's own
- * matcher ({@link VMTacletMatcher#assumesKeySource}), derived from the same dispatch its
- * matching is built from, so park keys and matching cannot drift apart.</li>
- * <li>A parked base is woken in exactly the round in which a formula it could match is added
- * or changed. That is the same round in which an un-parked copy would first see that formula
- * as new and become applicable. So the resulting rule application is created in the same round
- * either way, with the same age and cost.</li>
- * <li>A formula may be wrapped in a chain of <em>updates</em> (an update is a pending
- * assignment written in front of a formula, as in {@code {x := 1} phi}). The matcher removes
- * this update chain before it matches. The keys of kind {@link WakeKind#OP} therefore use the
- * top operator of the formula and of every formula obtained by removing one update from the
- * front, which is a safe over-approximation of what the matcher could accept.</li>
- * <li>The other three key kinds filter more precisely, using only conditions the matcher
- * checks literally. A base whose {@code \assumes} first argument is a concrete term can only
- * match a formula whose first argument has the same top operator ({@link WakeKind#ARG_OP}). A
- * base whose {@code \assumes} first argument (or whole formula) was fixed to a concrete term
- * by the main match can only match a formula equal to it up to renaming of bound variables,
- * and equal terms up to that renaming have the same {@link JTerm#hashCodeModRenaming()}, so
- * filtering by that hash ({@link WakeKind#ARG_HASH}, {@link WakeKind#WHOLE_HASH}) never drops
- * a formula the matcher would accept. Parking and waking hash the formula after its update
- * chain has been removed, so the two sides compare the same thing.</li>
- * <li>No hash is ever computed over a term whose top operator is a modality (a program
- * nested deeper is still hashed; the guard is by the top operator). Such a term
- * carries a program, and its hash walks that whole program; in a proof that executes a large
- * program step by step, the changed formula is a fresh term every step, so nothing is cached
- * and the walks add up to time quadratic in the program size. A base waiting for such a
- * formula is parked under the coarse {@link WakeKind#OP} key of the modality kind instead
- * ({@link #parkKeys}), and the wake side then stops at that key for modality formulas
- * ({@link #recordWakeKeysOf}). The base is woken whenever any formula of that kind changes,
- * which is more often than the exact hash would wake it, and that is harmless (see
- * above).</li>
- * </ul>
- * <p>
- * One assumption remains. A parked container keeps the cost it was parked with, while an
- * un-parked base is re-costed with a fresh age share every time the queue returns it. The
- * two runs still perform the same proof steps as long as, in every round and in both runs,
- * all candidates cheaper than the rule application the round finally selects are processed
- * in that round. Every measurement so far satisfies this (statistics-identical benchmark
- * runs and the RunAllProofs suite), but it is an assumption about the costs the strategy
- * produces, not a proven theorem. A statistics comparison against a run without parking and
- * a RunAllProofs run are therefore mandatory when changing anything in this area.
- * <p>
- * Three implementation notes. The map, its buckets, and {@link #pendingWakeKeys} must stay
- * insertion-ordered: the hash codes of operators differ from run to run, so iterating a
- * plain hash-ordered container would make the wake order, and with it the proof, differ from
- * run to run. A parked base whose find position has meanwhile disappeared from the
- * sequent is not removed at that moment; it is removed by {@link #sweepDeadParkedBases},
- * which keeps the memory held by such bases bounded (see there). Waking such a base is also
- * harmless: its re-expansion notices that it is no longer applicable and drops it. And a
- * changed formula only produces keys under whose head and kind some base is currently
- * parked (see {@link #recordWakeKeysOf} for why no wake can be missed); without this filter,
- * every change of a possibly very large formula would compute the two hashes, which walk
- * the whole formula, even in a proof that parks nothing or parks nothing with that head.
- */
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+
+/// After each change to the sequent the [QueueRuleApplicationManager] has to check whether
+/// an incomplete taclet application due to missing matches of the `\\assumes` formula can be
+/// completed.
+/// To avoid re-matching all incomplete applications after each rule application, it parks them
+/// using a so called _wake key_ built for each `\\assumes`-formula. Changed or new formulas are
+/// matched cheaply against these keys. The applications parked under that key are then taken
+/// (woken) to be matched fully against the new or changed formula.
+///
+/// The wake key for an `\\assumes`-formula is built from the top operator of the assumes formula
+/// and (if it has one) from its first argument:
+/// if the argument is concrete, the argument's top operator, otherwise if it is an already
+/// instantiated schema variable the term itself.
+///
+/// If an assumes formula is only a simple schema variable (e.g., in case of the `replace_known`
+/// taclets) two cases are distinguished:
+/// 1. if the schema variable is instantiated then the instantiation is used as wake key
+/// 2. otherwise, without an instantiation, no wake key can be constructed and such a taclet is
+/// matched against after each rule application.
+///
+/// The exact wake key is computed using the actual taclet matcher
+/// ([VMTacletMatcher#assumesKeySource]) and is a safe overapproximation, i.e., it is ensured
+/// that no potential match is missed. Using the taclet matcher ensures consistency as there
+/// is **no** duplicate matching logic.
+///
+/// The implementation is defensive to avoid that a match is missed, i.e., the applications parked
+/// under a wake key are always woken, if a match might be possible. Applications that have been
+/// woken, but whose full match is unsuccessful, are parked again. The defensiveness extends to the
+/// implementation of [VMTacletMatcher#assumesKeySource], if this returns
+/// [PatternKeySource.Unkeyable], then the corresponding taclet applications are matched against at
+/// every step and the only consequence is a performance regression.
+///
+/// In summary: A key describes a potential match by its operator family or by the formula up to
+/// renaming.
+/// A modified sequent formula wakes the candidates parked under the keys of the formula below
+/// its leading updates. Keys are equal if their operator families are identical and their
+/// terms are equal up to renaming ([TermModRenaming]). A modality top operator has no
+/// term key for performance reasons (its program would be hashed at every proof step).
+///
+/// After changing anything in this class: RunAllProofs and a run without parking **must**
+/// be run before committing/pushing. Map, buckets and pending set are insertion-ordered, so the
+/// wake order is the same in every run.
+///
 @NullMarked
 final class ParkedBases {
-    /**
-     * The parked bases, grouped by the key of the formula they wait for. A bucket is a plain
-     * {@link ArrayList} while small: a base is parked at most once per bucket and bases compare
-     * by object identity, so there is nothing to de-duplicate and a set would waste memory. A
-     * bucket past {@link #BUCKET_SET_THRESHOLD} becomes a {@link LinkedHashSet} to keep removing
-     * a woken base by value constant time (see {@link #park}).
-     */
+
+    /// The parked rule application containers (bases), grouped by their wake key.
+    /// A bucket is a plain [ArrayList] while small: a base is parked at most once per bucket
+    /// and bases compare by object identity, so there is nothing to de-duplicate and a set would
+    /// waste memory. If the size of a bucket becomes greater than or equal to
+    /// [#BUCKET_SET_THRESHOLD],
+    /// a [LinkedHashSet] is used instead of the [ArrayList] to keep removing a woken
+    /// base by value at amortized constant time (see [#park]).
     private @Nullable LinkedHashMap<WakeKey, Collection<RuleAppContainer>> parked = null;
 
-    /**
-     * Bucket size at which a parking bucket is promoted from ArrayList to LinkedHashSet.
-     */
+    /// Bucket size at which a parking bucket is promoted from ArrayList to LinkedHashSet.
     private static final int BUCKET_SET_THRESHOLD = 16;
 
-    /**
-     * The {@link WakeKey}s of every formula that was added to or changed in the sequent since the
-     * previous round. {@link #drainWoken()} reads and then empties this set at the start of
-     * the next round to decide which parked bases to wake. {@code null} until the first change is
-     * recorded. Package-private for the unit tests in this package.
-     */
+    /// The [WakeKey]s of every formula that was added to or changed in the sequent since the
+    /// previous rule application. [#getAndClearWokenApplications()] reads and then empties
+    /// this set at the start of the next round to decide which parked bases to wake.
+    /// `null` until the first change is recorded. Package-private for the unit tests in
+    /// this package.
     @Nullable
     LinkedHashSet<WakeKey> pendingWakeKeys = null;
 
-    /**
-     * Number of {@link #park} calls since the last {@link #sweepDeadParkedBases}, and the
-     * number of parked containers that survived that sweep. Together they trigger the next
-     * sweep: both counters depend only on this goal's own history, so the sweep runs at the
-     * same point in every run.
-     */
+    /// Number of [#park] calls since the last [#sweepDeadParkedBases], and the
+    /// number of parked containers that survived that sweep. Together they trigger the next
+    /// sweep: both counters depend only on this goal's own history, so the sweep runs at the
+    /// same point in every run.
     private int parksSinceSweep = 0;
     private int survivorsAtLastSweep = 0;
 
-    /**
-     * Number of entries of the parked map per key head and {@link WakeKind}: the array under a
-     * head holds one count per kind, indexed by its ordinal. {@link #recordWakeKeysOf} skips
-     * every key whose head and kind have no parked base, and in particular computes no hash
-     * then; see there for why this cannot suppress a needed wake. The map is only queried by
-     * key, never iterated in a way the proof could observe, so a plain {@link HashMap} is safe
-     * here. Kept up to date by {@link #park}, {@link #unindexParked}, and
-     * {@link #sweepDeadParkedBases}.
-     */
+    /// Number of parked taclet applications of the parked map per key head and [WakeKind]:
+    /// the array under a head holds one count per kind, indexed by its ordinal.
+    /// [#recordWakeKeysOf] skips every key whose head and kind have no parked base, and
+    /// in particular computes no hash then. The map is only queried by key, never iterated in a
+    /// way the proof could observe, so a plain [HashMap] is safe here. Kept up to date
+    /// by [#park], [#unindexParked], and [#sweepDeadParkedBases].
     private final HashMap<Object, int[]> parkedCountsByHead = new HashMap<>();
 
-    /** Number of {@link WakeKind}s, the length of the count arrays above. */
+    /// Number of [WakeKind]s, the length of the count arrays above.
     private static final int KINDS = WakeKind.values().length;
 
-    /** Minimum number of parks before the first sweep, so small proofs never sweep. */
+    /// Minimum number of parks before the first sweep, so small proofs never sweep.
     private static final int SWEEP_FLOOR = 64;
 
-    /**
-     * How precisely a {@link WakeKey} describes the formula a parked base waits for. Below,
-     * <em>core</em> means the formula after its update chain has been removed (see the class
-     * comment), and <em>descriptor</em> refers to an operator family as defined by the matcher
-     * ({@link JavaMatchPlanBuilder#matchFamilyOf} for concrete operators,
-     * {@link org.key_project.prover.rules.matcher.compiler.PatternKeySource} for patterns).
-     */
+
+    /// The wake kind describes the structure of the wake key and with that its precision. Below,
+    /// _core_ means the formula after its update chain has been removed, and
+    /// _descriptor_ refers to an operator family as defined by the matcher
+    /// ([JavaMatchPlanBuilder#matchFamilyOf] for concrete operators,
+    /// [org.key_project.prover.rules.matcher.compiler.PatternKeySource] for patterns).
     enum WakeKind {
-        /** The extra value is absent; the key uses only a descriptor of a top operator. */
+        /// the key uses only the operator family of the top level operator;
+        /// the [WakeKey#datum] field of the key has no meaning when this kind applies.
         OP,
-        /** The extra value is the descriptor of the core's first argument's top operator. */
+        /// In addition to the operator family of the top level operator, the key also contains the
+        /// operator family of the top operator's first argument in [WakeKey#datum].
         ARG_OP,
-        /** The extra value is {@link JTerm#hashCodeModRenaming()} of the core's first argument. */
+        /// In addition to the operator family of the top level operator, the key contains the first
+        /// argument as term (compared up to renaming), as a [TermModRenaming] in
+        /// [WakeKey#datum].
         ARG_HASH,
-        /** The extra value is {@link JTerm#hashCodeModRenaming()} of the whole core. */
+        /// In addition to the operator family of the top level operator, the key contains the whole
+        /// formula as a [TermModRenaming] in [WakeKey#datum] (this is the case if the
+        /// `\\assumes`-formula is a simple schema variable with an instantiation).
         WHOLE_HASH
     }
 
-    /**
-     * One entry key of the parked map. It holds the precision {@code kind}, the side of the
-     * sequent the formula is expected on ({@code inAntecedent}; an {@code \assumes} formula is
-     * only ever matched against formulas of its own side, so keys of different sides never
-     * meet), the descriptor {@code head} of the (core) formula's top operator (its operator
-     * family, see above), and one
-     * extra value whose meaning depends on the kind (see {@link WakeKind}): {@code null} for
-     * {@link WakeKind#OP}, a descriptor for {@link WakeKind#ARG_OP}, an {@link Integer} hash for
-     * the two hash kinds. A parked base is stored under the most precise key its {@code \assumes}
-     * shape allows ({@link #parkKeys}). A changed formula produces every key a base could match
-     * it with ({@link #recordWakeKeysOf}). A base is therefore woken exactly when some changed
-     * formula produces a key equal to one the base is stored under.
-     */
+    /// The actual wake key. Argument `kind` describes the precision of the key,
+    /// `inAntecedent` describes whether the assumes formula occurs in the antecedent or
+    /// succedent, the descriptor `head` of the (core) formula's top operator (its operator
+    /// family, see above), and `datum` holds one extra value whose meaning depends on the kind
+    /// (see [WakeKind]).
+    ///
+    /// A parked base is stored under the most precise key its
+    /// `\assumes` shape allows ([#parkKeys]). All possible keys for a new or changed
+    /// formula are built in [#recordWakeKeysOf] such that a parked rule application is woken
+    /// exactly when a new or changed formula produces a key equal to one the base is stored under.
+    ///
+    /// Note: If the class gets refactored and tested again (please use differential testing),
+    /// this record can be made more type safe by a sealed interface.
     record WakeKey(WakeKind kind, boolean inAntecedent, Object head, @Nullable Object datum) {
     }
 
-    /**
-     * The order in which {@link #drainWoken()} collects woken bases across the four kinds.
-     * Bases are put back into the queue in the order they are collected, and that order decides
-     * how the queue arranges candidates of equal cost, so it must stay fixed for the proof to stay
-     * the same.
-     */
+    /// A simple term wrapper to ensure that terms are compared modulo renaming as used by the
+    /// taclet matcher.
+    /// The parked map thus finds the bucket by the hash and decides by the equality, so the hash
+    /// function has no influence on which bases are woken. An earlier attempt used just the
+    /// hashcode (without the equality check), but this leads to non-deterministic cost assignments
+    /// as the age of woken rule applications is modified.
+    record TermModRenaming(JTerm term) {
+        @Override
+        public boolean equals(@Nullable Object o) {
+            return o instanceof TermModRenaming other
+                    && term.equalsModProperty(other.term, RENAMING_TERM_PROPERTY);
+        }
+
+        @Override
+        public int hashCode() {
+            return term.hashCodeModRenaming();
+        }
+    }
+
+    /// The order in which [#getAndClearWokenApplications()] collects woken bases across the
+    /// four kinds.
+    /// Bases are put back into the queue in the order they are collected, and that order decides
+    /// how the queue arranges candidates of equal cost, so it must stay fixed for the proof to stay
+    /// the same.
     private static final WakeKind[] WAKE_ORDER =
         { WakeKind.OP, WakeKind.ARG_HASH, WakeKind.ARG_OP, WakeKind.WHOLE_HASH };
     static {
@@ -220,21 +190,30 @@ final class ParkedBases {
                 : "WAKE_ORDER must list every WakeKind exactly once";
     }
 
-    /**
-     * The keys under which the given base is stored in the parked map: a single precise key when
-     * the shape of the base's {@code \assumes} allows one, otherwise one {@link WakeKind#OP} key
-     * per {@code \assumes} formula. Returns {@code null} when the base cannot be parked at all,
-     * that is when some {@code \assumes} top operator is a schema variable the main match did not
-     * fix to a concrete term; such a base stays in the queue. A base whose formula or hashed
-     * term has a modality at the top gets no precise key and falls through to the coarse
-     * {@link WakeKind#OP} case; see the class comment for why modality terms are never hashed.
-     * <p>
-     * What each {@code \assumes} pattern could accept is not analyzed here: the taclet's matcher
-     * summarizes each of its assumes formulas ({@link VMTacletMatcher#assumesKeySource}), derived
-     * from the same per-operator dispatch its matching is built from, so the keys cannot drift
-     * from what the matcher accepts. This method only combines those summaries with the main
-     * match's instantiations, and picks the most precise {@link WakeKind} they allow.
-     */
+    /// Creates and returns the wake keys (here, also referred to as park keys as they are
+    /// constructed for the `\\assumes`-formula) under which the given taclet application is
+    /// stored in the parked map.
+    /// Returns `null` when the base cannot be parked at all, for example, if an
+    /// `\assumes` top operator is a not yet instantiated schema variable. If the top
+    /// level operator of the formula is a modality, a rather imprecise key only specifying the
+    /// operator family (e.g. `Modality.Kind`) of kind [WakeKind#OP] is returned;
+    /// for performance reasons.
+    ///
+    /// The method does not inspect and extract the key components itself but refers to the taclet's
+    /// matcher ([VMTacletMatcher#assumesKeySource]) to avoid duplication of matching logic,
+    /// thus maintaining consistency.
+    /// This method only combines those summaries with the main match's instantiations, and picks
+    /// the most precise [WakeKind] they allow.
+    ///
+    /// Note: Precise keys are only computed for taclets with exactly one `\\assumes`-formula.
+    /// Potential for future improvements.
+    ///
+    /// @param app the taclet application for whose `\\assumes`-formulas wake keys are retrieved
+    /// @return null if the taclet application cannot be parked and has to be matched after each
+    /// change to a sequent;
+    /// otherwise it contains for each `\\assumes`-formula a wake key (if several formulas
+    /// share the same key only one key exists, hence, `\\result.size()` might
+    /// be less than the number of `\\assumes`-formulas)
     static @Nullable List<WakeKey> parkKeys(NoPosTacletApp app) {
         if (!(app.taclet().getMatcher() instanceof VMTacletMatcher matcher)) {
             return null;
@@ -256,7 +235,7 @@ final class ParkedBases {
                     final Object head = JavaMatchPlanBuilder.matchFamilyOf(core.op());
                     if (head != null && !(core.op() instanceof JModality)) {
                         return List.of(new WakeKey(WakeKind.WHOLE_HASH, inAntec, head,
-                            core.hashCodeModRenaming()));
+                            new TermModRenaming(core)));
                     }
                 }
             } else if (source instanceof PatternKeySource.ByHead byHead
@@ -269,7 +248,7 @@ final class ParkedBases {
                         // the main match fixed the assumes first argument (the applyEq family:
                         // \assumes(s = t1) with s already bound to the term being rewritten)
                         return List.of(new WakeKey(WakeKind.ARG_HASH, inAntec,
-                            byHead.headDescriptor(), instTerm.hashCodeModRenaming()));
+                            byHead.headDescriptor(), new TermModRenaming(instTerm)));
                     }
                 } else if (byHead
                         .firstArg() instanceof PatternKeySource.FirstArg.ByArgHead argHead) {
@@ -283,15 +262,11 @@ final class ParkedBases {
         return assumesOpKeys(app, matcher);
     }
 
-    /**
-     * One {@link WakeKind#OP} key per {@code \assumes} formula of the given taclet application,
-     * on the formula's own side of the sequent: the key's family comes from the formula's key
-     * source, or, for a schema-variable top, from the operator the main match fixed it to.
-     * Returns {@code null} if the application has no {@code \assumes} formulas, or if some
-     * formula yields no family (an unfixed schema variable would match anything; an update
-     * application or a schematic modality kind cannot be keyed). Used for a base that none of
-     * the precise cases in {@link #parkKeys} apply to.
-     */
+    /// Computes for each `\\assumes`-formula of the provided taclet application the coarse wake key
+    /// of kind [WakeKind#OP].
+    ///
+    /// @param app the taclet application for which to compute the wake keys
+    /// @param matcher the [VMTacletMatcher] to use for constructing the keys' components
     private static @Nullable List<WakeKey> assumesOpKeys(NoPosTacletApp app,
             VMTacletMatcher matcher) {
         final Sequent assumesSeq = app.taclet().assumesSequent();
@@ -329,14 +304,12 @@ final class ParkedBases {
         return List.copyOf(keys);
     }
 
-    /**
-     * Set the given base aside, under each of its {@link #parkKeys}.
-     *
-     * @param base the re-costed base container to park (carries the current age)
-     * @param goal the goal the base belongs to, used by the dead-base sweep
-     * @return {@code true} if the base was parked, {@code false} if it cannot be parked (see
-     *         {@link #parkKeys}) and the caller must keep it in the queue
-     */
+    /// Park the given taclet application container, under each of its [#parkKeys].
+    ///
+    /// @param base the re-costed base container to park (carries the current age)
+    /// @param goal the goal the base belongs to, used by the dead-base sweep
+    /// @return `true` if the base was parked, `false` if it cannot be parked (see
+    /// [#parkKeys]) and the caller must keep it in the queue
     boolean park(TacletAppContainer base, @Nullable Goal goal) {
         final List<WakeKey> keys = parkKeys(base.getTacletApp());
         if (keys == null) {
@@ -362,18 +335,18 @@ final class ParkedBases {
         return true;
     }
 
-    /**
-     * Remove every parked base that can no longer be applied because its find position has
-     * disappeared from the sequent (the same test, {@link TacletAppContainer#isStillApplicable},
-     * that would drop the base if it were woken). Such bases would otherwise stay parked until
-     * their key happens to fire, holding on to their rule application and the old formulas it
-     * points to. The sweep runs from {@link #park} once the number of parks since the last sweep
-     * reaches the number of survivors of that sweep (plus a floor for small proofs), so it walks
-     * the whole map at most once per doubling: the cost per park is constant on average, and the
-     * map never holds more than about twice the still-applicable bases. Removal keeps the
-     * insertion order of the surviving entries, and the trigger depends only on this goal's own
-     * park history, so the sweep does not introduce run-to-run differences.
-     */
+    /// Remove every parked base that can no longer be applied because its find position
+    /// (the term it matched against) disappeared from the sequent (the same test,
+    /// [TacletAppContainer#isStillApplicable], that would drop the base if it were woken).
+    /// Such bases would otherwise stay parked until their key happens to fire, holding on to their
+    /// rule application and the old formulas it points to.
+    ///
+    /// The sweep runs from [#park] once the number of parks since the last sweep
+    /// reaches the number of survivors of that sweep (plus a floor for small proofs), so it walks
+    /// the whole map at most once per doubling: the cost per park is constant on average, and the
+    /// map never holds more than about twice the still-applicable bases. Removal keeps the
+    /// insertion order of the surviving entries, and the trigger depends only on this goal's own
+    /// park history, so the sweep does not introduce run-to-run differences.
     private void sweepDeadParkedBases(@Nullable Goal goal) {
         if (parked == null || goal == null) {
             return;
@@ -401,16 +374,17 @@ final class ParkedBases {
         }
     }
 
-    /**
-     * The parked bases that some formula changed since the previous round could match (see
-     * {@link #pendingWakeKeys}); the caller puts them back into the queue. Bases are collected
-     * one {@link WakeKind} at a time in {@link #WAKE_ORDER}, within a kind in the order the
-     * changes were recorded, and each collected base is removed from the parked map. Empties
-     * the pending change set.
-     *
-     * @return the woken bases in wake order; empty if nothing is to be woken
-     */
-    Collection<RuleAppContainer> drainWoken() {
+    /// Changes to the sequent trigger a call to [#recordWakeKeysOf(Term, boolean)] which
+    /// collects the wake keys under which potentially matchable taclet applications are parked in
+    /// [#pendingWakeKeys]. The woken applications are removed from the parking map and may
+    /// need to be explicitly reparked if not completed.
+    ///
+    /// This method collects the taclet applications parked under these keys and clears the pending
+    /// wake keys set. For determinism, the apps are collected in a fixed order determined by the
+    /// one given in [#WAKE_ORDER].
+    ///
+    /// @return the woken applications in wake order; empty if nothing is to be woken
+    Collection<RuleAppContainer> getAndClearWokenApplications() {
         if (pendingWakeKeys == null) {
             return List.of();
         }
@@ -441,17 +415,19 @@ final class ParkedBases {
         return woken;
     }
 
-    /**
-     * Remove a base that is being woken from every bucket that holds it. The keys are recomputed
-     * by {@link #parkKeys}; this yields the keys the base was stored under, because everything
-     * they are computed from (the taclet, its instantiations, the cached hashes) is never
-     * modified after the base was parked. A failed removal would mean this assumption broke and
-     * the base would stay in the map forever, hence the asserts.
-     */
+    /// Remove a base that is being woken from every bucket that holds it.
     private void unindexParked(RuleAppContainer c) {
         if (parked == null || !(c instanceof TacletAppContainer tac)) {
             return;
         }
+
+        /*
+         * The keys are recomputed by {@link #parkKeys}; this yields the keys the base was stored
+         * under, because everything they are computed from (the taclet, its instantiations,
+         * the cached hashes) is never modified after the base was parked. A failed removal would
+         * mean this assumption broke and the taclet application would stay in the map forever.
+         * We check this assumption with the asserts to fail fast in case of a bug.
+         */
         final List<WakeKey> keys = parkKeys(tac.getTacletApp());
         if (keys == null) {
             return;
@@ -476,26 +452,23 @@ final class ParkedBases {
         }
     }
 
-    /**
-     * Add to {@link #pendingWakeKeys} every {@link WakeKey} that the given formula could let a
-     * parked base match. This is the wake counterpart of {@link #parkKeys}: the two produce the
-     * same kinds of keys, so a base is woken exactly when a changed formula could match it.
-     * <p>
-     * Keys are only computed when a base is currently parked under the same head and kind
-     * ({@link #parkedCountsByHead}). This cannot suppress a needed wake. A key without such a
-     * base has no base to wake now, and a base parked later does not need it either: within a
-     * round the prover first picks candidates from the queue, which is when bases are parked,
-     * and then applies the chosen rule, which is when formula changes are recorded. So every
-     * change is recorded after all parks of its round, with the counts already raised, and a
-     * change recorded before a base was parked concerns a formula the base's own failed match
-     * already saw in the sequent. Skipping by head is also what makes recording cheap. The head
-     * costs only the walk down the update chain. The two hashes, which walk the whole formula,
-     * are computed only when a base is actually waiting for a formula with this head; without
-     * this test, a proof step that changes a large formula, such as one carrying a whole
-     * program, would hash it even though no base waits for such a formula.
-     */
+    /// Computes the wake keys for a new or modified sequent formula used to lookup (wake) potential
+    /// matching parked taclet applications.
+    ///
+    /// The computed keys are stored in [#pendingWakeKeys]. This is the wake counterpart of
+    /// [#parkKeys]: the two produce the same kinds of keys, so a base is woken exactly when a
+    /// changed formula could match it.
+    ///
+    /// @param formula the changed sequent formula for which to produce wake keys
+    /// @param inAntecedent true if the formula occurs in the antecedent, false if it occurs
+    /// in the succedent
     void recordWakeKeysOf(Term formula, boolean inAntecedent) {
+        // The return early tests like the one below rest on the
+        // fact that it is always established that parking happens
+        // before any change is reported and the corresponding wake
+        // keys are determined.
         if (parked == null || parked.isEmpty()) {
+            // no parked apps no need to check if we can wake anything
             return;
         }
         // Strip the leading updates the matcher would strip before matching, so both sides key
@@ -511,6 +484,8 @@ final class ParkedBases {
         }
         final int[] counts = parkedCountsByHead.get(head);
         if (counts == null) {
+            // all wake keys have a head, if there is no parked app with a matching head there is
+            // nothing to do
             return;
         }
         if (pendingWakeKeys == null) {
@@ -526,7 +501,7 @@ final class ParkedBases {
         if (t instanceof JTerm core) {
             if (counts[WakeKind.WHOLE_HASH.ordinal()] > 0) {
                 pendingWakeKeys.add(new WakeKey(WakeKind.WHOLE_HASH, inAntecedent, head,
-                    core.hashCodeModRenaming()));
+                    new TermModRenaming(core)));
             }
             if (core.arity() > 0 && core.sub(0) instanceof JTerm firstArg) {
                 if (counts[WakeKind.ARG_OP.ordinal()] > 0) {
@@ -539,19 +514,17 @@ final class ParkedBases {
                 if (counts[WakeKind.ARG_HASH.ordinal()] > 0
                         && !(firstArg.op() instanceof JModality)) {
                     pendingWakeKeys.add(new WakeKey(WakeKind.ARG_HASH, inAntecedent, head,
-                        firstArg.hashCodeModRenaming()));
+                        new TermModRenaming(firstArg)));
                 }
             }
         }
     }
 
-    /**
-     * A deep copy for a goal that splits into two: fresh map, fresh buckets, fresh pending set,
-     * so the two goals park and wake independently (see the copy method of
-     * {@link QueueRuleApplicationManager} for why sharing would change proofs). The stored
-     * containers and the key components are never modified in place and stay shared. The copy
-     * starts with the same parked population, so it inherits the sweep counters.
-     */
+    /// A deep copy for a goal that splits into two: fresh map, fresh buckets, fresh pending set,
+    /// so the two goals park and wake independently (see the copy method of
+    /// [QueueRuleApplicationManager] for why sharing would change proofs). The stored
+    /// containers and the key components are never modified in place and stay shared. The copy
+    /// starts with the same parked population, so it inherits the sweep counters.
     ParkedBases copy() {
         final ParkedBases res = new ParkedBases();
         if (parked != null) {
@@ -575,7 +548,7 @@ final class ParkedBases {
         return res;
     }
 
-    /** Consistency of {@link #parkedCountsByHead} with the parked map, for asserts. */
+    /// Consistency of [#parkedCountsByHead] with the parked map, for asserts.
     private boolean parkedCountsConsistent() {
         final HashMap<Object, int[]> expected = new HashMap<>();
         if (parked != null) {
@@ -596,13 +569,13 @@ final class ParkedBases {
         return true;
     }
 
-    /** Access to the parked map for the deep-copy test in this package. */
+    /// Access to the parked map for the deep-copy test in this package.
     @Nullable
     LinkedHashMap<WakeKey, Collection<RuleAppContainer>> parkedMapForTests() {
         return parked;
     }
 
-    /** Insert an entry under the given key, bypassing {@link #parkKeys}; only for tests. */
+    /// Insert an entry under the given key, bypassing [#parkKeys]; only for tests.
     void parkForTests(WakeKey key, RuleAppContainer entry) {
         if (parked == null) {
             parked = new LinkedHashMap<>();

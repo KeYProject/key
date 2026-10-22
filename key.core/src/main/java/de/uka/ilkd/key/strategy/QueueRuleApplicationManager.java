@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
 import java.util.ArrayList;
@@ -460,10 +461,10 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
 
     /**
      * Put back into the queue every parked base that a formula changed since the previous round
-     * could match; see {@link ParkedBases#drainWoken()}.
+     * could match; see {@link ParkedBases#getAndClearWokenApplications()}.
      */
     private void wakeParkedBases() {
-        final Collection<RuleAppContainer> woken = parking.drainWoken();
+        final Collection<RuleAppContainer> woken = parking.getAndClearWokenApplications();
         if (!woken.isEmpty()) {
             var time = System.nanoTime();
             try {

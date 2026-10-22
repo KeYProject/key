@@ -322,7 +322,7 @@ subprojects {
 
             licenses {
                 license {
-                    name = "GNU General Public License (GPL), Version 2"
+                    name = "GNU General Public License (GPL), Version 2, or later"
                     url = "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"
                 }
             }

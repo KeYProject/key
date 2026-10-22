@@ -1,6 +1,7 @@
 /* This file is part of KeY - https://key-project.org
- * KeY is licensed under the GNU General Public License Version 2
- * SPDX-License-Identifier: GPL-2.0-only */
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.awt.event.ActionEvent;
@@ -347,7 +348,7 @@ public final class ProofTreePopupFactory {
     static class Notes extends ProofTreeAction {
         public Notes(ProofTreeContext context) {
             super(context);
-            setName("Edit Notes...");
+            setName("Set bookmark/Annotate ...");
             setIcon(IconFactory.editFile(ICON_SIZE));
         }
 
@@ -355,7 +356,10 @@ public final class ProofTreePopupFactory {
         public void actionPerformed(ActionEvent e) {
             // display a dialog to attach text to the node
             final Icon editIcon = IconFactory.editFile(20);
-            final String origNotes = context.invokedNode.getNodeInfo().getNotes();
+            String origNotes = context.invokedNode.getNodeInfo().getNotes();
+            if (origNotes == null || origNotes.isBlank()) {
+                origNotes = "Bookmark %d".formatted(context.invokedNode.serialNr());
+            }
             final String newNotes = (String) JOptionPane.showInputDialog(context.proofTreeView,
                 null, "Annotate this proof node", JOptionPane.PLAIN_MESSAGE, editIcon, null,
                 origNotes);
