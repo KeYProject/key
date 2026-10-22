@@ -4,12 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.doc;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
@@ -29,46 +26,29 @@ public class ScriptDoc extends AbstractDocGenerator {
     }
 
     @Override
-    protected void generateDocumentation(PrintStream out) {
+    protected List<DocItem> collectData() {
+        var items = new ArrayList<DocItem>();
         for (var command : sortedCommands()) {
-            out.println();
-            out.println();
-            out.format("### `%s`\n\n", command.getName());
-            out.println(cleanJavadoc(command.getDocumentation()));
-        }
-    }
-
-    @Override
-    protected Object generateJsonData() {
-        var commands = new ArrayList<Map<String, Object>>();
-        for (var command : sortedCommands()) {
-            var data = new LinkedHashMap<String, Object>();
-            data.put("name", command.getName());
-            data.put("category", command.getCategory());
-            data.put("deprecated", command.getClass().isAnnotationPresent(Deprecated.class));
-            data.put("documentation", cleanJavadoc(command.getDocumentation()));
-
-            var arguments = new ArrayList<Map<String, Object>>();
+            var parameters = new ArrayList<DocParameter>();
             for (ProofScriptArgument meta : command.getArguments()) {
-                var argument = new LinkedHashMap<String, Object>();
-                argument.put("name", meta.getName());
-                argument.put("type", meta.getType().getSimpleName());
-                argument.put("kind",
-                    meta.isFlag() ? "flag" : meta.isOption() ? "option" : "positional");
-                argument.put("required", meta.isRequired());
-                if (meta.isPositional()) {
-                    argument.put("position", meta.getArgumentPosition());
-                }
-                if (meta.isPositionalVarArgs() || meta.isOptionalVarArgs()) {
-                    argument.put("varargs", true);
-                }
-                argument.put("description", meta.getDocumentation());
-                arguments.add(argument);
+                String kind = meta.isFlag() ? "flag" : meta.isOption() ? "option" : "positional";
+                parameters.add(new DocParameter(meta.getName(),
+                    meta.getType().getSimpleName(),
+                    cleanJavadoc(meta.getDocumentation()),
+                    kind,
+                    meta.isRequired(),
+                    meta.isPositional() ? meta.getArgumentPosition() : null,
+                    meta.isPositionalVarArgs() || meta.isOptionalVarArgs()));
             }
-            data.put("arguments", arguments);
-            commands.add(data);
+
+            var signature = new DocSignature(parameters, "", false);
+            items.add(new DocItem(command.getName(),
+                cleanJavadoc(command.getDocumentation()),
+                List.of(signature),
+                command.getCategory(),
+                command.getClass().isAnnotationPresent(Deprecated.class)));
         }
-        return Map.of("commands", commands);
+        return items;
     }
 
     /// Returns all loaded proof script commands sorted by their name.

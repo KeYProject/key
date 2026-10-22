@@ -4,13 +4,10 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.doc;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -19,7 +16,6 @@ import de.uka.ilkd.key.nparser.varexp.TacletBuilderCommandInfo;
 import de.uka.ilkd.key.nparser.varexp.TacletBuilderManipulators;
 
 import com.github.therapi.runtimejavadoc.CommentFormatter;
-import com.google.common.collect.Streams;
 
 /**
  * Generates the markdown documentation of all variable conditions (varconds) registered in
@@ -35,89 +31,53 @@ public class VarcondDoc extends AbstractDocGenerator {
     }
 
     @Override
-    protected void generateDocumentation(PrintStream out) {
+    protected List<DocItem> collectData() {
+        var items = new ArrayList<DocItem>();
         for (var entry : collectVarconds().entrySet()) {
             String name = entry.getKey();
             List<TacletBuilderCommandInfo> cmds = entry.getValue();
 
-            out.println();
-            out.println();
-            out.format("### `%s`\n\n", name);
-
             final var generalDocumentation = cmds.getFirst().getGeneralDocumentation();
-            out.println(
-                cleanJavadoc(new CommentFormatter().format(generalDocumentation.getComment())));
+            String documentation =
+                cleanJavadoc(new CommentFormatter().format(generalDocumentation.getComment()));
 
-            out.format("\n**Signatures**\n\n");
+            var signatures = new ArrayList<DocSignature>();
             for (TacletBuilderCommandInfo cmd : cmds) {
-
-                final var arguments = Streams.zip(
-                    Arrays.stream(cmd.argNames()),
-                    Arrays.stream(cmd.argumentTypes()).map(Enum::toString),
-                    "%s: %s"::formatted)
-                        .collect(Collectors.joining(", "));
-                out.printf("* `%s(%s)`\n", name, arguments);
-
-                if (cmd.isNegationSupported()) {
-                    out.printf("* `\\not%s(%s)`\n", name, arguments);
-                }
-
-                out.println();
-                final var argumentInformation = cmd.getArgumentInformation();
-
-                out.println(
-                    indent("   ", cleanJavadoc(argumentInformation.getComment().toString())));
-                out.println();
-                argumentInformation.getParams().stream()
-                        .map(tag -> "   * `%s` %s".formatted(tag.getName(), tag.getComment()))
-                        .forEach(out::println);
-                out.println();
+                signatures.add(collectSignature(cmd));
             }
+
+            items.add(new DocItem(name, documentation, signatures, null, false));
         }
+        return items;
     }
 
-    @Override
-    protected Object generateJsonData() {
-        var varconds = new ArrayList<Map<String, Object>>();
-        for (var entry : collectVarconds().entrySet()) {
-            String name = entry.getKey();
-            List<TacletBuilderCommandInfo> cmds = entry.getValue();
+    /// Builds the data of a single signature of a variable condition, i.e. of one registered
+    /// command with the same (normalized) trigger name.
+    private static DocSignature collectSignature(TacletBuilderCommandInfo cmd) {
+        final var argumentInformation = cmd.getArgumentInformation();
+        final var params = argumentInformation.getParams();
 
-            var varcond = new LinkedHashMap<String, Object>();
-            varcond.put("name", name);
-            final var generalDocumentation = cmds.getFirst().getGeneralDocumentation();
-            varcond.put("description",
-                cleanJavadoc(new CommentFormatter().format(generalDocumentation.getComment())));
-
-            var signatures = new ArrayList<Map<String, Object>>();
-            for (TacletBuilderCommandInfo cmd : cmds) {
-                final var argumentInformation = cmd.getArgumentInformation();
-                var params = argumentInformation.getParams();
-
-                var signature = new LinkedHashMap<String, Object>();
-                signature.put("negated", cmd.isNegationSupported());
-                signature.put("description",
-                    cleanJavadoc(argumentInformation.getComment().toString()));
-
-                var arguments = new ArrayList<Map<String, Object>>();
-                for (var i = 0; i < cmd.argumentTypes().length; i++) {
-                    var argument = new LinkedHashMap<String, Object>();
-                    argument.put("name", cmd.argNames()[i]);
-                    argument.put("type", cmd.argumentTypes()[i].toString());
-                    if (i < params.size()) {
-                        final var comment = params.get(i).getComment();
-                        argument.put("description",
-                            cleanJavadoc(comment == null ? null : comment.toString()));
-                    }
-                    arguments.add(argument);
-                }
-                signature.put("arguments", arguments);
-                signatures.add(signature);
+        var parameters = new ArrayList<DocParameter>();
+        for (var i = 0; i < cmd.argumentTypes().length; i++) {
+            String description = null;
+            if (i < params.size()) {
+                final var comment = params.get(i).getComment();
+                description = cleanJavadoc(comment == null ? null : comment.toString());
             }
-            varcond.put("signatures", signatures);
-            varconds.add(varcond);
+            parameters.add(new DocParameter(cmd.argNames()[i], cmd.argumentTypes()[i].toString(),
+                description, null, false, null, false));
         }
-        return Map.of("varconds", varconds);
+        // Javadoc parameter tags beyond the declared argument list (e.g. `negated`) carry no
+        // type, but their documentation is kept so that it is not lost.
+        for (var i = cmd.argumentTypes().length; i < params.size(); i++) {
+            final var comment = params.get(i).getComment();
+            parameters.add(new DocParameter(params.get(i).getName(), null,
+                cleanJavadoc(comment == null ? null : comment.toString()), null, false, null,
+                false));
+        }
+        return new DocSignature(parameters,
+            cleanJavadoc(argumentInformation.getComment().toString()),
+            cmd.isNegationSupported());
     }
 
     /// Collects all registered variable conditions, grouped and sorted by their trigger name;

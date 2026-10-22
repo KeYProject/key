@@ -6,14 +6,19 @@ package de.uka.ilkd.key.doc;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
@@ -22,91 +27,71 @@ import de.uka.ilkd.key.rule.metaconstruct.TransformerMeta;
 import com.github.therapi.runtimejavadoc.ClassJavadoc;
 import com.github.therapi.runtimejavadoc.CommentFormatter;
 import com.github.therapi.runtimejavadoc.RuntimeJavadoc;
-import com.google.common.collect.Streams;
 
+/**
+ * Generates the documentation of all code transformers (program transformers and term
+ * transformers) annotated with {@link TransformerMeta}, extracted from their Javadocs.
+ *
+ * @author Alexander Weigl
+ * @version 1 (22.10.26)
+ */
 public class CodeTransformerDoc extends AbstractDocGenerator {
+
     public static void main(String[] args) throws Exception {
         new CodeTransformerDoc().run(args[0], args[1]);
     }
 
     @Override
-    protected void generateDocumentation(PrintStream out) throws IOException {
+    protected List<DocItem> collectData() throws IOException {
+        var items = new ArrayList<DocItem>();
         for (Class<?> entry : collectTransformers()) {
-            out.println();
-            out.println();
-
-
             final var annotation = entry.getAnnotation(TransformerMeta.class);
-            String name;
-            if (annotation != null) {
-                name = annotation.name();
-            } else
+            if (annotation == null) {
                 continue;
-
-            out.format("### `%s`\n\n", name);
+            }
+            String name = annotation.name();
 
             ClassJavadoc classDoc = RuntimeJavadoc.getJavadoc(entry);
-            out.println(cleanJavadoc(new CommentFormatter().format(classDoc.getComment())));
+            String documentation =
+                cleanJavadoc(new CommentFormatter().format(classDoc.getComment()));
 
-            out.format("\n**Signatures**\n\n");
+            var signatures = new ArrayList<DocSignature>();
             for (var constr : entry.getConstructors()) {
-                final var arguments = Streams.zip(
-                    Arrays.stream(constr.getParameters())
-                            .map(Parameter::getName),
-                    Arrays.stream(constr.getParameters())
-                            .map(Parameter::getType)
-                            .map(Class::getCanonicalName),
-                    "%s: %s"::formatted)
-                        .collect(Collectors.joining(", "));
-                out.printf("* `%s(%s)`\n", name, arguments);
-
-                out.println();
-                final var argumentInformation = RuntimeJavadoc.getJavadoc(constr);
-
-                out.println(
-                    indent("   ", cleanJavadoc(argumentInformation.getComment().toString())));
-                out.println();
-                argumentInformation.getParams().stream()
-                        .map(tag -> "   * `%s` %s".formatted(tag.getName(), tag.getComment()))
-                        .forEach(out::println);
-                out.println();
+                signatures.add(collectSignature(constr));
             }
+            items.add(new DocItem(name, documentation, signatures, null, false));
         }
+        return items;
     }
 
-    @Override
-    protected Object generateJsonData() throws IOException {
-        var varconds = new ArrayList<Map<String, Object>>();
-        for (Class<?> entry : collectTransformers()) {
-            final var annotation = entry.getAnnotation(TransformerMeta.class);
-            String name;
-            if (annotation != null) {
-                name = annotation.name();
-            } else
-                continue;
+    /// Builds the data of a single signature of a code transformer, i.e. of one of its
+    /// constructors including the javadoc of the constructor and of its parameters.
+    private static DocSignature collectSignature(Constructor<?> constr) {
+        final var parameterNames =
+            Arrays.stream(constr.getParameters()).map(Parameter::getName).toList();
+        final var parameterTypes =
+            Arrays.stream(constr.getParameters()).map(Parameter::getType)
+                    .map(Class::getCanonicalName)
+                    .toList();
+        final var argumentInformation = RuntimeJavadoc.getJavadoc(constr);
+        final var params = argumentInformation.getParams();
 
-            var transformer = new LinkedHashMap<String, Object>();
-            varconds.add(transformer);
-            transformer.put("name", name);
-            transformer.put("doc",
-                RuntimeJavadoc.getJavadoc(entry).getComment().toString());
-            var c = new ArrayList<>();
-            transformer.put("signatures", c);
-            for (var constr : entry.getConstructors()) {
-                var d = new HashMap<>();
-                c.add(d);
-                d.put("paramNames", Arrays.stream(constr.getParameters())
-                        .map(Parameter::getName).toList());
-                d.put("paramTypes",
-                    Arrays.stream(constr.getParameters())
-                            .map(Parameter::getType)
-                            .map(Class::getCanonicalName).toList());
-                final var argumentInformation = RuntimeJavadoc.getJavadoc(constr);
-                d.put("documentation",
-                    cleanJavadoc(argumentInformation.getComment().toString()));
+        var parameters = new ArrayList<DocParameter>();
+        for (var i = 0; i < parameterNames.size(); i++) {
+            // prefer the javadoc parameter name over the reflection name (`arg0`, `arg1`)
+            String name = i < params.size() && !params.get(i).getName().isBlank()
+                    ? params.get(i).getName()
+                    : parameterNames.get(i);
+            String description = null;
+            if (i < params.size()) {
+                final var comment = params.get(i).getComment();
+                description = cleanJavadoc(comment == null ? null : comment.toString());
             }
+            parameters.add(new DocParameter(name, parameterTypes.get(i), description, null,
+                false, null, false));
         }
-        return varconds;
+        return new DocSignature(parameters,
+            cleanJavadoc(argumentInformation.getComment().toString()), false);
     }
 
     private List<? extends Class<?>> collectTransformers() throws IOException {

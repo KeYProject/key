@@ -7,65 +7,108 @@ package de.uka.ilkd.key.doc;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.lang.reflect.RecordComponent;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jspecify.annotations.Nullable;
 
 /**
- * Base class for the documentation generators of KeY's taclet language constructs, e.g., for the
- * variable conditions ({@link VarcondDoc}) and the proof script commands ({@link ScriptDoc}). It
- * provides the shared handling of the output target and the post-processing of javadoc text.
+ * Base class for the documentation generators of KeY's taclet language constructs, e.g. for the
+ * variable conditions ({@link VarcondDoc}) and the proof script commands ({@link ScriptDoc}).
+ * It provides the shared handling of the output target and the post-processing of javadoc text.
+ *
+ * <p>
+ * A generator implements {@link #collectData()} which builds a {@link List} of {@link DocItem}s
+ * as the single source of truth. That structure is both dumped as a JSON file and rendered to the
+ * markdown documentation, so the two outputs cannot drift apart.
  *
  * @author Alexander Weigl
  * @version 1 (23.08.26)
  */
 public abstract class AbstractDocGenerator {
 
-    /// Runs this generator. If a command line argument is given, the markdown output is written
-    /// to that file together with a JSON dump ([#generateJsonData()]) next to it; otherwise the
-    /// markdown is printed to stdout.
+    /// Runs this generator: collects the documentation data structure once, writes it as a JSON
+    /// dump next to the markdown file, and renders the markdown from that structure.
     ///
-    /// @param mdFile an optional single argument with the path of the output file
-    /// @param jsonFile
-    /// @throws IOException if the output file cannot be written
-    protected void run(String mdFile, String jsonFile) throws IOException {
+    /// @param mdFile the path of the markdown output file
+    /// @param jsonFile the path of the JSON output file
+    /// @throws IOException if an output file cannot be written
+    protected final void run(String mdFile, String jsonFile) throws IOException {
+        List<DocItem> data = collectData();
+
+        writeJson(jsonFile, data);
+        writeMarkdown(mdFile, data);
+    }
+
+    /// Collects the documentation data of this generator as a list of documented items. The
+    /// returned structure is dumped verbatim into the JSON file and is the source for the
+    /// rendered markdown.
+    ///
+    /// @return the documentation data
+    protected abstract List<DocItem> collectData() throws IOException;
+
+    /// Writes the JSON dump of the given documentation data.
+    private void writeJson(String jsonFile, List<DocItem> data) throws IOException {
+        Path jsonPath = Paths.get(jsonFile);
+        if (jsonPath.getParent() != null) {
+            Files.createDirectories(jsonPath.getParent());
+        }
+        try (var out = new PrintWriter(Files.newOutputStream(jsonPath), false)) {
+            JsonWriter.toJson(data, out);
+        }
+    }
+
+    /// Renders the markdown documentation of the given documentation data and writes it to the
+    /// given file.
+    private void writeMarkdown(String mdFile, List<DocItem> items) throws IOException {
         Path mdPath = Path.of(mdFile);
         if (mdPath.getParent() != null) {
             Files.createDirectories(mdPath.getParent());
         }
-
         try (var out = new PrintStream(Files.newOutputStream(mdPath), false)) {
-            generateDocumentation(out);
-        }
-
-
-        Object data = generateJsonData();
-
-        if (data != null) {
-            Path jsonPath = Paths.get(jsonFile);
-            if (jsonPath.getParent() != null) {
-                Files.createDirectories(jsonPath.getParent());
-            }
-            try (var out = new PrintWriter(Files.newOutputStream(jsonPath), false)) {
-                JsonWriter.toJson(data, out);
-            }
+            out.print(renderMarkdown(items));
         }
     }
 
-    /// Writes the documentation of this generator in markdown format.
-    protected abstract void generateDocumentation(PrintStream out) throws IOException;
-
-    /// Returns the documentation data of this generator in a structured form, which is serialized
-    /// into a JSON dump next to the markdown file. Returns `null` if this generator does not
-    /// support a JSON dump.
-    ///
-    /// @return the structured documentation data, or `null`
-    protected @Nullable Object generateJsonData() throws IOException {
-        return null;
+    /// Renders the markdown documentation of the given items. Each item is rendered as a level-3
+    /// heading with its trigger name, followed by its general documentation and a signature list;
+    /// each signature lists its formal parameters, its documentation, and (for variable
+    /// conditions) the negated form.
+    private static String renderMarkdown(List<DocItem> items) {
+        var sb = new StringBuilder();
+        for (DocItem item : items) {
+            sb.append("\n\n### `").append(item.name()).append("`\n\n");
+            sb.append(item.documentation()).append('\n');
+            sb.append("\n**Signatures**\n\n");
+            for (DocSignature signature : item.signatures()) {
+                String arguments = signature.parameters().stream()
+                        .filter(parameter -> parameter.type() != null)
+                        .map(parameter -> parameter.name() + ": " + parameter.type())
+                        .collect(Collectors.joining(", "));
+                sb.append("* `").append(item.name()).append('(').append(arguments).append(")`\n");
+                if (signature.negated()) {
+                    sb.append("* `\\not").append(item.name()).append('(').append(arguments)
+                            .append(")`\n");
+                }
+                sb.append('\n');
+                sb.append(indent("   ", signature.documentation())).append('\n');
+                sb.append('\n');
+                for (DocParameter parameter : signature.parameters()) {
+                    if (parameter.description() != null && !parameter.description().isBlank()) {
+                        sb.append("   * `").append(parameter.name()).append("` ")
+                                .append(parameter.description()).append('\n');
+                    }
+                }
+                sb.append('\n');
+            }
+        }
+        return sb.toString();
     }
 
     /// Converts a javadoc comment into markdown by replacing common HTML tags and entities and
@@ -342,7 +385,7 @@ public abstract class AbstractDocGenerator {
     /// @param spaces the indentation prefix
     /// @param it the text to indent
     /// @return the indented text
-    protected static String indent(String spaces, String it) {
+    private static String indent(String spaces, String it) {
         return spaces + it.replace("\n", "\n" + spaces);
     }
 }
@@ -350,8 +393,9 @@ public abstract class AbstractDocGenerator {
 
 /**
  * A minimal, dependency-free JSON serializer supporting the data structures used by the
- * documentation generators: {@link Map}s, {@link Iterable}s, strings, numbers, booleans, and
- * {@code null}. Other objects are serialized via their {@link Object#toString()}.
+ * documentation generators: {@link Map}s, {@link Iterable}s, strings, numbers, booleans,
+ * {@code null}, and {@link Record records} (serialized via their record components). Other
+ * objects are serialized via their {@link Object#toString()}.
  *
  * @author Alexander Weigl
  * @version 1 (10.10.26)
@@ -379,6 +423,7 @@ final class JsonWriter {
             case Number n -> sb.print(n);
             case Map<?, ?> map -> writeObject(sb, map, depth);
             case Iterable<?> iterable -> writeArray(sb, iterable, depth);
+            case Record record -> writeRecord(sb, record, depth);
             default -> writeString(sb, value.toString());
         }
     }
@@ -414,6 +459,33 @@ final class JsonWriter {
         }
         indent(sb, depth);
         sb.append(']');
+    }
+
+    private static void writeRecord(PrintWriter sb, Record record, int depth) {
+        sb.append("{\n");
+        RecordComponent[] components = record.getClass().getRecordComponents();
+        for (int i = 0; i < components.length; i++) {
+            RecordComponent component = components[i];
+            indent(sb, depth + 1);
+            writeString(sb, component.getName());
+            sb.append(": ");
+            write(sb, componentValue(record, component), depth + 1);
+            if (i + 1 < components.length) {
+                sb.append(',');
+            }
+            sb.append('\n');
+        }
+        indent(sb, depth);
+        sb.append('}');
+    }
+
+    private static Object componentValue(Record record, RecordComponent component) {
+        try {
+            return component.getAccessor().invoke(record);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Cannot read record component " + component.getName()
+                + " of " + record.getClass(), e);
+        }
     }
 
     private static void writeString(PrintWriter sb, String s) {
