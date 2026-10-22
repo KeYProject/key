@@ -15,6 +15,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 
 
+@TransformerMeta(name = "#memberPVToField")
 public final class MemberPVToField extends AbstractTermTransformer {
 
     public MemberPVToField() {

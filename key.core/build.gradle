@@ -35,7 +35,7 @@ dependencies {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs << "-Ajavadoc.packages=de.uka.ilkd.key.scripts,de.uka.ilkd.key.rule.conditions"
+    options.compilerArgs << "-Ajavadoc.packages=de.uka.ilkd.key.scripts,de.uka.ilkd.key.rule.conditions,de.uka.ilkd.key.rule.metaconstruct"
 }
 
 // The target directory for JavaCC (parser generation)
@@ -95,6 +95,22 @@ tasks.register('generateScriptDoc', JavaExec) {
     mainClass = 'de.uka.ilkd.key.doc.ScriptDoc'
     def mdFile = layout.buildDirectory.file("docs/keydocs/script-commands.md")
     def jsonFile = layout.buildDirectory.file("docs/keydocs/script-commands.json")
+    outputs.file(mdFile)
+    outputs.file(jsonFile)
+    doFirst {
+        args = [mdFile.get().asFile.absolutePath, jsonFile.get().asFile.absolutePath ]
+    }
+}
+
+// Generates the markdown documentation of all code transformers (program
+// transformers and term transformers), see de.uka.ilkd.key.doc.CodeTransformerDoc.
+tasks.register('generateCodeTransformerDoc', JavaExec) {
+    group = 'documentation'
+    description = 'Generates the markdown documentation of all code transformers.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'de.uka.ilkd.key.doc.CodeTransformerDoc'
+    def mdFile = layout.buildDirectory.file("docs/keydocs/code-transformers.md")
+    def jsonFile = layout.buildDirectory.file("docs/keydocs/code-transformers.json")
     outputs.file(mdFile)
     outputs.file(jsonFile)
     doFirst {

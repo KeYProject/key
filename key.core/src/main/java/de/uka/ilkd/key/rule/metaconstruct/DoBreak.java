@@ -21,6 +21,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *  l1:l2:{...}
  * </code>
  */
+@TransformerMeta(name = "do-break")
 public class DoBreak extends ProgramTransformer {
 
     /**

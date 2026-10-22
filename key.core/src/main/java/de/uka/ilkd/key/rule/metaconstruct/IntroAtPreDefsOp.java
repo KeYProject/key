@@ -34,6 +34,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
 /**
  * Transformer that introduces concrete prestate variables
  */
+@TransformerMeta(name = "#introAtPreDefs")
 public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
     /**

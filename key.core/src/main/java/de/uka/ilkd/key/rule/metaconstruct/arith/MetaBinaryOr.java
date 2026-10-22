@@ -6,9 +6,12 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
 
+import de.uka.ilkd.key.rule.metaconstruct.TransformerMeta;
+
 import org.key_project.logic.Name;
 
 
+@TransformerMeta(name = "#BinaryOr")
 public final class MetaBinaryOr extends MetaArithBitMaskOp {
 
     public MetaBinaryOr() {

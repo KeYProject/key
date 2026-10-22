@@ -40,6 +40,7 @@ import org.key_project.util.collection.ImmutableList;
  * </pre>
  *
  */
+@TransformerMeta(name = "#unwind-loop")
 public class UnwindLoop extends ProgramTransformer {
 
     /** the outer label that is used to leave the while loop ('l1') */

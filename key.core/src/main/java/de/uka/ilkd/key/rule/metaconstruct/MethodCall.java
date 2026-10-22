@@ -60,6 +60,7 @@ import org.slf4j.LoggerFactory;
  * argument sound. Behaviour is varied through the taclet/{@link ProgramElement} arguments, not by
  * subclassing, so nothing is lost.
  */
+@TransformerMeta(name = "method-call")
 public final class MethodCall extends ProgramTransformer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MethodCall.class);
 

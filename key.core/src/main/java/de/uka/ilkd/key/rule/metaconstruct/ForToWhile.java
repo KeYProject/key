@@ -52,6 +52,7 @@ import org.key_project.util.collection.ImmutableList;
  * @author MU
  */
 
+@TransformerMeta(name = "#for-to-while")
 public class ForToWhile extends ProgramTransformer {
 
     /**

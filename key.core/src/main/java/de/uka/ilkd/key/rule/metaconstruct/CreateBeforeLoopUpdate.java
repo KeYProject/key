@@ -33,6 +33,7 @@ import org.key_project.logic.op.UpdateableOperator;
  *
  * @author Dominic Steinhoefel
  */
+@TransformerMeta(name = "#createBeforeLoopUpdate")
 public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
 
     public CreateBeforeLoopUpdate() {

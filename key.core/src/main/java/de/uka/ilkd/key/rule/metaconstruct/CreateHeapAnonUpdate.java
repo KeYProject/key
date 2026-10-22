@@ -32,6 +32,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  *
  * @author Dominic Steinhoefel
  */
+@TransformerMeta(name = "#createHeapAnonUpdate")
 public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
 
     public CreateHeapAnonUpdate() {

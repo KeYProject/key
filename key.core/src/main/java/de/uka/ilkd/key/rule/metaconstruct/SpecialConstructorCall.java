@@ -22,6 +22,7 @@ import org.key_project.logic.Name;
  * to an implict method called <code>&lt;init&gt;</code> that is mainly the constructor but in its
  * normalform.
  */
+@TransformerMeta(name = "special-constructor-call")
 public class SpecialConstructorCall extends ProgramTransformer {
 
     /**
