@@ -42,7 +42,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     protected final ProgramElementName name;
 
     /**
-     * Java Annotations (like @NonNull or @Rep)
+     * Java Annotations (like @NonNull or @Rep).
      */
     protected final ImmutableList<Annotation> annotations;
 
@@ -250,9 +250,8 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
 
     public MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement pe = source.getSource();
-
-        if (!(pe instanceof TypeReference tr)
-                || tr.getDimensions() != getDimensions()) {
+        if (!(pe instanceof TypeReference)
+                || ((TypeReference) pe).getDimensions() != getDimensions()) {
             return null;
         }
 

@@ -196,9 +196,15 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
         return getKeYJavaType();
     }
 
+
+    /**
+     * We do not have a prefix, so fake it! This way we implement ReferencePrefix
+     *
+     * @author VK
+     */
     @Override
     public ReferencePrefix getReferencePrefix() {
-        return type.getReferencePrefix();
+        return null;
     }
 
     @Override
