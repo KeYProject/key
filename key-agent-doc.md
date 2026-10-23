@@ -216,6 +216,14 @@ classes are needed. The metadata of all tools (name, description, parameter sche
 approval) is available programmatically via `KeYAgentTools.agents()` / `agent(name)` and as an
 OpenAI-format tool list via `getTools()`; `list_tools` renders it as Markdown for the model.
 
+The same documentation can be printed from the command line without a GUI (useful for keeping
+the docs in sync or for scripts):
+
+```sh
+java -cp <classpath> org.key_project.key.llm.mcp.KeYAgentTools        # Markdown document
+java -cp <classpath> org.key_project.key.llm.mcp.KeYAgentTools --json # OpenAI-format tool list
+```
+
 ### 7.1 Questions
 
 The agent can ask you a question (e.g. about a case split or a design decision), which pauses the
