@@ -67,14 +67,26 @@ public final class TacletOperations {
     /** The current taclet options (choices) of the proof, one line per category. */
     public static String listTacletOptions(Proof proof) {
         var initConfig = proof.getInitConfig();
-        var settings = proof.getSettings().getChoiceSettings();
+        // The possible values are taken from the proof's choice namespace; the settings mirror
+        // (ChoiceSettings#getCategory2Choices) is not filled when a proof is loaded headless.
         var possible = new LinkedHashMap<String, List<String>>();
-        settings.getCategory2Choices().forEach(
-            (cat, values) -> possible.put(cat, values.stream().sorted().toList()));
+        for (var choice : proof.getNamespaces().choices().allElements()) {
+            var values = possible.computeIfAbsent(choice.category(), c -> new ArrayList<String>());
+            var option = optionOf(choice);
+            if (!values.contains(option)) {
+                values.add(option);
+            }
+        }
+        possible.values().forEach(v -> v.sort(String::compareTo));
         // effective selection: the activated choices may differ from the settings mirror
         var selected = new LinkedHashMap<String, String>();
         initConfig.getActivatedChoices().forEach(c -> selected.put(c.category(), optionOf(c)));
-        settings.getDefaultChoices().forEach((cat, value) -> selected.putIfAbsent(cat, value));
+        // settings defaults may name categories without an activated choice; the stored value is
+        // either the bare option name or the full "category:option" choice name
+        var settings = proof.getSettings().getChoiceSettings();
+        settings.getDefaultChoices()
+                .forEach((cat, value) -> selected.putIfAbsent(cat,
+                    value.startsWith(cat + ":") ? value.substring(cat.length() + 1) : value));
         for (var cat : selected.keySet()) {
             possible.computeIfAbsent(cat, c -> List.of());
         }
@@ -102,9 +114,18 @@ public final class TacletOperations {
             return "Error: no taclet named \"" + tacletName + "\"";
         }
         var printed = printTaclet(proof, taclet);
-        return printed == null
-                ? "Error: could not export taclet \"" + tacletName + "\""
-                : printed;
+        if (printed == null) {
+            return "Error: could not print taclet \"" + tacletName + "\"";
+        }
+        // dry run: the declaration must survive a re-parse in a throwaway copy of the proof's
+        // context; otherwise it would be useless as input for addTaclet
+        try {
+            parseSource(proof.getInitConfig().copy(), normalize(printed));
+        } catch (Exception e) {
+            return "Error: the exported declaration of \"" + tacletName
+                + "\" does not re-parse: " + e.getMessage();
+        }
+        return printed;
     }
 
     /**
@@ -204,11 +225,14 @@ public final class TacletOperations {
                 .filter(t -> !t.name().equals(taclet.name())).toList();
         config.setTaclets(ImmutableList.fromList(remaining));
         config.getTaclet2Builder().remove(taclet);
+        config.getJustifInfo().removeJustificationFor(taclet);
         int openGoals = 0;
         for (Goal goal : proof.openGoals()) {
             var index = goal.ruleAppIndex();
+            // the goal indices may hold choice-pruned variants of the taclet, hence the
+            // comparison by name rather than by object identity
             var apps = index.tacletIndex().allNoPosTacletApps().stream()
-                    .filter(app -> app.taclet() == taclet).toList();
+                    .filter(app -> app.taclet().name().equals(taclet.name())).toList();
             for (var app : apps) {
                 index.removeNoPosTacletApp(app);
             }
@@ -284,10 +308,10 @@ public final class TacletOperations {
         return s;
     }
 
-    /** The selected value of a choice, i.e. the part after the category separator. */
+    /** The selected value of a choice, i.e. the choice name without its category prefix. */
     private static String optionOf(Choice choice) {
         var full = choice.name().toString();
-        int idx = full.indexOf(':');
-        return idx >= 0 ? full.substring(idx + 1) : full;
+        var prefix = choice.category() + ":";
+        return full.startsWith(prefix) ? full.substring(prefix.length()) : full;
     }
 }
