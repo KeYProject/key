@@ -46,7 +46,9 @@ import org.key_project.key.llm.subagents.SubagentRole;
  * </ul>
  * The result is a single text message for the delegating agent that summarizes the run and
  * contains the child's final answer(s), so the parent can parse the {@code KEY_AGENT_RESULT}
- * markers if the child complied with the system prompt.
+ * markers if the child complied with the system prompt. Every finished delegation is also
+ * recorded in {@link LlmSession#getSubagentLog()} for observability (the {@code get_subagent_logs}
+ * tool and the indented activity block in the chat panel).
  *
  * @author Alexander Weigl
  */
@@ -99,8 +101,13 @@ final class SubagentRunner {
             return "[spawn_subagent: maximum nesting depth (" + maxDepth + ") reached]";
         }
         DEPTH.set(depth + 1);
+        var recorder = new RunRecorder();
+        long started = System.currentTimeMillis();
         try {
-            return runOne(parent, completions, role, task, cancelled);
+            var text = runOne(parent, completions, role, task, cancelled, recorder);
+            parent.getSubagentLog().add(new SubagentLog.SubagentRun(0L, role.name(), "sequential",
+                started, System.currentTimeMillis() - started, recorder.snapshot()));
+            return text;
         } finally {
             DEPTH.set(depth);
         }
@@ -124,6 +131,8 @@ final class SubagentRunner {
         }
         int poolSize =
             Math.min(tasks.size(), Math.max(1, LlmSettings.INSTANCE.getMaxParallelSubagents()));
+        var recorder = new RunRecorder();
+        long started = System.currentTimeMillis();
         var pool = Executors.newFixedThreadPool(poolSize);
         try {
             var futures = new ArrayList<Future<String>>();
@@ -132,7 +141,7 @@ final class SubagentRunner {
                 futures.add(pool.submit(() -> {
                     DEPTH.set(depth + 1);
                     try {
-                        return runOne(parent, completions, role, task, cancelled);
+                        return runOne(parent, completions, role, task, cancelled, recorder);
                     } finally {
                         DEPTH.set(depth);
                     }
@@ -158,6 +167,8 @@ final class SubagentRunner {
                             .append(']');
                 }
             }
+            parent.getSubagentLog().add(new SubagentLog.SubagentRun(0L, role.name(), "parallel",
+                started, System.currentTimeMillis() - started, recorder.snapshot()));
             if (cancelled.getAsBoolean()) {
                 sb.append('\n').append("(Parallel run stopped: the turn was cancelled.)");
             }
@@ -181,10 +192,34 @@ final class SubagentRunner {
         return List.of();
     }
 
+    /**
+     * Thread-local accumulator of the per-task outcomes of one {@code spawn_subagent} call. The
+     * parallel workers append concurrently; the run's record is snapshotted after they joined.
+     */
+    private static final class RunRecorder {
+        private final List<SubagentLog.SubagentTask> tasks = new ArrayList<>();
+
+        synchronized void addTask(SubagentLog.SubagentTask task) {
+            tasks.add(task);
+        }
+
+        synchronized List<SubagentLog.SubagentTask> snapshot() {
+            return List.copyOf(tasks);
+        }
+    }
+
+    /** Records the finished child task and returns the outcome text for the delegating agent. */
+    private static String childDone(RunRecorder recorder, String task, SubagentLog.Status status,
+            int rounds, List<String> called, String text) {
+        recorder.addTask(new SubagentLog.SubagentTask(task, status, rounds, List.copyOf(called),
+            text));
+        return text;
+    }
+
     // ------------------------------------------------------------------ the child loop
 
     private static String runOne(LlmSession parent, ChatCompletionsClient completions,
-            SubagentRole role, String task, BooleanSupplier cancelled) {
+            SubagentRole role, String task, BooleanSupplier cancelled, RunRecorder recorder) {
         var tools = advertiseTools(parent, role);
         var model = role.model() != null && !role.model().isBlank() ? role.model()
                 : parent.getModel();
@@ -199,11 +234,13 @@ final class SubagentRunner {
         int rounds = 0;
         while (true) {
             if (cancelled.getAsBoolean() || Thread.currentThread().isInterrupted()) {
-                return "[sub-agent '" + role.name() + "' cancelled]";
+                return childDone(recorder, task, SubagentLog.Status.CANCELLED, rounds, called,
+                    "[sub-agent '" + role.name() + "' cancelled]");
             }
             if (rounds >= maxTurns) {
-                return "[sub-agent '" + role.name() + "' stopped: reached its tool-round limit ("
-                    + maxTurns + ") without a final answer]";
+                return childDone(recorder, task, SubagentLog.Status.STOPPED, rounds, called,
+                    "[sub-agent '" + role.name() + "' stopped: reached its tool-round limit ("
+                        + maxTurns + ") without a final answer]");
             }
 
             final Map<String, Object> response;
@@ -211,14 +248,16 @@ final class SubagentRunner {
                 response = completions.complete(parent,
                     new AgentRequest(model, List.copyOf(thread), tools, null, null, maxTurns));
             } catch (Exception e) {
-                return "[sub-agent '" + role.name() + "' failed: " + e.getMessage() + "]";
+                return childDone(recorder, task, SubagentLog.Status.FAILED, rounds, called,
+                    "[sub-agent '" + role.name() + "' failed: " + e.getMessage() + "]");
             }
 
             final Map<?, ?> message;
             try {
                 message = AgentLoop.extractMessage(response);
             } catch (Exception e) {
-                return "[sub-agent '" + role.name() + "' failed: " + e.getMessage() + "]";
+                return childDone(recorder, task, SubagentLog.Status.FAILED, rounds, called,
+                    "[sub-agent '" + role.name() + "' failed: " + e.getMessage() + "]");
             }
             var toolCalls = AgentLoop.asList(message.get("tool_calls"));
             String content = message.get("content") == null ? ""
@@ -231,10 +270,8 @@ final class SubagentRunner {
                     header += ", called: " + String.join(", ", called);
                 }
                 header += "]";
-                if (content.isBlank()) {
-                    return header;
-                }
-                return header + "\n\n" + content.stripTrailing();
+                return childDone(recorder, task, SubagentLog.Status.OK, rounds, called,
+                    content.isBlank() ? header : header + "\n\n" + content.stripTrailing());
             }
 
             rounds++;

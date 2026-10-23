@@ -204,6 +204,7 @@ The built-in tool set (`KeYAgentTools`):
 | `ask_user`          | auto     | ask the user a question; the turn pauses until it is answered       |
 | `use_skill`         | auto     | activate a user-defined skill by name (only if enabled in settings) |
 | `spawn_subagent`    | ask      | delegate a task to a sub-agent (only if enabled in settings)        |
+| `get_subagent_logs` | auto     | list the recorded sub-agent runs (role, mode, per-task status and the tools that were called) |
 | `tryclose`          | auto     | apply the `tryclose` proof-script command (TryClose macro) to the current branch, all open goals, or a goal by index |
 | `auto`              | auto     | apply KeY's automatic proof strategy ('Auto' button) with an arbitrary step limit |
 | `list_proofs`       | auto     | enumerate all open proofs with an identifier usable in the taclet tools' `proof` parameter |
@@ -288,6 +289,11 @@ spawn_subagent { "role": "goal-solver", "task": "Close all open goals of the cur
 - **Result:** the child's final answer (which should start with
   `KEY_AGENT_RESULT {"summary": "…"}` for machine-readable outcomes) is returned to the
   delegating agent as the tool result.
+- **Observability:** every finished delegation is recorded in a per-session log (role, mode,
+  timing, and per task the status, round count and called tools). The read-only
+  `get_subagent_logs` tool renders it for the model (newest first, optional `limit` and `role`
+  filter), the chat panel shows the per-task lines indented under the `spawn_subagent` row in
+  the tool-activity summary, and *Clear history* clears the log together with the conversation.
 
 ---
 

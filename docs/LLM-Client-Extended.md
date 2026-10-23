@@ -276,6 +276,7 @@ new tools with their approval requirement.
 | `LlmToolsPanel` | per-tool approval/disablement table |
 | `LibraryEditorPanel` + editors | create/edit/delete/export/import for prompts and skills |
 | `SubagentRunner` + `subagents.*` | sequential + parallel sub-agent delegation (`spawn_subagent` child loop, role registry/whitelist, depth guard, parallel fan-out with serialized tool dispatch); see `docs/subagents.md` |
+| `SubagentLog` | per-session, bounded record of sub-agent runs (role, mode, per-task status/tools), exposed via the `get_subagent_logs` tool and rendered in the chat panel's tool-activity summary |
 
 ## Testing
 
