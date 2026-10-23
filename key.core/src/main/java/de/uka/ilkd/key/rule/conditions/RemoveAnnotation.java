@@ -45,7 +45,7 @@ public final class RemoveAnnotation implements VariableCondition {
      * @param read the {@link SchemaVariable} that gets copied.
      * @param annot the fully qualified name of the {@link Annotation} to remove.
      *
-     * @throws IllegalArgumentException if <code>read</code> or <code>store</code> 
+     * @throws IllegalArgumentException if <code>read</code> or <code>store</code>
      *         are not a `SimpleInstanceCreation`.
      */
     public RemoveAnnotation(SchemaVariable store, SchemaVariable read, String annot) {

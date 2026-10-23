@@ -45,7 +45,7 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
      * create an instance of the variable condition.
      *
      * @param variable the variable whos {@link TypeReference} is to check for
-     *        {@link Annotation}s, which can be a `Variable`, a `LocalVariable`, 
+     *        {@link Annotation}s, which can be a `Variable`, a `LocalVariable`,
      *        a `SimpleInstanceCreation` or a `Field`.
      * @param annot the fully qualified name of the {@link Annotation} to check for.
      *
