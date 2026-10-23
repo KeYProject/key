@@ -198,7 +198,9 @@ public interface McpToolProvider {
   `TacletOperations`). Plugins add tools by registering another `AgentToolProvider`. The tool
   metadata (name, description, parameter schema, approval) is available via
   `KeYAgentTools.agents()` / `agent(String)` and `toolsMarkdown()`, and the `list_tools`
-  tool dumps the Markdown documentation of the whole tool set on demand.
+  tool dumps the Markdown documentation of the whole tool set on demand. The same documentation
+  is also available from a headless `main`: `KeYAgentTools [--json]` prints the Markdown
+  document (or the OpenAI-format tool list).
 * `McpClientStdio` is a **reference implementation** for talking to external MCP servers
   over stdin/stdout (JSON-RPC 2.0, protocol version 2024-11-05, 30 s timeouts). It wraps an
   already-started `Process` (`initialize()` then `getTools()`/`callTool`), but is currently
@@ -273,7 +275,8 @@ assembly), `PromptResolverTest` (markup), `LlmContextTest` (wire serialization),
 `BuiltInMCPClientTest` (registry/approvals), `ShellSafetyPolicyTest`,
 `SchemaSerializationTest`, `AutocompleteInputTest`/`AutocompleteProvidersTest`,
 `LibraryEditorPanelsTest`, `mcp/KeYAgentToolsCommandTest` (proof-script tool mapping) and
-`mcp/AgentToolsTest` (modular discovery, metadata API, `list_tools` documentation);
+`mcp/AgentToolsTest` (modular discovery, metadata API, `list_tools` documentation, CLI
+rendering);
 `TestMcpToolProvider` and `TestAgentToolProvider` are service-loader test fixtures.
 
 ## Author
