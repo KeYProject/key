@@ -258,7 +258,8 @@ turn until you answer. Turn this off with *Allow the agent to ask questions*.
 ### 7.3 Sub-agents (`spawn_subagent`)
 
 A **sub-agent** is a delegated, bounded tool loop with a role-specific system prompt and a
-restricted tool whitelist. The `spawn_subagent` tool takes a role, a precise task and a mode:
+restricted tool whitelist. The `spawn_subagent` tool takes a role, a task (or a `tasks` array
+in parallel mode) and a mode:
 
 ```
 spawn_subagent { "role": "goal-solver", "task": "Close all open goals of the current proof.",
@@ -276,13 +277,17 @@ spawn_subagent { "role": "goal-solver", "task": "Close all open goals of the cur
 - **Bounded:** each sub-agent has a tool-round budget (role-specific, or `max sub-agent turns`)
   and a maximum nesting depth (`max sub-agent depth`); delegations inside a sub-agent are
   depth-guarded, cancellations of the parent turn propagate into running children.
+- **Parallel fan-out:** `mode: parallel` solves a `tasks` array of independent tasks
+  concurrently (only for roles marked `parallelAllowed`, e.g. `goal-solver` and `file-explorer`,
+  not `rule-designer`). One worker thread runs per task on a pool capped by
+  `max parallel sub-agents`; tool *dispatch* is serialized through a global lock, because KeY
+  proofs and the GUI mediator are not thread-safe — the speed-up is in the overlapping LLM
+  round-trips, while every call that touches the proof stays mutually exclusive. The merged
+  result is one tool message listing `(1) …`, `(2) …` per task. Nested spawns run outside the
+  lock, so parallel sub-sub-agents cannot deadlock.
 - **Result:** the child's final answer (which should start with
   `KEY_AGENT_RESULT {"summary": "…"}` for machine-readable outcomes) is returned to the
   delegating agent as the tool result.
-- `mode: parallel` exists in the schema but is **not implemented yet**; currently parallel is
-  rejected and sub-agents run sequentially. Configuring it, plus status reporting in the chat
-  panel, is planned: parallel fan-out will only be offered for roles marked
-  `parallelAllowed` and must be restricted to disjoint proofs (proofs are not thread-safe).
 
 ---
 
@@ -337,6 +342,7 @@ are edited in their own panels.
 | Agent may spawn sub-agents (`spawn_subagent`) | `false` |
 | Max sub-agent turns (per delegation) | `8` |
 | Max sub-agent depth (nesting) | `2` |
+| Max parallel sub-agents (per parallel run) | `4` |
 
 ### Context and history
 | Setting | Default |
