@@ -14,9 +14,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -30,7 +29,8 @@ import org.jspecify.annotations.Nullable;
  * below "LLM Settings" (see {@code LlmExtension.LlmSettingsProvider}). The entries are listed in a
  * simple vertical list (name in bold, description below); entries are selectable, created and
  * edited in a modal dialog opened by {@code New} or {@code Edit} (or a double click), deleted with
- * {@code Delete} and the whole library can be exported to or imported from a JSON file.
+ * {@code Delete} and the whole library can be exported to or imported from a ZIP archive of
+ * Markdown files (one {@code <name>.md} per entry, see {@link LibraryZip}).
  *
  * <p>
  * Like every KeY settings panel it renders the standard header (title + optional subtitle) via
@@ -156,11 +156,11 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
     /** Deletes the entry with the given name; returns {@code null} on success or an error. */
     protected abstract String removeByName(String name);
 
-    /** Serializes the whole library to JSON (for export). */
-    protected abstract String toJson(List<E> entries);
+    /** Serializes one entry to its Markdown document (for the ZIP export). */
+    protected abstract String toMarkdown(E e);
 
-    /** Parses a JSON export back into entries; returns an empty list on failure. */
-    protected abstract List<E> fromJson(String json);
+    /** Parses one entry from its Markdown document; {@code null} when the entry is invalid. */
+    protected abstract @Nullable E fromMarkdown(String markdown);
 
     // ----------------------------------------------------------------------- editor actions
 
@@ -248,16 +248,20 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
     private void exportLibrary() {
         var chooser = new JFileChooser();
         chooser.setDialogTitle("Export " + title.toLowerCase());
-        chooser.setFileFilter(new FileNameExtensionFilter("JSON files", "json"));
+        chooser.setFileFilter(new FileNameExtensionFilter("ZIP archives", "zip"));
         if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
             return;
         }
         var file = chooser.getSelectedFile();
-        if (file != null && !file.getName().toLowerCase().endsWith(".json")) {
-            file = new File(file.getParentFile(), file.getName() + ".json");
+        if (file != null && !file.getName().toLowerCase().endsWith(".zip")) {
+            file = new File(file.getParentFile(), file.getName() + ".zip");
+        }
+        var entries = new LinkedHashMap<String, String>();
+        for (var e : items) {
+            entries.put(nameOf(e) + ".md", toMarkdown(e));
         }
         try {
-            Files.writeString(file.toPath(), toJson(items), StandardCharsets.UTF_8);
+            LibraryZip.write(file.toPath(), entries);
             JOptionPane.showMessageDialog(this,
                 "Exported " + items.size() + " " + title.toLowerCase() + " to " + file);
         } catch (IOException ex) {
@@ -269,14 +273,21 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
     private void importLibrary() {
         var chooser = new JFileChooser();
         chooser.setDialogTitle("Import " + title.toLowerCase());
-        chooser.setFileFilter(new FileNameExtensionFilter("JSON files", "json"));
+        chooser.setFileFilter(new FileNameExtensionFilter("ZIP archives", "zip"));
         if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
             return;
         }
-        List<E> imported;
+        List<E> imported = new ArrayList<>();
         try {
-            imported = fromJson(
-                Files.readString(chooser.getSelectedFile().toPath(), StandardCharsets.UTF_8));
+            for (var entry : LibraryZip.read(chooser.getSelectedFile().toPath()).entrySet()) {
+                if (!entry.getKey().endsWith(".md")) {
+                    continue; // only library documents, ignore everything else in the archive
+                }
+                var e = fromMarkdown(entry.getValue());
+                if (e != null) {
+                    imported.add(e);
+                }
+            }
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Import failed: " + ex.getMessage(),
                 "Import failed", JOptionPane.ERROR_MESSAGE);
@@ -284,7 +295,7 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
         }
         if (imported.isEmpty()) {
             JOptionPane.showMessageDialog(this,
-                "The file contains no valid " + title.toLowerCase() + ".");
+                "The archive contains no valid " + title.toLowerCase() + ".");
             return;
         }
         reload();
