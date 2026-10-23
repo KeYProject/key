@@ -4,33 +4,40 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.llm.mcp;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.ServiceLoader;
+import java.util.TreeMap;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.scripts.ProofScriptEngine;
-import de.uka.ilkd.key.scripts.ScriptCommandAst;
-import de.uka.ilkd.key.scripts.ScriptException;
-
-import org.key_project.key.llm.*;
-
-import com.google.gson.GsonBuilder;
 import org.jspecify.annotations.Nullable;
 
-import static org.key_project.key.llm.mcp.Tool.ApprovalRequirement.ASK;
-import static org.key_project.key.llm.mcp.Tool.ApprovalRequirement.AUTO;
-
 /**
- * The built-in tool set of the KeY-Agent:
+ * The KeY-Agent's client side of the tool contract: a registry that aggregates every
+ * {@link AgentTool} contributed by the {@link AgentToolProvider}s found on the class path
+ * (Java {@link ServiceLoader}, service file
+ * {@code META-INF/services/org.key_project.key.llm.mcp.AgentToolProvider}) and exposes them as
+ * one {@link McpClient}.
+ * <p>
+ * The tool set is dynamic and modular by design:
+ * <ul>
+ * <li>each tool lives in its own provider class (see {@code org.key_project.key.llm.mcp.tools})
+ * carrying its metadata (name, description, parameter schema, default approval) and its call
+ * logic; the monolithic tool list + dispatch switch is gone,</li>
+ * <li>plugins and test suites add tools by registering an {@link AgentToolProvider} - no change
+ * to this class is needed,</li>
+ * <li>the tool metadata is available programmatically via {@link #agents()} /
+ * {@link #agent(String)},
+ * as OpenAI-format definitions via {@link #getTools()} and rendered as Markdown via
+ * {@link #toolsMarkdown()},</li>
+ * <li>the tool set documents itself: {@code list_tools} ({@link #TOOL_LIST_TOOLS}) returns the
+ * Markdown documentation of every registered tool.</li>
+ * </ul>
+ *
+ * <p>
+ * The built-in tools provided by {@code keyext.llm}:
  * <ul>
  * <li>{@code get_proof_context} - the current proof state as a text block</li>
  * <li>{@code list_files} / {@code read_file} / {@code file_info} - bounded, sandboxed access to
@@ -50,6 +57,7 @@ import static org.key_project.key.llm.mcp.Tool.ApprovalRequirement.AUTO;
  * (bounded output, optional filter)</li>
  * <li>{@code add_taclet} / {@code remove_taclet} - register a new taclet for a proof, resp. retire
  * one (future rule applications only; requires user approval)</li>
+ * <li>{@code list_tools} - dumps the Markdown documentation of all tools</li>
  * </ul>
  *
  * @author Alexander Weigl
@@ -72,611 +80,60 @@ public final class KeYAgentTools implements McpClient {
     public static final String TOOL_EXPORT_TACLETS = "export_taclets";
     public static final String TOOL_ADD_TACLET = "add_taclet";
     public static final String TOOL_REMOVE_TACLET = "remove_taclet";
+    public static final String TOOL_LIST_TOOLS = "list_tools";
 
-    private final ShellSafetyPolicy safetyPolicy = new ShellSafetyPolicy();
+    /** All registered tools, sorted by name (insertion order is otherwise load-order dependent). */
+    private final TreeMap<String, AgentTool> tools = new TreeMap<>();
 
-    private static @Nullable Proof selectedProof() {
-        var mediator = MainWindow.getInstance().getMediator();
-        return mediator == null ? null : mediator.getSelectedProof();
+    public KeYAgentTools() {
+        for (var provider : ServiceLoader.load(AgentToolProvider.class)) {
+            for (var tool : provider.get()) {
+                if (tool == null || tool.name() == null || tool.name().isBlank()) {
+                    continue;
+                }
+                tools.putIfAbsent(tool.name(), tool);
+            }
+        }
+        // The documentation tool sees the whole registry, including itself.
+        tools.putIfAbsent(TOOL_LIST_TOOLS, new ToolsDocumentation(this::agents));
     }
+
+    // ------------------------------------------------------------------- metadata access
+
+    /**
+     * All tools known to the registry (including the {@code list_tools} documentation tool),
+     * sorted by name. This makes the tool metadata available programmatically; for the settings
+     * UI use {@link BuiltInMCPClient#getAllTools()} instead, which also covers tools from other
+     * MCP clients.
+     */
+    public List<AgentTool> agents() {
+        return List.copyOf(new ArrayList<>(tools.values()));
+    }
+
+    /** The registered tool with the given name, or {@code null}. */
+    public @Nullable AgentTool agent(String name) {
+        return tools.get(name);
+    }
+
+    /** Renders the documentation of every registered tool as Markdown. */
+    public String toolsMarkdown() {
+        return agents().stream().map(AgentTool::toMarkdown).collect(Collectors.joining("\n\n"));
+    }
+
+    // ------------------------------------------------------------------- McpClient
 
     @Override
     public List<Tool> getTools() {
-        return List.of(
-            tool(TOOL_GET_PROOF_CONTEXT, "Returns a text block describing the current proof state:"
-                + " name, open/closed goals, the current sequent, open goal sequents, model info and"
-                + " the computation path from the root to the selected node.", AUTO,
-                schema(
-                    "include_compute_path",
-                    JsonSchema.builder().withType("boolean")
-                            .withDescription("include the computation path")
-                            .build())),
-            tool(TOOL_LIST_FILES, "Lists files of the current Java model directory (relative paths,"
-                + " bounded). Use with an optional prefix to filter.", AUTO,
-                schema("prefix",
-                    JsonSchema.builder().withType("string")
-                            .withDescription("optional path prefix to filter").build())),
-            tool(TOOL_READ_FILE, "Reads a text file of the current Java model directory (relative"
-                + " path). Respects the configured size limits.", AUTO,
-                schema("path",
-                    JsonSchema.builder().withType("string")
-                            .withDescription("relative path inside the model")
-                            .build())),
-            tool(TOOL_FILE_INFO, "Returns metadata (size, last modified, kind) of a file inside the"
-                + " model directory.", AUTO,
-                schema("path",
-                    JsonSchema.builder().withType("string")
-                            .withDescription("relative path inside the model")
-                            .build())),
-            tool(TOOL_RUN_COMMAND, "Runs a shell command in the model directory. Requires user"
-                + " approval. Destructive commands are blocked by a blocklist.", ASK,
-                schema(
-                    "command", JsonSchema.builder().withType("string")
-                            .withDescription("the shell command to run").build())),
-            tool(TOOL_ASK_USER, "Asks the user a question. Use this whenever a case split, an"
-                + " assumption or a design decision is ambiguous. The user's answer is returned"
-                + " verbatim.", AUTO,
-                schema("question",
-                    JsonSchema.builder().withType("string").withDescription("the question text")
-                            .build(),
-                    "options",
-                    JsonSchema.builder().withType("array")
-                            .withDescription("optional answer options")
-                            .withItems(JsonSchema.builder().withType("string").build()).build())),
-            tool(TOOL_USE_SKILL, "Activates a user-defined skill by name. Skills add focused"
-                + " instructions to the system prompt of this and subsequent turns. Enabled only"
-                + " when the 'agent can use skills' setting is on.", AUTO,
-                schema("name",
-                    JsonSchema.builder().withType("string")
-                            .withDescription("the name of the skill to activate").build())),
-            tool(TOOL_TRYCLOSE, "Applies the KeY proof-script command 'tryclose' to the current"
-                + " proof: it automatically tries to close goals with the TryClose strategy."
-                + " Targets either the first open goal of the current branch (default), all open"
-                + " goals, or a single goal by index.", AUTO,
-                schema(
-                    "branch",
-                    JsonSchema.builder().withType("string")
-                            .withDescription("the target: \"branch\" (first open goal, default),"
-                                + " \"all\" (all open goals), or the 0-based index of one open"
-                                + " goal")
-                            .build(),
-                    "steps",
-                    JsonSchema.builder().withType("integer")
-                            .withDescription("maximum number of proof steps")
-                            .build(),
-                    "assertClosed",
-                    JsonSchema.builder().withType("boolean")
-                            .withDescription("report an error if the target cannot be closed")
-                            .build())),
-            tool(TOOL_AUTO, "Applies KeY's automatic proof strategy (the 'Auto' button / the"
-                + " 'auto' proof-script command) to the current branch, with an arbitrary maximum"
-                + " number of proof steps. Use it to try to discharge the current goal by"
-                + " automatic proof search.", AUTO,
-                schema(
-                    "steps",
-                    JsonSchema.builder().withType("integer")
-                            .withDescription("maximum number of proof steps (the configured"
-                                + " strategy limit applies if omitted)")
-                            .build(),
-                    "all",
-                    JsonSchema.builder().withType("boolean")
-                            .withDescription("apply the strategy to all open goals instead of the"
-                                + " first one")
-                            .build())),
-            tool(TOOL_LIST_PROOFS, "Lists all currently open proofs with an identifier (name or"
-                + " index). Pass the identifier as the optional 'proof' parameter of the taclet"
-                + " tools (list_taclets, list_taclet_options, export_taclet, add_taclet,"
-                + " remove_taclet); omitting it targets the currently selected proof.", AUTO,
-                schema()),
-            tool(TOOL_LIST_TACLETS, "Lists the taclets (rewrite and apply rules) available for a"
-                + " proof, one name per line. Optionally filters by a case-insensitive substring.",
-                AUTO,
-                schema(
-                    "proof",
-                    JsonSchema.builder().withType("string")
-                            .withDescription("proof identifier (name or index) as returned by"
-                                + " list_proofs; omit to use the currently selected proof")
-                            .build(),
-                    "filter",
-                    JsonSchema.builder().withType("string")
-                            .withDescription("optional case-insensitive substring to filter"
-                                + " taclet names")
-                            .build())),
-            tool(TOOL_LIST_TACLET_OPTIONS, "Lists the taclet options (choices) of a proof: the"
-                + " selected value of each option category such as programRules, together with"
-                + " the possible values.", AUTO,
-                schema(
-                    "proof",
-                    JsonSchema.builder().withType("string")
-                            .withDescription("proof identifier (name or index) as returned by"
-                                + " list_proofs; omit to use the currently selected proof")
-                            .build())),
-            tool(TOOL_EXPORT_TACLET, "Exports a taclet of a proof as a parseable KeY rule"
-                + " declaration. The text can be edited and registered again with add_taclet.",
-                AUTO,
-                schema(
-                    "proof",
-                    JsonSchema.builder().withType("string")
-                            .withDescription("proof identifier (name or index) as returned by"
-                                + " list_proofs; omit to use the currently selected proof")
-                            .build(),
-                    "taclet",
-                    JsonSchema.builder().withType("string")
-                            .withDescription("name of the taclet to export")
-                            .build())),
-            tool(TOOL_EXPORT_TACLETS, "Exports several taclets of a proof as parseable KeY rule"
-                + " declarations, optionally filtered by a case-insensitive substring; without a"
-                + " filter all available taclets are exported. The output is capped: narrow it"
-                + " with 'filter' if the result is truncated, or export single taclets with"
-                + " export_taclet.", AUTO,
-                schema(
-                    "proof",
-                    JsonSchema.builder().withType("string")
-                            .withDescription("proof identifier (name or index) as returned by"
-                                + " list_proofs; omit to use the currently selected proof")
-                            .build(),
-                    "filter",
-                    JsonSchema.builder().withType("string")
-                            .withDescription("optional case-insensitive substring to filter"
-                                + " taclet names")
-                            .build())),
-            tool(TOOL_ADD_TACLET, "Registers a new taclet for a proof, given as a parseable KeY"
-                + " rule declaration (\\taclet <name> { ... };). The taclet becomes available for"
-                + " future rule applications of that proof. Requires user approval.", ASK,
-                schema(
-                    "proof",
-                    JsonSchema.builder().withType("string")
-                            .withDescription("proof identifier (name or index) as returned by"
-                                + " list_proofs; omit to use the currently selected proof")
-                            .build(),
-                    "taclet",
-                    JsonSchema.builder().withType("string")
-                            .withDescription("the taclet declaration text, e.g."
-                                + " \\taclet my_rule { ... };")
-                            .build())),
-            tool(TOOL_REMOVE_TACLET, "Removes a taclet from a proof's rule set so that it is no"
-                + " longer offered for future rule applications. Rule applications that already"
-                + " happened are not affected. Requires user approval.", ASK,
-                schema(
-                    "proof",
-                    JsonSchema.builder().withType("string")
-                            .withDescription("proof identifier (name or index) as returned by"
-                                + " list_proofs; omit to use the currently selected proof")
-                            .build(),
-                    "taclet",
-                    JsonSchema.builder().withType("string")
-                            .withDescription("name of the taclet to remove")
-                            .build())));
+        return agents().stream().map(AgentTool::asTool).toList();
     }
 
-    private static Tool tool(String name, String description, Tool.ApprovalRequirement approval,
-            JsonSchema parameters) {
-        return new Tool(new FunctionDefinition(name, description, parameters), approval);
-    }
-
-    private static JsonSchema schema(Object... keyValue) {
-        var builder = JsonSchema.builder().withType("object");
-        for (int i = 0; i + 1 < keyValue.length; i += 2) {
-            builder.addProperty((String) keyValue[i], (JsonSchema) keyValue[i + 1]);
-        }
-        return builder.build();
-    }
-
-    @SuppressWarnings("unchecked")
     @Override
     public Object callTool(String toolName, String arguments) throws Exception {
-        var args = parseArgs(arguments);
-        return switch (toolName) {
-            case TOOL_GET_PROOF_CONTEXT -> contextBlock(args);
-            case TOOL_LIST_FILES -> listFiles(stringArg(args, "prefix"));
-            case TOOL_READ_FILE -> readFile(stringArg(args, "path"), false);
-            case TOOL_FILE_INFO -> readFile(stringArg(args, "path"), true);
-            case TOOL_RUN_COMMAND -> runCommand(stringArg(args, "command"));
-            case TOOL_ASK_USER ->
-                "[ask_user is interactive and handled by the agent loop; it cannot be called "
-                    + "directly]";
-            case TOOL_USE_SKILL ->
-                "[use_skill is handled by the agent loop; it cannot be called directly]";
-            case TOOL_TRYCLOSE -> tryClose(args);
-            case TOOL_AUTO -> runAuto(args);
-            case TOOL_LIST_PROOFS -> listProofs();
-            case TOOL_LIST_TACLETS -> listTaclets(args);
-            case TOOL_LIST_TACLET_OPTIONS -> listTacletOptions(args);
-            case TOOL_EXPORT_TACLET -> exportTaclet(args);
-            case TOOL_EXPORT_TACLETS -> exportTaclets(args);
-            case TOOL_ADD_TACLET -> addTaclet(args);
-            case TOOL_REMOVE_TACLET -> removeTaclet(args);
-            default -> throw new IllegalArgumentException("unknown tool: " + toolName);
-        };
-    }
-
-    private static Map<String, Object> parseArgs(String arguments) {
-        if (arguments == null || arguments.isBlank()) {
-            return Map.of();
+        var agent = tools.get(toolName);
+        if (agent == null) {
+            throw new IllegalArgumentException("unknown tool: " + toolName);
         }
-        try {
-            var parsed = new GsonBuilder().create().fromJson(arguments, Map.class);
-            return parsed == null ? Map.of() : parsed;
-        } catch (Exception e) {
-            return Map.of();
-        }
-    }
-
-    private static @Nullable String stringArg(Map<String, Object> args, String key) {
-        Object v = args.get(key);
-        return v == null ? null : String.valueOf(v);
-    }
-
-    private static boolean boolArg(Map<String, Object> args, String key) {
-        Object v = args.get(key);
-        return v instanceof Boolean b && b || "true".equals(v);
-    }
-
-    private static @Nullable Integer intArg(Map<String, Object> args, String key) {
-        Object v = args.get(key);
-        if (v instanceof Number n) {
-            return n.intValue();
-        }
-        if (v != null) {
-            try {
-                return Integer.parseInt(String.valueOf(v).trim());
-            } catch (NumberFormatException e) {
-                return null;
-            }
-        }
-        return null;
-    }
-
-    // ----------------------------------------------------------------- proof-manipulation tools
-
-    /**
-     * Runs the {@code tryclose} proof-script command. The default target is the first open goal
-     * (mirroring {@code tryclose branch;}); {@code "all"} or a goal index select the other
-     * targets.
-     */
-    private static String tryClose(Map<String, Object> args) {
-        return runScript(tryCloseCommand(stringArg(args, "branch"), intArg(args, "steps"),
-            boolArg(args, "assertClosed")));
-    }
-
-    /**
-     * Runs the {@code auto} proof-script command with the given step limit.
-     */
-    private static String runAuto(Map<String, Object> args) {
-        return runScript(autoCommand(intArg(args, "steps"), boolArg(args, "all")));
-    }
-
-    /**
-     * Builds the {@code tryclose} script command from the tool parameters. {@code null}/{@code
-     * blank}/{@code "branch"} targets the first open goal, {@code "all"} all open goals, and a
-     * decimal string the goal with that index.
-     */
-    static ScriptCommandAst tryCloseCommand(@Nullable String branch, @Nullable Integer steps,
-            boolean assertClosed) {
-        List<Object> positional;
-        if (branch == null || branch.isBlank() || "branch".equals(branch)) {
-            positional = List.of("branch");
-        } else if ("all".equals(branch)) {
-            positional = List.of();
-        } else {
-            try {
-                Integer.parseInt(branch);
-                positional = List.of(branch);
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException(
-                    "'branch' must be \"branch\", \"all\" or a goal index, got: " + branch);
-            }
-        }
-
-        var named = new HashMap<String, Object>();
-        if (steps != null) {
-            named.put("steps", steps);
-        }
-        if (assertClosed) {
-            named.put("assertClosed", true);
-        }
-        return new ScriptCommandAst("tryclose", named, positional);
-    }
-
-    /**
-     * Builds the {@code auto} script command from the tool parameters.
-     */
-    static ScriptCommandAst autoCommand(@Nullable Integer steps, boolean all) {
-        var named = new HashMap<String, Object>();
-        if (steps != null) {
-            named.put("steps", steps);
-        }
-        if (all) {
-            named.put("all", true);
-        }
-        return new ScriptCommandAst("auto", named, List.of());
-    }
-
-    /**
-     * Executes a single proof-script command on the currently selected proof via the
-     * {@link ProofScriptEngine}, i.e. through the same machinery as the "Apply Script" action.
-     * The result tells the agent how many open goals remain.
-     */
-    private static String runScript(ScriptCommandAst command) {
-        var proof = selectedProof();
-        if (proof == null) {
-            return "Error: no proof selected";
-        }
-        int before = proof.openGoals().size();
-        var ui = MainWindow.getInstance().getMediator().getUI();
-        try {
-            new ProofScriptEngine(proof).execute(ui, List.of(command));
-        } catch (ScriptException e) {
-            return "Error: " + e.getMessage();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return "Error: proof search interrupted";
-        }
-        int after = proof.openGoals().size();
-        int closed = before - after;
-        return command.commandName() + ": " + closed + " goal(s) closed, " + after
-            + " open goal(s) remain" + (after == 0 ? " - the proof is closed" : "") + ".";
-    }
-
-    private static String contextBlock(Map<String, Object> args) {
-        var proof = selectedProof();
-        if (proof == null) {
-            return "(no proof selected)";
-        }
-        var node = MainWindow.getInstance().getMediator().getSelectedNode();
-        return ProofContextCollector.contextBlock(proof, node);
-    }
-
-    // ---------------------------------------------------------------------- taclet management
-    // tools
-
-    /**
-     * A resolved tool target: either a proof or an error text to return to the model.
-     */
-    private record ProofRef(@Nullable Proof proof, @Nullable String error) {
-    }
-
-    /**
-     * Resolves the target proof of a tool call: the optional {@code proof} parameter (name or
-     * index as listed by {@link #listProofs()}), or the currently selected proof if omitted.
-     */
-    private static ProofRef proofRef(Map<String, Object> args) {
-        var mediator = MainWindow.getInstance().getMediator();
-        var selected = mediator == null ? null : mediator.getSelectedProof();
-        return selectProof(mediator.getCurrentlyOpenedProofs(), selected, stringArg(args, "proof"));
-    }
-
-    /**
-     * Selects a proof from the opened proofs by identifier: an exact (or case-insensitive) proof
-     * name, or the 0-based index shown by {@code list_proofs}. Without an identifier the selected
-     * proof is used.
-     */
-    static ProofRef selectProof(List<Proof> opened, @Nullable Proof selected,
-            @Nullable String id) {
-        if (id == null || id.isBlank()) {
-            return selected != null ? new ProofRef(selected, null)
-                    : new ProofRef(null,
-                        "Error: no proof selected; pass a 'proof' identifier from list_proofs");
-        }
-        Integer index = null;
-        try {
-            index = Integer.valueOf(id.trim());
-        } catch (NumberFormatException ignored) {
-        }
-        if (index != null) {
-            if (index < 0 || index >= opened.size()) {
-                return new ProofRef(null, "Error: proof index " + index + " is out of range [0,"
-                    + Math.max(0, opened.size() - 1) + "]; call list_proofs");
-            }
-            return new ProofRef(opened.get(index), null);
-        }
-        var matches = opened.stream().filter(p -> id.equals(proofName(p))).toList();
-        if (matches.size() != 1) {
-            matches = opened.stream().filter(p -> id.equalsIgnoreCase(proofName(p))).toList();
-        }
-        if (matches.size() == 1) {
-            return new ProofRef(matches.get(0), null);
-        }
-        if (matches.isEmpty()) {
-            return new ProofRef(null,
-                "Error: no open proof named \"" + id + "\"; call list_proofs");
-        }
-        return new ProofRef(null, "Error: \"" + id + "\" matches " + matches.size()
-            + " open proofs; use the index shown by list_proofs instead");
-    }
-
-    private static String proofName(Proof proof) {
-        return ProofContextCollector.proofName(proof);
-    }
-
-    /**
-     * Renders the {@code list_proofs} result for the open proofs, marking the selected one.
-     */
-    static String proofsBlock(List<Proof> opened, @Nullable Proof selected) {
-        if (opened.isEmpty()) {
-            return "(no proofs are open)";
-        }
-        var sb = new StringBuilder();
-        for (int i = 0; i < opened.size(); i++) {
-            var proof = opened.get(i);
-            int openGoals = proof.openGoals().size();
-            sb.append(i).append(": ").append(proofName(proof)).append(" — ").append(openGoals)
-                    .append(openGoals == 0 ? " (closed)" : " open goal(s)")
-                    .append(proof == selected ? " [selected]" : "").append("\n");
-        }
-        sb.append("Pass the name or the index as the 'proof' parameter of the taclet tools.");
-        return sb.toString().stripTrailing();
-    }
-
-    private static String listProofs() {
-        var mediator = MainWindow.getInstance().getMediator();
-        var selected = mediator == null ? null : mediator.getSelectedProof();
-        return proofsBlock(mediator.getCurrentlyOpenedProofs(), selected);
-    }
-
-    private static String listTaclets(Map<String, Object> args) {
-        var ref = proofRef(args);
-        return ref.error() != null ? ref.error()
-                : TacletOperations.listTaclets(ref.proof(), stringArg(args, "filter"));
-    }
-
-    private static String listTacletOptions(Map<String, Object> args) {
-        var ref = proofRef(args);
-        return ref.error() != null ? ref.error() : TacletOperations.listTacletOptions(ref.proof());
-    }
-
-    private static String exportTaclet(Map<String, Object> args) {
-        var ref = proofRef(args);
-        if (ref.error() != null) {
-            return ref.error();
-        }
-        var name = stringArg(args, "taclet");
-        return name == null || name.isBlank() ? "Error: 'taclet' parameter is required"
-                : TacletOperations.exportTaclet(ref.proof(), name);
-    }
-
-    private static String exportTaclets(Map<String, Object> args) {
-        var ref = proofRef(args);
-        return ref.error() != null ? ref.error()
-                : TacletOperations.exportTaclets(ref.proof(), stringArg(args, "filter"));
-    }
-
-    private static String addTaclet(Map<String, Object> args) {
-        var ref = proofRef(args);
-        if (ref.error() != null) {
-            return ref.error();
-        }
-        var source = stringArg(args, "taclet");
-        return source == null || source.isBlank() ? "Error: 'taclet' parameter is required"
-                : TacletOperations.addTaclet(ref.proof(), source);
-    }
-
-    private static String removeTaclet(Map<String, Object> args) {
-        var ref = proofRef(args);
-        if (ref.error() != null) {
-            return ref.error();
-        }
-        var name = stringArg(args, "taclet");
-        return name == null || name.isBlank() ? "Error: 'taclet' parameter is required"
-                : TacletOperations.removeTaclet(ref.proof(), name);
-    }
-
-    private static String listFiles(@Nullable String prefix) {
-        var proof = selectedProof();
-        var files = FileAccess.listFiles(proof);
-        var filtered = prefix == null || prefix.isBlank() ? files
-                : files.stream().filter(p -> {
-                    var rel = FileAccess.relativeName(proof, p);
-                    return rel != null && rel.startsWith(prefix);
-                }).toList();
-        if (filtered.isEmpty()) {
-            return "(no files" + (prefix == null ? "" : " matching prefix \"" + prefix + "\"")
-                + ")";
-        }
-        return filtered.stream().map(p -> {
-            var rel = FileAccess.relativeName(proof, p);
-            return "- " + (rel == null ? p : rel);
-        }).collect(Collectors.joining("\n"));
-    }
-
-    private static String readFile(@Nullable String path, boolean info) {
-        if (path == null || path.isBlank()) {
-            return "Error: 'path' parameter is required";
-        }
-        var proof = selectedProof();
-        if (proof == null) {
-            return "Error: no proof selected; no model directory available";
-        }
-        var resolved = FileAccess.resolveInModel(proof, path);
-        if (resolved == null || !Files.exists(resolved)) {
-            return "Error: file not found inside the model directory: " + path;
-        }
-        if (FileAccess.isBinary(path)) {
-            return "Error: binary file (not offered for reading): " + path;
-        }
-        if (info) {
-            try {
-                return "path: " + path + "\nsize: " + Files.size(resolved)
-                    + " bytes\nlast modified: "
-                    + Files.getLastModifiedTime(resolved) + "\nregular file: "
-                    + Files.isRegularFile(resolved);
-            } catch (IOException e) {
-                return "Error: " + e.getMessage();
-            }
-        }
-        try {
-            return FileAccess.readText(resolved);
-        } catch (IOException e) {
-            return "Error: " + e.getMessage();
-        }
-    }
-
-    private String runCommand(@Nullable String command) throws Exception {
-        if (command == null || command.isBlank()) {
-            return "Error: 'command' parameter is required";
-        }
-        var settings = LlmSettings.INSTANCE;
-        var verdict = safetyPolicy.evaluate(command);
-        if (!verdict.allowed()) {
-            return "[Command blocked by safety policy: " + verdict.reason() + "]";
-        }
-        if (!settings.getShellEnabled()) {
-            return "[Shell commands are disabled in the LLM settings]";
-        }
-        var proof = selectedProof();
-        var workDir = proof == null ? null : FileAccess.modelRoot(proof);
-        var pb = new ProcessBuilder("/bin/sh", "-c", command);
-        pb.redirectErrorStream(true);
-        if (workDir != null) {
-            pb.directory(workDir.toFile());
-        }
-        Process process;
-        try {
-            process = pb.start();
-        } catch (IOException e) {
-            return "Error: could not start command: " + e.getMessage();
-        }
-        int timeout = Math.max(1, settings.getShellTimeoutSeconds());
-        int maxChars = Math.max(1, settings.getShellMaxOutputChars());
-
-        var outFuture = CompletableFuture.supplyAsync(
-            () -> readBounded(process.getInputStream(), maxChars));
-        boolean done;
-        try {
-            done = process.waitFor(timeout, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            process.destroyForcibly();
-            return "Error: interrupted";
-        }
-        if (!done) {
-            process.destroyForcibly();
-            return "[Command timed out after " + timeout + "s and was terminated]";
-        }
-        try {
-            String output = outFuture.get(2, TimeUnit.SECONDS);
-            return "exit code: " + process.exitValue() + "\n" + output;
-        } catch (Exception e) {
-            return "exit code: " + process.exitValue() + "\n(output unavailable)";
-        }
-    }
-
-    private static String readBounded(InputStream in, int maxChars) {
-        var sb = new StringBuilder();
-        byte[] buf = new byte[4096];
-        try {
-            int read;
-            while ((read = in.read(buf)) != -1 && sb.length() < maxChars) {
-                int keep = Math.min(read, maxChars - sb.length());
-                sb.append(new String(buf, 0, keep, StandardCharsets.UTF_8));
-            }
-        } catch (IOException e) {
-            // stream closed (e.g. command terminated early)
-        }
-        if (sb.length() >= maxChars) {
-            sb.append("\n... [output truncated]");
-        }
-        return sb.toString();
+        return agent.call(AgentTool.parseArgs(arguments));
     }
 
     @Override
@@ -686,5 +143,44 @@ public final class KeYAgentTools implements McpClient {
 
     @Override
     public void close() {
+    }
+
+    // ------------------------------------------------------------------- documentation tool
+
+    /**
+     * The self-documenting {@code list_tools} tool: dumps the Markdown documentation of all
+     * currently registered tools. It is registered directly by {@link KeYAgentTools} (not via a
+     * provider) because it must observe the whole registry.
+     */
+    private static final class ToolsDocumentation implements AgentTool {
+        private final Supplier<List<AgentTool>> all;
+
+        ToolsDocumentation(Supplier<List<AgentTool>> all) {
+            this.all = all;
+        }
+
+        @Override
+        public String name() {
+            return TOOL_LIST_TOOLS;
+        }
+
+        @Override
+        public String description() {
+            return "Dumps the Markdown documentation of every tool currently available to the"
+                + " agent - name, approval requirement, description and parameters, including"
+                + " this tool itself. Use it to inspect the available capabilities before"
+                + " calling them, or to keep the tool documentation up to date.";
+        }
+
+        @Override
+        public Object call(Map<String, Object> arguments) {
+            var sb = new StringBuilder();
+            sb.append("# KeY-Agent tools\n\n");
+            sb.append("All tools currently available to the agent.\n\n");
+            sb.append("**Approval**: `AUTO` tools run without asking the user; `ASK` tools prompt"
+                + " the user before the first execution in a turn.\n\n");
+            all.get().forEach(t -> sb.append(t.toMarkdown()).append("\n\n"));
+            return sb.toString().stripTrailing();
+        }
     }
 }

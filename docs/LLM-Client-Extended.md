@@ -186,13 +186,19 @@ public interface McpToolProvider {
   `LlmSettings`, implements the approval policy (`requiresApproval`,
   `allowWithoutApproval`, `resetApproval`) and throws `McpToolNowAllowedException` for
   disabled tools.
-* `KeYAgentTools` (registered via `KeYAgentToolsProvider`) provides the built-in tools:
-  `get_proof_context`, `list_files`, `read_file`, `file_info`, `run_command` (gated by
-  `ShellSafetyPolicy` blocklist, timeout and output caps), `ask_user`, `use_skill`,
-  the proof-script tools `tryclose` and `auto`, and the taclet-management tools
-  `list_proofs`, `list_taclets`, `list_taclet_options`, `export_taclet`,
-  `export_taclets` (bounded bulk export), `add_taclet` / `remove_taclet` (the latter two
-  modify a proof's rule set and require approval; they delegate to `TacletOperations`).
+* `KeYAgentTools` (registered via `KeYAgentToolsProvider`) aggregates the built-in tools,
+  which are contributed by `AgentToolProvider`s discovered through the Java `ServiceLoader`
+  (service file `META-INF/services/...AgentToolProvider`; providers live in
+  `org.key_project.key.llm.mcp.tools`): `get_proof_context`, `list_files`, `read_file`,
+  `file_info`, `run_command` (gated by `ShellSafetyPolicy` blocklist, timeout and output
+  caps), `ask_user`, `use_skill`, the proof-script tools `tryclose` and `auto`, and the
+  taclet-management tools `list_proofs`, `list_taclets`, `list_taclet_options`,
+  `export_taclet`, `export_taclets` (bounded bulk export), `add_taclet` / `remove_taclet`
+  (the latter two modify a proof's rule set and require approval; they delegate to
+  `TacletOperations`). Plugins add tools by registering another `AgentToolProvider`. The tool
+  metadata (name, description, parameter schema, approval) is available via
+  `KeYAgentTools.agents()` / `agent(String)` and `toolsMarkdown()`, and the `list_tools`
+  tool dumps the Markdown documentation of the whole tool set on demand.
 * `McpClientStdio` is a **reference implementation** for talking to external MCP servers
   over stdin/stdout (JSON-RPC 2.0, protocol version 2024-11-05, 30 s timeouts). It wraps an
   already-started `Process` (`initialize()` then `getTools()`/`callTool`), but is currently
@@ -266,8 +272,9 @@ core: `AgentLoopTest` (bounded rounds, pause/resume), `ExtendedPromptTest` (requ
 assembly), `PromptResolverTest` (markup), `LlmContextTest` (wire serialization),
 `BuiltInMCPClientTest` (registry/approvals), `ShellSafetyPolicyTest`,
 `SchemaSerializationTest`, `AutocompleteInputTest`/`AutocompleteProvidersTest`,
-`LibraryEditorPanelsTest`, and `mcp/KeYAgentToolsCommandTest` (proof-script tool mapping);
-`TestMcpToolProvider` is a service-loader test fixture.
+`LibraryEditorPanelsTest`, `mcp/KeYAgentToolsCommandTest` (proof-script tool mapping) and
+`mcp/AgentToolsTest` (modular discovery, metadata API, `list_tools` documentation);
+`TestMcpToolProvider` and `TestAgentToolProvider` are service-loader test fixtures.
 
 ## Author
 
