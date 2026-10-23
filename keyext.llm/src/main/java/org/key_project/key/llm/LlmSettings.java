@@ -65,6 +65,8 @@ public class LlmSettings extends AbstractPropertiesSettings {
         createIntegerProperty("maxSubagentTurns", 8);
     private final PropertyEntry<Integer> maxSubagentDepth =
         createIntegerProperty("maxSubagentDepth", 2);
+    private final PropertyEntry<Integer> maxParallelSubagents =
+        createIntegerProperty("maxParallelSubagents", 4);
 
     // --- context & history ---
     private final PropertyEntry<Boolean> attachProofContext =
@@ -131,6 +133,7 @@ public class LlmSettings extends AbstractPropertiesSettings {
         setSubagentsEnabled(other.getSubagentsEnabled());
         setMaxSubagentTurns(other.getMaxSubagentTurns());
         setMaxSubagentDepth(other.getMaxSubagentDepth());
+        setMaxParallelSubagents(other.getMaxParallelSubagents());
         setAttachProofContext(other.getAttachProofContext());
         setProofContextMaxSequents(other.getProofContextMaxSequents());
         setProofContextMaxChars(other.getProofContextMaxChars());
@@ -276,6 +279,18 @@ public class LlmSettings extends AbstractPropertiesSettings {
 
     public void setMaxSubagentDepth(int depth) {
         this.maxSubagentDepth.set(depth);
+    }
+
+    /**
+     * Maximum number of sub-agents that run concurrently in one parallel {@code spawn_subagent}
+     * call (the pool size; additional tasks queue and run as workers finish).
+     */
+    public int getMaxParallelSubagents() {
+        return maxParallelSubagents.get();
+    }
+
+    public void setMaxParallelSubagents(int n) {
+        this.maxParallelSubagents.set(n);
     }
 
     // --- context & history ---

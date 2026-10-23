@@ -1,6 +1,7 @@
 # Sub-agents in the KeY-Agent
 
-Status: **Phase 1 implemented** (sequential delegation); parallel fan-out planned.
+Status: **Phase 1 + 2 implemented** (sequential delegation and parallel fan-out); observability
+planned.
 
 ## Idea
 
@@ -41,9 +42,9 @@ Built-in roles:
 ## Execution
 
 `AgentLoop.processBatch` intercepts `spawn_subagent` (like `ask_user`/`use_skill`) and calls
-`SubagentRunner.runSequential(...)`, which:
+`SubagentRunner.run(...)`, which:
 
-1. resolves the role, validates the task and the `mode` argument,
+1. resolves the role and the `mode` argument (`sequential` or `parallel`),
 2. applies the settings gate (`subagentsEnabled`) and the depth guard (`maxSubagentDepth`,
    thread-local so nested delegations are bounded),
 3. runs the child loop: fresh `LlmContext`, system prompt + task, advertised tools =
@@ -52,6 +53,24 @@ Built-in roles:
    `spawn_subagent` is intercepted again (depth-guarded recursion),
 5. returns `[sub-agent '<role>' finished after N round(s), called: ...]` + the child's final
    answer as the tool result text.
+
+### Parallel fan-out
+
+`mode: parallel` runs the `tasks` array (list of independent task strings) concurrently, one
+worker thread per task on a shared fixed-size pool. Constraints:
+
+- only roles with `parallelAllowed` accept it, and at least one task is required,
+- the pool size is `min(tasks, maxParallelSubagents)` — extra tasks queue and run as workers
+  finish,
+- **tool dispatch is serialized** through a global lock: KeY `Proof` objects and the GUI
+  mediator are not thread-safe, so the parallelism is in the LLM round-trips (each worker owns
+  its own message thread and a fresh HTTP call) while every mutation/queries on the proof are
+  mutually exclusive. Nested `spawn_subagent` calls happen *outside* that lock, so parallel
+  nesting cannot deadlock,
+- the merged result is one tool message: a run header, then `(1) …`, `(2) …` per task (a task
+  that failed/interrupted is reported as such, the rest still run to completion),
+- the depth guard applies per worker thread (a parallel worker is at depth `parentDepth + 1`),
+  so a broadcaster can hand out tasks but filling sub-sub-agents is still bounded.
 
 ### Safety model
 
@@ -73,23 +92,12 @@ kept verbatim); a dedicated structured field in the result is a later refinement
 
 ## Settings (`LlmSettings`)
 
-| key                | default | meaning                             |
-|--------------------|---------|-------------------------------------|
-| `subagentsEnabled` | `false` | `spawn_subagent` allowed at all     |
-| `maxSubagentTurns` | `8`     | global per-delegation round budget  |
-| `maxSubagentDepth` | `2`     | maximum nesting depth (1 = children may not spawn children) |
-
-## Parallel fan-out (Phase 3, planned)
-
-`mode: parallel` exists in the tool schema but is rejected for now. The plan:
-
-- only for roles with `parallelAllowed`,
-- one worker thread per sub-agent on a shared `ExecutorService`; **each worker must work on a
-  disjoint proof** (KeY `Proof` objects and the GUI mediator are not thread-safe — the win is
-  parallel LLM round-trips, not parallel proof mutation; sharing a proof requires a lock),
-- per-worker `ChatCompletionsClient` (HTTP clients are already independent), results collected
-  into `taskId → outcome`, merged into one tool result with a cap from the settings,
-- UI feedback ("3 sub-agents running…") via a status callback.
+| key                    | default | meaning                         |
+|------------------------|---------|---------------------------------|
+| `subagentsEnabled`     | `false` | `spawn_subagent` allowed at all |
+| `maxSubagentTurns`     | `8`     | global per-delegation round budget |
+| `maxSubagentDepth`     | `2`     | maximum nesting depth (1 = children may not spawn children) |
+| `maxParallelSubagents` | `4`     | concurrent workers in one parallel run (pool size) |
 
 ## Observability
 

@@ -116,7 +116,8 @@ boolean hasPendingQuestion(); boolean hasPendingApproval();
 Tool dispatch details (`AgentLoop.processBatch`): `ask_user` and `use_skill` are intercepted
 by the loop itself (gated by the settings `allowAgentQuestions` / `agentCanUseSkills`);
 `spawn_subagent` is intercepted, too (gated by `subagentsEnabled`) and runs a bounded child
-loop via `SubagentRunner` (role whitelist + depth guard, see `docs/subagents.md`); every
+loop via `SubagentRunner` (role whitelist + depth guard; `mode: parallel` fans out a `tasks`
+array over a pool, serializing tool dispatch globally — see `docs/subagents.md`); every
 other call goes through `session.getMcpClient()`. If `requiresApproval(name)` holds, the loop
 returns `NeedsApproval`; otherwise the tool is executed and the result is appended to both
 the internal wire thread and `session.getContext()`. `always` approvals are remembered via
@@ -245,7 +246,8 @@ new tools with their approval requirement.
   `apiEndpoint` (default `https://ki-toolbox.scc.kit.edu/v1`), `authToken`, `defaultModel`
   (`azure.gpt-4.1-mini`), `availableModels`, `systemPrompt`, `maxToolRounds` (8),
   `allowAgentQuestions`, `agentCanUseSkills`, `subagentsEnabled`, `maxSubagentTurns` (8),
-  `maxSubagentDepth` (2), `sendTemperature`/`temperature` (0.2),
+  `maxSubagentDepth` (2), `maxParallelSubagents` (4),
+  `sendTemperature`/`temperature` (0.2),
   `sendMaxOutputTokens`/`maxOutputTokens` (4096), `attachProofContext`,
   `proofContextMaxSequents` (3), `proofContextMaxChars` (8000), `maxHistoryMessages` (30),
   `maxHistoryChars` (32000), `maxFileAttachments` (10), `maxFileSizeKB` (64),
@@ -273,7 +275,7 @@ new tools with their approval requirement.
 | `LlmSettingsUI` | main settings page incl. *Fetch Models* (`SwingWorker`) |
 | `LlmToolsPanel` | per-tool approval/disablement table |
 | `LibraryEditorPanel` + editors | create/edit/delete/export/import for prompts and skills |
-| `SubagentRunner` + `subagents.*` | sequential sub-agent delegation (`spawn_subagent` child loop, role registry/whitelist, depth guard); see `docs/subagents.md` |
+| `SubagentRunner` + `subagents.*` | sequential + parallel sub-agent delegation (`spawn_subagent` child loop, role registry/whitelist, depth guard, parallel fan-out with serialized tool dispatch); see `docs/subagents.md` |
 
 ## Testing
 

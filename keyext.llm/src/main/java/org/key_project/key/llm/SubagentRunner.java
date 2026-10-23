@@ -7,6 +7,9 @@ package org.key_project.key.llm;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.BooleanSupplier;
 
 import org.key_project.key.llm.LlmContext.LlmMessage;
@@ -21,6 +24,15 @@ import org.key_project.key.llm.subagents.SubagentRole;
  * (endpoint/auth come from the parent {@link LlmSession}). Invoked synchronously by
  * {@link AgentLoop} when it intercepts the {@code spawn_subagent} tool call.
  * <p>
+ * Two {@code mode}s:
+ * <ul>
+ * <li>{@code sequential} - one sub-agent solves one {@code task} (the default),</li>
+ * <li>{@code parallel} - the {@code tasks} array is solved concurrently, one worker thread per
+ * task on a shared pool, capped by the {@code maxParallelSubagents} setting. Only roles with
+ * {@code parallelAllowed} accept it. The win is parallel LLM round-trips: tool <em>dispatch</em>
+ * is serialized through a global lock, because KeY proofs and the GUI mediator are not
+ * thread-safe.</li>
+ * </ul>
  * Safety:
  * <ul>
  * <li>only the tools of the role's whitelist are advertised and may be dispatched (the parent's
@@ -33,8 +45,8 @@ import org.key_project.key.llm.subagents.SubagentRole;
  * parent loop.</li>
  * </ul>
  * The result is a single text message for the delegating agent that summarizes the run and
- * contains the child's final answer, so the parent can parse the {@code KEY_AGENT_RESULT} marker
- * if the child complied with the system prompt.
+ * contains the child's final answer(s), so the parent can parse the {@code KEY_AGENT_RESULT}
+ * markers if the child complied with the system prompt.
  *
  * @author Alexander Weigl
  */
@@ -42,38 +54,45 @@ final class SubagentRunner {
 
     private static final ThreadLocal<Integer> DEPTH = ThreadLocal.withInitial(() -> 0);
 
+    /**
+     * Serializes every tool dispatch, so concurrent parallel sub-agents never race on the shared
+     * proof state or the GUI mediator. Nested {@code spawn_subagent} calls happen outside the
+     * lock, so parallel nesting cannot deadlock.
+     */
+    private static final Object DISPATCH_LOCK = new Object();
+
     private SubagentRunner() {
     }
 
     /**
      * Runs the {@code spawn_subagent} tool call: validates the arguments, applies the settings
-     * and depth guards and executes the child loop (sequential mode). Returns the tool result
-     * text to be inserted into the parent's thread.
+     * and depth guards and executes the child loop(s). Returns the tool result text to be
+     * inserted into the parent's thread.
      */
-    static String runSequential(LlmSession parent, ChatCompletionsClient completions,
-            String arguments, BooleanSupplier cancelled) {
+    static String run(LlmSession parent, ChatCompletionsClient completions, String arguments,
+            BooleanSupplier cancelled) {
         var args = AgentTool.parseArgs(arguments);
         var roleName = AgentTool.stringArg(args, "role");
-        var task = AgentTool.stringArg(args, "task");
-        var mode = AgentTool.stringArg(args, "mode");
-
         var role = roleName == null ? null : SubagentRegistry.INSTANCE.get(roleName);
         if (role == null) {
             return "[spawn_subagent: unknown role '" + roleName + "' (known roles: "
                 + String.join(", ", SubagentRegistry.INSTANCE.roleNames()) + ")]";
         }
+        var mode = AgentTool.stringArg(args, "mode");
+        if ("parallel".equalsIgnoreCase(mode)) {
+            return runParallel(parent, completions, role, args, cancelled);
+        }
+        return runSequential(parent, completions, role, args, cancelled);
+    }
+
+    // ------------------------------------------------------------------ sequential delegation
+
+    private static String runSequential(LlmSession parent, ChatCompletionsClient completions,
+            SubagentRole role, Map<String, Object> args, BooleanSupplier cancelled) {
+        var task = AgentTool.stringArg(args, "task");
         if (task == null || task.isBlank()) {
             return "[spawn_subagent: the 'task' parameter must not be empty]";
         }
-        if ("parallel".equalsIgnoreCase(mode)) {
-            if (!role.parallelAllowed()) {
-                return "[spawn_subagent: role '" + roleName
-                    + "' does not allow parallel execution]";
-            }
-            return "[spawn_subagent: parallel execution is not implemented yet; call again with"
-                + " \"mode\": \"sequential\"]";
-        }
-
         int depth = DEPTH.get();
         int maxDepth = Math.max(1, LlmSettings.INSTANCE.getMaxSubagentDepth());
         if (depth >= maxDepth) {
@@ -81,13 +100,90 @@ final class SubagentRunner {
         }
         DEPTH.set(depth + 1);
         try {
-            return runChild(parent, completions, role, task, cancelled);
+            return runOne(parent, completions, role, task, cancelled);
         } finally {
             DEPTH.set(depth);
         }
     }
 
-    private static String runChild(LlmSession parent, ChatCompletionsClient completions,
+    // ------------------------------------------------------------------ parallel fan-out
+
+    private static String runParallel(LlmSession parent, ChatCompletionsClient completions,
+            SubagentRole role, Map<String, Object> args, BooleanSupplier cancelled) {
+        if (!role.parallelAllowed()) {
+            return "[spawn_subagent: role '" + role.name() + "' does not allow parallel execution]";
+        }
+        var tasks = stringListArg(args, "tasks");
+        if (tasks.isEmpty()) {
+            return "[spawn_subagent: parallel mode requires a non-empty \"tasks\" array]";
+        }
+        int depth = DEPTH.get();
+        int maxDepth = Math.max(1, LlmSettings.INSTANCE.getMaxSubagentDepth());
+        if (depth >= maxDepth) {
+            return "[spawn_subagent: maximum nesting depth (" + maxDepth + ") reached]";
+        }
+        int poolSize =
+            Math.min(tasks.size(), Math.max(1, LlmSettings.INSTANCE.getMaxParallelSubagents()));
+        var pool = Executors.newFixedThreadPool(poolSize);
+        try {
+            var futures = new ArrayList<Future<String>>();
+            for (int i = 0; i < tasks.size(); i++) {
+                var task = tasks.get(i);
+                futures.add(pool.submit(() -> {
+                    DEPTH.set(depth + 1);
+                    try {
+                        return runOne(parent, completions, role, task, cancelled);
+                    } finally {
+                        DEPTH.set(depth);
+                    }
+                }));
+            }
+            var sb = new StringBuilder();
+            sb.append("[parallel run of ").append(tasks.size()).append(" sub-agents")
+                    .append(" (role '").append(role.name()).append("')]").append('\n');
+            for (int i = 0; i < futures.size(); i++) {
+                if (i > 0) {
+                    sb.append("\n--------\n");
+                }
+                try {
+                    sb.append('(').append(i + 1).append(") ").append(futures.get(i).get());
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    sb.append('(').append(i + 1).append(") [sub-agent interrupted]");
+                } catch (ExecutionException e) {
+                    var cause = e.getCause();
+                    sb.append('(').append(i + 1).append(") [sub-agent failed: ")
+                            .append(cause == null || cause.getMessage() == null ? "unknown error"
+                                    : cause.getMessage())
+                            .append(']');
+                }
+            }
+            if (cancelled.getAsBoolean()) {
+                sb.append('\n').append("(Parallel run stopped: the turn was cancelled.)");
+            }
+            return sb.toString();
+        } finally {
+            pool.shutdownNow();
+        }
+    }
+
+    private static List<String> stringListArg(Map<String, Object> args, String key) {
+        Object v = args.get(key);
+        if (v instanceof List<?> list) {
+            var result = new ArrayList<String>();
+            for (Object item : list) {
+                if (item != null) {
+                    result.add(String.valueOf(item));
+                }
+            }
+            return result;
+        }
+        return List.of();
+    }
+
+    // ------------------------------------------------------------------ the child loop
+
+    private static String runOne(LlmSession parent, ChatCompletionsClient completions,
             SubagentRole role, String task, BooleanSupplier cancelled) {
         var tools = advertiseTools(parent, role);
         var model = role.model() != null && !role.model().isBlank() ? role.model()
@@ -157,23 +253,26 @@ final class SubagentRunner {
                     continue;
                 }
                 called.add(name);
-                // a sub-agent may delegate further (depth-guarded), exactly like the parent loop
+                // a sub-agent may delegate further (depth-guarded), exactly like the parent loop;
+                // must run outside the dispatch lock, otherwise nested parallel runs deadlock
                 if (KeYAgentTools.TOOL_SPAWN_SUBAGENT.equals(name)) {
                     if (!LlmSettings.INSTANCE.getSubagentsEnabled()) {
                         thread.add(LlmMessage.tool(id,
                             "[Spawning sub-agents is disabled in the settings]").toOpenAiMap());
                         continue;
                     }
-                    var outcome = runSequential(parent, completions, callArguments, cancelled);
+                    var outcome = run(parent, completions, callArguments, cancelled);
                     thread.add(LlmMessage.tool(id, outcome).toOpenAiMap());
                     continue;
                 }
-                try {
-                    var result = parent.getMcpClient().callTool(name, callArguments);
-                    thread.add(LlmMessage.tool(id, AgentLoop.stringify(result)).toOpenAiMap());
-                } catch (Exception e) {
-                    thread.add(LlmMessage.tool(id,
-                        "Error calling " + name + ": " + e.getMessage()).toOpenAiMap());
+                synchronized (DISPATCH_LOCK) {
+                    try {
+                        var result = parent.getMcpClient().callTool(name, callArguments);
+                        thread.add(LlmMessage.tool(id, AgentLoop.stringify(result)).toOpenAiMap());
+                    } catch (Exception e) {
+                        thread.add(LlmMessage.tool(id,
+                            "Error calling " + name + ": " + e.getMessage()).toOpenAiMap());
+                    }
                 }
             }
         }
