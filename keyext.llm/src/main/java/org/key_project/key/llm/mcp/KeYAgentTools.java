@@ -12,6 +12,7 @@ import java.util.TreeMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import com.google.gson.GsonBuilder;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -120,6 +121,61 @@ public final class KeYAgentTools implements McpClient {
         return agents().stream().map(AgentTool::toMarkdown).collect(Collectors.joining("\n\n"));
     }
 
+    /** The full Markdown tool documentation (heading + approval legend + every tool block). */
+    public String toolsDocumentation() {
+        return buildToolsDocumentation(agents());
+    }
+
+    // ------------------------------------------------------------------- command line
+
+    private static final String USAGE = "Usage: org.key_project.key.llm.mcp.KeYAgentTools [--json]";
+
+    /**
+     * CLI entry point: prints the tool documentation to stdout and exits. With {@code --json}
+     * the OpenAI-format tool definitions (name, description, parameter schema) are printed
+     * instead of the Markdown document. The registry is built headless, so no GUI or open proof
+     * is required.
+     */
+    public static void main(String[] args) {
+        boolean json = false;
+        for (var arg : args) {
+            switch (arg) {
+                case "--json", "-j" -> json = true;
+                case "--help", "-h" -> {
+                    System.out.println(
+                        "Prints the documentation of every tool available to the KeY-Agent.\n\n"
+                            + USAGE + "\n  --json   print the OpenAI-format tool definitions"
+                            + " instead of the Markdown document");
+                    return;
+                }
+                default -> {
+                    System.err.println("Unknown option: " + arg);
+                    System.err.println(USAGE);
+                    System.exit(2);
+                }
+            }
+        }
+        try {
+            System.out.print(cliDocumentation(json));
+        } catch (Exception e) {
+            System.err.println("Failed to render the tool documentation: " + e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    /**
+     * Renders the CLI output (separated from {@link #main} so tests exercise it without starting
+     * a second JVM): the Markdown tool documentation, or the OpenAI-format tool list as JSON.
+     */
+    static String cliDocumentation(boolean json) {
+        var registry = new KeYAgentTools();
+        if (json) {
+            return new GsonBuilder().setPrettyPrinting().create()
+                    .toJson(registry.getTools().stream().map(Tool::toMap).toList());
+        }
+        return registry.toolsDocumentation();
+    }
+
     // ------------------------------------------------------------------- McpClient
 
     @Override
@@ -174,13 +230,18 @@ public final class KeYAgentTools implements McpClient {
 
         @Override
         public Object call(Map<String, Object> arguments) {
-            var sb = new StringBuilder();
-            sb.append("# KeY-Agent tools\n\n");
-            sb.append("All tools currently available to the agent.\n\n");
-            sb.append("**Approval**: `AUTO` tools run without asking the user; `ASK` tools prompt"
-                + " the user before the first execution in a turn.\n\n");
-            all.get().forEach(t -> sb.append(t.toMarkdown()).append("\n\n"));
-            return sb.toString().stripTrailing();
+            return buildToolsDocumentation(all.get());
         }
+    }
+
+    /** Renders the Markdown document describing the given tools (heading + legend + blocks). */
+    private static String buildToolsDocumentation(List<AgentTool> toolList) {
+        var sb = new StringBuilder();
+        sb.append("# KeY-Agent tools\n\n");
+        sb.append("All tools currently available to the agent.\n\n");
+        sb.append("**Approval**: `AUTO` tools run without asking the user; `ASK` tools prompt"
+            + " the user before the first execution in a turn.\n\n");
+        toolList.forEach(t -> sb.append(t.toMarkdown()).append("\n\n"));
+        return sb.toString().stripTrailing();
     }
 }

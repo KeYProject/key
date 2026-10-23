@@ -86,6 +86,20 @@ class AgentToolsTest {
     }
 
     @Test
+    void cliRendersDocumentationOnStdoutFormat() {
+        // the CLI output delegates to the same rendering as list_tools
+        var doc = KeYAgentTools.cliDocumentation(false);
+        assertTrue(doc.startsWith("# KeY-Agent tools"), "expected the Markdown document");
+        assertTrue(doc.contains("### `" + KeYAgentTools.TOOL_RUN_COMMAND + "`"));
+        // --json prints the OpenAI-format definitions as a JSON array
+        var json = KeYAgentTools.cliDocumentation(true);
+        assertTrue(json.startsWith("["), "expected a JSON array");
+        assertTrue(json.contains("\"get_proof_context\""),
+            "JSON output must carry the tool names");
+        assertTrue(json.contains("\"parameters\""), "JSON output must carry the schemas");
+    }
+
+    @Test
     void callToolDispatchesToTheRegisteredAgent() throws Exception {
         var tools = new KeYAgentTools();
         // the test provider's tool is callable through the registry
