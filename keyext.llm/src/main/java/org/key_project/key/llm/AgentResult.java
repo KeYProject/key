@@ -37,8 +37,17 @@ public sealed interface AgentResult {
     record Failed(Throwable error) implements AgentResult {
     }
 
-    /** One executed tool call, rendered to the user when tool activity is shown. */
-    record ToolActivity(String name, String arguments, String result) {
+    /**
+     * One executed tool call, rendered to the user when tool activity is shown. {@code children}
+     * holds the indented sub-activity of a {@code spawn_subagent} call (one entry per delegated
+     * task).
+     */
+    record ToolActivity(String name, String arguments, String result,
+            List<ToolActivity> children) {
+
+        ToolActivity(String name, String arguments, String result) {
+            this(name, arguments, result, List.of());
+        }
     }
 
     /** A question to be shown to the user, with optional predefined answer options. */

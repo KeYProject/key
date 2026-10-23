@@ -271,6 +271,94 @@ class SubagentLoopTest {
         assertTrue(String.valueOf(toolMsg.get("content")).contains("does not allow parallel"));
     }
 
+    @Test
+    void sequentialSpawnRecordsSubagentRunAndActivity() {
+        LlmSettings.INSTANCE.setSubagentsEnabled(true);
+        var mock = new MockCompletions();
+        mock.thenRespond(MockCompletions.toolCalls(
+            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SPAWN_SUBAGENT,
+                "{\"role\":\"echo-role\",\"task\":\"say hi\",\"mode\":\"sequential\"}")),
+            ""));
+        mock.thenRespond(MockCompletions.toolCalls(
+            List.of(MockCompletions.tool("c1", TestMcpToolProvider.ECHO, "{\"x\":1}")), ""));
+        mock.thenRespond(MockCompletions.text("KEY_AGENT_RESULT {\"summary\":\"hi\"}\ndone"));
+        mock.thenRespond(MockCompletions.text("parent done"));
+
+        var loop = new AgentLoop(session, mock);
+        AgentResult result = loop.begin("delegate", null, null, null);
+
+        assertInstanceOf(AgentResult.Done.class, result);
+
+        // the run is recorded on the session's log
+        assertEquals(1, session.getSubagentLog().size());
+        var run = session.getSubagentLog().snapshot(1).get(0);
+        assertEquals("echo-role", run.role());
+        assertEquals("sequential", run.mode());
+        assertEquals(1, run.tasks().size());
+        var task = run.tasks().get(0);
+        assertEquals("say hi", task.task());
+        assertEquals(SubagentLog.Status.OK, task.status());
+        assertEquals(1, task.rounds());
+        assertEquals(List.of("echo_test"), task.tools());
+        assertTrue(task.outcome().contains("finished after 1 tool round"));
+
+        // the spawn tool activity carries one indented child per task
+        var done = (AgentResult.Done) result;
+        assertEquals(1, done.activities().size());
+        var children = done.activities().get(0).children();
+        assertEquals(1, children.size());
+        assertEquals("echo-role", children.get(0).name());
+        assertEquals("say hi", children.get(0).arguments());
+        assertTrue(children.get(0).result().contains("sequential"),
+            "expected mode in the child activity result, got: " + children.get(0).result());
+    }
+
+    @Test
+    void parallelSpawnRecordsParallelRunWithPerTaskResults() {
+        LlmSettings.INSTANCE.setSubagentsEnabled(true);
+        var mock = new ParallelMock();
+        var loop = new AgentLoop(session, mock);
+        AgentResult result = loop.begin("delegate parallel", null, null, null);
+
+        assertInstanceOf(AgentResult.Done.class, result);
+        assertEquals(1, session.getSubagentLog().size());
+        var run = session.getSubagentLog().snapshot(1).get(0);
+        assertEquals("echo-role", run.role());
+        assertEquals("parallel", run.mode());
+        assertEquals(2, run.tasks().size());
+        assertTrue(run.tasks().stream().allMatch(t -> t.status() == SubagentLog.Status.OK));
+        assertTrue(run.tasks().stream().anyMatch(t -> t.tools().contains("echo_test")),
+            "task A must have called the echo tool");
+
+        var done = (AgentResult.Done) result;
+        assertEquals(2, done.activities().get(0).children().size());
+    }
+
+    @Test
+    void subagentStoppedAtRoundLimitIsRecorded() {
+        LlmSettings.INSTANCE.setSubagentsEnabled(true);
+        var mock = new MockCompletions();
+        mock.thenRespond(MockCompletions.toolCalls(
+            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SPAWN_SUBAGENT,
+                "{\"role\":\"echo-role\",\"task\":\"loop\",\"mode\":\"sequential\"}")),
+            ""));
+        for (int i = 1; i <= 4; i++) { // echo-role's budget is 4 tool rounds
+            mock.thenRespond(MockCompletions.toolCalls(
+                List.of(MockCompletions.tool("c" + i, TestMcpToolProvider.ECHO, "{\"x\":1}")), ""));
+        }
+        mock.thenRespond(MockCompletions.text("ok"));
+
+        var loop = new AgentLoop(session, mock);
+        AgentResult result = loop.begin("delegate", null, null, null);
+
+        assertInstanceOf(AgentResult.Done.class, result);
+        var task = session.getSubagentLog().snapshot(1).get(0).tasks().get(0);
+        assertEquals(SubagentLog.Status.STOPPED, task.status());
+        assertEquals(4, task.rounds());
+        assertEquals(4, task.tools().size());
+        assertTrue(task.outcome().contains("reached its tool-round limit"));
+    }
+
     /** Scripted {@link ChatCompletionsClient}, shared with the parent and the child loop. */
     static class MockCompletions implements ChatCompletionsClient {
         private final ArrayDeque<Map<String, Object>> script = new ArrayDeque<>();

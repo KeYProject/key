@@ -264,10 +264,11 @@ public class AgentLoop {
                     continue;
                 }
                 // the sub-agent runs synchronously; the outcome text is the tool result
+                long seqBefore = session.getSubagentLog().latestSeq();
                 var outcome = SubagentRunner.run(session, completions, arguments,
                     this::isCancelled);
                 results.add(LlmMessage.tool(id, outcome));
-                activities.add(new ToolActivity(name, arguments, outcome));
+                activities.add(subagentActivity(name, arguments, outcome, seqBefore));
                 continue;
             }
 
@@ -297,6 +298,29 @@ public class AgentLoop {
             session.getContext().addMessage(msg);
         }
         results.clear();
+    }
+
+    /**
+     * Builds the tool activity of a {@code spawn_subagent} call with one indented child per task
+     * of every run recorded since {@code seqBefore} (the synchronous runs of this call).
+     */
+    private ToolActivity subagentActivity(String name, String arguments, String outcome,
+            long seqBefore) {
+        var children = new ArrayList<ToolActivity>();
+        for (var run : session.getSubagentLog().after(seqBefore)) {
+            for (var task : run.tasks()) {
+                children.add(new ToolActivity(run.role(), clip(task.task(), 100),
+                    run.mode() + " · " + clip(task.outcome(), 400)));
+            }
+        }
+        return new ToolActivity(name, arguments, outcome, children);
+    }
+
+    private static String clip(String s, int max) {
+        if (s == null || s.length() <= max) {
+            return s;
+        }
+        return s.substring(0, max) + "…";
     }
 
     private void addToolResult(String toolCallId, String content, boolean asActivity) {

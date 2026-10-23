@@ -21,6 +21,7 @@ import org.jspecify.annotations.Nullable;
 public class LlmSession {
     private final BuiltInMCPClient mcpClient;
     private final LlmContext context = new LlmContext();
+    private final SubagentLog subagentLog = new SubagentLog();
     private String model = KeYAgentPrompts.DEFAULT_MODEL;
     private String apiEndpoint;
     private String authToken;
@@ -80,6 +81,14 @@ public class LlmSession {
     /** Per-proof conversation history. */
     public LlmContext getContext() {
         return context;
+    }
+
+    /**
+     * Bounded record of sub-agent runs of this session (role, mode, per-task outcomes), consulted
+     * by the {@code get_subagent_logs} tool and rendered in the tool-activity summary.
+     */
+    public SubagentLog getSubagentLog() {
+        return subagentLog;
     }
 
     /** Whether the proof context block should be attached to the next prompt. */

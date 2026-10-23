@@ -287,15 +287,30 @@ public class LlmPrompt extends JPanel implements TabPanel {
             return;
         }
         for (var activity : activities) {
-            var label = new JLabel("<html><i>" + escapeHtml(activity.name() + "("
-                + activity.arguments() + ")") + "</i></html>");
-            label.setToolTipText(activity.result());
-            var box = new JPanel(new MigLayout(new LC().insets("3 10 3 10")));
-            box.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-            box.add(label);
-            pOutput.add(box, new CC().growX());
+            addActivityBox(activity, 0);
         }
         scrollToEnd();
+    }
+
+    /** Renders one tool-activity row; sub-activity (e.g. sub-agent tasks) is indented deeper. */
+    private void addActivityBox(AgentResult.ToolActivity activity, int depth) {
+        var box = new JPanel(new MigLayout(new LC().insets("3 " + (10 + depth * 12) + " 3 10")));
+        box.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        var label = new JLabel("<html><i>" + escapeHtml(activity.name() + "("
+            + clip(activity.arguments(), 160) + ")") + "</i></html>");
+        label.setToolTipText(clip(activity.result(), 2000));
+        box.add(label);
+        pOutput.add(box, new CC().growX());
+        for (var child : activity.children()) {
+            addActivityBox(child, depth + 1);
+        }
+    }
+
+    private static String clip(String s, int max) {
+        if (s == null || s.length() <= max) {
+            return s;
+        }
+        return s.substring(0, max) + "…";
     }
 
     private static String escapeHtml(String s) {
@@ -510,7 +525,9 @@ public class LlmPrompt extends JPanel implements TabPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            LlmUtils.getSession(mediator.getSelectedProof()).getContext().clear();
+            var session = LlmUtils.getSession(mediator.getSelectedProof());
+            session.getContext().clear();
+            session.getSubagentLog().clear();
             pOutput.removeAll();
             pOutput.invalidate();
             pOutput.repaint();
