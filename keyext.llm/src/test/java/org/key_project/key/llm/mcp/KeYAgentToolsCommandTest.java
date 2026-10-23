@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.llm.mcp;
 
+import org.key_project.key.llm.mcp.tools.ProofScriptTools;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,7 +20,7 @@ class KeYAgentToolsCommandTest {
 
     @Test
     void trycloseDefaultsToCurrentBranch() {
-        var cmd = KeYAgentTools.tryCloseCommand(null, null, false);
+        var cmd = ProofScriptTools.tryCloseCommand(null, null, false);
         assertEquals("tryclose", cmd.commandName());
         assertEquals(java.util.List.of("branch"), cmd.positionalArgs());
         assertEquals(java.util.Map.of(), cmd.namedArgs());
@@ -26,21 +28,21 @@ class KeYAgentToolsCommandTest {
 
     @Test
     void trycloseExplicitBranchWithSteps() {
-        var cmd = KeYAgentTools.tryCloseCommand("branch", 100, false);
+        var cmd = ProofScriptTools.tryCloseCommand("branch", 100, false);
         assertEquals(java.util.List.of("branch"), cmd.positionalArgs());
         assertEquals(java.util.Map.of("steps", 100), cmd.namedArgs());
     }
 
     @Test
     void trycloseAllGoalsWithoutPositional() {
-        var cmd = KeYAgentTools.tryCloseCommand("all", null, false);
+        var cmd = ProofScriptTools.tryCloseCommand("all", null, false);
         assertEquals(java.util.List.of(), cmd.positionalArgs());
         assertEquals(java.util.Map.of(), cmd.namedArgs());
     }
 
     @Test
     void trycloseByIndexWithAssertClosed() {
-        var cmd = KeYAgentTools.tryCloseCommand("2", 50, true);
+        var cmd = ProofScriptTools.tryCloseCommand("2", 50, true);
         assertEquals(java.util.List.of("2"), cmd.positionalArgs());
         assertEquals(java.util.Map.of("steps", 50, "assertClosed", true), cmd.namedArgs());
     }
@@ -48,12 +50,12 @@ class KeYAgentToolsCommandTest {
     @Test
     void trycloseRejectsUnknownBranchValue() {
         assertThrows(IllegalArgumentException.class,
-            () -> KeYAgentTools.tryCloseCommand("left", null, false));
+            () -> ProofScriptTools.tryCloseCommand("left", null, false));
     }
 
     @Test
     void autoWithoutParameters() {
-        var cmd = KeYAgentTools.autoCommand(null, false);
+        var cmd = ProofScriptTools.autoCommand(null, false);
         assertEquals("auto", cmd.commandName());
         assertEquals(java.util.List.of(), cmd.positionalArgs());
         assertEquals(java.util.Map.of(), cmd.namedArgs());
@@ -61,13 +63,13 @@ class KeYAgentToolsCommandTest {
 
     @Test
     void autoWithSteps() {
-        var cmd = KeYAgentTools.autoCommand(200, false);
+        var cmd = ProofScriptTools.autoCommand(200, false);
         assertEquals(java.util.Map.of("steps", 200), cmd.namedArgs());
     }
 
     @Test
     void autoAllGoals() {
-        var cmd = KeYAgentTools.autoCommand(100, true);
+        var cmd = ProofScriptTools.autoCommand(100, true);
         assertEquals(java.util.Map.of("steps", 100, "all", true), cmd.namedArgs());
     }
 }
