@@ -1,7 +1,6 @@
 # Sub-agents in the KeY-Agent
 
-Status: **Phase 1 + 2 implemented** (sequential delegation and parallel fan-out); observability
-planned.
+Status: **Phases 1–3 implemented** (sequential delegation, parallel fan-out, observability).
 
 ## Idea
 
@@ -101,8 +100,20 @@ kept verbatim); a dedicated structured field in the result is a later refinement
 
 ## Observability
 
-Not yet wired into the chat UI. Candidate: an indented activity block in the tool-activity
-summary and a per-session `subagentLogs` map exposed to the model.
+Every finished delegation is recorded in the per-session `SubagentLog` (bounded, thread-safe,
+sequence-numbered so parallel workers can append concurrently):
+
+- **`get_subagent_logs`** (read-only, auto-approval) renders the recorded runs for the model:
+  role, mode, timing, and per task the status (`OK` / `stopped (round limit)` / `cancelled` /
+  `failed`), the number of tool rounds and the tools that were called. Optional `limit` and
+  `role` parameters.
+- **Chat panel:** the tool-activity summary shows the `spawn_subagent` row with one indented
+  child line per delegated task (role + task, tooltip = mode + outcome), honoring the existing
+  *Show tool activity* setting. *Clear history* clears the sub-agent log together with the
+  conversation.
+- **Status tracking:** hard terminations are recorded distinctly — `STOPPED` (round budget),
+  `CANCELLED` (turn cancelled), `FAILED` (completion/parse error) — so `get_subagent_logs`
+  reflects why a sub-agent did not deliver an answer.
 
 ## Files
 
