@@ -199,6 +199,13 @@ The built-in tool set (`KeYAgentTools`):
 | `use_skill`         | auto     | activate a user-defined skill by name (only if enabled in settings) |
 | `tryclose`          | auto     | apply the `tryclose` proof-script command (TryClose macro) to the current branch, all open goals, or a goal by index |
 | `auto`              | auto     | apply KeY's automatic proof strategy ('Auto' button) with an arbitrary step limit |
+| `list_proofs`       | auto     | enumerate all open proofs with an identifier usable in the taclet tools' `proof` parameter |
+| `list_taclets`      | auto     | list the taclets available for a proof (optional substring filter) |
+| `list_taclet_options` | auto   | list the taclet options (choices) of a proof with their selected and possible values |
+| `export_taclet`     | auto     | export a taclet as a parseable KeY rule declaration |
+| `export_taclets`    | auto     | export several or all taclets of a proof as parseable declarations (optional filter, capped output) |
+| `add_taclet`        | ask      | register a new taclet for a proof from a `\taclet` declaration (future rule applications only) |
+| `remove_taclet`     | ask      | remove a taclet from a proof's rule set (past rule applications are not affected) |
 
 ### 7.1 Questions
 
@@ -209,10 +216,13 @@ turn until you answer. Turn this off with *Allow the agent to ask questions*.
 
 - File access tools are **read-only**, restricted to the current Java model directory, and run
   without approval.
-- `tryclose` and `auto` are the first tools that **modify the current proof** (they run the
-  corresponding proof-script commands, i.e. the same actions as *Apply Script* / the *Auto*
-  button). They are approved by default so the agent can actually prove, but you can move them
-  to *with approval* in the Tools panel if you want to review each invocation.
+- `tryclose` and `auto` modify the current proof (they run the corresponding proof-script
+  commands, i.e. the same actions as *Apply Script* / the *Auto* button). They are approved by
+  default so the agent can actually prove, but you can move them to *with approval* in the Tools
+  panel if you want to review each invocation.
+- `add_taclet` and `remove_taclet` change the rule set of a proof and therefore require approval
+  by default; inspection tools (`list_taclets`, `list_taclet_options`, `export_taclet`,
+  `export_taclets`) do not.
 - `run_command` *always* requires per-call approval, and commands matching the configured
   **blocklist** (e.g. `rm -rf /`, `sudo`, `chmod -R` on system directories, `curl … | sh`) are
   refused regardless of approval.
