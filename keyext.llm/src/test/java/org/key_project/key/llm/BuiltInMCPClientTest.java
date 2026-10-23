@@ -110,9 +110,17 @@ class BuiltInMCPClientTest {
         assertFalse(client.requiresApproval(KeYAgentTools.TOOL_ASK_USER));
         assertFalse(client.requiresApproval(KeYAgentTools.TOOL_TRYCLOSE));
         assertFalse(client.requiresApproval(KeYAgentTools.TOOL_AUTO));
+        // proof listing and taclet inspection are AUTO
+        assertFalse(client.requiresApproval(KeYAgentTools.TOOL_LIST_PROOFS));
+        assertFalse(client.requiresApproval(KeYAgentTools.TOOL_LIST_TACLETS));
+        assertFalse(client.requiresApproval(KeYAgentTools.TOOL_LIST_TACLET_OPTIONS));
+        assertFalse(client.requiresApproval(KeYAgentTools.TOOL_EXPORT_TACLET));
+        assertFalse(client.requiresApproval(KeYAgentTools.TOOL_EXPORT_TACLETS));
         assertFalse(client.requiresApproval(TestMcpToolProvider.ECHO));
-        // shell execution and aimless test tools are ASK by default
+        // shell execution, taclet mutation and aimless test tools are ASK by default
         assertTrue(client.requiresApproval(KeYAgentTools.TOOL_RUN_COMMAND));
+        assertTrue(client.requiresApproval(KeYAgentTools.TOOL_ADD_TACLET));
+        assertTrue(client.requiresApproval(KeYAgentTools.TOOL_REMOVE_TACLET));
         assertTrue(client.requiresApproval(TestMcpToolProvider.NEEDS_APPROVAL));
     }
 

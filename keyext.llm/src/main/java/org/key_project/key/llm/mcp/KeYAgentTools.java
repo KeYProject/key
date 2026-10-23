@@ -21,10 +21,7 @@ import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.scripts.ScriptCommandAst;
 import de.uka.ilkd.key.scripts.ScriptException;
 
-import org.key_project.key.llm.FileAccess;
-import org.key_project.key.llm.LlmSettings;
-import org.key_project.key.llm.ProofContextCollector;
-import org.key_project.key.llm.ShellSafetyPolicy;
+import org.key_project.key.llm.*;
 
 import com.google.gson.GsonBuilder;
 import org.jspecify.annotations.Nullable;
@@ -45,6 +42,14 @@ import static org.key_project.key.llm.mcp.Tool.ApprovalRequirement.AUTO;
  * goal, a branch or all open goals</li>
  * <li>{@code auto} - applies KeY's automatic proof strategy with a given step limit
  * (the {@code auto} proof-script command)</li>
+ * <li>{@code list_proofs} - enumerates the open proofs with an identifier that the taclet tools
+ * accept in their optional {@code proof} parameter</li>
+ * <li>{@code list_taclets} / {@code list_taclet_options} / {@code export_taclet} - inspect the
+ * taclets and taclet options of a proof, and export a taclet as parseable rule text</li>
+ * <li>{@code export_taclets} - export several or all taclets of a proof as parseable rule text
+ * (bounded output, optional filter)</li>
+ * <li>{@code add_taclet} / {@code remove_taclet} - register a new taclet for a proof, resp. retire
+ * one (future rule applications only; requires user approval)</li>
  * </ul>
  *
  * @author Alexander Weigl
@@ -60,6 +65,13 @@ public final class KeYAgentTools implements McpClient {
     public static final String TOOL_USE_SKILL = "use_skill";
     public static final String TOOL_TRYCLOSE = "tryclose";
     public static final String TOOL_AUTO = "auto";
+    public static final String TOOL_LIST_PROOFS = "list_proofs";
+    public static final String TOOL_LIST_TACLETS = "list_taclets";
+    public static final String TOOL_LIST_TACLET_OPTIONS = "list_taclet_options";
+    public static final String TOOL_EXPORT_TACLET = "export_taclet";
+    public static final String TOOL_EXPORT_TACLETS = "export_taclets";
+    public static final String TOOL_ADD_TACLET = "add_taclet";
+    public static final String TOOL_REMOVE_TACLET = "remove_taclet";
 
     private final ShellSafetyPolicy safetyPolicy = new ShellSafetyPolicy();
 
@@ -150,6 +162,90 @@ public final class KeYAgentTools implements McpClient {
                     JsonSchema.builder().withType("boolean")
                             .withDescription("apply the strategy to all open goals instead of the"
                                 + " first one")
+                            .build())),
+            tool(TOOL_LIST_PROOFS, "Lists all currently open proofs with an identifier (name or"
+                + " index). Pass the identifier as the optional 'proof' parameter of the taclet"
+                + " tools (list_taclets, list_taclet_options, export_taclet, add_taclet,"
+                + " remove_taclet); omitting it targets the currently selected proof.", AUTO,
+                schema()),
+            tool(TOOL_LIST_TACLETS, "Lists the taclets (rewrite and apply rules) available for a"
+                + " proof, one name per line. Optionally filters by a case-insensitive substring.",
+                AUTO,
+                schema(
+                    "proof",
+                    JsonSchema.builder().withType("string")
+                            .withDescription("proof identifier (name or index) as returned by"
+                                + " list_proofs; omit to use the currently selected proof")
+                            .build(),
+                    "filter",
+                    JsonSchema.builder().withType("string")
+                            .withDescription("optional case-insensitive substring to filter"
+                                + " taclet names")
+                            .build())),
+            tool(TOOL_LIST_TACLET_OPTIONS, "Lists the taclet options (choices) of a proof: the"
+                + " selected value of each option category such as programRules, together with"
+                + " the possible values.", AUTO,
+                schema(
+                    "proof",
+                    JsonSchema.builder().withType("string")
+                            .withDescription("proof identifier (name or index) as returned by"
+                                + " list_proofs; omit to use the currently selected proof")
+                            .build())),
+            tool(TOOL_EXPORT_TACLET, "Exports a taclet of a proof as a parseable KeY rule"
+                + " declaration. The text can be edited and registered again with add_taclet.",
+                AUTO,
+                schema(
+                    "proof",
+                    JsonSchema.builder().withType("string")
+                            .withDescription("proof identifier (name or index) as returned by"
+                                + " list_proofs; omit to use the currently selected proof")
+                            .build(),
+                    "taclet",
+                    JsonSchema.builder().withType("string")
+                            .withDescription("name of the taclet to export")
+                            .build())),
+            tool(TOOL_EXPORT_TACLETS, "Exports several taclets of a proof as parseable KeY rule"
+                + " declarations, optionally filtered by a case-insensitive substring; without a"
+                + " filter all available taclets are exported. The output is capped: narrow it"
+                + " with 'filter' if the result is truncated, or export single taclets with"
+                + " export_taclet.", AUTO,
+                schema(
+                    "proof",
+                    JsonSchema.builder().withType("string")
+                            .withDescription("proof identifier (name or index) as returned by"
+                                + " list_proofs; omit to use the currently selected proof")
+                            .build(),
+                    "filter",
+                    JsonSchema.builder().withType("string")
+                            .withDescription("optional case-insensitive substring to filter"
+                                + " taclet names")
+                            .build())),
+            tool(TOOL_ADD_TACLET, "Registers a new taclet for a proof, given as a parseable KeY"
+                + " rule declaration (\\taclet <name> { ... };). The taclet becomes available for"
+                + " future rule applications of that proof. Requires user approval.", ASK,
+                schema(
+                    "proof",
+                    JsonSchema.builder().withType("string")
+                            .withDescription("proof identifier (name or index) as returned by"
+                                + " list_proofs; omit to use the currently selected proof")
+                            .build(),
+                    "taclet",
+                    JsonSchema.builder().withType("string")
+                            .withDescription("the taclet declaration text, e.g."
+                                + " \\taclet my_rule { ... };")
+                            .build())),
+            tool(TOOL_REMOVE_TACLET, "Removes a taclet from a proof's rule set so that it is no"
+                + " longer offered for future rule applications. Rule applications that already"
+                + " happened are not affected. Requires user approval.", ASK,
+                schema(
+                    "proof",
+                    JsonSchema.builder().withType("string")
+                            .withDescription("proof identifier (name or index) as returned by"
+                                + " list_proofs; omit to use the currently selected proof")
+                            .build(),
+                    "taclet",
+                    JsonSchema.builder().withType("string")
+                            .withDescription("name of the taclet to remove")
                             .build())));
     }
 
@@ -183,6 +279,13 @@ public final class KeYAgentTools implements McpClient {
                 "[use_skill is handled by the agent loop; it cannot be called directly]";
             case TOOL_TRYCLOSE -> tryClose(args);
             case TOOL_AUTO -> runAuto(args);
+            case TOOL_LIST_PROOFS -> listProofs();
+            case TOOL_LIST_TACLETS -> listTaclets(args);
+            case TOOL_LIST_TACLET_OPTIONS -> listTacletOptions(args);
+            case TOOL_EXPORT_TACLET -> exportTaclet(args);
+            case TOOL_EXPORT_TACLETS -> exportTaclets(args);
+            case TOOL_ADD_TACLET -> addTaclet(args);
+            case TOOL_REMOVE_TACLET -> removeTaclet(args);
             default -> throw new IllegalArgumentException("unknown tool: " + toolName);
         };
     }
@@ -236,7 +339,9 @@ public final class KeYAgentTools implements McpClient {
             boolArg(args, "assertClosed")));
     }
 
-    /** Runs the {@code auto} proof-script command with the given step limit. */
+    /**
+     * Runs the {@code auto} proof-script command with the given step limit.
+     */
     private static String runAuto(Map<String, Object> args) {
         return runScript(autoCommand(intArg(args, "steps"), boolArg(args, "all")));
     }
@@ -273,7 +378,9 @@ public final class KeYAgentTools implements McpClient {
         return new ScriptCommandAst("tryclose", named, positional);
     }
 
-    /** Builds the {@code auto} script command from the tool parameters. */
+    /**
+     * Builds the {@code auto} script command from the tool parameters.
+     */
     static ScriptCommandAst autoCommand(@Nullable Integer steps, boolean all) {
         var named = new HashMap<String, Object>();
         if (steps != null) {
@@ -318,6 +425,140 @@ public final class KeYAgentTools implements McpClient {
         }
         var node = MainWindow.getInstance().getMediator().getSelectedNode();
         return ProofContextCollector.contextBlock(proof, node);
+    }
+
+    // ---------------------------------------------------------------------- taclet management
+    // tools
+
+    /**
+     * A resolved tool target: either a proof or an error text to return to the model.
+     */
+    private record ProofRef(@Nullable Proof proof, @Nullable String error) {
+    }
+
+    /**
+     * Resolves the target proof of a tool call: the optional {@code proof} parameter (name or
+     * index as listed by {@link #listProofs()}), or the currently selected proof if omitted.
+     */
+    private static ProofRef proofRef(Map<String, Object> args) {
+        var mediator = MainWindow.getInstance().getMediator();
+        var selected = mediator == null ? null : mediator.getSelectedProof();
+        return selectProof(mediator.getCurrentlyOpenedProofs(), selected, stringArg(args, "proof"));
+    }
+
+    /**
+     * Selects a proof from the opened proofs by identifier: an exact (or case-insensitive) proof
+     * name, or the 0-based index shown by {@code list_proofs}. Without an identifier the selected
+     * proof is used.
+     */
+    static ProofRef selectProof(List<Proof> opened, @Nullable Proof selected,
+            @Nullable String id) {
+        if (id == null || id.isBlank()) {
+            return selected != null ? new ProofRef(selected, null)
+                    : new ProofRef(null,
+                        "Error: no proof selected; pass a 'proof' identifier from list_proofs");
+        }
+        Integer index = null;
+        try {
+            index = Integer.valueOf(id.trim());
+        } catch (NumberFormatException ignored) {
+        }
+        if (index != null) {
+            if (index < 0 || index >= opened.size()) {
+                return new ProofRef(null, "Error: proof index " + index + " is out of range [0,"
+                    + Math.max(0, opened.size() - 1) + "]; call list_proofs");
+            }
+            return new ProofRef(opened.get(index), null);
+        }
+        var matches = opened.stream().filter(p -> id.equals(proofName(p))).toList();
+        if (matches.size() != 1) {
+            matches = opened.stream().filter(p -> id.equalsIgnoreCase(proofName(p))).toList();
+        }
+        if (matches.size() == 1) {
+            return new ProofRef(matches.get(0), null);
+        }
+        if (matches.isEmpty()) {
+            return new ProofRef(null,
+                "Error: no open proof named \"" + id + "\"; call list_proofs");
+        }
+        return new ProofRef(null, "Error: \"" + id + "\" matches " + matches.size()
+            + " open proofs; use the index shown by list_proofs instead");
+    }
+
+    private static String proofName(Proof proof) {
+        return ProofContextCollector.proofName(proof);
+    }
+
+    /**
+     * Renders the {@code list_proofs} result for the open proofs, marking the selected one.
+     */
+    static String proofsBlock(List<Proof> opened, @Nullable Proof selected) {
+        if (opened.isEmpty()) {
+            return "(no proofs are open)";
+        }
+        var sb = new StringBuilder();
+        for (int i = 0; i < opened.size(); i++) {
+            var proof = opened.get(i);
+            int openGoals = proof.openGoals().size();
+            sb.append(i).append(": ").append(proofName(proof)).append(" — ").append(openGoals)
+                    .append(openGoals == 0 ? " (closed)" : " open goal(s)")
+                    .append(proof == selected ? " [selected]" : "").append("\n");
+        }
+        sb.append("Pass the name or the index as the 'proof' parameter of the taclet tools.");
+        return sb.toString().stripTrailing();
+    }
+
+    private static String listProofs() {
+        var mediator = MainWindow.getInstance().getMediator();
+        var selected = mediator == null ? null : mediator.getSelectedProof();
+        return proofsBlock(mediator.getCurrentlyOpenedProofs(), selected);
+    }
+
+    private static String listTaclets(Map<String, Object> args) {
+        var ref = proofRef(args);
+        return ref.error() != null ? ref.error()
+                : TacletOperations.listTaclets(ref.proof(), stringArg(args, "filter"));
+    }
+
+    private static String listTacletOptions(Map<String, Object> args) {
+        var ref = proofRef(args);
+        return ref.error() != null ? ref.error() : TacletOperations.listTacletOptions(ref.proof());
+    }
+
+    private static String exportTaclet(Map<String, Object> args) {
+        var ref = proofRef(args);
+        if (ref.error() != null) {
+            return ref.error();
+        }
+        var name = stringArg(args, "taclet");
+        return name == null || name.isBlank() ? "Error: 'taclet' parameter is required"
+                : TacletOperations.exportTaclet(ref.proof(), name);
+    }
+
+    private static String exportTaclets(Map<String, Object> args) {
+        var ref = proofRef(args);
+        return ref.error() != null ? ref.error()
+                : TacletOperations.exportTaclets(ref.proof(), stringArg(args, "filter"));
+    }
+
+    private static String addTaclet(Map<String, Object> args) {
+        var ref = proofRef(args);
+        if (ref.error() != null) {
+            return ref.error();
+        }
+        var source = stringArg(args, "taclet");
+        return source == null || source.isBlank() ? "Error: 'taclet' parameter is required"
+                : TacletOperations.addTaclet(ref.proof(), source);
+    }
+
+    private static String removeTaclet(Map<String, Object> args) {
+        var ref = proofRef(args);
+        if (ref.error() != null) {
+            return ref.error();
+        }
+        var name = stringArg(args, "taclet");
+        return name == null || name.isBlank() ? "Error: 'taclet' parameter is required"
+                : TacletOperations.removeTaclet(ref.proof(), name);
     }
 
     private static String listFiles(@Nullable String prefix) {
