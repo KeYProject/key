@@ -136,22 +136,27 @@ Unknown `$tokens` and bare activation directives (`/skill:name`) are left untouc
 ## 5. Skills
 
 A **skill** is a named bundle of instructions that is appended to the system prompt while active,
-optionally restricting the tool set:
+optionally restricting the tool set. It is stored as a Markdown file whose metadata lives in a
+YAML front matter and whose body holds the instructions (under `llm/skills/<name>.md`):
 
-```jsonc
-// <key-config-dir>/llm/skills/<name>.json
-{
-  "name": "optics",
-  "description": "focus on arithmetic overflow proofs",
-  "instructions": "Pay special attention to integer overflow; ...",
-  "allowedTools": ["list_files", "read_file", "get_proof_context"], // empty = no restriction
-  "enabled": true
-}
+```markdown
+---
+name: optics
+description: focus on arithmetic overflow proofs
+enabled: true
+allowedTools:         # empty/absent = no restriction
+  - list_files
+  - read_file
+  - get_proof_context
+---
+
+Pay special attention to integer overflow; check the goal sequent before choosing a rule.
 ```
 
 - Skills are managed in **Settings → LLM Settings → Skills**: a list of the stored skills, with
   `New`/`Edit`/`Delete` (editing happens in a dialog) and `Export...`/`Import...` to share the
-  whole library as a JSON file (see [section 9](#9-settings-reference-settings--llm-settings)).
+  whole library as a ZIP archive of its Markdown files (see
+  [section 9](#9-settings-reference-settings--llm-settings)).
 - If a skill restricts `allowedTools`, only those tools are offered to the model while the skill
   is active.
 - The agent itself can activate a skill through the `use_skill` tool — this is **off by default**
@@ -161,21 +166,22 @@ optionally restricting the tool set:
 
 ## 6. Prompts
 
-A **prompt** is a named, reusable message template:
+A **prompt** is a named, reusable message template, stored as a Markdown file with a YAML front
+matter (under `llm/prompts/<name>.md`):
 
-```jsonc
-// <key-config-dir>/llm/prompts/<name>.json
-{
-  "name": "prove-method",
-  "description": "prove the postcondition of the selected method",
-  "template": "Prove the selected method. Collect $proof and $seq, ..."
-}
+```markdown
+---
+name: prove-method
+description: prove the postcondition of the selected method
+---
+
+Prove the selected method. Collect $proof and $seq, then try to close the goals.
 ```
 
 Templates are inserted from the *Prompts* toolbar button or via `/prompt:name`; markup inside the
 template is resolved like normal input. Prompts are managed in **Settings → LLM Settings →
 Prompts**: a list of the stored prompts with `New`/`Edit`/`Delete` (editing happens in a dialog)
-and `Export...`/`Import...` to share the whole library as a JSON file.
+and `Export...`/`Import...` to share the whole library as a ZIP archive of its Markdown files.
 
 ---
 
@@ -334,18 +340,21 @@ Auto-scroll output (`true`) and show tool activity (`true`).
 Editors for the user libraries described in [section 5](#5-skills) and [section 6](#6-prompts):
 the entries are shown as a selectable list (name + description), `New`/`Edit` (or double click)
 open a dialog with the full form and `Delete` removes the selected entry. `Export...` saves the
-whole library as a JSON file, `Import...` merges one back in (new entries are added; entries with
-an existing name are only overwritten after you confirm, otherwise they are kept). Changes are
-saved immediately.
+whole library as a ZIP archive of its Markdown files (one `<name>.md` per entry), `Import...`
+merges such an archive back in (new entries are added; entries with an existing name are only
+overwritten after you confirm, otherwise they are kept). Changes are saved immediately.
 
 ---
 
 ## 10. Storage
 
-User-defined prompts and skills are stored as JSON files in the versioned KeY configuration
-directory (`llm/prompts` and `llm/skills`), e.g. `~/.key/v3.1/llm/prompts/<name>.json` for
-KeY 3.1. The chat history and selected models are part of the proof session and are not
-persisted as files.
+User-defined prompts and skills are stored as **Markdown files with a YAML front matter** in the
+versioned KeY configuration directory (`llm/prompts` and `llm/skills`), e.g.
+`~/.key/v3.1/llm/prompts/<name>.md` for KeY 3.1. The front matter holds the metadata (`name`,
+`description`, and for skills also `enabled` and `allowedTools`); the Markdown body is the prompt
+template, respectively the skill instructions. Legacy `<name>.json` files from older KeY versions
+are converted to the Markdown format automatically on first access and then removed. The chat
+history and selected models are part of the proof session and are not persisted as files.
 
 ---
 

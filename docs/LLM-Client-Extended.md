@@ -250,10 +250,14 @@ new tools with their approval requirement.
   `shellTimeoutSeconds` (30), `shellMaxOutputChars` (65536), `shellBlockedPatterns`,
   `toolsDisabled`, `allowedToolsWithApproval`, `allowedToolsWithoutApproval`,
   `autoScrollOutput`, `showToolActivity`.
-* Prompt and skill libraries are file-backed JSON (`FileBackedLibrary`) under
-  `<keyConfig>/llm/prompts` and `<keyConfig>/llm/skills`, edited by the settings sub-panels
-  (`PromptLibraryEditor`, `SkillLibraryEditor`); records are `Prompt(name, description,
-  template)` and `Skill(name, description, instructions, allowedTools, enabled)`.
+* Prompt and skill libraries are file-backed Markdown (`FileBackedLibrary`) under
+  `<keyConfig>/llm/prompts` and `<keyConfig>/llm/skills`: one `<name>.md` per entry with a YAML
+  front matter (`MarkdownFrontMatter`, keys `name`/`description` and for skills `enabled`/
+  `allowedTools`) and the template/instructions as the body; legacy `<name>.json` files are
+  migrated on first access. Edited by the settings sub-panels (`PromptLibraryEditor`,
+  `SkillLibraryEditor`); records are `Prompt(name, description, template)` and
+  `Skill(name, description, instructions, allowedTools, enabled)`; export/import shares the whole
+  library as a ZIP of `.md` entries (`LibraryZip`).
 * The conversation history itself is kept per proof in memory (`LlmSession.getContext()`) and
   is not persisted.
 

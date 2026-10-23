@@ -14,23 +14,38 @@ import java.util.List;
 
 import de.uka.ilkd.key.settings.PathConfig;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Shared plumbing for the file-backed user libraries (prompts and skills). Content is stored as
- * human-readable JSON files under {@code <key-config-dir>/llm/prompts|skills/<name>.json}. Names
- * are validated so they cannot escape the library directory.
+ * Markdown files with a YAML front matter ({@link MarkdownFrontMatter}) under
+ * {@code <key-config-dir>/llm/prompts|skills/<name>.md}. Legacy {@code <name>.json} files from
+ * older KeY versions are migrated to Markdown automatically on first access. Names are validated
+ * so they cannot escape the library directory.
  *
  * @author Alexander Weigl
  */
 abstract class FileBackedLibrary<E> {
 
-    /** The directory holding the JSON files of this library. */
+    private static final String MD_SUFFIX = ".md";
+    private static final String JSON_SUFFIX = ".json";
+
+    /** The directory holding the Markdown files of this library. */
     protected abstract String subDirectory();
 
-    /** Reads a single element from its JSON text. */
-    protected abstract E fromJson(String json);
+    /** Reads a single element from its Markdown text (front matter + body). */
+    protected abstract @Nullable E fromMarkdown(String markdown);
 
-    /** Serializes a single element to JSON text. */
-    protected abstract String toJson(E element);
+    /** Serializes a single element to Markdown text (front matter + body). */
+    protected abstract String toMarkdown(E element);
+
+    /**
+     * Reads a single element from the legacy JSON format (used to migrate old files). Returns
+     * {@code null} when the format is not supported / the text is invalid.
+     */
+    protected @Nullable E fromLegacyJson(String json) {
+        return null;
+    }
 
     /** Returns the id of an element (also the file name). */
     protected abstract String nameOf(E element);
@@ -51,17 +66,18 @@ abstract class FileBackedLibrary<E> {
 
     public synchronized List<E> all() {
         var dir = baseDir();
+        migrateLegacy(dir);
         var result = new ArrayList<E>();
         try {
             if (!Files.isDirectory(dir)) {
                 return result;
             }
             try (var stream = Files.list(dir)) {
-                stream.filter(p -> p.toString().endsWith(".json"))
+                stream.filter(p -> p.toString().endsWith(MD_SUFFIX))
                         .sorted(Comparator.comparing(Path::toString)).forEach(p -> {
                             try {
-                                var json = Files.readString(p, StandardCharsets.UTF_8);
-                                var e = fromJson(json);
+                                var markdown = Files.readString(p, StandardCharsets.UTF_8);
+                                var e = fromMarkdown(markdown);
                                 if (e != null) {
                                     result.add(e);
                                 }
@@ -74,6 +90,38 @@ abstract class FileBackedLibrary<E> {
             // treat as empty library
         }
         return result;
+    }
+
+    /**
+     * Converts leftover legacy {@code <name>.json} files to the Markdown format and deletes them.
+     * Existing Markdown files win: a legacy file for a name that already has a {@code .md} file
+     * is deleted without conversion.
+     */
+    private void migrateLegacy(Path dir) {
+        try {
+            if (!Files.isDirectory(dir)) {
+                return;
+            }
+            try (var stream = Files.list(dir)) {
+                stream.filter(p -> p.toString().endsWith(JSON_SUFFIX)).forEach(p -> {
+                    try {
+                        var json = Files.readString(p, StandardCharsets.UTF_8);
+                        var e = fromLegacyJson(json);
+                        if (e != null) {
+                            var target = dir.resolve(nameOf(e) + MD_SUFFIX);
+                            if (!Files.exists(target)) {
+                                Files.writeString(target, toMarkdown(e), StandardCharsets.UTF_8);
+                            }
+                        }
+                        Files.deleteIfExists(p);
+                    } catch (IOException ex) {
+                        // keep the file; it will be retried on the next access
+                    }
+                });
+            }
+        } catch (IOException e) {
+            // treat as empty library
+        }
     }
 
     public synchronized E get(String name) {
@@ -97,8 +145,11 @@ abstract class FileBackedLibrary<E> {
         }
         try {
             Files.createDirectories(baseDir());
-            var target = baseDir().resolve(nameOf(element) + ".json");
-            Files.writeString(target, toJson(element), StandardCharsets.UTF_8);
+            var name = nameOf(element);
+            var target = baseDir().resolve(name + MD_SUFFIX);
+            Files.writeString(target, toMarkdown(element), StandardCharsets.UTF_8);
+            // drop a stale legacy file of the same name
+            Files.deleteIfExists(baseDir().resolve(name + JSON_SUFFIX));
             return null;
         } catch (IOException e) {
             return "Could not write library file: " + e.getMessage();
@@ -106,12 +157,10 @@ abstract class FileBackedLibrary<E> {
     }
 
     public synchronized String delete(String name) {
-        var file = baseDir().resolve(name + ".json");
         try {
-            if (Files.deleteIfExists(file)) {
-                return null;
-            }
-            return "No such entry: " + name;
+            boolean any = Files.deleteIfExists(baseDir().resolve(name + MD_SUFFIX))
+                    | Files.deleteIfExists(baseDir().resolve(name + JSON_SUFFIX));
+            return any ? null : "No such entry: " + name;
         } catch (IOException e) {
             return "Could not delete " + name + ": " + e.getMessage();
         }
