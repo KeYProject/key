@@ -203,6 +203,7 @@ The built-in tool set (`KeYAgentTools`):
 | `run_command`       | ask      | run a shell command in the model directory (blocklist + approval)   |
 | `ask_user`          | auto     | ask the user a question; the turn pauses until it is answered       |
 | `use_skill`         | auto     | activate a user-defined skill by name (only if enabled in settings) |
+| `spawn_subagent`    | ask      | delegate a task to a sub-agent (only if enabled in settings)        |
 | `tryclose`          | auto     | apply the `tryclose` proof-script command (TryClose macro) to the current branch, all open goals, or a goal by index |
 | `auto`              | auto     | apply KeY's automatic proof strategy ('Auto' button) with an arbitrary step limit |
 | `list_proofs`       | auto     | enumerate all open proofs with an identifier usable in the taclet tools' `proof` parameter |
@@ -254,6 +255,35 @@ turn until you answer. Turn this off with *Allow the agent to ask questions*.
   approval* / *without approval (always)*.
 - The tools exposed to the model never include the ones you disabled.
 
+### 7.3 Sub-agents (`spawn_subagent`)
+
+A **sub-agent** is a delegated, bounded tool loop with a role-specific system prompt and a
+restricted tool whitelist. The `spawn_subagent` tool takes a role, a precise task and a mode:
+
+```
+spawn_subagent { "role": "goal-solver", "task": "Close all open goals of the current proof.",
+                 "mode": "sequential" }
+```
+
+- **Roles** are registered via the Java `ServiceLoader` (service file
+  `META-INF/services/org.key_project.key.llm.subagents.SubagentRoleProvider`). Built-in roles:
+  `goal-solver` (automatic strategies + proof inspection), `file-explorer` (read-only file
+  inspection) and `rule-designer` (taclet design, sequential only).
+- **Whitelist:** the child only sees (and may only call) the tools of its role's whitelist,
+  intersected with the tools enabled in the Tools panel. The child never asks the user and never
+  pauses for approval — the `spawn_subagent` call itself (ask-approval by default) is the
+  approval point.
+- **Bounded:** each sub-agent has a tool-round budget (role-specific, or `max sub-agent turns`)
+  and a maximum nesting depth (`max sub-agent depth`); delegations inside a sub-agent are
+  depth-guarded, cancellations of the parent turn propagate into running children.
+- **Result:** the child's final answer (which should start with
+  `KEY_AGENT_RESULT {"summary": "…"}` for machine-readable outcomes) is returned to the
+  delegating agent as the tool result.
+- `mode: parallel` exists in the schema but is **not implemented yet**; currently parallel is
+  rejected and sub-agents run sequentially. Configuring it, plus status reporting in the chat
+  panel, is planned: parallel fan-out will only be offered for roles marked
+  `parallelAllowed` and must be restricted to disjoint proofs (proofs are not thread-safe).
+
 ---
 
 ## 8. Proof context
@@ -304,6 +334,9 @@ are edited in their own panels.
 | Send temperature | `false` (`temperature` 0.2) |
 | Send max output tokens | `false` (`4096`) |
 | Agent may use skills (`use_skill`) | `false` |
+| Agent may spawn sub-agents (`spawn_subagent`) | `false` |
+| Max sub-agent turns (per delegation) | `8` |
+| Max sub-agent depth (nesting) | `2` |
 
 ### Context and history
 | Setting | Default |
@@ -373,3 +406,4 @@ history and selected models are part of the proof session and are not persisted 
 | Settings            | `org.key_project.key.llm.LlmSettings` / `LlmSettingsUI` / `LlmToolsPanel` |
 | Skill library       | `org.key_project.key.llm.SkillLibrary` + `Skill`   |
 | Prompt library      | `org.key_project.key.llm.PromptLibrary` + `Prompt` |
+| Sub-agents          | `org.key_project.key.llm.SubagentRunner` (loop) + `org.key_project.key.llm.subagents.SubagentRegistry` / `SubagentRole` / `BuiltInSubagentRoles` (roles) |

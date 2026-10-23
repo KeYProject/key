@@ -72,6 +72,7 @@ public final class KeYAgentTools implements McpClient {
     public static final String TOOL_RUN_COMMAND = "run_command";
     public static final String TOOL_ASK_USER = "ask_user";
     public static final String TOOL_USE_SKILL = "use_skill";
+    public static final String TOOL_SPAWN_SUBAGENT = "spawn_subagent";
     public static final String TOOL_TRYCLOSE = "tryclose";
     public static final String TOOL_AUTO = "auto";
     public static final String TOOL_LIST_PROOFS = "list_proofs";

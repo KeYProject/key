@@ -58,6 +58,14 @@ public class LlmSettings extends AbstractPropertiesSettings {
     private final PropertyEntry<Boolean> agentCanUseSkills =
         createBooleanProperty("agentCanUseSkills", false);
 
+    // --- sub-agents ---
+    private final PropertyEntry<Boolean> subagentsEnabled =
+        createBooleanProperty("subagentsEnabled", false);
+    private final PropertyEntry<Integer> maxSubagentTurns =
+        createIntegerProperty("maxSubagentTurns", 8);
+    private final PropertyEntry<Integer> maxSubagentDepth =
+        createIntegerProperty("maxSubagentDepth", 2);
+
     // --- context & history ---
     private final PropertyEntry<Boolean> attachProofContext =
         createBooleanProperty("attachProofContext", false);
@@ -120,6 +128,9 @@ public class LlmSettings extends AbstractPropertiesSettings {
         setSendMaxOutputTokens(other.getSendMaxOutputTokens());
         setMaxOutputTokens(other.getMaxOutputTokens());
         setAgentCanUseSkills(other.getAgentCanUseSkills());
+        setSubagentsEnabled(other.getSubagentsEnabled());
+        setMaxSubagentTurns(other.getMaxSubagentTurns());
+        setMaxSubagentDepth(other.getMaxSubagentDepth());
         setAttachProofContext(other.getAttachProofContext());
         setProofContextMaxSequents(other.getProofContextMaxSequents());
         setProofContextMaxChars(other.getProofContextMaxChars());
@@ -238,6 +249,33 @@ public class LlmSettings extends AbstractPropertiesSettings {
 
     public void setAgentCanUseSkills(boolean v) {
         this.agentCanUseSkills.set(v);
+    }
+
+    /** Whether the agent may delegate tasks to sub-agents ({@code spawn_subagent}). */
+    public boolean getSubagentsEnabled() {
+        return subagentsEnabled.get();
+    }
+
+    public void setSubagentsEnabled(boolean enabled) {
+        this.subagentsEnabled.set(enabled);
+    }
+
+    /** Global cap on tool-call rounds of a sub-agent (used when the role has no own budget). */
+    public int getMaxSubagentTurns() {
+        return maxSubagentTurns.get();
+    }
+
+    public void setMaxSubagentTurns(int turns) {
+        this.maxSubagentTurns.set(turns);
+    }
+
+    /** Maximum nesting depth of sub-agent delegations (1 = children may not spawn children). */
+    public int getMaxSubagentDepth() {
+        return maxSubagentDepth.get();
+    }
+
+    public void setMaxSubagentDepth(int depth) {
+        this.maxSubagentDepth.set(depth);
     }
 
     // --- context & history ---

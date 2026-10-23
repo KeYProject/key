@@ -257,6 +257,20 @@ public class AgentLoop {
                 continue;
             }
 
+            if (KeYAgentTools.TOOL_SPAWN_SUBAGENT.equals(name)) {
+                if (!LlmSettings.INSTANCE.getSubagentsEnabled()) {
+                    results.add(LlmMessage.tool(id,
+                        "[Spawning sub-agents is disabled in the settings]"));
+                    continue;
+                }
+                // the sub-agent runs synchronously; the outcome text is the tool result
+                var outcome = SubagentRunner.runSequential(session, completions, arguments,
+                    this::isCancelled);
+                results.add(LlmMessage.tool(id, outcome));
+                activities.add(new ToolActivity(name, arguments, outcome));
+                continue;
+            }
+
             if (session.getMcpClient().requiresApproval(name)) {
                 flush(results);
                 pending = new PendingApproval(id, name, arguments);
@@ -313,7 +327,7 @@ public class AgentLoop {
         return null;
     }
 
-    private static Map<?, ?> extractMessage(Map<String, Object> response) throws Exception {
+    static Map<?, ?> extractMessage(Map<String, Object> response) throws Exception {
         var choices = asList(response.get("choices"));
         if (choices == null || choices.isEmpty()) {
             throw new RuntimeException("The API response contains no choices.");
@@ -329,7 +343,7 @@ public class AgentLoop {
         return m;
     }
 
-    private static String stringify(Object result) {
+    static String stringify(Object result) {
         if (result == null) {
             return "(no result)";
         }
@@ -344,7 +358,7 @@ public class AgentLoop {
     }
 
     @SuppressWarnings("unchecked")
-    private static List<Map<String, Object>> casts(List<?> toolCalls) {
+    static List<Map<String, Object>> casts(List<?> toolCalls) {
         List<Map<String, Object>> result = new ArrayList<>();
         for (Object o : toolCalls) {
             if (o instanceof Map<?, ?> m) {
@@ -355,7 +369,7 @@ public class AgentLoop {
     }
 
     @SuppressWarnings("unchecked")
-    private static List<?> asList(Object o) {
+    static List<?> asList(Object o) {
         return o instanceof List<?> l ? l : null;
     }
 }
