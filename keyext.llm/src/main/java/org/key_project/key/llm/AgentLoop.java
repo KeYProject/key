@@ -264,7 +264,7 @@ public class AgentLoop {
                     continue;
                 }
                 // the sub-agent runs synchronously; the outcome text is the tool result
-                var outcome = SubagentRunner.runSequential(session, completions, arguments,
+                var outcome = SubagentRunner.run(session, completions, arguments,
                     this::isCancelled);
                 results.add(LlmMessage.tool(id, outcome));
                 activities.add(new ToolActivity(name, arguments, outcome));
