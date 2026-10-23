@@ -206,6 +206,15 @@ The built-in tool set (`KeYAgentTools`):
 | `export_taclets`    | auto     | export several or all taclets of a proof as parseable declarations (optional filter, capped output) |
 | `add_taclet`        | ask      | register a new taclet for a proof from a `\taclet` declaration (future rule applications only) |
 | `remove_taclet`     | ask      | remove a taclet from a proof's rule set (past rule applications are not affected) |
+| `list_tools`        | auto     | dump the Markdown documentation of every available tool (metadata + this list) |
+
+The tool set is **modular and self-describing**: every tool is contributed by an
+`AgentToolProvider` that is discovered via the Java `ServiceLoader` (service file
+`META-INF/services/org.key_project.key.llm.mcp.AgentToolProvider`) and aggregated by
+`KeYAgentTools`. Plugins add tools by providing another provider — no changes to the core
+classes are needed. The metadata of all tools (name, description, parameter schema, default
+approval) is available programmatically via `KeYAgentTools.agents()` / `agent(name)` and as an
+OpenAI-format tool list via `getTools()`; `list_tools` renders it as Markdown for the model.
 
 ### 7.1 Questions
 
