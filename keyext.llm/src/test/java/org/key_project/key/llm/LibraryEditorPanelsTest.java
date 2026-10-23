@@ -51,21 +51,35 @@ class LibraryEditorPanelsTest {
     }
 
     @Test
-    void promptExportImportJsonRoundTrip() {
+    void promptMarkdownRoundTrip() {
         var editor = new PromptLibraryEditor();
         var original = List.of(new Prompt("p1", "First prompt", "Do $seq"),
-            new Prompt("p2", "With markup", "Read @file and reply with \"quotes\"."));
-        assertEquals(original, editor.fromJson(editor.toJson(original)));
+            new Prompt("p2", "With markup", "Read @file and reply with \"quotes\"."),
+            new Prompt("p3", "empty body", ""));
+        for (var p : original) {
+            assertEquals(p, editor.fromMarkdown(editor.toMarkdown(p)));
+        }
     }
 
     @Test
-    void skillExportImportJsonRoundTrip() {
+    void skillMarkdownRoundTrip() {
         var editor = new SkillLibraryEditor();
         var original = List.of(
             new Skill("s1", "A skill", "instructions and $goals", List.of("auto", "tryclose"),
                 true),
-            new Skill("s2", "", "", List.of(), false));
-        assertEquals(original, editor.fromJson(editor.toJson(original)));
+            new Skill("s2", "", "", List.of(), false),
+            new Skill("s3", "multi-line",
+                "line one\n\nline two\n```\ncode\n```\n", List.of(), true));
+        for (var s : original) {
+            assertEquals(s, editor.fromMarkdown(editor.toMarkdown(s)));
+        }
+    }
+
+    @Test
+    void invalidMarkdownParsesToNull() {
+        var editor = new SkillLibraryEditor();
+        assertEquals(null, editor.fromMarkdown("no front matter here"));
+        assertEquals(null, editor.fromMarkdown("---\nname:\n---\nbody")); // blank name
     }
 
     @Test

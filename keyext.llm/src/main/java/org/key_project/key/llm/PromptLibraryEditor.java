@@ -9,8 +9,6 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -92,19 +90,12 @@ public class PromptLibraryEditor extends LibraryEditorPanel<Prompt> {
     }
 
     @Override
-    protected String toJson(List<Prompt> entries) {
-        return new GsonBuilder().setPrettyPrinting().create().toJson(entries);
+    protected String toMarkdown(Prompt e) {
+        return PromptLibrary.serialize(e);
     }
 
     @Override
-    protected List<Prompt> fromJson(String json) {
-        try {
-            var type = new TypeToken<List<Prompt>>() {
-            }.getType();
-            List<Prompt> list = new GsonBuilder().create().fromJson(json, type);
-            return list == null ? List.of() : list;
-        } catch (Exception e) {
-            return List.of();
-        }
+    protected @Nullable Prompt fromMarkdown(String markdown) {
+        return PromptLibrary.parse(markdown);
     }
 }
