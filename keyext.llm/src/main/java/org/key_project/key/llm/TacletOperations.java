@@ -174,7 +174,7 @@ public final class TacletOperations {
      */
     public static String addTaclet(Proof proof, String tacletSource) {
         var source = normalize(tacletSource);
-        if (source == null || source.isBlank()) {
+        if (source.isBlank()) {
             return "Error: empty taclet declaration";
         }
         InitConfig config = proof.getInitConfig();
@@ -289,11 +289,13 @@ public final class TacletOperations {
 
     /**
      * Accepts a bare {@code name { ... }} declaration, an optional legacy {@code \taclet}
-     * keyword prefix, or a complete {@code \rules { ... }} block.
+     * keyword prefix, or a complete {@code \rules { ... }} block, and returns the declaration in
+     * the {@code \rules { ... }} form expected by the parser. The empty string is returned for a
+     * blank or missing declaration.
      */
-    private static @Nullable String normalize(String source) {
+    private static String normalize(@Nullable String source) {
         if (source == null) {
-            return null;
+            return "";
         }
         var s = source.strip();
         if (s.startsWith("\\taclet")) {
