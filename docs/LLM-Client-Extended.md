@@ -189,7 +189,10 @@ public interface McpToolProvider {
 * `KeYAgentTools` (registered via `KeYAgentToolsProvider`) provides the built-in tools:
   `get_proof_context`, `list_files`, `read_file`, `file_info`, `run_command` (gated by
   `ShellSafetyPolicy` blocklist, timeout and output caps), `ask_user`, `use_skill`,
-  and the proof-script tools `tryclose` and `auto`.
+  the proof-script tools `tryclose` and `auto`, and the taclet-management tools
+  `list_proofs`, `list_taclets`, `list_taclet_options`, `export_taclet`,
+  `export_taclets` (bounded bulk export), `add_taclet` / `remove_taclet` (the latter two
+  modify a proof's rule set and require approval; they delegate to `TacletOperations`).
 * `McpClientStdio` is a **reference implementation** for talking to external MCP servers
   over stdin/stdout (JSON-RPC 2.0, protocol version 2024-11-05, 30 s timeouts). It wraps an
   already-started `Process` (`initialize()` then `getTools()`/`callTool`), but is currently
