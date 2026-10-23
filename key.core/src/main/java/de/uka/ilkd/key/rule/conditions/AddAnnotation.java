@@ -31,7 +31,8 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * This variable condition can be used to create a copy of a {@link SchemaVariable}
- * that has an additional {@link Annotation} in its {@link TypeReference}.
+ * where there is an additional last {@link Annotation} in its {@link TypeReference}. 
+ * It only match if the desired {@link Annotation} does exist.
  *
  * @author Daniel Grévent
  */
@@ -45,15 +46,16 @@ public final class AddAnnotation implements VariableCondition {
     private final String annot;
 
     /**
-     * create an instance of the variable condition.
+     * create an instance of the variable condition. 
      *
-     * @param store the {@link SchemaVariable} in which the new copy is stored
-     * @param read the {@link SchemaVariable} that gets copied
-     * @param annot the fully qualified name of the {@link Annotation} to add
+     * @param store the {@link SchemaVariable} in which the new copy is stored.
+     * @param read the {@link SchemaVariable} that gets copied.
+     * @param annot the fully qualified name of the {@link Annotation} to add.
      *
-     * @throws IllegalArgumentException if `read` is not one of the {@link Sort}s
-     *         in the `ALLOWED` array or the {@link Sort} of write is not compatible with
-     *         that of `read`, so they do not correspond to the same kind of AST type.
+     * @throws IllegalArgumentException if <code>read</code> is not a `Variable`, 
+     *         a `LocalVariable` or a `SimpleInstanceCreation` or the {@link Sort} of 
+     *         <code>store</code> is not compatible with that of <code>read</code>, so 
+     *         they do not correspond to the same kind of AST type.
      */
     public AddAnnotation(SchemaVariable store, SchemaVariable read, String annot) {
         if (!equivalent(store.sort(), read.sort())) {
@@ -73,7 +75,7 @@ public final class AddAnnotation implements VariableCondition {
         this.annot = annot;
     }
 
-    /*
+    /**
      * check that two sorts that are part of `ALLOWED` are correspond to a same
      * underlying type
      */

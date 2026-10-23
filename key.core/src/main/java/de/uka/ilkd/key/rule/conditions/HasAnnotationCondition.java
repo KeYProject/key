@@ -45,11 +45,11 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
      * create an instance of the variable condition.
      *
      * @param variable the variable whos {@link TypeReference} is to check for
-     *        {@link Annotation}s.
-     * @param annot the fully qualified name of the {@link Annotation} to check for
+     *        {@link Annotation}s, which can be a `Variable`, a `LocalVariable`, 
+     *        a `SimpleInstanceCreation` or a `Field`.
+     * @param annot the fully qualified name of the {@link Annotation} to check for.
      *
-     * @throws IllegalArgumentException if `variable` is not one of the {@link Sort}s
-     *         in the `ALLOWED` array or the {@link Sort} has the name `Field`.
+     * @throws IllegalArgumentException if <code>variable</code> is not supported.
      */
     public HasAnnotationCondition(SchemaVariable variable, String annot) {
         if (!Arrays.stream(ALLOWED).anyMatch(variable.sort()::equals) &&
