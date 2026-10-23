@@ -15,8 +15,6 @@ import de.uka.ilkd.key.gui.settings.SettingsPanel;
 
 import org.key_project.key.llm.mcp.BuiltInMCPClient;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import net.miginfocom.layout.CC;
 import org.jspecify.annotations.Nullable;
 
@@ -133,19 +131,12 @@ public class SkillLibraryEditor extends LibraryEditorPanel<Skill> {
     }
 
     @Override
-    protected String toJson(List<Skill> entries) {
-        return new GsonBuilder().setPrettyPrinting().create().toJson(entries);
+    protected String toMarkdown(Skill e) {
+        return SkillLibrary.serialize(e);
     }
 
     @Override
-    protected List<Skill> fromJson(String json) {
-        try {
-            var type = new TypeToken<List<Skill>>() {
-            }.getType();
-            List<Skill> list = new GsonBuilder().create().fromJson(json, type);
-            return list == null ? List.of() : list;
-        } catch (Exception e) {
-            return List.of();
-        }
+    protected @Nullable Skill fromMarkdown(String markdown) {
+        return SkillLibrary.parse(markdown);
     }
 }
