@@ -98,7 +98,7 @@ public class KeYJavaType implements Type {
      *
      * @return the default value of the given type according to JLS Sect. 4.5.5
      */
-    public Literal getDefaultValue() {
+    public @Nullable Literal getDefaultValue() {
         if (javaType == null) {
             return null;
         }

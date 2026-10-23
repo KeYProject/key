@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.operator.NewArray;
 import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.Debug;
@@ -103,7 +104,8 @@ public abstract class InitArray extends ProgramTransformer {
 
         while (i-- != 0) {
             p_stmnts[i] =
-                KeYJavaASTFactory.declare(services, "_tmpArray", initializers.get(i), elementType);
+                KeYJavaASTFactory.declare(services, "_tmpArray", initializers.get(i),
+                    new TypeRef(elementType));
             res[i] = (ProgramVariable) ((LocalVariableDeclaration) p_stmnts[i]).getVariables()
                     .get(0).getProgramVariable();
         }
