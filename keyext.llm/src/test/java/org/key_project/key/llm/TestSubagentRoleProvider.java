@@ -18,6 +18,7 @@ import org.key_project.key.llm.subagents.SubagentRoleProvider;
 public class TestSubagentRoleProvider implements SubagentRoleProvider {
     public static final String ECHO_ROLE = "echo-role";
     public static final String SPAWNER_ROLE = "spawner-role";
+    public static final String PARALLEL_SPAWNER_ROLE = "parallel-spawner-role";
 
     @Override
     public List<SubagentRole> get() {
@@ -27,6 +28,11 @@ public class TestSubagentRoleProvider implements SubagentRoleProvider {
             new SubagentRole(SPAWNER_ROLE, "test role that may spawn sub-agents",
                 "You may delegate work to sub-agents.",
                 List.of(KeYAgentTools.TOOL_SPAWN_SUBAGENT, TestMcpToolProvider.ECHO), null, 4,
-                false));
+                false),
+            new SubagentRole(PARALLEL_SPAWNER_ROLE,
+                "test role that may spawn sub-agents in parallel",
+                "You may delegate work to sub-agents.",
+                List.of(KeYAgentTools.TOOL_SPAWN_SUBAGENT, TestMcpToolProvider.ECHO), null, 4,
+                true));
     }
 }
