@@ -195,10 +195,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         private void handleJmlStatement(Statement x) {
             var spec =
-                Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
+                Objects.requireNonNull(((JmlSpecCarrier) x).getSpec());
             addNeededVariables(spec.vars().atPres.keySet());
             var newSpec = spec.updateVariables(atPres, services);
-            services.getSpecificationRepository().addStatementSpec(x, newSpec);
+            ((JmlSpecCarrier) x).setSpec(newSpec);
         }
 
         @Override

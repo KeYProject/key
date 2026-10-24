@@ -8,6 +8,9 @@ import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.nparser.KeyAst.SetStatementContext;
+import de.uka.ilkd.key.speclang.JmlStatementSpec;
+
+import org.jspecify.annotations.Nullable;
 
 
 
@@ -16,7 +19,7 @@ import de.uka.ilkd.key.nparser.KeyAst.SetStatementContext;
  *
  * @author Julian Wiesler
  */
-public class SetStatement extends JavaStatement {
+public class SetStatement extends JavaStatement implements JmlSpecCarrier {
 
     /**
      * The target of the assignment as a term. Either a heap access for a ghost field
@@ -34,6 +37,12 @@ public class SetStatement extends JavaStatement {
      */
     private final SetStatementContext context;
 
+    /**
+     * the translated specification of this statement (target/value terms), or {@code null} until
+     * {@code JMLSpecFactory.translateSetStatement} has run
+     */
+    private @Nullable JmlStatementSpec spec;
+
     /** Constructor used in recoderext */
     public SetStatement(SetStatementContext context, PositionInfo positionInfo) {
         super(positionInfo);
@@ -43,6 +52,7 @@ public class SetStatement extends JavaStatement {
     /** Constructor used when cloning */
     public SetStatement(SetStatement copyFrom) {
         this(copyFrom.context, copyFrom.getPositionInfo());
+        this.spec = copyFrom.spec;
     }
 
 
@@ -53,6 +63,14 @@ public class SetStatement extends JavaStatement {
      */
     public SetStatementContext getParserContext() {
         return context;
+    }
+
+    public @Nullable JmlStatementSpec getSpec() {
+        return spec;
+    }
+
+    public void setSpec(@Nullable JmlStatementSpec spec) {
+        this.spec = spec;
     }
 
 
