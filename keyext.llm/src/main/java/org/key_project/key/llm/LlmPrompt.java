@@ -124,6 +124,12 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
         splitPane.add(tabInputPanes);
         add(splitPane, BorderLayout.CENTER);
 
+        // conversation output gets 2/3 of the panel height, input 1/3 - and the split keeps
+        // that ratio when the dock is resized (the default resize weight would give all extra
+        // space to the bottom input area)
+        splitPane.setResizeWeight(2.0 / 3.0);
+        splitPane.setDividerLocation(2.0 / 3.0);
+
         txtInput.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,
             InputEvent.CTRL_DOWN_MASK), "sendPrompt");
         txtInput.getActionMap().put("sendPrompt", new SendPromptAction());
@@ -546,7 +552,8 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
                 + clip(job.arguments(), 80) + ")…") + (job.isCancelled() ? " (cancelling)" : "")
                 + "</i></html>");
             label.setToolTipText("Running in the background since it was moved out of the"
-                + " foreground turn; the result is delivered when it finishes.\nJob " + job.jobId());
+                + " foreground turn; the result is delivered when it finishes.\nJob "
+                + job.jobId());
             row.add(label);
             var cancel = new JButton("Cancel job");
             cancel.addActionListener(e -> schedulerOfCurrentSession().cancelJob(job.jobId()));

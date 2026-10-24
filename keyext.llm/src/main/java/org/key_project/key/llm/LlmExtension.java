@@ -32,7 +32,7 @@ import org.jspecify.annotations.Nullable;
  */
 @KeYGuiExtension.Info(experimental = false, description = "LLM support for KeY")
 public class LlmExtension implements KeYGuiExtension, KeYGuiExtension.ContextMenu,
-        KeYGuiExtension.Settings, KeYGuiExtension.Startup, KeYGuiExtension.LeftPanel,
+        KeYGuiExtension.Settings, KeYGuiExtension.Startup, KeYGuiExtension.RightPanel,
         KeYGuiExtension.MainMenu {
     private KeyAction actionStartLlmPromptForCurrentProof;
     private TabPanel uiPrompt;
