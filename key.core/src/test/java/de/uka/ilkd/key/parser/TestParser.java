@@ -94,6 +94,8 @@ public class TestParser {
     // Handled by javac, javaparser does no type checking
     @Disabled
     @Test
+    // uses the deprecated Location#getFileURI() accessor of the legacy location API
+    @SuppressWarnings("deprecation")
     void testConstantEvaluationError() throws MalformedURLException {
         var file =
             HelperClassForTests.TESTCASE_DIRECTORY.resolve("parserErrorTest/AssignToArray.java");

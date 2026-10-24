@@ -24,6 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 class ProofSaverTest {
 
+    // the deprecated Proof constructor taking a Sequent is the one exercised by the saver
+    @SuppressWarnings("deprecation")
     void testSaveProblemToFile(String content) throws IOException {
         Services services = TacletForTests.services();
         KeyIO io = new KeyIO(services);
