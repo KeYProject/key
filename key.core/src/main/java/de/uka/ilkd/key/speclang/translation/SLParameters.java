@@ -11,9 +11,12 @@ import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Wraps a list of expressions.
  */
+@NullMarked
 public record SLParameters(ImmutableList<SLExpression> parameters) {
     public boolean isListOfTerm() {
         for (SLExpression expr : parameters) {

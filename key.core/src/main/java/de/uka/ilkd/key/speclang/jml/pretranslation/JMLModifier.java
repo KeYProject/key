@@ -5,12 +5,14 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import com.github.javaparser.ast.Modifier;
+import org.jspecify.annotations.NullMarked;
 
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
 
 /**
  * Enum to wrap all current jml modifiers to avoid having to work with strings.
  */
+@NullMarked
 public enum JMLModifier {
     ABSTRACT("abstract", Modifier.DefaultKeyword.ABSTRACT),
     FINAL("final", Modifier.DefaultKeyword.FINAL),

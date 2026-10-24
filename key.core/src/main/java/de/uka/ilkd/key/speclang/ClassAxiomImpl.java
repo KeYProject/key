@@ -23,20 +23,24 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents an axiom specified in a class.
  *
  * @author bruns
  *
  */
+@NullMarked
 public final class ClassAxiomImpl extends ClassAxiom {
 
 
     private final String name;
     private final KeYJavaType kjt;
-    private final ModifierKind visibility;
+    private final @Nullable ModifierKind visibility;
     private final JTerm originalRep;
-    private final LocationVariable originalSelfVar;
+    private final @Nullable LocationVariable originalSelfVar;
 
     /**
      * JML axioms may not be declared static, but they may be used like static specifications. This
@@ -45,8 +49,9 @@ public final class ClassAxiomImpl extends ClassAxiom {
     private final boolean isStatic;
 
 
-    public ClassAxiomImpl(String name, KeYJavaType kjt, ModifierKind visibility, JTerm rep,
-            LocationVariable selfVar) {
+    public ClassAxiomImpl(String name, KeYJavaType kjt, @Nullable ModifierKind visibility,
+            JTerm rep,
+            @Nullable LocationVariable selfVar) {
         assert name != null;
         assert kjt != null;
         this.name = name;
@@ -60,8 +65,8 @@ public final class ClassAxiomImpl extends ClassAxiom {
     }
 
 
-    public ClassAxiomImpl(String name, String displayName, KeYJavaType kjt,
-            ModifierKind visibility, JTerm rep, LocationVariable selfVar) {
+    public ClassAxiomImpl(String name, @Nullable String displayName, KeYJavaType kjt,
+            @Nullable ModifierKind visibility, JTerm rep, @Nullable LocationVariable selfVar) {
         this(name, kjt, visibility, rep, selfVar);
         this.displayName = displayName;
     }
@@ -186,7 +191,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
      * Class axioms do not have targets (in opposition to represents clauses)
      */
     @Override
-    public IObserverFunction getTarget() {
+    public @Nullable IObserverFunction getTarget() {
         return null;
     }
 

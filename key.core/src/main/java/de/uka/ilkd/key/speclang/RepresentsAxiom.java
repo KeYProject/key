@@ -30,18 +30,22 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A class axiom corresponding to a JML* represents clause.
  */
+@NullMarked
 public final class RepresentsAxiom extends ClassAxiom {
 
     private final String name;
     private final IObserverFunction target;
     private final KeYJavaType kjt;
-    private final ModifierKind visibility;
-    private final JTerm originalPre;
+    private final @Nullable ModifierKind visibility;
+    private final @Nullable JTerm originalPre;
     private final JTerm originalRep;
-    private final LocationVariable originalSelfVar;
+    private final @Nullable LocationVariable originalSelfVar;
     /**
      * The mapping of the pre-heaps.
      */
@@ -49,15 +53,16 @@ public final class RepresentsAxiom extends ClassAxiom {
     private final ImmutableList<LocationVariable> originalParamVars;
 
     public RepresentsAxiom(String name, IObserverFunction target, KeYJavaType kjt,
-            ModifierKind visibility, JTerm pre, JTerm rep, LocationVariable selfVar,
+            @Nullable ModifierKind visibility, @Nullable JTerm pre, JTerm rep,
+            @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars) {
         this(name, null, target, kjt, visibility, pre, rep, selfVar, paramVars, atPreVars);
     }
 
-    public RepresentsAxiom(String name, String displayName, IObserverFunction target,
-            KeYJavaType kjt, ModifierKind visibility, JTerm pre, JTerm rep,
-            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+    public RepresentsAxiom(String name, @Nullable String displayName, IObserverFunction target,
+            KeYJavaType kjt, @Nullable ModifierKind visibility, @Nullable JTerm pre, JTerm rep,
+            @Nullable LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars) {
         assert name != null;
         assert kjt != null;
@@ -110,7 +115,8 @@ public final class RepresentsAxiom extends ClassAxiom {
                         .equals(originalSelfVar));
     }
 
-    public JTerm getAxiom(JAbstractSortedOperator heapVar, JAbstractSortedOperator selfVar,
+    public JTerm getAxiom(JAbstractSortedOperator heapVar,
+            @Nullable JAbstractSortedOperator selfVar,
             Services services) {
         assert heapVar != null;
         // assert (selfVar == null) == target.isStatic();
@@ -140,7 +146,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     }
 
     @Override
-    public ModifierKind getVisibility() {
+    public @Nullable ModifierKind getVisibility() {
         return visibility;
     }
 

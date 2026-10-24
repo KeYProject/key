@@ -50,6 +50,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
@@ -66,6 +67,7 @@ import static java.util.Objects.requireNonNull;
  * @author Alexander Weigl
  * @version 1 (5/10/20)
  */
+@NullMarked
 class Translator extends JmlParserBaseVisitor<Object> {
 
     private final static String[] DISCOURAGED_CLAUSE_NAMES =
@@ -81,20 +83,21 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private final SortLDT sortLDT;
     private final SLExceptionFactory exc;
     private final JmlTermFactory termFactory;
-    private final LocationVariable selfVar;
-    private final ImmutableList<LocationVariable> paramVars;
-    private final LocationVariable resultVar;
-    private final LocationVariable excVar;
-    private final Map<LocationVariable, JTerm> atPres;
-    private final Map<LocationVariable, JTerm> atBefores;
+    private final @Nullable LocationVariable selfVar;
+    private final @Nullable ImmutableList<LocationVariable> paramVars;
+    private final @Nullable LocationVariable resultVar;
+    private final @Nullable LocationVariable excVar;
+    private final @Nullable Map<LocationVariable, JTerm> atPres;
+    private final @Nullable Map<LocationVariable, JTerm> atBefores;
 
     // Helper objects
     private final JMLResolverManager resolverManager;
 
-    Translator(Services services, KeYJavaType specInClass, LocationVariable self,
-            SpecMathMode specMathMode, ImmutableList<LocationVariable> paramVars,
-            LocationVariable result, LocationVariable exc, Map<LocationVariable, JTerm> atPres,
-            Map<LocationVariable, JTerm> atBefores) {
+    Translator(Services services, KeYJavaType specInClass, @Nullable LocationVariable self,
+            SpecMathMode specMathMode, @Nullable ImmutableList<LocationVariable> paramVars,
+            @Nullable LocationVariable result, @Nullable LocationVariable exc,
+            @Nullable Map<LocationVariable, JTerm> atPres,
+            @Nullable Map<LocationVariable, JTerm> atBefores) {
         assert self == null || specInClass != null;
 
         // save parameters
@@ -238,7 +241,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
             tb.var(getPermissionHeap()), term.sub(1), term.sub(2));
     }
 
-    private String createSignatureString(ImmutableList<SLExpression> signature) {
+    private String createSignatureString(@Nullable ImmutableList<SLExpression> signature) {
         if (signature == null || signature.isEmpty()) {
             return "";
         }
@@ -250,7 +253,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
     // region expression
     @Override
-    public KeYJavaType visitBuiltintype(JmlParser.BuiltintypeContext ctx) {
+    public @Nullable KeYJavaType visitBuiltintype(JmlParser.BuiltintypeContext ctx) {
         if (ctx.BYTE() != null) {
             return javaInfo.getKeYJavaType(PrimitiveType.JAVA_BYTE);
         }
@@ -384,7 +387,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
 
     @Override
-    public SLExpression visitPredornot(JmlParser.PredornotContext ctx) {
+    public @Nullable SLExpression visitPredornot(JmlParser.PredornotContext ctx) {
         if (ctx.predicate() != null) {
             return accept(ctx.predicate());
         }
@@ -600,7 +603,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return result;
     }
 
-    private SLExpression floatEqualityExpr(String img, SLExpression lhs, SLExpression rhs) {
+    private @Nullable SLExpression floatEqualityExpr(String img, SLExpression lhs,
+            SLExpression rhs) {
         if (lhs.getType() == null || rhs.getType() == null) {
             return null;
         }
@@ -960,8 +964,9 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return new SLExpression(tb.var(selfVar), selfVar.getKeYJavaType());
     }
 
-    private SLExpression lookupIdentifier(String lookupName, SLExpression receiver,
-            SLParameters params, ParserRuleContext ctx) {
+    private @Nullable SLExpression lookupIdentifier(String lookupName,
+            @Nullable SLExpression receiver,
+            @Nullable SLParameters params, ParserRuleContext ctx) {
         exc.updatePosition(ctx.start);
 
         SLExpression result = null;
@@ -991,7 +996,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
     private String fullyQualifiedName;
 
     @Override
-    public SLExpression visitPrimarySuffixAccess(JmlParser.PrimarySuffixAccessContext ctx) {
+    public @Nullable SLExpression visitPrimarySuffixAccess(
+            JmlParser.PrimarySuffixAccessContext ctx) {
         SLExpression receiver = this.receiver;
         String lookupName;
         boolean methodCall = ctx.LPAREN() != null;
@@ -1131,7 +1137,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
         return getSlParametersWithHeap(params);
     }
 
-    private SLParameters getSlParametersWithHeap(ImmutableList<SLExpression> params) {
+    private SLParameters getSlParametersWithHeap(@Nullable ImmutableList<SLExpression> params) {
         ImmutableList<SLExpression> preHeapParams = ImmutableList.nil();
         for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             JTerm p;
@@ -1156,13 +1162,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
     // endregion
 
     @Override
-    public Object visitNew_expr(JmlParser.New_exprContext ctx) {
+    public @Nullable Object visitNew_expr(JmlParser.New_exprContext ctx) {
         raiseError("Object creation with 'new' is not supported specifications.", ctx);
         return null;
     }
 
     @Override
-    public Object visitArray_initializer(JmlParser.Array_initializerContext ctx) {
+    public @Nullable Object visitArray_initializer(JmlParser.Array_initializerContext ctx) {
         raiseError("Array Initializer are currently not allowed in JML specifications.", ctx);
         return null;
     }
@@ -1395,7 +1401,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public SLExpression visitPrimaryCreateLocsetSingleton(
+    public @Nullable SLExpression visitPrimaryCreateLocsetSingleton(
             JmlParser.PrimaryCreateLocsetSingletonContext ctx) {
         SLExpression e = accept(ctx.expression());
         assert e != null;
@@ -1411,19 +1417,19 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitPrimaryDuration(JmlParser.PrimaryDurationContext ctx) {
+    public @Nullable Object visitPrimaryDuration(JmlParser.PrimaryDurationContext ctx) {
         raiseError("The \\duration function is not supported", ctx);
         return null;
     }
 
     @Override
-    public Object visitPrimarySpace(JmlParser.PrimarySpaceContext ctx) {
+    public @Nullable Object visitPrimarySpace(JmlParser.PrimarySpaceContext ctx) {
         raiseError("The \\space function is not supported", ctx);
         return null;
     }
 
     @Override
-    public Object visitPrimaryWorksingSpace(JmlParser.PrimaryWorksingSpaceContext ctx) {
+    public @Nullable Object visitPrimaryWorksingSpace(JmlParser.PrimaryWorksingSpaceContext ctx) {
         raiseError("The \\working_space function is not supported", ctx);
         return null;
     }
@@ -1441,7 +1447,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitPrimaryElemtype(JmlParser.PrimaryElemtypeContext ctx) {
+    public @Nullable Object visitPrimaryElemtype(JmlParser.PrimaryElemtypeContext ctx) {
         raiseError("The \\elemtype function is not supported", ctx);
         return null;
     }
@@ -1686,7 +1692,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitSequenceFuncs(JmlParser.SequenceFuncsContext ctx) {
+    public @Nullable Object visitSequenceFuncs(JmlParser.SequenceFuncsContext ctx) {
         SLExpression e1 = accept(ctx.expression(0));
         SLExpression e2 = accept(ctx.expression(1));
 
@@ -1713,7 +1719,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public SLExpression visitSpecquantifiedexpression(
+    public @Nullable SLExpression visitSpecquantifiedexpression(
             JmlParser.SpecquantifiedexpressionContext ctx) {
         boolean nullable = Boolean.TRUE == accept(ctx.boundvarmodifiers());
         Pair<KeYJavaType, ImmutableList<LogicVariable>> declVars = accept(ctx.quantifiedvardecls());
@@ -1911,7 +1917,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public KeYJavaType visitReferencetype(JmlParser.ReferencetypeContext ctx) {
+    public @Nullable KeYJavaType visitReferencetype(JmlParser.ReferencetypeContext ctx) {
         String typename = accept(ctx.name());
         try {
             return resolverManager.resolve(null, typename, null).getType();
@@ -1929,7 +1935,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitQuantifiedvariabledeclarator(
+    public @Nullable Object visitQuantifiedvariabledeclarator(
             JmlParser.QuantifiedvariabledeclaratorContext ctx) {
         raiseError(ctx, "call the other method");
         return null;
@@ -2085,13 +2091,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public ClassAxiom visitClass_axiom(JmlParser.Class_axiomContext ctx) {
+    public @Nullable ClassAxiom visitClass_axiom(JmlParser.Class_axiomContext ctx) {
         raiseError(ctx, "Class axioms are not handled by the %s", getClass().getName());
         return null;
     }
 
     @Override
-    public Object visitInitially_clause(JmlParser.Initially_clauseContext ctx) {
+    public @Nullable Object visitInitially_clause(JmlParser.Initially_clauseContext ctx) {
         raiseError(ctx, "Initially clauses are not handled by the %s", getClass().getName());
         return null;
     }
@@ -2103,7 +2109,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
 
 
     @Override
-    public Contract visitSpec_case(JmlParser.Spec_caseContext ctx) {
+    public @Nullable Contract visitSpec_case(JmlParser.Spec_caseContext ctx) {
         this.mods = accept(ctx.modifiers());
         contractClauses = new ContractClauses();
         accept(ctx.spec_body());
@@ -2111,7 +2117,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitSpec_body(JmlParser.Spec_bodyContext ctx) {
+    public @Nullable Object visitSpec_body(JmlParser.Spec_bodyContext ctx) {
         listOf(ctx.clause());
         listOf(ctx.spec_body());
         return null;
@@ -2202,13 +2208,13 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitDuration_clause(JmlParser.Duration_clauseContext ctx) {
+    public @Nullable Object visitDuration_clause(JmlParser.Duration_clauseContext ctx) {
         addWarning(ctx, "Duration clause is not supported. Ignored!");
         return null;
     }
 
     @Override
-    public Object visitWhen_clause(JmlParser.When_clauseContext ctx) {
+    public @Nullable Object visitWhen_clause(JmlParser.When_clauseContext ctx) {
         addWarning(ctx, "When clause is not supported. Ignored!");
         return null;
     }
@@ -2352,14 +2358,14 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitName_clause(JmlParser.Name_clauseContext ctx) {
+    public @Nullable Object visitName_clause(JmlParser.Name_clauseContext ctx) {
         raiseError(ctx, "Name clauses are not handled by the %s", getClass().getName());
         return null;
     }
 
 
     @Override
-    public Object visitField_declaration(JmlParser.Field_declarationContext ctx) {
+    public @Nullable Object visitField_declaration(JmlParser.Field_declarationContext ctx) {
         raiseError(ctx, "Field declarations are not handled by the %s", getClass().getName());
         return null;
     }
@@ -2455,67 +2461,67 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitHistory_constraint(JmlParser.History_constraintContext ctx) {
+    public @Nullable Object visitHistory_constraint(JmlParser.History_constraintContext ctx) {
         raiseError(ctx, "History constraints are not handled by the %s", getClass().getName());
         return null;
     }
 
     @Override
-    public Object visitDatagroup_clause(JmlParser.Datagroup_clauseContext ctx) {
+    public @Nullable Object visitDatagroup_clause(JmlParser.Datagroup_clauseContext ctx) {
         raiseError(ctx, "Datagroup clause are not handled by the %s", getClass().getName());
         return null;
     }
 
     @Override
-    public Object visitMonitors_for_clause(JmlParser.Monitors_for_clauseContext ctx) {
+    public @Nullable Object visitMonitors_for_clause(JmlParser.Monitors_for_clauseContext ctx) {
         raiseError(ctx, "Monitors-For clause are not handled by the %s", getClass().getName());
         return null;
     }
 
     @Override
-    public Object visitReadable_if_clause(JmlParser.Readable_if_clauseContext ctx) {
+    public @Nullable Object visitReadable_if_clause(JmlParser.Readable_if_clauseContext ctx) {
         raiseError(ctx, "Readable-If clause are not handled by the %s", getClass().getName());
         return null;
     }
 
     @Override
-    public Object visitWritable_if_clause(JmlParser.Writable_if_clauseContext ctx) {
+    public @Nullable Object visitWritable_if_clause(JmlParser.Writable_if_clauseContext ctx) {
         raiseError(ctx, "Writeable-If clause are not handled by the %s", getClass().getName());
         return null;
     }
 
     @Override
-    public Object visitIn_group_clause(JmlParser.In_group_clauseContext ctx) {
+    public @Nullable Object visitIn_group_clause(JmlParser.In_group_clauseContext ctx) {
         raiseError(ctx, "In-Group clauses are not handled by the %s", getClass().getName());
         return null;
     }
 
     @Override
-    public Object visitMaps_into_clause(JmlParser.Maps_into_clauseContext ctx) {
+    public @Nullable Object visitMaps_into_clause(JmlParser.Maps_into_clauseContext ctx) {
         raiseError(ctx, "'maps into' are not handled by the %s", getClass().getName());
         return null;
     }
 
     @Override
-    public Object visitNowarn_pragma(JmlParser.Nowarn_pragmaContext ctx) {
+    public @Nullable Object visitNowarn_pragma(JmlParser.Nowarn_pragmaContext ctx) {
         raiseError(ctx, "Nowarn pragma is not handled by the %s", getClass().getName());
         return null;
     }
 
     @Override
-    public Object visitDebug_statement(JmlParser.Debug_statementContext ctx) {
+    public @Nullable Object visitDebug_statement(JmlParser.Debug_statementContext ctx) {
         raiseError(ctx, "Debug statements are not handled by the %s", getClass().getName());
         return null;
     }
 
     @Override
-    public Object visitSet_statement(JmlParser.Set_statementContext ctx) {
+    public @Nullable Object visitSet_statement(JmlParser.Set_statementContext ctx) {
         raiseError(ctx, "Set statements are not handled by the %s", getClass().getName());
         return null;
     }
 
     @Override
-    public Object visitMerge_point_statement(JmlParser.Merge_point_statementContext ctx) {
+    public @Nullable Object visitMerge_point_statement(JmlParser.Merge_point_statementContext ctx) {
         raiseError(ctx, "Merge points are not handled by the %s", getClass().getName());
         return null;
     }
@@ -2535,7 +2541,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitLoop_specification(JmlParser.Loop_specificationContext ctx) {
+    public @Nullable Object visitLoop_specification(JmlParser.Loop_specificationContext ctx) {
         raiseError(ctx, "Loop specification are not handled by the %s", getClass().getName());
         return null;
     }
@@ -2554,19 +2560,20 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitInitialiser(JmlParser.InitialiserContext ctx) {
+    public @Nullable Object visitInitialiser(JmlParser.InitialiserContext ctx) {
         raiseError(ctx, "Initialisers are not handled by the %s", getClass().getName());
         return null;
     }
 
     @Override
-    public Object visitBlock_specification(JmlParser.Block_specificationContext ctx) {
+    public @Nullable Object visitBlock_specification(JmlParser.Block_specificationContext ctx) {
         raiseError(ctx, "Block specification are not handled by the %s", getClass().getName());
         return null;
     }
 
     @Override
-    public Object visitBlock_loop_specification(JmlParser.Block_loop_specificationContext ctx) {
+    public @Nullable Object visitBlock_loop_specification(
+            JmlParser.Block_loop_specificationContext ctx) {
         raiseError(ctx, "'block loop' are not handled by the %s", getClass().getName());
         return null;
     }
@@ -2585,7 +2592,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public LocationVariable[] visitTargetHeap(JmlParser.TargetHeapContext ctx) {
+    public LocationVariable[] visitTargetHeap(JmlParser.@Nullable TargetHeapContext ctx) {
         if (ctx == null || ctx.SPECIAL_IDENT().isEmpty()) {
             return new LocationVariable[] { getBaseHeap() };
         }
@@ -2610,7 +2617,7 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     private void warnPotentiallyUnintendedFramingSemantics(
-            ParserRuleContext ctx, TerminalNode clauseHeader) {
+            ParserRuleContext ctx, @Nullable TerminalNode clauseHeader) {
         final String clauseName =
             clauseHeader != null && clauseHeader.getText().startsWith("loop_")
                     ? clauseHeader.getText().replaceFirst("loop_", "")
