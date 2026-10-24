@@ -104,6 +104,12 @@ public class LlmSettings extends AbstractPropertiesSettings {
         createStringSetProperty("allowedToolsWithApproval", new TreeSet<>());
     private final PropertyEntry<Set<String>> allowedToolsWithoutApproval =
         createStringSetProperty("allowedToolsWithoutApproval", new TreeSet<>());
+    private final PropertyEntry<Set<String>> backgroundToolsEnabled =
+        createStringSetProperty("backgroundToolsEnabled", new TreeSet<>());
+    private final PropertyEntry<Set<String>> backgroundToolsDisabled =
+        createStringSetProperty("backgroundToolsDisabled", new TreeSet<>());
+    private final PropertyEntry<Integer> maxBackgroundJobs =
+        createIntegerProperty("maxBackgroundJobs", 4);
 
     // --- ui ---
     private final PropertyEntry<Boolean> autoScrollOutput =
@@ -150,6 +156,9 @@ public class LlmSettings extends AbstractPropertiesSettings {
         setToolsDisabled(new TreeSet<>(other.getToolsDisabled()));
         setAllowedToolsWithApproval(new TreeSet<>(other.getAllowedToolsWithApproval()));
         setAllowedToolsWithoutApproval(new TreeSet<>(other.getAllowedToolsWithoutApproval()));
+        setBackgroundToolsEnabled(new TreeSet<>(other.getBackgroundToolsEnabled()));
+        setBackgroundToolsDisabled(new TreeSet<>(other.getBackgroundToolsDisabled()));
+        setMaxBackgroundJobs(other.getMaxBackgroundJobs());
         setAutoScrollOutput(other.getAutoScrollOutput());
         setShowToolActivity(other.getShowToolActivity());
     }
@@ -425,6 +434,56 @@ public class LlmSettings extends AbstractPropertiesSettings {
 
     public void setAllowedToolsWithoutApproval(Set<String> val) {
         this.allowedToolsWithoutApproval.set(val);
+    }
+
+    /**
+     * Tools that may run in the background although their metadata default says otherwise
+     * (user override, see {@link #isBackgroundAllowed(String, boolean)}).
+     */
+    public Set<String> getBackgroundToolsEnabled() {
+        return backgroundToolsEnabled.get();
+    }
+
+    public void setBackgroundToolsEnabled(Set<String> val) {
+        this.backgroundToolsEnabled.set(val);
+    }
+
+    /**
+     * Tools that must not run in the background although their metadata default allows it
+     * (user override, see {@link #isBackgroundAllowed(String, boolean)}).
+     */
+    public Set<String> getBackgroundToolsDisabled() {
+        return backgroundToolsDisabled.get();
+    }
+
+    public void setBackgroundToolsDisabled(Set<String> val) {
+        this.backgroundToolsDisabled.set(val);
+    }
+
+    /** Maximum number of concurrently backgrounded tool calls (background jobs). */
+    public int getMaxBackgroundJobs() {
+        return maxBackgroundJobs.get();
+    }
+
+    public void setMaxBackgroundJobs(int n) {
+        this.maxBackgroundJobs.set(Math.max(1, n));
+    }
+
+    /**
+     * Effective background permission of a tool: the per-tool user overrides win, otherwise the
+     * tool's metadata default applies.
+     *
+     * @param toolName the tool name
+     * @param metadataDefault the tool's {@code backgroundable} metadata value
+     */
+    public boolean isBackgroundAllowed(String toolName, boolean metadataDefault) {
+        if (backgroundToolsDisabled.get().contains(toolName)) {
+            return false;
+        }
+        if (backgroundToolsEnabled.get().contains(toolName)) {
+            return true;
+        }
+        return metadataDefault;
     }
 
     // --- ui ---

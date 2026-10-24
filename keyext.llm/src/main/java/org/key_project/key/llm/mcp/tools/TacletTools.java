@@ -13,6 +13,7 @@ import org.key_project.key.llm.mcp.JsonSchema;
 import org.key_project.key.llm.mcp.KeYAgentTools;
 import org.key_project.key.llm.mcp.ProofSelector;
 import org.key_project.key.llm.mcp.Tool;
+import org.key_project.key.llm.mcp.ToolCategory;
 
 /**
  * The taclet-management tools ({@code list_taclets}, {@code list_taclet_options},
@@ -31,7 +32,7 @@ public final class TacletTools implements AgentToolProvider {
                     + " omit to use the currently selected proof")
                 .build();
         return List.of(
-            AgentTool.tool(KeYAgentTools.TOOL_LIST_TACLETS,
+            AgentTool.tool(KeYAgentTools.TOOL_LIST_TACLETS, ToolCategory.TACLETS,
                 "Lists the taclets (rewrite and apply rules) available for a proof, one name per"
                     + " line. Optionally filters by a case-insensitive substring.",
                 AgentTool.schema("proof", proofParam,
@@ -45,7 +46,7 @@ public final class TacletTools implements AgentToolProvider {
                             : TacletOperations.listTaclets(ref.proof(),
                                 AgentTool.stringArg(args, "filter"));
                 }),
-            AgentTool.tool(KeYAgentTools.TOOL_LIST_TACLET_OPTIONS,
+            AgentTool.tool(KeYAgentTools.TOOL_LIST_TACLET_OPTIONS, ToolCategory.TACLETS,
                 "Lists the taclet options (choices) of a proof: the selected value of each option"
                     + " category such as programRules, together with the possible values.",
                 AgentTool.schema("proof", proofParam),
@@ -54,7 +55,7 @@ public final class TacletTools implements AgentToolProvider {
                     return ref.error() != null ? ref.error()
                             : TacletOperations.listTacletOptions(ref.proof());
                 }),
-            AgentTool.tool(KeYAgentTools.TOOL_EXPORT_TACLET,
+            AgentTool.tool(KeYAgentTools.TOOL_EXPORT_TACLET, ToolCategory.TACLETS,
                 "Exports a taclet of a proof as a parseable KeY rule declaration. The text can be"
                     + " edited and registered again with add_taclet.",
                 AgentTool.schema("proof", proofParam,
@@ -71,7 +72,7 @@ public final class TacletTools implements AgentToolProvider {
                             ? "Error: 'taclet' parameter is required"
                             : TacletOperations.exportTaclet(ref.proof(), name);
                 }),
-            AgentTool.tool(KeYAgentTools.TOOL_EXPORT_TACLETS,
+            AgentTool.tool(KeYAgentTools.TOOL_EXPORT_TACLETS, ToolCategory.TACLETS,
                 "Exports several taclets of a proof as parseable KeY rule declarations,"
                     + " optionally filtered by a case-insensitive substring; without a filter all"
                     + " available taclets are exported. The output is capped: narrow it with"
@@ -88,7 +89,7 @@ public final class TacletTools implements AgentToolProvider {
                             : TacletOperations.exportTaclets(ref.proof(),
                                 AgentTool.stringArg(args, "filter"));
                 }),
-            AgentTool.tool(KeYAgentTools.TOOL_ADD_TACLET,
+            AgentTool.tool(KeYAgentTools.TOOL_ADD_TACLET, ToolCategory.TACLETS,
                 "Registers a new taclet for a proof, given as a parseable KeY rule declaration"
                     + " (\\taclet <name> { ... };). The taclet becomes available for future rule"
                     + " applications of that proof. Requires user approval.",
@@ -108,7 +109,7 @@ public final class TacletTools implements AgentToolProvider {
                             ? "Error: 'taclet' parameter is required"
                             : TacletOperations.addTaclet(ref.proof(), source);
                 }),
-            AgentTool.tool(KeYAgentTools.TOOL_REMOVE_TACLET,
+            AgentTool.tool(KeYAgentTools.TOOL_REMOVE_TACLET, ToolCategory.TACLETS,
                 "Removes a taclet from a proof's rule set so that it is no longer offered for"
                     + " future rule applications. Rule applications that already happened are not"
                     + " affected. Requires user approval.",

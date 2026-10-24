@@ -17,6 +17,7 @@ import org.key_project.key.llm.mcp.AgentToolProvider;
 import org.key_project.key.llm.mcp.JsonSchema;
 import org.key_project.key.llm.mcp.KeYAgentTools;
 import org.key_project.key.llm.mcp.ProofSelector;
+import org.key_project.key.llm.mcp.ToolCategory;
 
 import org.jspecify.annotations.Nullable;
 
@@ -31,7 +32,7 @@ public final class ProofScriptTools implements AgentToolProvider {
     @Override
     public List<AgentTool> get() {
         return List.of(
-            AgentTool.tool(KeYAgentTools.TOOL_TRYCLOSE,
+            AgentTool.tool(KeYAgentTools.TOOL_TRYCLOSE, ToolCategory.PROOF,
                 "Applies the KeY proof-script command 'tryclose' to the current proof: it"
                     + " automatically tries to close goals with the TryClose strategy. Targets"
                     + " either the first open goal of the current branch (default), all open"
@@ -52,11 +53,12 @@ public final class ProofScriptTools implements AgentToolProvider {
                             .build()),
                 args -> runScript(tryCloseCommand(AgentTool.stringArg(args, "branch"),
                     AgentTool.intArg(args, "steps"), AgentTool.boolArg(args, "assertClosed")))),
-            AgentTool.tool(KeYAgentTools.TOOL_AUTO,
+            AgentTool.tool(KeYAgentTools.TOOL_AUTO, ToolCategory.PROOF,
                 "Applies KeY's automatic proof strategy (the 'Auto' button / the 'auto'"
                     + " proof-script command) to the current branch, with an arbitrary maximum"
                     + " number of proof steps. Use it to try to discharge the current goal by"
-                    + " automatic proof search.",
+                    + " automatic proof search. Proof search may take a while; this tool can run"
+                    + " in the background, so you can keep asking questions while it works.",
                 AgentTool.schema("steps",
                     JsonSchema.builder().withType("integer")
                             .withDescription("maximum number of proof steps (the configured"
@@ -67,6 +69,7 @@ public final class ProofScriptTools implements AgentToolProvider {
                             .withDescription("apply the strategy to all open goals instead of the"
                                 + " first one")
                             .build()),
+                true,
                 args -> runScript(autoCommand(AgentTool.intArg(args, "steps"),
                     AgentTool.boolArg(args, "all")))));
     }

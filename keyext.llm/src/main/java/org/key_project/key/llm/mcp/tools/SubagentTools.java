@@ -14,6 +14,7 @@ import org.key_project.key.llm.mcp.JsonSchema;
 import org.key_project.key.llm.mcp.KeYAgentTools;
 import org.key_project.key.llm.mcp.ProofSelector;
 import org.key_project.key.llm.mcp.Tool;
+import org.key_project.key.llm.mcp.ToolCategory;
 import org.key_project.key.llm.subagents.SubagentRegistry;
 
 /**
@@ -31,15 +32,17 @@ public final class SubagentTools implements AgentToolProvider {
     @Override
     public List<AgentTool> get() {
         var roleNames = SubagentRegistry.INSTANCE.roleNames();
-        return List.of(AgentTool.tool(KeYAgentTools.TOOL_SPAWN_SUBAGENT,
+        return List.of(AgentTool.tool(KeYAgentTools.TOOL_SPAWN_SUBAGENT, ToolCategory.SUBAGENTS,
             "Delegates a task to a sub-agent with a dedicated role. The sub-agent runs its own"
                 + " bounded tool loop with a role-specific system prompt and a restricted tool"
                 + " whitelist, and returns a summary. Available roles: "
                 + String.join(", ", roleNames) + ". Use \"mode\": \"sequential\" with a \"task\""
                 + " for one sub-agent, or \"mode\": \"parallel\" with a \"tasks\" array of"
                 + " independent tasks (run concurrently, capped by the max-parallel-sub-agents"
-                + " setting; only roles that allow parallel execution accept it). Enabled only"
-                + " when the 'agent may spawn sub-agents' setting is on.",
+                + " setting; only roles that allow parallel execution accept it). Delegation may"
+                + " take a while; this tool can run in the background, so you can keep asking"
+                + " questions while it works. Enabled only when the 'agent may spawn sub-agents'"
+                + " setting is on.",
             Tool.ApprovalRequirement.ASK,
             AgentTool.schema("role",
                 JsonSchema.builder().withType("string").withDescription("the sub-agent role")
@@ -59,9 +62,10 @@ public final class SubagentTools implements AgentToolProvider {
                 "model",
                 JsonSchema.builder().withType("string")
                         .withDescription("optional model override for the sub-agent").build()),
+            true,
             args -> "[spawn_subagent is handled by the agent loop; it cannot be called"
                 + " directly]"),
-            AgentTool.tool(KeYAgentTools.TOOL_GET_SUBAGENT_LOGS,
+            AgentTool.tool(KeYAgentTools.TOOL_GET_SUBAGENT_LOGS, ToolCategory.SUBAGENTS,
                 "Lists the sub-agent runs recorded for the current session (newest first,"
                     + " empty until spawn_subagent has been used): role, mode, timing, and per"
                     + " task the status, the number of tool rounds and the tools that were"

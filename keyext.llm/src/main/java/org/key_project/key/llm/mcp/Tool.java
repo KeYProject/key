@@ -12,16 +12,25 @@ import java.util.Map;
  * @param type the tool type, always {@code "function"}
  * @param function the function definition
  * @param defaultApproval whether this tool is safe to run without asking the user by default
+ * @param category the KeY-side tool category (grouping/sorting metadata; default
+ *        {@link ToolCategory#GENERAL})
+ * @param backgroundable whether this tool may run in the background (user can detach a running
+ *        call; its result is delivered to the agent when it finishes)
  */
 public record Tool(String type, FunctionDefinition function,
-        ApprovalRequirement defaultApproval) {
+        ApprovalRequirement defaultApproval, ToolCategory category, boolean backgroundable) {
 
     public Tool(FunctionDefinition function) {
-        this("function", function, ApprovalRequirement.AUTO);
+        this("function", function, ApprovalRequirement.AUTO, ToolCategory.GENERAL, false);
     }
 
     public Tool(FunctionDefinition function, ApprovalRequirement defaultApproval) {
-        this("function", function, defaultApproval);
+        this("function", function, defaultApproval, ToolCategory.GENERAL, false);
+    }
+
+    public Tool(FunctionDefinition function, ApprovalRequirement defaultApproval,
+            ToolCategory category, boolean backgroundable) {
+        this("function", function, defaultApproval, category, backgroundable);
     }
 
     /** Converts this tool to the OpenAI-format map (approval metadata is not serialized). */
