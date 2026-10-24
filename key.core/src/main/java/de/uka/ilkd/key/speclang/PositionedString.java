@@ -9,7 +9,7 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Location;
 import org.key_project.util.parsing.Position;
 
@@ -23,7 +23,7 @@ import org.jspecify.annotations.Nullable;
  */
 @NullMarked
 public class PositionedString {
-    private static final ImmutableArray<TermLabel> EMPTY_LABEL_LIST = new ImmutableArray<>();
+    private static final ImmutableList<TermLabel> EMPTY_LABEL_LIST = ImmutableList.of();
 
     public final String text;
     public final Location location;
@@ -108,11 +108,11 @@ public class PositionedString {
      *
      * @return list of labels (maybe be empty but never <code>null</code>
      */
-    public ImmutableArray<TermLabel> getLabels() {
+    public ImmutableList<TermLabel> getLabels() {
         return EMPTY_LABEL_LIST;
     }
 
-    public PositionedLabeledString label(ImmutableArray<TermLabel> labels) {
+    public PositionedLabeledString label(ImmutableList<TermLabel> labels) {
         return new PositionedLabeledString(text, location, labels);
     }
 
