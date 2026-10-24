@@ -12,6 +12,8 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * <p>
  * This collection represents the set containing URIs of all Java source files relevant to a given
@@ -29,6 +31,7 @@ import org.key_project.util.collection.ImmutableSet;
  *
  * @author lanzinger
  */
+@NullMarked
 public class ProofJavaSourceCollection {
 
     /** @see #getRelevantFiles() */

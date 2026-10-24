@@ -13,6 +13,9 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class CountingBufferedReader extends BufferedReader {
 
     private long chars;

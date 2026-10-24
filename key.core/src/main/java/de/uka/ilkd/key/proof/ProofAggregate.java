@@ -9,6 +9,10 @@ import java.util.List;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public abstract class ProofAggregate {
 
     private final String name;
@@ -25,7 +29,7 @@ public abstract class ProofAggregate {
         }
     }
 
-    public static ProofAggregate createProofAggregate(Proof[] proofs, String name) {
+    public static @Nullable ProofAggregate createProofAggregate(Proof[] proofs, String name) {
         if (proofs.length == 0) {
             return null; // needed for tests
         }
@@ -46,7 +50,7 @@ public abstract class ProofAggregate {
 
     public abstract Proof[] getProofs();
 
-    public Proof getFirstProof() {
+    public @Nullable Proof getFirstProof() {
         return getProofs() != null && getProofs().length >= 1 ? getProofs()[0] : null;
     }
 

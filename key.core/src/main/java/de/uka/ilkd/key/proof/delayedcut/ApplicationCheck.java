@@ -16,11 +16,15 @@ import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Determines conflicts relevant for a delayed cut application.
  *
  * @author Benjamin Niedermann
  */
+@NullMarked
 public interface ApplicationCheck {
 
     /**
@@ -29,6 +33,7 @@ public interface ApplicationCheck {
      * @return A String representation of a possible conflict affecting a delayed cut application
      *         for the given node and cut formula or null if there is no conflict.
      */
+    @Nullable
     String check(Node cutNode, JTerm cutFormula);
 
     /**
@@ -40,7 +45,7 @@ public interface ApplicationCheck {
      * @author Benjamin Niedermann
      */
     class NoNewSymbolsCheck implements ApplicationCheck {
-        private Node node;
+        private @Nullable Node node;
         private final Set<String> names = new TreeSet<>();
 
         private static final String INFORMATION1 =
@@ -57,7 +62,7 @@ public interface ApplicationCheck {
                     as required by the corresponding rule definitions.""";
 
         @Override
-        public String check(Node cutNode, JTerm cutFormula) {
+        public @Nullable String check(Node cutNode, JTerm cutFormula) {
             if (cutNode == null) {
                 throw new IllegalArgumentException("cutNode is null");
             }
@@ -92,7 +97,7 @@ public interface ApplicationCheck {
             }
         }
 
-        private String checkFormula(JTerm formula) {
+        private @Nullable String checkFormula(JTerm formula) {
             final List<String> newSymbols = new LinkedList<>();
             formula.execPreOrder((DefaultVisitor) visited -> {
                 String name = visited.op().name().toString();

@@ -13,9 +13,10 @@ import org.key_project.logic.LogicServices;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-
+@NullMarked
 public class RuleJustificationInfo {
 
     /**

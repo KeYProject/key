@@ -12,20 +12,24 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Encapsulates intermediate information for constructing a {@link MergeRule} application.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class MergeAppIntermediate extends BuiltInAppIntermediate {
 
     private int id = 0;
-    private final String mergeProc;
-    private String distinguishingFormula = null;
+    private final @Nullable String mergeProc;
+    private @Nullable String distinguishingFormula = null;
     private int nrPartners = 0;
-    private String abstractionPredicates = null;
-    private String userChoices = null;
-    private final Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType;
+    private @Nullable String abstractionPredicates = null;
+    private @Nullable String userChoices = null;
+    private final @Nullable Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType;
 
     /**
      * Constructs a new join rule.
@@ -48,10 +52,10 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
      *        chosen by the user
      */
     public MergeAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos, int id,
-            String joinProc, int nrPartners, ImmutableList<Name> newNames,
-            String distinguishingFormula,
-            Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType,
-            String abstractionPredicates, String userChoices) {
+            @Nullable String joinProc, int nrPartners, ImmutableList<Name> newNames,
+            @Nullable String distinguishingFormula,
+            @Nullable Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType,
+            @Nullable String abstractionPredicates, @Nullable String userChoices) {
         super(ruleName, pos, null, null, null, newNames);
 
         String mergeRuleName = MergeRule.INSTANCE.name().toString();
@@ -79,7 +83,7 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
     /**
      * @return The name of the join procedure used during joining.
      */
-    public String getJoinProc() {
+    public @Nullable String getJoinProc() {
         return mergeProc;
     }
 
@@ -93,21 +97,21 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
     /**
      * @return The user-supplied distinguishing formula; null if none given.
      */
-    public String getDistinguishingFormula() {
+    public @Nullable String getDistinguishingFormula() {
         return distinguishingFormula;
     }
 
     /**
      * @return The abstraction predicates, if predicate abstraction is used as a join technique.
      */
-    public Class<? extends AbstractPredicateAbstractionLattice> getPredAbstrLatticeType() {
+    public @Nullable Class<? extends AbstractPredicateAbstractionLattice> getPredAbstrLatticeType() {
         return predAbstrLatticeType;
     }
 
     /**
      * @return The abstraction predicates for predicate abstraction; null if none given.
      */
-    public String getAbstractionPredicates() {
+    public @Nullable String getAbstractionPredicates() {
         return abstractionPredicates;
     }
 
@@ -115,7 +119,7 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
      * @return The abstraction predicates for program variables involved in a join that are manually
      *         chosen by the user.
      */
-    public String getUserChoices() {
+    public @Nullable String getUserChoices() {
         return userChoices;
     }
 

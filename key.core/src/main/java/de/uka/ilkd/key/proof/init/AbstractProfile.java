@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.init;
 
-
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.Goal;
@@ -26,7 +25,10 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public abstract class AbstractProfile implements Profile {
     /**
      * The default profile which is used if no profile is defined in custom problem files (loaded
@@ -115,7 +117,7 @@ public abstract class AbstractProfile implements Profile {
     }
 
     @Override
-    public StrategyFactory getStrategyFactory(Name n) {
+    public @Nullable StrategyFactory getStrategyFactory(Name n) {
         for (StrategyFactory sf : getStrategyFactories()) {
             if (sf.name().equals(n)) {
                 return sf;
@@ -166,7 +168,7 @@ public abstract class AbstractProfile implements Profile {
      * @return a new instance of the builder or <code>null</code> if the demanded chooser is not
      *         supported
      */
-    public GoalChooserFactory<Proof, Goal> lookupGC(String name) {
+    public @Nullable GoalChooserFactory<Proof, Goal> lookupGC(String name) {
         for (var supprotedGCB : supportedGCB) {
             if (supprotedGCB.name().equals(name)) {
                 return supprotedGCB.copy();

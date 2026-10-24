@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * An abstract adapter class for receiving proof tree events. <code>proofStructureChanged</code> has
  * an empty implementation, the other methods delegate to <code>proofStructureChanged</code>.
@@ -14,6 +16,7 @@ package de.uka.ilkd.key.proof;
  * override the other methods to provide more fine-grained actions.
  */
 
+@NullMarked
 public abstract class ProofTreeAdapter implements ProofTreeListener {
 
     /**

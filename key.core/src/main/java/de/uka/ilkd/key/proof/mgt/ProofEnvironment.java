@@ -16,12 +16,16 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The unique environment a proof is performed in. The environment consists of a java model,
  * specifications, and a set of justified rules. Since the starting point of the proofs contained in
  * the environment is equal, there is an InitConfig contained to be used to start proofs of this
  * environment.
  */
+@NullMarked
 public class ProofEnvironment {
 
     private final InitConfig initConfig;
@@ -80,13 +84,13 @@ public class ProofEnvironment {
         fireProofRegistered(new ProofEnvironmentEvent(this, po, pl));
     }
 
-    public void addProofEnvironmentListener(ProofEnvironmentListener l) {
+    public void addProofEnvironmentListener(@Nullable ProofEnvironmentListener l) {
         if (l != null) {
             listeners.add(l);
         }
     }
 
-    public void removeProofEnvironmentListener(ProofEnvironmentListener l) {
+    public void removeProofEnvironmentListener(@Nullable ProofEnvironmentListener l) {
         if (l != null) {
             listeners.remove(l);
         }

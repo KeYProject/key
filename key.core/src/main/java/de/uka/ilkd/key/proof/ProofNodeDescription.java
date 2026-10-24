@@ -6,6 +6,10 @@ package de.uka.ilkd.key.proof;
 
 import java.io.Serializable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class ProofNodeDescription implements Serializable {
     /**
      * Collects the information from the tree to which branch the current node belongs:
@@ -19,7 +23,7 @@ public class ProofNodeDescription implements Serializable {
      * @param node the current node
      * @return a String containing the path information to display
      */
-    public static String collectPathInformation(Node node) {
+    public static String collectPathInformation(@Nullable Node node) {
         while (node != null) {
             if (node.getNodeInfo() != null && node.getNodeInfo().getBranchLabel() != null) {
                 String label = node.getNodeInfo().getBranchLabel();

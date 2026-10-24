@@ -11,19 +11,23 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Encapsulates intermediate information for constructing a taclet application.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class TacletAppIntermediate extends AppIntermediate {
 
     private String tacletName = null;
     private Pair<Integer, PosInTerm> posInfo = null;
-    private List<String> insts = null;
+    private @Nullable List<String> insts = null;
     private ImmutableList<String> ifSeqFormulaList = null;
     private ImmutableList<String> ifDirectFormulaList = null;
-    private ImmutableList<Name> newNames = null;
+    private @Nullable ImmutableList<Name> newNames = null;
 
     /**
      * Constructs a new intermediate taclet application.
@@ -37,8 +41,8 @@ public class TacletAppIntermediate extends AppIntermediate {
      * @param newNames New names registered during taclet application.
      */
     public TacletAppIntermediate(String tacletName, Pair<Integer, PosInTerm> posInfo,
-            List<String> insts, ImmutableList<String> ifSeqFormulaList,
-            ImmutableList<String> ifDirectFormulaList, ImmutableList<Name> newNames) {
+            @Nullable List<String> insts, ImmutableList<String> ifSeqFormulaList,
+            ImmutableList<String> ifDirectFormulaList, @Nullable ImmutableList<Name> newNames) {
         // Taclet names are internalized later, so we don't waste memory
         this.tacletName = tacletName.intern();
         this.posInfo = posInfo;
@@ -57,7 +61,7 @@ public class TacletAppIntermediate extends AppIntermediate {
         return posInfo;
     }
 
-    public List<String> getInsts() {
+    public @Nullable List<String> getInsts() {
         return insts;
     }
 
@@ -75,7 +79,7 @@ public class TacletAppIntermediate extends AppIntermediate {
      * @see de.uka.ilkd.key.proof.io.intermediate.AppIntermediate#getNewNames()
      */
     @Override
-    public ImmutableList<Name> getNewNames() {
+    public @Nullable ImmutableList<Name> getNewNames() {
         return newNames;
     }
 

@@ -18,6 +18,9 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A map to be used in an {@link OpReplacer}. It maps operators that should be replaced to their
  * replacements.
@@ -27,6 +30,7 @@ import org.key_project.logic.SyntaxElement;
  * @param <S> the type of the elements to replace.
  * @param <T> the type of the replacements.
  */
+@NullMarked
 public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
 
     /**
@@ -39,7 +43,7 @@ public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
      * @return a new replacement map.
      */
     static <S extends SyntaxElement, T> ReplacementMap<S, T> create(TermFactory tf,
-            Proof proof) {
+            @Nullable Proof proof) {
         var noIrrelevantTermLabelsMap = proof == null
                 ? ProofSettings.DEFAULT_SETTINGS.getTermLabelSettings().getUseOriginLabels()
                 : proof.getServices().getTermBuilder().getOriginFactory() != null;
@@ -61,7 +65,7 @@ public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
      * @return a new replacement map.
      */
     static <S extends SyntaxElement, T> ReplacementMap<S, T> create(TermFactory tf,
-            Proof proof, Map<S, T> initialMappings) {
+            @Nullable Proof proof, Map<S, T> initialMappings) {
         ReplacementMap<S, T> result = create(tf, proof);
         result.putAll(initialMappings);
         return result;
@@ -152,17 +156,17 @@ public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
         }
 
         @Override
-        public T get(Object key) {
+        public @Nullable T get(Object key) {
             return map.get(wrap(key));
         }
 
         @Override
-        public T put(S key, T value) {
+        public @Nullable T put(S key, T value) {
             return map.put(wrap(key), value);
         }
 
         @Override
-        public T remove(Object key) {
+        public @Nullable T remove(Object key) {
             return map.remove(wrap(key));
         }
 

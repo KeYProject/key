@@ -8,6 +8,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Instances of this interface are used to customize and extend the behavior of a
  * {@link ProofOblInput}.
@@ -18,6 +20,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public interface POExtension {
     /**
      * Checks if the given {@link ProofOblInput} is supported.

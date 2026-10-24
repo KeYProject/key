@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.proofevent;
 
-
 import java.util.Iterator;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -20,11 +19,14 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
  * Collect changes applied to a node during a given period of time
  */
+@NullMarked
 public class NodeChangeJournal implements GoalListener {
 
     private final Proof proof;
@@ -119,11 +121,11 @@ public class NodeChangeJournal implements GoalListener {
         changes = changes.put(p_node, p_obj);
     }
 
-    private NodeChangesHolder getChangeObj(Node p_node) {
+    private @Nullable NodeChangesHolder getChangeObj(Node p_node) {
         return changes.get(p_node);
     }
 
-    private NodeChangesHolder removeChangeObj(Node p_node) {
+    private @Nullable NodeChangesHolder removeChangeObj(Node p_node) {
         final NodeChangesHolder res = changes.get(p_node);
         changes = changes.remove(p_node);
         return res;

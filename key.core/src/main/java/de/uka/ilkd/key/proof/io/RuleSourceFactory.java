@@ -11,6 +11,9 @@ import java.nio.file.Paths;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class RuleSourceFactory {
 
     /**

@@ -33,8 +33,10 @@ import org.key_project.util.collection.Pair;
 import org.key_project.util.lookup.Lookup;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class Node implements Iterable<Node> {
     private static final String RULE_WITHOUT_NAME = "rule without name";
 
@@ -57,15 +59,15 @@ public class Node implements Iterable<Node> {
     /**
      * The branch location of this proof node.
      */
-    private BranchLocation branchLocation = null;
+    private @Nullable BranchLocation branchLocation = null;
 
     private Sequent seq = JavaDLSequentKit.getInstance().getEmptySequent();
 
     private final ArrayList<Node> children = new ArrayList<>(1);
 
-    private RuleApp appliedRuleApp;
+    private @Nullable RuleApp appliedRuleApp;
 
-    private NameRecorder nameRecorder;
+    private @Nullable NameRecorder nameRecorder;
 
     /**
      * a linked list of the locally generated program variables. It extends the list of the parent
@@ -106,9 +108,9 @@ public class Node implements Iterable<Node> {
      */
     private int siblingNr = -1;
 
-    private ImmutableList<RenamingTable> renamings;
+    private @Nullable ImmutableList<RenamingTable> renamings;
 
-    private String cachedName = null;
+    private @Nullable String cachedName = null;
 
     private @Nullable Lookup userData = null;
 
@@ -179,7 +181,7 @@ public class Node implements Iterable<Node> {
         return proof;
     }
 
-    public void setAppliedRuleApp(RuleApp ruleApp) {
+    public void setAppliedRuleApp(@Nullable RuleApp ruleApp) {
         this.nodeInfo.updateNoteInfo();
         this.appliedRuleApp = ruleApp;
         clearNameCache();
@@ -204,7 +206,7 @@ public class Node implements Iterable<Node> {
         }
     }
 
-    public NameRecorder getNameRecorder() {
+    public @Nullable NameRecorder getNameRecorder() {
         return nameRecorder;
     }
 
@@ -216,11 +218,11 @@ public class Node implements Iterable<Node> {
         renamings = list;
     }
 
-    public ImmutableList<RenamingTable> getRenamingTable() {
+    public @Nullable ImmutableList<RenamingTable> getRenamingTable() {
         return renamings;
     }
 
-    public RuleApp getAppliedRuleApp() {
+    public @Nullable RuleApp getAppliedRuleApp() {
         return appliedRuleApp;
     }
 

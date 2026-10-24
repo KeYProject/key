@@ -25,9 +25,13 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Proposes names for variables (except program variables).
  */
+@NullMarked
 public class VariableNameProposer implements InstantiationProposer {
 
     /**
@@ -46,8 +50,8 @@ public class VariableNameProposer implements InstantiationProposer {
      * skolemterm SVs, variable SVs, and labels.
      */
     @Override
-    public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
-            ImmutableList<String> previousProposals) {
+    public @Nullable String getProposal(TacletApp app, SchemaVariable var, Services services,
+            Node undoAnchor, @Nullable ImmutableList<String> previousProposals) {
         if (var instanceof SkolemTermSV) {
             return getNameProposalForSkolemTermVariable(app, var, services, undoAnchor,
                 previousProposals);
@@ -177,7 +181,7 @@ public class VariableNameProposer implements InstantiationProposer {
      * variables.
      */
     private String getNameProposalForVariableSV(TacletApp app, SchemaVariable var,
-            TermServices services, ImmutableList<String> previousProposals) {
+            TermServices services, @Nullable ImmutableList<String> previousProposals) {
 
         String baseName = var.name().toString();
         if (previousProposals == null || !previousProposals.contains(baseName)) {

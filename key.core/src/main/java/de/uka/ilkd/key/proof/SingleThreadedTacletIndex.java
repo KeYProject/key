@@ -15,6 +15,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The default taclet index implementation. It executes method
@@ -28,6 +30,7 @@ import org.jspecify.annotations.NonNull;
  * @see TacletIndex
  * @see TacletIndexKit
  */
+@NullMarked
 final class SingleThreadedTacletIndex extends TacletIndex {
 
     SingleThreadedTacletIndex() {
@@ -63,7 +66,7 @@ final class SingleThreadedTacletIndex extends TacletIndex {
     @Override
     protected ImmutableList<NoPosTacletApp> matchTaclets(
             @NonNull ImmutableList<NoPosTacletApp> tacletApps,
-            RuleFilter p_filter, PosInOccurrence pos, LogicServices services) {
+            RuleFilter p_filter, @Nullable PosInOccurrence pos, LogicServices services) {
         ImmutableList<NoPosTacletApp> result = ImmutableList.nil();
 
         for (final NoPosTacletApp tacletApp : tacletApps) {

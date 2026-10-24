@@ -25,6 +25,8 @@ import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -35,14 +37,15 @@ import org.jspecify.annotations.NonNull;
  * calculate new TacletApps.
  */
 
+@NullMarked
 public class TacletAppIndex {
     public static final AtomicLong PERF_CREATE_ALL = new AtomicLong();
     public static final AtomicLong PERF_UPDATE = new AtomicLong();
 
     private final TacletIndex tacletIndex;
 
-    private SemisequentTacletAppIndex antecIndex;
-    private SemisequentTacletAppIndex succIndex;
+    private @Nullable SemisequentTacletAppIndex antecIndex;
+    private @Nullable SemisequentTacletAppIndex succIndex;
 
     private TermTacletAppIndexCacheSet indexCaches;
 
@@ -65,7 +68,7 @@ public class TacletAppIndex {
      * <code>seq != null</code> implies that the indices <code>antecIndex</code>,
      * <code>succIndex</code> are up-to-date for the sequent <code>seq</code>
      */
-    private Sequent seq;
+    private @Nullable Sequent seq;
 
     private final Map<CacheKey, TermTacletAppIndex> cache;
 
@@ -76,7 +79,7 @@ public class TacletAppIndex {
     }
 
     private TacletAppIndex(TacletIndex tacletIndex, SemisequentTacletAppIndex antecIndex,
-            SemisequentTacletAppIndex succIndex, @NonNull Goal goal, Sequent seq,
+            SemisequentTacletAppIndex succIndex, @NonNull Goal goal, @Nullable Sequent seq,
             RuleFilter ruleFilter,
             TermTacletAppIndexCacheSet indexCaches, Map<CacheKey, TermTacletAppIndex> cache) {
         this.tacletIndex = tacletIndex;
@@ -223,7 +226,7 @@ public class TacletAppIndex {
         return result;
     }
 
-    static TacletApp createTacletApp(NoPosTacletApp tacletApp,
+    static @Nullable TacletApp createTacletApp(NoPosTacletApp tacletApp,
             PosInOccurrence pos,
             Services services) {
         if (tacletApp.taclet() instanceof FindTaclet) {
@@ -470,7 +473,7 @@ public class TacletAppIndex {
         return goal;
     }
 
-    private Sequent getSequent() {
+    private @Nullable Sequent getSequent() {
         return seq;
     }
 

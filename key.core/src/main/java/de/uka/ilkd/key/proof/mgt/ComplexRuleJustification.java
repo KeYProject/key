@@ -7,6 +7,9 @@ package de.uka.ilkd.key.proof.mgt;
 import org.key_project.logic.LogicServices;
 import org.key_project.prover.rules.RuleApp;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public interface ComplexRuleJustification extends RuleJustification {
 
     RuleJustification getSpecificJustification(RuleApp app, LogicServices services);

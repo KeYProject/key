@@ -7,7 +7,9 @@ package de.uka.ilkd.key.proof;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.parsing.Position;
 
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class SortMismatchException extends SVInstantiationExceptionWithPosition {
 
     /**

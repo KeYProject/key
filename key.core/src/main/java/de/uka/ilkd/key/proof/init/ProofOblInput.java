@@ -9,11 +9,14 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents something that produces an input proof obligation for the prover. A .key file or a
  * proof obligation generated from a CASE tool may be instances.
  */
+@NullMarked
 public interface ProofOblInput {
 
     /**
@@ -27,6 +30,7 @@ public interface ProofOblInput {
      * Returns the proof obligation term as result of the proof obligation input. If there is still
      * no input available because nothing has been read yet null is returned.
      */
+    @Nullable
     ProofAggregate getPO() throws ProofInputException;
 
     /**
@@ -40,6 +44,7 @@ public interface ProofOblInput {
      * @return The {@link KeYJavaType} in which the proven element is contained in or {@code null}
      *         if not available.
      */
+    @Nullable
     KeYJavaType getContainerType();
 
 

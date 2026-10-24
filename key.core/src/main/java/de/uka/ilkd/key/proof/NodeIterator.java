@@ -6,6 +6,9 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 class NodeIterator implements Iterator<Node> {
 
     private final Iterator<Node> it;

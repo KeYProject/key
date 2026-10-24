@@ -28,6 +28,9 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * The JoinProcessor is responsible for executing the joining. Let N1 and N2 be the nodes which
@@ -54,6 +57,7 @@ import org.key_project.util.collection.ImmutableList;
  * @author Benjamin Niedermann
  * @see DelayedCutProcessor
  */
+@NullMarked
 public class JoinProcessor implements Runnable {
     private boolean used = false;
     private final Proof proof;
@@ -127,7 +131,7 @@ public class JoinProcessor implements Runnable {
 
     }
 
-    private SequentFormula findFormula(Sequent sequent, JTerm content,
+    private @Nullable SequentFormula findFormula(Sequent sequent, JTerm content,
             boolean antecedent) {
         for (SequentFormula sf : (antecedent ? sequent.antecedent()
                 : sequent.succedent())) {
@@ -153,7 +157,7 @@ public class JoinProcessor implements Runnable {
     /**
      * Applies one of the given taclets if this possible otherwise an exception is thrown.
      */
-    private ImmutableList<Goal> apply(final String[] tacletNames, Goal goal,
+    private @Nullable ImmutableList<Goal> apply(final String[] tacletNames, Goal goal,
             PosInOccurrence pio) {
 
         TacletFilter filter = new TacletFilter() {

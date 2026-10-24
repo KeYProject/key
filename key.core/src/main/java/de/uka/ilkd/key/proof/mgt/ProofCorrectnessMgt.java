@@ -25,10 +25,12 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+@NullMarked
 public final class ProofCorrectnessMgt {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofCorrectnessMgt.class);
 
@@ -74,7 +76,7 @@ public final class ProofCorrectnessMgt {
     // public interface
     // -------------------------------------------------------------------------
 
-    public RuleJustification getJustification(RuleApp r) {
+    public @Nullable RuleJustification getJustification(RuleApp r) {
         return proof.getInitConfig().getJustifInfo().getJustification(r, proof.getServices());
     }
 

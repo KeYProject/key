@@ -18,6 +18,8 @@ import de.uka.ilkd.key.logic.op.*;
 import org.key_project.logic.Choice;
 import org.key_project.logic.op.Function;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class is responsible for making the immutable treatment of final fields possible also for
  * constructors.
@@ -38,6 +40,7 @@ import org.key_project.logic.op.Function;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class FinalFieldsPOExtension implements POExtension {
 
     private static final Choice FINAL_IMMUTABLE_CHOICE = new Choice("finalFields", "immutable");
