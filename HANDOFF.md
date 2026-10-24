@@ -33,6 +33,19 @@
   IntSemanticsTest fixture fix (6/6 now green) brought the count to **34
   remaining failures, all recorded pre-existing jmltk gaps** — see §5.2.
 - **Worktree:** `/home/weigl/.local/share/opencode/worktree/fa2a33/witty-cabin`.
+- **CI status after the Phase-4 slices + spotless fix:** `formatting` failed all
+  along (violations across the branch); fixed in `e17111ed30` → CodeQuality
+  green. The remaining red jobs are all **pre-existing** — verified identical at
+  slice-3/4-era commits (`ae716ed74a`/`c81c034dd1`) and pre-slice-8
+  (`d1321bec5d`), i.e. slices 7–9 introduced **zero** new failures: unit-tests
+  key.core = the 34 recorded §5.2 gaps (CI 1638 completed/34 failed, matches
+  local full suite); key.core.infflow = 3 pre-existing `InfFlowProfileLoadingTest`;
+  keyext.caching = `ProofCachingSingleRunTest`+`TestReferenceSearcher`;
+  keyext.slicing = 5 tests (incl. proof-size collapse 5308→54 in
+  `EndToEndTests`); integration-tests testMt2w/4w/Stress + testRunAllInf/WdProofs =
+  `ProblemLoaderException`→`BuildingExceptions` on load of JML-bearing proofs +
+  proofs not closing. Base branch `weigl/jmltk` CI is green; these trace to the
+  Phase 0–3 front-end swap, not to Phase 4.
 - **Do NOT touch:** `/home/weigl/work/key` (~216 unstaged deletions from a
   concurrent agent).
 
@@ -53,6 +66,7 @@
 | `fd32802417` | Phase 4 slice 7 — initially clauses out of `ContractRegistry` into the `JMLSpecFactory` load path: factory gains the `initiallyClauses` map + `addInitiallyClause(s)`/`createContractsFromInitiallyClauses()` (+ private derivation helper; derived constructor contracts register via `services.getContractRegistry()` with `addContractNoInheritance`/`unregisterContract`/`cf.addPost`/`cf.func`); `SLEnvInput.createSpecs` partitions `InitiallyClause` out of the class specs and calls the derivation at the end of loading (same ordering); registry drops field + 4 methods, `map(...)` no longer maps initially clauses, `unregisterContract` becomes public (WD override bumped); repo `addSpecs` stops dispatching `InitiallyClause`. |
 | `2ae5b95be0` | Phase 4 slice 8 — `addSpecs` collapse + `map(...)` removal: the dispatch moves into a private `SLEnvInput.registerSpecs` helper (Contract → registry, ClassInvariant/ClassAxiom → computer, loop/block/merge → AST nodes; same order); `SpecificationRepository.map`, `ContractRegistry.map`+`mapValueSets`, `ClassAxiomComputer.map`+`mapValueSets` and the `ContractRegistryWD` map override deleted (zero callers anywhere, main or test; per-element `SpecificationElement.map` stays); repo shrinks to ctor + empty `processJavaType`; thread-safety comment updated (no state mutated during proving). |
 | `e50d64b699` | Phase 4 slice 9 — **`SpecificationRepository.java` deleted** (final): `processJavaType` moves to `ContractRegistry` (empty default) + `ContractRegistryWD` (override with the former `SpecificationRepositoryWD` body: RepresentsAxiom → WD checks); `SLEnvInput.createSpecs` calls `contractRegistry.processJavaType(kjt)`; deleted `Services.specRepos` field + `getSpecificationRepository()` + copy paths, `KeYEnvironment.getSpecificationRepository()`, `Profile.createSpecificationRepository`, `WdProfile` override and `SpecificationRepositoryWD.java`; imports/javadoc links cleaned (PROOF of Phase-4 completion). |
+| `e17111ed30` | CI fix — `spotlessJavaCheck` had been failing for the whole branch; run `spotlessApply` on the 25 affected files (all within the PR diff: import ordering in key.ui/proofmanagement, javadoc/line reflow + statement wrapping in key.core/key.core.wd) and commit. CI `CodeQuality` (formatting + checkerFramework) is GREEN again. |
 
 ## 2. What Phase 1 did
 
