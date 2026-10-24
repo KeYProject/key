@@ -249,8 +249,9 @@ public final class TypeConverter {
                         "KeYJavaType " + kjt + " has no sort"), ec),
                     "cannot find 'this' for sort " + kjt.getSort());
             }
-            return convertToLogicElement(Objects.requireNonNull(ec,
-                "no execution context for 'this'").getRuntimeInstance());
+            return convertToLogicElement(Objects.requireNonNull(
+                Objects.requireNonNull(ec, "no execution context for 'this'").getRuntimeInstance(),
+                "no runtime instance for 'this'"));
         } else {
             LOGGER.warn("unknown reference prefix: {} {}", prefix,
                 prefix == null ? null : prefix.getClass());
@@ -474,54 +475,84 @@ public final class TypeConverter {
 
         if ((t1 == PrimitiveType.JAVA_REAL && isNumericalType(t2)
                 || (isNumericalType(t1) && t2 == PrimitiveType.JAVA_REAL))) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL),
+                "no KeYJavaType for \\real");
         } else if ((t1 == PrimitiveType.JAVA_BOOLEAN && t2 == PrimitiveType.JAVA_BOOLEAN)) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN),
+                "no KeYJavaType for \\boolean");
         } else if ((t1 == PrimitiveType.JAVA_BYTE || t1 == PrimitiveType.JAVA_SHORT
                 || t1 == PrimitiveType.JAVA_CHAR || t1 == PrimitiveType.JAVA_INT)
                 && (t2 == PrimitiveType.JAVA_BYTE || t2 == PrimitiveType.JAVA_SHORT
                         || t2 == PrimitiveType.JAVA_CHAR || t2 == PrimitiveType.JAVA_INT)) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT),
+                "no KeYJavaType for \\int");
         } else if ((t2 == PrimitiveType.JAVA_LONG) && (t1 == PrimitiveType.JAVA_BYTE
                 || t1 == PrimitiveType.JAVA_SHORT || t1 == PrimitiveType.JAVA_INT
                 || t1 == PrimitiveType.JAVA_CHAR || t1 == PrimitiveType.JAVA_LONG)) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG),
+                "no KeYJavaType for \\long");
         } else if ((t1 == PrimitiveType.JAVA_LONG) && (t2 == PrimitiveType.JAVA_BYTE
                 || t2 == PrimitiveType.JAVA_SHORT || t2 == PrimitiveType.JAVA_INT
                 || t2 == PrimitiveType.JAVA_CHAR || t2 == PrimitiveType.JAVA_LONG)) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG),
+                "no KeYJavaType for \\long");
         } else if ((t1 == PrimitiveType.JAVA_BIGINT) && isIntegerType(t2)) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT),
+                "no KeYJavaType for \\bigint");
         } else if ((t2 == PrimitiveType.JAVA_BIGINT) && isIntegerType(t2)) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT),
+                "no KeYJavaType for \\bigint");
         } else if (t1 == PrimitiveType.JAVA_LOCSET && t2 == PrimitiveType.JAVA_LOCSET) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET),
+                "no KeYJavaType for \\locset");
         } else if (t1 == PrimitiveType.JAVA_SEQ && t2 == PrimitiveType.JAVA_SEQ) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
-        } else if (type1.equals(services.getJavaInfo().getKeYJavaType("java.lang.String"))) {
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ),
+                "no KeYJavaType for \\seq");
+        } else if (type1.equals(Objects.requireNonNull(
+            services.getJavaInfo().getKeYJavaType("java.lang.String"),
+            "no KeYJavaType for java.lang.String"))) {
             return type1;
-        } else if (type2.equals(services.getJavaInfo().getKeYJavaType("java.lang.String"))) {
+        } else if (type2.equals(Objects.requireNonNull(
+            services.getJavaInfo().getKeYJavaType("java.lang.String"),
+            "no KeYJavaType for java.lang.String"))) {
             return type2;
         } else if ((t2 == PrimitiveType.JAVA_FLOAT)
                 && (t1 == PrimitiveType.JAVA_BYTE || t1 == PrimitiveType.JAVA_SHORT
                         || t1 == PrimitiveType.JAVA_INT || t1 == PrimitiveType.JAVA_CHAR
                         || t1 == PrimitiveType.JAVA_LONG || t1 == PrimitiveType.JAVA_FLOAT)) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT),
+                "no KeYJavaType for \\float");
         } else if ((t1 == PrimitiveType.JAVA_FLOAT)
                 && (t2 == PrimitiveType.JAVA_BYTE || t2 == PrimitiveType.JAVA_SHORT
                         || t2 == PrimitiveType.JAVA_INT || t2 == PrimitiveType.JAVA_CHAR
                         || t2 == PrimitiveType.JAVA_LONG || t2 == PrimitiveType.JAVA_FLOAT)) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT),
+                "no KeYJavaType for \\float");
         } else if ((t2 == PrimitiveType.JAVA_DOUBLE) && (t1 == PrimitiveType.JAVA_BYTE
                 || t1 == PrimitiveType.JAVA_SHORT || t1 == PrimitiveType.JAVA_INT
                 || t1 == PrimitiveType.JAVA_CHAR || t1 == PrimitiveType.JAVA_LONG
                 || t1 == PrimitiveType.JAVA_FLOAT || t1 == PrimitiveType.JAVA_DOUBLE)) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE),
+                "no KeYJavaType for \\double");
         } else if ((t1 == PrimitiveType.JAVA_DOUBLE) && (t2 == PrimitiveType.JAVA_BYTE
                 || t2 == PrimitiveType.JAVA_SHORT || t2 == PrimitiveType.JAVA_INT
                 || t2 == PrimitiveType.JAVA_CHAR || t2 == PrimitiveType.JAVA_LONG
                 || t2 == PrimitiveType.JAVA_FLOAT || t2 == PrimitiveType.JAVA_DOUBLE)) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE),
+                "no KeYJavaType for \\double");
         } else {
             throw new RuntimeException(
                 "Could not determine promoted type " + "of " + t1 + " and " + t2);
@@ -541,24 +572,42 @@ public final class TypeConverter {
         if (t1 == PrimitiveType.JAVA_BOOLEAN)
         // not really numeric ...
         {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN),
+                "no KeYJavaType for \\boolean");
         } else if (t1 == PrimitiveType.JAVA_BYTE || t1 == PrimitiveType.JAVA_SHORT
                 || t1 == PrimitiveType.JAVA_CHAR || t1 == PrimitiveType.JAVA_INT) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT),
+                "no KeYJavaType for \\int");
         } else if (t1 == PrimitiveType.JAVA_LONG) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG),
+                "no KeYJavaType for \\long");
         } else if (t1 == PrimitiveType.JAVA_LOCSET) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LOCSET),
+                "no KeYJavaType for \\locset");
         } else if (t1 == PrimitiveType.JAVA_SEQ) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ),
+                "no KeYJavaType for \\seq");
         } else if (t1 == PrimitiveType.JAVA_BIGINT) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT),
+                "no KeYJavaType for \\bigint");
         } else if (t1 == PrimitiveType.JAVA_REAL) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL),
+                "no KeYJavaType for \\real");
         } else if (t1 == PrimitiveType.JAVA_FLOAT) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT),
+                "no KeYJavaType for \\float");
         } else if (t1 == PrimitiveType.JAVA_DOUBLE) {
-            return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
+            return Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE),
+                "no KeYJavaType for \\double");
         } else {
             throw new RuntimeException("Could not determine promoted type " + "of " + type1);
         }
@@ -566,12 +615,16 @@ public final class TypeConverter {
 
 
     public KeYJavaType getBooleanType() {
-        return services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
+        return Objects.requireNonNull(
+            services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN),
+            "no KeYJavaType for \\boolean");
     }
 
 
     public Sort getPrimitiveSort(Type t) {
-        return Objects.requireNonNull(services.getJavaInfo().getKeYJavaType(t).getSort(),
+        return Objects.requireNonNull(
+            Objects.requireNonNull(services.getJavaInfo().getKeYJavaType(t),
+                "no KeYJavaType for " + t).getSort(),
             "sort of " + t);
     }
 
@@ -714,7 +767,8 @@ public final class TypeConverter {
 
 
     public KeYJavaType getKeYJavaType(Type t) {
-        return services.getJavaInfo().getKeYJavaType(t);
+        return Objects.requireNonNull(services.getJavaInfo().getKeYJavaType(t),
+            "no KeYJavaType for " + t);
     }
 
 
