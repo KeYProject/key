@@ -10,6 +10,8 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +25,7 @@ import org.slf4j.LoggerFactory;
  * <code>PrefixTermTacletAppIndexCacheImpl</code> (different proofs, different proof branches,
  * different locations).
  */
+@NullMarked
 public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTacletAppIndexCache {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(PrefixTermTacletAppIndexCacheImpl.class);
@@ -36,7 +39,7 @@ public abstract class PrefixTermTacletAppIndexCacheImpl extends PrefixTermTaclet
     }
 
     @Override
-    public TermTacletAppIndex getIndexForTerm(Term t) {
+    public @Nullable TermTacletAppIndex getIndexForTerm(Term t) {
         return cache.get(new CacheKey(this, t));
     }
 

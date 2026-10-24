@@ -8,11 +8,14 @@ import java.util.EventListener;
 
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Listens for changes on {@link ProofSaver} instances.
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public interface ProofSaverListener extends EventListener {
     /**
      * This method is called when a file was saved via {@link ProofSaver#save()}.

@@ -32,13 +32,16 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An abstract proof obligation implementing common functionality.
  */
+@NullMarked
 public abstract class AbstractPO implements IPersistablePO {
 
-    protected TermBuilder tb;
+    protected @Nullable TermBuilder tb;
     protected final InitConfig environmentConfig;
     protected Services environmentServices;
     protected final JavaInfo javaInfo;
@@ -46,10 +49,10 @@ public abstract class AbstractPO implements IPersistablePO {
     protected final SpecificationRepository specRepos;
     protected final String name;
     protected ImmutableSet<NoPosTacletApp> taclets;
-    protected JTerm[] poTerms;
-    protected String[] poNames;
-    private KeyAst.Declarations header;
-    private ProofAggregate proofAggregate;
+    protected @Nullable JTerm[] poTerms;
+    protected @Nullable String[] poNames;
+    private KeyAst.@Nullable Declarations header;
+    private @Nullable ProofAggregate proofAggregate;
 
 
     // fields used by Tarjan Algorithm
@@ -118,7 +121,7 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected final void register(LocationVariable pv, Services services) {
+    protected final void register(@Nullable LocationVariable pv, Services services) {
         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);
@@ -133,7 +136,7 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected final void register(Function f, Services services) {
+    protected final void register(@Nullable Function f, Services services) {
         Namespace<Function> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != JavaDLTheory.UPDATE;
@@ -148,7 +151,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
-    protected JTerm generateSelfNotNull(IProgramMethod pm, ProgramVariable selfVar) {
+    protected JTerm generateSelfNotNull(IProgramMethod pm, @Nullable ProgramVariable selfVar) {
         return selfVar == null || pm.isConstructor() ? tb.tt()
                 : tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
     }
@@ -163,7 +166,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * @return The term representing the general assumption.
      */
     protected JTerm generateSelfCreated(List<LocationVariable> heaps, IProgramMethod pm,
-            ProgramVariable selfVar, Services services) {
+            @Nullable ProgramVariable selfVar, Services services) {
         if (selfVar == null || pm.isConstructor()) {
             return tb.tt();
         }
@@ -191,7 +194,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param selfKJT The {@link KeYJavaType} of the self variable.
      * @return The term representing the general assumption.
      */
-    protected JTerm generateSelfExactType(IProgramMethod pm, ProgramVariable selfVar,
+    protected JTerm generateSelfExactType(IProgramMethod pm, @Nullable ProgramVariable selfVar,
             KeYJavaType selfKJT) {
         return selfVar == null || pm.isConstructor() ? tb.tt()
                 : generateSelfExactType(pm, tb.var(selfVar), selfKJT);
@@ -205,7 +208,8 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param selfKJT The {@link KeYJavaType} of the self variable.
      * @return The term representing the general assumption.
      */
-    protected JTerm generateSelfExactType(IProgramMethod pm, JTerm selfVar, KeYJavaType selfKJT) {
+    protected JTerm generateSelfExactType(IProgramMethod pm, @Nullable JTerm selfVar,
+            KeYJavaType selfKJT) {
         return selfVar == null || pm.isConstructor() ? tb.tt()
                 : tb.exactInstance(selfKJT.getSort(), selfVar);
     }
@@ -382,7 +386,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param proofConfig the proof configuration
      * @return the created proof
      */
-    protected Proof createProof(String proofName, JTerm poTerm, InitConfig proofConfig) {
+    protected Proof createProof(String proofName, JTerm poTerm, @Nullable InitConfig proofConfig) {
         if (proofConfig == null) {
             proofConfig = environmentConfig.deepCopy();
         }
@@ -403,7 +407,7 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected abstract InitConfig getCreatedInitConfigForSingleProof();
+    protected abstract @Nullable InitConfig getCreatedInitConfigForSingleProof();
 
     @Override
     public final ProofAggregate getPO() {
@@ -463,7 +467,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param properties The properties to read from.
      * @return The name value.
      */
-    public static String getName(Configuration properties) {
+    public static @Nullable String getName(Configuration properties) {
         return properties.getString(PROPERTY_NAME);
     }
 
@@ -471,7 +475,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * {@inheritDoc}
      */
     @Override
-    public KeYJavaType getContainerType() {
+    public @Nullable KeYJavaType getContainerType() {
         return null;
     }
 }

@@ -10,9 +10,12 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Index for managing built-in rules such as integer decision or update simplification rule.
  */
+@NullMarked
 public class BuiltInRuleIndex implements Serializable {
 
     /**

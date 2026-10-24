@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /** this exception thrown if an if-sequent match failed */
+@NullMarked
 public class IfMismatchException extends SVInstantiationException {
 
     /**

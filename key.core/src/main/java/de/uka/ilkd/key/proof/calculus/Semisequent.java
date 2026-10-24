@@ -10,6 +10,10 @@ import org.key_project.prover.sequent.SemisequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 class Semisequent extends org.key_project.prover.sequent.Semisequent {
 
     static final org.key_project.prover.sequent.Semisequent EMPTY_SEMISEQUENT = new Empty();
@@ -138,7 +142,7 @@ class Semisequent extends org.key_project.prover.sequent.Semisequent {
          * @return {@link SequentFormula} found at index idx
          */
         @Override
-        public SequentFormula get(int idx) {
+        public @Nullable SequentFormula get(int idx) {
             return null;
         }
 
@@ -146,7 +150,7 @@ class Semisequent extends org.key_project.prover.sequent.Semisequent {
          * @return the first SequentFormula of this Semisequent
          */
         @Override
-        public SequentFormula getFirst() {
+        public @Nullable SequentFormula getFirst() {
             return null;
         }
 

@@ -8,11 +8,15 @@ import java.util.EventObject;
 
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * An event thrown by a {@link ProofSaver}.
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class ProofSaverEvent extends EventObject {
     /**
      * Generated UID.
@@ -27,7 +31,7 @@ public class ProofSaverEvent extends EventObject {
     /**
      * The error message.
      */
-    private final String errorMsg;
+    private final @Nullable String errorMsg;
 
     /**
      * Constructor.
@@ -36,7 +40,7 @@ public class ProofSaverEvent extends EventObject {
      * @param filename The file name.
      * @param errorMsg The error message.
      */
-    public ProofSaverEvent(ProofSaver source, String filename, String errorMsg) {
+    public ProofSaverEvent(ProofSaver source, String filename, @Nullable String errorMsg) {
         super(source);
         this.filename = filename;
         this.errorMsg = errorMsg;
@@ -56,7 +60,7 @@ public class ProofSaverEvent extends EventObject {
      *
      * @return The error message.
      */
-    public String getErrorMsg() {
+    public @Nullable String getErrorMsg() {
         return errorMsg;
     }
 

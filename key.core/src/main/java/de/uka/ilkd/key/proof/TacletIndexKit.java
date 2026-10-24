@@ -6,9 +6,12 @@ package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Abstract factory for creating {@link TacletIndex} instances
  */
+@NullMarked
 public abstract class TacletIndexKit {
 
     private static final TacletIndexKit ACTIVE_TACLET_INDEX_KIT;

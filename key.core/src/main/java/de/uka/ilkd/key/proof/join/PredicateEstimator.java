@@ -14,11 +14,15 @@ import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Responsible for estimating decision predicates for a join.
  *
  * @author Benjamin Niedermann
  */
+@NullMarked
 public interface PredicateEstimator {
     PredicateEstimator STD_ESTIMATOR = new StdPredicateEstimator();
 
@@ -48,6 +52,7 @@ public interface PredicateEstimator {
  *
  * @author Benjamin Niedermann
  */
+@NullMarked
 class StdPredicateEstimator implements PredicateEstimator {
 
     private static final String FALSE_LABEL = "FALSE";
@@ -95,7 +100,7 @@ class StdPredicateEstimator implements PredicateEstimator {
         return new Result() {
 
             @Override
-            public JTerm getPredicate() {
+            public @Nullable JTerm getPredicate() {
                 // The decision predicate has to be specified by the user.
                 return null;
             }
@@ -115,7 +120,7 @@ class StdPredicateEstimator implements PredicateEstimator {
      * @param partner The prospective partner object.
      * @return The next node on the path to partner.getNode(0).
      */
-    private Node getFirstDifferentNode(ProspectivePartner partner) {
+    private @Nullable Node getFirstDifferentNode(ProspectivePartner partner) {
         TreeSet<Node> set = new TreeSet<>(Comparator.comparingInt(Node::serialNr));
 
         Node node = partner.getNode(0);
@@ -152,7 +157,7 @@ class StdPredicateEstimator implements PredicateEstimator {
      * @param services The services object.
      * @return A term corresponding to the branch label.
      */
-    private JTerm translate(String estimation, Services services) {
+    private @Nullable JTerm translate(String estimation, Services services) {
         try {
             return new KeyIO(services).parseExpression(estimation);
         } catch (Throwable e) {

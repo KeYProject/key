@@ -39,6 +39,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public abstract class AbstractProblemLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractProblemLoader.class);
 
@@ -789,7 +791,7 @@ public abstract class AbstractProblemLoader {
      *
      * @return The instantiated {@link EnvInput} which describes the file to load.
      */
-    public EnvInput getEnvInput() {
+    public @Nullable EnvInput getEnvInput() {
         return envInput;
     }
 
@@ -798,7 +800,7 @@ public abstract class AbstractProblemLoader {
      *
      * @return The instantiated {@link ProblemInitializer} used during the loading process.
      */
-    public ProblemInitializer getProblemInitializer() {
+    public @Nullable ProblemInitializer getProblemInitializer() {
         return problemInitializer;
     }
 
@@ -809,7 +811,7 @@ public abstract class AbstractProblemLoader {
      * @return The instantiated {@link InitConfig} which provides access to the loaded source
      *         elements and specifications.
      */
-    public InitConfig getInitConfig() {
+    public @Nullable InitConfig getInitConfig() {
         return initConfig;
     }
 
@@ -820,7 +822,7 @@ public abstract class AbstractProblemLoader {
      * @return The instantiate proof or {@code null} if no proof was instantiated during loading
      *         process.
      */
-    public Proof getProof() {
+    public @Nullable Proof getProof() {
         return proof;
     }
 
@@ -829,7 +831,7 @@ public abstract class AbstractProblemLoader {
      *
      * @return The {@link ReplayResult} or {@code null} if not available.
      */
-    public ReplayResult getResult() {
+    public @Nullable ReplayResult getResult() {
         return result;
     }
 
@@ -859,7 +861,7 @@ public abstract class AbstractProblemLoader {
 
     /// An arbitrary object representing additional options for the given profile.
     /// @see ProblemInitializer
-    public Configuration getAdditionalProfileOptions() {
+    public @Nullable Configuration getAdditionalProfileOptions() {
         return additionalProfileOptions;
     }
 

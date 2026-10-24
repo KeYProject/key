@@ -32,6 +32,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
@@ -39,8 +40,9 @@ import org.jspecify.annotations.Nullable;
  * Represents an input from a .key user problem file producing an environment as well as a proof
  * obligation.
  */
+@NullMarked
 public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
-    private Sequent problem = null;
+    private @Nullable Sequent problem = null;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -157,12 +159,12 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     }
 
     @Override
-    public String chooseContract() {
+    public @Nullable String chooseContract() {
         return getProblemFinder().getChooseContract();
     }
 
     @Override
-    public Configuration getProofObligation() {
+    public @Nullable Configuration getProofObligation() {
         return getProblemFinder().getProofObligation();
     }
 
@@ -222,7 +224,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
@@ -267,7 +269,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @return The {@link Profile} defined by the file to load or {@code null} if no {@link Profile}
      *         is defined by the file.
      */
-    private Profile readProfileFromFile() {
+    private @Nullable Profile readProfileFromFile() {
         ProblemInformation pi = getProblemInformation();
         String profileName = pi.getProfile();
         if (profileName != null && !profileName.isEmpty()) {
@@ -287,7 +289,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * {@inheritDoc}
      */
     @Override
-    public KeYJavaType getContainerType() {
+    public @Nullable KeYJavaType getContainerType() {
         return null;
     }
 }

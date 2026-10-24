@@ -11,7 +11,9 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 class Sequent extends org.key_project.prover.sequent.Sequent {
     static final org.key_project.prover.sequent.Sequent EMPTY_SEQUENT =
         new Sequent(de.uka.ilkd.key.proof.calculus.Semisequent.EMPTY_SEMISEQUENT) {

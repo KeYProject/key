@@ -4,11 +4,14 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.init;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A {@link DefaultProfileResolver} which returns {@link JavaProfile#defaultInstancePermissions}.
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class JavaProfileWithPermissionsDefaultProfileResolver implements DefaultProfileResolver {
     /**
      * {@inheritDoc}
