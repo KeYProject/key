@@ -74,9 +74,11 @@ public interface IProgramMethod
 
     int getParameterDeclarationCount();
 
+    @SuppressWarnings("deprecation") // contract of getParameters is bound to ImmutableArray
     ImmutableArray<ParameterDeclaration> getParameters();
 
     // Methods from OberverFunction, TODO Create interface for ObersverFunction
+    @SuppressWarnings("deprecation") // contract of getParamTypes is bound to ImmutableArray
     ImmutableArray<KeYJavaType> getParamTypes();
 
     /**
