@@ -7,6 +7,7 @@ package de.uka.ilkd.key.java;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -108,31 +109,38 @@ public final class TypeConverter {
     }
 
     public JavaDLTheory getJavaDLTheory() {
-        return getLDT(JavaDLTheory.class);
+        return Objects.requireNonNull(getLDT(JavaDLTheory.class),
+            "JavaDL theory not registered");
     }
 
     public IntegerLDT getIntegerLDT() {
-        return getLDT(IntegerLDT.class);
+        return Objects.requireNonNull(getLDT(IntegerLDT.class),
+            "Integer theory not registered");
     }
 
     public FloatLDT getFloatLDT() {
-        return getLDT(FloatLDT.class);
+        return Objects.requireNonNull(getLDT(FloatLDT.class),
+            "Float theory not registered");
     }
 
     public DoubleLDT getDoubleLDT() {
-        return getLDT(DoubleLDT.class);
+        return Objects.requireNonNull(getLDT(DoubleLDT.class),
+            "Double theory not registered");
     }
 
     public RealLDT getRealLDT() {
-        return getLDT(RealLDT.class);
+        return Objects.requireNonNull(getLDT(RealLDT.class),
+            "Real theory not registered");
     }
 
     public BooleanLDT getBooleanLDT() {
-        return getLDT(BooleanLDT.class);
+        return Objects.requireNonNull(getLDT(BooleanLDT.class),
+            "Boolean theory not registered");
     }
 
     public LocSetLDT getLocSetLDT() {
-        return getLDT(LocSetLDT.class);
+        return Objects.requireNonNull(getLDT(LocSetLDT.class),
+            "LocSet theory not registered");
     }
 
     public @Nullable HeapLDT getHeapLDT() {
@@ -142,26 +150,33 @@ public final class TypeConverter {
 
 
     public PermissionLDT getPermissionLDT() {
-        return getLDT(PermissionLDT.class);
+        return Objects.requireNonNull(getLDT(PermissionLDT.class),
+            "Permission theory not registered");
     }
 
     public SeqLDT getSeqLDT() {
-        return getLDT(SeqLDT.class);
+        return Objects.requireNonNull(getLDT(SeqLDT.class),
+            "Seq theory not registered");
     }
 
     public SortLDT getSortLDT() {
-        return getLDT(SortLDT.class);
+        return Objects.requireNonNull(getLDT(SortLDT.class),
+            "Sort theory not registered");
     }
 
     public MapLDT getMapLDT() {
-        return getLDT(MapLDT.class);
+        return Objects.requireNonNull(getLDT(MapLDT.class),
+            "Map theory not registered");
     }
 
     public CharListLDT getCharListLDT() {
-        return getLDT(CharListLDT.class);
+        return Objects.requireNonNull(getLDT(CharListLDT.class),
+            "CharList theory not registered");
     }
 
-    private JTerm translateOperator(Operator op, ExecutionContext ec) {
+    private JTerm translateOperator(Operator op, @Nullable ExecutionContext ec) {
+        final HeapLDT heapLDT = Objects.requireNonNull(this.heapLDT,
+            "heap theory not initialized in TypeConverter");
         final JTerm[] subs = new JTerm[op.getArity()];
         for (int i = 0, n = op.getArity(); i < n; i++) {
             subs[i] = convertToLogicElement(op.getExpressionAt(i), ec);
@@ -178,7 +193,11 @@ public final class TypeConverter {
 
         AbstractLDT responsibleLDT = getResponsibleLDT(op, subs, services, ec);
         if (responsibleLDT != null) {
-            return tb.func(responsibleLDT.getFunctionFor(op, services, ec), subs);
+            final Function fieldSymbol = Objects.requireNonNull(
+                responsibleLDT.getFunctionFor(op, services, Objects.requireNonNull(ec,
+                    "no execution context for operator " + op)),
+                "no function symbol for operator " + op);
+            return tb.func(fieldSymbol, subs);
         } else if (op instanceof BinaryOperator bo
                 && bo.getKind() == BinaryOperatorKind.EQUALS) {
             assert subs.length == 2;
@@ -193,7 +212,8 @@ public final class TypeConverter {
         } else if (op instanceof DLEmbeddedExpression emb) {
             return emb.makeTerm(heapLDT.getHeap(), subs, services);
         } else if (op instanceof TypeCast tc) {
-            return tb.cast(tc.getKeYJavaType(services).getSort(), subs[0]);
+            return tb.cast(Objects.requireNonNull(tc.getKeYJavaType(services).getSort(),
+                "cast target type has no sort"), subs[0]);
         } else {
             LOGGER.warn("no data type model " + "available to convert:{} {}", op,
                 op.getClass());
@@ -203,7 +223,7 @@ public final class TypeConverter {
     }
 
 
-    private JTerm convertReferencePrefix(ReferencePrefix prefix, ExecutionContext ec) {
+    private JTerm convertReferencePrefix(ReferencePrefix prefix, @Nullable ExecutionContext ec) {
         if (prefix instanceof FieldReference) {
             return convertVariableReference((FieldReference) prefix, ec);
         } else if (prefix instanceof VariableReference vr) {
@@ -224,9 +244,13 @@ public final class TypeConverter {
             if (prefix.getReferencePrefix() != null
                     && (prefix.getReferencePrefix() instanceof TypeReference tr)) {
                 KeYJavaType kjt = tr.getKeYJavaType();
-                return findThisForSortExact(kjt.getSort(), ec);
+                return Objects.requireNonNull(
+                    findThisForSortExact(Objects.requireNonNull(kjt.getSort(),
+                        "KeYJavaType " + kjt + " has no sort"), ec),
+                    "cannot find 'this' for sort " + kjt.getSort());
             }
-            return convertToLogicElement(ec.getRuntimeInstance());
+            return convertToLogicElement(Objects.requireNonNull(ec,
+                "no execution context for 'this'").getRuntimeInstance());
         } else {
             LOGGER.warn("unknown reference prefix: {} {}", prefix,
                 prefix == null ? null : prefix.getClass());
@@ -235,51 +259,69 @@ public final class TypeConverter {
     }
 
 
-    public @Nullable JTerm findThisForSortExact(Sort s, ExecutionContext ec) {
-        ProgramElement pe = ec.getRuntimeInstance();
+    public @Nullable JTerm findThisForSortExact(Sort s, @Nullable ExecutionContext ec) {
+        final ExecutionContext context = Objects.requireNonNull(ec,
+            "no execution context to resolve 'this' for " + s);
+        ProgramElement pe = context.getRuntimeInstance();
         if (pe == null) {
             return null;
         }
-        JTerm inst = convertToLogicElement(pe, ec);
-        return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), true);
+        JTerm inst = convertToLogicElement(pe, context);
+        return findThisForSort(s, inst, context.getTypeReference().getKeYJavaType(), true);
 
     }
 
-    public @Nullable JTerm findThisForSort(Sort s, ExecutionContext ec) {
-        ProgramElement pe = ec.getRuntimeInstance();
+    public @Nullable JTerm findThisForSort(Sort s, @Nullable ExecutionContext ec) {
+        final ExecutionContext context = Objects.requireNonNull(ec,
+            "no execution context to resolve 'this' for " + s);
+        ProgramElement pe = context.getRuntimeInstance();
         if (pe == null) {
             return null;
         }
-        JTerm inst = convertToLogicElement(pe, ec);
-        return findThisForSort(s, inst, ec.getTypeReference().getKeYJavaType(), false);
+        JTerm inst = convertToLogicElement(pe, context);
+        return findThisForSort(s, inst, context.getTypeReference().getKeYJavaType(), false);
     }
 
 
     public JTerm findThisForSort(Sort s, JTerm self, KeYJavaType context, boolean exact) {
         JTerm result = self;
         LocationVariable inst;
-        while (!exact && !context.getSort().extendsTrans(s)
-                || exact && !context.getSort().equals(s)) {
+        final HeapLDT heapLDT = Objects.requireNonNull(this.heapLDT,
+            "heap theory not initialized in TypeConverter");
+        while (true) {
+            final KeYJavaType contextType = Objects.requireNonNull(context,
+                "no enclosing type in chain to " + s);
+            final Sort contextSort = Objects.requireNonNull(contextType.getSort(),
+                "enclosing type " + contextType + " has no sort");
+            if (exact ? contextSort.equals(s) : contextSort.extendsTrans(s)) {
+                break;
+            }
             inst = (LocationVariable) services.getJavaInfo()
-                    .getAttribute(PipelineConstants.IMPLICIT_ENCLOSING_THIS, context);
-            final Function fieldSymbol = heapLDT.getFieldSymbolForPV(inst, services);
-            result = tb.dot(inst.sort(), result, fieldSymbol);
-            context = inst.getKeYJavaType();
+                    .getAttribute(PipelineConstants.IMPLICIT_ENCLOSING_THIS, contextType);
+            final LocationVariable enclosingThis = Objects.requireNonNull(inst,
+                "no enclosing 'this' attribute for " + contextType);
+            final Function fieldSymbol = heapLDT.getFieldSymbolForPV(enclosingThis, services);
+            result = tb.dot(enclosingThis.sort(), result, fieldSymbol);
+            context = enclosingThis.getKeYJavaType();
         }
         return result;
     }
 
-    public JTerm convertMethodReference(MethodReference mr, ExecutionContext ec) {
+    public JTerm convertMethodReference(MethodReference mr, @Nullable ExecutionContext ec) {
         // FIXME this needs to handle two state?
         final ReferencePrefix prefix = mr.getReferencePrefix();
         JTerm p = convertReferencePrefix(prefix, ec);
-        IProgramMethod pm = mr.method(services, services.getTypeConverter().getKeYJavaType(p), ec);
+        IProgramMethod pm = mr.method(services, services.getTypeConverter().getKeYJavaType(p),
+            Objects.requireNonNull(ec, "no execution context for method reference " + mr));
         if (pm.isModel()) {
             ImmutableArray<? extends Expression> args = mr.getArguments();
             JTerm[] argTerms = new JTerm[args.size() + 2]; // heap, self,
             int index = 0;
-            for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                if (h == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
+            final HeapLDT heapLDT = Objects.requireNonNull(
+                services.getTypeConverter().getHeapLDT(),
+                "heap theory not initialized");
+            for (LocationVariable h : heapLDT.getAllHeaps()) {
+                if (h == heapLDT.getSavedHeap()) {
                     continue;
                 }
                 argTerms[index++] = tb.var(h);
@@ -293,27 +335,40 @@ public final class TypeConverter {
         throw new IllegalArgumentException("TypeConverter could not handle this");
     }
 
-    public JTerm convertVariableReference(VariableReference fr, ExecutionContext ec) {
+    public JTerm convertVariableReference(VariableReference fr, @Nullable ExecutionContext ec) {
         final ReferencePrefix prefix = fr.getReferencePrefix();
         final ProgramVariable var = fr.getProgramVariable();
         if (var instanceof ProgramConstant pc) {
             return tb.var(pc);
         } else if (var == services.getJavaInfo().getArrayLength()) {
-            return tb.dotLength(convertReferencePrefix(prefix, ec));
+            return tb.dotLength(convertReferencePrefix(Objects.requireNonNull(prefix,
+                "missing reference prefix for " + var), ec));
         } else if (var.isStatic()) {
+            final HeapLDT heapLDT = Objects.requireNonNull(this.heapLDT,
+                "heap theory not initialized in TypeConverter");
             final Function fieldSymbol =
                 heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
             return tb.staticDot(var.sort(), fieldSymbol);
         } else if (prefix == null) {
             if (var.isMember()) {
+                final HeapLDT heapLDT = Objects.requireNonNull(this.heapLDT,
+                    "heap theory not initialized in TypeConverter");
+                final KeYJavaType containerType = Objects.requireNonNull(var.getContainerType(),
+                    "container type missing for " + var);
+                final Sort containerSort = Objects.requireNonNull(containerType.getSort(),
+                    "container sort missing for " + containerType);
                 final Function fieldSymbol =
                     heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
-                return tb.dot(var.sort(), findThisForSort(var.getContainerType().getSort(), ec),
+                return tb.dot(var.sort(),
+                    Objects.requireNonNull(findThisForSort(containerSort, ec),
+                        "cannot find 'this' for " + containerSort),
                     fieldSymbol);
             } else {
                 return tb.var(var);
             }
         } else if (!(prefix instanceof PackageReference)) {
+            final HeapLDT heapLDT = Objects.requireNonNull(this.heapLDT,
+                "heap theory not initialized in TypeConverter");
             final Function fieldSymbol =
                 heapLDT.getFieldSymbolForPV((LocationVariable) var, services);
             return tb.dot(var.sort(), convertReferencePrefix(prefix, ec), fieldSymbol);
@@ -323,7 +378,7 @@ public final class TypeConverter {
     }
 
 
-    public JTerm convertArrayReference(ArrayReference ar, ExecutionContext ec) {
+    public JTerm convertArrayReference(ArrayReference ar, @Nullable ExecutionContext ec) {
         final JTerm[] index = new JTerm[ar.getDimensionExpressions().size()];
         final JTerm t = convertToLogicElement(ar.getReferencePrefix(), ec);
         for (int i = 0; i < index.length; i++) {
@@ -333,11 +388,12 @@ public final class TypeConverter {
         return tb.dotArr(t, index[0]);
     }
 
-    private JTerm convertToInstanceofTerm(Instanceof io, ExecutionContext ec) {
+    private JTerm convertToInstanceofTerm(Instanceof io, @Nullable ExecutionContext ec) {
         final KeYJavaType type = ((TypeReference) io.getChildAt(1)).getKeYJavaType();
         final JTerm obj = convertToLogicElement(io.getChildAt(0), ec);
         final Function instanceOfSymbol =
-            getJavaDLTheory().getInstanceofSymbol(type.getSort(), services);
+            getJavaDLTheory().getInstanceofSymbol(Objects.requireNonNull(type.getSort(),
+                "type " + type + " of instanceof has no sort"), services);
 
         // in JavaDL S::instance(o) is also true if o (for reference types S)
         // is null in opposite to Java
@@ -395,12 +451,15 @@ public final class TypeConverter {
         } else {
             AbstractLDT ldt = LDTs.get(lit.getLDTName());
             if (ldt != null) {
-                return ldt.translateLiteral(lit, services);
+                return Objects.requireNonNull(ldt.translateLiteral(lit, services),
+                    "no literal translation for " + lit);
             } else if ((ldt = PLDTs.get(lit.getLDTName())) != null) {
-                return ldt.translateLiteral(lit, services);
+                return Objects.requireNonNull(ldt.translateLiteral(lit, services),
+                    "no literal translation for " + lit);
             } else {
                 Debug.fail("Unknown literal type", lit);
-                return null;
+                throw new IllegalArgumentException(
+                    "TypeConverter could not convert literal " + lit);
             }
         }
     }
@@ -469,7 +528,7 @@ public final class TypeConverter {
         }
     }
 
-    public boolean isIntegerType(Type t2) {
+    public boolean isIntegerType(@Nullable Type t2) {
         return (t2 == PrimitiveType.JAVA_BYTE || t2 == PrimitiveType.JAVA_CHAR
                 || t2 == PrimitiveType.JAVA_INT || t2 == PrimitiveType.JAVA_LONG
                 || t2 == PrimitiveType.JAVA_SHORT || t2 == PrimitiveType.JAVA_BIGINT);
@@ -512,7 +571,8 @@ public final class TypeConverter {
 
 
     public Sort getPrimitiveSort(Type t) {
-        return services.getJavaInfo().getKeYJavaType(t).getSort();
+        return Objects.requireNonNull(services.getJavaInfo().getKeYJavaType(t).getSort(),
+            "sort of " + t);
     }
 
 
@@ -541,9 +601,11 @@ public final class TypeConverter {
      */
     public KeYJavaType getKeYJavaType(Expression e, @Nullable ExecutionContext ec) {
         if (e instanceof ThisReference) {
-            return ec.getTypeReference().getKeYJavaType();
+            return Objects.requireNonNull(ec, "no execution context for 'this'")
+                    .getTypeReference().getKeYJavaType();
         }
-        return e.getKeYJavaType(services, ec);
+        return e.getKeYJavaType(services, Objects.requireNonNull(ec,
+            "no execution context to determine type of " + e));
     }
 
 
@@ -557,17 +619,21 @@ public final class TypeConverter {
      */
     public Expression convertToProgramElement(JTerm term) {
         assert term != null;
+        final HeapLDT heapLDT = Objects.requireNonNull(this.heapLDT,
+            "heap theory not initialized in TypeConverter");
         if (term.op() == heapLDT.getNull()) {
             return NullLiteral.NULL;
         } else if (term.op() instanceof Function function) {
             for (LDT model : LDTs.values()) {
                 if (model.hasLiteralFunction(function)) {
-                    return model.translateTerm(term, null, services);
+                    return Objects.requireNonNull(model.translateTerm(term, new ExtList(),
+                        services), "no literal program term for " + term);
                 }
             }
             for (ParametricLDT model : PLDTs.values()) {
                 if (model.hasLiteralFunction(function)) {
-                    return model.translateTerm(term, null, services);
+                    return Objects.requireNonNull(model.translateTerm(term, new ExtList(),
+                        services), "no literal program term for " + term);
                 }
             }
         }
@@ -582,12 +648,14 @@ public final class TypeConverter {
         } else if (term.op() instanceof Function function) {
             for (LDT model : LDTs.values()) {
                 if (model.containsFunction(function)) {
-                    return model.translateTerm(term, children, services);
+                    return Objects.requireNonNull(model.translateTerm(term, children, services),
+                        "no term translation for " + term);
                 }
             }
             for (ParametricLDT model : PLDTs.values()) {
                 if (model.containsFunction(function)) {
-                    return model.translateTerm(term, children, services);
+                    return Objects.requireNonNull(model.translateTerm(term, children, services),
+                        "no term translation for " + term);
                 }
             }
             Expression tryTranslate = translateJavaCast(term, children);
@@ -626,7 +694,7 @@ public final class TypeConverter {
         } else if (t.op() instanceof Function) {
             for (LDT ldt : LDTs.values()) {
                 if (ldt.containsFunction((Function) t.op())) {
-                    Type type = ldt.getType(t);
+                    Type type = Objects.requireNonNull(ldt.getType(t));
                     result = services.getJavaInfo().getKeYJavaType(type);
                     break;
                 }
@@ -745,7 +813,7 @@ public final class TypeConverter {
             }
         } else if (from instanceof ArrayType) {
             if (to instanceof ClassType) {
-                final Sort toSort = getKeYJavaType(to).getSort();
+                final Sort toSort = Objects.requireNonNull(getKeYJavaType(to).getSort());
                 return services.getJavaInfo().isAJavaCommonSort(toSort);
             } else if (to instanceof ArrayType) {
                 return isWidening((ArrayType) from, (ArrayType) to);
@@ -761,7 +829,8 @@ public final class TypeConverter {
         Type b = to.getJavaType();
 
         if (a instanceof ClassType || a == null) {
-            return from.getSort().extendsTrans(to.getSort())
+            return Objects.requireNonNull(from.getSort())
+                    .extendsTrans(Objects.requireNonNull(to.getSort()))
                     || (a == NullType.JAVA_NULL && b instanceof ArrayType);
         } else {
             if (b == null) {
@@ -830,7 +899,8 @@ public final class TypeConverter {
         Type b = to.getJavaType();
 
         if (a instanceof ClassType || a == null) {
-            return to.getSort().extendsTrans(from.getSort())
+            return Objects.requireNonNull(to.getSort())
+                    .extendsTrans(Objects.requireNonNull(from.getSort()))
                     || (from == services.getJavaInfo().getJavaLangObject()
                             && a instanceof ArrayType);
         } else {
@@ -945,7 +1015,7 @@ public final class TypeConverter {
     }
 
 
-    public boolean isNumericalType(Type t) {
+    public boolean isNumericalType(@Nullable Type t) {
         if (t instanceof KeYJavaType) {
             t = ((KeYJavaType) t).getJavaType();
         }
@@ -999,14 +1069,16 @@ public final class TypeConverter {
     }
 
     private @Nullable AbstractLDT getResponsibleLDT(Operator op, JTerm[] subs,
-            Services services, ExecutionContext ec) {
+            Services services, @Nullable ExecutionContext ec) {
+        final ExecutionContext context = Objects.requireNonNull(ec,
+            "no execution context to find responsible theory for " + op);
         for (LDT ldt : LDTs.values()) {
-            if (ldt.isResponsible(op, subs, services, ec)) {
+            if (ldt.isResponsible(op, subs, services, context)) {
                 return ldt;
             }
         }
         for (ParametricLDT ldt : PLDTs.values()) {
-            if (ldt.isResponsible(op, subs, services, ec)) {
+            if (ldt.isResponsible(op, subs, services, context)) {
                 return ldt;
             }
         }

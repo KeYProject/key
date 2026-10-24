@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.ast.Reference;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * extracted interface to allow schema variabes to stand for an execution context
@@ -33,5 +34,6 @@ public interface IExecutionContext extends Reference {
      *
      * @return the runtime instance object
      */
+    @Nullable
     ReferencePrefix getRuntimeInstance();
 }
