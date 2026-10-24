@@ -31,6 +31,7 @@ import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,7 @@ import static de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
  * @author bruns
  *
  */
+@NullMarked
 public class ContractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(ContractFactory.class);
 
@@ -89,9 +91,10 @@ public class ContractFactory {
      * @return the resulting contract
      */
     public FunctionalOperationContract addPost(FunctionalOperationContract old, JTerm addedPost,
-            LocationVariable selfVar, LocationVariable resultVar, LocationVariable excVar,
-            ImmutableList<LocationVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars) {
+            @Nullable LocationVariable selfVar, @Nullable LocationVariable resultVar,
+            @Nullable LocationVariable excVar,
+            @Nullable ImmutableList<LocationVariable> paramVars,
+            @Nullable Map<LocationVariable, LocationVariable> atPreVars) {
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
         addedPost = replaceVariables(addedPost, selfVar, resultVar, excVar, paramVars, atPreVars,
@@ -143,8 +146,8 @@ public class ContractFactory {
      * @return the resulting contract
      */
     public FunctionalOperationContract addPre(FunctionalOperationContract old, JTerm addedPre,
-            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars) {
+            @Nullable LocationVariable selfVar, @Nullable ImmutableList<LocationVariable> paramVars,
+            @Nullable Map<LocationVariable, LocationVariable> atPreVars) {
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
         addedPre = replaceVariables(addedPre, selfVar, paramVars, atPreVars, foci.originalSelfVar,
@@ -196,16 +199,17 @@ public class ContractFactory {
 
     public DependencyContract dep(KeYJavaType containerType, IObserverFunction pm,
             KeYJavaType specifiedIn, Map<LocationVariable, JTerm> requires, JTerm measuredBy,
-            Map<LocationVariable, JTerm> accessibles, LocationVariable selfVar,
+            Map<LocationVariable, JTerm> accessibles, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars, JTerm globalDefs) {
+            @Nullable Map<LocationVariable, LocationVariable> atPreVars,
+            @Nullable JTerm globalDefs) {
         assert (selfVar == null) == pm.isStatic();
         return dep("JML accessible clause", containerType, pm, specifiedIn, requires, measuredBy,
             accessibles, selfVar, paramVars, atPreVars, globalDefs);
     }
 
     public DependencyContract dep(KeYJavaType kjt, LocationVariable targetHeap,
-            TranslatedDependencyContract dep, LocationVariable selfVar) {
+            TranslatedDependencyContract dep, @Nullable LocationVariable selfVar) {
         final ImmutableList<LocationVariable> paramVars =
             tb.paramVars(dep.observerFunction(), false);
         assert (selfVar == null) == dep.observerFunction().isStatic();
@@ -468,8 +472,8 @@ public class ContractFactory {
         return kind;
     }
 
-    private static JTerm combineMeasuredBy(JTerm mby, JTerm otherMby, LocationVariable h,
-            JTerm otherPre, Services services) {
+    private static @Nullable JTerm combineMeasuredBy(@Nullable JTerm mby, @Nullable JTerm otherMby,
+            LocationVariable h, JTerm otherPre, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         if (h == services.getTypeConverter().getHeapLDT().getHeap()) {
             // bugfix (MU)
@@ -634,7 +638,7 @@ public class ContractFactory {
      */
     private FunctionalOperationContract joinWithOtherContracts(final String name,
             FunctionalOperationContractImpl t, FunctionalOperationContract[] others,
-            Map<LocationVariable, JTerm> pres, JTerm mby,
+            Map<LocationVariable, JTerm> pres, @Nullable JTerm mby,
             Map<LocationVariable, Boolean> hasModifiable,
             Map<LocationVariable, Boolean> hasFreeModifiable,
             Map<LocationVariable, JTerm> uniformModifiable,
@@ -828,7 +832,7 @@ public class ContractFactory {
      * @param contracts the passed contracts
      * @return the union contract
      */
-    public FunctionalOperationContract union(FunctionalOperationContract... contracts) {
+    public @Nullable FunctionalOperationContract union(FunctionalOperationContract... contracts) {
         if (contracts.length == 0) {
             return null;
         }
@@ -846,7 +850,7 @@ public class ContractFactory {
 
     // PRIVATE METHODS
 
-    private static <T> void addToMap(T var, T originalVar, Map<T, T> map) {
+    private static <T> void addToMap(@Nullable T var, T originalVar, Map<T, T> map) {
         if (var != null) {
             map.put(var, originalVar);
         }
@@ -865,9 +869,10 @@ public class ContractFactory {
     /**
      * replace in original the variables used for self and parameters
      */
-    private JTerm replaceVariables(JTerm original, LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars, LocationVariable originalSelfVar,
+    private JTerm replaceVariables(JTerm original, @Nullable LocationVariable selfVar,
+            @Nullable ImmutableList<LocationVariable> paramVars,
+            @Nullable Map<LocationVariable, LocationVariable> atPreVars,
+            LocationVariable originalSelfVar,
             ImmutableList<LocationVariable> originalParamVars,
             Map<LocationVariable, LocationVariable> originalAtPreVars) {
         return replaceVariables(original, selfVar, null, null, paramVars, atPreVars,
@@ -877,10 +882,11 @@ public class ContractFactory {
     /**
      * replace in original the variables used for self, result, exception, heap, and parameters
      */
-    private JTerm replaceVariables(JTerm original, LocationVariable selfVar,
-            LocationVariable resultVar,
-            LocationVariable excVar, ImmutableList<LocationVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars, LocationVariable originalSelfVar,
+    private JTerm replaceVariables(JTerm original, @Nullable LocationVariable selfVar,
+            @Nullable LocationVariable resultVar,
+            @Nullable LocationVariable excVar, @Nullable ImmutableList<LocationVariable> paramVars,
+            @Nullable Map<LocationVariable, LocationVariable> atPreVars,
+            LocationVariable originalSelfVar,
             LocationVariable originalResultVar, LocationVariable originalExcVar,
             ImmutableList<LocationVariable> originalParamVars,
             Map<LocationVariable, LocationVariable> originalAtPreVars) {

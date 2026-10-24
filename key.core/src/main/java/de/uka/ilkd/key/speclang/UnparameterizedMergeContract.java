@@ -14,11 +14,14 @@ import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.UnparametricMergeProcedure;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A {@link MergeContract} for {@link UnparametricMergeProcedure}s like {@link MergeByIfThenElse}.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class UnparameterizedMergeContract implements MergeContract {
 
     private final static String NAME = "Unparametrized Merge Contract";

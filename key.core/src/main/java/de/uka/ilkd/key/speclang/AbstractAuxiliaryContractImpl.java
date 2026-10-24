@@ -29,12 +29,16 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Abstract base class for all default implementations of the sub-interfaces of
  * {@link AuxiliaryContract}.
  *
  * @author wacker, lanzinger
  */
+@NullMarked
 public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract {
 
     /**
@@ -60,7 +64,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     /**
      * @see #getInstantiationSelfTerm()
      */
-    protected JTerm instantiationSelf;
+    protected @Nullable JTerm instantiationSelf;
 
     /**
      * @see #getPrecondition(LocationVariable, Services)
@@ -75,7 +79,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     /**
      * @see #getMby()
      */
-    protected final JTerm measuredBy;
+    protected final @Nullable JTerm measuredBy;
 
     /**
      * @see #getPostcondition(LocationVariable, Services)
@@ -100,7 +104,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     /**
      * @see #getInfFlowSpecs()
      */
-    protected ImmutableList<InfFlowSpec> infFlowSpecs;
+    protected @Nullable ImmutableList<InfFlowSpec> infFlowSpecs;
 
     /**
      * @see #getVariables()
@@ -154,12 +158,12 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
             final List<Label> labels, final IProgramMethod method,
             final JModality.JavaModalityKind modalityKind,
             final Map<LocationVariable, JTerm> preconditions,
-            final Map<LocationVariable, JTerm> freePreconditions, final JTerm measuredBy,
+            final Map<LocationVariable, JTerm> freePreconditions, final @Nullable JTerm measuredBy,
             final Map<LocationVariable, JTerm> postconditions,
             final Map<LocationVariable, JTerm> freePostconditions,
             final Map<LocationVariable, JTerm> modifiableClauses,
             final Map<LocationVariable, JTerm> freeModifiableClauses,
-            final ImmutableList<InfFlowSpec> infFlowSpecs,
+            final @Nullable ImmutableList<InfFlowSpec> infFlowSpecs,
             final Variables variables,
             final boolean transactionApplicable,
             final Map<LocationVariable, Boolean> hasModifiable,
@@ -310,24 +314,24 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public JTerm getMby() {
+    public @Nullable JTerm getMby() {
         return measuredBy;
     }
 
     @Override
-    public JTerm getMby(Variables variables, Services services) {
+    public @Nullable JTerm getMby(Variables variables, Services services) {
         return getTerm(measuredBy, variables, services);
     }
 
     @Override
-    public JTerm getMby(LocationVariable selfVar, Services services) {
+    public @Nullable JTerm getMby(LocationVariable selfVar, Services services) {
         return getTerm(measuredBy,
             new Variables(selfVar, null, null, null, null, null, null, null, null, null, services),
             services);
     }
 
     @Override
-    public JTerm getMby(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
+    public @Nullable JTerm getMby(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
             Map<LocationVariable, JTerm> atPres, Services services) {
         return getTerm(measuredBy, null,
             new Terms(selfTerm, null, null, null, null, null, null, null, null, atPres), services);
@@ -553,12 +557,12 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public JTerm getInstantiationSelfTerm() {
+    public @Nullable JTerm getInstantiationSelfTerm() {
         return instantiationSelf;
     }
 
     @Override
-    public JTerm getInstantiationSelfTerm(TermServices services) {
+    public @Nullable JTerm getInstantiationSelfTerm(TermServices services) {
         if (instantiationSelf != null) {
             return instantiationSelf;
         } else if (variables.self != null) {
@@ -969,7 +973,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         /**
          * @see AuxiliaryContract#getMby()
          */
-        private final JTerm measuredBy;
+        private final @Nullable JTerm measuredBy;
 
         /**
          * Precondition.
@@ -1009,7 +1013,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
         /**
          * Postcondition for abrupt termination with {@code return} statements.
          */
-        private final JTerm returns;
+        private final @Nullable JTerm returns;
 
         /**
          * Postcondition for abrupt termination due to an uncaught exception.
@@ -1084,12 +1088,12 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
                 final List<Label> labels,
                 final IProgramMethod method, final Behavior behavior, final Variables variables,
                 final Map<LocationVariable, JTerm> requires,
-                final Map<LocationVariable, JTerm> requiresFree, final JTerm measuredBy,
+                final Map<LocationVariable, JTerm> requiresFree, final @Nullable JTerm measuredBy,
                 final Map<LocationVariable, JTerm> ensures,
                 final Map<LocationVariable, JTerm> ensuresFree,
                 final ImmutableList<InfFlowSpec> infFlowSpecs,
                 final Map<Label, JTerm> breaks, final Map<Label, JTerm> continues,
-                final JTerm returns,
+                final @Nullable JTerm returns,
                 final JTerm signals, final JTerm signalsOnly, final JTerm diverges,
                 final Map<LocationVariable, JTerm> modifiables,
                 final Map<LocationVariable, JTerm> modifiablesFree,
@@ -1312,7 +1316,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @return a part of the postcondition.
          */
         private JTerm conditionPostcondition(final ProgramVariable flag,
-                final JTerm postcondition) {
+                final @Nullable JTerm postcondition) {
             JTerm result = tt();
             if (flag != null) {
                 result =
@@ -1654,7 +1658,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param heap the heap to use.
          * @return the precondition.
          */
-        private JTerm addPreconditionFrom(final T contract, final LocationVariable heap) {
+        private @Nullable JTerm addPreconditionFrom(final T contract, final LocationVariable heap) {
             final JTerm precondition = contract.getPrecondition(heap, placeholderVariables.self,
                 placeholderVariables.remembranceHeaps, services);
             if (precondition != null) {
@@ -1683,7 +1687,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param contract the contract the postcondition belongs to.
          * @param heap the heap to use.
          */
-        private void addPostconditionFrom(final JTerm precondition, final T contract,
+        private void addPostconditionFrom(final @Nullable JTerm precondition, final T contract,
                 final LocationVariable heap) {
             final JTerm unconditionalPostcondition =
                 contract.getPostcondition(heap, placeholderVariables, services);
@@ -1701,7 +1705,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param contract the contract the free postcondition belongs to.
          * @param heap the heap to use.
          */
-        private void addFreePostconditionFrom(final JTerm precondition, final T contract,
+        private void addFreePostconditionFrom(final @Nullable JTerm precondition, final T contract,
                 final LocationVariable heap) {
             final JTerm unconditionalFreePostcondition =
                 contract.getFreePostcondition(heap, placeholderVariables, services);
@@ -1749,7 +1753,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param additionalCondition a condition.
          * @return the disjunction of the conditions.
          */
-        private JTerm orPossiblyNull(final JTerm currentCondition,
+        private JTerm orPossiblyNull(final @Nullable JTerm currentCondition,
                 final JTerm additionalCondition) {
             if (currentCondition == null) {
                 return additionalCondition;
@@ -1764,7 +1768,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param additionalCondition a condition.
          * @return the conjunction of the conditions.
          */
-        private JTerm andPossiblyNull(final JTerm currentCondition,
+        private JTerm andPossiblyNull(final @Nullable JTerm currentCondition,
                 final JTerm additionalCondition) {
             if (currentCondition == null) {
                 return additionalCondition;
@@ -1779,8 +1783,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param additionalLocationSet a location set.
          * @return the union of the location sets.
          */
-        private JTerm unionPossiblyNull(final JTerm currentLocationSet,
-                final JTerm additionalLocationSet) {
+        private JTerm unionPossiblyNull(final @Nullable JTerm currentLocationSet,
+                final @Nullable JTerm additionalLocationSet) {
             if (currentLocationSet == null) {
                 return additionalLocationSet;
             } else if (additionalLocationSet == null) {
@@ -1795,7 +1799,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
          * @param formula a formula.
          * @return the formula with all variables replaced by the remembrance variables.
          */
-        private JTerm preify(final JTerm formula) {
+        private JTerm preify(final @Nullable JTerm formula) {
             if (formula == null) {
                 return tt();
             } else {

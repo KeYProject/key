@@ -34,11 +34,15 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * A factory for creating class invariants and operation contracts from DL specifications. For an
  * example, see java_dl/DLContractChooser.
  */
+@NullMarked
 public final class DLSpecFactory {
     private final Services services;
 
@@ -67,7 +71,7 @@ public final class DLSpecFactory {
     }
 
 
-    private LocationVariable extractHeapAtPre(JTerm fma) throws ProofInputException {
+    private @Nullable LocationVariable extractHeapAtPre(JTerm fma) throws ProofInputException {
         if (fma.sub(1).op() instanceof UpdateApplication) {
             final JTerm update = fma.sub(1).sub(0);
             assert update.sort() == JavaDLTheory.UPDATE;
@@ -89,7 +93,7 @@ public final class DLSpecFactory {
     }
 
 
-    private LocationVariable extractExcVar(JTerm fma) {
+    private @Nullable LocationVariable extractExcVar(JTerm fma) {
         final JTerm modFma =
             fma.sub(1).op() instanceof UpdateApplication ? fma.sub(1).sub(1) : fma.sub(1);
 
@@ -127,7 +131,7 @@ public final class DLSpecFactory {
     }
 
 
-    private LocationVariable extractSelfVar(UseOperationContractRule.Instantiation inst)
+    private @Nullable LocationVariable extractSelfVar(UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
         if (inst.actualSelf() == null) {
             assert inst.pm().isStatic();
@@ -156,7 +160,7 @@ public final class DLSpecFactory {
     }
 
 
-    private LocationVariable extractResultVar(UseOperationContractRule.Instantiation inst)
+    private @Nullable LocationVariable extractResultVar(UseOperationContractRule.Instantiation inst)
             throws ProofInputException {
         if (inst.actualResult() == null) {
             return null;
@@ -184,7 +188,7 @@ public final class DLSpecFactory {
     /**
      * Creates a class invariant from a formula and a designated "self".
      */
-    public ClassInvariant createDLClassInvariant(String name, String displayName,
+    public ClassInvariant createDLClassInvariant(String name, @Nullable String displayName,
             LocationVariable selfVar, JTerm inv) throws ProofInputException {
         assert name != null;
         if (displayName == null) {

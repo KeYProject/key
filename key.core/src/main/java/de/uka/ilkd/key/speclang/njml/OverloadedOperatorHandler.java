@@ -16,6 +16,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -29,6 +30,7 @@ import org.jspecify.annotations.Nullable;
  * @author Alexander Weigl
  * @version 1 (1/9/22)
  */
+@NullMarked
 public class OverloadedOperatorHandler {
 
     /**
@@ -91,7 +93,7 @@ public class OverloadedOperatorHandler {
          * @throws SLTranslationException if translation fails (incompatible types e.g.)
          */
         @Nullable
-        SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+        SLExpression build(JMLOperator op, SLExpression left, @Nullable SLExpression right)
                 throws SLTranslationException;
     }
 
@@ -127,7 +129,8 @@ public class OverloadedOperatorHandler {
         return integerHandler.getSpecMathMode();
     }
 
-    public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+    public @Nullable SLExpression build(JMLOperator op, SLExpression left,
+            @Nullable SLExpression right)
             throws SLTranslationException {
         for (JMLOperatorHandler handler : handlers) {
             var term = handler.build(op, left, right);
@@ -184,7 +187,8 @@ public class OverloadedOperatorHandler {
         }
 
         @Override
-        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+        public @Nullable SLExpression build(JMLOperator op, SLExpression left,
+                @Nullable SLExpression right)
                 throws SLTranslationException {
             if (right == null) {
                 return null;
@@ -209,7 +213,8 @@ public class OverloadedOperatorHandler {
         }
 
         @Override
-        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right)
+        public @Nullable SLExpression build(JMLOperator op, SLExpression left,
+                @Nullable SLExpression right)
                 throws SLTranslationException {
             if (right == null) {
                 return null;
@@ -242,7 +247,8 @@ public class OverloadedOperatorHandler {
         }
 
         @Override
-        public @Nullable SLExpression build(JMLOperator op, SLExpression left, SLExpression right) {
+        public @Nullable SLExpression build(JMLOperator op, SLExpression left,
+                @Nullable SLExpression right) {
             if ((left.getTerm().sort() == sortBoolean
                     || left.getTerm().sort() == JavaDLTheory.FORMULA)
                     && (right.getTerm().sort() == sortBoolean

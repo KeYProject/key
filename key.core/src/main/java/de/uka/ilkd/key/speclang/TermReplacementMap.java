@@ -10,11 +10,15 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A replacement map for terms.
  *
  * @author lanzinger
  */
+@NullMarked
 public class TermReplacementMap extends ReplacementMap<JTerm> {
 
     /**
@@ -32,7 +36,7 @@ public class TermReplacementMap extends ReplacementMap<JTerm> {
      * @param newHeap the heap that should be used
      * @param services services
      */
-    public void replaceHeap(final JTerm newHeap, final Services services) {
+    public void replaceHeap(final @Nullable JTerm newHeap, final Services services) {
         if (newHeap == null) {
             throw new IllegalArgumentException("newHeap can't be null");
         }

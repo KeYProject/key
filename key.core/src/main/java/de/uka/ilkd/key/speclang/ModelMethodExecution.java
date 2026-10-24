@@ -18,21 +18,24 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public final class ModelMethodExecution extends ClassAxiom {
 
     private final String name;
     private final IObserverFunction target;
     private final KeYJavaType kjt;
-    private final ModifierKind visibility;
+    private final @Nullable ModifierKind visibility;
 
     public ModelMethodExecution(String name, IObserverFunction target, KeYJavaType kjt,
-            ModifierKind visibility) {
+            @Nullable ModifierKind visibility) {
         this(name, null, target, kjt, visibility);
     }
 
-    public ModelMethodExecution(String name, String displayName, IObserverFunction target,
-            KeYJavaType kjt, ModifierKind visibility) {
+    public ModelMethodExecution(String name, @Nullable String displayName, IObserverFunction target,
+            KeYJavaType kjt, @Nullable ModifierKind visibility) {
 
         assert name != null;
         assert kjt != null;
@@ -71,7 +74,8 @@ public final class ModelMethodExecution extends ClassAxiom {
     }
 
     @Override
-    public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
+    public @Nullable ImmutableSet<Taclet> getTaclets(
+            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
 
         // Name tacletName = MiscTools.toValidTacletName(name);
@@ -104,7 +108,7 @@ public final class ModelMethodExecution extends ClassAxiom {
     }
 
     @Override
-    public ModifierKind getVisibility() {
+    public @Nullable ModifierKind getVisibility() {
         return visibility;
     }
 

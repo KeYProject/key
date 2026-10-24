@@ -13,12 +13,14 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
  * @version 1 (8/3/25)
  */
+@NullMarked
 public record InformationFlowContractInfo(String informationFlowContractBasename,
         KeYJavaType forClass,
         IProgramMethod pm,
