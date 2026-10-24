@@ -17,6 +17,8 @@ import org.key_project.util.parsing.SourceNames;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,10 +31,11 @@ import static java.text.MessageFormat.format;
  * This class produces exception with position information. For this, the class can be constructed
  * from antlr3.
  */
+@NullMarked
 public class SLExceptionFactory {
     public static final Logger LOGGER = LoggerFactory.getLogger(SLExceptionFactory.class);
 
-    private URI fileName;
+    private @Nullable URI fileName;
     private final int offsetLine, offsetColumn;
     /**
      * line, 1-based
@@ -57,7 +60,7 @@ public class SLExceptionFactory {
         this.offsetLine = offsetPos.line();
     }
 
-    public SLExceptionFactory(URI fileName, int line, int column) {
+    public SLExceptionFactory(@Nullable URI fileName, int line, int column) {
         this.fileName = fileName;
         this.offsetColumn = column;
         this.offsetLine = line;

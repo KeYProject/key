@@ -10,11 +10,15 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * A JML axiom declaration in textual form. According to Sect. 8 of the JML reference manual, axioms
  * may not have any modifiers.
  */
+@NullMarked
 public final class TextualJMLClassAxiom extends TextualJMLConstruct {
     private final LabeledParserRuleContext inv;
 
@@ -65,7 +69,7 @@ public final class TextualJMLClassAxiom extends TextualJMLConstruct {
         return Objects.hash(modifiers, inv);
     }
 
-    public String getName() {
+    public @Nullable String getName() {
         return name;
     }
 }

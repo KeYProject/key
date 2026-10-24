@@ -54,6 +54,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.MapUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Default implementation for {@link LoopContract}.
  *
@@ -61,6 +64,7 @@ import org.key_project.util.java.MapUtil;
  *
  * @author lanzinger
  */
+@NullMarked
 public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implements LoopContract {
 
     /**
@@ -71,12 +75,12 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     /**
      * @see LoopContract#getDecreases()
      */
-    private final JTerm decreases;
+    private final @Nullable JTerm decreases;
 
     /**
      * @see LoopContract#getHead()
      */
-    private final StatementBlock head;
+    private final @Nullable StatementBlock head;
 
     /**
      * @see LoopContract#getGuard()
@@ -101,12 +105,12 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     /**
      * @see LoopContract#getIndexVariable()
      */
-    private final ProgramVariable index;
+    private final @Nullable ProgramVariable index;
 
     /**
      * @see LoopContract#getValuesVariable()
      */
-    private final ProgramVariable values;
+    private final @Nullable ProgramVariable values;
 
     /**
      * Services.
@@ -126,12 +130,12 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     /**
      * @see LoopContract#toBlockContract()
      */
-    private BlockContract blockContract;
+    private @Nullable BlockContract blockContract;
 
     /**
      * @see LoopContract#replaceEnhancedForVariables(StatementBlock, Services)
      */
-    private LoopContractImpl replacedEnhancedForVars;
+    private @Nullable LoopContractImpl replacedEnhancedForVars;
 
     /**
      * Construct a loop contract for a block that starts with a loop.
@@ -160,7 +164,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             final List<Label> labels, final IProgramMethod method,
             final JModality.JavaModalityKind modalityKind,
             final Map<LocationVariable, JTerm> preconditions,
-            final Map<LocationVariable, JTerm> freePreconditions, final JTerm measuredBy,
+            final Map<LocationVariable, JTerm> freePreconditions, final @Nullable JTerm measuredBy,
             final Map<LocationVariable, JTerm> postconditions,
             final Map<LocationVariable, JTerm> freePostconditions,
             final Map<LocationVariable, JTerm> modifiableClauses,
@@ -168,7 +172,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasModifiable,
             final Map<LocationVariable, Boolean> hasFreeModifiable,
-            final JTerm decreases, ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
+            final @Nullable JTerm decreases,
+            ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
             Services services) {
         super(baseName, block, labels, method, modalityKind,
             preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
@@ -261,7 +266,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             final List<Label> labels, final IProgramMethod method,
             final JModality.JavaModalityKind modalityKind,
             final Map<LocationVariable, JTerm> preconditions,
-            final Map<LocationVariable, JTerm> freePreconditions, final JTerm measuredBy,
+            final Map<LocationVariable, JTerm> freePreconditions, final @Nullable JTerm measuredBy,
             final Map<LocationVariable, JTerm> postconditions,
             final Map<LocationVariable, JTerm> freePostconditions,
             final Map<LocationVariable, JTerm> modifiableClauses,
@@ -270,7 +275,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             final boolean transactionApplicable,
             final Map<LocationVariable, Boolean> hasModifiable,
             final Map<LocationVariable, Boolean> hasFreeModifiable,
-            final JTerm decreases, ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
+            final @Nullable JTerm decreases,
+            ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts,
             Services services) {
         super(baseName, new StatementBlock(loop), labels, method, modalityKind,
             preconditions, freePreconditions, measuredBy, postconditions, freePostconditions,
@@ -338,8 +344,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
      * @param services the services object
      * @return the new according op replacer
      */
-    private static OpReplacer createOpReplacer(final ProgramVariable index,
-            final ProgramVariable values, Services services) {
+    private static OpReplacer createOpReplacer(final @Nullable ProgramVariable index,
+            final @Nullable ProgramVariable values, Services services) {
         final Map<SyntaxElement, SyntaxElement> replacementMap = new LinkedHashMap<>();
         if (index != null) {
             replacementMap.put(services.getTermBuilder().index(),
@@ -360,7 +366,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
      * @param services the services object
      * @return the new variables
      */
-    private static LoopContractImpl replaceVariable(LoopContractImpl vars, ProgramVariable variable,
+    private static LoopContractImpl replaceVariable(LoopContractImpl vars,
+            @Nullable ProgramVariable variable,
             Services services) {
         if (variable != null) {
             LocationVariable rem = new LocationVariable(
@@ -379,8 +386,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
      * @param data the transformation data used to transform the loop, or {@code null}.
      * @return the initializers if the loop is a for-loop, {@code null} otherwise.
      */
-    private static StatementBlock getHeadStatement(LoopStatement loop, StatementBlock block,
-            EnhancedForElimination.TransformationData data) {
+    private static @Nullable StatementBlock getHeadStatement(LoopStatement loop,
+            StatementBlock block,
+            EnhancedForElimination.@Nullable TransformationData data) {
         final StatementBlock sb;
 
         if (loop instanceof For) {
@@ -482,7 +490,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     }
 
     @Override
-    public StatementBlock getHead() {
+    public @Nullable StatementBlock getHead() {
         return head;
     }
 
@@ -507,12 +515,12 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     }
 
     @Override
-    public ProgramVariable getIndexVariable() {
+    public @Nullable ProgramVariable getIndexVariable() {
         return index;
     }
 
     @Override
-    public ProgramVariable getValuesVariable() {
+    public @Nullable ProgramVariable getValuesVariable() {
         return values;
     }
 
@@ -690,12 +698,12 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     }
 
     @Override
-    public JTerm getDecreases() {
+    public @Nullable JTerm getDecreases() {
         return decreases;
     }
 
     @Override
-    public JTerm getDecreases(JTerm heap, JTerm self, Services services) {
+    public @Nullable JTerm getDecreases(JTerm heap, JTerm self, Services services) {
         final Map<JTerm, JTerm> replacementMap = createReplacementMap(heap,
             new Terms(self, null, null, null, null, null, null, null, null, null), services);
         final OpReplacer replacer =
@@ -704,7 +712,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     }
 
     @Override
-    public JTerm getDecreases(Variables variables, Services services) {
+    public @Nullable JTerm getDecreases(Variables variables, Services services) {
         Map<LocationVariable, LocationVariable> map = createReplacementMap(variables, services);
         return new OpReplacer(map, services.getTermFactory(), services.getProof())
                 .replace(decreases);
@@ -928,13 +936,13 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         /**
          * @see LoopContract#getDecreases()
          */
-        private final JTerm decreases;
+        private final @Nullable JTerm decreases;
 
         /**
          * {@code null} if this contracts belongs to a block instead of a loop, the loop this
          * contract belongs to otherwise.
          */
-        private LoopStatement loop;
+        private @Nullable LoopStatement loop;
 
         /**
          * Creates loop contract for a block that starts with a loop.
@@ -977,7 +985,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                 Map<LocationVariable, JTerm> modifiablesFree,
                 Map<LocationVariable, Boolean> hasModifiable,
                 Map<LocationVariable, Boolean> hasFreeModifiable,
-                JTerm decreases, Services services) {
+                @Nullable JTerm decreases, Services services) {
             super(baseName, block, labels, method, behavior, variables,
                 requires, requiresFree, measuredBy, ensures, ensuresFree,
                 infFlowSpecs, breaks, continues, returns, signals, signalsOnly,
@@ -1026,7 +1034,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                 Map<LocationVariable, JTerm> modifiablesFree,
                 Map<LocationVariable, Boolean> hasModifiable,
                 Map<LocationVariable, Boolean> hasFreeModifiable,
-                JTerm decreases, Services services) {
+                @Nullable JTerm decreases, Services services) {
             super(baseName, null, labels, method, behavior, variables,
                 requires, requiresFree, measuredBy, ensures, ensuresFree,
                 infFlowSpecs, breaks, continues, returns, signals, signalsOnly,

@@ -55,6 +55,7 @@ import org.key_project.util.parsing.Location;
 
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
@@ -69,6 +70,7 @@ import static java.lang.String.format;
  * A factory for creating class invariants and operation contracts from textual JML specifications.
  * This is the public interface to the jml.translation package.
  */
+@NullMarked
 public class JMLSpecFactory {
 
     public static final String AT_PRE = "AtPre";
@@ -268,8 +270,8 @@ public class JMLSpecFactory {
         public ImmutableList<JTerm> abbreviations = ImmutableList.nil();
         public final Map<LocationVariable, JTerm> requires = new LinkedHashMap<>();
         public final Map<LocationVariable, JTerm> requiresFree = new LinkedHashMap<>();
-        public JTerm measuredBy;
-        public JTerm decreases;
+        public @Nullable JTerm measuredBy;
+        public @Nullable JTerm decreases;
         /**
          * The name 'assignable' is kept here for legacy reasons.
          * Note that KeY does only verify what can be modified (i.e., what is 'modifiable').
@@ -302,7 +304,7 @@ public class JMLSpecFactory {
     // internal methods
     // -------------------------------------------------------------------------
 
-    protected String getDefaultInvName(String name, KeYJavaType kjt) {
+    protected String getDefaultInvName(@Nullable String name, KeYJavaType kjt) {
         if (name == null) {
             int number = invCounter.getOrDefault(kjt, 1);
             invCounter.put(kjt, number + 1);
@@ -324,7 +326,7 @@ public class JMLSpecFactory {
      * Collects local variables of the passed statement that are visible for the passed loop.
      * Returns null if the loop has not been found.
      */
-    private ImmutableList<LocationVariable> collectLocalVariables(StatementContainer sc,
+    private @Nullable ImmutableList<LocationVariable> collectLocalVariables(StatementContainer sc,
             LoopStatement loop) {
         ImmutableList<LocationVariable> result = ImmutableList.nil();
         for (int i = 0, m = sc.getStatementCount(); i < m; i++) {
@@ -369,7 +371,7 @@ public class JMLSpecFactory {
         return null;
     }
 
-    private ModifierKind getVisibility(TextualJMLConstruct textualConstruct) {
+    private @Nullable ModifierKind getVisibility(TextualJMLConstruct textualConstruct) {
         for (JMLModifier modifier : textualConstruct.getModifiers()) {
             switch (modifier) {
                 case PRIVATE:
@@ -877,7 +879,8 @@ public class JMLSpecFactory {
         return false;
     }
 
-    private JTerm translateMeasuredBy(Context context, ImmutableList<LocationVariable> paramVars,
+    private @Nullable JTerm translateMeasuredBy(Context context,
+            ImmutableList<LocationVariable> paramVars,
             ImmutableList<LabeledParserRuleContext> originalMeasuredBy) {
         JTerm measuredBy = null;
         if (!originalMeasuredBy.isEmpty()) {
@@ -894,7 +897,8 @@ public class JMLSpecFactory {
         return measuredBy;
     }
 
-    private JTerm translateDecreases(Context context, ImmutableList<LocationVariable> paramVars,
+    private @Nullable JTerm translateDecreases(Context context,
+            ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, JTerm> atPres, Map<LocationVariable, JTerm> atBefores,
             ImmutableList<LabeledParserRuleContext> originalDecreases) {
         JTerm decreases = null;
@@ -918,7 +922,8 @@ public class JMLSpecFactory {
         return generateName(pm, originalBehavior, customName);
     }
 
-    public String generateName(IProgramMethod pm, Behavior originalBehavior, String customName) {
+    public String generateName(IProgramMethod pm, Behavior originalBehavior,
+            @Nullable String customName) {
         return ((!(customName == null) && !customName.isEmpty()) ? customName
                 : getContractName(pm, originalBehavior));
     }
@@ -1249,8 +1254,8 @@ public class JMLSpecFactory {
             context.selfVar());
     }
 
-    public Contract createJMLDependencyContract(KeYJavaType kjt, LocationVariable targetHeap,
-            LabeledParserRuleContext originalDep) {
+    public Contract createJMLDependencyContract(@Nullable KeYJavaType kjt,
+            @Nullable LocationVariable targetHeap, @Nullable LabeledParserRuleContext originalDep) {
         if (kjt == null) {
             throw new NullPointerException();
         }
@@ -1671,7 +1676,8 @@ public class JMLSpecFactory {
         return collectLocalVariablesVisibleTo(statement, method.getBody());
     }
 
-    private ImmutableList<LocationVariable> collectLocalVariablesVisibleTo(Statement statement,
+    private @Nullable ImmutableList<LocationVariable> collectLocalVariablesVisibleTo(
+            Statement statement,
             StatementContainer container) {
         ImmutableList<LocationVariable> result = ImmutableList.nil();
         final int statementCount = container.getStatementCount();
@@ -1722,7 +1728,7 @@ public class JMLSpecFactory {
             Map<String, ImmutableList<LabeledParserRuleContext>> originalModifiables,
             Map<String, ImmutableList<LabeledParserRuleContext>> originalFreeModifiables,
             ImmutableList<LabeledParserRuleContext> originalInfFlowSpecs,
-            LabeledParserRuleContext originalVariant) {
+            @Nullable LabeledParserRuleContext originalVariant) {
         assert pm != null;
         assert loop != null;
         assert originalInvariants != null;
@@ -1779,8 +1785,10 @@ public class JMLSpecFactory {
             localOuts, atPres);
     }
 
-    private JTerm translateToTermVariant(Context context, Map<LocationVariable, JTerm> atPres,
-            ImmutableList<LocationVariable> allVars, LabeledParserRuleContext originalVariant) {
+    private @Nullable JTerm translateToTermVariant(Context context,
+            Map<LocationVariable, JTerm> atPres,
+            ImmutableList<LocationVariable> allVars,
+            @Nullable LabeledParserRuleContext originalVariant) {
         final JTerm variant;
         if (originalVariant == null) {
             variant = null;

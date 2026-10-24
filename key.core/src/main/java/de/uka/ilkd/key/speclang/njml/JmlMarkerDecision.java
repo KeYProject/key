@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Externalize algorithm to decide whether a JML comment is active given a set of enabled keys.
@@ -21,6 +22,7 @@ import org.jspecify.annotations.NonNull;
  * @version 1 (9/24/21)
  * @see #isComment(String)
  */
+@NullMarked
 public class JmlMarkerDecision {
     private final JmlLexer lexer;
     private Set<String> enabledKeys = new HashSet<>();

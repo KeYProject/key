@@ -14,6 +14,8 @@ import org.key_project.util.parsing.Location;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Facade for implementing syntactical JML syntax checks.
@@ -25,6 +27,7 @@ import org.jspecify.annotations.NonNull;
  * @version 1 (6/8/21)
  * @see JmlIO
  */
+@NullMarked
 public final class JmlChecks {
     private static final List<JmlCheck> jmlChecks = new ArrayList<>();
 
@@ -44,6 +47,7 @@ public final class JmlChecks {
 }
 
 
+@NullMarked
 class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
     private final List<PositionedString> warnings = new LinkedList<>();
 
@@ -66,9 +70,10 @@ class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
  * constellation has different semantics in KeY than in the JML ref manual. KeY does not recognize
  * {@code requires} as contract initiators.
  */
+@NullMarked
 class JmlWarnDifferentRequiresSemantics extends AbstractCheck {
     @Override
-    public Void visitSpec_body(JmlParser.Spec_bodyContext ctx) {
+    public @Nullable Void visitSpec_body(JmlParser.Spec_bodyContext ctx) {
         checkRequires(ctx.a);
         checkRequires(ctx.inner);
         return null;

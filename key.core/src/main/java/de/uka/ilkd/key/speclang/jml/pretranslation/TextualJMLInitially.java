@@ -8,12 +8,15 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * A JML initially clause declaration in textual form.
  *
  * @author Daniel Bruns
  */
+@NullMarked
 public final class TextualJMLInitially extends TextualJMLConstruct {
 
     private final LabeledParserRuleContext inv;

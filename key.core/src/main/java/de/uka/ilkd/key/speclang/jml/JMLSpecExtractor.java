@@ -43,6 +43,8 @@ import org.key_project.util.collection.*;
 import org.key_project.util.parsing.Location;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS_ONLY;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.*;
@@ -54,6 +56,7 @@ import static java.lang.String.format;
  * java.recoderext.JMLTransformer; if you change one of these classes, you probably need to change
  * the other as well.
  */
+@NullMarked
 public final class JMLSpecExtractor implements SpecExtractor {
     private static final String THROWABLE = "java.lang.Throwable";
     private static final String ERROR = "java.lang.Error";
@@ -572,7 +575,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     @Override
-    public LoopSpecification extractLoopInvariant(IProgramMethod pm, LoopStatement loop) {
+    public @Nullable LoopSpecification extractLoopInvariant(IProgramMethod pm, LoopStatement loop) {
         LoopSpecification result = null;
 
         ImmutableList<TextualJMLConstruct> constructs = loop.getAttachedJml();

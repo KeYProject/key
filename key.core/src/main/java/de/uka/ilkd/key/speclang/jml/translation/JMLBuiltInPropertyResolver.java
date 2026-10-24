@@ -10,10 +10,14 @@ import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.speclang.translation.*;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Resolver for built-in JML operators. Currently only handles array length.
  */
+@NullMarked
 public final class JMLBuiltInPropertyResolver extends SLExpressionResolver {
 
     private final SeqLDT seqLDT;
@@ -34,7 +38,8 @@ public final class JMLBuiltInPropertyResolver extends SLExpressionResolver {
 
 
     @Override
-    protected SLExpression doResolving(SLExpression receiver, String name, SLParameters parameters)
+    protected @Nullable SLExpression doResolving(SLExpression receiver, String name,
+            @Nullable SLParameters parameters)
             throws SLTranslationException {
         if (parameters != null) {
             return null;

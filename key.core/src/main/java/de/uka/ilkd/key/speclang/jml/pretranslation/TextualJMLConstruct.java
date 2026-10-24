@@ -14,11 +14,14 @@ import org.key_project.util.parsing.Location;
 import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Objects of this type represent the various JML specification constructs in textual, unprocessed
  * form.
  */
+@NullMarked
 public abstract class TextualJMLConstruct {
 
     protected final ImmutableList<JMLModifier> modifiers;
@@ -28,14 +31,15 @@ public abstract class TextualJMLConstruct {
     /**
      * A user-provided identifier to keep an overview over large specification collections
      */
-    protected String name;
+    protected @Nullable String name;
 
     protected TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers) {
         assert specModifiers != null;
         this.modifiers = specModifiers;
     }
 
-    protected TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers, String name) {
+    protected TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers,
+            @Nullable String name) {
         this(specModifiers);
         this.name = name;
     }
