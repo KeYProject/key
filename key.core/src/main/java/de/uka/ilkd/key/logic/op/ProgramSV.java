@@ -308,7 +308,8 @@ public final class ProgramSV extends JOperatorSV
             src = source.getSource();
         }
 
-        return addProgramInstantiation(ImmutableList.fromList(matchedElements), matchCond, services);
+        return addProgramInstantiation(ImmutableList.fromList(matchedElements), matchCond,
+            services);
     }
 
     /**
