@@ -55,7 +55,7 @@ generated into `de.uka.ilkd.key.speclang.njml`.
                                   LoopSpec/BlockContract/MergeContract/DependencyContract
                                   from TextualJML* via LabeledParserRuleContext
           └─ JmlIO → Translator → JmlTermFactory ─ JML parse trees → KeY terms (SLExpression/JTerm)
-      └─ SpecificationRepository
+      └─ SpecificationRepository     ← Phase 4: deleted — specs stay attached to the AST
 ```
 
 Dotted boxes = the parts this rewrite removes/replaces.
@@ -79,12 +79,16 @@ Dotted boxes = the parts this rewrite removes/replaces.
 
 ### 2.4 Classes kept as integration seams
 
-`JMLSpecExtractor`, `SpecExtractor`, `SLEnvInput`, `SpecificationRepository`,
+`JMLSpecExtractor`, `SpecExtractor`, `SLEnvInput`,
 `JP2KeYConverter` (attachedJml transfer — payload changes to JML AST),
 `JMLInfoExtractor`, `JMLResolverManager`, `JMLBuiltInPropertyResolver`,
 `Context`, `ProgramVariableCollection` — plus the `speclang` root
 (`Contract`, `ClassInvariant`, `ClassAxiom`, `InitiallyClause`,
 `LoopSpecification`, impls) and `speclang/dl/DLSpecFactory` (`.key` DL specs).
+
+`SpecificationRepository` is kept as a seam **only through Phase 3** and is
+deleted in Phase 4 (specs then live attached to the AST / are derived per
+node; see §5 Phase 4).
 
 ## 3. JMLtk readiness (verified facts)
 
@@ -140,9 +144,10 @@ Dotted boxes = the parts this rewrite removes/replaces.
           └─ JMLTransformer (adapted or removed)  ─ no more PreParser/TextualJML*
           └─ JP2KeYConverter   ─ JML AST chunks attached to KeY AST (attachedJml)
   └─ SLEnvInput.read() → JMLSpecExtractor
-      └─ JMLSpecFactory (rewritten) ─ consumes JmlContract/JmlClause/JmlClassLevelDeclaration
+      └─ JMLSpecFactory (rewritten) ─ consumes JmlContract/JmlClause/JmlClassLevelDeclaration,
+                                      derives speclang objects attached to the AST
           └─ JML-AST Translator (new; replaces Translator+JmlTermFactory) → JTerm
-      └─ SpecificationRepository
+      └─ SpecificationRepository  ← Phase 4: removed (specs derived per AST node)
 ```
 
 Design principles:
@@ -165,20 +170,17 @@ Design principles:
 
 ## 5. Phases
 
-### Phase 0 — Enable & probe JMLtk JML parsing in KeY
-Goal: JML parsed by JMLtk inside KeY's real pipeline, with a coverage report.
+### Phase 0 — Enable JMLtk JML parsing in KeY
+Goal: JML parsed by JMLtk inside KeY's real pipeline (construct→AST/gap mapping
+already verified — see `JML_MAPPING.md` and §3).
 - Switch `JavaParserFactory` (and `JavaService`) to
   `new ParserConfiguration().setProcessJml(true)` with `setJmlKeys` reflecting
   KeY's default marker policy (`+KEY`/`+OPENJML` handling).
 - Wire KeY's `+KEY`/`-KEY`/`+OPENJML` semantics onto `setJmlKeys`; verify
   behavior against `JmlMarkerDecisionTest`.
-- Probe: parse the JML fixture corpus from the tests in §6 with the enabled
-  config; compare which constructs yield clean `Jml*` AST vs. `JmlDoc` leftovers
-  or parse problems. Report the gap list.
 - Only gap-fill upstream (open jmltoolkit issues/PRs) for constructs KeY
   genuinely needs and JMLtk does not support yet.
-- Deliverable: a mapping "JML construct → JMLtk AST node (or gap)" and a green
-  `JavaParserFactory`-level smoke test.
+- Deliverable: a green `JavaParserFactory`-level smoke test.
 
 ### Phase 1 — Front-end swap on KeY side
 - Replace the `TextualJML*` production: `JMLTransformer` no longer sanitizes
@@ -214,6 +216,58 @@ Goal: JML parsed by JMLtk inside KeY's real pipeline, with a coverage report.
 - Separate `.jml`/`.spec` files: parse via JMLtk (with which enclosing
   context?) or document the remaining gap.
 
+### Phase 4 — Delete `SpecificationRepository`: specs are rewritten via the AST
+
+Rationale: with Phases 0–3 done, the *parsed* JML lives on the Java AST
+(`attachedJml` on declarations, `getContracts()` on statements, `JmlStatementSpec`
+on statements), and internal mechanisms (KeYJavaPipeline transformations,
+`JP2KeYConverter`) rewrite that AST — and with it the specs. A central
+`key.core/src/main/java/de/uka/ilkd/key/proof/mgt/SpecificationRepository.java`
+that holds a *second* copy of the parsed/translated specifications is then pure
+redundancy and a drift risk (every transformation must re-register/unregister
+there; the current code does exactly that in ~10 metaconstructs and visitors).
+Once the specifications stay attached to the Java AST they are rewritten by the
+same internal mechanisms that rewrite the program — the repository's global
+snapshot becomes unnecessary.
+
+What the repository does today (`SpecificationRepository.java`, 1757 lines):
+
+| Responsibility | Where it lives now | Where it moves |
+|---|---|---|
+| Contract registry: `contracts`, `operationContracts`, `contractTargets`, `contractsByName`, `getContracts/getOperationContracts/getContractTargets/getAllContracts/getContractByName` | `Map<Pair<KJT,obs>, Set<Contract>>` + name index | Contracts stay attached to the JML AST / KeY AST nodes (`MethodDeclaration.getContracts()` etc.) and are *derived* on demand by `JMLSpecFactory`; a per-node derived-spec cache replaces the global maps. Name→contract resolution moves to the `Contract` naming/keying layer (name is constructed from target + id). |
+| Contract combination/split: `combineOperationContracts` (`cf.union` sorted), `splitContract` (`§`-joined names), `CONTRACT_COMBINATION_MARKER` | name-based maps | Pure computation on `ImmutableSet<FunctionalOperationContract>`; moves into `ContractFactory`/`Contract` (no repository state) — combination is already deterministic by sorting. |
+| Contract ids: `prepareContract`/`contractCounters` (`setID`) | per-type-name counter | Id assignment moves to `JMLSpecFactory`/`ContractFactory` at derivation time (KeY already needs deterministic ids for `.key` I/O and digests). |
+| Inheritance over overriding methods: `getOverridingMethods`, `getOverridingTargets`, `getCanonicalFormForKJT`, `getInheritedContracts` | method-name+param matching over `JavaInfo` | Pure `JavaInfo`-based resolution — moves to a helper next to `JMLSpecFactory`/`SLEnvInput` (or `JavaInfo` itself); no registry. |
+| Class invariants: `invs`, `getClassInvariants`, `addClassInvariant` (+ inherit to subtypes, `PartialInvAxiom` creation) | `Map<KJT, Set<ClassInvariant>>` | Derived from `TypeDeclaration.attachedJml` invariant declarations; inheritance & `PartialInvAxiom` are derivation steps in `JMLSpecFactory`/`getClassAxioms` computation. |
+| Class axioms: `axioms`, `addClassAxiom` (represents conjoining), `getClassAxioms` incl. synthesized invariant-definition axioms (`invDef`/`staticInvDef`/`freeInvDef`/`freeStaticInvDef`), `QueryAxiom`s, model-method axioms (`getModelMethodAxioms`, `ContractAxiom`), `getVisibleAxiomsOfOtherClasses`, enclosing-class recursion (`getEnclosingKJT`), `allClassAxiomsCache` | `Map<KJT, Set<ClassAxiom>>` + cache | All synthesizable axioms are pure functions of (JavaInfo, invariants, contracts, represents); the `getClassAxioms(kjt)` computation moves to `JMLSpecExtractor`/a `ClassAxiomComputer` with a per-`KeYJavaType` memo (preserving the singleton identity requirement `equals`/`hashCode` rely on). |
+| Initially clauses: `initiallyClauses`, `addInitiallyClause`, `createContractsFromInitiallyClauses` (postcondition on all constructors, + inheritance) | `Map<KJT, Set<InitiallyClause>>` | Derivation step in `JMLSpecFactory` (initially → constructor postconditions) run at load time from `attachedJml` — no repository. |
+| Loop invariants: `loopInvs`, `getLoopSpec`, `addLoopInvariant`, `copyLoopInvariant` (`(loop,line)` keys) | `Map<(LoopStatement,line), LoopSpecification>` | Attached to the `LoopStatement` AST node already in Phase 1; `copyLoopInvariant` (used by `InnerBreakAndContinueReplacer` etc.) becomes copying the attached spec to the new loop — the AST rewrites carry it. |
+| Block/loop/merge contracts: `blockContracts`, `loopContracts`, `loopContractsOnLoops`, `mergeContracts`, `get/add/remove{Block,Loop,Merge}Contract`, `getLoopContracts(LoopStatement, modality)` | `(block/loop,file,line)` keys | Attached to `StatementBlock`/`LoopStatement`/`MergePointStatement` AST nodes; modality filtering stays as a pure helper on the contract set. |
+| Proof↔PO registry: `proofs`, `registerProof`, `removeProof`, `getProofs(po/contract/kjt+target)`, `getPO(Contract)`, `getPOForProof`, `getProofOblInput`, `getContractPOForProof`, `getTargetOfProof` | `Map<PO, Set<Proof>>` | Proof-lifecycle bookkeeping is orthogonal to JML; moves to the proof management layer (`ProofEnvironment`/`ProofCorrectnessMgt`), which already own the lifecycle — a local `Map<PO, Set<Proof>>` there, or derive via `PO.getProofs()`. |
+| Limited observers: `limitObs`/`unlimitObs`, `LIMIT_SUFFIX` `$lmtd`, limit/unlimit taclets | `Map<IObserverFunction,…>` | Taclet *construction* moves to `Ramification`/the rule that needs them (`TacletGenerator`); the maps become stateless functions (limited-name is a pure function of the observer), so no repository needed. |
+| JML statement specs: `statementMap` (`IdentityHashMap<Statement,JmlStatementSpec>`), `getStatementSpec`/`addStatementSpec`, `JmlStatementSpec` record with `getTerm`/`updateVariables` | global identity map | Attached to the `JmlAssert`/`SetStatement` AST nodes (Phase 2 already produces the `JmlStatementSpec`); lookups via the node — consumers (`JmlAssertRule`, `SetStatementRule`, `IntroAtPreDefsOp`, `PrettyPrinter`, `MiscTools`) read it off the node. |
+| `map(UnaryOperator, Services)` (apply a term transformation to *all* specs, e.g. for at-pre/WD transforms) | walks every map | Becomes the *reason* the rewrite is safe to delete: transformations run on the AST-attached spec; `IntroAtPreDefsOp`/WD re-walk the affected AST instead of the global snapshot. |
+| `addSpecs` dispatcher, `processJavaType` no-op | — | `addSpecs` collapses into `JMLSpecFactory` output handling; `processJavaType` (empty) disappears. |
+| Thread-safety (synchronized maps for the parallel prover's lock-free phase) | explicit sync on hot maps | Attached + derived specs are immutable after load; the parallel-prover mutation concern disappears with the global registry. |
+
+Transition notes:
+- ~77 files reference `Services.getSpecificationRepository()`. Most calls are
+  reads (`getContracts`, `getLoopSpec`, `getLoopContracts`, `getBlockContracts`,
+  `getStatementSpec`, `getClassAxioms`, proof queries); each maps to an
+  AST-node or proof-layer counterpart. Mutation sites (metaconstructs,
+  visitors, `IntroAtPreDefsOp`, WD) stop maintaining a registry — they edit the
+  AST and the attached specs follow.
+- The `ClassAxiom` identity guarantee (no `equals`/`hashCode`, same instances
+  required) must survive: memoize the `ClassAxiomComputer` per `KeYJavaType`
+  and invalidate with the class-reload machinery (same life cycle as
+  `allClassAxiomsCache` today).
+- Contract `id` determinism: `prepareContract`'s counter moved to
+  `ContractFactory` must keep ids stable across re-parse (proof digests,
+  `.key` files, proof reuse compare ids — see `ContentOrderNumberingTest`).
+- Deliverable: `SpecificationRepository.java` deleted; `Services`/`KeYEnvironment`
+  expose no repository; the whole `key.core`/`key.ui` test suite green with
+  contract/loop/block/WD behaviors unchanged (fix only mechanical lookups).
+
 ## 6. Regression net (tests defining KeY-supported JML)
 
 `key.core/src/test/java/de/uka/ilkd/key/speclang/`:
@@ -229,7 +283,7 @@ Goal: JML parsed by JMLtk inside KeY's real pipeline, with a coverage report.
   `key.core/src/test/java/de/uka/ilkd/key/parser/TestJMLParserAssociativity.java`
 
 Fixtures: `key.core/src/test/resources/de/uka/ilkd/key/speclang/` (incl.
-`njml/exceptional/`). These fixtures double as the Phase 0 corpus probe input.
+`njml/exceptional/`).
 
 ## 7. Open questions
 
@@ -266,7 +320,6 @@ Fixtures: `key.core/src/test/resources/de/uka/ilkd/key/speclang/` (incl.
 Phase 0 spike — **no KeY code committed yet**:
 1. Flip `setProcessJml(true)` (+ start mapping `setJmlKeys`) in a scratch
    `JavaParserFactory` change or standalone probe.
-2. Run KeY's JML fixture corpus (§6) through it and report coverage: which
-   constructs attach clean `Jml*` AST, which fall back to `JmlDoc` or produce
-   problems.
-3. Publish the gap list; only then decide on any jmltk upstream work.
+   (A corpus coverage report and gap publication are intentionally *not* part
+   of the spike: the mapping and gap list are already established in
+   `JML_MAPPING.md`/§3, and upstream work is decided on demand.)
