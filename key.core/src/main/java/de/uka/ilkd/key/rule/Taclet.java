@@ -147,6 +147,9 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         this.matcher = TacletMatcherKit.getKit().createTacletMatcher(this);
     }
 
+    // All concrete subclasses assign the {@code executor} field in their overrides, so the
+    // inherited @EnsuresNonNull postcondition is mirrored here.
+    @EnsuresNonNull("executor")
     protected abstract void createAndInitializeExecutor();
 
     public RuleJustification getRuleJustification() {
@@ -270,13 +273,15 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
     public SchemaVariable getNameCorrespondent(SchemaVariable p, Services services) {
         // should be synchronized
         if (svNameCorrespondences == null) {
-            final SVNameCorrespondenceCollector c =
-                new SVNameCorrespondenceCollector(services.getTypeConverter().getHeapLDT());
+            final SVNameCorrespondenceCollector c = new SVNameCorrespondenceCollector(
+                Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+                    "heap logic data type not registered"));
             c.visit(this, true);
             svNameCorrespondences = c.getCorrespondences();
         }
 
-        return svNameCorrespondences.get(p);
+        return Objects.requireNonNull(svNameCorrespondences.get(p),
+            "no name correspondence for schema variable " + p);
     }
 
     public Set<SchemaVariable> collectSchemaVars() {
@@ -332,22 +337,22 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         /**
          * The optional {@link Sequent} of the add or replace part of the taclet.
          */
-        private final Sequent sequent;
+        private final @Nullable Sequent sequent;
 
         /**
          * The optional {@link SequentFormula} contained in {@link #getSequent()}.
          */
-        private final SequentFormula sequentFormula;
+        private final @Nullable SequentFormula sequentFormula;
 
         /**
          * The optional replace {@link JTerm} of the taclet.
          */
-        private final JTerm term;
+        private final @Nullable JTerm term;
 
         /**
          * The stack maintained during application of a taclet {@link JTerm}.
          */
-        private Deque<JTerm> tacletTermStack;
+        private @Nullable Deque<JTerm> tacletTermStack;
 
         /**
          * Constructor.
@@ -411,7 +416,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
          *
          * @return The optional {@link Sequent} of the add or replace part of the taclet.
          */
-        public Sequent getSequent() {
+        public @Nullable Sequent getSequent() {
             return sequent;
         }
 
@@ -420,7 +425,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
          *
          * @return The optional {@link SequentFormula} contained in {@link #getSequent()}.
          */
-        public SequentFormula getSequentFormula() {
+        public @Nullable SequentFormula getSequentFormula() {
             return sequentFormula;
         }
 
@@ -429,7 +434,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
          *
          * @return The stack maintained during application of a taclet {@link JTerm}.
          */
-        public Deque<JTerm> getTacletTermStack() {
+        public @Nullable Deque<JTerm> getTacletTermStack() {
             return tacletTermStack;
         }
 
@@ -447,7 +452,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
          *
          * @return The optional replace {@link JTerm} of the taclet.
          */
-        public JTerm getTerm() {
+        public @Nullable JTerm getTerm() {
             return term;
         }
 

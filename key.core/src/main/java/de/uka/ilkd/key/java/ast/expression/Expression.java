@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Expression taken from COMPOST and changed to achieve an immutable structure
@@ -19,5 +20,6 @@ public interface Expression extends ProgramElement {
     /**
      * returns the {@link KeYJavaType} of an expression
      */
+    @Nullable
     KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec);
 }

@@ -7,6 +7,7 @@ package de.uka.ilkd.key.java.ast.reference;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Reference prefix.
@@ -16,6 +17,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public interface ReferencePrefix extends ProgramElement {
 
+    @Nullable
     ReferencePrefix getReferencePrefix();
 
 }

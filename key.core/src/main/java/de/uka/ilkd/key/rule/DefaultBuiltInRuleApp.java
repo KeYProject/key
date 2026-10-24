@@ -11,6 +11,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * this class represents an application of a built-in rule application
@@ -18,13 +19,13 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class DefaultBuiltInRuleApp<T extends BuiltInRule> extends AbstractBuiltInRuleApp<T> {
 
-    public DefaultBuiltInRuleApp(T builtInRule, PosInOccurrence pio) {
+    public DefaultBuiltInRuleApp(T builtInRule, @Nullable PosInOccurrence pio) {
         super(builtInRule, pio);
     }
 
 
-    public DefaultBuiltInRuleApp(T builtInRule, PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> ifInsts) {
+    public DefaultBuiltInRuleApp(T builtInRule, @Nullable PosInOccurrence pio,
+            @Nullable ImmutableList<PosInOccurrence> ifInsts) {
         super(builtInRule, pio, ifInsts);
     }
 
