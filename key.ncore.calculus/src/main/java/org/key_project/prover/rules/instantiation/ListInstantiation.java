@@ -7,6 +7,9 @@ package org.key_project.prover.rules.instantiation;
 import org.key_project.util.collection.ImmutableArray;
 
 /// This class is used to store the instantiation of a SchemaVariable if it is a ProgramElement.
+// The whole class is bound to the deprecated ImmutableArray (generic superclass InstantiationEntry
+// and the getInstantiation API are used by key.core's schema-variable instantiation machinery).
+@SuppressWarnings("deprecation")
 public class ListInstantiation<T> extends InstantiationEntry<ImmutableArray<T>> {
 
     /// type of the stored elements

@@ -35,6 +35,9 @@ public interface BinderMatcher {
      * @param boundVars the pattern's bound variables
      * @return the binding instruction
      */
+    // The language SPI passes the term's bound variables in the deprecated ImmutableArray form
+    // (as returned by Term.boundVars()); implementations live in key.core and share this type.
+    @SuppressWarnings("deprecation")
     MatchInstruction binder(ImmutableArray<? extends QuantifiableVariable> boundVars);
 
     /**
@@ -46,6 +49,7 @@ public interface BinderMatcher {
      * @param boundVars the pattern bound variables the scope was opened for
      * @return the match result with the binding scope closed
      */
+    @SuppressWarnings("deprecation")
     MatchResultInfo unbind(MatchResultInfo mc,
             ImmutableArray<? extends QuantifiableVariable> boundVars);
 }

@@ -35,6 +35,9 @@ public final class OperatorPlan implements MatchPlan {
 
     private final MatchHead head;
     private final List<MatchPlan> children;
+    // Bound variables arrive in the deprecated ImmutableArray representation (see BinderMatcher
+    // and Term.boundVars()); the constructor signature is part of the plan-building API.
+    @SuppressWarnings("deprecation")
     private final ImmutableArray<? extends QuantifiableVariable> boundVars;
     private final BinderMatcher binder;
 
@@ -45,6 +48,7 @@ public final class OperatorPlan implements MatchPlan {
      * @param binder the language's {@link BinderMatcher} (used only if {@code boundVars} is
      *        non-empty)
      */
+    @SuppressWarnings("deprecation")
     public OperatorPlan(MatchHead head, List<MatchPlan> children,
             ImmutableArray<? extends QuantifiableVariable> boundVars, BinderMatcher binder) {
         this.head = head;
@@ -120,8 +124,11 @@ public final class OperatorPlan implements MatchPlan {
      * matched, when the cursor has already advanced past the whole term; there is no current
      * element it could read.
      */
+    // Same deprecated bound-variable representation as the enclosing plan (see BinderMatcher);
+    // the annotation is placed on the record component so it covers field, parameter and accessor.
     private record UnbindInstruction(BinderMatcher binder,
-            ImmutableArray<? extends QuantifiableVariable> boundVars) implements VMInstruction {
+            @SuppressWarnings("deprecation") ImmutableArray<? extends QuantifiableVariable> boundVars)
+            implements VMInstruction {
         @Override
         public MatchResultInfo match(PoolSyntaxElementCursor cursor, MatchResultInfo mc,
                 LogicServices services) {

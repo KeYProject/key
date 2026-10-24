@@ -22,10 +22,13 @@ public final class AssumesFormulaInstantiationCache {
 
     private static final int SIZE = 64; // power of two
 
-    @SuppressWarnings("unchecked")
+    // The cached type is bound to the deprecated ImmutableArray through
+    // AssumesFormulaInstSeq.createList. Generic array creation is not possible, so the arrays
+    // stay raw (rawtypes) and the element-store conversion needs the unchecked suppression.
+    @SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
     private final Pair<Semisequent, ImmutableArray<AssumesFormulaInstantiation>>[] antecCache =
         new Pair[SIZE];
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
     private final Pair<Semisequent, ImmutableArray<AssumesFormulaInstantiation>>[] succCache =
         new Pair[SIZE];
 
@@ -33,12 +36,18 @@ public final class AssumesFormulaInstantiationCache {
         return System.identityHashCode(s) & (SIZE - 1);
     }
 
+    // ImmutableArray is deprecated in favor of ImmutableList; the cached value type is dictated
+    // by AssumesFormulaInstSeq.createList.
+    @SuppressWarnings("deprecation")
     public @Nullable ImmutableArray<AssumesFormulaInstantiation> get(boolean antec, Semisequent s) {
         final Pair<Semisequent, ImmutableArray<AssumesFormulaInstantiation>> p =
             (antec ? antecCache : succCache)[indexFor(s)];
         return p != null && p.first == s ? p.second : null;
     }
 
+    // ImmutableArray is deprecated in favor of ImmutableList; the cached value type is dictated
+    // by AssumesFormulaInstSeq.createList.
+    @SuppressWarnings("deprecation")
     public void put(boolean antec, Semisequent s,
             ImmutableArray<AssumesFormulaInstantiation> value) {
         (antec ? antecCache : succCache)[indexFor(s)] = new Pair<>(s, value);

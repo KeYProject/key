@@ -50,6 +50,9 @@ public class AssumesFormulaInstSeq
     }
 
     /// Create a list with all formulas of a given semi-sequent
+    // ImmutableArray is deprecated in favor of ImmutableList; the type is part of the public
+    // createList API used by key.core (TacletApp, AssumesInstantiator).
+    @SuppressWarnings("deprecation")
     private static ImmutableArray<AssumesFormulaInstantiation> createListHelp(Sequent p_s,
             Semisequent semi,
             boolean inAntecedent) {
@@ -66,6 +69,9 @@ public class AssumesFormulaInstSeq
     }
 
     /// Retrieves a list with all formulas of a given semi-sequent
+    // ImmutableArray is deprecated in favor of ImmutableList; the return type is part of the
+    // public API used by key.core (TacletApp, AssumesInstantiator, instantiation models).
+    @SuppressWarnings("deprecation")
     public static ImmutableArray<AssumesFormulaInstantiation> createList(Sequent p_s,
             boolean inAntecedent,
             ProofServices services) {
