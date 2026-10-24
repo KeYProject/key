@@ -519,13 +519,15 @@ public class SVInstantiations
 
         for (final var e : map) {
             final Object inst = e.value().getInstantiation();
+            final Object cmpInst = cmp.getInstantiation(e.key());
             assert inst != null : "Illegal null instantiation.";
             if (inst instanceof JTerm instAsTerm) {
-                if (!instAsTerm.equalsModProperty(cmp.getInstantiation(e.key()),
-                    IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                if (cmpInst == null
+                        || !instAsTerm.equalsModProperty(cmpInst,
+                            IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     return false;
                 }
-            } else if (!inst.equals(cmp.getInstantiation(e.key()))) {
+            } else if (!inst.equals(cmpInst)) {
                 return false;
             }
         }
