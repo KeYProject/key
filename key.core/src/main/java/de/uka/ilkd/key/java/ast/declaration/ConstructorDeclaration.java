@@ -19,6 +19,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * The getTypeReference method returns null - constructors do not have explicite return types. A
@@ -26,6 +27,7 @@ import org.key_project.util.collection.ImmutableList;
  * occurs as syntactical element and hence must be represented. taken from COMPOST and changed to
  * achieve an immutable structure
  */
+@NullMarked
 public class ConstructorDeclaration extends MethodDeclaration implements Constructor {
 
     /**

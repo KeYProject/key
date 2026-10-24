@@ -18,9 +18,12 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The statement inserted by KeY if a method call is executed.
  */
+@NullMarked
 public class MethodFrame extends JavaStatement
         implements StatementContainer, ProgramPrefix {
 

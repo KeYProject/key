@@ -26,6 +26,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -36,6 +37,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public abstract non-sealed class AbstractIntegerLiteral extends Literal {
     public AbstractIntegerLiteral(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
         super(pi, comments);

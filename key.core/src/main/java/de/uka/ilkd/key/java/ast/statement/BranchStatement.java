@@ -12,6 +12,8 @@ import de.uka.ilkd.key.java.ast.PositionInfo;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Branch statement.
  *
@@ -19,6 +21,7 @@ import org.key_project.util.ExtList;
  * @author <TT>AutoDoc</TT>
  */
 
+@NullMarked
 public abstract class BranchStatement extends JavaStatement implements NonTerminalProgramElement {
 
     public BranchStatement() {

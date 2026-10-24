@@ -12,11 +12,15 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Package reference.
  *
  * @author <TT>AutoDoc</TT>
  */
+@NullMarked
 public class PackageReference extends JavaNonTerminalProgramElement
         implements TypeReferenceInfix, PackageReferenceContainer {
 
@@ -114,7 +118,7 @@ public class PackageReference extends JavaNonTerminalProgramElement
      *
      * @return the package reference.
      */
-    public PackageReference getPackageReference() {
+    public @Nullable PackageReference getPackageReference() {
         return (prefix instanceof PackageReference) ? (PackageReference) prefix : null;
     }
 
@@ -124,7 +128,7 @@ public class PackageReference extends JavaNonTerminalProgramElement
      *
      * @return the string.
      */
-    public final String getName() {
+    public final @Nullable String getName() {
         return (name == null) ? null : name.toString();
     }
 

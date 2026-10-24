@@ -21,6 +21,7 @@ import org.key_project.prover.rules.matcher.vm.ProgramChildrenMatcher;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -33,6 +34,7 @@ import org.jspecify.annotations.Nullable;
  * arbitrary program. This pattern is realized using this class.
  */
 
+@NullMarked
 public class ContextStatementBlock extends StatementBlock {
 
 
@@ -132,7 +134,7 @@ public class ContextStatementBlock extends StatementBlock {
         return true;
     }
 
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
         return match(source, matchCond, null);
     }
 
@@ -348,7 +350,8 @@ public class ContextStatementBlock extends StatementBlock {
      *        prefix.getPrefixElementAt(pos);
      * @return the PosInProgram of the first element, which is not part of the prefix
      */
-    private PosInProgram matchPrefixEnd(final ProgramPrefix prefix, int pos, PosInProgram relPos) {
+    private PosInProgram matchPrefixEnd(final @Nullable ProgramPrefix prefix, int pos,
+            PosInProgram relPos) {
         PosInProgram prefixEnd = PosInProgram.TOP;
         if (prefix != null) {
             ProgramPrefix currentPrefix = prefix;

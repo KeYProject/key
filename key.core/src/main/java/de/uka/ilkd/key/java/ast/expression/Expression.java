@@ -9,10 +9,12 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Expression taken from COMPOST and changed to achieve an immutable structure
  */
+@NullMarked
 public interface Expression extends ProgramElement {
     /**
      * returns the {@link KeYJavaType} of an expression

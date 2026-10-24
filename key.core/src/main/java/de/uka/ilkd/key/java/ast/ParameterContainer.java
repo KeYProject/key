@@ -6,11 +6,14 @@ package de.uka.ilkd.key.java.ast;
 
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Describes program elements that contain ParameterDeclarations.
  * taken from RECODER and changed to achieve an immutable structure
  */
 
+@NullMarked
 public interface ParameterContainer extends StatementContainer {
 
     /**

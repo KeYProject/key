@@ -14,11 +14,14 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A reference to the current object. "this" can be prefixed by a type reference (to resolve
  * ambiguities with inner classes).
  */
 
+@NullMarked
 public class ThisReference extends JavaNonTerminalProgramElement
         implements Reference, Expression, ReferencePrefix, ReferenceSuffix, TypeReferenceContainer {
 

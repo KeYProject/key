@@ -15,11 +15,14 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Formal parameters require a VariableSpecificationList of {@code size() <= 1} ({@code size() == 0}
  * for abstract
  * methods) without initializer (for Java).
  */
+@NullMarked
 public class ParameterDeclaration extends VariableDeclaration {
 
 

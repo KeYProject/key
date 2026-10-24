@@ -8,9 +8,12 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Comment element of Java source code.
  */
+@NullMarked
 public class Comment extends JavaSourceElement {
 
     private final String text;

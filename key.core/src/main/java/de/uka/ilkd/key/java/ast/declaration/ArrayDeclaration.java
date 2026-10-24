@@ -14,6 +14,9 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * KeY used to model arrays using only the {@link ArrayType}. As
  * the only attribute of an array has been the length attribute, it has been handled in a different
@@ -25,6 +28,7 @@ import org.key_project.util.collection.ImmutableList;
  * array declarations may be added at runtime.
  */
 
+@NullMarked
 public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
 
 
@@ -193,7 +197,7 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
         }
     }
 
-    public static ProgramElementName createName(TypeReference basetype) {
+    public static @Nullable ProgramElementName createName(TypeReference basetype) {
 
         Type javaBasetype = basetype.getKeYJavaType().getJavaType();
 

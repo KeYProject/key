@@ -15,9 +15,9 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
-
+@NullMarked
 public class Exec extends BranchStatement implements StatementContainer, ProgramPrefix {
     private final StatementBlock body;
     private final ImmutableArray<Branch> branches;
@@ -135,13 +135,11 @@ public class Exec extends BranchStatement implements StatementContainer, Program
         return StatementBlock.computePrefixElements(body.getBody(), this);
     }
 
-    @NonNull
     @Override
     public SourceElement getFirstElement() {
         return body.getFirstElement();
     }
 
-    @NonNull
     @Override
     public SourceElement getLastElement() {
         return getChildAt(getChildCount() - 1).getLastElement();

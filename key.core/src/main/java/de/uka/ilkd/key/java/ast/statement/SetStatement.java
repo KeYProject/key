@@ -9,13 +9,14 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.nparser.KeyAst.SetStatementContext;
 
-
+import org.jspecify.annotations.NullMarked;
 
 /**
  * JML set statement
  *
  * @author Julian Wiesler
  */
+@NullMarked
 public class SetStatement extends JavaStatement {
 
     /**

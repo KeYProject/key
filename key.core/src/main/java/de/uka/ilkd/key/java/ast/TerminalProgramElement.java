@@ -6,10 +6,13 @@ package de.uka.ilkd.key.java.ast;
 
 import org.key_project.logic.TerminalSyntaxElement;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Terminal program element. taken from COMPOST and changed to achieve an immutable structure
  */
 
+@NullMarked
 public interface TerminalProgramElement extends ProgramElement, TerminalSyntaxElement {
 
 }

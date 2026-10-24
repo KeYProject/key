@@ -13,15 +13,14 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public final class Ccatch extends BranchImp implements ParameterContainer, VariableScope {
-    @Nullable
-    private final ParameterDeclaration parameter;
+    private @Nullable ParameterDeclaration parameter;
 
-    @Nullable
-    private final CcatchNonstandardParameterDeclaration nonStdParameter;
+    private @Nullable CcatchNonstandardParameterDeclaration nonStdParameter;
 
     private final StatementBlock body;
 
@@ -73,7 +72,6 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
         body = children.get(StatementBlock.class);
     }
 
-    @NonNull
     @Override
     public SourceElement getLastElement() {
         return (body != null) ? body.getLastElement() : this;

@@ -6,11 +6,15 @@ package de.uka.ilkd.key.java.ast.abstraction;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Default constructor of class types.
  *
  * @deprecated is actually never used
  */
+@NullMarked
 @Deprecated
 public class DefaultConstructor implements Constructor {
 
@@ -134,7 +138,7 @@ public class DefaultConstructor implements Constructor {
      *
      * @return the return type of this method.
      */
-    public Type getReturnType() {
+    public @Nullable Type getReturnType() {
         return null;
     }
 
@@ -152,7 +156,7 @@ public class DefaultConstructor implements Constructor {
      *
      * @return the package of this element.
      */
-    public Package getPackage() {
+    public @Nullable Package getPackage() {
         return null;
     }
 

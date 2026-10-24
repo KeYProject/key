@@ -7,9 +7,12 @@ package de.uka.ilkd.key.java.ast;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Alexander Weigl
  * @version 1 (05.03.22)
  */
+@NullMarked
 public record JPContext(ClassOrInterfaceDeclaration classContext, CompilationUnit cu) {
 }

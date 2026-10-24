@@ -10,8 +10,9 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 
-
+@NullMarked
 public class CatchAllStatement extends JavaNonTerminalProgramElement
         implements Statement, StatementContainer {
     private final StatementBlock body;

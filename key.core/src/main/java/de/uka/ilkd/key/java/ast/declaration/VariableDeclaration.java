@@ -17,12 +17,13 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Variable declaration. taken from COMPOST and changed to achieve an immutable structure
  */
 
+@NullMarked
 public abstract class VariableDeclaration extends JavaDeclaration
         implements TypeReferenceContainer {
 
@@ -161,7 +162,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
 
 
     @Override
-    public @NonNull ImmutableArray<Modifier> getModifiers() {
+    public ImmutableArray<Modifier> getModifiers() {
         return modArray;
     }
 

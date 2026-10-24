@@ -28,14 +28,15 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class DLEmbeddedExpression extends Operator {
     private final JFunction functionSymbol;
 
     public DLEmbeddedExpression(
             PositionInfo pi, List<Comment> comments, JFunction functionSymbol,
-            @NonNull ImmutableArray<Expression> children) {
+            ImmutableArray<Expression> children) {
         super(pi, comments, children);
         this.functionSymbol = functionSymbol;
     }

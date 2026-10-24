@@ -12,6 +12,8 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * TypeReferences reference Types by name. A TypeReference can refer to
  * an outer or inner type and hence can also be a {@link MemberReference}, but does not have to. A
@@ -19,6 +21,7 @@ import org.key_project.util.collection.ImmutableList;
  * possible suffix for types, it can have other TypeReferences as a prefix, playing the role of a
  * {@link TypeReferenceContainer}.
  */
+@NullMarked
 public interface TypeReference extends TypeReferenceInfix, TypeReferenceContainer,
         PackageReferenceContainer, MemberReference, NonTerminalProgramElement, SourceElement {
 

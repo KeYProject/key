@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A model element that carries a name.
  */
+@NullMarked
 public interface NamedModelElement extends ModelElement {
 
     /**

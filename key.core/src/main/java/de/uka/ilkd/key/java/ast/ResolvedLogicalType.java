@@ -14,18 +14,18 @@ import com.github.javaparser.resolution.types.AssignableToPrimitive;
 import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * @author Alexander Weigl
  * @version 1 (23.06.23)
  */
+@NullMarked
 public class ResolvedLogicalType
         implements ResolvedReferenceTypeDeclaration, AssignableToPrimitive {
-    @NonNull
     private final KeYJavaType keYJavaType;
 
-    public ResolvedLogicalType(@NonNull KeYJavaType kjt) {
+    public ResolvedLogicalType(KeYJavaType kjt) {
         this.keYJavaType = kjt;
     }
 
@@ -118,7 +118,6 @@ public class ResolvedLogicalType
         return Collections.emptyList();
     }
 
-    @NonNull
     public KeYJavaType getKeYJavaType() {
         return keYJavaType;
     }

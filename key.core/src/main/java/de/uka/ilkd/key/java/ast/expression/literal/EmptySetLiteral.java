@@ -12,8 +12,9 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
 
-
+@NullMarked
 public non-sealed class EmptySetLiteral extends Literal {
 
     public static final EmptySetLiteral LOCSET = new EmptySetLiteral();

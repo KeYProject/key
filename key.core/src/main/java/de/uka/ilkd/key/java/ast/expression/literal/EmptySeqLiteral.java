@@ -12,8 +12,9 @@ import de.uka.ilkd.key.ldt.SeqLDT;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
 
-
+@NullMarked
 public non-sealed class EmptySeqLiteral extends Literal {
 
     public static final EmptySeqLiteral INSTANCE = new EmptySeqLiteral();

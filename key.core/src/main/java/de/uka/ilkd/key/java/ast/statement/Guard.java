@@ -12,6 +12,10 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class Guard extends JavaNonTerminalProgramElement implements IGuard {
 
     final Expression expr;
@@ -41,7 +45,7 @@ public class Guard extends JavaNonTerminalProgramElement implements IGuard {
         return (expr != null) ? 1 : 0;
     }
 
-    public ProgramElement getChildAt(int index) {
+    public @Nullable ProgramElement getChildAt(int index) {
         if (index == 0) {
             return expr;
         }

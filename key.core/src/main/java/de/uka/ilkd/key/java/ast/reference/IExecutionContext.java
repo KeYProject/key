@@ -7,9 +7,12 @@ package de.uka.ilkd.key.java.ast.reference;
 import de.uka.ilkd.key.java.ast.Reference;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * extracted interface to allow schema variabes to stand for an execution context
  */
+@NullMarked
 public interface IExecutionContext extends Reference {
     /**
      * returns the type reference to the next enclosing class

@@ -18,11 +18,15 @@ import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Field reference.
  *
  * @author <TT>AutoDoc</TT>
  */
+@NullMarked
 public class SchematicFieldReference extends FieldReference
         implements MemberReference, ReferenceSuffix, TypeReferenceContainer, ExpressionContainer {
 
@@ -166,7 +170,7 @@ public class SchematicFieldReference extends FieldReference
     }
 
 
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, @Nullable MatchConditions matchCond) {
         ProgramElement src = source.getSource();
         if (!(src instanceof FieldReference)) {
             return null;

@@ -4,8 +4,11 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.expression;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Common interface for assignment kinds
  */
+@NullMarked
 public interface AssignmentKind {
 }

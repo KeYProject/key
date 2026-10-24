@@ -6,10 +6,13 @@ package de.uka.ilkd.key.java.ast;
 
 import de.uka.ilkd.key.java.ast.expression.Expression;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Expression container. taken from COMPOST and changed to achieve an immutable structure
  */
 
+@NullMarked
 public interface ExpressionContainer extends NonTerminalProgramElement {
 
     /**

@@ -15,8 +15,9 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class TypeRef extends TypeReferenceImp {
 
     private final KeYJavaType kjt;
@@ -27,7 +28,7 @@ public class TypeRef extends TypeReferenceImp {
      * TypeRef(ProgramElementName, ImmutableList<Annotation>, int, ReferencePrefix, KeYJavaType)
      * and take null as last argument.
      */
-    public TypeRef(@NonNull KeYJavaType kjt) {
+    public TypeRef(KeYJavaType kjt) {
         this(kjt, ImmutableList.of(), 0);
     }
 
@@ -37,7 +38,7 @@ public class TypeRef extends TypeReferenceImp {
      * constructor TypeRef(ProgramElementName, ImmutableList<Annotation>, int, ReferencePrefix,
      * KeYJavaType) and take null as last argument.
      */
-    public TypeRef(@NonNull KeYJavaType kjt, ImmutableList<Annotation> annotations,
+    public TypeRef(KeYJavaType kjt, ImmutableList<Annotation> annotations,
             int dim) {
         super(new ProgramElementName(kjt.getName()), annotations, dim, kjt.createPackagePrefix());
         this.kjt = kjt;

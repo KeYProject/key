@@ -13,12 +13,15 @@ import de.uka.ilkd.key.ldt.FloatLDT;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Float literal.
  *
  * @author <TT>AutoDoc</TT>
  */
 
+@NullMarked
 public non-sealed class FloatLiteral extends Literal {
 
     /**

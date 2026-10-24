@@ -14,11 +14,14 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Meta class reference.
  *
  */
 
+@NullMarked
 public class MetaClassReference extends JavaNonTerminalProgramElement
         implements Reference, Expression, ReferencePrefix, ReferenceSuffix, TypeReferenceContainer {
 
