@@ -7,6 +7,8 @@ package de.uka.ilkd.key.smt.model;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A LocationSet represents a location set in an SMT model.
  *
@@ -14,6 +16,7 @@ import java.util.List;
  *
  */
 
+@NullMarked
 public class LocationSet {
     /**
      * The name of the location set.

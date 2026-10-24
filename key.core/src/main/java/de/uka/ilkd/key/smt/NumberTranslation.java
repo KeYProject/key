@@ -12,9 +12,13 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Translates a number into a string representation.
  */
+@NullMarked
 public final class NumberTranslation {
 
     private NumberTranslation() {}
@@ -25,7 +29,7 @@ public final class NumberTranslation {
      * @param term term with sort "numbers"
      * @return An instance of BigInteger representing the number
      */
-    public static BigInteger translate(Term term) {
+    public static @Nullable BigInteger translate(Term term) {
         if (!term.sort().name().toString().trim().equals("numbers")) {
             throw new IllegalArgumentException(
                 "Only terms with sort \"numbers\" may be translated.\n" + "Term " + term

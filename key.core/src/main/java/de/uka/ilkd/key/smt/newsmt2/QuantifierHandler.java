@@ -18,6 +18,9 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This SMT translation handler takes care of quantifier formulas using existential or universal
  * quantifiers.
@@ -27,13 +30,14 @@ import org.key_project.util.collection.ImmutableArray;
  * @author Jonas Schiffl
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class QuantifierHandler implements SMTHandler {
 
-    private Services services;
+    private @Nullable Services services;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         this.services = services;
     }
 

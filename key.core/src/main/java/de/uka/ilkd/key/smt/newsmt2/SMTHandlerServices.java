@@ -20,6 +20,8 @@ import de.uka.ilkd.key.smt.solvertypes.SolverPropertiesLoader;
 import org.key_project.util.Streams;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +36,7 @@ import org.slf4j.LoggerFactory;
  * @author Mattias Ulbrich
  * @author Alicia Appelhagen (load handlers from handler names array instead of ServiceLoader)
  */
+@NullMarked
 public class SMTHandlerServices {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SMTHandlerServices.class);
@@ -46,7 +49,7 @@ public class SMTHandlerServices {
     private static final String DEFAULT_HANDLERS = "defaultHandlers.txt";
 
     /** Singleton instance */
-    private static SMTHandlerServices theInstance;
+    private static @Nullable SMTHandlerServices theInstance;
 
     /**
      * A map from template handler objects to their smt2 snippets.
@@ -63,7 +66,7 @@ public class SMTHandlerServices {
     // preamble is volatile since sonarcube tells me the synchronisation scheme
     // for loading would be broken otherwise. (MU 2021)
     /** The smt2 preamble */
-    private volatile String preamble;
+    private volatile @Nullable String preamble;
 
     /** lock for synchronisation */
     private final Object handlerModificationLock = new Object();
@@ -213,7 +216,7 @@ public class SMTHandlerServices {
      * @return freshly created property object, null if the resource does not exist
      * @throws IOException may be thrown during reading of the resource
      */
-    private static Properties loadSnippets(Class<?> aClass) throws IOException {
+    private static @Nullable Properties loadSnippets(Class<?> aClass) throws IOException {
         String resourceName = aClass.getSimpleName() + ".preamble.xml";
         URL resource = aClass.getResource(resourceName);
         if (resource != null) {

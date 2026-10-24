@@ -9,6 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  *
  *
@@ -19,6 +21,7 @@ import java.util.Map;
 // The name of this class become misleading. Now, I am only distinguishing between unary operators,
 // binary operators and multi operators.
 // A more suitable name for this class will be TermMultOp
+@NullMarked
 public class SMTTermMultOp extends SMTTerm {
 
     /*

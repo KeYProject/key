@@ -18,18 +18,22 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This handler treats KeY updated terms ({x:=5}x>4).
  *
  * Updates are replaced by let-expressions.
  */
+@NullMarked
 public class UpdateHandler implements SMTHandler {
 
-    private Services services;
+    private @Nullable Services services;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         this.services = services;
     }
 

@@ -5,18 +5,22 @@
 package de.uka.ilkd.key.smt.lang;
 
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  *
  * @author Aboubakr Achraf El Ghazi
  *
  */
+@NullMarked
 public class SMTTermNumber extends SMTTerm {
 
     private long intValue;
     private long bitSize;
-    private SMTTerm upp;
-    private SMTSort sort;
+    private @Nullable SMTTerm upp;
+    private @Nullable SMTSort sort;
 
     public SMTTermNumber(int n) {
         this.intValue = n;
@@ -28,7 +32,7 @@ public class SMTTermNumber extends SMTTerm {
         this.bitSize = -1;
     }
 
-    public SMTTermNumber(long intValue, long bitSize, SMTSort sort) {
+    public SMTTermNumber(long intValue, long bitSize, @Nullable SMTSort sort) {
         this.intValue = intValue;
         this.bitSize = bitSize;
         this.sort = sort;
@@ -65,14 +69,14 @@ public class SMTTermNumber extends SMTTerm {
     /**
      * @return the upp
      */
-    public SMTTerm getUpp() {
+    public @Nullable SMTTerm getUpp() {
         return upp;
     }
 
     /**
      * @param upp the upp to set
      */
-    public void setUpp(SMTTerm upp) {
+    public void setUpp(@Nullable SMTTerm upp) {
         this.upp = upp;
     }
 

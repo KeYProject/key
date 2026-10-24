@@ -8,6 +8,8 @@ import java.util.*;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents an object inside a heap.
@@ -15,6 +17,7 @@ import org.key_project.logic.sort.Sort;
  * @author mihai
  *
  */
+@NullMarked
 public class ObjectVal {
     /**
      * The name of the object.
@@ -27,7 +30,7 @@ public class ObjectVal {
     /**
      * The sort of the object.
      */
-    private Sort sort;
+    private @Nullable Sort sort;
     /**
      * True if object is an exact instance of its sort.
      */
@@ -84,7 +87,7 @@ public class ObjectVal {
      * @param i the index of the array element to be returned
      * @return the value stores at index i
      */
-    public String getArrayValue(int i) {
+    public @Nullable String getArrayValue(int i) {
         return arrayValues.get(i);
     }
 
@@ -147,7 +150,7 @@ public class ObjectVal {
      *
      * @return the sort
      */
-    public Sort getSort() {
+    public @Nullable Sort getSort() {
         return sort;
     }
 
@@ -156,7 +159,7 @@ public class ObjectVal {
      *
      * @param sort the sort
      */
-    public void setSort(Sort sort) {
+    public void setSort(@Nullable Sort sort) {
         this.sort = sort;
     }
 
@@ -198,7 +201,7 @@ public class ObjectVal {
      * @param field the field name
      * @return the value associated to the field (or null if no value is known)
      */
-    public String get(String field) {
+    public @Nullable String get(String field) {
         return fieldvalues.get(field);
     }
 
@@ -209,7 +212,7 @@ public class ObjectVal {
      * @param value the value assigned to the specified field
      * @return the old value of the field (or null if no value was known before)
      */
-    public String put(String field, String value) {
+    public @Nullable String put(String field, String value) {
         return fieldvalues.put(field, value);
     }
 
@@ -219,7 +222,7 @@ public class ObjectVal {
      * @param name the short name of the field
      * @return the value associated to the field (or null if not known)
      */
-    public String getFieldUsingSimpleName(String name) {
+    public @Nullable String getFieldUsingSimpleName(String name) {
 
         if (fieldvalues.containsKey(name)) {
             return fieldvalues.get(name);

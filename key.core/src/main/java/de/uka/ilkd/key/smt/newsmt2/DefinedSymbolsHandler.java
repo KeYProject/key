@@ -27,6 +27,9 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
 
@@ -70,6 +73,7 @@ import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
  * is the axiom for seqLen (hence stored in <tt>seqLen.dl</tt>). The trigger pattern to be used for
  * instantiation is <tt>seqLen(s)</tt> matching against any ground instance of seqLen.
  */
+@NullMarked
 public class DefinedSymbolsHandler implements SMTHandler {
 
     public static final String PREFIX = "k_";
@@ -87,16 +91,16 @@ public class DefinedSymbolsHandler implements SMTHandler {
                 + "solver astray.");
 
     private final Set<String> supportedFunctions = new HashSet<>();
-    private Services services;
+    private @Nullable Services services;
 
     public static final TermLabel TRIGGER_LABEL = new ParameterlessTermLabel(new Name("Trigger"));
 
-    private Properties snippets;
+    private @Nullable Properties snippets;
     private boolean enabled;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) throws IOException {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) throws IOException {
         this.services = services;
         this.snippets = handlerSnippets;
 

@@ -8,6 +8,7 @@ package de.uka.ilkd.key.smt.lang;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * SMTLib supports functions as well as predicates. We only use functions and represent predicates
@@ -17,6 +18,7 @@ import java.util.List;
  * @author Aboubakr Achraf El Ghazi
  *
  */
+@NullMarked
 public class SMTTermCall extends SMTTerm {
 
     SMTFunction func;

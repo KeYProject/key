@@ -11,9 +11,12 @@ import java.util.LinkedList;
 
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Stores a set of solver types. This class can be used in order to encapsulate multiple solvers.
  */
+@NullMarked
 public class SolverTypeCollection implements Iterable<SolverType> {
     public final static SolverTypeCollection EMPTY_COLLECTION = new SolverTypeCollection();
 

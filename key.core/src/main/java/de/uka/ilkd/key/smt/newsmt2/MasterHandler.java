@@ -18,6 +18,8 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Instances of this class are the controlling units of the translation. They control how the
  * translation is delegated to different {@link SMTHandler}s and collects the translations.
@@ -31,6 +33,7 @@ import org.key_project.logic.sort.Sort;
  * @author Mattias Ulbrich
  * @author Jonas Schiffl
  */
+@NullMarked
 public class MasterHandler {
 
     /** Exceptions that occur during translation */
