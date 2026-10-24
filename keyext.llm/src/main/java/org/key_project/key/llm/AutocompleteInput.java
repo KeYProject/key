@@ -373,6 +373,8 @@ public class AutocompleteInput extends JTextPane {
             } finally {
                 suspendUpdates = false;
             }
+            // the document listener was suppressed during the edit: re-highlight the fences
+            scheduleHighlight();
             setCaretPosition(index + wrapped.length());
         } catch (BadLocationException e) {
             getToolkit().beep();
@@ -482,6 +484,8 @@ public class AutocompleteInput extends JTextPane {
             } finally {
                 suspendUpdates = false;
             }
+            // the document listener was suppressed during the edit: re-highlight the fences
+            scheduleHighlight();
             setCaretPosition(start + expanded.length());
         } catch (BadLocationException e) {
             getToolkit().beep();
@@ -658,6 +662,8 @@ public class AutocompleteInput extends JTextPane {
             } finally {
                 suspendUpdates = false;
             }
+            // the document listener was suppressed during the edit: re-highlight the fences
+            scheduleHighlight();
         } catch (BadLocationException e) {
             getToolkit().beep();
         }

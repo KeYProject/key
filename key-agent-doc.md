@@ -145,6 +145,18 @@ seq ::  a <= b  ==>  b <= a
 ```
 ````
 
+The printing of the dropped content follows the keyboard modifiers held during the drop:
+
+- default: pretty-printed as in the sequent view (current notation settings and term label
+  visibility)
+- **Shift** held: pretty-printed with safe settings — ASCII operators only (no unicode symbols),
+  package prefixes shown, all term labels shown
+- **Ctrl** held: non-pretty-printed term structure
+
+While a term or sequent is dragged, the hint below the prompt shows which printing the drop will
+produce; when no drag is active, the hint shows the send shortcut (**Ctrl+Enter**) and points to
+the completion trigger characters (`$`, `@`, `/`).
+
 ### 4.6 KeY syntax highlighting
 
 Fenced blocks marked with the `key` language (as produced by drag and drop) are highlighted in
