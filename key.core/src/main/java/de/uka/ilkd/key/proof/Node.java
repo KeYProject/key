@@ -13,6 +13,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.logic.RenamingTable;
@@ -301,7 +302,8 @@ public class Node implements Iterable<Node> {
             if (node.root()) {
                 return false;
             }
-            node = node.parent();
+            node = Objects.requireNonNull(node.parent(),
+                "node is not part of the same proof tree (no parent to step to)");
         }
 
         return true;
@@ -332,7 +334,8 @@ public class Node implements Iterable<Node> {
             if (n.root()) {
                 break;
             }
-            n = n.parent();
+            n = Objects.requireNonNull(n.parent(),
+                "node without parent encountered on the way to the root");
 
             if (!paths.add(other)) {
                 return other;
@@ -341,11 +344,13 @@ public class Node implements Iterable<Node> {
                 other = n;
                 break;
             }
-            other = other.parent();
+            other = Objects.requireNonNull(other.parent(),
+                "node without parent encountered on the way to the root");
         }
 
         while (!paths.contains(other)) {
-            other = other.parent();
+            other = Objects.requireNonNull(other.parent(),
+                "node without parent encountered on the way to the root");
         }
 
         return other;
@@ -650,10 +655,11 @@ public class Node implements Iterable<Node> {
      */
     public boolean sanityCheckDoubleLinks() {
         if (!root()) {
-            if (!parent().children.contains(this)) {
+            final Node par = Objects.requireNonNull(parent(), "non-root node must have a parent");
+            if (!par.children.contains(this)) {
                 return false;
             }
-            if (parent.proof() != proof()) {
+            if (par.proof() != proof()) {
                 return false;
             }
         }
