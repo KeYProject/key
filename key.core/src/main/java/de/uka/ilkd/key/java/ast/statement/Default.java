@@ -41,7 +41,7 @@ public class Default extends BranchImp {
      */
 
     public Default(Statement[] body) {
-        this.body = ImmutableList.of(body);
+        this.body = ImmutableList.ofFixedSize(body);
     }
 
     /**
@@ -53,7 +53,7 @@ public class Default extends BranchImp {
      */
     public Default(ExtList children) {
         super(children);
-        this.body = ImmutableList.of(children.collect(Statement.class));
+        this.body = ImmutableList.ofFixedSize(children.collect(Statement.class));
     }
 
     public Default(ImmutableList<Statement> body, PositionInfo pi, List<Comment> comments) {
