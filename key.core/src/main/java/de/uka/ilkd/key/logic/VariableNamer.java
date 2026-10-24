@@ -196,7 +196,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     protected int getMaxCounterInProgram(String basename, ProgramElement program,
             @Nullable PosInProgram posOfDeclaration) {
         class MyWalker extends CustomJavaASTWalker {
-            public String basename;
+            public String basename = "";
             public int maxCounter = -1;
 
             public MyWalker(ProgramElement program, @Nullable PosInProgram posOfDeclaration) {
@@ -248,7 +248,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     protected boolean isUniqueInProgram(String name, ProgramElement program,
             @Nullable PosInProgram posOfDeclaration) {
         class MyWalker extends CustomJavaASTWalker {
-            public String nameToFind;
+            public String nameToFind = "";
             public boolean foundIt = false;
 
             public MyWalker(ProgramElement program, @Nullable PosInProgram posOfDeclaration) {
@@ -318,8 +318,8 @@ public abstract class VariableNamer implements InstantiationProposer {
     private String getBaseNameProposal(Type type) {
         String result;
         if (type instanceof ArrayType) {
-            result = getBaseNameProposal(
-                ((ArrayType) type).getBaseType().getKeYJavaType().getJavaType());
+            result = getBaseNameProposal(Objects.requireNonNull(
+                ((ArrayType) type).getBaseType().getKeYJavaType().getJavaType()));
             result += "_arr";
         } else {
             String name = type.getName();
@@ -349,7 +349,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     protected @Nullable ProgramElementName getNameProposalForSchemaVariable(
             @Nullable String basename,
-            SchemaVariable sv, PosInOccurrence posOfFind,
+            SchemaVariable sv, @Nullable PosInOccurrence posOfFind,
             @Nullable PosInProgram posOfDeclaration,
             @Nullable ImmutableList<String> previousProposals, Services services) {
         ProgramElementName result = null;
@@ -449,7 +449,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     @Override
     public @Nullable String getProposal(TacletApp app, SchemaVariable var, Services services,
             @Nullable Node undoAnchor,
-            ImmutableList<String> previousProposals) {
+            @Nullable ImmutableList<String> previousProposals) {
         // determine posOfDeclaration from TacletApp
         ContextStatementBlockInstantiation cie = app.instantiations().getContextInstantiation();
         PosInProgram posOfDeclaration = (cie == null ? null : cie.prefix());
@@ -464,12 +464,12 @@ public abstract class VariableNamer implements InstantiationProposer {
                 basename = getBaseNameProposal(type);
             } else {
                 SchemaVariable psv = nv.getPeerSchemaVariable();
-                Object inst = app.instantiations().getInstantiation(psv);
+                Object inst = psv == null ? null : app.instantiations().getInstantiation(psv);
                 if (inst instanceof Expression) {
                     final ExecutionContext ec = app.instantiations().getExecutionContext();
                     if (ec != null) {
                         KeYJavaType kjt = ((Expression) inst).getKeYJavaType(this.services, ec);
-                        basename = getBaseNameProposal(kjt.getJavaType());
+                        basename = getBaseNameProposal(Objects.requireNonNull(kjt.getJavaType()));
                     } else {
                         // usually this should never be entered, but because of
                         // naming issues we do not want nullpointer exceptions
@@ -546,10 +546,12 @@ public abstract class VariableNamer implements InstantiationProposer {
                     int index = Integer.parseInt(name.substring(sepPos + 1));
                     result = new PermIndProgramElementName(basename, index, creationInfo, comments);
                 } catch (NumberFormatException e) {
-                    result = new ProgramElementName(name, creationInfo, comments);
+                    result = creationInfo == null ? new ProgramElementName(name, comments)
+                            : new ProgramElementName(name, creationInfo, comments);
                 }
             } else {
-                result = new ProgramElementName(name, creationInfo, comments);
+                result = creationInfo == null ? new ProgramElementName(name, comments)
+                        : new ProgramElementName(name, creationInfo, comments);
             }
         }
 
@@ -593,7 +595,7 @@ public abstract class VariableNamer implements InstantiationProposer {
             String name = "";
             while (templs.hasNext()) {
                 rwgt = (RewriteTacletGoalTemplate) templs.next();
-                JTerm t = findProgramInTerm(rwgt.replaceWith());
+                JTerm t = Objects.requireNonNull(findProgramInTerm(rwgt.replaceWith()));
                 ContextStatementBlock c = (ContextStatementBlock) t.javaBlock().program();
                 if (c.getStatementAt(0) instanceof LocalVariableDeclaration) {
                     VariableSpecification v =
@@ -609,7 +611,8 @@ public abstract class VariableNamer implements InstantiationProposer {
                         Expression lhs = p2.getExpressionAt(0);
                         if (lhs.equals(sv)) {
                             SchemaVariable rhs = (SchemaVariable) p2.getExpressionAt(1);
-                            name = app.instantiations().getInstantiation(rhs).toString();
+                            name = Objects.requireNonNull(
+                                app.instantiations().getInstantiation(rhs)).toString();
                             break;
                         }
                     }
@@ -641,7 +644,7 @@ public abstract class VariableNamer implements InstantiationProposer {
             Services services) {
         ProgramReplaceVisitor trans = new ProgramReplaceVisitor(e, services, svInst);
         trans.start();
-        return trans.result();
+        return Objects.requireNonNull(trans.result());
     }
 
 
@@ -758,7 +761,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * tuple of a basename and an index
      */
     protected static class BasenameAndIndex {
-        public String basename;
+        public String basename = "";
         public int index;
     }
 

@@ -58,7 +58,7 @@ public class ProgramElementName extends Name
         comments = c;
     }
 
-    public ProgramElementName(String name, NameCreationInfo creationInfo) {
+    public ProgramElementName(String name, @Nullable NameCreationInfo creationInfo) {
         super(name);
         this.qualifierString = "";
         this.shortName = name.intern();
@@ -66,7 +66,8 @@ public class ProgramElementName extends Name
         comments = new Comment[0];
     }
 
-    public ProgramElementName(String name, NameCreationInfo creationInfo, Comment[] c) {
+    public ProgramElementName(String name, @Nullable NameCreationInfo creationInfo,
+            Comment[] c) {
         super(name);
         this.qualifierString = "";
         this.shortName = name.intern();
