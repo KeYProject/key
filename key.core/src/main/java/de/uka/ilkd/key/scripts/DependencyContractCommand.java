@@ -20,7 +20,6 @@ import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
@@ -91,7 +90,7 @@ public class DependencyContractCommand extends AbstractCommand {
         if (term.equals(subTerm)) {
             pios.add(pio);
         } else {
-            ImmutableArray<? extends Term> subs = subTerm.subs();
+            ImmutableList<? extends Term> subs = subTerm.subs();
             for (int i = 0; i < subs.size(); i++) {
                 find(pios, term, pio.down(i));
             }
