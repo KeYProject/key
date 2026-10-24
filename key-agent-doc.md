@@ -215,6 +215,16 @@ The built-in tool set (`KeYAgentTools`):
 | `cut_formula`       | Proof          | ask      |                | cut on a formula (`cut`): splits the goal into a case and its negation |
 | `expand_definitions`| Proof          | ask      |                | unfold method-definition and class-invariant axioms (`expand`)      |
 | `rewrite_term`      | Proof          | ask      |                | find and apply a rewrite taclet transforming a term into another (`rewrite`) |
+| `run_script`        | Proof          | ask      |                | run a short guarded sequence (≤ 8 steps) of the whitelisted proof commands on targeted goals |
+| `explore_assumption`| Proof          | auto     | ✓              | probe: run auto on an isolated side proof of a goal plus an added assumption; report if it closes; the main proof is never modified |
+| `explore_formula`   | Proof          | auto     | ✓              | probe: run auto on an isolated side proof of a goal plus an added succedent formula; report if it closes; the main proof is never modified |
+| `fork_proof`        | Proof          | ask      |                | create an independent copy (fork) at a goal's sequent, registered for the `proof` parameter — for side experiments |
+| `list_branches`     | Proof          | auto     |                | read-only: list the open goals in the order the `goal` indexes use, with branch labels and leading formulas |
+| `assert_open_goals` | Proof          | auto     |                | read-only: check that the proof has the expected number of open goals |
+| `hide_sequent`      | Proof          | ask      |                | hide the formulas of a sequent pattern (declutters the goal; `hide`)     |
+| `unhide_sequent`    | Proof          | ask      |                | re-insert previously hidden formulas (`unhide`)                          |
+| `focus_goal`        | Proof          | ask      |                | keep only the formulas of a sequent pattern, hide all others (`focus`)   |
+| `let_abbrev`        | Proof          | ask      |                | introduce a term abbreviation for the proof's abbreviation table (`let`/`letf`) |
 | `list_proofs`       | Proof          | auto     |                | enumerate all open proofs with an identifier usable in the proof tools' `proof` parameter |
 | `list_files`        | Files          | auto     |                | bounded listing of the files of the current Java model              |
 | `read_file`         | Files          | auto     |                | read a text file of the model directory (respects size limits)      |
@@ -234,7 +244,8 @@ The built-in tool set (`KeYAgentTools`):
 
 **Goal targeting and proof selection.** The proof-manipulation tools (`tryclose`, `auto`,
 `run_macro`, `run_smt`, `simplify_goal`, `apply_rule`, `instantiate_quantifier`,
-`witness_constant`, `cut_formula`, `expand_definitions`, `rewrite_term`) share two parameters:
+`witness_constant`, `cut_formula`, `expand_definitions`, `rewrite_term`, `hide_sequent`,
+`unhide_sequent`, `focus_goal`, `fork_proof`) share two parameters:
 
 - `goal` — `"branch"` (default; the first open goal of the current branch), `"all"` (every open
   goal; single-goal surgery tools reject it), or a 0-based goal index (negative = from the end).
@@ -242,8 +253,20 @@ The built-in tool set (`KeYAgentTools`):
   selected proof is used. This lets the agent work on a non-selected proof, e.g. while the user
   interacts with another one.
 
+`run_script` targets each ordered step individually with its own `goal` (branch default or an
+index). `let_abbrev` is proof-wide (no goal). `list_branches` shows the open goals in exactly the
+order the `goal` indexes use, so indices can be picked from it directly.
+
 Every proof tool reports its outcome uniformly as `"<tool>: N goal(s) closed, M open goal(s)
 remain"` (plus `- the proof is closed` when it finishes).
+
+**Sandboxed exploration and forking.** `explore_assumption` and `explore_formula` answer
+"is this goal provable if an extra formula were available?" by running the auto strategy on an
+*isolated side proof* (constructed via KeY's `SideProofUtil` machinery from the goal's sequent
+plus the formula) — the main proof is never modified, so they are safe to approve automatically.
+`fork_proof` goes the other way: it *persists* the copy by registering a new proof (root sequent =
+the targeted goal's sequent) that appears in `list_proofs` and can be worked on through the
+`proof` parameter, leaving the original untouched.
 
 **Categories.** Every tool carries a `category` (Proof, Files, Shell, Taclets, Interaction,
 Sub-agents, Documentation, General) and a `backgroundable` flag — pure KeY-side *metadata*: the
@@ -280,12 +303,15 @@ turn until you answer. Turn this off with *Allow the agent to ask questions*.
 - File access tools are **read-only**, restricted to the current Java model directory, and run
   without approval.
 - The proof-script tools run the corresponding KeY proof-script commands (i.e. the same actions
-  as *Apply Script* / the *Auto* button): `tryclose`, `auto`, `run_macro`, `run_smt` and
-  `simplify_goal` are approved by default so the agent can actually prove (you can move them to
-  *with approval* in the Tools panel to review each invocation); the goal-surgery tools
-  `apply_rule`, `instantiate_quantifier`, `witness_constant`, `cut_formula`,
-  `expand_definitions` and `rewrite_term` mutate the proof and require approval by default.
-  The latter act on a single goal (`"branch"` or an index) and reject `"all"`.
+  as *Apply Script* / the *Auto* button): `tryclose`, `auto`, `run_macro`, `run_smt`,
+  `simplify_goal` and the sandboxed probes `explore_assumption`/`explore_formula` (side proofs;
+  the main proof stays untouched) are approved by default so the agent can actually prove — you
+  can move them to *with approval* in the Tools panel to review each invocation. The goal-surgery
+  tools `apply_rule`, `instantiate_quantifier`, `witness_constant`, `cut_formula`,
+  `expand_definitions` and `rewrite_term`, the sequent-editing tools `hide_sequent`,
+  `unhide_sequent`, `focus_goal`, `let_abbrev`, the composed `run_script` and `fork_proof`
+  mutate the proof and require approval by default. The listed single-goal tools act on one goal
+  (`"branch"` or an index) and reject `"all"`.
 - `add_taclet` and `remove_taclet` change the rule set of a proof and therefore require approval
   by default; inspection tools (`list_taclets`, `list_taclet_options`, `export_taclet`,
   `export_taclets`) do not.
@@ -350,7 +376,8 @@ delegations) can be **moved into the background** while they run:
 - When the call finishes, its output is enqueued and the parked turn resumes with it (a
   *"In the background"* box marks where the turn parked).
 - Only tools marked **backgroundable** offer the button (by default `auto`, `tryclose`,
-  `run_command`, `run_macro`, `run_smt`, `spawn_subagent`); per-tool overrides and the
+  `run_command`, `run_macro`, `run_smt`, `spawn_subagent`, `explore_assumption`,
+  `explore_formula`); per-tool overrides and the
   concurrency limit live in the [Tools panel](#tools-sub-panel-llm-settings--tools). While a
   turn is parked on a question or an approval, further
   prompts are *deferred* (they do not start new turns); while it is parked on a background job
@@ -445,8 +472,8 @@ tool shows a short explanation, a radio group selecting its permission — **Def
 own behavior, `auto` or `ask`), **With approval** (always ask), **Without approval (always)** or
 **Disabled** (not sent to the model) — and a **may run in background** checkbox. Read-only tools
 default to `auto`, `run_command` to `ask`; the background checkbox follows the tool's metadata
-(default on for `auto`, `tryclose`, `run_command`, `run_macro`, `run_smt`, `spawn_subagent`;
-overriding it adds/removes the tool in the
+(default on for `auto`, `tryclose`, `run_command`, `run_macro`, `run_smt`, `spawn_subagent`,
+`explore_assumption`, `explore_formula`; overriding it adds/removes the tool in the
 `backgroundToolsEnabled`/`backgroundToolsDisabled` settings). While such a call runs it can
 be moved to the background, the agent then continues with your queued messages and the result is
 delivered when the call finishes (see [section 7.4](#74-backgrounding)). The number of concurrent
