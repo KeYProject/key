@@ -274,7 +274,7 @@ public class ContractRegistryWD extends ContractRegistry {
      * Removes the contract from the registry, but keeps its target.
      */
     @Override
-    protected void unregisterContract(Contract contract) {
+    public void unregisterContract(Contract contract) {
         super.unregisterContract(contract);
 
         final KeYJavaType kjt = contract.getKJT();

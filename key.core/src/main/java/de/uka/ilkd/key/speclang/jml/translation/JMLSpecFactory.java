@@ -97,6 +97,14 @@ public class JMLSpecFactory {
      */
     private final Set<Pair<KeYJavaType, IObserverFunction>> modelFields;
 
+    /**
+     * Initially clauses collected during loading. They are turned into constructor contracts by
+     * {@link #createContractsFromInitiallyClauses()} once all contracts are registered (see
+     * {@code SLEnvInput}). Previously held by the specification repository / contract registry.
+     */
+    private final Map<KeYJavaType, ImmutableSet<InitiallyClause>> initiallyClauses =
+        new LinkedHashMap<>();
+
 
     // -------------------------------------------------------------------------
     // constructors
@@ -2253,6 +2261,93 @@ public class JMLSpecFactory {
         Contract result = resultList.toArray(new Contract[1])[0];
         assert result instanceof FunctionalOperationContract;
         return ((FunctionalOperationContract) result);
+    }
+
+    /**
+     * Registers the passed initially clause. Initially clauses in JML specify the post-state of any
+     * constructor of subtypes; they may particularly be used in interface types. To create proof
+     * obligations from initially clauses, the method
+     * {@link #createContractsFromInitiallyClauses()} adds them to the contracts of respective
+     * constructors (or adds a contract if there is none yet).
+     *
+     * @param ini initially clause
+     */
+    public void addInitiallyClause(InitiallyClause ini) {
+        ImmutableSet<InitiallyClause> oldClauses = initiallyClauses.get(ini.getKJT());
+        if (oldClauses == null) {
+            oldClauses = DefaultImmutableSet.nil();
+        }
+        initiallyClauses.put(ini.getKJT(), oldClauses.add(ini));
+    }
+
+    /**
+     * Registers the passed initially clauses.
+     */
+    public void addInitiallyClauses(ImmutableSet<InitiallyClause> toAdd) {
+        for (InitiallyClause inv : toAdd) {
+            addInitiallyClause(inv);
+        }
+    }
+
+    /**
+     * Adds postconditions raising from initially clauses to all constructors. <b>Warning</b>: To be
+     * called after all contracts have been registered.
+     *
+     * @throws SLTranslationException may be thrown during contract extraction
+     */
+    public void createContractsFromInitiallyClauses() throws SLTranslationException {
+        final var registry = services.getContractRegistry();
+        for (KeYJavaType kjt : initiallyClauses.keySet()) {
+            for (InitiallyClause inv : initiallyClauses.get(kjt)) {
+                createContractsFromInitiallyClause(inv, kjt, registry);
+                if (ModifierKind.allowsInheritance(inv.getVisibility())) {
+                    final ImmutableList<KeYJavaType> subs =
+                        services.getJavaInfo().getAllSubtypes(kjt);
+                    for (KeYJavaType sub : subs) {
+                        createContractsFromInitiallyClause(inv, sub, registry);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds the initially clause as post-condition to contracts of constructors. Creates a new
+     * contract if there is none yet.
+     *
+     * @param inv initially clause
+     * @param kjt constructors of this type are added a post-condition
+     * @param registry the contract registry the derived contracts are registered with
+     * @throws SLTranslationException during contract construction from history constraint
+     */
+    private void createContractsFromInitiallyClause(InitiallyClause inv, KeYJavaType kjt,
+            ContractRegistry registry) throws SLTranslationException {
+        if (!kjt.equals(inv.getKJT())) {
+            inv = inv.setKJT(kjt);
+        }
+        for (IProgramMethod pm : services.getJavaInfo().getConstructors(kjt)) {
+            if (!JMLInfoExtractor.isHelper(pm)) {
+                final ImmutableSet<Contract> oldContracts = registry.getContracts(kjt, pm);
+                ImmutableSet<FunctionalOperationContract> oldFuncContracts =
+                    DefaultImmutableSet.nil();
+                for (Contract old : oldContracts) {
+                    if (old instanceof FunctionalOperationContract) {
+                        oldFuncContracts = oldFuncContracts.add((FunctionalOperationContract) old);
+                    }
+                }
+                if (oldFuncContracts.isEmpty()) {
+                    final FunctionalOperationContract iniContr = cf.func(pm, inv);
+                    registry.addContractNoInheritance(iniContr);
+                } else {
+                    for (FunctionalOperationContract c : oldFuncContracts) {
+                        registry.unregisterContract(c);
+                        registry.addContractNoInheritance(cf.addPost(c, inv));
+                        assert registry.getContractTargets(kjt).contains(c.getTarget());
+                    }
+                    assert registry.getContracts(kjt, pm).size() == oldContracts.size();
+                }
+            }
+        }
     }
 
     private ImmutableList<LabeledParserRuleContext> createPrecond(IProgramMethod pm,
