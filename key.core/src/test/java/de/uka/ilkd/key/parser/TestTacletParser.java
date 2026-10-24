@@ -367,7 +367,7 @@ public class TestTacletParser {
         JTerm find = taclet.find();
         JavaBlock jb = find.javaBlock();
         ContextStatementBlock ct = (ContextStatementBlock) jb.program();
-        Assignment ca = (Assignment) ct.getChildAt(0);
+        Assignment<?> ca = (Assignment<?>) ct.getChildAt(0);
         ArrayReference ar = (ArrayReference) ca.getChildAt(0);
         for (int i = 0; i < 2; i++) {
             assertNotNull(ar.getChildAt(i));

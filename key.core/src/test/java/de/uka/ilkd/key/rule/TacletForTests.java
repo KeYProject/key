@@ -60,6 +60,9 @@ public class TacletForTests {
     private static Namespace<QuantifiableVariable> variables = null;
     private static Namespace<SchemaVariable> schemaVariables;
 
+    // the anonymous JavaProfile subclass inherits AbstractProfile's non-generic implementations of
+    // Profile's generic goal-chooser-builder methods, which javac flags as unchecked overrides
+    @SuppressWarnings("unchecked")
     public static final Profile profile = new JavaProfile() {
         // we do not want normal standard rules, but ruleSetsDeclarations is needed for string
         // library (HACK)
