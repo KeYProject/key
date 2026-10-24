@@ -20,6 +20,7 @@ import org.key_project.util.collection.ImmutableArray;
  * @author <TT>AutoDoc</TT>
  */
 
+@SuppressWarnings("deprecation") // exception list storage is bound to the deprecated ImmutableArray
 public class Throws extends JavaNonTerminalProgramElement implements TypeReferenceContainer {
 
 

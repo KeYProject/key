@@ -20,6 +20,8 @@ import org.key_project.util.collection.ImmutableArray;
  * @author AL
  */
 
+@SuppressWarnings("deprecation") // AST children storage is bound to the deprecated ImmutableArray
+                                 // API
 public abstract class Operator extends JavaNonTerminalProgramElement
         implements Expression, ExpressionContainer {
     protected final ImmutableArray<Expression> children;

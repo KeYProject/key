@@ -19,5 +19,6 @@ public interface Declaration extends NonTerminalProgramElement {
      *
      * @return the (original) list of modifiers wrapped .
      */
+    @SuppressWarnings("deprecation") // contract of getModifiers is bound to ImmutableArray
     ImmutableArray<Modifier> getModifiers();
 }
