@@ -20,6 +20,7 @@ import org.key_project.key.llm.mcp.JsonSchema;
 import org.key_project.key.llm.mcp.KeYAgentTools;
 import org.key_project.key.llm.mcp.ProofSelector;
 import org.key_project.key.llm.mcp.Tool;
+import org.key_project.key.llm.mcp.ToolCategory;
 
 /**
  * The {@code run_command} tool: executes a shell command in the model directory. Requires user
@@ -32,13 +33,16 @@ public final class ShellTools implements AgentToolProvider {
 
     @Override
     public List<AgentTool> get() {
-        return List.of(AgentTool.tool(KeYAgentTools.TOOL_RUN_COMMAND,
+        return List.of(AgentTool.tool(KeYAgentTools.TOOL_RUN_COMMAND, ToolCategory.SHELL,
             "Runs a shell command in the model directory. Requires user approval. Destructive"
-                + " commands are blocked by a blocklist.",
+                + " commands are blocked by a blocklist. Long-running commands (builds, tests)"
+                + " can be put into the background, so you can keep asking questions while they"
+                + " run.",
             Tool.ApprovalRequirement.ASK,
             AgentTool.schema("command",
                 JsonSchema.builder().withType("string")
                         .withDescription("the shell command to run").build()),
+            true,
             args -> runCommand(AgentTool.stringArg(args, "command"))));
     }
 

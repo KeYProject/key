@@ -15,6 +15,7 @@ import org.key_project.key.llm.mcp.AgentToolProvider;
 import org.key_project.key.llm.mcp.JsonSchema;
 import org.key_project.key.llm.mcp.KeYAgentTools;
 import org.key_project.key.llm.mcp.ProofSelector;
+import org.key_project.key.llm.mcp.ToolCategory;
 
 /**
  * The file-access tools {@code list_files}, {@code read_file} and {@code file_info}: bounded,
@@ -26,14 +27,14 @@ public final class FileTools implements AgentToolProvider {
     @Override
     public List<AgentTool> get() {
         return List.of(
-            AgentTool.tool(KeYAgentTools.TOOL_LIST_FILES,
+            AgentTool.tool(KeYAgentTools.TOOL_LIST_FILES, ToolCategory.FILES,
                 "Lists files of the current Java model directory (relative paths, bounded)."
                     + " Use with an optional prefix to filter.",
                 AgentTool.schema("prefix",
                     JsonSchema.builder().withType("string")
                             .withDescription("optional path prefix to filter").build()),
                 args -> listFiles(AgentTool.stringArg(args, "prefix"))),
-            AgentTool.tool(KeYAgentTools.TOOL_READ_FILE,
+            AgentTool.tool(KeYAgentTools.TOOL_READ_FILE, ToolCategory.FILES,
                 "Reads a text file of the current Java model directory (relative path)."
                     + " Respects the configured size limits.",
                 AgentTool.schema("path",
@@ -41,7 +42,7 @@ public final class FileTools implements AgentToolProvider {
                             .withDescription("relative path inside the model")
                             .build()),
                 args -> readFile(AgentTool.stringArg(args, "path"), false)),
-            AgentTool.tool(KeYAgentTools.TOOL_FILE_INFO,
+            AgentTool.tool(KeYAgentTools.TOOL_FILE_INFO, ToolCategory.FILES,
                 "Returns metadata (size, last modified, kind) of a file inside the model"
                     + " directory.",
                 AgentTool.schema("path",

@@ -13,6 +13,7 @@ import org.key_project.key.llm.mcp.AgentTool;
 import org.key_project.key.llm.mcp.AgentToolProvider;
 import org.key_project.key.llm.mcp.KeYAgentTools;
 import org.key_project.key.llm.mcp.ProofSelector;
+import org.key_project.key.llm.mcp.ToolCategory;
 
 /**
  * The {@code list_proofs} tool: enumerates the currently open proofs with an identifier (name or
@@ -23,7 +24,7 @@ import org.key_project.key.llm.mcp.ProofSelector;
 public final class ProofListTools implements AgentToolProvider {
     @Override
     public List<AgentTool> get() {
-        return List.of(AgentTool.tool(KeYAgentTools.TOOL_LIST_PROOFS,
+        return List.of(AgentTool.tool(KeYAgentTools.TOOL_LIST_PROOFS, ToolCategory.PROOF,
             "Lists all currently open proofs with an identifier (name or index). Pass the"
                 + " identifier as the optional 'proof' parameter of the taclet tools"
                 + " (list_taclets, list_taclet_options, export_taclet, add_taclet,"

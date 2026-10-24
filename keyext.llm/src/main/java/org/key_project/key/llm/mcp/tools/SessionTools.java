@@ -10,6 +10,7 @@ import org.key_project.key.llm.mcp.AgentTool;
 import org.key_project.key.llm.mcp.AgentToolProvider;
 import org.key_project.key.llm.mcp.JsonSchema;
 import org.key_project.key.llm.mcp.KeYAgentTools;
+import org.key_project.key.llm.mcp.ToolCategory;
 
 /**
  * The interactive session tools {@code ask_user} and {@code use_skill}. Their schemas are
@@ -23,7 +24,7 @@ public final class SessionTools implements AgentToolProvider {
     @Override
     public List<AgentTool> get() {
         return List.of(
-            AgentTool.tool(KeYAgentTools.TOOL_ASK_USER,
+            AgentTool.tool(KeYAgentTools.TOOL_ASK_USER, ToolCategory.INTERACTION,
                 "Asks the user a question. Use this whenever a case split, an assumption or a"
                     + " design decision is ambiguous. The user's answer is returned verbatim.",
                 AgentTool.schema("question",
@@ -35,7 +36,7 @@ public final class SessionTools implements AgentToolProvider {
                             .withItems(JsonSchema.builder().withType("string").build()).build()),
                 args -> "[ask_user is interactive and handled by the agent loop; it cannot be"
                     + " called directly]"),
-            AgentTool.tool(KeYAgentTools.TOOL_USE_SKILL,
+            AgentTool.tool(KeYAgentTools.TOOL_USE_SKILL, ToolCategory.INTERACTION,
                 "Activates a user-defined skill by name. Skills add focused instructions to the"
                     + " system prompt of this and subsequent turns. Enabled only when the 'agent"
                     + " can use skills' setting is on.",
