@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -75,7 +75,7 @@ public class SequentViewLogicPrinter extends LogicPrinter {
     }
 
     @Override
-    protected ImmutableArray<TermLabel> getVisibleTermLabels(JTerm t) {
+    protected ImmutableList<TermLabel> getVisibleTermLabels(JTerm t) {
         List<TermLabel> termLabelList = new LinkedList<>();
         if (visibleTermLabels != null) {
             for (TermLabel label : t.getLabels()) {
@@ -85,7 +85,7 @@ public class SequentViewLogicPrinter extends LogicPrinter {
             }
         }
 
-        return new ImmutableArray<>(termLabelList);
+        return ImmutableList.fromList(termLabelList);
     }
 
     @Override
