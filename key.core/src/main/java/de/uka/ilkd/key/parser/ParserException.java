@@ -7,6 +7,7 @@ package de.uka.ilkd.key.parser;
 import org.key_project.util.parsing.HasLocation;
 import org.key_project.util.parsing.Location;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -15,6 +16,7 @@ import org.jspecify.annotations.Nullable;
  * @author Hubert Schmid
  */
 
+@NullMarked
 public final class ParserException extends RuntimeException implements HasLocation {
     /* --- constructors --- */
     /**
@@ -23,7 +25,7 @@ public final class ParserException extends RuntimeException implements HasLocati
      * @param location The location on which the error occured. The location may be null, if the
      *        location is unknown or the error is independent of a location.
      */
-    public ParserException(String message, Location location) {
+    public ParserException(String message, @Nullable Location location) {
         super(message + " at " + location);
         this.location = location;
     }
@@ -46,6 +48,6 @@ public final class ParserException extends RuntimeException implements HasLocati
     }
 
     /* --- fields --- */
-    private final Location location;
+    private final @Nullable Location location;
 
 }

@@ -113,5 +113,5 @@ public abstract class LDT extends AbstractLDT {
     // -------------------------------------------------------------------------
 
 
-    public abstract Type getType(JTerm t);
+    public abstract @Nullable Type getType(JTerm t);
 }

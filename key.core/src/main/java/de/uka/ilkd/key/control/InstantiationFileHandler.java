@@ -14,9 +14,12 @@ import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.PathConfig;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class InstantiationFileHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(InstantiationFileHandler.class);
 
@@ -31,7 +34,7 @@ public class InstantiationFileHandler {
     private static final int SAVE_COUNT = 5;
 
 
-    private static Map<String, List<List<String>>> hm;
+    private static @Nullable Map<String, List<List<String>>> hm;
 
     /// Finds the current place to store used instantiations. If there was a version change
     /// (the folder does not exist), this method tries to copy previous instantiations to
@@ -82,7 +85,7 @@ public class InstantiationFileHandler {
         return hm.containsKey(taclet.name().toString());
     }
 
-    public static List<List<String>> getInstantiationListsFor(Taclet taclet) {
+    public static @Nullable List<List<String>> getInstantiationListsFor(Taclet taclet) {
         if (hasInstantiationListsFor(taclet)) {
             if (hm.get(taclet.name().toString()) == null) {
                 createListFor(taclet);

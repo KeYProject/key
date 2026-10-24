@@ -17,6 +17,8 @@ import java.util.Properties;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,7 @@ import org.slf4j.LoggerFactory;
  * @see Properties
  * @see Settings
  */
+@NullMarked
 public class ProofSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofSettings.class);
 
@@ -53,7 +56,7 @@ public class ProofSettings {
                 .orElse(PROVER_CONFIG_FILE);
     }
 
-    public static final URL PROVER_CONFIG_FILE_TEMPLATE = KeYResourceManager.getManager()
+    public static final @Nullable URL PROVER_CONFIG_FILE_TEMPLATE = KeYResourceManager.getManager()
             .getResourceFile(ProofSettings.class, "default-proof-settings.json");
 
     public static final ProofSettings DEFAULT_SETTINGS = loadedSettings();
@@ -82,8 +85,8 @@ public class ProofSettings {
     private final NewSMTTranslationSettings newSMTSettings = new NewSMTTranslationSettings();
     private final TermLabelSettings termLabelSettings = new TermLabelSettings();
 
-    private Properties lastLoadedProperties = null;
-    private Configuration lastLoadedConfiguration = null;
+    private @Nullable Properties lastLoadedProperties = null;
+    private @Nullable Configuration lastLoadedConfiguration = null;
 
     /**
      * create a proof settings object. When you add a new settings object, PLEASE UPDATE THE LIST
@@ -239,7 +242,7 @@ public class ProofSettings {
     /**
      * Used to load Settings from a .key file
      */
-    public void loadSettingsFromPropertyString(String s) {
+    public void loadSettingsFromPropertyString(@Nullable String s) {
         if (s == null) {
             return;
         }

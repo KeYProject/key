@@ -11,6 +11,8 @@ import de.uka.ilkd.key.proof.init.Profile;
 import org.key_project.prover.engine.GoalChooser;
 import org.key_project.prover.engine.ProverCore;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The central place where the prover for automatic proof search is selected (a "seam" in the
  * sense of Feathers: a place where behavior can be switched without editing the code that uses
@@ -24,6 +26,7 @@ import org.key_project.prover.engine.ProverCore;
  * centrally and the profile guard cannot be bypassed.
  *
  */
+@NullMarked
 public final class AutoProvers {
 
     private AutoProvers() {}

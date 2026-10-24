@@ -10,11 +10,14 @@ import de.uka.ilkd.key.logic.TermBuilder;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The Geq element of the sign lattice, representing all positive integers and zero.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class Geq extends SignAnalysisDomainElem {
 
     private static final Geq INSTANCE = new Geq();

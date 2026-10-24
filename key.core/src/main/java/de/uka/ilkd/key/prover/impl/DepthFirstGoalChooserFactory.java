@@ -10,6 +10,9 @@ import de.uka.ilkd.key.proof.Proof;
 import org.key_project.prover.engine.GoalChooser;
 import org.key_project.prover.engine.GoalChooserFactory;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class DepthFirstGoalChooserFactory implements GoalChooserFactory<Proof, Goal> {
 
     public static final String NAME = "Depth First Goal Chooser";

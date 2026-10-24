@@ -27,6 +27,10 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 interface VariablePool {
     LogicVariable getInstantiationOfLogicVar(Sort instantiation, LogicVariable lv);
 
@@ -34,6 +38,7 @@ interface VariablePool {
 }
 
 
+@NullMarked
 public class AssumptionGenerator implements TacletTranslator, VariablePool {
     protected final Map<String, LogicVariable> usedVariables = new LinkedHashMap<>();
 
@@ -49,7 +54,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
     }
 
-    public TacletFormula translate(Taclet t, ImmutableSet<Sort> sorts, int maxGeneric)
+    public TacletFormula translate(Taclet t, @Nullable ImmutableSet<Sort> sorts, int maxGeneric)
             throws IllegalTacletException {
 
         // determine the variable conditions.

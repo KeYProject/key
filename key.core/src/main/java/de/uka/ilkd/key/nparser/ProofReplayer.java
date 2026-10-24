@@ -17,6 +17,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A short little hack, but completely working and fast, for replaying proofs inside KeY files.
@@ -28,6 +29,7 @@ import org.jspecify.annotations.NonNull;
  * @version 1 (12/5/19)
  * @see #run(Token, CharStream, IProofFileParser, URI)
  */
+@NullMarked
 public class ProofReplayer {
     /**
      * This map is for the translation between symbols in the sexpr and the corresponding proof tag.

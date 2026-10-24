@@ -9,6 +9,8 @@ import java.util.*;
 import org.key_project.logic.Choice;
 import org.key_project.logic.Namespace;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A POJO representing the information on choices in ASTs.
  * <p>
@@ -18,6 +20,7 @@ import org.key_project.logic.Namespace;
  * @author Alexander Weigl
  * @version 1 (12/5/19)
  */
+@NullMarked
 public class ChoiceInformation {
     /**
      * A map from a found category to a set of possible (defined) options.

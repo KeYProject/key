@@ -12,6 +12,8 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Translates the configuration grammar (something like JSON) into a {@link Configuration} object.
@@ -20,6 +22,7 @@ import org.jspecify.annotations.NonNull;
  * @version 1 (03.04.23)
  * @see KeyAst.ConfigurationFile#asConfiguration()
  */
+@NullMarked
 class ConfigurationBuilder extends JavaKeYParserBaseVisitor<Object> {
     @Override
     public List<Object> visitCfile(JavaKeYParser.CfileContext ctx) {
@@ -34,7 +37,7 @@ class ConfigurationBuilder extends JavaKeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public String visitCsymbol(JavaKeYParser.CsymbolContext ctx) {
+    public @Nullable String visitCsymbol(JavaKeYParser.CsymbolContext ctx) {
         if (ctx.getText().equals("null")) {
             return null;
         }

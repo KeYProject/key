@@ -10,11 +10,14 @@ import de.uka.ilkd.key.logic.TermBuilder;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The Zero element of the sign lattice, representing only the number 0.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class Zero extends SignAnalysisDomainElem {
 
     private static final Zero INSTANCE = new Zero();

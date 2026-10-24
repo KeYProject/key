@@ -8,6 +8,9 @@ package de.uka.ilkd.key.settings;
 import java.util.*;
 import java.util.Map.Entry;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A collection of settings for the new (= 2021) SMT translation.
  * <p>
@@ -22,6 +25,7 @@ import java.util.Map.Entry;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class NewSMTTranslationSettings extends AbstractSettings {
     private static final String PREFIX = "[NewSMT]";
 
@@ -112,6 +116,7 @@ public class NewSMTTranslationSettings extends AbstractSettings {
      * @param key the key to look up
      * @return the value for the key, null if not present
      */
+    @Nullable
     public String get(String key) {
         return map.get(key);
     }
@@ -123,6 +128,7 @@ public class NewSMTTranslationSettings extends AbstractSettings {
      * @param value the non-null value to set
      * @return the value that was in the map prior to the call (see {@link Map#put(Object, Object)}.
      */
+    @Nullable
     public String put(String key, String value) {
         var old = map.get(key);
         String result = map.put(Objects.requireNonNull(key), Objects.requireNonNull(value));
