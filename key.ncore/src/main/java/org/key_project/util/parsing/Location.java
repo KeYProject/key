@@ -28,8 +28,11 @@ import org.jspecify.annotations.NonNull;
  * @author Hubert Schmid
  */
 public record Location(URI fileUri, Position position) implements Comparable<Location> {
+    // The fileUri component may legitimately be null (e.g. standard input); see the class javadoc.
+    @SuppressWarnings("NullAway")
     public static final Location UNDEFINED = new Location(null, Position.UNDEFINED);
 
+    @SuppressWarnings("NullAway") // a token source may not name a file (e.g. standard input)
     public static Location fromToken(Token token) {
         return new Location(SourceNames.getURIFromTokenSource(token.getTokenSource()),
             Position.fromToken(token));

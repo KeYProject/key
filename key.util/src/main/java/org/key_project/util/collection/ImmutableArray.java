@@ -211,6 +211,7 @@ public class ImmutableArray<S extends @Nullable Object>
      *
      * @return This element converted to an {@link ImmutableList}.
      */
+    @SuppressWarnings("NullAway") // foreach var of nullable-bounded S into T-typed parameter
     public ImmutableList<S> toImmutableList() {
         ImmutableList<S> ret = ImmutableList.nil();
         for (S s : this) {

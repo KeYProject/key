@@ -111,6 +111,7 @@ public final class StringUtil {
      * @param text The text to convert.
      * @return The text in lower case or {@code null} if the given text is {@code null}.
      */
+    @SuppressWarnings("NullAway") // @PolyNull is checked by EISOP, not understood by NullAway
     public static @PolyNull String toLowerCase(@PolyNull String text) {
         return text == null ? null : text.toLowerCase();
     }
@@ -326,6 +327,7 @@ public final class StringUtil {
      * @param text The text to trim its right side.
      * @return The trimmed text.
      */
+    @SuppressWarnings("NullAway") // @PolyNull is checked by EISOP, not understood by NullAway
     public static @PolyNull String trimRight(@PolyNull String text) {
         if (text != null) {
             char[] content = text.toCharArray();

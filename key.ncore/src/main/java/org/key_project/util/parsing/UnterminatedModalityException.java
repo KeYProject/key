@@ -32,6 +32,7 @@ public class UnterminatedModalityException extends RuntimeException implements H
     }
 
     @Override
+    @SuppressWarnings("NullAway") // the source name may not refer to a file (e.g. standard input)
     public @Nullable Location getLocation() {
         return new Location(SourceNames.getURIFromTokenSource(sourceName),
             Position.fromOneZeroBased(line, charPositionInLine));

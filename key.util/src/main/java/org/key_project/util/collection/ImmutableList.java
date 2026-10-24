@@ -417,9 +417,13 @@ public interface ImmutableList<T extends @Nullable Object>
     /// @param array the array into which to store the elements, or used for type hint
     /// @return an array containing all elements in this list
     /// @see #iterator()
-    @SuppressWarnings("unchecked")
+    // NullAway does not honor component-nullability of type-variable arrays
+    // (S @Nullable []), misreading the local as S[] with non-null components;
+    // the write below is safe because S extends @Nullable Object. EISOP's
+    // NullnessChecker (the module's conformance gate) accepts these methods.
+    @SuppressWarnings({ "unchecked", "NullAway" })
     default <S extends @Nullable Object> S[] toArray(S[] array) {
-        S[] result;
+        S @Nullable [] result;
         if (array.length < size()) {
             Class<? extends Object[]> arrayClass = array.getClass();
             assert arrayClass.isArray()
@@ -442,8 +446,11 @@ public interface ImmutableList<T extends @Nullable Object>
     /// @param type the class of the type
     /// @return an array of the specified type containing all elements in this list
     /// @see #iterator()
+    // NullAway ignores component-nullability of type-variable arrays here as
+    // well (see toArray(S[])); suppression bridge for the same false positive.
+    @SuppressWarnings("NullAway")
     default <S extends @Nullable Object> S[] toArray(Class<S> type) {
-        S[] result = (S[]) Array.newInstance(type, size());
+        S @Nullable [] result = (S[]) Array.newInstance(type, size());
         int pos = 0;
         for (var head : this) {
             // Somehow the nullness checker needs this cast to be explicit.
@@ -451,7 +458,6 @@ public interface ImmutableList<T extends @Nullable Object>
         }
         return result;
     }
-
 
     /// A stream object for this collection containing all elements of this collection.
     ///
