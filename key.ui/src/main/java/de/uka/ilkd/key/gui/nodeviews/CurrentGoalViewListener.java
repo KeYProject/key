@@ -130,8 +130,12 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
 
         if (localMousePos != null) {
             try {
-                getSequentView().getDragSource().startDrag(dgEvent, DragSource.DefaultCopyDrop,
-                    new PosInSequentTransferable(localMousePos, mediator.getServices()),
+                var node = mediator.getSelectedNode();
+                var sequent = node != null ? node.sequent() : null;
+                // no fixed drag cursor: the DnD system cursor (null) reflects the acceptance of
+                // the drop target below it (copy over a target, no-drop elsewhere)
+                getSequentView().getDragSource().startDrag(dgEvent, null,
+                    new PosInSequentTransferable(localMousePos, mediator.getServices(), sequent),
                     new DragSourceAdapter() {
                         @Override
                         public void dragDropEnd(DragSourceDropEvent event) {

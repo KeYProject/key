@@ -9,19 +9,13 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.net.URI;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Supplier;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.KeYSelectionEvent;
-import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
@@ -31,6 +25,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.help.HelpFacade;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.gui.utilities.LexerHighlighter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -80,7 +75,6 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
     private final JButton btnStop = new JButton("Stop");
     private final JLabel lblQueued = new JLabel("");
     private final JCheckBox chkProofContext = new JCheckBox("attach proof context");
-    private final JPanel tblFiles = new JPanel(new MigLayout(new LC().fillX().wrapAfter(1)));
 
     /** The live row of the tool call currently running in the foreground (with Background). */
     private @Nullable JPanel runningToolRow;
@@ -117,11 +111,7 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
         hint.setBorder(BorderFactory.createEmptyBorder(0, 4, 2, 4));
         inputPane.add(hint, BorderLayout.SOUTH);
 
-        var tabInputPanes = new JTabbedPane();
-        tabInputPanes.addTab("Prompt", inputPane);
-        var scrpFiles = new JScrollPane(tblFiles);
-        tabInputPanes.addTab("Files", scrpFiles);
-        splitPane.add(tabInputPanes);
+        splitPane.add(inputPane);
         add(splitPane, BorderLayout.CENTER);
 
         // conversation output gets 2/3 of the panel height, input 1/3 - and the split keeps
@@ -144,14 +134,8 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
                 }
             });
 
-        populateFiles();
-
-        mediator.addKeYSelectionListener(new KeYSelectionListener() {
-            @Override
-            public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-                populateFilesIfWritable();
-            }
-        });
+        // simple KeY syntax highlighting for ```key fenced blocks typed into the prompt
+        txtInput.setHighlighter(new LexerHighlighter.KeYLexerHighlighter());
     }
 
     private JComponent buildToolbar() {
@@ -220,45 +204,6 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
             PromptResolver.Context context) {
         var resolved = PromptResolver.resolve(fragment, session, context);
         return resolved.text().isBlank() ? null : resolved.text();
-    }
-
-    /** (Re)builds the Files tab from the bounded model file listing. */
-    void populateFilesIfWritable() {
-        if (SwingUtilities.isEventDispatchThread()) {
-            populateFiles();
-        } else {
-            SwingUtilities.invokeLater(this::populateFiles);
-        }
-    }
-
-    private void populateFiles() {
-        try {
-            tblFiles.removeAll();
-            var proof = mediator.getSelectedProof();
-            var session = LlmUtils.getSession(proof);
-            var possible = new ArrayList<>(FileAccess.listFiles(proof));
-            possible.sort(Comparator.comparing(Path::toString));
-            Set<URI> selectedFiles = session.getSelectedFiles();
-            int limit = Math.max(1, LlmSettings.INSTANCE.getMaxModelListingEntries());
-            var shown = 0;
-            for (var path : possible) {
-                shown++;
-                if (shown > limit) {
-                    break;
-                }
-                var chk = new JCheckBox(new CheckBoxFileAction(path.toUri(), selectedFiles));
-                chk.setLabel(path.getFileName().toString());
-                tblFiles.add(chk);
-            }
-            if (shown > limit) {
-                tblFiles.add(new JLabel("(listing truncated at " + limit + " entries)"));
-            }
-            tblFiles.invalidate();
-            tblFiles.revalidate();
-            tblFiles.repaint();
-        } catch (Exception e) {
-            LOGGER.warn("Could not populate the file list", e);
-        }
     }
 
     // ------------------------------------------------------------------ rendering helpers
@@ -683,27 +628,6 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
             newItem.addActionListener(ev -> openPromptSettings());
             menu.add(newItem);
             menu.show(LlmPrompt.this, 0, 30);
-        }
-    }
-
-    static class CheckBoxFileAction extends KeyAction {
-        private final Set<URI> selectedFiles;
-        private final URI file;
-
-        public CheckBoxFileAction(URI file, Set<URI> selectedFiles) {
-            this.file = file;
-            this.selectedFiles = selectedFiles;
-            setName(file.toString());
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            var chk = (JCheckBox) e.getSource();
-            if (chk.isSelected()) {
-                selectedFiles.add(file);
-            } else {
-                selectedFiles.remove(file);
-            }
         }
     }
 
