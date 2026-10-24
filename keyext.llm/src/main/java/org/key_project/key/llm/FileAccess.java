@@ -20,8 +20,10 @@ import org.jspecify.annotations.Nullable;
  * Bounded and sandboxed access to the files of the current Java model. Used by the built-in file
  * tools, by the {@code @file:...} prompt references and by the file listing UI.
  * <p>
- * All operations are confined to the model directory of the current proof (the {@code jail}).
- * Absolute paths outside the jail, {@code ..} segments and symlink escapes are rejected.
+ * All operations are confined to the model directory of the current proof (the {@code jail}). For
+ * proofs without a Java model, the directory of the initial source file is used, and finally the
+ * working directory, so that file references and shell commands remain usable. Absolute paths
+ * outside the jail, {@code ..} segments and symlink escapes are rejected.
  *
  * @author Alexander Weigl
  */
@@ -44,7 +46,21 @@ public final class FileAccess {
             return null;
         }
         var javaModel = proof.getEnv().getServicesForEnvironment().getJavaModel();
-        return javaModel == null ? null : javaModel.getModelDir();
+        if (javaModel == null) {
+            return null;
+        }
+        var dir = javaModel.getModelDir();
+        if (dir != null) {
+            return dir;
+        }
+        // proofs without a model directory (e.g. .key problems): the directory of the initial
+        // source file is the next best jail
+        var initial = javaModel.getInitialFile();
+        if (initial != null) {
+            return initial.toAbsolutePath().getParent();
+        }
+        // otherwise the working directory: file references and shell commands remain usable
+        return Path.of("").toAbsolutePath();
     }
 
     /**
@@ -71,7 +87,8 @@ public final class FileAccess {
             var result = new ArrayList<Path>();
             try (var stream = Files.walk(root)) {
                 stream.limit(2L * limit).forEach(p -> {
-                    if (result.size() < limit && Files.isRegularFile(p)) {
+                    if (result.size() < limit && Files.isRegularFile(p)
+                            && !inSkippedDirectory(p)) {
                         result.add(p);
                     }
                 });
@@ -81,6 +98,16 @@ public final class FileAccess {
         } catch (IOException e) {
             return List.of();
         }
+    }
+
+    /** Whether any path segment of {@code p} (relative to its root) is a skipped directory. */
+    private static boolean inSkippedDirectory(Path p) {
+        for (Path part : p) {
+            if (SKIP_DIRS.contains(part.toString())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static String relative(Path root, Path p) {
@@ -152,7 +179,8 @@ public final class FileAccess {
         }
         try {
             if (absolute.startsWith(root)) {
-                return root.relativize(absolute).toString();
+                // forward slashes: relative names are used as @references in prompts
+                return root.relativize(absolute).toString().replace('\\', '/');
             }
         } catch (IllegalArgumentException e) {
             // fall through

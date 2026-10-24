@@ -159,7 +159,9 @@ payload containing `model`, `messages`, `tools` (+ `tool_choice=auto`), optional
    *max proof-context* settings.
 3. **File attachments** — files selected in the session, read through `FileAccess`
    (sandboxed to the model directory with a path-traversal guard): text files are inlined as
-   fenced code blocks, images as base64 data URLs; counts and sizes are capped.
+   fenced code blocks, images as base64 data URLs; counts and sizes are capped. The sandbox root
+   falls back to the initial source file's directory and then to the working directory for proofs
+   without a Java model; skipped directories (`.git`, `build`, …) are excluded from listings.
 4. **History** — the tail of `session.getContext()`, capped by the *max history* settings.
 5. **User prompt** — the raw input after `PromptResolver` markup resolution.
 
@@ -167,8 +169,14 @@ payload containing `model`, `messages`, `tools` (+ `tool_choice=auto`), optional
 `key-agent-doc.md`, §4): context tokens `$seq`, `$goals`, `$proof`, `$proofName`,
 `$computePath`, `$model`, `$classpath`, `$bootClasspath`, `$selectedFiles`; file references
 `@path`; and the directives `/skill:NAME`, `/prompt:NAME`, `/skills`, `/prompts`.
-`AutocompleteInput` + `AutocompleteProviders` provide the popup (`$`, `@`, `/` triggers) and
-Ctrl+Space expansion used by the panel.
+`AutocompleteInput` (a `JTextPane`) + `AutocompleteProviders` provide the popup (`$`, `@`, `/`
+triggers) and Ctrl+Space expansion used by the panel: the popup is sized to its content (at least
+the input width, resizable via a corner grip), dropped sequent terms are inserted verbatim-wrapped
+(`` ` ``, or ```` ```key ```` fences for multi-line content) by a custom `TransferHandler`, and
+```key fences are highlighted with the KeY lexer (`LexerHighlighter.KeYLexerHighlighter`). On the
+drag source side, `CurrentGoalViewListener` leaves the cursor to the DnD system (it then reflects
+the drop target's acceptance) and `PosInSequentTransferable` provides the whole sequent as the
+string flavor when the sequent view selection is the sequent itself.
 
 ## Tools and MCP
 
@@ -284,7 +292,7 @@ new tools with their approval requirement.
 | Class | Role |
 |---|---|
 | `LlmExtension` | `KeYGuiExtension` wiring: registers settings, the `LlmPrompt` tab, the *Proof → LLM → Open LLM prompt* menu action (Ctrl+K) and the settings providers (`LLM Settings` with children `Tools`, `Prompts`, `Skills`) |
-| `LlmPrompt` | the chat panel; renders `LlmPromptModel` boxes (INPUT/OUTPUT/ERROR), hosts `AskUserBox`/`ApprovalBox`, `AutocompleteInput` |
+| `LlmPrompt` | the chat panel; renders `LlmPromptModel` boxes (INPUT/OUTPUT/ERROR), hosts `AskUserBox`/`ApprovalBox`, `AutocompleteInput` (prompt input only, no separate Files tab) |
 | `LlmSettingsUI` | main settings page incl. *Fetch Models* (`SwingWorker`, timeouts in `Util`, HTTP status in the error dialog) |
 | `LlmToolsPanel` | per-tool approval/disablement table |
 | `LibraryEditorPanel` + editors | lightweight library editing: file list, template creation via *New*, external editing via *Edit*, `Delete`/`Reload`/export/import and the search path editor |
