@@ -49,6 +49,8 @@ public class IrrelevantTermLabelsProperty implements Property<JTerm> {
      * @see TermLabel#isProofRelevant() isStrategyRelevant
      */
     @Override
+    // Varargs parameter cannot be made safe; uses deprecated ImmutableArray via JTerm API.
+    @SuppressWarnings({ "unchecked", "deprecation" })
     public <V> boolean equalsModThisProperty(JTerm term1, JTerm term2, V... v) {
         if (term2 == term1) {
             return true;
@@ -92,6 +94,8 @@ public class IrrelevantTermLabelsProperty implements Property<JTerm> {
      * @return the hash code
      */
     @Override
+    // Uses deprecated ImmutableArray via the JTerm API (subs(), boundVars(), getLabels()).
+    @SuppressWarnings("deprecation")
     public int hashCodeModThisProperty(JTerm term) {
         int hashcode = 5;
         hashcode = hashcode * 17 + term.op().hashCode();

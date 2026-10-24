@@ -475,6 +475,8 @@ public class TermLabelManager {
      * @param newTerm The new {@link JTerm} to update its labels.
      * @return The {@link JTerm} with updates labels.
      */
+    // Uses the deprecated ImmutableArray via the JTerm API and the TermFactory contract.
+    @SuppressWarnings("deprecation")
     public JTerm label(TermLabelState state, Services services, JTerm applicationTerm,
             PosInOccurrence applicationPosInOccurrence, Rule rule,
             RuleApp ruleApp, Goal goal,
@@ -514,6 +516,8 @@ public class TermLabelManager {
      * @param newTerm the template for the new {@link JTerm} to create
      * @return The {@link TermLabel}s to add to the new {@link JTerm} which should be created.
      */
+    // Uses the deprecated ImmutableArray via the JTerm API and the TermFactory contract.
+    @SuppressWarnings("deprecation")
     public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
             Services services,
             PosInOccurrence applicationPosInOccurrence, Rule rule,
@@ -556,6 +560,8 @@ public class TermLabelManager {
      * @param newTerm the template for the new {@link JTerm} to create
      * @return The {@link TermLabel}s to add to the new {@link JTerm} which should be created.
      */
+    // Uses the deprecated ImmutableArray via the JTerm API and the TermFactory contract.
+    @SuppressWarnings("deprecation")
     public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
             Services services, JTerm applicationTerm,
             PosInOccurrence applicationPosInOccurrence,
@@ -660,6 +666,8 @@ public class TermLabelManager {
      * @param newTerm the template for the new {@link JTerm} to create
      * @return The {@link TermLabel}s to add to the new {@link JTerm} which should be created.
      */
+    // Uses the deprecated ImmutableArray via the JTerm API and the TermFactory contract.
+    @SuppressWarnings("deprecation")
     public ImmutableArray<TermLabel> instantiateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule,
@@ -1334,6 +1342,8 @@ public class TermLabelManager {
      * @return The root of the {@link PosInOccurrence} containing the new {@link JTerm} at the
      *         specified {@link PosInOccurrence}.
      */
+    // Uses the deprecated ImmutableArray via the JTerm API and the TermFactory contract.
+    @SuppressWarnings("deprecation")
     protected JTerm replaceTerm(TermLabelState state,
             PosInOccurrence pio, JTerm newTerm,
             TermFactory tf, Set<TermLabelRefactoring> parentRefactorings,
@@ -1556,6 +1566,8 @@ public class TermLabelManager {
      * @param tf The {@link TermFactory} to create the term.
      * @return The new application {@link JTerm} or {@code null} if no refactoring was performed.
      */
+    // Uses the deprecated ImmutableArray via the JTerm API and the TermFactory contract.
+    @SuppressWarnings("deprecation")
     private JTerm refactorChildTerms(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
@@ -1608,6 +1620,8 @@ public class TermLabelManager {
      * @param newApplicationTerm The refactored application term until now.
      * @return The new application {@link JTerm} or {@code null} if no refactoring was performed.
      */
+    // Uses the deprecated ImmutableArray via the JTerm API and the TermFactory contract.
+    @SuppressWarnings("deprecation")
     private JTerm refactorBelowUpdates(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
@@ -1780,6 +1794,8 @@ public class TermLabelManager {
      * @param activeRefactorings The active {@link TermLabelRefactoring}s to execute.
      * @return The refactored {@link JTerm} in which the {@link TermLabel}s may have changed.
      */
+    // Uses the deprecated ImmutableArray via the JTerm API and the TermFactory contract.
+    @SuppressWarnings("deprecation")
     protected JTerm refactorLabelsRecursive(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
@@ -1822,6 +1838,8 @@ public class TermLabelManager {
      * @param activeRefactorings The active {@link TermLabelRefactoring}s to execute.
      * @return The new {@link TermLabel} which should be used for the given {@link JTerm}.
      */
+    // Uses the deprecated ImmutableArray via the JTerm API and the TermFactory contract.
+    @SuppressWarnings("deprecation")
     protected ImmutableArray<TermLabel> performRefactoring(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
@@ -2090,6 +2108,8 @@ public class TermLabelManager {
      * @param inAntecedent {@code true} rejected {@link SequentFormula} is in antecedent,
      *        {@code false} it is in succedent.
      */
+    // Uses the deprecated ImmutableArray via the JTerm API and the TermFactory contract.
+    @SuppressWarnings("deprecation")
     protected void mergeLabels(
             SequentChangeInfo currentSequent,
             Services services,
@@ -2157,6 +2177,8 @@ public class TermLabelManager {
      * @return the transformed term.
      * @see TermLabel#isProofRelevant()
      */
+    // Uses the deprecated ImmutableArray via the JTerm API and the TermFactory contract.
+    @SuppressWarnings("deprecation")
     public static JTerm removeIrrelevantLabels(JTerm term, TermFactory tf) {
         // Identity-preserving rebuild: only allocate along paths that actually carry an irrelevant
         // label, and return the original term unchanged otherwise. The previous implementation

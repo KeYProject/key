@@ -148,6 +148,8 @@ public class SVInstantiations
         return addInteresting(sv, new InstantiationEntry<>(subst), services);
     }
 
+    // Parameter type is bound to the deprecated ImmutableArray (ListInstantiation contract).
+    @SuppressWarnings("deprecation")
     public <T> SVInstantiations add(SchemaVariable sv, ImmutableArray<T> pes, Class<T> type,
             LogicServices services) {
         return add(sv, new ListInstantiation<>(pes, type), services);
@@ -319,6 +321,8 @@ public class SVInstantiations
      * @param sv the SchemaVariable to be instantiated
      * @param pes the ArrayOf<t> the SchemaVariable is instantiated with
      */
+    // Parameter type is bound to the deprecated ImmutableArray (ListInstantiation contract).
+    @SuppressWarnings("deprecation")
     public SVInstantiations replace(SchemaVariable sv, ImmutableArray<ProgramElement> pes,
             Services services) {
         return replace(sv, new ListInstantiation<>(pes, ProgramElement.class), services);
@@ -361,6 +365,8 @@ public class SVInstantiations
      *         no
      *         instantiation is stored
      */
+    // Inherently unchecked cast against the map-backed instantiation store.
+    @SuppressWarnings("unchecked")
     public <T> InstantiationEntry<T> getInstantiationEntry(SchemaVariable sv) {
         return (InstantiationEntry<T>) map.get(sv);
     }
@@ -403,6 +409,8 @@ public class SVInstantiations
      *
      * @param updateApplicationlabels the TermLabels attached to the application operator term
      */
+    // Parameter type is bound to the deprecated ImmutableArray (UpdateLabelPair contract).
+    @SuppressWarnings("deprecation")
     public SVInstantiations addUpdate(@NonNull JTerm update,
             ImmutableArray<TermLabel> updateApplicationlabels) {
         assert update.sort() == JavaDLTheory.UPDATE;
@@ -615,13 +623,17 @@ public class SVInstantiations
     }
 
     @Override
+    // Inherently unchecked cast against the map-backed instantiation store.
+    @SuppressWarnings("unchecked")
     public <T> @Nullable T lookupValue(@NonNull Name name) {
         final var e = lookupEntryForSV(name);
         // e.value() cannot be null here as null instantiations are not allowed
         return e == null ? null : (T) e.value().getInstantiation();
     }
 
+    // The component type is bound to the deprecated ImmutableArray by the addUpdate() contract;
+    // the annotation on the component covers field, parameter and accessor.
     public record UpdateLabelPair(@NonNull JTerm update,
-            ImmutableArray<TermLabel> updateApplicationlabels) {
+            @SuppressWarnings("deprecation") ImmutableArray<TermLabel> updateApplicationlabels) {
     }
 }

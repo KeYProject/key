@@ -26,6 +26,8 @@ abstract class PrefixTermTacletAppIndexCache implements ITermTacletAppIndexCache
         return prefix;
     }
 
+    // Parameter type is bound to the deprecated ImmutableArray (returned by Term.varBoundHere()).
+    @SuppressWarnings("deprecation")
     protected ImmutableList<QuantifiableVariable> getExtendedPrefix(
             ImmutableArray<? extends QuantifiableVariable> extension) {
         ImmutableList<QuantifiableVariable> res = prefix;

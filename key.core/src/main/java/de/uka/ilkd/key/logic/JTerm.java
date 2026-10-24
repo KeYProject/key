@@ -50,6 +50,9 @@ public interface JTerm
     /**
      * The subterms.
      */
+    // Return type is bound to the deprecated ImmutableArray through the whole Term
+    // implementation chain (TermImpl, TermFactory); migration is not local.
+    @SuppressWarnings("deprecation")
     @Override
     ImmutableArray<JTerm> subs();
 
@@ -62,12 +65,18 @@ public interface JTerm
     /**
      * {@inheritDoc}
      */
+    // Return type is bound to the deprecated ImmutableArray through the whole Term
+    // implementation chain (TermImpl, TermFactory); migration is not local.
+    @SuppressWarnings("deprecation")
     @Override
     ImmutableArray<QuantifiableVariable> boundVars();
 
     /**
      * {@inheritDoc}
      */
+    // Return type is bound to the deprecated ImmutableArray through the whole Term
+    // implementation chain (TermImpl, TermFactory); migration is not local.
+    @SuppressWarnings("deprecation")
     @Override
     ImmutableArray<QuantifiableVariable> varsBoundHere(int n);
 
@@ -100,6 +109,9 @@ public interface JTerm
      *
      * @return list of labels (maybe be empty but never <code>null</code>
      */
+    // Return type is bound to the deprecated ImmutableArray through the whole Term
+    // implementation chain (TermImpl, TermFactory); migration is not local.
+    @SuppressWarnings("deprecation")
     ImmutableArray<TermLabel> getLabels();
 
     /**

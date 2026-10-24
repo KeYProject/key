@@ -284,6 +284,8 @@ public class OriginTermLabel implements TermLabel {
      * @param services services.
      * @return the transformed term.
      */
+    // Uses deprecated ImmutableArray via the JTerm API and TermFactory.createTerm().
+    @SuppressWarnings("deprecation")
     public static JTerm removeOriginLabels(JTerm term, Services services) {
         if (term == null) {
             return null;
@@ -436,6 +438,8 @@ public class OriginTermLabel implements TermLabel {
      * @param services services.
      * @return the transformed term.
      */
+    // Uses deprecated ImmutableArray via the JTerm API and TermFactory.createTerm().
+    @SuppressWarnings("deprecation")
     public static JTerm collectSubtermOrigins(JTerm term, Services services) {
         if (!canAddLabel(term, services)) {
             return term;
@@ -506,6 +510,9 @@ public class OriginTermLabel implements TermLabel {
     }
 
 
+    // Return type and body are bound to the deprecated ImmutableArray (used by
+    // collectSubtermOrigins/TermFactory.createTerm()).
+    @SuppressWarnings("deprecation")
     private static ImmutableArray<TermLabel> computeOriginLabelsFromSubTermOrigins(final JTerm term,
             final Set<Origin> origins) {
         List<TermLabel> labels = term.getLabels().toList();
@@ -533,6 +540,8 @@ public class OriginTermLabel implements TermLabel {
      * @return origin information about the searched sub-terms stored in a {@link SubTermOriginData}
      *         object.
      */
+    // Parameter type is bound to the deprecated ImmutableArray (JTerm.subs()).
+    @SuppressWarnings("deprecation")
     private static SubTermOriginData getSubTermOriginData(final ImmutableArray<JTerm> subs,
             final Services services) {
         JTerm[] newSubs = new JTerm[subs.size()];

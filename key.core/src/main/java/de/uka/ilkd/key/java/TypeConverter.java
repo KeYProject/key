@@ -271,6 +271,8 @@ public final class TypeConverter {
         JTerm p = convertReferencePrefix(prefix, ec);
         IProgramMethod pm = mr.method(services, services.getTypeConverter().getKeYJavaType(p), ec);
         if (pm.isModel()) {
+            // getArguments() is bound to the deprecated ImmutableArray by the javaparser fork.
+            @SuppressWarnings("deprecation")
             ImmutableArray<? extends Expression> args = mr.getArguments();
             JTerm[] argTerms = new JTerm[args.size() + 2]; // heap, self,
             int index = 0;

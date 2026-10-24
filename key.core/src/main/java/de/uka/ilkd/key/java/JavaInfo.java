@@ -843,6 +843,8 @@ public final class JavaInfo {
     /**
      * gets an array of expression and returns a list of types
      */
+    // Parameter type is bound to the deprecated ImmutableArray by the javaparser fork.
+    @SuppressWarnings("deprecation")
     private ImmutableList<KeYJavaType> getKeYJavaTypes(ImmutableArray<? extends Expression> args) {
         ImmutableList<KeYJavaType> result = ImmutableList.nil();
         if (args != null) {
@@ -861,6 +863,8 @@ public final class JavaInfo {
      * @param arguments ArrayOf<Expression> of which we try to construct a signature
      * @return the signature
      */
+    // Parameter type is bound to the deprecated ImmutableArray by the javaparser fork.
+    @SuppressWarnings("deprecation")
     public ImmutableList<KeYJavaType> createSignature(
             ImmutableArray<? extends Expression> arguments) {
         return getKeYJavaTypes(arguments);
@@ -885,6 +889,9 @@ public final class JavaInfo {
      * @param filter the Filter to be satisifed by the attributes to be returned
      * @return all attributes declared in class <tt>cl</tt> satisfying the given filter
      */
+    // getMembers()/getFieldSpecifications() are bound to the deprecated ImmutableArray
+    // by the javaparser fork.
+    @SuppressWarnings("deprecation")
     private ImmutableList<Field> filterLocalDeclaredFields(TypeDeclaration classDecl,
             Filter filter) {
         ImmutableList<Field> fields = ImmutableList.nil();
@@ -937,6 +944,8 @@ public final class JavaInfo {
      * @return a IList<Field> the includes all field specifications found int the field declaration
      *         of the given list
      */
+    // getFieldSpecifications() is bound to the deprecated ImmutableArray by the javaparser fork.
+    @SuppressWarnings("deprecation")
     private ImmutableList<Field> getFields(FieldDeclaration field) {
         ImmutableList<Field> result = ImmutableList.nil();
         final ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
@@ -954,6 +963,8 @@ public final class JavaInfo {
      * @return a IList<Field> the includes all field specifications found int the field declaration
      *         of the given list
      */
+    // Parameter type is bound to the deprecated ImmutableArray by the javaparser fork.
+    @SuppressWarnings("deprecation")
     private ImmutableList<Field> getFields(ImmutableArray<MemberDeclaration> list) {
         ImmutableList<Field> result = ImmutableList.nil();
         for (int i = list.size() - 1; i >= 0; i--) {
@@ -1453,6 +1464,8 @@ public final class JavaInfo {
      * @throws NullPointerException e.g., if the receiver of the observer happens to be replaced by
      *         "null".
      */
+    // getParamTypes() is bound to the deprecated ImmutableArray by the recoder fork.
+    @SuppressWarnings("deprecation")
     public boolean isCanonicalProgramMethod(IProgramMethod method, KeYJavaType context)
             throws NullPointerException {
         String name = method.getName();

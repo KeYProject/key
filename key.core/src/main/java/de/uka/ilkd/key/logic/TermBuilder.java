@@ -469,6 +469,8 @@ public class TermBuilder {
         return tf.createTerm(f, s);
     }
 
+    // Parameter type is bound to the deprecated ImmutableArray (TermFactory contract).
+    @SuppressWarnings("deprecation")
     public JTerm func(Function f, JTerm[] s, ImmutableArray<QuantifiableVariable> boundVars) {
         return tf.createTerm(f, s, boundVars, null);
     }
@@ -485,6 +487,8 @@ public class TermBuilder {
         return tf.createTerm(JModality.getModality(modKind, jb), new JTerm[] { t }, null, null);
     }
 
+    // Parameter type is bound to the deprecated ImmutableArray (TermFactory contract).
+    @SuppressWarnings("deprecation")
     public JTerm prog(JModality.JavaModalityKind modKind, JavaBlock jb, JTerm t,
             ImmutableArray<TermLabel> labels) {
         return tf.createTerm(JModality.getModality(modKind, jb), new JTerm[] { t }, null, labels);
@@ -505,6 +509,8 @@ public class TermBuilder {
     /**
      * Construct a term with the \ifEx operator.
      */
+    // Constructs terms via the deprecated ImmutableArray (TermFactory contract).
+    @SuppressWarnings("deprecation")
     public JTerm ifEx(QuantifiableVariable qv, JTerm cond, JTerm _then, JTerm _else) {
         return tf.createTerm(IfExThenElse.IF_EX_THEN_ELSE,
             new ImmutableArray<>(cond, _then, _else),
@@ -538,6 +544,8 @@ public class TermBuilder {
         return ff;
     }
 
+    // Constructs terms via the deprecated ImmutableArray (TermFactory contract).
+    @SuppressWarnings("deprecation")
     public JTerm all(QuantifiableVariable qv, JTerm t) {
         return tf.createTerm(Quantifier.ALL, new ImmutableArray<>(t),
             new ImmutableArray<>(qv), null);
@@ -567,6 +575,8 @@ public class TermBuilder {
         }
     }
 
+    // Constructs terms via the deprecated ImmutableArray (TermFactory contract).
+    @SuppressWarnings("deprecation")
     public JTerm ex(QuantifiableVariable qv, JTerm t) {
         return tf.createTerm(Quantifier.EX, new ImmutableArray<>(t),
             new ImmutableArray<>(qv), null);
@@ -580,6 +590,8 @@ public class TermBuilder {
         return result;
     }
 
+    // Constructs terms via the deprecated ImmutableArray (TermFactory contract).
+    @SuppressWarnings("deprecation")
     public JTerm bsum(QuantifiableVariable qv, JTerm a, JTerm b, JTerm t) {
         Function bsum = services.getTypeConverter().getIntegerLDT().getBsum();
         return func(bsum, new JTerm[] { a, b, t }, new ImmutableArray<>(qv));
@@ -588,6 +600,8 @@ public class TermBuilder {
     /**
      * General (unbounded) sum
      */
+    // Constructs terms via the deprecated ImmutableArray (TermFactory contract).
+    @SuppressWarnings("deprecation")
     public JTerm sum(ImmutableList<LogicVariable> qvs, JTerm range, JTerm t) {
         final Function sum = services.getNamespaces().functions().lookup("sum");
         final Iterator<LogicVariable> it = qvs.iterator();
@@ -602,6 +616,8 @@ public class TermBuilder {
     /**
      * Constructs a bounded product comprehension expression.
      */
+    // Constructs terms via the deprecated ImmutableArray (TermFactory contract).
+    @SuppressWarnings("deprecation")
     public JTerm bprod(QuantifiableVariable qv, JTerm a, JTerm b, JTerm t, Services services) {
         Function bprod = services.getTypeConverter().getIntegerLDT().getBprod();
         return func(bprod, new JTerm[] { a, b, t }, new ImmutableArray<>(qv));
@@ -610,6 +626,8 @@ public class TermBuilder {
     /**
      * General (unbounded) product
      */
+    // Constructs terms via the deprecated ImmutableArray (TermFactory contract).
+    @SuppressWarnings("deprecation")
     public JTerm prod(ImmutableList<LogicVariable> qvs, JTerm range, JTerm t,
             TermServices services) {
         final Function prod = services.getNamespaces().functions().lookup("prod");
@@ -626,6 +644,8 @@ public class TermBuilder {
     /**
      * minimum operator
      */
+    // Constructs terms via the deprecated ImmutableArray (TermFactory contract).
+    @SuppressWarnings("deprecation")
     public JTerm min(ImmutableList<? extends QuantifiableVariable> qvs, JTerm range, JTerm t,
             TermServices services) {
         final Function min = services.getNamespaces().functions().lookup("min");
@@ -642,6 +662,8 @@ public class TermBuilder {
     /**
      * minimum operator
      */
+    // Constructs terms via the deprecated ImmutableArray (TermFactory contract).
+    @SuppressWarnings("deprecation")
     public JTerm max(ImmutableList<? extends QuantifiableVariable> qvs, JTerm range, JTerm t,
             TermServices services) {
         final Function max = services.getNamespaces().functions().lookup("max");
@@ -792,6 +814,8 @@ public class TermBuilder {
         return imp(t1, t2, null);
     }
 
+    // Parameter type is bound to the deprecated ImmutableArray (TermFactory contract).
+    @SuppressWarnings("deprecation")
     public JTerm imp(JTerm t1, JTerm t2, ImmutableArray<TermLabel> labels) {
         if (t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
             return tt();
@@ -832,6 +856,8 @@ public class TermBuilder {
      * @param substTerm the Term that replaces substVar
      * @param origTerm the Term that is substituted
      */
+    // Constructs terms via the deprecated ImmutableArray (TermFactory contract).
+    @SuppressWarnings("deprecation")
     public JTerm subst(SubstOp op, QuantifiableVariable substVar, JTerm substTerm,
             JTerm origTerm) {
         return tf.createTerm(op, new ImmutableArray<>(substTerm, origTerm),
@@ -1100,6 +1126,8 @@ public class TermBuilder {
         return result;
     }
 
+    // Parameter type is bound to the deprecated ImmutableArray (TermFactory contract).
+    @SuppressWarnings("deprecation")
     public JTerm apply(JTerm update, JTerm target, ImmutableArray<TermLabel> labels) {
         if (update.sort() != JavaDLTheory.UPDATE) {
             throw new TermCreationException("Not an update: " + update);
@@ -1136,6 +1164,8 @@ public class TermBuilder {
         return apply(parallel(updates), target, null);
     }
 
+    // Parameter type is bound to the deprecated ImmutableArray (TermFactory contract).
+    @SuppressWarnings("deprecation")
     public JTerm applyParallel(ImmutableList<JTerm> updates, JTerm target,
             ImmutableArray<TermLabel> labels) {
         return apply(parallel(updates), target, labels);
@@ -1466,6 +1496,8 @@ public class TermBuilder {
         }
     }
 
+    // Constructs terms via the deprecated ImmutableArray (TermFactory contract).
+    @SuppressWarnings("deprecation")
     public JTerm infiniteUnion(QuantifiableVariable[] qvs, JTerm s) {
         final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
         return tf.createTerm(ldt.getInfiniteUnion(), new JTerm[] { s },
@@ -1777,6 +1809,8 @@ public class TermBuilder {
      * @param labels the labels to apply.
      * @return a labeled term.
      */
+    // Uses the deprecated ImmutableArray via the JTerm API and the TermFactory contract.
+    @SuppressWarnings("deprecation")
     public JTerm addLabelToAllSubs(JTerm term, ImmutableArray<TermLabel> labels) {
         if (labels == null || labels.isEmpty() || (!OriginTermLabel.canAddLabel(term, services)
                 && labels.stream().anyMatch(l -> l instanceof OriginTermLabel))) {
@@ -1808,6 +1842,8 @@ public class TermBuilder {
      * @param label the label to apply.
      * @return a labeled term.
      */
+    // Wraps into the deprecated ImmutableArray used by addLabelToAllSubs().
+    @SuppressWarnings("deprecation")
     public JTerm addLabelToAllSubs(JTerm term, TermLabel label) {
         return addLabelToAllSubs(term, new ImmutableArray<>(label));
     }
@@ -1819,6 +1855,8 @@ public class TermBuilder {
      * @param labels the labels to add.
      * @return the term with the labels added.
      */
+    // Uses the deprecated ImmutableArray via the JTerm API and the TermFactory contract.
+    @SuppressWarnings("deprecation")
     public JTerm addLabel(JTerm term, ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty()) && !term.hasLabels()) {
             return term;
@@ -1853,6 +1891,8 @@ public class TermBuilder {
      * @param label the label to add.
      * @return the term with the label added.
      */
+    // Wraps into the deprecated ImmutableArray used by addLabel().
+    @SuppressWarnings("deprecation")
     public JTerm addLabel(JTerm term, TermLabel label) {
         if (label == null && !term.hasLabels()) {
             return term;
@@ -1868,6 +1908,8 @@ public class TermBuilder {
      * @param labels the labels to apply.
      * @return the modified term.
      */
+    // Uses the deprecated ImmutableArray via the JTerm API and the TermFactory contract.
+    @SuppressWarnings("deprecation")
     public JTerm label(JTerm term, ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty())) {
             return term;
@@ -1884,6 +1926,8 @@ public class TermBuilder {
      * @param label the label to apply.
      * @return the modified term.
      */
+    // Wraps into the deprecated ImmutableArray used by label().
+    @SuppressWarnings("deprecation")
     public JTerm label(JTerm term, TermLabel label) {
         if (label == null) {
             return term;
@@ -2203,6 +2247,8 @@ public class TermBuilder {
         return replace(term, pos, replacement, 0);
     }
 
+    // Uses the deprecated ImmutableArray via the JTerm API and the TermFactory contract.
+    @SuppressWarnings("deprecation")
     private JTerm replace(JTerm term, PosInTerm pos, JTerm replacement, int depth) {
         if (depth == pos.depth()) {
             return replacement;
@@ -2263,6 +2309,8 @@ public class TermBuilder {
         return new Pair<>(updates, term);
     }
 
+    // Constructs terms via the deprecated ImmutableArray (TermFactory contract).
+    @SuppressWarnings("deprecation")
     public JTerm seqDef(QuantifiableVariable qv, JTerm a, JTerm b, JTerm t) {
         return func(services.getTypeConverter().getSeqLDT().getSeqDef(), new JTerm[] { a, b, t },
             new ImmutableArray<>(qv));
