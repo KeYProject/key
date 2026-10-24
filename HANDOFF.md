@@ -7,7 +7,7 @@
 ## 1. Where things stand
 
 - **Branch:** `weigl/jmltk-jml` — **HEAD** contains Phases 0–4 (front-end swap,
-  Option-B dead-code sweep, test cleanup/runtime parity, and the first two
+  Option-B dead-code sweep, test cleanup/runtime parity, and the first six
   Phase-4 `SpecificationRepository` slices), pushed to origin.
 - **PR:** #3997, retitled *"JMLtk front-end: consume JMLtk's parsed JML AST
   (Phases 0+1)"*, body refreshed.
@@ -17,10 +17,11 @@
   specMath loads). `:key.core:compileTestJava`/`:key.ui:compileTestJava` green.
 - **Phase 4 in progress:** `SpecificationRepository` deletion, slice by slice
   (see PLAN §Phase 4 table; each committed slice keeps compile + speclang slice
-  green). Slices 1–5 DONE (statement specs → AST nodes; limited observers →
+  green). Slices 1–6 DONE (statement specs → AST nodes; limited observers →
   `LimitedObservers`; loop/block/merge specs → AST nodes; proof↔PO registry →
   `ProofRegistry`/`Services`; class invariants/axioms → `ClassAxiomComputer`/
-  `Services`).
+  `Services`; contract registry → `ContractRegistry`/`Services`). The repo is
+  now a thin dispatcher (`map`/`addSpecs`/empty `processJavaType`).
 - **Full-suite baseline (clean, re-measured, no concurrent gradle):**
   **1638 tests, 40 failed, 72 skipped** at slices-1–2 HEAD. A/B against the
   Phase-3 HEAD worktree re-running the same 14 failing classes: **identical 40
@@ -44,6 +45,7 @@
 | `ae716ed74a` | Phase 4 slice 3 — loop invariants, block/loop/merge contracts attached to their AST nodes (`LoopStatement`/`StatementBlock`/`MergePointStatement`); repo loop/block/merge maps + helpers deleted. |
 | `c81c034dd1` | Phase 4 slice 4 — proof↔PO registry (`proofs` map, `registerProof`/`removeProof`/`getProofs`/`getPO`/`getPOForProof`/`getProofOblInput`/`getContractPOForProof`/`getTargetOfProof`/`getAllProofs`) → new `de.uka.ilkd.key.proof.mgt.ProofRegistry` owned by/`Services`, shared in all copy paths; repo proof block + `proofs` field deleted; redundant pre-env register in `DefaultUserInterfaceControl` dropped. |
 | `1b0f1f94ee` | Phase 4 slice 5 — class invariants/axioms (`invs`/`axioms`/`allClassAxiomsCache` maps, `getClassInvariants`/`addClassInvariant(s)`, `getClassAxioms` incl. synthesized invDef/staticInv/free/Query/ContractAxioms + model-method axioms, `getClassAxiomsForType`, `addClassAxiom(s)`) → new `de.uka.ilkd.key.speclang.ClassAxiomComputer` owned by `Services` (created via `Profile.createClassAxiomComputer`; WD variant `ClassAxiomComputerWD` keeps invariant→`ClassWellDefinedness` registration); repo class-axiom surface deleted (~340 lines); callers rewired (AbstractPO/WellDefinednessPO selectClassAxioms, KeYFile, JMLSpecFactory, ClassAxiomImpl, macros/testgen/proofmanagement). |
+| `005320b2ec` | Phase 4 slice 6 — contract registry: contracts/initially clauses out of `SpecificationRepository` into new `de.uka.ilkd.key.speclang.ContractRegistry` (Services-owned, via `Profile.createContractRegistry`; WD variant `ContractRegistryWD` absorbs the `SpecificationRepositoryWD` hooks: wdChecks, register/unregister overrides, getWdChecks/getAllWdChecks/getWdMethodChecks/getWdClassChecks, WD contract filters, map, addWdStatement, ClassAxiomComputer bridges); `CONTRACT_COMBINATION_MARKER` (`§`) → `ContractFactory`; `TacletPOGenerator.generate` now takes `Services`; repo shrinks to a thin dispatcher (`map`/`addSpecs`/empty `processJavaType`). |
 
 ## 2. What Phase 1 did
 
@@ -270,22 +272,29 @@ must NOT grow.
 
 1. `git status` clean? (only HANDOFF.md/PLAN.md doc edits may be pending).
 2. Decision §5 was taken; Phase 3 (§5.1) is DONE — speclang slice green.
-3. **Phase 4 status:** slices 1–5 committed + pushed (statement specs →
+3. **Phase 4 status:** slices 1–6 committed + pushed (statement specs →
    AST nodes; limited observers → `LimitedObservers`; loop/block/merge specs
    → AST nodes, `ae716ed74a`; proof↔PO registry → `ProofRegistry`/`Services`,
    `c81c034dd1`; class invariants/axioms → `ClassAxiomComputer`/`Services`,
-   `1b0f1f94ee`); full-suite baseline measured + A/B-verified
+   `1b0f1f94ee`; contract registry → `ContractRegistry`/`Services`,
+   `005320b2ec`); full-suite baseline measured + A/B-verified
    (40 failures at HEAD = 40 at Phase-3 HEAD; zero slice regressions);
-   IntSemantics fix landed (now 34 recorded gaps, see §5.2). Slice-5
-   baseline re-verified at its own HEAD: speclang 285/0/12, IntSemantics
+   IntSemantics fix landed (now 34 recorded gaps, see §5.2). Slice-5/6
+   baselines re-verified at their own HEADs: speclang 285/0/12, IntSemantics
    6/0/0, full suite **1640/74/34** — the 34 failures are exactly the §5.2
    recorded jmltk gaps (13 failing classes match the triage 1:1; the +2 on
    the 1638 sample count is the earlier re-measurement artifact), zero new
-   regressions. NEXT = **contract registry** (repo `contracts`/`operationContracts`/
-   `contractsByName`/`contractTargets` + `splitContract`/`getOverridingTargets`/
-   `getInheritedContracts`/`prepareContract`/`contractCounters` — also
-   unblocking the `ProofRegistry` contract-lookup delegation).
-4. Then: initially clauses (→ `JMLSpecFactory` at load), `addSpecs` collapse,
-   `map(...)`, delete `SpecificationRepository.java` + `Services`/`KeYEnvironment`
+   regressions. Slice-6 module runs: key.core.wd 1/0/0, key.core.testgen
+   15/2/0, key.ui 44/1/0 all green; the 3 `InfFlowProfileLoadingTest`
+   failures are **pre-existing** (verified identical at Phase-3 HEAD
+   `d9ead21162` and at slice-5 HEAD in clean worktrees — stale
+   bracket-vs-paren contract naming in the `.m.key` example, unrelated to
+   Phase 4 / out of slice scope). NEXT = **slice 7: initially clauses**
+   (move `initiallyClauses`/`addInitiallyClause(s)`/
+   `createContractsFromInitiallyClauses` out of `ContractRegistry` into the
+   `JMLSpecFactory` load path), then `addSpecs` collapse → `map(...)`
+   removal → delete the repo.
+4. Then: `addSpecs` collapse, `map(...)` removal, delete
+   `SpecificationRepository.java` + `Services`/`KeYEnvironment`
    repo accessors.
 5. Remember: do NOT touch `/home/weigl/work/key`.
