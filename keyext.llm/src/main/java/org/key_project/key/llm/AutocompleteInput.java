@@ -94,6 +94,21 @@ public class AutocompleteInput extends JTextPane {
     private int userPopupWidth;
     private int userPopupHeight;
 
+    /**
+     * Suppresses popup and highlight updates while the component itself modifies the document
+     * (completing, expanding, dropping): the document listeners would otherwise recompute the
+     * completion state in the middle of the modification.
+     */
+    private boolean suspendUpdates;
+    /**
+     * Set when Enter/Tab confirmed a completion: the following KEY_TYPED event of that key would
+     * insert a line break or tab into the text.
+     */
+    private boolean suppressTypedKey;
+
+    /** Invoked when the user presses Ctrl+Space; set by the chat panel. */
+    private @Nullable Runnable expandHook;
+
     /** Smallest allowed popup size when the user resizes it with the grip. */
     private static final int MIN_POPUP_WIDTH = 120;
     private static final int MIN_POPUP_HEIGHT = 80;
@@ -147,28 +162,48 @@ public class AutocompleteInput extends JTextPane {
         });
 
         getDocument().addDocumentListener(new DocumentListener() {
+            private void changed(boolean attributeOnly) {
+                if (suspendUpdates) {
+                    return;
+                }
+                updatePopup();
+                if (!attributeOnly) {
+                    scheduleHighlight();
+                }
+            }
+
             @Override
             public void insertUpdate(DocumentEvent e) {
-                updatePopup();
-                scheduleHighlight();
+                changed(false);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                updatePopup();
-                scheduleHighlight();
+                changed(false);
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
                 // attribute-only changes (e.g. from the highlighter) must not re-highlight
-                updatePopup();
+                changed(true);
             }
         });
 
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
+                suppressTypedKey = false;
+                // Ctrl+Space expands the $token / @file / /directive at the caret (the chat
+                // panel registers the hook). Handled directly in the key listener so that no
+                // key binding of the component or an ancestor can swallow the shortcut.
+                if (e.getKeyCode() == KeyEvent.VK_SPACE
+                        && (e.getModifiersEx() & InputEvent.CTRL_DOWN_MASK) != 0) {
+                    e.consume();
+                    if (expandHook != null) {
+                        expandHook.run();
+                    }
+                    return;
+                }
                 if (!popup.isVisible()) {
                     return;
                 }
@@ -190,10 +225,22 @@ public class AutocompleteInput extends JTextPane {
                     e.consume();
                 } else if (code == KeyEvent.VK_ENTER || code == KeyEvent.VK_TAB) {
                     accept();
+                    // the KEY_TYPED event of the confirmed key would insert a line break or tab
+                    suppressTypedKey = true;
                     e.consume();
                 } else if (code == KeyEvent.VK_ESCAPE) {
                     popup.setVisible(false);
                     e.consume();
+                }
+            }
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (suppressTypedKey) {
+                    suppressTypedKey = false;
+                    if (e.getKeyChar() == '\n' || e.getKeyChar() == '\t') {
+                        e.consume();
+                    }
                 }
             }
         });
@@ -214,6 +261,15 @@ public class AutocompleteInput extends JTextPane {
     public void setHighlighter(@Nullable LexerHighlighter highlighter) {
         this.highlighter = highlighter;
         scheduleHighlight();
+    }
+
+    /**
+     * Sets the hook that is invoked when the user presses Ctrl+Space (the chat panel uses it to
+     * expand the {@code $token}/{@code @file}/{@code /directive} at the caret). The hook runs
+     * directly from the key listener, before any key binding processing.
+     */
+    public void setExpandHook(@Nullable Runnable expandHook) {
+        this.expandHook = expandHook;
     }
 
     public List<Suggestion> suggestionsFor(char trigger, String prefix) {
@@ -311,7 +367,12 @@ public class AutocompleteInput extends JTextPane {
                 && !Character.isWhitespace(current.charAt(index));
         var wrapped = (spaceBefore ? " " : "") + verbatim(data) + (spaceAfter ? " " : "");
         try {
-            getDocument().insertString(index, wrapped, null);
+            suspendUpdates = true;
+            try {
+                getDocument().insertString(index, wrapped, null);
+            } finally {
+                suspendUpdates = false;
+            }
             setCaretPosition(index + wrapped.length());
         } catch (BadLocationException e) {
             getToolkit().beep();
@@ -414,8 +475,13 @@ public class AutocompleteInput extends JTextPane {
         try {
             int caret = getCaretPosition();
             int start = caret - fragment.length();
-            getDocument().remove(start, fragment.length());
-            getDocument().insertString(start, expanded, null);
+            suspendUpdates = true;
+            try {
+                getDocument().remove(start, fragment.length());
+                getDocument().insertString(start, expanded, null);
+            } finally {
+                suspendUpdates = false;
+            }
             setCaretPosition(start + expanded.length());
         } catch (BadLocationException e) {
             getToolkit().beep();
@@ -568,20 +634,33 @@ public class AutocompleteInput extends JTextPane {
             popup.setVisible(false);
             return;
         }
+        popup.setVisible(false);
         if (sel.action() != null) {
-            popup.setVisible(false);
             sel.action().run();
             return;
         }
-        if (sel.insert() != null) {
-            try {
-                getDocument().remove(completionStart, getCaretPosition() - completionStart);
-                getDocument().insertString(completionStart, sel.insert(), null);
-            } catch (BadLocationException e) {
-                // ignore
-            }
+        if (sel.insert() == null) {
+            return;
         }
-        popup.setVisible(false);
+        try {
+            // capture the range before modifying: the document listeners recompute the
+            // completion state (and clear completionStart) on every change
+            int start = completionStart;
+            int end = getCaretPosition();
+            if (start < 0 || end < start) {
+                return;
+            }
+            suspendUpdates = true;
+            try {
+                getDocument().remove(start, end - start);
+                getDocument().insertString(start, sel.insert(), null);
+                setCaretPosition(start + sel.insert().length());
+            } finally {
+                suspendUpdates = false;
+            }
+        } catch (BadLocationException e) {
+            getToolkit().beep();
+        }
     }
 
     /**
