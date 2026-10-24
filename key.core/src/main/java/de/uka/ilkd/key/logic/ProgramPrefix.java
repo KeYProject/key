@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * this interface is implemented by program elements that may be matched by the inactive program
@@ -42,6 +43,7 @@ public interface ProgramPrefix extends NonTerminalProgramElement {
     int getPrefixLength();
 
     /** returns the innermost {@link MethodFrame} */
+    @Nullable
     MethodFrame getInnerMostMethodFrame();
 
 }

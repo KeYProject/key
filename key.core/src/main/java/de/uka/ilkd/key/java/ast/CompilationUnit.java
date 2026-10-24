@@ -15,6 +15,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
      * Package spec.
      */
 
-    protected final PackageSpecification packageSpec;
+    protected final @Nullable PackageSpecification packageSpec;
 
     /**
      * Imports.
@@ -182,7 +183,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
      * @return the package specification.
      */
 
-    public PackageSpecification getPackageSpecification() {
+    public @Nullable PackageSpecification getPackageSpecification() {
         return packageSpec;
     }
 
@@ -230,7 +231,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
      * primary declaration, this method returns <CODE>null</CODE>.
      */
 
-    public TypeDeclaration getPrimaryTypeDeclaration() {
+    public @Nullable TypeDeclaration getPrimaryTypeDeclaration() {
         TypeDeclaration res = null;
         int s = typeDeclarations.size();
         for (int i = 0; i < s; i += 1) {

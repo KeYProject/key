@@ -471,7 +471,8 @@ public final class JavaInfo {
         if (t instanceof ClassType) {
             return ((ClassType) t).isPrivate();
         } else if (t instanceof ArrayType at) {
-            return isPrivate(at.getBaseType().getKeYJavaType());
+            return isPrivate(Objects.requireNonNull(at.getBaseType().getKeYJavaType(),
+                "array base type has no KeYJavaType"));
         } else // primitive type or null
         {
             return true;

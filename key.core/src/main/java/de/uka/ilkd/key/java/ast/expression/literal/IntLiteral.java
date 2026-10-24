@@ -121,7 +121,7 @@ public class IntLiteral extends AbstractIntegerLiteral {
     }
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
     }
 

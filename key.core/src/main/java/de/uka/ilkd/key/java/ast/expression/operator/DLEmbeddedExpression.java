@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.expression.operator;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -28,6 +29,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class DLEmbeddedExpression extends Operator {
@@ -76,7 +78,9 @@ public class DLEmbeddedExpression extends Operator {
             return kjt;
         } else {
             // FIXME FIXME FIXME Unknown types are mapped to int.
-            return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+            return Objects.requireNonNull(
+                javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT),
+                "no KeYJavaType for \\int");
         }
     }
 
@@ -116,7 +120,9 @@ public class DLEmbeddedExpression extends Operator {
                 + " arguments, but received only " + actual);
         }
 
-        String name = containingClass.getSort().name().toString();
+        final Sort containingSort = Objects.requireNonNull(containingClass.getSort(),
+            "no sort for containing class " + containingClass);
+        String name = containingSort.name().toString();
         String qualifier =
             name.lastIndexOf('.') != -1 ? name.substring(0, name.lastIndexOf('.')) : "";
         name = name.substring(name.lastIndexOf('.') + 1);
@@ -135,7 +141,10 @@ public class DLEmbeddedExpression extends Operator {
 
             KeYJavaType kjtActual = javaServ.getTypeConverter().getKeYJavaType(child, ec);
 
-            if (kjtExpected != null && !kjtActual.getSort().extendsTrans(kjtExpected.getSort())) {
+            if (kjtExpected != null && !Objects.requireNonNull(kjtActual.getSort(),
+                "no sort for actual type " + kjtActual).extendsTrans(
+                    Objects.requireNonNull(
+                        kjtExpected.getSort(), "no sort for expected type " + kjtExpected))) {
                 throw new ConvertException(
                     "Received " + child + " as argument " + i + " for function " + functionSymbol
                         + ". Was expecting type " + kjtExpected + ", but received " + kjtActual);
@@ -145,14 +154,16 @@ public class DLEmbeddedExpression extends Operator {
 
 
     private static Sort getHeapSort(Services javaServ) {
-        return javaServ.getTypeConverter().getHeapLDT().targetSort();
+        return Objects.requireNonNull(javaServ.getTypeConverter().getHeapLDT(),
+            "heap theory not initialized").targetSort();
     }
 
-    private static KeYJavaType getKeYJavaType(Services javaServ, Sort argSort) {
+    private static @Nullable KeYJavaType getKeYJavaType(Services javaServ, Sort argSort) {
         // JavaInfo returns wrong data for sort integer! We need to find it over
         // other paths.
         JavaInfo javaInfo = javaServ.getJavaInfo();
-        KeYJavaType intType = javaInfo.getPrimitiveKeYJavaType("int");
+        final KeYJavaType intType = Objects.requireNonNull(
+            javaInfo.getPrimitiveKeYJavaType("int"), "no KeYJavaType for primitive type \"int\"");
         if (argSort == intType.getSort()) {
             return intType;
         } else {
