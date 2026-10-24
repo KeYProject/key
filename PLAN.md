@@ -119,6 +119,9 @@ Dotted boxes = the parts this rewrite removes/replaces.
   `JmlExpressionTest`, resolution tests, `fragments/` corpus) plus grammar
   commits titled "changes for KeY". KeY-side gap-fill should therefore be the
   exception, not the rule.
+- **Per-construct mapping** (`TextualJML*` vs the `ast.jml`/`ast.key`
+  replacement, clause-level mapping, verified gap list, integration notes):
+  see `JML_MAPPING.md` on this branch.
 
 > Correction note: an earlier version of this document claimed the published
 > snapshot lacks the JML grammar. That was a false negative (a `strings` scan
@@ -235,15 +238,24 @@ Fixtures: `key.core/src/test/resources/de/uka/ilkd/key/speclang/` (incl.
    `JmlMarkerDecision`/`JmlMarkerDecisionTest`.
 2. Attached-JML carrier: single `attachedJml` list of `ast.jml` nodes vs.
    typed slots per declaration kind.
-3. `\by separates/determined` (KeY-specific) and backtick `KEY_TERM` escapes:
-   supported by JMLtk grammar as-is, or must they stay opaque/tolerated?
-4. Separate `.jml`/`.spec` files: parse via JMLtk with which enclosing context?
-5. Position mapping: JMLtk ranges (offset-based) → KeY file/line for warnings —
-   reuse `JmlDocSanitizer`/`JmlUtility` or extend?
-6. License header policy for new files on this branch (repo convention
+3. `merge_point`: JMLtk only parses the raw-Java `merge_point ( expr );`
+   (`ast.key.KeyMergePointStmt`); KeY writes `//@ merge_point …`. Decide:
+   jmltk grammar change, or KeY-side normalization of the comment text.
+4. Assert labels + proof scripts: JMLtk supports only JML-standard prefix
+   labels (`//@ L1: assert e;`), not KeY's `assert LAB: e`, and has no
+   `BY …` assertion-proof syntax. Scope a small KeY-side shim or upstream work.
+5. Silent-mis-parse protection: `monitors_for`/`readable_if`/`writable_if`/
+   `in_group`/`maps_into`/`nowarn`/`debug` tokens are absent from JMLtk and
+   currently mis-parse (probe: `monitors_for` → spurious `JmlFieldDeclaration`).
+   KeY must reject or pre-filter these.
+6. `\strictly_nothing`, `\nothing`/`\everything` are plain `NameExpr`s in
+   JMLtk — their locset meaning must be re-added in KeY's term translation.
+7. Separate `.jml`/`.spec` files: parse via JMLtk with which enclosing context?
+8. Position mapping: JMLtk `TokenRange` → KeY `Location` for warnings (Phase 2).
+9. License header policy for new files on this branch (repo convention
    GPL-2.0-or-later vs current -only drift).
-7. Performance: JMLtk parse time with JML processing on large files; and
-   `JmlProcessor` behavior on `.key` files' embedded Java.
+10. Performance: JMLtk parse time with JML processing on large files; and
+    `JmlProcessor` behavior on `.key` files' embedded Java.
 
 ## 8. Immediate next step (after this doc)
 
