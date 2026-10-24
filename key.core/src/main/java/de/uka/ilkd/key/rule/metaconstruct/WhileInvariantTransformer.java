@@ -39,7 +39,9 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import com.github.javaparser.ast.key.KeyTransactionStatement;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public final class WhileInvariantTransformer {
     /** the outer label that is used to leave the while loop ('l1') */
     private final SchemaVariable outerLabel = SchemaVariableFactory

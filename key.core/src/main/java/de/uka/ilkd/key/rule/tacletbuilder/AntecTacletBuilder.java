@@ -14,9 +14,12 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * class builds Schematic Theory Specific Rules (Taclets) with find part int antecedent.
  */
+@NullMarked
 public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet> {
     /**
      * sets the <I>find</I> of the Taclet that is to build to the given sequent.

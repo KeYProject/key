@@ -32,7 +32,8 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -77,11 +78,12 @@ import org.jspecify.annotations.NonNull;
  * {@link TacletApp TacletApp}
  * </p>
  */
+@NullMarked
 public abstract class Taclet extends org.key_project.prover.rules.Taclet implements Rule {
     /**
      * This map contains (a, b) if there is a substitution {b a} somewhere in this taclet
      */
-    private ImmutableMap<@NonNull SchemaVariable, SchemaVariable> svNameCorrespondences = null;
+    private @Nullable ImmutableMap<SchemaVariable, SchemaVariable> svNameCorrespondences = null;
 
     /** Integer to cache the hashcode */
     private int hashcode = 0;
@@ -108,7 +110,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
-            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, boolean surviveSmbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, find, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
@@ -134,7 +136,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
-            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, find, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false,
             tacletAnnotations);
@@ -189,7 +191,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
     protected abstract ImmutableSet<QuantifiableVariable> getBoundVariablesHelper();
 
     @Override
-    public @NonNull TacletExecutor getExecutor() {
+    public TacletExecutor getExecutor() {
         return executor;
     }
 
@@ -516,7 +518,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         }
     }
 
-    public abstract @NonNull Taclet setName(@NonNull String s);
+    public abstract Taclet setName(String s);
 
     StringBuffer toStringAttribs(StringBuffer sb) {
         // if (noninteractive()) sb = sb.append(" \\noninteractive");

@@ -15,6 +15,9 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Matches the term labels of a labelled pattern term, in place (the cursor does not move; the
  * current element is the labelled term itself). Only label <em>schema variables</em> in the
@@ -22,6 +25,7 @@ import org.key_project.util.collection.ImmutableArray;
  * already instantiated, all of its labels must occur on the source term); concrete pattern labels
  * are ignored. See the in-code TODO for the intended refinement of these semantics.
  */
+@NullMarked
 public class MatchTermLabelInstruction implements MatchInstruction {
 
     private final ImmutableArray<TermLabel> labels;
@@ -30,7 +34,7 @@ public class MatchTermLabelInstruction implements MatchInstruction {
         this.labels = labels;
     }
 
-    private MatchResultInfo match(TermLabelSV sv, JTerm instantiationCandidate,
+    private @Nullable MatchResultInfo match(TermLabelSV sv, JTerm instantiationCandidate,
             MatchResultInfo matchCond, LogicServices services) {
 
         final SVInstantiations svInsts = (SVInstantiations) matchCond.getInstantiations();
@@ -53,8 +57,8 @@ public class MatchTermLabelInstruction implements MatchInstruction {
      * {@inheritDoc}
      */
     @Override
-    public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo matchConditions,
-            LogicServices services) {
+    public @Nullable MatchResultInfo match(SyntaxElement actualElement,
+            MatchResultInfo matchConditions, LogicServices services) {
         final JTerm term = (JTerm) actualElement;
         MatchResultInfo result = matchConditions;
         // TODO: Define a sane version of taclet matching for term labels

@@ -26,7 +26,6 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -67,7 +66,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
     public static final Name NAME = new Name("Loop Apply Head");
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp application)
+    public ImmutableList<Goal> apply(Goal goal, RuleApp application)
             throws RuleAbortException {
         assert application instanceof LoopApplyHeadBuiltInRuleApp;
         LoopApplyHeadBuiltInRuleApp ruleApp = (LoopApplyHeadBuiltInRuleApp) application;

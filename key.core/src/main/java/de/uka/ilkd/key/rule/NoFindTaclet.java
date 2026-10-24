@@ -17,12 +17,14 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Used to implement a Taclet that has no <I>find</I> part. This kind of taclet is not attached to
  * term or formula, but to a complete sequent. A typical representant is the <code>cut</code> rule.
  */
+@NullMarked
 public class NoFindTaclet extends Taclet {
 
     /**
@@ -74,7 +76,7 @@ public class NoFindTaclet extends Taclet {
     }
 
     @Override
-    public @NonNull NoFindTaclet setName(@NonNull String s) {
+    public NoFindTaclet setName(String s) {
         final TacletApplPart applPart =
             new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
                 varsNotFreeIn(),

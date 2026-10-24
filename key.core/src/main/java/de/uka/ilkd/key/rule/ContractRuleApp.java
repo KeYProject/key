@@ -32,7 +32,7 @@ import org.jspecify.annotations.Nullable;
  */
 @NullMarked
 public class ContractRuleApp extends AbstractContractRuleApp<UseOperationContractRule> {
-    private List<LocationVariable> heapContext;
+    private @Nullable List<LocationVariable> heapContext;
 
     ContractRuleApp(UseOperationContractRule rule, @Nullable PosInOccurrence pio) {
         this(rule, pio, null);
@@ -104,11 +104,11 @@ public class ContractRuleApp extends AbstractContractRuleApp<UseOperationContrac
     }
 
     @Override
-    public List<LocationVariable> getHeapContext() {
+    public @Nullable List<LocationVariable> getHeapContext() {
         return heapContext;
     }
 
-    public JTerm programTerm() {
+    public @Nullable JTerm programTerm() {
         if (posInOccurrence() != null) {
             return TermBuilder.goBelowUpdates((JTerm) posInOccurrence().subTerm());
         }

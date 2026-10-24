@@ -15,11 +15,15 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Matches a modal-operator schema variable against a concrete Java modality kind: the source kind
  * must be one of the kinds the schema variable ranges over, and the schema variable is
  * instantiated with it.
  */
+@NullMarked
 public final class MatchModalOperatorSVInstruction implements MatchInstruction {
 
     private final Set<JModality.JavaModalityKind> modalityKinds;
@@ -31,7 +35,7 @@ public final class MatchModalOperatorSVInstruction implements MatchInstruction {
     }
 
     @Override
-    public MatchResultInfo match(SyntaxElement actualElement,
+    public @Nullable MatchResultInfo match(SyntaxElement actualElement,
             MatchResultInfo mc, LogicServices services) {
         if (actualElement instanceof JModality.JavaModalityKind kind
                 && modalityKinds.contains(kind)) {

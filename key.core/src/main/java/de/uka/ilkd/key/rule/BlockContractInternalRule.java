@@ -31,7 +31,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * <p>
@@ -50,6 +52,7 @@ import org.jspecify.annotations.NonNull;
  * @author wacker, lanzinger
  * @see BlockContractInternalBuiltInRuleApp
  */
+@NullMarked
 public class BlockContractInternalRule extends AbstractBlockContractRule {
 
     /**
@@ -176,7 +179,7 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
     }
 
     @Override
-    public JTerm getLastFocusTerm() {
+    public @Nullable JTerm getLastFocusTerm() {
         return lastFocusTerm.get();
     }
 
@@ -186,7 +189,7 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
     }
 
     @Override
-    public Instantiation getLastInstantiation() {
+    public @Nullable Instantiation getLastInstantiation() {
         return lastInstantiation.get();
     }
 
@@ -196,7 +199,7 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
     }
 
     @Override
-    protected void setLastInstantiation(Instantiation lastInstantiation) {
+    protected void setLastInstantiation(@Nullable Instantiation lastInstantiation) {
         this.lastInstantiation.set(lastInstantiation);
     }
 
@@ -207,7 +210,7 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(final Goal goal, final RuleApp ruleApp)
+    public ImmutableList<Goal> apply(final Goal goal, final RuleApp ruleApp)
             throws RuleAbortException {
         assert ruleApp instanceof BlockContractInternalBuiltInRuleApp<?>;
         var application = (BlockContractInternalBuiltInRuleApp<?>) ruleApp;

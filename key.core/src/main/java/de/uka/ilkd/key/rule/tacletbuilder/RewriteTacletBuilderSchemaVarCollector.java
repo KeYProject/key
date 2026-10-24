@@ -18,11 +18,14 @@ import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  *
  * @author christoph
  */
+@NullMarked
 public class RewriteTacletBuilderSchemaVarCollector {
 
     private final RewriteTacletBuilder<? extends RewriteTaclet> rtb;

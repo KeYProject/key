@@ -10,9 +10,12 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Interface for the rules of external solvers
  */
+@NullMarked
 public interface ExternalSolverRule extends BuiltInRule {
     <T extends ExternalSolverRule> AbstractExternalSolverRuleApp<T> createApp(
             String successfulSolverName);
