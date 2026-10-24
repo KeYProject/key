@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.speclang.ClassAxiomComputer;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.QuantifierTheorySupport;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.QuantifierTheorySupports;
@@ -183,6 +184,12 @@ public interface Profile {
     /// For example WD requires a special instance.
     default SpecificationRepository createSpecificationRepository(Services services) {
         return new SpecificationRepository(services);
+    }
+
+    /// Create an instance of the class-axiom/invariant computer (derived-spec synthesis)
+    /// suitable for the given profile. For example WD requires a special instance.
+    default ClassAxiomComputer createClassAxiomComputer(Services services) {
+        return new ClassAxiomComputer(services);
     }
 
     /// Returns the implementation of a [UseDependencyContractRule] for this profile.

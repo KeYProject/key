@@ -22,7 +22,6 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
@@ -110,10 +109,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         List<SequentFormula> result = new LinkedList<>();
 
         JavaInfo info = services.getJavaInfo();
-        SpecificationRepository spec = services.getSpecificationRepository();
 
         Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
-
         LogicVariable h = new LogicVariable(new Name("h"), heapSort);
 
         for (KeYJavaType kjt : info.getAllKeYJavaTypes()) {
@@ -131,7 +128,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
             }
 
             LogicVariable o = new LogicVariable(new Name("o"), kjt.getSort());
-            for (ClassAxiom c : spec.getClassAxioms(kjt)) {
+            for (ClassAxiom c : services.getClassAxiomComputer().getClassAxioms(kjt)) {
                 if (c instanceof RepresentsAxiom && c.getKJT().equals(kjt)) {
                     addFormulas(result, kjt, c, o, h, services);
                 }

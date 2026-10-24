@@ -1500,7 +1500,7 @@ public class JMLSpecFactory {
                     : PipelineConstants.IMPLICIT_OBJECT_FREE_INVARIANT;
 
             KeYJavaType classType = pm.getContainerType();
-            boolean hasFreeInvariant = services.getSpecificationRepository()
+            boolean hasFreeInvariant = services.getClassAxiomComputer()
                     .getClassInvariants(classType).stream()
                     .anyMatch(ClassInvariant::isFree);
 
