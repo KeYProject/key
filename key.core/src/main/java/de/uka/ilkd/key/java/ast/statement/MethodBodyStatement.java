@@ -204,7 +204,9 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     }
 
     public ReferencePrefix getDesignatedContext() {
-        return methodReference.getReferencePrefix();
+        return Objects.requireNonNull(methodReference.getReferencePrefix(),
+            "Method reference of a method body statement needs an "
+                + "explicit reference prefix.");
     }
 
     public ImmutableArray<? extends Expression> getArguments() {

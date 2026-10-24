@@ -102,12 +102,15 @@ public class AppliedRuleAppsNameCache {
             nodeCache = cache.get(node);
             if (nodeCache == null) {
                 // Try to use parent cache to initialize the new cache
-                HashMap<Name, HashMap<Integer, List<RuleApp>>> parentCache =
-                    node.root() ? null : cache.get(node.parent());
+                HashMap<Name, HashMap<Integer, List<RuleApp>>> parentCache = node.root() ? null
+                        : cache.get(Objects.requireNonNull(node.parent(),
+                            "a non-root node has a parent"));
                 nodeCache = new HashMap<>();
 
                 if (parentCache != null) {
-                    if (node.parent().childrenCount() <= 1) {
+                    final Node par = Objects.requireNonNull(node.parent(),
+                        "a node inheriting its parent's cache cannot be the root");
+                    if (par.childrenCount() <= 1) {
                         // Parent cache will be removed, reuse it
                         nodeCache = parentCache;
                     } else {
@@ -126,19 +129,20 @@ public class AppliedRuleAppsNameCache {
                     // Parent did not have a rule applied when we calculated this, add the rule
                     // applied
                     // there
-                    add(nodeCache, node.parent().getAppliedRuleApp());
+                    add(nodeCache, par.getAppliedRuleApp());
 
                     // If this is an inner node, we hope we will never revisit it, remove it from
                     // the
                     // cache
-                    if (node.parent().childrenCount() <= 1) {
-                        cache.remove(node.parent());
+                    if (par.childrenCount() <= 1) {
+                        cache.remove(par);
                     }
                 } else {
                     // Check all earlier rule applications
                     Node current = node;
                     while (!current.root()) {
-                        final Node par = current.parent();
+                        final Node par = Objects.requireNonNull(current.parent(),
+                            "a non-root node has a parent");
                         add(nodeCache, par.getAppliedRuleApp());
                         current = par;
                     }

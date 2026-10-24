@@ -64,7 +64,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      *        created.
      * @return whether any refactorings should be applied on an application of the given rule.
      */
-    static boolean shouldRefactorOnBuiltInRule(Rule rule, Goal goal, Object hint) {
+    static boolean shouldRefactorOnBuiltInRule(Rule rule, Goal goal, @Nullable Object hint) {
         if (goal != null) {
             Proof proof = goal.proof();
             if ((rule instanceof WhileInvariantRule
@@ -114,9 +114,9 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      * @return The required {@link RefactoringScope}.
      */
     RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             @Nullable JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm);
+            @Nullable Object hint, @Nullable JTerm tacletTerm);
 
     /**
      * This method is used to refactor the labels of the given {@link JTerm}.
@@ -137,9 +137,9 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      * @param labels The new labels the {@link JTerm} will have after the refactoring.
      */
     void refactorLabels(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             @Nullable JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels);
+            @Nullable Object hint, @Nullable JTerm tacletTerm, JTerm term, LabelCollection labels);
 
     /**
      * Possible refactoring scopes.

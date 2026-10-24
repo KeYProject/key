@@ -316,7 +316,8 @@ public final class TypeConverter {
 
     public JTerm convertMethodReference(MethodReference mr, @Nullable ExecutionContext ec) {
         // FIXME this needs to handle two state?
-        final ReferencePrefix prefix = mr.getReferencePrefix();
+        final ReferencePrefix prefix = Objects.requireNonNull(mr.getReferencePrefix(),
+            "missing reference prefix for method reference " + mr);
         JTerm p = convertReferencePrefix(prefix, ec);
         final IProgramMethod pm = Objects.requireNonNull(
             mr.method(services, services.getTypeConverter().getKeYJavaType(p),

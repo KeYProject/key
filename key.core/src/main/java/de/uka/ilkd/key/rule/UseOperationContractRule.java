@@ -7,6 +7,7 @@ package de.uka.ilkd.key.rule;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -28,6 +29,7 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.proof.rules.ComplexJustificationable;
@@ -129,37 +131,50 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         }
 
         // constructor may not refer to anonymous class
-        if (mr instanceof New
-                && ((New) mr).getTypeReference().getKeYJavaType()
-                        .getJavaType() instanceof ClassDeclaration
-                && ((ClassDeclaration) ((New) mr).getTypeReference().getKeYJavaType().getJavaType())
-                        .isAnonymousClass()) {
-            return null;
+        if (mr instanceof New) {
+            final KeYJavaType type = Objects.requireNonNull(
+                ((New) mr).getTypeReference().getKeYJavaType(),
+                "no KeYJavaType for the constructor type reference");
+            if (type.getJavaType() instanceof ClassDeclaration
+                    && ((ClassDeclaration) type.getJavaType()).isAnonymousClass()) {
+                return null;
+            }
         }
 
         // receiver must be simple
         final ReferencePrefix rp = mr.getReferencePrefix();
-        if (rp != null && !ProgramSVSort.SIMPLEEXPRESSION.canStandFor(rp, null, services)
+        if (rp != null
+                && !ProgramSVSort.SIMPLEEXPRESSION.canStandFor(rp,
+                    services.getJavaInfo().getDefaultExecutionContext(), services)
                 && !(rp instanceof ThisReference) && !(rp instanceof SuperReference)
                 && !(rp instanceof TypeReference)) {
             return null;
         } else {
-            return new Pair<>(actualResult, mr);
+            return new Pair<Expression, MethodOrConstructorReference>(actualResult, mr);
         }
     }
 
     private static KeYJavaType getStaticPrefixType(MethodOrConstructorReference mr,
-            Services services, ExecutionContext ec) {
+            Services services, @Nullable ExecutionContext ec) {
         if (mr instanceof MethodReference) {
-            return ((MethodReference) mr).determineStaticPrefixType(services, ec);
+            // determining the static prefix type of a method reference requires an
+            // execution context (used for the implicit prefix and the context type)
+            final ExecutionContext sigEc = Objects.requireNonNull(ec,
+                "no execution context to determine the static prefix type");
+            return ((MethodReference) mr).determineStaticPrefixType(services, sigEc);
         } else {
-            New n = (New) mr;
-            return n.getKeYJavaType(services, ec);
+            // the constructor type reference does not require an execution context
+            return ((New) mr).getKeYJavaType(services);
         }
     }
 
-    private static IProgramMethod getProgramMethod(MethodOrConstructorReference mr,
-            KeYJavaType staticType, ExecutionContext ec, Services services) {
+    private static @Nullable IProgramMethod getProgramMethod(MethodOrConstructorReference mr,
+            KeYJavaType staticType, @Nullable ExecutionContext ec, Services services) {
+        // a missing execution context should only happen for .key files with a
+        // problem section or tests; the default execution context is used there
+        final ExecutionContext sigEc = ec == null
+                ? services.getJavaInfo().getDefaultExecutionContext()
+                : ec;
         IProgramMethod result;
         if (mr instanceof MethodReference methRef) { // from MethodCall.java
             if (ec != null) {
@@ -169,43 +184,53 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
                     // execContext are in different packages we have to
                     // simulate visibility rules like being in prefixType
                     result = methRef.method(services, staticType,
-                        methRef.getMethodSignature(services, ec), staticType);
+                        methRef.getMethodSignature(services, sigEc), staticType);
                 }
             } else {
                 result = methRef.method(services, staticType,
-                    methRef.getMethodSignature(services, ec), staticType);
+                    methRef.getMethodSignature(services, sigEc), staticType);
             }
         } else {
             New n = (New) mr;
             ImmutableList<KeYJavaType> sig = ImmutableList.nil();
             for (Expression e : n.getArguments()) {
-                sig = sig.append(e.getKeYJavaType(services, ec));
+                sig = sig.append(Objects.requireNonNull(e.getKeYJavaType(services, sigEc),
+                    "no KeYJavaType for method argument"));
             }
 
-            // null should only happen for .key files with a problem section or tests
             final TypeReference invocationContext = ec == null || ec.getTypeReference() == null
                     ? services.getJavaInfo().getDefaultExecutionContext().getTypeReference()
                     : ec.getTypeReference();
 
             result = services.getJavaInfo().getConstructor(staticType, sig,
-                invocationContext.getKeYJavaType());
+                Objects.requireNonNull(invocationContext.getKeYJavaType(),
+                    "no KeYJavaType for the invocation context type reference"));
             assert result != null;
         }
         return result;
     }
 
     private static @Nullable JTerm getActualSelf(MethodOrConstructorReference mr, IProgramMethod pm,
-            ExecutionContext ec, Services services) {
+            @Nullable ExecutionContext ec, Services services) {
         final TypeConverter tc = services.getTypeConverter();
         final ReferencePrefix rp = mr.getReferencePrefix();
         if (pm.isStatic() || pm.isConstructor()) {
             return null;
         } else if (rp == null || rp instanceof ThisReference || rp instanceof SuperReference) {
-            return tc.findThisForSort(pm.getContainerType().getSort(), ec);
+            final KeYJavaType containerType = Objects.requireNonNull(pm.getContainerType(),
+                "no container type for the program method");
+            return tc.findThisForSort(
+                Objects.requireNonNull(containerType.getSort(), "no sort for the container type"),
+                ec);
         } else if (rp instanceof FieldReference
                 && ((FieldReference) rp).referencesOwnInstanceField()) {
-            final ReferencePrefix rp2 =
-                ((FieldReference) rp).setReferencePrefix(ec.getRuntimeInstance());
+            // an own instance field only occurs in an instance context, so an
+            // execution context with a runtime instance is available here
+            final ExecutionContext sigEc = Objects.requireNonNull(ec,
+                "no execution context for an own instance field");
+            final ReferencePrefix rp2 = ((FieldReference) rp).setReferencePrefix(
+                Objects.requireNonNull(sigEc.getRuntimeInstance(),
+                    "no runtime instance in the execution context"));
             return tc.convertToLogicElement(rp2);
         } else {
             return tc.convertToLogicElement(rp, ec);
@@ -213,7 +238,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
     }
 
     private static ImmutableList<JTerm> getActualParams(MethodOrConstructorReference mr,
-            ExecutionContext ec, Services services) {
+            @Nullable ExecutionContext ec, Services services) {
         ImmutableList<JTerm> result = ImmutableList.nil();
         for (Expression expr : mr.getArguments()) {
             JTerm actualParam = services.getTypeConverter().convertToLogicElement(expr, ec);
@@ -277,7 +302,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         assert modifiable != null;
         final TermBuilder tb = services.getTermBuilder();
 
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap theory initialized");
         final Name methodHeapName = new Name(tb.newName(heap + "After_" + pm.getName()));
         final Function methodHeapFunc =
             new JFunction(methodHeapName, heapLDT.targetSort(), SKOLEM);
@@ -303,32 +329,44 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
      * for location sets containing only locations that belong to created objects.
      */
     private static JTerm getFreePost(List<LocationVariable> heapContext, IProgramMethod pm,
-            KeYJavaType kjt, JTerm resultTerm, JTerm selfTerm,
+            KeYJavaType kjt, @Nullable JTerm resultTerm, @Nullable JTerm selfTerm,
             Map<LocationVariable, JTerm> heapAtPres,
             JTerm freeSpecPost, Services services) {
         final TermBuilder TB = services.getTermBuilder();
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap theory initialized");
         final JTerm result;
         if (pm.isConstructor()) {
             assert resultTerm == null;
-            assert selfTerm != null;
+            final JTerm ctorSelf = Objects.requireNonNull(selfTerm,
+                "no self term for a constructor contract");
             JTerm createdForm = null;
             for (LocationVariable heap : heapContext) {
-                if (heap == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
+                if (heap == heapLDT.getSavedHeap()) {
                     continue;
                 }
-                final JTerm cr = TB.and(OpReplacer.replace(TB.var(heap), heapAtPres.get(heap),
-                    TB.not(TB.created(TB.var(heap), selfTerm)), services.getTermFactory(),
-                    services.getProof()), TB.created(TB.var(heap), selfTerm));
+                final JTerm cr = TB.and(
+                    OpReplacer.replace(TB.var(heap),
+                        Objects.requireNonNull(heapAtPres.get(heap),
+                            "no pre-heap term for " + heap),
+                        TB.not(TB.created(TB.var(heap), ctorSelf)), services.getTermFactory(),
+                        Objects.requireNonNull(services.getProof(),
+                            "the rule is not applied within a proof")),
+                    TB.created(TB.var(heap), ctorSelf));
                 if (createdForm == null) {
                     createdForm = cr;
                 } else {
                     createdForm = TB.and(createdForm, cr);
                 }
             }
-            result = TB.and(TB.not(TB.equals(selfTerm, TB.NULL())), createdForm,
-                TB.exactInstance(kjt.getSort(), selfTerm));
+            result = TB.and(TB.not(TB.equals(ctorSelf, TB.NULL())),
+                Objects.requireNonNull(createdForm, "no created form has been computed"),
+                TB.exactInstance(
+                    Objects.requireNonNull(kjt.getSort(), "no sort for the static type"),
+                    ctorSelf));
         } else if (resultTerm != null) {
-            result = TB.reachableValue(resultTerm, pm.getReturnType());
+            result = TB.reachableValue(resultTerm, Objects.requireNonNull(pm.getReturnType(),
+                "no return type for the program method"));
         } else {
             result = TB.tt();
         }
@@ -423,7 +461,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         }
 
         // active statement must be method call or new
-        final Pair<Expression, MethodOrConstructorReference> methodCall =
+        final @Nullable Pair<Expression, MethodOrConstructorReference> methodCall =
             getMethodCall(progPost.javaBlock(), services);
         if (methodCall == null) {
             return null;
@@ -434,8 +472,12 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         // arguments of method call must be simple expressions
         final ExecutionContext ec =
             JavaTools.getInnermostExecutionContext(progPost.javaBlock(), services);
+        // the execution context argument of canStandFor is not used by the
+        // implementation; the default execution context is passed instead, as
+        // the parameter is not nullable
+        final ExecutionContext svEc = services.getJavaInfo().getDefaultExecutionContext();
         for (Expression arg : mr.getArguments()) {
-            if (!ProgramSVSort.SIMPLEEXPRESSION.canStandFor(arg, ec, services)) {
+            if (!ProgramSVSort.SIMPLEEXPRESSION.canStandFor(arg, svEc, services)) {
                 return null;
             }
         }
@@ -443,9 +485,10 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         // collect further information
         final KeYJavaType staticType = getStaticPrefixType(mr, services, ec);
         assert staticType != null;
-        final IProgramMethod pm = getProgramMethod(mr, staticType, ec, services);
-        assert pm != null : "Getting program method failed.\nReference: " + mr + ", static type: "
-            + staticType + ", execution context: " + ec;
+        final IProgramMethod pm = Objects.requireNonNull(
+            getProgramMethod(mr, staticType, ec, services),
+            "Getting program method failed.\nReference: " + mr + ", static type: " + staticType
+                + ", execution context: " + ec);
         final JTerm actualSelf = getActualSelf(mr, pm, ec, services);
         final ImmutableList<JTerm> actualParams = getActualParams(mr, ec, services);
 
@@ -457,7 +500,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
     }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, @Nullable PosInOccurrence pio) {
         // focus must be top level succedent
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return false;
@@ -498,7 +541,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         // applying a contract here must not create circular dependencies
         // between proofs
         for (FunctionalOperationContract contract : contracts) {
-            if (goal.proof().mgt().isContractApplicable(contract)) {
+            if (Objects.requireNonNull(goal.proof().mgt(), "no proof management")
+                    .isContractApplicable(contract)) {
                 return true;
             }
         }
@@ -572,11 +616,11 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
     }
 
     public ContractRuleApp createApp(PosInOccurrence pos) {
-        return createApp(pos, null);
+        return new ContractRuleApp(this, pos);
     }
 
     @Override
-    public ContractRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public ContractRuleApp createApp(@Nullable PosInOccurrence pos, TermServices services) {
         return new ContractRuleApp(this, pos);
     }
 
@@ -604,10 +648,18 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
      * @param tf the term factory
      * @return the resulting self term
      */
-    public static JTerm computeSelf(JTerm baseHeapTerm, Map<LocationVariable, JTerm> atPres,
-            LocationVariable baseHeap, Instantiation inst, JTerm resultTerm, TermFactory tf) {
-        return OpReplacer.replace(baseHeapTerm, atPres.get(baseHeap),
-            inst.pm.isConstructor() ? resultTerm : inst.actualSelf, tf);
+    public static @Nullable JTerm computeSelf(JTerm baseHeapTerm,
+            Map<LocationVariable, JTerm> atPres, LocationVariable baseHeap, Instantiation inst,
+            @Nullable JTerm resultTerm, TermFactory tf) {
+        final JTerm replacement = inst.pm.isConstructor() ? resultTerm : inst.actualSelf;
+        if (replacement == null) {
+            // OpReplacer.replace requires non-null arguments and returns null for
+            // a null input, so returning early is equivalent
+            return null;
+        }
+        return OpReplacer.replace(baseHeapTerm,
+            Objects.requireNonNull(atPres.get(baseHeap), "no pre-heap term for " + baseHeap),
+            replacement, tf);
     }
 
     /**
@@ -623,7 +675,9 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
     public static ImmutableList<JTerm> computeParams(JTerm baseHeapTerm,
             Map<LocationVariable, JTerm> atPres, LocationVariable baseHeap, Instantiation inst,
             TermFactory tf) {
-        return OpReplacer.replace(baseHeapTerm, atPres.get(baseHeap), inst.actualParams, tf);
+        return OpReplacer.replace(baseHeapTerm,
+            Objects.requireNonNull(atPres.get(baseHeap), "no pre-heap term for " + baseHeap),
+            inst.actualParams, tf);
     }
 
     /**
@@ -633,7 +687,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
      * @param services the services object
      * @return the result variable
      */
-    public static ProgramVariable computeResultVar(Instantiation inst, TermServices services) {
+    public static @Nullable ProgramVariable computeResultVar(Instantiation inst,
+            TermServices services) {
         final TermBuilder tb = services.getTermBuilder();
         return inst.pm.isConstructor() ? tb.selfVar(inst.staticType, true)
                 : tb.resultVar(inst.pm, true);
@@ -671,7 +726,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         protected List<LocationVariable> heapContext;
         protected Map<LocationVariable, LocationVariable> atPreVars;
         protected Map<LocationVariable, JTerm> atPres;
-        protected ProgramVariable resultVar;
+        protected @Nullable ProgramVariable resultVar;
         protected ProgramVariable excVar;
         protected LocationVariable baseHeap;
         protected JTerm originalPost;
@@ -679,7 +734,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         protected JTerm post;
         protected JTerm freeSpecPost;
         protected ImmutableList<JTerm> contractParams;
-        protected JTerm contractSelf;
+        protected @Nullable JTerm contractSelf;
         protected FunctionalOperationContract contract;
         protected JTerm excPostAssumption;
         protected @Nullable JTerm mby;
@@ -699,17 +754,21 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         protected final Map<LocationVariable, JTerm> modifiables;
         protected final @Nullable JTerm globalDefs;
         protected final JTerm originalPre;
-        protected JTerm finalPreTerm;
+        protected final PosInOccurrence posInOccurrence;
+        protected @Nullable JTerm finalPreTerm;
 
 
         public UseOperationContractRuleApplier(Goal goal, RuleApp ruleApp) {
             this.goal = goal;
             this.ruleApp = ruleApp;
+            posInOccurrence = Objects.requireNonNull(ruleApp.posInOccurrence(),
+                "no position in occurrence");
             termLabelState = new TermLabelState();
             services = goal.getOverlayServices();
 
             // get instantiation
-            inst = instantiate((JTerm) ruleApp.posInOccurrence().subTerm(), services);
+            inst = Objects.requireNonNull(instantiate((JTerm) posInOccurrence.subTerm(), services),
+                "no instantiation");
             jb = inst.progPost.javaBlock();
             tb = services.getTermBuilder();
 
@@ -743,7 +802,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             assert excVar != null;
             goal.addProgramVariable(excVar);
 
-            baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+            baseHeap = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+                "no heap theory initialized").getHeap();
             // translate the contract
             final JTerm baseHeapTerm = tb.getBaseHeap();
             contractParams = computeParams(baseHeapTerm, atPres, baseHeap, inst, tb.tf());
@@ -758,11 +818,15 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             }
             globalDefs = contract.getGlobalDefs(baseHeap, baseHeapTerm, contractSelf,
                 contractParams, services);
-            originalPre = contract.getPre(heapContext, heapTerms, contractSelf, contractParams,
-                atPres, services);
+            originalPre = Objects.requireNonNull(
+                contract.getPre(heapContext, heapTerms, contractSelf, contractParams, atPres,
+                    services),
+                "no precondition of the contract");
             pre = globalDefs == null ? originalPre : tb.apply(globalDefs, originalPre);
-            originalPost = contract.getPost(heapContext, heapTerms, contractSelf,
-                contractParams, contractResult, tb.var(excVar), atPres, services);
+            originalPost = Objects.requireNonNull(
+                contract.getPost(heapContext, heapTerms, contractSelf, contractParams,
+                    contractResult, tb.var(excVar), atPres, services),
+                "no postcondition of the contract");
             JTerm originalFreePost = contract.getFreePost(heapContext, heapTerms, contractSelf,
                 contractParams, contractResult, tb.var(excVar), atPres, services);
             originalFreePost = originalFreePost != null ? originalFreePost : tb.tt();
@@ -790,7 +854,9 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
                         tb.var(heap), tb.var(heap),
                         tb.var(heap));
                 } else {
-                    tAnon = createAnonUpdate(heap, inst.pm, modifiables.get(heap), services);
+                    tAnon = createAnonUpdate(heap, inst.pm,
+                        Objects.requireNonNull(modifiables.get(heap), "no modifiable for " + heap),
+                        services);
                 }
                 anonUpdateDatas = anonUpdateDatas.append(tAnon);
                 if (anonAssumption == null) {
@@ -808,7 +874,9 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
                 } else {
                     wellFormedAnon = tb.and(wellFormedAnon, tb.wellFormed(tAnon.anonHeap));
                 }
-                final JTerm up = tb.elementary(atPreVars.get(heap), tb.var(heap));
+                final JTerm up = tb.elementary(
+                    Objects.requireNonNull(atPreVars.get(heap), "no at-pre variable for " + heap),
+                    tb.var(heap));
                 if (atPreUpdates == null) {
                     atPreUpdates = up;
                 } else {
@@ -826,11 +894,15 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             freePost = getFreePost(heapContext, inst.pm, inst.staticType, contractResult,
                 contractSelf, atPres, freeSpecPost, services);
             freeExcPost = inst.pm.isConstructor() ? freePost : tb.tt();
+            final JTerm anonAssumptionNonNull = Objects.requireNonNull(anonAssumption,
+                "no anonymous heap assumption has been computed");
+            final JTerm anonUpdateNonNull = Objects.requireNonNull(anonUpdate,
+                "no anonymous heap update has been computed");
             postAssumption = tb.applySequential(new JTerm[] { inst.u, atPreUpdates },
-                tb.and(anonAssumption,
-                    tb.apply(anonUpdate, tb.and(excNull, freePost, post), null)));
+                tb.and(anonAssumptionNonNull,
+                    tb.apply(anonUpdateNonNull, tb.and(excNull, freePost, post), null)));
             excPostAssumption = tb.applySequential(new JTerm[] { inst.u, atPreUpdates },
-                tb.and(anonAssumption, tb.apply(anonUpdate,
+                tb.and(anonAssumptionNonNull, tb.apply(anonUpdateNonNull,
                     tb.and(tb.not(excNull), excCreated, freeExcPost, post), null)));
 
         }
@@ -870,18 +942,24 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             // create "Pre" branch
             if (nullGoal != null) {
                 // see #1555
-                reachableState = tb.and(reachableState, tb.created(contractSelf));
+                reachableState = tb.and(
+                    Objects.requireNonNull(reachableState, "no reachable state computed"),
+                    tb.created(Objects.requireNonNull(contractSelf,
+                        "no self term in the null reference branch")));
             }
             int i = 0;
             for (JTerm arg : contractParams) {
-                KeYJavaType argKJT = contract.getTarget().getParameterType(i++);
-                reachableState = tb.and(reachableState, tb.reachableValue(arg, argKJT));
+                KeYJavaType argKJT = Objects.requireNonNull(
+                    contract.getTarget().getParameterType(i++), "no parameter type");
+                reachableState = tb.and(
+                    Objects.requireNonNull(reachableState, "no reachable state computed"),
+                    tb.reachableValue(arg, argKJT));
             }
 
-            finalPreTerm = getFinalPreTerm();
+            final JTerm fp = Objects.requireNonNull(getFinalPreTerm(), "no final pre term");
             finalPreTerm =
-                TermLabelManager.refactorTerm(termLabelState, services, null, finalPreTerm,
-                    ruleApp.rule(), preGoal, FINAL_PRE_TERM_HINT, null);
+                TermLabelManager.refactorTerm(termLabelState, services, null, fp, ruleApp.rule(),
+                    preGoal, FINAL_PRE_TERM_HINT, null);
             createPreGoal(preGoal);
             createPostGoal(postGoal);
             createExceptionalPostGoal(excPostGoal);
@@ -897,8 +975,9 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         }
 
         protected void createPreGoal(Goal preGoal) {
-            preGoal.changeFormula(new SequentFormula(finalPreTerm), ruleApp.posInOccurrence());
-            TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(),
+            preGoal.changeFormula(new SequentFormula(Objects.requireNonNull(finalPreTerm,
+                "no final pre term")), posInOccurrence);
+            TermLabelManager.refactorGoal(termLabelState, services, posInOccurrence,
                 ruleApp.rule(),
                 preGoal, null, null);
         }
@@ -906,9 +985,12 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         /// create and add {@link RuleJustificationBySpec}
         protected void createRuleJustification() {
             final RuleJustificationBySpec just = new RuleJustificationBySpec(contract);
+            final InitConfig initConfig = Objects.requireNonNull(
+                goal.proof().getInitConfig(), "no initial configuration");
             final ComplexRuleJustificationBySpec cjust =
-                (ComplexRuleJustificationBySpec) goal.proof()
-                        .getInitConfig().getJustifInfo().getJustification(ruleApp.rule());
+                (ComplexRuleJustificationBySpec) Objects.requireNonNull(
+                    initConfig.getJustifInfo().getJustification(ruleApp.rule()),
+                    "no rule justification for " + ruleApp.rule().name());
             cjust.add(ruleApp, just);
         }
 
@@ -953,7 +1035,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             } else {
                 final Assignment ca =
                     new BinaryAssignment(COPY, inst.actualResult,
-                        resultVar);
+                        Objects.requireNonNull(resultVar, "no result variable"));
                 resultAssign = new StatementBlock(ca);
             }
             final StatementBlock postSB = replaceStatement(jb, resultAssign);
