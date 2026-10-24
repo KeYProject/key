@@ -25,7 +25,8 @@ public abstract class AbstractSortedOperator extends AbstractOperator
 
     protected AbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, Boolean[] whereToBind,
             Modifier modifier) {
-        this(name, ImmutableList.of(argSorts), sort, ImmutableList.of(whereToBind),
+        this(name, ImmutableList.ofFixedSize(argSorts), sort,
+            ImmutableList.ofFixedSize(whereToBind),
             modifier);
     }
 
@@ -35,7 +36,7 @@ public abstract class AbstractSortedOperator extends AbstractOperator
     }
 
     protected AbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, Modifier modifier) {
-        this(name, ImmutableList.of(argSorts), sort, null, modifier);
+        this(name, ImmutableList.ofFixedSize(argSorts), sort, null, modifier);
     }
 
     protected AbstractSortedOperator(Name name, Sort sort, Modifier modifier) {
