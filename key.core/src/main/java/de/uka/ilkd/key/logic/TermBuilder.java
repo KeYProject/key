@@ -9,11 +9,13 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.ldt.*;
@@ -104,7 +106,9 @@ public class TermBuilder {
         final AbbrevMap abbr =
             (services.getProof() == null) ? null : services.getProof().abbreviations();
         final KeyIO parser = new KeyIO(services, namespaces);
-        parser.setAbbrevMap(abbr);
+        if (abbr != null) {
+            parser.setAbbrevMap(abbr);
+        }
         return parser.parseExpression(s);
     }
 
@@ -260,13 +264,18 @@ public class TermBuilder {
             boolean makeNamesUnique) {
         ImmutableList<LocationVariable> result = ImmutableList.nil();
         for (int i = 0, n = obs.getNumParams(); i < n; i++) {
-            final KeYJavaType paramType = obs.getParamType(i);
+            final KeYJavaType kjt =
+                Objects.requireNonNull(obs.getParamType(i), "no parameter type");
             String name;
             if (obs instanceof IProgramMethod) {
-                name = ((IProgramMethod) obs).getParameterDeclarationAt(i)
-                        .getVariableSpecification().getName();
+                final ParameterDeclaration pd = Objects.requireNonNull(
+                    ((IProgramMethod) obs).getParameterDeclarationAt(i),
+                    "no parameter declaration");
+                name = Objects.requireNonNull(pd.getVariableSpecification().getName(),
+                    "no parameter name");
             } else {
-                name = String.valueOf(paramType.getSort().name().toString().charAt(0));
+                final Sort sort = Objects.requireNonNull(kjt.getSort(), "no parameter sort");
+                name = String.valueOf(sort.name().toString().charAt(0));
             }
             final LocationVariable paramVar =
                 locationVariable(name, new TypeRef(paramType), makeNamesUnique);
@@ -285,7 +294,9 @@ public class TermBuilder {
         for (LocationVariable paramVar : paramVars) {
             ProgramElementName pen = new ProgramElementName(paramVar.name() + postfix);
             LocationVariable formalParamVar =
-                new LocationVariable(pen, paramVar.getTypeReference());
+                new LocationVariable(pen,
+                    Objects.requireNonNull(paramVar.getTypeReference(),
+                        "no parameter variable type"));
             result = result.append(formalParamVar);
         }
         return result;
@@ -308,7 +319,9 @@ public class TermBuilder {
             return null;
         } else {
             name += "_" + pm.getName();
-            return locationVariable(name, new TypeRef(pm.getReturnType()), makeNameUnique);
+            return locationVariable(name,
+                new TypeRef(Objects.requireNonNull(pm.getReturnType(), "no return type")),
+                makeNameUnique);
         }
     }
 
@@ -326,7 +339,9 @@ public class TermBuilder {
      */
     public LocationVariable excVar(String name, IProgramMethod pm, boolean makeNameUnique) {
         return locationVariable(name,
-            new TypeRef(services.getJavaInfo().getTypeByClassName(JAVA_LANG_THROWABLE)),
+            new TypeRef(Objects.requireNonNull(
+                services.getJavaInfo().getTypeByClassName(JAVA_LANG_THROWABLE),
+                "no throwable type")),
             makeNameUnique);
     }
 
@@ -334,7 +349,7 @@ public class TermBuilder {
      * Creates a program variable for the atPre heap. Take care to register it in the namespaces.
      */
     public LocationVariable heapAtPreVar(String baseName, boolean makeNameUnique) {
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT());
         return locationVariable(baseName, heapLDT.getHeap().sort(), makeNameUnique);
     }
 
@@ -484,7 +499,7 @@ public class TermBuilder {
     }
 
     public JTerm func(Function f, JTerm[] s, ImmutableArray<QuantifiableVariable> boundVars) {
-        return tf.createTerm(f, s, boundVars, null);
+        return tf.createTerm(f, new ImmutableArray<JTerm>(s), boundVars, null);
     }
 
     // public Term prog(Modality modality, Term t) {
@@ -496,12 +511,14 @@ public class TermBuilder {
     // }
 
     public JTerm prog(JModality.JavaModalityKind modKind, JavaBlock jb, JTerm t) {
-        return tf.createTerm(JModality.getModality(modKind, jb), new JTerm[] { t }, null, null);
+        return tf.createTerm(JModality.getModality(modKind, jb), new ImmutableArray<JTerm>(t),
+            null, null);
     }
 
     public JTerm prog(JModality.JavaModalityKind modKind, JavaBlock jb, JTerm t,
             ImmutableArray<TermLabel> labels) {
-        return tf.createTerm(JModality.getModality(modKind, jb), new JTerm[] { t }, null, labels);
+        return tf.createTerm(JModality.getModality(modKind, jb), new ImmutableArray<JTerm>(t),
+            null, labels);
     }
 
     public JTerm box(JavaBlock jb, JTerm t) {
@@ -603,7 +620,8 @@ public class TermBuilder {
      * General (unbounded) sum
      */
     public JTerm sum(ImmutableList<LogicVariable> qvs, JTerm range, JTerm t) {
-        final Function sum = services.getNamespaces().functions().lookup("sum");
+        final Function sum = Objects.requireNonNull(
+            services.getNamespaces().functions().lookup("sum"), "no sum function");
         final Iterator<LogicVariable> it = qvs.iterator();
         JTerm res = func(sum, new JTerm[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
@@ -626,7 +644,8 @@ public class TermBuilder {
      */
     public JTerm prod(ImmutableList<LogicVariable> qvs, JTerm range, JTerm t,
             TermServices services) {
-        final Function prod = services.getNamespaces().functions().lookup("prod");
+        final Function prod = Objects.requireNonNull(
+            services.getNamespaces().functions().lookup("prod"), "no prod function");
         final Iterator<LogicVariable> it = qvs.iterator();
         JTerm res = func(prod, new JTerm[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
@@ -642,7 +661,8 @@ public class TermBuilder {
      */
     public JTerm min(ImmutableList<? extends QuantifiableVariable> qvs, JTerm range, JTerm t,
             TermServices services) {
-        final Function min = services.getNamespaces().functions().lookup("min");
+        final Function min = Objects.requireNonNull(
+            services.getNamespaces().functions().lookup("min"), "no min function");
         final Iterator<? extends QuantifiableVariable> it = qvs.iterator();
         JTerm res = func(min, new JTerm[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
@@ -658,7 +678,8 @@ public class TermBuilder {
      */
     public JTerm max(ImmutableList<? extends QuantifiableVariable> qvs, JTerm range, JTerm t,
             TermServices services) {
-        final Function max = services.getNamespaces().functions().lookup("max");
+        final Function max = Objects.requireNonNull(
+            services.getNamespaces().functions().lookup("max"), "no max function");
         final Iterator<? extends QuantifiableVariable> it = qvs.iterator();
         JTerm res = func(max, new JTerm[] { convertToBoolean(range), t },
             new ImmutableArray<>(it.next()));
@@ -814,7 +835,7 @@ public class TermBuilder {
         } else if (t2.op() == Junctor.FALSE) {
             return not(t1);
         } else {
-            return tf.createTerm(Junctor.IMP, t1, t2, labels);
+            return tf.createTerm(Junctor.IMP, new ImmutableArray<JTerm>(t1, t2), null, labels);
         }
     }
 

@@ -219,7 +219,7 @@ public class RenamingTermProperty implements Property<Term> {
      * @return the updated {@link NameAbstractionTable} if the {@link JavaBlock}s are equal modulo
      *         renaming or {@link #FAILED} if they are not
      */
-    private static NameAbstractionTable handleJava(JavaBlock jb0, JavaBlock jb1,
+    private static @Nullable NameAbstractionTable handleJava(JavaBlock jb0, JavaBlock jb1,
             @Nullable NameAbstractionTable nat) {
         if (!jb0.isEmpty() || !jb1.isEmpty()) {
             nat = checkNat(nat);
