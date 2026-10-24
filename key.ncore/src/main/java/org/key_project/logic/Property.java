@@ -22,6 +22,7 @@ public interface Property<T> {
     /// @param v the additional arguments needed for the equality check
     /// @return whether `t1` and `t2` are equal ignoring a certain property
     /// @param <V> the type of the additional parameters needed for the comparison
+    @SuppressWarnings("unchecked") // varargs array is forwarded to the implementing property
     <V> boolean equalsModThisProperty(T t1, T t2, V... v);
 
     /// Computes the hash code of `t` in a context where
