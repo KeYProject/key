@@ -15,6 +15,8 @@ import de.uka.ilkd.key.java.ast.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The DeclarationProgramVariableCollector collects all top level declared program variables
  * relative to the given block to be visited, for example starting with <code>
@@ -22,6 +24,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
  * </code> the collector will return a set containg <code>j, h</code> the <code>h</code> because of
  * the second occurrence of <code>h</code>
  */
+@NullMarked
 public class DeclarationProgramVariableCollector extends JavaASTVisitor {
 
     private final Set<IProgramVariable> result = new LinkedHashSet<>();

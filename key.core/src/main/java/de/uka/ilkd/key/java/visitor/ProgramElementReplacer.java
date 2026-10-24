@@ -10,6 +10,9 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ProgramElementReplacer extends CreatingASTVisitor {
 
     private ProgramElement oldElement;

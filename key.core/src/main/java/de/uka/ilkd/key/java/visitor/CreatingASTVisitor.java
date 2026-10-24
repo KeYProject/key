@@ -23,9 +23,13 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Walks through a java AST in depth-left-fist-order.
  */
+@NullMarked
 public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     protected static final Boolean CHANGED = Boolean.TRUE;
@@ -1059,14 +1063,14 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         }
     }
 
-    protected void addToTopOfStack(SourceElement x) {
+    protected void addToTopOfStack(@Nullable SourceElement x) {
         if (x != null) {
             ExtList list = stack.peek();
             list.add(x);
         }
     }
 
-    protected void addChild(SourceElement x) {
+    protected void addChild(@Nullable SourceElement x) {
         stack.pop();
         addToTopOfStack(x);
     }

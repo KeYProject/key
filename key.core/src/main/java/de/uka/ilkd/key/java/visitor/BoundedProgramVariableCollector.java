@@ -10,6 +10,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A {@link ProgramVariableCollector} that stops as soon as it has found every variable in a given
  * <em>interested</em> set.
@@ -25,6 +27,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
  * {@code interested}. All the spec handling of the superclass (loop invariants, block/loop/merge
  * contracts, statement specs) is inherited unchanged, so it stays correct as that evolves.
  */
+@NullMarked
 public class BoundedProgramVariableCollector extends ProgramVariableCollector {
 
     private final Set<LocationVariable> interested;

@@ -13,6 +13,7 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import org.jspecify.annotations.NullMarked;
 
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
 
@@ -48,6 +49,7 @@ import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
 /// @author mulbrich, drodt
 /// @since 2006-11-18
 /// @version 2026-03-03
+@NullMarked
 public class EnumClassDeclaration extends ClassOrInterfaceDeclaration {
     /// name of the static variable of the array holding the names of the constants.
     private static final String ENUM_NAMES = "$enumConstantNames";

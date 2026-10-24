@@ -15,6 +15,7 @@ import com.github.javaparser.ast.key.KeyPassiveExpression;
 import com.github.javaparser.ast.key.sv.KeyExpressionSV;
 import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * An evaluator for constant expression in Java.
@@ -22,6 +23,7 @@ import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
  * @author Alexander Weigl
  * @version 1 (11/2/21)
  */
+@NullMarked
 public class ConstantExpressionEvaluator {
     public boolean isCompileTimeConstant(Expression expr) throws EvaluationException {
         var ccev = new ConstantExpressionEvaluatorVisitor();

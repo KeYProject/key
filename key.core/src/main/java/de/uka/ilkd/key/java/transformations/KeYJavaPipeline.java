@@ -12,6 +12,7 @@ import java.util.List;
 import de.uka.ilkd.key.java.transformations.pipeline.*;
 
 import com.github.javaparser.ast.CompilationUnit;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (11/7/21)
  */
+@NullMarked
 public class KeYJavaPipeline {
     private final TransformationPipelineServices pipelineServices;
     private final List<JavaTransformer> steps = new LinkedList<>();

@@ -39,6 +39,9 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.java.ast.expression.UnaryAssignment.UnaryAssignmentKind.POST_INCREMENT;
 import static de.uka.ilkd.key.java.ast.expression.operator.BinaryOperatorKind.LESS_THAN;
 
@@ -47,6 +50,7 @@ import static de.uka.ilkd.key.java.ast.expression.operator.BinaryOperatorKind.LE
  * particular its helper method <code>&lt;createArrayHelper&gt;</code>. This class should be
  * replaced by a recoder transformation as soon as we port our array data structures to RecodeR.
  */
+@NullMarked
 public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
     public static final String IMPLICIT_ARRAY_CREATE = "$createArray";
@@ -166,7 +170,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *        the IList<Field> where we have to look for the field
      * @return the program variable of the given name or null if not found
      */
-    private ProgramVariable find(String name, ImmutableList<Field> fields) {
+    private @Nullable ProgramVariable find(String name, ImmutableList<Field> fields) {
         for (Field field1 : fields) {
             Field field = field1;
             final ProgramVariable fieldVar = (ProgramVariable) field.getProgramVariable();
@@ -177,7 +181,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         return null;
     }
 
-    private ProgramVariable findInObjectFields(String name) {
+    private @Nullable ProgramVariable findInObjectFields(String name) {
         ProgramVariable var = cache.get(name);
         if (var == null && objectType.getJavaType() != null) {
             final ImmutableList<Field> objectFields = filterImplicitFields(

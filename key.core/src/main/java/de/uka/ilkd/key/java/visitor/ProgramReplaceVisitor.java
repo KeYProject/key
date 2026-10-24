@@ -17,13 +17,18 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used to transform a program
  * according to the given SVInstantiations.
  */
+@NullMarked
 public class ProgramReplaceVisitor extends CreatingASTVisitor {
 
+    @Nullable
     private ProgramElement result = null;
 
     private final SVInstantiations svinsts;
@@ -58,7 +63,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
     /**
      * @return The result.
      */
-    public ProgramElement result() {
+    public @Nullable ProgramElement result() {
         return result;
     }
 

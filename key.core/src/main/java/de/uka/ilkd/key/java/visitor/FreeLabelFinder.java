@@ -9,9 +9,12 @@ import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * descends recursively a given program and looks for free occurrences of a specified label
  */
+@NullMarked
 public class FreeLabelFinder {
 
     public FreeLabelFinder() {}

@@ -31,6 +31,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,7 @@ import static de.uka.ilkd.key.java.ast.declaration.ModifierKind.*;
  * specific details like the use of Recoder is hidden in the field of type {@link KeYProgModelInfo}.
  * This class can be extended to provide further services.
  */
+@NullMarked
 public final class JavaInfo {
     public static final Logger LOGGER = LoggerFactory.getLogger(JavaInfo.class);
 
@@ -53,7 +55,7 @@ public final class JavaInfo {
     /**
      * the type of null
      */
-    private KeYJavaType nullType = null;
+    private @Nullable KeYJavaType nullType = null;
 
     // Caches for the getKeYJavaType methods. A single JavaInfo is shared across all parallel-prover
     // workers of a proof, so every access below is made thread-safe:
@@ -64,9 +66,9 @@ public final class JavaInfo {
     // ConcurrentHashMap; its lazy creation is serialized by cacheBuildLock.
     // * commonSubtypeCache is an access-ordered LRU (get() mutates), so all access synchronizes on
     // the cache instance.
-    private volatile HashMap<Sort, List<KeYJavaType>> sort2KJTCache = null;
-    private volatile ConcurrentHashMap<Type, KeYJavaType> type2KJTCache = null;
-    private volatile HashMap<String, KeYJavaType> name2KJTCache = null;
+    private volatile @Nullable HashMap<Sort, List<KeYJavaType>> sort2KJTCache = null;
+    private volatile @Nullable ConcurrentHashMap<Type, KeYJavaType> type2KJTCache = null;
+    private volatile @Nullable HashMap<String, KeYJavaType> name2KJTCache = null;
 
     /** serializes (re)builds of the lazily populated caches above */
     private final Object cacheBuildLock = new Object();
@@ -80,7 +82,7 @@ public final class JavaInfo {
      * Cached user-facing type view: all types minus {@link KeYJavaType#isInternal() internal} ones.
      * Rebuilt only when the type set grows (see {@link #getAllKeYJavaTypes(boolean)}).
      */
-    private volatile Collection<KeYJavaType> userTypesCache = null;
+    private volatile @Nullable Collection<KeYJavaType> userTypesCache = null;
     private volatile int userTypesCachedSize = 0;
 
     /**
@@ -101,22 +103,22 @@ public final class JavaInfo {
      * with a {@link MethodBodyStatement} or a
      * {@link MethodFrame}, which contains a valid execution context.
      */
-    private ExecutionContext defaultExecutionContext;
+    private @Nullable ExecutionContext defaultExecutionContext;
 
     /**
      * caches the arrays' length attribute
      */
-    private LocationVariable length;
+    private @Nullable LocationVariable length;
 
     /**
      * caches the observer for {@code $inv}
      */
-    private ObserverFunction inv;
+    private @Nullable ObserverFunction inv;
 
     /**
      * caches the observer for {@code <inv_free>}
      */
-    private ObserverFunction invFree;
+    private @Nullable ObserverFunction invFree;
 
     /**
      * the name of the class used as default execution context
@@ -205,7 +207,7 @@ public final class JavaInfo {
      * @param fullName the String
      * @return the KeYJavaType with the name of the String
      */
-    public KeYJavaType getTypeByName(String fullName) {
+    public @Nullable KeYJavaType getTypeByName(String fullName) {
         fullName = translateArrayType(fullName);
         HashMap<String, KeYJavaType> cache = name2KJTCache;
         if (cache == null || kpmi.rec2key().keYTypes().size() > nameCachedSize) {
@@ -299,7 +301,7 @@ public final class JavaInfo {
      *        java.lang)
      * @return a class matching the name
      */
-    public KeYJavaType getTypeByClassName(String className) {
+    public @Nullable KeYJavaType getTypeByClassName(String className) {
         return getTypeByClassName(className, null);
     }
 
@@ -366,7 +368,7 @@ public final class JavaInfo {
     }
 
 
-    public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
+    public KeYJavaType getPrimitiveKeYJavaType(@Nullable PrimitiveType type) {
         if (type == null) {
             throw new IllegalArgumentException("Given type is null");
         }
@@ -547,7 +549,7 @@ public final class JavaInfo {
         }
     }
 
-    public List<KeYJavaType> lookupSort2KJTCache(Sort sort) {
+    public @Nullable List<KeYJavaType> lookupSort2KJTCache(Sort sort) {
         return updateSort2KJTCache().get(sort);
     }
 
@@ -725,7 +727,7 @@ public final class JavaInfo {
         return getTermFromProgramMethod(pm, methodName, className, args, null);
     }
 
-    public JTerm getProgramMethodTerm(JTerm prefix, String methodName, JTerm[] args,
+    public JTerm getProgramMethodTerm(@Nullable JTerm prefix, String methodName, JTerm[] args,
             String className,
             boolean traverseHierarchy) {
 
@@ -770,8 +772,9 @@ public final class JavaInfo {
         return getTermFromProgramMethod(pm, methodName, className, args, prefix);
     }
 
-    public JTerm getTermFromProgramMethod(IProgramMethod pm, String methodName, String className,
-            JTerm[] args, JTerm prefix) throws IllegalArgumentException {
+    public JTerm getTermFromProgramMethod(@Nullable IProgramMethod pm, String methodName,
+            String className,
+            JTerm[] args, @Nullable JTerm prefix) throws IllegalArgumentException {
         if (pm == null) {
             throw new IllegalArgumentException(
                 "Program method " + methodName + " in " + className + " not found.");
@@ -807,7 +810,7 @@ public final class JavaInfo {
      * @param type the KeYJavaType of the type whose superclass has to be determined
      * @return KeYJavaType of the extended supertype
      */
-    public KeYJavaType getSuperclass(KeYJavaType type) {
+    public @Nullable KeYJavaType getSuperclass(KeYJavaType type) {
         KeYJavaType result = null;
         final ClassType javaType = (ClassType) type.getJavaType();
 
@@ -843,7 +846,8 @@ public final class JavaInfo {
     /**
      * gets an array of expression and returns a list of types
      */
-    private ImmutableList<KeYJavaType> getKeYJavaTypes(ImmutableArray<? extends Expression> args) {
+    private ImmutableList<KeYJavaType> getKeYJavaTypes(
+            @Nullable ImmutableArray<? extends Expression> args) {
         ImmutableList<KeYJavaType> result = ImmutableList.nil();
         if (args != null) {
             for (int i = args.size() - 1; i >= 0; i--) {
@@ -921,7 +925,7 @@ public final class JavaInfo {
      * @param fields the IList<Field> where we have to look for the field
      * @return the program variable of the given name or null if not found
      */
-    private ProgramVariable find(String programName, Iterable<Field> fields) {
+    private @Nullable ProgramVariable find(String programName, Iterable<Field> fields) {
         for (Field field : fields) {
             if (programName.equals(field.getProgramName())) {
                 return (ProgramVariable) field.getProgramVariable();
@@ -973,7 +977,7 @@ public final class JavaInfo {
      * @return an attribute program variable of the given name
      * @throws IllegalArgumentException if the given name is not fully qualified
      */
-    public ProgramVariable getAttribute(String fullyQualifiedName) {
+    public @Nullable ProgramVariable getAttribute(String fullyQualifiedName) {
         final JavaDLFieldNames.ParsedFieldName parsedName =
             JavaDLFieldNames.split(fullyQualifiedName);
 
@@ -995,7 +999,7 @@ public final class JavaInfo {
      * @throws IllegalArgumentException if the qualified class name is empty or null
      * @throws UnknownJavaTypeException if the qualified name refers to an unknown type
      */
-    public ProgramVariable getAttribute(String programName, String qualifiedClassName) {
+    public @Nullable ProgramVariable getAttribute(String programName, String qualifiedClassName) {
         if (qualifiedClassName == null || qualifiedClassName.isEmpty()) {
             throw new IllegalArgumentException("Missing qualified classname");
         }
@@ -1026,7 +1030,8 @@ public final class JavaInfo {
      * @param classType the KeYJavaType representing the class where to look for the attribute
      * @return the attribute of the given name declared in <tt>classType</tt>
      */
-    public ProgramVariable getAttribute(final String name, KeYJavaType classType) {
+    public @Nullable ProgramVariable getAttribute(final String name,
+            @Nullable KeYJavaType classType) {
         if (classType != null) {
             if (classType.getJavaType() instanceof ArrayDeclaration) {
                 ProgramVariable res =
@@ -1056,7 +1061,8 @@ public final class JavaInfo {
      * on an object of (dynamic) type {@code kjt} during Java program execution would end up in the
      * same type as the type of the returned {@link ProgramVariable}.
      */
-    public ProgramVariable getCanonicalFieldProgramVariable(String fieldName, KeYJavaType kjt) {
+    public @Nullable ProgramVariable getCanonicalFieldProgramVariable(String fieldName,
+            KeYJavaType kjt) {
         ImmutableList<ProgramVariable> allAttributes = getAllAttributes(fieldName, kjt, false);
         if (allAttributes.isEmpty()) {
             return null;
@@ -1510,7 +1516,8 @@ public final class JavaInfo {
      * @param containerType the KeYJavaType of the context in which the type should be resolved
      * @return the KeYJavaType of the given type or <code>null</code> if type name is unknown
      */
-    public KeYJavaType getTypeByClassName(String name, KeYJavaType containerType) {
+    public @Nullable KeYJavaType getTypeByClassName(String name,
+            @Nullable KeYJavaType containerType) {
         KeYJavaType result = getTypeByName(name);
         if (result == null) {
             if (containerType != null) {
