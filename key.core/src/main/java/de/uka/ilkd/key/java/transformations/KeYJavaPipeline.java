@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.java.transformations.pipeline.*;
+import de.uka.ilkd.key.java.transformations.pipeline.lambda.LambdaReplacer;
 
 import com.github.javaparser.ast.CompilationUnit;
 import org.slf4j.Logger;
@@ -44,8 +45,14 @@ public class KeYJavaPipeline {
         p.add(new TryWithResourceReducer());
         p.add(new EnumClassBuilder(pipelineServices));
         p.add(new RecordClassBuilder(pipelineServices));
-        p.add(new JMLTransformer(pipelineServices));
+        // Lambdas and method references must be eliminated before any JML processing:
+        // (i) JP2KeYConverter rejects both, and (ii) the JML model-method conversion of
+        // the generated classes (phase 2) requires JMLTransformer to run afterwards.
         p.add(new LambdaReplacer(pipelineServices));
+        // Hoists the local classes created by the lambda replacer (and user-written local
+        // classes) into unique private static final nested classes capturing the closure.
+        p.add(new LocalClassTransformation(pipelineServices));
+        p.add(new JMLTransformer(pipelineServices));
         p.add(new JmlDocRemoval(pipelineServices));
         p.add(new ImplicitFieldAdder(pipelineServices));
         p.add(new InstanceAllocationMethodBuilder(pipelineServices));
@@ -55,7 +62,6 @@ public class KeYJavaPipeline {
         p.add(new PrepareObjectBuilder(pipelineServices));
         p.add(new CreateBuilder(pipelineServices));
         p.add(new CreateObjectBuilder(pipelineServices));
-        p.add(new LocalClassTransformation(pipelineServices));
         // Below is an expensive transformation as it has to traverse down
         // to an expression level.
         p.add(new ConstantStringExpressionEvaluator(pipelineServices));
