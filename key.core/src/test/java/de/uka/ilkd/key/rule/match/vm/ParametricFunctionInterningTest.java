@@ -19,7 +19,6 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -61,7 +60,7 @@ public class ParametricFunctionInterningTest {
                 new GenericSort(new Name(name + "_P" + i)),
                 GenericParameter.Variance.INVARIANT));
         }
-        return new ParametricFunctionDecl(new Name(name), params, new ImmutableArray<>(),
+        return new ParametricFunctionDecl(new Name(name), params, ImmutableList.of(),
             concrete, null, false, true, false);
     }
 
