@@ -45,7 +45,8 @@ local commands such as `/skills` (see [Input markup](#4-input-markup)).
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
-![The KeY-Agent panel, docked as a tab in the lower left of the main window](docs/images/agent/llm-panel.png)
+![The KeY-Agent panel, docked as a tab on the right side of the main window, stacked with the
+Source view](docs/images/agent/llm-panel.png)
 
 - **Sending.** `Ctrl+Enter` sends the current input (there is no send button). `Shift+Enter` and
   plain Enter insert a line break. Input is **always accepted**: while a turn runs or is parked,

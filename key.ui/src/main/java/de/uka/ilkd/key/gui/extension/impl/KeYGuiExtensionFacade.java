@@ -40,12 +40,18 @@ public final class KeYGuiExtensionFacade {
 
     // region panel extension
     public static Stream<TabPanel> getAllPanels(MainWindow window) {
-        return getLeftPanel().stream()
-                .flatMap(it -> it.getPanels(window, window.getMediator()).stream());
+        var mediator = window.getMediator();
+        return Stream.concat(
+            getLeftPanel().stream().flatMap(it -> it.getPanels(window, mediator).stream()),
+            getRightPanel().stream().flatMap(it -> it.getPanels(window, mediator).stream()));
     }
 
     public static List<KeYGuiExtension.LeftPanel> getLeftPanel() {
         return getExtensionInstances(KeYGuiExtension.LeftPanel.class);
+    }
+
+    public static List<KeYGuiExtension.RightPanel> getRightPanel() {
+        return getExtensionInstances(KeYGuiExtension.RightPanel.class);
     }
     // endregion
 
