@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.statement.JmlAssert;
+import de.uka.ilkd.key.java.ast.statement.JmlSpecCarrier;
 import de.uka.ilkd.key.java.ast.statement.SetStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
@@ -279,8 +280,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 
     private void handleJmlStatement(Statement x) {
         TermProgramVariableCollector tpvc = services.getFactory().create(services);
-        var spec =
-            Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
+        var spec = Objects.requireNonNull(((JmlSpecCarrier) x).getSpec());
         for (JTerm v : spec.vars().atPres.values()) {
             v.execPostOrder(tpvc);
         }

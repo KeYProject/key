@@ -17,10 +17,10 @@ import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
+import de.uka.ilkd.key.speclang.JmlStatementSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement.Kind;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -139,8 +139,7 @@ public final class JmlAssertRule implements BuiltInRule {
         final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
         final JTerm self = MiscTools.getSelfTerm(frame, services);
 
-        final SpecificationRepository.JmlStatementSpec spec =
-            services.getSpecificationRepository().getStatementSpec(jmlAssert);
+        final JmlStatementSpec spec = jmlAssert.getSpec();
 
         if (spec == null) {
             throw new RuleAbortException(
