@@ -10,7 +10,6 @@ import java.util.List;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 
