@@ -133,7 +133,7 @@ public class AssumesInstantiator {
                 ++i;
             }
         }
-        return ImmutableList.of(Arrays.copyOfRange(res, 0, i));
+        return ImmutableList.ofFixedSize(Arrays.copyOfRange(res, 0, i));
     }
 
     /**
