@@ -216,8 +216,10 @@ The built-in tool set (`KeYAgentTools`):
 | `expand_definitions`| Proof          | ask      |                | unfold method-definition and class-invariant axioms (`expand`)      |
 | `rewrite_term`      | Proof          | ask      |                | find and apply a rewrite taclet transforming a term into another (`rewrite`) |
 | `run_script`        | Proof          | ask      |                | run a short guarded sequence (≤ 8 steps) of the whitelisted proof commands on targeted goals |
-| `explore_assumption`| Proof          | auto     | ✓              | probe: run auto on an isolated side proof of a goal plus an added assumption; report if it closes; the main proof is never modified |
-| `explore_formula`   | Proof          | auto     | ✓              | probe: run auto on an isolated side proof of a goal plus an added succedent formula; report if it closes; the main proof is never modified |
+| `probe_add_formula`          | Proof          | auto     | ✓              | probe: run auto on an isolated side proof of a goal plus an added formula (antecedent or succedent); report if the goal then closes; the main proof is never modified |
+| `probe_edit_formula`         | Proof          | auto     | ✓              | probe: run auto on an isolated side proof of a goal with a formula occurrence replaced; report if the goal then closes; the main proof is never modified |
+| `explorative_add_formula`    | Proof          | ask      |                | explorative: add a formula to the goal via a cut and disable the other cut branch — the theorem is reframed around the added formula |
+| `explorative_edit_formula`   | Proof          | ask      |                | explorative: replace a formula occurrence via a cut, hide the old occurrence and disable the other cut branch — the theorem is reframed around the replacement |
 | `fork_proof`        | Proof          | ask      |                | create an independent copy (fork) at a goal's sequent, registered for the `proof` parameter — for side experiments |
 | `list_branches`     | Proof          | auto     |                | read-only: list the open goals in the order the `goal` indexes use, with branch labels and leading formulas |
 | `assert_open_goals` | Proof          | auto     |                | read-only: check that the proof has the expected number of open goals |
@@ -245,7 +247,9 @@ The built-in tool set (`KeYAgentTools`):
 **Goal targeting and proof selection.** The proof-manipulation tools (`tryclose`, `auto`,
 `run_macro`, `run_smt`, `simplify_goal`, `apply_rule`, `instantiate_quantifier`,
 `witness_constant`, `cut_formula`, `expand_definitions`, `rewrite_term`, `hide_sequent`,
-`unhide_sequent`, `focus_goal`, `fork_proof`) share two parameters:
+`unhide_sequent`, `focus_goal`, `fork_proof`, and the exploration family `probe_add_formula`,
+`probe_edit_formula`, `explorative_add_formula`, `explorative_edit_formula`) share two
+parameters:
 
 - `goal` — `"branch"` (default; the first open goal of the current branch), `"all"` (every open
   goal; single-goal surgery tools reject it), or a 0-based goal index (negative = from the end).
@@ -260,10 +264,16 @@ order the `goal` indexes use, so indices can be picked from it directly.
 Every proof tool reports its outcome uniformly as `"<tool>: N goal(s) closed, M open goal(s)
 remain"` (plus `- the proof is closed` when it finishes).
 
-**Sandboxed exploration and forking.** `explore_assumption` and `explore_formula` answer
-"is this goal provable if an extra formula were available?" by running the auto strategy on an
-*isolated side proof* (constructed via KeY's `SideProofUtil` machinery from the goal's sequent
-plus the formula) — the main proof is never modified, so they are safe to approve automatically.
+**Sandboxed exploration, explorative edits and forking.** The exploration tools come in a 2×2
+family. The probes `probe_add_formula` and `probe_edit_formula` answer "is this goal provable if a
+formula were added / replaced?" by running the auto strategy on an *isolated side proof*
+(constructed via KeY's `SideProofUtil` machinery from the goal's sequent plus the formula) and
+report `TRUE` only if that side proof closes — the main proof is never modified, so they are safe
+to approve automatically. The explorative tools `explorative_add_formula` and
+`explorative_edit_formula` perform the same operation *in the main proof* following the
+exploration-mode recipe (cut with the new formula, hide the old occurrence on the kept branch,
+disable the other cut branch); they **reframe the theorem** around the added/replaced formula, so
+the disabled branch should be pruned before the proof can close, and they require approval.
 `fork_proof` goes the other way: it *persists* the copy by registering a new proof (root sequent =
 the targeted goal's sequent) that appears in `list_proofs` and can be worked on through the
 `proof` parameter, leaving the original untouched.
@@ -304,14 +314,15 @@ turn until you answer. Turn this off with *Allow the agent to ask questions*.
   without approval.
 - The proof-script tools run the corresponding KeY proof-script commands (i.e. the same actions
   as *Apply Script* / the *Auto* button): `tryclose`, `auto`, `run_macro`, `run_smt`,
-  `simplify_goal` and the sandboxed probes `explore_assumption`/`explore_formula` (side proofs;
+  `simplify_goal` and the sandboxed probes `probe_add_formula`/`probe_edit_formula` (side proofs;
   the main proof stays untouched) are approved by default so the agent can actually prove — you
   can move them to *with approval* in the Tools panel to review each invocation. The goal-surgery
   tools `apply_rule`, `instantiate_quantifier`, `witness_constant`, `cut_formula`,
   `expand_definitions` and `rewrite_term`, the sequent-editing tools `hide_sequent`,
-  `unhide_sequent`, `focus_goal`, `let_abbrev`, the composed `run_script` and `fork_proof`
-  mutate the proof and require approval by default. The listed single-goal tools act on one goal
-  (`"branch"` or an index) and reject `"all"`.
+  `unhide_sequent`, `focus_goal`, `let_abbrev`, the composed `run_script`, `fork_proof` and the
+  explorative tools `explorative_add_formula`/`explorative_edit_formula` (which reframe the
+  theorem via cut) mutate the proof and require approval by default. The listed single-goal tools
+  act on one goal (`"branch"` or an index) and reject `"all"`.
 - `add_taclet` and `remove_taclet` change the rule set of a proof and therefore require approval
   by default; inspection tools (`list_taclets`, `list_taclet_options`, `export_taclet`,
   `export_taclets`) do not.
@@ -376,8 +387,8 @@ delegations) can be **moved into the background** while they run:
 - When the call finishes, its output is enqueued and the parked turn resumes with it (a
   *"In the background"* box marks where the turn parked).
 - Only tools marked **backgroundable** offer the button (by default `auto`, `tryclose`,
-  `run_command`, `run_macro`, `run_smt`, `spawn_subagent`, `explore_assumption`,
-  `explore_formula`); per-tool overrides and the
+  `run_command`, `run_macro`, `run_smt`, `spawn_subagent`, `probe_add_formula`,
+  `probe_edit_formula`); per-tool overrides and the
   concurrency limit live in the [Tools panel](#tools-sub-panel-llm-settings--tools). While a
   turn is parked on a question or an approval, further
   prompts are *deferred* (they do not start new turns); while it is parked on a background job
@@ -473,7 +484,7 @@ own behavior, `auto` or `ask`), **With approval** (always ask), **Without approv
 **Disabled** (not sent to the model) — and a **may run in background** checkbox. Read-only tools
 default to `auto`, `run_command` to `ask`; the background checkbox follows the tool's metadata
 (default on for `auto`, `tryclose`, `run_command`, `run_macro`, `run_smt`, `spawn_subagent`,
-`explore_assumption`, `explore_formula`; overriding it adds/removes the tool in the
+`probe_add_formula`, `probe_edit_formula`; overriding it adds/removes the tool in the
 `backgroundToolsEnabled`/`backgroundToolsDisabled` settings). While such a call runs it can
 be moved to the background, the agent then continues with your queued messages and the result is
 delivered when the call finishes (see [section 7.4](#74-backgrounding)). The number of concurrent
