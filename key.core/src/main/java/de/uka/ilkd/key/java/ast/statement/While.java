@@ -9,7 +9,7 @@ import java.util.List;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.JmlSpec;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
@@ -67,7 +67,7 @@ public class While extends LoopStatement {
     }
 
     public While(PositionInfo pi, List<Comment> c, Guard guard, Statement body,
-            List<TextualJMLConstruct> specs) {
+            List<JmlSpec> specs) {
         super(pi, c, null, null, guard, body, ImmutableList.fromList(specs));
     }
 

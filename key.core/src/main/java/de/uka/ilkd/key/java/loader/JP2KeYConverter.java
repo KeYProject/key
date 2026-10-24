@@ -38,10 +38,11 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.rule.metaconstruct.*;
+import de.uka.ilkd.key.speclang.jml.JmlSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
+import de.uka.ilkd.key.speclang.njml.JmlFacade;
+import de.uka.ilkd.key.speclang.njml.JmlLexer;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 
 import org.key_project.logic.MetaSpace;
 import org.key_project.logic.Namespace;
@@ -293,7 +294,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         ImmutableArray<Statement> body = map(n.getStatements());
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
-        return new StatementBlock(pi, c, body, getSpec(n));
+        return new StatementBlock(pi, c, body, ImmutableList.fromList(getSpec(n)));
     }
 
     @Override
@@ -567,9 +568,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         List<Comment> c = createComments(n);
         Object guard = accept(n.getCondition());
         Object body = accept(n.getBody());
-        List<TextualJMLConstruct> loopSpecs = new ArrayList<>();
-        loopSpecs.addAll(getLoopSpec(n)); // loop invariants
-        loopSpecs.addAll(getSpec(n)); // loop contracts
+        List<JmlSpec> loopSpecs = getSpec(n);
         return new Do(pi, c, new Guard((Expression) guard),
             (Statement) body, loopSpecs);
     }
@@ -763,17 +762,26 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(JmlExpressionStmt n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         return switch (n.getKind()) {
-            case JmlStmtKind.ASSERT -> {
-                TextualJMLAssertStatement construct = n.getData(MarkerStatementHelper.KEY_ASSERT);
-                yield new JmlAssert(TextualJMLAssertStatement.Kind.ASSERT, construct, pi);
-            }
-            case JmlStmtKind.ASSUME -> {
-                TextualJMLAssertStatement construct = n.getData(MarkerStatementHelper.KEY_ASSERT);
-                yield new JmlAssert(TextualJMLAssertStatement.Kind.ASSUME, construct, pi);
+            case JmlStmtKind.ASSERT, JmlStmtKind.ASSUME -> {
+                // Re-parse the JML expression text against KeY's own JML grammar so that the
+                // JML term translation (JMLSpecFactory) can process it.
+                JmlLexer lexer = JmlFacade.createLexer(n.getExpression().toString());
+                lexer._mode = JmlLexer.expr;
+                JmlParser parser = JmlFacade.createParser(lexer);
+                var exprCtx = parser.expressionEOF();
+                parser.getErrorReporter().throwException();
+                KeyAst.Expression condition = new KeyAst.Expression(exprCtx.expression());
+                TextualJMLAssertStatement.Kind kind = n.getKind() == JmlStmtKind.ASSERT
+                        ? TextualJMLAssertStatement.Kind.ASSERT
+                        : TextualJMLAssertStatement.Kind.ASSUME;
+                yield new JmlAssert(kind, null, condition, null, pi);
             }
             case JmlStmtKind.SET -> {
-                KeyAst.SetStatementContext context = n.getData(MarkerStatementHelper.KEY_ASSIGN);
-                yield new SetStatement(context, pi);
+                JmlParser parser = JmlFacade.createParser(JmlFacade.createLexer(
+                    "set " + n.getExpression() + ";"));
+                var ctx = parser.set_statement();
+                parser.getErrorReporter().throwException();
+                yield new SetStatement(new KeyAst.SetStatementContext(ctx), pi);
             }
             default -> throw new IllegalStateException("Unexpected value: " + n.getKind());
         };
@@ -820,9 +828,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         LocalVariableDeclaration decl = accept(n.getVariable());
         ILoopInit init = new LoopInit(new LoopInitializer[] { decl });
         Guard guard = new Guard(null, null, accept(n.getIterable()));
-        List<TextualJMLConstruct> loopSpecs = new ArrayList<>();
-        loopSpecs.addAll(getLoopSpec(n)); // loop invariants
-        loopSpecs.addAll(getSpec(n)); // loop contracts
+        List<JmlSpec> loopSpecs = getSpec(n);
         return new EnhancedFor(pi, c, init, guard, accept(n.getBody()), loopSpecs);
     }
 
@@ -854,13 +860,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         } else if (!n.getUpdate().isEmpty()) {
             forUpdates = new ForUpdates(updates);
         }
-        List<TextualJMLConstruct> loopSpecs = new ArrayList<>();
-        loopSpecs.addAll(getLoopSpec(n)); // loop invariants
-        loopSpecs.addAll(getSpec(n)); // loop contracts
+        List<JmlSpec> loopSpecs = getSpec(n);
         return new For(pi, c, forInit, forUpdates, forGuard, accept(n.getBody()), loopSpecs);
     }
 
-    public static List<TextualJMLConstruct> getSpec(Node n) {
+    public static List<JmlSpec> getSpec(Node n) {
         try {
             return n.getData(JMLTransformer.KEY_SPEC_CASE);
         } catch (IllegalStateException e) {
@@ -868,15 +872,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
     }
 
-    public static List<TextualJMLLoopSpec> getLoopSpec(Node n) {
-        try {
-            return n.getData(JMLTransformer.KEY_LOOP_SPEC);
-        } catch (IllegalStateException e) {
-            return List.of();
-        }
-    }
-
-    public static List<TextualJMLConstruct> getClassSpec(Node n) {
+    public static List<JmlSpec> getClassSpec(Node n) {
         try {
             return n.getData(JMLTransformer.KEY_CLASS_SPEC);
         } catch (IllegalStateException e) {
@@ -1547,9 +1543,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         List<Comment> c = createComments(n);
         Guard guard = new Guard((Expression) accept(n.getCondition()));
         Statement body = accept(n.getBody());
-        List<TextualJMLConstruct> loopSpecs = new ArrayList<>();
-        loopSpecs.addAll(getLoopSpec(n)); // loop invariants
-        loopSpecs.addAll(getSpec(n)); // loop contracts
+        List<JmlSpec> loopSpecs = getSpec(n);
         return new While(pi, c, guard, body, loopSpecs);
     }
 
@@ -1825,11 +1819,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             var loc = new LocationVariable(
                 services.getVariableNamer().getTemporaryNameProposal("x"),
                 services.getNamespaces().sorts().lookup("boolean"));
-            TextualJMLMergePointDecl a = n.getData(MarkerStatementHelper.KEY_MERGE_POINT);
-            return new MergePointStatement(pi, c, a, loc);
+            return new MergePointStatement(pi, c, new JmlSpec(n), loc);
         } else {
-            IProgramVariable expr = accept(n.getExpr());
-            return new MergePointStatement(pi, c, null, expr);
+            return accept(n.getExpr());
         }
     }
 

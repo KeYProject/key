@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.JmlSpec;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -122,7 +122,7 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
             ImmutableArray<MemberDeclaration> members, boolean parentIsInterface,
             boolean isLibrary, Extends extending, Implements implementing, boolean innerClass,
             boolean localClassDeclaration, boolean isAnonymousClass,
-            ImmutableList<TextualJMLConstruct> spec) {
+            ImmutableList<JmlSpec> spec) {
         super(pi, c, modArray, name, fullName, members, parentIsInterface, isLibrary,
             ImmutableList.fromList(spec));
         this.extending = extending;

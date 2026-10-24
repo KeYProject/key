@@ -9,7 +9,7 @@ import java.util.List;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.JmlSpec;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -52,7 +52,7 @@ public abstract class LoopStatement extends JavaStatement
     @NonNull
     protected final Statement body;
 
-    protected final ImmutableList<TextualJMLConstruct> attachedJml;
+    protected final ImmutableList<JmlSpec> attachedJml;
 
     /**
      * Loop statement.
@@ -209,7 +209,7 @@ public abstract class LoopStatement extends JavaStatement
 
     public LoopStatement(PositionInfo pi, List<Comment> comments, ILoopInit inits,
             IForUpdates updates, @NonNull IGuard guard, @NonNull Statement body,
-            ImmutableList<TextualJMLConstruct> attachedJml) {
+            ImmutableList<JmlSpec> attachedJml) {
         super(pi, comments);
         this.inits = inits;
         this.updates = updates;
@@ -224,7 +224,7 @@ public abstract class LoopStatement extends JavaStatement
     }
 
     @Override
-    public ImmutableList<TextualJMLConstruct> getAttachedJml() {
+    public ImmutableList<JmlSpec> getAttachedJml() {
         return attachedJml;
     }
 

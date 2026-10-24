@@ -25,7 +25,7 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.JmlSpec;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -44,7 +44,7 @@ public class InterfaceDeclaration extends TypeDeclaration {
             @NonNull ImmutableArray<Modifier> modArray, ProgramElementName name,
             ProgramElementName fullName, ImmutableArray<MemberDeclaration> members,
             boolean parentIsInterfaceDeclaration, boolean isLibrary, Extends extending,
-            List<TextualJMLConstruct> spec) {
+            List<JmlSpec> spec) {
         super(pi, comments, modArray, name, fullName, members, parentIsInterfaceDeclaration,
             isLibrary, ImmutableList.fromList(spec));
         this.extending = extending;
