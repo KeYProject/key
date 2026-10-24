@@ -44,12 +44,13 @@ import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.DefaultConstructorDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserMethodDeclaration;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+@NullMarked
 public class KeYProgModelInfo {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeYProgModelInfo.class);
@@ -110,7 +111,6 @@ public class KeYProgModelInfo {
         return rec2key().keYTypes();
     }
 
-    @NonNull
     private List<ResolvedMethodDeclaration> getAllMethods(KeYJavaType kjt) {
         var type = rec2key().resolveType(kjt);
         if (type.isReferenceType()) {
@@ -355,7 +355,7 @@ public class KeYProgModelInfo {
     /**
      * retrieves implicit methods
      */
-    private IProgramMethod getImplicitMethod(KeYJavaType ct, String name) {
+    private @Nullable IProgramMethod getImplicitMethod(KeYJavaType ct, String name) {
         final Map<String, IProgramMethod> m = implicits.get(ct);
         if (m != null) {
             final IProgramMethod pm = m.get(name);
@@ -378,7 +378,7 @@ public class KeYProgModelInfo {
 
     // TODO: copied from TransformationPipeLineServices we should have some utility class to avoid
     // copy-and-past
-    public Type getType(ResolvedType type) {
+    public @Nullable Type getType(ResolvedType type) {
         if (type.isArray()) {
             // TODO weigl type.arrayLevel()
             return new com.github.javaparser.ast.type.ArrayType(
@@ -419,7 +419,7 @@ public class KeYProgModelInfo {
      *         a debug output is written to console).
      */
     public @Nullable IProgramMethod getProgramMethod(
-            @NonNull KeYJavaType ct, String name,
+            KeYJavaType ct, String name,
             Iterable<KeYJavaType> signature, KeYJavaType context) {
 
         if (context.getJavaType() instanceof ArrayType || ct.getJavaType() instanceof ArrayType) {

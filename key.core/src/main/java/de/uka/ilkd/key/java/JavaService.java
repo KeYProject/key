@@ -62,7 +62,7 @@ import com.github.javaparser.resolution.model.typesystem.NullType;
 import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
 import com.github.javaparser.resolution.types.ResolvedVoidType;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +77,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (19.02.22)
  */
+@NullMarked
 public class JavaService {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaService.class);
 
@@ -113,20 +114,19 @@ public class JavaService {
      * second category. A null value indicates that the boot classes are to
      * be read from an internal repository.
      */
-    @NonNull
     private final Path bootClassPath;
 
+    @Nullable
     private final FileRepo fileRepo;
 
     /**
      * A list of {@link File} objects that describes the classpath to be searched
      * for classes or Java files.
      */
-    @NonNull
     private final Collection<Path> libraryPath;
 
-    public JavaService(Services services, @NonNull Path bootClassPath,
-            @NonNull Collection<Path> libraryPath, FileRepo fileRepo) {
+    public JavaService(Services services, Path bootClassPath,
+            Collection<Path> libraryPath, @Nullable FileRepo fileRepo) {
         this.services = services;
         this.mapping = new KeYJPMapping();
         this.bootClassPath = bootClassPath;
@@ -167,22 +167,18 @@ public class JavaService {
      *
      * @return not null
      */
-    @NonNull
     public JP2KeYTypeConverter getTypeConverter() {
         return typeConverter;
     }
 
-    @NonNull
     public KeYJPMapping getMapping() {
         return mapping;
     }
 
-    @NonNull
     public Path getBootClassPath() {
         return bootClassPath;
     }
 
-    @NonNull
     public Collection<Path> getLibraryPath() {
         return Collections.unmodifiableCollection(libraryPath);
     }
@@ -372,7 +368,7 @@ public class JavaService {
 
     // ----- parsing libraries
 
-    private static void fixupPackageDeclaration(CompilationUnit cu, String relativePath) {
+    private static void fixupPackageDeclaration(CompilationUnit cu, @Nullable String relativePath) {
         if (cu.getPackageDeclaration().isPresent()) {
             return;
         }
@@ -413,7 +409,7 @@ public class JavaService {
      * @param fileRepo the FileRepo that provides the InputStream to resources
      * @return the compilation units
      */
-    private List<CompilationUnit> parseBootClasses(FileRepo fileRepo) throws IOException {
+    private List<CompilationUnit> parseBootClasses(@Nullable FileRepo fileRepo) throws IOException {
         if (!Files.isDirectory(bootClassPath)) {
             throw new FileNotFoundException(String.format(
                 "The \\bootclasspath \"%s\" does not exist or is not a directory.",
@@ -478,7 +474,8 @@ public class JavaService {
      * @throws IOException an exception
      * @author mulbrich
      */
-    private List<CompilationUnit> parseLibraryClasses(FileRepo fileRepo) throws IOException {
+    private List<CompilationUnit> parseLibraryClasses(@Nullable FileRepo fileRepo)
+            throws IOException {
         List<FileCollection> sources = new ArrayList<>();
         for (var cp : libraryPath) {
             if (cp == null) {
@@ -566,7 +563,7 @@ public class JavaService {
      *
      * @param fileRepo the fileRepo which will store the files
      */
-    public void parseSpecialClasses(FileRepo fileRepo) {
+    public void parseSpecialClasses(@Nullable FileRepo fileRepo) {
         if (mapping.setParsedSpecial())
             return;
         mapping.setParsedSpecial(true);
@@ -603,7 +600,7 @@ public class JavaService {
         }
     }
 
-    private void parseLibraryPaths(FileRepo fileRepo) throws IOException {
+    private void parseLibraryPaths(@Nullable FileRepo fileRepo) throws IOException {
         LOGGER.debug("Parsing library classes");
         var libraryClasses = parseLibraryClasses(fileRepo);
         programFactory.setLibraryClasses(libraryClasses);
@@ -622,7 +619,7 @@ public class JavaService {
         LOGGER.debug("Finished processing library classes");
     }
 
-    private void parseBootClasspath(FileRepo fileRepo) throws IOException {
+    private void parseBootClasspath(@Nullable FileRepo fileRepo) throws IOException {
         LOGGER.debug("Parsing internal classes from {}", bootClassPath);
         var bootClasses = parseBootClasses(fileRepo);
 
@@ -907,7 +904,7 @@ public class JavaService {
      * @return the parsed and resolved JavaBlock
      */
     public JavaBlock readBlock(String block, JPContext context,
-            Namespace<SchemaVariable> allowSchemaJava) {
+            @Nullable Namespace<SchemaVariable> allowSchemaJava) {
         var sb = parseBlock(block, context);
         if (allowSchemaJava == null && containsSchemaJava(sb)) {
             throw new RuntimeException("SchemaJava unexpected in the given block");
@@ -929,7 +926,7 @@ public class JavaService {
      * @param node the node
      * @return true if type name of the node matches "Key*SV".
      */
-    private boolean isSchemaJavaNode(@NonNull Node node) {
+    private boolean isSchemaJavaNode(Node node) {
         String typeName = node.getMetaModel().getTypeName();
         return typeName.startsWith("Key") && typeName.endsWith("SV");
     }
@@ -959,7 +956,7 @@ public class JavaService {
      * @return the parsed and resolved JavaBlock
      */
     public JavaBlock readBlockWithProgramVariables(Namespace<IProgramVariable> variables, String s,
-            Namespace<SchemaVariable> allowSchemaJava) {
+            @Nullable Namespace<SchemaVariable> allowSchemaJava) {
         ImmutableList<IProgramVariable> pvs = ImmutableList.nil();
         for (IProgramVariable n : variables.allElements()) {
             if (n instanceof ProgramVariable) {
@@ -1005,7 +1002,6 @@ public class JavaService {
         return programFactory;
     }
 
-    @NonNull
     public JavaSymbolSolver getSymbolResolver() {
         return programFactory.getSymbolSolver();
     }

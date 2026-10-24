@@ -30,7 +30,7 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.key.KeyPassiveExpression;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.VoidType;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.java.transformations.AstFactory.*;
 import static de.uka.ilkd.key.java.transformations.pipeline.ClassPreparationMethodBuilder.CLASS_PREPARE_IDENTIFIER;
@@ -42,6 +42,7 @@ import static de.uka.ilkd.key.java.transformations.pipeline.ClassPreparationMeth
  * <code>&lt;clprepare&gt;</code> responsible for the class
  * preparation.
  */
+@NullMarked
 public class ClassInitializeMethodBuilder extends JavaTransformerAbstract {
     public static final String CLASS_INITIALIZE_IDENTIFIER = "$clinit";
 
@@ -123,8 +124,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformerAbstract {
      *        the TypeDeclaration<?> whose fields have to be prepared
      * @return the list of copy assignments
      */
-    @NonNull
-    private NodeList<Statement> getInitializers(@NonNull TypeDeclaration<?> typeDeclaration) {
+    private NodeList<Statement> getInitializers(TypeDeclaration<?> typeDeclaration) {
         NodeList<Statement> result = new NodeList<>();
         for (Node childNode : typeDeclaration.getChildNodes()) {
             if (childNode instanceof InitializerDeclaration) {
@@ -172,8 +172,7 @@ public class ClassInitializeMethodBuilder extends JavaTransformerAbstract {
      * eventually thrown errors or exceptions and handles them in a
      * special way
      */
-    @NonNull
-    private TryStmt createInitializerExecutionTryBlock(@NonNull TypeDeclaration<?> td) {
+    private TryStmt createInitializerExecutionTryBlock(TypeDeclaration<?> td) {
         // try block
         NodeList<Statement> initializerExecutionBody = getInitializers(td);
 

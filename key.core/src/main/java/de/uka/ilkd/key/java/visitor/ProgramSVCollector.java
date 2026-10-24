@@ -11,9 +11,12 @@ import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This visitor is used to collect all appearing SchemaVariables in a java program
  */
+@NullMarked
 public class ProgramSVCollector extends JavaASTWalker {
 
     private ImmutableList<SchemaVariable> result;

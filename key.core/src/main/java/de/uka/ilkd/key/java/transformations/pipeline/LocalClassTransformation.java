@@ -21,6 +21,8 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.ThisExpr;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Local and anonymous classes may access variables from the creating context
  * if they are declared final and initialised.
@@ -33,6 +35,7 @@ import com.github.javaparser.ast.expr.ThisExpr;
  *
  * @author engelc
  */
+@NullMarked
 public class LocalClassTransformation extends JavaTransformerAbstract {
 
     public LocalClassTransformation(TransformationPipelineServices services) {
