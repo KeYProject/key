@@ -17,9 +17,6 @@ import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.*;
@@ -60,7 +57,6 @@ public class SpecificationRepository {
     protected final Map<KeYJavaType, ImmutableSet<ClassAxiom>> axioms = new LinkedHashMap<>();
     private final Map<KeYJavaType, ImmutableSet<InitiallyClause>> initiallyClauses =
         new LinkedHashMap<>();
-    private final Map<ProofOblInput, ImmutableSet<Proof>> proofs = new LinkedHashMap<>();
 
     /**
      * <p>
@@ -963,162 +959,6 @@ public class SpecificationRepository {
     public void addClassAxioms(ImmutableSet<ClassAxiom> toAdd) {
         for (ClassAxiom ax : toAdd) {
             addClassAxiom(ax);
-        }
-    }
-
-    /**
-     * Returns all proofs registered for the passed PO (or stronger POs).
-     */
-    public ImmutableSet<Proof> getProofs(ProofOblInput po) {
-        ImmutableSet<Proof> result = DefaultImmutableSet.nil();
-        for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
-            ProofOblInput mapPO = entry.getKey();
-            ImmutableSet<Proof> sop = entry.getValue();
-            if (mapPO.implies(po)) {
-                result = result.union(sop);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Returns all proofs registered for the passed atomic contract, or for combined contracts
-     * including the passed atomic contract
-     */
-    public ImmutableSet<Proof> getProofs(Contract atomicContract) {
-        assert !atomicContract.getName().contains(CONTRACT_COMBINATION_MARKER)
-                : "Contract must be atomic";
-
-        ImmutableSet<Proof> result = DefaultImmutableSet.nil();
-        for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
-            final ProofOblInput po = entry.getKey();
-            if (po instanceof ContractPO) {
-                final Contract poContract = ((ContractPO) po).getContract();
-                if (splitContract(poContract).contains(atomicContract)) {
-                    result = result.union(entry.getValue());
-                }
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Returns all proofs registered for the passed target and its overriding targets.
-     */
-    public ImmutableSet<Proof> getProofs(KeYJavaType kjt, IObserverFunction target) {
-        final ImmutableSet<Pair<KeYJavaType, IObserverFunction>> targets =
-            getOverridingTargets(kjt, target).add(new Pair<>(kjt, target));
-        ImmutableSet<Proof> result = DefaultImmutableSet.nil();
-        for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
-            final ProofOblInput po = entry.getKey();
-            final ImmutableSet<Proof> sop = entry.getValue();
-            if (po instanceof ContractPO) {
-                final Contract contract = ((ContractPO) po).getContract();
-                final Pair<KeYJavaType, IObserverFunction> pair =
-                    new Pair<>(contract.getKJT(), contract.getTarget());
-                if (targets.contains(pair)) {
-                    result = result.union(sop);
-                }
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Returns all proofs registered with this specification repository.
-     */
-    public ImmutableSet<Proof> getAllProofs() {
-        ImmutableSet<Proof> result = DefaultImmutableSet.nil();
-        Collection<ImmutableSet<Proof>> proofSets = proofs.values();
-        for (ImmutableSet<Proof> proofSet : proofSets) {
-            result = result.union(proofSet);
-        }
-        return result;
-    }
-
-    /**
-     * Returns the PO that the passed proof is about, or null.
-     */
-    public ContractPO getContractPOForProof(Proof proof) {
-        ProofOblInput po = getProofOblInput(proof);
-        if (po instanceof ContractPO) {
-            return (ContractPO) po;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Returns the PO that the passed contract is about, or null.
-     */
-    public ContractPO getPO(Contract c) {
-        for (ProofOblInput po : proofs.keySet()) {
-            if (po instanceof ContractPO && ((ContractPO) po).getContract().equals(c)) {
-                return (ContractPO) po;
-            }
-        }
-        return null;
-    }
-
-    public ContractPO getPOForProof(Proof proof) {
-        for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
-            ProofOblInput po = entry.getKey();
-            ImmutableSet<Proof> sop = entry.getValue();
-            if (sop.contains(proof) && po instanceof ContractPO) {
-                return (ContractPO) po;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns the {@link ProofOblInput} from which the given {@link Proof} was created.
-     *
-     * @param proof The {@link Proof}.
-     * @return The {@link ProofOblInput} of the given {@link Proof} or {@code null} if not
-     *         available.
-     */
-    public @Nullable ProofOblInput getProofOblInput(Proof proof) {
-        for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
-            ProofOblInput po = entry.getKey();
-            ImmutableSet<Proof> sop = entry.getValue();
-            if (sop.contains(proof)) {
-                return po;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns the target that the passed proof is about, or null.
-     */
-    public IObserverFunction getTargetOfProof(Proof proof) {
-        final ContractPO po = getPOForProof(proof);
-        return po == null ? null : po.getContract().getTarget();
-    }
-
-    /**
-     * Registers the passed proof.
-     */
-    public void registerProof(ProofOblInput po, Proof proof) {
-        proofs.put(po, getProofs(po).add(proof));
-    }
-
-    /**
-     * Unregisters the passed proof.
-     */
-    public void removeProof(Proof proof) {
-        for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
-            ImmutableSet<Proof> sop = entry.getValue();
-            if (sop.contains(proof)) {
-                sop = sop.remove(proof);
-                if (sop.isEmpty()) {
-                    proofs.remove(entry.getKey());
-                } else {
-                    proofs.put(entry.getKey(), sop);
-                }
-                return;
-            }
         }
     }
 

@@ -75,7 +75,7 @@ public class ProofEnvironment {
         pl.setProofEnv(this);
         proofs.add(pl);
         for (Proof p : pl.getProofs()) {
-            getServicesForEnvironment().getSpecificationRepository().registerProof(po, p);
+            getServicesForEnvironment().getProofRegistry().registerProof(po, p);
         }
         fireProofRegistered(new ProofEnvironmentEvent(this, po, pl));
     }
@@ -125,7 +125,7 @@ public class ProofEnvironment {
         //
 
         for (Proof p : pl.getProofs()) {
-            getServicesForEnvironment().getSpecificationRepository().removeProof(p);
+            getServicesForEnvironment().getProofRegistry().removeProof(p);
         }
 
         fireProofUnregistered(new ProofEnvironmentEvent(this, null, pl));

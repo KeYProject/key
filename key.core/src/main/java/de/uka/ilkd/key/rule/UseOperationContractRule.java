@@ -974,7 +974,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
 
         protected JTerm getFinalPreTerm() {
             JTerm finalPreTerm;
-            final ContractPO po = services.getSpecificationRepository().getPOForProof(goal.proof());
+            final ContractPO po = services.getProofRegistry().getPOForProof(goal.proof());
 
             final JTerm mbyOk;
             // see #1417

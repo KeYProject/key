@@ -193,14 +193,14 @@ public final class KeYFacade {
         ProofAggregate proofList = pi.startProver(initConfig, poContainer.getProofOblInput());
         for (Proof p : proofList.getProofs()) {
             // register proof
-            initConfig.getServices().getSpecificationRepository()
+            initConfig.getServices().getProofRegistry()
                     .registerProof(poContainer.getProofOblInput(), p);
             initConfig.getFileRepo().registerProof(p);
         }
 
         Proof proof = proofList.getFirstProof();
-        SpecificationRepository specRepo = initConfig.getServices().getSpecificationRepository();
-        ContractPO contractPO = specRepo.getContractPOForProof(proof);
+        ContractPO contractPO =
+            initConfig.getServices().getProofRegistry().getContractPOForProof(proof);
         if (contractPO == null) {
             // happens for taclet proofs (they have no contract)
             // TODO: currently we ignore taclet proofs

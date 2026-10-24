@@ -148,7 +148,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
         Services services = goal.proof().getServices();
         Proof proof = goal.proof();
-        return services.getSpecificationRepository().getProofOblInput(proof);
+        return services.getProofRegistry().getProofOblInput(proof);
     }
 
     /**

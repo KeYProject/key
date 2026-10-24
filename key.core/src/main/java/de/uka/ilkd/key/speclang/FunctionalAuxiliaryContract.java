@@ -293,7 +293,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
 
     @Override
     public ProofOblInput getProofObl(Services services) {
-        return services.getSpecificationRepository().getPO(this);
+        return services.getProofRegistry().getPO(this);
     }
 
     @Override
