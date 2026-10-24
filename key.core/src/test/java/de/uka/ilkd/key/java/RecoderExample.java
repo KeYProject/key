@@ -13,7 +13,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * this class is an example how to work with a java AST. Therefore we demonstrate the transformation
@@ -65,7 +65,7 @@ public class RecoderExample {
     public StatementBlock transform(StatementBlock prg) {
         ExtList newBody = new ExtList();
 
-        ImmutableArray<? extends Statement> body = prg.getBody();
+        ImmutableList<? extends Statement> body = prg.getBody();
         for (int i = 0; i < body.size(); i++) {
             if (body.get(i) instanceof While) {
                 newBody.addAll(transform((While) body.get(i)));
