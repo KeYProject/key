@@ -312,7 +312,7 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
     }
 
     public LoopSpecification retrieveLoopInvariantFromSpecification(Services services) {
-        return services.getSpecificationRepository().getLoopSpec(loop);
+        return loop.getLoopInvariant();
     }
 
     @Override

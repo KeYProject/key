@@ -368,8 +368,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         // i.e.
         // the loop spec has not changed since it was computed.
         final Instantiation cached = app.getInstantiation();
-        if (cached != null && cached.inv() == services.getSpecificationRepository()
-                .getLoopSpec(cached.loop())) {
+        if (cached != null && cached.inv() == cached.loop().getLoopInvariant()) {
             return cached;
         }
 
@@ -408,7 +407,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final ExecutionContext innermostExecutionContext = //
             innermostMethodFrame == null ? null
                     : (ExecutionContext) innermostMethodFrame.getExecutionContext();
-        services.getSpecificationRepository().addLoopInvariant(spec);
+        spec.getLoop().setLoopInvariant(spec);
 
         // cache and return result
         final Instantiation result = new Instantiation( //
