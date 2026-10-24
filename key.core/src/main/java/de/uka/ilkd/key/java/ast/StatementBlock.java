@@ -16,7 +16,7 @@ import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.JmlSpec;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.ExtList;
@@ -43,12 +43,12 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     @Nullable
     private final MethodFrame innerMostMethodFrame;
-    private final ImmutableList<TextualJMLConstruct> attachedJML;
+    private final ImmutableList<JmlSpec> attachedJML;
 
     public StatementBlock(
             PositionInfo pi, List<Comment> comments,
             @NonNull ImmutableArray<? extends Statement> body,
-            ImmutableList<TextualJMLConstruct> attachedJML) {
+            ImmutableList<JmlSpec> attachedJML) {
         super(pi, comments);
         this.body = body;
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
@@ -78,7 +78,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
         attachedJML =
-            ImmutableList.fromList(Arrays.asList(children.collect(TextualJMLConstruct.class)));
+            ImmutableList.fromList(Arrays.asList(children.collect(JmlSpec.class)));
     }
 
     public StatementBlock(@NonNull ImmutableArray<? extends Statement> as) {
@@ -102,12 +102,12 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     }
 
     public StatementBlock(PositionInfo pi, List<Comment> c, ImmutableArray<Statement> body,
-            List<TextualJMLConstruct> spec) {
+            List<JmlSpec> spec) {
         this(pi, c, body, ImmutableList.fromList(spec));
     }
 
     @Override
-    public ImmutableList<TextualJMLConstruct> getAttachedJml() {
+    public ImmutableList<JmlSpec> getAttachedJml() {
         return attachedJML;
     }
 

@@ -23,7 +23,7 @@ import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.Declaration;
 import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.PositionInfo;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.JmlSpec;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -39,7 +39,7 @@ import org.jspecify.annotations.Nullable;
 
 public abstract class JavaDeclaration extends JavaNonTerminalProgramElement implements Declaration {
 
-    protected final ImmutableList<TextualJMLConstruct> attachedJml;
+    protected final ImmutableList<JmlSpec> attachedJml;
 
 
     /**
@@ -53,7 +53,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
 
     public JavaDeclaration(PositionInfo pi, List<Comment> comments,
             @NonNull ImmutableArray<Modifier> modArray,
-            ImmutableList<TextualJMLConstruct> attachedJml) {
+            ImmutableList<JmlSpec> attachedJml) {
         super(pi, comments);
         this.modArray = modArray;
         this.attachedJml = attachedJml;
@@ -89,7 +89,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
         super(children);
         modArray = new ImmutableArray<>(children.collect(Modifier.class));
         this.attachedJml =
-            ImmutableList.fromList(List.of(children.collect(TextualJMLConstruct.class)));
+            ImmutableList.fromList(List.of(children.collect(JmlSpec.class)));
     }
 
 
@@ -116,7 +116,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
 
 
     @Override
-    public ImmutableList<TextualJMLConstruct> getAttachedJml() {
+    public ImmutableList<JmlSpec> getAttachedJml() {
         return attachedJml;
     }
 

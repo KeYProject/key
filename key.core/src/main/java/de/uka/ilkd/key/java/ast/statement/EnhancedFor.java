@@ -10,7 +10,7 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.JmlSpec;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
@@ -39,7 +39,7 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
     }
 
     public EnhancedFor(PositionInfo pi, List<Comment> comments, ILoopInit inits,
-            IGuard guard, Statement body, List<TextualJMLConstruct> specs) {
+            IGuard guard, Statement body, List<JmlSpec> specs) {
         super(pi, comments, inits, null, guard, body, ImmutableList.fromList(specs));
     }
 
