@@ -24,7 +24,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -614,9 +613,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         handleJmlStatements(x, SetStatement::new);
     }
 
-    public <T extends Statement> void handleJmlStatements(T x, Function<T, T> cloner) {
-        var spec = Objects.requireNonNull(
-            services.getSpecificationRepository().getStatementSpec(x));
+    public <T extends Statement & JmlSpecCarrier> void handleJmlStatements(T x,
+            Function<T, T> cloner) {
+        var spec = Objects.requireNonNull(x.getSpec());
 
         ProgramVariableCollection vars = spec.vars();
         Map<LocationVariable, JTerm> atPres = vars.atPres;
@@ -644,10 +643,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
 
         var newTerms = spec.terms().map(this::replaceVariablesInTerm);
-        var newSpec = new SpecificationRepository.JmlStatementSpec(newVars, newTerms);
+        var newSpec = new JmlStatementSpec(newVars, newTerms);
 
         var c = cloner.apply(x);
-        services.getSpecificationRepository().addStatementSpec(c, newSpec);
+        c.setSpec(newSpec);
 
         /*
          * if (!newAtPres.equals(vars.atPres)) {
