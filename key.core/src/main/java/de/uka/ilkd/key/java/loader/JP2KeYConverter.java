@@ -584,21 +584,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(EmptyStmt n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
-        /*
-         * if (n.containsData(JMLTransformer.KEY_CONSTRUCT)) {
-         * var construct = n.getData(JMLTransformer.KEY_CONSTRUCT);
-         * if (construct instanceof TextualJMLAssertStatement a) {
-         * return new JmlAssert(a.getKind(), a.getContext(), pi);
-         * }
-         * if (construct instanceof TextualJMLMergePointDecl a) {
-         * var loc =
-         * new LocationVariable(services.getVariableNamer().getTemporaryNameProposal("x"),
-         * services.getNamespaces().sorts().lookup("boolean"));
-         * return new MergePointStatement(pi, c, a, loc);
-         * }
-         * LOGGER.warn(n.getRange() + " Ignoring statement " + construct.getClass());
-         * }
-         */
         return new EmptyStatement(pi, c);
     }
 

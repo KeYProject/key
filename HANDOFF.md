@@ -6,8 +6,8 @@
 
 ## 1. Where things stand
 
-- **Branch:** `weigl/jmltk-jml` — **HEAD `74b68f6f82`** ("Phase 1: swap KeY's
-  front-end onto the JMLtk AST"), pushed to origin.
+- **Branch:** `weigl/jmltk-jml` — **HEAD** contains Phase 1 (`74b68f6f82`) plus
+  the Phase-2-Option-B deletions (front-end dead code), pushed to origin.
 - **PR:** #3997, retitled *"JMLtk front-end: consume JMLtk's parsed JML AST
   (Phases 0+1)"*, body refreshed.
 - **Feedback loop:** `./gradlew :key.core:compileJava` — **GREEN** at HEAD.
@@ -101,25 +101,51 @@
   works. **`testcase/merge/A.java` and `Gcd.java` (parametric,
   `merge_proc`/`merge_params` in comments) will fail to load under jmltk.**
 
-## 5. OPEN DECISION (user paused; resume here)
+## 5. Phase-2 decision — TAKEN (resume here for the next chunk)
 
-User: *"stop for now. I go to sleep. save the plan and the current state, so
-you can continue."* → ask on resume which Phase 2 direction to take:
+**Decision: Option B — the `JmlToTextual` re-parse bridge IS the semantics
+layer** (it re-uses the exact same `JmlParser.g4` rules the old `PreParser`
+used, so the specification semantics of the old front-end are preserved and
+validated by the compile-only loop). Proceed with provably-dead deletions,
+keep the KeY grammar + `Translator`/`JmlTermFactory` machinery, adjust
+`PLAN.md`.
 
-- **Option A — full Phase 2 translator (PLAN.md §196):** new translator walking
-  `JmlExpression`/`JmlClause` directly → `JTerm`/`LocationAccess`, porting
-  `Translator`/`JmlTermFactory` semantics (operators via
-  `OverloadedOperatorHandler`, quantifiers, `\old`, `\result`, `\fresh`,
-  seq/map ops, math modes, backtick DL…). Largest path; enables Phase 3 to
-  delete `JmlLexer.g4`/`JmlParser.g4` + `speclang/njml` + `pretranslation`.
-- **Option B — bridge-is-the-semantics:** the `JmlToTextual` re-parse already
-  preserves semantics (same `JmlParser.g4` rules the old `PreParser` used);
-  keep the bridge, then delete only provably dead `TextualJML*`/njml code and
-  tighten `PLAN.md` accordingly. Smaller, much lower risk.
-- **Phase 3** (either way): delete `preparser`/`TextualTranslator`/unused
-  `TextualJML*`/grammars; **Phase 4**: delete `SpecificationRepository`
-  (specs stay on the AST, rewritten by the pipeline). Testing unlocks at
-  Phase 3.
+Already done as part of Option B:
+- Deleted (main code, unused since Phase 1 — verified by repo-wide grep, no
+  refs outside `key.core/src/test`): `njml/PreParser.java`,
+  `njml/TextualTranslator.java`, `njml/JmlCheck.java`, `njml/JmlChecks.java`,
+  `pretranslation/TextualJMLFieldDecl.java`,
+  `pretranslation/TextualJMLModifierList.java`,
+  `pretranslation/TextualJMLSetStatement.java`,
+  `pretranslation/TextualJMLMergePointDecl.java`.
+  (Kept `DebugJmlLexer` — backs the `gradle debugJmlLexer` task.)
+- Removed the now-dead factory overload
+  `createJMLMergeContracts(mps, TextualJMLMergePointDecl)`; cleaned the stale
+  commented-out block in `JP2KeYConverter.visit(EmptyStmt)` and the
+  `njml` `package-info` (now documents the JMLtk → JmlSpec → re-parse flow).
+- `:key.core:compileJava` GREEN after the deletions.
+
+Remaining (next chunks, still Option B):
+- More dead-code sweeps: re-grep `new TextualJML*` after each change. Only the
+  following pretranslation classes are constructed by live code
+  (`JmlToTextual`/`JMLSpecFactory`/`JmlAssert`/`SpecialJavaPrinter`):
+  `TextualJMLSpecCase`, `TextualJMLLoopSpec`, `TextualJMLClassInv`,
+  `TextualJMLClassAxiom`, `TextualJMLInitially`, `TextualJMLRepresents`,
+  `TextualJMLDepends`, `TextualJMLMethodDecl`, `TextualJMLAssertStatement`
+  (only its `Kind` enum + legacy ctor are used), plus `Behavior`, `JMLModifier`,
+  `TextualJMLConstruct`.
+- Stale tests in `key.core/src/test` referencing the deleted front-end need to
+  be dropped/rewritten in Phase 3 (they no longer compile): `TestJMLPreTranslator`,
+  `TextualTranslatorTest`, `MethodlevelTranslatorTest`, `ClasslevelTranslatorTest`,
+  `NJmlTranslatorTests`, `ContractFactoryTest`, `SetStatementTest`,
+  and the `njml`-based parts of `JmlMarkerDecisionTest`/sources in `preparser`.
+  (`TextualJMLAssertStatementTest` keeps compiling — the class stays.)
+- **End state of Option B:** KeY grammar + njml translation machinery stay;
+  `JmlParser.g4`/`JmlLexer.g4` are NOT deleted (the bridge needs them). This
+  deviates from the PLAN §196 "full Phase 2 translator" and §210 "delete the
+  ANTLR grammars" — those become the (optional) later phase if a direct
+  JMLtk-AST→`JTerm` translator is ever wanted. **Phase 4** (delete
+  `SpecificationRepository`) is unaffected and remains as planned.
 
 ## 6. Useful references (may vanish — re-verify before trusting paths)
 
@@ -134,9 +160,11 @@ you can continue."* → ask on resume which Phase 2 direction to take:
 
 ## 7. First actions on resume
 
-1. `git status` clean? (should be — all Phase 1 work committed at `74b68f6f82`).
-2. Confirm the Phase 2 fork with the user (§5).
-3. Then either start the new translator (Option A, commit a skeleton early) or
-   begin Phase-3-safe deletions (Option B: `grep -rn "new TextualJML"` — after
-   Phase 1 only `JmlToTextual`/factory should construct them anymore).
-4. Keep `:key.core:compileJava` green; commit regularly.
+1. `git status` clean? (should be — all work committed).
+2. Decision §5 is already taken (Option B, dead-code sweep started).
+3. Next chunk: continue the Option-B sweep (§5 "Remaining") — re-grep
+   `new TextualJML*`/class refs, delete what is provably dead, keep
+   `:key.core:compileJava` green, commit regularly, push.
+4. When the sweep stalls (only `JmlToTextual`/`JMLSpecFactory` construct
+   `TextualJML*`), move to Phase-3 work: stale-test cleanup +
+   `SpecificationRepository` (Phase 4) prep.
