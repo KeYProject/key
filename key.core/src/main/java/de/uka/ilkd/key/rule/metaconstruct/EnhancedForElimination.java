@@ -326,11 +326,11 @@ public class EnhancedForElimination extends ProgramTransformer {
      */
     private void setInvariant(EnhancedFor original, LoopStatement transformed,
             ProgramVariable loopIdxVar, Optional<ProgramVariable> valuesVar, Services services) {
-        LoopSpecification li = services.getSpecificationRepository().getLoopSpec(original);
+        LoopSpecification li = original.getLoopInvariant();
         if (li != null) {
             li = li.setLoop(transformed);
             li = instantiateIndexValues(li, loopIdxVar, valuesVar, services);
-            services.getSpecificationRepository().addLoopInvariant(li);
+            transformed.setLoopInvariant(li);
         }
     }
 

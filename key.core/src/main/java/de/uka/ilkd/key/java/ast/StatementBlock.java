@@ -16,12 +16,16 @@ import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.jml.JmlSpec;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.NonNull;
@@ -44,6 +48,18 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     @Nullable
     private final MethodFrame innerMostMethodFrame;
     private final ImmutableList<JmlSpec> attachedJML;
+
+    /**
+     * The block contracts applying to this block, attached to the node; former
+     * {@code blockContracts} map (keyed by {@code BlockContractKey}).
+     */
+    private ImmutableSet<BlockContract> blockContracts = DefaultImmutableSet.nil();
+
+    /**
+     * The loop contracts applying to the block itself, attached to the node; former
+     * {@code loopContracts} map (keyed by {@code LoopContractKey}).
+     */
+    private ImmutableSet<LoopContract> loopContracts = DefaultImmutableSet.nil();
 
     public StatementBlock(
             PositionInfo pi, List<Comment> comments,
@@ -328,5 +344,65 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     @Override
     public PosInProgram getFirstActiveChildPos() {
         return isEmpty() ? PosInProgram.TOP : PosInProgram.ZERO;
+    }
+
+    // ----------------------------------------------------------------------
+    // node-attached (translated) specifications — formerly SpecificationRepository state
+    // ----------------------------------------------------------------------
+
+    /**
+     * Returns the block contracts applying to this block.
+     */
+    public ImmutableSet<BlockContract> getBlockContracts() {
+        return blockContracts;
+    }
+
+    /**
+     * Replaces the set of block contracts attaching to this block.
+     */
+    public void setBlockContracts(ImmutableSet<BlockContract> contracts) {
+        this.blockContracts = contracts == null ? DefaultImmutableSet.nil() : contracts;
+    }
+
+    /**
+     * Registers the given block contract on this block.
+     */
+    public void addBlockContract(BlockContract contract) {
+        this.blockContracts = this.blockContracts.add(contract);
+    }
+
+    /**
+     * Removes the given block contract from this block.
+     */
+    public void removeBlockContract(BlockContract contract) {
+        this.blockContracts = this.blockContracts.remove(contract);
+    }
+
+    /**
+     * Returns the loop contracts applying to this block.
+     */
+    public ImmutableSet<LoopContract> getLoopContracts() {
+        return loopContracts;
+    }
+
+    /**
+     * Replaces the set of loop contracts attaching to this block.
+     */
+    public void setLoopContracts(ImmutableSet<LoopContract> contracts) {
+        this.loopContracts = contracts == null ? DefaultImmutableSet.nil() : contracts;
+    }
+
+    /**
+     * Registers the given loop contract on this block.
+     */
+    public void addLoopContract(LoopContract contract) {
+        this.loopContracts = this.loopContracts.add(contract);
+    }
+
+    /**
+     * Removes the given loop contract from this block.
+     */
+    public void removeLoopContract(LoopContract contract) {
+        this.loopContracts = this.loopContracts.remove(contract);
     }
 }

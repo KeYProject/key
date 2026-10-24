@@ -143,7 +143,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         for (ProgramElement loop : collector.getNodes()) {
             LoopSpecification inv = specExtractor.extractLoopInvariant(pm, (LoopStatement) loop);
             if (inv != null) {
-                specRepos.addLoopInvariant(inv.setTarget(kjt, pm));
+                ((LoopStatement) loop).setLoopInvariant(inv.setTarget(kjt, pm));
             }
         }
     }
@@ -161,7 +161,8 @@ public final class SLEnvInput extends AbstractEnvInput {
                 specExtractor.extractLoopContracts(pm, (LoopStatement) loop);
 
             for (LoopContract specification : loopContracts) {
-                specRepos.addLoopContract(specification, true);
+                attachLoopContract(specification);
+                specRepos.addFunctionalLoopContract(specification);
             }
         }
     }
@@ -178,14 +179,16 @@ public final class SLEnvInput extends AbstractEnvInput {
                 specExtractor.extractBlockContracts(pm, (StatementBlock) block);
 
             for (BlockContract specification : blockContracts) {
-                specRepos.addBlockContract(specification, true);
+                specification.getBlock().addBlockContract(specification);
+                specRepos.addFunctionalBlockContract(specification);
             }
 
             final ImmutableSet<LoopContract> loopContracts =
                 specExtractor.extractLoopContracts(pm, (StatementBlock) block);
 
             for (LoopContract specification : loopContracts) {
-                specRepos.addLoopContract(specification, true);
+                attachLoopContract(specification);
+                specRepos.addFunctionalLoopContract(specification);
             }
         }
     }
@@ -200,7 +203,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         for (ProgramElement mps : mpsCollector.getNodes()) {
             final ImmutableSet<MergeContract> mergeContracts = specExtractor
                     .extractMergeContracts(pm, (MergePointStatement) mps, methodParameters);
-            mergeContracts.forEach(specRepos::addMergeContract);
+            mergeContracts.forEach(((MergePointStatement) mps)::addMergeContract);
         }
     }
 
@@ -214,7 +217,8 @@ public final class SLEnvInput extends AbstractEnvInput {
             final ImmutableSet<BlockContract> blockContracts =
                 specExtractor.extractBlockContracts(pm, (LabeledStatement) labeled);
             for (BlockContract specification : blockContracts) {
-                specRepos.addBlockContract(specification, true);
+                specification.getBlock().addBlockContract(specification);
+                specRepos.addFunctionalBlockContract(specification);
             }
         }
     }
@@ -229,8 +233,21 @@ public final class SLEnvInput extends AbstractEnvInput {
             final ImmutableSet<LoopContract> loopContracts =
                 specExtractor.extractLoopContracts(pm, (LabeledStatement) labeled);
             for (LoopContract specification : loopContracts) {
-                specRepos.addLoopContract(specification, true);
+                attachLoopContract(specification);
+                specRepos.addFunctionalLoopContract(specification);
             }
+        }
+    }
+
+    /**
+     * Attaches the given loop contract to its node: on-block loop contracts attach to the
+     * containing {@link StatementBlock}, all others to the {@link LoopStatement} itself.
+     */
+    private static void attachLoopContract(final LoopContract specification) {
+        if (specification.isOnBlock()) {
+            specification.getBlock().addLoopContract(specification);
+        } else {
+            specification.getLoop().addLoopContract(specification);
         }
     }
 

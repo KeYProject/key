@@ -92,7 +92,7 @@ public final class MiscTools {
 
         final LoopStatement loop = (LoopStatement) pe.getFirstElement();
 
-        return services.getSpecificationRepository().getLoopSpec(loop);
+        return loop.getLoopInvariant();
     }
 
     /**
