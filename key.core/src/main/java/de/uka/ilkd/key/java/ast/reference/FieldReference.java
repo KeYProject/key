@@ -23,7 +23,7 @@ public class FieldReference extends VariableReference
     /**
      * Reference prefix.
      */
-    protected final ReferencePrefix prefix;
+    protected final @Nullable ReferencePrefix prefix;
 
     public FieldReference(ProgramVariable pv, ReferencePrefix prefix) {
         super(Objects.requireNonNull(pv));
@@ -36,12 +36,13 @@ public class FieldReference extends VariableReference
         this.prefix = constructPrefix(prefix, getProgramVariable());
     }
 
-    public FieldReference(ProgramVariable pv, ReferencePrefix prefix, PositionInfo pi) {
+    public FieldReference(ProgramVariable pv, ReferencePrefix prefix, @Nullable PositionInfo pi) {
         super(pv, pi);
         this.prefix = constructPrefix(prefix, getProgramVariable());
     }
 
-    private ReferencePrefix constructPrefix(@Nullable ReferencePrefix prefix, ProgramVariable pv) {
+    private @Nullable ReferencePrefix constructPrefix(@Nullable ReferencePrefix prefix,
+            ProgramVariable pv) {
         if (prefix == null && !pv.isStatic() && pv.isMember()) {
             return new ThisReference();
         } else {
@@ -94,7 +95,7 @@ public class FieldReference extends VariableReference
      *
      * @return the reference prefix.
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return prefix;
     }
 
@@ -195,7 +196,8 @@ public class FieldReference extends VariableReference
      * are there "dots" in the prefix?
      */
     public boolean isSingleDeref() {
-        return prefix.getReferencePrefix() == null;
+        final ReferencePrefix p = Objects.requireNonNull(prefix, "no reference prefix");
+        return p.getReferencePrefix() == null;
     }
 
 }
