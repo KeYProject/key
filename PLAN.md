@@ -243,7 +243,9 @@ Fixtures: `key.core/src/test/resources/de/uka/ilkd/key/speclang/` (incl.
    jmltk grammar change, or KeY-side normalization of the comment text.
 4. Assert labels + proof scripts: JMLtk supports only JML-standard prefix
    labels (`//@ L1: assert e;`), not KeY's `assert LAB: e`, and has no
-   `BY …` assertion-proof syntax. Scope a small KeY-side shim or upstream work.
+   `BY …` assertion-proof syntax. **Deferred: upstream JMLtk grammar support
+   planned (near future); KeY keeps the raw `JmlDoc` text for these until
+   then.**
 5. Silent-mis-parse protection: `monitors_for`/`readable_if`/`writable_if`/
    `in_group`/`maps_into`/`nowarn`/`debug` tokens are absent from JMLtk and
    currently mis-parse (probe: `monitors_for` → spurious `JmlFieldDeclaration`).
