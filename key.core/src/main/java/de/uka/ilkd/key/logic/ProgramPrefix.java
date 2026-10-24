@@ -7,7 +7,7 @@ package de.uka.ilkd.key.logic;
 import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * this interface is implemented by program elements that may be matched by the inactive program
@@ -30,7 +30,7 @@ public interface ProgramPrefix extends NonTerminalProgramElement {
     /**
      * returns an array with all prefix elements starting at this element
      */
-    ImmutableArray<ProgramPrefix> getPrefixElements();
+    ImmutableList<ProgramPrefix> getPrefixElements();
 
     /** returns the position of the first active child */
     PosInProgram getFirstActiveChildPos();
