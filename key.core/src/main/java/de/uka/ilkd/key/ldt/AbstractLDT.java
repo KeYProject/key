@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.ldt;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
@@ -68,10 +70,9 @@ public abstract class AbstractLDT implements Named {
 
     protected final ParametricFunctionDecl addParametricFunction(TermServices services,
             String name) {
-        final ParametricFunctionDecl f =
-            services.getNamespaces().parametricFunctions().lookup(name);
-        assert f != null : "LDT: Parametric function " + name + " not found";
-        return addParametricFunction(f);
+        return addParametricFunction(Objects.requireNonNull(
+            services.getNamespaces().parametricFunctions().lookup(name),
+            "LDT: Parametric function " + name + " not found"));
     }
 
     /// returns the basic functions of the model

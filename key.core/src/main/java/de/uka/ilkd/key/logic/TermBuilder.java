@@ -1001,7 +1001,8 @@ public class TermBuilder {
     }
 
     public JTerm elementary(JTerm lhs, JTerm rhs) {
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT in services");
         if (lhs.op() instanceof UpdateableOperator updateableOperator) {
             assert lhs.arity() == 0 : "uh oh: " + lhs;
             return elementary(updateableOperator, rhs);
@@ -1132,7 +1133,8 @@ public class TermBuilder {
         } else if (target.equals(tt())) {
             return tt();
         } else {
-            return tf.createTerm(UpdateApplication.UPDATE_APPLICATION, update, target, labels);
+            return tf.createTerm(UpdateApplication.UPDATE_APPLICATION,
+                new ImmutableArray<>(update, target), null, labels);
         }
     }
 
@@ -1365,27 +1367,33 @@ public class TermBuilder {
     }
 
     public JTerm inByte(JTerm var) {
-        Function f = services.getNamespaces().functions().lookup(new Name("inByte"));
+        final Function f = Objects.requireNonNull(
+            services.getNamespaces().functions().lookup(new Name("inByte")), "no inByte function");
         return func(f, var);
     }
 
     public JTerm inShort(JTerm var) {
-        Function f = services.getNamespaces().functions().lookup(new Name("inShort"));
+        final Function f = Objects.requireNonNull(
+            services.getNamespaces().functions().lookup(new Name("inShort")),
+            "no inShort function");
         return func(f, var);
     }
 
     public JTerm inChar(JTerm var) {
-        Function f = services.getNamespaces().functions().lookup(new Name("inChar"));
+        final Function f = Objects.requireNonNull(
+            services.getNamespaces().functions().lookup(new Name("inChar")), "no inChar function");
         return func(f, var);
     }
 
     public JTerm inInt(JTerm var) {
-        Function f = services.getNamespaces().functions().lookup(new Name("inInt"));
+        final Function f = Objects.requireNonNull(
+            services.getNamespaces().functions().lookup(new Name("inInt")), "no inInt function");
         return func(f, var);
     }
 
     public JTerm inLong(JTerm var) {
-        Function f = services.getNamespaces().functions().lookup(new Name("inLong"));
+        final Function f = Objects.requireNonNull(
+            services.getNamespaces().functions().lookup(new Name("inLong")), "no inLong function");
         return func(f, var);
     }
 
@@ -1492,7 +1500,7 @@ public class TermBuilder {
 
     public JTerm infiniteUnion(QuantifiableVariable[] qvs, JTerm s) {
         final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
-        return tf.createTerm(ldt.getInfiniteUnion(), new JTerm[] { s },
+        return tf.createTerm(ldt.getInfiniteUnion(), new ImmutableArray<>(s),
             new ImmutableArray<>(qvs), null);
     }
 
@@ -1602,7 +1610,8 @@ public class TermBuilder {
     // -------------------------------------------------------------------------
 
     public JTerm NULL() {
-        return func(services.getTypeConverter().getHeapLDT().getNull());
+        return func(Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT in services").getNull());
     }
 
     /**
@@ -1610,13 +1619,15 @@ public class TermBuilder {
      * recursively defined for arrays. See bug #1392.
      */
     public JTerm deepNonNull(JTerm o, JTerm d) {
-        final Function nonNull = services.getNamespaces().functions().lookup("nonNull");
+        final Function nonNull = Objects.requireNonNull(
+            services.getNamespaces().functions().lookup("nonNull"), "no nonNull function");
         final JTerm heap = getBaseHeap();
         return func(nonNull, heap, o, d);
     }
 
     public JTerm wellFormed(JTerm heap) {
-        return func(services.getTypeConverter().getHeapLDT().getWellFormed(), heap);
+        return func(Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT in services").getWellFormed(), heap);
     }
 
     public JTerm wellFormed(LocationVariable heap) {
@@ -1695,7 +1706,8 @@ public class TermBuilder {
     }
 
     public JTerm select(Sort asSort, JTerm h, JTerm o, JTerm f) {
-        return func(services.getTypeConverter().getHeapLDT().getSelect(asSort, services), h, o, f);
+        return func(Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT in services").getSelect(asSort, services), h, o, f);
     }
 
     /**
@@ -1703,7 +1715,8 @@ public class TermBuilder {
      */
     public JTerm select(Sort asSort, JTerm h, JTerm o, LocationVariable field) {
         final Function f =
-            services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(field, services);
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+                "no heap LDT in services").getFieldSymbolForPV(field, services);
         return select(asSort, h, o, func(f));
     }
 
@@ -1712,19 +1725,24 @@ public class TermBuilder {
     }
 
     public JTerm getBaseHeap() {
-        return var((LocationVariable) services.getNamespaces().programVariables()
-                .lookup(HeapLDT.BASE_HEAP_NAME));
+        final LocationVariable heapVar = Objects.requireNonNull(
+            (LocationVariable) services.getNamespaces().programVariables()
+                    .lookup(HeapLDT.BASE_HEAP_NAME),
+            "no base heap program variable");
+        return var(heapVar);
         // return var(services.getTypeConverter().getHeapLDT().getHeap());
     }
 
     public JTerm dot(Sort asSort, JTerm o, Function f) {
-        final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
+        final Sort fieldSort = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT in services").getFieldSort();
         return f.sort() == fieldSort ? dot(asSort, o, func(f)) : func(f, getBaseHeap(), o);
     }
 
     public JTerm dot(Sort asSort, JTerm o, LocationVariable field) {
         final Function f =
-            services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(field, services);
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+                "no heap LDT in services").getFieldSymbolForPV(field, services);
         return dot(asSort, o, f);
     }
 
@@ -1733,7 +1751,8 @@ public class TermBuilder {
     }
 
     public JTerm staticDot(Sort asSort, Function f) {
-        final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
+        final Sort fieldSort = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT in services").getFieldSort();
         return f.sort() == fieldSort ? staticDot(asSort, func(f)) : func(f, getBaseHeap());
     }
 
@@ -1750,7 +1769,8 @@ public class TermBuilder {
      * @see #dot(Sort, JTerm, Function) for accessing final model fields
      */
     public JTerm finalDot(Sort sort, JTerm o, Function f) {
-        final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
+        final Sort fieldSort = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT in services").getFieldSort();
         return f.sort() == fieldSort ? finalDot(sort, o, func(f))
                 : func(f, getBaseHeap(), o);
     }
@@ -1766,7 +1786,8 @@ public class TermBuilder {
      * @see #dot(Sort, JTerm, Function) for accessing final model fields
      */
     public JTerm staticFinalDot(Sort sort, Function f) {
-        final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
+        final Sort fieldSort = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT in services").getFieldSort();
         return f.sort() == fieldSort ? finalDot(sort, NULL(), func(f))
                 : func(f, getBaseHeap(), NULL());
     }
@@ -1781,12 +1802,13 @@ public class TermBuilder {
      * @return the term representing the access "o.f"
      */
     public JTerm finalDot(Sort asSort, JTerm o, JTerm f) {
-        return func(services.getTypeConverter().getHeapLDT().getFinal(asSort, services),
-            o, f);
+        return func(Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT in services").getFinal(asSort, services), o, f);
     }
 
     public JTerm arr(JTerm idx) {
-        return func(services.getNamespaces().functions().lookup("arr"), idx);
+        return func(Objects.requireNonNull(
+            services.getNamespaces().functions().lookup("arr"), "no arr function"), idx);
         // return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
     }
 
@@ -1881,7 +1903,7 @@ public class TermBuilder {
         if (label == null && !term.hasLabels()) {
             return term;
         } else {
-            return addLabel(term, new ImmutableArray<>(label));
+            return addLabel(term, new ImmutableArray<>(Objects.requireNonNull(label, "label")));
         }
     }
 
@@ -1929,7 +1951,7 @@ public class TermBuilder {
         for (int i = 0; i < subs.length; i++) {
             subs[i] = unlabelRecursive(term.sub(i));
         }
-        return tf.createTerm(term.op(), subs, term.boundVars(), null);
+        return tf.createTerm(term.op(), new ImmutableArray<>(subs), term.boundVars(), null);
     }
 
     public JTerm dotArr(@Nullable JTerm ref, @Nullable JTerm idx) {
@@ -1954,13 +1976,16 @@ public class TermBuilder {
 
     public JTerm dotLength(JTerm a) {
         final TypeConverter tc = services.getTypeConverter();
-        return func(tc.getHeapLDT().getLength(), a);
+        return func(Objects.requireNonNull(tc.getHeapLDT(), "no heap LDT in services").getLength(),
+            a);
     }
 
     public JTerm created(JTerm h, JTerm o) {
         final TypeConverter tc = services.getTypeConverter();
         return equals(
-            select(tc.getBooleanLDT().targetSort(), h, o, func(tc.getHeapLDT().getCreated())),
+            select(tc.getBooleanLDT().targetSort(), h, o,
+                func(Objects.requireNonNull(tc.getHeapLDT(), "no heap LDT in services")
+                        .getCreated())),
             TRUE());
     }
 
@@ -1970,44 +1995,56 @@ public class TermBuilder {
 
     public JTerm initialized(JTerm o) {
         final TypeConverter tc = services.getTypeConverter();
-        return equals(dot(tc.getBooleanLDT().targetSort(), o, tc.getHeapLDT().getInitialized()),
+        return equals(dot(tc.getBooleanLDT().targetSort(), o,
+            Objects.requireNonNull(tc.getHeapLDT(), "no heap LDT in services").getInitialized()),
             TRUE());
     }
 
     public JTerm classPrepared(Sort classSort) {
         final TypeConverter tc = services.getTypeConverter();
         return equals(staticDot(tc.getBooleanLDT().targetSort(),
-            tc.getHeapLDT().getClassPrepared(classSort, services)), TRUE());
+            Objects.requireNonNull(tc.getHeapLDT(), "no heap LDT in services")
+                    .getClassPrepared(classSort, services)),
+            TRUE());
     }
 
     public JTerm classInitialized(Sort classSort) {
         final TypeConverter tc = services.getTypeConverter();
         return equals(staticDot(tc.getBooleanLDT().targetSort(),
-            tc.getHeapLDT().getClassInitialized(classSort, services)), TRUE());
+            Objects.requireNonNull(tc.getHeapLDT(), "no heap LDT in services")
+                    .getClassInitialized(classSort, services)),
+            TRUE());
     }
 
     public JTerm classInitializationInProgress(Sort classSort) {
         final TypeConverter tc = services.getTypeConverter();
         return equals(staticDot(tc.getBooleanLDT().targetSort(),
-            tc.getHeapLDT().getClassInitializationInProgress(classSort, services)), TRUE());
+            Objects.requireNonNull(tc.getHeapLDT(), "no heap LDT in services")
+                    .getClassInitializationInProgress(classSort, services)),
+            TRUE());
     }
 
     public JTerm classErroneous(Sort classSort) {
         final TypeConverter tc = services.getTypeConverter();
         return equals(staticDot(tc.getBooleanLDT().targetSort(),
-            tc.getHeapLDT().getClassErroneous(classSort, services)), TRUE());
+            Objects.requireNonNull(tc.getHeapLDT(), "no heap LDT in services")
+                    .getClassErroneous(classSort, services)),
+            TRUE());
     }
 
     public JTerm store(JTerm h, JTerm o, JTerm f, JTerm v) {
-        return func(services.getTypeConverter().getHeapLDT().getStore(), h, o, f, v);
+        return func(Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT in services").getStore(), h, o, f, v);
     }
 
     public JTerm create(JTerm h, JTerm o) {
-        return func(services.getTypeConverter().getHeapLDT().getCreate(), new JTerm[] { h, o });
+        return func(Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT in services").getCreate(), new JTerm[] { h, o });
     }
 
     public JTerm anon(JTerm h1, JTerm s, JTerm h2) {
-        return func(services.getTypeConverter().getHeapLDT().getAnon(), h1, s, h2);
+        return func(Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT in services").getAnon(), h1, s, h2);
     }
 
     public JTerm fieldStore(TermServices services, JTerm o, Function f, JTerm v) {
@@ -2019,13 +2056,17 @@ public class TermBuilder {
     }
 
     public JTerm arrayStore(JTerm o, JTerm i, JTerm v) {
-        return store(getBaseHeap(), o, func(services.getTypeConverter().getHeapLDT().getArr(), i),
+        return store(getBaseHeap(), o,
+            func(Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+                "no heap LDT in services").getArr(), i),
             v);
     }
 
     public JTerm reachableValue(JTerm h, JTerm t, KeYJavaType kjt) {
         assert t.sort().extendsTrans(kjt.getSort()) || t.sort() instanceof ProgramSVSort;
-        final Sort s = t.sort() instanceof ProgramSVSort ? kjt.getSort() : t.sort();
+        final Sort s = t.sort() instanceof ProgramSVSort
+                ? Objects.requireNonNull(kjt.getSort(), "no type for object sort")
+                : t.sort();
         final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
         if (s.extendsTrans(services.getJavaInfo().objectSort())) {
@@ -2034,7 +2075,10 @@ public class TermBuilder {
             return createdInHeap(t, h);
         } else if (s.equals(intLDT.targetSort())
                 && kjt.getJavaType() != PrimitiveType.JAVA_BIGINT) {
-            return func(intLDT.getInBounds(kjt.getJavaType()), t);
+            var javaType = Objects.requireNonNull(kjt.getJavaType(), "no java type");
+            return func(
+                Objects.requireNonNull(intLDT.getInBounds(javaType), "no inBounds function"),
+                t);
         } else {
             return tt();
         }
@@ -2045,12 +2089,14 @@ public class TermBuilder {
     }
 
     public JTerm reachableValue(LocationVariable pv) {
-        return reachableValue(var(pv), pv.getKeYJavaType());
+        return reachableValue(var(pv),
+            Objects.requireNonNull(pv.getKeYJavaType(), "no type for program variable"));
     }
 
     public JTerm frame(JTerm heapTerm, Map<JTerm, JTerm> normalToAtPre, JTerm modifiable) {
         final Sort objectSort = services.getJavaInfo().objectSort();
-        final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
+        final Sort fieldSort = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT in services").getFieldSort();
 
         final Name objVarName = new Name(newName("o"));
         final Name fieldVarName = new Name(newName("f"));
@@ -2060,8 +2106,10 @@ public class TermBuilder {
         final JTerm fieldVarTerm = var(fieldVar);
 
         final OpReplacer or = new OpReplacer(normalToAtPre, tf);
-        final JTerm modifiableAtPre = or.replace(modifiable);
-        final JTerm createdAtPre = or.replace(created(heapTerm, objVarTerm));
+        final JTerm modifiableAtPre =
+            Objects.requireNonNull(or.replace(modifiable), "no replacement for modifiable");
+        final JTerm createdAtPre = Objects.requireNonNull(or.replace(created(heapTerm, objVarTerm)),
+            "no replacement for created-at-pre");
 
         ImmutableList<QuantifiableVariable> quantVars = ImmutableList.nil();
         quantVars = quantVars.append(objVar);
@@ -2070,7 +2118,8 @@ public class TermBuilder {
         // narrowing
         // does not follow Java typing for the permission heap
         boolean permissionHeap =
-            heapTerm.op() == services.getTypeConverter().getHeapLDT().getPermissionHeap();
+            heapTerm.op() == Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+                "no heap LDT in services").getPermissionHeap();
         return all(quantVars, or(elementOf(objVarTerm, fieldVarTerm, modifiableAtPre),
             and(not(equals(objVarTerm, NULL())), not(createdAtPre)),
             equals(
@@ -2079,7 +2128,8 @@ public class TermBuilder {
                     heapTerm, objVarTerm, fieldVarTerm),
                 select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort()
                         : JavaDLTheory.ANY,
-                    or.replace(heapTerm), objVarTerm, fieldVarTerm))));
+                    Objects.requireNonNull(or.replace(heapTerm), "no replacement for heap term"),
+                    objVarTerm, fieldVarTerm))));
     }
 
     /**
@@ -2090,7 +2140,8 @@ public class TermBuilder {
      */
     public JTerm frameStrictlyEmpty(JTerm heapTerm, Map<JTerm, JTerm> normalToAtPre) {
         final Sort objectSort = services.getJavaInfo().objectSort();
-        final Sort fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
+        final Sort fieldSort = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT in services").getFieldSort();
 
         final Name objVarName = new Name(newName("o"));
         final Name fieldVarName = new Name(newName("f"));
@@ -2107,7 +2158,8 @@ public class TermBuilder {
 
         // see above
         boolean permissionHeap =
-            heapTerm.op() == services.getTypeConverter().getHeapLDT().getPermissionHeap();
+            heapTerm.op() == Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+                "no heap LDT in services").getPermissionHeap();
 
         return all(quantVars,
             equals(
@@ -2116,7 +2168,8 @@ public class TermBuilder {
                     heapTerm, objVarTerm, fieldVarTerm),
                 select(permissionHeap ? services.getTypeConverter().getPermissionLDT().targetSort()
                         : JavaDLTheory.ANY,
-                    or.replace(heapTerm), objVarTerm, fieldVarTerm)));
+                    Objects.requireNonNull(or.replace(heapTerm), "no replacement for heap term"),
+                    objVarTerm, fieldVarTerm)));
     }
 
     public JTerm anonUpd(LocationVariable heap, JTerm modifiable, JTerm anonHeap) {
@@ -2124,12 +2177,13 @@ public class TermBuilder {
     }
 
     public JTerm forallHeaps(Services services, JTerm t) {
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT in services");
         final LogicVariable heapLV = new LogicVariable(new Name("h"), heapLDT.targetSort());
         final Map<LocationVariable, LogicVariable> map = new LinkedHashMap<>();
         map.put(heapLDT.getHeap(), heapLV);
         final OpReplacer or = new OpReplacer(map, tf);
-        t = or.replace(t);
+        t = Objects.requireNonNull(or.replace(t), "no replacement for term");
         return all(heapLV, t);
     }
 
@@ -2138,11 +2192,13 @@ public class TermBuilder {
     // -------------------------------------------------------------------------
 
     public JTerm acc(JTerm h, JTerm s, JTerm o1, JTerm o2) {
-        return func(services.getTypeConverter().getHeapLDT().getAcc(), h, s, o1, o2);
+        return func(Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT in services").getAcc(), h, s, o1, o2);
     }
 
     public JTerm reach(JTerm h, JTerm s, JTerm o1, JTerm o2, JTerm n) {
-        return func(services.getTypeConverter().getHeapLDT().getReach(), h, s, o1, o2, n);
+        return func(Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT in services").getReach(), h, s, o1, o2, n);
     }
 
     // -------------------------------------------------------------------------
@@ -2476,7 +2532,7 @@ public class TermBuilder {
      *
      * @return the OriginTermLabelFactory
      */
-    public OriginTermLabelFactory getOriginFactory() {
+    public @Nullable OriginTermLabelFactory getOriginFactory() {
         return services.getOriginFactory();
     }
 }
