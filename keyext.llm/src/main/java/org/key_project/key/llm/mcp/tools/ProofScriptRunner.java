@@ -4,10 +4,15 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.llm.mcp.tools;
 
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.scripts.ScriptBlock;
@@ -15,6 +20,7 @@ import de.uka.ilkd.key.scripts.ScriptCommandAst;
 import de.uka.ilkd.key.scripts.ScriptException;
 
 import org.key_project.key.llm.mcp.ProofSelector;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -100,6 +106,83 @@ public final class ProofScriptRunner {
             return List.of(selectGoal(index.number()), command);
         }
         return List.of(onAll(command));
+    }
+
+    // ------------------------------------------------------------------ goal resolution
+
+    /**
+     * The open goals of a proof in the order the {@code select number:<n>} script command numbers
+     * them: a depth-first walk from the root that counts only the open, automatic goals.
+     * <p>
+     * This is the ordering behind the {@code goal} parameter of every proof tool: a {@code goal}
+     * index selects the goal at this position, {@code "branch"} the first one.
+     */
+    public static List<Goal> goalsInSelectOrder(Proof proof) {
+        List<Goal> ordered = new ArrayList<>();
+        ImmutableList<Goal> openGoals = proof.openGoals();
+        Deque<Node> choices = new LinkedList<>();
+        Node node = proof.root();
+        while (node != null) {
+            if (node.isClosed()) {
+                return ordered;
+            }
+            int childCount = node.childrenCount();
+            switch (childCount) {
+                case 0 -> {
+                    Goal goal = openGoalAt(openGoals, node);
+                    if (goal != null && goal.isAutomatic()) {
+                        ordered.add(goal);
+                    }
+                    node = choices.pollLast();
+                }
+                case 1 -> node = node.child(0);
+                default -> {
+                    Node next = null;
+                    for (int i = 0; i < childCount; i++) {
+                        Node child = node.child(i);
+                        if (!child.isClosed()) {
+                            if (next == null) {
+                                next = child;
+                            } else {
+                                choices.add(child);
+                            }
+                        }
+                    }
+                    if (next == null) {
+                        return ordered;
+                    }
+                    node = next;
+                }
+            }
+        }
+        return ordered;
+    }
+
+    private static @Nullable Goal openGoalAt(ImmutableList<Goal> openGoals, Node node) {
+        for (Goal goal : openGoals) {
+            if (goal.node() == node) {
+                return goal;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Resolves a parsed {@link GoalTarget} to an actual goal of a proof, using the same numbering
+     * as {@code select}: {@code branch} = the first open automatic goal, an index selects by
+     * 0-based position (negative = from the end). Returns {@code null} when the target does not
+     * name an open automatic goal.
+     */
+    public static @Nullable Goal resolveGoal(Proof proof, GoalTarget target) {
+        List<Goal> ordered = goalsInSelectOrder(proof);
+        if (target instanceof Branch) {
+            return ordered.isEmpty() ? null : ordered.getFirst();
+        }
+        if (target instanceof Index index) {
+            int i = index.number() < 0 ? ordered.size() + index.number() : index.number();
+            return i >= 0 && i < ordered.size() ? ordered.get(i) : null;
+        }
+        return null; // "all" is never a single goal
     }
 
     // ------------------------------------------------------------------ execution + reporting
