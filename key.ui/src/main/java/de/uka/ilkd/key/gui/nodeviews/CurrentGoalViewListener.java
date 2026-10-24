@@ -132,10 +132,18 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
             try {
                 var node = mediator.getSelectedNode();
                 var sequent = node != null ? node.sequent() : null;
+                var transferable = new PosInSequentTransferable(localMousePos,
+                    mediator.getServices(), mediator.getNotationInfo(),
+                    getSequentView().getVisibleTermLabels(), sequent);
+                // the print mode applied on drop follows the keyboard modifiers while dragging
+                // (Shift: safe ASCII, Ctrl: term structure); the initial mode is taken from the
+                // modifiers of the event that triggered the drag
+                transferable.setPrintMode(
+                    PosInSequentTransferable.PrintMode
+                            .of(dgEvent.getTriggerEvent().getModifiersEx()));
                 // no fixed drag cursor: the DnD system cursor (null) reflects the acceptance of
                 // the drop target below it (copy over a target, no-drop elsewhere)
-                getSequentView().getDragSource().startDrag(dgEvent, null,
-                    new PosInSequentTransferable(localMousePos, mediator.getServices(), sequent),
+                getSequentView().getDragSource().startDrag(dgEvent, null, transferable,
                     new DragSourceAdapter() {
                         @Override
                         public void dragDropEnd(DragSourceDropEvent event) {
