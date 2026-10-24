@@ -70,7 +70,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
                 || !WellDefinednessCheck.isOn(proof.getServices())) {
             return false;
         }
-        final ContractPO po = proof.getServices().getSpecificationRepository().getPOForProof(proof);
+        final ContractPO po = proof.getServices().getProofRegistry().getPOForProof(proof);
         if (po instanceof WellDefinednessPO) { // applicable for all well-definedness checks
             return true;
         }

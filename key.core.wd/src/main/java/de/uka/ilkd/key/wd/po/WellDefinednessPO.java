@@ -202,7 +202,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     @Override
     protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType kjt) {
         ImmutableSet<ClassAxiom> result = DefaultImmutableSet.nil();
-        for (ClassAxiom axiom : specRepos.getClassAxioms(kjt)) {
+        for (ClassAxiom axiom : environmentServices.getClassAxiomComputer()
+                .getClassAxioms(kjt)) {
             if (check instanceof ClassWellDefinedness cwd) {
                 final String kjtName = cwd.getKJT().getFullName();
                 final String invName = "in " + cwd.getKJT().getName();

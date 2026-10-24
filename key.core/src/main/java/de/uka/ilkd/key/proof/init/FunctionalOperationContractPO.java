@@ -330,7 +330,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         if (!(po instanceof FunctionalOperationContractPO cPO)) {
             return false;
         }
-        return specRepos.splitContract(cPO.contract).subset(specRepos.splitContract(contract));
+        return environmentServices.getContractRegistry().splitContract(cPO.contract)
+                .subset(environmentServices.getContractRegistry().splitContract(contract));
     }
 
     /**

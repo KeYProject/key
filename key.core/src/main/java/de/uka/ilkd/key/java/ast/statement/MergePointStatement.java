@@ -24,11 +24,15 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
+import de.uka.ilkd.key.speclang.MergeContract;
+import de.uka.ilkd.key.speclang.jml.JmlSpec;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * A statement indicating a merge point.
@@ -41,15 +45,42 @@ public class MergePointStatement extends JavaStatement
     // Those are used for JML to JavaDL conversions
     protected final IProgramVariable identifier;
 
-    private final TextualJMLMergePointDecl context;
+    private final @Nullable JmlSpec context;
+
+    /**
+     * The merge contracts belonging to this merge point, attached to the node; former
+     * {@code mergeContracts} map.
+     */
+    private ImmutableSet<MergeContract> mergeContracts = DefaultImmutableSet.nil();
+
+    /**
+     * Returns the merge contracts belonging to this merge point.
+     */
+    public ImmutableSet<MergeContract> getMergeContracts() {
+        return mergeContracts;
+    }
+
+    /**
+     * Registers the given merge contract on this merge point.
+     */
+    public void addMergeContract(MergeContract contract) {
+        this.mergeContracts = this.mergeContracts.add(contract);
+    }
+
+    /**
+     * Deletes all merge contracts registered on this merge point.
+     */
+    public void removeMergeContracts() {
+        this.mergeContracts = DefaultImmutableSet.nil();
+    }
 
     @Override
-    public ImmutableList<TextualJMLConstruct> getAttachedJml() {
+    public ImmutableList<JmlSpec> getAttachedJml() {
         return context == null ? ImmutableList.nil() : ImmutableList.of(context);
     }
 
     public MergePointStatement(
-            PositionInfo pi, List<Comment> c, TextualJMLMergePointDecl context,
+            PositionInfo pi, List<Comment> c, @Nullable JmlSpec context,
             IProgramVariable identifier) {
         super(pi, c);
         this.identifier = identifier;
@@ -67,7 +98,7 @@ public class MergePointStatement extends JavaStatement
         this.context = null;
     }
 
-    public TextualJMLMergePointDecl getContext() {
+    public @Nullable JmlSpec getContext() {
         return context;
     }
 

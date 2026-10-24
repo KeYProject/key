@@ -281,9 +281,9 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
 
         LoopContract innerLoopContract = contract.getAuxiliaryContract().toLoopContract();
         if (innerLoopContract != null) {
-            services.getSpecificationRepository().addLoopContract(innerLoopContract
-                    .replaceEnhancedForVariables(innerLoopContract.getBlock(), services),
-                false);
+            LoopContract blockContract = innerLoopContract
+                    .replaceEnhancedForVariables(innerLoopContract.getBlock(), services);
+            blockContract.getBlock().addLoopContract(blockContract);
         }
 
         final List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);

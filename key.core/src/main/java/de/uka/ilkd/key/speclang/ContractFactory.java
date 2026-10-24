@@ -17,7 +17,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
 import de.uka.ilkd.key.speclang.infflow.InformationFlowContractInfo;
 import de.uka.ilkd.key.speclang.infflow.InformationFlowContractSupplier;
@@ -55,6 +54,13 @@ public class ContractFactory {
      * The base name for information flow contracts.
      */
     public static final String INFORMATION_FLOW_CONTRACT_BASENAME = "Non-interference contract";
+
+    /**
+     * The characters separating the names of atomic contracts inside a combined contract's name.
+     * Contract names must never contain this marker (see
+     * {@link ContractRegistry#registerContract(Contract, Pair)}).
+     */
+    public static final String CONTRACT_COMBINATION_MARKER = "§";
 
     private static final String INVALID_ID = "INVALID_ID";
     private static final String UNKNOWN_CONTRACT_IMPLEMENTATION = "unknown contract implementation";
@@ -809,7 +815,7 @@ public class ContractFactory {
         // determine names
         StringBuilder nameSB = new StringBuilder(t.getName());
         for (FunctionalOperationContract other : others) {
-            nameSB.append(SpecificationRepository.CONTRACT_COMBINATION_MARKER)
+            nameSB.append(ContractFactory.CONTRACT_COMBINATION_MARKER)
                     .append(other.getName());
         }
         final String name = nameSB.toString();

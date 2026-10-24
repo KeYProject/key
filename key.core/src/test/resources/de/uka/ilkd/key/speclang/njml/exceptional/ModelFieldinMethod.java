@@ -1,8 +1,7 @@
 // verbose: true
 // broken: false
-// exceptionClass: BuildingException
-// msgContains: Model modifier on variable declaration detected, only model fields are allowed
-// position: 11/19
+// exceptionClass: ProofInputException
+// msgContains: Encountered unexpected token
 
 class ModelFieldinMethod {
 

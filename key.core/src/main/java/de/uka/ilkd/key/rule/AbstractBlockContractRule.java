@@ -19,7 +19,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract;
 
 import org.key_project.logic.Name;
@@ -56,32 +55,30 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         if (instantiation == null) {
             return DefaultImmutableSet.nil();
         }
-        return getApplicableContracts(services.getSpecificationRepository(),
-            instantiation.statement(), instantiation.modality().kind(), goal);
+        return getApplicableContracts(services, instantiation.statement(),
+            instantiation.modality().kind(), goal);
     }
 
     /**
-     * @param specifications a specification repository.
+     * @param services services.
      * @param statement a block.
      * @param modalityKind the current goal's modality.
      * @param goal the current goal.
-     * @return all applicable block contracts for the block from the repository.
+     * @return all applicable block contracts for the block (read off the AST node).
      */
     public static @Nullable ImmutableSet<BlockContract> getApplicableContracts(
-            final SpecificationRepository specifications, final JavaStatement statement,
+            final Services services, final JavaStatement statement,
             final JModality.JavaModalityKind modalityKind, final Goal goal) {
         if (statement instanceof StatementBlock block) {
 
             ImmutableSet<BlockContract> collectedContracts =
-                specifications.getBlockContracts(block, modalityKind);
+                getBlockContracts(block, modalityKind, services);
             if (modalityKind == JModality.JavaModalityKind.BOX) {
-                collectedContracts =
-                    collectedContracts.union(
-                        specifications.getBlockContracts(block, JModality.JavaModalityKind.DIA));
+                collectedContracts = collectedContracts.union(
+                    getBlockContracts(block, JModality.JavaModalityKind.DIA, services));
             } else if (modalityKind == JModality.JavaModalityKind.BOX_TRANSACTION) {
-                collectedContracts = collectedContracts
-                        .union(specifications.getBlockContracts(block,
-                            JModality.JavaModalityKind.DIA_TRANSACTION));
+                collectedContracts = collectedContracts.union(getBlockContracts(block,
+                    JModality.JavaModalityKind.DIA_TRANSACTION, services));
             }
             return filterAppliedContracts(collectedContracts, goal);
         } else {
@@ -150,7 +147,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
         Services services = goal.proof().getServices();
         Proof proof = goal.proof();
-        return services.getSpecificationRepository().getProofOblInput(proof);
+        return services.getProofRegistry().getProofOblInput(proof);
     }
 
     /**
@@ -232,8 +229,8 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         protected boolean hasApplicableContracts(final Services services,
                 final JavaStatement statement, final JModality.JavaModalityKind modalityKind,
                 Goal goal) {
-            ImmutableSet<BlockContract> contracts = getApplicableContracts(
-                services.getSpecificationRepository(), statement, modalityKind, goal);
+            ImmutableSet<BlockContract> contracts = getApplicableContracts(services, statement,
+                modalityKind, goal);
 
             return contracts != null && !contracts.isEmpty();
         }

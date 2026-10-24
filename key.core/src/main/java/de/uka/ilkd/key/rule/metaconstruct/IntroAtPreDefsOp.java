@@ -81,14 +81,11 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
             if (statement instanceof StatementBlock block) {
 
-                contracts =
-                    contracts.union(services.getSpecificationRepository().getBlockContracts(block));
-                contracts =
-                    contracts.union(services.getSpecificationRepository().getLoopContracts(block));
+                contracts = contracts.union(block.getBlockContracts());
+                contracts = contracts.union(block.getLoopContracts());
             } else {
                 LoopStatement loop = (LoopStatement) statement;
-                contracts =
-                    contracts.union(services.getSpecificationRepository().getLoopContracts(loop));
+                contracts = contracts.union(loop.getLoopContracts());
             }
 
             for (AuxiliaryContract contract : contracts) {
@@ -175,11 +172,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             if (spec instanceof PredicateAbstractionMergeContract pamc) {
                 final MergePointStatement mps = spec.getMergePointStatement();
                 addNeededVariables(pamc.getAtPres().keySet());
-                services.getSpecificationRepository().removeMergeContracts(mps);
-                services.getSpecificationRepository()
-                        .addMergeContract(new PredicateAbstractionMergeContract(mps, atPres,
-                            pamc.getKJT(), pamc.getLatticeTypeName(),
-                            pamc.getAbstractionPredicates(atPres, services)));
+                mps.removeMergeContracts();
+                mps.addMergeContract(new PredicateAbstractionMergeContract(mps, atPres,
+                    pamc.getKJT(), pamc.getLatticeTypeName(),
+                    pamc.getAbstractionPredicates(atPres, services)));
             }
         }
 
@@ -195,10 +191,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         private void handleJmlStatement(Statement x) {
             var spec =
-                Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
+                Objects.requireNonNull(((JmlSpecCarrier) x).getSpec());
             addNeededVariables(spec.vars().atPres.keySet());
             var newSpec = spec.updateVariables(atPres, services);
-            services.getSpecificationRepository().addStatementSpec(x, newSpec);
+            ((JmlSpecCarrier) x).setSpec(newSpec);
         }
 
         @Override
@@ -260,7 +256,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 frame.getProgramMethod().getContainerType(), newInvariants, newFreeInvariants,
                 newModifiables, newFreeModifiables, newInfFlowSpecs, newVariant, self, newLocalIns,
                 newLocalOuts, atPres);
-            services.getSpecificationRepository().addLoopInvariant(newInv);
+            loop.setLoopInvariant(newInv);
         }
 
         public void addNeededVariables(Collection<LocationVariable> variables) {
@@ -358,29 +354,46 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 newModifiableClauses, newFreeModifiableClauses,
                 contract.getInfFlowSpecs(), newVariables, contract.getMby(newVariables, services));
 
-            services.getSpecificationRepository().removeBlockContract((BlockContract) contract);
-            services.getSpecificationRepository().addBlockContract(newBlockContract, false);
+            StatementBlock block = (StatementBlock) statement;
+            block.removeBlockContract((BlockContract) contract);
+            block.addBlockContract(newBlockContract);
         } else if (contract instanceof LoopContract) {
             final LoopContract newLoopContract;
 
-            if (statement instanceof StatementBlock) {
-                newLoopContract = ((LoopContract) contract).update((StatementBlock) statement,
+            if (statement instanceof StatementBlock block) {
+                newLoopContract = ((LoopContract) contract).update(block,
                     newPreconditions, newFreePreconditions, newPostconditions,
                     newFreePostconditions, newModifiableClauses,
                     newFreeModifiableClauses, contract.getInfFlowSpecs(),
                     newVariables, contract.getMby(newVariables, services),
                     ((LoopContract) contract).getDecreases(newVariables, services));
+
+                removeAttachedLoopContract((LoopContract) contract);
+                block.addLoopContract(newLoopContract);
             } else {
-                newLoopContract = ((LoopContract) contract).update((LoopStatement) statement,
+                LoopStatement loop = (LoopStatement) statement;
+                newLoopContract = ((LoopContract) contract).update(loop,
                     newPreconditions, newFreePreconditions, newPostconditions,
                     newFreePostconditions, newModifiableClauses, newFreeModifiableClauses,
                     contract.getInfFlowSpecs(), newVariables,
                     contract.getMby(newVariables, services),
                     ((LoopContract) contract).getDecreases(newVariables, services));
-            }
 
-            services.getSpecificationRepository().removeLoopContract((LoopContract) contract);
-            services.getSpecificationRepository().addLoopContract(newLoopContract, false);
+                removeAttachedLoopContract((LoopContract) contract);
+                loop.addLoopContract(newLoopContract);
+            }
+        }
+    }
+
+    /**
+     * Removes the loop contract from whichever node it is attached to (the block it belongs to if
+     * it is an on-block contract, the loop otherwise).
+     */
+    private static void removeAttachedLoopContract(final LoopContract contract) {
+        if (contract.isOnBlock()) {
+            contract.getBlock().removeLoopContract(contract);
+        } else {
+            contract.getLoop().removeLoopContract(contract);
         }
     }
 }
