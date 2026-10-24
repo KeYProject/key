@@ -45,6 +45,24 @@ public interface AgentTool {
     }
 
     /**
+     * The category of this tool, used to group and sort the tool set (docs, settings UI).
+     * Defaults to {@link ToolCategory#GENERAL}.
+     */
+    default ToolCategory category() {
+        return ToolCategory.GENERAL;
+    }
+
+    /**
+     * Whether this tool may run in the background: while such a call is running, the user can put
+     * it into the background and the agent loop continues with queued user messages; when the
+     * call finishes, its output is delivered to the agent as a tool result. Only meaningful for
+     * long-running tools.
+     */
+    default boolean backgroundable() {
+        return false;
+    }
+
+    /**
      * Executes the tool with the parsed {@code arguments}.
      *
      * @param arguments the tool arguments (already parsed from JSON)
@@ -56,13 +74,19 @@ public interface AgentTool {
 
     /** Converts this tool to the OpenAI tool format used by the MCP clients. */
     default Tool asTool() {
-        return new Tool(new FunctionDefinition(name(), description(), parameters()), approval());
+        return new Tool(new FunctionDefinition(name(), description(), parameters()), approval(),
+            category(), backgroundable());
     }
 
     /** Renders this tool as a Markdown block for the tools documentation. */
     default String toMarkdown() {
         var sb = new StringBuilder();
-        sb.append("### `").append(name()).append("` (").append(approval()).append(")\n\n");
+        sb.append("### `").append(name()).append("` (").append(approval()).append(" · ")
+                .append(category().label()).append(')');
+        if (backgroundable()) {
+            sb.append(" · can run in background");
+        }
+        sb.append("\n\n");
         sb.append(description()).append('\n');
         var parameters = parameters();
         if (parameters != null && parameters.properties() != null
@@ -100,9 +124,89 @@ public interface AgentTool {
      */
     static AgentTool tool(String name, String description, Tool.ApprovalRequirement approval,
             JsonSchema parameters, ToolCall body) {
+        return tool(name, ToolCategory.GENERAL, description, approval, parameters, false, body);
+    }
+
+    /**
+     * Creates a tool with a category and background metadata, AUTO approval.
+     *
+     * @param name the unique tool name
+     * @param category the tool category (grouping/sorting metadata)
+     * @param description the tool explanation
+     * @param parameters the argument schema
+     * @param body the call implementation
+     */
+    static AgentTool tool(String name, ToolCategory category, String description,
+            JsonSchema parameters, ToolCall body) {
+        return tool(name, category, description, Tool.ApprovalRequirement.AUTO, parameters, false,
+            body);
+    }
+
+    /**
+     * Creates a tool with a category and background metadata.
+     *
+     * @param name the unique tool name
+     * @param category the tool category (grouping/sorting metadata)
+     * @param description the tool explanation
+     * @param approval the default approval requirement
+     * @param parameters the argument schema
+     * @param body the call implementation
+     */
+    static AgentTool tool(String name, ToolCategory category, String description,
+            Tool.ApprovalRequirement approval, JsonSchema parameters, ToolCall body) {
+        return tool(name, category, description, approval, parameters, false, body);
+    }
+
+    /**
+     * Creates a tool with an explicit background marker, AUTO approval.
+     *
+     * @param name the unique tool name
+     * @param description the tool explanation
+     * @param approval the default approval requirement
+     * @param parameters the argument schema
+     * @param backgroundable whether the call may run in the background
+     * @param body the call implementation
+     */
+    static AgentTool tool(String name, String description, Tool.ApprovalRequirement approval,
+            JsonSchema parameters, boolean backgroundable, ToolCall body) {
+        return tool(name, ToolCategory.GENERAL, description, approval, parameters, backgroundable,
+            body);
+    }
+
+    /**
+     * Creates a tool with a category and an explicit background marker, AUTO approval.
+     *
+     * @param name the unique tool name
+     * @param category the tool category (grouping/sorting metadata)
+     * @param description the tool explanation
+     * @param parameters the argument schema
+     * @param backgroundable whether the call may run in the background
+     * @param body the call implementation
+     */
+    static AgentTool tool(String name, ToolCategory category, String description,
+            JsonSchema parameters, boolean backgroundable, ToolCall body) {
+        return tool(name, category, description, Tool.ApprovalRequirement.AUTO, parameters,
+            backgroundable, body);
+    }
+
+    /**
+     * The canonical factory: creates a tool from its metadata and call body.
+     *
+     * @param name the unique tool name
+     * @param category the tool category (grouping/sorting metadata)
+     * @param description the tool explanation
+     * @param approval the default approval requirement
+     * @param parameters the argument schema
+     * @param backgroundable whether the call may run in the background
+     * @param body the call implementation
+     */
+    static AgentTool tool(String name, ToolCategory category, String description,
+            Tool.ApprovalRequirement approval, JsonSchema parameters, boolean backgroundable,
+            ToolCall body) {
         Objects.requireNonNull(name, "tool name");
         Objects.requireNonNull(body, "tool body");
         Objects.requireNonNull(description, "tool description");
+        Objects.requireNonNull(category, "tool category");
         return new AgentTool() {
             @Override
             public String name() {
@@ -125,6 +229,16 @@ public interface AgentTool {
             }
 
             @Override
+            public ToolCategory category() {
+                return category;
+            }
+
+            @Override
+            public boolean backgroundable() {
+                return backgroundable;
+            }
+
+            @Override
             public Object call(Map<String, Object> arguments) throws Exception {
                 return body.call(arguments);
             }
@@ -136,13 +250,27 @@ public interface AgentTool {
      * AUTO approval.
      */
     static AgentTool tool(String name, String description, JsonSchema parameters, ToolCall body) {
-        return tool(name, description, Tool.ApprovalRequirement.AUTO, parameters, body);
+        return tool(name, ToolCategory.GENERAL, description, Tool.ApprovalRequirement.AUTO,
+            parameters, false, body);
     }
 
     /** Like {@link #tool(String, String, JsonSchema, ToolCall)} with an empty parameter schema. */
     static AgentTool tool(String name, String description, ToolCall body) {
-        return tool(name, description, Tool.ApprovalRequirement.AUTO,
-            JsonSchema.builder().withType("object").build(), body);
+        return tool(name, ToolCategory.GENERAL, description, Tool.ApprovalRequirement.AUTO,
+            JsonSchema.builder().withType("object").build(), false, body);
+    }
+
+    /**
+     * Creates a tool with a category and an empty parameter schema, AUTO approval.
+     *
+     * @param name the unique tool name
+     * @param category the tool category (grouping/sorting metadata)
+     * @param description the tool explanation
+     * @param body the call implementation
+     */
+    static AgentTool tool(String name, ToolCategory category, String description, ToolCall body) {
+        return tool(name, category, description, Tool.ApprovalRequirement.AUTO,
+            JsonSchema.builder().withType("object").build(), false, body);
     }
 
     /** Builds an object-typed parameter schema from alternating key/value pairs. */
