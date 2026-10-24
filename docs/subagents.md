@@ -1,6 +1,7 @@
 # Sub-agents in the KeY-Agent
 
-Status: **Phases 1–3 implemented** (sequential delegation, parallel fan-out, observability).
+Status: **Phases 1–3 implemented** (sequential delegation, parallel fan-out, observability),
+plus self-consultation (`ask_llm`).
 
 ## Idea
 
@@ -89,10 +90,36 @@ The tool result is a plain text message: a short run header plus the child's fin
 Structured parsing of `KEY_AGENT_RESULT {json}` is left to the delegating agent (the marker is
 kept verbatim); a dedicated structured field in the result is a later refinement.
 
+## Self-consultation (`ask_llm`)
+
+The `ask_llm` tool is the sibling of `spawn_subagent` in the same *Sub-agents* category: it
+lets the agent think *about itself* by sending a prompt to a **fresh** LLM instance — a
+one-shot completion with a clean, empty context (no history, no tools, no proof context) —
+and delivering the reply back as the tool result. Typical uses: review a draft plan, play
+devil's advocate, summarize noisy tool output through fresh eyes, or get a second opinion from
+another model (optional `model` override; an optional `system` prompt for the fresh context is
+supported too).
+
+Implementation (`AskLlmRunner.run`):
+
+- intercepted by `AgentLoop.processCall` **and** by the sub-agent child loop
+  (`SubagentRunner.runOne`), gated by the `askLlmEnabled` setting — sub-agents are off by
+  default, self-consultation is **on** by default because it is read-only (it never touches the
+  proof, files or shell, and never dispatches tools);
+- executed via `ToolDispatcher.submitTask` **without the dispatch lock** — an HTTP round-trip
+  of several seconds must not stall parallel sub-agents or other sessions' tool calls, and
+  since the query never dispatches tools, no nested locking is possible;
+- auto-approved (`AUTO`) and marked backgroundable, like the other long-running read-only
+  calls.
+- child loops may use it as well, if the child role's whitelist contains `ask_llm`. The reply
+  format is `[ask_llm (model <m>): fresh-context reply]\n\n<content>`; errors are reported as
+  `[ask_llm failed: …]` / `[ask_llm: the 'prompt' parameter must not be empty]`.
+
 ## Settings (`LlmSettings`)
 
 | key                    | default | meaning                         |
 |------------------------|---------|---------------------------------|
+| `askLlmEnabled`        | `true`  | `ask_llm` allowed at all        |
 | `subagentsEnabled`     | `false` | `spawn_subagent` allowed at all |
 | `maxSubagentTurns`     | `8`     | global per-delegation round budget |
 | `maxSubagentDepth`     | `2`     | maximum nesting depth (1 = children may not spawn children) |
@@ -120,5 +147,6 @@ sequence-numbered so parallel workers can append concurrently):
 | file | role |
 |------|------|
 | `org.key_project.key.llm.SubagentRunner` | the child loop + guards |
-| `org.key_project.key.llm.mcp.tools.SubagentTools` | the `spawn_subagent` tool schema (intercepted by `AgentLoop`) |
+| `org.key_project.key.llm.AskLlmRunner` | the fresh one-shot completion behind `ask_llm` (intercepted by the agent loop and the child loop, runs without the dispatch lock) |
+| `org.key_project.key.llm.mcp.tools.SubagentTools` | the `spawn_subagent` + `ask_llm` tool schemas (both intercepted by `AgentLoop`) |
 | `org.key_project.key.llm.subagents.SubagentRole` / `SubagentRoleProvider` / `SubagentRegistry` / `BuiltInSubagentRoles` | role model + service loading |
