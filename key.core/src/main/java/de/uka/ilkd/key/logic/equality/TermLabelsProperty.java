@@ -10,6 +10,8 @@ import org.key_project.logic.Property;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Modality;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A property that can be used in
  * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for terms.
@@ -20,6 +22,7 @@ import org.key_project.logic.op.Modality;
  *
  * @author Tobias Reinhold
  */
+@NullMarked
 public class TermLabelsProperty implements Property<Term> {
     /**
      * The single instance of this property.

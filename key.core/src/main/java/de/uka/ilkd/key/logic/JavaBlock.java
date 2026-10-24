@@ -13,9 +13,11 @@ import de.uka.ilkd.key.pp.PrettyPrinter;
 import org.key_project.logic.Program;
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class JavaBlock implements Program {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaBlock.class);
 

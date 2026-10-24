@@ -18,6 +18,8 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * <p>
  * The labeled term class is used for terms that have a label attached.
@@ -34,6 +36,7 @@ import org.key_project.util.java.CollectionUtil;
  * @see JTerm
  * @see TermImpl
  */
+@NullMarked
 public class LabeledTermImpl extends TermImpl {
 
     /**

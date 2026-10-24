@@ -7,6 +7,9 @@ package de.uka.ilkd.key.logic.op;
 import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class JavaDLOperatorUtil {
     /**
      * comparator to compare operators; for modalities only their kind is compared

@@ -18,6 +18,8 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
  * Abstract class factoring out commonalities of typical term transformer implementations. The
  * available singletons of term transformers are kept here.
  */
+@NullMarked
 public abstract class AbstractTermTransformer extends JAbstractSortedOperator
         implements TermTransformer {
     public static final Logger LOGGER = LoggerFactory.getLogger(AbstractTermTransformer.class);
@@ -119,7 +122,7 @@ public abstract class AbstractTermTransformer extends JAbstractSortedOperator
         this(name, arity, METASORT);
     }
 
-    public static TermTransformer name2metaop(String s) {
+    public static @Nullable TermTransformer name2metaop(String s) {
         return NAME_TO_META_OP.get(s);
     }
 

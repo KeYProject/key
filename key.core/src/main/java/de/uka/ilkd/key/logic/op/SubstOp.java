@@ -15,11 +15,14 @@ import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Standard first-order substitution operator, resolving clashes but not preventing (usually
  * unsound) substitution of non-rigid terms across modal operators. Currently, only the subclass
  * <code>WarySubstOp</code> is used and accessible through the key parser.
  */
+@NullMarked
 public abstract class SubstOp extends AbstractOperator implements Operator {
 
     protected SubstOp(Name name) {

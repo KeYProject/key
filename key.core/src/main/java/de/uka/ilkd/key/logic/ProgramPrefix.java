@@ -9,10 +9,13 @@ import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * this interface is implemented by program elements that may be matched by the inactive program
  * prefix
  */
+@NullMarked
 public interface ProgramPrefix extends NonTerminalProgramElement {
 
     /** return true if there is a next prefix element */

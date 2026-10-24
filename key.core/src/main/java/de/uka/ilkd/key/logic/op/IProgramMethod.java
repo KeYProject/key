@@ -12,9 +12,14 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public interface IProgramMethod
         extends IObserverFunction, MemberDeclaration {
 
+    @Nullable
     MethodDeclaration getMethodDeclaration();
 
     /**
@@ -24,8 +29,10 @@ public interface IProgramMethod
      * @param i the int specifying the parameter position
      * @return the KeYJavaType of the <tt>i</tt>-th parameter
      */
+    @Nullable
     KeYJavaType getParameterType(int i);
 
+    @Nullable
     StatementBlock getBody();
 
     /**
@@ -43,12 +50,14 @@ public interface IProgramMethod
     /**
      * @return the return type
      */
+    @Nullable
     KeYJavaType getReturnType();
 
     ProgramElementName getProgramElementName();
 
     String getUniqueName();
 
+    @Nullable
     String getFullName();
 
     String getName();
@@ -63,25 +72,31 @@ public interface IProgramMethod
 
     boolean isSynchronized();
 
+    @Nullable
     Throws getThrown();
 
+    @Nullable
     ParameterDeclaration getParameterDeclarationAt(int index);
 
     /**
      * Returns the variablespecification of the i-th parameterdeclaration
      */
+    @Nullable
     VariableSpecification getVariableSpecification(int index);
 
     int getParameterDeclarationCount();
 
+    @Nullable
     ImmutableArray<ParameterDeclaration> getParameters();
 
     // Methods from OberverFunction, TODO Create interface for ObersverFunction
+    @Nullable
     ImmutableArray<KeYJavaType> getParamTypes();
 
     /**
      * @return The list of {@link LocationVariable}s passed as parameters to this
      *         {@link IProgramMethod}.
      */
+    @Nullable
     ImmutableList<LocationVariable> collectParameters();
 }
