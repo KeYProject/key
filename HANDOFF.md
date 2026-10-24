@@ -17,8 +17,8 @@
   specMath loads). `:key.core:compileTestJava`/`:key.ui:compileTestJava` green.
 - **Phase 4 in progress:** `SpecificationRepository` deletion, slice by slice
   (see PLAN §Phase 4 table; each committed slice keeps compile + speclang slice
-  green). Slices 1–2 DONE (statement specs → AST nodes; limited observers →
-  `LimitedObservers`).
+  green). Slices 1–3 DONE (statement specs → AST nodes; limited observers →
+  `LimitedObservers`; loop/block/merge specs → AST nodes).
 - **Full-suite baseline (clean, re-measured, no concurrent gradle):**
   **1638 tests, 40 failed, 72 skipped** at slices-1–2 HEAD. A/B against the
   Phase-3 HEAD worktree re-running the same 14 failing classes: **identical 40
@@ -39,6 +39,7 @@
 | `7f369e5c29` | Phase 4 slice 1 — `JmlStatementSpec` attached to `JmlAssert`/`SetStatement` nodes (`JmlSpecCarrier`); repo `statementMap` deleted. |
 | `806c2b1ba6` | Phase 4 slice 2 — limited observers (`limitObs`/`unlimitObs`/`LIMIT_SUFFIX`/taclets) → `de.uka.ilkd.key.util.LimitedObservers`. |
 | `14a26a43d0` | Phase 4 triage — drop class-level `code_*_math`/`spec_*_math` pragmas from `intSemantics` fixtures (jmltk parity, same pattern as Phase 3); IntSemanticsTest 6/6. |
+| `ae716ed74a` | Phase 4 slice 3 — loop invariants, block/loop/merge contracts attached to their AST nodes (`LoopStatement`/`StatementBlock`/`MergePointStatement`); repo loop/block/merge maps + helpers deleted. |
 
 ## 2. What Phase 1 did
 
@@ -265,27 +266,16 @@ must NOT grow.
 
 1. `git status` clean? (only HANDOFF.md/PLAN.md doc edits may be pending).
 2. Decision §5 was taken; Phase 3 (§5.1) is DONE — speclang slice green.
-3. **Phase 4 status:** slices 1–2 committed + pushed (statement specs →
-   AST nodes; limited observers → `LimitedObservers`); full-suite baseline
-   measured + A/B-verified (40 failures at HEAD = 40 at Phase-3 HEAD; zero
-   slice regressions); IntSemantics fix landed (now 34 recorded gaps, see
-   §5.2). NEXT = **slice 3: loop/block/merge specs → AST nodes** —
-   attach `LoopSpecification` to `LoopStatement`, `BlockContract` (keyed by
-   `BlockContractKey(block,parentClass,line)`) to `StatementBlock`, loop
-   contracts to `LoopStatement`, `MergeContract` to `MergePointStatement`
-   (already in Phase 1 these nodes carry `attachedJml`/`JmlSpec`; consume it
-   and delete the repo's `loopInvs`/`blockContracts`/`loopContracts`/
-   `loopContractsOnLoops`/`mergeContracts` maps). ~26 readers to update:
-   `InnerBreakAndContinueReplacer`, `OuterBreakContinueAndReturnReplacer`,
-   `ProgVarReplaceVisitor`, `FunctionalBlockContractPO`,
-   `AbstractBlockContractRule`/`AbstractLoopContractRule`/
-   `AbstractLoopInvariantRule`, `HasLoopInvariantCondition`,
-   `LoopFreeInvariantCondition`, `LoopInvariantCondition`,
-   `LoopVariantCondition`, `LoopApplyHeadRule`, `LoopInvariantBuiltInRuleApp`,
-   `MergeRuleBuiltInRuleApp`, … — keep compile + speclang slice green.
-4. Then: proof↔PO registry (→ proof layer; entangled with `splitContract`/
-   `getOverridingTargets`), class invariants/axioms (`ClassAxiomComputer` +
-   identity memo), contract registry (`contracts`/`operationContracts`/
+3. **Phase 4 status:** slices 1–3 committed + pushed (statement specs →
+   AST nodes; limited observers → `LimitedObservers`; loop/block/merge specs
+   → AST nodes, `ae716ed74a`); full-suite baseline measured + A/B-verified
+   (40 failures at HEAD = 40 at Phase-3 HEAD; zero slice regressions);
+   IntSemantics fix landed (now 34 recorded gaps, see §5.2). Slice-3
+   baseline re-verified at its own HEAD: speclang 285/0/12, IntSemantics
+   6/0/0. NEXT = **slice 4: proof↔PO registry → proof layer**.
+4. Then: class invariants/axioms (`ClassAxiomComputer` + identity memo),
+   contract registry (`contracts`/`operationContracts`/
    `contractsByName`/`contractTargets`), initially clauses (→
-   `JMLSpecFactory` at load), `addSpecs` collapse, `map(...)`.
+   `JMLSpecFactory` at load), `addSpecs` collapse, `map(...)`, `splitContract`/
+   `getOverridingTargets` cleanup.
 5. Remember: do NOT touch `/home/weigl/work/key`.
