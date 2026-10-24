@@ -383,6 +383,38 @@ public class AgentLoop {
             };
         }
 
+        if (KeYAgentTools.TOOL_ASK_LLM.equals(name)) {
+            if (!LlmSettings.INSTANCE.getAskLlmEnabled()) {
+                stagedTool(id, "[ask_llm is disabled in the settings]");
+                return null;
+            }
+            var observer = session.getTurnObserver();
+            if (observer != null) {
+                observer.toolStarted(new ToolCallInfo(id, name, arguments));
+            }
+            // a fresh LLM query runs without the dispatch lock: an HTTP round-trip must not stall
+            // parallel sub-agents or other sessions' tool calls (the query never dispatches tools,
+            // so no nested locking is possible)
+            var future = session.getToolDispatcher().submitTask(
+                () -> AskLlmRunner.run(session, completions, arguments));
+            var outcome = await(future, id, name, arguments);
+            if (observer != null) {
+                observer.toolFinished(id, outcome instanceof AwaitDone done
+                        ? done.content()
+                        : "[moved to background]");
+            }
+            return switch (outcome) {
+                case AwaitDone d -> {
+                    stagedTool(id, d.content());
+                    activities.add(new ToolActivity(name, arguments, d.content()));
+                    yield null;
+                }
+                case AwaitBackgrounded bg -> new AgentResult.PausedForBackground(bg.jobId(), name,
+                    arguments);
+                case AwaitCancelled ignored -> done("(Turn cancelled by the user.)");
+            };
+        }
+
         if (session.getMcpClient().requiresApproval(name)) {
             commitRound();
             pending = new PendingApproval(id, name, arguments);
