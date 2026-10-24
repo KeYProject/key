@@ -1,53 +1,51 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2
+ * SPDX-License-Identifier: GPL-2.0-only */
 package de.uka.ilkd.key.java.transformations.pipeline.lambda;
 
-import com.github.javaparser.Position;
-import com.github.javaparser.ast.expr.SimpleName;
-import com.sun.source.tree.LineMap;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Generates names guaranteeing uniqueness in generated names by one instance of NameGenerator.
+ * Generates names that are unique within one instance of this generator.
+ * <p>
+ * A fresh instance is used per {@link com.github.javaparser.ast.CompilationUnit}, which
+ * guarantees that all names generated during desugaring of one compilation unit are
+ * pairwise distinct.
+ *
+ * @author weigl, csicar
  */
 public class NameGenerator {
-    private final LineMap lineMap;
-    private final List<String> generatedNames;
+    private final Set<String> used = new HashSet<>();
 
-    public NameGenerator(LineMap lineMap) {
-        this.lineMap = lineMap;
-        this.generatedNames = new ArrayList<>();
+    /**
+     * Returns a fresh name of the form {@code prefix__N} for a strictly increasing
+     * counter N (starting at 1), unique within this generator.
+     */
+    public String fresh(String prefix) {
+        String candidate;
+        for (int i = 1;; i++) {
+            candidate = prefix + "__" + i;
+            if (used.add(candidate)) {
+                return candidate;
+            }
+        }
     }
 
     /**
-     * Generates a unique name based on the prefix and position.
-     *
-     * @param prefix the prefix for the generated name
-     * @param pos    the position in the source file
-     * @return a unique Name
+     * Returns {@code base} if it is not yet used by this generator, otherwise the
+     * first {@code base_N} (N &ge; 2) not yet used.
      */
-    public SimpleName generate(String prefix, Position pos) {
-        return generate(prefix, pos, null);
-    }
-
-    /**
-     * Recursively generates a unique name.
-     *
-     * @param prefix  the prefix for the generated name
-     * @param pos     the position in the source file
-     * @param counter an optional counter for disambiguation
-     * @return a unique Name
-     */
-    private SimpleName generate(String prefix, Position pos, Integer counter) {
-        int line = pos.line;
-        String newName = "%sL%d".formatted(prefix, line);
-        if (counter != null) {
-            newName += "_" + counter;
+    public String freshName(String base) {
+        if (used.add(base)) {
+            return base;
         }
-        if (generatedNames.contains(newName)) {
-            return generate(prefix, pos, counter == null ? 0 : counter + 1);
+        String candidate;
+        for (int i = 2;; i++) {
+            candidate = base + "_" + i;
+            if (used.add(candidate)) {
+                return candidate;
+            }
         }
-        generatedNames.add(newName);
-        return new SimpleName(newName);
     }
 }
