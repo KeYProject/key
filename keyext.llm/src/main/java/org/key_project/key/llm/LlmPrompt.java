@@ -7,6 +7,10 @@ package org.key_project.key.llm;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceAdapter;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -25,6 +29,8 @@ import de.uka.ilkd.key.gui.docking.DynamicCMenu;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.help.HelpFacade;
+import de.uka.ilkd.key.gui.nodeviews.PosInSequentTransferable;
+import de.uka.ilkd.key.gui.nodeviews.PosInSequentTransferable.PrintMode;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.utilities.LexerHighlighter;
@@ -87,6 +93,23 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
     private final MainWindow mainWindow;
     private final KeYMediator mediator;
 
+    /** Hint shown while no drag is active: the send shortcut and the completion triggers. */
+    private static final String HINT_SEND =
+        "<html><b>Ctrl+Enter</b> to send &nbsp;·&nbsp; completions: <b>$</b> context, "
+            + "<b>@</b> files, <b>/</b> commands &nbsp;·&nbsp; <b>Ctrl+Space</b> expands</html>";
+    private static final String HINT_DRAG_PRETTY = "<html><b>Drop:</b> pretty-printed as in the "
+        + "sequent view &nbsp;·&nbsp; <b>Shift</b> safe ASCII, <b>Ctrl</b> term structure</html>";
+    private static final String HINT_DRAG_SAFE = "<html><b>Drop:</b> safe ASCII (no unicode, all "
+        + "term labels) &nbsp;·&nbsp; release <b>Shift</b> for pretty, <b>Ctrl</b> structure</html>";
+    private static final String HINT_DRAG_STRUCTURE =
+        "<html><b>Drop:</b> term structure &nbsp;·&nbsp; <b>Shift</b> safe ASCII, release "
+            + "<b>Ctrl</b> for pretty</html>";
+
+    /** The hint below the prompt; shows the drag print mode while a term/sequent is dragged. */
+    private final JLabel hint = new JLabel();
+    /** The print mode last shown in the hint (to avoid redundant label updates). */
+    private @Nullable PrintMode lastHintMode;
+
     public LlmPrompt(MainWindow mainWindow, @NonNull KeYMediator mediator) {
         this.mainWindow = mainWindow;
         this.mediator = mediator;
@@ -108,7 +131,7 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
 
         var inputPane = new JPanel(new BorderLayout());
         inputPane.add(new JScrollPane(txtInput), BorderLayout.CENTER);
-        var hint = new JLabel("Ctrl+Enter to send");
+        hint.setText(HINT_SEND);
         hint.setForeground(Color.GRAY);
         hint.setBorder(BorderFactory.createEmptyBorder(0, 4, 2, 4));
         inputPane.add(hint, BorderLayout.SOUTH);
@@ -131,6 +154,63 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
 
         // simple KeY syntax highlighting for ```key fenced blocks typed into the prompt
         txtInput.setHighlighter(new LexerHighlighter.KeYLexerHighlighter());
+
+        // While a term/sequent is dragged from the sequent view, the keyboard modifiers choose
+        // the print mode applied on drop. The sequent view drags via the default drag source,
+        // so global listeners here can observe the drag and reflect the mode in the hint.
+        var dragSource = DragSource.getDefaultDragSource();
+        dragSource.addDragSourceMotionListener(this::dragMoved);
+        dragSource.addDragSourceListener(new DragSourceAdapter() {
+            @Override
+            public void dropActionChanged(DragSourceDragEvent e) {
+                // fired when the gesture modifiers change without mouse movement
+                dragMoved(e);
+            }
+
+            @Override
+            public void dragDropEnd(DragSourceDropEvent e) {
+                endDragHint();
+            }
+        });
+    }
+
+    /**
+     * A drag of a term/sequent is in motion: apply the modifier-dependent print mode and show it
+     * in the hint label. Drag source events may arrive off the EDT.
+     */
+    private void dragMoved(DragSourceDragEvent e) {
+        if (!(e.getDragSourceContext().getTransferable() instanceof PosInSequentTransferable t)) {
+            return;
+        }
+        var mode = PrintMode.of(e.getGestureModifiersEx());
+        if (mode == t.getPrintMode() && mode == lastHintMode) {
+            return;
+        }
+        t.setPrintMode(mode);
+        runOnEdt(() -> showDragHint(mode));
+    }
+
+    private void showDragHint(PrintMode mode) {
+        lastHintMode = mode;
+        hint.setText(switch (mode) {
+            case PRETTY -> HINT_DRAG_PRETTY;
+            case SAFE -> HINT_DRAG_SAFE;
+            case STRUCTURE -> HINT_DRAG_STRUCTURE;
+        });
+    }
+
+    /** The drag ended: restore the default hint. */
+    private void endDragHint() {
+        lastHintMode = null;
+        runOnEdt(() -> hint.setText(HINT_SEND));
+    }
+
+    private static void runOnEdt(Runnable r) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            r.run();
+        } else {
+            SwingUtilities.invokeLater(r);
+        }
     }
 
     private JComponent buildToolbar() {

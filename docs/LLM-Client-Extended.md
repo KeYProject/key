@@ -173,10 +173,24 @@ payload containing `model`, `messages`, `tools` (+ `tool_choice=auto`), optional
 triggers) and Ctrl+Space expansion used by the panel: the popup is sized to its content (at least
 the input width, resizable via a corner grip), dropped sequent terms are inserted verbatim-wrapped
 (`` ` ``, or ```` ```key ```` fences for multi-line content) by a custom `TransferHandler`, and
-```key fences are highlighted with the KeY lexer (`LexerHighlighter.KeYLexerHighlighter`). On the
-drag source side, `CurrentGoalViewListener` leaves the cursor to the DnD system (it then reflects
-the drop target's acceptance) and `PosInSequentTransferable` provides the whole sequent as the
-string flavor when the sequent view selection is the sequent itself.
+```key fences are highlighted with the KeY lexer (`LexerHighlighter.KeYLexerHighlighter`).
+Programmatic edits (drop insert, completion accept, expansion) suspend the document listener and
+call `scheduleHighlight()` afterwards, so dropped fences are highlighted as well. On the drag
+source side, `CurrentGoalViewListener` leaves the cursor to the DnD system (it then reflects the
+drop target's acceptance) and `PosInSequentTransferable` provides the whole sequent as the string
+flavor when the sequent view selection is the sequent itself.
+
+The string flavor is printed lazily in one of the `PosInSequentTransferable.PrintMode`s:
+`PRETTY` (pretty-printed with the view's `NotationInfo` and `VisibleTermLabels`),
+`SAFE` (fresh `NotationInfo` with `refresh(services, true, false, false)` — pretty, no unicode,
+no hidden packages — plus a fresh `TermLabelVisibilityManager`, i.e. all term labels), and
+`STRUCTURE` (`ProofSaver.printTerm` for terms, `toString()` for the whole sequent). The mode is
+selected with the drag modifiers (Shift: `SAFE`, Ctrl: `STRUCTURE`, else `PRETTY`); the initial
+mode comes from the triggering event and `LlmPrompt` keeps it in sync while the drag is in motion
+via global listeners on `DragSource.getDefaultDragSource()` (the sequent view drags on the default
+drag source for this reason), updating the hint label below the prompt accordingly. Note that the
+`LogicPrinter` constructor refreshes the passed `NotationInfo` from the `NotationInfo.DEFAULT_*`
+view settings, which is why the safe notation info is re-applied after printer construction.
 
 ## Tools and MCP
 
