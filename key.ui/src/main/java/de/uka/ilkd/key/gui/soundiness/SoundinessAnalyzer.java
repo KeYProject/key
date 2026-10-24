@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;

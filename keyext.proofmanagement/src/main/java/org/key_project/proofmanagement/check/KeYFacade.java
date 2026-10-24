@@ -25,7 +25,6 @@ import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.Contract;
@@ -254,7 +253,7 @@ public final class KeYFacade {
                 baseContractName = chooseContract.substring(0, ind);
             }
             final Contract contract = initConfig.getServices()
-                    .getSpecificationRepository()
+                    .getContractRegistry()
                     .getContractByName(baseContractName);
             if (contract == null) {
                 throw new RuntimeException("Contract not found: " + baseContractName);

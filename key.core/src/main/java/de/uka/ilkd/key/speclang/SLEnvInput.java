@@ -30,6 +30,7 @@ import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.speclang.ContractRegistry;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
@@ -135,7 +136,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addLoopInvariants(SpecExtractor specExtractor,
-            final SpecificationRepository specRepos, final KeYJavaType kjt, final IProgramMethod pm)
+            final KeYJavaType kjt, final IProgramMethod pm)
             throws ProofInputException {
         // Loop invariants.
         final JavaASTCollector collector = new JavaASTCollector(pm.getBody(), LoopStatement.class);
@@ -149,7 +150,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addLoopContracts(SpecExtractor specExtractor,
-            final SpecificationRepository specRepos, final IProgramMethod pm)
+            final ContractRegistry specRepos, final IProgramMethod pm)
             throws ProofInputException {
         // Loop contracts on loops.
         // For loop contracts on blocks, see addBlockAndLoopContracts.
@@ -168,7 +169,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addBlockAndLoopContracts(SpecExtractor specExtractor,
-            final SpecificationRepository specRepos, final IProgramMethod pm)
+            final ContractRegistry specRepos, final IProgramMethod pm)
             throws ProofInputException {
         // Block and loop contracts.
         final JavaASTCollector blockCollector =
@@ -194,7 +195,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addMergePointStatements(SpecExtractor specExtractor,
-            final SpecificationRepository specRepos, final IProgramMethod pm,
+            final IProgramMethod pm,
             final ImmutableList<LocationVariable> methodParameters) throws ProofInputException {
         // merge point statements
         final JavaASTCollector mpsCollector =
@@ -208,7 +209,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addLabeledBlockContracts(SpecExtractor specExtractor,
-            final SpecificationRepository specRepos, final IProgramMethod pm)
+            final ContractRegistry specRepos, final IProgramMethod pm)
             throws ProofInputException {
         final JavaASTCollector labeledCollector =
             new JavaASTCollector(pm.getBody(), LabeledStatement.class);
@@ -224,7 +225,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     private void addLabeledLoopContracts(SpecExtractor specExtractor,
-            final SpecificationRepository specRepos, final IProgramMethod pm)
+            final ContractRegistry specRepos, final IProgramMethod pm)
             throws ProofInputException {
         final JavaASTCollector labeledCollector =
             new JavaASTCollector(pm.getBody(), LabeledStatement.class);
@@ -284,6 +285,8 @@ public final class SLEnvInput extends AbstractEnvInput {
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
         final SpecificationRepository specRepos =
             initConfig.getServices().getSpecificationRepository();
+        final ContractRegistry contractRegistry =
+            initConfig.getServices().getContractRegistry();
 
         // read DL library specs before any other specs
         ImmutableSet<PositionedString> warnings = createDLLibrarySpecs();
@@ -335,19 +338,19 @@ public final class SLEnvInput extends AbstractEnvInput {
                         && (declaringType instanceof TypeDeclaration decl && decl.isLibraryClass())
                         && !declaringType.getFullName().equals("java.lang.Object")
                         && !pm.isImplicit()) {
-                    specRepos.addContract(specExtractor.createDefaultContract(pm,
+                    contractRegistry.addContract(specExtractor.createDefaultContract(pm,
                         initConfig.getActivatedChoices().exists(
                             choice -> choice.category().equals("soundDefaultContracts")
                                     && choice.name().toString()
                                             .equals("soundDefaultContracts:on"))));
                 }
 
-                addLoopInvariants(specExtractor, specRepos, kjt, pm);
-                addLoopContracts(specExtractor, specRepos, pm);
-                addBlockAndLoopContracts(specExtractor, specRepos, pm);
-                addMergePointStatements(specExtractor, specRepos, pm, params);
-                addLabeledBlockContracts(specExtractor, specRepos, pm);
-                addLabeledLoopContracts(specExtractor, specRepos, pm);
+                addLoopInvariants(specExtractor, kjt, pm);
+                addLoopContracts(specExtractor, contractRegistry, pm);
+                addBlockAndLoopContracts(specExtractor, contractRegistry, pm);
+                addMergePointStatements(specExtractor, pm, params);
+                addLabeledBlockContracts(specExtractor, contractRegistry, pm);
+                addLabeledLoopContracts(specExtractor, contractRegistry, pm);
                 transformProgramElements(pm);
             }
 
@@ -362,7 +365,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         }
 
         // add initially clauses to constructor contracts
-        specRepos.createContractsFromInitiallyClauses();
+        contractRegistry.createContractsFromInitiallyClauses();
 
         // update warnings to user
         final ImmutableSet<PositionedString> jmlWarnings =

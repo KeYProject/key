@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.*;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.speclang.ContractRegistry;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractAxiom;
@@ -144,8 +144,8 @@ public class ContractAppCollector extends NodeIntermediateWalker {
             }
         }
 
-        // get all class axioms of the class via SpecificationRepository, filter for name
-        SpecificationRepository specRepo = proof.getServices().getSpecificationRepository();
+        // get all class axioms of the class, filter for name
+        ContractRegistry specRepo = proof.getServices().getContractRegistry();
         String axiomName = tacletApp.getRuleName().replace('_', ' ');
         Set<ClassAxiom> axioms =
             proof.getServices().getClassAxiomComputer().getClassAxioms(classType).toSet();
@@ -189,7 +189,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
     private void extractContractsFromBuiltin(BuiltInAppIntermediate biApp) {
         // The string may still contain multiple contracts, syntax: contract1#contract2#...
         // split and add all
-        SpecificationRepository specRepo = proof.getServices().getSpecificationRepository();
+        ContractRegistry specRepo = proof.getServices().getContractRegistry();
         Contract c = specRepo.getContractByName(biApp.getContract());
         ImmutableSet<Contract> contracts = specRepo.splitContract(c);
 

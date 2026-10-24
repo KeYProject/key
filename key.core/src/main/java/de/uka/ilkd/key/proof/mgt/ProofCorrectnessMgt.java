@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.ContractRegistry;
 import de.uka.ilkd.key.util.LimitedObservers;
 
 import org.key_project.prover.rules.RuleApp;
@@ -34,7 +35,7 @@ public final class ProofCorrectnessMgt {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofCorrectnessMgt.class);
 
     private final Proof proof;
-    private final SpecificationRepository specRepos;
+    private final ContractRegistry specRepos;
     private final ProofRegistry proofRegistry;
     private final DefaultMgtProofListener proofListener = new DefaultMgtProofListener();
     private final DefaultMgtProofTreeListener proofTreeListener = new DefaultMgtProofTreeListener();
@@ -49,7 +50,7 @@ public final class ProofCorrectnessMgt {
 
     public ProofCorrectnessMgt(Proof p) {
         this.proof = p;
-        this.specRepos = p.getServices().getSpecificationRepository();
+        this.specRepos = p.getServices().getContractRegistry();
         this.proofRegistry = p.getServices().getProofRegistry();
         proof.addProofTreeListener(proofTreeListener);
         proof.addRuleAppListener(proofListener);

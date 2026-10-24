@@ -10,7 +10,7 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.speclang.ContractRegistry;
 import de.uka.ilkd.key.speclang.Contract;
 
 import org.key_project.proofmanagement.check.CheckerData;
@@ -40,7 +40,7 @@ public abstract class DependencyGraphBuilder {
             Proof proof = line.proof;
             String contractName = proof.name().toString();
             Services services = proof.getServices();
-            SpecificationRepository specRepo = services.getSpecificationRepository();
+            ContractRegistry specRepo = services.getContractRegistry();
             Contract contract = specRepo.getContractByName(contractName);
 
             // create fresh node for current contract
@@ -57,7 +57,7 @@ public abstract class DependencyGraphBuilder {
 
             // collect all contracts the current proof refers to
             Services services = proof.getServices();
-            SpecificationRepository specRepo = services.getSpecificationRepository();
+            ContractRegistry specRepo = services.getContractRegistry();
             ContractAppCollector collector = new ContractAppCollector(node, proof, logger);
             collector.start();
             Map<String, DependencyGraph.EdgeType> dependentContracts = collector.getResult();

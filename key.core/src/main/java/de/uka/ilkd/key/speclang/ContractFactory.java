@@ -56,6 +56,13 @@ public class ContractFactory {
      */
     public static final String INFORMATION_FLOW_CONTRACT_BASENAME = "Non-interference contract";
 
+    /**
+     * The characters separating the names of atomic contracts inside a combined contract's name.
+     * Contract names must never contain this marker (see
+     * {@link ContractRegistry#registerContract(Contract, Pair)}).
+     */
+    public static final String CONTRACT_COMBINATION_MARKER = "§";
+
     private static final String INVALID_ID = "INVALID_ID";
     private static final String UNKNOWN_CONTRACT_IMPLEMENTATION = "unknown contract implementation";
 
@@ -809,7 +816,7 @@ public class ContractFactory {
         // determine names
         StringBuilder nameSB = new StringBuilder(t.getName());
         for (FunctionalOperationContract other : others) {
-            nameSB.append(SpecificationRepository.CONTRACT_COMBINATION_MARKER)
+            nameSB.append(ContractFactory.CONTRACT_COMBINATION_MARKER)
                     .append(other.getName());
         }
         final String name = nameSB.toString();

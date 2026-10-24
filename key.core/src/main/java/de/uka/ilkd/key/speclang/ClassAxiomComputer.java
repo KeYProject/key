@@ -489,8 +489,9 @@ public class ClassAxiomComputer {
 
     /**
      * Returns the operation contracts registered for the given model method. <em>Temporary
-     * bridge:</em> the contract registry still lives in the specification repository (it moves in a
-     * later Phase-4 slice); once it does, this lookup switches to the contract registry.
+     * bridge:</em> the contract registry is the home of operation contracts; once the specific
+     * derivation (represents/contract axioms for model methods) moves to the registry or the
+     * spec factory, this lookup switches to the derivation input.
      *
      * @param kjt the type.
      * @param pm the model method.
@@ -498,6 +499,6 @@ public class ClassAxiomComputer {
      */
     private ImmutableSet<FunctionalOperationContract> getOperationContracts(KeYJavaType kjt,
             IProgramMethod pm) {
-        return services.getSpecificationRepository().getOperationContracts(kjt, pm);
+        return services.getContractRegistry().getOperationContracts(kjt, pm);
     }
 }

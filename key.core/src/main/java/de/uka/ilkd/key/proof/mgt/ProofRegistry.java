@@ -14,6 +14,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.ContractFactory;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -45,8 +46,8 @@ import org.jspecify.annotations.Nullable;
  *
  * <p>
  * The contract-splitting and overriding-target resolution used by the contract-based lookups is
- * still performed by the {@link SpecificationRepository}; once the contract registry leaves the
- * repository, those helpers move along and this delegation disappears.
+ * performed by the {@link de.uka.ilkd.key.speclang.ContractRegistry}; once the repository is
+ * deleted, these helpers are already registry-owned.
  * </p>
  */
 public class ProofRegistry {
@@ -89,7 +90,7 @@ public class ProofRegistry {
      * @return all registered proofs for the contract.
      */
     public ImmutableSet<Proof> getProofs(Contract atomicContract) {
-        assert !atomicContract.getName().contains(SpecificationRepository.CONTRACT_COMBINATION_MARKER)
+        assert !atomicContract.getName().contains(ContractFactory.CONTRACT_COMBINATION_MARKER)
                 : "Contract must be atomic";
 
         ImmutableSet<Proof> result = DefaultImmutableSet.nil();
@@ -97,7 +98,7 @@ public class ProofRegistry {
             final ProofOblInput po = entry.getKey();
             if (po instanceof ContractPO) {
                 final Contract poContract = ((ContractPO) po).getContract();
-                if (services.getSpecificationRepository().splitContract(poContract)
+                if (services.getContractRegistry().splitContract(poContract)
                         .contains(atomicContract)) {
                     result = result.union(entry.getValue());
                 }
@@ -115,7 +116,7 @@ public class ProofRegistry {
      */
     public ImmutableSet<Proof> getProofs(KeYJavaType kjt, IObserverFunction target) {
         final ImmutableSet<Pair<KeYJavaType, IObserverFunction>> targets =
-            services.getSpecificationRepository().getOverridingTargets(kjt, target)
+            services.getContractRegistry().getOverridingTargets(kjt, target)
                     .add(new Pair<>(kjt, target));
         ImmutableSet<Proof> result = DefaultImmutableSet.nil();
         for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
