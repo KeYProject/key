@@ -7,8 +7,6 @@ package de.uka.ilkd.key.speclang;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -447,43 +445,6 @@ public class ClassAxiomComputer {
     public void addClassAxioms(ImmutableSet<ClassAxiom> toAdd) {
         for (ClassAxiom ax : toAdd) {
             addClassAxiom(ax);
-        }
-    }
-
-    /**
-     * Applies the specified operator to every invariant and class axiom of this computer
-     * (including the memoized computed axiom sets).
-     *
-     * @param op an operator.
-     * @param services services.
-     * @see SpecificationElement#map(UnaryOperator, Services)
-     */
-    public synchronized void map(UnaryOperator<JTerm> op, Services services) {
-        mapValueSets(invs, op, services);
-        mapValueSets(axioms, op, services);
-        mapValueSets(allClassAxiomsCache, op, services);
-    }
-
-    /**
-     * Applies the specified operator to every specification element in the passed map.
-     *
-     * @param map a map.
-     * @param op an operator.
-     * @param services services.
-     */
-    @SuppressWarnings("unchecked")
-    protected <K, V extends SpecificationElement> void mapValueSets(Map<K, ImmutableSet<V>> map,
-            UnaryOperator<JTerm> op, Services services) {
-        for (Entry<K, ImmutableSet<V>> entry : map.entrySet()) {
-            final K key = entry.getKey();
-            final ImmutableSet<V> oldSet = entry.getValue();
-            ImmutableSet<V> newSet = DefaultImmutableSet.nil();
-
-            for (V oldSpec : oldSet) {
-                newSet = newSet.add((V) oldSpec.map(op, services));
-            }
-
-            map.put(key, newSet);
         }
     }
 
