@@ -188,20 +188,11 @@ public class JavaService {
     }
 
     private static BuildingIssue buildingIssueFromProblem(String source, Problem problem) {
-        final Position loc;
-        if (problem.getCause().orElse(null) instanceof ParseException pe
-                && pe.currentToken != null && pe.currentToken.next != null) {
-            // according to the currentToken javadoc, the next token is the
-            // error token, so we report that one
-            final Token nextToken = pe.currentToken.next;
-            loc = new Position(nextToken.beginLine, nextToken.beginColumn);
-        } else {
-            loc = problem.getLocation()
-                    .flatMap(TokenRange::toRange)
-                    .map(b -> b.begin)
-                    .orElse(new Position(-1, -1));
-        }
-        return new BuildingIssue(simplifyJavaParserMessage(problem.getMessage()),
+        var loc = problem.getLocation()
+                .flatMap(TokenRange::toRange)
+                .map(b -> b.begin)
+                .orElse(new Position(-1, -1));
+        return new BuildingIssue(simplifyJavaParserMessage(problem.getVerboseMessage()),
             problem.getCause().orElse(null), false,
             JavaSourceLocations.positionFromJP(loc), source);
     }
