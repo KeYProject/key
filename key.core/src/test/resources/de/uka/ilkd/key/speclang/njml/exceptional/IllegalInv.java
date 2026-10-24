@@ -1,6 +1,5 @@
-// exceptionClass: ParserException
-// msgContains: expected, but found ';'
-// position: 17/19
+// exceptionClass: ProofInputException
+// msgContains: Encountered unexpected token
 // verbose: true
 // broken: false
 

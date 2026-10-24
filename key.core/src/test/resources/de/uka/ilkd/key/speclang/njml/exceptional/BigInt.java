@@ -1,7 +1,6 @@
 // verbose: true
 // broken: false
 // msgContains: Method f(\bigint) not found
-// position: 10/20
 
 class BigInt {
 
