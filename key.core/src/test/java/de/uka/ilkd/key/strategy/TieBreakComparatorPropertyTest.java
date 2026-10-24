@@ -181,6 +181,7 @@ public class TieBreakComparatorPropertyTest {
      * not equal.
      */
     @Test
+    @SuppressWarnings("deprecation") // labels are passed via the deprecated ImmutableArray
     void orderingHashesIgnoreLabels() {
         final var services = de.uka.ilkd.key.rule.TacletForTests.services();
         final TermFactory tf = services.getTermFactory();
