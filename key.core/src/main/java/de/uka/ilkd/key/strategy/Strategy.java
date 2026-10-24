@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -76,7 +78,8 @@ public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, 
      * @param p The new {@link StrategyProperties}
      */
     static void updateStrategySettings(Proof proof, StrategyProperties p) {
-        final Strategy<de.uka.ilkd.key.proof.Goal> strategy = proof.getActiveStrategy();
+        final Strategy<de.uka.ilkd.key.proof.Goal> strategy = Objects
+                .requireNonNull(proof.getActiveStrategy(), "the proof has no active strategy");
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setStrategy(strategy.name());
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(p);
 

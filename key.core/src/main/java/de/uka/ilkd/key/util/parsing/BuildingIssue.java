@@ -64,7 +64,9 @@ public record BuildingIssue(String message, @Nullable Throwable cause, boolean i
                 uri = null;
             }
         }
-        return new Location(uri, position);
+        // A null file URI means the source has no file (e.g. standard input); Location.UNDEFINED
+        // represents exactly this case, as its fileUri component is not declared @Nullable.
+        return uri == null ? Location.UNDEFINED : new Location(uri, position);
     }
 
     public PositionedString asPositionedString() {

@@ -324,21 +324,21 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public @Nullable JTerm getMby(LocationVariable selfVar, Services services) {
+    public @Nullable JTerm getMby(@Nullable LocationVariable selfVar, Services services) {
         return getTerm(measuredBy,
             new Variables(selfVar, null, null, null, null, null, null, null, null, null, services),
             services);
     }
 
     @Override
-    public @Nullable JTerm getMby(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
+    public @Nullable JTerm getMby(Map<LocationVariable, JTerm> heapTerms, @Nullable JTerm selfTerm,
             Map<LocationVariable, JTerm> atPres, Services services) {
         return getTerm(measuredBy, null,
             new Terms(selfTerm, null, null, null, null, null, null, null, null, atPres), services);
     }
 
     @Override
-    public JTerm getPrecondition(final LocationVariable heap, final LocationVariable self,
+    public JTerm getPrecondition(final LocationVariable heap, final @Nullable LocationVariable self,
             final Map<LocationVariable, LocationVariable> atPres, final Services services) {
         return getTerm(preconditions.get(heap),
             new Variables(self, null, null, null, null, null, null, null, null, atPres, services),
@@ -347,7 +347,8 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
     @Override
     public JTerm getPrecondition(final LocationVariable heapVariable, final JTerm heap,
-            final JTerm self, final Map<LocationVariable, JTerm> atPres, final Services services) {
+            final @Nullable JTerm self, final Map<LocationVariable, JTerm> atPres,
+            final Services services) {
         return getTerm(preconditions.get(heapVariable), heap,
             new Terms(self, null, null, null, null, null, null, null, null, atPres), services);
     }

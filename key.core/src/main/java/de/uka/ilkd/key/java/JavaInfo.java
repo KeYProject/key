@@ -395,7 +395,8 @@ public final class JavaInfo {
             ldtName = type.getCorrespondingLDTName();
         }
 
-        Sort sort = services.getNamespaces().lookupSortOrAlias(ldtName);
+        Sort sort = services.getNamespaces().lookupSortOrAlias(
+            Objects.requireNonNull(ldtName, "corresponding LDT name of " + type));
 
         if (sort == null) {
             throw new IllegalStateException(

@@ -201,7 +201,7 @@ public final class GenericSortInstantiations {
         if (p_s instanceof GenericSort gs) {
             p_s = getInstantiation(gs);
             if (p_s == null) {
-                throw new GenericSortException("Generic sort is not yet instantiated", null);
+                throw new GenericSortException("Generic sort is not yet instantiated");
             }
         } else if (p_s instanceof ParametricSortInstance psi && psi.containsGenericSort()) {
             ImmutableList<GenericArgument> args = ImmutableList.nil();
@@ -209,13 +209,13 @@ public final class GenericSortInstantiations {
                 GenericArgument oa = psi.getArgs().get(i);
                 Sort realSort = getRealSort(oa.sort(), services);
                 if (realSort == null) {
-                    throw new GenericSortException("Generic sort is not yet instantiated", null);
+                    throw new GenericSortException("Generic sort is not yet instantiated");
                 }
                 args = args.prepend(new GenericArgument(realSort));
             }
             var inst = ParametricSortInstance.get(psi.getBase(), args, services);
             if (inst.containsGenericSort())
-                throw new GenericSortException("Generic sort is not yet instantiated", null);
+                throw new GenericSortException("Generic sort is not yet instantiated");
             p_s = inst;
         }
 
@@ -428,7 +428,7 @@ public final class GenericSortInstantiations {
      * @param p_conditions conditions (see above)
      * @return a solution if one could be found, null otherwise
      */
-    private static ImmutableMap<GenericSort, Sort> solveForcedInst(
+    private static @Nullable ImmutableMap<GenericSort, Sort> solveForcedInst(
             ImmutableList<GenericSort> p_remainingSorts, ImmutableMap<GenericSort, Sort> p_curRes,
             ImmutableList<GenericSortCondition> p_conditions, LogicServices services) {
 
