@@ -317,7 +317,9 @@ public final class SLEnvInput extends AbstractEnvInput {
                     toRegister = toRegister.add(spec);
                 }
             }
-            specRepos.addSpecs(toRegister);
+            // Register the class-level specifications (invariants, represents clauses);
+            // initially clauses were partitioned into the JMLSpecFactory above.
+            registerSpecs(toRegister, initConfig.getServices());
 
             // Check whether a static invariant is present.
             // Later, we will only add static invariants to contracts per default if
@@ -339,7 +341,8 @@ public final class SLEnvInput extends AbstractEnvInput {
                 if (!methodSpecs.isEmpty()) {
                     params = ((Contract) methodSpecs.getFirst()).getOrigVars().params;
                 }
-                specRepos.addSpecs(DefaultImmutableSet.fromCollection(methodSpecs));
+                registerSpecs(DefaultImmutableSet.fromCollection(methodSpecs),
+                    initConfig.getServices());
 
                 Type declaringType = pm.getContainerType().getJavaType();
 
@@ -370,7 +373,8 @@ public final class SLEnvInput extends AbstractEnvInput {
                 assert constructor.isConstructor();
                 final List<SpecificationElement> constructorSpecs =
                     specExtractor.extractMethodSpecs(constructor, staticInvPresent);
-                specRepos.addSpecs(DefaultImmutableSet.fromCollection(constructorSpecs));
+                registerSpecs(DefaultImmutableSet.fromCollection(constructorSpecs),
+                    initConfig.getServices());
             }
             specRepos.processJavaType(kjt);
         }
@@ -383,6 +387,38 @@ public final class SLEnvInput extends AbstractEnvInput {
             DefaultImmutableSet.fromImmutableList(specExtractor.getWarnings());
         warnings = warnings.union(jmlWarnings);
         return warnings;
+    }
+
+    /**
+     * Registers the passed specification elements, dispatching each to its home: contracts to the
+     * contract registry, class invariants/axioms to the class-axiom computer, loop/block/merge
+     * specs to their AST nodes. Formerly {@code SpecificationRepository.addSpecs}.
+     */
+    private static void registerSpecs(ImmutableSet<SpecificationElement> specs,
+            Services services) {
+        for (SpecificationElement spec : specs) {
+            if (spec instanceof Contract) {
+                services.getContractRegistry().addContract((Contract) spec);
+            } else if (spec instanceof ClassInvariant) {
+                services.getClassAxiomComputer().addClassInvariant((ClassInvariant) spec);
+            } else if (spec instanceof ClassAxiom) {
+                services.getClassAxiomComputer().addClassAxiom((ClassAxiom) spec);
+            } else if (spec instanceof LoopSpecification loopSpec) {
+                loopSpec.getLoop().setLoopInvariant(loopSpec);
+            } else if (spec instanceof BlockContract blockContract) {
+                blockContract.getBlock().addBlockContract(blockContract);
+            } else if (spec instanceof LoopContract loopContract) {
+                if (loopContract.isOnBlock()) {
+                    loopContract.getBlock().addLoopContract(loopContract);
+                } else {
+                    loopContract.getLoop().addLoopContract(loopContract);
+                }
+            } else if (spec instanceof MergeContract mergeContract) {
+                mergeContract.getMergePointStatement().addMergeContract(mergeContract);
+            } else {
+                assert false : "unexpected spec: " + spec + "\n(" + spec.getClass() + ")";
+            }
+        }
     }
 
 

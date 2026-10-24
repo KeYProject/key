@@ -8,14 +8,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -52,10 +49,8 @@ import org.slf4j.LoggerFactory;
  *
  * <p>
  * Thread-safety: a single registry is shared by all parallel-prover workers of a proof. The maps
- * are populated once during problem loading and then only read, so concurrent reads are safe; the
- * maps that are mutated during proving (none today once loading finished, but the contract maps
- * and the initially-clause handling are written by {@link #addContract} etc.) are guarded by this
- * object's monitor (a coarse, reentrant lock -- several methods call one another).
+ * are populated during problem loading (contract derivation and registration) and only read
+ * afterwards, so concurrent reads are safe. There is no state left that is mutated during proving.
  * </p>
  */
 public class ContractRegistry {
@@ -254,49 +249,6 @@ public class ContractRegistry {
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
-
-    /**
-     * Applies the specified operator to every contract in this registry.
-     *
-     * @param op an operator.
-     * @param services services.
-     * @see SpecificationElement#map(UnaryOperator, Services)
-     */
-    public synchronized void map(UnaryOperator<JTerm> op, Services services) {
-        mapValueSets(contracts, op, services);
-        mapValueSets(operationContracts, op, services);
-    }
-
-    /**
-     * Helper for {@link #map(UnaryOperator, Services)}.
-     *
-     * @param map a map.
-     * @param op an operator.
-     * @param services services.
-     */
-    @SuppressWarnings("unchecked")
-    protected <K, V extends SpecificationElement> void mapValueSets(Map<K, ImmutableSet<V>> map,
-            UnaryOperator<JTerm> op, Services services) {
-        for (Entry<K, ImmutableSet<V>> entry : map.entrySet()) {
-            final K key = entry.getKey();
-            final ImmutableSet<V> oldSet = entry.getValue();
-            ImmutableSet<V> newSet = DefaultImmutableSet.nil();
-
-            for (V oldContract : oldSet) {
-                V newContract = (V) oldContract.map(op, services);
-                newSet = newSet.add(newContract);
-
-                assert oldContract.getName().equals(newContract.getName());
-                if (oldContract instanceof Contract
-                        && contractsByName.containsKey(oldContract.getName())) {
-                    contractsByName.put(oldContract.getName(), (Contract) newContract);
-                }
-            }
-
-            map.put(key, (ImmutableSet<V>) oldSet.stream()
-                    .map(contract -> contract.map(op, services)).collect(ImmutableSet.collector()));
-        }
-    }
 
     /**
      * Returns all registered contracts.
