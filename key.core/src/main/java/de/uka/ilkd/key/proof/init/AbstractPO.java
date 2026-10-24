@@ -103,7 +103,7 @@ public abstract class AbstractPO implements IPersistablePO {
 
 
     protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType selfKJT) {
-        return specRepos.getClassAxioms(selfKJT);
+        return environmentServices.getClassAxiomComputer().getClassAxioms(selfKJT);
     }
 
 
