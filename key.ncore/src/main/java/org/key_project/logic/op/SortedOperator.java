@@ -12,5 +12,8 @@ import org.key_project.util.collection.ImmutableArray;
 public interface SortedOperator extends Operator, Sorted {
     Sort argSort(int i);
 
+    // Signature bound to the deprecated ImmutableArray until the codebase-wide migration to
+    // ImmutableList is done (implemented by key.core operator classes).
+    @SuppressWarnings("deprecation")
     ImmutableArray<Sort> argSorts();
 }

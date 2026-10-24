@@ -11,6 +11,10 @@ import org.key_project.util.collection.ImmutableArray;
 import org.jspecify.annotations.Nullable;
 
 /// Abstract sorted operator class offering some common functionality.
+// ImmutableArray is deprecated in favor of ImmutableList, but this class is entirely bound to the
+// old type (field, all constructors, accessor); the signature is used by every sorted-operator
+// implementation, so the migration cannot happen locally.
+@SuppressWarnings("deprecation")
 public abstract class AbstractSortedOperator extends AbstractOperator
         implements SortedOperator {
     private final Sort sort;

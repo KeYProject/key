@@ -34,6 +34,9 @@ public abstract class Function extends AbstractSortedOperator {
     /// rule applications, or [#UNRECORDED].
     private final int introductionTime;
 
+    // Constructor signature bound to the deprecated ImmutableArray (subclasses in key.core pass
+    // their arg sorts and binding information in that representation).
+    @SuppressWarnings("deprecation")
     protected Function(Name name, ImmutableArray<Sort> argSorts, Sort sort,
             ImmutableArray<Boolean> whereToBind, boolean isRigid, boolean unique,
             FunctionKind kind, int introductionTime) {

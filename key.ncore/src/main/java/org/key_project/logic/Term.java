@@ -20,15 +20,20 @@ public interface Term extends LogicElement, Sorted {
     <T> T op(Class<T> opClass) throws IllegalArgumentException;
 
     /// The subterms.
+    /// The return type is bound to the deprecated ImmutableArray by TermImpl (outside this
+    /// migration); changing it would break the whole term implementation chain.
+    @SuppressWarnings("deprecation")
     ImmutableArray<? extends Term> subs();
 
     /// The <code>n</code>-th direct subterm.
     Term sub(int n);
 
     /// The logical variables bound by the top level operator.
+    @SuppressWarnings("deprecation")
     ImmutableArray<? extends QuantifiableVariable> boundVars();
 
     /// The logical variables bound by the top level operator for the nth subterm.
+    @SuppressWarnings("deprecation")
     ImmutableArray<? extends QuantifiableVariable> varsBoundHere(int n);
 
     /// The arity of the term.

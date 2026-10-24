@@ -12,6 +12,10 @@ import org.key_project.util.collection.ImmutableArray;
 import org.jspecify.annotations.Nullable;
 
 /// Abstract operator class offering some common functionality.
+// ImmutableArray is deprecated in favor of ImmutableList, but this class is entirely bound to the
+// old type (field, all constructors, accessor); the signature is used by every operator
+// implementation, so the migration cannot happen locally.
+@SuppressWarnings("deprecation")
 public abstract class AbstractOperator implements Operator {
     private final Name name;
     private final int arity;
