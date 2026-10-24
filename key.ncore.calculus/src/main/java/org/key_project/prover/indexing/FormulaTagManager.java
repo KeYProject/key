@@ -6,6 +6,7 @@ package org.key_project.prover.indexing;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.proof.ProofGoal;
@@ -88,7 +89,7 @@ public final class FormulaTagManager {
         final FormulaInfo formulaInfo = getFormulaInfo(p_tag);
         assert formulaInfo != null
                 : "@AssumeAssertion(nullness): Method should only be called for valid/existing tags";
-        return formulaInfo.modifications;
+        return Objects.requireNonNull(formulaInfo).modifications;
     }
 
     public void sequentChanged(SequentChangeInfo sci, long newAge) {
@@ -183,7 +184,7 @@ public final class FormulaTagManager {
                 : "@AssumeAssertion(nullness): Tried to remove a tag that does not exist";
 
         tagToFormulaInfo.remove(tag);
-        putInQueryCache(tag, null);
+        putInQueryCache(Objects.requireNonNull(tag), null);
         pioToTag.remove(p_pio);
     }
 
@@ -192,15 +193,17 @@ public final class FormulaTagManager {
         final FormulaTag tag = getTagForPos(oldPIO);
         assert tag != null
                 : "@AssumeAssertion(nullness): Tried to update a tag that does not exist";
-        final FormulaInfo oldInfo = getFormulaInfo(tag);
+        final FormulaTag tagNonNull = Objects.requireNonNull(tag);
+        final FormulaInfo oldInfo = getFormulaInfo(tagNonNull);
         assert oldInfo != null
                 : "@AssumeAssertion(nullness): Tried to update a tag with no previous information";
-        final FormulaInfo newInfo = oldInfo.addModification(p_info, newAge);
+        final FormulaInfo oldInfoNonNull = Objects.requireNonNull(oldInfo);
+        final FormulaInfo newInfo = oldInfoNonNull.addModification(p_info, newAge);
 
-        tagToFormulaInfo.put(tag, newInfo);
-        putInQueryCache(tag, newInfo);
+        tagToFormulaInfo.put(tagNonNull, newInfo);
+        putInQueryCache(tagNonNull, newInfo);
         pioToTag.remove(oldPIO);
-        pioToTag.put(newInfo.pio, tag);
+        pioToTag.put(newInfo.pio, tagNonNull);
     }
 
     ////////////////////////////////////////////////////////////////////////////
