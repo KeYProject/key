@@ -5,6 +5,7 @@
 package org.key_project.prover.rules;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
@@ -86,7 +87,7 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
                         // noinspection unchecked
                         assert assumesObl != null
                                 : "@AssumeAssertion(nullness): assumesObl should not be null";
-                        assumesObl = and(assumesObl, assumesPart, p_goal);
+                        assumesObl = and(Objects.requireNonNull(assumesObl), assumesPart, p_goal);
                     }
 
                     // UGLY: We create a flat structure of the new
@@ -119,7 +120,8 @@ public abstract class TacletExecutor<Goal extends @NonNull ProofGoal<Goal>, App 
                 seq = itNewGoalSequents.next();
             }
             assert assumesObl != null : "@AssumeAssertion(nullness): assumesObl should not be null";
-            addToPosWithoutInst(createSequentFormula(assumesObl), seq, null, false);
+            addToPosWithoutInst(createSequentFormula(Objects.requireNonNull(assumesObl)), seq,
+                null, false);
         }
 
         return res;
