@@ -41,7 +41,6 @@ import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -1142,7 +1141,7 @@ public interface AuxiliaryContract extends SpecificationElement {
             }
 
             if (first instanceof For) {
-                ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
+                ImmutableList<LoopInitializer> inits = ((For) first).getInitializers();
                 ProgramVariableCollector collector =
                     new ProgramVariableCollector(new StatementBlock(inits), services);
                 collector.start();
@@ -1193,7 +1192,7 @@ public interface AuxiliaryContract extends SpecificationElement {
                 }
 
                 if (first instanceof For) {
-                    ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
+                    ImmutableList<LoopInitializer> inits = ((For) first).getInitializers();
                     ProgramVariableCollector collector =
                         new ProgramVariableCollector(new StatementBlock(inits), services);
                     collector.start();
