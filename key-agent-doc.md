@@ -204,9 +204,18 @@ The built-in tool set (`KeYAgentTools`):
 | Tool                | Category       | Approval | Backgroundable | Description                                                         |
 |---------------------|----------------|----------|----------------|---------------------------------------------------------------------|
 | `get_proof_context` | Proof          | auto     |                | a text block describing the current proof state                     |
-| `tryclose`          | Proof          | auto     |                | apply the `tryclose` proof-script command (TryClose macro) to the current branch, all open goals, or a goal by index |
+| `tryclose`          | Proof          | auto     | ✓              | apply the `tryclose` proof-script command (TryClose macro) to the current branch, all open goals, or a goal by index |
 | `auto`              | Proof          | auto     | ✓              | apply KeY's automatic proof strategy ('Auto' button) with an arbitrary step limit |
-| `list_proofs`       | Proof          | auto     |                | enumerate all open proofs with an identifier usable in the taclet tools' `proof` parameter |
+| `run_macro`         | Proof          | auto     | ✓              | run a curated proof macro (symbolic execution, propositional splitting, simplification, transcendental SMT, auto-pilot, …) on the targeted goals |
+| `run_smt`           | Proof          | auto     | ✓              | run the SMT solvers on the targeted goals; goals the solver proves valid are closed |
+| `simplify_goal`     | Proof          | auto     |                | apply KeY's one-step simplifier (`oss`) to a single goal            |
+| `apply_rule`        | Proof          | ask      |                | apply a named taclet or built-in rule (see `list_taclets`) to a goal, with an optional term/formula occurrence and schema-variable instantiations |
+| `instantiate_quantifier` | Proof      | ask      |                | instantiate a quantified formula with a term (`instantiate`)        |
+| `witness_constant`  | Proof          | ask      |                | introduce a fresh Skolem witness constant for a quantified formula (`witness`) |
+| `cut_formula`       | Proof          | ask      |                | cut on a formula (`cut`): splits the goal into a case and its negation |
+| `expand_definitions`| Proof          | ask      |                | unfold method-definition and class-invariant axioms (`expand`)      |
+| `rewrite_term`      | Proof          | ask      |                | find and apply a rewrite taclet transforming a term into another (`rewrite`) |
+| `list_proofs`       | Proof          | auto     |                | enumerate all open proofs with an identifier usable in the proof tools' `proof` parameter |
 | `list_files`        | Files          | auto     |                | bounded listing of the files of the current Java model              |
 | `read_file`         | Files          | auto     |                | read a text file of the model directory (respects size limits)      |
 | `file_info`         | Files          | auto     |                | metadata (size, last modified, kind) of a file                      |
@@ -222,6 +231,19 @@ The built-in tool set (`KeYAgentTools`):
 | `spawn_subagent`    | Sub-agents     | ask      | ✓              | delegate a task to a sub-agent (only if enabled in settings)        |
 | `get_subagent_logs` | Sub-agents     | auto     |                | list the recorded sub-agent runs (role, mode, per-task status and the tools that were called) |
 | `list_tools`        | Documentation  | auto     |                | dump the Markdown documentation of every available tool (metadata + this list) |
+
+**Goal targeting and proof selection.** The proof-manipulation tools (`tryclose`, `auto`,
+`run_macro`, `run_smt`, `simplify_goal`, `apply_rule`, `instantiate_quantifier`,
+`witness_constant`, `cut_formula`, `expand_definitions`, `rewrite_term`) share two parameters:
+
+- `goal` — `"branch"` (default; the first open goal of the current branch), `"all"` (every open
+  goal; single-goal surgery tools reject it), or a 0-based goal index (negative = from the end).
+- `proof` — an optional identifier from `list_proofs` (index or name); without it the currently
+  selected proof is used. This lets the agent work on a non-selected proof, e.g. while the user
+  interacts with another one.
+
+Every proof tool reports its outcome uniformly as `"<tool>: N goal(s) closed, M open goal(s)
+remain"` (plus `- the proof is closed` when it finishes).
 
 **Categories.** Every tool carries a `category` (Proof, Files, Shell, Taclets, Interaction,
 Sub-agents, Documentation, General) and a `backgroundable` flag — pure KeY-side *metadata*: the
@@ -257,10 +279,13 @@ turn until you answer. Turn this off with *Allow the agent to ask questions*.
 
 - File access tools are **read-only**, restricted to the current Java model directory, and run
   without approval.
-- `tryclose` and `auto` modify the current proof (they run the corresponding proof-script
-  commands, i.e. the same actions as *Apply Script* / the *Auto* button). They are approved by
-  default so the agent can actually prove, but you can move them to *with approval* in the Tools
-  panel if you want to review each invocation.
+- The proof-script tools run the corresponding KeY proof-script commands (i.e. the same actions
+  as *Apply Script* / the *Auto* button): `tryclose`, `auto`, `run_macro`, `run_smt` and
+  `simplify_goal` are approved by default so the agent can actually prove (you can move them to
+  *with approval* in the Tools panel to review each invocation); the goal-surgery tools
+  `apply_rule`, `instantiate_quantifier`, `witness_constant`, `cut_formula`,
+  `expand_definitions` and `rewrite_term` mutate the proof and require approval by default.
+  The latter act on a single goal (`"branch"` or an index) and reject `"all"`.
 - `add_taclet` and `remove_taclet` change the rule set of a proof and therefore require approval
   by default; inspection tools (`list_taclets`, `list_taclet_options`, `export_taclet`,
   `export_taclets`) do not.
@@ -324,8 +349,10 @@ delegations) can be **moved into the background** while they run:
   completion, and its result is reported to the agent as cancelled).
 - When the call finishes, its output is enqueued and the parked turn resumes with it (a
   *"In the background"* box marks where the turn parked).
-- Only tools marked **backgroundable** offer the button (by default `auto`, `run_command`,
-  `spawn_subagent`); per-tool overrides and the concurrency limit live in the [Tools panel](#tools-sub-panel-llm-settings--tools). While a turn is parked on a question or an approval, further
+- Only tools marked **backgroundable** offer the button (by default `auto`, `tryclose`,
+  `run_command`, `run_macro`, `run_smt`, `spawn_subagent`); per-tool overrides and the
+  concurrency limit live in the [Tools panel](#tools-sub-panel-llm-settings--tools). While a
+  turn is parked on a question or an approval, further
   prompts are *deferred* (they do not start new turns); while it is parked on a background job
   they are processed normally.
 - Backgrounding needs no extra user input — the call is already executing anyway; only the turn
@@ -418,8 +445,9 @@ tool shows a short explanation, a radio group selecting its permission — **Def
 own behavior, `auto` or `ask`), **With approval** (always ask), **Without approval (always)** or
 **Disabled** (not sent to the model) — and a **may run in background** checkbox. Read-only tools
 default to `auto`, `run_command` to `ask`; the background checkbox follows the tool's metadata
-(default on for `auto`, `run_command`, `spawn_subagent`; overriding it adds/removes the tool in
-the `backgroundToolsEnabled`/`backgroundToolsDisabled` settings). While such a call runs it can
+(default on for `auto`, `tryclose`, `run_command`, `run_macro`, `run_smt`, `spawn_subagent`;
+overriding it adds/removes the tool in the
+`backgroundToolsEnabled`/`backgroundToolsDisabled` settings). While such a call runs it can
 be moved to the background, the agent then continues with your queued messages and the result is
 delivered when the call finishes (see [section 7.4](#74-backgrounding)). The number of concurrent
 background jobs is capped by *Max background jobs* (Agent behavior section).
