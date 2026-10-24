@@ -38,7 +38,7 @@ public abstract class JAbstractSortedOperator extends AbstractSortedOperator
     }
 
     protected JAbstractSortedOperator(Name name, Sort[] argSorts, Sort sort,
-            @Nullable Boolean[] whereToBind,
+            Boolean @Nullable [] whereToBind,
             boolean isRigid) {
         this(name, new ImmutableArray<>(argSorts), sort,
             whereToBind == null ? null : new ImmutableArray<>(whereToBind), isRigid);

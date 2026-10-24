@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.rule.MatchConditions;
 
@@ -45,7 +46,8 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
         super(children, pos);
     }
 
-    public JavaNonTerminalProgramElement(PositionInfo pi, List<Comment> comments) {
+    public JavaNonTerminalProgramElement(@Nullable PositionInfo pi,
+            @Nullable List<Comment> comments) {
         super(pi, comments);
     }
 
@@ -162,7 +164,13 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
             @Nullable MatchConditions matchCond, int offset) {
 
         for (int i = offset, sz = getChildCount(); i < sz; i++) {
-            matchCond = getChildAt(i).match(source, matchCond);
+            // per ProgramElement.match's contract the incoming conditions are never null once
+            // matching has started (all in-repo callers pass a non-null MatchConditions);
+            // a null value here could only stem from a matching failure, which is handled by
+            // the null checks around the invocation instead of being fed back into a child
+            final MatchConditions conditions =
+                Objects.requireNonNull(matchCond, "match conditions must not be null");
+            matchCond = getChildAt(i).match(source, conditions);
             if (matchCond == null) {
                 return null;
             }

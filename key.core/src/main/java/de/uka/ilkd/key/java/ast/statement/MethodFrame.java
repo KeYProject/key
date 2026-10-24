@@ -19,6 +19,7 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The statement inserted by KeY if a method call is executed.
@@ -43,7 +44,7 @@ public class MethodFrame extends JavaStatement
 
     private final int prefixLength;
 
-    private final MethodFrame innerMostMethodFrame;
+    private final @Nullable MethodFrame innerMostMethodFrame;
 
     /**
      * Labeled statement.
@@ -85,7 +86,7 @@ public class MethodFrame extends JavaStatement
      */
     public MethodFrame(IProgramVariable resultVar, IExecutionContext execContext,
             StatementBlock body, PositionInfo pos) {
-        this(resultVar, execContext, body, pos, null);
+        this(resultVar, execContext, body, pos, List.of());
     }
 
     /**
@@ -145,7 +146,7 @@ public class MethodFrame extends JavaStatement
     }
 
     @Override
-    public MethodFrame getInnerMostMethodFrame() {
+    public @Nullable MethodFrame getInnerMostMethodFrame() {
         return innerMostMethodFrame;
     }
 
@@ -203,7 +204,7 @@ public class MethodFrame extends JavaStatement
      *
      * @return the method
      */
-    public IProgramMethod getProgramMethod() {
+    public @Nullable IProgramMethod getProgramMethod() {
         return getExecutionContext().getMethodContext();
     }
 

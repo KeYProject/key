@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.java.ast.declaration.Modifier.createModifierList;
 
@@ -21,7 +22,7 @@ public class ClassInitializer extends JavaDeclaration
         implements MemberDeclaration, StatementContainer {
 
 
-    protected final StatementBlock body;
+    protected final @Nullable StatementBlock body;
 
 
     public ClassInitializer() {
@@ -55,7 +56,7 @@ public class ClassInitializer extends JavaDeclaration
     }
 
 
-    public StatementBlock getBody() {
+    public @Nullable StatementBlock getBody() {
         return body;
     }
 
@@ -167,6 +168,10 @@ public class ClassInitializer extends JavaDeclaration
         return modArray != null && modArray.size() != 0;
     }
 
+    // body may be null for the parameterless stub constructor or an ExtList without a
+    // StatementBlock, but SourceElement.getLastElement() is @NonNull and cannot be widened
+    // without ripple, so the null-returning override is exempted from the check.
+    @SuppressWarnings("NullAway")
     public SourceElement getLastElement() {
         return body;
     }
