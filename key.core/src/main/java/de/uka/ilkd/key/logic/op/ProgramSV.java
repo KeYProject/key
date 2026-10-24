@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -323,7 +324,10 @@ public final class ProgramSV extends JOperatorSV
         if (match == null) {
             return false;
         }
-        return ((ProgramSVSort) sort()).canStandFor(match, ec, services);
+        // the schema variable can only be matched in the context of an enclosing program, which
+        // provides the execution context
+        return ((ProgramSVSort) sort())
+                .canStandFor(match, Objects.requireNonNull(ec, "no execution context"), services);
     }
 
     @Override
@@ -347,7 +351,8 @@ public final class ProgramSV extends JOperatorSV
         if (instant == null || instant.equals(src)
                 || (instant instanceof JTerm && ((JTerm) instant).op().equals(src))) {
 
-            matchCond = addProgramInstantiation(src, matchCond, services);
+            matchCond = addProgramInstantiation(
+                Objects.requireNonNull(src, "no matched program element"), matchCond, services);
 
             if (matchCond == null) {
                 // FAILED due to incompatibility with already found matchings

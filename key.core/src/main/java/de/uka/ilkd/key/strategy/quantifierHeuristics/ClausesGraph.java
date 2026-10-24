@@ -7,6 +7,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -18,6 +19,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class describes the relation between different clauses in a CNF. If two clauses have the
@@ -63,7 +65,8 @@ public class ClausesGraph {
             changed = false;
 
             for (final Term clause : clauses) {
-                final ImmutableSet<Term> oldConnections = getConnections(clause);
+                final ImmutableSet<Term> oldConnections = Objects.requireNonNull(
+                    getConnections(clause), "a clause always has connections");
                 final ImmutableSet<Term> newConnections = getTransitiveConnections(oldConnections);
 
                 if (newConnections.size() > oldConnections.size()) {
@@ -77,7 +80,8 @@ public class ClausesGraph {
 
     private ImmutableSet<Term> getTransitiveConnections(ImmutableSet<Term> formulas) {
         for (Term formula : formulas) {
-            formulas = formulas.union(getConnections(formula));
+            formulas = formulas.union(Objects.requireNonNull(getConnections(formula),
+                "a clause always has connections"));
         }
         return formulas;
     }
@@ -101,7 +105,8 @@ public class ClausesGraph {
     boolean isFullGraph() {
         final Iterator<Term> it = clauses.iterator();
         if (it.hasNext()) {
-            return getConnections(it.next()).size() >= clauses.size();
+            return Objects.requireNonNull(getConnections(it.next()),
+                "a clause always has connections").size() >= clauses.size();
         }
         return true;
     }
@@ -111,7 +116,7 @@ public class ClausesGraph {
      * @param formula
      * @return set of terms that connect to the formula.
      */
-    private ImmutableSet<Term> getConnections(Term formula) {
+    private @Nullable ImmutableSet<Term> getConnections(Term formula) {
         return connections.get(formula);
     }
 
@@ -197,7 +202,8 @@ public class ClausesGraph {
      * @param set1
      * @return a set of terms which are belonged to both set0 and set1.
      */
-    private ImmutableSet<Term> intersect(ImmutableSet<Term> set0, ImmutableSet<Term> set1) {
+    private ImmutableSet<Term> intersect(@Nullable ImmutableSet<Term> set0,
+            ImmutableSet<Term> set1) {
         ImmutableSet<Term> res = DefaultImmutableSet.nil();
         if (set0 == null || set1 == null) {
             return res;

@@ -105,8 +105,8 @@ public class PreParser {
      */
     public ImmutableList<TextualJMLConstruct> parseClassLevel(String concatenatedComment,
             @Nullable URI fileName, Position pos) {
-        return parseClassLevel(
-            new PositionedString(concatenatedComment, new Location(fileName, pos)));
+        return parseClassLevel(new PositionedString(concatenatedComment,
+            fileName == null ? Location.UNDEFINED : new Location(fileName, pos)));
     }
 
     /**
@@ -124,8 +124,8 @@ public class PreParser {
      */
     public ImmutableList<TextualJMLConstruct> parseMethodLevel(String concatenatedComment,
             @Nullable URI fileName, Position position) {
-        return parseMethodLevel(
-            new PositionedString(concatenatedComment, new Location(fileName, position)));
+        return parseMethodLevel(new PositionedString(concatenatedComment,
+            fileName == null ? Location.UNDEFINED : new Location(fileName, position)));
     }
 
     /**

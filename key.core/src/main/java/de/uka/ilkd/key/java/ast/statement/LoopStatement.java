@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -197,7 +198,7 @@ public abstract class LoopStatement extends JavaStatement
      * @param body
      *        the body of the loop
      */
-    public LoopStatement(ILoopInit inits, IGuard guard, IForUpdates updates,
+    public LoopStatement(@Nullable ILoopInit inits, IGuard guard, IForUpdates updates,
             Statement body) {
         this.body = body;
         this.updates = updates;
@@ -334,9 +335,11 @@ public abstract class LoopStatement extends JavaStatement
             index -= 1;
         }
         if (inits != null) {
-            int s = inits.size();
+            final ImmutableArray<LoopInitializer> inits2 =
+                Objects.requireNonNull(inits.getInits(), "loop inits are mandatory");
+            int s = inits2.size();
             for (int i = 0; i < s && index >= 0; i++) {
-                final LoopInitializer ii = inits.getInits().get(i);
+                final LoopInitializer ii = inits2.get(i);
                 if (ii instanceof Expression) {
                     if (index == 0) {
                         return (Expression) ii;

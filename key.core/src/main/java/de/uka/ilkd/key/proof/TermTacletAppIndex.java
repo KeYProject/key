@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -279,7 +281,8 @@ public class TermTacletAppIndex {
             return updateCompleteRebuild(pos, services, tacletIndex, listener, indexCache);
         }
 
-        final Term newTerm = pathToModification.getSubTerm();
+        final Term newTerm =
+            Objects.requireNonNull(pathToModification.getSubTerm(), "no subterm to index");
 
         final TermTacletAppIndex cached = indexCache.getIndexForTerm(newTerm);
         if (cached != null) {
@@ -341,7 +344,8 @@ public class TermTacletAppIndex {
             ITermTacletAppIndexCache indexCache) {
         ImmutableArray<TermTacletAppIndex> newSubIndices = subtermIndices;
 
-        final Term newTerm = pathToModification.getSubTerm();
+        final Term newTerm =
+            Objects.requireNonNull(pathToModification.getSubTerm(), "no subterm to index");
         final int child = pathToModification.getChild();
 
         if (newTerm.op() instanceof UpdateApplication) {

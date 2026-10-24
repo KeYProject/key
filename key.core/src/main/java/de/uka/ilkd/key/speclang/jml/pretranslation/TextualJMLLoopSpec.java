@@ -212,7 +212,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
             return false;
         }
         TextualJMLLoopSpec that = (TextualJMLLoopSpec) o;
-        return variant.equals(that.variant) && clauses.equals(that.clauses);
+        return Objects.equals(variant, that.variant) && clauses.equals(that.clauses);
     }
 
     @Override
@@ -225,7 +225,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         final LabeledParserRuleContext ctx;
         final @Nullable Name heap;
 
-        Entry(Object clauseType, LabeledParserRuleContext ctx, Name heap) {
+        Entry(Object clauseType, LabeledParserRuleContext ctx, @Nullable Name heap) {
             this.clauseType = clauseType;
             this.ctx = ctx;
             this.heap = heap;

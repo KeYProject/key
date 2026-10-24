@@ -177,12 +177,13 @@ public interface AuxiliaryContract extends SpecificationElement {
      *
      * @param heap the heap to use.
      * @param self the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
+     *        May be {@code null} if the context has no {@code self} variable.
      * @param atPres a map from every variable {@code var} to {@code \old(var)} to use instead of
      *        {@link #getPlaceholderVariables()}.
      * @param services services.
      * @return this contract's precondition on the specified heap.
      */
-    JTerm getPrecondition(LocationVariable heap, LocationVariable self,
+    JTerm getPrecondition(LocationVariable heap, @Nullable LocationVariable self,
             Map<LocationVariable, LocationVariable> atPres, Services services);
 
     /**
@@ -190,13 +191,14 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param heapVariable the heap to use.
      * @param heap the heap to use.
      * @param self the {@code self} variable to use to use instead of
-     *        {@link #getPlaceholderVariables()}.
+     *        {@link #getPlaceholderVariables()}. May be {@code null} if the context has no
+     *        {@code self} term.
      * @param atPres a map from every variable {@code var} to {@code \old(var)} to use instead of
      *        {@link #getPlaceholderVariables()}.
      * @param services services.
      * @return this contract's precondition on the specified heap.
      */
-    JTerm getPrecondition(LocationVariable heapVariable, JTerm heap, JTerm self,
+    JTerm getPrecondition(LocationVariable heapVariable, JTerm heap, @Nullable JTerm self,
             Map<LocationVariable, JTerm> atPres, Services services);
 
     /**
@@ -505,25 +507,27 @@ public interface AuxiliaryContract extends SpecificationElement {
     /**
      *
      * @param selfVar the {@code self} variable to use instead of
-     *        {@link #getPlaceholderVariables()}.
+     *        {@link #getPlaceholderVariables()}. May be {@code null} if the context has no
+     *        {@code self} variable.
      * @param services services.
      * @return this contract's measured-by clause if it has one, {@code null} otherwise.
      */
     @Nullable
-    JTerm getMby(LocationVariable selfVar, Services services);
+    JTerm getMby(@Nullable LocationVariable selfVar, Services services);
 
     /**
      *
      * @param heapTerms the heaps to use.
      * @param selfTerm the {@code self} variable to use instead of
-     *        {@link #getPlaceholderVariables()}.
+     *        {@link #getPlaceholderVariables()}. May be {@code null} if the context has no
+     *        {@code self} term.
      * @param atPres a map from every variable {@code var} to {@code \old(var)} to use instead of
      *        {@link #getPlaceholderVariables()}.
      * @param services services.
      * @return this contract's measured-by clause if it has one, {@code null} otherwise.
      */
     @Nullable
-    JTerm getMby(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
+    JTerm getMby(Map<LocationVariable, JTerm> heapTerms, @Nullable JTerm selfTerm,
             Map<LocationVariable, JTerm> atPres, Services services);
 
     /**

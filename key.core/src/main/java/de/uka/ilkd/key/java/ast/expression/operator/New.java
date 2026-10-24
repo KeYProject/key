@@ -94,7 +94,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
      * @param rp
      *        a ReferencePrefix as access path for the constructor
      */
-    public New(Expression[] arguments, TypeReference type, ReferencePrefix rp) {
+    public New(Expression[] arguments, TypeReference type, @Nullable ReferencePrefix rp) {
         super(arguments, type);
         anonymousClass = null;
         accessPath = rp;
