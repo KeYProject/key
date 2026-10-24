@@ -21,7 +21,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 
 import org.key_project.util.collection.ImmutableList;
@@ -98,10 +97,10 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      * @return the generated name.
      */
     private String generateName(String baseName, UnaryOperator<String> generator) {
-        return Arrays.stream(baseName.split(SpecificationRepository.CONTRACT_COMBINATION_MARKER))
+        return Arrays.stream(baseName.split(ContractFactory.CONTRACT_COMBINATION_MARKER))
                 .map(generator)
                 .reduce(
-                    (acc, curr) -> acc + SpecificationRepository.CONTRACT_COMBINATION_MARKER + curr)
+                    (acc, curr) -> acc + ContractFactory.CONTRACT_COMBINATION_MARKER + curr)
                 .get();
     }
 

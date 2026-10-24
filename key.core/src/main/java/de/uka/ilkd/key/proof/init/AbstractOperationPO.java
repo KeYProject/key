@@ -1029,7 +1029,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
             final IProgramMethod pm, final Services proofServices) {
         ImmutableList<FunctionalOperationContract> lookupContracts =
             ImmutableList.nil();
-        ImmutableSet<FunctionalOperationContract> cs = proofServices.getSpecificationRepository()
+        ImmutableSet<FunctionalOperationContract> cs = proofServices.getContractRegistry()
                 .getOperationContracts(getCalleeKeYJavaType(), pm);
         for (KeYJavaType superType : proofServices.getJavaInfo()
                 .getAllSupertypes(getCalleeKeYJavaType())) {

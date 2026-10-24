@@ -629,7 +629,7 @@ public abstract class AbstractProblemLoader {
         } else {
             baseContractName = chooseContract.substring(0, ind);
         }
-        final Contract contract = initConfig.getServices().getSpecificationRepository()
+        final Contract contract = initConfig.getServices().getContractRegistry()
                 .getContractByName(baseContractName);
         if (contract == null) {
             throw new RuntimeException("Contract not found: " + baseContractName);

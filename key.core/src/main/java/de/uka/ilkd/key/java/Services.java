@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.ProofRegistry;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.ClassAxiomComputer;
+import de.uka.ilkd.key.speclang.ContractRegistry;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.key_project.logic.LogicServices;
@@ -100,6 +101,13 @@ public class Services implements TermServices, LogicServices, ProofServices {
      */
     private ClassAxiomComputer classAxiomComputer;
 
+    /**
+     * the per-node derived-spec cache for contracts and initially clauses (the contract registry).
+     * Owned here (not by the specification repository); see {@link ContractRegistry}. Shared by
+     * {@link #copy(boolean)} copies like the specification repository.
+     */
+    private ContractRegistry contractRegistry;
+
     /*
      * the Java model (with all paths)
      */
@@ -156,6 +164,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
         this.classAxiomComputer = profile.createClassAxiomComputer(this);
+        this.contractRegistry = profile.createContractRegistry(this);
         this.specRepos = profile.createSpecificationRepository(this);
         this.proofRegistry = new ProofRegistry(this);
         this.cee = new ConstantExpressionEvaluator();
@@ -180,6 +189,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
         this.specRepos = s.specRepos;
         this.proofRegistry = s.proofRegistry;
         this.classAxiomComputer = s.classAxiomComputer;
+        this.contractRegistry = s.contractRegistry;
         this.javaModel = s.javaModel;
         // Share the (per-thread) recorder with the source: an overlay (see getOverlay) is the
         // services the rule executor works through, and fresh-name proposals set on the base
@@ -285,6 +295,17 @@ public class Services implements TermServices, LogicServices, ProofServices {
         return classAxiomComputer;
     }
 
+    /**
+     * Returns the contract registry (per-node derived-spec cache for contracts and initially
+     * clauses) of this {@link Services} instance (shared by copies of this instance, like the
+     * specification repository).
+     *
+     * @return the contract registry.
+     */
+    public ContractRegistry getContractRegistry() {
+        return contractRegistry;
+    }
+
 
     /**
      * Returns the VariableNamer associated with this Services object.
@@ -323,6 +344,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
         s.specRepos = specRepos;
         s.proofRegistry = proofRegistry;
         s.classAxiomComputer = classAxiomComputer;
+        s.contractRegistry = contractRegistry;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
         // Detach this instance's recorder from earlier overlays/aliases, keeping the calling

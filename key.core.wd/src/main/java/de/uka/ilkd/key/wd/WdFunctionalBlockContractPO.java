@@ -116,7 +116,7 @@ public class WdFunctionalBlockContractPO extends FunctionalBlockContractPO {
         // however only completeness is lost, soundness is guaranteed
         final BlockWellDefinedness bwd =
             new BlockWellDefinedness(contract, variables, localIns, services);
-        ((SpecificationRepositoryWD) services.getSpecificationRepository()).addWdStatement(bwd);
+        ((ContractRegistryWD) services.getContractRegistry()).addWdStatement(bwd);
         final LocationVariable heapAtPre = variables.remembranceHeaps.get(heap);
         final JTerm anon = anonHeap != null ? services.getTermBuilder().func(anonHeap) : null;
         final SequentFormula wdBlock = bwd.generateSequent(
