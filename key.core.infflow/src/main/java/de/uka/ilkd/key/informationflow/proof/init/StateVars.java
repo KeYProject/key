@@ -241,6 +241,9 @@ public class StateVars {
     }
 
 
+    // ImmutableArray is deprecated in favor of ImmutableList; the label list is passed to
+    // buildHeapFunc which still takes the old type.
+    @SuppressWarnings("deprecation")
     public static StateVars buildMethodContractPreVars(IProgramMethod pm, KeYJavaType kjt,
             Services services) {
         ImmutableArray<TermLabel> heapLabels =
@@ -251,6 +254,7 @@ public class StateVars {
     }
 
 
+    @SuppressWarnings("deprecation")
     public static StateVars buildMethodContractPostVars(StateVars preVars, IProgramMethod pm,
             KeYJavaType kjt, Services services) {
         final String postfix = "AtPost";
@@ -330,6 +334,9 @@ public class StateVars {
     }
 
 
+    // ImmutableArray is deprecated in favor of ImmutableList; the labels are consumed by
+    // TermBuilder.label which still expects the old representation.
+    @SuppressWarnings("deprecation")
     private static JTerm buildHeapFunc(String postfix, ImmutableArray<TermLabel> labels,
             Services services) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();

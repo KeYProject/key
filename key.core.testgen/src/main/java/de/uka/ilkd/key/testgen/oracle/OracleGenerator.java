@@ -603,6 +603,8 @@ public class OracleGenerator {
 
     private OracleMethod createQuantifierMethod(Term term, boolean initialSelect) {
         String methodName = generateMethodName();
+        // varsBoundHere still returns the deprecated ImmutableArray representation.
+        @SuppressWarnings("deprecation")
         ImmutableArray<? extends QuantifiableVariable> vars = term.varsBoundHere(0);
         QuantifiableVariable qv = vars.get(0);
         OracleVariable var = new OracleVariable(qv.name().toString(), qv.sort());

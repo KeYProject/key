@@ -102,6 +102,9 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         return tb.apply(update, programTerm);
     }
 
+    // ImmutableArray is deprecated in favor of ImmutableList; MethodBodyStatement still requires
+    // the old type for its argument list, so the local cannot be migrated yet.
+    @SuppressWarnings("deprecation")
     private JavaBlock buildJavaBlock(BasicSnippetData d, ImmutableList<JTerm> formalPars,
             ProgramVariable selfVar, ProgramVariable resultVar, ProgramVariable exceptionVar,
             LocationVariable eVar) {
@@ -125,7 +128,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
                 formalArray.toArray(new Expression[formalArray.size()]);
             KeYJavaType forClass = (KeYJavaType) d.get(BasicSnippetData.Key.FOR_CLASS);
             final New n = new New(formalArray2, new TypeRef(forClass), null);
-            final Assignment ca = new BinaryAssignment(selfVar, n);
+            final Assignment<?> ca = new BinaryAssignment(selfVar, n);
             sb = new StatementBlock(ca);
         } else {
             final MethodBodyStatement call =
@@ -138,11 +141,11 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
         final TypeReference excTypeRef = javaInfo.createTypeReference(eType);
 
         // create try statement
-        final Assignment nullStat = new BinaryAssignment(exceptionVar, NullLiteral.NULL);
+        final Assignment<?> nullStat = new BinaryAssignment(exceptionVar, NullLiteral.NULL);
         final VariableSpecification eSpec = new VariableSpecification(eVar);
         final ParameterDeclaration excDecl =
             new ParameterDeclaration(new Modifier[0], excTypeRef, eSpec, false);
-        final Assignment assignStat = new BinaryAssignment(exceptionVar, eVar);
+        final Assignment<?> assignStat = new BinaryAssignment(exceptionVar, eVar);
         final Catch catchStat = new Catch(excDecl, new StatementBlock(assignStat));
         final Try tryStat = new Try(sb, new Branch[] { catchStat });
         final StatementBlock sb2 = new StatementBlock(nullStat, tryStat);

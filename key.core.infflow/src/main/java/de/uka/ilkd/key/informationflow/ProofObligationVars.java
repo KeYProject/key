@@ -98,6 +98,9 @@ public class ProofObligationVars {
         this.formalParams = null;
     }
 
+    // ImmutableArray is deprecated in favor of ImmutableList; keep the deprecated type for the
+    // label collection until the whole proof-obligation machinery shares one representation.
+    @SuppressWarnings("deprecation")
     public ProofObligationVars labelHeapAtPreAsAnonHeapFunc() {
         if (pre.heap.op() instanceof Function
                 && !pre.heap.containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL)) {

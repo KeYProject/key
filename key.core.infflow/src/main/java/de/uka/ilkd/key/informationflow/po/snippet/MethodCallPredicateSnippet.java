@@ -31,6 +31,9 @@ class MethodCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
         return nameString;
     }
 
+    // ImmutableArray is deprecated in favor of ImmutableList; pm.argSorts() still returns the old
+    // representation, so the local cannot be migrated yet.
+    @SuppressWarnings("deprecation")
     @Override
     protected Sort[] generateContApplArgumentSorts(ImmutableList<JTerm> termList,
             IProgramMethod pm) {
