@@ -113,7 +113,7 @@ public class NewLocalVarsCondition implements VariableCondition {
         return matchCond.setInstantiations(
             ((SVInstantiations) svInst)
                     .add(varDeclsSV,
-                        new ListInstantiation<>(new ImmutableArray<>(decls),
+                        new ListInstantiation<>(ImmutableList.fromList(decls),
                             VariableDeclaration.class),
                         services)
                     .add(updateBeforeSV, tb.parallel(updatesBefore), services)
