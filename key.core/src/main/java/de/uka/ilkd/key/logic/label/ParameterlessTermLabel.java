@@ -8,6 +8,7 @@ import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -19,6 +20,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author mattias ulbrich
  */
+@NullMarked
 public final class ParameterlessTermLabel implements TermLabel {
     /**
      * Name of {@link #ANON_HEAP_LABEL}.

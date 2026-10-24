@@ -14,19 +14,22 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.logic.Name;
 import org.key_project.util.parsing.Position;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * represents a name that is part of a program
  */
+@NullMarked
 public class ProgramElementName extends Name
         implements Label, ReferenceSuffix, MethodName {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramElementName.class);
 
     private final String qualifierString;
     private final String shortName;
-    private final NameCreationInfo creationInfo;
+    private final @Nullable NameCreationInfo creationInfo;
     private final Comment[] comments;
 
     /**
@@ -146,11 +149,11 @@ public class ProgramElementName extends Name
         return shortName;
     }
 
-    public NameCreationInfo getCreationInfo() {
+    public @Nullable NameCreationInfo getCreationInfo() {
         return creationInfo;
     }
 
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         if (this.equals(src)) {
             source.next();

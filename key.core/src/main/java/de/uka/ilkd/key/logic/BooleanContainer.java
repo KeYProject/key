@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic;
 
+import org.jspecify.annotations.NullMarked;
+
 /** BooleanContainer wraps primitive bool */
+@NullMarked
 public final class BooleanContainer {
     private boolean bool;
 

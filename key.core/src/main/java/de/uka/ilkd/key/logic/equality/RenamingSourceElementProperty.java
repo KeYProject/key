@@ -19,6 +19,8 @@ import org.key_project.logic.Property;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.SyntaxElementCursor;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A property that can be used in
  * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for
@@ -29,6 +31,7 @@ import org.key_project.logic.SyntaxElementCursor;
  *
  * @author Tobias Reinhold
  */
+@NullMarked
 public class RenamingSourceElementProperty implements Property<SourceElement> {
     /**
      * The single instance of this property.

@@ -13,6 +13,9 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Objects of this class represent "observer" function or predicate symbols. An observer symbol is a
@@ -23,12 +26,13 @@ import org.key_project.util.collection.ImmutableArray;
  * Observer symbols serve as the targets of contracts (i.e., as the subjects that the contracts are
  * about).
  */
+@NullMarked
 public class ObserverFunction extends JFunction implements IObserverFunction {
 
     private final KeYJavaType container;
     private final boolean isStatic;
     private final ImmutableArray<KeYJavaType> paramTypes;
-    private final KeYJavaType type;
+    private final @Nullable KeYJavaType type;
     private final int heapCount;
     private final int stateCount;
 
@@ -96,7 +100,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
      * @see de.uka.ilkd.key.logic.op.IObserverFunction#getType()
      */
     @Override
-    public final KeYJavaType getType() {
+    public final @Nullable KeYJavaType getType() {
         return type;
     }
 

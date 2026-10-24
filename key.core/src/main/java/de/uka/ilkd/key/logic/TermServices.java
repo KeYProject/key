@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * This interface defines the basic functionalities of services required to construct
@@ -11,6 +13,7 @@ package de.uka.ilkd.key.logic;
  *
  * @author Richard Bubel
  */
+@NullMarked
 public interface TermServices {
 
     /**

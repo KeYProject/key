@@ -6,9 +6,12 @@ package de.uka.ilkd.key.logic.sort;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * this exception is thrown if a generic sort has been declared with an illegal supersort
  */
+@NullMarked
 public class GenericSupersortException extends Exception {
 
     /**

@@ -11,9 +11,13 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A factory for creating {@link BlockContractValidityTermLabel} objects.
  */
+@NullMarked
 public class BlockContractValidityTermLabelFactory
         implements TermLabelFactory<BlockContractValidityTermLabel> {
     /**
@@ -23,7 +27,7 @@ public class BlockContractValidityTermLabelFactory
      * This method accepts single arguments which can be parsed as a {@link String}.
      */
     @Override
-    public BlockContractValidityTermLabel parseInstance(List<String> parameters,
+    public BlockContractValidityTermLabel parseInstance(@Nullable List<String> parameters,
             TermServices services) throws TermLabelException {
         if (parameters == null || parameters.size() != 1) {
             throw new TermLabelException("Label " + BlockContractValidityTermLabel.NAME

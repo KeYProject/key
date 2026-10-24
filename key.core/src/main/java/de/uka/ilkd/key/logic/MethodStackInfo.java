@@ -11,6 +11,9 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class MethodStackInfo implements NameCreationInfo {
 
     public static NameCreationInfo create(ProgramElement program) {
