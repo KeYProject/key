@@ -244,21 +244,20 @@ already verified — see `JML_MAPPING.md` and §3).
 
 ### Phase 4 — Delete `SpecificationRepository`: specs are rewritten via the AST
 
-> **Progress (see HANDOFF §5.2/§7.3):** slices 1–5 DONE (`7f369e5c29` statement
+> **Progress (see HANDOFF §5.2/§7.3):** slices 1–6 DONE (`7f369e5c29` statement
 > specs → AST nodes; `806c2b1ba6` limited observers → `LimitedObservers`;
 > `ae716ed74a` loop/block/merge specs → AST nodes; `c81c034dd1` proof↔PO
 > registry → `ProofRegistry`/`Services`; `1b0f1f94ee` class invariants/axioms
-> → `ClassAxiomComputer`/`Services`); full-suite baseline
+> → `ClassAxiomComputer`/`Services`; `005320b2ec` contract registry → new
+> `ContractRegistry`/`Services`); full-suite baseline
 > measured + A/B-verified (40 failures at slices-1–2 HEAD identical to
 > Phase-3 HEAD — zero regressions), IntSemantics fixture fix landed
 > (`14a26a43d0`), leaving **34 recorded pre-existing jmltk gaps**.
-> NEXT = **contract registry** (repo `contracts`/`operationContracts`/
-> `contractsByName`/`contractTargets` maps + `splitContract`/
-> `getOverridingTargets`/`getInheritedContracts`/`prepareContract`/
-> `contractCounters` → per-node derived cache + `JMLSpecFactory`, name keying
-> in the `Contract` layer; this also unblocks the `ProofRegistry` contract
-> lookups, which still delegate `splitContract`/`getOverridingTargets` to the
-> repository).
+> NEXT = **slice 7: initially clauses** — move `initiallyClauses`/
+> `addInitiallyClause(s)`/`createContractsFromInitiallyClauses` out of
+> `ContractRegistry` into the `JMLSpecFactory` load path (constructor-
+> postcondition derivation at load time, no registry); then `addSpecs`
+> collapse + `map(...)` removal, and finally delete `SpecificationRepository.java`.
 
 Rationale: with Phases 0–3 done, the *parsed* JML lives on the Java AST
 (`attachedJml` on declarations, `getContracts()` on statements, `JmlStatementSpec`
@@ -276,13 +275,13 @@ What the repository does today (`SpecificationRepository.java`, 1757 lines):
 
 | Responsibility | Where it lives now | Where it moves |
 |---|---|---|
-| Contract registry: `contracts`, `operationContracts`, `contractTargets`, `contractsByName`, `getContracts/getOperationContracts/getContractTargets/getAllContracts/getContractByName` | `Map<Pair<KJT,obs>, Set<Contract>>` + name index | Contracts stay attached to the JML AST / KeY AST nodes (`MethodDeclaration.getContracts()` etc.) and are *derived* on demand by `JMLSpecFactory`; a per-node derived-spec cache replaces the global maps. Name→contract resolution moves to the `Contract` naming/keying layer (name is constructed from target + id). |
-| Contract combination/split: `combineOperationContracts` (`cf.union` sorted), `splitContract` (`§`-joined names), `CONTRACT_COMBINATION_MARKER` | name-based maps | Pure computation on `ImmutableSet<FunctionalOperationContract>`; moves into `ContractFactory`/`Contract` (no repository state) — combination is already deterministic by sorting. |
-| Contract ids: `prepareContract`/`contractCounters` (`setID`) | per-type-name counter | Id assignment moves to `JMLSpecFactory`/`ContractFactory` at derivation time (KeY already needs deterministic ids for `.key` I/O and digests). |
-| Inheritance over overriding methods: `getOverridingMethods`, `getOverridingTargets`, `getCanonicalFormForKJT`, `getInheritedContracts` | method-name+param matching over `JavaInfo` | Pure `JavaInfo`-based resolution — moves to a helper next to `JMLSpecFactory`/`SLEnvInput` (or `JavaInfo` itself); no registry. |
+| Contract registry: `contracts`, `operationContracts`, `contractTargets`, `contractsByName`, `getContracts/getOperationContracts/getContractTargets/getAllContracts/getContractByName` | `Map<Pair<KJT,obs>, Set<Contract>>` + name index | ✅ DONE (slice 6, `005320b2ec`) — moved to new `de.uka.ilkd.key.speclang.ContractRegistry` owned by `Services` (created via `Profile.createContractRegistry`; `WdProfile` returns `ContractRegistryWD`; shared by `Services.copy`). The registry is the successor home until specs migrate to the AST-attached per-node derived cache. |
+| Contract combination/split: `combineOperationContracts` (`cf.union` sorted), `splitContract` (`§`-joined names), `CONTRACT_COMBINATION_MARKER` | name-based maps | ✅ DONE (slice 6, `005320b2ec`) — `combineOperationContracts`/`splitContract` moved to `ContractRegistry`; `CONTRACT_COMBINATION_MARKER` (`§`) to `ContractFactory` (public constant, refs in `BlockContractImpl`/`LoopContractImpl`/`FunctionalAuxiliaryContract`/`ProofRegistry` updated); combination stays deterministic by sorting. |
+| Contract ids: `prepareContract`/`contractCounters` (`setID`) | per-type-name counter | ✅ DONE (slice 6, `005320b2ec`) — still on `ContractRegistry` (`prepareContract` + per-method `contractCounters` keep ids `.0`-stable across type-load order); the final move to `JMLSpecFactory`/`ContractFactory` at derivation time is a later cleanup. |
+| Inheritance over overriding methods: `getOverridingMethods`, `getOverridingTargets`, `getCanonicalFormForKJT`, `getInheritedContracts` | method-name+param matching over `JavaInfo` | ✅ DONE (slice 6, `005320b2ec`) — moved to `ContractRegistry` (pure `JavaInfo`-based resolution; `ProofRegistry` and all callers rewired). |
 | Class invariants: `invs`, `getClassInvariants`, `addClassInvariant` (+ inherit to subtypes, `PartialInvAxiom` creation) | `Map<KJT, Set<ClassInvariant>>` | ✅ DONE (slice 5, `1b0f1f94ee`) — `invs` map + `getClassInvariants`/`addClassInvariant(s)` moved to `ClassAxiomComputer` (Services-owned; WD variant `ClassAxiomComputerWD` keeps registering `ClassWellDefinedness` checks). |
 | Class axioms: `axioms`, `addClassAxiom` (represents conjoining), `getClassAxioms` incl. synthesized invariant-definition axioms (`invDef`/`staticInvDef`/`freeInvDef`/`freeStaticInvDef`), `QueryAxiom`s, model-method axioms (`getModelMethodAxioms`, `ContractAxiom`), `getVisibleAxiomsOfOtherClasses`, enclosing-class recursion (`getEnclosingKJT`), `allClassAxiomsCache` | `Map<KJT, Set<ClassAxiom>>` + cache | ✅ DONE (slice 5, `1b0f1f94ee`) — moved to `de.uka.ilkd.key.speclang.ClassAxiomComputer` (per-`KeYJavaType` identity memo preserving the singleton requirement; operation-contract lookup is a documented temporary bridge to the still-alive repo). |
-| Initially clauses: `initiallyClauses`, `addInitiallyClause`, `createContractsFromInitiallyClauses` (postcondition on all constructors, + inheritance) | `Map<KJT, Set<InitiallyClause>>` | Derivation step in `JMLSpecFactory` (initially → constructor postconditions) run at load time from `attachedJml` — no repository. |
+| Initially clauses: `initiallyClauses`, `addInitiallyClause`, `createContractsFromInitiallyClauses` (postcondition on all constructors, + inheritance) | `Map<KJT, Set<InitiallyClause>>` | 🔜 slice 6 (`005320b2ec`) moved them into `ContractRegistry`; NEXT = slice 7 — derivation step into `JMLSpecFactory` (initially → constructor postconditions) at load time from `attachedJml`, then delete from the registry. |
 | Loop invariants: `loopInvs`, `getLoopSpec`, `addLoopInvariant`, `copyLoopInvariant` (`(loop,line)` keys) | `Map<(LoopStatement,line), LoopSpecification>` | ✅ DONE (slice 3, `ae716ed74a`) — attached to the `LoopStatement` node (`setLoopInvariant`); `copyLoopInvariant` is `LoopStatement.copyLoopInvariantTo`, carried by the AST rewrites. |
 | Block/loop/merge contracts: `blockContracts`, `loopContracts`, `loopContractsOnLoops`, `mergeContracts`, `get/add/remove{Block,Loop,Merge}Contract`, `getLoopContracts(LoopStatement, modality)` | `(block/loop,file,line)` keys | ✅ DONE (slice 3, `ae716ed74a`) — attached to `StatementBlock`/`LoopStatement`/`MergePointStatement` nodes; modality filtering is a pure helper (`AbstractAuxiliaryContractRule.get{Block,Loop}Contracts`). |
 | Proof↔PO registry: `proofs`, `registerProof`, `removeProof`, `getProofs(po/contract/kjt+target)`, `getPO(Contract)`, `getPOForProof`, `getProofOblInput`, `getContractPOForProof`, `getTargetOfProof` | `Map<PO, Set<Proof>>` | ✅ DONE (slice 4, `c81c034dd1`) — moved verbatim to a new `de.uka.ilkd.key.proof.mgt.ProofRegistry` owned by `Services` (shared by `Services.copy()` like `specRepos`, so side-proof envs and env-less loader paths keep the same registry); the contract-based lookups temporarily delegate `splitContract`/`getOverridingTargets` to the still-alive repository (they move with the contract registry). |
