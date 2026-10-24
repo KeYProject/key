@@ -125,8 +125,7 @@ public class KeYJavaType implements Type {
         if (javaType != null) {
             return javaType.getName();
         } else {
-            assert sort != null;
-            return sort.name().toString();
+            return Objects.requireNonNull(sort, "no sort for type").name().toString();
         }
     }
 
@@ -152,7 +151,7 @@ public class KeYJavaType implements Type {
     }
 
 
-    public PackageReference createPackagePrefix() {
+    public @Nullable PackageReference createPackagePrefix() {
         PackageReference ref = null;
         String rest = getFullName();
         if (rest.indexOf('.') > 0) {
