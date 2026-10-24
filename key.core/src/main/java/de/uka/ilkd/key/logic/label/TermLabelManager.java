@@ -1105,9 +1105,9 @@ public class TermLabelManager {
      * @return The updated application {@link JTerm}.
      */
     public static JTerm refactorTerm(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm) {
+            Object hint, @Nullable JTerm tacletTerm) {
         TermLabelManager manager = getTermLabelManager(services);
         if (manager != null) {
             return manager.refactorTerm(state, services, applicationPosInOccurrence,
@@ -1135,9 +1135,9 @@ public class TermLabelManager {
      * @return The updated application {@link JTerm}.
      */
     public JTerm refactorTerm(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Goal goal,
-            Object hint, Rule rule, JTerm tacletTerm) {
+            Object hint, Rule rule, @Nullable JTerm tacletTerm) {
         // Compute active refactorings
         RefactoringsContainer refactorings = computeRefactorings(state, services,
             applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
@@ -1171,8 +1171,8 @@ public class TermLabelManager {
      */
     public static void refactorGoal(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Rule rule,
-            Goal goal, Object hint,
-            JTerm tacletTerm) {
+            Goal goal, @Nullable Object hint,
+            @Nullable JTerm tacletTerm) {
         TermLabelManager manager = getTermLabelManager(services);
         if (manager != null) {
             JTerm applicationTerm =
@@ -1209,7 +1209,7 @@ public class TermLabelManager {
     public void refactorGoal(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             @Nullable JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm) {
+            @Nullable Object hint, @Nullable JTerm tacletTerm) {
         // Compute active refactorings
         RefactoringsContainer refactorings = computeRefactorings(state, services,
             applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
@@ -1348,7 +1348,7 @@ public class TermLabelManager {
             Services services,
             PosInOccurrence applicationPosInOccurrence,
             @Nullable JTerm applicationTerm,
-            Rule rule, Goal goal, Object hint, JTerm tacletTerm) {
+            Rule rule, Goal goal, @Nullable Object hint, @Nullable JTerm tacletTerm) {
         do {
             if (pio.isTopLevel()) {
                 pio = null;
@@ -1398,9 +1398,9 @@ public class TermLabelManager {
      */
     private void determineAndCollectRuleSpecificRefactorings(TermLabelState state,
             Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             @Nullable JTerm applicationTerm,
-            Rule rule, Goal goal, Object hint, JTerm tacletTerm,
+            Rule rule, Goal goal, @Nullable Object hint, @Nullable JTerm tacletTerm,
             RefactoringsContainer refactorings) {
         if (rule != null) {
             ImmutableList<TermLabelRefactoring> ruleRefactorings =
@@ -1447,9 +1447,9 @@ public class TermLabelManager {
      */
     private void determineAndRuleIndependentRefactorings(TermLabelState state,
             Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             @Nullable JTerm applicationTerm,
-            Rule rule, Goal goal, Object hint, JTerm tacletTerm,
+            Rule rule, Goal goal, @Nullable Object hint, @Nullable JTerm tacletTerm,
             RefactoringsContainer refactorings) {
         for (TermLabelRefactoring refactoring : allRulesRefactorings) {
             RefactoringScope scope = refactoring.defineRefactoringScope(state, services,
@@ -1488,9 +1488,9 @@ public class TermLabelManager {
      * @return The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s to consider.
      */
     protected RefactoringsContainer computeRefactorings(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             @Nullable JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm) {
+            @Nullable Object hint, @Nullable JTerm tacletTerm) {
         final RefactoringsContainer refactorings = new RefactoringsContainer();
         determineAndCollectRuleSpecificRefactorings(state, services, applicationPosInOccurrence,
             applicationTerm, rule, goal, hint, tacletTerm, refactorings);
@@ -1565,9 +1565,10 @@ public class TermLabelManager {
      * @return The new application {@link JTerm} or {@code null} if no refactoring was performed.
      */
     private JTerm refactorChildTerms(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, RefactoringsContainer refactorings, TermFactory tf) {
+            @Nullable Object hint, @Nullable JTerm tacletTerm,
+            RefactoringsContainer refactorings, TermFactory tf) {
         JTerm newApplicationTerm = applicationTerm;
         if (!refactorings.directChildRefactorings().isEmpty()) {
             boolean changed = false;
@@ -1617,9 +1618,10 @@ public class TermLabelManager {
      * @return The new application {@link JTerm} or {@code null} if no refactoring was performed.
      */
     private JTerm refactorBelowUpdates(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, RefactoringsContainer refactorings, TermFactory tf,
+            @Nullable Object hint, @Nullable JTerm tacletTerm,
+            RefactoringsContainer refactorings, TermFactory tf,
             JTerm newApplicationTerm) {
         if (!refactorings.belowUpdatesRefactorings().isEmpty()) {
             Pair<ImmutableList<JTerm>, JTerm> pair =
@@ -1660,9 +1662,10 @@ public class TermLabelManager {
      * @return The new application {@link JTerm} or {@code null} if no refactoring was performed.
      */
     private JTerm refactorChildrenRecursively(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, RefactoringsContainer refactorings, TermFactory tf,
+            @Nullable Object hint, @Nullable JTerm tacletTerm,
+            RefactoringsContainer refactorings, TermFactory tf,
             JTerm newApplicationTerm) {
         final Set<TermLabelRefactoring> allChildAndGrandchildRefactorings =
             refactorings.getAllApplicationChildAndGrandchildRefactorings();
@@ -1707,9 +1710,10 @@ public class TermLabelManager {
      * @return The new application {@link JTerm} or {@code null} if no refactoring was performed.
      */
     protected @Nullable JTerm refactorApplicationTerm(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             @Nullable JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, RefactoringsContainer refactorings, TermFactory tf) {
+            @Nullable Object hint, @Nullable JTerm tacletTerm,
+            RefactoringsContainer refactorings, TermFactory tf) {
         if (applicationTerm != null && (!refactorings.directChildRefactorings().isEmpty()
                 || !refactorings.childAndGrandchildRefactorings().isEmpty()
                 || !refactorings.belowUpdatesRefactorings().isEmpty())) {
@@ -1753,7 +1757,8 @@ public class TermLabelManager {
     protected void refactorSemisequent(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             @Nullable JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, Semisequent semisequent, boolean inAntec,
+            @Nullable Object hint, @Nullable JTerm tacletTerm, Semisequent semisequent,
+            boolean inAntec,
             Set<TermLabelRefactoring> activeRefactorings) {
         if (!activeRefactorings.isEmpty()) {
             for (SequentFormula sfa : semisequent) {
@@ -1789,9 +1794,9 @@ public class TermLabelManager {
      * @return The refactored {@link JTerm} in which the {@link TermLabel}s may have changed.
      */
     protected JTerm refactorLabelsRecursive(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             @Nullable JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm term,
+            @Nullable Object hint, @Nullable JTerm tacletTerm, JTerm term,
             Set<TermLabelRefactoring> activeRefactorings) {
         boolean subsChanged = false;
         JTerm[] newSubs = new JTerm[term.arity()];
@@ -1831,9 +1836,9 @@ public class TermLabelManager {
      * @return The new {@link TermLabel} which should be used for the given {@link JTerm}.
      */
     protected ImmutableArray<TermLabel> performRefactoring(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             @Nullable JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm term,
+            @Nullable Object hint, @Nullable JTerm tacletTerm, JTerm term,
             Set<TermLabelRefactoring> activeRefactorings) {
         // Create list with all old labels
         LabelCollection newLabels = new LabelCollection(term.getLabels());

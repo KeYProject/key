@@ -305,7 +305,7 @@ public class JP2KeYTypeConverter {
                         .ifPresent(services.getJavaService().getConverter(null)::process);
             }
         }
-        return __objectType;
+        return Objects.requireNonNull(__objectType, "java.lang.Object type not initialized");
     }
 
     public KeYJavaType addReferenceType(ResolvedReferenceType type) {
@@ -403,7 +403,8 @@ public class JP2KeYTypeConverter {
         var sat = getSuperArrayType();
         final SuperArrayDeclaration superArray = (SuperArrayDeclaration) Objects
                 .requireNonNull(sat.getJavaType(), "Java type of super array");
-        final FieldDeclaration length = superArray.length();
+        final FieldDeclaration length =
+            Objects.requireNonNull(superArray.length(), "length attribute of the super array");
         final TypeReference baseTypeRef;
 
         if (baseType.getJavaType() != null) {

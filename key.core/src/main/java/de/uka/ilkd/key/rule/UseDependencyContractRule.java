@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -19,6 +20,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.proof.rules.ComplexJustificationable;
@@ -108,7 +110,8 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
 
 
     private boolean hasRawSteps(JTerm heapTerm, Sequent seq, Services services) {
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "heap LDT");
         final Operator op = heapTerm.op();
         assert heapTerm.sort().equals(heapLDT.targetSort());
         if (op == heapLDT.getStore() || op == heapLDT.getCreate() || op == heapLDT.getAnon()
@@ -130,7 +133,8 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
 
     private static void getRawSteps(JTerm heapTerm, Sequent seq, Services services,
             List<JTerm> result) {
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "heap LDT");
         final Operator op = heapTerm.op();
         assert heapTerm.sort().equals(heapLDT.targetSort());
         if (op == heapLDT.getStore() || op == heapLDT.getCreate() || op == heapLDT.getAnon()
@@ -150,7 +154,8 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
     private static @Nullable PosInOccurrence getFreshLocsStep(
             PosInOccurrence heapPos, Sequent seq,
             Services services) {
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "heap LDT");
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         final var heapTerm = heapPos.subTerm();
         final var op = heapTerm.op();
@@ -180,7 +185,8 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
     private static @Nullable Pair<JTerm, ImmutableList<PosInOccurrence>> getChangedLocsForStep(
             JTerm heapTerm,
             JTerm stepHeap, Sequent seq, Services services) {
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "heap LDT");
         final Operator op = heapTerm.op();
         assert heapTerm.sort().equals(heapLDT.targetSort());
         final TermBuilder TB = services.getTermBuilder();
@@ -193,7 +199,8 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
             final JTerm f = heapTerm.sub(2);
             final JTerm locs = TB.singleton(o, f);
             final Pair<JTerm, ImmutableList<PosInOccurrence>> furtherLocs =
-                getChangedLocsForStep(h, stepHeap, seq, services);
+                Objects.requireNonNull(getChangedLocsForStep(h, stepHeap, seq, services),
+                    "no further changed locations");
             return new Pair<>(TB.union(locs, furtherLocs.first),
                 furtherLocs.second);
         } else if (op == heapLDT.getCreate()) {
@@ -205,7 +212,8 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
             final JTerm h = heapTerm.sub(0);
             final JTerm s = heapTerm.sub(1);
             final Pair<JTerm, ImmutableList<PosInOccurrence>> furtherLocs =
-                getChangedLocsForStep(h, stepHeap, seq, services);
+                Objects.requireNonNull(getChangedLocsForStep(h, stepHeap, seq, services),
+                    "no further changed locations");
             return new Pair<>(TB.union(s, furtherLocs.first),
                 furtherLocs.second);
         } else if (op.arity() == 0) {
@@ -375,7 +383,9 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
         for (RuleApp app : goal.appliedRuleApps()) {
             if (app.rule() instanceof UseDependencyContractRule
                     && RENAMING_TERM_PROPERTY.equalsModThisProperty(
-                        app.posInOccurrence().subTerm(), focus)) {
+                        Objects.requireNonNull(app.posInOccurrence(), "no position in occurrence")
+                                .subTerm(),
+                        focus)) {
                 final IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
                 for (PosInOccurrence ifInst : bapp.assumesInsts()) {
                     steps.remove(ifInst);
@@ -406,7 +416,7 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
     // -------------------------------------------------------------------------
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, @Nullable PosInOccurrence pio) {
         if (pio == null) {
             return false;
         }
@@ -442,9 +452,11 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
             return false;
         }
         // there must be contracts for the observer
-        final KeYJavaType kjt = target.isStatic() ? target.getContainerType()
-                : services.getJavaInfo().getKeYJavaType(
-                    focus.sub(target.getHeapCount(services) * target.getStateCount()).sort());
+        final KeYJavaType kjt = Objects.requireNonNull(
+            target.isStatic() ? target.getContainerType()
+                    : services.getJavaInfo().getKeYJavaType(
+                        focus.sub(target.getHeapCount(services) * target.getStateCount()).sort()),
+            "could not determine receiver type for " + focus);
         assert kjt != null : "could not determine receiver type for " + focus;
         if (kjt.getSort() instanceof NullSort) {
             return false;
@@ -456,7 +468,8 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
 
         // applying a contract here must not create circular dependencies
         // between proofs
-        return goal.proof().mgt().isContractApplicable(contracts.iterator().next());
+        return Objects.requireNonNull(goal.proof().mgt(), "no proof correctness manager")
+                .isContractApplicable(contracts.iterator().next());
     }
 
     @Override
@@ -464,7 +477,8 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
         final var services = goal.getOverlayServices();
         // collect information
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        final PosInOccurrence pio = ruleApp.posInOccurrence();
+        final PosInOccurrence pio =
+            Objects.requireNonNull(ruleApp.posInOccurrence(), "no position in occurrence");
         final JTerm focus = (JTerm) pio.subTerm();
         final IObserverFunction target = (IObserverFunction) focus.op();
         final List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
@@ -495,8 +509,7 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
 
         final boolean twoState = target.getStateCount() == 2;
         final int obsHeapCount = target.getHeapCount(services);
-        Map<LocationVariable, JTerm> atPres =
-            twoState ? new LinkedHashMap<>() : null;
+        final Map<LocationVariable, JTerm> atPres = new LinkedHashMap<>();
         Map<LocationVariable, JTerm> heapTerms = new LinkedHashMap<>();
         int i = 0;
         for (LocationVariable heap : heaps) {
@@ -515,7 +528,9 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
 
         assert !step.subTerm().equals(focus);
 
-        JTerm freePre = !target.isStatic() ? TB.not(TB.equals(selfTerm, TB.NULL())) : null;
+        JTerm freePre = !target.isStatic()
+                ? TB.not(TB.equals(Objects.requireNonNull(selfTerm, "no self term"), TB.NULL()))
+                : null;
         JTerm disjoint = null;
         JTerm pre = null;
         final JTerm[] subs = focus.subs().toArray(new JTerm[focus.arity()]);
@@ -533,14 +548,17 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
                 // get changed locs and used equalities
                 final JTerm subStep = (JTerm) step.subTerm().sub(heapExprIndex);
                 final Pair<JTerm, ImmutableList<PosInOccurrence>> changedLocs =
-                    getChangedLocsForStep(focus.sub(heapExprIndex), subStep, goal.sequent(),
-                        services);
+                    Objects.requireNonNull(
+                        getChangedLocsForStep(focus.sub(heapExprIndex), subStep, goal.sequent(),
+                            services),
+                        "no changed locations for step");
 
                 assert changedLocs != null;
                 // store insts
                 ifInsts = ifInsts.append(changedLocs.second.prepend(step));
                 if (!target.isStatic()) {
-                    final JTerm cr = TB.created(subStep, selfTerm);
+                    final JTerm cr = TB.created(subStep,
+                        Objects.requireNonNull(selfTerm, "no self term"));
                     if (freePre == null) {
                         freePre = cr;
                     } else {
@@ -558,7 +576,8 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
                 for (JTerm paramTerm : paramTerms) {
                     assert freePre != null;
                     freePre = TB.and(freePre,
-                        TB.reachableValue(subStep, paramTerm, target.getParamType(i++)));
+                        TB.reachableValue(subStep, paramTerm,
+                            Objects.requireNonNull(target.getParamType(i++), "no parameter type")));
                 }
                 final JTerm dep =
                     contract.getDep(heap, atPre, subStep, selfTerm, paramTerms, atPres, services);
@@ -600,8 +619,11 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
 
         // create justification
         final RuleJustificationBySpec just = new RuleJustificationBySpec(contract);
-        final ComplexRuleJustificationBySpec cjust = (ComplexRuleJustificationBySpec) goal.proof()
-                .getInitConfig().getJustifInfo().getJustification(this);
+        final InitConfig initConfig =
+            Objects.requireNonNull(goal.proof().getInitConfig(), "no initial configuration");
+        final ComplexRuleJustificationBySpec cjust = (ComplexRuleJustificationBySpec) Objects
+                .requireNonNull(initConfig.getJustifInfo().getJustification(this),
+                    "no complex rule justification");
         cjust.add(ruleApp, just);
 
         if (!useful) {
@@ -620,7 +642,10 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
         } else {
             mbyOk = TB.tt();
         }
-        final JTerm cutFormula = TB.and(freePre, pre, disjoint, mbyOk);
+        final JTerm cutFormula =
+            TB.and(Objects.requireNonNull(freePre, "no free precondition"),
+                Objects.requireNonNull(pre, "no precondition"),
+                Objects.requireNonNull(disjoint, "no disjointness term"), mbyOk);
 
 
         // create "Post" branch
@@ -655,8 +680,9 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
     }
 
     @Override
-    public UseDependencyContractApp createApp(PosInOccurrence pos, TermServices services) {
-        return new UseDependencyContractApp(this, pos);
+    public UseDependencyContractApp createApp(@Nullable PosInOccurrence pos,
+            @Nullable TermServices services) {
+        return new UseDependencyContractApp(this, Objects.requireNonNull(pos, "no position"));
     }
 
     /**
