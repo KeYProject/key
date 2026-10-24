@@ -169,6 +169,27 @@ public interface ImmutableList<T extends @Nullable Object>
         return new ImmutableListArray<>(es.clone());
     }
 
+    /// Return an immutable list with the iterated elements.
+    ///
+    /// In contrast to [#of(T...)] the result is always backed by the fixed-size array
+    /// implementation `ImmutableListArray` (or `NIL` for an empty sequence). The HotSpot JIT
+    /// cannot inline calls on fields whose possible runtime types are `NIL`, a cons cell and an
+    /// `ImmutableListArray`; restricting the construction of hot paths (e.g. term subterm lists,
+    /// operator argument sorts, Java AST children lists) to this factory leaves only two
+    /// variants and allows inlining.
+    ///
+    /// @param es the elements to put into the list
+    /// @param <T> the entry type of the list.
+    /// @return (e1, e2, e3, ...) as immutable list
+    static <T extends @Nullable Object> ImmutableList<T> ofFixedSize(T... es) {
+        if (es.length == 0) {
+            return nil();
+        }
+        // we need to make a copy here since es can be an array that can be modified from the
+        // outside, see ImmutableListArrayTest#immutability3
+        return new ImmutableListArray<>(es.clone());
+    }
+
     /// the empty list
     static <T extends @Nullable Object> ImmutableList<T> nil() {
         return (ImmutableSLList<T>) ImmutableSLList.NIL.NIL;
