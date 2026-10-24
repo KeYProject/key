@@ -23,7 +23,6 @@ import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -88,7 +87,7 @@ class GenericTranslator {
     private JTerm instantiateGeneric(JTerm term, GenericSort generic, Sort instantiation, Taclet t)
             throws IllegalArgumentException, IllegalTacletException {
         JTerm[] subTerms = new JTerm[term.arity()];
-        ImmutableArray<QuantifiableVariable> variables = term.boundVars();
+        ImmutableList<QuantifiableVariable> variables = term.boundVars();
         for (int i = 0; i < term.arity(); i++) {
             subTerms[i] = instantiateGeneric(term.sub(i), generic, instantiation, t);
 
