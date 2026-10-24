@@ -652,8 +652,8 @@ public abstract class AbstractProblemLoader {
             problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
 
         for (Proof p : proofList.getProofs()) {
-            // register proof
-            initConfig.getServices().getSpecificationRepository()
+            // register proof (in the shared proof registry of the init-config services)
+            initConfig.getServices().getProofRegistry()
                     .registerProof(poContainer.getProofOblInput(), p);
             initConfig.getFileRepo().registerProof(p);
         }

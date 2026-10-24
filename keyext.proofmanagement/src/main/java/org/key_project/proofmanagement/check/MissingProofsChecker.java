@@ -75,8 +75,7 @@ public class MissingProofsChecker implements Checker {
         // compare: Is there a proof for every contract?
         for (CheckerData.ProofEntry entry : data.getProofEntries()) {
             Proof p = entry.proof;
-            SpecificationRepository sr = p.getServices().getSpecificationRepository();
-            ContractPO cpo = sr.getPOForProof(p);
+            ContractPO cpo = p.getServices().getProofRegistry().getPOForProof(p);
             Contract foundContract = cpo.getContract();
 
             if (foundContract == null) {

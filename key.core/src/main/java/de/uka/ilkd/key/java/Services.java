@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+import de.uka.ilkd.key.proof.mgt.ProofRegistry;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -82,6 +83,13 @@ public class Services implements TermServices, LogicServices, ProofServices {
      */
     private SpecificationRepository specRepos;
 
+    /**
+     * the proof↔proof-obligation registry. Owned here (not by the specification repository) since
+     * proof-lifecycle bookkeeping is orthogonal to JML; see {@link ProofRegistry}. Shared by
+     * {@link #copy(boolean)} copies like the specification repository.
+     */
+    private ProofRegistry proofRegistry;
+
     /*
      * the Java model (with all paths)
      */
@@ -138,6 +146,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
         this.specRepos = profile.createSpecificationRepository(this);
+        this.proofRegistry = new ProofRegistry(this);
         this.cee = new ConstantExpressionEvaluator();
         typeconverter = new TypeConverter(this);
         if (javaService == null) {
@@ -158,6 +167,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
         this.javaInfo = s.javaInfo;
         this.counters = s.counters;
         this.specRepos = s.specRepos;
+        this.proofRegistry = s.proofRegistry;
         this.javaModel = s.javaModel;
         // Share the (per-thread) recorder with the source: an overlay (see getOverlay) is the
         // services the rule executor works through, and fresh-name proposals set on the base
@@ -243,6 +253,16 @@ public class Services implements TermServices, LogicServices, ProofServices {
         return specRepos;
     }
 
+    /**
+     * Returns the proof↔proof-obligation registry of this {@link Services} instance (shared by
+     * copies of this instance, like the specification repository).
+     *
+     * @return the proof registry.
+     */
+    public ProofRegistry getProofRegistry() {
+        return proofRegistry;
+    }
+
 
     /**
      * Returns the VariableNamer associated with this Services object.
@@ -279,6 +299,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
         Services s = new Services(profile, javaService, copyCounters(), newCaches);
         s.specRepos = specRepos;
+        s.proofRegistry = proofRegistry;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
         // Detach this instance's recorder from earlier overlays/aliases, keeping the calling

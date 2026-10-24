@@ -25,7 +25,6 @@ import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.Contract;
@@ -193,14 +192,14 @@ public final class KeYFacade {
         ProofAggregate proofList = pi.startProver(initConfig, poContainer.getProofOblInput());
         for (Proof p : proofList.getProofs()) {
             // register proof
-            initConfig.getServices().getSpecificationRepository()
+            initConfig.getServices().getProofRegistry()
                     .registerProof(poContainer.getProofOblInput(), p);
             initConfig.getFileRepo().registerProof(p);
         }
 
         Proof proof = proofList.getFirstProof();
-        SpecificationRepository specRepo = initConfig.getServices().getSpecificationRepository();
-        ContractPO contractPO = specRepo.getContractPOForProof(proof);
+        ContractPO contractPO =
+            initConfig.getServices().getProofRegistry().getContractPOForProof(proof);
         if (contractPO == null) {
             // happens for taclet proofs (they have no contract)
             // TODO: currently we ignore taclet proofs

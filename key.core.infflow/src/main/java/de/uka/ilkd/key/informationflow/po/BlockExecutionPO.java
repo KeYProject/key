@@ -92,8 +92,8 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
         final Proof initiatingProof = initiatingGoal.proof();
         if (initiatingProof != null) {
             // proof is not loaded
-            final AbstractOperationPO initiatingPO =
-                (AbstractOperationPO) specRepos.getProofOblInput(initiatingProof);
+            final AbstractOperationPO initiatingPO = (AbstractOperationPO) initiatingProof
+                    .getServices().getProofRegistry().getProofOblInput(initiatingProof);
             taclets = initiatingPO.getInitialTaclets();
         }
     }
@@ -228,7 +228,7 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
         Proof initiatingProof = getInitiatingGoal().proof();
         Services initiatingServices = initiatingProof.getServices();
         ProofOblInput initiatingPO =
-            initiatingServices.getSpecificationRepository().getProofOblInput(initiatingProof);
+            initiatingServices.getProofRegistry().getProofOblInput(initiatingProof);
         assert initiatingPO instanceof AbstractInfFlowPO : "Information flow auxiliary "
             + "proof started from within non-information flow proof!?!";
         return (AbstractInfFlowPO) initiatingPO;

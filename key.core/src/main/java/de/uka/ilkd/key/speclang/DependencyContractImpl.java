@@ -487,7 +487,7 @@ public final class DependencyContractImpl implements DependencyContract {
 
     @Override
     public ProofOblInput getProofObl(Services services) {
-        return services.getSpecificationRepository().getPO(this);
+        return services.getProofRegistry().getPO(this);
     }
 
 
