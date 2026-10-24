@@ -5,6 +5,8 @@
 package de.uka.ilkd.key.logic.op;
 
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -24,28 +26,37 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
     public LocationVariable(ProgramElementName name, KeYJavaType t,
             @Nullable KeYJavaType containingType,
             boolean isStatic, boolean isModel, boolean isGhost, boolean isFinal) {
-        super(name, t.getSort(), t, containingType, isStatic, isModel, isGhost, isFinal);
+        super(name, Objects.requireNonNull(t.getSort(), "no sort for type " + t), t, containingType,
+            isStatic, isModel,
+            isGhost, isFinal);
     }
 
     public LocationVariable(ProgramElementName name, KeYJavaType t,
             @Nullable KeYJavaType containingType,
             boolean isStatic, boolean isModel) {
-        super(name, t.getSort(), t, containingType, isStatic, isModel, false);
+        super(name, Objects.requireNonNull(t.getSort(), "no sort for type " + t), t, containingType,
+            isStatic, isModel,
+            false);
     }
 
 
     public LocationVariable(ProgramElementName name, KeYJavaType t) {
-        super(name, t.getSort(), t, null, false, false, false);
+        super(name, Objects.requireNonNull(t.getSort(), "no sort for type " + t), t, null, false,
+            false, false);
     }
 
 
     public LocationVariable(ProgramElementName name, KeYJavaType t, boolean isFinal) {
-        super(name, t.getSort(), t, null, false, false, false, isFinal);
+        super(name, Objects.requireNonNull(t.getSort(), "no sort for type " + t), t, null, false,
+            false, false,
+            isFinal);
     }
 
     public LocationVariable(ProgramElementName name, KeYJavaType t, boolean isGhost,
             boolean isFinal) {
-        super(name, t.getSort(), t, null, false, false, isGhost, isFinal);
+        super(name, Objects.requireNonNull(t.getSort(), "no sort for type " + t), t, null, false,
+            false, isGhost,
+            isFinal);
     }
 
 
@@ -68,7 +79,9 @@ public final class LocationVariable extends ProgramVariable implements Updateabl
      */
     public static LocationVariable fromProgramVariable(ProgramVariable variable,
             ProgramElementName name) {
-        return new LocationVariable(name, variable.getKeYJavaType(), variable.getContainerType(),
-            variable.isStatic(), variable.isModel(), variable.isGhost(), variable.isFinal());
+        return new LocationVariable(name,
+            Objects.requireNonNull(variable.getKeYJavaType(), "type of " + variable),
+            variable.getContainerType(), variable.isStatic(), variable.isModel(),
+            variable.isGhost(), variable.isFinal());
     }
 }
