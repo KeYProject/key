@@ -17,12 +17,15 @@ import de.uka.ilkd.key.ldt.DoubleLDT;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Double literal.
  *
  * @author <TT>AutoDoc</TT>
  */
 
+@NullMarked
 public non-sealed class DoubleLiteral extends Literal {
 
     /**

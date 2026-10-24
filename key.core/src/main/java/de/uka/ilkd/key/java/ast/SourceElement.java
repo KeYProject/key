@@ -11,12 +11,15 @@ import org.key_project.logic.Property;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.parsing.Position;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A source element is a piece of syntax. It does not necessarily have a semantics, at least none
  * that is machinable, for instance a Comment. taken from RECODER and changed
  * to achieve an immutable structure
  */
 
+@NullMarked
 public interface SourceElement extends SyntaxElement, EqualsModProperty<SourceElement> {
 
 

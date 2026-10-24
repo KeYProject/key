@@ -16,10 +16,14 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Label jump statement.
  */
 
+@NullMarked
 public abstract class LabelJumpStatement extends JumpStatement implements NameReference {
 
     /**
@@ -71,7 +75,7 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      *
      * @return the string.
      */
-    public final String getName() {
+    public final @Nullable String getName() {
         return (name == null) ? null : name.toString();
     }
 
@@ -91,7 +95,7 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      *
      * @return the identifier.
      */
-    public ProgramElementName getProgramElementName() {
+    public @Nullable ProgramElementName getProgramElementName() {
         if ((name instanceof ProgramElementName) || (name == null)) {
             return (ProgramElementName) name;
         }

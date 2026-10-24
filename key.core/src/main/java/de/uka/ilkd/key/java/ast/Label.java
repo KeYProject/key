@@ -8,6 +8,9 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.parsing.Position;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public interface Label extends TerminalProgramElement {
 
     Comment[] getComments();

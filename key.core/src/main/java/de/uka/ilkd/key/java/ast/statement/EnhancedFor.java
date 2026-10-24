@@ -15,7 +15,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * The new enhanced form of a for-loop.
@@ -27,6 +27,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author mulbrich
  */
+@NullMarked
 public class EnhancedFor extends LoopStatement implements VariableScope {
     private EnhancedFor(PositionInfo pi, List<Comment> comments, ILoopInit inits,
             IForUpdates updates, IGuard guard, Statement body) {
@@ -59,7 +60,7 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      * @param info
      *        position
      */
-    public EnhancedFor(@NonNull LoopInit init, @NonNull Guard guard, @NonNull Statement statement,
+    public EnhancedFor(LoopInit init, Guard guard, Statement statement,
             ExtList comments, PositionInfo info) {
         this(info, null, init, null, guard, statement);
     }
@@ -80,7 +81,6 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      * @see JavaSourceElement#getLastElement()
      */
     @Override
-    @NonNull
     public SourceElement getLastElement() {
         return (body != null) ? body.getLastElement() : this;
     }

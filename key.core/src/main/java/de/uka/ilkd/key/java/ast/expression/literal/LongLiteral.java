@@ -29,8 +29,10 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class LongLiteral extends AbstractIntegerLiteral {
 
     // constants for range check at String to long conversion

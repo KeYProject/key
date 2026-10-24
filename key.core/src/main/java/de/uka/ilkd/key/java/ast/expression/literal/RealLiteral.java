@@ -16,6 +16,8 @@ import de.uka.ilkd.key.ldt.RealLDT;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * JML {@code \real} literal.
  * <p>
@@ -27,6 +29,7 @@ import org.key_project.util.ExtList;
  *
  * @author bruns
  */
+@NullMarked
 public non-sealed class RealLiteral extends Literal {
 
     private final BigInteger unscaledValue;

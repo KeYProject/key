@@ -16,8 +16,10 @@ import de.uka.ilkd.key.ldt.MapLDT;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public non-sealed class EmptyMapLiteral extends Literal {
     public static final EmptyMapLiteral INSTANCE = new EmptyMapLiteral(null, null);
 

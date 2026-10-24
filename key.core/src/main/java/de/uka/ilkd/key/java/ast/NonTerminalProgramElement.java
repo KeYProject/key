@@ -8,10 +8,13 @@ import java.util.stream.Stream;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Non terminal program element. taken from COMPOST and changed to achieve an immutable structure
  */
 
+@NullMarked
 public interface NonTerminalProgramElement extends ProgramElement {
 
     /**

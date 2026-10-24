@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * An ArrayInitializer is a valid expression exclusively for initializing ArrayTypes. Any other
@@ -23,6 +24,7 @@ import org.key_project.util.collection.ImmutableArray;
  * seem adequate. The parent expression is either another ArrayInitializer (nested blocks) or a
  * VariableDeclaration.
  */
+@NullMarked
 public class ArrayInitializer extends JavaNonTerminalProgramElement
         implements Expression, ExpressionContainer {
 

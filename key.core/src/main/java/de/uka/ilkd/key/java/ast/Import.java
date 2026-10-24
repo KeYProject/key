@@ -11,10 +11,14 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Import.
  *
  */
+@NullMarked
 public class Import extends JavaNonTerminalProgramElement
         implements TypeReferenceContainer, PackageReferenceContainer {
 
@@ -157,7 +161,7 @@ public class Import extends JavaNonTerminalProgramElement
      * @return the reference of this import statement.
      */
 
-    public TypeReference getTypeReference() {
+    public @Nullable TypeReference getTypeReference() {
         return (reference instanceof TypeReference) ? (TypeReference) reference : null;
     }
 
@@ -167,7 +171,7 @@ public class Import extends JavaNonTerminalProgramElement
      * @return the reference of this import statement.
      */
 
-    public PackageReference getPackageReference() {
+    public @Nullable PackageReference getPackageReference() {
         return (reference instanceof PackageReference) ? (PackageReference) reference : null;
     }
 

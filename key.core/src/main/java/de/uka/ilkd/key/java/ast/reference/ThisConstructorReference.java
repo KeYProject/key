@@ -14,10 +14,13 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This constructor reference.
  */
+@NullMarked
 public class ThisConstructorReference extends SpecialConstructorReference {
 
     /**
@@ -87,7 +90,7 @@ public class ThisConstructorReference extends SpecialConstructorReference {
 
 
     @Override
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return null;
     }
 }

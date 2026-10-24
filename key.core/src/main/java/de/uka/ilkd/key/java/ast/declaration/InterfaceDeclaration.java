@@ -31,17 +31,18 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Interface declaration.
  */
+@NullMarked
 public class InterfaceDeclaration extends TypeDeclaration {
     protected final Extends extending;
 
 
     public InterfaceDeclaration(PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<Modifier> modArray, ProgramElementName name,
+            ImmutableArray<Modifier> modArray, ProgramElementName name,
             ProgramElementName fullName, ImmutableArray<MemberDeclaration> members,
             boolean parentIsInterfaceDeclaration, boolean isLibrary, Extends extending,
             List<TextualJMLConstruct> spec) {

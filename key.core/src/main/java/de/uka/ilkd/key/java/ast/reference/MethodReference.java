@@ -24,11 +24,15 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Method reference.
  *
  * @author <TT>AutoDoc</TT>
  */
+@NullMarked
 public class MethodReference extends JavaNonTerminalProgramElement
         implements MethodOrConstructorReference, ReferenceSuffix,
         ExpressionStatement, TypeReferenceContainer, NameReference {
@@ -242,7 +246,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
      *
      * @return the string.
      */
-    public final String getName() {
+    public final @Nullable String getName() {
         return (name == null) ? null : name.toString();
     }
 
@@ -251,7 +255,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
      *
      * @return the identifier.
      */
-    public ProgramElementName getProgramElementName() {
+    public @Nullable ProgramElementName getProgramElementName() {
         if (name instanceof ProgramElementName peName) {
             return peName;
         } else if (name instanceof ProgramSV sv) {
@@ -385,7 +389,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
         return getKeYJavaType();
     }
 
-    public KeYJavaType getKeYJavaType() {
+    public @Nullable KeYJavaType getKeYJavaType() {
         Debug.fail("");
         return null;
     }

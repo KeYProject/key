@@ -15,10 +15,13 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Null literal. Is used as singleton.
  */
 
+@NullMarked
 public final class NullLiteral extends Literal implements ReferencePrefix {
 
     public static final NullLiteral NULL = new NullLiteral();

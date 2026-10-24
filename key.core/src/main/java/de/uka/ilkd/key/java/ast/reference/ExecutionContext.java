@@ -25,6 +25,9 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ExecutionContext
         extends JavaNonTerminalProgramElement
         implements IExecutionContext, Reference {

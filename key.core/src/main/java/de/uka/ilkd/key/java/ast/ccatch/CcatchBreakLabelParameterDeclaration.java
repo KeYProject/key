@@ -14,11 +14,14 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A "\Break label" parameter declaration of a ccatch clause.
  *
  * @author Dominic Steinhöfel
  */
+@NullMarked
 public class CcatchBreakLabelParameterDeclaration extends CcatchNonstandardParameterDeclaration {
 
     private final Label label;

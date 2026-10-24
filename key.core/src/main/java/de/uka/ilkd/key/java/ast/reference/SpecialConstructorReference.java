@@ -12,11 +12,14 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Occurs in a constructor declaration as the first statement as this(...) or super(...) reference.
  * The Reference knows the constructor declaration it refers to.
  */
 
+@NullMarked
 public abstract class SpecialConstructorReference extends JavaNonTerminalProgramElement
         implements ConstructorReference {
 

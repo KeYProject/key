@@ -10,7 +10,9 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class Assert extends JavaStatement implements ExpressionContainer {
 
     private final Expression condition;

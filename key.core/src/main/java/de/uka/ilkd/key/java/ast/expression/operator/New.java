@@ -21,6 +21,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The object allocation operator. There are two variants for New:
  * <OL>
@@ -36,6 +38,7 @@ import org.key_project.util.collection.ImmutableArray;
  * from an outer instance.
  */
 
+@NullMarked
 public class New extends TypeOperator implements ConstructorReference, ExpressionStatement,
         ReferenceSuffix, TypeDeclarationContainer {
 

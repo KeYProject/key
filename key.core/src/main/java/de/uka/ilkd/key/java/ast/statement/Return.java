@@ -13,11 +13,14 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Return.
  *
  */
 
+@NullMarked
 public class Return extends ExpressionJumpStatement {
 
 

@@ -15,6 +15,9 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * TypeReferences reference Types by name. A TypeReference can refer to
  * an outer or inner type and hence can also be a {@link MemberReference}, but does not have to. A
@@ -23,6 +26,7 @@ import org.key_project.util.collection.ImmutableList;
  * {@link TypeReferenceContainer}.
  */
 
+@NullMarked
 public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
         implements TypeReference {
 
@@ -202,7 +206,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      *
      * @return the package reference.
      */
-    public PackageReference getPackageReference() {
+    public @Nullable PackageReference getPackageReference() {
         return (prefix instanceof PackageReference) ? (PackageReference) prefix : null;
     }
 
@@ -220,7 +224,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      *
      * @return the string.
      */
-    public final String getName() {
+    public final @Nullable String getName() {
         return (name == null) ? null : name.toString();
     }
 
@@ -249,7 +253,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     }
 
 
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement pe = source.getSource();
         if (!(pe instanceof TypeReference)
                 || ((TypeReference) pe).getDimensions() != getDimensions()) {

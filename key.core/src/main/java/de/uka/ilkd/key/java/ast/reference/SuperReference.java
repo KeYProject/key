@@ -14,11 +14,14 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Super reference.
  *
  */
 
+@NullMarked
 public class SuperReference extends JavaNonTerminalProgramElement implements Reference, Expression,
         ReferencePrefix, ReferenceSuffix, ExpressionContainer, TypeReferenceContainer {
 

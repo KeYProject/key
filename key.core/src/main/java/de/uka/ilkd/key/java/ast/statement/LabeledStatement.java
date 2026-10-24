@@ -14,9 +14,13 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Labeled statement.
  */
+@NullMarked
 public class LabeledStatement extends JavaStatement
         implements StatementContainer, NamedProgramElement, ProgramPrefix {
 
@@ -168,7 +172,7 @@ public class LabeledStatement extends JavaStatement
      *
      * @return the string.
      */
-    public final String getName() {
+    public final @Nullable String getName() {
         return (name == null) ? null : name.toString();
     }
 
@@ -187,7 +191,7 @@ public class LabeledStatement extends JavaStatement
      *
      * @return the identifier.
      */
-    public ProgramElementName getProgramElementName() {
+    public @Nullable ProgramElementName getProgramElementName() {
         if ((name instanceof ProgramElementName) || (name == null)) {
             return (ProgramElementName) name;
         }

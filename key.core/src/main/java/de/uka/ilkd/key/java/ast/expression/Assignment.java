@@ -10,10 +10,13 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElementWithKind;
 import de.uka.ilkd.key.java.ast.SourceElement;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Role interface to catch assignments via one type check.
  * An assignment is an operator with side-effects.
  */
+@NullMarked
 public interface Assignment<K extends Enum<K> & AssignmentKind>
         extends SourceElement, ProgramElement, NonTerminalProgramElement, Expression,
         ExpressionContainer, ExpressionStatement, ProgramElementWithKind<K> {

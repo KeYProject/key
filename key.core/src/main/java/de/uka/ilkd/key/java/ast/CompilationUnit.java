@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
  * that it can be used as an immutable class
  */
 
+@NullMarked
 public class CompilationUnit extends JavaNonTerminalProgramElement
         implements TypeDeclarationContainer, TypeScope {
     private static final Logger LOGGER = LoggerFactory.getLogger(CompilationUnit.class);
