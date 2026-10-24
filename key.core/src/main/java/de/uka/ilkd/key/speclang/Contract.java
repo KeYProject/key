@@ -315,9 +315,9 @@ public interface Contract extends SpecificationElement {
      */
     final class OriginalVariables {
 
-        public final LocationVariable self;
-        public final LocationVariable result;
-        public final LocationVariable exception;
+        public final @Nullable LocationVariable self;
+        public final @Nullable LocationVariable result;
+        public final @Nullable LocationVariable exception;
         public final Map<LocationVariable, LocationVariable> atPres;
         public final ImmutableList<LocationVariable> params;
 
@@ -331,8 +331,8 @@ public interface Contract extends SpecificationElement {
          * @param paramVars the original parameter variables
          */
         @SuppressWarnings("unchecked")
-        public OriginalVariables(LocationVariable selfVar, LocationVariable resVar,
-                LocationVariable excVar,
+        public OriginalVariables(@Nullable LocationVariable selfVar,
+                @Nullable LocationVariable resVar, @Nullable LocationVariable excVar,
                 Map<LocationVariable, LocationVariable> atPreVars,
                 @Nullable ImmutableList<LocationVariable> paramVars) {
             this.self = selfVar;

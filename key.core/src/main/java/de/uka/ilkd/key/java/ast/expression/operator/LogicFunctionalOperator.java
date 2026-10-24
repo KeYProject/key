@@ -125,7 +125,7 @@ public class LogicFunctionalOperator extends Operator
     }
 
     @Override
-    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, @Nullable MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         if (src instanceof LogicFunctionalOperator other) {
             if (getFunction().equals(other.getFunction())) {

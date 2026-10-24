@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
@@ -265,11 +266,20 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
                 types = types.prepend(kjt);
             }
         }
-        if (extending != null && !extending.getSupertypes().isEmpty()) {
-            final KeYJavaType kjt = Objects.requireNonNull(
-                extending.getSupertypes().get(0).getKeYJavaType(),
-                "extended type must be resolvable");
-            types = types.prepend(kjt);
+        // `extending` is honestly @Nullable (a class may have no explicit extends clause), but it
+        // is runtime-guaranteed non-null exactly when this branch runs, so capture it in a local
+        // for the flow-sensitive check; getSupertypes() is likewise never null for an Extends node
+        // (it has no parameterless constructor).
+        final Extends ext = extending;
+        if (ext != null) {
+            final ImmutableArray<TypeReference> supertypes = Objects.requireNonNull(
+                ext.getSupertypes(), "extended type must have supertypes");
+            if (!supertypes.isEmpty()) {
+                final KeYJavaType kjt = Objects.requireNonNull(
+                    supertypes.get(0).getKeYJavaType(),
+                    "extended type must be resolvable");
+                types = types.prepend(kjt);
+            }
         }
         return types;
     }

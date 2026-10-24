@@ -318,8 +318,10 @@ public final class TypeConverter {
         // FIXME this needs to handle two state?
         final ReferencePrefix prefix = mr.getReferencePrefix();
         JTerm p = convertReferencePrefix(prefix, ec);
-        IProgramMethod pm = mr.method(services, services.getTypeConverter().getKeYJavaType(p),
-            Objects.requireNonNull(ec, "no execution context for method reference " + mr));
+        final IProgramMethod pm = Objects.requireNonNull(
+            mr.method(services, services.getTypeConverter().getKeYJavaType(p),
+                Objects.requireNonNull(ec, "no execution context for method reference " + mr)),
+            "no method found for method reference " + mr);
         if (pm.isModel()) {
             ImmutableArray<? extends Expression> args = mr.getArguments();
             JTerm[] argTerms = new JTerm[args.size() + 2]; // heap, self,

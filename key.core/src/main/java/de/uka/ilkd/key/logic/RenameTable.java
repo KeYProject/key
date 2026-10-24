@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
+
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
@@ -47,7 +49,8 @@ public class RenameTable {
      * @return true if <code>n</code> has been already assigned to an abstract name
      */
     public boolean contains(QuantifiableVariable n) {
-        return localRenamingTable.containsKey(n) || parent.contains(n);
+        return localRenamingTable.containsKey(n)
+                || Objects.requireNonNull(parent, "no parent renaming table").contains(n);
     }
 
     /**
@@ -73,9 +76,12 @@ public class RenameTable {
      */
     public boolean sameAbstractName(QuantifiableVariable n1, QuantifiableVariable n2) {
         if (containsLocally(n1)) {
-            return localRenamingTable.get(n1).equals(localRenamingTable.get(n2));
+            final Integer n1AbstractName = Objects.requireNonNull(localRenamingTable.get(n1),
+                "no abstract name assigned to " + n1);
+            return n1AbstractName.equals(localRenamingTable.get(n2));
         } else {
-            return parent.sameAbstractName(n1, n2);
+            return Objects.requireNonNull(parent, "no parent renaming table")
+                    .sameAbstractName(n1, n2);
         }
     }
 

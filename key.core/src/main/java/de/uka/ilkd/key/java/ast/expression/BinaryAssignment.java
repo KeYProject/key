@@ -87,7 +87,7 @@ public final class BinaryAssignment extends Operator
 
 
     @Override
-    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, @Nullable MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         if (src instanceof Assignment other) {
             if (getKind().equals(other.getKind())) {
@@ -105,7 +105,11 @@ public final class BinaryAssignment extends Operator
      * @return the type of the assignment expression
      */
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-        return getExpressionAt(0).getKeYJavaType(javaServ, ec);
+        // Expression.getKeYJavaType is honestly @Nullable, but the operands of a type-checked
+        // assignment always resolve (TypeConverter requires it), and Operator's abstract
+        // contract here is @NonNull, so narrow at the deref.
+        return Objects.requireNonNull(getExpressionAt(0).getKeYJavaType(javaServ, ec),
+            "no KeYJavaType for the operand");
     }
 
 

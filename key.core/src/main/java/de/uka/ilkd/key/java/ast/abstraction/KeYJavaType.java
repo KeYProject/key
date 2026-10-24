@@ -123,7 +123,9 @@ public class KeYJavaType implements Type {
 
     public String getName() {
         if (javaType != null) {
-            return javaType.getName();
+            // any resolved java type carries a name (NamedModelElement.getName() is declared
+            // @Nullable in general, but a non-null javaType always has one)
+            return Objects.requireNonNull(javaType.getName(), "no name for type");
         } else {
             return Objects.requireNonNull(sort, "no sort for type").name().toString();
         }
