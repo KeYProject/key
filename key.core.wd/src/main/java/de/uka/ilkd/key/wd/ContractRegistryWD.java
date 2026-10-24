@@ -7,7 +7,6 @@ package de.uka.ilkd.key.wd;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -296,12 +295,6 @@ public class ContractRegistryWD extends ContractRegistry {
             unregisterWdCheck((WellDefinednessCheck) contract);
         }
 
-    }
-
-    @Override
-    public void map(UnaryOperator<JTerm> op, Services services) {
-        super.map(op, services);
-        mapValueSets(wdChecks, op, services);
     }
 
     @Override
