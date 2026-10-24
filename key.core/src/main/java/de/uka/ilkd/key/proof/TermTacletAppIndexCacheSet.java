@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
@@ -196,8 +197,9 @@ public class TermTacletAppIndexCacheSet {
         final TopLevelCacheKey key = new TopLevelCacheKey(prefix, polarity);
         // computeIfAbsent is atomic on the ConcurrentLruCache, so concurrent misses share one
         // sub-cache instance instead of racing to create duplicates that orphan backend entries.
-        return topLevelCaches.computeIfAbsent(key,
-            k -> new TopLevelCache(k.prefix(), k.polarity(), cache));
+        return Objects.requireNonNull(topLevelCaches.computeIfAbsent(key,
+            k -> new TopLevelCache(k.prefix(), k.polarity(), cache)),
+            "missing top-level sub-cache for " + key);
     }
 
     /**
@@ -232,7 +234,9 @@ public class TermTacletAppIndexCacheSet {
         }
         // computeIfAbsent is atomic: concurrent misses share one sub-cache instance (see
         // getTopLevelCache).
-        return belowProgCaches.computeIfAbsent(prefix, p -> new BelowProgCache(p, cache));
+        return Objects.requireNonNull(belowProgCaches.computeIfAbsent(prefix,
+            p -> new BelowProgCache(p, cache)),
+            "missing below-program sub-cache for " + prefix);
     }
 
     /**
