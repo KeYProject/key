@@ -164,11 +164,13 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         final Token offendingSymbol;
         final int charPositionInLine;
         final String msg;
-        final URI source;
+        // The source URI may be unknown (e.g. for synthetic token streams); a null file URI is
+        // already tolerated by Location (cf. ExceptionTools/LabeledParserRuleContext).
+        final @Nullable URI source;
         final String stack;
 
         public SyntaxError(Recognizer<?, ?> recognizer, int line, Token offendingSymbol,
-                int charPositionInLine, String msg, URI source, String stack) {
+                int charPositionInLine, String msg, @Nullable URI source, String stack) {
             this.recognizer = recognizer;
             this.line = line;
             this.offendingSymbol = offendingSymbol;

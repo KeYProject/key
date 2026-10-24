@@ -9,6 +9,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -47,7 +48,8 @@ public abstract class AbstractSettings implements Settings {
         return changeSupport.getPropertyChangeListeners(propertyName);
     }
 
-    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+    protected void firePropertyChange(String propertyName, @Nullable Object oldValue,
+            @Nullable Object newValue) {
         changeSupport.firePropertyChange(propertyName, oldValue, newValue);
     }
 

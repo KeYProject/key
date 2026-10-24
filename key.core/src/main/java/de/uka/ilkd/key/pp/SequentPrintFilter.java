@@ -7,6 +7,7 @@ package de.uka.ilkd.key.pp;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -25,7 +26,7 @@ public abstract class SequentPrintFilter {
     /**
      * the original sequent
      */
-    Sequent originalSequent;
+    Sequent originalSequent = JavaDLSequentKit.getInstance().getEmptySequent();
 
     /**
      * the antecedent of the filtered formula

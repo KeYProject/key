@@ -263,7 +263,9 @@ public class InitConfig {
         if (activatedTacletCache == null) {
             fillActiveTacletCache();
         }
-        return activatedTacletCache.get(name);
+        final Map<Name, Taclet> cache = Objects.requireNonNull(activatedTacletCache,
+            "activated taclet cache is not filled");
+        return cache.get(name);
     }
 
     /**
@@ -273,7 +275,9 @@ public class InitConfig {
         if (activatedTacletCache == null) {
             fillActiveTacletCache();
         }
-        return activatedTacletCache.values();
+        final Map<Name, Taclet> cache = Objects.requireNonNull(activatedTacletCache,
+            "activated taclet cache is not filled");
+        return cache.values();
     }
 
 

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
@@ -377,7 +378,8 @@ public final class StrategyProperties extends Properties {
             // remove this line if always satisfied. add another assignment if not.
             assert o.equals(getUniqueString(o));
         }
-        return o;
+        return Objects.requireNonNull(o,
+            "no default value registered for strategy property " + key);
     }
 
     /**
