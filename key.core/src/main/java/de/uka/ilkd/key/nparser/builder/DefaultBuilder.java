@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.nparser.JavaKeYParser;
+import de.uka.ilkd.key.util.LimitedObservers;
 
 import org.key_project.logic.*;
 import org.key_project.logic.op.Function;
@@ -50,7 +51,7 @@ import org.jspecify.annotations.Nullable;
  * @version 1
  */
 public class DefaultBuilder extends AbstractBuilder<Object> {
-    public static final String LIMIT_SUFFIX = "$lmtd";
+    public static final String LIMIT_SUFFIX = LimitedObservers.LIMIT_SUFFIX;
 
     private static final ResourceBundle bundle =
         ResourceBundle.getBundle("de.uka.ilkd.key.nparser.builder.resources");
