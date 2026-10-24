@@ -40,14 +40,26 @@ class Tier3ToolMetadataTest {
     }
 
     @Test
-    void explorationProbesAreAutoAndBackgroundable() {
-        for (var name : List.of(ExploreProofTools.TOOL_EXPLORE_ASSUMPTION,
-            ExploreProofTools.TOOL_EXPLORE_FORMULA)) {
+    void probeToolsAreAutoAndBackgroundable() {
+        for (var name : List.of(ExploreProofTools.TOOL_PROBE_ADD_FORMULA,
+            ExploreProofTools.TOOL_PROBE_EDIT_FORMULA)) {
             var t = tool(all(), name);
             assertEquals(ToolCategory.PROOF, t.category(), name);
             assertEquals(Tool.ApprovalRequirement.AUTO, t.approval(), name);
             assertTrue(t.backgroundable(),
                 name + " runs an isolated side proof and must be backgroundable");
+        }
+    }
+
+    @Test
+    void explorativeTier3ToolsAreAskAndNeverBackgroundable() {
+        for (var name : List.of(ExploreProofTools.TOOL_EXPLORATIVE_ADD_FORMULA,
+            ExploreProofTools.TOOL_EXPLORATIVE_EDIT_FORMULA)) {
+            var t = tool(all(), name);
+            assertEquals(ToolCategory.PROOF, t.category(), name);
+            assertEquals(Tool.ApprovalRequirement.ASK, t.approval(), name);
+            assertFalse(t.backgroundable(),
+                name + " rewrites the main proof and must not be backgroundable");
         }
     }
 
@@ -80,10 +92,14 @@ class Tier3ToolMetadataTest {
         var tools = all();
         assertEquals(List.of("steps"), tool(tools, ScriptSequenceTools.TOOL_RUN_SCRIPT)
                 .parameters().required());
-        assertEquals(List.of("formula"), tool(tools, ExploreProofTools.TOOL_EXPLORE_ASSUMPTION)
+        assertEquals(List.of("formula"), tool(tools, ExploreProofTools.TOOL_PROBE_ADD_FORMULA)
                 .parameters().required());
-        assertEquals(List.of("formula"), tool(tools, ExploreProofTools.TOOL_EXPLORE_FORMULA)
-                .parameters().required());
+        assertEquals(List.of("find", "replace"),
+            tool(tools, ExploreProofTools.TOOL_PROBE_EDIT_FORMULA).parameters().required());
+        assertEquals(List.of("formula"),
+            tool(tools, ExploreProofTools.TOOL_EXPLORATIVE_ADD_FORMULA).parameters().required());
+        assertEquals(List.of("find", "replace"),
+            tool(tools, ExploreProofTools.TOOL_EXPLORATIVE_EDIT_FORMULA).parameters().required());
         assertEquals(List.of("expected"),
             tool(tools, ProofOrientationTools.TOOL_ASSERT_OPEN_GOALS).parameters().required());
         assertEquals(List.of("sequent"), tool(tools, SequentEditingTools.TOOL_HIDE_SEQUENT)
@@ -107,8 +123,10 @@ class Tier3ToolMetadataTest {
     @Test
     void singleGoalTier3ToolsRejectAllGoals() throws Exception {
         var tools = all();
-        var names = List.of(ExploreProofTools.TOOL_EXPLORE_ASSUMPTION,
-            ExploreProofTools.TOOL_EXPLORE_FORMULA, ProofForkTools.TOOL_FORK_PROOF,
+        var names = List.of(ExploreProofTools.TOOL_PROBE_ADD_FORMULA,
+            ExploreProofTools.TOOL_PROBE_EDIT_FORMULA,
+            ExploreProofTools.TOOL_EXPLORATIVE_ADD_FORMULA,
+            ExploreProofTools.TOOL_EXPLORATIVE_EDIT_FORMULA, ProofForkTools.TOOL_FORK_PROOF,
             SequentEditingTools.TOOL_HIDE_SEQUENT, SequentEditingTools.TOOL_UNHIDE_SEQUENT,
             SequentEditingTools.TOOL_FOCUS_GOAL);
         for (var name : names) {
@@ -116,9 +134,14 @@ class Tier3ToolMetadataTest {
             var callArgs = new java.util.HashMap<String, Object>();
             callArgs.put("goal", "all");
             // required schema args are supplied so only the goal-targeting error can fire
-            if (name.equals(ExploreProofTools.TOOL_EXPLORE_ASSUMPTION)
-                    || name.equals(ExploreProofTools.TOOL_EXPLORE_FORMULA)) {
+            if (name.equals(ExploreProofTools.TOOL_PROBE_ADD_FORMULA)
+                    || name.equals(ExploreProofTools.TOOL_EXPLORATIVE_ADD_FORMULA)) {
                 callArgs.put("formula", "true");
+            }
+            if (name.equals(ExploreProofTools.TOOL_PROBE_EDIT_FORMULA)
+                    || name.equals(ExploreProofTools.TOOL_EXPLORATIVE_EDIT_FORMULA)) {
+                callArgs.put("find", "true");
+                callArgs.put("replace", "false");
             }
             if (name.equals(SequentEditingTools.TOOL_HIDE_SEQUENT)
                     || name.equals(SequentEditingTools.TOOL_UNHIDE_SEQUENT)) {
