@@ -9,6 +9,9 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ProxySort extends SortImpl {
     public ProxySort(Name name, ImmutableSet<Sort> ext) {
         super(name, ext, false);

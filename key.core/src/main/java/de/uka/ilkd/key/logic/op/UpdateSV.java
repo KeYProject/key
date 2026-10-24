@@ -9,10 +9,13 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import org.key_project.logic.Name;
 import org.key_project.logic.TerminalSyntaxElement;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * A schema variable that is used as placeholder for updates.
  */
+@NullMarked
 public final class UpdateSV extends JOperatorSV implements TerminalSyntaxElement {
 
 

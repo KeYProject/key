@@ -14,9 +14,12 @@ import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Collects all operators occurring in the traversed term.
  */
+@NullMarked
 public class OpCollector implements DefaultVisitor {
     /** the found operators */
     protected final HashSet<Operator> ops;

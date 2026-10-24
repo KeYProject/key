@@ -13,6 +13,10 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class ClashFreeSubst {
     protected final QuantifiableVariable v;
     protected final JTerm s;
@@ -60,8 +64,8 @@ public class ClashFreeSubst {
     }
 
     // XXX
-    protected static ImmutableArray<QuantifiableVariable> getSingleArray(
-            ImmutableArray<QuantifiableVariable>[] bv) {
+    protected static @Nullable ImmutableArray<QuantifiableVariable> getSingleArray(
+            @Nullable ImmutableArray<QuantifiableVariable>[] bv) {
         if (bv == null) {
             return null;
         }

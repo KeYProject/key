@@ -15,7 +15,8 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The TermFactory is the <em>only</em> way to create terms using constructors of class Term or any
@@ -26,11 +27,11 @@ import org.jspecify.annotations.NonNull;
  * This class is used to encapsulate knowledge about the internal term structures. See
  * {@link TermBuilder} for more convenient methods to create terms.
  */
+@NullMarked
 public final class TermFactory {
 
-
     private static final ImmutableArray<JTerm> NO_SUBTERMS = new ImmutableArray<>();
-    private final Map<JTerm, JTerm> cache;
+    private final @Nullable Map<JTerm, JTerm> cache;
 
 
     // -------------------------------------------------------------------------
@@ -56,9 +57,9 @@ public final class TermFactory {
      * Master method for term creation. Should be the only place where terms are created in the
      * entire system.
      */
-    public JTerm createTerm(@NonNull Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels) {
+    public JTerm createTerm(@Nullable Operator op, @Nullable ImmutableArray<JTerm> subs,
+            @Nullable ImmutableArray<QuantifiableVariable> boundVars,
+            @Nullable ImmutableArray<TermLabel> labels) {
         if (op == null) {
             throw new TermCreationException("Given operator is null.");
         }
@@ -70,13 +71,13 @@ public final class TermFactory {
         return doCreateTerm(op, subs, boundVars, labels, "");
     }
 
-    public JTerm createTerm(Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<QuantifiableVariable> boundVars) {
+    public JTerm createTerm(@Nullable Operator op, ImmutableArray<JTerm> subs,
+            @Nullable ImmutableArray<QuantifiableVariable> boundVars) {
 
         return createTerm(op, subs, boundVars, null);
     }
 
-    public JTerm createTerm(@NonNull Operator op, JTerm... subs) {
+    public JTerm createTerm(@Nullable Operator op, JTerm... subs) {
         return createTerm(op, createSubtermArray(subs), null, null);
     }
 
@@ -112,13 +113,13 @@ public final class TermFactory {
     // private interface
     // -------------------------------------------------------------------------
 
-    private ImmutableArray<JTerm> createSubtermArray(JTerm[] subs) {
+    private ImmutableArray<JTerm> createSubtermArray(@Nullable JTerm[] subs) {
         return subs == null || subs.length == 0 ? NO_SUBTERMS : new ImmutableArray<>(subs);
     }
 
     private JTerm doCreateTerm(Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels, String origin) {
+            @Nullable ImmutableArray<QuantifiableVariable> boundVars,
+            @Nullable ImmutableArray<TermLabel> labels, String origin) {
 
         final TermImpl newTerm =
             (labels == null || labels.isEmpty()
@@ -147,7 +148,7 @@ public final class TermFactory {
      * @param junctor the left-associative operator to combine the terms together
      * @param terms a list of non-null temrs
      */
-    public @NonNull JTerm createTerm(@NonNull Operator junctor, @NonNull List<JTerm> terms) {
+    public JTerm createTerm(Operator junctor, List<JTerm> terms) {
         if (terms.size() == 1) {
             return terms.get(0);
         } else if (terms.size() == 2) {

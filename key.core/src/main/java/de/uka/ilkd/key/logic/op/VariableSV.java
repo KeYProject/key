@@ -10,9 +10,12 @@ import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Schema variable that is instantiated with logical variables.
  */
+@NullMarked
 public final class VariableSV extends JOperatorSV
         implements QuantifiableVariable, TerminalSyntaxElement {
 

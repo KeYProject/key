@@ -24,6 +24,9 @@ import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 // spotless:off     // this protects the JavaDoc from automatic reformatting
 /**
  * <p>
@@ -153,6 +156,7 @@ import org.key_project.prover.sequent.SequentFormula;
  * @see TermLabelManager
  */
 // spotless:on
+@NullMarked
 public interface TermLabel
         extends Named, HasMetaSpaceKey, /* TODO: Remove */ TerminalSyntaxElement {
 
@@ -167,6 +171,7 @@ public interface TermLabel
      * @throws IndexOutOfBoundsException if the given parameter number <tt>i</tt> is negative or
      *         greater-or-equal the number of parameters returned by {@link #getTLChildCount()}
      */
+    @Nullable
     Object getTLChild(int i);
 
     /**

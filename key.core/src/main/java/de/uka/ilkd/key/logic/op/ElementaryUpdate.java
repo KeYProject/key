@@ -12,12 +12,15 @@ import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.WeakValueInterner;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Class of operators for elementary updates, i.e., updates of the form "x := t". There is one such
  * operator for every left hand side "x". Each of these operator is unary, accepting a single
  * argument "t".
  */
+@NullMarked
 public final class ElementaryUpdate extends JAbstractSortedOperator {
 
     /**

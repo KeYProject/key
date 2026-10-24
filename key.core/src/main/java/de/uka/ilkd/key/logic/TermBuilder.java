@@ -40,6 +40,9 @@ import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * Use this class if you intend to build complex terms by hand. It is more convenient than
@@ -51,6 +54,7 @@ import org.key_project.util.collection.*;
  * the term looks exactly as you built it, you will have to use the TermFactory.
  * </p>
  */
+@NullMarked
 public class TermBuilder {
     private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
     private final TermFactory tf;
@@ -184,7 +188,7 @@ public class TermBuilder {
      * @return a name not occurring in {@code localNamespace} or {@code taken}
      */
     public static String freeName(String baseName, NamespaceSet localNamespace,
-            java.util.Set<String> taken) {
+            java.util.@Nullable Set<String> taken) {
         int i = 0;
         String result = baseName;
         while (localNamespace.lookup(new Name(result)) != null
@@ -224,8 +228,8 @@ public class TermBuilder {
     /**
      * Creates a program variable for "self". Take care to register it in the namespaces!
      */
-    public LocationVariable selfVar(IProgramMethod pm, KeYJavaType kjt, boolean makeNameUnique,
-            String postfix) {
+    public @Nullable LocationVariable selfVar(IProgramMethod pm, KeYJavaType kjt,
+            boolean makeNameUnique, String postfix) {
         if (pm.isStatic()) {
             return null;
         } else {
@@ -236,7 +240,8 @@ public class TermBuilder {
     /**
      * Creates a program variable for "self". Take care to register it in the namespaces!
      */
-    public LocationVariable selfVar(IProgramMethod pm, KeYJavaType kjt, boolean makeNameUnique) {
+    public @Nullable LocationVariable selfVar(IProgramMethod pm, KeYJavaType kjt,
+            boolean makeNameUnique) {
         if (pm.isStatic()) {
             return null;
         } else {
@@ -283,7 +288,7 @@ public class TermBuilder {
     /**
      * Creates a program variable for the result. Take care to register it in the namespaces.
      */
-    public LocationVariable resultVar(IProgramMethod pm, boolean makeNameUnique) {
+    public @Nullable LocationVariable resultVar(IProgramMethod pm, boolean makeNameUnique) {
         return resultVar("result", pm, makeNameUnique);
     }
 
@@ -291,7 +296,8 @@ public class TermBuilder {
      * Creates a program variable for the result with passed name. Take care to register it in the
      * namespaces.
      */
-    public LocationVariable resultVar(String name, IProgramMethod pm, boolean makeNameUnique) {
+    public @Nullable LocationVariable resultVar(String name, IProgramMethod pm,
+            boolean makeNameUnique) {
         if (pm.isVoid() || pm.isConstructor()) {
             return null;
         } else {
@@ -792,7 +798,7 @@ public class TermBuilder {
         return imp(t1, t2, null);
     }
 
-    public JTerm imp(JTerm t1, JTerm t2, ImmutableArray<TermLabel> labels) {
+    public JTerm imp(JTerm t1, JTerm t2, @Nullable ImmutableArray<TermLabel> labels) {
         if (t1.op() == Junctor.FALSE || t2.op() == Junctor.TRUE) {
             return tt();
         } else if (t1.op() == Junctor.TRUE) {
@@ -918,7 +924,7 @@ public class TermBuilder {
     /**
      * If a is a boolean literal, the method returns the literal as a Formula.
      */
-    public JTerm convertToFormula(JTerm a) {
+    public JTerm convertToFormula(@Nullable JTerm a) {
         BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
         if (booleanLDT == null) {
             throw new IllegalStateException("boolean ldt is not set in services");
@@ -1100,7 +1106,7 @@ public class TermBuilder {
         return result;
     }
 
-    public JTerm apply(JTerm update, JTerm target, ImmutableArray<TermLabel> labels) {
+    public JTerm apply(JTerm update, JTerm target, @Nullable ImmutableArray<TermLabel> labels) {
         if (update.sort() != JavaDLTheory.UPDATE) {
             throw new TermCreationException("Not an update: " + update);
         } else if (update.op() == UpdateJunctor.SKIP) {
@@ -1224,7 +1230,7 @@ public class TermBuilder {
      * @return Term in "number" notation representing the given number
      * @throws NumberFormatException if <code>numberString</code> is not a number
      */
-    private JTerm numberTerm(String numberString) {
+    private JTerm numberTerm(@Nullable String numberString) {
         if (numberString == null || numberString.isEmpty()) {
             throw new NumberFormatException(numberString + " is not a number.");
         }
@@ -1777,7 +1783,7 @@ public class TermBuilder {
      * @param labels the labels to apply.
      * @return a labeled term.
      */
-    public JTerm addLabelToAllSubs(JTerm term, ImmutableArray<TermLabel> labels) {
+    public JTerm addLabelToAllSubs(JTerm term, @Nullable ImmutableArray<TermLabel> labels) {
         if (labels == null || labels.isEmpty() || (!OriginTermLabel.canAddLabel(term, services)
                 && labels.stream().anyMatch(l -> l instanceof OriginTermLabel))) {
             return term;
@@ -1819,7 +1825,7 @@ public class TermBuilder {
      * @param labels the labels to add.
      * @return the term with the labels added.
      */
-    public JTerm addLabel(JTerm term, ImmutableArray<TermLabel> labels) {
+    public JTerm addLabel(JTerm term, @Nullable ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty()) && !term.hasLabels()) {
             return term;
         } else if (!term.hasLabels()) {
@@ -1853,7 +1859,7 @@ public class TermBuilder {
      * @param label the label to add.
      * @return the term with the label added.
      */
-    public JTerm addLabel(JTerm term, TermLabel label) {
+    public JTerm addLabel(JTerm term, @Nullable TermLabel label) {
         if (label == null && !term.hasLabels()) {
             return term;
         } else {
@@ -1868,7 +1874,7 @@ public class TermBuilder {
      * @param labels the labels to apply.
      * @return the modified term.
      */
-    public JTerm label(JTerm term, ImmutableArray<TermLabel> labels) {
+    public JTerm label(JTerm term, @Nullable ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty())) {
             return term;
         } else {
@@ -1884,7 +1890,7 @@ public class TermBuilder {
      * @param label the label to apply.
      * @return the modified term.
      */
-    public JTerm label(JTerm term, TermLabel label) {
+    public JTerm label(JTerm term, @Nullable TermLabel label) {
         if (label == null) {
             return term;
         } else {
@@ -1908,7 +1914,7 @@ public class TermBuilder {
         return tf.createTerm(term.op(), subs, term.boundVars(), null);
     }
 
-    public JTerm dotArr(JTerm ref, JTerm idx) {
+    public JTerm dotArr(@Nullable JTerm ref, @Nullable JTerm idx) {
         if (ref == null || idx == null) {
             throw new TermCreationException(
                 "Tried to build an array access " + "term without providing an "
