@@ -10,10 +10,13 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Package specification. taken from COMPOST and changed to achieve an immutable structure
  */
 
+@NullMarked
 public class PackageSpecification extends JavaNonTerminalProgramElement
         implements PackageReferenceContainer {
 

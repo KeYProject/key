@@ -13,12 +13,15 @@ import de.uka.ilkd.key.java.ast.Statement;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Default implementation for non-terminal Java statements.
  *
  * @author <TT>AutoDoc</TT>
  */
 
+@NullMarked
 public abstract class JavaStatement extends JavaNonTerminalProgramElement implements Statement {
 
 

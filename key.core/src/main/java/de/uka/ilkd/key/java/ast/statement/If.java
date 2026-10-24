@@ -12,11 +12,14 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * If.
  *
  * @author <TT>AutoDoc</TT>
  */
+@NullMarked
 public class If extends BranchStatement implements ExpressionContainer {
 
     /**

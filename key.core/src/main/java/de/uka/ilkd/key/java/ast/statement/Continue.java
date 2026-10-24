@@ -13,10 +13,13 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Continue.
  *
  */
+@NullMarked
 public class Continue extends LabelJumpStatement {
 
     /**

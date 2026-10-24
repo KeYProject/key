@@ -26,6 +26,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.pp.PrettyPrinter.*;
@@ -35,6 +36,7 @@ import static de.uka.ilkd.key.pp.PrettyPrinter.*;
  * @author Alexander Weigl
  * @version 1 (4/12/26)
  */
+@NullMarked
 public class LogicFunctionalOperator extends Operator
         implements ProgramElementWithKind<LogicFunction> {
 

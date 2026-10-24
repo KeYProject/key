@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -36,6 +37,7 @@ import org.jspecify.annotations.Nullable;
  * @author <TT>AutoDoc</TT>
  */
 
+@NullMarked
 public class IntLiteral extends AbstractIntegerLiteral {
 
     /**

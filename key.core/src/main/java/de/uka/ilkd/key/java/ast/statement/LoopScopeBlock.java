@@ -31,7 +31,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -39,12 +39,11 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public final class LoopScopeBlock extends JavaStatement
         implements StatementContainer, ExpressionContainer, ProgramPrefix {
 
-    @Nullable
-    private final IProgramVariable indexPV;
-    @NonNull
+    private @Nullable IProgramVariable indexPV;
     private final StatementBlock body;
     private final MethodFrame innerMostMethodFrame;
     private final int prefixLength;
@@ -258,7 +257,6 @@ public final class LoopScopeBlock extends JavaStatement
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    @NonNull
     @Override
     public SourceElement getFirstElement() {
         return body.getFirstElement();

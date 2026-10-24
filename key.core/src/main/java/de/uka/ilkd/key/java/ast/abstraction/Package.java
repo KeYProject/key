@@ -4,12 +4,16 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.abstraction;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A program model element representing packages.
  *
  * @author AL
  * @author RN
  */
+@NullMarked
 public class Package implements ClassTypeContainer {
 
     private final String name;
@@ -47,7 +51,7 @@ public class Package implements ClassTypeContainer {
      *
      * @return <CODE>null</CODE>.
      */
-    public ClassTypeContainer getContainer() {
+    public @Nullable ClassTypeContainer getContainer() {
         return null;
     }
 

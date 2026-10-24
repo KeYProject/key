@@ -14,10 +14,13 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Do.
  *
  */
+@NullMarked
 public class Do extends LoopStatement {
     /**
      * Do.

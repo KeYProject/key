@@ -11,12 +11,15 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Expression jump statement.
  *
  * @author <TT>AutoDoc</TT>
  */
 
+@NullMarked
 public abstract class ExpressionJumpStatement extends JumpStatement implements ExpressionContainer {
 
     /**

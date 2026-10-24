@@ -17,11 +17,15 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * For.
  *
  */
 
+@NullMarked
 public class For extends LoopStatement implements VariableScope {
 
     private static final ImmutableArray<VariableSpecification> EMPTY_VARSPECS =
@@ -90,7 +94,7 @@ public class For extends LoopStatement implements VariableScope {
         return EMPTY_VARSPECS;
     }
 
-    public VariableSpecification getVariableInScope(String name) {
+    public @Nullable VariableSpecification getVariableInScope(String name) {
         if (inits != null) {
             LoopInitializer li = inits.getInits().get(0);
             if (li instanceof LocalVariableDeclaration) {

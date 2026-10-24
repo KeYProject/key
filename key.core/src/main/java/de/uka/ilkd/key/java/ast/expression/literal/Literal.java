@@ -29,6 +29,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -39,7 +40,7 @@ import org.jspecify.annotations.Nullable;
 
 public abstract sealed
 
-class Literal extends JavaProgramElement
+@NullMarked class Literal extends JavaProgramElement
         implements Expression, TerminalProgramElement
         permits AbstractIntegerLiteral, BooleanLiteral, DoubleLiteral, EmptyMapLiteral,
         EmptySeqLiteral, EmptySetLiteral, FloatLiteral, FreeLiteral, NullLiteral, RealLiteral,
@@ -113,7 +114,7 @@ class Literal extends JavaProgramElement
 
 
     @Override
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         if (this.equals(src)) {
             source.next();

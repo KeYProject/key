@@ -4,9 +4,11 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast;
 
+import org.jspecify.annotations.NullMarked;
 
 /** Any non-SingleLineComment is a multi line comment. */
 
+@NullMarked
 public class SingleLineComment extends Comment {
 
     /**

@@ -19,6 +19,8 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * There are several types of class declarations:
  * <ul>
@@ -58,6 +60,7 @@ import org.key_project.util.collection.ImmutableList;
  * immutable structure
  */
 
+@NullMarked
 public class ClassDeclaration extends TypeDeclaration implements Statement {
 
     protected final Extends extending;

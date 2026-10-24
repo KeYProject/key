@@ -11,9 +11,12 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.java.ast.declaration.Modifier.createModifierList;
 
 
+@NullMarked
 public class ClassInitializer extends JavaDeclaration
         implements MemberDeclaration, StatementContainer {
 

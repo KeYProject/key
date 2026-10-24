@@ -9,6 +9,8 @@ import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * TypeReferences reference Types by name. A TypeReference can refer to
  * an outer or inner type and hence can also be a {@link MemberReference}, but does not have to. A
@@ -16,6 +18,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
  * possible suffix for types, it can have other TypeReferences as a prefix, playing the role of a
  * {@link TypeReferenceContainer}.
  */
+@NullMarked
 public interface TypeReference extends TypeReferenceInfix, TypeReferenceContainer,
         PackageReferenceContainer, MemberReference, NonTerminalProgramElement, SourceElement {
 

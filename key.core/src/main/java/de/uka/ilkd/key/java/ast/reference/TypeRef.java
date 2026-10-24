@@ -13,8 +13,9 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.util.ExtList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class TypeRef extends TypeReferenceImp {
 
     private final KeYJavaType kjt;
@@ -25,7 +26,7 @@ public class TypeRef extends TypeReferenceImp {
      * TypeRef(ProgramElementName, int, ReferencePrefix, KeYJavaType) and take null as last
      * argument.
      */
-    public TypeRef(@NonNull KeYJavaType kjt) {
+    public TypeRef(KeYJavaType kjt) {
         this(kjt, 0);
     }
 
@@ -35,7 +36,7 @@ public class TypeRef extends TypeReferenceImp {
      * constructor TypeRef(ProgramElementName, int, ReferencePrefix, KeYJavaType) and take null as
      * last argument.
      */
-    public TypeRef(@NonNull KeYJavaType kjt, int dim) {
+    public TypeRef(KeYJavaType kjt, int dim) {
         super(new ProgramElementName(kjt.getName()), dim, kjt.createPackagePrefix());
         this.kjt = kjt;
     }
