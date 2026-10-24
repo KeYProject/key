@@ -27,13 +27,15 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * A rule for set statements. This unwraps the contained CopyAssignment
  *
  * @author Julian Wiesler
  */
+@NullMarked
 public final class SetStatementRule implements BuiltInRule {
 
     /**
@@ -79,7 +81,7 @@ public final class SetStatementRule implements BuiltInRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
+    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
             throws RuleAbortException {
         if (!(ruleApp instanceof SetStatementBuiltInRuleApp)) {
             throw new IllegalArgumentException("can only apply SetStatementBuiltInRuleApp");

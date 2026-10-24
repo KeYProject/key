@@ -20,6 +20,9 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class NoFindTacletExecutor extends TacletExecutor {
     public static final AtomicLong PERF_APPLY = new AtomicLong();
     public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();

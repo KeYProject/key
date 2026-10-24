@@ -17,6 +17,8 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Uses the class <code>QueryExpand</code> in order to insert query expansions in the term that the
@@ -24,6 +26,7 @@ import org.key_project.logic.Name;
  *
  * @author gladisch
  */
+@NullMarked
 public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
 
     public static final String name = "#ExpandQueries";

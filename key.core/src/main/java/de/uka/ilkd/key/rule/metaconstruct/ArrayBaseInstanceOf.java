@@ -16,10 +16,13 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Creates an <tt>instance<Type>(..)</tt> term for the component type of the array. The component
  * type has to be a reference type.
  */
+@NullMarked
 public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
 
     public ArrayBaseInstanceOf() {

@@ -17,6 +17,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * This variable condition can be used to check whether an assignment expression occurs as a
@@ -25,6 +27,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
  * @author Dominic Scheurer
  *
  */
+@NullMarked
 public class ContainsAssignmentCondition extends VariableConditionAdapter {
 
     /* the schemavariable matched agains an expression */

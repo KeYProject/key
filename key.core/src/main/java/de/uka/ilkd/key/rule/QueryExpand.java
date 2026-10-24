@@ -43,7 +43,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +60,7 @@ import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignm
  *
  * @author Richard Bubel
  */
+@NullMarked
 public class QueryExpand implements BuiltInRule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryExpand.class);
@@ -85,7 +86,7 @@ public class QueryExpand implements BuiltInRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
 
         final PosInOccurrence pio = ruleApp.posInOccurrence();
         final JTerm query = (JTerm) pio.subTerm();
@@ -683,7 +684,7 @@ public class QueryExpand implements BuiltInRule {
             strategyInfos -> strategyInfos.put(QUERY_INTRODUCTION_TIMES, previous));
     }
 
-    public Long getTimeOfQuery(JTerm t, Goal goal) {
+    public @Nullable Long getTimeOfQuery(@Nullable JTerm t, Goal goal) {
         if (t == null || !(t.op() instanceof IProgramMethod)) {
             LOGGER.warn(
                 "QueryExpand::getAgeOfQuery(t). The term is expected to be a query but it is: {}",

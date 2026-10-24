@@ -13,6 +13,8 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.transformations.pipeline.CreateObjectBuilder;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * If an allocation expression <code>new Class(...)</code> occurs, a new object has to be created,
  * in KeY this is quite similar to take it out of a list of objects and setting the implicit flag
@@ -21,6 +23,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * <code>&lt;createObject&gt;</code> which on its part calls another implicit method
  * <code>lt;prepare&gt;</code> for setting the fields values.
  */
+@NullMarked
 public class CreateObject extends ProgramTransformer {
 
     /**

@@ -29,6 +29,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Refactoring for {@link OriginTermLabel}s.
  *
@@ -36,10 +39,11 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author lanzinger
  */
+@NullMarked
 public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
     @Override
-    public ImmutableList<Name> getSupportedRuleNames() {
+    public @Nullable ImmutableList<Name> getSupportedRuleNames() {
         return null;
     }
 

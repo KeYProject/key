@@ -46,7 +46,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
@@ -79,6 +79,7 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
  * @see MergeWithLatticeAbstraction
  * @see MergeWithPredicateAbstraction
  */
+@NullMarked
 public class MergeRule implements BuiltInRule {
     public static final MergeRule INSTANCE = new MergeRule();
 
@@ -130,7 +131,7 @@ public class MergeRule implements BuiltInRule {
     }
 
     @Override
-    public final @NonNull ImmutableList<Goal> apply(Goal goal,
+    public final ImmutableList<Goal> apply(Goal goal,
             RuleApp ruleApp)
             throws RuleAbortException {
 

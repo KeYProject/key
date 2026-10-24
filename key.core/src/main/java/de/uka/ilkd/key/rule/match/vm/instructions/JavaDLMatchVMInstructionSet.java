@@ -22,6 +22,8 @@ import org.key_project.prover.rules.matcher.vm.instruction.MatchIdentityInstruct
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The factory for the Java-DL match instructions: static creation methods for every instruction
  * kind used when a find pattern's matcher is built (schema variables by kind, term labels,
@@ -40,6 +42,7 @@ import org.key_project.util.collection.ImmutableArray;
  * family, and {@code matchFamilyOf} must agree with it (pinned by
  * {@code QueueRuleApplicationManagerWakeKeyTest}).
  */
+@NullMarked
 public final class JavaDLMatchVMInstructionSet {
 
     public static GotoNextInstruction gotoNextInstruction() {

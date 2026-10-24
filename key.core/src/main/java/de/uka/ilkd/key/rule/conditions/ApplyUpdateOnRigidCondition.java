@@ -21,6 +21,9 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 
@@ -32,6 +35,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * @author Benjamin Weiss
  * @author Tobias Reinhold
  */
+@NullMarked
 public final class ApplyUpdateOnRigidCondition implements VariableCondition {
 
     /**
@@ -203,7 +207,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     }
 
     @Override
-    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
             MatchResultInfo mc,
             LogicServices services) {
         var svInst = mc.getInstantiations();

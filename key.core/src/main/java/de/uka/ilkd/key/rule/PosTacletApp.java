@@ -22,6 +22,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A position taclet application object, contains already the information to which term/formula of
@@ -31,6 +33,7 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
  * ({@link NoPosTacletApp}) is used to keep track of the (partial)
  * instantiation information.
  */
+@NullMarked
 public class PosTacletApp extends TacletApp {
 
     /**
@@ -50,12 +53,12 @@ public class PosTacletApp extends TacletApp {
      * @param pos the PosInOccurrence storing the position where to apply the Taclet
      * @return new PosTacletApp or null if conditions (assertions) have been hurt
      */
-    public static PosTacletApp createPosTacletApp(FindTaclet taclet,
+    public static @Nullable PosTacletApp createPosTacletApp(FindTaclet taclet,
             SVInstantiations instantiations, PosInOccurrence pos, Services services) {
         return createPosTacletApp(taclet, instantiations, null, pos, services);
     }
 
-    public static PosTacletApp createPosTacletApp(FindTaclet taclet,
+    public static @Nullable PosTacletApp createPosTacletApp(FindTaclet taclet,
             SVInstantiations instantiations,
             ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
             PosInOccurrence pos, Services services) {
@@ -70,8 +73,8 @@ public class PosTacletApp extends TacletApp {
         return null;
     }
 
-    public static PosTacletApp createPosTacletApp(FindTaclet taclet, MatchResultInfo matchCond,
-            PosInOccurrence pos, Services services) {
+    public static @Nullable PosTacletApp createPosTacletApp(FindTaclet taclet,
+            MatchResultInfo matchCond, PosInOccurrence pos, Services services) {
         return createPosTacletApp(taclet, matchCond.getInstantiations(), null, pos, services);
     }
 
@@ -156,7 +159,8 @@ public class PosTacletApp extends TacletApp {
      * @return the new TacletApp
      */
     @Override
-    public TacletApp addInstantiation(SchemaVariable sv, SyntaxElement term, boolean interesting,
+    public @Nullable TacletApp addInstantiation(SchemaVariable sv, SyntaxElement term,
+            boolean interesting,
             Services services) {
         if (interesting) {
             return createPosTacletApp((FindTaclet) taclet(),
@@ -177,7 +181,7 @@ public class PosTacletApp extends TacletApp {
      * @return the new Taclet application
      */
     @Override
-    public TacletApp addInstantiation(SVInstantiations svi, Services services) {
+    public @Nullable TacletApp addInstantiation(SVInstantiations svi, Services services) {
         return createPosTacletApp((FindTaclet) taclet(), svi.union(instantiations(), services),
             assumesFormulaInstantiations(), posInOccurrence(), services);
     }
@@ -191,7 +195,7 @@ public class PosTacletApp extends TacletApp {
      * @return the new Taclet application
      */
     @Override
-    protected TacletApp setInstantiation(SVInstantiations svi, Services services) {
+    protected @Nullable TacletApp setInstantiation(SVInstantiations svi, Services services) {
         return createPosTacletApp((FindTaclet) taclet(), svi, assumesFormulaInstantiations(),
             posInOccurrence(), services);
     }
@@ -202,7 +206,7 @@ public class PosTacletApp extends TacletApp {
      * metavariables given by the mc object and forget the old ones
      */
     @Override
-    public TacletApp setMatchConditions(MatchResultInfo mc, LogicServices services) {
+    public @Nullable TacletApp setMatchConditions(MatchResultInfo mc, LogicServices services) {
         return createPosTacletApp((FindTaclet) taclet(), mc.getInstantiations(),
             assumesFormulaInstantiations(), posInOccurrence(), (Services) services);
     }
@@ -213,7 +217,7 @@ public class PosTacletApp extends TacletApp {
      * metavariables and if formula instantiations given and forget the old ones
      */
     @Override
-    protected TacletApp setAllInstantiations(MatchResultInfo mc,
+    protected @Nullable TacletApp setAllInstantiations(MatchResultInfo mc,
             ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
             Services services) {
         return createPosTacletApp((FindTaclet) taclet(),

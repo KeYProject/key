@@ -13,7 +13,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
 
+
+@NullMarked
 public final class MetaGreater extends AbstractTermTransformer {
 
 

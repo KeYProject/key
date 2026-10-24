@@ -17,6 +17,8 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * This variable condition checks if an instantiation is an array.
@@ -24,6 +26,7 @@ import org.key_project.logic.sort.Sort;
  * @author mulbrich
  * @since 2006-12-03
  */
+@NullMarked
 public final class ArrayTypeCondition extends VariableConditionAdapter {
 
     private final SchemaVariable var;

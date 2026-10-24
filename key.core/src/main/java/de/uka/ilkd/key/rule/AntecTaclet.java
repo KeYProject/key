@@ -18,12 +18,14 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * An AntecTaclet represents a taclet whose find part has to match a top level formula in the
  * antecedent of the sequent.
  */
+@NullMarked
 public class AntecTaclet extends FindTaclet {
     /**
      * creates a Schematic Theory Specific Rule (Taclet) with the given parameters.
@@ -42,7 +44,7 @@ public class AntecTaclet extends FindTaclet {
     public AntecTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> heuristics,
             TacletAttributes attrs, Sequent find,
-            ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
+            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             ChoiceExpr choices,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, applPart, goalTemplates, heuristics, attrs, find, prefixMap, choices,
@@ -67,7 +69,7 @@ public class AntecTaclet extends FindTaclet {
     }
 
     @Override
-    public @NonNull AntecTaclet setName(@NonNull String s) {
+    public AntecTaclet setName(String s) {
         final TacletApplPart applPart =
             new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
                 varsNotFreeIn(),

@@ -144,8 +144,8 @@ public class WhileInvariantRule implements BuiltInRule {
      * @param innermostExecutionContext The innermost execution context.
      */
     public record Instantiation(JTerm u, JTerm progPost, While loop, LoopSpecification inv,
-            JTerm selfTerm,
-            ExecutionContext innermostExecutionContext) {
+            @Nullable JTerm selfTerm,
+            @Nullable ExecutionContext innermostExecutionContext) {
         public Instantiation {
             assert u != null;
             assert u.sort() == JavaDLTheory.UPDATE;
@@ -402,7 +402,7 @@ public class WhileInvariantRule implements BuiltInRule {
         }
 
 
-        public static Instantiation instantiate(final LoopInvariantBuiltInRuleApp<?> app,
+        public static @Nullable Instantiation instantiate(final LoopInvariantBuiltInRuleApp<?> app,
                 Services services) throws RuleAbortException {
             final JTerm focusTerm = (JTerm) app.posInOccurrence().subTerm();
 

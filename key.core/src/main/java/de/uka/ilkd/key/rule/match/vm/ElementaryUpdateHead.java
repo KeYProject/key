@@ -16,6 +16,7 @@ import org.key_project.prover.rules.matcher.vm.MatchProgram;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.getCheckNodeKindInstruction;
@@ -30,6 +31,7 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  * subterm is matched by the enclosing
  * {@link org.key_project.prover.rules.matcher.compiler.OperatorPlan}.
  */
+@NullMarked
 public final class ElementaryUpdateHead implements MatchHead {
 
     /**
