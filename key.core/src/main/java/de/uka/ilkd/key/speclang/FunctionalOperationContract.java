@@ -18,11 +18,14 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A contract about an operation (i.e., a method or a constructor), consisting of a precondition, a
  * postcondition, a modifiable clause, a measured-by clause, and a modality.
  */
+@NullMarked
 public interface FunctionalOperationContract extends OperationContract {
 
     @Override
@@ -49,14 +52,15 @@ public interface FunctionalOperationContract extends OperationContract {
      * @param services the services object.
      * @return the post condition.
      */
-    JTerm getPost(LocationVariable heap, LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+    JTerm getPost(LocationVariable heap, @Nullable LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, @Nullable LocationVariable resultVar,
+            @Nullable LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services);
 
-    JTerm getPost(List<LocationVariable> heapContext, LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+    @Nullable
+    JTerm getPost(List<LocationVariable> heapContext, @Nullable LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, @Nullable LocationVariable resultVar,
+            @Nullable LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services);
 
     /**
@@ -72,42 +76,50 @@ public interface FunctionalOperationContract extends OperationContract {
      * @param services the services object.
      * @return the postcondition.
      */
-    JTerm getPost(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-            ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
+    JTerm getPost(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, @Nullable JTerm resultTerm, @Nullable JTerm excTerm,
             Map<LocationVariable, JTerm> atPres, Services services);
 
+    @Nullable
     JTerm getPost(List<LocationVariable> heapContext, Map<LocationVariable, JTerm> heapTerms,
-            JTerm selfTerm, ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
+            @Nullable JTerm selfTerm, ImmutableList<JTerm> paramTerms, @Nullable JTerm resultTerm,
+            @Nullable JTerm excTerm,
             Map<LocationVariable, JTerm> atPres, Services services);
 
-    JTerm getFreePost(LocationVariable heap, LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+    JTerm getFreePost(LocationVariable heap, @Nullable LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, @Nullable LocationVariable resultVar,
+            @Nullable LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services);
 
-    JTerm getFreePost(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-            ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
+    JTerm getFreePost(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, @Nullable JTerm resultTerm, @Nullable JTerm excTerm,
             Map<LocationVariable, JTerm> atPres, Services services);
 
+    @Nullable
     JTerm getFreePost(List<LocationVariable> heapContext,
-            Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm, ImmutableList<JTerm> paramTerms,
-            JTerm resultTerm, JTerm excTerm, Map<LocationVariable, JTerm> atPres,
-            Services services);
+            Map<LocationVariable, JTerm> heapTerms, @Nullable JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, @Nullable JTerm resultTerm, @Nullable JTerm excTerm,
+            Map<LocationVariable, JTerm> atPres, Services services);
 
-    JTerm getFreePost(List<LocationVariable> heapContext, LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+    @Nullable
+    JTerm getFreePost(List<LocationVariable> heapContext,
+            @Nullable LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, @Nullable LocationVariable resultVar,
+            @Nullable LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services);
 
     /**
      * Returns the model method definition for model method contracts
      */
-    JTerm getRepresentsAxiom(LocationVariable heap, LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
+    @Nullable
+    JTerm getRepresentsAxiom(LocationVariable heap, @Nullable LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, @Nullable LocationVariable resultVar,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
-    JTerm getRepresentsAxiom(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-            ImmutableList<JTerm> paramTerms, JTerm resultTerm, JTerm excTerm,
+    @Nullable
+    JTerm getRepresentsAxiom(LocationVariable heap, JTerm heapTerm,
+            @Nullable JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, @Nullable JTerm resultTerm, @Nullable JTerm excTerm,
             Map<LocationVariable, JTerm> atPres, Services services);
 
     String getBaseName();
@@ -119,14 +131,19 @@ public interface FunctionalOperationContract extends OperationContract {
     JTerm getModifiable();
 
     @Override
+    @Nullable
     JTerm getMby();
 
+    @Nullable
     JTerm getSelf();
 
+    @Nullable
     ImmutableList<JTerm> getParams();
 
+    @Nullable
     JTerm getResult();
 
+    @Nullable
     JTerm getExc();
 
     KeYJavaType getSpecifiedIn();

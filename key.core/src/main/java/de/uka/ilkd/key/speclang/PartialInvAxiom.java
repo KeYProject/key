@@ -24,12 +24,16 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A class axiom which is essentially of the form "o.$inv -> phi": it demands that the invariants
  * of the objects of a particular class imply a particular formula. These axioms are logically
  * weaker than the full definitions of $inv expressed as RepresentsAxioms, but they may have higher
  * visibility, making them available in proofs where the corresponding full definition is not.
  */
+@NullMarked
 public final class PartialInvAxiom extends ClassAxiom {
 
     /**
@@ -64,7 +68,7 @@ public final class PartialInvAxiom extends ClassAxiom {
         assert target != null;
     }
 
-    public PartialInvAxiom(ClassInvariant inv, String displayName, Services services) {
+    public PartialInvAxiom(ClassInvariant inv, @Nullable String displayName, Services services) {
         this(inv, false, services);
         this.displayName = displayName;
     }

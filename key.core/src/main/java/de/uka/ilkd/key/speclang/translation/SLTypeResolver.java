@@ -9,10 +9,14 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Resolves types occurring explicitly in specification expressions (e.g. as part of a static method
  * call MyClass.m()).
  */
+@NullMarked
 public final class SLTypeResolver extends SLExpressionResolver {
 
     public SLTypeResolver(JavaInfo javaInfo, SLResolverManager manager, KeYJavaType specInClass) {
@@ -21,14 +25,14 @@ public final class SLTypeResolver extends SLExpressionResolver {
 
 
     @Override
-    protected boolean canHandleReceiver(SLExpression receiver) {
+    protected boolean canHandleReceiver(@Nullable SLExpression receiver) {
         return true;
     }
 
 
     @Override
-    protected SLExpression doResolving(SLExpression receiver, String name, SLParameters parameters)
-            throws SLTranslationException {
+    protected @Nullable SLExpression doResolving(@Nullable SLExpression receiver, String name,
+            @Nullable SLParameters parameters) throws SLTranslationException {
         try {
             KeYJavaType type = javaInfo.getTypeByClassName(name, specInClass);
             if (type == null) {

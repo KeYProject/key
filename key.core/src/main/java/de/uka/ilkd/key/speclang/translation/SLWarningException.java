@@ -8,7 +8,10 @@ import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.key_project.util.parsing.Location;
 
+import org.jspecify.annotations.NullMarked;
 
+
+@NullMarked
 public class SLWarningException extends SLTranslationException {
 
     /**

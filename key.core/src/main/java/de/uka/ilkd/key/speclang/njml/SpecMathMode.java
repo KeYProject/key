@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang.njml;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Spec math modes
  */
+@NullMarked
 public enum SpecMathMode {
     /** Bigint arithmetic */
     BIGINT,

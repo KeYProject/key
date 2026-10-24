@@ -28,6 +28,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.MapUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Default implementation of {@link BlockContract}.
  *
@@ -35,13 +38,14 @@ import org.key_project.util.java.MapUtil;
  *
  * @author wacker, lanzinger
  */
+@NullMarked
 public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
         implements BlockContract {
 
     /**
      * @see #toLoopContract()
      */
-    private LoopContract loopContract = null;
+    private @Nullable LoopContract loopContract = null;
 
     /**
      * @param baseName the base name.
@@ -98,7 +102,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
      * @param loopContract the loop contract from which this block contract was created.
      * @see #toLoopContract()
      */
-    void setLoopContract(LoopContract loopContract) {
+    void setLoopContract(@Nullable LoopContract loopContract) {
         if (this.loopContract != null) {
             throw new IllegalStateException();
         }
@@ -107,7 +111,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
     }
 
     @Override
-    public LoopContract toLoopContract() {
+    public @Nullable LoopContract toLoopContract() {
         return loopContract;
     }
 
