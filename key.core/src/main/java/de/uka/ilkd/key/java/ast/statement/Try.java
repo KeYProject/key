@@ -67,7 +67,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     public Try(StatementBlock body, Branch[] branches) {
         super(null, null);
         this.body = body;
-        this.branches = ImmutableList.of(branches);
+        this.branches = ImmutableList.ofFixedSize(branches);
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -102,7 +102,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     public Try(ExtList children) {
         super(children);
         this.body = children.get(StatementBlock.class);
-        this.branches = ImmutableList.of(children.collect(Branch.class));
+        this.branches = ImmutableList.ofFixedSize(children.collect(Branch.class));
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();

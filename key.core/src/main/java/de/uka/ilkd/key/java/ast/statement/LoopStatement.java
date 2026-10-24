@@ -112,9 +112,9 @@ public abstract class LoopStatement extends JavaStatement
             @NonNull Statement body) {
         this.body = body;
         if (updates != null) {
-            this.updates = new ForUpdates(ImmutableList.of(updates));
+            this.updates = new ForUpdates(ImmutableList.ofFixedSize(updates));
         } else {
-            this.updates = new ForUpdates(ImmutableList.of(new Expression[0]));
+            this.updates = new ForUpdates(ImmutableList.ofFixedSize(new Expression[0]));
         }
         this.inits = new LoopInit(inits);
         this.guard = new Guard(guard);
