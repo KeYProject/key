@@ -88,7 +88,8 @@ public final class CheckerData implements Logger {
         }
     }
 
-    ////////////////////////////////// results from settings checker
+    // ------------------------------------------------------------------ results from settings
+    // checker
 
     /** all choice names that occur in at least one settings object of a proof */
     private final SortedSet<String> choiceNames = new TreeSet<>();

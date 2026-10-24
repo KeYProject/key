@@ -62,7 +62,7 @@ public class Pair<T1, T2> {
         return 31 * result + (second == null ? 0 : second.hashCode());
     }
 
-    ///////////////////////////////////////////////////////////
+    // ----------------------------------------------------------------
     // convenience methods to operate on collections of pairs
 
     /**
