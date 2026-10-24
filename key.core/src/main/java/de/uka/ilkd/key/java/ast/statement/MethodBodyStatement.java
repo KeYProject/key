@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -21,6 +22,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A shortcut-statement for a method body, i.e. no dynamic dispatching any longer.
@@ -45,7 +47,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
      * the variable the result of the method execution is assigned to if the method is declared void
      * or the result not assigned to a variable or field, this value is null.
      */
-    private final IProgramVariable resultVar;
+    private final @Nullable IProgramVariable resultVar;
 
     /**
      * This type reference determines the class where the represented method has to be implemented.
@@ -58,7 +60,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     private final MethodReference methodReference;
 
     /** cache resolved method */
-    private IProgramMethod method;
+    private @Nullable IProgramMethod method;
 
     /**
      * indicates whether this stands for the specification of a method rather than the concrete body
@@ -90,10 +92,12 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     }
 
     public MethodBodyStatement(ExtList list) {
-        this.bodySource = list.get(TypeReference.class);
+        this.bodySource = Objects.requireNonNull(list.get(TypeReference.class),
+            "method body statement needs a body source type reference");
         this.resultVar = list.get(IProgramVariable.class);
 
-        this.methodReference = list.get(MethodReference.class);
+        this.methodReference = Objects.requireNonNull(list.get(MethodReference.class),
+            "method body statement needs a method reference");
 
         assert methodReference != null : "Missing methodreference";
         assert methodReference.getReferencePrefix() != null
@@ -110,9 +114,10 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
 
     public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,
             IProgramVariable res, ImmutableArray<Expression> args, boolean useSpecification,
-            ProgramElement scope) {
+            @Nullable ProgramElement scope) {
         this.method = method;
-        this.bodySource = new TypeRef(method.getContainerType());
+        this.bodySource = new TypeRef(Objects.requireNonNull(method.getContainerType(),
+            "a program method must have a container type"));
         this.resultVar = res;
         this.useSpecification = useSpecification;
 
@@ -173,7 +178,8 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         if (method == null) {
             resolveMethod(services);
         }
-        return method.getBody();
+        return Objects.requireNonNull(method, "method body statement did not resolve its method")
+                .getBody();
     }
 
     /**
@@ -240,7 +246,8 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         if (method == null) {
             resolveMethod(services);
         }
-        return method.isStatic();
+        return Objects.requireNonNull(method, "method body statement did not resolve its method")
+                .isStatic();
     }
 
 
@@ -255,7 +262,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         v.performActionOnMethodBodyStatement(this);
     }
 
-    public IProgramVariable getResultVariable() {
+    public @Nullable IProgramVariable getResultVariable() {
         return resultVar;
     }
 
@@ -272,7 +279,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         if (method == null) {
             resolveMethod(services);
         }
-        return method;
+        return Objects.requireNonNull(method, "method body statement did not resolve its method");
     }
 
     private void resolveMethod(Services services) {

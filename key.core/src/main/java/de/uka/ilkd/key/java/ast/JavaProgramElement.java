@@ -67,7 +67,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
         comments = extractComments(children);
     }
 
-    public JavaProgramElement(PositionInfo pi, @Nullable List<Comment> comments) {
+    public JavaProgramElement(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
         super(pi);
         this.comments = comments == null ? NO_COMMENTS : comments.toArray(new Comment[0]);
     }

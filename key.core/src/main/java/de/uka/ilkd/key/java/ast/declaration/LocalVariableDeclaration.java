@@ -35,7 +35,11 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     /**
      * Local variable declaration.
      */
-
+    // The parameterless constructor deliberately leaves the varSpecs field unset (null): it
+    // builds an "empty" declaration stub whose consumers are all null-guarded
+    // (getChildCount/getChildAt). The null assignment violates the @NonNull field contract,
+    // so the check is scoped here.
+    @SuppressWarnings("NullAway")
     public LocalVariableDeclaration() {
         super();
         this.varSpecs = null;

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.ast.Statement;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Default implementation for non-terminal Java statements.
@@ -48,7 +49,7 @@ public abstract class JavaStatement extends JavaNonTerminalProgramElement implem
         super(pos);
     }
 
-    public JavaStatement(PositionInfo pi, List<Comment> comments) {
+    public JavaStatement(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
         super(pi, comments);
     }
 }

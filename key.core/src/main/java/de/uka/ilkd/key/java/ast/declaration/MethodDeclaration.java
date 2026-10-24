@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -37,11 +38,11 @@ public class MethodDeclaration extends JavaDeclaration
     /**
      * The return type of the method.
      */
-    protected final TypeReference returnType;
+    protected final @Nullable TypeReference returnType;
     /**
      * In case of void return type: comments associated with the method.
      */
-    protected final Comment[] voidComments;
+    protected final @Nullable Comment[] voidComments;
     /**
      * The name of the method.
      */
@@ -54,12 +55,12 @@ public class MethodDeclaration extends JavaDeclaration
      * 'throws' part of the method. Indicates which exceptions the method may throw.
      * May be null.
      */
-    protected final Throws exceptions;
+    protected final @Nullable Throws exceptions;
     /**
      * Body of the method.
      * May be null, in which case the body is referenced in a file using {@link #posInfo}.
      */
-    protected final StatementBlock body;
+    protected final @Nullable StatementBlock body;
     /**
      * JML modifiers of the referenced method. Includes e.g. {@code pure}.
      */
@@ -128,9 +129,11 @@ public class MethodDeclaration extends JavaDeclaration
     public MethodDeclaration(ExtList children, boolean parentIsInterfaceDeclaration,
             Comment[] voidComments) {
         super(children);
-        returnType = children.get(TypeReference.class);
+        returnType = Objects.requireNonNull(children.get(TypeReference.class),
+            "a method declaration requires a return type");
         this.voidComments = voidComments;
-        name = children.get(ProgramElementName.class);
+        name = Objects.requireNonNull(children.get(ProgramElementName.class),
+            "a method declaration requires a name");
         this.parameters = new ImmutableArray<>(children.collect(ParameterDeclaration.class));
         exceptions = children.get(Throws.class);
         body = children.get(StatementBlock.class);
@@ -343,7 +346,7 @@ public class MethodDeclaration extends JavaDeclaration
      *
      * @return the type reference.
      */
-    public TypeReference getTypeReference() {
+    public @Nullable TypeReference getTypeReference() {
         return returnType;
     }
 
@@ -354,14 +357,14 @@ public class MethodDeclaration extends JavaDeclaration
      *
      * @return the "void comments"
      */
-    public Comment[] getVoidComments() {
+    public @Nullable Comment[] getVoidComments() {
         return voidComments;
     }
 
 
     @Override
-    public final @Nullable String getName() {
-        return (name == null) ? null : name.toString();
+    public final String getName() {
+        return name.toString();
     }
 
 
@@ -376,12 +379,12 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
 
-    public Throws getThrown() {
+    public @Nullable Throws getThrown() {
         return exceptions;
     }
 
 
-    public StatementBlock getBody() {
+    public @Nullable StatementBlock getBody() {
         return body;
     }
 

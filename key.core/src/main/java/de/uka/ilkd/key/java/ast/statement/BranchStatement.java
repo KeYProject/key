@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.ast.PositionInfo;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Branch statement.
@@ -39,7 +40,7 @@ public abstract class BranchStatement extends JavaStatement implements NonTermin
         super(children);
     }
 
-    public BranchStatement(PositionInfo pi, List<Comment> comments) {
+    public BranchStatement(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
         super(pi, comments);
     }
 

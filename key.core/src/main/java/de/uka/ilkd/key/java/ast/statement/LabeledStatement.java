@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.statement;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -38,7 +40,7 @@ public class LabeledStatement extends JavaStatement
     private final PosInProgram firstActiveChildPos;
 
     private final int prefixLength;
-    private final MethodFrame innerMostMethodFrame;
+    private final @Nullable MethodFrame innerMostMethodFrame;
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
@@ -51,7 +53,8 @@ public class LabeledStatement extends JavaStatement
         super(children, pos);
         name = label;
 
-        body = children.get(Statement.class);
+        body = Objects.requireNonNull(children.get(Statement.class),
+            "labeled statement needs a body statement");
         firstActiveChildPos = body instanceof StatementBlock
                 ? ((StatementBlock) body).isEmpty() ? PosInProgram.TOP : PosInProgram.ONE_ZERO
                 : PosInProgram.ONE;
@@ -172,6 +175,11 @@ public class LabeledStatement extends JavaStatement
      *
      * @return the string.
      */
+    // The label is always present (all constructors require a non-null Label), so the
+    // @Nullable return is defensive; the override cannot be widened to @NullMarked's @NonNull
+    // without rippling into NamedModelElement.getName(), whose contract cannot be widened
+    // without ripple (see TypeDeclaration.getName()).
+    @SuppressWarnings("NullAway")
     public final @Nullable String getName() {
         return (name == null) ? null : name.toString();
     }
@@ -191,6 +199,11 @@ public class LabeledStatement extends JavaStatement
      *
      * @return the identifier.
      */
+    // The label of a labeled statement is always a ProgramElementName (all constructors
+    // require a non-null Label); the final null return is defensive for schema-variable
+    // labels. The override cannot be widened to the @NonNull contract of
+    // NamedProgramElement.getProgramElementName(), which cannot be widened without ripple.
+    @SuppressWarnings("NullAway")
     public @Nullable ProgramElementName getProgramElementName() {
         if ((name instanceof ProgramElementName) || (name == null)) {
             return (ProgramElementName) name;
@@ -295,7 +308,7 @@ public class LabeledStatement extends JavaStatement
     }
 
     @Override
-    public MethodFrame getInnerMostMethodFrame() {
+    public @Nullable MethodFrame getInnerMostMethodFrame() {
         return innerMostMethodFrame;
     }
 
