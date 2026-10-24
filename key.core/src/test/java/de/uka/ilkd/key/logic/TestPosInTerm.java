@@ -134,9 +134,10 @@ public class TestPosInTerm {
 
         PosInTerm pit = toPosInTerm(pos);
 
-        assertEquals("[10,2,5,20,4,100,25,65,23,40,2,0,1,0,1]", pit.integerList(pit.iterator()));
+        assertEquals("[10,2,5,20,4,100,25,65,23,40,2,0,1,0,1]",
+            PosInTerm.integerList(pit.iterator()));
         assertEquals("[1,0,1,0,2,40,23,65,25,100,4,20,5,2,10]",
-            pit.integerList(pit.reverseIterator()));
+            PosInTerm.integerList(pit.reverseIterator()));
     }
 
     @Test
