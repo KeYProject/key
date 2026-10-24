@@ -20,7 +20,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -47,13 +47,13 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
         this.args = args;
     }
 
-    private static ImmutableArray<Expression> toExpArray(
-            ImmutableArray<? extends ProgramElement> a) {
+    private static ImmutableList<Expression> toExpArray(
+            ImmutableList<? extends ProgramElement> a) {
         Expression[] result = new Expression[a.size()];
         for (int i = 0; i < a.size(); i++) {
             result[i] = (Expression) a.get(i);
         }
-        return new ImmutableArray<>(result);
+        return ImmutableList.of(result);
     }
 
 
@@ -64,14 +64,14 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
 
         ReferencePrefix rp = (ReferencePrefix) svInst.getInstantiation(caller);
         MethodName mn = (MethodName) svInst.getInstantiation(methname);
-        ImmutableArray<ProgramElement> ape =
-            (ImmutableArray<ProgramElement>) svInst.getInstantiation(args);
+        ImmutableList<ProgramElement> ape =
+            (ImmutableList<ProgramElement>) svInst.getInstantiation(args);
 
         if (rp != null && mn != null && ape != null) {
-            ImmutableArray<Expression> ar =
-                toExpArray((ImmutableArray<ProgramElement>) svInst.getInstantiation(args));
+            ImmutableList<Expression> ar =
+                toExpArray((ImmutableList<ProgramElement>) svInst.getInstantiation(args));
             if (var == args) {
-                ar = toExpArray((ImmutableArray<? extends ProgramElement>) subst);
+                ar = toExpArray((ImmutableList<? extends ProgramElement>) subst);
             }
             ExecutionContext ec = svInst.getContextInstantiation().activeStatementContext();
             MethodReference mr = new MethodReference(ar, mn, rp);
