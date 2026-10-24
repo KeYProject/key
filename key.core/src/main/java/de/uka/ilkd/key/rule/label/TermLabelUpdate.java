@@ -68,7 +68,7 @@ public interface TermLabelUpdate extends RuleSpecificTask {
     void updateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             @Nullable JTerm applicationTerm, @Nullable JTerm modalityTerm,
-            Rule rule, RuleApp ruleApp, Object hint, JTerm tacletTerm,
+            Rule rule, RuleApp ruleApp, Object hint, @Nullable JTerm tacletTerm,
             JTerm newTerm,
             Set<TermLabel> labels);
 }

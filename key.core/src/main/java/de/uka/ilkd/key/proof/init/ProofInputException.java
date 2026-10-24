@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Reading prover input failed
@@ -21,7 +22,7 @@ public class ProofInputException extends Exception {
         super(s);
     }
 
-    public ProofInputException(String message, Throwable cause) {
+    public ProofInputException(String message, @Nullable Throwable cause) {
         super(message, cause);
     }
 }

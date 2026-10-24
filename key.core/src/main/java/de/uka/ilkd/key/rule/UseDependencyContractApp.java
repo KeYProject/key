@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -26,7 +27,7 @@ import org.jspecify.annotations.Nullable;
 public class UseDependencyContractApp<T extends UseDependencyContractRule>
         extends AbstractContractRuleApp<T> {
 
-    private final PosInOccurrence step;
+    private final @Nullable PosInOccurrence step;
     private @Nullable List<LocationVariable> heapContext;
 
     public UseDependencyContractApp(UseDependencyContractRule builtInRule, PosInOccurrence pio) {
@@ -34,13 +35,13 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
     }
 
     public UseDependencyContractApp(UseDependencyContractRule builtInRule, PosInOccurrence pio,
-            Contract instantiation, PosInOccurrence step) {
+            @Nullable Contract instantiation, @Nullable PosInOccurrence step) {
         this(builtInRule, pio, ImmutableList.nil(), instantiation, step);
     }
 
-    public UseDependencyContractApp(UseDependencyContractRule rule, PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> ifInsts, Contract contract,
-            PosInOccurrence step) {
+    public UseDependencyContractApp(UseDependencyContractRule rule, @Nullable PosInOccurrence pio,
+            ImmutableList<PosInOccurrence> ifInsts, @Nullable Contract contract,
+            @Nullable PosInOccurrence step) {
         // weigl: why is this unchecked cast needed?
         super((T) rule, pio, ifInsts, contract);
         this.step = step;
@@ -60,8 +61,13 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
 
     private UseDependencyContractApp computeStep(Goal goal, Services services) {
         assert this.step == null;
+        final List<LocationVariable> heapCtx =
+            Objects.requireNonNull(getHeapContext(),
+                "no heap context to compute the dependency step");
+        final PosInOccurrence pos = Objects.requireNonNull(posInOccurrence(),
+            "no position in occurrence to compute the dependency step");
         final List<PosInOccurrence> steps = UseDependencyContractRule
-                .getSteps(this.getHeapContext(), this.posInOccurrence(), goal.sequent(), services);
+                .getSteps(heapCtx, pos, goal.sequent(), services);
         final PosInOccurrence recorded =
             UseDependencyContractRule.findStepInIfInsts(steps, this);
         if (recorded != null) {
@@ -88,8 +94,8 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
         // center on making the UseDependencyContractApp immutable and use the instantiateApp
         // path instead of assumes to provide step instantiations and cost evaluation for
         // different steps.
-        final PosInOccurrence chosen = UseDependencyContractRule.chooseStep(posInOccurrence(),
-            goal, getHeapContext(), services);
+        final PosInOccurrence chosen =
+            UseDependencyContractRule.chooseStep(pos, goal, heapCtx, services);
         if (chosen == null) {
             // the policy offers no step on this goal: the step stays unset, which keeps
             // complete() false, and the caller discards the application
@@ -102,7 +108,7 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
     }
 
 
-    public PosInOccurrence step() {
+    public @Nullable PosInOccurrence step() {
         return step;
     }
 
@@ -114,7 +120,7 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
     }
 
     @Override
-    public UseDependencyContractApp<T> setContract(Contract contract) {
+    public UseDependencyContractApp<T> setContract(@Nullable Contract contract) {
         return new UseDependencyContractApp<>(rule(), posInOccurrence(), ifInsts, contract,
             step);
     }
@@ -139,7 +145,9 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
     }
 
     public UseDependencyContractApp tryToInstantiateContract(final Services services) {
-        final var focus = posInOccurrence().subTerm();
+        final PosInOccurrence focusPos = Objects.requireNonNull(posInOccurrence(),
+            "no position in occurrence");
+        final var focus = focusPos.subTerm();
         if (!(focus.op() instanceof IObserverFunction target))
         // TODO: find more appropriate exception
         {
@@ -160,8 +168,10 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
             selfTerm = focus.sub(target.getStateCount() * target.getHeapCount(services));
             kjt = services.getJavaInfo().getKeYJavaType(selfTerm.sort());
         }
+        final KeYJavaType containerType = Objects.requireNonNull(kjt,
+            "no container type for the observer function");
         ImmutableSet<Contract> contracts =
-            UseDependencyContractRule.getApplicableContracts(services, kjt, target);
+            UseDependencyContractRule.getApplicableContracts(services, containerType, target);
 
         if (!contracts.isEmpty()) {
             UseDependencyContractApp r = setContract(contracts.iterator().next());
@@ -179,8 +189,10 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
     }
 
     @Override
-    public IObserverFunction getObserverFunction(Services services) {
-        final var op = posInOccurrence().subTerm().op();
+    public @Nullable IObserverFunction getObserverFunction(Services services) {
+        final PosInOccurrence focusPos = Objects.requireNonNull(posInOccurrence(),
+            "no position in occurrence");
+        final var op = focusPos.subTerm().op();
         return (IObserverFunction) (op instanceof IObserverFunction ? op : null);
     }
 
