@@ -41,7 +41,6 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
@@ -71,7 +70,7 @@ public final class MethodCall extends ProgramTransformer {
     protected ProgramVariable pvar;
     private final IExecutionContext execContextSV;
     private ExecutionContext execContext;
-    protected ImmutableArray<Expression> arguments;
+    protected ImmutableList<Expression> arguments;
     protected KeYJavaType staticPrefixType;
 
     /**
@@ -118,7 +117,7 @@ public final class MethodCall extends ProgramTransformer {
     }
 
     /** gets an array of expression and returns a list of types */
-    private ImmutableList<KeYJavaType> getTypes(ImmutableArray<Expression> args,
+    private ImmutableList<KeYJavaType> getTypes(ImmutableList<Expression> args,
             Services services) {
         ImmutableList<KeYJavaType> result = ImmutableList.nil();
         for (int i = args.size() - 1; i >= 0; i--) {
@@ -492,12 +491,12 @@ public final class MethodCall extends ProgramTransformer {
         return paramDecl;
     }
 
-    private ImmutableArray<Expression> getVariables(VariableSpecification[] varspecs) {
+    private ImmutableList<Expression> getVariables(VariableSpecification[] varspecs) {
         Expression[] vars = new Expression[varspecs.length];
         for (int i = 0; i < varspecs.length; i++) {
             vars[i] = (Expression) varspecs[i].getProgramVariable();
         }
-        return new ImmutableArray<>(vars);
+        return ImmutableList.of(vars);
     }
 
     /**
