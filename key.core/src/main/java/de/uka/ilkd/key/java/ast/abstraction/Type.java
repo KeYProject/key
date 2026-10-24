@@ -6,12 +6,15 @@ package de.uka.ilkd.key.java.ast.abstraction;
 
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A program model element representing types.
  *
  * @author AL
  * @author RN
  */
+@NullMarked
 public interface Type extends ProgramModelElement {
 
     /**

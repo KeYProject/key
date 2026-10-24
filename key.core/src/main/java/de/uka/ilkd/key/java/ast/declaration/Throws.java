@@ -14,12 +14,15 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Throws.
  *
  * @author <TT>AutoDoc</TT>
  */
 
+@NullMarked
 public class Throws extends JavaNonTerminalProgramElement implements TypeReferenceContainer {
 
 

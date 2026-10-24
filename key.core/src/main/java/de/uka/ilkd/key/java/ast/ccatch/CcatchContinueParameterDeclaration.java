@@ -13,11 +13,15 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A "\Continue" parameter declaration of a ccatch clause.
  *
  * @author Dominic Steinhöfel
  */
+@NullMarked
 public class CcatchContinueParameterDeclaration extends CcatchNonstandardParameterDeclaration {
 
     public CcatchContinueParameterDeclaration(ExtList children) {
@@ -34,7 +38,7 @@ public class CcatchContinueParameterDeclaration extends CcatchNonstandardParamet
     }
 
     @Override
-    public ProgramElement getChildAt(int index) {
+    public @Nullable ProgramElement getChildAt(int index) {
         return null;
     }
 

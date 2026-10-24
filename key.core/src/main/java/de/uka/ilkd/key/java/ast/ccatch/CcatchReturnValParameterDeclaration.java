@@ -15,11 +15,15 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A "\Return int v" parameter declaration of a ccatch clause.
  *
  * @author Dominic Steinhöfel
  */
+@NullMarked
 public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParameterDeclaration
         implements ParameterContainer {
 
@@ -105,7 +109,7 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
     }
 
     @Override
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
         return super.match(source, matchCond);
     }
 

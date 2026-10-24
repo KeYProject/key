@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -35,6 +36,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author <TT>Wolfram Pfeifer</TT>
  */
+@NullMarked
 public class CharLiteral extends AbstractIntegerLiteral {
 
     /**

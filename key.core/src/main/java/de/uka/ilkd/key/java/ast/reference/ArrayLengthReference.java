@@ -13,12 +13,15 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Array length reference. As a length reference is int-valued, and hence it is no valid prefix. Do
  * <b>not</b> instantiate this class if you want to construct the Java expression
  * <code>a.length</code>! Use {@link JavaInfo#getArrayLength()} instead.
  */
 
+@NullMarked
 public class ArrayLengthReference extends JavaNonTerminalProgramElement
         implements Reference, Expression, ReferenceSuffix {
 

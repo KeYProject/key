@@ -13,11 +13,15 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A "\Break" parameter declaration of a ccatch clause.
  *
  * @author Dominic Steinhöfel
  */
+@NullMarked
 public class CcatchBreakParameterDeclaration extends CcatchNonstandardParameterDeclaration {
 
     public CcatchBreakParameterDeclaration(ExtList children) {}
@@ -32,7 +36,7 @@ public class CcatchBreakParameterDeclaration extends CcatchNonstandardParameterD
     }
 
     @Override
-    public ProgramElement getChildAt(int index) {
+    public @Nullable ProgramElement getChildAt(int index) {
         return null;
     }
 

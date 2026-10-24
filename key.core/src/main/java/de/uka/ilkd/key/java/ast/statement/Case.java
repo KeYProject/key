@@ -13,10 +13,13 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Case.
  *
  */
+@NullMarked
 public class Case extends BranchImp implements ExpressionContainer {
 
     /**

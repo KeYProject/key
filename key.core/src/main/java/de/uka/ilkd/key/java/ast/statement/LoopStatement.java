@@ -16,7 +16,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Position;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -24,6 +24,7 @@ import org.jspecify.annotations.Nullable;
  *
  */
 
+@NullMarked
 public abstract class LoopStatement extends JavaStatement
         implements StatementContainer, ExpressionContainer {
 
@@ -42,14 +43,12 @@ public abstract class LoopStatement extends JavaStatement
     /**
      * Guard.
      */
-    @NonNull
     protected final IGuard guard;
 
 
     /**
      * Body.
      */
-    @NonNull
     protected final Statement body;
 
     protected final ImmutableList<TextualJMLConstruct> attachedJml;
@@ -60,7 +59,7 @@ public abstract class LoopStatement extends JavaStatement
      * @param body
      *        a statement.
      */
-    public LoopStatement(@NonNull Expression guard, @NonNull Statement body, ExtList comments) {
+    public LoopStatement(Expression guard, Statement body, ExtList comments) {
         super(comments);
         this.body = body;
         this.updates = null;
@@ -69,7 +68,7 @@ public abstract class LoopStatement extends JavaStatement
         this.attachedJml = ImmutableList.nil();
     }
 
-    public LoopStatement(Expression guard, @NonNull Statement body, ExtList comments,
+    public LoopStatement(Expression guard, Statement body, ExtList comments,
             PositionInfo pos) {
         super(add(comments, pos));
         this.body = body;
@@ -79,7 +78,7 @@ public abstract class LoopStatement extends JavaStatement
         this.attachedJml = ImmutableList.nil();
     }
 
-    public LoopStatement(Expression guard, @NonNull Statement body) {
+    public LoopStatement(Expression guard, Statement body) {
         this.body = body;
         this.updates = null;
         this.inits = null;
@@ -87,7 +86,7 @@ public abstract class LoopStatement extends JavaStatement
         this.attachedJml = ImmutableList.nil();
     }
 
-    public LoopStatement(Expression guard, @NonNull Statement body, PositionInfo pos) {
+    public LoopStatement(Expression guard, Statement body, PositionInfo pos) {
         super(pos);
         this.body = body;
         this.updates = null;
@@ -110,7 +109,7 @@ public abstract class LoopStatement extends JavaStatement
      *        the body of the loop
      */
     public LoopStatement(LoopInitializer[] inits, Expression guard, Expression[] updates,
-            @NonNull Statement body) {
+            Statement body) {
         this.body = body;
         if (updates != null) {
             this.updates = new ForUpdates(new ImmutableArray<>(updates));
@@ -136,8 +135,8 @@ public abstract class LoopStatement extends JavaStatement
      * @param comments
      *        the comments attached to this statement.
      */
-    public LoopStatement(ILoopInit inits, @NonNull IGuard guard, IForUpdates updates,
-            @NonNull Statement body,
+    public LoopStatement(ILoopInit inits, IGuard guard, IForUpdates updates,
+            Statement body,
             ExtList comments) {
         super(comments);
         this.body = body;
@@ -148,8 +147,8 @@ public abstract class LoopStatement extends JavaStatement
     }
 
 
-    public LoopStatement(ILoopInit inits, @NonNull IGuard guard, IForUpdates updates,
-            @NonNull Statement body,
+    public LoopStatement(ILoopInit inits, IGuard guard, IForUpdates updates,
+            Statement body,
             ExtList comments, PositionInfo pos) {
         super(add(comments, pos));
         this.body = body;
@@ -174,8 +173,8 @@ public abstract class LoopStatement extends JavaStatement
      * @param pos
      *        the position of the loop
      */
-    public LoopStatement(ILoopInit inits, @NonNull IGuard guard, IForUpdates updates,
-            @NonNull Statement body,
+    public LoopStatement(ILoopInit inits, IGuard guard, IForUpdates updates,
+            Statement body,
             PositionInfo pos) {
         super(pos);
         this.body = body;
@@ -198,8 +197,8 @@ public abstract class LoopStatement extends JavaStatement
      * @param body
      *        the body of the loop
      */
-    public LoopStatement(ILoopInit inits, @NonNull IGuard guard, IForUpdates updates,
-            @NonNull Statement body) {
+    public LoopStatement(ILoopInit inits, IGuard guard, IForUpdates updates,
+            Statement body) {
         this.body = body;
         this.updates = updates;
         this.inits = inits;
@@ -208,7 +207,7 @@ public abstract class LoopStatement extends JavaStatement
     }
 
     public LoopStatement(PositionInfo pi, List<Comment> comments, ILoopInit inits,
-            IForUpdates updates, @NonNull IGuard guard, @NonNull Statement body,
+            IForUpdates updates, IGuard guard, Statement body,
             ImmutableList<TextualJMLConstruct> attachedJml) {
         super(pi, comments);
         this.inits = inits;
@@ -356,7 +355,6 @@ public abstract class LoopStatement extends JavaStatement
      *
      * @return the expression.
      */
-    @NonNull
     public IGuard getGuard() {
         return guard;
     }
@@ -366,8 +364,7 @@ public abstract class LoopStatement extends JavaStatement
      *
      * @return the expression.
      */
-    @Nullable
-    public Expression getGuardExpression() {
+    public @Nullable Expression getGuardExpression() {
         return (Expression) guard.getChildAt(0);
     }
 
@@ -376,7 +373,6 @@ public abstract class LoopStatement extends JavaStatement
      *
      * @return the statement.
      */
-    @NonNull
     public Statement getBody() {
         return body;
     }
@@ -411,7 +407,7 @@ public abstract class LoopStatement extends JavaStatement
      *
      * @return the loop initializer array wrapper .
      */
-    public ImmutableArray<LoopInitializer> getInitializers() {
+    public @Nullable ImmutableArray<LoopInitializer> getInitializers() {
         if (inits != null) {
             return inits.getInits();
         }
@@ -424,7 +420,7 @@ public abstract class LoopStatement extends JavaStatement
      *
      * @return the expression mutable list.
      */
-    public ImmutableArray<Expression> getUpdates() {
+    public @Nullable ImmutableArray<Expression> getUpdates() {
         if (updates != null) {
             return updates.getUpdates();
         }

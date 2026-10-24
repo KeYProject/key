@@ -6,6 +6,9 @@ package de.uka.ilkd.key.java.ast.statement;
 
 import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public interface IGuard extends NonTerminalProgramElement {
 
 

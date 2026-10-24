@@ -12,10 +12,13 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Finally.
  *
  */
+@NullMarked
 public class Finally extends BranchImp {
 
     /**

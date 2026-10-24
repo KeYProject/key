@@ -16,6 +16,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class is used for wrapping an enum into a standard class type.
  *
@@ -27,6 +29,7 @@ import org.key_project.util.ExtList;
  * @since 2006-12-10
  */
 
+@NullMarked
 public class EnumClassDeclaration extends ClassDeclaration {
 
     /**
