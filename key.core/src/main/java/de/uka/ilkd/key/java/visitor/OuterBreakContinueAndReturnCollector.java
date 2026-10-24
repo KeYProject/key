@@ -21,6 +21,9 @@ import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.java.ast.statement.Return;
 import de.uka.ilkd.key.java.ast.statement.Switch;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class OuterBreakContinueAndReturnCollector extends JavaASTVisitor {
 
     private final List<Break> breaks;

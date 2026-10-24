@@ -27,6 +27,7 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * The Java DL requires some implicit fields and methods, that are
@@ -39,6 +40,7 @@ import com.github.javaparser.ast.type.Type;
  * them will access these fields, this transformer has to be executed
  * before the other transformers are called.
  */
+@NullMarked
 public class ImplicitFieldAdder extends JavaTransformerAbstract {
 
     /**

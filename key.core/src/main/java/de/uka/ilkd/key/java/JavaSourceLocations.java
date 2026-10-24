@@ -14,6 +14,7 @@ import org.key_project.util.parsing.Position;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -23,6 +24,7 @@ import org.jspecify.annotations.Nullable;
  * JavaParser (and other target-language) dependencies. The conversions from JavaParser positions
  * and AST nodes therefore live here, in {@code key.core}.
  */
+@NullMarked
 public final class JavaSourceLocations {
 
     private JavaSourceLocations() {}

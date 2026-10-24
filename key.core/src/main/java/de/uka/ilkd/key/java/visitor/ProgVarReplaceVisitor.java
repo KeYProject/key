@@ -37,10 +37,14 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Walks through a java AST in depth-left-first-order. This visitor replaces a number of program
  * variables by others or new ones.
  */
+@NullMarked
 public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     // indicates if ALL program variables are to be replace by new
@@ -52,7 +56,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      */
     protected final Map<LocationVariable, LocationVariable> replaceMap;
 
-    private ProgramElement result = null;
+    private @Nullable ProgramElement result = null;
 
     /**
      * creates a visitor that replaces the program variables in the given statement by new ones with
@@ -143,7 +147,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         result = (ProgramElement) stack.peek().get(i);
     }
 
-    public ProgramElement result() {
+    public @Nullable ProgramElement result() {
         return result;
     }
 
@@ -158,7 +162,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
     }
 
-    private JTerm replaceVariablesInTerm(JTerm t) {
+    private @Nullable JTerm replaceVariablesInTerm(@Nullable JTerm t) {
         if (t == null) {
             return null;
         }
@@ -483,7 +487,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             replaceRemembranceLocalVariables(variables.outerRemembranceVariables), services);
     }
 
-    private LocationVariable replaceVariable(final LocationVariable variable) {
+    private @Nullable LocationVariable replaceVariable(final @Nullable LocationVariable variable) {
         if (variable != null) {
             if (replaceMap.containsKey(variable)) {
                 // TODO Can we really safely assume that replaceMap contains a

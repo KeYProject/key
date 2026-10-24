@@ -12,12 +12,16 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.statement.While;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Utilits class used by
  * SymbolicExecutionUtil#containsStatement(MethodFrame, ProgramElement, Services).
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class ContainsStatementVisitor extends JavaASTVisitor {
     /**
      * The {@link ProgramElement} to search.
@@ -79,7 +83,8 @@ public class ContainsStatementVisitor extends JavaASTVisitor {
      * @return {@code true} both are equal and at the same {@link PositionInfo}, {@code false}
      *         otherwise.
      */
-    public static boolean equalsWithPosition(SourceElement first, SourceElement second) {
+    public static boolean equalsWithPosition(@Nullable SourceElement first,
+            @Nullable SourceElement second) {
         if (first != null && second != null) {
             if (first instanceof While) {
                 if (second instanceof While) {

@@ -7,13 +7,17 @@ package de.uka.ilkd.key.java;
 import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class ProgramPrefixUtil {
 
     public static class ProgramPrefixInfo {
         private final int length;
-        private final MethodFrame mf;
+        private final @Nullable MethodFrame mf;
 
-        public ProgramPrefixInfo(int length, MethodFrame mf) {
+        public ProgramPrefixInfo(int length, @Nullable MethodFrame mf) {
             this.length = length;
             this.mf = mf;
         }
@@ -22,7 +26,7 @@ public class ProgramPrefixUtil {
             return length;
         }
 
-        public MethodFrame getInnerMostMethodFrame() {
+        public @Nullable MethodFrame getInnerMostMethodFrame() {
             return mf;
         }
     }
