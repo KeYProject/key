@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof;
 
-
 import org.key_project.util.parsing.HasLocation;
 import org.key_project.util.parsing.Location;
 import org.key_project.util.parsing.Position;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -16,6 +16,7 @@ import org.jspecify.annotations.Nullable;
  * a table it is the row of the table, but the column position is relative to the text and does not
  * describe the column of the table. (has to be changed)
  */
+@NullMarked
 public abstract class SVInstantiationExceptionWithPosition extends SVInstantiationException
         implements HasLocation {
 

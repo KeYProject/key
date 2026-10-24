@@ -14,7 +14,9 @@ import java.util.Objects;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class FileRuleSource extends RuleSource {
 
     /**

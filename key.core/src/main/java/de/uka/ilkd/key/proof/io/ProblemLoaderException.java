@@ -6,7 +6,9 @@ package de.uka.ilkd.key.proof.io;
 
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public final class ProblemLoaderException extends Exception {
 
     private static final long serialVersionUID = 5683051720482052601L;

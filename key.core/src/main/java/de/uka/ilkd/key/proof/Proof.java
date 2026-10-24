@@ -82,7 +82,7 @@ public class Proof implements ProofObject<Goal>, Named {
     /**
      * the root of the proof
      */
-    private Node root;
+    private @Nullable Node root;
 
     /**
      * list with prooftree listeners of this proof attention: firing events makes use of array
@@ -122,12 +122,12 @@ public class Proof implements ProofObject<Goal>, Named {
     /**
      * the logic configuration for this proof, i.e., logic signature, rules etc.
      */
-    private InitConfig initConfig;
+    private @Nullable InitConfig initConfig;
 
     /**
      * the environment of the proof with specs and java model
      */
-    private ProofCorrectnessMgt localMgt;
+    private @Nullable ProofCorrectnessMgt localMgt;
 
     /**
      * settings valid independent of a proof
@@ -143,13 +143,13 @@ public class Proof implements ProofObject<Goal>, Named {
      * when load and save a proof with different versions of key this vector fills up with Strings
      * containing the GIT versions.
      */
-    public List<String> keyVersionLog;
+    public @Nullable List<String> keyVersionLog;
 
     private long autoModeTime = 0;
 
     private @Nullable Strategy<Goal> activeStrategy;
 
-    private PropertyChangeListener settingsListener;
+    private @Nullable PropertyChangeListener settingsListener;
 
     /**
      * Set to true if the proof has been abandoned and the dispose method has been called on this
@@ -360,7 +360,7 @@ public class Proof implements ProofObject<Goal>, Named {
         return problemHeader;
     }
 
-    public ProofCorrectnessMgt mgt() {
+    public @Nullable ProofCorrectnessMgt mgt() {
         return localMgt;
     }
 
@@ -407,7 +407,7 @@ public class Proof implements ProofObject<Goal>, Named {
         fstGoal.makeLocalNamespacesFrom(ns);
     }
 
-    public ProofEnvironment getEnv() {
+    public @Nullable ProofEnvironment getEnv() {
         return env;
     }
 
@@ -420,7 +420,7 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
 
-    public Strategy<Goal> getActiveStrategy() {
+    public @Nullable Strategy<Goal> getActiveStrategy() {
         if (activeStrategy == null) {
             initStrategy();
         }
@@ -460,7 +460,7 @@ public class Proof implements ProofObject<Goal>, Named {
     /**
      * returns the root node of the proof
      */
-    public Node root() {
+    public @Nullable Node root() {
         return root;
     }
 
@@ -765,11 +765,12 @@ public class Proof implements ProofObject<Goal>, Named {
      * @param cuttingPoint node below which to prune
      * @return the subtrees that have been pruned.
      */
-    public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint) {
+    public synchronized @Nullable ImmutableList<Node> pruneProof(Node cuttingPoint) {
         return pruneProof(cuttingPoint, true);
     }
 
-    public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint, boolean fireChanges) {
+    public synchronized @Nullable ImmutableList<Node> pruneProof(Node cuttingPoint,
+            boolean fireChanges) {
         assert cuttingPoint.proof() == this;
         if (getOpenGoal(cuttingPoint) != null) {
             return null;
@@ -1260,7 +1261,7 @@ public class Proof implements ProofObject<Goal>, Named {
         }
     }
 
-    public void addRuleAppListener(RuleAppListener p) {
+    public void addRuleAppListener(@Nullable RuleAppListener p) {
         if (p == null) {
             return;
         }
@@ -1269,7 +1270,7 @@ public class Proof implements ProofObject<Goal>, Named {
         }
     }
 
-    public void removeRuleAppListener(RuleAppListener p) {
+    public void removeRuleAppListener(@Nullable RuleAppListener p) {
         synchronized (ruleAppListenerList) { // TODO (DS, 2019-03-19): Is null for SET tests!?!
             ruleAppListenerList.remove(p);
         }
@@ -1421,7 +1422,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @param l The {@link ProofDisposedListener} to register.
      */
-    public void addProofDisposedListener(ProofDisposedListener l) {
+    public void addProofDisposedListener(@Nullable ProofDisposedListener l) {
         if (l != null) {
             proofDisposedListener.add(l);
         }
@@ -1433,7 +1434,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @param l The {@link ProofDisposedListener} to register.
      */
-    public void addProofDisposedListenerFirst(ProofDisposedListener l) {
+    public void addProofDisposedListenerFirst(@Nullable ProofDisposedListener l) {
         if (l != null) {
             proofDisposedListener.add(0, l);
         }
@@ -1444,7 +1445,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @param l The {@link ProofDisposedListener} to unregister.
      */
-    public void removeProofDisposedListener(ProofDisposedListener l) {
+    public void removeProofDisposedListener(@Nullable ProofDisposedListener l) {
         if (l != null) {
             proofDisposedListener.remove(l);
         }
@@ -1486,7 +1487,7 @@ public class Proof implements ProofObject<Goal>, Named {
         }
     }
 
-    public InitConfig getInitConfig() {
+    public @Nullable InitConfig getInitConfig() {
         return initConfig;
     }
 

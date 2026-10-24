@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Marker for proof listeners that are part of the proving machinery itself and must keep receiving
  * events even while non-essential observers are suspended.
@@ -34,5 +36,6 @@ package de.uka.ilkd.key.proof;
  * @see Proof#suspendNonEssentialListeners()
  * @see Proof#isErroneous()
  */
+@NullMarked
 public interface EssentialProofListener {
 }

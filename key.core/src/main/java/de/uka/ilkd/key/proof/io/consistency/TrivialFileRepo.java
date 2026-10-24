@@ -17,12 +17,15 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.io.RuleSource;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This FileRepo does not cache any files but writes to / reads from the original files on disk. It
  * can be used for recreating the old behavior of KeY without a FileRepo.
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class TrivialFileRepo implements FileRepo {
     @Override
     public InputStream getInputStream(Path path) throws IOException {

@@ -11,12 +11,15 @@ import java.util.zip.GZIPOutputStream;
 
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This proof saver derivative wraps its generated output stream into a {@link GZIPOutputStream}
  * thus compressing proof files.
  *
  * @author tbormer on 12.02.16.
  */
+@NullMarked
 public class GZipProofSaver extends ProofSaver {
 
     /**

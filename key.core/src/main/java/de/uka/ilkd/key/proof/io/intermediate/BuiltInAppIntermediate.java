@@ -9,23 +9,28 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Encapsulates intermediate information for constructing a built-in rule application.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class BuiltInAppIntermediate extends AppIntermediate {
 
     private String ruleName = null;
     private Pair<Integer, PosInTerm> posInfo = null;
-    private String contract = null;
-    private String modality = null;
-    private ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts = null;
-    private ImmutableList<Name> newNames = null;
+    private @Nullable String contract = null;
+    private @Nullable String modality = null;
+    private @Nullable ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts = null;
+    private @Nullable ImmutableList<Name> newNames = null;
 
-    public BuiltInAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos, String contract,
-            String modality, ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts,
-            ImmutableList<Name> newNames) {
+    public BuiltInAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos,
+            @Nullable String contract, @Nullable String modality,
+            @Nullable ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts,
+            @Nullable ImmutableList<Name> newNames) {
         this.ruleName = ruleName;
         this.posInfo = pos;
         this.contract = contract;
@@ -43,13 +48,13 @@ public class BuiltInAppIntermediate extends AppIntermediate {
         return posInfo;
     }
 
-    public String getContract() {
+    public @Nullable String getContract() {
         return contract;
     }
 
-    public String getModality() { return modality; }
+    public @Nullable String getModality() { return modality; }
 
-    public ImmutableList<Pair<Integer, PosInTerm>> getBuiltInIfInsts() {
+    public @Nullable ImmutableList<Pair<Integer, PosInTerm>> getBuiltInIfInsts() {
         return builtInIfInsts;
     }
 
@@ -59,7 +64,7 @@ public class BuiltInAppIntermediate extends AppIntermediate {
      * @see de.uka.ilkd.key.proof.io.intermediate.AppIntermediate#getNewNames()
      */
     @Override
-    public ImmutableList<Name> getNewNames() {
+    public @Nullable ImmutableList<Name> getNewNames() {
         return newNames;
     }
 

@@ -7,11 +7,14 @@ package de.uka.ilkd.key.proof.delayedcut;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Simple immutable structure encapsulating a Node-Goal pair.
  *
  * @author Benjamin Niedermann
  */
+@NullMarked
 public class NodeGoalPair {
     public final Node node;
     public final Goal goal;

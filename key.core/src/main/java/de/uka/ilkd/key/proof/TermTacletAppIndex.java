@@ -21,10 +21,13 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Class whose objects represent an index of taclet apps for one particular position within a
  * formula, and that also contain references to the indices of direct subformulas
  */
+@NullMarked
 public class TermTacletAppIndex {
     /** the term for which NoPosTacletApps are kept in this index node */
     private final Term term;

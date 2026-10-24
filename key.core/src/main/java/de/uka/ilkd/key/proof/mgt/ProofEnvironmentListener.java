@@ -6,6 +6,9 @@ package de.uka.ilkd.key.proof.mgt;
 
 import java.util.EventListener;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public interface ProofEnvironmentListener extends EventListener {
 
     void proofRegistered(ProofEnvironmentEvent event);

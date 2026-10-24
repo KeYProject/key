@@ -16,9 +16,10 @@ import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Saves intermediate proof artifacts during strategy execution. An {@link AutoSaver} instance saves
@@ -31,20 +32,21 @@ import org.slf4j.LoggerFactory;
  *
  * @author bruns
  */
+@NullMarked
 public class AutoSaver implements ProverTaskListener {
     public static final Logger LOGGER = LoggerFactory.getLogger(AutoSaver.class);
 
     private static final File TMP_DIR = IOUtil.getTempDirectory();
     private static final String PREFIX = TMP_DIR + File.separator + ".autosave.";
 
-    private Proof proof;
+    private @Nullable Proof proof;
     private final int interval;
     private final boolean saveClosed;
 
     private static int defaultSaveInterval = 0;
     private static boolean defaultSaveClosedProof = false;
 
-    private static AutoSaver DEFAULT_INSTANCE = null;
+    private static @Nullable AutoSaver DEFAULT_INSTANCE = null;
 
     public static final PropertyChangeListener settingsListener =
         e -> {
@@ -71,7 +73,7 @@ public class AutoSaver implements ProverTaskListener {
      * Create a new instance using default values, or null if auto save is disabled by default. The
      * default values can be set through <code>AutoSaver.setDefaultValues()</code>
      */
-    public static AutoSaver getDefaultInstance() {
+    public static @Nullable AutoSaver getDefaultInstance() {
         return DEFAULT_INSTANCE;
     }
 

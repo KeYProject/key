@@ -39,6 +39,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.proof.io.OutputStreamProofSaver.printAnything;
 
 /**
@@ -47,6 +50,7 @@ import static de.uka.ilkd.key.proof.io.OutputStreamProofSaver.printAnything;
  *
  * @author Arne Keller
  */
+@NullMarked
 public abstract class AbstractProofReplayer {
     /**
      * The original proof used when constructing the new proof.
@@ -76,7 +80,7 @@ public abstract class AbstractProofReplayer {
      * @return the new goals added by this rule application
      * @throws IntermediateProofReplayer.BuiltInConstructionException on error
      */
-    protected ImmutableList<Goal> reApplyRuleApp(Node node, Goal openGoal)
+    protected @Nullable ImmutableList<Goal> reApplyRuleApp(Node node, Goal openGoal)
             throws IntermediateProofReplayer.BuiltInConstructionException {
         RuleApp ruleApp = node.getAppliedRuleApp();
         ImmutableList<Goal> nextGoals;
@@ -204,7 +208,7 @@ public abstract class AbstractProofReplayer {
         return ourApp;
     }
 
-    private NoPosTacletApp lookupIntroducedTaclet(TacletApp app, Goal goal) {
+    private @Nullable NoPosTacletApp lookupIntroducedTaclet(TacletApp app, Goal goal) {
         for (Node n = goal.node(); n != null; n = n.parent()) {
             for (NoPosTacletApp introduced : n.getLocalIntroducedRules()) {
                 if (EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(introduced,
@@ -341,7 +345,7 @@ public abstract class AbstractProofReplayer {
      * @param newSequent sequent
      * @return the formula in the sequent, or null if not found
      */
-    private PosInOccurrence findInNewSequent(PosInOccurrence oldPos,
+    private @Nullable PosInOccurrence findInNewSequent(PosInOccurrence oldPos,
             Sequent newSequent) {
         SequentFormula oldFormula = oldPos.sequentFormula();
         Semisequent semiSeq = oldPos.isInAntec() ? newSequent.antecedent()
