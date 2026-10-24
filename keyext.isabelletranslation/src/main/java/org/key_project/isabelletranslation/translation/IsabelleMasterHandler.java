@@ -158,6 +158,10 @@ public class IsabelleMasterHandler {
      * @param terms terms to be translated
      * @return a List of StringBuilders containing translations in the same order as the given terms
      */
+    // ImmutableArray is deprecated in favor of ImmutableList, but callers pass term.subs()
+    // which still returns ImmutableArray; migrating the parameter type would break those call
+    // sites.
+    @SuppressWarnings("deprecation")
     public List<StringBuilder> translate(ImmutableArray<? extends Term> terms) {
         List<StringBuilder> result = new LinkedList<>();
         for (Term term : terms) {
