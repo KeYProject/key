@@ -20,12 +20,14 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 
 /**
  * This abstract class contains some auxiliary methods for the selection of beta rules that are
  * supposed to be applied. Used terminology is defined in Diss. by Martin Giese.
  */
+@NullMarked
 public abstract class AbstractBetaFeature implements Feature {
     /** helper for computing maxPosPath_* in TermInfo */
     private static final MaxPosPathHelper maxPosPathHelper = new MaxPosPathHelper();

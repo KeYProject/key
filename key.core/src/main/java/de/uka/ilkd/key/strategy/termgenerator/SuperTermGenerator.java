@@ -30,6 +30,9 @@ import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Generates the terms upward a given (usually the find-)position and
  * allows to iterate over those in order to check e.g. whether the
@@ -37,6 +40,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * As it only looks upwards, the computed cost is weak stable
  */
+@NullMarked
 @WeakStableCost
 public abstract class SuperTermGenerator implements TermGenerator<Goal> {
 
@@ -148,7 +152,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
             }
 
             @Override
-            public ImmutableArray<Sort> argSorts() {
+            public @Nullable ImmutableArray<Sort> argSorts() {
                 return null;
             }
 

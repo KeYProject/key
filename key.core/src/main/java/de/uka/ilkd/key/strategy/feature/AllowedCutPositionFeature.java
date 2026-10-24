@@ -16,12 +16,14 @@ import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 
 /**
  * Feature that returns zero iff the application focus of a rule is a potential cut position (taclet
  * cut_direct). For positions that are below quantifiers, the feature generally returns zero.
  */
+@NullMarked
 public class AllowedCutPositionFeature extends BinaryFeature {
 
     public static final Feature INSTANCE = new AllowedCutPositionFeature();

@@ -16,6 +16,8 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
@@ -24,6 +26,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  */
 // Stable: compares the find term against the taclet's replacewith template, both fixed for a given
 // rule application.
+@NullMarked
 @StableCost
 public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
 

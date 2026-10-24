@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
+import org.jspecify.annotations.NullMarked;
+
+
 /**
  * FOL-theory-internal ordering costs, used by {@link FOLStrategy}. These are the fine, within-FOL
  * ordering values that are <em>reused</em> across FOLStrategy's normalisation / splitting /
@@ -17,6 +20,7 @@ package de.uka.ilkd.key.strategy;
  * (as for {@code CostBand}).
  * </p>
  */
+@NullMarked
 final class FOLCost {
     private FOLCost() {}
 

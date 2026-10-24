@@ -13,6 +13,9 @@ import de.uka.ilkd.key.logic.JTerm;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Support for the sequence theory: a sequence read with a compound index is registered as a
  * trigger together with its index.
@@ -30,6 +33,7 @@ import org.key_project.util.collection.ImmutableSet;
  *
  * This support provides no derived triggers and decides no literals.
  */
+@NullMarked
 final class SequenceTheorySupport implements QuantifierTheorySupport {
 
     /**
@@ -47,7 +51,8 @@ final class SequenceTheorySupport implements QuantifierTheorySupport {
      * @return the verdict
      */
     @Override
-    public CandidateVerdict verdictOn(JTerm candidate, JTerm enclosing, Services services) {
+    public CandidateVerdict verdictOn(JTerm candidate, @Nullable JTerm enclosing,
+            Services services) {
         final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
         // the index is the second argument of seqGet
         if (enclosing != null && seqLDT.isSeqGetOp(enclosing.op())

@@ -15,10 +15,14 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Instances of this class are immutable
  */
+@NullMarked
 public class BuiltInRuleAppContainer extends RuleAppContainer {
 
     /**
@@ -27,8 +31,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * formula, and <code>applicationPosition</code> is the original position for which the rule app
      * was created
      */
-    private final FormulaTag positionTag;
-    private final PosInOccurrence applicationPosition;
+    private final @Nullable FormulaTag positionTag;
+    private final @Nullable PosInOccurrence applicationPosition;
 
     private final IBuiltInRuleApp bir;
 
@@ -39,7 +43,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     // -------------------------------------------------------------------------
 
     private BuiltInRuleAppContainer(IBuiltInRuleApp bir,
-            PosInOccurrence pio, RuleAppCost cost,
+            @Nullable PosInOccurrence pio, RuleAppCost cost,
             Goal goal) {
         super(bir, cost);
         applicationPosition = pio;
@@ -99,7 +103,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      *         <code>TopRuleAppCost</code>.
      */
     static RuleAppContainer createAppContainer(IBuiltInRuleApp bir,
-            PosInOccurrence pio,
+            @Nullable PosInOccurrence pio,
             Goal goal) {
         final RuleAppCost cost =
             withAge(goal.getGoalStrategy().computeCost(bir, pio, goal), goal);
@@ -113,7 +117,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      *         <code>TopRuleAppCost</code>.
      */
     static ImmutableList<RuleAppContainer> createInitialAppContainers(
-            ImmutableList<IBuiltInRuleApp> birs, PosInOccurrence pio,
+            ImmutableList<IBuiltInRuleApp> birs, @Nullable PosInOccurrence pio,
             Goal goal) {
         ImmutableList<RuleAppContainer> result = ImmutableList.nil();
 
@@ -143,7 +147,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
 
 
     @Override
-    public RuleApp completeRuleApp(Goal goal) {
+    public @Nullable RuleApp completeRuleApp(Goal goal) {
         if (!isStillApplicable(goal)) {
             return null;
         }

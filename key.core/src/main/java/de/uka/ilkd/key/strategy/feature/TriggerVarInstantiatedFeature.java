@@ -12,6 +12,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
 
     public static final Feature INSTANCE = new TriggerVarInstantiatedFeature();

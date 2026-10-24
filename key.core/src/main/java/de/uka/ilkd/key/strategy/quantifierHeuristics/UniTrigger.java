@@ -17,11 +17,14 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * A trigger consisting of a single term. Matching it against a target term yields the substitutions
  * for the quantified variables; results are cached per target term.
  */
+@NullMarked
 class UniTrigger implements Trigger {
 
     private final Term trigger;

@@ -12,6 +12,8 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The within-band ordering of tied quantifier instantiation candidates.
  *
@@ -29,6 +31,7 @@ import org.key_project.prover.sequent.Sequent;
  * {@link de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCostScalerFeature}), so the
  * prediction itself is never overridden.
  */
+@NullMarked
 public interface QuantifierInstantiationTieBreak {
 
     /**

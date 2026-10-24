@@ -28,12 +28,14 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Container for RuleApp instances with cost as determined by a given Strategy. Instances of this
  * class are immutable.
  */
+@NullMarked
 public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
 
     /**
@@ -138,7 +140,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * The position a container's rule app is (to be) applied at: the creation-time position of a
      * find-taclet container, or the rule app's own position for built-in rule apps.
      */
-    private static PosInOccurrence applicationPosition(RuleAppContainer c) {
+    private static @Nullable PosInOccurrence applicationPosition(RuleAppContainer c) {
         if (c instanceof FindTacletAppContainer findContainer) {
             return findContainer.getApplicationPosition();
         }
@@ -196,7 +198,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
         return 0;
     }
 
-    private static int comparePos(PosInOccurrence a, PosInOccurrence b) {
+    private static int comparePos(@Nullable PosInOccurrence a, @Nullable PosInOccurrence b) {
         if (a == b) {
             return 0;
         }
@@ -337,7 +339,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
     /**
      * Create a <code>RuleApp</code> that is suitable to be applied or <code>null</code>.
      */
-    public abstract RuleApp completeRuleApp(Goal p_goal);
+    public abstract @Nullable RuleApp completeRuleApp(Goal p_goal);
 
     protected final RuleApp getRuleApp() {
         return ruleApp;
@@ -366,9 +368,9 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * @return container for the currently applicable RuleApp, the cost may be an instance of
      *         <code>TopRuleAppCost</code>.
      */
-    public static @NonNull RuleAppContainer createAppContainer(
+    public static RuleAppContainer createAppContainer(
             RuleApp p_app,
-            PosInOccurrence p_pio,
+            @Nullable PosInOccurrence p_pio,
             Goal p_goal) {
 
         if (p_app instanceof NoPosTacletApp) {
@@ -393,7 +395,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      */
     public static ImmutableList<RuleAppContainer> createAppContainers(
             ImmutableList<? extends RuleApp> rules,
-            PosInOccurrence pos, Goal goal) {
+            @Nullable PosInOccurrence pos, Goal goal) {
         ImmutableList<RuleAppContainer> result = ImmutableList.nil();
 
         if (rules.size() == 1) {
