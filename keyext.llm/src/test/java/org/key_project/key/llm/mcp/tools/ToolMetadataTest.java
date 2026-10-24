@@ -81,13 +81,12 @@ class ToolMetadataTest {
     void onlyLongRunningToolsAreBackgroundableByDefault() {
         var tools = new KeYAgentTools();
         for (var name : java.util.List.of(KeYAgentTools.TOOL_RUN_COMMAND, KeYAgentTools.TOOL_AUTO,
-            KeYAgentTools.TOOL_SPAWN_SUBAGENT)) {
+            KeYAgentTools.TOOL_TRYCLOSE, KeYAgentTools.TOOL_SPAWN_SUBAGENT)) {
             assertTrue(tools.agent(name).backgroundable(),
                 "tool " + name + " must default to backgroundable");
         }
-        for (var name : java.util.List.of(KeYAgentTools.TOOL_READ_FILE, KeYAgentTools.TOOL_TRYCLOSE,
-            KeYAgentTools.TOOL_ASK_USER, KeYAgentTools.TOOL_LIST_TOOLS,
-            KeYAgentTools.TOOL_GET_SUBAGENT_LOGS)) {
+        for (var name : java.util.List.of(KeYAgentTools.TOOL_READ_FILE, KeYAgentTools.TOOL_ASK_USER,
+            KeYAgentTools.TOOL_LIST_TOOLS, KeYAgentTools.TOOL_GET_SUBAGENT_LOGS)) {
             assertFalse(tools.agent(name).backgroundable(),
                 "tool " + name + " must not default to backgroundable");
         }
