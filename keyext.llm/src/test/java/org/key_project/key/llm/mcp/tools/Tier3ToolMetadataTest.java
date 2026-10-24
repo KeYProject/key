@@ -40,14 +40,26 @@ class Tier3ToolMetadataTest {
     }
 
     @Test
-    void explorationProbesAreAutoAndBackgroundable() {
-        for (var name : List.of(ExploreProofTools.TOOL_EXPLORE_ASSUMPTION,
-            ExploreProofTools.TOOL_EXPLORE_FORMULA)) {
+    void probeToolsAreAutoAndBackgroundable() {
+        for (var name : List.of(ExploreProofTools.TOOL_PROBE_ADD_FORMULA,
+            ExploreProofTools.TOOL_PROBE_EDIT_FORMULA)) {
             var t = tool(all(), name);
             assertEquals(ToolCategory.PROOF, t.category(), name);
             assertEquals(Tool.ApprovalRequirement.AUTO, t.approval(), name);
             assertTrue(t.backgroundable(),
                 name + " runs an isolated side proof and must be backgroundable");
+        }
+    }
+
+    @Test
+    void explorativeTier3ToolsAreAskAndNeverBackgroundable() {
+        for (var name : List.of(ExploreProofTools.TOOL_EXPLORATIVE_ADD_FORMULA,
+            ExploreProofTools.TOOL_EXPLORATIVE_EDIT_FORMULA)) {
+            var t = tool(all(), name);
+            assertEquals(ToolCategory.PROOF, t.category(), name);
+            assertEquals(Tool.ApprovalRequirement.ASK, t.approval(), name);
+            assertFalse(t.backgroundable(),
+                name + " rewrites the main proof and must not be backgroundable");
         }
     }
 
@@ -79,21 +91,25 @@ class Tier3ToolMetadataTest {
     void requiredParametersOfTheTier3Tools() {
         var tools = all();
         assertEquals(List.of("steps"), tool(tools, ScriptSequenceTools.TOOL_RUN_SCRIPT)
-            .parameters().required());
-        assertEquals(List.of("formula"), tool(tools, ExploreProofTools.TOOL_EXPLORE_ASSUMPTION)
-            .parameters().required());
-        assertEquals(List.of("formula"), tool(tools, ExploreProofTools.TOOL_EXPLORE_FORMULA)
-            .parameters().required());
+                .parameters().required());
+        assertEquals(List.of("formula"), tool(tools, ExploreProofTools.TOOL_PROBE_ADD_FORMULA)
+                .parameters().required());
+        assertEquals(List.of("find", "replace"),
+            tool(tools, ExploreProofTools.TOOL_PROBE_EDIT_FORMULA).parameters().required());
+        assertEquals(List.of("formula"),
+            tool(tools, ExploreProofTools.TOOL_EXPLORATIVE_ADD_FORMULA).parameters().required());
+        assertEquals(List.of("find", "replace"),
+            tool(tools, ExploreProofTools.TOOL_EXPLORATIVE_EDIT_FORMULA).parameters().required());
         assertEquals(List.of("expected"),
             tool(tools, ProofOrientationTools.TOOL_ASSERT_OPEN_GOALS).parameters().required());
         assertEquals(List.of("sequent"), tool(tools, SequentEditingTools.TOOL_HIDE_SEQUENT)
-            .parameters().required());
+                .parameters().required());
         assertEquals(List.of("sequent"), tool(tools, SequentEditingTools.TOOL_UNHIDE_SEQUENT)
-            .parameters().required());
+                .parameters().required());
         assertEquals(List.of("keep"), tool(tools, SequentEditingTools.TOOL_FOCUS_GOAL)
-            .parameters().required());
+                .parameters().required());
         assertEquals(List.of("name", "term"), tool(tools, SequentEditingTools.TOOL_LET_ABBREV)
-            .parameters().required());
+                .parameters().required());
     }
 
     @Test
@@ -107,8 +123,10 @@ class Tier3ToolMetadataTest {
     @Test
     void singleGoalTier3ToolsRejectAllGoals() throws Exception {
         var tools = all();
-        var names = List.of(ExploreProofTools.TOOL_EXPLORE_ASSUMPTION,
-            ExploreProofTools.TOOL_EXPLORE_FORMULA, ProofForkTools.TOOL_FORK_PROOF,
+        var names = List.of(ExploreProofTools.TOOL_PROBE_ADD_FORMULA,
+            ExploreProofTools.TOOL_PROBE_EDIT_FORMULA,
+            ExploreProofTools.TOOL_EXPLORATIVE_ADD_FORMULA,
+            ExploreProofTools.TOOL_EXPLORATIVE_EDIT_FORMULA, ProofForkTools.TOOL_FORK_PROOF,
             SequentEditingTools.TOOL_HIDE_SEQUENT, SequentEditingTools.TOOL_UNHIDE_SEQUENT,
             SequentEditingTools.TOOL_FOCUS_GOAL);
         for (var name : names) {
@@ -116,9 +134,14 @@ class Tier3ToolMetadataTest {
             var callArgs = new java.util.HashMap<String, Object>();
             callArgs.put("goal", "all");
             // required schema args are supplied so only the goal-targeting error can fire
-            if (name.equals(ExploreProofTools.TOOL_EXPLORE_ASSUMPTION)
-                    || name.equals(ExploreProofTools.TOOL_EXPLORE_FORMULA)) {
+            if (name.equals(ExploreProofTools.TOOL_PROBE_ADD_FORMULA)
+                    || name.equals(ExploreProofTools.TOOL_EXPLORATIVE_ADD_FORMULA)) {
                 callArgs.put("formula", "true");
+            }
+            if (name.equals(ExploreProofTools.TOOL_PROBE_EDIT_FORMULA)
+                    || name.equals(ExploreProofTools.TOOL_EXPLORATIVE_EDIT_FORMULA)) {
+                callArgs.put("find", "true");
+                callArgs.put("replace", "false");
             }
             if (name.equals(SequentEditingTools.TOOL_HIDE_SEQUENT)
                     || name.equals(SequentEditingTools.TOOL_UNHIDE_SEQUENT)) {
@@ -146,7 +169,8 @@ class Tier3ToolMetadataTest {
             tooMany.add(Map.of("command", "auto"));
         }
         assertTrue(((String) t.call(Map.of("steps", tooMany)))
-            .startsWith("Error: run_script accepts at most 8 steps"), "bounded length");
+                .startsWith("Error: run_script accepts at most 8 steps"),
+            "bounded length");
         // unknown command
         assertEquals("Error: run_script step 0: unknown command 'close-magic'; allowed: tryclose,"
             + " auto, macro, smt, oss, apply_rule, instantiate_quantifier, witness_constant,"
@@ -155,11 +179,11 @@ class Tier3ToolMetadataTest {
         // unknown step parameter
         assertTrue(((String) t.call(Map.of("steps",
             List.of(Map.of("command", "auto", "args", Map.of("bogus", 1))))))
-            .contains("unknown parameter 'bogus'"));
+                .contains("unknown parameter 'bogus'"));
         // "all" goal inside a step is rejected
         assertTrue(((String) t.call(Map.of("steps",
             List.of(Map.of("command", "auto", "goal", "all")))))
-            .contains("not supported inside run_script"));
+                .contains("not supported inside run_script"));
     }
 
     @Test
