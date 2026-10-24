@@ -158,8 +158,8 @@ public abstract class JavaNonTerminalProgramElement extends JavaProgramElement
      *        the int denoting the index of the child to start with
      * @return the resulting match conditions or <tt>null</tt> if matching failed
      */
-    protected MatchConditions matchChildren(SourceData source, MatchConditions matchCond,
-            int offset) {
+    protected @Nullable MatchConditions matchChildren(SourceData source,
+            @Nullable MatchConditions matchCond, int offset) {
 
         for (int i = offset, sz = getChildCount(); i < sz; i++) {
             matchCond = getChildAt(i).match(source, matchCond);

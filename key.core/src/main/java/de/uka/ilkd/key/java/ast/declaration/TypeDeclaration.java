@@ -76,6 +76,11 @@ public abstract class TypeDeclaration extends JavaDeclaration
     }
 
     @Deprecated
+    // The deprecated no-arg constructor deliberately leaves the name/fullName/members
+    // fields unset (null): it builds an "empty" declaration stub whose consumers are all
+    // null-guarded (getName/getFullName/getAllFields/getTypeDeclarationCount/...). The
+    // null assignments violate the @NonNull field contracts, so the check is scoped here.
+    @SuppressWarnings("NullAway")
     public TypeDeclaration() {
         this.name = null;
         this.fullName = null;
@@ -130,6 +135,11 @@ public abstract class TypeDeclaration extends JavaDeclaration
      *        MemberDeclaration (as members of the type), a parentIsInterfaceDeclaration (indicating
      *        if parent is interface), several Modifier (as modifiers of the type decl), Comments
      */
+    // ExtList.get(ProgramElementName.class) may be empty for anonymous classes and for
+    // declarations created directly by njml (see JP2KeYConverter), where the name is deliberately
+    // left unset; the resulting declaration is only used through null-guarded accessors, so the
+    // @NonNull parameter contract is intentionally not met at the delegation site.
+    @SuppressWarnings("NullAway")
     public TypeDeclaration(ExtList children, ProgramElementName fullName, boolean isLibrary) {
         this(children, children.get(ProgramElementName.class), fullName, isLibrary);
     }
@@ -152,6 +162,11 @@ public abstract class TypeDeclaration extends JavaDeclaration
      *
      * @return the string.
      */
+    // name/fullName may legitimately be null for anonymous classes and for the
+    // deprecated no-arg constructor's stub declarations (see the constructor above);
+    // returning null here collides with the @NonNull contract of
+    // NamedModelElement.getName(), which cannot be widened without ripple.
+    @SuppressWarnings("NullAway")
     public final String getName() {
         return (name == null) ? ((fullName == null) ? null : fullName.toString())
                 : name.toString();

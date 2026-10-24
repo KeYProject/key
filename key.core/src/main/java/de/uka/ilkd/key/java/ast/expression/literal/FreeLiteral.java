@@ -47,7 +47,7 @@ public non-sealed class FreeLiteral extends Literal {
     }
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FREE_ADT);
     }
 

@@ -35,7 +35,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     public static final int POSTFIX = 2;
 
     protected Operator() {
-        this.children = null;
+        this(new Expression[0]);
     }
 
     /**

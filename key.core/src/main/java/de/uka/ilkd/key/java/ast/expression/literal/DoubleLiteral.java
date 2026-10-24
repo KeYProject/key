@@ -18,6 +18,7 @@ import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Double literal.
@@ -121,7 +122,7 @@ public non-sealed class DoubleLiteral extends Literal {
         v.performActionOnDoubleLiteral(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_DOUBLE);
     }
 

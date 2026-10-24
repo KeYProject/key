@@ -63,17 +63,17 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * Java declaration.
      */
     public JavaDeclaration() {
-        this(null, null, new ImmutableArray<>(), ImmutableList.nil());
+        this(PositionInfo.UNDEFINED, List.of(), new ImmutableArray<>(), ImmutableList.nil());
     }
 
 
     public JavaDeclaration(Modifier[] mods) {
-        this(null, null, new ImmutableArray<>(mods), ImmutableList.nil());
+        this(PositionInfo.UNDEFINED, List.of(), new ImmutableArray<>(mods), ImmutableList.nil());
     }
 
 
     public JavaDeclaration(ImmutableArray<Modifier> mods) {
-        this(null, null, mods, ImmutableList.nil());
+        this(PositionInfo.UNDEFINED, List.of(), mods, ImmutableList.nil());
     }
 
 

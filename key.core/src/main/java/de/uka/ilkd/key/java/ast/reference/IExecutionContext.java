@@ -27,6 +27,7 @@ public interface IExecutionContext extends Reference {
      *
      * @return the currently active method
      */
+    @Nullable
     IProgramMethod getMethodContext();
 
     /**

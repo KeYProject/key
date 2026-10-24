@@ -14,6 +14,7 @@ import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Float literal.
@@ -104,7 +105,7 @@ public non-sealed class FloatLiteral extends Literal {
         v.performActionOnFloatLiteral(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
     }
 

@@ -81,7 +81,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     }
 
     public StatementBlock(ImmutableArray<? extends Statement> as) {
-        super((PositionInfo) null, null);
+        super(PositionInfo.UNDEFINED, List.of());
         // check for non-null elements (bug fix)
         Debug.assertDeepNonNull(as, "statement block contructor");
         body = as;

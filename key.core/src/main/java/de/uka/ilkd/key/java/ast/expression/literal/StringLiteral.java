@@ -109,7 +109,7 @@ public final class StringLiteral extends Literal implements ReferencePrefix {
         return this;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType("java.lang.String");
     }
 

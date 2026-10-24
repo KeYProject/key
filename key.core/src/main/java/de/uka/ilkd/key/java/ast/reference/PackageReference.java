@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.reference;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
@@ -45,7 +47,7 @@ public class PackageReference extends JavaNonTerminalProgramElement
      */
     public PackageReference(ExtList children) {
         prefix = children.get(PackageReference.class);
-        name = children.get(ProgramElementName.class);
+        name = Objects.requireNonNull(children.get(ProgramElementName.class), "missing name");
         assert name != null;
     }
 
@@ -128,8 +130,8 @@ public class PackageReference extends JavaNonTerminalProgramElement
      *
      * @return the string.
      */
-    public final @Nullable String getName() {
-        return (name == null) ? null : name.toString();
+    public final String getName() {
+        return name.toString();
     }
 
     /**
