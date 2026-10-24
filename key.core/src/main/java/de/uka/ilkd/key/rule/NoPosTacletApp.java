@@ -73,11 +73,6 @@ public class NoPosTacletApp extends TacletApp {
         return createNoPosTacletApp(taclet, instantiations, null, services);
     }
 
-    @SuppressWarnings("NullAway") // null "assumes"-instantiations is the intentional "not yet
-                                  // matched" contract (cf. TacletApp#assumesFormulaInstantiations);
-                                  // the private ctor/storage stay @NonNull for the many callers --
-                                  // an honest @Nullable widening ripples into PosTacletApp and
-                                  // ~15 callers and belongs to a dedicated follow-up wave.
     public static @Nullable NoPosTacletApp createNoPosTacletApp(
             org.key_project.prover.rules.Taclet taclet,
             SVInstantiations instantiations,
@@ -133,7 +128,7 @@ public class NoPosTacletApp extends TacletApp {
      */
     private NoPosTacletApp(org.key_project.prover.rules.Taclet taclet,
             SVInstantiations instantiations,
-            ImmutableList<AssumesFormulaInstantiation> ifInstantiations) {
+            @Nullable ImmutableList<AssumesFormulaInstantiation> ifInstantiations) {
         super(taclet, instantiations, ifInstantiations);
     }
 

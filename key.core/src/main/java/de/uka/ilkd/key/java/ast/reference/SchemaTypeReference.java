@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.reference;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceData;
@@ -40,20 +42,18 @@ public class SchemaTypeReference extends TypeReferenceImp implements AbstractPro
     }
 
     public KeYJavaType getKeYJavaType(Services services) {
-        KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(fullName);
-        assert kjt != null
-                : "KeYJavaType is null for SchemaTypeReference " + this + " - " + fullName;
-        return kjt;
+        return Objects.requireNonNull(services.getJavaInfo().getKeYJavaType(fullName),
+            "KeYJavaType is null for SchemaTypeReference " + this + " - " + fullName);
     }
 
     public ProgramElement getConcreteProgramElement(Services services) {
         return new TypeRef(getKeYJavaType(services));
     }
 
-    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, @Nullable MatchConditions matchCond) {
         ProgramElement t = source.getSource();
         if (t instanceof TypeReference) {
-            if (getName().equals(((TypeReference) t).getName())
+            if (Objects.requireNonNull(getName()).equals(((TypeReference) t).getName())
                     && ((TypeReference) t).getDimensions() == getDimensions()) {
                 source.next();
                 return matchCond;

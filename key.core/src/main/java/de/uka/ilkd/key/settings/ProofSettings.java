@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -42,14 +43,18 @@ public class ProofSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofSettings.class);
 
     public static final Path PROVER_CONFIG_FILE =
-        PathConfig.currentPaths.keyConfigDir.resolve("proof-settings.json");
+        Objects.requireNonNull(PathConfig.currentPaths,
+            "KeY paths are not initialized").keyConfigDir.resolve("proof-settings.json");
 
     private static Path getProofSettingsReadPath() {
         var newPathJson = List.of(
             PROVER_CONFIG_FILE,
-            PathConfig.currentPaths.keyConfigDir.resolve("proof-settings.props"),
-            PathConfig.previousPaths.keyConfigDir.resolve("proof-settings.json"),
-            PathConfig.previousPaths.keyConfigDir.resolve("proof-settings.props"));
+            Objects.requireNonNull(PathConfig.currentPaths,
+                "KeY paths are not initialized").keyConfigDir.resolve("proof-settings.props"),
+            Objects.requireNonNull(PathConfig.previousPaths,
+                "KeY paths are not initialized").keyConfigDir.resolve("proof-settings.json"),
+            Objects.requireNonNull(PathConfig.previousPaths,
+                "KeY paths are not initialized").keyConfigDir.resolve("proof-settings.props"));
         return newPathJson.stream()
                 .filter(Files::exists)
                 .findFirst()

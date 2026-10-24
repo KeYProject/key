@@ -120,7 +120,7 @@ public class Configuration {
 
     public <T> @NonNull T get(String name, Class<T> clazz, @NonNull T defaultValue) {
         if (exists(name, defaultValue.getClass()))
-            return clazz.cast(data.get(name));
+            return Objects.requireNonNull(clazz.cast(data.get(name)));
         else
             return defaultValue;
     }
@@ -165,7 +165,8 @@ public class Configuration {
      * @throws NullPointerException if no such value entry exists
      */
     public long getLong(String name) {
-        return get(name, Long.class);
+        return Objects.requireNonNull(get(name, Long.class),
+            "No entry in configuration: " + name);
     }
 
     /**
@@ -209,7 +210,8 @@ public class Configuration {
      * @throws NullPointerException if no such value entry exists
      */
     public double getDouble(String name) {
-        return get(name, Double.class);
+        return Objects.requireNonNull(get(name, Double.class),
+            "No entry in configuration: " + name);
     }
 
     /**
@@ -365,7 +367,8 @@ public class Configuration {
     }
 
     public Configuration getOrCreateSection(String name) {
-        return getSection(name, true);
+        return Objects.requireNonNull(getSection(name, true),
+            "Could not create configuration section: " + name);
     }
 
     public @Nullable Configuration getSection(String name, boolean createIfNotExists) {
@@ -466,12 +469,12 @@ public class Configuration {
      */
     public static class ConfigurationMeta {
         /** Position of declaration within a file */
-        private Position position;
+        private @Nullable Position position;
 
         /** documentation given in the file */
-        private String documentation;
+        private @Nullable String documentation;
 
-        public Position getPosition() {
+        public @Nullable Position getPosition() {
             return position;
         }
 
@@ -479,7 +482,7 @@ public class Configuration {
             this.position = position;
         }
 
-        public String getDocumentation() {
+        public @Nullable String getDocumentation() {
             return documentation;
         }
 

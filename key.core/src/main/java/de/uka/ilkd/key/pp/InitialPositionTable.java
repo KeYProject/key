@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.pp;
 
+import java.util.Objects;
+
 import org.key_project.logic.IntIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
@@ -76,7 +78,8 @@ public class InitialPositionTable extends PositionTable {
         if (posList.isEmpty() || posList.tail().isEmpty()) {
             return PosInSequent.createSequentPos();
         } else {
-            return children[0].getSequentPIS(posList.tail(), filter);
+            return Objects.requireNonNull(children[0], "no position table for the sequent")
+                    .getSequentPIS(posList.tail(), filter);
         }
     }
 
@@ -122,8 +125,10 @@ public class InitialPositionTable extends PositionTable {
      */
     private int indexOfCfma(SequentFormula cfma,
             SequentPrintFilter filter) {
-        ImmutableList<SequentPrintFilterEntry> list =
-            filter.getFilteredAntec().append(filter.getFilteredSucc());
+        ImmutableList<SequentPrintFilterEntry> list = Objects.requireNonNull(
+            filter.getFilteredAntec(), "filter has no filtered antecedent")
+                .append(Objects.requireNonNull(filter.getFilteredSucc(),
+                    "filter has no filtered succedent"));
         int k;
         for (k = 0; !list.isEmpty(); k++, list = list.tail()) {
             if (list.head().getOriginalFormula() == cfma) {
