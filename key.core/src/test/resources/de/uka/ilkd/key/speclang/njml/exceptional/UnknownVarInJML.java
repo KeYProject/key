@@ -1,6 +1,5 @@
 // exceptionClass: BuildingException
 // msgContains: Cannot resolve 'unknownVar'
-// position: 9/18
 
 
 class UnknownVar {

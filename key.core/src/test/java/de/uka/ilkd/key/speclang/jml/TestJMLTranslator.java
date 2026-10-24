@@ -63,7 +63,9 @@ public class TestJMLTranslator {
                 TB.var(TB.heapAtPreVar("heapAtPre", false)));
         }
         jmlIO = new JmlIO(services).classType(testClassType)
-                .specMathMode(JMLInfoExtractor.getSpecMathModeOrDefault(testClassType))
+                // the old class-level `/*@ spec_java_math @*/` pragma (JAVA math) was removed
+                // from the fixture: JMLtk does not accept it (see TestClass.java)
+                .specMathMode(SpecMathMode.JAVA)
                 .selfVar(buildSelfVarAsProgVar());
     }
 
