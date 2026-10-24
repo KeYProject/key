@@ -16,7 +16,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -245,14 +244,14 @@ public class TestTerm {
             JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
         JTerm withJB =
             tf.createTerm(JModality.getModality(JModality.JavaModalityKind.DIA, javaBlock),
-                new ImmutableArray<>(noJB), null, null);
+                ImmutableList.of(noJB), null, null);
         JTerm withJBChild = tf.createTerm(Junctor.NOT, withJB);
         JTerm withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);
         // a modality whose program has no statements still carries a JavaBlock
         JTerm withEmptyJB = tf.createTerm(
             JModality.getModality(JModality.JavaModalityKind.DIA,
                 JavaBlock.createJavaBlock(new StatementBlock())),
-            new ImmutableArray<>(noJB), null, null);
+            ImmutableList.of(noJB), null, null);
         assertFalse(noJB.containsJavaBlockRecursive());
         assertFalse(noJBWithChild.containsJavaBlockRecursive());
         assertTrue(withJB.containsJavaBlockRecursive());
