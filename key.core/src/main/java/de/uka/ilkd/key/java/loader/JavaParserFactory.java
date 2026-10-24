@@ -50,6 +50,7 @@ public class JavaParserFactory {
     private final List<CompilationUnit> bootClasses;
     private final List<CompilationUnit> libraryClasses;
     private final List<CompilationUnit> userClasses;
+    private final List<TypeSolver> additionalSolvers = new ArrayList<>();
 
 
     public JavaParserFactory(Services services) {
@@ -91,6 +92,16 @@ public class JavaParserFactory {
 
     public void addUserClasses(Collection<CompilationUnit> classes) {
         userClasses.addAll(classes);
+        typeSolver.lazyRebuild();
+    }
+
+    /**
+     * Registers an additional {@link TypeSolver} that is consulted after the boot,
+     * library and user classes. Used e.g. to make the JDK classes available for symbol
+     * resolution ({@code ReflectionTypeSolver}) when no boot classpath is configured.
+     */
+    public void addTypeSolver(TypeSolver solver) {
+        additionalSolvers.add(solver);
         typeSolver.lazyRebuild();
     }
 
@@ -196,6 +207,9 @@ public class JavaParserFactory {
             ct.add(new ListTypeSolver(bootClasses));
             ct.add(new ListTypeSolver(libraryClasses));
             ct.add(new ListTypeSolver(userClasses));
+            for (TypeSolver s : additionalSolvers) {
+                ct.add(s);
+            }
             delegate = ct;
         }
 
