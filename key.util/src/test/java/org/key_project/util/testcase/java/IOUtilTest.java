@@ -839,6 +839,9 @@ public class IOUtilTest {
      * @see IOUtil#toURI(java.net.URL)
      */
     @Test
+    // the URLs are deliberately constructed via the deprecated URL(String) constructor, which is
+    // exactly what these methods of IOUtil are documented for
+    @SuppressWarnings("deprecation")
     public void testToURI() throws Exception {
         // Test null
         assertNull(IOUtil.toURI(null));
@@ -870,6 +873,8 @@ public class IOUtilTest {
      * @see IOUtil#toFile(URL)
      */
     @Test
+    // uses the deprecated URL(String) constructor to build the URL passed to IOUtil#toFile
+    @SuppressWarnings("deprecation")
     public void testToFile() throws MalformedURLException {
         // Test null
         assertNull(IOUtil.toFile(null));
@@ -888,6 +893,8 @@ public class IOUtilTest {
      * @see IOUtil#toFileString(URL)
      */
     @Test()
+    // uses the deprecated URL(String) constructor to build the URL passed to IOUtil#toFileString
+    @SuppressWarnings("deprecation")
     public void testToFileString() throws MalformedURLException {
         // Test null
         assertNull(IOUtil.toFileString(null));
