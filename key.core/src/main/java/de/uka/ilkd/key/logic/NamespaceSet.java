@@ -326,7 +326,11 @@ public class NamespaceSet {
             Namespace<?> parent = b.parent();
             newSpaces.put(a, parent != null ? parent : new Namespace<>());
         });
-        return new NamespaceSet(newSpaces, documentation.parent());
+        // same convention for the documentation space: no parent means an empty MetaSpace
+        // rather than null, keeping the "no null values" invariant for `documentation` too
+        org.key_project.logic.MetaSpace docParent = documentation.parent();
+        return new NamespaceSet(newSpaces,
+            docParent != null ? docParent : new org.key_project.logic.MetaSpace());
     }
 
     public org.key_project.logic.MetaSpace docs() {
