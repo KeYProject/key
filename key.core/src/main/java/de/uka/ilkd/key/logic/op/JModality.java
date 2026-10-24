@@ -22,12 +22,14 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.collection.WeakValueLinkedHashMap;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class is used to represent a dynamic logic modality like diamond and box (but also
  * extensions of DL like preserves and throughout are possible in the future).
  */
+@NullMarked
 public class JModality extends Modality implements Operator {
     /**
      * keeps track of created modalities
@@ -66,7 +68,6 @@ public class JModality extends Modality implements Operator {
     }
 
     @Override
-    @NonNull
     public JavaBlock programBlock() {
         return javaBlock;
     }
@@ -183,7 +184,7 @@ public class JModality extends Modality implements Operator {
             kinds.put(name.toString(), this);
         }
 
-        public static JavaModalityKind getKind(String name) {
+        public static @Nullable JavaModalityKind getKind(String name) {
             return kinds.get(name);
         }
 

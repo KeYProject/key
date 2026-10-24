@@ -9,9 +9,12 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 
 import org.key_project.logic.IntIterator;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * this class describes the position of a statement in a program.
  */
+@NullMarked
 public class PosInProgram {
 
     /** pos at the beginning of the program */

@@ -13,10 +13,13 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * The objects of this class represent logical variables, used e.g. for quantification.
  */
+@NullMarked
 public final class LogicVariable extends JAbstractSortedOperator
         implements QuantifiableVariable {
 

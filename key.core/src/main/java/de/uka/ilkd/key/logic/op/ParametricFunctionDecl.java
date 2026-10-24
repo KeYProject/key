@@ -14,13 +14,14 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /// The abstract declaration of a parametric function, e.g., `append<E>(List<E>, List<E>)`.
 ///
 /// To get an instantiated instance, use [ParametricFunctionInstance#get(ParametricFunctionDecl,
 /// ImmutableList, de.uka.ilkd.key.java.Services)].
+@NullMarked
 public final class ParametricFunctionDecl implements Named, Sorted, HasMetaSpaceKey {
     private final Name name;
     private final ImmutableList<GenericParameter> parameters;
@@ -52,7 +53,7 @@ public final class ParametricFunctionDecl implements Named, Sorted, HasMetaSpace
     }
 
     @Override
-    public @NonNull Sort sort() {
+    public Sort sort() {
         return sort;
     }
 
@@ -81,7 +82,7 @@ public final class ParametricFunctionDecl implements Named, Sorted, HasMetaSpace
     }
 
     @Override
-    public @NonNull Name name() {
+    public Name name() {
         return name;
     }
 

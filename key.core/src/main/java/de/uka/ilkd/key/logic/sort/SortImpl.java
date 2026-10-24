@@ -12,13 +12,17 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Abstract base class for implementations of the Sort interface.
  */
+@NullMarked
 public class SortImpl extends AbstractSort {
     private ImmutableSet<Sort> ext;
 
-    public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
+    public SortImpl(Name name, @Nullable ImmutableSet<Sort> ext, boolean isAbstract) {
         super(name, isAbstract);
         this.ext = ext;
     }

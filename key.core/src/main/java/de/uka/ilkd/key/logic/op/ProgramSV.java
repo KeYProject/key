@@ -32,6 +32,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Position;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +41,7 @@ import org.slf4j.LoggerFactory;
  * Objects of this class are schema variables matching program constructs within modal operators.
  * The particular construct being matched is determined by the ProgramSVSort of the schema variable.
  */
+@NullMarked
 public final class ProgramSV extends JOperatorSV
         implements ProgramConstruct, UpdateableOperator {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramSV.class);
@@ -103,7 +106,7 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return null;
     }
 
@@ -128,7 +131,7 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public PackageReference getPackageReference() {
+    public @Nullable PackageReference getPackageReference() {
         return null;
     }
 
@@ -138,7 +141,7 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public Expression getExpressionAt(int index) {
+    public @Nullable Expression getExpressionAt(int index) {
         return null;
     }
 
@@ -168,12 +171,12 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public ImmutableArray<Expression> getUpdates() {
+    public @Nullable ImmutableArray<Expression> getUpdates() {
         return null;
     }
 
     @Override
-    public ImmutableArray<LoopInitializer> getInits() {
+    public @Nullable ImmutableArray<LoopInitializer> getInits() {
         return null;
     }
 
@@ -198,17 +201,17 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public KeYJavaType getKeYJavaType() {
+    public @Nullable KeYJavaType getKeYJavaType() {
         return null;
     }
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ) {
         return null;
     }
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
         return null;
     }
 
@@ -223,7 +226,8 @@ public final class ProgramSV extends JOperatorSV
      * @return the updated match conditions including mapping <code>var</code> to <code>pe</code> or
      *         null if some variable condition would be hurt by the mapping
      */
-    private MatchConditions addProgramInstantiation(ProgramElement pe, MatchConditions matchCond,
+    private @Nullable MatchConditions addProgramInstantiation(ProgramElement pe,
+            @Nullable MatchConditions matchCond,
             Services services) {
         if (matchCond == null) {
             return null;
@@ -264,8 +268,8 @@ public final class ProgramSV extends JOperatorSV
      * @return the updated match conditions including mapping <code>var</code> to <code>list</code>
      *         or null if some variable condition would be hurt by the mapping
      */
-    private MatchConditions addProgramInstantiation(ImmutableArray<ProgramElement> list,
-            MatchConditions matchCond,
+    private @Nullable MatchConditions addProgramInstantiation(ImmutableArray<ProgramElement> list,
+            @Nullable MatchConditions matchCond,
             Services services) {
         if (matchCond == null) {
             return null;
@@ -285,7 +289,7 @@ public final class ProgramSV extends JOperatorSV
         return insts == null ? null : matchCond.setInstantiations(insts);
     }
 
-    private MatchConditions matchListSV(SourceData source, MatchConditions matchCond) {
+    private @Nullable MatchConditions matchListSV(SourceData source, MatchConditions matchCond) {
         final Services services = source.getServices();
         ProgramElement src = source.getSource();
 
@@ -320,7 +324,7 @@ public final class ProgramSV extends JOperatorSV
      *        like (static)types etc.
      * @return true if the SchemaVariable can stand for the given element
      */
-    private boolean check(ProgramElement match, ExecutionContext ec, Services services) {
+    private boolean check(@Nullable ProgramElement match, ExecutionContext ec, Services services) {
         if (match == null) {
             return false;
         }
@@ -328,7 +332,7 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
         if (isListSV()) {
             return matchListSV(source, matchCond);
         }
@@ -370,17 +374,17 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public MethodDeclaration getMethodDeclaration() {
+    public @Nullable MethodDeclaration getMethodDeclaration() {
         return null;
     }
 
     @Override
-    public KeYJavaType getParameterType(int i) {
+    public @Nullable KeYJavaType getParameterType(int i) {
         return null;
     }
 
     @Override
-    public StatementBlock getBody() {
+    public @Nullable StatementBlock getBody() {
         return null;
     }
 
@@ -410,7 +414,7 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public KeYJavaType getReturnType() {
+    public @Nullable KeYJavaType getReturnType() {
         return null;
     }
 
@@ -420,7 +424,7 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public String getFullName() {
+    public @Nullable String getFullName() {
         return null;
     }
 
@@ -450,17 +454,17 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public Throws getThrown() {
+    public @Nullable Throws getThrown() {
         return null;
     }
 
     @Override
-    public ParameterDeclaration getParameterDeclarationAt(int index) {
+    public @Nullable ParameterDeclaration getParameterDeclarationAt(int index) {
         return null;
     }
 
     @Override
-    public VariableSpecification getVariableSpecification(int index) {
+    public @Nullable VariableSpecification getVariableSpecification(int index) {
         return null;
     }
 
@@ -470,12 +474,12 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public ImmutableArray<ParameterDeclaration> getParameters() {
+    public @Nullable ImmutableArray<ParameterDeclaration> getParameters() {
         return null;
     }
 
     @Override
-    public ImmutableList<LocationVariable> collectParameters() {
+    public @Nullable ImmutableList<LocationVariable> collectParameters() {
         return null;
     }
 
@@ -505,22 +509,22 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public ImmutableArray<Modifier> getModifiers() {
+    public @Nullable ImmutableArray<Modifier> getModifiers() {
         return null;
     }
 
     @Override
-    public ImmutableArray<KeYJavaType> getParamTypes() {
+    public @Nullable ImmutableArray<KeYJavaType> getParamTypes() {
         return null;
     }
 
     @Override
-    public KeYJavaType getType() {
+    public @Nullable KeYJavaType getType() {
         return null;
     }
 
     @Override
-    public KeYJavaType getContainerType() {
+    public @Nullable KeYJavaType getContainerType() {
         return null;
     }
 
@@ -530,22 +534,22 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public KeYJavaType getParamType(int i) {
+    public @Nullable KeYJavaType getParamType(int i) {
         return null;
     }
 
     @Override
-    public TypeReference getTypeReference() {
+    public @Nullable TypeReference getTypeReference() {
         return null;
     }
 
     @Override
-    public IProgramMethod getMethodContext() {
+    public @Nullable IProgramMethod getMethodContext() {
         return null;
     }
 
     @Override
-    public ReferencePrefix getRuntimeInstance() {
+    public @Nullable ReferencePrefix getRuntimeInstance() {
         return null;
     }
 }

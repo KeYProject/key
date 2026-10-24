@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic.label;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * An exception which can be thrown by the term label system.
  *
@@ -16,6 +18,7 @@ package de.uka.ilkd.key.logic.label;
  *
  * @author mattias ulbrich
  */
+@NullMarked
 public class TermLabelException extends Exception {
     private static final long serialVersionUID = -6012867553428479252L;
 

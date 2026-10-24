@@ -13,12 +13,15 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Sort used for generic taclets
  *
  * Within an SVInstantiations-object a generic sort is instantiated by a concrete sort, which has to
  * be a subsort of the instantiations of the supersorts of this sort
  */
+@NullMarked
 public final class GenericSort extends SortImpl {
 
 

@@ -10,10 +10,13 @@ import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The two objects of this class represent the universal and the existential quantifier,
  * respectively.
  */
+@NullMarked
 public final class Quantifier extends JAbstractSortedOperator {
     public static final Name ALL_NAME = new Name("all");
     public static final Name EX_NAME = new Name("exists");

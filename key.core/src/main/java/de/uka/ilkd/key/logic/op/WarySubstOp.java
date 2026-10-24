@@ -11,7 +11,10 @@ import de.uka.ilkd.key.logic.WaryClashFreeSubst;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.QuantifiableVariable;
 
+import org.jspecify.annotations.NullMarked;
 
+
+@NullMarked
 public final class WarySubstOp extends SubstOp {
 
     /**

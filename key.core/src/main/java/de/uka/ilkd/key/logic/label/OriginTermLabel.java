@@ -30,6 +30,7 @@ import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author lanzinger
  */
+@NullMarked
 public class OriginTermLabel implements TermLabel {
     public static final Logger LOGGER = LoggerFactory.getLogger(OriginTermLabel.class);
 
@@ -76,7 +78,7 @@ public class OriginTermLabel implements TermLabel {
      * @param pis the position of the term whose origin to find.
      * @return the term's origin, or the origin of one of its parents.
      */
-    public static Origin getOrigin(PosInSequent pis) {
+    public static @Nullable Origin getOrigin(@Nullable PosInSequent pis) {
         if (pis == null) {
             return null;
         }
@@ -91,7 +93,7 @@ public class OriginTermLabel implements TermLabel {
      * @param pio the position of the term whose origin to find.
      * @return the term's origin, or the origin of one of its parents.
      */
-    public static Origin getOrigin(PosInOccurrence pio) {
+    public static @Nullable Origin getOrigin(@Nullable PosInOccurrence pio) {
         if (pio == null) {
             return null;
         }
@@ -253,7 +255,7 @@ public class OriginTermLabel implements TermLabel {
      * @param services services.
      * @return the resulting sequent change info.
      */
-    public static SequentChangeInfo removeOriginLabels(
+    public static @Nullable SequentChangeInfo removeOriginLabels(
             Sequent seq,
             Services services) {
         SequentChangeInfo changes = null;
@@ -284,7 +286,7 @@ public class OriginTermLabel implements TermLabel {
      * @param services services.
      * @return the transformed term.
      */
-    public static JTerm removeOriginLabels(JTerm term, Services services) {
+    public static @Nullable JTerm removeOriginLabels(@Nullable JTerm term, Services services) {
         if (term == null) {
             return null;
         }
@@ -460,7 +462,7 @@ public class OriginTermLabel implements TermLabel {
     }
 
     @Override
-    public Object getTLChild(int i) {
+    public @Nullable Object getTLChild(int i) {
         if (i == 0) {
             return origin;
         } else if (i == 1) {

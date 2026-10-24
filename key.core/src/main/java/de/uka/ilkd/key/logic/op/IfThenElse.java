@@ -17,11 +17,14 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * This singleton class implements a general conditional operator
  * <tt>\if (phi) \then (t1) \else (t2)</tt>.
  */
+@NullMarked
 public final class IfThenElse extends AbstractOperator implements Operator {
 
     public static final IfThenElse IF_THEN_ELSE = new IfThenElse();
