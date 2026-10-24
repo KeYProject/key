@@ -8,6 +8,8 @@ package de.uka.ilkd.key.scripts;
 import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Option;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Halts the script if the expected number of open and enabled goals is not met.
  * <p>
@@ -58,6 +60,6 @@ public class AssertOpenGoalsCommand extends AbstractCommand {
          * The number of open and enabled goals.
          */
         @Option("goals")
-        public Integer goals;
+        public @Nullable Integer goals;
     }
 }

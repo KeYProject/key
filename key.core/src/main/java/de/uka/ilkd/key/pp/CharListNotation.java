@@ -6,7 +6,10 @@ package de.uka.ilkd.key.pp;
 
 import de.uka.ilkd.key.logic.JTerm;
 
+import org.jspecify.annotations.NullMarked;
 
+
+@NullMarked
 public final class CharListNotation extends Notation {
     public CharListNotation() {
         super(130);

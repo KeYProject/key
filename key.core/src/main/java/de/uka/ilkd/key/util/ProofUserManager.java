@@ -11,12 +11,16 @@ import java.util.WeakHashMap;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This singleton class is used to manage user of a {@link Proof} to make sure that a {@link Proof}
  * is only disposed via {@link Proof#dispose()} if it is no longer in use (no user available).
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public final class ProofUserManager {
     /**
      * Stores for each {@link Proof} the registered users.
@@ -56,7 +60,7 @@ public final class ProofUserManager {
      *        known {@link Proof} is removed from it.
      * @param user The user.
      */
-    public void addUser(Proof proof, KeYEnvironment<?> environment, Object user) {
+    public void addUser(Proof proof, @Nullable KeYEnvironment<?> environment, Object user) {
         if (proof == null) {
             throw new IllegalArgumentException("Proof not defined.");
         }
@@ -134,7 +138,7 @@ public final class ProofUserManager {
      * @param proof The {@link Proof} to get its users.
      * @return The registered user of the {@link Proof}.
      */
-    public Object[] getUsers(Proof proof) {
+    public Object[] getUsers(@Nullable Proof proof) {
         if (proof != null) {
             synchronized (this) {
                 Set<Object> users = proofUsers.get(proof);
@@ -151,7 +155,7 @@ public final class ProofUserManager {
      * @param proof The {@link Proof} to get its {@link KeYEnvironment}.
      * @return The {@link KeYEnvironment} of the given {@link Proof}.
      */
-    public KeYEnvironment<?> getEnvironment(Proof proof) {
+    public @Nullable KeYEnvironment<?> getEnvironment(@Nullable Proof proof) {
         if (proof != null) {
             synchronized (this) {
                 return proofEnvironments.get(proof);
@@ -167,7 +171,7 @@ public final class ProofUserManager {
      * @param environment The known {@link Proof}s of the given {@link KeYEnvironment}.
      * @return All known {@link Proof}s of the given {@link KeYEnvironment}.
      */
-    public Proof[] getProofs(KeYEnvironment<?> environment) {
+    public Proof[] getProofs(@Nullable KeYEnvironment<?> environment) {
         if (environment != null) {
             synchronized (this) {
                 Set<Proof> proofs = environmentProofs.get(environment);

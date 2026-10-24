@@ -7,6 +7,8 @@ package de.uka.ilkd.key.pp;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,12 +18,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author jschiffl
  */
+@NullMarked
 public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchSequentPrintFilter.class);
 
     /**
      * the String that is to be matched in the sequent view
      */
+    @Nullable
     String searchString;
 
     /**
@@ -56,7 +60,8 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
      * @return A pattern matching the input String
      * @throws IllegalRegexException if the given pattern is not a valid regex
      */
-    public static Pattern createPattern(String search, boolean regex) throws IllegalRegexException {
+    public static @Nullable Pattern createPattern(String search, boolean regex)
+            throws IllegalRegexException {
         int searchFlag = 0;
         if (search.toLowerCase().equals(search)) {
             searchFlag = searchFlag | Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
@@ -92,7 +97,7 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
      *
      * @return a brand new shiny pattern
      */
-    protected Pattern createPattern() {
+    protected @Nullable Pattern createPattern() {
         try {
             return createPattern(this.searchString, this.regex);
         } catch (IllegalRegexException e) {

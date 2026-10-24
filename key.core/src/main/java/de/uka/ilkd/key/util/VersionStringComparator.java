@@ -6,12 +6,16 @@ package de.uka.ilkd.key.util;
 
 import java.util.Comparator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Compares Strings by integer values of 'dot' separated components.
  *
  * @author bruns
  *
  */
+@NullMarked
 public class VersionStringComparator implements Comparator<String> {
 
     private final static String SEPARATOR_PATTERN = "\\D";
@@ -23,7 +27,7 @@ public class VersionStringComparator implements Comparator<String> {
         return lxc.compare(parseVersionString(arg0), parseVersionString(arg1));
     }
 
-    private static Integer[] parseVersionString(String s) {
+    private static Integer[] parseVersionString(@Nullable String s) {
         if (s != null) {
             final String[] p = s.split(SEPARATOR_PATTERN);
             final Integer[] r = new Integer[p.length];

@@ -6,6 +6,8 @@ package de.uka.ilkd.key.macros;
 
 import java.util.Set;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This macro performs simplification of Heap and LocSet terms. It applies simplification rules
  * (including the "unoptimized" select rules), One Step Simplification, alpha, and delta rules.
@@ -13,6 +15,7 @@ import java.util.Set;
  * @author bruns
  *
  */
+@NullMarked
 public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro {
 
     @Override

@@ -14,6 +14,9 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Takes care of providing the whole ProofMacro interface by only making it necessary to implement
  * to most general application methods for a given list of goals and translating the less general
@@ -23,9 +26,10 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public abstract class AbstractProofMacro implements ProofMacro {
 
-    private static ImmutableList<Goal> getGoals(Node node) {
+    private static ImmutableList<Goal> getGoals(@Nullable Node node) {
         if (node == null) {
             // can happen during initialisation
             return ImmutableList.nil();

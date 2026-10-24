@@ -51,6 +51,8 @@ import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +82,7 @@ import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class MergeRuleUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MergeRuleUtils.class);
 
@@ -94,7 +97,7 @@ public class MergeRuleUtils {
      * @param obj The object to wrap.
      * @return None iff obj is null, Some(obj) otherwise.
      */
-    public static <T> Optional<T> wrapOption(T obj) {
+    public static <T> Optional<T> wrapOption(@Nullable T obj) {
         if (obj == null) {
             return Optional.empty();
         } else {
@@ -153,7 +156,8 @@ public class MergeRuleUtils {
      * @param toTranslate The formula to be translated.
      * @return The formula represented by the input or null if not applicable.
      */
-    public static JTerm translateToFormula(final Services services, final String toTranslate) {
+    public static @Nullable JTerm translateToFormula(final Services services,
+            final String toTranslate) {
         try {
             @NonNull
             JTerm result = new KeyIO(services).parseExpression(toTranslate);
@@ -320,7 +324,7 @@ public class MergeRuleUtils {
      * @return The right side in the update for the given left side, or null if the right side could
      *         not be determined.
      */
-    public static JTerm getUpdateRightSideFor(JTerm update, LocationVariable leftSide) {
+    public static @Nullable JTerm getUpdateRightSideFor(JTerm update, LocationVariable leftSide) {
         if (update.op() instanceof ElementaryUpdate elementaryUpdate
                 && elementaryUpdate.lhs().equals(leftSide)) {
 
@@ -499,7 +503,8 @@ public class MergeRuleUtils {
      *        constant.
      * @return A term equal to the input, but with constants substituted by fresh variables.
      */
-    public static JTerm substConstantsByFreshVars(JTerm term, HashSet<Function> restrictTo,
+    public static JTerm substConstantsByFreshVars(JTerm term,
+            @Nullable HashSet<Function> restrictTo,
             HashMap<Function, LogicVariable> replMap, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
@@ -1701,7 +1706,7 @@ public class MergeRuleUtils {
      * @param name Name to find a PV for.
      * @return The PV with the given name in the global namespace, or null if there is none.
      */
-    private static LocationVariable lookupVarInNS(String name, Services services) {
+    private static @Nullable LocationVariable lookupVarInNS(String name, Services services) {
         return (LocationVariable) services.getNamespaces().programVariables()
                 .lookup(new Name(name));
     }
@@ -1868,7 +1873,7 @@ public class MergeRuleUtils {
         }
 
         @Override
-        public LocationVariable get(Object key) {
+        public @Nullable LocationVariable get(Object key) {
             if (key instanceof LocationVariable var) {
 
                 if (doNotRename.contains(var)) {
@@ -1889,27 +1894,27 @@ public class MergeRuleUtils {
         }
 
         @Override
-        public LocationVariable put(LocationVariable key, LocationVariable value) {
+        public @Nullable LocationVariable put(LocationVariable key, LocationVariable value) {
             return null;
         }
 
         @Override
-        public LocationVariable remove(Object key) {
+        public @Nullable LocationVariable remove(Object key) {
             return null;
         }
 
         @Override
-        public Set<LocationVariable> keySet() {
+        public @Nullable Set<LocationVariable> keySet() {
             return null;
         }
 
         @Override
-        public Collection<LocationVariable> values() {
+        public @Nullable Collection<LocationVariable> values() {
             return null;
         }
 
         @Override
-        public Set<Map.Entry<LocationVariable, LocationVariable>> entrySet() {
+        public @Nullable Set<Map.Entry<LocationVariable, LocationVariable>> entrySet() {
             return null;
         }
     }

@@ -10,6 +10,8 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 
+import org.jspecify.annotations.Nullable;
+
 /// Parses proof script source code into a tree structure of [ScriptNode]s.
 /// Handles nested block structures and branch management commands.
 ///
@@ -17,7 +19,7 @@ import java.util.ArrayDeque;
 @Deprecated
 class ScriptTreeParser {
 
-    private static ScriptNode parse(Reader reader) throws IOException, ScriptException {
+    private static @Nullable ScriptNode parse(Reader reader) throws IOException, ScriptException {
 
         ScriptNode root = null;
         ScriptNode last = null;

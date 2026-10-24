@@ -18,6 +18,7 @@ import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 
 
+@NullMarked
 public class ZipFileCollection implements FileCollection, AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(ZipFileCollection.class);
 
@@ -83,7 +85,7 @@ public class ZipFileCollection implements FileCollection, AutoCloseable {
         }
 
         @Override
-        public InputStream openCurrent(FileRepo fileRepo) throws IOException {
+        public InputStream openCurrent(@Nullable FileRepo fileRepo) throws IOException {
             if (currentEntry == null) {
                 throw new NoSuchElementException();
             } else if (fileRepo != null) {

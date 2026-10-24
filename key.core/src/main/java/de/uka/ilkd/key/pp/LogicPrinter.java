@@ -44,6 +44,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +66,7 @@ import static de.uka.ilkd.key.pp.PosTableLayouter.DEFAULT_LINE_WIDTH;
  * @see Notation
  * @see de.uka.ilkd.key.util.pp.Layouter
  */
+@NullMarked
 public class LogicPrinter {
     private static final Logger LOGGER = LoggerFactory.getLogger(LogicPrinter.class);
 
@@ -75,7 +78,7 @@ public class LogicPrinter {
     /**
      * the services object
      */
-    protected final Services services;
+    protected final @Nullable Services services;
 
     /**
      * This chooses the layout.
@@ -106,7 +109,8 @@ public class LogicPrinter {
      * @param services services.
      * @param layouter the layouter to use
      */
-    public LogicPrinter(NotationInfo notationInfo, Services services, PosTableLayouter layouter) {
+    public LogicPrinter(NotationInfo notationInfo, @Nullable Services services,
+            PosTableLayouter layouter) {
         this.notationInfo = notationInfo;
         this.services = services;
         if (services != null) {
@@ -135,7 +139,7 @@ public class LogicPrinter {
         return layouter;
     }
 
-    public static SequentViewLogicPrinter quickPrinter(Services services,
+    public static SequentViewLogicPrinter quickPrinter(@Nullable Services services,
             boolean usePrettyPrinting, boolean useUnicodeSymbols,
             boolean hidePackagePrefix) {
         final NotationInfo ni = new NotationInfo();
@@ -276,7 +280,7 @@ public class LogicPrinter {
      * @param lineWidth the max. number of character to put on one line (the actual taken linewidth
      *        is the max of {@link PosTableLayouter#DEFAULT_LINE_WIDTH} and the given value
      */
-    public void update(SequentPrintFilter filter, int lineWidth) {
+    public void update(@Nullable SequentPrintFilter filter, int lineWidth) {
         setLineWidth(lineWidth);
         reset();
         if (filter != null) {
@@ -363,7 +367,7 @@ public class LogicPrinter {
         printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, true);
     }
 
-    protected HeapLDT getHeapLDT() {
+    protected @Nullable HeapLDT getHeapLDT() {
         return services == null ? null : services.getTypeConverter().getHeapLDT();
     }
 
@@ -547,7 +551,7 @@ public class LogicPrinter {
         layouter.brk(0, -2).print(")").end();
     }
 
-    protected void printTextSequent(Sequent seq, String text) {
+    protected void printTextSequent(@Nullable Sequent seq, String text) {
         layouter.nl();
 
         layouter.beginC().print(text).print("(").brk(0);
@@ -1169,7 +1173,7 @@ public class LogicPrinter {
     /*
      * Print a term of the form: T::select(heap, object, field).
      */
-    public void printSelect(JTerm t, JTerm tacitHeap) {
+    public void printSelect(JTerm t, @Nullable JTerm tacitHeap) {
         selectPrinter.printSelect(this, t, tacitHeap);
     }
 
@@ -1223,7 +1227,7 @@ public class LogicPrinter {
         }
     }
 
-    public void printObserver(JTerm t, JTerm tacitHeap) {
+    public void printObserver(JTerm t, @Nullable JTerm tacitHeap) {
         assert t.op() instanceof IObserverFunction;
         assert t.boundVars().isEmpty();
 
@@ -1406,7 +1410,7 @@ public class LogicPrinter {
         layouter.markEndSub();
     }
 
-    public void printElementOf(JTerm t, String symbol) {
+    public void printElementOf(JTerm t, @Nullable String symbol) {
         if (symbol == null) {
             printElementOf(t);
             return;

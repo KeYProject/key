@@ -10,6 +10,9 @@ import java.util.function.Function;
 
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A union type contains a value that can be one of two types. It is also called
  * the "sum" type sometimes. Union containers are immutable.
@@ -26,7 +29,8 @@ import org.key_project.util.collection.Pair;
  * @see java.util.Optional
  * @see Pair
  */
-public record Union<A, B>(Object value, boolean isFirst) {
+@NullMarked
+public record Union<A, B>(@Nullable Object value, boolean isFirst) {
 
     /**
      * private constructor the static methods {@link #fromFirst(Object)} and
@@ -48,7 +52,7 @@ public record Union<A, B>(Object value, boolean isFirst) {
      * @param <B> the type of the second alternative
      * @return a freshly created immutable union object.
      */
-    public static <A, B> Union<A, B> fromFirst(A value) {
+    public static <A, B> Union<A, B> fromFirst(@Nullable A value) {
         return new Union<A, B>(value, true);
     }
 
@@ -62,7 +66,7 @@ public record Union<A, B>(Object value, boolean isFirst) {
      * @param <B> the type of the second alternative
      * @return a freshly created immutable union object.
      */
-    public static <A, B> Union<A, B> fromSecond(B value) {
+    public static <A, B> Union<A, B> fromSecond(@Nullable B value) {
         return new Union<A, B>(value, false);
     }
 
@@ -96,7 +100,7 @@ public record Union<A, B>(Object value, boolean isFirst) {
      *
      * @return the stored value, may be null
      */
-    public A getFirst() {
+    public @Nullable A getFirst() {
         if (isFirst) {
             return (A) value;
         } else {
@@ -111,7 +115,7 @@ public record Union<A, B>(Object value, boolean isFirst) {
      *
      * @return the stored value, may be null
      */
-    public B getSecond() {
+    public @Nullable B getSecond() {
         if (!isFirst) {
             return (B) value;
         } else {
