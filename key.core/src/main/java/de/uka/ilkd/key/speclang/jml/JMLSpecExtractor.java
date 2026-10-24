@@ -91,7 +91,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             return JmlFacade.parseClause(DEFAULT_SIGNALS_ONLY);
         }
 
-        ImmutableArray<TypeReference> exceptions = pm.getThrown().getExceptions();
+        ImmutableList<TypeReference> exceptions = pm.getThrown().getExceptions();
 
         if (exceptions == null) {
             return JmlFacade.parseClause(DEFAULT_SIGNALS_ONLY);
