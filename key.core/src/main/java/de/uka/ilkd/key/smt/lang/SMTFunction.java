@@ -7,27 +7,31 @@ package de.uka.ilkd.key.smt.lang;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  *
  * @author Aboubakr Achraf El Ghazi
  *
  */
+@NullMarked
 public class SMTFunction {
 
-    protected String comment;
+    protected @Nullable String comment;
 
-    public String getComment() {
+    public @Nullable String getComment() {
         return comment;
     }
 
-    public void setComment(String comment) {
+    public void setComment(@Nullable String comment) {
         this.comment = comment;
     }
 
-    protected String id;
-    protected List<SMTSort> domainSorts;
-    protected SMTSort imageSort;
+    protected @Nullable String id;
+    protected @Nullable List<SMTSort> domainSorts;
+    protected @Nullable SMTSort imageSort;
 
     /**
      * creates an inital SMT function
@@ -56,19 +60,19 @@ public class SMTFunction {
         this.imageSort = imageSort;
     }
 
-    public SMTSort getImageSort() {
+    public @Nullable SMTSort getImageSort() {
         return imageSort;
     }
 
-    public void setImageSort(SMTSort imageSort) {
+    public void setImageSort(@Nullable SMTSort imageSort) {
         this.imageSort = imageSort;
     }
 
-    public String getId() {
+    public @Nullable String getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(@Nullable String id) {
         this.id = id;
     }
 
@@ -101,14 +105,14 @@ public class SMTFunction {
     /**
      * @return the domainSorts
      */
-    public List<SMTSort> getDomainSorts() {
+    public @Nullable List<SMTSort> getDomainSorts() {
         return domainSorts;
     }
 
     /**
      * @param domainSorts the domainSorts to set
      */
-    public void setDomainSorts(List<SMTSort> domainSorts) {
+    public void setDomainSorts(@Nullable List<SMTSort> domainSorts) {
         this.domainSorts = domainSorts;
     }
 

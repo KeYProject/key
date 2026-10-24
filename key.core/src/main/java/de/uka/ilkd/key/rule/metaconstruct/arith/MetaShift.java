@@ -13,7 +13,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
 
+
+@NullMarked
 public abstract class MetaShift extends AbstractTermTransformer {
 
     public final static BigInteger INT_MIN_VALUE = BigInteger.valueOf(Integer.MIN_VALUE);

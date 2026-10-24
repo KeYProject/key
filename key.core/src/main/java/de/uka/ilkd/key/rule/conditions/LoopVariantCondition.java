@@ -17,11 +17,15 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Extracts the variant for a loop term.
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public class LoopVariantCondition implements VariableCondition {
     private final SchemaVariable loopStmtSV;
     private final SchemaVariable variantSV;
@@ -32,7 +36,7 @@ public class LoopVariantCondition implements VariableCondition {
     }
 
     @Override
-    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
             MatchResultInfo matchCond, LogicServices p_services) {
         final var svInst = matchCond.getInstantiations();
         final var services = (Services) p_services;

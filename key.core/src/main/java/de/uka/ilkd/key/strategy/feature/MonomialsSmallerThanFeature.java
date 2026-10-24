@@ -25,6 +25,8 @@ import org.key_project.prover.strategy.costbased.termfeature.SubTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Feature that returns zero iff each monomial of one polynomial is smaller than all monomials of a
@@ -38,6 +40,7 @@ import org.key_project.util.collection.ImmutableList;
  * {@link AbstractMonomialSmallerThanFeature#introductionTime}).
  * </p>
  */
+@NullMarked
 @StableCost
 public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeature {
 

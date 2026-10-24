@@ -13,12 +13,14 @@ import org.key_project.util.parsing.SourceNames;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
  * @version 1 (3/27/20)
  */
+@NullMarked
 public class BuildingException extends RuntimeException implements HasLocation {
     private final @Nullable Token offendingSymbol;
 

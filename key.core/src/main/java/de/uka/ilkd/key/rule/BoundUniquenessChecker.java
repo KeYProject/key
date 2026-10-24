@@ -15,6 +15,8 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The bound uniqueness checker ensures that schemavariables can be bound at most once in the
  * <tt>\find</tt> and <tt>\assumes</tt> part of a taclet. The justification for this restriction is
@@ -23,6 +25,7 @@ import org.key_project.util.collection.ImmutableList;
  *   \find (\forall var; phi ==>)
  * </code> would nearly never match, as <tt>var</tt> would be required to match the same object.
  */
+@NullMarked
 public class BoundUniquenessChecker {
 
     private final HashSet<QuantifiableVariable> boundVars =

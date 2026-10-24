@@ -24,6 +24,8 @@ import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The abstract class StrategyProofMacro can be used to define proof macros which use their own
@@ -39,9 +41,11 @@ import org.jspecify.annotations.NonNull;
  * @see ProverTaskListener
  * @see Strategy
  */
+@NullMarked
 public abstract class StrategyProofMacro extends AbstractProofMacro {
 
-    protected abstract Strategy<Goal> createStrategy(Proof proof, PosInOccurrence posInOcc);
+    protected abstract Strategy<Goal> createStrategy(Proof proof,
+            @Nullable PosInOccurrence posInOcc);
 
     /**
      * Whether this macro's run may use the multi-core prover.

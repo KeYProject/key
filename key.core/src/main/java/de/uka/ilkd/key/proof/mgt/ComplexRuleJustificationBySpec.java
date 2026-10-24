@@ -10,7 +10,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.key_project.logic.LogicServices;
 import org.key_project.prover.rules.RuleApp;
 
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class ComplexRuleJustificationBySpec implements ComplexRuleJustification {
 
     /**

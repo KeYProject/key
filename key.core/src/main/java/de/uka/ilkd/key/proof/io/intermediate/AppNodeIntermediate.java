@@ -4,21 +4,25 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.io.intermediate;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Node in an intermediate proof representation storing a rule application.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class AppNodeIntermediate extends NodeIntermediate {
 
-    private AppIntermediate ruleApp = null;
+    private @Nullable AppIntermediate ruleApp = null;
     private boolean interactiveRuleApplication = false;
     /** Signals that this app has been triggered by a proof script. */
     private boolean scriptRuleApplication = false;
     /** user-provided notes for the node */
-    private String notes = null;
+    private @Nullable String notes = null;
 
-    public AppIntermediate getIntermediateRuleApp() {
+    public @Nullable AppIntermediate getIntermediateRuleApp() {
         return ruleApp;
     }
 
@@ -42,11 +46,11 @@ public class AppNodeIntermediate extends NodeIntermediate {
         this.scriptRuleApplication = scriptRuleApplication;
     }
 
-    public void setNotes(String notes) {
+    public void setNotes(@Nullable String notes) {
         this.notes = notes;
     }
 
-    public String getNotes() {
+    public @Nullable String getNotes() {
         return notes;
     }
 }

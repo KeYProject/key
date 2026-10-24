@@ -19,6 +19,9 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * <p>
@@ -35,6 +38,7 @@ import org.key_project.prover.sequent.Sequent;
  * @see TermLabel
  * @see TermLabelManager
  */
+@NullMarked
 public interface TermLabelUpdate extends RuleSpecificTask {
     /**
      * This method can freely add, remove or sort the given {@link TermLabel} which will be added to
@@ -63,7 +67,7 @@ public interface TermLabelUpdate extends RuleSpecificTask {
      */
     void updateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, JTerm modalityTerm,
+            @Nullable JTerm applicationTerm, @Nullable JTerm modalityTerm,
             Rule rule, RuleApp ruleApp, Object hint, JTerm tacletTerm,
             JTerm newTerm,
             Set<TermLabel> labels);

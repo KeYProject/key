@@ -12,7 +12,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
 
+
+@NullMarked
 public final class AddCast extends AbstractTermTransformer {
 
     public AddCast() {

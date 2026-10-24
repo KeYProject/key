@@ -9,8 +9,11 @@ import de.uka.ilkd.key.logic.op.Junctor;
 
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.strategy.StaticFeatureCollection.op;
 
+@NullMarked
 class ValueTermFeature {
 
     public ValueTermFeature(TermFeature nullTerm) {

@@ -22,10 +22,14 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This variable condition ensures that no other label of the same name exists in the context
  * program or one of the schemavariable instantiations.
  */
+@NullMarked
 public final class NewJumpLabelCondition implements VariableCondition {
 
     private final ProgramSV labelSV;
@@ -41,7 +45,7 @@ public final class NewJumpLabelCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var,
+    public @Nullable MatchConditions check(SchemaVariable var,
             SyntaxElement instCandidate,
             MatchResultInfo matchCond,
             LogicServices services) {

@@ -22,11 +22,14 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * ensures that the given instantiation for the schemavariable denotes a static method. For
  * determining the method the callee and the arguments of the method are needed as arguments.
  */
+@NullMarked
 public final class StaticMethodCondition extends VariableConditionAdapter {
 
     private final boolean negation;

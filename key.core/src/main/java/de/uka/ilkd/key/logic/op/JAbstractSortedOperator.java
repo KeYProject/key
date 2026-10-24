@@ -16,27 +16,32 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Abstract sorted operator class offering some common functionality.
  */
+@NullMarked
 public abstract class JAbstractSortedOperator extends AbstractSortedOperator
         implements Sorted, Operator {
 
     protected JAbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-            ImmutableArray<Boolean> whereToBind, Modifier modifier) {
+            @Nullable ImmutableArray<Boolean> whereToBind, Modifier modifier) {
         super(name, argSorts, sort, whereToBind, modifier);
     }
 
     protected JAbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-            ImmutableArray<Boolean> whereToBind, boolean isRigid) {
+            @Nullable ImmutableArray<Boolean> whereToBind, boolean isRigid) {
         this(name, argSorts, sort, whereToBind, isRigid ? Modifier.RIGID : Modifier.NONE);
     }
 
-    protected JAbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, Boolean[] whereToBind,
+    protected JAbstractSortedOperator(Name name, Sort[] argSorts, Sort sort,
+            @Nullable Boolean[] whereToBind,
             boolean isRigid) {
         this(name, new ImmutableArray<>(argSorts), sort,
-            new ImmutableArray<>(whereToBind), isRigid);
+            whereToBind == null ? null : new ImmutableArray<>(whereToBind), isRigid);
     }
 
     protected JAbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,

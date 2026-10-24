@@ -17,6 +17,9 @@ import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 
 import org.key_project.logic.Term;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
@@ -31,6 +34,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  * Instances equal up to term labels share one entry. Of several offers for one instance the
  * cheapest is kept.
  */
+@NullMarked
 final class InstanceTable {
 
     /**
@@ -91,6 +95,7 @@ final class InstanceTable {
      * @param services access to the cast symbol
      * @return the entry, or null
      */
+    @Nullable
     Entry entryOf(Term query, Services services) {
         final Entry entry = entries.get(query);
         if (entry != null) {

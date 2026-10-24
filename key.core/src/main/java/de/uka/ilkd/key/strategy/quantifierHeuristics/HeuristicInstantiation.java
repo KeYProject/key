@@ -23,7 +23,11 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+
+@NullMarked
 public class HeuristicInstantiation implements TermGenerator<Goal> {
 
     /** One generator per treatment, so the option costs no allocation per instantiation. */
@@ -76,7 +80,7 @@ public class HeuristicInstantiation implements TermGenerator<Goal> {
         private final Sort quantifiedVarSort;
         private final Function quantifiedVarSortCast;
 
-        private Term nextInst = null;
+        private @Nullable Term nextInst = null;
         private final TermServices services;
 
         private HIIterator(Iterator<Term> it, QuantifiableVariable var, Services services) {

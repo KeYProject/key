@@ -27,6 +27,7 @@ import org.key_project.util.Streams;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,7 @@ import org.slf4j.LoggerFactory;
 ///
 /// @author Alicia Appelhagen
 /// @author Alexander Weigl
+@NullMarked
 public class SolverPropertiesLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(SolverPropertiesLoader.class);
 

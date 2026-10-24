@@ -9,14 +9,18 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * variable condition used if a new variable is introduced
  */
+@NullMarked
 public class NewVarcond implements org.key_project.prover.rules.conditions.NewVarcond {
 
     private final SchemaVariable sv;
-    private final SchemaVariable peerSV;
-    private final KeYJavaType type;
+    private final @Nullable SchemaVariable peerSV;
+    private final @Nullable KeYJavaType type;
 
     /*
      * @param sv the SchemaVariable representing a new variable.
@@ -49,12 +53,12 @@ public class NewVarcond implements org.key_project.prover.rules.conditions.NewVa
     }
 
 
-    public SchemaVariable getPeerSchemaVariable() {
+    public @Nullable SchemaVariable getPeerSchemaVariable() {
         return peerSV;
     }
 
 
-    public KeYJavaType getType() {
+    public @Nullable KeYJavaType getType() {
         return type;
     }
 

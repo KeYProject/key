@@ -6,11 +6,14 @@ package de.uka.ilkd.key.proof.event;
 
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Observes a {@link Proof}.
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public interface ProofDisposedListener {
     /**
      * When a {@link Proof} is going to be disposed.

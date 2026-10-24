@@ -18,12 +18,15 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 
 /**
  * Generic interface for evaluating the cost of a RuleApp with regard to a specific strategy
  */
+@NullMarked
 public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, Feature {
     /**
      * Evaluate the cost of a <code>RuleApp</code>. Starts a new independent computation.
@@ -85,7 +88,7 @@ public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, 
 
     default boolean isResponsibleFor(RuleSet rs) { return false; }
 
-    default RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio,
+    default @Nullable RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio,
             de.uka.ilkd.key.proof.Goal goal,
             MutableState mState) {
         return null;

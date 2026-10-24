@@ -15,10 +15,13 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * ensures that the given instantiation for the schemavariable denotes a static field
  */
+@NullMarked
 public final class StaticReferenceCondition extends VariableConditionAdapter {
 
     private final SchemaVariable reference;

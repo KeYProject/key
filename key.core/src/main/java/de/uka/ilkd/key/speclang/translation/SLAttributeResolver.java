@@ -23,9 +23,13 @@ import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Resolver for attributes (i.e., fields).
  */
+@NullMarked
 public final class SLAttributeResolver extends SLExpressionResolver {
 
     public SLAttributeResolver(JavaInfo javaInfo, SLResolverManager manager,
@@ -34,7 +38,8 @@ public final class SLAttributeResolver extends SLExpressionResolver {
     }
 
 
-    private ProgramVariable lookupVisibleAttribute(String name, KeYJavaType containingType) {
+    private @Nullable ProgramVariable lookupVisibleAttribute(String name,
+            KeYJavaType containingType) {
         assert containingType.getJavaType() instanceof TypeDeclaration
                 : "type %s is primitive, lookup for %s".formatted(containingType, name);
         final TypeDeclaration td = (TypeDeclaration) containingType.getJavaType();
@@ -67,14 +72,14 @@ public final class SLAttributeResolver extends SLExpressionResolver {
 
 
     @Override
-    protected boolean canHandleReceiver(SLExpression receiver) {
+    protected boolean canHandleReceiver(@Nullable SLExpression receiver) {
         return receiver != null;
     }
 
 
     @Override
-    protected SLExpression doResolving(SLExpression receiver, String name, SLParameters parameters)
-            throws SLTranslationException {
+    protected @Nullable SLExpression doResolving(@Nullable SLExpression receiver, String name,
+            @Nullable SLParameters parameters) throws SLTranslationException {
         if (parameters != null) {
             return null;
         }

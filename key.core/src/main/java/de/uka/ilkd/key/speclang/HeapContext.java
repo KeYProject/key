@@ -14,11 +14,13 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Heap contexts are various scenarios of what happens to heap variables during PO generation and
  * built-in rule applications, like saving atPre heaps, anonymisation, etc.
  */
+@NullMarked
 public class HeapContext {
 
     public static List<LocationVariable> getModifiableHeaps(Services services,

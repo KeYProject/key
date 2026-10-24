@@ -34,6 +34,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
@@ -46,6 +49,7 @@ import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
  * @see WhileInvariantRule
  * @author Dominic Scheurer
  */
+@NullMarked
 public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
 
@@ -361,7 +365,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * @throws RuleAbortException If the {@link LoopInvariantBuiltInRuleApp} does not contain a
      *         {@link LoopSpecification}.
      */
-    protected static Instantiation instantiate(final LoopInvariantBuiltInRuleApp app,
+    protected static @Nullable Instantiation instantiate(final LoopInvariantBuiltInRuleApp app,
             Services services) throws RuleAbortException {
         // Use the instantiation cached on this (thread-confined) rule app if it is still valid,
         // i.e.
@@ -564,8 +568,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      *        rule. Could be needed for the information flow validity goal.
      */
     public record Instantiation(JTerm u, JTerm progPost, While loop, LoopSpecification inv,
-            JTerm selfTerm,
-            ExecutionContext innermostExecutionContext) {
+            @Nullable JTerm selfTerm,
+            @Nullable ExecutionContext innermostExecutionContext) {
         public Instantiation {
             assert u != null;
             assert u.sort() == JavaDLTheory.UPDATE;

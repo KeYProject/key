@@ -20,11 +20,13 @@ import org.key_project.util.parsing.Location;
 import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Transforms pure text comments into {@link TextualJMLConstruct}s.
  */
+@NullMarked
 public class PreParser {
     private final List<PositionedString> warnings = new ArrayList<>(8);
 

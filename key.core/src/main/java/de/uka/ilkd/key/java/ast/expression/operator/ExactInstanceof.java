@@ -12,12 +12,15 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Instanceof.
  *
  * @author <TT>AutoDoc</TT>
  */
 
+@NullMarked
 public class ExactInstanceof extends TypeOperator {
 
 

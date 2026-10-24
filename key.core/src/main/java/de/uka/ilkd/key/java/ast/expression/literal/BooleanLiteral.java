@@ -30,14 +30,15 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-
 
 /**
  * Boolean literal.
  *
  * @author <TT>AutoDoc</TT>
  */
+@NullMarked
 public final class BooleanLiteral extends Literal {
     public static final BooleanLiteral TRUE = new BooleanLiteral(true);
     public static final BooleanLiteral FALSE = new BooleanLiteral(false);
@@ -162,7 +163,7 @@ public final class BooleanLiteral extends Literal {
         v.performActionOnBooleanLiteral(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
     }
 

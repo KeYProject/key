@@ -17,10 +17,13 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /*
  * FieldSpecification taken from COMPOST and changed to achieve an immutable structure
  */
 
+@NullMarked
 public class FieldSpecification extends VariableSpecification implements Field {
 
     /**

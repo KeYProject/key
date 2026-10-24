@@ -16,6 +16,8 @@ import org.key_project.logic.Property;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * A property that can be used in
@@ -27,6 +29,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Tobias Reinhold
  */
+@NullMarked
 public class ProofIrrelevancyProperty implements Property<JTerm> {
     /**
      * The single instance of this property.

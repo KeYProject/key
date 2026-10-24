@@ -12,10 +12,13 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Catch.
  *
  */
+@NullMarked
 public class Catch extends BranchImp implements ParameterContainer, VariableScope {
 
     /**

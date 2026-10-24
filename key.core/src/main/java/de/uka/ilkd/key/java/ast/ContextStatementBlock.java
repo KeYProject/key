@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
@@ -21,6 +22,7 @@ import org.key_project.prover.rules.matcher.vm.ProgramChildrenMatcher;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -33,6 +35,7 @@ import org.jspecify.annotations.Nullable;
  * arbitrary program. This pattern is realized using this class.
  */
 
+@NullMarked
 public class ContextStatementBlock extends StatementBlock {
 
 
@@ -132,8 +135,9 @@ public class ContextStatementBlock extends StatementBlock {
         return true;
     }
 
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
-        return match(source, matchCond, null);
+    public @Nullable MatchConditions match(SourceData source,
+            @Nullable MatchConditions matchCond) {
+        return match(source, Objects.requireNonNull(matchCond, "missing match conditions"), null);
     }
 
     /**
@@ -152,7 +156,7 @@ public class ContextStatementBlock extends StatementBlock {
      *        built-in {@link #matchChildren}
      * @return the resulting match conditions, or {@code null} if matching fails
      */
-    public MatchConditions match(SourceData source, MatchConditions matchCond,
+    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond,
             @Nullable ProgramChildrenMatcher activeStatements) {
         assert getPrefixLength() > 0;
         SourceData newSource = source;
@@ -163,7 +167,8 @@ public class ContextStatementBlock extends StatementBlock {
             return null;
         }
 
-        final ProgramElement src = newSource.getSource();
+        final ProgramElement src =
+            Objects.requireNonNull(newSource.getSource(), "context block has no source element");
         final Services services = source.getServices();
 
         ExecutionContext lastExecutionContext = null;
@@ -269,7 +274,7 @@ public class ContextStatementBlock extends StatementBlock {
      * position
      */
     private MatchConditions makeContextInfoComplete(MatchConditions matchCond, SourceData newSource,
-            ProgramPrefix prefix, int pos, PosInProgram relPos, ProgramElement src,
+            final @Nullable ProgramPrefix prefix, int pos, PosInProgram relPos, ProgramElement src,
             Services services) {
 
         final SVInstantiations instantiations = matchCond.getInstantiations();
@@ -305,9 +310,15 @@ public class ContextStatementBlock extends StatementBlock {
      *        the original source
      * @return the inner most execution context
      */
-    private MatchConditions matchInnerExecutionContext(MatchConditions matchCond,
-            final Services services, ExecutionContext lastExecutionContext,
-            final ProgramPrefix prefix, int pos, final ProgramElement src) {
+    // The two null arguments to {@code add(...)} deliberately violate the callee's @NonNull
+    // positions: they denote "no prefix/suffix set" for this bookkeeping entry, which
+    // {@link #makeContextInfoComplete} unconditionally replaces via
+    // {@code instantiations.replace(...)} before the instantiations are ever read, so no null
+    // position leaks to a consumer.
+    @SuppressWarnings("NullAway")
+    private @Nullable MatchConditions matchInnerExecutionContext(MatchConditions matchCond,
+            final Services services, @Nullable ExecutionContext lastExecutionContext,
+            final @Nullable ProgramPrefix prefix, int pos, final ProgramElement src) {
 
         // partial context instantiation
 
@@ -330,6 +341,11 @@ public class ContextStatementBlock extends StatementBlock {
             }
         }
 
+        // The two null arguments deliberately violate the callee's @NonNull positions: they denote
+        // "no prefix/suffix set" for this bookkeeping entry, which {@link #makeContextInfoComplete}
+        // unconditionally replaces via {@code instantiations.replace(...)} before the
+        // instantiations
+        // are ever read, so no null position leaks to a consumer.
         matchCond = matchCond.setInstantiations(
             matchCond.getInstantiations().add(null, null, innerContext, src, services));
 
@@ -348,7 +364,8 @@ public class ContextStatementBlock extends StatementBlock {
      *        prefix.getPrefixElementAt(pos);
      * @return the PosInProgram of the first element, which is not part of the prefix
      */
-    private PosInProgram matchPrefixEnd(final ProgramPrefix prefix, int pos, PosInProgram relPos) {
+    private PosInProgram matchPrefixEnd(final @Nullable ProgramPrefix prefix, int pos,
+            PosInProgram relPos) {
         PosInProgram prefixEnd = PosInProgram.TOP;
         if (prefix != null) {
             ProgramPrefix currentPrefix = prefix;

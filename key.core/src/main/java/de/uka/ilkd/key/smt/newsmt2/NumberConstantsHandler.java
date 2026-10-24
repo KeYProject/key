@@ -13,20 +13,24 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This handler is responsible to render number constants Z(3(2(1(#)))) as "123".
  *
  * TODO Should that also do character constants (C) with the same machinery?
  */
+@NullMarked
 public class NumberConstantsHandler implements SMTHandler {
 
-    private Function numberSymbol;
-    private Services services;
-    private Function negNumberSign;
+    private @Nullable Function numberSymbol;
+    private @Nullable Services services;
+    private @Nullable Function negNumberSign;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         this.services = services;
         numberSymbol = services.getTypeConverter().getIntegerLDT().getNumberSymbol();
         negNumberSign = services.getTypeConverter().getIntegerLDT().getNegativeNumberSign();

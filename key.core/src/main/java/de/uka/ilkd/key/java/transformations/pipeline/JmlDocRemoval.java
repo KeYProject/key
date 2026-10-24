@@ -10,15 +10,17 @@ import com.github.javaparser.ast.key.JmlDocModifier;
 import com.github.javaparser.ast.key.JmlDocsBodyDeclaration;
 import com.github.javaparser.ast.key.JmlDocsStatements;
 import com.github.javaparser.ast.key.JmlDocsTypeDeclaration;
-import org.jspecify.annotations.NonNull;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  *
  * @author Alexander Weigl
  * @version 1 (3/3/26)
  */
+@NullMarked
 public class JmlDocRemoval extends JavaTransformerAbstract {
-    public JmlDocRemoval(@NonNull TransformationPipelineServices services) {
+    public JmlDocRemoval(TransformationPipelineServices services) {
         super(services);
     }
 

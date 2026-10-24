@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
  * Walks through a java AST in depth-left-fist-order. This walker is used to transform a loop (not
  * only while loops) according to the rules of the dynamic logic.
  */
+@NullMarked
 public class WhileInvariantTransformation extends WhileLoopTransformation {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(WhileInvariantTransformation.class);

@@ -45,6 +45,7 @@ import org.key_project.prover.strategy.DelegationBasedRuleApplicationManager;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -59,6 +60,7 @@ import org.jspecify.annotations.Nullable;
  * methods for setting back several proof steps. The sequent has to be changed using the methods of
  * Goal.
  */
+@NullMarked
 public final class Goal implements ProofGoal<Goal> {
 
     public static final AtomicLong PERF_APP_EXECUTE = new AtomicLong();
@@ -151,7 +153,8 @@ public final class Goal implements ProofGoal<Goal> {
      * @return {@code true} has applicable rules, {@code false} no rules are applicable.
      */
     public static boolean hasApplicableRules(Goal goal) {
-        return goal.getRuleAppManager().peekNext() != null;
+        return Objects.requireNonNull(goal.getRuleAppManager(),
+            "The goal has no rule application manager").peekNext() != null;
     }
 
     /**
@@ -168,7 +171,8 @@ public final class Goal implements ProofGoal<Goal> {
         if (goalStrategy == null) {
             goalStrategy = proof().getActiveStrategy();
         }
-        return goalStrategy;
+        return Objects.requireNonNull(goalStrategy,
+            "No strategy could be determined for this goal");
     }
 
     public void setGoalStrategy(Strategy<Goal> p_goalStrategy) {
@@ -183,9 +187,18 @@ public final class Goal implements ProofGoal<Goal> {
         return ruleAppManager;
     }
 
+    /**
+     * Associates this goal with a new rule application manager. Passing {@code null} detaches the
+     * goal from any manager.
+     */
+    @SuppressWarnings("NullAway")
     public void setRuleAppManager(@Nullable RuleApplicationManager<Goal> manager) {
         if (ruleAppManager != null) {
             ruleAppIndex.setNewRuleListener(null);
+            // Detach the old manager from this goal. The parameter of setGoal is declared @NonNull
+            // on org.key_project.prover.strategy.RuleApplicationManager (key.ncore.calculus), but
+            // null is exactly its implemented "no goal" contract (see QueueRuleApplicationManager);
+            // making the parameter @Nullable belongs to that module and is out of scope here.
             ruleAppManager.setGoal(null);
         }
 
@@ -497,7 +510,8 @@ public final class Goal implements ProofGoal<Goal> {
      * Rebuild all rule caches
      */
     public void clearAndDetachRuleAppIndex() {
-        getRuleAppManager().clearCache();
+        Objects.requireNonNull(getRuleAppManager(),
+            "The goal has no rule application manager").clearCache();
         ruleAppIndex.clearAndDetachCache();
     }
 
@@ -515,14 +529,16 @@ public final class Goal implements ProofGoal<Goal> {
      */
     @SuppressWarnings("unchecked")
     public Goal clone(Node node) {
+        final RuleApplicationManager<Goal> manager = Objects.requireNonNull(ruleAppManager,
+            "Cannot clone a goal without a rule application manager");
         Goal clone;
         if (node.sequent() != this.node.sequent()) {
-            clone = new Goal(node, ruleAppIndex, appliedRuleApps, null, ruleAppManager.copy(),
-                strategyInfos.clone(), localNamespaces);
-        } else {
             clone =
-                new Goal(node, ruleAppIndex, appliedRuleApps, getFormulaTagManager().copy(),
-                    ruleAppManager.copy(), strategyInfos.clone(), localNamespaces);
+                new Goal(node, ruleAppIndex, appliedRuleApps, null, manager.copy(),
+                    strategyInfos.clone(), localNamespaces);
+        } else {
+            clone = new Goal(node, ruleAppIndex, appliedRuleApps, getFormulaTagManager().copy(),
+                manager.copy(), strategyInfos.clone(), localNamespaces);
         }
         clone.listeners = (List<GoalListener>) ((ArrayList<GoalListener>) listeners).clone();
         clone.automatic = this.automatic;
@@ -631,7 +647,8 @@ public final class Goal implements ProofGoal<Goal> {
     }
 
     void pruneToParent() {
-        setNode(node().parent());
+        setNode(Objects.requireNonNull(node().parent(),
+            "Cannot prune to the parent of the proof root"));
         removeLastAppliedRuleApp();
         resetLocalSymbols();
     }
@@ -661,7 +678,7 @@ public final class Goal implements ProofGoal<Goal> {
      * @return new goal(s)
      */
     @Override
-    public ImmutableList<Goal> apply(final RuleApp ruleApp) {
+    public @Nullable ImmutableList<Goal> apply(final RuleApp ruleApp) {
         final PendingRuleApp pending = computeRuleApp(ruleApp);
         if (pending == null) {
             return null;
@@ -704,9 +721,11 @@ public final class Goal implements ProofGoal<Goal> {
      * @return the pending application to be committed, or {@code null} if the rule aborted
      */
     public @Nullable PendingRuleApp computeRuleApp(final RuleApp p_ruleApp) {
-        final RuleApp ruleApp = p_ruleApp instanceof TacletApp tacletApp
-                ? tacletApp.createSkolemConstants(this)
-                : p_ruleApp;
+        final RuleApp ruleApp = Objects.requireNonNull(
+            p_ruleApp instanceof TacletApp tacletApp
+                    ? tacletApp.createSkolemConstants(this)
+                    : p_ruleApp,
+            "The rule application could not be created for this goal");
         final Proof proof = proof();
 
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);

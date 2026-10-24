@@ -7,6 +7,9 @@ package de.uka.ilkd.key.smt.lang;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class SMTFunctionDef extends SMTFunction {
 
     private final SMTTerm sub;

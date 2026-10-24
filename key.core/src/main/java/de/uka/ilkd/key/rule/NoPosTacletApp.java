@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -25,6 +26,7 @@ import org.key_project.prover.rules.instantiation.SVInstantiations;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +45,7 @@ import org.slf4j.LoggerFactory;
  * </ul>
  *
  */
+@NullMarked
 public class NoPosTacletApp extends TacletApp {
     public static final Logger LOGGER = LoggerFactory.getLogger(NoPosTacletApp.class);
 
@@ -65,14 +68,20 @@ public class NoPosTacletApp extends TacletApp {
      * @param taclet the Taclet
      * @param instantiations the SVInstantiations
      */
-    public static NoPosTacletApp createNoPosTacletApp(Taclet taclet,
+    public static @Nullable NoPosTacletApp createNoPosTacletApp(Taclet taclet,
             SVInstantiations instantiations, Services services) {
         return createNoPosTacletApp(taclet, instantiations, null, services);
     }
 
-    public static NoPosTacletApp createNoPosTacletApp(org.key_project.prover.rules.Taclet taclet,
+    @SuppressWarnings("NullAway") // null "assumes"-instantiations is the intentional "not yet
+                                  // matched" contract (cf. TacletApp#assumesFormulaInstantiations);
+                                  // the private ctor/storage stay @NonNull for the many callers --
+                                  // an honest @Nullable widening ripples into PosTacletApp and
+                                  // ~15 callers and belongs to a dedicated follow-up wave.
+    public static @Nullable NoPosTacletApp createNoPosTacletApp(
+            org.key_project.prover.rules.Taclet taclet,
             SVInstantiations instantiations,
-            ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
+            @Nullable ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
             Services services) {
         Debug.assertTrue(ifInstsCorrectSize(taclet, assumesInstantiations),
             "If instantiations list has wrong size");
@@ -84,8 +93,8 @@ public class NoPosTacletApp extends TacletApp {
         return null;
     }
 
-    public static NoPosTacletApp createNoPosTacletApp(Taclet taclet, MatchResultInfo matchCond,
-            Services services) {
+    public static @Nullable NoPosTacletApp createNoPosTacletApp(Taclet taclet,
+            MatchResultInfo matchCond, Services services) {
         return createNoPosTacletApp(taclet, matchCond.getInstantiations(), null, services);
     }
 
@@ -95,7 +104,7 @@ public class NoPosTacletApp extends TacletApp {
      * to decide about introduction of metavariables. Immutable instantiations are important for the
      * "addrules" part of taclets.
      */
-    public static NoPosTacletApp createFixedNoPosTacletApp(
+    public static @Nullable NoPosTacletApp createFixedNoPosTacletApp(
             org.key_project.prover.rules.Taclet taclet,
             SVInstantiations instantiations, Services services) {
         NoPosTacletApp res = createNoPosTacletApp(taclet, instantiations, null, services);
@@ -141,7 +150,8 @@ public class NoPosTacletApp extends TacletApp {
      * @return the new TacletApp
      */
     @Override
-    public TacletApp addInstantiation(SchemaVariable sv, SyntaxElement se, boolean interesting,
+    public @Nullable TacletApp addInstantiation(SchemaVariable sv, SyntaxElement se,
+            boolean interesting,
             Services services) {
         if (interesting) {
             return createNoPosTacletApp(taclet(), instantiations().addInteresting(sv, se, services),
@@ -182,7 +192,7 @@ public class NoPosTacletApp extends TacletApp {
      * metavariables given by the mc object and forget the old ones
      */
     @Override
-    public TacletApp setMatchConditions(MatchResultInfo mc, LogicServices services) {
+    public @Nullable TacletApp setMatchConditions(MatchResultInfo mc, LogicServices services) {
         return createNoPosTacletApp(taclet(), mc.getInstantiations(),
             assumesFormulaInstantiations(),
             (Services) services);
@@ -193,7 +203,7 @@ public class NoPosTacletApp extends TacletApp {
      * metavariables and if formula instantiations given and forget the old ones
      */
     @Override
-    protected TacletApp setAllInstantiations(MatchResultInfo mc,
+    protected @Nullable TacletApp setAllInstantiations(MatchResultInfo mc,
             ImmutableList<AssumesFormulaInstantiation> assumesInstantiations, Services services) {
         return createNoPosTacletApp(taclet(), mc.getInstantiations(), assumesInstantiations,
             services);
@@ -227,7 +237,7 @@ public class NoPosTacletApp extends TacletApp {
      *
      * @return TacletApp with the resulting instantiations or null
      */
-    public NoPosTacletApp matchFind(PosInOccurrence pos, LogicServices services) {
+    public @Nullable NoPosTacletApp matchFind(PosInOccurrence pos, LogicServices services) {
         return matchFind(null, pos, services);
     }
 
@@ -236,7 +246,8 @@ public class NoPosTacletApp extends TacletApp {
      * expensive pos.subTerm() while matching during a recursive descent in a term (where the
      * current subterm is known anyway).
      */
-    private NoPosTacletApp matchFind(@Nullable JTerm termToBeMatched, PosInOccurrence pos,
+    private @Nullable NoPosTacletApp matchFind(@Nullable JTerm termToBeMatched,
+            @Nullable PosInOccurrence pos,
             LogicServices services) {
         if ((termToBeMatched == null) && (pos != null)) {
             termToBeMatched = (JTerm) pos.subTerm();
@@ -250,7 +261,10 @@ public class NoPosTacletApp extends TacletApp {
 
         MatchResultInfo res;
         if (taclet() instanceof final FindTaclet findTaclet) {
-            res = findTaclet.getMatcher().matchFind(termToBeMatched, mc, services);
+            res = Objects.requireNonNull(findTaclet.getMatcher(),
+                "taclet has no initialized matcher")
+                    .matchFind(Objects.requireNonNull(termToBeMatched,
+                        "no term to match and no position given"), mc, services);
             // the following check will partly be repeated within the
             // constructor; this could be optimised
             if (res == null || !checkVarCondNotFreeIn(findTaclet,
@@ -263,7 +277,8 @@ public class NoPosTacletApp extends TacletApp {
         return evalCheckRes(res, (Services) services);
     }
 
-    private NoPosTacletApp evalCheckRes(MatchResultInfo res, Services services) {
+    private @Nullable NoPosTacletApp evalCheckRes(@Nullable MatchResultInfo res,
+            Services services) {
         if (res == null) {
             return null;
         }
@@ -277,7 +292,7 @@ public class NoPosTacletApp extends TacletApp {
     }
 
 
-    protected MatchResultInfo setupMatchConditions(PosInOccurrence pos) {
+    protected @Nullable MatchResultInfo setupMatchConditions(@Nullable PosInOccurrence pos) {
         var svInst = taclet() instanceof NoFindTaclet ? instantiations()
                 : instantiations().clearUpdateContext();
 
@@ -289,7 +304,8 @@ public class NoPosTacletApp extends TacletApp {
         }
 
         if (taclet() instanceof RewriteTaclet rewriteTaclet) {
-            mc = rewriteTaclet.checkPrefix(pos, mc);
+            mc = rewriteTaclet.checkPrefix(
+                Objects.requireNonNull(pos, "rewrite taclet requires the position"), mc);
         }
 
         return mc;

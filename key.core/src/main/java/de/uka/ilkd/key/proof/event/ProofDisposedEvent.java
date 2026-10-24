@@ -8,11 +8,14 @@ import java.util.EventObject;
 
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * An event thrown by a {@link Proof} and observed via a {@link ProofDisposedListener}.
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class ProofDisposedEvent extends EventObject {
     /**
      * Generated UID.

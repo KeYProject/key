@@ -24,6 +24,7 @@ import org.key_project.prover.strategy.costbased.feature.VolatileCost;
 import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -69,6 +70,7 @@ import org.jspecify.annotations.Nullable;
  * recompute the cost and log a warning on any mismatch, a development aid to catch a feature that
  * is mis-classified local (it should then get {@link VolatileCost}).
  */
+@NullMarked
 public final class CostReuse {
 
     public static final boolean VERIFY = Boolean.getBoolean("key.strategy.costReuse.verify");

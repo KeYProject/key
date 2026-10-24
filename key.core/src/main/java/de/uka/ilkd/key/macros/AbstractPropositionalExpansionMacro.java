@@ -24,6 +24,7 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * The Class AbstractPropositionalExpansionMacro applies purely propositional rules.
@@ -35,6 +36,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author mattias ulbrich
  */
+@NullMarked
 public abstract class AbstractPropositionalExpansionMacro extends StrategyProofMacro {
 
     /*

@@ -15,6 +15,8 @@ import java.util.stream.Stream;
 
 import de.uka.ilkd.key.util.KeYResourceManager;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +47,7 @@ import org.slf4j.LoggerFactory;
 /// upgrading.
 ///
 /// @author weigl
+@NullMarked
 public final class PathConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(PathConfig.class);
 
@@ -112,9 +115,9 @@ public final class PathConfig {
         }
     }
 
-    public static KeyPaths currentPaths;
+    public static @Nullable KeyPaths currentPaths;
 
-    public static KeyPaths previousPaths;
+    public static @Nullable KeyPaths previousPaths;
 
     private PathConfig() {
     }

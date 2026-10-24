@@ -13,12 +13,15 @@ import de.uka.ilkd.key.java.ast.reference.TypeReferenceContainer;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Inheritance specification.
  *
  * @author <TT>AutoDoc</TT>
  */
 
+@NullMarked
 public abstract class InheritanceSpecification extends JavaNonTerminalProgramElement
         implements TypeReferenceContainer {
 

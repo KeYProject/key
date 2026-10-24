@@ -28,6 +28,8 @@ import org.key_project.util.collection.IdentityHashSet;
 import org.key_project.util.parsing.LocatableException;
 import org.key_project.util.parsing.Location;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Validates a constructor to ensure that the executed code does not read final fields before they
  * have been initialized. This is implemented by a rather straightforward static analysis of the
@@ -62,6 +64,7 @@ import org.key_project.util.parsing.Location;
  * @since 2024-12-10
  */
 
+@NullMarked
 class FinalFieldCodeValidator {
     private final InitConfig initConfig;
     private final KeYJavaType enclosingClass;

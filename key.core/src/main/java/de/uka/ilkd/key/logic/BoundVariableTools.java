@@ -14,12 +14,15 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 
 /**
  * Some generally useful tools for dealing with arrays of bound variables
  */
+@NullMarked
 public class BoundVariableTools {
 
     public final static BoundVariableTools DEFAULT = new BoundVariableTools();

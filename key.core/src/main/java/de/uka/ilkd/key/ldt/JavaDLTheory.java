@@ -23,11 +23,15 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The JavaDL theory class provides access to function symvols, sorts that are part of the core
  * logic
  * like cast or instanceof functions.
  */
+@NullMarked
 public class JavaDLTheory extends LDT {
 
     /**
@@ -102,7 +106,7 @@ public class JavaDLTheory extends LDT {
      * }
      */
 
-    public final ParametricFunctionDecl getCastSymbol(Services services) {
+    public final @Nullable ParametricFunctionDecl getCastSymbol(Services services) {
         return services.getNamespaces().parametricFunctions().lookup(CAST_NAME);
     }
 
@@ -123,7 +127,7 @@ public class JavaDLTheory extends LDT {
             ImmutableList.of(new GenericArgument(sort)), services);
     }
 
-    public final ParametricFunctionDecl getInstanceofSymbol(Services services) {
+    public final @Nullable ParametricFunctionDecl getInstanceofSymbol(Services services) {
         return services.getNamespaces().parametricFunctions().lookup(INSTANCE_NAME);
     }
 
@@ -144,7 +148,7 @@ public class JavaDLTheory extends LDT {
             ImmutableList.of(new GenericArgument(sort)), services);
     }
 
-    public final ParametricFunctionDecl getExactInstanceofSymbol(Services services) {
+    public final @Nullable ParametricFunctionDecl getExactInstanceofSymbol(Services services) {
         return services.getNamespaces().parametricFunctions().lookup(EXACT_INSTANCE_NAME);
     }
 
@@ -185,12 +189,12 @@ public class JavaDLTheory extends LDT {
     }
 
     @Override
-    public JTerm translateLiteral(Literal lit, Services services) {
+    public @Nullable JTerm translateLiteral(Literal lit, Services services) {
         return null;
     }
 
     @Override
-    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+    public @Nullable Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         return null;
     }
 
@@ -200,12 +204,12 @@ public class JavaDLTheory extends LDT {
     }
 
     @Override
-    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+    public @Nullable Expression translateTerm(JTerm t, ExtList children, Services services) {
         return null;
     }
 
     @Override
-    public Type getType(JTerm t) {
+    public @Nullable Type getType(JTerm t) {
         return null;
     }
 }

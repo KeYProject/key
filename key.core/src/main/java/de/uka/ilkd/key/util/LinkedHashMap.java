@@ -9,6 +9,9 @@ import java.util.Map;
 
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V>
         implements Iterable<Pair<K, V>> {
 

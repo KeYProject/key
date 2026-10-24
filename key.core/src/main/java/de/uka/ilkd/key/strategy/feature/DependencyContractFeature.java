@@ -21,8 +21,10 @@ import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 
+@NullMarked
 public final class DependencyContractFeature extends BinaryFeature {
 
     @Override

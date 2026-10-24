@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof;
 
-
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Proof-specific counter object: taclet names, var names, node numbers, etc.
@@ -18,6 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * {@link #getCountPlusPlus()} still returns the pre-increment value and {@link #copy()} still
  * snapshots the current value.
  */
+@NullMarked
 public class Counter {
 
     private final String name;

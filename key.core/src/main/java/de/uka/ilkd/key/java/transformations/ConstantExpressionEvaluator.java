@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.transformations;
 
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Queue;
 
 import com.github.javaparser.StaticJavaParser;
@@ -17,6 +18,8 @@ import com.github.javaparser.ast.key.sv.KeyExpressionSV;
 import com.github.javaparser.ast.key.sv.KeyMetaConstructExpression;
 import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An evaluator for constant expression in Java.
@@ -24,6 +27,7 @@ import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
  * @author Alexander Weigl
  * @version 1 (11/2/21)
  */
+@NullMarked
 public class ConstantExpressionEvaluator {
     public boolean isCompileTimeConstant(Expression expr) throws EvaluationException {
         var ccev = new ConstantExpressionEvaluatorVisitor();
@@ -45,7 +49,7 @@ public class ConstantExpressionEvaluator {
         }
     }
 
-    private Expression toLiteral(Object value) throws EvaluationException {
+    private Expression toLiteral(@Nullable Object value) throws EvaluationException {
         if (value instanceof String) {
             return new StringLiteralExpr(value.toString());
         }
@@ -70,7 +74,8 @@ public class ConstantExpressionEvaluator {
         if (value instanceof Character) {
             return new CharLiteralExpr(value.toString());
         }
-        throw new EvaluationException("Can not express the given value as a literal", null);
+        throw new EvaluationException("Can not express the given value as a literal",
+            new RuntimeException());
     }
 
     public Expression evaluate(String string) throws EvaluationException {
@@ -78,32 +83,32 @@ public class ConstantExpressionEvaluator {
     }
 
     private static class ConstantExpressionEvaluatorVisitor
-            extends GenericVisitorAdapter<Object, Void> {
+            extends GenericVisitorAdapter<@Nullable Object, Void> {
 
         private Queue<FieldDeclaration> path = new LinkedList<FieldDeclaration>();
 
         @Override
-        public Object visit(ArrayAccessExpr n, Void arg) {
+        public @Nullable Object visit(ArrayAccessExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(ArrayCreationExpr n, Void arg) {
+        public @Nullable Object visit(ArrayCreationExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(ArrayInitializerExpr n, Void arg) {
+        public @Nullable Object visit(ArrayInitializerExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(AssignExpr n, Void arg) {
+        public @Nullable Object visit(AssignExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(BinaryExpr n, Void arg) {
+        public @Nullable Object visit(BinaryExpr n, Void arg) {
             Object left = n.getLeft().accept(this, arg);
             Object right = n.getRight().accept(this, arg);
             return switch (n.getOperator()) {
@@ -132,8 +137,8 @@ public class ConstantExpressionEvaluator {
                         yield ((Integer) left) ^ (Integer) right;
                     throw new RuntimeException();
                 }
-                case EQUALS -> left.equals(right);
-                case NOT_EQUALS -> !left.equals(right);
+                case EQUALS -> Objects.requireNonNull(left).equals(right);
+                case NOT_EQUALS -> !Objects.requireNonNull(left).equals(right);
                 case LESS -> {
                     if (left instanceof Integer && right instanceof Integer)
                         yield ((Integer) left) < (Integer) right;
@@ -198,49 +203,49 @@ public class ConstantExpressionEvaluator {
         }
 
         @Override
-        public Object visit(BooleanLiteralExpr n, Void arg) {
+        public @Nullable Object visit(BooleanLiteralExpr n, Void arg) {
             return n.getValue();
         }
 
         @Override
-        public Object visit(CastExpr n, Void arg) {
+        public @Nullable Object visit(CastExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(CharLiteralExpr n, Void arg) {
+        public @Nullable Object visit(CharLiteralExpr n, Void arg) {
             return n.getValue().charAt(0);
         }
 
         @Override
-        public Object visit(ClassExpr n, Void arg) {
+        public @Nullable Object visit(ClassExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(ConditionalExpr n, Void arg) {
+        public @Nullable Object visit(ConditionalExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(DoubleLiteralExpr n, Void arg) {
+        public @Nullable Object visit(DoubleLiteralExpr n, Void arg) {
             return n.asDouble();
         }
 
         @Override
-        public Object visit(EnclosedExpr n, Void arg) {
+        public @Nullable Object visit(EnclosedExpr n, Void arg) {
             return n.getInner().accept(this, arg);
         }
 
         @Override
-        public Object visit(ExplicitConstructorInvocationStmt n, Void arg) {
+        public @Nullable Object visit(ExplicitConstructorInvocationStmt n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(FieldAccessExpr n, Void arg) {
-            final FieldDeclaration fd =
-                (FieldDeclaration) n.resolve().asField().toAst().orElse(null);
+        public @Nullable Object visit(FieldAccessExpr n, Void arg) {
+            final FieldDeclaration fd = Objects.requireNonNull(
+                (FieldDeclaration) n.resolve().asField().toAst().orElse(null));
             if (fd.isFinal() && fd.isStatic() && !path.contains(fd)) {
                 path.add(fd);
                 var result = super.visit(fd, arg);
@@ -252,87 +257,87 @@ public class ConstantExpressionEvaluator {
         }
 
         @Override
-        public Object visit(InstanceOfExpr n, Void arg) {
+        public @Nullable Object visit(InstanceOfExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(IntegerLiteralExpr n, Void arg) {
+        public @Nullable Object visit(IntegerLiteralExpr n, Void arg) {
             return n.asNumber();
         }
 
         @Override
-        public Object visit(LambdaExpr n, Void arg) {
+        public @Nullable Object visit(LambdaExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(LongLiteralExpr n, Void arg) {
+        public @Nullable Object visit(LongLiteralExpr n, Void arg) {
             return n.asNumber();
         }
 
         @Override
-        public Object visit(MarkerAnnotationExpr n, Void arg) {
+        public @Nullable Object visit(MarkerAnnotationExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(MethodCallExpr n, Void arg) {
+        public @Nullable Object visit(MethodCallExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(MethodReferenceExpr n, Void arg) {
+        public @Nullable Object visit(MethodReferenceExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(NameExpr n, Void arg) {
+        public @Nullable Object visit(NameExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(NormalAnnotationExpr n, Void arg) {
+        public @Nullable Object visit(NormalAnnotationExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(NullLiteralExpr n, Void arg) {
+        public @Nullable Object visit(NullLiteralExpr n, Void arg) {
             return null;
         }
 
         @Override
-        public Object visit(ObjectCreationExpr n, Void arg) {
+        public @Nullable Object visit(ObjectCreationExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(SingleMemberAnnotationExpr n, Void arg) {
+        public @Nullable Object visit(SingleMemberAnnotationExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(StringLiteralExpr n, Void arg) {
+        public @Nullable Object visit(StringLiteralExpr n, Void arg) {
             return n.asString();
         }
 
         @Override
-        public Object visit(SuperExpr n, Void arg) {
+        public @Nullable Object visit(SuperExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(ThisExpr n, Void arg) {
+        public @Nullable Object visit(ThisExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(TypeExpr n, Void arg) {
+        public @Nullable Object visit(TypeExpr n, Void arg) {
             return super.visit(n, arg);
         }
 
         @Override
-        public Object visit(UnaryExpr n, Void arg) {
+        public @Nullable Object visit(UnaryExpr n, Void arg) {
             Object value = n.getExpression().accept(this, arg);
             switch (n.getOperator()) {
                 case PLUS:
@@ -399,55 +404,55 @@ public class ConstantExpressionEvaluator {
         }
 
         @Override
-        public Object visit(VariableDeclarationExpr n, Void arg) {
+        public @Nullable Object visit(VariableDeclarationExpr n, Void arg) {
             throw new RuntimeException("unsupported expression");
         }
 
         @Override
-        public Object visit(SwitchExpr n, Void arg) {
+        public @Nullable Object visit(SwitchExpr n, Void arg) {
             throw new RuntimeException("unsupported expression");
         }
 
         @Override
-        public Object visit(TextBlockLiteralExpr n, Void arg) {
+        public @Nullable Object visit(TextBlockLiteralExpr n, Void arg) {
             return n.asString();
         }
 
         @Override
-        public Object visit(RecordPatternExpr n, Void arg) {
+        public @Nullable Object visit(RecordPatternExpr n, Void arg) {
             throw new RuntimeException("unsupported expression");
         }
 
         @Override
-        public Object visit(TypePatternExpr n, Void arg) {
+        public @Nullable Object visit(TypePatternExpr n, Void arg) {
             throw new RuntimeException("unsupported expression");
         }
 
         @Override
-        public Object visit(KeyEscapeExpression n, Void arg) {
-            throw new RuntimeException("unsupported expression");
-
-        }
-
-        @Override
-        public Object visit(KeyRangeExpression n, Void arg) {
+        public @Nullable Object visit(KeyEscapeExpression n, Void arg) {
             throw new RuntimeException("unsupported expression");
 
         }
 
         @Override
-        public Object visit(KeyExpressionSV n, Void arg) {
+        public @Nullable Object visit(KeyRangeExpression n, Void arg) {
             throw new RuntimeException("unsupported expression");
 
         }
 
         @Override
-        public Object visit(KeyMetaConstructExpression n, Void arg) {
+        public @Nullable Object visit(KeyExpressionSV n, Void arg) {
+            throw new RuntimeException("unsupported expression");
+
+        }
+
+        @Override
+        public @Nullable Object visit(KeyMetaConstructExpression n, Void arg) {
             throw new RuntimeException("unsupported expression");
         }
 
         @Override
-        public Object visit(KeyPassiveExpression n, Void arg) {
+        public @Nullable Object visit(KeyPassiveExpression n, Void arg) {
             throw new RuntimeException("unsupported expression");
 
         }

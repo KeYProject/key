@@ -7,12 +7,15 @@ package de.uka.ilkd.key.smt.model;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Represents a heap in the SMT model.
  *
  * @author mihai
  *
  */
+@NullMarked
 public class Heap {
     /**
      * The name of the heap.

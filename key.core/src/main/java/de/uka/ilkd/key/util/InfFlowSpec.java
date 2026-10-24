@@ -10,11 +10,13 @@ import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  *
  * @author christoph
  */
+@NullMarked
 public class InfFlowSpec {
     public static final InfFlowSpec EMPTY_INF_FLOW_SPEC = new InfFlowSpec();
 

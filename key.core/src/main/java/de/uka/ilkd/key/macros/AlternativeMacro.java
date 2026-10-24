@@ -16,12 +16,16 @@ import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The abstract class AlternativeMacro can be used to create compound macros which apply the first
  * applicable macro (similar to a shortcut disjunction) and then it returns.
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public abstract class AlternativeMacro extends AbstractProofMacro {
 
     /**
@@ -29,7 +33,7 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
      *
      * This array is created on demand using {@link #createProofMacroArray()}.
      */
-    private ProofMacro[] proofMacros = null;
+    private ProofMacro @Nullable [] proofMacros = null;
 
     /**
      * Creates the proof macro array.

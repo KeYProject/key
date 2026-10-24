@@ -19,6 +19,9 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Parses a KeY proof file into an intermediate representation. The parsed intermediate result can
  * be processed by {@link IntermediateProofReplayer}. This approach is more flexible than direct
@@ -59,6 +62,7 @@ import org.key_project.util.collection.Pair;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class IntermediatePresentationProofFileParser implements IProofFileParser {
 
     /* + The proof object for storing meta information */
@@ -68,11 +72,11 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     private final ArrayDeque<NodeIntermediate> stack = new ArrayDeque<>();
 
     /* + State Information */
-    private RuleInformation ruleInfo = null;
+    private @Nullable RuleInformation ruleInfo = null;
 
     /* + State information that is returned after parsing */
-    private BranchNodeIntermediate root = null; // the "dummy ID" branch
-    private NodeIntermediate currNode;
+    private @Nullable BranchNodeIntermediate root = null; // the "dummy ID" branch
+    private @Nullable NodeIntermediate currNode;
     private final LinkedList<Throwable> errors = new LinkedList<>();
 
     /**
@@ -283,7 +287,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      * @return The parsed intermediate representation in form of the top level branch node (the
      *         "dummy ID" branch).
      */
-    public BranchNodeIntermediate getParsedResult() {
+    public @Nullable BranchNodeIntermediate getParsedResult() {
         return root;
     }
 
@@ -353,8 +357,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         protected String currRuleName;
         protected int currFormula = 0;
         protected PosInTerm currPosInTerm = PosInTerm.getTopLevel();
-        protected ImmutableList<Name> currNewNames = null;
-        protected String notes = null;
+        protected @Nullable ImmutableList<Name> currNewNames = null;
+        protected @Nullable String notes = null;
 
         protected RuleInformation(String ruleName) {
             this.currRuleName = ruleName.trim();
@@ -372,7 +376,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      */
     private static class TacletInformation extends RuleInformation {
         /* + Taclet Information */
-        protected List<String> loadedInsts = null;
+        protected @Nullable List<String> loadedInsts = null;
         protected ImmutableList<String> ifSeqFormulaList = ImmutableList.nil();
         protected ImmutableList<String> ifDirectFormulaList = ImmutableList.nil();
 
@@ -388,23 +392,23 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      */
     private static class BuiltinRuleInformation extends RuleInformation {
         /* + Built-In Formula Information */
-        protected ImmutableList<Pair<Integer, PosInTerm>> builtinIfInsts;
+        protected @Nullable ImmutableList<Pair<Integer, PosInTerm>> builtinIfInsts;
         protected int currIfInstFormula;
-        protected PosInTerm currIfInstPosInTerm;
+        protected @Nullable PosInTerm currIfInstPosInTerm;
         /* > Method Contract */
-        protected String currContract = null;
-        protected String currContractModality = null;
+        protected @Nullable String currContract = null;
+        protected @Nullable String currContractModality = null;
         /* > Merge Rule */
-        protected String currMergeProc = null;
+        protected @Nullable String currMergeProc = null;
         protected int currNrPartners = 0;
         protected int currCorrespondingMergeNodeId = 0;
         protected int currMergeNodeId = 0;
-        protected String currDistFormula = null;
-        protected Class<? extends AbstractPredicateAbstractionLattice> currPredAbstraLatticeType =
+        protected @Nullable String currDistFormula = null;
+        protected @Nullable Class<? extends AbstractPredicateAbstractionLattice> currPredAbstraLatticeType =
             null;
-        protected String currAbstractionPredicates = null;
-        protected String currUserChoices = null;
-        protected String solver;
+        protected @Nullable String currAbstractionPredicates = null;
+        protected @Nullable String currUserChoices = null;
+        protected @Nullable String solver;
 
         public BuiltinRuleInformation(String ruleName) {
             super(ruleName);
@@ -418,7 +422,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      */
     public record Result(
             List<Throwable> errors, String status,
-            BranchNodeIntermediate parsedResult) {
+            @Nullable BranchNodeIntermediate parsedResult) {
     }
 
 }

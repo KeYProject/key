@@ -16,12 +16,16 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A program model element representing primitive types.
  *
  * @author AL
  * @author RN
  */
+@NullMarked
 public final class PrimitiveType implements Type {
 
     // must be first in file.
@@ -63,7 +67,7 @@ public final class PrimitiveType implements Type {
 
     public static final PrimitiveType PROGRAM_SV = new PrimitiveType("SV", null, null);
 
-    private ProgramElementName arrayElementName = null;
+    private @Nullable ProgramElementName arrayElementName = null;
 
 
     public static PrimitiveType getPrimitiveType(String name) {
@@ -87,7 +91,7 @@ public final class PrimitiveType implements Type {
     private final Literal defaultValue;
     private final Name ldtName;
 
-    private PrimitiveType(String name, Literal defaultValue, Name ldtName) {
+    private PrimitiveType(String name, Literal defaultValue, @Nullable Name ldtName) {
         this.defaultValue = defaultValue;
         this.name = name.intern();
         this.ldtName = ldtName;

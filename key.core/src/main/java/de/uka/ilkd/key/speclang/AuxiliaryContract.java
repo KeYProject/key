@@ -45,11 +45,15 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Super-interface for {@link BlockContract} and {@link LoopContract}.
  *
  * @author wacker, lanzinger
  */
+@NullMarked
 public interface AuxiliaryContract extends SpecificationElement {
 
     /**
@@ -484,6 +488,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      *
      * @return this contract's measured-by clause if it has one, {@code null} otherwise.
      */
+    @Nullable
     JTerm getMby();
 
     /**
@@ -492,6 +497,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param services services.
      * @return this contract's measured-by clause if it has one, {@code null} otherwise.
      */
+    @Nullable
     JTerm getMby(Variables variables, Services services);
 
     /**
@@ -501,6 +507,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param services services.
      * @return this contract's measured-by clause if it has one, {@code null} otherwise.
      */
+    @Nullable
     JTerm getMby(LocationVariable selfVar, Services services);
 
     /**
@@ -513,6 +520,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param services services.
      * @return this contract's measured-by clause if it has one, {@code null} otherwise.
      */
+    @Nullable
     JTerm getMby(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
             Map<LocationVariable, JTerm> atPres, Services services);
 
@@ -823,7 +831,7 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @param variable a variable.
          * @return a term containing the specified variable.
          */
-        private JTerm termifyVariable(final LocationVariable variable) {
+        private @Nullable JTerm termifyVariable(final @Nullable LocationVariable variable) {
             if (variable != null) {
                 return services.getTermBuilder().var(variable);
             } else {
@@ -995,7 +1003,7 @@ public interface AuxiliaryContract extends SpecificationElement {
         /**
          * @see Variables#returnFlag
          */
-        private LocationVariable returnFlag;
+        private @Nullable LocationVariable returnFlag;
 
         /**
          * Constructor.
@@ -1239,7 +1247,7 @@ public interface AuxiliaryContract extends SpecificationElement {
         /**
          * @see Variables#self
          */
-        public final JTerm self;
+        public final @Nullable JTerm self;
 
         /**
          * @see Variables#breakFlags
@@ -1254,17 +1262,17 @@ public interface AuxiliaryContract extends SpecificationElement {
         /**
          * @see Variables#returnFlag
          */
-        public final JTerm returnFlag;
+        public final @Nullable JTerm returnFlag;
 
         /**
          * @see Variables#result
          */
-        public final JTerm result;
+        public final @Nullable JTerm result;
 
         /**
          * @see Variables#exception
          */
-        public final JTerm exception;
+        public final @Nullable JTerm exception;
 
         /**
          * @see Variables#remembranceHeaps
@@ -1309,9 +1317,11 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @param outerRemembranceVariables a map from every variable {@code var} that is accessible
          *        inside the block to {@code var_Before_METHOD}.
          */
-        public Terms(final JTerm self, final Map<Label, JTerm> breakFlags,
-                final Map<Label, JTerm> continueFlags, final JTerm returnFlag, final JTerm result,
-                final JTerm exception, final Map<LocationVariable, JTerm> remembranceHeaps,
+        public Terms(final @Nullable JTerm self, final Map<Label, JTerm> breakFlags,
+                final Map<Label, JTerm> continueFlags, final @Nullable JTerm returnFlag,
+                final @Nullable JTerm result,
+                final @Nullable JTerm exception,
+                final Map<LocationVariable, JTerm> remembranceHeaps,
                 final Map<LocationVariable, JTerm> remembranceLocalVariables,
                 final Map<LocationVariable, JTerm> outerRemembranceHeaps,
                 final Map<LocationVariable, JTerm> outerRemembranceVariables) {

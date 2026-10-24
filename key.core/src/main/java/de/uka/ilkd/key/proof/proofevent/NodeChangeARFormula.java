@@ -6,10 +6,12 @@ package de.uka.ilkd.key.proof.proofevent;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Information about a formula that has been added or removed from a node
  */
+@NullMarked
 public abstract class NodeChangeARFormula implements NodeChange {
 
     final PosInOccurrence pos;

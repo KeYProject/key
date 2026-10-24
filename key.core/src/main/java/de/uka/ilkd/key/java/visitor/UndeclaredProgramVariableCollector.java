@@ -19,6 +19,9 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * This class is a specialization of {@link ProgramVariableCollector} which returns as result
@@ -36,6 +39,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class UndeclaredProgramVariableCollector extends ProgramVariableCollector {
     /**
      * Contains the found declared {@link IProgramVariable}s.
@@ -46,12 +50,12 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
     /**
      * Contains the super result.
      */
-    private LinkedHashSet<LocationVariable> allVariables;
+    private @Nullable LinkedHashSet<LocationVariable> allVariables;
 
     /**
      * Contains the undeclared variables as result.
      */
-    private LinkedHashSet<LocationVariable> undeclaredVariables;
+    private @Nullable LinkedHashSet<LocationVariable> undeclaredVariables;
 
     /**
      * Constructor.

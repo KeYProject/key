@@ -22,7 +22,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-
 /**
  * An assignment is an operator with side-effects.
  */

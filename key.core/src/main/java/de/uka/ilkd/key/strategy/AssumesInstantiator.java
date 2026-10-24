@@ -26,9 +26,13 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class implements custom instantiation of if-formulas.
  */
+@NullMarked
 public class AssumesInstantiator {
     private final Goal goal;
     private final AssumesInstantiationCache ifInstCache;
@@ -47,7 +51,7 @@ public class AssumesInstantiator {
             goal.proof().getServices().getCaches().getIfInstantiationCache().getCache(goal.node());
     }
 
-    private void addResult(NoPosTacletApp app) {
+    private void addResult(@Nullable NoPosTacletApp app) {
         if (app == null) {
             return;
         }
@@ -177,7 +181,7 @@ public class AssumesInstantiator {
         return tacletAppContainer.getAge() < formulaAge;
     }
 
-    private ImmutableArray<AssumesFormulaInstantiation> getNewSequentFormulasFromCache(
+    private @Nullable ImmutableArray<AssumesFormulaInstantiation> getNewSequentFormulasFromCache(
             boolean p_antec) {
         return ifInstCache.get(p_antec, tacletAppContainer.getAge());
     }
@@ -204,7 +208,7 @@ public class AssumesInstantiator {
      */
     private void findIfFormulaInstantiationsHelp(
             ImmutableList<SequentFormula> p_ifSeqTail,
-            ImmutableList<SequentFormula> p_ifSeqTail2nd,
+            @Nullable ImmutableList<SequentFormula> p_ifSeqTail2nd,
             ImmutableList<AssumesFormulaInstantiation> p_alreadyMatched,
             MatchConditions p_matchCond, boolean p_alreadyMatchedNewFor) {
 

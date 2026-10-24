@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Common interface for BinaryAssignment, UnaryOperator, BinaryOperator, LogicFunctinalOperator and
  * Modifier
@@ -11,6 +13,7 @@ package de.uka.ilkd.key.java.ast;
  * @param <K> specifies the concrete kind of the program element, e.g. whether it is a logical-and
  *        or a logical-or
  */
+@NullMarked
 public interface ProgramElementWithKind<K extends Enum<K>> extends ProgramElement {
     K getKind();
 }

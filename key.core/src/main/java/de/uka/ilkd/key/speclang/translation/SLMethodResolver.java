@@ -19,10 +19,14 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Resolver for method calls in specifications.
  */
+@NullMarked
 public final class SLMethodResolver extends SLExpressionResolver {
 
     public SLMethodResolver(JavaInfo javaInfo, SLResolverManager manager, KeYJavaType specInClass) {
@@ -31,14 +35,14 @@ public final class SLMethodResolver extends SLExpressionResolver {
 
 
     @Override
-    protected boolean canHandleReceiver(SLExpression receiver) {
+    protected boolean canHandleReceiver(@Nullable SLExpression receiver) {
         return receiver != null && !receiver.getType().getFullName().endsWith("[]");
     }
 
 
     @Override
-    protected SLExpression doResolving(SLExpression receiver, String methodName,
-            SLParameters parameters) throws SLTranslationException {
+    protected @Nullable SLExpression doResolving(@Nullable SLExpression receiver, String methodName,
+            @Nullable SLParameters parameters) throws SLTranslationException {
 
         if (parameters == null || !parameters.isListOfTerm()) {
             return null;

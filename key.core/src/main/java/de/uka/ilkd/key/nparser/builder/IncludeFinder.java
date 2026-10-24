@@ -16,12 +16,16 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This visitor finds all includes in the given ASTs.
  *
  * @author weigl
  * @see #getIncludes()
  */
+@NullMarked
 public class IncludeFinder extends AbstractBuilder<Void> {
     private final Path base;
     private final Includes includes = new Includes();
@@ -32,14 +36,15 @@ public class IncludeFinder extends AbstractBuilder<Void> {
     }
 
     @Override
-    public Void visitOne_include_statement(JavaKeYParser.One_include_statementContext ctx) {
+    public @Nullable Void visitOne_include_statement(
+            JavaKeYParser.One_include_statementContext ctx) {
         ldt = ctx.INCLUDELDTS() != null;
         mapOf(ctx.one_include());
         return null;
     }
 
     @Override
-    public Void visitOne_include(JavaKeYParser.One_includeContext ctx) {
+    public @Nullable Void visitOne_include(JavaKeYParser.One_includeContext ctx) {
         String value = StringUtil.trim(ctx.getText(), "\"'");
         try {
             addInclude(value);

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.strategy.costbased.feature;
 
+import java.util.Objects;
+
 import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
@@ -39,7 +41,7 @@ public class BelowBinderFeature extends BinaryFeature {
         while (it.next() != -1) {
             final Term t = it.getSubTerm();
             assert t != null : "@AssumeAssertion(nullness) Term t is null";
-            if (!t.varsBoundHere(it.getChild()).isEmpty()) {
+            if (!Objects.requireNonNull(t).varsBoundHere(it.getChild()).isEmpty()) {
                 return true;
             }
         }

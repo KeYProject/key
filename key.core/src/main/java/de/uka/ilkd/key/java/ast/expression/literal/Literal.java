@@ -29,6 +29,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -39,14 +40,14 @@ import org.jspecify.annotations.Nullable;
 
 public abstract sealed
 
-class Literal extends JavaProgramElement
+@NullMarked class Literal extends JavaProgramElement
         implements Expression, TerminalProgramElement
         permits AbstractIntegerLiteral, BooleanLiteral, DoubleLiteral, EmptyMapLiteral,
         EmptySeqLiteral, EmptySetLiteral, FloatLiteral, FreeLiteral, NullLiteral, RealLiteral,
         StringLiteral {
 
     public Literal(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
-        super(pi, comments);
+        super(pi == null ? PositionInfo.UNDEFINED : pi, comments);
     }
 
     /**
@@ -97,7 +98,7 @@ class Literal extends JavaProgramElement
      * @return the literal's type
      */
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ,
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ,
             ExecutionContext ec) {
         return getKeYJavaType(javaServ);
     }
@@ -109,12 +110,15 @@ class Literal extends JavaProgramElement
      *        the Services offering access to the Java model
      * @return the literal's type
      */
-    public abstract KeYJavaType getKeYJavaType(Services javaServ);
+    public abstract @Nullable KeYJavaType getKeYJavaType(Services javaServ);
 
 
     @Override
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
+        if (src == null) {
+            return null;
+        }
         if (this.equals(src)) {
             source.next();
             return matchCond;

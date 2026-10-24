@@ -18,11 +18,10 @@ import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Variable specification that defines a variable name. This is a part of a VariableDeclaration and
@@ -34,6 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author AL
  */
 
+@NullMarked
 public class VariableSpecification extends JavaNonTerminalProgramElement
         implements NamedProgramElement, ExpressionContainer, Variable {
     private static final Logger LOGGER = LoggerFactory.getLogger(VariableSpecification.class);
@@ -192,7 +192,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      *
      * @return the string.
      */
-    public final String getName() {
+    public final @Nullable String getName() {
         return (programVariable == null) ? null : programVariable.name().toString();
     }
 
@@ -268,13 +268,11 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         return getName();
     }
 
-    @NonNull
     @Override
     public SourceElement getFirstElement() {
         return programVariable;
     }
 
-    @NonNull
     @Override
     public SourceElement getLastElement() {
         if (initializer != null) {
@@ -331,7 +329,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     }
 
     @Override
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, @Nullable MatchConditions matchCond) {
         final ProgramElement pe = source.getSource();
         matchCond = super.match(source, matchCond);
         if (matchCond != null && getDimensions() != ((VariableSpecification) pe).getDimensions()) {

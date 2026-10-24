@@ -12,12 +12,15 @@ import de.uka.ilkd.key.rule.Taclet;
 import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.TacletApplPart;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Due to the immutability of {@link Taclet}s, they are created in the parsers using
  * {@link TacletBuilder}s. This builder is used for {@link NoFindTaclet} rules. Besides this some
  * tests are performed that avoid some common errors on applicability of taclets.
  */
+@NullMarked
 public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
 
 

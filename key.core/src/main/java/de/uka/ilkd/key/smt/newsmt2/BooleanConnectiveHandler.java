@@ -19,11 +19,15 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This SMT translation handler takes care of the builtin Boolean connectives.
  *
  * @author Jonas Schiffl
  */
+@NullMarked
 public class BooleanConnectiveHandler implements SMTHandler {
 
     private final Map<Operator, String> supportedOperators = new HashMap<>();
@@ -38,8 +42,8 @@ public class BooleanConnectiveHandler implements SMTHandler {
     }
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         BooleanLDT ldt = services.getTypeConverter().getBooleanLDT();
         var logicFalse = ldt.getFalseConst();
         supportedOperators.put(logicFalse, "false");

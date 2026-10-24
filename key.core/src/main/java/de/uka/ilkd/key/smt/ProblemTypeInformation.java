@@ -21,8 +21,13 @@ import de.uka.ilkd.key.smt.lang.Util;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class ProblemTypeInformation {
 
+    @Nullable
     Services services;
 
     final Map<String, SMTSort> fieldTypes;
@@ -31,11 +36,11 @@ public class ProblemTypeInformation {
 
     Set<Sort> javaSorts;
 
-    private SMTSettings settings;
+    private @Nullable SMTSettings settings;
 
-    private Map<SMTSort, SMTTermNumber> sortNumbers;
+    private @Nullable Map<SMTSort, SMTTermNumber> sortNumbers;
 
-    private Map<String, SMTSort> sorts;
+    private @Nullable Map<String, SMTSort> sorts;
 
     public ProblemTypeInformation(TermServices services) {
         super();
@@ -49,7 +54,7 @@ public class ProblemTypeInformation {
         originalConstantType.put(c, s);
     }
 
-    public Sort getOriginalConstantType(String c) {
+    public @Nullable Sort getOriginalConstantType(String c) {
         return originalConstantType.get(c);
     }
 
@@ -58,7 +63,7 @@ public class ProblemTypeInformation {
      * @return
      * @see Map#get(Object)
      */
-    public SMTSort getTypeForConstant(Object key) {
+    public @Nullable SMTSort getTypeForConstant(Object key) {
         return constantsTypes.get(key);
     }
 
@@ -68,7 +73,7 @@ public class ProblemTypeInformation {
      * @return
      * @see Map#put(Object, Object)
      */
-    public SMTSort putConstantType(String key, SMTSort value) {
+    public @Nullable SMTSort putConstantType(String key, SMTSort value) {
         return constantsTypes.put(key, value);
     }
 
@@ -88,7 +93,7 @@ public class ProblemTypeInformation {
      * @return
      * @see Map#get(Object)
      */
-    public SMTSort getTypeForField(Object key) {
+    public @Nullable SMTSort getTypeForField(Object key) {
         return fieldTypes.get(key);
     }
 
@@ -98,7 +103,7 @@ public class ProblemTypeInformation {
      * @return
      * @see Map#put(Object, Object)
      */
-    public SMTSort putFieldType(String key, SMTSort value) {
+    public @Nullable SMTSort putFieldType(String key, SMTSort value) {
 
         return fieldTypes.put(key, value);
     }
@@ -147,7 +152,7 @@ public class ProblemTypeInformation {
         return result;
     }
 
-    public TermServices getServices() {
+    public @Nullable TermServices getServices() {
         return services;
     }
 
@@ -165,7 +170,7 @@ public class ProblemTypeInformation {
 
     }
 
-    public SMTSettings getSettings() {
+    public @Nullable SMTSettings getSettings() {
         return settings;
     }
 
@@ -189,7 +194,7 @@ public class ProblemTypeInformation {
         this.sorts = sorts;
     }
 
-    public SMTSort getSort(String sortName) {
+    public @Nullable SMTSort getSort(String sortName) {
         return sorts.get(sortName);
     }
 

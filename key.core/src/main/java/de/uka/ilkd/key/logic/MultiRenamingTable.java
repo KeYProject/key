@@ -9,8 +9,12 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.java.ast.SourceElement;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
+
+@NullMarked
 public class MultiRenamingTable extends RenamingTable {
 
     private final HashMap<? extends SourceElement, ? extends SourceElement> hmap;
@@ -19,7 +23,7 @@ public class MultiRenamingTable extends RenamingTable {
         this.hmap = hmap;
     }
 
-    public SourceElement getRenaming(SourceElement se) {
+    public @Nullable SourceElement getRenaming(SourceElement se) {
         return hmap.get(se);
     }
 

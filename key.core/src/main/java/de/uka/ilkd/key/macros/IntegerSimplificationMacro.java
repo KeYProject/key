@@ -6,6 +6,8 @@ package de.uka.ilkd.key.macros;
 
 import java.util.Set;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This macro performs simplification of integers and terms with integers. It applies only
  * non-splitting simplification rules.
@@ -13,6 +15,7 @@ import java.util.Set;
  * @author Michael Kirsten
  *
  */
+@NullMarked
 public class IntegerSimplificationMacro extends AbstractPropositionalExpansionMacro {
 
     @Override

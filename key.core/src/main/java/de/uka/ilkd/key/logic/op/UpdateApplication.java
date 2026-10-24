@@ -14,11 +14,14 @@ import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Singleton class defining a binary operator {u}t that applies updates u to terms, formulas, or
  * other updates t.
  */
+@NullMarked
 public final class UpdateApplication extends AbstractOperator implements Operator {
 
     public static final UpdateApplication UPDATE_APPLICATION = new UpdateApplication();

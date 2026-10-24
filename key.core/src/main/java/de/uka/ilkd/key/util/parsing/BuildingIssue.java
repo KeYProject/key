@@ -14,8 +14,10 @@ import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public record BuildingIssue(String message, @Nullable Throwable cause, boolean isWarning,
         Position position, @Nullable String sourceName) {
 

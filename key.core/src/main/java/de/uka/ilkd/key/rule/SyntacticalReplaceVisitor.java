@@ -33,26 +33,30 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * visitor for method {@link JTerm#execPostOrder(Visitor)}. Called with that
  * method
  * on a term, the visitor builds a new term replacing SchemaVariables with their instantiations that
  * are given as a SVInstantiations object.
  */
+@NullMarked
 public class SyntacticalReplaceVisitor implements DefaultVisitor {
     public static final String SUBSTITUTION_WITH_LABELS_HINT = "SUBSTITUTION_WITH_LABELS";
     protected final SVInstantiations svInst;
     protected final Services services;
     /** the term builder used to construct terms */
     protected final TermBuilder tb;
-    private JTerm computedResult = null;
-    protected final PosInOccurrence applicationPosInOccurrence;
-    protected final Rule rule;
-    protected final Goal goal;
-    protected final RuleApp ruleApp;
+    private @Nullable JTerm computedResult = null;
+    protected final @Nullable PosInOccurrence applicationPosInOccurrence;
+    protected final @Nullable Rule rule;
+    protected final @Nullable Goal goal;
+    protected final @Nullable RuleApp ruleApp;
 
     protected final TermLabelState termLabelState;
-    protected final TacletLabelHint labelHint;
+    protected final @Nullable TacletLabelHint labelHint;
 
     /**
      * the stack contains the subterms that will be added in the next step of execPostOrder in Term

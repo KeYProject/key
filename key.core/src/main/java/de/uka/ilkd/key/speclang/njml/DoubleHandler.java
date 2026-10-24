@@ -14,10 +14,12 @@ import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
 
+@NullMarked
 public class DoubleHandler extends LDTHandler {
 
     private final Map<JMLOperator, TypedOperator> opMap = new EnumMap<>(JMLOperator.class);

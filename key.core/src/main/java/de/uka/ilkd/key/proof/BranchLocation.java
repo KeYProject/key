@@ -10,12 +10,15 @@ import java.util.Objects;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Describes a branch in a proof as a series of branch choices.
  * Each branch choice is a proof node and the sub-node to descend into.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class BranchLocation {
     /**
      * Branch location of the initial proof branch.

@@ -4,9 +4,11 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof;
 
-
 import org.key_project.util.parsing.Position;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class MissingInstantiationException extends SVInstantiationExceptionWithPosition {
 
     /**

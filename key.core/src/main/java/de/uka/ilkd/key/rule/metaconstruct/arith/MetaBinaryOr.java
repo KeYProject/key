@@ -8,7 +8,10 @@ import java.math.BigInteger;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
 
+
+@NullMarked
 public final class MetaBinaryOr extends MetaArithBitMaskOp {
 
     public MetaBinaryOr() {

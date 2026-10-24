@@ -43,6 +43,7 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,7 @@ import org.slf4j.LoggerFactory;
  * invariants. Provides methods for adding such elements to the repository, and for retrieving them
  * afterwards.
  */
+@NullMarked
 public class SpecificationRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpecificationRepository.class);
 
@@ -141,7 +143,8 @@ public class SpecificationRepository {
             sb.append("_static_");
         }
 
-        for (KeYJavaType pType : obs.getParamTypes()) {
+        for (KeYJavaType pType : Objects.requireNonNull(obs.getParamTypes(),
+            "observer function has no parameter types")) {
             sb.append(pType.getFullName());
         }
 
@@ -218,10 +221,13 @@ public class SpecificationRepository {
         }
     }
 
-    protected IObserverFunction getCanonicalFormForKJT(IObserverFunction obs, KeYJavaType kjt) {
+    protected @Nullable IObserverFunction getCanonicalFormForKJT(IObserverFunction obs,
+            KeYJavaType kjt) {
         assert obs != null;
         assert kjt != null;
-        if (!(obs instanceof IProgramMethod pm) || obs.getContainerType().equals(kjt)) {
+        if (!(obs instanceof IProgramMethod pm)
+                || Objects.requireNonNull(obs.getContainerType(), "container type is required")
+                        .equals(kjt)) {
             return unlimitObs(obs);
         }
         if (pm.isConstructor()) {
@@ -230,15 +236,23 @@ public class SpecificationRepository {
         }
 
         // search through all locally available methods
-        final String name = pm.getMethodDeclaration().getName();
+        final String name = Objects.requireNonNull(pm.getMethodDeclaration(),
+            "method declaration of " + pm + " is null").getName();
         final int numParams = pm.getParameterDeclarationCount();
         final List<IProgramMethod> candidatePMs =
             services.getJavaInfo().getAllProgramMethods(kjt);
         outer: for (IProgramMethod candidatePM : candidatePMs) {
-            if (candidatePM.getMethodDeclaration().getName().equals(name)
+            final String candidateName = Objects.requireNonNull(
+                Objects.requireNonNull(candidatePM.getMethodDeclaration(),
+                    "method declaration of " + candidatePM + " is null").getName(),
+                "method declaration of " + candidatePM + " is null has no name");
+            if (candidateName.equals(name)
                     && candidatePM.getParameterDeclarationCount() == numParams) {
                 for (int i = 0; i < numParams; i++) {
-                    if (!candidatePM.getParameterType(i).equals(pm.getParameterType(i))) {
+                    if (!Objects.requireNonNull(candidatePM.getParameterType(i),
+                        "parameter type of " + candidatePM + " is null")
+                            .equals(Objects.requireNonNull(pm.getParameterType(i),
+                                "parameter type of " + pm + " is null"))) {
                         continue outer;
                     }
                 }
@@ -275,7 +289,9 @@ public class SpecificationRepository {
         final JavaInfo javaInfo = services.getJavaInfo();
         for (KeYJavaType sub : javaInfo.getAllSubtypes(kjt)) {
             assert sub != null;
-            final IProgramMethod subPM = (IProgramMethod) getCanonicalFormForKJT(pm, sub);
+            final IProgramMethod subPM = Objects.requireNonNull(
+                (IProgramMethod) getCanonicalFormForKJT(pm, sub),
+                "no canonical form for method " + pm + " in " + sub);
             result = result.prepend(new Pair<>(sub, subPM));
         }
 
@@ -311,7 +327,7 @@ public class SpecificationRepository {
     /**
      * Returns the kjt for the outer class, if the passed kjt is a member class, and null otherwise.
      */
-    private KeYJavaType getEnclosingKJT(KeYJavaType kjt) {
+    private @Nullable KeYJavaType getEnclosingKJT(KeYJavaType kjt) {
         // HACK, this should be easier
         if (kjt.getJavaType() instanceof ClassDeclaration) {
 
@@ -343,13 +359,14 @@ public class SpecificationRepository {
         return result;
     }
 
-    private RepresentsAxiom getRepresentsAxiom(KeYJavaType kjt, ClassAxiom ax) {
+    private @Nullable RepresentsAxiom getRepresentsAxiom(KeYJavaType kjt, ClassAxiom ax) {
         if (!(ax instanceof RepresentsAxiom) || axioms.get(kjt) == null) {
             return null;
         }
         RepresentsAxiom result = null;
         for (ClassAxiom ca : axioms.get(kjt)) {
-            if (ca instanceof RepresentsAxiom && (ca.getTarget().equals(ax.getTarget()))) {
+            if (ca instanceof RepresentsAxiom && (Objects.requireNonNull(ca.getTarget(),
+                "represents axiom has no target").equals(ax.getTarget()))) {
                 assert result == null : "More than one represents clause for " + ax.getTarget();
                 result = (RepresentsAxiom) ca;
             }
@@ -424,12 +441,14 @@ public class SpecificationRepository {
     protected void unregisterContract(Contract contract) {
         final KeYJavaType kjt = contract.getKJT();
         final Pair<KeYJavaType, IObserverFunction> tp = new Pair<>(kjt, contract.getTarget());
-        contracts.put(tp, contracts.get(tp).remove(contract));
+        contracts.put(tp, Objects.requireNonNull(contracts.get(tp),
+            "no contracts registered for " + tp).remove(contract));
         if (contract instanceof FunctionalOperationContract) {
             final Pair<KeYJavaType, IProgramMethod> tp2 =
                 new Pair<>(tp.first, (IProgramMethod) tp.second);
-            operationContracts.put(tp2,
-                operationContracts.get(tp2).remove((FunctionalOperationContract) contract));
+            operationContracts.put(tp2, Objects.requireNonNull(operationContracts.get(tp2),
+                "no operation contracts registered for " + tp2)
+                    .remove((FunctionalOperationContract) contract));
         }
         contractsByName.remove(contract.getName());
     }
@@ -582,8 +601,9 @@ public class SpecificationRepository {
      * Returns all registered (atomic) contracts for the passed target.
      */
     public ImmutableSet<Contract> getContracts(KeYJavaType kjt, IObserverFunction target) {
-        target =
-            getCanonicalFormForKJT(Objects.requireNonNull(target), Objects.requireNonNull(kjt));
+        target = Objects.requireNonNull(
+            getCanonicalFormForKJT(Objects.requireNonNull(target), Objects.requireNonNull(kjt)),
+            "no canonical form for target " + target + " in " + kjt);
         final Pair<KeYJavaType, IObserverFunction> pair = new Pair<>(kjt, target);
         final ImmutableSet<Contract> result = contracts.get(pair);
         return result == null ? DefaultImmutableSet.nil() : result;
@@ -594,7 +614,8 @@ public class SpecificationRepository {
      */
     public ImmutableSet<FunctionalOperationContract> getOperationContracts(KeYJavaType kjt,
             IProgramMethod pm) {
-        pm = (IProgramMethod) getCanonicalFormForKJT(pm, kjt);
+        pm = Objects.requireNonNull((IProgramMethod) getCanonicalFormForKJT(pm, kjt),
+            "no canonical form for operation " + pm + " in " + kjt);
         final Pair<KeYJavaType, IProgramMethod> pair = new Pair<>(kjt, pm);
         final ImmutableSet<FunctionalOperationContract> result = operationContracts.get(pair);
         return result == null ? DefaultImmutableSet.nil() : result;
@@ -700,7 +721,9 @@ public class SpecificationRepository {
                     .add(new Pair<>(contract.getKJT(), contract.getTarget()));
 
         registerContract(contract, impls);
-        if (!contractTargets.get(contract.getKJT()).contains(contract.getTarget())) {
+        if (!Objects.requireNonNull(contractTargets.get(contract.getKJT()),
+            "no contract targets registered for " + contract.getKJT())
+                .contains(contract.getTarget())) {
             throw new IllegalStateException(
                 "target " + contract.getTarget() + " missing for contract " + contract);
         }
@@ -738,7 +761,8 @@ public class SpecificationRepository {
             toCombine.toArray(new FunctionalOperationContract[toCombine.size()]);
         Arrays.sort(contractsArray, Comparator.comparing(SpecificationElement::getName));
 
-        return cf.union(contractsArray);
+        return Objects.requireNonNull(cf.union(contractsArray),
+            "cannot combine zero contracts");
     }
 
     /**
@@ -780,7 +804,9 @@ public class SpecificationRepository {
             addClassAxiom(new PartialInvAxiom(inv, true, services));
         }
         // inherit non-private, non-static invariants
-        if (!inv.isStatic() && ModifierKind.allowsInheritance(inv.getVisibility())) {
+        if (!inv.isStatic()
+                && ModifierKind.allowsInheritance(Objects.requireNonNullElse(inv.getVisibility(),
+                    ModifierKind.JML_PACKAGE))) {
             final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
             for (KeYJavaType sub : subs) {
                 ClassInvariant subInv = inv.setKJT(sub);
@@ -808,7 +834,9 @@ public class SpecificationRepository {
         for (KeYJavaType kjt : initiallyClauses.keySet()) {
             for (InitiallyClause inv : initiallyClauses.get(kjt)) {
                 createContractsFromInitiallyClause(inv, kjt);
-                if (ModifierKind.allowsInheritance(inv.getVisibility())) {
+                // null visibility (default) must not be inherited
+                if (ModifierKind.allowsInheritance(Objects.requireNonNullElse(inv.getVisibility(),
+                    ModifierKind.JML_PACKAGE))) {
                     final ImmutableList<KeYJavaType> subs =
                         services.getJavaInfo().getAllSubtypes(kjt);
                     for (KeYJavaType sub : subs) {
@@ -889,7 +917,7 @@ public class SpecificationRepository {
 
                     if (inv.isStatic()) {
                         if (!inv.isFree()) {
-                            staticInvDef = tb.and(staticInvDef, inv.getInv(null, services));
+                            staticInvDef = tb.and(staticInvDef, inv.getInv(selfVar, services));
                         } else {
                             freeStaticInvDef =
                                 tb.and(freeStaticInvDef, inv.getInv(selfVar, services));
@@ -913,37 +941,41 @@ public class SpecificationRepository {
                 final ClassAxiom invRepresentsAxiom =
                     new RepresentsAxiom("Class invariant axiom for " + kjt.getFullName(), invSymbol,
                         kjt, ModifierKind.PRIVATE, null, invDef, selfVar,
-                        ImmutableList.nil(), null);
+                        ImmutableList.nil(), new LinkedHashMap<>());
                 result = result.add(invRepresentsAxiom);
 
                 final ClassAxiom staticInvRepresentsAxiom = new RepresentsAxiom(
                     "Static class invariant axiom for " + kjt.getFullName(), staticInvSymbol, kjt,
                     ModifierKind.PRIVATE, null, staticInvDef, null, ImmutableList.nil(),
-                    null);
+                    new LinkedHashMap<>());
                 result = result.add(staticInvRepresentsAxiom);
 
                 final ClassAxiom invFreeRepresentsAxiom = new RepresentsAxiom(
                     "Free class invariant axiom for " + kjt.getFullName(), freeInvSymbol, kjt,
                     ModifierKind.PRIVATE, null, freeInvDef, selfVar, ImmutableList.nil(),
-                    null);
+                    new LinkedHashMap<>());
                 result = result.add(invFreeRepresentsAxiom);
 
                 final ClassAxiom staticFreeInvRepresentsAxiom = new RepresentsAxiom(
                     "Free static class invariant axiom for " + kjt.getFullName(),
                     freeStaticInvSymbol, kjt, ModifierKind.PRIVATE, null, freeStaticInvDef,
                     null,
-                    ImmutableList.nil(), null);
+                    ImmutableList.nil(), new LinkedHashMap<>());
                 result = result.add(staticFreeInvRepresentsAxiom);
 
             }
             // add query axioms for own class
             for (IProgramMethod pm : services.getJavaInfo().getAllProgramMethods(selfKjt)) {
                 if (!pm.isVoid() && !pm.isConstructor() && !pm.isImplicit() && !pm.isModel()) {
-                    pm = services.getJavaInfo().getToplevelPM(selfKjt, pm);
+                    pm = Objects.requireNonNull(
+                        services.getJavaInfo().getToplevelPM(selfKjt, pm),
+                        "no toplevel program method for " + pm);
 
                     var sb = new StringBuilder();
-                    for (KeYJavaType pd : pm.getParamTypes()) {
-                        sb.append(pd.getJavaType().getFullName());
+                    for (KeYJavaType pd : Objects.requireNonNull(pm.getParamTypes(),
+                        "no parameter types for " + pm)) {
+                        sb.append(Objects.requireNonNull(pd.getJavaType(),
+                            "no java type for parameter type " + pd).getFullName());
                         sb.append("_");
                     }
 
@@ -971,7 +1003,8 @@ public class SpecificationRepository {
             for (IProgramMethod pm : services.getJavaInfo().getAllProgramMethods(kjt)) {
                 final LocationVariable selfVar = pm.isStatic() ? null : tb.selfVar(kjt, false);
                 if (!pm.isVoid() && pm.isModel()) {
-                    pm = services.getJavaInfo().getToplevelPM(kjt, pm);
+                    pm = Objects.requireNonNull(services.getJavaInfo().getToplevelPM(kjt, pm),
+                        "no toplevel program method for " + pm);
                     ImmutableList<LocationVariable> paramVars = tb.paramVars(pm, false);
                     Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<>();
                     List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
@@ -979,7 +1012,8 @@ public class SpecificationRepository {
                         atPreVars.put(heap,
                             tb.atPreVar(heap.name().toString(), heap.sort(), false));
                     }
-                    LocationVariable resultVar = tb.resultVar(pm, false);
+                    LocationVariable resultVar = Objects.requireNonNull(tb.resultVar(pm, false),
+                        "no result variable for model method " + pm);
 
                     // This assumes there is one operation contract for each
                     // model pm per class
@@ -1045,9 +1079,13 @@ public class SpecificationRepository {
                                 "Contract axiom for " + pm.getName() + " in " + kjt.getFullName(),
                                 pm,
                                 kjt, ModifierKind.PRIVATE, preFromContract,
-                                freePreFromContract,
-                                postFromContract, freePostFromContract, mbyFromContract, atPreVars,
-                                selfVar, resultVar, paramVars);
+                                Objects.requireNonNull(freePreFromContract,
+                                    "model method contract has no free pre"),
+                                Objects.requireNonNull(postFromContract,
+                                    "model method contract has no post"),
+                                Objects.requireNonNull(freePostFromContract,
+                                    "model method contract has no free post"),
+                                mbyFromContract, atPreVars, selfVar, resultVar, paramVars);
                             result = result.add(modelMethodContractAxiom);
                         }
                     }
@@ -1090,7 +1128,8 @@ public class SpecificationRepository {
                 axioms.put(kjt, currentAxioms.add(ax));
             }
             // inherit represents clauses to subclasses and conjoin together
-            if (ModifierKind.allowsInheritance(ax.getVisibility())) {
+            if (ModifierKind.allowsInheritance(
+                Objects.requireNonNullElse(ax.getVisibility(), ModifierKind.JML_PACKAGE))) {
                 final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
                 for (KeYJavaType sub : subs) {
                     RepresentsAxiom subAx = ((RepresentsAxiom) ax).setKJT(sub);
@@ -1194,7 +1233,7 @@ public class SpecificationRepository {
     /**
      * Returns the PO that the passed proof is about, or null.
      */
-    public ContractPO getContractPOForProof(Proof proof) {
+    public @Nullable ContractPO getContractPOForProof(Proof proof) {
         ProofOblInput po = getProofOblInput(proof);
         if (po instanceof ContractPO) {
             return (ContractPO) po;
@@ -1206,7 +1245,7 @@ public class SpecificationRepository {
     /**
      * Returns the PO that the passed contract is about, or null.
      */
-    public ContractPO getPO(Contract c) {
+    public @Nullable ContractPO getPO(Contract c) {
         for (ProofOblInput po : proofs.keySet()) {
             if (po instanceof ContractPO && ((ContractPO) po).getContract().equals(c)) {
                 return (ContractPO) po;
@@ -1215,7 +1254,7 @@ public class SpecificationRepository {
         return null;
     }
 
-    public ContractPO getPOForProof(Proof proof) {
+    public @Nullable ContractPO getPOForProof(Proof proof) {
         for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
             ProofOblInput po = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
@@ -1247,7 +1286,7 @@ public class SpecificationRepository {
     /**
      * Returns the target that the passed proof is about, or null.
      */
-    public IObserverFunction getTargetOfProof(Proof proof) {
+    public @Nullable IObserverFunction getTargetOfProof(Proof proof) {
         final ContractPO po = getPOForProof(proof);
         return po == null ? null : po.getContract().getTarget();
     }
@@ -1280,7 +1319,7 @@ public class SpecificationRepository {
     /**
      * Returns the registered loop invariant for the passed loop, or null.
      */
-    public synchronized LoopSpecification getLoopSpec(LoopStatement loop) {
+    public synchronized @Nullable LoopSpecification getLoopSpec(LoopStatement loop) {
         final int line = loop.getStartPosition().line();
         Pair<LoopStatement, Integer> l = new Pair<>(loop, line);
         LoopSpecification inv = loopInvs.get(l);
@@ -1611,9 +1650,14 @@ public class SpecificationRepository {
         if (limited == null) {
             final String baseName =
                 ((ProgramElementName) obs.name()).getProgramName() + LIMIT_SUFFIX;
-            final Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
-            limited = new ObserverFunction(baseName, obs.sort(), obs.getType(), heapSort,
-                obs.getContainerType(), obs.isStatic(), obs.getParamTypes(),
+            final Sort heapSort = Objects
+                    .requireNonNull(services.getTypeConverter().getHeapLDT(), "no heap LDT")
+                    .targetSort();
+            limited = new ObserverFunction(baseName, obs.sort(),
+                Objects.requireNonNull(obs.getType(), "no type for " + obs), heapSort,
+                Objects.requireNonNull(obs.getContainerType(), "no container type for " + obs),
+                obs.isStatic(),
+                Objects.requireNonNull(obs.getParamTypes(), "no parameter types for " + obs),
                 obs.getHeapCount(services), obs.getStateCount());
             unlimitedToLimited.put(obs, limited);
             limitedToUnlimited.put(limited, obs);
@@ -1647,7 +1691,7 @@ public class SpecificationRepository {
         return statementMap.get(statement);
     }
 
-    public JmlStatementSpec addStatementSpec(Statement statement, JmlStatementSpec spec) {
+    public @Nullable JmlStatementSpec addStatementSpec(Statement statement, JmlStatementSpec spec) {
         return statementMap.put(statement, spec);
     }
 
@@ -1711,15 +1755,17 @@ public class SpecificationRepository {
             final TermFactory termFactory = services.getTermFactory();
             final TermReplacementMap replacementMap = new TermReplacementMap(termFactory);
             if (self != null) {
-                replacementMap.replaceSelf(vars().selfVar, self, services);
+                replacementMap.replaceSelf(Objects.requireNonNull(vars().selfVar,
+                    "no self variable to resolve self in JML statement spec"), self, services);
             }
             replacementMap.replaceRemembranceLocalVariables(vars().atPreVars, vars().atPres,
                 services);
-            replacementMap.replaceRemembranceLocalVariables(vars().atBeforeVars, vars().atBefores,
-                services);
+            replacementMap.replaceRemembranceLocalVariables(
+                Objects.requireNonNullElse(vars().atBeforeVars, Map.of()),
+                Objects.requireNonNullElse(vars().atBefores, Map.of()), services);
             final OpReplacer replacer =
                 new OpReplacer(replacementMap, termFactory, services.getProof());
-            return replacer.replace(term);
+            return Objects.requireNonNull(replacer.replace(term), "no replacement for " + term);
         }
 
         /**
@@ -1739,12 +1785,19 @@ public class SpecificationRepository {
             var replacementMap = new TermReplacementMap(termFactory);
             replacementMap.replaceRemembranceLocalVariables(vars.atPreVars, atPres, services);
             var replacer = new OpReplacer(replacementMap, termFactory, services.getProof());
-            var newTerms = terms().map(replacer::replace);
-            return new JmlStatementSpec(
-                new ProgramVariableCollection(vars.selfVar, vars.paramVars, vars.resultVar,
-                    vars.excVar,
-                    vars.atPreVars, atPres, vars.atBeforeVars, vars.atBefores),
-                newTerms);
+            var newTerms = terms()
+                    .<JTerm>map(t -> Objects.requireNonNull(replacer.replace(t),
+                        "no replacement for " + t));
+            var newVars = new ProgramVariableCollection();
+            newVars.selfVar = vars.selfVar;
+            newVars.paramVars = vars.paramVars;
+            newVars.resultVar = vars.resultVar;
+            newVars.excVar = vars.excVar;
+            newVars.atPreVars = vars.atPreVars;
+            newVars.atPres = atPres;
+            newVars.atBeforeVars = vars.atBeforeVars;
+            newVars.atBefores = vars.atBefores;
+            return new JmlStatementSpec(newVars, newTerms);
         }
     }
 

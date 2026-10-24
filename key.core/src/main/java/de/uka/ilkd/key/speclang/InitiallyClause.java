@@ -13,7 +13,9 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public interface InitiallyClause extends SpecificationElement {
 
     @Override

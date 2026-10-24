@@ -10,6 +10,7 @@ import org.key_project.util.parsing.HasLocation;
 import org.key_project.util.parsing.Location;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * An exception that bundles several {@link BuildingIssue}s that occurred while building KeY
@@ -18,6 +19,7 @@ import org.jspecify.annotations.NonNull;
  * @author Alexander Weigl
  * @version 1 (12/4/19)
  */
+@NullMarked
 public class BuildingExceptions extends RuntimeException implements HasLocation {
     private final List<BuildingIssue> errors;
 

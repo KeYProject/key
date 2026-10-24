@@ -30,11 +30,14 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A statement indicating a merge point.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class MergePointStatement extends JavaStatement
         implements ExpressionContainer {
 

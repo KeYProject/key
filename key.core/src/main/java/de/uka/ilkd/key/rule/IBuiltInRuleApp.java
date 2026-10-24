@@ -14,6 +14,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public interface IBuiltInRuleApp extends RuleApp {
@@ -35,6 +36,7 @@ public interface IBuiltInRuleApp extends RuleApp {
 
     IBuiltInRuleApp forceInstantiate(Goal goal);
 
+    @Nullable
     List<LocationVariable> getHeapContext();
 
     /**

@@ -15,6 +15,9 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 
 import org.key_project.logic.Term;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class TermProgramVariableCollector implements DefaultVisitor {
 
     private final HashSet<LocationVariable> result = new LinkedHashSet<>();

@@ -16,6 +16,9 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This SMT translation handler takes care of integer expressions.
  *
@@ -23,6 +26,7 @@ import org.key_project.logic.op.Operator;
  *
  * @author Jonas Schiffl
  */
+@NullMarked
 public class IntegerOpHandler implements SMTHandler {
 
     /** to indicate that an expression holds a value of type Int. */
@@ -35,13 +39,13 @@ public class IntegerOpHandler implements SMTHandler {
 
     private final Map<Operator, String> supportedOperators = new HashMap<>();
     private final Set<Operator> predicateOperators = new HashSet<>();
-    private Function mul;
+    private @Nullable Function mul;
     private boolean limitedToPresbuger;
-    private IntegerLDT integerLDT;
+    private @Nullable IntegerLDT integerLDT;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         supportedOperators.clear();
         this.integerLDT = services.getTypeConverter().getIntegerLDT();
 

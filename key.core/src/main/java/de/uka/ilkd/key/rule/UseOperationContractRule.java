@@ -42,7 +42,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.*;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.*;
@@ -51,6 +51,7 @@ import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 /**
  * Implements the rule which inserts operation contracts for a method call.
  */
+@NullMarked
 public class UseOperationContractRule implements BuiltInRule, ComplexJustificationable {
     /**
      * Hint to refactor the final pre term.
@@ -96,7 +97,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
     // internal methods
     // -------------------------------------------------------------------------
 
-    private static Pair<Expression, MethodOrConstructorReference> getMethodCall(JavaBlock jb,
+    private static @Nullable Pair<Expression, MethodOrConstructorReference> getMethodCall(
+            JavaBlock jb,
             Services services) {
         final Expression actualResult;
         final MethodOrConstructorReference mr;
@@ -192,7 +194,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         return result;
     }
 
-    private static JTerm getActualSelf(MethodOrConstructorReference mr, IProgramMethod pm,
+    private static @Nullable JTerm getActualSelf(MethodOrConstructorReference mr, IProgramMethod pm,
             ExecutionContext ec, Services services) {
         final TypeConverter tc = services.getTypeConverter();
         final ReferencePrefix rp = mr.getReferencePrefix();
@@ -504,7 +506,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
         return new UseOperationContractRuleApplier(goal, ruleApp).apply();
     }
 
@@ -540,7 +542,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
      * @param transaction TODO
      */
     public record Instantiation(JTerm u, JTerm progPost, JModality modality,
-            Expression actualResult, JTerm actualSelf,
+            @Nullable Expression actualResult, @Nullable JTerm actualSelf,
             KeYJavaType staticType, MethodOrConstructorReference mr, IProgramMethod pm,
             ImmutableList<JTerm> actualParams, boolean transaction) {
         /**
@@ -680,22 +682,22 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         protected JTerm contractSelf;
         protected FunctionalOperationContract contract;
         protected JTerm excPostAssumption;
-        protected JTerm mby;
+        protected @Nullable JTerm mby;
         protected JTerm excNull;
         protected JTerm excCreated;
-        protected JTerm contractResult;
+        protected @Nullable JTerm contractResult;
         protected JTerm freePost;
         protected JTerm freeExcPost;
         protected JTerm postAssumption;
-        protected JTerm anonAssumption;
-        protected JTerm anonUpdate;
-        protected JTerm wellFormedAnon;
-        protected JTerm atPreUpdates;
-        protected JTerm reachableState;
+        protected @Nullable JTerm anonAssumption;
+        protected @Nullable JTerm anonUpdate;
+        protected @Nullable JTerm wellFormedAnon;
+        protected @Nullable JTerm atPreUpdates;
+        protected @Nullable JTerm reachableState;
         protected ImmutableList<UseOperationContractRule.AnonUpdateData> anonUpdateDatas =
             ImmutableList.nil();
         protected final Map<LocationVariable, JTerm> modifiables;
-        protected final JTerm globalDefs;
+        protected final @Nullable JTerm globalDefs;
         protected final JTerm originalPre;
         protected JTerm finalPreTerm;
 
@@ -833,7 +835,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
 
         }
 
-        public @NonNull ImmutableList<Goal> apply() {
+        public ImmutableList<Goal> apply() {
             // split goal into three/four branches
             final ImmutableList<Goal> result;
             final Goal preGoal, postGoal, excPostGoal, nullGoal;

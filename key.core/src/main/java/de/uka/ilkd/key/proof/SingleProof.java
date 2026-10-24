@@ -9,6 +9,9 @@ import java.util.List;
 
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class SingleProof extends ProofAggregate {
 
     private final Proof proof;

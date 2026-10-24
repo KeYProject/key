@@ -29,6 +29,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +48,7 @@ import static de.uka.ilkd.key.smt.SMTProblem.sequentToTerm;
  * @author Simon Greiner
  *
  */
+@NullMarked
 public abstract class AbstractSMTTranslator implements SMTTranslator {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSMTTranslator.class);
 
@@ -55,7 +58,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     private final StringBuilder standardSort = new StringBuilder("u");
 
     /** The translation result is stored in this variable. */
-    protected String text;
+    protected @Nullable String text;
 
     /** remember all function declarations */
     protected static class FunctionWrapper {
@@ -154,7 +157,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     private final ArrayList<StringBuilder> assumptions = new ArrayList<>();
 
     /** Formulae made of taclets, used for assumptions. */
-    private TacletSetTranslation tacletSetTranslation = null;
+    private @Nullable TacletSetTranslation tacletSetTranslation = null;
 
     private final Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<>();
 
@@ -163,19 +166,19 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     private ArrayList<StringBuilder> tacletAssumptions = new ArrayList<>();
 
-    private SMTSettings smtSettings = null;
+    private @Nullable SMTSettings smtSettings = null;
 
     /**
      * If the solver supports only simple multiplications, complex multiplications are translated
      * into a uninterpreted function. The name of the function is stored here.
      */
-    private Function multiplicationFunction = null;
+    private @Nullable Function multiplicationFunction = null;
 
     private static final String BSUM_STRING = "bsum";
 
     private static final String BPROD_STRING = "bprod";
 
-    public TacletSetTranslation getTacletSetTranslation() {
+    public @Nullable TacletSetTranslation getTacletSetTranslation() {
         return tacletSetTranslation;
     }
 
@@ -204,7 +207,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         return exceptionsForTacletTranslation;
     }
 
-    protected final SMTSettings getSettings() {
+    protected final @Nullable SMTSettings getSettings() {
         return smtSettings;
     }
 
@@ -1323,7 +1326,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @param distinct the set of functions, that should be distinct.
      * @return the translation of the unique function
      */
-    protected StringBuilder translateUniqueness(FunctionWrapper function,
+    protected @Nullable StringBuilder translateUniqueness(FunctionWrapper function,
             Collection<FunctionWrapper> distinct, Services services)
             throws IllegalFormulaException {
         if (!function.getFunction().isUnique()) {
@@ -2049,7 +2052,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     /**
      * This StringBuilder is used as predicate name for casts from int-valued to u-valued obects
      */
-    private StringBuilder castPredicate;
+    private @Nullable StringBuilder castPredicate;
 
     /**
      * This method adds a type cast to a translated formula, if neccessary. It is neccesary, if the

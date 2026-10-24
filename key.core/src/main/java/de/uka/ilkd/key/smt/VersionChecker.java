@@ -10,12 +10,14 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Little helper class that helps to check for the version of a solver. Mainly it provides a method
  * that starts the solver using certain parameters in order to obtain the version of that solver.
  */
+@NullMarked
 public class VersionChecker {
     public static final VersionChecker INSTANCE = new VersionChecker();
 

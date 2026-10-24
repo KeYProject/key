@@ -6,6 +6,9 @@ package de.uka.ilkd.key.ldt;
 
 import org.key_project.logic.op.Function;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public interface FloatingPointLDT {
 
     Function getLessThan();

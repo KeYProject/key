@@ -11,6 +11,10 @@ import java.util.LinkedHashMap;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class SingleRenamingTable extends RenamingTable {
 
     final SourceElement oldVar;
@@ -21,7 +25,7 @@ public class SingleRenamingTable extends RenamingTable {
         this.newVar = newVar;
     }
 
-    public SourceElement getRenaming(SourceElement se) {
+    public @Nullable SourceElement getRenaming(SourceElement se) {
         if (se.equals(oldVar)) {
             return newVar;
         }
@@ -47,7 +51,7 @@ public class SingleRenamingTable extends RenamingTable {
 
     private static class SingleIterator implements Iterator<SourceElement> {
 
-        private SourceElement se;
+        private @Nullable SourceElement se;
 
         public SingleIterator(SourceElement se) {
             this.se = se;
@@ -59,7 +63,7 @@ public class SingleRenamingTable extends RenamingTable {
         }
 
         @Override
-        public SourceElement next() {
+        public @Nullable SourceElement next() {
             final SourceElement next = se;
             se = null;
             return next;

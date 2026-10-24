@@ -10,6 +10,9 @@ import java.util.function.Predicate;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * Realises a collection for term labels keeping track whether its content has been modified
@@ -21,6 +24,7 @@ import org.key_project.util.collection.ImmutableArray;
  * as modified
  * </p>
  */
+@NullMarked
 public class LabelCollection {
 
     private final LinkedHashSet<TermLabel> labels = new LinkedHashSet<>();
@@ -105,7 +109,7 @@ public class LabelCollection {
      *         present
      * @param <S> the type of the label to be retrieved
      */
-    public <S> S getFirst(Class<S> termLabelClass) {
+    public @Nullable <S> S getFirst(Class<S> termLabelClass) {
         for (var label : labels) {
             if (termLabelClass.isInstance(label)) {
                 return (S) label;

@@ -24,7 +24,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Then.
@@ -32,6 +32,7 @@ import org.jspecify.annotations.NonNull;
  * @author <TT>AutoDoc</TT>
  */
 
+@NullMarked
 public final class Then extends BranchImp {
     private final Statement body;
 
@@ -57,12 +58,11 @@ public final class Then extends BranchImp {
      * @param stmnt
      *        the statement part of Then.
      */
-    public Then(@NonNull Statement stmnt) {
+    public Then(Statement stmnt) {
         this(null, null, stmnt);
     }
 
 
-    @NonNull
     public SourceElement getFirstElement() {
         return body.getFirstElement();
     }
@@ -72,7 +72,6 @@ public final class Then extends BranchImp {
         return body.getFirstElementIncludingBlocks();
     }
 
-    @NonNull
     public SourceElement getLastElement() {
         return body.getLastElement();
     }

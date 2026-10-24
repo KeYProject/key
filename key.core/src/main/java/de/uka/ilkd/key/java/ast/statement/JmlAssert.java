@@ -18,7 +18,7 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -26,6 +26,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Benjamin Takacs
  */
+@NullMarked
 public class JmlAssert extends JavaStatement {
     /**
      * Index in the list of terms of
@@ -211,7 +212,7 @@ public class JmlAssert extends JavaStatement {
      *
      * @return a freshly created list of at least one term
      */
-    public @NonNull ImmutableList<JmlParser.ExpressionContext> collectTerms() {
+    public ImmutableList<JmlParser.ExpressionContext> collectTerms() {
         ImmutableList<JmlParser.ExpressionContext> result = ImmutableList.of();
         if (assertionProof != null) {
             result = result.prepend(assertionProof.collectTerms());

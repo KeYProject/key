@@ -31,17 +31,20 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * abstract taclet builder class to be inherited from taclet builders specialised for their concrete
  * taclet variant
  */
+@NullMarked
 public abstract class TacletBuilder<T extends Taclet> {
 
     protected final static Name NONAME = new Name("unnamed");
 
-    protected Taclet taclet;
+    protected @Nullable Taclet taclet;
 
     protected Name name = NONAME;
     protected Sequent assumesSeq = JavaDLSequentKit.getInstance().getEmptySequent();
@@ -58,7 +61,7 @@ public abstract class TacletBuilder<T extends Taclet> {
      */
     protected ImmutableList<VariableCondition> variableConditions =
         ImmutableList.nil();
-    protected HashMap<TacletGoalTemplate, ChoiceExpr> goal2Choices = null;
+    protected @Nullable HashMap<TacletGoalTemplate, ChoiceExpr> goal2Choices = null;
     protected ChoiceExpr choices = ChoiceExpr.TRUE;
     protected ImmutableSet<TacletAnnotation> tacletAnnotations =
         DefaultImmutableSet.nil();
@@ -85,14 +88,14 @@ public abstract class TacletBuilder<T extends Taclet> {
         return false;
     }
 
-    static void checkContainsFreeVarSV(Sequent seq, Name tacletName, String str) {
+    static void checkContainsFreeVarSV(Sequent seq, @Nullable Name tacletName, String str) {
         if (containsFreeVarSV(seq)) {
             throw new TacletBuilderException(tacletName,
                 "Free Variable in " + str + " in Taclet / sequent: " + seq);
         }
     }
 
-    static void checkContainsFreeVarSV(JTerm t, Name tacletName, String str) {
+    static void checkContainsFreeVarSV(JTerm t, @Nullable Name tacletName, String str) {
         if (containsFreeVarSV(t)) {
             throw new TacletBuilderException(tacletName,
                 "Free Variable found in " + str + " in Taclet / Term: " + t);
@@ -109,14 +112,14 @@ public abstract class TacletBuilder<T extends Taclet> {
     /**
      * returns the name of the Taclet to be built
      */
-    public @NonNull Name getName() {
+    public Name getName() {
         return this.name;
     }
 
     /**
      * sets the name of the Taclet to be built
      */
-    public void setName(@NonNull Name name) {
+    public void setName(Name name) {
         this.name = name;
         if (NONAME.toString().equals(attrs.displayName())) {
             this.attrs = new TacletAttributes(name.toString(), attrs.trigger());
@@ -126,7 +129,7 @@ public abstract class TacletBuilder<T extends Taclet> {
     /**
      * sets an optional display name (presented to the user)
      */
-    public void setDisplayName(@NonNull String s) {
+    public void setDisplayName(String s) {
         attrs = new TacletAttributes(s, attrs.trigger());
     }
 
@@ -148,7 +151,7 @@ public abstract class TacletBuilder<T extends Taclet> {
         goal2Choices.put(gt, soc);
     }
 
-    public HashMap<TacletGoalTemplate, ChoiceExpr> getGoal2Choices() {
+    public @Nullable HashMap<TacletGoalTemplate, ChoiceExpr> getGoal2Choices() {
         return goal2Choices;
     }
 
@@ -305,7 +308,7 @@ public abstract class TacletBuilder<T extends Taclet> {
 
     public abstract TacletBuilder<T> copy();
 
-    public T getTacletWithoutInactiveGoalTemplates(Set<Choice> active) {
+    public @Nullable T getTacletWithoutInactiveGoalTemplates(Set<Choice> active) {
         if (goal2Choices == null || goals.isEmpty()) {
             return getTaclet();
         } else {
@@ -327,10 +330,10 @@ public abstract class TacletBuilder<T extends Taclet> {
     }
 
     public static class TacletBuilderException extends IllegalArgumentException {
-        private final Name tacletname;
+        private final @Nullable Name tacletname;
         private final String errorMessage;
 
-        TacletBuilderException(Name tacletname, String errorMessage) {
+        TacletBuilderException(@Nullable Name tacletname, String errorMessage) {
             this.tacletname = tacletname;
             this.errorMessage = errorMessage;
         }

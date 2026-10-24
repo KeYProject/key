@@ -20,11 +20,15 @@ import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The default implementation of {@link ProofControl}.
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class DefaultProofControl extends AbstractProofControl {
     private static final org.slf4j.Logger LOGGER =
         org.slf4j.LoggerFactory.getLogger(DefaultProofControl.class);
@@ -39,7 +43,7 @@ public class DefaultProofControl extends AbstractProofControl {
      * {@code volatile} so the null-out from the run thread's {@code finally} is visible to callers
      * of {@link #isInAutoMode()} / {@link #startAutoMode} / {@link #runMacro} on other threads.
      */
-    private volatile Thread autoModeThread;
+    private volatile @Nullable Thread autoModeThread;
 
     /**
      * Constructor.
@@ -64,14 +68,14 @@ public class DefaultProofControl extends AbstractProofControl {
      */
     public DefaultProofControl(UserInterfaceControl ui,
             DefaultUserInterfaceControl defaultProverTaskListener,
-            RuleCompletionHandler ruleCompletionHandler) {
+            @Nullable RuleCompletionHandler ruleCompletionHandler) {
         super(defaultProverTaskListener, ruleCompletionHandler);
         this.ui = ui;
     }
 
     @Override
     public synchronized void startAutoMode(Proof proof, ImmutableList<Goal> goals,
-            ProverTaskListener ptl) {
+            @Nullable ProverTaskListener ptl) {
         if (proof.isErroneous()) {
             // A previous run marked the proof erroneous (an essential proof listener failed); it
             // may be inconsistent, so no new search is started. The proof can still be saved.
@@ -111,9 +115,10 @@ public class DefaultProofControl extends AbstractProofControl {
 
         private final ImmutableList<Goal> goals;
 
-        private final ProverTaskListener ptl;
+        private final @Nullable ProverTaskListener ptl;
 
-        public AutoModeThread(Proof proof, ImmutableList<Goal> goals, ProverTaskListener ptl) {
+        public AutoModeThread(Proof proof, ImmutableList<Goal> goals,
+                @Nullable ProverTaskListener ptl) {
             this.proof = proof;
             this.goals = goals;
             this.ptl = ptl;

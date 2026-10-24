@@ -18,8 +18,10 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public abstract class LDTHandler implements JMLOperatorHandler {
     /**
      * Pair (KJT, Operator)
@@ -50,7 +52,8 @@ public abstract class LDTHandler implements JMLOperatorHandler {
         return jop;
     }
 
-    public @Nullable SLExpression build(JMLOperator jop, SLExpression left, SLExpression right)
+    public @Nullable SLExpression build(JMLOperator jop, SLExpression left,
+            @Nullable SLExpression right)
             throws SLTranslationException {
         if (OverloadedOperatorHandler.UNARY_OPERATORS.contains(jop)) {
             return buildUnary(jop, left);
@@ -74,7 +77,7 @@ public abstract class LDTHandler implements JMLOperatorHandler {
         }
     }
 
-    private SLExpression buildUnary(JMLOperator jop, SLExpression left) {
+    private @Nullable SLExpression buildUnary(JMLOperator jop, SLExpression left) {
         KeYJavaType type = left.getType();
         TypedOperator top = getOperator(type.getJavaType(), jop);
         if (top == null) {

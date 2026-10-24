@@ -9,6 +9,9 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public interface IForUpdates extends NonTerminalProgramElement {
 
     int size();

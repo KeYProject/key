@@ -35,6 +35,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
@@ -61,13 +62,14 @@ import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
  * </pre>
  * </p>
  */
+@NullMarked
 public class FunctionalOperationContractPO extends AbstractOperationPO implements ContractPO {
     public static final Map<Boolean, @NonNull String> TRANSACTION_TAGS =
         new LinkedHashMap<>();
 
     private final FunctionalOperationContract contract;
 
-    protected JTerm mbyAtPre;
+    protected @Nullable JTerm mbyAtPre;
 
     static {
         TRANSACTION_TAGS.put(false, "transaction_inactive");
@@ -220,7 +222,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     }
 
     @Override
-    protected JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+    protected JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Services services) {
         return contract.getGlobalDefs(heap, heapTerm, selfTerm, paramTerms, services);
     }
@@ -318,7 +320,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    public JTerm getMbyAtPre() {
+    public @Nullable JTerm getMbyAtPre() {
         return mbyAtPre;
     }
 

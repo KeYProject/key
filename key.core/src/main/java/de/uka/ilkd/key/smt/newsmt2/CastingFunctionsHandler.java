@@ -16,6 +16,9 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This SMT translation handler takes care of those parametric functions f whose return type is
  * coerced, i.e.
@@ -29,14 +32,15 @@ import org.key_project.logic.sort.Sort;
  * @author Mattias Ulbrich
  * @see CastHandler
  */
+@NullMarked
 public class CastingFunctionsHandler implements SMTHandler {
 
-    private ParametricFunctionDecl seqGet;
-    private ParametricFunctionDecl select;
+    private @Nullable ParametricFunctionDecl seqGet;
+    private @Nullable ParametricFunctionDecl select;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         this.seqGet = services.getTypeConverter().getSeqLDT().getSeqGet();
         this.select =
             services.getTypeConverter().getHeapLDT().getSelect();

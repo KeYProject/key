@@ -25,11 +25,14 @@ import de.uka.ilkd.key.speclang.MergeContract;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Extends the JavaASTWalker to use the visitor mechanism. The methods inherited by the Visitor
  * interface are all implemented that they call the method
  * <code> doDefaultAction(ProgramElement) </code>.
  */
+@NullMarked
 public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     protected final Services services;

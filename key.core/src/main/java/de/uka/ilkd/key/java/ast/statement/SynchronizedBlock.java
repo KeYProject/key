@@ -19,10 +19,13 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Synchronized block.
  */
 
+@NullMarked
 public class SynchronizedBlock extends JavaStatement
         implements StatementContainer, ExpressionContainer, ProgramPrefix {
 

@@ -14,12 +14,15 @@ import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Operator base class.
  *
  * @author AL
  */
 
+@NullMarked
 public abstract class Operator extends JavaNonTerminalProgramElement
         implements Expression, ExpressionContainer {
     protected final ImmutableArray<Expression> children;
@@ -32,7 +35,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
     public static final int POSTFIX = 2;
 
     protected Operator() {
-        this.children = null;
+        this(new Expression[0]);
     }
 
     /**

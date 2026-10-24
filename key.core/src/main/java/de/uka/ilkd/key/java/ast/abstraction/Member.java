@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.abstraction;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A program model element representing members.
  */
+@NullMarked
 public interface Member extends ProgramModelElement {
 
     /**

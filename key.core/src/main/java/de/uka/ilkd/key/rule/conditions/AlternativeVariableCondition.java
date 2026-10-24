@@ -12,12 +12,15 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * disjoin two variable conditions
  *
  * @author bruns
  */
+@NullMarked
 public final class AlternativeVariableCondition extends VariableConditionAdapter {
 
     private final VariableConditionAdapter delegate0, delegate1;

@@ -13,6 +13,8 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Feature that returns the maximum number of literals occurring within a d-path of the find-formula
@@ -21,6 +23,7 @@ import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 // Reads the whole find formula (pos.sequentFormula().formula()) -- its d-path count, so the cost is
 // fixed by the formula but can change if a sibling part of it is rewritten. Reusable only while the
 // find formula is unchanged; see WeakStableCost.
+@NullMarked
 @WeakStableCost
 public class CountMaxDPathFeature extends AbstractBetaFeature {
 

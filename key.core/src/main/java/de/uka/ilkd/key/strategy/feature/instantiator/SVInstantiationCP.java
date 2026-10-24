@@ -29,6 +29,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -37,9 +39,10 @@ import org.jspecify.annotations.NonNull;
  * particular combined with <code>ForEachCP</code>. Although the feature formally is a choice point,
  * it will always have exactly one branch
  */
+@NullMarked
 public class SVInstantiationCP implements Feature {
 
-    private final Name svToInstantiate;
+    private final @Nullable Name svToInstantiate;
     private final ProjectionToTerm<Goal> value;
 
     public static Feature create(Name svToInstantiate, ProjectionToTerm<Goal> value) {
@@ -51,7 +54,7 @@ public class SVInstantiationCP implements Feature {
     }
 
 
-    private SVInstantiationCP(Name svToInstantiate, ProjectionToTerm<Goal> value) {
+    private SVInstantiationCP(@Nullable Name svToInstantiate, ProjectionToTerm<Goal> value) {
         this.svToInstantiate = svToInstantiate;
         this.value = value;
     }
@@ -65,7 +68,7 @@ public class SVInstantiationCP implements Feature {
         return NumberRuleAppCost.getZeroCost();
     }
 
-    private SchemaVariable findSVWithName(TacletApp app) {
+    private @Nullable SchemaVariable findSVWithName(TacletApp app) {
 
         if (svToInstantiate == null) {
             return app.taclet().getTrigger().triggerVar();

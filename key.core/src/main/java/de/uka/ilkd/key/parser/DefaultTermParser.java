@@ -26,6 +26,7 @@ import org.key_project.prover.sequent.Sequent;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.RecognitionException;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 
 /**
@@ -35,6 +36,7 @@ import org.jspecify.annotations.NonNull;
  * @author weigl
  * @deprecated Use the facade new KeyIO(services).parseTerm directly
  */
+@NullMarked
 @Deprecated // java11:(forRemoval = true, since = "2.8.0")
 public final class DefaultTermParser {
 

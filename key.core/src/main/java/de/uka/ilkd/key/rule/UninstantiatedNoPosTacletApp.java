@@ -6,12 +6,16 @@ package de.uka.ilkd.key.rule;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * A subclass of <code>NoPosTacletApp</code> for the special case of a taclet app without any
  * instantiations. The method <code>setupMatchConditions</code> is overwritten to avoid object
  * creations.
  */
+@NullMarked
 class UninstantiatedNoPosTacletApp extends NoPosTacletApp {
 
     /**
@@ -28,7 +32,7 @@ class UninstantiatedNoPosTacletApp extends NoPosTacletApp {
      * PosInOccurrence, de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.Constraint)
      */
     @Override
-    protected MatchConditions setupMatchConditions(PosInOccurrence pos) {
+    protected @Nullable MatchConditions setupMatchConditions(PosInOccurrence pos) {
         if (taclet() instanceof RewriteTaclet) {
             return ((RewriteTaclet) taclet()).checkPrefix(pos,
                 MatchConditions.EMPTY_MATCHCONDITIONS);

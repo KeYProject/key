@@ -17,6 +17,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A map from some type to the same type.
  *
@@ -24,6 +26,7 @@ import org.key_project.logic.SyntaxElement;
  *
  * @author lanzinger
  */
+@NullMarked
 public abstract class ReplacementMap<S extends Sorted & SyntaxElement>
         extends de.uka.ilkd.key.proof.ReplacementMap.NoIrrelevantLabelsReplacementMap<S, S> {
 

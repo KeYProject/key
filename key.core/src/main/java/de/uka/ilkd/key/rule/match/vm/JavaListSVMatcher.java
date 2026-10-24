@@ -21,7 +21,9 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.compiler.ListSVMatcher;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
 
 /**
  * Java-DL implementation of the {@link ListSVMatcher} SPI (service provider interface): a source
@@ -33,6 +35,7 @@ import org.jspecify.annotations.Nullable;
  * exactly when the existing list equals the run. (The interpreter back-end matches list schema
  * variables with {@code ProgramSV.matchListSV}; both must yield identical results.)
  */
+@NullMarked
 public final class JavaListSVMatcher implements ListSVMatcher {
 
     /** stateless; a single shared instance suffices. */

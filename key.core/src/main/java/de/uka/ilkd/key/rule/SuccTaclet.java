@@ -20,12 +20,14 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * A SuccTaclet represents a taclet whose find part has to match a top level formula in the
  * succedent of the sequent.
  */
+@NullMarked
 public class SuccTaclet extends FindTaclet {
     /**
      * creates a {@link Taclet} (old name Schematic Theory Specific Rule) with the given parameters
@@ -69,7 +71,7 @@ public class SuccTaclet extends FindTaclet {
     }
 
     @Override
-    public @NonNull SuccTaclet setName(@NonNull String s) {
+    public SuccTaclet setName(String s) {
         final TacletApplPart applPart =
             new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
                 varsNotFreeIn(),

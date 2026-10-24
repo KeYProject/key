@@ -6,12 +6,15 @@ package de.uka.ilkd.key.rule.merge.procedures;
 
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A {@link MergeProcedure} like {@link MergeWithPredicateAbstraction} which cannot be applied
  * without parameters being set beforehand.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public interface ParametricMergeProcedure {
 
 }

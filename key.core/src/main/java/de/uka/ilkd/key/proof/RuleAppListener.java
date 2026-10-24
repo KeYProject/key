@@ -4,10 +4,13 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This listener is notified whenever a rule is applied in an ongoing proof.
  */
 @FunctionalInterface
+@NullMarked
 public interface RuleAppListener {
 
     /**

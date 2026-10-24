@@ -7,9 +7,13 @@ package de.uka.ilkd.key.java.ast.reference;
 import de.uka.ilkd.key.java.ast.Reference;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * extracted interface to allow schema variabes to stand for an execution context
  */
+@NullMarked
 public interface IExecutionContext extends Reference {
     /**
      * returns the type reference to the next enclosing class
@@ -23,6 +27,7 @@ public interface IExecutionContext extends Reference {
      *
      * @return the currently active method
      */
+    @Nullable
     IProgramMethod getMethodContext();
 
     /**
@@ -30,5 +35,6 @@ public interface IExecutionContext extends Reference {
      *
      * @return the runtime instance object
      */
+    @Nullable
     ReferencePrefix getRuntimeInstance();
 }

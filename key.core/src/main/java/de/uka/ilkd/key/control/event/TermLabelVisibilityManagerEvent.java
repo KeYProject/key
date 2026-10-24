@@ -8,11 +8,14 @@ import java.util.EventObject;
 
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * An event thrown by a {@link TermLabelVisibilityManager}.
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class TermLabelVisibilityManagerEvent extends EventObject {
     /**
      * Generated UID.

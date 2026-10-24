@@ -14,6 +14,9 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 @StableCost
 public class TriggerVariableInstantiationProjection implements ProjectionToTerm<Goal> {
 

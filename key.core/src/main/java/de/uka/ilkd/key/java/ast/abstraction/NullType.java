@@ -9,12 +9,16 @@ import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A program model element representing the null type.
  *
  * @author AL
  * @author RN
  */
+@NullMarked
 public class NullType implements ClassType {
 
     public static final NullType JAVA_NULL = new NullType();
@@ -121,7 +125,7 @@ public class NullType implements ClassType {
      *
      * @return the array of locally defined supertypes of this type.
      */
-    public ImmutableList<KeYJavaType> getSupertypes() {
+    public @Nullable ImmutableList<KeYJavaType> getSupertypes() {
         return null;
     }
 
@@ -132,7 +136,7 @@ public class NullType implements ClassType {
      *
      * @return the array of all supertypes of this type in topological order.
      */
-    public ImmutableList<ClassType> getAllSupertypes(Services services) {
+    public @Nullable ImmutableList<ClassType> getAllSupertypes(Services services) {
         return null;
     }
 
@@ -141,7 +145,7 @@ public class NullType implements ClassType {
      *
      * @return the array of field members of this type.
      */
-    public ImmutableList<Field> getFields(Services services) {
+    public @Nullable ImmutableList<Field> getFields(Services services) {
         return null;
     }
 
@@ -152,7 +156,7 @@ public class NullType implements ClassType {
      *
      * @return the array of visible field members of this type and its supertypes.
      */
-    public ImmutableList<Field> getAllFields(Services services) {
+    public @Nullable ImmutableList<Field> getAllFields(Services services) {
         return null;
     }
 
@@ -161,7 +165,7 @@ public class NullType implements ClassType {
      *
      * @return the array of methods of this type.
      */
-    public ImmutableList<Method> getMethods(Services services) {
+    public @Nullable ImmutableList<Method> getMethods(Services services) {
         return null;
     }
 
@@ -171,7 +175,7 @@ public class NullType implements ClassType {
      *
      * @return the array of visible methods of this type and its supertypes.
      */
-    public ImmutableList<Method> getAllMethods(Services services) {
+    public @Nullable ImmutableList<Method> getAllMethods(Services services) {
         return null;
     }
 
@@ -180,7 +184,7 @@ public class NullType implements ClassType {
      *
      * @return the array of constructors of this type.
      */
-    public ImmutableList<Constructor> getConstructors(Services services) {
+    public @Nullable ImmutableList<Constructor> getConstructors(Services services) {
         return null;
     }
 
@@ -191,11 +195,11 @@ public class NullType implements ClassType {
      * @return an array of class types that are members of this type or any of its supertypes.
      * @see #getAllSupertypes
      */
-    public ImmutableList<ClassType> getAllTypes(Services services) {
+    public @Nullable ImmutableList<ClassType> getAllTypes(Services services) {
         return null;
     }
 
-    public Package getPackage() {
+    public @Nullable Package getPackage() {
         return null;
     }
 
@@ -205,7 +209,7 @@ public class NullType implements ClassType {
      *
      * @return the default value of the given type according to JLS Sect. 4.5.5
      */
-    public Literal getDefaultValue() {
+    public @Nullable Literal getDefaultValue() {
         return null;
     }
 

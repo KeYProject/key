@@ -33,11 +33,14 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * TODO
  *
  * @author N/A
  */
+@NullMarked
 public class EvaluateArgs extends ProgramTransformer {
 
     /**

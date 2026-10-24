@@ -17,21 +17,25 @@ import java.util.stream.Stream;
 
 import de.uka.ilkd.key.settings.GeneralSettings;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 /**
  * This class uses a temporary directory as a store for the proof-relevant files.
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public final class DiskFileRepo extends AbstractFileRepo {
     private static final Logger LOGGER = LoggerFactory.getLogger(DiskFileRepo.class);
 
     /**
      * The temporary directory used as a cache.
      */
-    private Path tmpDir;
+    private @Nullable Path tmpDir;
 
     /**
      * Stores for each requested path the mapping to its concrete path in repo. Key and value paths
@@ -68,7 +72,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
     ///////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public InputStream getInputStream(URL url) throws IOException {
+    public @Nullable InputStream getInputStream(URL url) throws IOException {
         String protocol = url.getProtocol();
         // currently, we support only two protocols: file and zip/jar
         if (protocol.equals("file")) {
@@ -109,7 +113,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
         }
     }
 
-    private InputStream copyAndOpenInputStream(Path path) throws IOException {
+    private @Nullable InputStream copyAndOpenInputStream(Path path) throws IOException {
         // this method assumes that the path exists and is a valid (w/o protocol part as in URL!)
 
         final Path norm = path.toAbsolutePath().normalize();
@@ -148,7 +152,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
         return null;
     }
 
-    private InputStream getJavaFileInputStream(Path javaFile) throws IOException {
+    private @Nullable InputStream getJavaFileInputStream(Path javaFile) throws IOException {
         // assumes that javaFile is an actual *.java file, path has to be absolute and normalized
 
         Path newFile = null;
@@ -203,7 +207,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
         return new FileInputStream(newFile.toFile());
     }
 
-    private InputStream getClassFileInputStream(Path classFile) throws IOException {
+    private @Nullable InputStream getClassFileInputStream(Path classFile) throws IOException {
         // copy to classpath folder (*.class files may only occur in classpath)
 
         Path newFile = null;
@@ -297,7 +301,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    protected InputStream getInputStreamInternal(Path p) throws FileNotFoundException {
+    protected @Nullable InputStream getInputStreamInternal(Path p) throws FileNotFoundException {
         Path concrete;
         if (p.isAbsolute()) { // p is absolute -> lookup in map
             concrete = map.get(p.normalize());

@@ -12,7 +12,7 @@ import com.github.javaparser.ast.key.KeyPassiveExpression;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
-
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This class provides static function for constructing AST more efficiently.
@@ -21,6 +21,7 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
  * @version 1 (15.04.23)
  */
 
+@NullMarked
 public class AstFactory {
     /**
      * creates the package reference java.lang

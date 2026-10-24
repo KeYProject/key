@@ -38,6 +38,9 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.COPY;
 import static de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator.LogicFunction.SeqConcat;
 import static de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperator.LogicFunction.SeqSingleton;
@@ -54,6 +57,7 @@ import static de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperat
  *
  */
 
+@NullMarked
 public class EnhancedForElimination extends ProgramTransformer {
 
     /**
@@ -346,7 +350,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      *
      * @return The updated {@link LoopSpecification}, or null if the supplied invariant is null.
      */
-    private LoopSpecification instantiateIndexValues(LoopSpecification rawInv,
+    private @Nullable LoopSpecification instantiateIndexValues(@Nullable LoopSpecification rawInv,
             ProgramVariable loopIdxVar, Optional<ProgramVariable> maybeValuesVar,
             Services services) {
         final TermBuilder tb = services.getTermBuilder();

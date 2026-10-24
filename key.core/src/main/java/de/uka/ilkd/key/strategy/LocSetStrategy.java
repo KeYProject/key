@@ -23,10 +23,12 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /// Strategy for location sets
 /// Do not create directly; use [SetStrategyFactory] instead.
+@NullMarked
 public class LocSetStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
     public static final Name NAME = new Name("LocSet Strategy");
 

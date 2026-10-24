@@ -298,7 +298,7 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
         return pio != null && loop != null;
     }
 
-    public JTerm programTerm() {
+    public @Nullable JTerm programTerm() {
         if (posInOccurrence() != null) {
             return TermBuilder.goBelowUpdates((JTerm) posInOccurrence().subTerm());
         }
@@ -363,7 +363,7 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
     }
 
     @Override
-    public List<LocationVariable> getHeapContext() {
+    public @Nullable List<LocationVariable> getHeapContext() {
         return heapContext;
     }
 

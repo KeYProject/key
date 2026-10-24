@@ -41,6 +41,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import com.github.javaparser.ast.key.KeyTransactionStatement;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.COPY;
@@ -81,10 +82,11 @@ import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignm
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public abstract class AbstractOperationPO extends AbstractPO {
     private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
 
-    protected InitConfig proofConfig;
+    protected @Nullable InitConfig proofConfig;
 
     /**
      * If this is {@code true} an uninterpreted predicate is added to the postconditions which
@@ -106,7 +108,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * {@link #createUninterpretedPredicate(ImmutableList, JTerm, String, Services)} and available
      * via {@link #getUninterpretedPredicate()}.
      */
-    private JTerm uninterpretedPredicate;
+    private @Nullable JTerm uninterpretedPredicate;
 
     /**
      * Additional uninterpreted predicates, e.g. used in the validity branch of applied block
@@ -148,7 +150,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param proof The {@link Proof} to get its uninterpreted predicate.
      * @return The uninterpreted predicate or {@code null} if not used.
      */
-    public static JTerm getUninterpretedPredicate(Proof proof) {
+    public static @Nullable JTerm getUninterpretedPredicate(@Nullable Proof proof) {
         if (proof != null && !proof.isDisposed()) {
             ProofOblInput problem =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
@@ -167,7 +169,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param proof The {@link Proof} to get its uninterpreted predicate.
      * @return The uninterpreted predicate or {@code null} if not used.
      */
-    public static Set<JTerm> getAdditionalUninterpretedPredicates(Proof proof) {
+    public static @Nullable Set<JTerm> getAdditionalUninterpretedPredicates(@Nullable Proof proof) {
         if (proof != null && !proof.isDisposed()) {
             ProofOblInput problem =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
@@ -366,7 +368,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     private static JTerm createProgPost(IObserverFunction target,
             LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             LocationVariable resultVar, List<LocationVariable> modifiableHeaps,
-            Map<LocationVariable, LocationVariable> atPreVars, JTerm saveBeforeHeaps,
+            Map<LocationVariable, LocationVariable> atPreVars, @Nullable JTerm saveBeforeHeaps,
             @Nullable JTerm representsFromContract, JTerm post, TermBuilder tb) {
         if (representsFromContract == null) {
             final JTerm[] updateSubs =
@@ -488,7 +490,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      *
      * @return The used uninterpreted predicate.
      */
-    public JTerm getUninterpretedPredicate() {
+    public @Nullable JTerm getUninterpretedPredicate() {
         return uninterpretedPredicate;
     }
 
@@ -526,7 +528,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     @Override
-    protected InitConfig getCreatedInitConfigForSingleProof() {
+    protected @Nullable InitConfig getCreatedInitConfigForSingleProof() {
         return proofConfig;
     }
 
@@ -716,8 +718,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
             LocationVariable resultVar, LocationVariable exceptionVar,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
-    protected abstract JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-            ImmutableList<JTerm> paramTerms, Services services);
+    protected abstract JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm,
+            @Nullable JTerm selfTerm, ImmutableList<JTerm> paramTerms, Services services);
 
     /**
      * Returns the name used for the uninterpreted predicate.
@@ -889,7 +891,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @return The created {@link JavaBlock} which contains the try catch block.
      */
     protected JavaBlock buildJavaBlock(ImmutableList<LocationVariable> formalParVars,
-            ProgramVariable selfVar, ProgramVariable resultVar, ProgramVariable exceptionVar,
+            ProgramVariable selfVar, ProgramVariable resultVar,
+            @Nullable ProgramVariable exceptionVar,
             boolean transaction, ImmutableList<StatementBlock> sb) {
         assert sb.size() == 4 : "wrong number of blocks in method";
         final StatementBlock beforeTry = sb.head();
@@ -1077,7 +1080,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         }
     }
 
-    private JTerm createApplyGlobalUpdateTerm(final LocationVariable selfVar,
+    private JTerm createApplyGlobalUpdateTerm(final @Nullable LocationVariable selfVar,
             final ImmutableList<LocationVariable> paramVars, final JTerm preImpliesProgPost,
             final Services proofServices) {
         final LocationVariable baseHeap = proofServices.getTypeConverter().getHeapLDT().getHeap();

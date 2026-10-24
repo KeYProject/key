@@ -29,6 +29,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -67,6 +68,7 @@ import org.jspecify.annotations.Nullable;
  * {@link AbstractProfile#setDefaultProfile(Profile)}.
  * </p>
  */
+@NullMarked
 public interface Profile {
 
     /**
@@ -99,6 +101,7 @@ public interface Profile {
     /**
      * returns the strategy factory for the default strategy of this profile
      */
+    @Nullable
     StrategyFactory getDefaultStrategyFactory();
 
     /**
@@ -130,6 +133,7 @@ public interface Profile {
      * @param strategyName the Name of the strategy
      * @return the StrategyFactory to build the demanded strategy
      */
+    @Nullable
     StrategyFactory getStrategyFactory(Name strategyName);
 
     /**

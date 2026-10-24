@@ -8,6 +8,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class SimplePipe implements Pipe {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimplePipe.class);
 

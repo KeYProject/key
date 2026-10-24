@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.smt.SMTSolverResult;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Stores the communication between KeY and an external solver: Contains a list that stores the
  * messages that have been sent from the solver to KeY and vice versa. Further, it also contains the
@@ -22,6 +24,7 @@ import de.uka.ilkd.key.smt.SMTSolverResult;
  * @author Benjamin Niedermann
  * @author Wolfram Pfeifer (overhaul)
  */
+@NullMarked
 public class SolverCommunication {
     /** All messages (input/output/error) sent between KeY and SMT solver. */
     private final List<Message> messages = Collections.synchronizedList(new LinkedList<>());

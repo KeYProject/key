@@ -9,7 +9,10 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
+import org.jspecify.annotations.NullMarked;
 
+
+@NullMarked
 public class ProofDependentSMTSettings extends AbstractSettings {
     public static final String CATEGORY = "SMTSettings";
 

@@ -20,6 +20,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A shortcut-statement for a method body, i.e. no dynamic dispatching any longer.
@@ -36,6 +37,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  *
  */
+@NullMarked
 public class MethodBodyStatement extends JavaNonTerminalProgramElement
         implements Statement {
 

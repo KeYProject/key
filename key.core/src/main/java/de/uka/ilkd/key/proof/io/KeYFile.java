@@ -38,6 +38,7 @@ import org.key_project.util.parsing.Location;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Represents an input from a .key file producing an environment.
  */
+@NullMarked
 public class KeYFile implements EnvInput {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeYFile.class);
 
@@ -60,16 +62,16 @@ public class KeYFile implements EnvInput {
     protected final @Nullable ProgressMonitor monitor;
     private final String name;
     protected @Nullable Profile profile;
-    protected InitConfig initConfig;
+    protected @Nullable InitConfig initConfig;
     private KeyAst.@Nullable File fileCtx = null;
     private @Nullable ProblemFinder problemFinder = null;
     private @Nullable ProblemInformation problemInformation = null;
-    private Includes includes;
+    private @Nullable Includes includes;
 
     /**
      * The FileRepo that will store the files.
      */
-    private FileRepo fileRepo;
+    private @Nullable FileRepo fileRepo;
 
     /// creates a new representation for a given file by indicating a name and a RuleSource
     /// representing the physical source of the .key file.
@@ -179,7 +181,7 @@ public class KeYFile implements EnvInput {
         return fileCtx;
     }
 
-    protected ProofSettings getPreferences() {
+    protected @Nullable ProofSettings getPreferences() {
         if (initConfig.getSettings() == null) {
             var settings = readPreferences();
             initConfig.setSettings(settings);
@@ -188,7 +190,7 @@ public class KeYFile implements EnvInput {
         return initConfig.getSettings();
     }
 
-    public ProofSettings readPreferences() {
+    public @Nullable ProofSettings readPreferences() {
         if (file.isDirectory()) {
             return null;
         }
@@ -247,7 +249,7 @@ public class KeYFile implements EnvInput {
     }
 
     @Override
-    public Path readBootClassPath() {
+    public @Nullable Path readBootClassPath() {
         ProblemInformation pi = getProblemInformation();
         String bootClassPath = pi.getBootClassPath();
         if (bootClassPath == null) {
@@ -313,7 +315,7 @@ public class KeYFile implements EnvInput {
     }
 
     @Override
-    public Path readJavaPath() throws ProofInputException {
+    public @Nullable Path readJavaPath() throws ProofInputException {
         ProblemInformation pi = getProblemInformation();
         String javaPath = pi.getJavaSource();
         if (javaPath != null) {
@@ -472,11 +474,11 @@ public class KeYFile implements EnvInput {
                 .collect(Collectors.<PositionedString>toList());
     }
 
-    public String chooseContract() {
+    public @Nullable String chooseContract() {
         return null;
     }
 
-    public Configuration getProofObligation() {
+    public @Nullable Configuration getProofObligation() {
         return null;
     }
 
@@ -488,7 +490,7 @@ public class KeYFile implements EnvInput {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
@@ -518,7 +520,7 @@ public class KeYFile implements EnvInput {
     }
 
     @Override
-    public Path getInitialFile() {
+    public @Nullable Path getInitialFile() {
         return file != null ? file.file() : null;
     }
 }

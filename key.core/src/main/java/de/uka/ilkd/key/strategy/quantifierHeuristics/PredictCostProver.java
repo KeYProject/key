@@ -19,6 +19,8 @@ import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Predicts the cost of instantiating a quantified formula with a candidate term. The instantiated
  * matrix is read as a conjunction of clauses. Each clause is refined against the literals already
@@ -26,6 +28,7 @@ import org.key_project.util.collection.ImmutableSet;
  * of its literals is proved. The predicted cost combines the sizes of the clauses that remain, so
  * an instantiation that leaves fewer open clauses is cheaper.
  */
+@NullMarked
 public class PredictCostProver {
 
     private final TermBuilder tb;

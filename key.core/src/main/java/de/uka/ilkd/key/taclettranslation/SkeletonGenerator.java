@@ -14,6 +14,10 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public interface SkeletonGenerator {
     SkeletonGenerator DEFAULT_TACLET_TRANSLATOR = new DefaultTacletTranslator();
 
@@ -32,6 +36,7 @@ public interface SkeletonGenerator {
  * Translates a taclet into a logical skeleton without instantiating the schema variables. This must
  * be done by the user of this class.
  */
+@NullMarked
 abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
     /**
      * Translates a sequent to a term by using the following translations rules: T ==> D is
@@ -44,7 +49,7 @@ abstract class AbstractSkeletonGenerator implements SkeletonGenerator {
      * @return the resulting term of the translation or <code>null</code> if both antecedent and
      *         succendent are empty.
      */
-    protected JTerm translate(Sequent s, TermServices services) {
+    protected @Nullable JTerm translate(Sequent s, TermServices services) {
         TermBuilder builder = services.getTermBuilder();
 
         ImmutableList<JTerm> ante = getFormulaeOfSemisequent(s.antecedent());

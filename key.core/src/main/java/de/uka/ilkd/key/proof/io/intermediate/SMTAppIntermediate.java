@@ -7,15 +7,20 @@ package de.uka.ilkd.key.proof.io.intermediate;
 import org.key_project.logic.PosInTerm;
 import org.key_project.util.collection.Pair;
 
-public class SMTAppIntermediate extends BuiltInAppIntermediate {
-    private final String solver;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
-    public SMTAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos, String solver) {
+@NullMarked
+public class SMTAppIntermediate extends BuiltInAppIntermediate {
+    private final @Nullable String solver;
+
+    public SMTAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos,
+            @Nullable String solver) {
         super(ruleName, pos, null, null, null, null);
         this.solver = solver;
     }
 
-    public String getSolver() {
+    public @Nullable String getSolver() {
         return solver;
     }
 }
