@@ -45,6 +45,14 @@ def module_of(path: Path) -> str:
         return "(outside repo)"
 
 
+def relativize(path: str) -> str:
+    """Return the path relative to the repo root (fall back to the absolute path)."""
+    try:
+        return str(Path(path).resolve().relative_to(ROOT.resolve()))
+    except ValueError:
+        return path
+
+
 def parse(log_path: Path):
     """Return (warnings, unmatched) where warnings is a list of dicts."""
     warnings = []
@@ -127,7 +135,7 @@ def main() -> None:
                 if mod != current_module:
                     current_module = mod
                     rep.write(f"* **{mod}**\n")
-                rep.write(f"  * `{file_}` — {n}\n")
+                rep.write(f"  * `{relativize(file_)}` — {n}\n")
             rep.write("\n")
 
     print(f"report written to {REPORT}")
