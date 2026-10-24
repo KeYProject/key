@@ -295,6 +295,17 @@ final class SubagentRunner {
                     thread.add(LlmMessage.tool(id, outcome).toOpenAiMap());
                     continue;
                 }
+                if (KeYAgentTools.TOOL_ASK_LLM.equals(name)) {
+                    if (!LlmSettings.INSTANCE.getAskLlmEnabled()) {
+                        thread.add(LlmMessage.tool(id,
+                            "[ask_llm is disabled in the settings]").toOpenAiMap());
+                        continue;
+                    }
+                    // direct call without the dispatch lock (the query never dispatches tools)
+                    thread.add(LlmMessage.tool(id,
+                        AskLlmRunner.run(parent, completions, callArguments)).toOpenAiMap());
+                    continue;
+                }
                 try {
                     var text = parent.getToolDispatcher().callNow(parent, name, callArguments);
                     thread.add(LlmMessage.tool(id, text).toOpenAiMap());

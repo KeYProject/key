@@ -116,6 +116,8 @@ class BuiltInMCPClientTest {
         assertFalse(client.requiresApproval(KeYAgentTools.TOOL_LIST_TACLET_OPTIONS));
         assertFalse(client.requiresApproval(KeYAgentTools.TOOL_EXPORT_TACLET));
         assertFalse(client.requiresApproval(KeYAgentTools.TOOL_EXPORT_TACLETS));
+        // a fresh LLM consultation is AUTO (read-only, no proof/shell/file side effects)
+        assertFalse(client.requiresApproval(KeYAgentTools.TOOL_ASK_LLM));
         assertFalse(client.requiresApproval(TestMcpToolProvider.ECHO));
         // shell execution, taclet mutation and aimless test tools are ASK by default
         assertTrue(client.requiresApproval(KeYAgentTools.TOOL_RUN_COMMAND));

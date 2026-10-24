@@ -70,6 +70,11 @@ public class LlmSettingsUI extends SettingsPanel {
             model.getAllowAgentQuestions(), model::setAllowAgentQuestions);
         addCheckBox("Agent may use skills", "Give the agent a use_skill tool (default off).",
             model.getAgentCanUseSkills(), model::setAgentCanUseSkills);
+        addCheckBox("Agent may consult the LLM (ask_llm)",
+            "Give the agent an ask_llm tool: a fresh model context (clean, without conversation"
+                + " history) to reflect on its own reasoning; the reply is delivered back to the"
+                + " agent (default on).",
+            model.getAskLlmEnabled(), model::setAskLlmEnabled);
         addIntField("Max tool rounds",
             "Maximum number of tool-calling rounds in one agent turn.", model::getMaxToolRounds,
             model::setMaxToolRounds);

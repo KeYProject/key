@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.llm.mcp.tools;
 
+import java.util.List;
+
 import org.key_project.key.llm.mcp.AgentTool;
 import org.key_project.key.llm.mcp.KeYAgentTools;
 import org.key_project.key.llm.mcp.Tool;
@@ -72,6 +74,7 @@ class ToolMetadataTest {
         assertEquals(ToolCategory.INTERACTION, tools.agent(KeYAgentTools.TOOL_ASK_USER).category());
         assertEquals(ToolCategory.SUBAGENTS,
             tools.agent(KeYAgentTools.TOOL_SPAWN_SUBAGENT).category());
+        assertEquals(ToolCategory.SUBAGENTS, tools.agent(KeYAgentTools.TOOL_ASK_LLM).category());
         assertEquals(ToolCategory.DOCUMENTATION,
             tools.agent(KeYAgentTools.TOOL_LIST_TOOLS).category());
         assertEquals(ToolCategory.FILES, tools.agent(KeYAgentTools.TOOL_LIST_FILES).category());
@@ -81,7 +84,8 @@ class ToolMetadataTest {
     void onlyLongRunningToolsAreBackgroundableByDefault() {
         var tools = new KeYAgentTools();
         for (var name : java.util.List.of(KeYAgentTools.TOOL_RUN_COMMAND, KeYAgentTools.TOOL_AUTO,
-            KeYAgentTools.TOOL_TRYCLOSE, KeYAgentTools.TOOL_SPAWN_SUBAGENT)) {
+            KeYAgentTools.TOOL_TRYCLOSE, KeYAgentTools.TOOL_SPAWN_SUBAGENT,
+            KeYAgentTools.TOOL_ASK_LLM)) {
             assertTrue(tools.agent(name).backgroundable(),
                 "tool " + name + " must default to backgroundable");
         }
@@ -109,5 +113,14 @@ class ToolMetadataTest {
         // background flag is rendered on the backgroundable tools themselves
         assertTrue(doc.contains("`" + KeYAgentTools.TOOL_RUN_COMMAND
             + "` (ASK · Shell) · can run in background"), doc);
+    }
+
+    @Test
+    void askLlmIsSubAgentsAutoBackgroundableWithRequiredPrompt() {
+        var tool = new KeYAgentTools().agent(KeYAgentTools.TOOL_ASK_LLM);
+        assertEquals(ToolCategory.SUBAGENTS, tool.category());
+        assertEquals(Tool.ApprovalRequirement.AUTO, tool.approval());
+        assertTrue(tool.backgroundable(), "a fresh LLM round-trip may take a while");
+        assertEquals(List.of("prompt"), tool.parameters().required());
     }
 }

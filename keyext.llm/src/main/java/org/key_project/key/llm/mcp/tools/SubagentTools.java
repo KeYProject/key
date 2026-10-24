@@ -18,12 +18,16 @@ import org.key_project.key.llm.mcp.ToolCategory;
 import org.key_project.key.llm.subagents.SubagentRegistry;
 
 /**
- * The {@code spawn_subagent} tool and its observability counterpart {@code get_subagent_logs}.
- * The {@code spawn_subagent} schema is advertised to the model, but the call itself is
- * intercepted by the agent loop ({@code AgentLoop} runs the sub-agent) - like {@code ask_user}
- * and {@code use_skill}, a direct call only produces an explanatory placeholder. It requires user
- * approval by default, because a sub-agent works autonomously on its whole tool round.
- * {@code get_subagent_logs} is a plain read-only tool that renders the session's recorded runs.
+ * The {@code spawn_subagent} tool, the self-consultation tool {@code ask_llm} and the
+ * observability counterpart {@code get_subagent_logs}. The {@code spawn_subagent} schema is
+ * advertised to the model, but the call itself is intercepted by the agent loop ({@code AgentLoop}
+ * runs the sub-agent) - like {@code ask_user} and {@code use_skill}, a direct call only produces
+ * an explanatory placeholder. It requires user approval by default, because a sub-agent works
+ * autonomously on its whole tool round. {@code ask_llm} is likewise intercepted by the agent loop
+ * (and by the sub-agent child loops) so the nested one-shot completion never occupies the global
+ * dispatch lock; it is AUTO-approved because it only sends a text prompt and never touches the
+ * proof or any side-effectful tool. {@code get_subagent_logs} is a plain read-only tool that
+ * renders the session's recorded runs.
  *
  * @author Alexander Weigl
  */
@@ -65,6 +69,32 @@ public final class SubagentTools implements AgentToolProvider {
             true,
             args -> "[spawn_subagent is handled by the agent loop; it cannot be called"
                 + " directly]"),
+            AgentTool.tool(KeYAgentTools.TOOL_ASK_LLM, ToolCategory.SUBAGENTS,
+                "Sends the given \"prompt\" to a FRESH instance of the configured LLM - a"
+                    + " one-shot completion with a clean, empty context (no conversation history,"
+                    + " no tools) - and delivers the reply back to the caller. Use it to think"
+                    + " about your own reasoning: review a draft plan, play devil's advocate,"
+                    + " summarize noisy tool output through fresh eyes, or get a second opinion"
+                    + " from another model via the optional \"model\" override. The reply is"
+                    + " plain text; it does not see the current proof or conversation. Enabled"
+                    + " only when the 'agent may consult the LLM' setting is on.",
+                JsonSchema.builder().withType("object")
+                        .addProperty("prompt",
+                            JsonSchema.builder().withType("string").withDescription(
+                                "the prompt for the fresh model context; must be self-contained, since"
+                                    + " the fresh context has no conversation history")
+                                    .build())
+                        .addProperty("system",
+                            JsonSchema.builder().withType("string").withDescription(
+                                "optional system prompt of the fresh context (default: none - the"
+                                    + " model sees only the prompt)").build())
+                        .addProperty("model",
+                            JsonSchema.builder().withType("string").withDescription(
+                                "optional model override (default: the session's model)").build())
+                        .addRequired("prompt")
+                        .build(),
+                true,
+                args -> "[ask_llm is handled by the agent loop; it cannot be called directly]"),
             AgentTool.tool(KeYAgentTools.TOOL_GET_SUBAGENT_LOGS, ToolCategory.SUBAGENTS,
                 "Lists the sub-agent runs recorded for the current session (newest first,"
                     + " empty until spawn_subagent has been used): role, mode, timing, and per"

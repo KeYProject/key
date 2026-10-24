@@ -74,6 +74,8 @@ public final class KeYAgentTools implements McpClient {
     public static final String TOOL_USE_SKILL = "use_skill";
     public static final String TOOL_SPAWN_SUBAGENT = "spawn_subagent";
     public static final String TOOL_GET_SUBAGENT_LOGS = "get_subagent_logs";
+    /** Consults a fresh LLM instance with a clean context; intercepted by the agent loop. */
+    public static final String TOOL_ASK_LLM = "ask_llm";
     public static final String TOOL_TRYCLOSE = "tryclose";
     public static final String TOOL_AUTO = "auto";
     public static final String TOOL_LIST_PROOFS = "list_proofs";

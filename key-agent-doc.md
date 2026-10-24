@@ -240,6 +240,7 @@ The built-in tool set (`KeYAgentTools`):
 | `remove_taclet`     | Taclets        | ask      |                | remove a taclet from a proof's rule set (past rule applications are not affected) |
 | `ask_user`          | Interaction    | auto     |                | ask the user a question; the turn pauses until it is answered       |
 | `use_skill`         | Interaction    | auto     |                | activate a user-defined skill by name (only if enabled in settings) |
+| `ask_llm`           | Sub-agents     | auto     | ✓              | send a prompt to a fresh LLM instance (clean context, no tools) and deliver the reply back to the agent (only if enabled in settings) |
 | `spawn_subagent`    | Sub-agents     | ask      | ✓              | delegate a task to a sub-agent (only if enabled in settings)        |
 | `get_subagent_logs` | Sub-agents     | auto     |                | list the recorded sub-agent runs (role, mode, per-task status and the tools that were called) |
 | `list_tools`        | Documentation  | auto     |                | dump the Markdown documentation of every available tool (metadata + this list) |
@@ -373,10 +374,25 @@ spawn_subagent { "role": "goal-solver", "task": "Close all open goals of the cur
   filter), the chat panel shows the per-task lines indented under the `spawn_subagent` row in
   the tool-activity summary, and *Clear history* clears the log together with the conversation.
 
+**Self-consultation (`ask_llm`).** The `ask_llm` tool lets the agent think *about itself*: it
+takes a prompt, sends it to a **fresh** instance of the configured LLM — a one-shot completion
+with a clean, empty context (no conversation history, no tools, no proof context) — and
+delivers the reply back to the caller. That makes it a round trip around the agent's own
+reasoning: review a draft plan, play devil's advocate against a proposed proof strategy,
+summarize noisy tool output through fresh eyes, or get a second opinion from another model via
+the optional `model` override (an optional `system` prompt for the fresh context is supported
+too). Like `spawn_subagent` the call is intercepted by the agent loop — it deliberately runs
+*outside* the global dispatch lock, because an HTTP round-trip must not stall parallel
+sub-agents — but unlike a sub-agent it never touches the proof or any other tool; it is a
+read-only consultation approved automatically (`auto`) and marked backgroundable. It is gated
+by the *Agent may consult the LLM* setting (default on), and sub-agent child loops may use it
+as well (if their role whitelists it).
+
 ### 7.4 Backgrounding
 
 Long-running calls (`auto` proof search, `run_command` builds/tests, `spawn_subagent`
-delegations) can be **moved into the background** while they run:
+delegations, `ask_llm` reflection queries) can be **moved into the background** while they
+run:
 
 - While a foreground tool call runs, its live row in the chat panel shows a **Background**
   button. Clicking it hands the running call to a background job: the agent parks that turn and
@@ -387,7 +403,7 @@ delegations) can be **moved into the background** while they run:
 - When the call finishes, its output is enqueued and the parked turn resumes with it (a
   *"In the background"* box marks where the turn parked).
 - Only tools marked **backgroundable** offer the button (by default `auto`, `tryclose`,
-  `run_command`, `run_macro`, `run_smt`, `spawn_subagent`, `probe_add_formula`,
+  `run_command`, `run_macro`, `run_smt`, `spawn_subagent`, `ask_llm`, `probe_add_formula`,
   `probe_edit_formula`); per-tool overrides and the
   concurrency limit live in the [Tools panel](#tools-sub-panel-llm-settings--tools). While a
   turn is parked on a question or an approval, further
@@ -449,6 +465,7 @@ are edited in their own panels.
 | Send temperature | `false` (`temperature` 0.2) |
 | Send max output tokens | `false` (`4096`) |
 | Agent may use skills (`use_skill`) | `false` |
+| Agent may consult the LLM (`ask_llm`) | `true` |
 | Agent may spawn sub-agents (`spawn_subagent`) | `false` |
 | Max sub-agent turns (per delegation) | `8` |
 | Max sub-agent depth (nesting) | `2` |
@@ -484,7 +501,7 @@ own behavior, `auto` or `ask`), **With approval** (always ask), **Without approv
 **Disabled** (not sent to the model) — and a **may run in background** checkbox. Read-only tools
 default to `auto`, `run_command` to `ask`; the background checkbox follows the tool's metadata
 (default on for `auto`, `tryclose`, `run_command`, `run_macro`, `run_smt`, `spawn_subagent`,
-`probe_add_formula`, `probe_edit_formula`; overriding it adds/removes the tool in the
+`ask_llm`, `probe_add_formula`, `probe_edit_formula`; overriding it adds/removes the tool in the
 `backgroundToolsEnabled`/`backgroundToolsDisabled` settings). While such a call runs it can
 be moved to the background, the agent then continues with your queued messages and the result is
 delivered when the call finishes (see [section 7.4](#74-backgrounding)). The number of concurrent
