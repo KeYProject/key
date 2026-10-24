@@ -19,7 +19,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.Debug;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Split an array creation expression with explicit array initializer, creating a creation
@@ -35,7 +35,7 @@ public abstract class InitArray extends ProgramTransformer {
     /**
      * Extract the variable initializers from the array initializer
      */
-    protected ImmutableArray<Expression> extractInitializers(NewArray p_creationExpression) {
+    protected ImmutableList<Expression> extractInitializers(NewArray p_creationExpression) {
 
         Debug.assertTrue(p_creationExpression instanceof NewArray, "Don't know how to handle ",
             p_creationExpression);
@@ -68,7 +68,7 @@ public abstract class InitArray extends ProgramTransformer {
      */
     protected Expression createArrayCreation(NewArray p_creationExpression) {
 
-        ImmutableArray<Expression> initializers = extractInitializers(p_creationExpression);
+        ImmutableList<Expression> initializers = extractInitializers(p_creationExpression);
 
         if (initializers == null) {
             return p_creationExpression;
@@ -90,7 +90,7 @@ public abstract class InitArray extends ProgramTransformer {
     protected ProgramVariable[] evaluateInitializers(Statement[] p_stmnts,
             NewArray p_creationExpression, Services services) {
 
-        ImmutableArray<Expression> initializers = extractInitializers(p_creationExpression);
+        ImmutableList<Expression> initializers = extractInitializers(p_creationExpression);
 
         if (initializers == null) {
             return new ProgramVariable[0];
