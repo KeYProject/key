@@ -27,7 +27,6 @@ import de.uka.ilkd.key.speclang.SpecificationElement;
 import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ConcurrentLruCache;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
@@ -843,7 +842,7 @@ public final class JavaInfo {
     /**
      * gets an array of expression and returns a list of types
      */
-    private ImmutableList<KeYJavaType> getKeYJavaTypes(ImmutableArray<? extends Expression> args) {
+    private ImmutableList<KeYJavaType> getKeYJavaTypes(ImmutableList<? extends Expression> args) {
         ImmutableList<KeYJavaType> result = ImmutableList.nil();
         if (args != null) {
             for (int i = args.size() - 1; i >= 0; i--) {
@@ -862,7 +861,7 @@ public final class JavaInfo {
      * @return the signature
      */
     public ImmutableList<KeYJavaType> createSignature(
-            ImmutableArray<? extends Expression> arguments) {
+            ImmutableList<? extends Expression> arguments) {
         return getKeYJavaTypes(arguments);
     }
 
@@ -888,11 +887,11 @@ public final class JavaInfo {
     private ImmutableList<Field> filterLocalDeclaredFields(TypeDeclaration classDecl,
             Filter filter) {
         ImmutableList<Field> fields = ImmutableList.nil();
-        final ImmutableArray<MemberDeclaration> members = classDecl.getMembers();
+        final ImmutableList<MemberDeclaration> members = classDecl.getMembers();
         for (int i = members.size() - 1; i >= 0; i--) {
             final MemberDeclaration member = members.get(i);
             if (member instanceof FieldDeclaration) {
-                final ImmutableArray<FieldSpecification> specs =
+                final ImmutableList<FieldSpecification> specs =
                     ((FieldDeclaration) member).getFieldSpecifications();
                 for (int j = specs.size() - 1; j >= 0; j--) {
                     final FieldSpecification fieldSpec = specs.get(j);
@@ -939,7 +938,7 @@ public final class JavaInfo {
      */
     private ImmutableList<Field> getFields(FieldDeclaration field) {
         ImmutableList<Field> result = ImmutableList.nil();
-        final ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
+        final ImmutableList<FieldSpecification> spec = field.getFieldSpecifications();
         for (int i = spec.size() - 1; i >= 0; i--) {
             result = result.prepend(spec.get(i));
         }
@@ -954,7 +953,7 @@ public final class JavaInfo {
      * @return a IList<Field> the includes all field specifications found int the field declaration
      *         of the given list
      */
-    private ImmutableList<Field> getFields(ImmutableArray<MemberDeclaration> list) {
+    private ImmutableList<Field> getFields(ImmutableList<MemberDeclaration> list) {
         ImmutableList<Field> result = ImmutableList.nil();
         for (int i = list.size() - 1; i >= 0; i--) {
             final MemberDeclaration pe = list.get(i);
@@ -1456,7 +1455,7 @@ public final class JavaInfo {
     public boolean isCanonicalProgramMethod(IProgramMethod method, KeYJavaType context)
             throws NullPointerException {
         String name = method.getName();
-        ImmutableArray<KeYJavaType> paramTypes = method.getParamTypes();
+        ImmutableList<KeYJavaType> paramTypes = method.getParamTypes();
         IProgramMethod canonicalMethod = getProgramMethod(context, name, paramTypes, context);
         if (method.isPublic()) {
             /*
