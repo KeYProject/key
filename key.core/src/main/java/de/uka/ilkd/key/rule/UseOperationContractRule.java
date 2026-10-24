@@ -255,7 +255,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
      * @return all applicable contracts
      */
     public static ImmutableSet<FunctionalOperationContract> getApplicableContracts(
-            Instantiation inst, Services services) {
+            @Nullable Instantiation inst, Services services) {
         if (inst == null) {
             return DefaultImmutableSet.nil();
         }
@@ -773,8 +773,9 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             tb = services.getTermBuilder();
 
             // configure contract
-            contract = (FunctionalOperationContract) ((AbstractContractRuleApp<?>) ruleApp)
-                    .getInstantiation();
+            contract = (FunctionalOperationContract) Objects.requireNonNull(
+                ((AbstractContractRuleApp<?>) ruleApp).getInstantiation(),
+                "no contract instantiation for the rule application");
 
             if (!contract.getTarget().equals(inst.pm)) {
                 throw new IllegalStateException(
@@ -995,40 +996,52 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         }
 
         protected void createNullGoal(Goal nullGoal) {
-            final JTerm actualSelfNotNull = tb.not(tb.equals(inst.actualSelf, tb.NULL()));
+            final JTerm actualSelfNotNull = tb.not(tb.equals(
+                Objects.requireNonNull(inst.actualSelf,
+                    "no actual self term in the null reference branch"),
+                tb.NULL()));
             nullGoal.changeFormula(new SequentFormula(tb.apply(inst.u, actualSelfNotNull, null)),
-                ruleApp.posInOccurrence());
-            TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(),
+                posInOccurrence);
+            TermLabelManager.refactorGoal(termLabelState, services, posInOccurrence,
                 ruleApp.rule(), nullGoal, null, null);
         }
 
 
         protected void createExceptionalPostGoal(Goal excPostGoal) {
             // create "Exceptional Post" branch
+            final JTerm anonUpdateNn = Objects.requireNonNull(anonUpdate,
+                "no anonymous heap update for the exceptional post branch");
+            final JTerm wellFormedAnonNn = Objects.requireNonNull(wellFormedAnon,
+                "no well-formed anonymous heap term for the exceptional post branch");
             final StatementBlock excPostSB =
                 replaceStatement(jb, new StatementBlock(new Throw(excVar)));
             JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
             final JModality instantiatedModality =
                 JModality.getModality(inst.modality.kind(), excJavaBlock);
-            final JTerm originalExcPost = tb.apply(anonUpdate, tb.prog(instantiatedModality.kind(),
-                instantiatedModality.programBlock(), inst.progPost.sub(0),
-                TermLabelManager.instantiateLabels(termLabelState, services,
-                    ruleApp.posInOccurrence(),
-                    ruleApp.rule(), ruleApp, excPostGoal, "ExceptionalPostModality", null,
-                    tb.tf().createTerm(instantiatedModality,
-                        new ImmutableArray<>(inst.progPost.sub(0)), null,
-                        inst.progPost.getLabels()))),
+            final JTerm originalExcPost = tb.apply(anonUpdateNn,
+                tb.prog(instantiatedModality.kind(),
+                    instantiatedModality.programBlock(), inst.progPost.sub(0),
+                    TermLabelManager.instantiateLabels(termLabelState, services,
+                        posInOccurrence,
+                        ruleApp.rule(), ruleApp, excPostGoal, "ExceptionalPostModality", null,
+                        tb.tf().createTerm(instantiatedModality,
+                            new ImmutableArray<>(inst.progPost.sub(0)), null,
+                            inst.progPost.getLabels()))),
                 null);
             final JTerm excPost =
                 globalDefs == null ? originalExcPost : tb.apply(globalDefs, originalExcPost);
-            excPostGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
+            excPostGoal.addFormula(new SequentFormula(wellFormedAnonNn), true, false);
             excPostGoal.changeFormula(new SequentFormula(tb.apply(inst.u, excPost, null)),
-                ruleApp.posInOccurrence());
+                posInOccurrence);
             excPostGoal.addFormula(new SequentFormula(excPostAssumption), true, false);
         }
 
         protected void createPostGoal(Goal postGoal) {
             // create "Post" branch
+            final JTerm anonUpdateNn = Objects.requireNonNull(anonUpdate,
+                "no anonymous heap update for the post branch");
+            final JTerm wellFormedAnonNn = Objects.requireNonNull(wellFormedAnon,
+                "no well-formed anonymous heap term for the post branch");
             final StatementBlock resultAssign;
             if (inst.actualResult == null) {
                 resultAssign = new StatementBlock();
@@ -1041,18 +1054,18 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             final StatementBlock postSB = replaceStatement(jb, resultAssign);
             JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
             JModality modality = JModality.getModality(inst.modality.kind(), postJavaBlock);
-            final JTerm normalPost = tb.apply(anonUpdate,
+            final JTerm normalPost = tb.apply(anonUpdateNn,
                 tb.prog(modality.kind(), modality.programBlock(), inst.progPost.sub(0),
                     TermLabelManager.instantiateLabels(termLabelState, services,
-                        ruleApp.posInOccurrence(), ruleApp.rule(), ruleApp, postGoal,
+                        posInOccurrence, ruleApp.rule(), ruleApp, postGoal,
                         "PostModality", null,
                         tb.tf().createTerm(modality,
                             new ImmutableArray<>(inst.progPost.sub(0)), null,
                             inst.progPost.getLabels()))),
                 null);
-            postGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
+            postGoal.addFormula(new SequentFormula(wellFormedAnonNn), true, false);
             postGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),
-                ruleApp.posInOccurrence());
+                posInOccurrence);
             postGoal.addFormula(new SequentFormula(postAssumption), true, false);
         }
 
@@ -1073,8 +1086,10 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             } else {
                 mbyOk = tb.tt();
             }
+            final JTerm reachableStateNn = Objects.requireNonNull(reachableState,
+                "no reachable state term has been computed");
             finalPreTerm = tb.applySequential(new JTerm[] { inst.u, atPreUpdates },
-                tb.and(pre, reachableState, mbyOk));
+                tb.and(pre, reachableStateNn, mbyOk));
             return finalPreTerm;
         }
     }

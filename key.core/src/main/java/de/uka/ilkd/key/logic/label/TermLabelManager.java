@@ -523,7 +523,7 @@ public class TermLabelManager {
     public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
             Services services,
             PosInOccurrence applicationPosInOccurrence, Rule rule,
-            RuleApp ruleApp, Goal goal, Object hint, JTerm tacletTerm,
+            RuleApp ruleApp, Goal goal, Object hint, @Nullable JTerm tacletTerm,
             JTerm newTerm) {
         JTerm applicationTerm =
             applicationPosInOccurrence != null ? (JTerm) applicationPosInOccurrence.subTerm()
@@ -566,7 +566,7 @@ public class TermLabelManager {
             Services services, @Nullable JTerm applicationTerm,
             PosInOccurrence applicationPosInOccurrence,
             Rule rule, RuleApp ruleApp, Goal goal, Object hint,
-            JTerm tacletTerm, JTerm newTerm) {
+            @Nullable JTerm tacletTerm, JTerm newTerm) {
         TermLabelManager manager = getTermLabelManager(services);
         if (manager != null) {
             return manager.instantiateLabels(state, services, applicationPosInOccurrence,
@@ -602,7 +602,7 @@ public class TermLabelManager {
     private void addLabelsBasedOnApplicationTerm(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             @Nullable JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm newTerm, Set<TermLabel> newLabels) {
+            Object hint, @Nullable JTerm tacletTerm, JTerm newTerm, Set<TermLabel> newLabels) {
         if (applicationTerm == null) {
             return;
         }
@@ -669,7 +669,7 @@ public class TermLabelManager {
     public ImmutableArray<TermLabel> instantiateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             @Nullable JTerm applicationTerm, Rule rule,
-            RuleApp ruleApp, Goal goal, Object hint, JTerm tacletTerm,
+            RuleApp ruleApp, Goal goal, Object hint, @Nullable JTerm tacletTerm,
             JTerm newTerm) {
         // Compute current rule specific updates
         ImmutableList<TermLabelUpdate> currentRuleSpecificUpdates =
@@ -759,7 +759,8 @@ public class TermLabelManager {
     protected void performTermLabelPolicies(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm newTerm, Map<Name, TermLabelPolicy> policies,
+            Object hint, @Nullable JTerm tacletTerm, JTerm newTerm,
+            Map<Name, TermLabelPolicy> policies,
             Set<TermLabel> newLabels) {
         if (applicationTerm.hasLabels() && !policies.isEmpty()) {
             for (TermLabel label : applicationTerm.getLabels()) {
@@ -802,7 +803,8 @@ public class TermLabelManager {
     protected void performTermLabelPolicies(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm newTerm, Map<Name, TermLabelPolicy> policies,
+            Object hint, @Nullable JTerm tacletTerm, JTerm newTerm,
+            Map<Name, TermLabelPolicy> policies,
             Set<TermLabel> newLabels, TermLabel label) {
         TermLabelPolicy policy = policies.get(label.name());
         if (policy != null) {
@@ -846,7 +848,7 @@ public class TermLabelManager {
     protected Map<Name, ChildTermLabelPolicy> computeActiveChildPolicies(TermServices services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm newTerm,
+            Object hint, @Nullable JTerm tacletTerm, JTerm newTerm,
             Map<Name, Map<Name, ChildTermLabelPolicy>> ruleSpecificPolicies,
             Map<Name, ChildTermLabelPolicy> ruleIndependentPolicies) {
         Map<Name, ChildTermLabelPolicy> activeDirectChildPolicies =
@@ -905,7 +907,7 @@ public class TermLabelManager {
     protected void performDirectChildPolicies(TermServices services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm newTerm,
+            Object hint, @Nullable JTerm tacletTerm, JTerm newTerm,
             Map<Name, ChildTermLabelPolicy> policies, Set<TermLabel> newLabels) {
         for (JTerm child : applicationTerm.subs()) {
             for (TermLabel label : child.getLabels()) {
@@ -948,7 +950,7 @@ public class TermLabelManager {
     protected void performChildAndGrandchildPolicies(final TermServices services,
             final PosInOccurrence applicationPosInOccurrence,
             final JTerm applicationTerm,
-            final Rule rule, final Goal goal, final Object hint, final JTerm tacletTerm,
+            final Rule rule, final Goal goal, final Object hint, final @Nullable JTerm tacletTerm,
             final JTerm newTerm, final Map<Name, ChildTermLabelPolicy> policies,
             final Set<TermLabel> newLabels) {
         applicationTerm.execPreOrder((DefaultVisitor) p_visited -> {
@@ -997,7 +999,7 @@ public class TermLabelManager {
     protected void performUpdater(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             @Nullable JTerm applicationTerm, @Nullable JTerm modalityTerm,
-            Rule rule, RuleApp ruleApp, Object hint, JTerm tacletTerm,
+            Rule rule, RuleApp ruleApp, Object hint, @Nullable JTerm tacletTerm,
             JTerm newTerm,
             ImmutableList<TermLabelUpdate> updater,
             Set<TermLabel> newLabels) {

@@ -129,7 +129,9 @@ public class AppliedRuleAppsNameCache {
                     // Parent did not have a rule applied when we calculated this, add the rule
                     // applied
                     // there
-                    add(nodeCache, par.getAppliedRuleApp());
+                    final RuleApp parentRuleApp = Objects.requireNonNull(par.getAppliedRuleApp(),
+                        "a non-root node was created by a rule application");
+                    add(nodeCache, parentRuleApp);
 
                     // If this is an inner node, we hope we will never revisit it, remove it from
                     // the
@@ -143,7 +145,10 @@ public class AppliedRuleAppsNameCache {
                     while (!current.root()) {
                         final Node par = Objects.requireNonNull(current.parent(),
                             "a non-root node has a parent");
-                        add(nodeCache, par.getAppliedRuleApp());
+                        final RuleApp parentRuleApp =
+                            Objects.requireNonNull(par.getAppliedRuleApp(),
+                                "a non-root node was created by a rule application");
+                        add(nodeCache, parentRuleApp);
                         current = par;
                     }
                 }
