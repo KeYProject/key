@@ -14,7 +14,7 @@ import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 
 import org.key_project.logic.Property;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -74,8 +74,8 @@ public class ProofIrrelevancyProperty implements Property<JTerm> {
             return false;
         }
 
-        final ImmutableArray<TermLabel> termLabels = term1.getLabels();
-        final ImmutableArray<TermLabel> term2Labels = term2.getLabels();
+        final ImmutableList<TermLabel> termLabels = term1.getLabels();
+        final ImmutableList<TermLabel> term2Labels = term2.getLabels();
         for (TermLabel label : termLabels) {
             if (label.isProofRelevant() && !term2Labels.contains(label)) {
                 return false;
@@ -87,8 +87,8 @@ public class ProofIrrelevancyProperty implements Property<JTerm> {
             }
         }
 
-        final ImmutableArray<JTerm> term1Subs = term1.subs();
-        final ImmutableArray<JTerm> term2Subs = term2.subs();
+        final ImmutableList<JTerm> term1Subs = term1.subs();
+        final ImmutableList<JTerm> term2Subs = term2.subs();
         final int numOfSubs = term1Subs.size();
         for (int i = 0; i < numOfSubs; ++i) {
             if (!term1Subs.get(i).equalsModProperty(term2Subs.get(i), PROOF_IRRELEVANCY_PROPERTY)) {
@@ -116,7 +116,7 @@ public class ProofIrrelevancyProperty implements Property<JTerm> {
             term.javaBlock());
 
         // part from LabeledTermImpl
-        final ImmutableArray<TermLabel> labels = term.getLabels();
+        final ImmutableList<TermLabel> labels = term.getLabels();
         for (int i = 0, sz = labels.size(); i < sz; i++) {
             final TermLabel currentLabel = labels.get(i);
             if (currentLabel.isProofRelevant()) {
