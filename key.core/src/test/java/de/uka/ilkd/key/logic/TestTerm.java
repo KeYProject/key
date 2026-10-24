@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic;
 
+import java.util.HashMap;
+import java.util.List;
+
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -11,6 +14,7 @@ import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
@@ -47,6 +51,7 @@ public class TestTerm {
     private final LogicVariable w = new LogicVariable(new Name("w"), sort2); // w:S2
     private final Function f = new JFunction(new Name("f"), sort1, sort3);
     // f(:S3):S1
+    Function h = new JFunction(new Name("h"), JavaDLTheory.FORMULA, sort1, sort3);
 
     private final ProgramVariable pv0 = new LocationVariable(new ProgramElementName("pv0"), sort1); // pv0:S1
 
@@ -193,6 +198,27 @@ public class TestTerm {
             quant2.hashCodeModProperty(RenamingTermProperty.RENAMING_TERM_PROPERTY),
             "Hash codes should be equal modulo renaming.");
 
+    }
+
+    @Test
+    public void testEqualsOfDifferentBuildTerms() {
+        JTerm viaArray = tf.createTerm(h, ImmutableList.of(tb.var(x), tb.var(y)), null, null);
+        JTerm viaList =
+            tf.createTerm(h, ImmutableList.fromList(List.of(tb.var(x), tb.var(y))), null, null);
+
+        assertEquals(viaArray.subs(), viaList.subs());
+        assertEquals(viaArray, viaList);
+    }
+
+    @Test
+    public void mergeRuleRebuildEqualsInput() {
+        JTerm term = tf.createTerm(h, tb.var(x), tb.var(y));
+        // no Skolem constant in the term, so the rebuilt term must equal the input
+        JTerm rebuilt =
+            MergeRuleUtils.substConstantsByFreshVars(term, new HashMap<>(),
+                TacletForTests.services());
+
+        assertEquals(term, rebuilt);
     }
 
     /*
