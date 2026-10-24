@@ -1,14 +1,17 @@
 /**
- * This package provides the functionalities of parsing JML comments into KeY constructs.
- * {@link de.uka.ilkd.key.speclang.njml.JmlIO} is the entry facade for the end-developer.
+ * This package provides the functionalities of parsing and translating JML
+ * comments into KeY constructs.
+ * {@link de.uka.ilkd.key.speclang.njml.JmlIO} is the entry facade for the
+ * end-developer.
  * <p>
- * The main translation happens (due to legacy restriction) in two step: First the given comments
- * are parsed and wrapped into {@code TextualJML*} part. Second these are interpreted and attached
- * to the {@link de.uka.ilkd.key.proof.mgt.SpecificationRepository} This process happens in the
- * legacy package {@link de.uka.ilkd.key.speclang.jml}.
- * <p>
- * The translation happens in {@link de.uka.ilkd.key.speclang.njml.TextualTranslator} and
- * {@link de.uka.ilkd.key.speclang.njml.Translator}.
+ * JML is parsed by JMLtk together with the surrounding Java file and consumed
+ * by the KeY front-end as {@link de.uka.ilkd.key.speclang.jml.JmlSpec}s. For
+ * the translation, the constructs are re-serialized against KeY's own JML
+ * grammar ({@code JmlParser.g4}, see
+ * {@code de.uka.ilkd.key.speclang.jml.translation.JmlToTextual}) and the
+ * resulting parse trees are interpreted by {@link
+ * de.uka.ilkd.key.speclang.njml.Translator} into KeY terms (see {@link
+ * de.uka.ilkd.key.speclang.njml.JmlTermFactory}).
  * <p>
  * Gradle has a task for debugging the lexer {@code gradle debugJmlLexer}.
  *

@@ -1585,13 +1585,6 @@ public class JMLSpecFactory {
     }
 
     public ImmutableSet<MergeContract> createJMLMergeContracts(final IProgramMethod method,
-            final MergePointStatement mps, final TextualJMLMergePointDecl mergePointDecl)
-            throws SLTranslationException {
-        return createJMLMergeContracts(method, mps, mergePointDecl.getMergeProc(),
-            mergePointDecl.getLocation());
-    }
-
-    public ImmutableSet<MergeContract> createJMLMergeContracts(final IProgramMethod method,
             final MergePointStatement mps, final JmlSpec specification)
             throws SLTranslationException {
         // The JmlSpec wraps the KeyMergePointStmt (a Java statement `merge_point(<expr>);`).
