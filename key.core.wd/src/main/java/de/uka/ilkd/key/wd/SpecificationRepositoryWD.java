@@ -11,7 +11,6 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -223,7 +222,7 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
     /**
      * Returns all registered (atomic) well-definedness class checks for the passed kjt.
      */
-    private ImmutableSet<ClassWellDefinedness> getWdClassChecks(KeYJavaType kjt) {
+    ImmutableSet<ClassWellDefinedness> getWdClassChecks(KeYJavaType kjt) {
         ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt);
         ImmutableSet<ClassWellDefinedness> invs = DefaultImmutableSet.nil();
         for (WellDefinednessCheck check : checks) {
@@ -253,6 +252,27 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
             result = result.union(s);
         }
         return result;
+    }
+
+    /**
+     * Registers a contract (package-private bridge for {@link ClassAxiomComputerWD}, which is not
+     * a {@link SpecificationRepository} subclass and thus cannot see the protected
+     * {@link #registerContract(Contract)}; the call chains into the overridden 2-arg
+     * {@link #registerContract(Contract, Pair)} so the well-definedness logic still runs).
+     *
+     * @param contract the contract to register
+     */
+    void registerContractForClassAxioms(Contract contract) {
+        registerContract(contract);
+    }
+
+    /**
+     * Unregisters a contract (package-private bridge for {@link ClassAxiomComputerWD}).
+     *
+     * @param contract the contract to unregister
+     */
+    void unregisterContractForClassAxioms(Contract contract) {
+        unregisterContract(contract);
     }
 
     /**
@@ -314,7 +334,8 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
      */
     @Override
     public void processJavaType(KeYJavaType kjt) {
-        ImmutableSet<ClassAxiom> axs = axioms.get(kjt);
+        ImmutableSet<ClassAxiom> axs =
+            services.getClassAxiomComputer().getClassAxiomsForType(kjt);
         if (axs == null) {
             return;
         }
@@ -339,49 +360,6 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
             if (!dep) {
                 MethodWellDefinedness mwd = new MethodWellDefinedness(rep, services);
                 registerContract(mwd);
-            }
-        }
-    }
-
-    @Override
-    public void addClassInvariant(ClassInvariant inv) {
-        super.addClassInvariant(inv);
-
-        final KeYJavaType kjt = inv.getKJT();
-        final IObserverFunction target = inv.isStatic() ? services.getJavaInfo().getStaticInv(kjt)
-                : services.getJavaInfo().getInv();
-
-        final ImmutableSet<ClassWellDefinedness> cwds = getWdClassChecks(kjt);
-        if (cwds.isEmpty()) {
-            registerContract(new ClassWellDefinedness(inv, target, null, null, services));
-        } else {
-            assert cwds.size() == 1;
-            ClassWellDefinedness cwd = cwds.iterator().next();
-            unregisterContract(cwd);
-            cwd = cwd.combine(new ClassWellDefinedness(inv, cwd.getTarget(), null, null, services),
-                services);
-            registerContract(cwd);
-        }
-
-        // inherit non-private, non-static invariants
-        if (!inv.isStatic() && ModifierKind.allowsInheritance(inv.getVisibility())) {
-            final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
-            for (KeYJavaType sub : subs) {
-                ClassInvariant subInv = inv.setKJT(sub);
-                final IObserverFunction subTarget =
-                    subInv.isStatic() ? services.getJavaInfo().getStaticInv(sub)
-                            : services.getJavaInfo().getInv();
-                final ImmutableSet<ClassWellDefinedness> subCwds = getWdClassChecks(sub);
-                if (subCwds.isEmpty()) {
-                    registerContract(
-                        new ClassWellDefinedness(subInv, subTarget, null, null, services));
-                } else {
-                    for (ClassWellDefinedness cwd : subCwds) {
-                        unregisterContract(cwd);
-                        cwd.addInv(subInv.getInv(cwd.getOrigVars().self, services));
-                        registerContract(cwd);
-                    }
-                }
             }
         }
     }

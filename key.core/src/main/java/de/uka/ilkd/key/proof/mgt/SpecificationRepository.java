@@ -11,9 +11,7 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
-import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.*;
@@ -46,24 +44,7 @@ public class SpecificationRepository {
     protected final Map<String, Contract> contractsByName = new LinkedHashMap<>();
     protected final Map<KeYJavaType, ImmutableSet<IObserverFunction>> contractTargets =
         new LinkedHashMap<>();
-    private final Map<KeYJavaType, ImmutableSet<ClassInvariant>> invs = new LinkedHashMap<>();
-    protected final Map<KeYJavaType, ImmutableSet<ClassAxiom>> axioms = new LinkedHashMap<>();
     private final Map<KeYJavaType, ImmutableSet<InitiallyClause>> initiallyClauses =
-        new LinkedHashMap<>();
-
-    /**
-     * <p>
-     * This {@link Map} is used to store the result of {@link #getClassAxioms(KeYJavaType)} to avoid
-     * that {@link RepresentsAxiom} and {@link QueryAxiom} are instantiated multiple times.
-     * </p>
-     * <p>
-     * It is strongly required that always the same instances are returned because
-     * {@link Object#equals(Object)} and {@link Object#hashCode()} is not implemented in instances
-     * of {@link ClassAxiom} and such the default reference check is done which off cause always
-     * fails in case of different references.
-     * </p>
-     */
-    private final Map<KeYJavaType, ImmutableSet<ClassAxiom>> allClassAxiomsCache =
         new LinkedHashMap<>();
 
     protected final Services services;
@@ -159,70 +140,7 @@ public class SpecificationRepository {
         }
     }
 
-    /**
-     * <p>
-     * Returns all known class invariants for the passed type.
-     * </p>
-     * <p>
-     * This method is used by Visual DbC and has to be public.
-     * </p>
-     */
-    public ImmutableSet<ClassInvariant> getClassInvariants(KeYJavaType kjt) {
-        ImmutableSet<ClassInvariant> result = invs.get(kjt);
-        return result == null ? DefaultImmutableSet.nil() : result;
-    }
-
-    /**
-     * Returns the kjt for the outer class, if the passed kjt is a member class, and null otherwise.
-     */
-    private KeYJavaType getEnclosingKJT(KeYJavaType kjt) {
-        // HACK, this should be easier
-        if (kjt.getJavaType() instanceof ClassDeclaration) {
-
-            final String name = kjt.getJavaType().getFullName();
-
-            if (name.contains(".")) {
-                final String enclosingName = name.substring(0, name.lastIndexOf('.'));
-                return services.getJavaInfo().getTypeByName(enclosingName);
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
-    private ImmutableSet<ClassAxiom> getVisibleAxiomsOfOtherClasses(KeYJavaType visibleTo) {
-        ImmutableSet<ClassAxiom> result = DefaultImmutableSet.nil();
-        for (Map.Entry<KeYJavaType, ImmutableSet<ClassAxiom>> e : axioms.entrySet()) {
-            if (e.getKey().equals(visibleTo)) {
-                continue;
-            }
-            for (ClassAxiom ax : e.getValue()) {
-                if (JavaInfo.isVisibleTo(ax, visibleTo)) {
-                    result = result.add(ax);
-                }
-            }
-        }
-        return result;
-    }
-
-    private RepresentsAxiom getRepresentsAxiom(KeYJavaType kjt, ClassAxiom ax) {
-        if (!(ax instanceof RepresentsAxiom) || axioms.get(kjt) == null) {
-            return null;
-        }
-        RepresentsAxiom result = null;
-        for (ClassAxiom ca : axioms.get(kjt)) {
-            if (ca instanceof RepresentsAxiom && (ca.getTarget().equals(ax.getTarget()))) {
-                assert result == null : "More than one represents clause for " + ax.getTarget();
-                result = (RepresentsAxiom) ca;
-            }
-        }
-        return result;
-    }
-
-    private Contract prepareContract(Contract contract) {
-        // sanity check
+    private Contract prepareContract(Contract contract) { // sanity check
         assert getCanonicalFormForKJT(contract.getTarget(), contract.getKJT())
                 .equals(contract.getTarget());
 
@@ -378,8 +296,8 @@ public class SpecificationRepository {
     // Thread-safety: a single SpecificationRepository is shared by all parallel-prover workers of a
     // proof. Most maps above are populated once during problem loading and then only read, so
     // concurrent reads of them are safe. The maps that are still *mutated during proving* -- the
-    // lazy allClassAxiomsCache, the limited/unlimited observer maps, and the contract maps -- are
-    // guarded by this object's monitor: every method that reads or writes one of them is
+    // lazy class-axiom memo (which now lives in the ClassAxiomComputer) and the contract maps --
+    // are guarded by this object's monitor: every method that reads or writes one of them is
     // synchronized (a coarse lock). The monitor is reentrant, which is required because several of
     // these methods call one another (e.g. getClassAxioms recurses into enclosing classes,
     // addContract refreshes contractsByName). Lock ordering is one-way (this monitor -> JavaInfo's
@@ -395,10 +313,10 @@ public class SpecificationRepository {
     public synchronized void map(UnaryOperator<JTerm> op, Services services) {
         mapValueSets(contracts, op, services);
         mapValueSets(operationContracts, op, services);
-        mapValueSets(invs, op, services);
-        mapValueSets(axioms, op, services);
         mapValueSets(initiallyClauses, op, services);
-        mapValueSets(allClassAxiomsCache, op, services);
+        // invariants and class axioms (incl. the memoized computed axiom sets) live in the
+        // class-axiom computer now
+        services.getClassAxiomComputer().map(op, services);
     }
 
     /**
@@ -600,39 +518,6 @@ public class SpecificationRepository {
     }
 
     /**
-     * Registers the passed class invariant, and inherits it to all subclasses if it is public or
-     * protected.
-     */
-    public void addClassInvariant(ClassInvariant inv) {
-        final KeYJavaType kjt = inv.getKJT();
-        invs.put(kjt, getClassInvariants(kjt).add(inv));
-
-        // in any case, create axiom with non-static target
-        addClassAxiom(new PartialInvAxiom(inv, false, services));
-        // for a static invariant, create also an axiom with a static target
-        if (inv.isStatic()) {
-            addClassAxiom(new PartialInvAxiom(inv, true, services));
-        }
-        // inherit non-private, non-static invariants
-        if (!inv.isStatic() && ModifierKind.allowsInheritance(inv.getVisibility())) {
-            final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
-            for (KeYJavaType sub : subs) {
-                ClassInvariant subInv = inv.setKJT(sub);
-                invs.put(sub, getClassInvariants(sub).add(subInv));
-            }
-        }
-    }
-
-    /**
-     * Registers the passed class invariants.
-     */
-    public void addClassInvariants(ImmutableSet<ClassInvariant> toAdd) {
-        for (ClassInvariant inv : toAdd) {
-            addClassInvariant(inv);
-        }
-    }
-
-    /**
      * Adds postconditions raising from initially clauses to all constructors. <b>Warning</b>: To be
      * called after all contracts have been registered.
      *
@@ -679,282 +564,6 @@ public class SpecificationRepository {
         }
     }
 
-    /**
-     * Returns all class axioms visible in the passed class, including the axioms induced by
-     * invariant declarations.
-     */
-    public synchronized ImmutableSet<ClassAxiom> getClassAxioms(KeYJavaType selfKjt) {
-        ImmutableSet<ClassAxiom> result = allClassAxiomsCache.get(selfKjt);
-        if (result == null) {
-            // get visible registered axioms of other classes
-            result = getVisibleAxiomsOfOtherClasses(selfKjt);
-            // add registered axioms of own class
-            ImmutableSet<ClassAxiom> ownAxioms = axioms.get(selfKjt);
-            if (ownAxioms != null) {
-                for (ClassAxiom ax : ownAxioms) {
-                    result = result.add(ax);
-                }
-            }
-
-            final JavaInfo ji = services.getJavaInfo();
-
-            // add invariant axiom for own class and other final classes
-            for (KeYJavaType kjt : services.getJavaInfo().getAllKeYJavaTypes()) {
-                if (kjt != selfKjt && !ji.isFinal(kjt)) {
-                    continue; // only final classes
-                }
-                if (kjt != selfKjt && JavaInfo.isPrivate(kjt)) {
-                    continue; // only non-private classes
-                }
-                final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
-                final LocationVariable selfVar = tb.selfVar(new TypeRef(kjt), false);
-
-                JTerm invDef = tb.tt();
-                JTerm staticInvDef = tb.tt();
-                JTerm freeInvDef = tb.tt();
-                JTerm freeStaticInvDef = tb.tt();
-
-                for (ClassInvariant inv : myInvs) {
-                    if (!inv.isFree()) {
-                        invDef = tb.and(invDef, inv.getInv(selfVar, services));
-                    } else {
-                        freeInvDef = tb.and(freeInvDef, inv.getInv(selfVar, services));
-                    }
-
-                    if (inv.isStatic()) {
-                        if (!inv.isFree()) {
-                            staticInvDef = tb.and(staticInvDef, inv.getInv(null, services));
-                        } else {
-                            freeStaticInvDef =
-                                tb.and(freeStaticInvDef, inv.getInv(selfVar, services));
-                        }
-                    }
-                }
-
-                invDef = tb.tf().createTerm(Equality.EQV, tb.inv(tb.var(selfVar)), invDef);
-                staticInvDef = tb.tf().createTerm(Equality.EQV, tb.staticInv(kjt), staticInvDef);
-                freeInvDef = tb.tf().createTerm(Equality.EQV,
-                    tb.invFree(tb.var(selfVar)), freeInvDef);
-                freeStaticInvDef = tb.tf().createTerm(Equality.EQV,
-                    tb.staticInvFree(kjt), freeStaticInvDef);
-
-                final IObserverFunction invSymbol = services.getJavaInfo().getInv();
-                final IObserverFunction staticInvSymbol = services.getJavaInfo().getStaticInv(kjt);
-                final IObserverFunction freeInvSymbol = services.getJavaInfo().getInvFree();
-                final IObserverFunction freeStaticInvSymbol = services.getJavaInfo()
-                        .getStaticInvFree(kjt);
-
-                final ClassAxiom invRepresentsAxiom =
-                    new RepresentsAxiom("Class invariant axiom for " + kjt.getFullName(), invSymbol,
-                        kjt, ModifierKind.PRIVATE, null, invDef, selfVar,
-                        ImmutableList.nil(), null);
-                result = result.add(invRepresentsAxiom);
-
-                final ClassAxiom staticInvRepresentsAxiom = new RepresentsAxiom(
-                    "Static class invariant axiom for " + kjt.getFullName(), staticInvSymbol, kjt,
-                    ModifierKind.PRIVATE, null, staticInvDef, null, ImmutableList.nil(),
-                    null);
-                result = result.add(staticInvRepresentsAxiom);
-
-                final ClassAxiom invFreeRepresentsAxiom = new RepresentsAxiom(
-                    "Free class invariant axiom for " + kjt.getFullName(), freeInvSymbol, kjt,
-                    ModifierKind.PRIVATE, null, freeInvDef, selfVar, ImmutableList.nil(),
-                    null);
-                result = result.add(invFreeRepresentsAxiom);
-
-                final ClassAxiom staticFreeInvRepresentsAxiom = new RepresentsAxiom(
-                    "Free static class invariant axiom for " + kjt.getFullName(),
-                    freeStaticInvSymbol, kjt, ModifierKind.PRIVATE, null, freeStaticInvDef,
-                    null,
-                    ImmutableList.nil(), null);
-                result = result.add(staticFreeInvRepresentsAxiom);
-
-            }
-            // add query axioms for own class
-            for (IProgramMethod pm : services.getJavaInfo().getAllProgramMethods(selfKjt)) {
-                if (!pm.isVoid() && !pm.isConstructor() && !pm.isImplicit() && !pm.isModel()) {
-                    pm = services.getJavaInfo().getToplevelPM(selfKjt, pm);
-
-                    var sb = new StringBuilder();
-                    for (KeYJavaType pd : pm.getParamTypes()) {
-                        sb.append(pd.getJavaType().getFullName());
-                        sb.append("_");
-                    }
-
-                    final ClassAxiom queryAxiom = new QueryAxiom("Query axiom for " + pm.getName()
-                        + "_" + sb + " in " + selfKjt.getFullName(), pm, selfKjt);
-                    result = result.add(queryAxiom);
-                }
-            }
-
-            // add model method axioms of all kinds
-            result = result.union(getModelMethodAxioms());
-            // add axioms for enclosing class, if applicable
-            final KeYJavaType enclosingKJT = getEnclosingKJT(selfKjt);
-            if (enclosingKJT != null) {
-                result = result.union(getClassAxioms(enclosingKJT));
-            }
-            allClassAxiomsCache.put(selfKjt, result);
-        }
-        return result;
-    }
-
-    private ImmutableSet<ClassAxiom> getModelMethodAxioms() {
-        ImmutableSet<ClassAxiom> result = DefaultImmutableSet.nil();
-        for (KeYJavaType kjt : services.getJavaInfo().getAllKeYJavaTypes()) {
-            for (IProgramMethod pm : services.getJavaInfo().getAllProgramMethods(kjt)) {
-                final LocationVariable selfVar =
-                    pm.isStatic() ? null : tb.selfVar(new TypeRef(kjt), false);
-                if (!pm.isVoid() && pm.isModel()) {
-                    pm = services.getJavaInfo().getToplevelPM(kjt, pm);
-                    ImmutableList<LocationVariable> paramVars = tb.paramVars(pm, false);
-                    Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<>();
-                    List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
-                    for (LocationVariable heap : heaps) {
-                        atPreVars.put(heap,
-                            tb.atPreVar(heap.name().toString(), heap.sort(), false));
-                    }
-                    LocationVariable resultVar = tb.resultVar(pm, false);
-
-                    // This assumes there is one operation contract for each
-                    // model pm per class
-                    // We need to construct an inheritance chain of contracts
-                    // starting at the bottom
-                    ImmutableList<FunctionalOperationContract> lookupContracts =
-                        ImmutableList.nil();
-                    ImmutableSet<FunctionalOperationContract> cs = getOperationContracts(kjt, pm);
-                    List<KeYJavaType> superTypes =
-                        services.getJavaInfo().getAllSupertypes(kjt);
-                    for (KeYJavaType superType : superTypes) {
-                        for (FunctionalOperationContract fop : cs) {
-                            if (fop.getSpecifiedIn().equals(superType)) {
-                                lookupContracts = lookupContracts.append(fop);
-                            }
-                        }
-                    }
-                    for (FunctionalOperationContract fop : lookupContracts) {
-                        JTerm representsFromContract = fop.getRepresentsAxiom(heaps.get(0), selfVar,
-                            paramVars, tb.resultVar(pm, false), atPreVars, services);
-                        JTerm preContract =
-                            fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
-                        if (preContract == null) {
-                            preContract = tb.tt();
-                        }
-                        if (representsFromContract != null) {
-                            // TODO Wojtek: I do not understand the visibility
-                            // issues of model fields/methods.
-                            // Modifier visibility = pm.isPrivate() ?
-                            // new Private() :
-                            // (pm.isProtected() ? new Protected() :
-                            // (pm.isPublic() ? new Public() : null));
-                            final ClassAxiom modelMethodRepresentsAxiom =
-                                new RepresentsAxiom(
-                                    "Definition axiom for " + pm.getName() + " in "
-                                        + kjt.getFullName(),
-                                    pm, kjt, ModifierKind.PRIVATE, preContract,
-                                    representsFromContract,
-                                    selfVar, paramVars, atPreVars);
-                            result = result.add(modelMethodRepresentsAxiom);
-                            break;
-                        }
-                    }
-                    for (FunctionalOperationContract fop : getOperationContracts(kjt, pm)) {
-                        if (!fop.getSpecifiedIn().equals(kjt)) {
-                            continue;
-                        }
-                        JTerm preFromContract =
-                            fop.getPre(heaps, selfVar, paramVars, atPreVars, services);
-                        JTerm freePreFromContract =
-                            fop.getFreePre(heaps, selfVar, paramVars, atPreVars, services);
-                        JTerm postFromContract = fop.getPost(heaps, selfVar, paramVars, resultVar,
-                            null, atPreVars, services);
-                        JTerm freePostFromContract = fop.getFreePost(heaps, selfVar, paramVars,
-                            resultVar, null, atPreVars, services);
-                        if (preFromContract != null
-                                && ((postFromContract != null && postFromContract != tb.tt())
-                                        || (freePostFromContract != null
-                                                && freePostFromContract != tb.tt()))) {
-                            JTerm mbyFromContract =
-                                fop.hasMby() ? fop.getMby(selfVar, paramVars, services) : null;
-                            final ClassAxiom modelMethodContractAxiom = new ContractAxiom(
-                                "Contract axiom for " + pm.getName() + " in " + kjt.getFullName(),
-                                pm,
-                                kjt, ModifierKind.PRIVATE, preFromContract,
-                                freePreFromContract,
-                                postFromContract, freePostFromContract, mbyFromContract, atPreVars,
-                                selfVar, resultVar, paramVars);
-                            result = result.add(modelMethodContractAxiom);
-                        }
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Returns the class axioms declared in (registered for) the given type. This is the group among
-     * which a {@link de.uka.ilkd.key.speclang.ClassAxiomImpl}'s taclet name must be unique; order
-     * is
-     * not significant.
-     *
-     * @param kjt the type
-     * @return the axioms registered for {@code kjt}, or the empty set if none
-     */
-    public synchronized ImmutableSet<ClassAxiom> getClassAxiomsForType(KeYJavaType kjt) {
-        final ImmutableSet<ClassAxiom> own = axioms.get(kjt);
-        return own == null ? DefaultImmutableSet.nil() : own;
-    }
-
-    /**
-     * Registers the passed class axiom.
-     */
-    public void addClassAxiom(ClassAxiom ax) {
-        KeYJavaType kjt = ax.getKJT();
-        ImmutableSet<ClassAxiom> currentAxioms = axioms.get(kjt);
-        if (currentAxioms == null) {
-            currentAxioms = DefaultImmutableSet.nil();
-        }
-        if (ax instanceof RepresentsAxiom) {
-            // there may only be one conjoined represents axiom per model field
-            RepresentsAxiom oldRep = getRepresentsAxiom(kjt, ax);
-            if (oldRep != null) {
-                final RepresentsAxiom newRep = oldRep.conjoin((RepresentsAxiom) ax, tb);
-                axioms.put(kjt, currentAxioms.remove(oldRep).add(newRep));
-            } else {
-                axioms.put(kjt, currentAxioms.add(ax));
-            }
-            // inherit represents clauses to subclasses and conjoin together
-            if (ModifierKind.allowsInheritance(ax.getVisibility())) {
-                final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
-                for (KeYJavaType sub : subs) {
-                    RepresentsAxiom subAx = ((RepresentsAxiom) ax).setKJT(sub);
-                    currentAxioms = axioms.get(sub);
-                    if (currentAxioms == null) {
-                        currentAxioms = DefaultImmutableSet.nil();
-                    }
-                    oldRep = getRepresentsAxiom(sub, subAx);
-                    if (oldRep == null) {
-                        axioms.put(sub, currentAxioms.add(subAx));
-                    } else {
-                        final RepresentsAxiom newSubRep = oldRep.conjoin(subAx, tb);
-                        axioms.put(sub, currentAxioms.remove(oldRep).add(newSubRep));
-                    }
-                }
-            }
-        } else {
-            axioms.put(kjt, currentAxioms.add(ax));
-        }
-    }
-
-    /**
-     * Registers the passed class axioms.
-     */
-    public void addClassAxioms(ImmutableSet<ClassAxiom> toAdd) {
-        for (ClassAxiom ax : toAdd) {
-            addClassAxiom(ax);
-        }
-    }
 
     /**
      * Adds a new functional (auxiliary) contract to the repository that is derived from the given
@@ -987,11 +596,11 @@ public class SpecificationRepository {
             if (spec instanceof Contract) {
                 addContract((Contract) spec);
             } else if (spec instanceof ClassInvariant) {
-                addClassInvariant((ClassInvariant) spec);
+                services.getClassAxiomComputer().addClassInvariant((ClassInvariant) spec);
             } else if (spec instanceof InitiallyClause) {
                 addInitiallyClause((InitiallyClause) spec);
             } else if (spec instanceof ClassAxiom) {
-                addClassAxiom((ClassAxiom) spec);
+                services.getClassAxiomComputer().addClassAxiom((ClassAxiom) spec);
             } else if (spec instanceof LoopSpecification loopSpec) {
                 loopSpec.getLoop().setLoopInvariant(loopSpec);
             } else if (spec instanceof BlockContract blockContract) {
