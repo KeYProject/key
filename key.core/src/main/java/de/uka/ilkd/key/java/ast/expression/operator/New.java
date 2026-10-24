@@ -19,7 +19,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The object allocation operator. There are two variants for New:
@@ -96,14 +96,14 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
         accessPath = rp;
     }
 
-    public New(PositionInfo pi, List<Comment> c, ImmutableArray<Expression> arguments,
+    public New(PositionInfo pi, List<Comment> c, ImmutableList<Expression> arguments,
             TypeReference type) {
         super(pi, c, arguments, type);
         anonymousClass = null;
         accessPath = null;
     }
 
-    public New(PositionInfo pi, List<Comment> c, ImmutableArray<Expression> arguments,
+    public New(PositionInfo pi, List<Comment> c, ImmutableList<Expression> arguments,
             TypeReference type, ClassDeclaration anonymousClass) {
         super(pi, c, arguments, type);
         this.anonymousClass = anonymousClass;
