@@ -11,7 +11,7 @@ import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Abstract base class for schema variables.
@@ -22,7 +22,7 @@ public abstract class JOperatorSV extends JAbstractSortedOperator
     private final boolean isStrict;
 
 
-    protected JOperatorSV(Name name, ImmutableArray<Sort> argSorts, Sort sort, boolean isRigid,
+    protected JOperatorSV(Name name, ImmutableList<Sort> argSorts, Sort sort, boolean isRigid,
             boolean isStrict) {
         super(name, argSorts, sort, isRigid);
         this.isStrict = isStrict;
@@ -31,12 +31,12 @@ public abstract class JOperatorSV extends JAbstractSortedOperator
 
     protected JOperatorSV(Name name, Sort[] argSorts, Sort sort, boolean isRigid,
             boolean isStrict) {
-        this(name, new ImmutableArray<>(argSorts), sort, isRigid, isStrict);
+        this(name, ImmutableList.of(argSorts), sort, isRigid, isStrict);
     }
 
 
     protected JOperatorSV(Name name, Sort sort, boolean isRigid, boolean isStrict) {
-        this(name, new ImmutableArray<>(), sort, isRigid, isStrict);
+        this(name, ImmutableList.of(), sort, isRigid, isStrict);
     }
 
 
