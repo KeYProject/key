@@ -287,6 +287,7 @@ public final class SLEnvInput extends AbstractEnvInput {
             initConfig.getServices().getSpecificationRepository();
         final ContractRegistry contractRegistry =
             initConfig.getServices().getContractRegistry();
+        final JMLSpecFactory jsf = new JMLSpecFactory(initConfig.getServices());
 
         // read DL library specs before any other specs
         ImmutableSet<PositionedString> warnings = createDLLibrarySpecs();
@@ -303,10 +304,20 @@ public final class SLEnvInput extends AbstractEnvInput {
                 continue;
             }
 
-            // class invariants, represents clauses, ...
+            // class invariants, represents clauses, initially clauses, ...
             final ImmutableSet<SpecificationElement> classSpecs =
                 specExtractor.extractClassSpecs(kjt);
-            specRepos.addSpecs(classSpecs);
+            // initially clauses are handled by the JMLSpecFactory (constructor-postcondition
+            // derivation at the end of loading), everything else goes to the repo dispatcher
+            ImmutableSet<SpecificationElement> toRegister = DefaultImmutableSet.nil();
+            for (SpecificationElement spec : classSpecs) {
+                if (spec instanceof InitiallyClause ic) {
+                    jsf.addInitiallyClause(ic);
+                } else {
+                    toRegister = toRegister.add(spec);
+                }
+            }
+            specRepos.addSpecs(toRegister);
 
             // Check whether a static invariant is present.
             // Later, we will only add static invariants to contracts per default if
@@ -365,7 +376,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         }
 
         // add initially clauses to constructor contracts
-        contractRegistry.createContractsFromInitiallyClauses();
+        jsf.createContractsFromInitiallyClauses();
 
         // update warnings to user
         final ImmutableSet<PositionedString> jmlWarnings =

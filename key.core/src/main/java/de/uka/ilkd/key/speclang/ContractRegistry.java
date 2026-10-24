@@ -15,14 +15,11 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.JModality;
-import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.LimitedObservers;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -35,15 +32,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The per-node derived-spec cache for operation/dependency/block/loop contracts and initially
- * clauses. This is the part of the former {@code SpecificationRepository} that stored and indexed
- * contracts: it owns the contract maps ({@link #contracts}, {@link #operationContracts},
- * {@link #contractTargets}, {@link #contractsByName}), the contract id counters, the initially
- * clauses, and the helpers that resolve contract overriding/inheritance and contract combination
- * over the {@link JavaInfo}. It no longer lives in the specification repository: it is owned by
- * the {@link Services} of the environment (shared by {@link Services#copy(boolean)} copies like
- * the specification repository, the proof registry and the class-axiom computer) and is fed by the
- * load pipeline ({@code SLEnvInput}, {@code KeYFile}, {@link JMLSpecFactory}).
+ * The per-node derived-spec cache for operation/dependency/block/loop contracts. This is the part
+ * of the former {@code SpecificationRepository} that stored and indexed contracts: it owns the
+ * contract maps ({@link #contracts}, {@link #operationContracts}, {@link #contractTargets},
+ * {@link #contractsByName}), the contract id counters, and the helpers that resolve contract
+ * overriding/inheritance and contract combination over the {@link JavaInfo}. (The initially
+ * clauses that used to live here moved to {@link JMLSpecFactory} at load time.) It no longer
+ * lives in the specification repository: it is owned by the {@link Services} of the environment
+ * (shared by {@link Services#copy(boolean)} copies like the specification repository, the proof
+ * registry and the class-axiom computer) and is fed by the load pipeline ({@code SLEnvInput},
+ * {@code KeYFile}, {@link JMLSpecFactory}).
  *
  * <p>
  * The maps are keyed per node -- a {@code (KeYJavaType, IObserverFunction)} pair is the program
@@ -72,8 +70,6 @@ public class ContractRegistry {
         new java.util.LinkedHashMap<>();
     protected final Map<String, Contract> contractsByName = new java.util.LinkedHashMap<>();
     protected final Map<KeYJavaType, ImmutableSet<IObserverFunction>> contractTargets =
-        new java.util.LinkedHashMap<>();
-    private final Map<KeYJavaType, ImmutableSet<InitiallyClause>> initiallyClauses =
         new java.util.LinkedHashMap<>();
 
     protected final Services services;
@@ -242,7 +238,7 @@ public class ContractRegistry {
     /**
      * Removes the contract from the registry, but keeps its target.
      */
-    protected void unregisterContract(Contract contract) {
+    public void unregisterContract(Contract contract) {
         final KeYJavaType kjt = contract.getKJT();
         final Pair<KeYJavaType, IObserverFunction> tp = new Pair<>(kjt, contract.getTarget());
         contracts.put(tp, contracts.get(tp).remove(contract));
@@ -255,50 +251,12 @@ public class ContractRegistry {
         contractsByName.remove(contract.getName());
     }
 
-    /**
-     * Adds initially clause as post-condition to contracts of constructors. Creates a new contract
-     * if there is none yet.
-     *
-     * @param inv initially clause
-     * @param kjt constructors of this type are added a post-condition
-     * @throws SLTranslationException during contract construction from history constraint
-     */
-    private void createContractsFromInitiallyClause(InitiallyClause inv, KeYJavaType kjt)
-            throws SLTranslationException {
-        if (!kjt.equals(inv.getKJT())) {
-            inv = inv.setKJT(kjt);
-        }
-        for (IProgramMethod pm : services.getJavaInfo().getConstructors(kjt)) {
-            if (!JMLInfoExtractor.isHelper(pm)) {
-                final ImmutableSet<Contract> oldContracts = getContracts(kjt, pm);
-                ImmutableSet<FunctionalOperationContract> oldFuncContracts =
-                    DefaultImmutableSet.nil();
-                for (Contract old : oldContracts) {
-                    if (old instanceof FunctionalOperationContract) {
-                        oldFuncContracts = oldFuncContracts.add((FunctionalOperationContract) old);
-                    }
-                }
-                if (oldFuncContracts.isEmpty()) {
-                    final FunctionalOperationContract iniContr = cf.func(pm, inv);
-                    addContractNoInheritance(iniContr);
-                } else {
-                    for (FunctionalOperationContract c : oldFuncContracts) {
-                        unregisterContract(c);
-                        addContractNoInheritance(cf.addPost(c, inv));
-                        assert contractTargets.get(kjt).contains(c.getTarget());
-                    }
-                    assert getContracts(kjt, pm).size() == oldContracts.size();
-                }
-            }
-        }
-    }
-
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
 
     /**
-     * Applies the specified operator to every contract and initially clause in this registry.
+     * Applies the specified operator to every contract in this registry.
      *
      * @param op an operator.
      * @param services services.
@@ -307,7 +265,6 @@ public class ContractRegistry {
     public synchronized void map(UnaryOperator<JTerm> op, Services services) {
         mapValueSets(contracts, op, services);
         mapValueSets(operationContracts, op, services);
-        mapValueSets(initiallyClauses, op, services);
     }
 
     /**
@@ -538,53 +495,6 @@ public class ContractRegistry {
             result = result.add(atomicContract);
         }
         return result;
-    }
-
-    /**
-     * Adds postconditions raising from initially clauses to all constructors. <b>Warning</b>: To be
-     * called after all contracts have been registered.
-     *
-     * @throws SLTranslationException may be thrown during contract extraction
-     */
-    public void createContractsFromInitiallyClauses() throws SLTranslationException {
-        for (KeYJavaType kjt : initiallyClauses.keySet()) {
-            for (InitiallyClause inv : initiallyClauses.get(kjt)) {
-                createContractsFromInitiallyClause(inv, kjt);
-                if (ModifierKind.allowsInheritance(inv.getVisibility())) {
-                    final ImmutableList<KeYJavaType> subs =
-                        services.getJavaInfo().getAllSubtypes(kjt);
-                    for (KeYJavaType sub : subs) {
-                        createContractsFromInitiallyClause(inv, sub);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Registers the passed initially clause. Initially clauses in JML specify the post-state of any
-     * constructor of subtypes; they may particularly be used in interface types. To create proof
-     * obligations from initially clauses, the method
-     * <code>createContractsFromInitiallyClauses</code> adds them to the contracts of respective
-     * constructors (or adds a contract if there is none yet).
-     *
-     * @param ini initially clause
-     */
-    public void addInitiallyClause(InitiallyClause ini) {
-        ImmutableSet<InitiallyClause> oldClauses = initiallyClauses.get(ini.getKJT());
-        if (oldClauses == null) {
-            oldClauses = DefaultImmutableSet.nil();
-        }
-        initiallyClauses.put(ini.getKJT(), oldClauses.add(ini));
-    }
-
-    /**
-     * Registers the passed initially clauses.
-     */
-    public void addInitiallyClauses(ImmutableSet<InitiallyClause> toAdd) {
-        for (InitiallyClause inv : toAdd) {
-            addInitiallyClause(inv);
-        }
     }
 
     /**
