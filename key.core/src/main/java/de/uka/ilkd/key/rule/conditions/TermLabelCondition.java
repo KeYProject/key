@@ -15,12 +15,15 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This variable condition checks if an instantiation for term labels contains a specific term
  * label.
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public class TermLabelCondition extends VariableConditionAdapter {
 
     private final TermLabelSV l;

@@ -28,6 +28,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The constructor call meta construct is used to handle a allocation expression like
  * <code>new Class(...)</code>. Thereby it replaces the allocation expression by a method reference
@@ -35,6 +37,7 @@ import org.key_project.util.collection.ImmutableList;
  * normalform.
  */
 @TransformerMeta(name = "#constructorCall")
+@NullMarked
 public class ConstructorCall extends ProgramTransformer {
 
     private static final String CONSTRUCTOR_CALL = "#constructorCall";

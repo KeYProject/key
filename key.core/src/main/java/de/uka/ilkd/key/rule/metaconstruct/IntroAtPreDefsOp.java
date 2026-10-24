@@ -29,12 +29,15 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * Transformer that introduces concrete prestate variables
  */
 @TransformerMeta(name = "#introAtPreDefs")
+@NullMarked
 public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
     /**

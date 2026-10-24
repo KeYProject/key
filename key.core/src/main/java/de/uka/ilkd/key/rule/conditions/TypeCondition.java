@@ -15,11 +15,14 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * This variable condition checks if a schemavariable is instantiated with a reference or primitive
  * type
  */
+@NullMarked
 public final class TypeCondition extends VariableConditionAdapter {
 
     private final TypeResolver resolver;

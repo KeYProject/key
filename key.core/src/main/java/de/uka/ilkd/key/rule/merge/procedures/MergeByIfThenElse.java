@@ -18,6 +18,8 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.countAtoms;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getDistinguishingFormula;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getUpdateRightSideFor;
@@ -35,6 +37,7 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.trySimplify;
  * @see MergeIfThenElseAntecedent
  * @see MergeRule
  */
+@NullMarked
 public class MergeByIfThenElse extends MergeProcedure implements UnparametricMergeProcedure {
     private static MergeByIfThenElse INSTANCE = null;
 

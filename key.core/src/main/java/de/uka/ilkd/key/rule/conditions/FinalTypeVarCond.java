@@ -16,6 +16,8 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * This variable condition checks if a given type denotes a final type.
@@ -25,6 +27,7 @@ import org.key_project.logic.sort.Sort;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public final class FinalTypeVarCond extends VariableConditionAdapter {
 
     private final TypeResolver resolver;

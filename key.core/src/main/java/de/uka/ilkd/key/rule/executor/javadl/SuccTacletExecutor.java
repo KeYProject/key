@@ -19,6 +19,10 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class SuccTacletExecutor extends FindTacletExecutor {
 
     public SuccTacletExecutor(SuccTaclet taclet) {
@@ -54,7 +58,7 @@ public class SuccTacletExecutor extends FindTacletExecutor {
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState,
             SequentChangeInfo currentSequent,
-            PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
+            @Nullable PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
             MatchResultInfo matchCond, Goal goal, TacletApp ruleApp, Services services) {
         addToAntec(add.antecedent(), currentSequent, null, posOfFind, matchCond, goal, ruleApp,
             services, termLabelState,

@@ -18,6 +18,8 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * <p>
  * A {@link ChildTermLabelPolicy} is used by
@@ -34,6 +36,7 @@ import org.key_project.prover.sequent.Sequent;
  * @see TermLabel
  * @see TermLabelManager
  */
+@NullMarked
 public interface ChildTermLabelPolicy extends RuleSpecificTask {
     /**
      * Decides if the currently active {@link Rule} application is supported or not. If it is not

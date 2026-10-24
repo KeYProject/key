@@ -15,6 +15,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * If an allocation expression <code>new Class(...)</code> occurs, a new object has to be created,
  * in KeY this is quite similar to take it out of a list of objects and setting the implicit flag
@@ -24,6 +26,7 @@ import org.key_project.util.collection.ImmutableList;
  * <code>lt;prepare&gt;</code> for setting the fields values.
  */
 @TransformerMeta(name = "#createObject")
+@NullMarked
 public class CreateObject extends ProgramTransformer {
 
     /**

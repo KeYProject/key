@@ -18,6 +18,9 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Opens a binding scope for a term with bound variables (a quantifier, a substitution, ...): it
  * extends the renaming table and matches the pattern's bound variables pairwise against the source
@@ -26,6 +29,7 @@ import org.key_project.util.collection.ImmutableArray;
  * source variable. The scope is closed again after the term has been matched
  * ({@code MatchConditions.shrinkRenameTable()}, called through the {@code BinderMatcher}).
  */
+@NullMarked
 public class BindVariablesInstruction implements MatchInstruction {
 
     private final VariableBinderSubinstruction[] boundVarBinders;
@@ -44,6 +48,7 @@ public class BindVariablesInstruction implements MatchInstruction {
     }
 
     private interface VariableBinderSubinstruction {
+        @Nullable
         MatchConditions match(LogicVariable instantiationCandidate,
                 MatchConditions matchCond, LogicServices services);
     }
@@ -55,7 +60,7 @@ public class BindVariablesInstruction implements MatchInstruction {
          * Two logic variables match if they are the same variable, or if the consistent renaming
          * maps both to the same abstract name and their sorts are equal.
          */
-        public MatchConditions match(LogicVariable instantiationCandidate,
+        public @Nullable MatchConditions match(LogicVariable instantiationCandidate,
                 MatchConditions matchCond, LogicServices services) {
             final RenameTable rt = matchCond.renameTable();
             if (!rt.containsLocally(templateVar) && !rt.containsLocally(instantiationCandidate)) {
@@ -80,7 +85,7 @@ public class BindVariablesInstruction implements MatchInstruction {
         }
 
         @Override
-        public MatchConditions match(LogicVariable instantiationCandidate,
+        public @Nullable MatchConditions match(LogicVariable instantiationCandidate,
                 MatchConditions matchCond, LogicServices p_services) {
             final Services services = (Services) p_services;
             final Object foundMapping = matchCond.getInstantiations().getInstantiation(op);
@@ -103,7 +108,7 @@ public class BindVariablesInstruction implements MatchInstruction {
     }
 
     @Override
-    public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo matchResult,
+    public @Nullable MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo matchResult,
             LogicServices services) {
         MatchConditions matchConditions = (MatchConditions) matchResult;
         final ImmutableArray<QuantifiableVariable> variablesToMatchAndBind =

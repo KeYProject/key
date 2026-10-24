@@ -21,6 +21,7 @@ import org.key_project.prover.rules.matcher.vm.VMProgramInterpreter;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchProgramElementInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.*;
@@ -38,6 +39,7 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  *
  * @see org.key_project.prover.rules.matcher.vm.VMProgramInterpreter
  */
+@NullMarked
 public class SyntaxElementMatchProgramGenerator {
 
     /**

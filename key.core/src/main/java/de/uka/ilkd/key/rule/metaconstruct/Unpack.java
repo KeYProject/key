@@ -15,6 +15,9 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableList;
 
 @TransformerMeta(name = "#unpack")
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class Unpack extends ProgramTransformer {
 
     /**

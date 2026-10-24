@@ -30,11 +30,15 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class is used to perform program transformations needed for the symbolic execution of a
  * switch-case statement.
  */
 @TransformerMeta(name = "#switchToIf")
+@NullMarked
 public class SwitchToIf extends ProgramTransformer {
 
 
@@ -119,7 +123,8 @@ public class SwitchToIf extends ProgramTransformer {
      * @return an if-statement that performs a null check
      */
 
-    private If mkIfNullCheck(Services services, ProgramVariable var, Statement elseBlock) {
+    private If mkIfNullCheck(Services services, ProgramVariable var,
+            @Nullable Statement elseBlock) {
         final New exception = KeYJavaASTFactory.newOperator(
             services.getJavaInfo().getKeYJavaType("java.lang.NullPointerException"));
         Throw t = KeYJavaASTFactory.throwClause(exception);
@@ -150,7 +155,8 @@ public class SwitchToIf extends ProgramTransformer {
             noNewBreak);
     }
 
-    private ChangeBreakResult recChangeBreaks(ProgramElement p, Break b, boolean noNewBreak) {
+    private @Nullable ChangeBreakResult recChangeBreaks(@Nullable ProgramElement p, Break b,
+            boolean noNewBreak) {
         if (p == null) {
             return null;
         }

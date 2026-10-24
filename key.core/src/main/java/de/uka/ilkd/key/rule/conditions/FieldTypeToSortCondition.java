@@ -22,6 +22,9 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Variable condition that enforces a given generic sort to be instantiated with the type of a field
  * constant.
@@ -29,6 +32,7 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
  * The condition can only be fulfilled if the given field term is constant of which the referred
  * type is known.
  */
+@NullMarked
 public final class FieldTypeToSortCondition implements VariableCondition {
 
     private final SchemaVariable exprOrTypeSV;
@@ -48,7 +52,7 @@ public final class FieldTypeToSortCondition implements VariableCondition {
     }
 
     @Override
-    public MatchResultInfo check(SchemaVariable var, SyntaxElement svSubst,
+    public @Nullable MatchResultInfo check(SchemaVariable var, SyntaxElement svSubst,
             MatchResultInfo matchCond, LogicServices services) {
 
         if (var != exprOrTypeSV) {

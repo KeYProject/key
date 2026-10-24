@@ -16,7 +16,11 @@ import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.instantiation.SVInstantiations;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+
+@NullMarked
 public final class ObserverCondition implements VariableCondition {
 
     private final TermSV obs;
@@ -30,7 +34,7 @@ public final class ObserverCondition implements VariableCondition {
 
 
     @Override
-    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
             MatchResultInfo mc,
             LogicServices services) {
         SVInstantiations svInst = mc.getInstantiations();

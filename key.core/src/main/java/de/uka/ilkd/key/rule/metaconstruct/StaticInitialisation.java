@@ -21,6 +21,10 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.collection.ImmutableList;
 
 @TransformerMeta(name = "#staticInitialisation")
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class StaticInitialisation extends ProgramTransformer {
 
     public StaticInitialisation(Expression expr) {
@@ -29,7 +33,7 @@ public class StaticInitialisation extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
+    public ProgramElement @Nullable [] transform(ProgramElement pe, Services services,
             SVInstantiations insts) {
         KeYJavaType typeToBeInitialised = null;
         if (pe instanceof FieldReference) {

@@ -19,6 +19,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This visitor is used to identify and replace the while loop in invariant rule.
  *
@@ -27,6 +29,7 @@ import org.key_project.util.ExtList;
  * @see WhileInvariantTransformer
  * @see WhileInvariantTransformation
  */
+@NullMarked
 public class ReplaceWhileLoop extends CreatingASTVisitor {
 
     private boolean firstWhileFound = false;

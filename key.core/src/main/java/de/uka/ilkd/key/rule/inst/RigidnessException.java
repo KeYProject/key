@@ -8,10 +8,13 @@ import java.io.Serial;
 
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * this exception is thrown if non-rigid instantiation has been given for a schema variable only
  * allowing rigid instantiations
  */
+@NullMarked
 public class RigidnessException extends IllegalInstantiationException {
 
     /**

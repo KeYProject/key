@@ -19,6 +19,9 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
 @TransformerMeta(name = "#div")
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public final class MetaDiv extends AbstractTermTransformer {
 
     public MetaDiv() {

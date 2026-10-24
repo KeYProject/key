@@ -13,6 +13,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * converts a for-loop to a while loop. Invariant and other rules cannot be performed on for but
  * only on while loops.
@@ -53,6 +55,7 @@ import org.key_project.util.collection.ImmutableList;
  */
 
 @TransformerMeta(name = "#forToWhile")
+@NullMarked
 public class ForToWhile extends ProgramTransformer {
 
     /**

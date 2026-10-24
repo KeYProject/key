@@ -12,10 +12,13 @@ import de.uka.ilkd.key.rule.metaconstruct.TransformerMeta;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Metaoperator for computing the result of dividing one monomial by another
  */
 @TransformerMeta(name = "#divideLCRMonomials")
+@NullMarked
 public final class DivideLCRMonomials extends AbstractTermTransformer {
 
     public DivideLCRMonomials() {

@@ -19,6 +19,8 @@ import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.instantiation.SVInstantiations;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Stores the given {@link Statement}, after substitution of {@link SchemaVariable}s, into the given
  * {@link ProgramSV} for later use in other conditions and transformers. The arguments are a
@@ -30,6 +32,7 @@ import org.key_project.prover.rules.instantiation.SVInstantiations;
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public class StoreStmtInCondition implements VariableCondition {
     private final ProgramSV storeInSV;
     private final JTerm term;

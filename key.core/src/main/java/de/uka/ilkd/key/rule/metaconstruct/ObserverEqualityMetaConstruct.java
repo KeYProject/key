@@ -25,6 +25,8 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * This meta contruct allows one to prove equality (equivalence) of two observer terms if they
@@ -53,6 +55,7 @@ import org.key_project.util.collection.ImmutableSet;
  * @see SameObserverCondition
  */
 @TransformerMeta(name = "#ObserverEquality")
+@NullMarked
 public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
 
     /**

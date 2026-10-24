@@ -10,13 +10,17 @@ import de.uka.ilkd.key.rule.FindTaclet;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.ApplicationRestriction;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Superclass of TacletBuilder objects that have a non-empty find clause. This should be all of them
  * except NoFindTacletBuilder.
  */
 
+@NullMarked
 public abstract class FindTacletBuilder<T extends FindTaclet> extends TacletBuilder<T> {
-    protected SyntaxElement find = null;
+    protected @Nullable SyntaxElement find = null;
     /**
      * encodes restrictions on the state where a rewrite taclet is applicable If the value is equal
      * to

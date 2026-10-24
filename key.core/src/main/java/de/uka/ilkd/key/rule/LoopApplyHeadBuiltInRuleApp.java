@@ -31,7 +31,7 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp<LoopAppl
     /**
      * The instantiation.
      */
-    protected AbstractLoopContractRule.Instantiation instantiation;
+    protected AbstractLoopContractRule.@Nullable Instantiation instantiation;
 
     /**
      * @param rule the rule being applied.

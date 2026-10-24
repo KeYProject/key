@@ -20,11 +20,14 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Replaces a declaration of multiple variables by two variable declarations where the first one
  * declares a single variable and the second one the remaining variables.
  */
 @TransformerMeta(name = "#resolveMultipleVarDecl")
+@NullMarked
 public class MultipleVarDecl extends ProgramTransformer {
 
     public MultipleVarDecl(SchemaVariable sv) {

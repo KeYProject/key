@@ -14,8 +14,11 @@ import de.uka.ilkd.key.rule.metaconstruct.TransformerMeta;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
 
 @TransformerMeta(name = "#geq")
+
+@NullMarked
 public final class MetaGeq extends AbstractTermTransformer {
 
     public MetaGeq() {

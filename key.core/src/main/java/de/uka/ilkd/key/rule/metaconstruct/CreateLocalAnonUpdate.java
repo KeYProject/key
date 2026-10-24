@@ -18,6 +18,9 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
 /**
@@ -28,6 +31,7 @@ import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
  * @author Dominic Steinhoefel
  */
 @TransformerMeta(name = "#createLocalAnonUpdate")
+@NullMarked
 public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
 
     public CreateLocalAnonUpdate() {
@@ -35,7 +39,7 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
     }
 
     @Override
-    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
+    public @Nullable JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
         final JTerm target = term.sub(0);
 
         // the target term should have a Java block

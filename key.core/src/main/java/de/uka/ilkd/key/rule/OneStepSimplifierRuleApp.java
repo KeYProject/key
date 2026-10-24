@@ -8,6 +8,9 @@ package de.uka.ilkd.key.rule;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class OneStepSimplifierRuleApp extends DefaultBuiltInRuleApp {
 
     /**

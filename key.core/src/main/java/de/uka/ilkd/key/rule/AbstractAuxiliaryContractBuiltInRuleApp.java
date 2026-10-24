@@ -15,13 +15,16 @@ import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
 
 /**
  * Application for {@link AbstractAuxiliaryContractRule}.
  *
  * @author wacker, lanzinger
  */
+@NullMarked
 public abstract class AbstractAuxiliaryContractBuiltInRuleApp<T extends BuiltInRule>
         extends AbstractBuiltInRuleApp<T> {
 
@@ -85,7 +88,7 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp<T extends BuiltInR
     }
 
     @Override
-    public List<LocationVariable> getHeapContext() {
+    public @Nullable List<LocationVariable> getHeapContext() {
         return heaps;
     }
 

@@ -13,10 +13,13 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The variable condition adapter can be used by variable conditions which can either fail or be
  * successful, but which do not create a constraint.
  */
+@NullMarked
 public abstract class VariableConditionAdapter implements VariableCondition {
 
     /**

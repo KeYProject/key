@@ -25,6 +25,9 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * ensures that the given instantiation for the schemavariable denotes a method whose body may be
@@ -42,6 +45,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Mattias Ulbrich, 2019
  */
+@NullMarked
 public final class MayExpandMethodCondition extends VariableConditionAdapter {
 
     /**
@@ -87,7 +91,7 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
      * @param args non-null program schema var for the arguments of the call
      * @param negation {@code true} iff the condition is to be negated
      */
-    public MayExpandMethodCondition(SchemaVariable receiver, SchemaVariable methname,
+    public MayExpandMethodCondition(@Nullable SchemaVariable receiver, SchemaVariable methname,
             SchemaVariable args, boolean negation) {
         this.negation = negation;
         this.receiver = receiver;

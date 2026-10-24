@@ -37,6 +37,8 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Split an array creation expression with explicit array initializer, creating a creation
  * expression with dimension expression and a list of assignments (-> Java language specification,
@@ -45,6 +47,7 @@ import org.key_project.util.collection.ImmutableList;
  * This meta construct delivers the creation expression
  */
 @TransformerMeta(name = "#initArrayCreation")
+@NullMarked
 public class InitArrayCreation extends InitArray {
 
     private final SchemaVariable newObjectSV;

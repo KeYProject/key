@@ -16,6 +16,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * ensures that the given instantiation for the schemavariable denotes a constant of an enum type.
@@ -24,6 +26,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
  * @since 2006-12-04
  * @version 2006-12-11
  */
+@NullMarked
 public final class EnumConstantCondition extends VariableConditionAdapter {
 
     private final SchemaVariable reference;

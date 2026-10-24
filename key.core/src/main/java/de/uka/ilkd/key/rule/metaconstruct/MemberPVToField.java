@@ -14,8 +14,12 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @TransformerMeta(name = "#memberPVToField")
+
+@NullMarked
 public final class MemberPVToField extends AbstractTermTransformer {
 
     public MemberPVToField() {
@@ -24,7 +28,7 @@ public final class MemberPVToField extends AbstractTermTransformer {
 
 
     @Override
-    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
+    public @Nullable JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
 

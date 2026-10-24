@@ -17,10 +17,13 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * This variable condition checks if an array component is of reference type
  */
+@NullMarked
 public final class ArrayComponentTypeCondition extends VariableConditionAdapter {
 
     private final SchemaVariable var;

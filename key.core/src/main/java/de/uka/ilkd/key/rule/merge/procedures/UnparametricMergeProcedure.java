@@ -6,12 +6,15 @@ package de.uka.ilkd.key.rule.merge.procedures;
 
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A {@link MergeProcedure} like {@link MergeByIfThenElse} which can be applied without setting any
  * parameters.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public interface UnparametricMergeProcedure {
 
 }

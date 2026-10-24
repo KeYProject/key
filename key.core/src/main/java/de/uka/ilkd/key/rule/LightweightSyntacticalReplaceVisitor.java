@@ -24,6 +24,9 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * A lightweight version of {@link SyntacticalReplaceVisitor} which does not replace labels. This
@@ -40,11 +43,12 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public final class LightweightSyntacticalReplaceVisitor implements DefaultVisitor {
     private final SVInstantiations svInst;
     private final Services services;
     private final TermBuilder tb;
-    private JTerm computedResult = null;
+    private @Nullable JTerm computedResult = null;
 
     /**
      * the stack contains the subterms that will be added in the next step of execPostOrder in Term

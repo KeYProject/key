@@ -24,12 +24,16 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Several variable conditions deal with types. The type resolver provides a unique interface to
  * access types, e.g. the type of a schemavariable instantiation, the instantiated type of a generic
  * sort or the type an attribute is declared in.
  */
+@NullMarked
 public abstract class TypeResolver {
 
     // -------------------------------------------------------------------------
@@ -59,7 +63,7 @@ public abstract class TypeResolver {
     public abstract boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
             SVInstantiations instMap, TermServices services);
 
-    public abstract Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
+    public abstract @Nullable Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
             SVInstantiations instMap, Services services);
 
 
@@ -86,7 +90,7 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
+        public @Nullable Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, Services services) {
             return instMap.getGenericSortInstantiations().getInstantiation(gs);
         }
@@ -142,7 +146,7 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
+        public @Nullable Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, Services services) {
 
             final Sort s;
@@ -191,7 +195,7 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
+        public @Nullable Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, Services services) {
             final Sort result;
 
@@ -216,7 +220,7 @@ public abstract class TypeResolver {
             return result;
         }
 
-        private Sort getContainerSort(Operator op, TermServices services) {
+        private @Nullable Sort getContainerSort(Operator op, TermServices services) {
             Sort result = null;
             if (op instanceof ProgramVariable) {
                 result = ((ProgramVariable) op).getContainerType().getSort();
@@ -254,7 +258,7 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
+        public @Nullable Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
                 SVInstantiations instMap, Services services) {
             return psi.resolveSort(instMap, services);
         }
