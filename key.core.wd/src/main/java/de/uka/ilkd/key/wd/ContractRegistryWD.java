@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.*;
 
 import org.key_project.util.collection.*;
@@ -23,11 +24,12 @@ import org.slf4j.LoggerFactory;
 /**
  * The well-definedness variant of the {@link ContractRegistry}: registers the
  * {@link WellDefinednessCheck}s that belong to newly registered contracts (mirroring the checks
- * the former {@link SpecificationRepositoryWD} created on top of the base repository) and keeps
+ * the former {@code SpecificationRepositoryWD} created on top of the base repository) and keeps
  * them in a separate {@code wdChecks} map. When well-definedness checks are deactivated
  * ({@link WellDefinednessCheck#isOn(Services)}), {@link #getAllContracts()} and
  * {@link #getContracts(KeYJavaType, IObserverFunction)} filter them out (mirroring the former
- * WD repository).
+ * WD repository). It also carries the WD {@link #processJavaType} hook (representa clauses →
+ * WD checks), which the former {@code SpecificationRepositoryWD} provided.
  */
 @NullMarked
 public class ContractRegistryWD extends ContractRegistry {
@@ -310,5 +312,44 @@ public class ContractRegistryWD extends ContractRegistry {
             return result;
         else
             return removeWdChecks(result);
+    }
+
+    /**
+     * Represent terms belong to model fields, so the well-definedness check considers both of them
+     * together. Formerly {@code SpecificationRepositoryWD.processJavaType} (the WD variant of the
+     * {@link de.uka.ilkd.key.speclang.ContractRegistry#processJavaType} hook).
+     *
+     * @param kjt The relevant KeYJavaType
+     */
+    @Override
+    public void processJavaType(KeYJavaType kjt) {
+        ImmutableSet<ClassAxiom> axs =
+            services.getClassAxiomComputer().getClassAxiomsForType(kjt);
+        if (axs == null) {
+            return;
+        }
+        ImmutableSet<RepresentsAxiom> reps = DefaultImmutableSet.nil();
+        for (ClassAxiom ax : axs) {
+            if (ax instanceof RepresentsAxiom) {
+                reps = reps.add((RepresentsAxiom) ax);
+            }
+        }
+        final ProgramVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
+        for (RepresentsAxiom rep : reps) {
+            boolean dep = false;
+            for (MethodWellDefinedness ch : getWdMethodChecks(kjt)) {
+                if (ch.modelField() && ch.getTarget().equals(rep.getTarget())) {
+                    dep = true;
+                    unregisterContractForClassAxioms(ch);
+                    JTerm represents = rep.getAxiom(heap, ch.getOrigVars().self, services);
+                    WellDefinednessCheck newCh = ch.addRepresents(represents);
+                    registerContractForClassAxioms(newCh);
+                }
+            }
+            if (!dep) {
+                MethodWellDefinedness mwd = new MethodWellDefinedness(rep, services);
+                registerContractForClassAxioms(mwd);
+            }
+        }
     }
 }

@@ -475,4 +475,12 @@ public class ContractRegistry {
             addContract(cf.funcLoop(contract));
         }
     }
+
+    /**
+     * Per-type post-processing hook called by the load pipeline after all specifications of a type
+     * have been registered. Profiles may override this (e.g. WD derives
+     * {@code WellDefinednessCheck}s). Formerly {@code SpecificationRepository.processJavaType}.
+     */
+    public void processJavaType(KeYJavaType kjt) {
+    }
 }
