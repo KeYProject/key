@@ -34,7 +34,6 @@ import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
@@ -408,7 +407,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         Optional<Label> loopLabel = Optional.empty();
         Statement stmtToRepl = whileLoop;
 
-        ImmutableArray<ProgramPrefix> prefixElems =
+        ImmutableList<ProgramPrefix> prefixElems =
             ((StatementBlock) TermBuilder
                     .goBelowUpdates((JTerm) ruleApp.posInOccurrence().subTerm())
                     .javaBlock().program()).getPrefixElements();
