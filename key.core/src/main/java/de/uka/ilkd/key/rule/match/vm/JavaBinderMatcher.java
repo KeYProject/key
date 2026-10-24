@@ -10,7 +10,7 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.compiler.BinderMatcher;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.matchAndBindVariables;
 
@@ -30,13 +30,13 @@ public final class JavaBinderMatcher implements BinderMatcher {
 
     @SuppressWarnings("unchecked")
     @Override
-    public MatchInstruction binder(ImmutableArray<? extends QuantifiableVariable> boundVars) {
-        return matchAndBindVariables((ImmutableArray<QuantifiableVariable>) boundVars);
+    public MatchInstruction binder(ImmutableList<? extends QuantifiableVariable> boundVars) {
+        return matchAndBindVariables((ImmutableList<QuantifiableVariable>) boundVars);
     }
 
     @Override
     public MatchResultInfo unbind(MatchResultInfo mc,
-            ImmutableArray<? extends QuantifiableVariable> boundVars) {
+            ImmutableList<? extends QuantifiableVariable> boundVars) {
         return ((MatchConditions) mc).shrinkRenameTable();
     }
 }
