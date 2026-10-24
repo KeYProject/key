@@ -216,6 +216,24 @@ already verified — see `JML_MAPPING.md` and §3).
   ranges back into the `.key`/`.java` file (reuse existing block-mapping logic).
 
 ### Phase 3 — Deletion & parity
+
+> **SUPERSEDED by Option B (see HANDOFF §5):** the *grammar* deletions and the
+> `pretranslation`-package deletion listed here are half un-done, half done via
+> the `JmlToTextual` bridge (which keeps the ANTLR grammars + `Translator`/
+> `JmlTermFactory` as the semantics layer). What actually shipped:
+> - Deleted: `PreParser`, `TextualTranslator`, `JmlCheck(s)` (dead), plus
+>   `TextualJMLFieldDecl/ModifierList/SetStatement/MergePointDecl` (superseded by
+>   the bridge) — Phase 3 bulk of the "delete" part.
+> - Kept: `JmlLexer.g4`/`JmlParser.g4`, `pretranslation` value classes
+>   (`TextualJMLSpecCase` et al. — still produced by `JmlToTextual`),
+>   `Translator`/`JmlTermFactory`/`JmlIO`/`JmlFacade`.
+> - Test cleanup DONE: stale tests deleted/rewritten; `speclang.*` slice green
+>   (279 tests, 0 failures, 12 skipped). Parity gaps recorded in HANDOFF §5.1:
+>   `spec_*_math` modifiers unparseable (pragmas removed, JAVA pin, 2 `@Disabled`
+>   loads), error positions null, error types become jmltk wrappers, single `=`
+>   silently dropped (`JmlToTextual.toSpecCase` try/catch),
+>   `ModifiersTest` inline modifiers.
+
 - Delete the ANTLR grammars `JmlLexer.g4`/`JmlParser.g4` and the
   `speclang/njml` front-end classes (`PreParser`, `TextualTranslator`, legacy
   `Translator` paths) and the whole `speclang/jml/pretranslation` package.
@@ -279,19 +297,23 @@ Transition notes:
 ## 6. Regression net (tests defining KeY-supported JML)
 
 `key.core/src/test/java/de/uka/ilkd/key/speclang/`:
-- `njml/NJmlTranslatorTests`, `njml/ClasslevelTranslatorTest`,
-  `njml/MethodlevelTranslatorTest`, `njml/TextualTranslatorTest`,
-  `njml/ExpressionTranslatorTest`, `njml/ModifiersTest`,
-  `njml/ContractLoadingTests`, `njml/JMLParserExceptionTest`
-- `jml/TestJMLPreTranslator`, `jml/TestJMLTranslator`, `jml/JmlMarkerDecisionTest`,
-  `jml/pretranslation/TextualJMLAssertStatementTest`
-- `SetStatementTest`, `ContractFactoryTest`, `ContentOrderNumberingTest`
+- `njml/ClasslevelTranslatorTest`, `njml/ExpressionTranslatorTest`,
+  `njml/ModifiersTest`, `njml/ContractLoadingTests`, `njml/JMLParserExceptionTest`
+  (surviving; `MethodlevelTranslatorTest`, `TextualTranslatorTest`,
+  `NJmlTranslatorTests` deleted in Phase 3 — they tested the removed front-end)
+- `jml/TestJMLTranslator`, `jml/JmlMarkerDecisionTest`
+  (`TestJMLPreTranslator`, `jml/pretranslation/TextualJMLAssertStatementTest`
+  deleted in Phase 3)
+- `SetStatementTest`, `ContractFactoryTest` (both rewritten in Phase 3 to the
+  `JmlFacade.parseClause` / `set_statement()` re-parse path),
+  `ContentOrderNumberingTest`
 - related: `key.core/src/test/java/TranslationTest.java`,
   `KeyJavaPipelineTest.java`, `ReduxTest.java`,
   `key.core/src/test/java/de/uka/ilkd/key/parser/TestJMLParserAssociativity.java`
 
 Fixtures: `key.core/src/test/resources/de/uka/ilkd/key/speclang/` (incl.
-`njml/exceptional/`).
+`njml/exceptional/` — metadata headers updated for jmltk error behavior;
+`njml/methodlevel.txt` deleted).
 
 ## 7. Open questions
 
