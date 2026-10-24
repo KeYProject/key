@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.settings.Configuration;
+import de.uka.ilkd.key.speclang.ClassAxiomComputer;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.key_project.logic.Choice;
@@ -87,6 +88,11 @@ public class WdProfile extends JavaProfile {
     @Override
     public SpecificationRepository createSpecificationRepository(Services services) {
         return new SpecificationRepositoryWD(services);
+    }
+
+    @Override
+    public ClassAxiomComputer createClassAxiomComputer(Services services) {
+        return new ClassAxiomComputerWD(services);
     }
 
     @Override

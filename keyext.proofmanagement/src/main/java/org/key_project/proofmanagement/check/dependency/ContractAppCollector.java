@@ -147,7 +147,8 @@ public class ContractAppCollector extends NodeIntermediateWalker {
         // get all class axioms of the class via SpecificationRepository, filter for name
         SpecificationRepository specRepo = proof.getServices().getSpecificationRepository();
         String axiomName = tacletApp.getRuleName().replace('_', ' ');
-        Set<ClassAxiom> axioms = specRepo.getClassAxioms(classType).toSet();
+        Set<ClassAxiom> axioms =
+            proof.getServices().getClassAxiomComputer().getClassAxioms(classType).toSet();
         List<ClassAxiom> axiomList = axioms.stream()
                 .filter(a -> a.getName().equals(axiomName))
                 .toList();

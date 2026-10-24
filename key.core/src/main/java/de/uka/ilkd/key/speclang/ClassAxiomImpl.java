@@ -155,7 +155,8 @@ public final class ClassAxiomImpl extends ClassAxiom {
      */
     private int classAxiomNumber(Services services) {
         ImmutableList<ClassAxiomImpl> group = ImmutableList.<ClassAxiomImpl>nil().prepend(this);
-        for (ClassAxiom ax : services.getSpecificationRepository().getClassAxiomsForType(kjt)) {
+        for (ClassAxiom ax :
+                services.getClassAxiomComputer().getClassAxiomsForType(kjt)) {
             if (ax instanceof ClassAxiomImpl impl) {
                 group = group.prepend(impl);
             }
