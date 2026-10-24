@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.*;
@@ -182,7 +183,7 @@ public class Statistics {
     }
 
     Statistics(Proof proof) {
-        this(proof.root());
+        this(Objects.requireNonNull(proof.root(), "proof must have a root node"));
     }
 
     protected static Statistics create(Statistics side, long creationTime) {
@@ -366,7 +367,9 @@ public class Statistics {
             final int res;
             if (node.getNodeInfo().getInteractiveRuleApplication()) {
                 res = 1;
-                final String ruleAppName = node.getAppliedRuleApp().rule().name().toString();
+                final RuleApp ruleApp = Objects.requireNonNull(node.getAppliedRuleApp(),
+                    "node with an interactive rule application must have an applied rule app");
+                final String ruleAppName = ruleApp.rule().name().toString();
                 if (!intAppsDetails.containsKey(ruleAppName)) {
                     intAppsDetails.put(ruleAppName, 1);
                 } else {

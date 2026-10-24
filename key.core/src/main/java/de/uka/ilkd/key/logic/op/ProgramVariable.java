@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic.op;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
@@ -62,7 +64,11 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
             @Nullable KeYJavaType containingType, boolean isStatic, boolean isModel,
             boolean isGhost,
             boolean isFinal) {
-        super(name, s == null ? t.getSort() : s, false);
+        super(name, s == null
+                ? Objects.requireNonNull(
+                    Objects.requireNonNull(t, "program variable type").getSort(), "type sort")
+                : s,
+            false);
         this.type = t;
         this.containingType = containingType;
         this.isStatic = isStatic;
@@ -213,7 +219,8 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
     @Override
     public Expression convertToProgram(JTerm t, ExtList l) {
         if (isStatic()) {
-            return new FieldReference(this, new TypeRef(getContainerType()));
+            return new FieldReference(this, new TypeRef(Objects.requireNonNull(
+                getContainerType(), "containing type of static field")));
         } else {
             return this;
         }
@@ -221,14 +228,16 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
 
 
     public String proofToString() {
-        final Type javaType = type.getJavaType();
+        final KeYJavaType kt = Objects.requireNonNull(type, "no type for program variable");
+        final Type javaType = kt.getJavaType();
         final String typeName;
         if (javaType instanceof ArrayType) {
             typeName = ((ArrayType) javaType).getAlternativeNameRepresentation();
         } else if (javaType != null) {
             typeName = javaType.getFullName();
         } else {
-            typeName = type.getSort().name().toString();
+            typeName = Objects.requireNonNull(kt.getSort(), "no sort for program variable")
+                    .name().toString();
         }
         return typeName + " " + name() + ";\n";
     }

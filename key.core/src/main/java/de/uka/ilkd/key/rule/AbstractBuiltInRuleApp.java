@@ -28,7 +28,7 @@ public abstract class AbstractBuiltInRuleApp<T extends BuiltInRule> implements I
     protected final T builtInRule;
 
     protected final @Nullable PosInOccurrence pio;
-    protected @Nullable ImmutableList<PosInOccurrence> ifInsts;
+    protected ImmutableList<PosInOccurrence> ifInsts;
 
     protected AbstractBuiltInRuleApp(T rule, @Nullable PosInOccurrence pio,
             @Nullable ImmutableList<PosInOccurrence> ifInsts) {

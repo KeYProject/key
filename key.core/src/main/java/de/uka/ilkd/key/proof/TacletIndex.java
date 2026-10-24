@@ -384,7 +384,7 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
     private ImmutableList<NoPosTacletApp> merge(@Nullable ImmutableList<NoPosTacletApp> first,
             @Nullable final ImmutableList<NoPosTacletApp> second) {
         if (second == null) {
-            return first;
+            return Objects.requireNonNull(first, "merge called with two null lists");
         } else if (first == null) {
             return second;
         } else {
@@ -507,7 +507,7 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
      * @return the found NoPosTacletApp or null if no matching Taclet is there
      */
     @Override
-    public NoPosTacletApp lookup(Name name) {
+    public @Nullable NoPosTacletApp lookup(Name name) {
         return allNoPosTacletAppsStream()
                 .filter(tacletApp -> tacletApp.taclet().name().equals(name))
                 .findAny()

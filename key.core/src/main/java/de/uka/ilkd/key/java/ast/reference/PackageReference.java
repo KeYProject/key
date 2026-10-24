@@ -27,7 +27,7 @@ public class PackageReference extends JavaNonTerminalProgramElement
     /**
      * Prefix.
      */
-    protected final ReferencePrefix prefix;
+    protected final @Nullable ReferencePrefix prefix;
 
     /**
      * Name.
@@ -49,7 +49,7 @@ public class PackageReference extends JavaNonTerminalProgramElement
         assert name != null;
     }
 
-    public PackageReference(ProgramElementName name, ReferencePrefix prefix) {
+    public PackageReference(ProgramElementName name, @Nullable ReferencePrefix prefix) {
         this.prefix = prefix;
         this.name = name;
         assert name != null;
@@ -109,7 +109,7 @@ public class PackageReference extends JavaNonTerminalProgramElement
      *
      * @return the reference prefix.
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return prefix;
     }
 

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * TypeReferences reference Types by name. A TypeReference can refer to
@@ -26,9 +27,11 @@ public interface TypeReference extends TypeReferenceInfix, TypeReferenceContaine
 
     ProgramElementName getProgramElementName();
 
+    @Nullable
     ReferencePrefix getReferencePrefix();
 
     int getDimensions();
 
+    @Nullable
     KeYJavaType getKeYJavaType();
 }
