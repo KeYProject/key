@@ -135,7 +135,7 @@ public class CompiledMatchProgramBenchmark {
                 continue;
             }
             findTaclets++;
-            final JTerm find = (JTerm) ft.find();
+            final JTerm find = ft.find();
             comps.add(JavaMatchPlanBuilder.compiledProgram(find));
             interps.add(new VMProgramInterpreter(JavaMatchPlanBuilder.interpreterProgram(find)));
         }

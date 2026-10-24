@@ -67,7 +67,7 @@ public class CompiledMatchProgramTest {
 
     /** compiles the find expression; the taclets here are all within the framework's coverage. */
     private static MatchProgram compile(FindTaclet t) {
-        final MatchProgram p = JavaMatchPlanBuilder.compiledProgram((JTerm) t.find());
+        final MatchProgram p = JavaMatchPlanBuilder.compiledProgram(t.find());
         assertNotNull(p, "find pattern of " + t.name() + " was expected to compile");
         return p;
     }
