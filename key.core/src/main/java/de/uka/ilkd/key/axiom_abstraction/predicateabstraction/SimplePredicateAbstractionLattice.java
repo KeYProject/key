@@ -13,6 +13,8 @@ import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A lattice for all predicates accepting the given sort. This lattice consists of n + 2 elements,
  * where n is the number of applicable predicates. The first element is a bottom element, the last a
@@ -20,6 +22,7 @@ import org.key_project.util.collection.ImmutableSet;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class SimplePredicateAbstractionLattice extends AbstractPredicateAbstractionLattice {
     public static final String PREDICATE_NAME_CONBINATION_STRING = "<<<<<<N/A>>>>>>";
 

@@ -8,10 +8,13 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Alexander Weigl
  * @version 1 (1/30/22)
  */
+@NullMarked
 public abstract class AbstractSettings implements Settings {
     protected final PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 

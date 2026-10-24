@@ -19,9 +19,12 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class is used for wrapping all variable conditions of a taclet in one object.
  */
+@NullMarked
 class TacletConditions {
 
     //

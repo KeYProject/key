@@ -23,6 +23,7 @@ import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.CharStream;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -36,6 +37,7 @@ import org.jspecify.annotations.Nullable;
  * @author Alexander Weigl
  * @version 1 (03.04.23)
  */
+@NullMarked
 public class Configuration {
     private final Map<String, Object> data;
     private final Map<String, ConfigurationMeta> meta = new HashMap<>();
@@ -366,7 +368,7 @@ public class Configuration {
         return getSection(name, true);
     }
 
-    public Configuration getSection(String name, boolean createIfNotExists) {
+    public @Nullable Configuration getSection(String name, boolean createIfNotExists) {
         if (!exists(name) && createIfNotExists) {
             set(name, new Configuration());
         }

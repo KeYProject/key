@@ -12,18 +12,22 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.IllegalTacletException;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class AssumptionFormula implements TacletFormula {
 
     final Taclet taclet;
     final Collection<JTerm> formula;
     final String status;
-    final TacletConditions conditions;
+    final @Nullable TacletConditions conditions;
 
-    public TacletConditions getConditions() {
+    public @Nullable TacletConditions getConditions() {
         return conditions;
     }
 
-    public AssumptionFormula(Taclet taclet, Collection<JTerm> formula, String status) {
+    public AssumptionFormula(Taclet taclet, @Nullable Collection<JTerm> formula, String status) {
         this.taclet = taclet;
         this.formula = formula;
         this.status = status;
@@ -33,7 +37,7 @@ public class AssumptionFormula implements TacletFormula {
 
 
     public AssumptionFormula(Taclet taclet, Collection<JTerm> formula, String status,
-            TacletConditions conditions) throws IllegalTacletException {
+            @Nullable TacletConditions conditions) throws IllegalTacletException {
         super();
         this.taclet = taclet;
         this.formula = formula;

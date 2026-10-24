@@ -6,7 +6,9 @@ package de.uka.ilkd.key.control;
 
 import de.uka.ilkd.key.proof.ProofEvent;
 
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public interface AutoModeListener {
 
     /**

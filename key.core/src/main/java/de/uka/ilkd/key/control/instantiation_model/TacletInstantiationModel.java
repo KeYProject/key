@@ -25,6 +25,9 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Position;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class TacletInstantiationModel {
 
     private static final TacletAssumesModel[] EMPTY_IF_CHOICES = new TacletAssumesModel[0];

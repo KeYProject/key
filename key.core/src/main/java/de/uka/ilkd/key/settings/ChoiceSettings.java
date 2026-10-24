@@ -15,10 +15,12 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  *
  */
+@NullMarked
 public class ChoiceSettings extends AbstractSettings {
     public static final String CATEGORY = "Choice";
     private static final String KEY_DEFAULT_CHOICES = "DefaultChoices";

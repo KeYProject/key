@@ -20,11 +20,13 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This class inherits from LDT and implements all method that are necessary to handle the primitive
  * type boolean.
  */
+@NullMarked
 public final class BooleanLDT extends LDT {
 
     public static final Name NAME = new Name("boolean");

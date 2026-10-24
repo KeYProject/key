@@ -25,7 +25,11 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+
+@NullMarked
 public final class SortLDT extends LDT {
 
     public static final Name NAME = new Name("SORT");
@@ -73,13 +77,13 @@ public final class SortLDT extends LDT {
     }
 
     @Override
-    public JTerm translateLiteral(Literal lit, Services services) {
+    public @Nullable JTerm translateLiteral(Literal lit, Services services) {
         assert false;
         return null;
     }
 
     @Override
-    public Function getFunctionFor(Operator op, Services services,
+    public @Nullable Function getFunctionFor(Operator op, Services services,
             ExecutionContext ec) {
         if (op instanceof BinaryOperator lfo
                 && lfo.getKind() == BinaryOperatorKind.SUBTYPE) {
@@ -106,7 +110,7 @@ public final class SortLDT extends LDT {
     }
 
     @Override
-    public Type getType(JTerm t) {
+    public @Nullable Type getType(JTerm t) {
         assert false;
         return null;
     }

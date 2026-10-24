@@ -15,14 +15,18 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A base class for abstract domain elements in a predicate abstraction lattice.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public abstract class AbstractPredicateAbstractionDomainElement extends AbstractDomainElement {
 
-    private ImmutableSet<AbstractionPredicate> predicates = null;
+    private @Nullable ImmutableSet<AbstractionPredicate> predicates = null;
     private boolean topElem = false;
 
     /**

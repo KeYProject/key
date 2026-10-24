@@ -30,10 +30,14 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The default lemma generator: Supports only certain types of taclets. If a taclet is not
  * supported, the generator throws an exception.
  */
+@NullMarked
 class DefaultLemmaGenerator implements LemmaGenerator {
 
     // Describes how a schema variable is mapped to another operator, e.g.
@@ -63,7 +67,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         return term;
     }
 
-    public static String checkTaclet(final Taclet taclet) {
+    public static @Nullable String checkTaclet(final Taclet taclet) {
         String result = checkForIllegalConditions(taclet);
         if (result != null) {
             return result;
@@ -100,7 +104,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
 
     }
 
-    public static String checkForIllegalConditions(Taclet taclet) {
+    public static @Nullable String checkForIllegalConditions(Taclet taclet) {
         if (!taclet.getVariableConditions().isEmpty()) {
             return "The given taclet " + taclet.name()
                 + " contains variable conditions that are not supported.";
@@ -108,7 +112,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         return null;
     }
 
-    public static String checkForIllegalOps(Term formula, Taclet owner,
+    public static @Nullable String checkForIllegalOps(Term formula, Taclet owner,
             boolean schemaVarsAreAllowed) {
         if ((!schemaVarsAreAllowed && formula.op() instanceof SchemaVariable)
                 || formula.op() instanceof Modality

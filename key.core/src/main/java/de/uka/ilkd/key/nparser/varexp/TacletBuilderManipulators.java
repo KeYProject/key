@@ -23,6 +23,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.VariableCondition;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.nparser.varexp.ArgumentType.SORT;
 import static de.uka.ilkd.key.nparser.varexp.ArgumentType.TYPE_RESOLVER;
@@ -35,6 +36,7 @@ import static de.uka.ilkd.key.rule.conditions.TypeComparisonCondition.Mode.*;
  * @author Alexander Weigl
  * @version 1 (12/9/19)
  */
+@NullMarked
 public class TacletBuilderManipulators {
     // region Factories
     // Short cut for argument types

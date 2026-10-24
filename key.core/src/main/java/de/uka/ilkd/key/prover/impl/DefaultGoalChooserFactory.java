@@ -10,9 +10,12 @@ import de.uka.ilkd.key.proof.Proof;
 import org.key_project.prover.engine.GoalChooser;
 import org.key_project.prover.engine.GoalChooserFactory;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * creates the default goal chooser used in KeY
  */
+@NullMarked
 public class DefaultGoalChooserFactory implements GoalChooserFactory<Proof, Goal> {
 
     public static final String NAME = "Simple Goal Chooser";

@@ -12,6 +12,8 @@ import java.util.*;
 
 import de.uka.ilkd.key.pp.NotationInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +25,7 @@ import org.slf4j.LoggerFactory;
  *
  * @see Settings
  */
+@NullMarked
 public class ProofIndependentSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofIndependentSettings.class);
 
@@ -65,8 +68,8 @@ public class ProofIndependentSettings {
     private final List<Settings> settings = new LinkedList<>();
 
     private final PropertyChangeListener settingsListener = e -> saveSettings();
-    private Properties lastReadProperties;
-    private Configuration lastReadConfiguration;
+    private @Nullable Properties lastReadProperties;
+    private @Nullable Configuration lastReadConfiguration;
 
     private ProofIndependentSettings() {
         addSettings(smtSettings);

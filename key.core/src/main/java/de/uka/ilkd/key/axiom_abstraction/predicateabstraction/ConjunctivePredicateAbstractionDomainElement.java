@@ -9,12 +9,15 @@ import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * An abstract domain element for a predicate abstraction lattice based on the conjunction of
  * predicates.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class ConjunctivePredicateAbstractionDomainElement
         extends AbstractPredicateAbstractionDomainElement {
 

@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.parser;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class NotDeclException extends Exception {
     private static final long serialVersionUID = 1630322840671708203L;
 

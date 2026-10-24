@@ -13,6 +13,9 @@ import javax.swing.tree.TreeNode;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.SelectionMode;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Change this file if you want to change the set of taclets that can be used for external provers.
  * REMARK: Adding taclets at this point does not automatically mean that the added taclets are used
@@ -20,6 +23,7 @@ import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.S
  * while translating.
  *
  */
+@NullMarked
 public final class SupportedTaclets {
 
     public static final SupportedTaclets REFERENCE = new SupportedTaclets();
@@ -101,7 +105,7 @@ public final class SupportedTaclets {
 
 
 
-    private TreeModel model = null;
+    private @Nullable TreeModel model = null;
 
 
 

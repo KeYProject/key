@@ -33,6 +33,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,13 +43,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public abstract class AbstractProofControl implements ProofControl {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractProofControl.class);
 
     /**
      * Optionally, the {@link RuleCompletionHandler} to use.
      */
-    private final RuleCompletionHandler ruleCompletionHandler;
+    private final @Nullable RuleCompletionHandler ruleCompletionHandler;
 
     /**
      * The default {@link ProverTaskListener} which will be added to all started
@@ -85,7 +88,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * @param ruleCompletionHandler An optional {@link RuleCompletionHandler}.
      */
     protected AbstractProofControl(ProverTaskListener defaultProverTaskListener,
-            RuleCompletionHandler ruleCompletionHandler) {
+            @Nullable RuleCompletionHandler ruleCompletionHandler) {
         this.ruleCompletionHandler = ruleCompletionHandler;
         this.defaultProverTaskListener = defaultProverTaskListener;
     }
@@ -133,7 +136,7 @@ public abstract class AbstractProofControl implements ProofControl {
 
     @Override
     public ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal,
-            PosInOccurrence pos) {
+            @Nullable PosInOccurrence pos) {
         if (pos != null && focusedGoal != null) {
             LOGGER.debug("NoPosTacletApp: Looking for applicables rule at node {}",
                 focusedGoal.node().serialNr());
@@ -145,7 +148,7 @@ public abstract class AbstractProofControl implements ProofControl {
 
     @Override
     public ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal,
-            PosInOccurrence pos) {
+            @Nullable PosInOccurrence pos) {
         if (pos != null) {
             return filterTaclet(focusedGoal,
                 focusedGoal.ruleAppIndex().getRewriteTaclet(TacletFilter.TRUE, pos), pos);
@@ -160,7 +163,7 @@ public abstract class AbstractProofControl implements ProofControl {
      */
     private ImmutableList<TacletApp> filterTaclet(Goal focusedGoal,
             ImmutableList<NoPosTacletApp> tacletInstances,
-            PosInOccurrence pos) {
+            @Nullable PosInOccurrence pos) {
         HashSet<Taclet> applicableRules = new HashSet<>();
         ImmutableList<TacletApp> result = ImmutableList.nil();
         for (NoPosTacletApp app : tacletInstances) {
@@ -194,7 +197,7 @@ public abstract class AbstractProofControl implements ProofControl {
 
     @Override
     public boolean selectedTaclet(Taclet taclet, Goal goal,
-            PosInOccurrence pos) {
+            @Nullable PosInOccurrence pos) {
         ImmutableSet<TacletApp> applics = getAppsForName(goal, taclet.name().toString(), pos);
         if (applics.isEmpty()) {
             return false;
@@ -311,7 +314,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * @return a list of all found rule applications of the given rule at position pos
      */
     protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name,
-            PosInOccurrence pos) {
+            @Nullable PosInOccurrence pos) {
         return getAppsForName(goal, name, pos, TacletFilter.TRUE);
     }
 
@@ -327,7 +330,7 @@ public abstract class AbstractProofControl implements ProofControl {
      *         passing the filter
      */
     protected ImmutableSet<TacletApp> getAppsForName(Goal goal, String name,
-            PosInOccurrence pos,
+            @Nullable PosInOccurrence pos,
             TacletFilter filter) {
         Services services = goal.proof().getServices();
         ImmutableSet<TacletApp> result = DefaultImmutableSet.nil();
@@ -400,7 +403,7 @@ public abstract class AbstractProofControl implements ProofControl {
     }
 
     @Override
-    public void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos,
+    public void selectedBuiltInRule(Goal goal, BuiltInRule rule, @Nullable PosInOccurrence pos,
             boolean forced, boolean interactive) {
         assert goal != null;
 
@@ -437,7 +440,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * @return a SetOf<IBuiltInRuleApp> with all possible rule applications
      */
     public ImmutableSet<IBuiltInRuleApp> getBuiltInRuleApp(Goal focusedGoal, BuiltInRule rule,
-            PosInOccurrence pos) {
+            @Nullable PosInOccurrence pos) {
 
         ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.nil();
 
@@ -459,7 +462,7 @@ public abstract class AbstractProofControl implements ProofControl {
      * @return a SetOf<RuleApp> with all possible applications of the rule
      */
     protected ImmutableSet<IBuiltInRuleApp> getBuiltInRuleAppsForName(Goal focusedGoal, String name,
-            PosInOccurrence pos) {
+            @Nullable PosInOccurrence pos) {
         ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.nil();
         ImmutableList<BuiltInRule> match = ImmutableList.nil();
 
@@ -493,7 +496,7 @@ public abstract class AbstractProofControl implements ProofControl {
         }
     }
 
-    protected IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal,
+    protected @Nullable IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal,
             boolean forced) {
         if (ruleCompletionHandler == null) {
             return completeBuiltInRuleAppByDefault(app, goal, forced);
@@ -516,7 +519,8 @@ public abstract class AbstractProofControl implements ProofControl {
      * Default implementation of
      * {@link RuleCompletionHandler#completeBuiltInRuleApp(IBuiltInRuleApp, Goal, boolean)}.
      */
-    public static IBuiltInRuleApp completeBuiltInRuleAppByDefault(IBuiltInRuleApp app, Goal goal,
+    public static @Nullable IBuiltInRuleApp completeBuiltInRuleAppByDefault(IBuiltInRuleApp app,
+            Goal goal,
             boolean forced) {
         app = forced ? app.forceInstantiate(goal) : app.tryToInstantiate(goal);
         // cannot complete that app
@@ -617,7 +621,7 @@ public abstract class AbstractProofControl implements ProofControl {
     }
 
     protected abstract void startAutoMode(Proof proof, ImmutableList<Goal> goals,
-            ProverTaskListener ptl);
+            @Nullable ProverTaskListener ptl);
 
     /**
      * starts the execution of rules with active strategy. Restrict the application of rules to a
@@ -626,7 +630,7 @@ public abstract class AbstractProofControl implements ProofControl {
      */
     @Override
     public synchronized void startFocussedAutoMode(
-            PosInOccurrence focus, Goal goal) {
+            @Nullable PosInOccurrence focus, Goal goal) {
         if (focus != null) {
             // exchange the rule app manager of that goal to filter rule apps
 

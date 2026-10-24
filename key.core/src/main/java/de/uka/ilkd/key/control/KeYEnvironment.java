@@ -29,6 +29,7 @@ import de.uka.ilkd.key.util.KeYTypeUtil;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -37,6 +38,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class KeYEnvironment<U extends UserInterfaceControl> implements AutoCloseable {
     /**
      * The {@link UserInterfaceControl} in which the {@link Proof} is loaded.
@@ -51,7 +53,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
     /**
      * An optional {@link Proof} which was loaded by the specified proof file.
      */
-    private final Proof loadedProof;
+    private final @Nullable Proof loadedProof;
 
     /**
      * An optional field denoting a script contained in the proof file.
@@ -66,7 +68,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
     /**
      * The {@link ReplayResult} if available.
      */
-    private final ReplayResult replayResult;
+    private final @Nullable ReplayResult replayResult;
 
     /**
      * Constructor
@@ -85,8 +87,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      * @param initConfig The loaded project.
      * @param proofScript add an optional proof script
      */
-    public KeYEnvironment(U ui, InitConfig initConfig, Proof loadedProof,
-            @Nullable ProofScript proofScript, ReplayResult replayResult) {
+    public KeYEnvironment(U ui, InitConfig initConfig, @Nullable Proof loadedProof,
+            @Nullable ProofScript proofScript, @Nullable ReplayResult replayResult) {
         this.ui = ui;
         this.initConfig = initConfig;
         this.loadedProof = loadedProof;
@@ -108,7 +110,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      *
      * @return The {@link ProofControl} of {@link #getUi()}.
      */
-    public ProofControl getProofControl() {
+    public @Nullable ProofControl getProofControl() {
         return ui != null ? ui.getProofControl() : null;
     }
 
@@ -157,7 +159,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      *
      * @return The loaded {@link Proof} if available and {@code null} otherwise.
      */
-    public Proof getLoadedProof() {
+    public @Nullable Proof getLoadedProof() {
         return loadedProof;
     }
 
@@ -166,7 +168,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      *
      * @return The {@link ReplayResult} or {@code null} if not available.
      */
-    public ReplayResult getReplayResult() {
+    public @Nullable ReplayResult getReplayResult() {
         return replayResult;
     }
 
@@ -212,8 +214,9 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      * @throws ProblemLoaderException Occurred Exception
      */
     public static KeYEnvironment<DefaultUserInterfaceControl> load(Path location,
-            List<Path> classPaths, Path bootClassPath, List<Path> includes,
-            RuleCompletionHandler ruleCompletionHandler) throws ProblemLoaderException {
+            @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
+            @Nullable List<Path> includes,
+            @Nullable RuleCompletionHandler ruleCompletionHandler) throws ProblemLoaderException {
         return load(null, location, classPaths, bootClassPath, includes, null,
             ruleCompletionHandler, false);
     }
@@ -235,7 +238,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      * @throws ProblemLoaderException Occurred Exception
      */
     public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
-            List<Path> classPaths, Path bootClassPath, List<Path> includes,
+            @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
+            @Nullable List<Path> includes,
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
         return load(profile, location, classPaths, bootClassPath, includes, null, null,
             forceNewProfileOfNewProofs);
@@ -262,8 +266,10 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      * @throws ProblemLoaderException Occurred Exception
      */
     public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
-            List<Path> classPaths, Path bootClassPath, List<Path> includes,
-            Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
+            @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
+            @Nullable List<Path> includes,
+            @Nullable Properties poPropertiesToForce,
+            @Nullable RuleCompletionHandler ruleCompletionHandler,
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
         return load(profile, location, classPaths, bootClassPath, includes, poPropertiesToForce,
             ruleCompletionHandler,
@@ -291,9 +297,11 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      * @throws ProblemLoaderException Occurred Exception
      */
     public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
-            List<Path> classPaths, Path bootClassPath, List<Path> includes,
-            Properties poPropertiesToForce, RuleCompletionHandler ruleCompletionHandler,
-            Consumer<Proof> callbackProofLoaded,
+            @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
+            @Nullable List<Path> includes,
+            @Nullable Properties poPropertiesToForce,
+            @Nullable RuleCompletionHandler ruleCompletionHandler,
+            @Nullable Consumer<Proof> callbackProofLoaded,
             boolean forceNewProfileOfNewProofs)
             throws ProblemLoaderException {
         DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(ruleCompletionHandler);

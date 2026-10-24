@@ -30,6 +30,7 @@ import org.key_project.prover.sequent.Sequent;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ import static de.uka.ilkd.key.nparser.ParsingFacade.parseFiles;
  * @author Alexander Weigl
  * @version 1 (17.10.19)
  */
+@NullMarked
 public class KeyIO {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyIO.class);
 
@@ -53,7 +55,7 @@ public class KeyIO {
     private final NamespaceSet nss;
     private @Nullable Namespace<SchemaVariable> schemaNamespace;
     private List<BuildingIssue> warnings = new LinkedList<>();
-    private AbbrevMap abbrevMap;
+    private @Nullable AbbrevMap abbrevMap;
 
 
     public KeyIO(@NonNull Services services, @NonNull NamespaceSet nss) {
@@ -208,7 +210,7 @@ public class KeyIO {
         this.abbrevMap = abbrevMap;
     }
 
-    public AbbrevMap getAbbrevMap() {
+    public @Nullable AbbrevMap getAbbrevMap() {
         return abbrevMap;
     }
 
@@ -229,21 +231,21 @@ public class KeyIO {
      * Little sister of {@link ProblemInitializer}.
      */
     public class Loader {
-        private final URL resource;
-        private final CharStream content;
+        private final @Nullable URL resource;
+        private final @Nullable CharStream content;
         private List<KeyAst.File> ctx = new LinkedList<>();
-        private Namespace<SchemaVariable> schemaNamespace;
+        private @Nullable Namespace<SchemaVariable> schemaNamespace;
 
         Loader(URL resource) {
             this(null, resource);
         }
 
-        Loader(CharStream content, URL url) {
+        Loader(@Nullable CharStream content, @Nullable URL url) {
             resource = url;
             this.content = content;
         }
 
-        public Namespace<SchemaVariable> getSchemaNamespace() {
+        public @Nullable Namespace<SchemaVariable> getSchemaNamespace() {
             return schemaNamespace;
         }
 
@@ -360,7 +362,7 @@ public class KeyIO {
             return taclets;
         }
 
-        public JTerm getProblem() {
+        public @Nullable JTerm getProblem() {
             // TODO weigl tbd
             return null;
         }

@@ -19,6 +19,7 @@ import org.key_project.prover.engine.impl.DefaultProver;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Richard Bubel
  */
+@NullMarked
 public class ApplyStrategy extends DefaultProver<Proof, Goal> {
     public static final Logger LOGGER = LoggerFactory.getLogger(ApplyStrategy.class);
 
