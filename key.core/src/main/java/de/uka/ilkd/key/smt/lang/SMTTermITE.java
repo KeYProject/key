@@ -8,7 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class SMTTermITE extends SMTTerm {
 
     SMTTerm condition;

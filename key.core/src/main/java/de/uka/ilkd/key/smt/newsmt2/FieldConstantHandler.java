@@ -19,6 +19,8 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This SMT translation handler takes care of field constants.
@@ -42,15 +44,16 @@ import org.key_project.logic.sort.Sort;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class FieldConstantHandler implements SMTHandler {
 
     private static final String CONSTANT_COUNTER_PROPERTY = "fieldConstant.counter";
     private static final Sort[] NO_ARGS = new Sort[0];
-    private Services services;
+    private @Nullable Services services;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         this.services = services;
         masterHandler.addDeclarationsAndAxioms(handlerSnippets);
     }

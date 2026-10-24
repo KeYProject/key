@@ -10,12 +10,14 @@ import de.uka.ilkd.key.java.Services;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * The translation for the SMT2-format. It nearly the same as for the SMT1-format.
  */
 @SuppressWarnings("unused") // used via reflection by the legacy solver types
+@NullMarked
 public class SmtLib2Translator extends AbstractSMTTranslator {
     // FIXME: StringBuilder::equals does not what you think it does! It is not overwritten!
     private static final StringBuilder INTSTRING = new StringBuilder("Int");

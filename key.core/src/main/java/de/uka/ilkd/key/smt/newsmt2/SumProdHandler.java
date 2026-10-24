@@ -13,12 +13,16 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 // W I P
+@NullMarked
 public class SumProdHandler implements SMTHandler {
 
-    private Function bsumOp, bprodOp;
+    private @Nullable Function bsumOp, bprodOp;
 
     // key is the term to identify the bsum, value is the name used for that function.
     private final Map<Term, SExpr> usedBsumTerms = new LinkedHashMap<>();
@@ -27,8 +31,8 @@ public class SumProdHandler implements SMTHandler {
     private final Map<Term, SExpr> usedBprodTerms = new LinkedHashMap<>();
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         bsumOp = services.getTypeConverter().getIntegerLDT().getBsum();
         bprodOp = services.getTypeConverter().getIntegerLDT().getBprod();
     }

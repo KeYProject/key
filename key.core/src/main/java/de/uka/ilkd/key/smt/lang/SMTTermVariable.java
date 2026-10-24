@@ -7,16 +7,21 @@ package de.uka.ilkd.key.smt.lang;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  *
  * @author Aboubakr Achraf El Ghazi
  *
  */
+@NullMarked
 public class SMTTermVariable extends SMTTerm {
 
     String id;
     SMTSort sort;
+    @Nullable
     SMTTerm quant;
 
     public SMTTermVariable(String id, SMTSort sort) {
@@ -45,14 +50,14 @@ public class SMTTermVariable extends SMTTerm {
     /**
      * @return the quant
      */
-    public SMTTerm getQuant() {
+    public @Nullable SMTTerm getQuant() {
         return quant;
     }
 
     /**
      * @param quant the quant to set
      */
-    public void setQuant(SMTTerm quant) {
+    public void setQuant(@Nullable SMTTerm quant) {
         this.quant = quant;
     }
 
