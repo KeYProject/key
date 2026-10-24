@@ -13,6 +13,10 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class WaryClashFreeSubst extends ClashFreeSubst {
 
     /** depth of recursion of the <code>apply</code> method */
@@ -23,13 +27,13 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
     /**
      * variable with which the original variable should be substituted below modalities
      */
-    private QuantifiableVariable newVar = null;
-    private JTerm newVarTerm = null;
+    private @Nullable QuantifiableVariable newVar = null;
+    private @Nullable JTerm newVarTerm = null;
 
     /**
      * variables occurring within the original term and within the term to be substituted
      */
-    private ImmutableSet<QuantifiableVariable> warysvars = null;
+    private @Nullable ImmutableSet<QuantifiableVariable> warysvars = null;
 
     public WaryClashFreeSubst(QuantifiableVariable v, JTerm s, TermBuilder tb) {
         super(v, s, tb);

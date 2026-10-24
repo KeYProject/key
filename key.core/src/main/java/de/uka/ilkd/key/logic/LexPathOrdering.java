@@ -23,9 +23,13 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  */
+@NullMarked
 public class LexPathOrdering implements TermOrdering {
 
     /**
@@ -345,7 +349,7 @@ public class LexPathOrdering implements TermOrdering {
             }
         }
 
-        protected abstract Integer getWeight(Operator p_op);
+        protected abstract @Nullable Integer getWeight(Operator p_op);
     }
 
     /**
@@ -382,7 +386,7 @@ public class LexPathOrdering implements TermOrdering {
 
 
 
-        protected Integer getWeight(Operator p_op) {
+        protected @Nullable Integer getWeight(Operator p_op) {
 
             final String opStr = p_op.name().toString();
 
@@ -460,7 +464,7 @@ public class LexPathOrdering implements TermOrdering {
      * C.<nextToCreate> should be smaller than other symbols
      */
     private static class FunctionWeighter extends Weighter {
-        protected Integer getWeight(Operator p_op) {
+        protected @Nullable Integer getWeight(Operator p_op) {
             final String opStr = p_op.name().toString();
 
             if (opStr.equals("heap")) {

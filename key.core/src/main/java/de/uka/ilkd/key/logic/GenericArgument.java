@@ -13,12 +13,13 @@ import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /// An argument for a [ParametricSortInstance] or [ParametricFunctionInstance].
-public record GenericArgument(@NonNull Sort sort) implements TerminalSyntaxElement {
+@NullMarked
+public record GenericArgument(Sort sort) implements TerminalSyntaxElement {
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return sort.toString();
     }
 

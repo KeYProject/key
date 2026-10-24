@@ -11,9 +11,12 @@ import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A factory class for different Schema Variables
  */
+@NullMarked
 public class SchemaVariableFactory {
 
     private SchemaVariableFactory() {}

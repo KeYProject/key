@@ -12,11 +12,15 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.logic.Name;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Implements "inner renaming", i.e. renaming - if a new variable entering the globals causes a name
  * clash - this "inner" variable, and leaving the clashing "outer" one untouched.
  */
+@NullMarked
 public class InnerVariableNamer extends VariableNamer {
 
     public InnerVariableNamer(Services services) {
@@ -29,7 +33,7 @@ public class InnerVariableNamer extends VariableNamer {
      */
     private int getMaxCounterInGlobalsAndProgram(String basename,
             Iterable<ProgramElementName> globals, ProgramElement program,
-            PosInProgram posOfDeclaration) {
+            @Nullable PosInProgram posOfDeclaration) {
         int maxInGlobals = getMaxCounterInGlobals(basename, globals);
         int maxInProgram = getMaxCounterInProgram(basename, program, posOfDeclaration);
 

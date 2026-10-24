@@ -28,7 +28,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.parsing.Position;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -38,9 +39,9 @@ import org.jspecify.annotations.NonNull;
  * This data is used in
  * {@link de.uka.ilkd.key.speclang.QueryAxiom#getTaclets(ImmutableSet, Services)}.
  */
+@NullMarked
 public final class ProgramMethod extends ObserverFunction
         implements ProgramInLogic, IProgramMethod {
-
 
     /**
      * The referenced method.
@@ -246,7 +247,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     @Override
-    public @NonNull ImmutableArray<Modifier> getModifiers() {
+    public ImmutableArray<Modifier> getModifiers() {
         return method.getModifiers();
     }
 
@@ -256,7 +257,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     @Override
-    public ProgramElement getChildAt(int i) {
+    public @Nullable ProgramElement getChildAt(int i) {
         return null;
     }
 
@@ -440,7 +441,7 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     @Override
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         if (src == this) {
             source.next();
