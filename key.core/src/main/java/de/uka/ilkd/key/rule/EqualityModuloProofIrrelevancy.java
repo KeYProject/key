@@ -29,7 +29,6 @@ import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.EqualsModProofIrrelevancyUtil;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
@@ -151,13 +150,13 @@ public class EqualityModuloProofIrrelevancy {
     /**
      * Compares two arrays of {@link Sort}s for equality based on their name
      *
-     * @param thisSorts The first {@code ImmutableArray<Sort>} object to compare.
-     * @param thatSorts The second {@code ImmutableArray<Sort>} object to compare.
-     * @return {@code true} if the two {@code ImmutableArray<Sort>} objects are considered equal;
+     * @param thisSorts The first {@code ImmutableList<Sort>} object to compare.
+     * @param thatSorts The second {@code ImmutableList<Sort>} object to compare.
+     * @return {@code true} if the two {@code ImmutableList<Sort>} objects are considered equal;
      *         {@code false} otherwise.
      */
-    public static boolean equalsModProofIrrelevancy(ImmutableArray<Sort> thisSorts,
-            ImmutableArray<Sort> thatSorts) {
+    public static boolean equalsModProofIrrelevancy(ImmutableList<Sort> thisSorts,
+            ImmutableList<Sort> thatSorts) {
         if (thisSorts == thatSorts)
             return true;
         if (thisSorts.size() != thatSorts.size())
