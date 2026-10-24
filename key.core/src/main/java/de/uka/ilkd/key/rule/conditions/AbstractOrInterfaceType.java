@@ -12,10 +12,13 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * This variable condition checks if a given type denotes an abstract class or interface type.
  */
+@NullMarked
 public final class AbstractOrInterfaceType extends VariableConditionAdapter {
 
     private final TypeResolver resolver;

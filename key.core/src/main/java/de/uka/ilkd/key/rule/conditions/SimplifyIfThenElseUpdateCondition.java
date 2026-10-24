@@ -23,6 +23,10 @@ import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.instantiation.SVInstantiations;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     private final FormulaSV phi;
@@ -133,7 +137,8 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
     }
 
-    private JTerm simplify(JTerm phi, JTerm u1, JTerm u2, JTerm t, TermServices services) {
+    private @Nullable JTerm simplify(JTerm phi, JTerm u1, JTerm u2, JTerm t,
+            TermServices services) {
 
         TreeMap<UpdateableOperator, ElementaryUpdateWrapper> map = createMap();
 
@@ -156,7 +161,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
 
     @Override
-    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
             MatchResultInfo mc, LogicServices p_services) {
         final Services services = (Services) p_services;
         SVInstantiations svInst = mc.getInstantiations();

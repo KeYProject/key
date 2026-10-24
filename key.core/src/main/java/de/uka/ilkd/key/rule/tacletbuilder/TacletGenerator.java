@@ -38,12 +38,16 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 
 /**
  *
  * @author christoph
  */
+@NullMarked
 public class TacletGenerator {
 
     private static final TacletGenerator instance = new TacletGenerator();
@@ -766,7 +770,7 @@ public class TacletGenerator {
     }
 
 
-    private TermSV createSchemaVariable(ProgramVariable programVar) {
+    private @Nullable TermSV createSchemaVariable(@Nullable ProgramVariable programVar) {
         if (programVar == null) {
             return null;
         } else {

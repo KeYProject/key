@@ -17,7 +17,7 @@ import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -36,11 +36,12 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * kind can stand for program elements, overrides
  * {@link #match(ProgramElement, MatchResultInfo, LogicServices)}.
  */
+@NullMarked
 public abstract class MatchSchemaVariableInstruction implements MatchInstruction {
 
-    protected final @NonNull OperatorSV op;
+    protected final OperatorSV op;
 
-    protected MatchSchemaVariableInstruction(@NonNull OperatorSV op) {
+    protected MatchSchemaVariableInstruction(OperatorSV op) {
         this.op = op;
     }
 
@@ -50,7 +51,8 @@ public abstract class MatchSchemaVariableInstruction implements MatchInstruction
      * schemavariable has been already matched to a term <tt>t2</tt> which is not unifiable with the
      * given term.
      */
-    protected final MatchConditions addInstantiation(JTerm term, MatchResultInfo matchResultInfo,
+    protected final @Nullable MatchConditions addInstantiation(JTerm term,
+            MatchResultInfo matchResultInfo,
             LogicServices services) {
 
         if (op.isRigid() && !term.isRigid()) {

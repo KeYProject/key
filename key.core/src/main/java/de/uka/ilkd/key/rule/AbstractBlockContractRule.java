@@ -29,6 +29,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
@@ -42,6 +43,7 @@ import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
  *
  * @author wacker, lanzinger
  */
+@NullMarked
 public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContractRule {
 
     /**
@@ -52,7 +54,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
      * @return all applicable block contracts for the instantiation.
      */
     public static @Nullable ImmutableSet<BlockContract> getApplicableContracts(
-            final Instantiation instantiation, final Goal goal, final Services services) {
+            final @Nullable Instantiation instantiation, final Goal goal, final Services services) {
         if (instantiation == null) {
             return DefaultImmutableSet.nil();
         }
@@ -203,7 +205,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
      * @param goal the current goal.
      * @return a new instantiation.
      */
-    public Instantiation instantiate(final JTerm formula, final Goal goal) {
+    public @Nullable Instantiation instantiate(final JTerm formula, final Goal goal) {
         if (formula == getLastFocusTerm()) {
             return getLastInstantiation();
         } else {

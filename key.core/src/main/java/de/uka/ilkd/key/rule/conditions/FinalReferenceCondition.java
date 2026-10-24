@@ -15,10 +15,13 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * ensures that the given instantiation for the schema variable denotes a final field
  */
+@NullMarked
 public final class FinalReferenceCondition extends VariableConditionAdapter {
 
     private final SchemaVariable reference;

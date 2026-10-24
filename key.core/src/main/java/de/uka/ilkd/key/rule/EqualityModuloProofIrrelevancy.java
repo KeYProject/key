@@ -32,6 +32,8 @@ import org.key_project.util.EqualsModProofIrrelevancyUtil;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
 
 /**
@@ -41,6 +43,7 @@ import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRE
  * different proofs and have therefore to rely on sort and type names instead of object
  * identity. Further more than just terms and programs must be compared.
  */
+@NullMarked
 public class EqualityModuloProofIrrelevancy {
     // Operator
     /**

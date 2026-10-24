@@ -23,10 +23,14 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * General varcond for checking relationships between types of schema variables.
  */
+@NullMarked
 public final class TypeComparisonCondition extends VariableConditionAdapter {
 
     public enum Mode {
@@ -88,7 +92,8 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     }
 
 
-    private boolean checkSorts(final Sort fstSort, final Sort sndSort, final Services services) {
+    private boolean checkSorts(final @Nullable Sort fstSort, final @Nullable Sort sndSort,
+            final Services services) {
 
         boolean proxy1 = fstSort instanceof ProxySort;
         boolean proxy2 = sndSort instanceof ProxySort;
@@ -148,7 +153,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
         return false;
     }
 
-    private static Boolean lookupInCache(Sort s1, Sort s2, ServiceCaches caches) {
+    private static @Nullable Boolean lookupInCache(Sort s1, Sort s2, ServiceCaches caches) {
         Boolean result = null;
 
         final Map<Sort, Map<Sort, Boolean>> disjointnessCache = caches.getDisjointnessCache();
@@ -201,7 +206,8 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     /**
      * Checks for disjointness modulo "null".
      */
-    private boolean checkDisjointness(Sort fstSort, Sort sndSort, Services services) {
+    private boolean checkDisjointness(final @Nullable Sort fstSort, final @Nullable Sort sndSort,
+            Services services) {
         // sorts identical?
         if (fstSort == sndSort) {
             return false;

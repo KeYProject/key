@@ -21,8 +21,11 @@ import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+
+@NullMarked
 public abstract class FindTacletExecutor extends TacletExecutor {
     public static final AtomicLong PERF_APPLY = new AtomicLong();
     public static final AtomicLong PERF_SET_SEQUENT = new AtomicLong();
@@ -73,7 +76,7 @@ public abstract class FindTacletExecutor extends TacletExecutor {
      */
     protected abstract void applyAdd(Sequent add, TermLabelState termLabelState,
             SequentChangeInfo currentSequent,
-            PosInOccurrence whereToAdd,
+            @Nullable PosInOccurrence whereToAdd,
             PosInOccurrence posOfFind,
             MatchResultInfo matchCond, Goal goal,
             TacletApp ruleApp, Services services);
@@ -87,7 +90,7 @@ public abstract class FindTacletExecutor extends TacletExecutor {
      * @param ruleApp the taclet application that is executed.
      */
     @Override
-    public final ImmutableList<Goal> apply(@NonNull Goal goal, @NonNull RuleApp ruleApp) {
+    public final ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
         final TermLabelState termLabelState = new TermLabelState();
         var services = goal.getOverlayServices();
         // Number without the if-goal eventually needed
@@ -203,7 +206,7 @@ public abstract class FindTacletExecutor extends TacletExecutor {
         return result;
     }
 
-    private PosInOccurrence updatePositionInformation(
+    private @Nullable PosInOccurrence updatePositionInformation(
             TacletApp tacletApp, TacletGoalTemplate gt,
             SequentChangeInfo currentSequent) {
         PosInOccurrence result = tacletApp.posInOccurrence();
