@@ -6,8 +6,56 @@ class LambdaMethodRef {
 
     static class Box {
 
+        int size;
+
+        //@ //@ requires size >= 0;
+        //@ //@ ensures this.size == size;
+
+
         Box(int size) {
+            this.size = size;
         }
+    }
+
+    static class Owner {
+
+        int size;
+
+        Owner(int size) {
+            this.size = size;
+        }
+
+        //@ //@ ensures \result == this.size;
+
+
+        int sizeOf() {
+            return size;
+        }
+    }
+
+    /**
+     * Functional interface with model methods; the target type of the constructor
+     * reference {@code Box::new} below (Csiky 6.2.4 "Application: Method References").
+     */
+    interface BoxFactory {
+
+        //@ //@ model boolean preCondition(Integer size);
+        //@ //@ model two_state boolean postCondition(Integer size, Box __result);
+
+
+        Box make(Integer size);
+    }
+
+    /**
+     * Target type of the unbound instance method reference {@code Owner::sizeOf}.
+     */
+    interface IntGetter {
+
+        //@ //@ model boolean preCondition(Owner owner);
+        //@ //@ model two_state boolean postCondition(Owner owner, Integer __result);
+
+
+        Integer get(Owner owner);
     }
 
     Predicate<Object> nullTest() {
@@ -44,14 +92,25 @@ class LambdaMethodRef {
         return p;
     }
 
-    Function<Integer, Box> factory() {
-        final class Function__2 implements java.util.function.Function<java.lang.Integer, LambdaMethodRef.Box> {
+    BoxFactory factory() {
+        final class BoxFactory__1 implements LambdaMethodRef.BoxFactory {
 
-            public LambdaMethodRef.Box apply(java.lang.Integer p0) {
+            public LambdaMethodRef.Box make(java.lang.Integer p0) {
                 return new Box(p0);
             }
         }
-        Function<Integer, Box> f = new Function__2();
+        BoxFactory f = new BoxFactory__1();
         return f;
+    }
+
+    IntGetter unbound() {
+        final class IntGetter__1 implements LambdaMethodRef.IntGetter {
+
+            public java.lang.Integer get(LambdaMethodRef.Owner p0) {
+                return p0.sizeOf();
+            }
+        }
+        IntGetter g = new IntGetter__1();
+        return g;
     }
 }

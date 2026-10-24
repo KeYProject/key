@@ -405,6 +405,7 @@ public class TransformationPipelineServices {
         }
 
         private void init() {
+            classDeclarations = new HashSet<>();
             class FindTypes extends VoidVisitorAdapter<Void> {
                 @Override
                 public void visit(EnumDeclaration n, Void arg) {
