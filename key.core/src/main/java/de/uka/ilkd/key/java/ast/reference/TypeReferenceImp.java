@@ -32,7 +32,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     /**
      * Prefix.
      */
-    protected final ReferencePrefix prefix;
+    protected final @Nullable ReferencePrefix prefix;
 
     /**
      * Dimensions.
@@ -67,7 +67,8 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
         this(name, 0, null);
     }
 
-    protected TypeReferenceImp(ProgramElementName name, int dimension, ReferencePrefix prefix) {
+    protected TypeReferenceImp(ProgramElementName name, int dimension,
+            @Nullable ReferencePrefix prefix) {
         this.name = name;
         this.dimensions = dimension;
         this.prefix = prefix;
@@ -179,7 +180,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      *
      * @return the reference prefix.
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return prefix;
     }
 

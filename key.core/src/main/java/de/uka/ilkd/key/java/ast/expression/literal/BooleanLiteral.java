@@ -163,7 +163,7 @@ public final class BooleanLiteral extends Literal {
         v.performActionOnBooleanLiteral(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
     }
 

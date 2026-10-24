@@ -1314,7 +1314,8 @@ public abstract class TacletApp implements RuleApp {
                     kjt = (KeYJavaType) o;
                 }
                 assert kjt != null : "could not find kjt for: " + o;
-                return new LocationVariable(VariableNamer.parseName(instantiation), kjt);
+                return new LocationVariable(VariableNamer.parseName(instantiation),
+                    Objects.requireNonNull(kjt, "could not find kjt for: " + o));
             }
         }
         return null;
