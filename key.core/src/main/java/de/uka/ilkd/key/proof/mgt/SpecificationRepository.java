@@ -30,8 +30,9 @@ import org.key_project.util.collection.ImmutableSet;
  * {@code MergePointStatement});</li>
  * <li>the proof↔PO bookkeeping lives in {@code ProofRegistry};</li>
  * <li>class invariants/axioms (and their synthesis) live in {@code ClassAxiomComputer};</li>
- * <li>contracts, initially clauses and their combination/inheritance live in
- * {@code ContractRegistry}.</li>
+ * <li>contracts and their combination/inheritance live in {@code ContractRegistry};
+ * initially clauses are turned into constructor contracts by
+ * {@code JMLSpecFactory} at load time.</li>
  * </ul>
  * What remains here is a thin dispatch layer ({@link #addSpecs}, {@link #map}) plus the
  * per-type {@link #processJavaType} hook for profiles (e.g. WD) that post-process a type's
@@ -53,8 +54,8 @@ public class SpecificationRepository {
 
     /**
      * Applies the specified operator to every specification element stored in the
-     * {@link Services}-owned components (contracts and initially clauses in the contract
-     * registry, invariants and class axioms in the class-axiom computer).
+     * {@link Services}-owned components (contracts in the contract registry,
+     * invariants and class axioms in the class-axiom computer).
      *
      * @param op an operator.
      * @param services services.
@@ -71,10 +72,11 @@ public class SpecificationRepository {
      * <li>{@link Contract} → {@link de.uka.ilkd.key.speclang.ContractRegistry#addContract}</li>
      * <li>{@link ClassInvariant} / {@link ClassAxiom} → the
      * {@link de.uka.ilkd.key.speclang.ClassAxiomComputer}</li>
-     * <li>{@link InitiallyClause} →
-     * {@link de.uka.ilkd.key.speclang.ContractRegistry#addInitiallyClause}</li>
      * <li>loop/block/merge specs → their AST nodes</li>
      * </ul>
+     * Initially clauses are not dispatched here anymore: the load pipeline
+     * ({@code SLEnvInput}) feeds them to {@code JMLSpecFactory}, which derives the
+     * constructor contracts from them.
      */
     public void addSpecs(ImmutableSet<SpecificationElement> specs) {
         for (SpecificationElement spec : specs) {
@@ -82,8 +84,6 @@ public class SpecificationRepository {
                 services.getContractRegistry().addContract((Contract) spec);
             } else if (spec instanceof ClassInvariant) {
                 services.getClassAxiomComputer().addClassInvariant((ClassInvariant) spec);
-            } else if (spec instanceof InitiallyClause) {
-                services.getContractRegistry().addInitiallyClause((InitiallyClause) spec);
             } else if (spec instanceof ClassAxiom) {
                 services.getClassAxiomComputer().addClassAxiom((ClassAxiom) spec);
             } else if (spec instanceof LoopSpecification loopSpec) {
