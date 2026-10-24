@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class ExecutionContext
@@ -35,7 +36,7 @@ public class ExecutionContext
     /**
      * the reference to the active object
      */
-    protected final ReferencePrefix runtimeInstance;
+    protected final @Nullable ReferencePrefix runtimeInstance;
 
     /**
      * the currently active method
@@ -44,7 +45,7 @@ public class ExecutionContext
 
     public ExecutionContext(
             PositionInfo pi, List<Comment> comments, TypeReference classContext,
-            ReferencePrefix runtimeInstance, IProgramMethod methodContext) {
+            @Nullable ReferencePrefix runtimeInstance, IProgramMethod methodContext) {
         super(pi, comments);
         this.classContext = classContext;
         this.runtimeInstance = runtimeInstance;
@@ -64,7 +65,7 @@ public class ExecutionContext
      *        is currently active/executed
      */
     public ExecutionContext(TypeReference classContext, IProgramMethod methodContext,
-            ReferencePrefix runtimeInstance) {
+            @Nullable ReferencePrefix runtimeInstance) {
         this(null, null, classContext, runtimeInstance, methodContext);
     }
 
@@ -153,7 +154,7 @@ public class ExecutionContext
      * {@inheritDoc}
      */
     @Override
-    public ReferencePrefix getRuntimeInstance() {
+    public @Nullable ReferencePrefix getRuntimeInstance() {
         return runtimeInstance;
     }
 
