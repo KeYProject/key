@@ -32,7 +32,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import org.key_project.logic.Named;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Operator;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.MapUtil;
 
@@ -974,7 +973,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         for (LocationVariable arg : originalParamVars) {
             args[i++] = arg;
         }
-        final MethodReference mr = new MethodReference(new ImmutableArray<>(args),
+        final MethodReference mr = new MethodReference(ImmutableList.of(args),
             pm.getProgramElementName(), originalSelfVar);
         final Statement callStatement;
         if (originalResultVar == null) {
