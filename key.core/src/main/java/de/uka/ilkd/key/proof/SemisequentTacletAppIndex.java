@@ -21,9 +21,13 @@ import org.key_project.prover.sequent.*;
 import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class holds <code>TermTacletAppIndex</code>s for all formulas of a semisequent.
  */
+@NullMarked
 public class SemisequentTacletAppIndex {
     public static final AtomicLong PERF_UPDATE = new AtomicLong();
     public static final AtomicLong PERF_ADD = new AtomicLong();
@@ -129,9 +133,9 @@ public class SemisequentTacletAppIndex {
      * @return the old indices in the same order as the list <code>infos</code> Note: destructive,
      *         use only when constructing new index
      */
-    private List<TermTacletAppIndex> removeFormulas(
+    private List<@Nullable TermTacletAppIndex> removeFormulas(
             ImmutableList<FormulaChangeInfo> infos) {
-        var oldIndices = new ArrayList<TermTacletAppIndex>(infos.size());
+        var oldIndices = new ArrayList<@Nullable TermTacletAppIndex>(infos.size());
 
         for (FormulaChangeInfo info : infos) {
             final SequentFormula oldFor = info.getOriginalFormula();
@@ -149,14 +153,14 @@ public class SemisequentTacletAppIndex {
      * The new indices are inserted in the map <code>termIndices</code>. Note: destructive, use only
      * when constructing new index
      */
-    private void updateTermIndices(List<TermTacletAppIndex> oldIndices,
+    private void updateTermIndices(List<@Nullable TermTacletAppIndex> oldIndices,
             ImmutableList<FormulaChangeInfo> infos,
             Services services,
             TacletIndex tacletIndex,
             NewRuleListener listener) {
         final Iterator<FormulaChangeInfo> infoIt =
             infos.iterator();
-        final Iterator<TermTacletAppIndex> oldIndexIt = oldIndices.iterator();
+        final Iterator<@Nullable TermTacletAppIndex> oldIndexIt = oldIndices.iterator();
 
         while (infoIt.hasNext()) {
             final FormulaChangeInfo info = infoIt.next();

@@ -43,6 +43,7 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,7 @@ import org.slf4j.LoggerFactory;
  * invariants. Provides methods for adding such elements to the repository, and for retrieving them
  * afterwards.
  */
+@NullMarked
 public class SpecificationRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpecificationRepository.class);
 
@@ -218,7 +220,8 @@ public class SpecificationRepository {
         }
     }
 
-    protected IObserverFunction getCanonicalFormForKJT(IObserverFunction obs, KeYJavaType kjt) {
+    protected @Nullable IObserverFunction getCanonicalFormForKJT(IObserverFunction obs,
+            KeYJavaType kjt) {
         assert obs != null;
         assert kjt != null;
         if (!(obs instanceof IProgramMethod pm) || obs.getContainerType().equals(kjt)) {
@@ -311,7 +314,7 @@ public class SpecificationRepository {
     /**
      * Returns the kjt for the outer class, if the passed kjt is a member class, and null otherwise.
      */
-    private KeYJavaType getEnclosingKJT(KeYJavaType kjt) {
+    private @Nullable KeYJavaType getEnclosingKJT(KeYJavaType kjt) {
         // HACK, this should be easier
         if (kjt.getJavaType() instanceof ClassDeclaration) {
 
@@ -343,7 +346,7 @@ public class SpecificationRepository {
         return result;
     }
 
-    private RepresentsAxiom getRepresentsAxiom(KeYJavaType kjt, ClassAxiom ax) {
+    private @Nullable RepresentsAxiom getRepresentsAxiom(KeYJavaType kjt, ClassAxiom ax) {
         if (!(ax instanceof RepresentsAxiom) || axioms.get(kjt) == null) {
             return null;
         }
@@ -1194,7 +1197,7 @@ public class SpecificationRepository {
     /**
      * Returns the PO that the passed proof is about, or null.
      */
-    public ContractPO getContractPOForProof(Proof proof) {
+    public @Nullable ContractPO getContractPOForProof(Proof proof) {
         ProofOblInput po = getProofOblInput(proof);
         if (po instanceof ContractPO) {
             return (ContractPO) po;
@@ -1206,7 +1209,7 @@ public class SpecificationRepository {
     /**
      * Returns the PO that the passed contract is about, or null.
      */
-    public ContractPO getPO(Contract c) {
+    public @Nullable ContractPO getPO(Contract c) {
         for (ProofOblInput po : proofs.keySet()) {
             if (po instanceof ContractPO && ((ContractPO) po).getContract().equals(c)) {
                 return (ContractPO) po;
@@ -1215,7 +1218,7 @@ public class SpecificationRepository {
         return null;
     }
 
-    public ContractPO getPOForProof(Proof proof) {
+    public @Nullable ContractPO getPOForProof(Proof proof) {
         for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
             ProofOblInput po = entry.getKey();
             ImmutableSet<Proof> sop = entry.getValue();
@@ -1247,7 +1250,7 @@ public class SpecificationRepository {
     /**
      * Returns the target that the passed proof is about, or null.
      */
-    public IObserverFunction getTargetOfProof(Proof proof) {
+    public @Nullable IObserverFunction getTargetOfProof(Proof proof) {
         final ContractPO po = getPOForProof(proof);
         return po == null ? null : po.getContract().getTarget();
     }
@@ -1280,7 +1283,7 @@ public class SpecificationRepository {
     /**
      * Returns the registered loop invariant for the passed loop, or null.
      */
-    public synchronized LoopSpecification getLoopSpec(LoopStatement loop) {
+    public synchronized @Nullable LoopSpecification getLoopSpec(LoopStatement loop) {
         final int line = loop.getStartPosition().line();
         Pair<LoopStatement, Integer> l = new Pair<>(loop, line);
         LoopSpecification inv = loopInvs.get(l);
@@ -1647,7 +1650,7 @@ public class SpecificationRepository {
         return statementMap.get(statement);
     }
 
-    public JmlStatementSpec addStatementSpec(Statement statement, JmlStatementSpec spec) {
+    public @Nullable JmlStatementSpec addStatementSpec(Statement statement, JmlStatementSpec spec) {
         return statementMap.put(statement, spec);
     }
 

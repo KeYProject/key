@@ -9,6 +9,8 @@ import java.util.Set;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Indicates that a branch has been closed by "reference" to another closed proof.
  * This is always looked up using {@link Node#lookup(Class)} on the node of that branch.
@@ -18,5 +20,6 @@ import de.uka.ilkd.key.proof.Proof;
  * @param nodesToSkip If the referenced proof has dependency graph information: proof steps to skip.
  * @author Arne Keller
  */
+@NullMarked
 public record ClosedBy(Proof proof, Node node, Set<Node> nodesToSkip) {
 }
