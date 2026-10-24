@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
@@ -32,6 +33,9 @@ public class FieldSpecification extends VariableSpecification implements Field {
 
     public FieldSpecification() {}
 
+    // May be created for a schema program variable whose KeYJavaType is null (see
+    // ProgramSV.getKeYJavaType()); the delegated constructor's Type parameter stays @NonNull.
+    @SuppressWarnings("NullAway")
     public FieldSpecification(IProgramVariable var) {
         this(var, var.getKeYJavaType());
     }
@@ -193,8 +197,10 @@ public class FieldSpecification extends VariableSpecification implements Field {
             return false;
         FieldSpecification other = (FieldSpecification) o;
         if (programVariable instanceof ProgramVariable thisPV) {
-            if (!(other.programVariable instanceof ProgramVariable otherPV) ||
-                    !thisPV.getContainerType().equals(otherPV.getContainerType())) {
+            if (!(other.programVariable instanceof ProgramVariable otherPV)) {
+                return false;
+            }
+            if (!Objects.equals(thisPV.getContainerType(), otherPV.getContainerType())) {
                 return false;
             }
         }

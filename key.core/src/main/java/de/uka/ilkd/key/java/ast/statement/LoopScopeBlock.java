@@ -18,6 +18,7 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -45,7 +46,7 @@ public final class LoopScopeBlock extends JavaStatement
 
     private @Nullable IProgramVariable indexPV;
     private final StatementBlock body;
-    private final MethodFrame innerMostMethodFrame;
+    private final @Nullable MethodFrame innerMostMethodFrame;
     private final int prefixLength;
 
     public LoopScopeBlock(PositionInfo pi, List<Comment> comments, IProgramVariable indexPV,
@@ -76,7 +77,7 @@ public final class LoopScopeBlock extends JavaStatement
      * @param body
      *        the StatementBlock inside the loop scope (the actual loop body)
      */
-    public LoopScopeBlock(IProgramVariable iProgramVariable, StatementBlock body) {
+    public LoopScopeBlock(@Nullable IProgramVariable iProgramVariable, StatementBlock body) {
         super((PositionInfo) null, null);
         this.indexPV = iProgramVariable;
         this.body = body;
@@ -95,7 +96,8 @@ public final class LoopScopeBlock extends JavaStatement
     public LoopScopeBlock(ExtList children) {
         super(children);
         indexPV = children.get(IProgramVariable.class);
-        body = children.get(StatementBlock.class);
+        body = Objects.requireNonNull(children.get(StatementBlock.class),
+            "a loop scope block requires a body");
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil
                 .computeEssentials(this);
         prefixLength = info.getLength();
@@ -132,7 +134,7 @@ public final class LoopScopeBlock extends JavaStatement
     }
 
     @Override
-    public MethodFrame getInnerMostMethodFrame() {
+    public @Nullable MethodFrame getInnerMostMethodFrame() {
         return innerMostMethodFrame;
     }
 
@@ -180,7 +182,7 @@ public final class LoopScopeBlock extends JavaStatement
      *
      * @return the expression.
      */
-    public IProgramVariable getIndexPV() {
+    public @Nullable IProgramVariable getIndexPV() {
         return indexPV;
     }
 

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -42,7 +43,8 @@ public class Import extends JavaNonTerminalProgramElement
      */
     public Import(ExtList children, boolean isMultiImport) {
         super(children);
-        reference = children.get(TypeReferenceInfix.class);
+        reference = Objects.requireNonNull(children.get(TypeReferenceInfix.class),
+            "an import requires a reference");
         this.isMultiImport = isMultiImport;
     }
 
@@ -50,6 +52,10 @@ public class Import extends JavaNonTerminalProgramElement
     /**
      * Import.
      */
+    // Stub used by extension points; leaves the reference unset. The {@code reference} field
+    // stays @NonNull (see {@link #getReference()}) and is left null only for this degenerate
+    // instance, which is not used through the getters.
+    @SuppressWarnings("NullAway")
     public Import() {
         isMultiImport = false;
         reference = null;
