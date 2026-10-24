@@ -52,6 +52,10 @@ public class KeYJavaPipeline {
         // Hoists the local classes created by the lambda replacer (and user-written local
         // classes) into unique private static final nested classes capturing the closure.
         p.add(new LocalClassTransformation(pipelineServices));
+        // Converts the JML contracts of lambdas and method references (extracted by the
+        // LambdaReplacer) into model methods on the desugared classes (Csiky Def. 7/8). Runs
+        // after the hoisting so that the clause bodies can refer to the hoisted fields.
+        p.add(new LambdaContractModelMethods(pipelineServices));
         p.add(new JMLTransformer(pipelineServices));
         p.add(new JmlDocRemoval(pipelineServices));
         p.add(new ImplicitFieldAdder(pipelineServices));
