@@ -17,7 +17,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Replaces a declaration of multiple variables by two variable declarations where the first one
@@ -33,9 +33,9 @@ public class MultipleVarDecl extends ProgramTransformer {
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
         VariableDeclaration vardecl = (VariableDeclaration) pe;
-        ImmutableArray<Modifier> modifiers = vardecl.getModifiers();
+        ImmutableList<Modifier> modifiers = vardecl.getModifiers();
         TypeReference tref = vardecl.getTypeReference();
-        ImmutableArray<? extends VariableSpecification> variables = vardecl.getVariables();
+        ImmutableList<? extends VariableSpecification> variables = vardecl.getVariables();
         VariableSpecification headVar = variables.get(0);
         VariableSpecification[] tailVars = new VariableSpecification[variables.size() - 1];
 
