@@ -312,7 +312,7 @@ primaryexpr
   | array_initializer
   ;
 this_: THIS;
-ident: IDENT | JML_IDENT | SPECIAL_IDENT | THIS | SUPER;
+ident: IDENT | JML_IDENT | DL_ESCAPE | SPECIAL_IDENT | THIS | SUPER;
 inv:INV;
 inv_free:INV_FREE;
 true_:TRUE;

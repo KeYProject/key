@@ -456,10 +456,11 @@ fragment
 LETTERORDIGIT: LETTER | DIGIT;
 
 IDENT: LETTER (LETTERORDIGIT)*;
+// Keep DL_ESCAPE BEFORE JML_IDENT so that maximal munch (rule order wins for
+// equally long matches) yields a dedicated token for '\dl_' escapes.
+DL_ESCAPE: '\\dl_' LETTER (LETTERORDIGIT | '_')*;
 JML_IDENT: '\\' IDENT ;
 SPECIAL_IDENT: '<'IDENT'>';
-
-//DL_ESCAPE: '\\dl_'  LETTER  ( LETTERORDIGIT )*  ;
 
 /*
 HEXLITERAL:

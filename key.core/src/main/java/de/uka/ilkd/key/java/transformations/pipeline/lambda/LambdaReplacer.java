@@ -5,7 +5,10 @@
 package de.uka.ilkd.key.java.transformations.pipeline.lambda;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import de.uka.ilkd.key.java.transformations.pipeline.JavaTransformerAbstract;
 import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
@@ -14,6 +17,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.InitializerDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -33,6 +37,8 @@ import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.SuperExpr;
 import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.expr.TypeExpr;
+import com.github.javaparser.ast.jml.doc.JmlDoc;
+import com.github.javaparser.ast.jml.doc.JmlDocDeclaration;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.LocalClassDeclarationStmt;
@@ -151,7 +157,12 @@ public class LambdaReplacer extends JavaTransformerAbstract {
         MethodDeclaration samMethod = samAsMethod(sam, fi, lambda);
         // The lambda parameters bind (positionally) to the SAM parameters.
         bindLambdaParameters(samMethod, lambda);
-        samMethod.setBody(lambdaBody(lambda, sam));
+        BlockStmt body = lambdaBody(lambda, sam);
+        // Phase 2: extract the explicit JML contract from the (cloned) body and remove the
+        // consumed JML statements; the generated class carries the contract for the
+        // subsequent model-method conversion (Csiky, Def. 7).
+        LambdaContractSpec spec = LambdaContractSpec.extract(body, true);
+        samMethod.setBody(body);
 
         // Escape `this`/`super` so they keep referring to the enclosing instance.
         escapeThisSuper(samMethod, enclosing);
@@ -160,6 +171,21 @@ public class LambdaReplacer extends JavaTransformerAbstract {
             new NodeList<>(Modifier.finalModifier()), false, className);
         local.setImplementedTypes(NodeList.nodeList(fiTypeSyntax(fi, lambda)));
         local.addMember(samMethod);
+
+        // A method reference normalized into a lambda (6.2.4) may already carry the copied
+        // contract of its target method; merge it with the clauses written in the body.
+        LambdaContractSpec refSpec = lambda.containsData(LambdaContractSpec.KEY)
+                ? lambda.getData(LambdaContractSpec.KEY)
+                : null;
+        if (refSpec != null) {
+            if (spec == null) {
+                spec = new LambdaContractSpec();
+            }
+            spec.addAll(refSpec);
+        }
+        if (spec != null) {
+            local.setData(LambdaContractSpec.KEY, spec);
+        }
 
         ObjectCreationExpr creation = new ObjectCreationExpr();
         creation.setType(className);
@@ -226,6 +252,7 @@ public class LambdaReplacer extends JavaTransformerAbstract {
         } else {
             ResolvedMethodDeclaration method = mr.resolve();
             boolean isStatic = method.isStatic();
+            int paramOffset = 0;
             if (scope instanceof TypeExpr texpr && resolvesAsType(texpr)) {
                 // T::m — static method of T, or unbound instance method.
                 if (isStatic) {
@@ -239,6 +266,7 @@ public class LambdaReplacer extends JavaTransformerAbstract {
                 } else {
                     // Unbound instance method: the first lambda parameter is the receiver.
                     params.add(new Parameter(texpr.getType().clone(), "p0"));
+                    paramOffset = 1;
                     var methodParams = new ArrayList<Parameter>();
                     for (int i = 0; i < method.getNumberOfParams(); i++) {
                         var p =
@@ -268,8 +296,72 @@ public class LambdaReplacer extends JavaTransformerAbstract {
                 params.forEach(p -> call.addArgument(new NameExpr(p.getNameAsString())));
                 body = call;
             }
+            LambdaExpr lambda =
+                new LambdaExpr(new NodeList<>(params), new ExpressionStmt(body), false);
+            // Copy the JML contract of the target method onto the synthetic lambda; the
+            // desugaring step turns it into model methods on the generated class (6.2.5).
+            LambdaContractSpec spec = contractFromMethodReference(method, params, paramOffset);
+            if (spec != null) {
+                lambda.setData(LambdaContractSpec.KEY, spec);
+            }
+            return lambda;
         }
         return new LambdaExpr(new NodeList<>(params), new ExpressionStmt(body), false);
+    }
+
+    /**
+     * Copies the JML contract of the target method of a method reference onto the synthetic
+     * lambda expression (6.2.5). The clause text of the target method refers to the target
+     * method's parameter names; these are renamed to the parameter names of the synthetic
+     * lambda, which are the names the generated SAM method uses (Def. 8, cb). Returns
+     * {@code null} if the target method declares no contract.
+     */
+    private @Nullable LambdaContractSpec contractFromMethodReference(
+            ResolvedMethodDeclaration method, List<Parameter> params, int paramOffset) {
+        Optional<? extends Node> ast;
+        try {
+            ast = method.toAst();
+        } catch (RuntimeException e) {
+            return null;
+        }
+        if (ast.isEmpty() || !(ast.get() instanceof MethodDeclaration md)) {
+            return null;
+        }
+        Optional<ClassOrInterfaceDeclaration> owner =
+            md.findAncestor(ClassOrInterfaceDeclaration.class);
+        if (owner.isEmpty()) {
+            return null;
+        }
+        NodeList<BodyDeclaration<?>> members = owner.get().getMembers();
+        int idx = -1;
+        for (int i = 0; i < members.size(); i++) {
+            if (members.get(i) == md) {
+                idx = i;
+                break;
+            }
+        }
+        if (idx <= 0) {
+            return null;
+        }
+        // The contract spans all JML comments directly preceding the method declaration.
+        List<JmlDoc> docs = new ArrayList<>();
+        for (int i = idx - 1; i >= 0 && members.get(i) instanceof JmlDocDeclaration jd; i--) {
+            docs.addAll(0, jd.getJmlComments());
+        }
+        LambdaContractSpec spec = LambdaContractSpec.fromJmlDocs(docs);
+        if (spec == null) {
+            return null;
+        }
+        Map<String, String> rename = new HashMap<>();
+        for (int i = 0; i < method.getNumberOfParams() && i + paramOffset < params.size(); i++) {
+            String target = method.getParam(i).getName();
+            String synthetic = params.get(i + paramOffset).getNameAsString();
+            if (!target.equals(synthetic)) {
+                rename.put(target, synthetic);
+            }
+        }
+        spec.renameIdentifiers(rename);
+        return spec;
     }
 
     /**

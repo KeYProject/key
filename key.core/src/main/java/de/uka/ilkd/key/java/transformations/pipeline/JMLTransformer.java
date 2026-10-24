@@ -617,10 +617,18 @@ record JmlDocSanitizer(Set<String> enabledKeys) {
     }
 
     public String asString(NodeList<JmlDoc> jmlDocs, boolean emulateGlobalPosition) {
-        final var tokenList = jmlDocs.stream().map(JmlDoc::getTokenRange)
-                .map(it -> it.get().getBegin())
-                .toList();
-        return asStringJT(tokenList, emulateGlobalPosition);
+        // Note: emulateGlobalPosition is kept for interface compatibility. The content is
+        // always available, also for content-constructed JmlDocs (created e.g. by the lambda
+        // contract conversion) that carry no token range; the sanitizer below strips the JML
+        // comment markers (//@, /*@ ... */, @ line leaders).
+        if (jmlDocs.isEmpty())
+            return "";
+        StringConstructor s = new StringConstructor();
+        for (JmlDoc doc : jmlDocs) {
+            s.append("\n");
+            s.append(doc.getContent());
+        }
+        return toSanitizedString(s.getBuffer());
     }
 
     public String toSanitizedString(StringBuilder s) {
