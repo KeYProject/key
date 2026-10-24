@@ -107,7 +107,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
      */
     protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp,
             PosInOccurrence pio,
-            ProofGoal goal) {
+            ProofGoal<?> goal) {
         return true;
     }
 
