@@ -16,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Alexander Weigl
  * @version 1 (30.05.19)
  */
+@SuppressWarnings("auxiliaryclass") // KeyboardTacletModel is an auxiliary class in
+// KeyboardTacletExtension.java
 public class KeyboardTacletTest {
 
     @Test

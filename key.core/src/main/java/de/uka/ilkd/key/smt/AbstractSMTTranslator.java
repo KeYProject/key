@@ -46,6 +46,7 @@ import static de.uka.ilkd.key.smt.SMTProblem.sequentToTerm;
  * @author Simon Greiner
  *
  */
+@SuppressWarnings("auxiliaryclass") // SortWrapper is an auxiliary class in SortHierarchy.java
 public abstract class AbstractSMTTranslator implements SMTTranslator {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSMTTranslator.class);
 
@@ -402,9 +403,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             for (SortWrapper swParent : swChild.getParents()) {
                 StringBuilder form;
                 if (swChild.getSort() == nullOp.sort() && settings.instantiateNullAssumption()) {
-                    form = buildInstantiatedHierarchyPredicate(swChild, swParent, translateNull());
+                    form = buildInstantiatedHierarchyPredicate(swParent.getPredicateName(),
+                        translateNull());
                 } else {
-                    form = buildGeneralHierarchyPredicate(swChild, swParent);
+                    form = buildGeneralHierarchyPredicate(swChild.getPredicateName(),
+                        swParent.getPredicateName());
                 }
 
                 if (form.length() > 0) {
@@ -416,13 +419,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         return toReturn;
     }
 
-    private StringBuilder buildGeneralHierarchyPredicate(SortWrapper child, SortWrapper parent) {
+    private StringBuilder buildGeneralHierarchyPredicate(StringBuilder childPredicateName,
+            StringBuilder parentPredicateName) {
 
         StringBuilder var = this.translateLogicalVar(new StringBuilder("tvar2"));
         ArrayList<StringBuilder> varlist = new ArrayList<>();
         varlist.add(var);
-        StringBuilder leftForm = this.translatePredicate(child.getPredicateName(), varlist);
-        StringBuilder rightForm = this.translatePredicate(parent.getPredicateName(), varlist);
+        StringBuilder leftForm = this.translatePredicate(childPredicateName, varlist);
+        StringBuilder rightForm = this.translatePredicate(parentPredicateName, varlist);
 
         StringBuilder form = this.translateLogicalImply(leftForm, rightForm);
         if (this.isMultiSorted()) {
@@ -433,12 +437,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         return form;
     }
 
-    private StringBuilder buildInstantiatedHierarchyPredicate(SortWrapper child, SortWrapper parent,
+    private StringBuilder buildInstantiatedHierarchyPredicate(StringBuilder parentPredicateName,
             StringBuilder constant) {
         ArrayList<StringBuilder> varlist = new ArrayList<>();
         varlist.add(constant);
 
-        return this.translatePredicate(parent.getPredicateName(), varlist);
+        return this.translatePredicate(parentPredicateName, varlist);
     }
 
     /**
