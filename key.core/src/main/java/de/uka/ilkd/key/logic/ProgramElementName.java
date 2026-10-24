@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.reference.MethodName;
@@ -156,7 +158,7 @@ public class ProgramElementName extends Name
 
     public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
-        if (this.equals(src)) {
+        if (Objects.equals(this, src)) {
             source.next();
             return matchCond;
         } else {
