@@ -244,22 +244,19 @@ already verified — see `JML_MAPPING.md` and §3).
 
 ### Phase 4 — Delete `SpecificationRepository`: specs are rewritten via the AST
 
-> **Progress (see HANDOFF §5.2/§7.3):** slices 1–7 DONE (`7f369e5c29` statement
-> specs → AST nodes; `806c2b1ba6` limited observers → `LimitedObservers`;
-> `ae716ed74a` loop/block/merge specs → AST nodes; `c81c034dd1` proof↔PO
-> registry → `ProofRegistry`/`Services`; `1b0f1f94ee` class invariants/axioms
-> → `ClassAxiomComputer`/`Services`; `005320b2ec` contract registry → new
-> `ContractRegistry`/`Services`; `fd32802417` initially clauses →
-> `JMLSpecFactory` load path); full-suite baseline
+> **Progress (see HANDOFF §5.2/§7.3):** Phase 4 **COMPLETE** (slices 1–9:
+> `7f369e5c29` statement specs → AST nodes; `806c2b1ba6` limited observers →
+> `LimitedObservers`; `ae716ed74a` loop/block/merge specs → AST nodes;
+> `c81c034dd1` proof↔PO registry → `ProofRegistry`/`Services`; `1b0f1f94ee`
+> class invariants/axioms → `ClassAxiomComputer`/`Services`; `005320b2ec`
+> contract registry → `ContractRegistry`/`Services`; `fd32802417` initially
+> clauses → `JMLSpecFactory` load path; `2ae5b95be0` `addSpecs` collapse +
+> `map(...)` removal; `e50d64b699` `SpecificationRepository.java` + the
+> `Services`/`KeYEnvironment` accessors + `SpecificationRepositoryWD` deleted,
+> WD `processJavaType` → `ContractRegistryWD`); full-suite baseline
 > measured + A/B-verified (40 failures at slices-1–2 HEAD identical to
 > Phase-3 HEAD — zero regressions), IntSemantics fixture fix landed
 > (`14a26a43d0`), leaving **34 recorded pre-existing jmltk gaps**.
-> NEXT = **slice 8: `addSpecs` collapse + `map(...)` removal** — move the
-> `addSpecs` dispatch into the `SLEnvInput`/`JMLSpecFactory` output handling
-> (Contract → registry, ClassInvariant/ClassAxiom → computer, loop/block/merge
-> → AST nodes) and delete `map(...)` from the repo/registry/computer surface
-> (WD transforms re-walk the AST instead of the global snapshot); then the
-> final deletion of `SpecificationRepository.java`.
 
 Rationale: with Phases 0–3 done, the *parsed* JML lives on the Java AST
 (`attachedJml` on declarations, `getContracts()` on statements, `JmlStatementSpec`
@@ -286,12 +283,12 @@ What the repository does today (`SpecificationRepository.java`, 1757 lines):
 | Initially clauses: `initiallyClauses`, `addInitiallyClause`, `createContractsFromInitiallyClauses` (postcondition on all constructors, + inheritance) | `Map<KJT, Set<InitiallyClause>>` | ✅ DONE (slice 7, `fd32802417`) — moved to `JMLSpecFactory`: the factory collects `InitiallyClause`s during loading (`addInitiallyClause(s)` on the per-load factory that `SLEnvInput.createSpecs` already owns) and derives the constructor contracts at the end of loading (`createContractsFromInitiallyClauses()`; derived contracts register via `services.getContractRegistry()` with `addContractNoInheritance`/`unregisterContract`/`cf.addPost`/`cf.func` — same ordering as before). `ContractRegistry` loses the map + 4 methods; `unregisterContract` becomes public; repo `addSpecs` no longer dispatches `InitiallyClause`. |
 | Loop invariants: `loopInvs`, `getLoopSpec`, `addLoopInvariant`, `copyLoopInvariant` (`(loop,line)` keys) | `Map<(LoopStatement,line), LoopSpecification>` | ✅ DONE (slice 3, `ae716ed74a`) — attached to the `LoopStatement` node (`setLoopInvariant`); `copyLoopInvariant` is `LoopStatement.copyLoopInvariantTo`, carried by the AST rewrites. |
 | Block/loop/merge contracts: `blockContracts`, `loopContracts`, `loopContractsOnLoops`, `mergeContracts`, `get/add/remove{Block,Loop,Merge}Contract`, `getLoopContracts(LoopStatement, modality)` | `(block/loop,file,line)` keys | ✅ DONE (slice 3, `ae716ed74a`) — attached to `StatementBlock`/`LoopStatement`/`MergePointStatement` nodes; modality filtering is a pure helper (`AbstractAuxiliaryContractRule.get{Block,Loop}Contracts`). |
-| Proof↔PO registry: `proofs`, `registerProof`, `removeProof`, `getProofs(po/contract/kjt+target)`, `getPO(Contract)`, `getPOForProof`, `getProofOblInput`, `getContractPOForProof`, `getTargetOfProof` | `Map<PO, Set<Proof>>` | ✅ DONE (slice 4, `c81c034dd1`) — moved verbatim to a new `de.uka.ilkd.key.proof.mgt.ProofRegistry` owned by `Services` (shared by `Services.copy()` like `specRepos`, so side-proof envs and env-less loader paths keep the same registry); the contract-based lookups temporarily delegate `splitContract`/`getOverridingTargets` to the still-alive repository (they move with the contract registry). |
+| Proof↔PO registry: `proofs`, `registerProof`, `removeProof`, `getProofs(po/contract/kjt+target)`, `getPO(Contract)`, `getPOForProof`, `getProofOblInput`, `getContractPOForProof`, `getTargetOfProof` | `Map<PO, Set<Proof>>` | ✅ DONE (slice 4, `c81c034dd1`) — moved verbatim to a new `de.uka.ilkd.key.proof.mgt.ProofRegistry` owned by `Services` (shared by `Services.copy()` copies, so side-proof envs and env-less loader paths keep the same registry); the contract-based lookups temporarily delegate `splitContract`/`getOverridingTargets` to the still-alive repository (they moved with the contract registry in slice 6). |
 | Limited observers: `limitObs`/`unlimitObs`, `LIMIT_SUFFIX` `$lmtd`, limit/unlimit taclets | `Map<IObserverFunction,…>` | ✅ DONE (slice 2, `806c2b1ba6`) — moved to `de.uka.ilkd.key.util.LimitedObservers` (stateless + thread-safe static memo; taclet builders move along). |
 | JML statement specs: `statementMap` (`IdentityHashMap<Statement,JmlStatementSpec>`), `getStatementSpec`/`addStatementSpec`, `JmlStatementSpec` record with `getTerm`/`updateVariables` | global identity map | ✅ DONE (slice 1, `7f369e5c29`) — attached to the `JmlAssert`/`SetStatement` AST nodes via `JmlSpecCarrier`; consumers read it off the node. |
-| `map(UnaryOperator, Services)` (apply a term transformation to *all* specs, e.g. for at-pre/WD transforms) | walks every map | Becomes the *reason* the rewrite is safe to delete: transformations run on the AST-attached spec; `IntroAtPreDefsOp`/WD re-walk the affected AST instead of the global snapshot. |
-| `addSpecs` dispatcher, `processJavaType` no-op | — | `addSpecs` collapses into `JMLSpecFactory` output handling; `processJavaType` (empty) disappears. |
-| Thread-safety (synchronized maps for the parallel prover's lock-free phase) | explicit sync on hot maps | Attached + derived specs are immutable after load; the parallel-prover mutation concern disappears with the global registry. |
+| `map(UnaryOperator, Services)` (apply a term transformation to *all* specs, e.g. for at-pre/WD transforms) | walks every map | ✅ DONE (slices 8–9, `2ae5b95be0`/`e50d64b699`) — deleted from the repo/registry/computer surface (it had zero callers): transformations run on the AST-attached spec; `IntroAtPreDefsOp`/WD re-walk the affected AST instead of the global snapshot. |
+| `addSpecs` dispatcher, `processJavaType` no-op | — | ✅ DONE (slices 8–9) — `addSpecs` collapsed into the `SLEnvInput` output handling (`registerSpecs` helper, `2ae5b95be0`); `processJavaType` moved to `ContractRegistry` (empty default; WD override in `ContractRegistryWD` with the former `SpecificationRepositoryWD` body, `e50d64b699`). |
+| Thread-safety (synchronized maps for the parallel prover's lock-free phase) | explicit sync on hot maps | ✅ DONE (slices 8–9) — attached + derived specs are immutable after load; the parallel-prover mutation concern disappeared with the global registry (the last `synchronized` walkers were `map(...)`, now deleted). |
 
 Transition notes:
 - ~77 files reference `Services.getSpecificationRepository()`. Most calls are
@@ -307,9 +304,11 @@ Transition notes:
 - Contract `id` determinism: `prepareContract`'s counter moved to
   `ContractFactory` must keep ids stable across re-parse (proof digests,
   `.key` files, proof reuse compare ids — see `ContentOrderNumberingTest`).
-- Deliverable: `SpecificationRepository.java` deleted; `Services`/`KeYEnvironment`
-  expose no repository; the whole `key.core`/`key.ui` test suite green with
-  contract/loop/block/WD behaviors unchanged (fix only mechanical lookups).
+- Deliverable: **REACHED** (`e50d64b699`) — `SpecificationRepository.java` deleted;
+  `Services`/`KeYEnvironment` expose no repository; the `key.core`/`key.ui`/
+  `key.core.wd`/testgen/infflow suites stay at their recorded baselines with
+  contract/loop/block/WD behaviors unchanged (only mechanical lookups were
+  rewired slice by slice).
 
 ## 6. Regression net (tests defining KeY-supported JML)
 
