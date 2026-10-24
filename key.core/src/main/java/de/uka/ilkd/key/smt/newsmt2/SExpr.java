@@ -9,6 +9,9 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class models s-expressions to be used for the SMT translation.
  * <p>
@@ -18,12 +21,13 @@ import java.util.stream.Collectors;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class SExpr implements Writable {
 
     /**
      * An enumeration of the types that an {@link SExpr} can assume.
      */
-    public record Type(String name, String injection, String projection) {
+    public record Type(String name, @Nullable String injection, @Nullable String projection) {
 
         /**
          * to indicate that this expression holds a value of type U

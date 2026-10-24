@@ -4,12 +4,16 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.smt.model;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents a sequence in an SMT model.
  *
  * @author mihai
  *
  */
+@NullMarked
 public class Sequence {
     /**
      * The name of the sequence.
@@ -18,7 +22,7 @@ public class Sequence {
     /**
      * The values contained by the sequence.
      */
-    private String[] content;
+    private @Nullable String[] content;
 
     public Sequence(int length, String name) {
         super();

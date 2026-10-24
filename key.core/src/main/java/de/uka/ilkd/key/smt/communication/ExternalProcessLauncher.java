@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class is responsible for starting external processes:
@@ -21,6 +23,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Wolfram Pfeifer (overhaul)
  */
+@NullMarked
 public class ExternalProcessLauncher {
     /**
      * the store of all messages send to and received from the external process
@@ -35,12 +38,12 @@ public class ExternalProcessLauncher {
     /**
      * the external process
      */
-    private Process process;
+    private @Nullable Process process;
 
     /**
      * the pipe for sending and receiving to/from the process
      */
-    private SimplePipe pipe;
+    private @Nullable SimplePipe pipe;
 
     /**
      * Creates the external process launcher.
@@ -88,7 +91,7 @@ public class ExternalProcessLauncher {
         // pipe.close();
     }
 
-    public Pipe getPipe() {
+    public @Nullable Pipe getPipe() {
         return pipe;
     }
 }

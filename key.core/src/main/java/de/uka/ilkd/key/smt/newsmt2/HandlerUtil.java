@@ -16,12 +16,15 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A collection of static methods that {@link SMTHandler}s are likely to use.
  *
  * @author Mattias Ulbrich
  * @author Jonas Schiffl
  */
+@NullMarked
 public class HandlerUtil {
 
     /**

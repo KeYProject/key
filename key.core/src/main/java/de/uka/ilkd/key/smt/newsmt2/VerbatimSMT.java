@@ -4,12 +4,15 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.smt.newsmt2;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Objects of this class are writable (like {@link SExpr}s), but are not really structured as such.
  * They are just arbitrary strings.
  * <p>
  * Writing them is obvious.
  */
+@NullMarked
 record VerbatimSMT(String string) implements Writable {
 
     @Override

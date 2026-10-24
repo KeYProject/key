@@ -16,6 +16,8 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class contains the outsourced routines for KeY sort definitions and axioms for the modular
  * smtlib2 translation.
@@ -28,6 +30,7 @@ import org.key_project.logic.sort.Sort;
  * @author Jonas Schiffl
  * @author Mattias Ulbrich
  */
+@NullMarked
 class TypeManager {
 
     private final Services services;

@@ -10,12 +10,15 @@ import java.util.Set;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Represents a node in the class hierarchy. Each SortNode contains a Sort and links to SortNodes
  * containing the parents and the children of the sort.
  *
  * @author mihai
  */
+@NullMarked
 public class SortNode {
     private final Sort sort;
 

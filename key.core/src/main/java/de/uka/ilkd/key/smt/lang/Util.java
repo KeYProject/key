@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.smt.lang;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public final class Util {
     private Util() {
 

@@ -7,12 +7,16 @@ package de.uka.ilkd.key.smt.lang;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  *
  * @author Aboubakr Achraf El Ghazi
  *
  */
+@NullMarked
 public class SMTTermQuant extends SMTTerm {
 
     public enum Quant {
@@ -40,10 +44,11 @@ public class SMTTermQuant extends SMTTerm {
     Quant quant;
     List<SMTTermVariable> bindVars;
     SMTTerm sub;
+    @Nullable
     List<List<SMTTerm>> pats;
 
     public SMTTermQuant(Quant quant, List<SMTTermVariable> bindVars, SMTTerm sub,
-            List<List<SMTTerm>> pats) {
+            @Nullable List<List<SMTTerm>> pats) {
         this.quant = quant;
         this.bindVars = bindVars;
         this.sub = sub;
@@ -93,14 +98,14 @@ public class SMTTermQuant extends SMTTerm {
     /**
      * @return the pats
      */
-    public List<List<SMTTerm>> getPats() {
+    public @Nullable List<List<SMTTerm>> getPats() {
         return pats;
     }
 
     /**
      * @param pats the pat to set
      */
-    public void setPats(List<List<SMTTerm>> pats) {
+    public void setPats(@Nullable List<List<SMTTerm>> pats) {
         this.pats = pats;
     }
 

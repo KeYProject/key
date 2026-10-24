@@ -10,6 +10,9 @@ import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The SMTSolver interface represents a solver process (e.g. Z3, Simplify,...) on the KeY side. It
  * is used to store information about an instance of a process and its result. A object of
@@ -22,6 +25,7 @@ import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
  *
  * @author ?
  */
+@NullMarked
 public interface SMTSolver {
 
     /**
@@ -53,6 +57,7 @@ public interface SMTSolver {
      * @return String representation of the corresponding problem, if the solver process is not
      *         running, otherwise null.
      */
+    @Nullable
     String getTranslation();
 
     /**
@@ -61,6 +66,7 @@ public interface SMTSolver {
      *
      * @return the taclet translation that is used as assumptions
      */
+    @Nullable
     TacletSetTranslation getTacletTranslation();
 
     /**
@@ -74,6 +80,7 @@ public interface SMTSolver {
      *
      * @return the SMT Problem that is connected to this solver process
      **/
+    @Nullable
     SMTProblem getProblem();
 
     /**
@@ -82,6 +89,7 @@ public interface SMTSolver {
      *
      * @return the exception that occured while executing the solver process, null if none occurred
      */
+    @Nullable
     Throwable getException();
 
     /**
@@ -152,6 +160,7 @@ public interface SMTSolver {
      *
      * @return the result of the solver process' execution
      **/
+    @Nullable
     SMTSolverResult getFinalResult();
 
     /**

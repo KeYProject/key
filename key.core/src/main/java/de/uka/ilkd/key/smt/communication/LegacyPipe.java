@@ -14,6 +14,7 @@ import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.communication.SolverCommunication.MessageType;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -25,14 +26,15 @@ import org.jspecify.annotations.Nullable;
  * @author Mattias Ulbrich (ovrhaul)
  * @author Wolfram Pfeifer (extracted interface, marked as legacy)
  */
+@NullMarked
 @Deprecated
 class LegacyPipe implements Pipe {
     /**
      * The workers of the pipe. One worker is responsible for sending messages, while the other two
      * workers handle messages which are received.
      */
-    private Receiver stdoutReceiver;
-    private Receiver stderrReceiver;
+    private @Nullable Receiver stdoutReceiver;
+    private @Nullable Receiver stderrReceiver;
 
     /**
      * The delimiters of the messages, i.e. strings that indicate the end of a message. If you
@@ -50,10 +52,10 @@ class LegacyPipe implements Pipe {
      * User specific data.
      */
     private final SolverCommunication session;
-    private OutputStreamWriter outputWriter;
+    private @Nullable OutputStreamWriter outputWriter;
     private final BlockingQueue<Message> messageQueue = new LinkedBlockingQueue<>();
-    private Exception thrownException;
-    private Process process;
+    private @Nullable Exception thrownException;
+    private @Nullable Process process;
 
 
     public LegacyPipe(SolverCommunication session, String[] messageDelimiters) {

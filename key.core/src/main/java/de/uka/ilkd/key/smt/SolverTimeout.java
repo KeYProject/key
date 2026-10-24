@@ -8,9 +8,12 @@ import java.util.TimerTask;
 
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The class controls the timer that checks for a solver whether it exceeds a pre-defined timeout.
  */
+@NullMarked
 class SolverTimeout extends TimerTask {
     private final SMTSolver solver;
     private final Session session;

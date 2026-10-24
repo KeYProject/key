@@ -24,6 +24,8 @@ import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 import org.key_project.prover.sequent.Sequent;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author ?
  * @author Wolfram Pfeifer (SMT communication overhaul)
  */
+@NullMarked
 public final class SMTSolverImplementation implements SMTSolver, Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(SMTSolverImplementation.class);
 
@@ -62,7 +65,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     /**
      * the ModelExtractor used to generate counterexamples (only used for CE solver type)
      */
-    private ModelExtractor query;
+    private @Nullable ModelExtractor query;
 
     /**
      * The SMT problem that is related to this solver
@@ -93,13 +96,13 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     /**
      * The thread that is associated with this solver.
      */
-    private Thread thread;
+    private @Nullable Thread thread;
 
     /**
      * The timeout that is associated with this solver. Represents the timertask that is started
      * when the solver is started.
      */
-    private SolverTimeout solverTimeout;
+    private @Nullable SolverTimeout solverTimeout;
 
     /**
      * stores the reason for interruption if present (e.g. User, Timeout, Exception)
@@ -119,7 +122,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     /**
      * Stores the settings that are used for the execution.
      */
-    private SMTSettings smtSettings;
+    private @Nullable SMTSettings smtSettings;
 
     /**
      * Stores the translation of the problem that is associated with this solver
@@ -129,12 +132,12 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     /**
      * Stores the taclet translation that is associated with this solver.
      */
-    private TacletSetTranslation tacletTranslation;
+    private @Nullable TacletSetTranslation tacletTranslation;
 
     /**
      * If there was an exception while executing the solver it is stored in this attribute.
      */
-    private Throwable exception;
+    private @Nullable Throwable exception;
 
     /**
      * the exceptions that may occur during taclet translation
@@ -186,11 +189,11 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         return isRunning() ? ReasonOfInterruption.NoInterruption : reasonOfInterruption;
     }
 
-    public Throwable getException() {
+    public @Nullable Throwable getException() {
         return isRunning() ? null : exception;
     }
 
-    public SMTProblem getProblem() {
+    public @Nullable SMTProblem getProblem() {
         return isRunning() ? null : problem;
     }
 
@@ -374,17 +377,17 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     }
 
     @Override
-    public SMTSolverResult getFinalResult() {
+    public @Nullable SMTSolverResult getFinalResult() {
         return isRunning() ? null : solverCommunication.getFinalResult();
     }
 
     @Override
-    public TacletSetTranslation getTacletTranslation() {
+    public @Nullable TacletSetTranslation getTacletTranslation() {
         return isRunning() ? null : tacletTranslation;
     }
 
     @Override
-    public String getTranslation() {
+    public @Nullable String getTranslation() {
         return isRunning() ? null : problemString;
     }
 
@@ -424,11 +427,11 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         return socket;
     }
 
-    public ModelExtractor getQuery() {
+    public @Nullable ModelExtractor getQuery() {
         return query;
     }
 
-    public void setQuery(ModelExtractor query) {
+    public void setQuery(@Nullable ModelExtractor query) {
         this.query = query;
     }
 }

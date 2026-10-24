@@ -19,19 +19,23 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents a problem that can be passed to a solver. This class was introduced because the SMT
  * module must handle both goals and terms.<br>
  * Each <code>SMTProblem</code> is related to a set of solvers that are used to solve this problem.
  *
  */
+@NullMarked
 public class SMTProblem {
 
     private final JTerm term;
     private final Collection<SMTSolver> solvers = new LinkedList<>();
-    private final Goal goal;
-    private final Node node;
-    private Sequent sequent;
+    private final @Nullable Goal goal;
+    private final @Nullable Node node;
+    private @Nullable Sequent sequent;
     private final String name;
 
     /* ############# public interface ############# */
@@ -82,15 +86,15 @@ public class SMTProblem {
         this.term = t;
     }
 
-    public Goal getGoal() {
+    public @Nullable Goal getGoal() {
         return goal;
     }
 
-    public Node getNode() {
+    public @Nullable Node getNode() {
         return node;
     }
 
-    public Sequent getSequent() {
+    public @Nullable Sequent getSequent() {
         return sequent;
     }
 
@@ -131,7 +135,7 @@ public class SMTProblem {
     /**
      * @return the solver that finished this problem
      */
-    public SMTSolver getSuccessfulSolver() {
+    public @Nullable SMTSolver getSuccessfulSolver() {
         for (SMTSolver solver : solvers) {
             if (solver.getFinalResult() != null
                     && solver.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
