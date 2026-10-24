@@ -88,10 +88,12 @@ public final class PrimitiveType implements Type {
     }
 
     private final String name;
-    private final Literal defaultValue;
+    private final @Nullable Literal defaultValue;
     private final Name ldtName;
 
-    private PrimitiveType(String name, Literal defaultValue, @Nullable Name ldtName) {
+    // defaultValue is optional: PROGRAM_SV and dynamically-loaded "\dl_" types have no default
+    // value (getDefaultValue() is @Nullable on the Type interface, as in NullType).
+    private PrimitiveType(String name, @Nullable Literal defaultValue, @Nullable Name ldtName) {
         this.defaultValue = defaultValue;
         this.name = name.intern();
         this.ldtName = ldtName;
@@ -129,7 +131,7 @@ public final class PrimitiveType implements Type {
      * @return the default value of the given type according to JLS ???4.5.5
      */
     @Override
-    public Literal getDefaultValue() {
+    public @Nullable Literal getDefaultValue() {
         return defaultValue;
     }
 

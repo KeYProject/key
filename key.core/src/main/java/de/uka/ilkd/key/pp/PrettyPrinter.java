@@ -272,7 +272,8 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnProgramMethod(IProgramMethod x) {
-        layouter.print(x.getMethodDeclaration().getProgramElementName().toString());
+        layouter.print(Objects.requireNonNull(x.getMethodDeclaration(),
+            "program method has no declaration").getProgramElementName().toString());
     }
 
     @Override
@@ -539,7 +540,10 @@ public class PrettyPrinter implements Visitor {
         if (type == null) {
             layouter.print("unknown");
         } else if (type instanceof ArrayDeclaration arr) {
-            performActionOnType(arr.getBaseType().getKeYJavaType().getJavaType());
+            performActionOnType(Objects.requireNonNull(
+                Objects.requireNonNull(arr.getBaseType().getKeYJavaType(),
+                    "array base type has no KeY Java type").getJavaType(),
+                "array base type has no Java type"));
             layouter.print("[]");
         } else {
             layouter.print(type.getFullName());
@@ -566,7 +570,7 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
-    private void printTypeReference(ReferencePrefix prefix, @Nullable KeYJavaType type,
+    private void printTypeReference(@Nullable ReferencePrefix prefix, @Nullable KeYJavaType type,
             ProgramElementName name, boolean fullTypeNames) {
         printReferencePrefix(prefix);
         if (fullTypeNames && type != null) {
@@ -617,7 +621,9 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnCompilationUnit(CompilationUnit x) {
         boolean hasPackageSpec = x.getPackageSpecification() != null;
         if (hasPackageSpec) {
-            performActionOnPackageSpecification(x.getPackageSpecification());
+            performActionOnPackageSpecification(
+                Objects.requireNonNull(x.getPackageSpecification(),
+                    "compilation unit is missing its package specification"));
         }
         boolean hasImports = (x.getImports() != null) && (!x.getImports().isEmpty());
         if (hasImports) {
@@ -732,15 +738,18 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnVariableDeclaration(@Nullable VariableDeclaration x) {
+        final VariableDeclaration varDecl =
+            Objects.requireNonNull(x, "variable declaration must not be null");
         layouter.beginI();
-        ImmutableArray<Modifier> modifiers = x.getModifiers();
+        ImmutableArray<Modifier> modifiers = varDecl.getModifiers();
         if (modifiers != null && !modifiers.isEmpty()) {
             writeKeywordList(modifiers);
             layouter.print(" ");
         }
-        x.getTypeReference().visit(this);
+        Objects.requireNonNull(varDecl.getTypeReference(),
+            "variable declaration has no type").visit(this);
         layouter.print(" ");
-        ImmutableArray<? extends VariableSpecification> varSpecs = x.getVariables();
+        ImmutableArray<? extends VariableSpecification> varSpecs = varDecl.getVariables();
         if (varSpecs != null) {
             writeCommaList(varSpecs);
         }
@@ -949,7 +958,8 @@ public class PrettyPrinter implements Visitor {
         layouter.print(" :");
         layouter.brk();
 
-        x.getGuardExpression().visit(this);
+        Objects.requireNonNull(x.getGuardExpression(),
+            "enhanced for has no iterated expression").visit(this);
 
         endMultilineBracket();
 
@@ -1033,7 +1043,7 @@ public class PrettyPrinter implements Visitor {
                 handleContinuationAfterNewBlock(newBlock);
             }
             Else e = x.getElse();
-            if (x.getElse() != null) {
+            if (e != null) {
                 performActionOnElse(e);
             }
         }
@@ -1387,13 +1397,16 @@ public class PrettyPrinter implements Visitor {
         layouter.print(x.getName());
         layouter.print("(");
         boolean afterFirst = false;
-        for (ParameterDeclaration pd : x.getParameters()) {
+        ImmutableArray<ParameterDeclaration> parameters = Objects.requireNonNull(x.getParameters(),
+            "method has no parameter list");
+        for (ParameterDeclaration pd : parameters) {
             if (afterFirst) {
                 layouter.print(", ");
             } else {
                 afterFirst = true;
             }
-            performActionOnTypeReference(pd.getTypeReference(), true);
+            performActionOnTypeReference(Objects.requireNonNull(pd.getTypeReference(),
+                "parameter " + pd + " has no type"), true);
         }
         layouter.print(")");
     }

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic.op;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -26,7 +28,8 @@ public final class ProgramConstant extends ProgramVariable {
     public ProgramConstant(ProgramElementName name, KeYJavaType t,
             @Nullable KeYJavaType containingType,
             boolean isStatic, @Nullable Literal compileTimeConstant) {
-        super(name, t.getSort(), t, containingType, isStatic, false, false);
+        super(name, Objects.requireNonNull(t.getSort(), "type has no sort: " + t), t,
+            containingType, isStatic, false, false);
         this.compileTimeConstant = compileTimeConstant;
     }
 

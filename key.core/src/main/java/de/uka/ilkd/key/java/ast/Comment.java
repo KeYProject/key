@@ -19,7 +19,9 @@ public class Comment extends JavaSourceElement {
     private final String text;
 
     public Comment() {
-        this.text = null;
+        // parameterless placeholder ctor (no in-repo callers); text defaults to the empty string
+        // instead of null so accessors treat it identically to a real comment
+        this.text = "";
     }
 
     public Comment(String text) {

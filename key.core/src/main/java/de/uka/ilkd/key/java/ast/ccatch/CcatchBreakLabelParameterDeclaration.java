@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A "\Break label" parameter declaration of a ccatch clause.
@@ -24,8 +25,10 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class CcatchBreakLabelParameterDeclaration extends CcatchNonstandardParameterDeclaration {
 
-    private final Label label;
+    private final @Nullable Label label;
 
+    // The label is optional (a "\Break label" clause without a label is constructed from an
+    // ExtList that contains no Label), so the field and getter are honestly @Nullable.
     public CcatchBreakLabelParameterDeclaration(ExtList children) {
         label = children.get(Label.class);
     }
@@ -40,15 +43,16 @@ public class CcatchBreakLabelParameterDeclaration extends CcatchNonstandardParam
         return (label != null) ? 1 : 0;
     }
 
-    public Label getLabel() {
+    public @Nullable Label getLabel() {
         return label;
     }
 
     @Override
     public ProgramElement getChildAt(int index) {
-        if (label != null) {
+        final Label l = label;
+        if (l != null) {
             if (index == 0) {
-                return label;
+                return l;
             }
         }
         throw new ArrayIndexOutOfBoundsException();

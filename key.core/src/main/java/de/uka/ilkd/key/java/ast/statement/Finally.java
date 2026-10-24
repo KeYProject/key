@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.statement;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.Statement;
@@ -13,6 +15,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Finally.
@@ -24,7 +27,7 @@ public class Finally extends BranchImp {
     /**
      * Body.
      */
-    protected final StatementBlock body;
+    protected final @Nullable StatementBlock body;
 
     /**
      * Finally.
@@ -118,12 +121,12 @@ public class Finally extends BranchImp {
      *
      * @return the statement.
      */
-    public StatementBlock getBody() {
+    public @Nullable StatementBlock getBody() {
         return body;
     }
 
     public SourceElement getLastElement() {
-        return body;
+        return Objects.requireNonNull(body, "finally body must not be null");
     }
 
     /**

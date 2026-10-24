@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.expression;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -108,7 +109,11 @@ public class ParenthesizedExpression extends Operator
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-        return getExpressionAt(0).getKeYJavaType(javaServ, ec);
+        // Expression.getKeYJavaType is honestly @Nullable, but the parenthesized expression of a
+        // type-checked program always resolves (TypeConverter requires it), and Operator's
+        // abstract contract here is @NonNull, so narrow at the deref.
+        return Objects.requireNonNull(getExpressionAt(0).getKeYJavaType(javaServ, ec),
+            "no KeYJavaType for the operand");
     }
 
 

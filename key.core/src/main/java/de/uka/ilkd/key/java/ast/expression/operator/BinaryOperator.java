@@ -87,7 +87,7 @@ public final class BinaryOperator extends Operator
     }
 
     @Override
-    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, @Nullable MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         if (src instanceof BinaryOperator other) {
             if (this.kind.equals(other.getKind())) {

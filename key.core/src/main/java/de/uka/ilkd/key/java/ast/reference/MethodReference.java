@@ -312,7 +312,9 @@ public class MethodReference extends JavaNonTerminalProgramElement
                 "no KeYJavaType for the context class");
         } else {
             if (prefix instanceof Expression) {
-                prefixType = ((Expression) prefix).getKeYJavaType(services, ec);
+                prefixType =
+                    Objects.requireNonNull(((Expression) prefix).getKeYJavaType(services, ec),
+                        "no KeYJavaType for the prefix");
             } else {
                 prefixType = Objects.requireNonNull(((TypeReference) prefix).getKeYJavaType(),
                     "no KeYJavaType for the prefix");

@@ -19,7 +19,6 @@ import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
 
-import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -260,7 +259,10 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
             "Cannot determine if " + programVariable + " is a model field");
     }
 
-    @EnsuresNonNull("initializer")
+    // Returns exactly whether an initializer is present (null-check on the honestly @Nullable
+    // field). The field itself can legitimately stay null after a false return, so no
+    // @EnsuresNonNull-style guarantee is (or can be) expressed here; callers must hold the
+    // result of this method before invoking getInitializer().
     public boolean hasInitializer() {
         return initializer != null;
     }
