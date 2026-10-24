@@ -37,7 +37,8 @@ public class ClassAxiomComputerWD extends ClassAxiomComputer {
 
         final ImmutableSet<ClassWellDefinedness> cwds = specRepo.getWdClassChecks(kjt);
         if (cwds.isEmpty()) {
-            specRepo.registerContractForClassAxioms(new ClassWellDefinedness(inv, target, null, null, services));
+            specRepo.registerContractForClassAxioms(
+                new ClassWellDefinedness(inv, target, null, null, services));
         } else {
             assert cwds.size() == 1;
             ClassWellDefinedness cwd = cwds.iterator().next();

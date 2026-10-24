@@ -35,8 +35,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
-import de.uka.ilkd.key.speclang.ContractRegistry;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.ContractRegistry;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 
 import org.key_project.logic.Name;
@@ -619,7 +619,8 @@ public final class ProofManagementDialog extends JDialog {
 
         // proof list
         DefaultListModel<ProofWrapper> model = new DefaultListModel<>();
-        for (Proof p : services.getProofRegistry().getAllProofs()) {            model.add(0, new ProofWrapper(p));
+        for (Proof p : services.getProofRegistry().getAllProofs()) {
+            model.add(0, new ProofWrapper(p));
         }
         boolean changed;
         if (model.size() != proofList.getModel().getSize()) {

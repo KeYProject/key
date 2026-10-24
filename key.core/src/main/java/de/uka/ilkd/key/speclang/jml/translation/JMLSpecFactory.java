@@ -57,15 +57,14 @@ import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.*;
 import org.key_project.util.parsing.Location;
 
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-
 import com.github.javaparser.ast.jml.body.JmlMethodDeclaration;
 import com.github.javaparser.ast.jml.clauses.ContractType;
 import com.github.javaparser.ast.jml.clauses.JmlContract;
 import com.github.javaparser.ast.key.KeyMergePointStmt;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -1727,7 +1726,8 @@ public class JMLSpecFactory {
         }
         ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
         for (TextualJMLSpecCase specificationCase : JmlToTextual.toSpecCases(specification)) {
-            result = result.union(createJMLBlockContracts(method, labels, block, specificationCase));
+            result =
+                result.union(createJMLBlockContracts(method, labels, block, specificationCase));
         }
         return result;
     }

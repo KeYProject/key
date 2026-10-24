@@ -278,7 +278,8 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
 
     private Map<ParserRuleContext, JTerm> getTermMap(JmlAssert jmlAssert, JavaBlock javaBlock,
             Services services) {
-        @Nullable JmlStatementSpec jmlspec = jmlAssert.getSpec();
+        @Nullable
+        JmlStatementSpec jmlspec = jmlAssert.getSpec();
         if (jmlspec == null) {
             throw new IllegalStateException(
                 "No specification found for JML assert statement at " + jmlAssert);

@@ -15,8 +15,8 @@ import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
-import de.uka.ilkd.key.speclang.ContractRegistry;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.ContractRegistry;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
 

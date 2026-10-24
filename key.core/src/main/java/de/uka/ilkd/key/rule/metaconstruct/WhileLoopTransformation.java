@@ -28,7 +28,6 @@ import de.uka.ilkd.key.speclang.LoopContract;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -12,9 +12,6 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.jml.JmlSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.DataKey;
 import com.github.javaparser.ast.Modifier;
@@ -43,6 +40,8 @@ import com.github.javaparser.ast.stmt.LabeledStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.KEY_ASSERT;
 import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.KEY_ASSIGN;
@@ -57,13 +56,13 @@ import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.KEY_MER
 /// only needs to
 ///
 /// * expose the attached JML as [JmlSpec] wrapped nodes via the data keys
-///   [JMLTransformer#KEY_SPEC_CASE] (method/block/loop contracts) and
-///   [JMLTransformer#KEY_CLASS_SPEC] (class level specifications such as invariants,
-///   initially clauses, model field and model method declarations),
+/// [JMLTransformer#KEY_SPEC_CASE] (method/block/loop contracts) and
+/// [JMLTransformer#KEY_CLASS_SPEC] (class level specifications such as invariants,
+/// initially clauses, model field and model method declarations),
 /// * replace the JMLtk wrapper declarations (`JmlMethodDeclaration`, `JmlFieldDeclaration`)
-///   by the contained real declarations,
+/// by the contained real declarations,
 /// * self-mark JML statements (`JmlExpressionStmt`, `KeyMergePointStmt`, `JmlGhostStmt`)
-///   so that the [de.uka.ilkd.key.java.loader.JP2KeYConverter] can recognize them.
+/// so that the [de.uka.ilkd.key.java.loader.JP2KeYConverter] can recognize them.
 ///
 /// The removal of the raw `JmlDoc*` nodes is left to [JmlDocRemoval].
 ///

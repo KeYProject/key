@@ -170,7 +170,7 @@ public class ContractRegistry {
         }
     }
 
-    private Contract prepareContract(Contract contract) {        // sanity check
+    private Contract prepareContract(Contract contract) { // sanity check
         assert getCanonicalFormForKJT(contract.getTarget(), contract.getKJT())
                 .equals(contract.getTarget());
 
@@ -430,7 +430,8 @@ public class ContractRegistry {
      */
     public ImmutableSet<Contract> splitContract(Contract contract) {
         ImmutableSet<Contract> result = DefaultImmutableSet.nil();
-        String[] atomicNames = contract.getName().split(ContractFactory.CONTRACT_COMBINATION_MARKER);
+        String[] atomicNames =
+            contract.getName().split(ContractFactory.CONTRACT_COMBINATION_MARKER);
         for (String atomicName : atomicNames) {
             Contract atomicContract = contractsByName.get(atomicName);
             if (atomicContract == null) {

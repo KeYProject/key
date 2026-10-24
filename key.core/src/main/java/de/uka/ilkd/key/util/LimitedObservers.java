@@ -91,7 +91,7 @@ public final class LimitedObservers {
         // converted into IProgramMethod? Wojtek: I guess so, but why are IProgramMethods excluded
         // from limiting? This kills limiting for model methods...
         // if(!(obs instanceof IObserverFunction && !(obs instanceof IProgramMethod))) {
-        //   return null;
+        // return null;
         // }
 
         IObserverFunction limited = UNLIMITED_TO_LIMITED.get(obs);

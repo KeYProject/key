@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
+
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;

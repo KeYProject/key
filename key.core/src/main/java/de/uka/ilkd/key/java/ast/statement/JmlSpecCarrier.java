@@ -18,8 +18,12 @@ import org.jspecify.annotations.Nullable;
  */
 public interface JmlSpecCarrier {
 
-    /** Returns the translated specification of this statement, or {@code null} if not yet translated. */
-    @Nullable JmlStatementSpec getSpec();
+    /**
+     * Returns the translated specification of this statement, or {@code null} if not yet
+     * translated.
+     */
+    @Nullable
+    JmlStatementSpec getSpec();
 
     /** Attaches the translated specification to this statement. */
     void setSpec(@Nullable JmlStatementSpec spec);

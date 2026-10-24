@@ -331,7 +331,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             return false;
         }
         return environmentServices.getContractRegistry().splitContract(cPO.contract)
-            .subset(environmentServices.getContractRegistry().splitContract(contract));
+                .subset(environmentServices.getContractRegistry().splitContract(contract));
     }
 
     /**

@@ -10,8 +10,8 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
-import de.uka.ilkd.key.speclang.ContractRegistry;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.ContractRegistry;
 
 import org.key_project.proofmanagement.check.CheckerData;
 import org.key_project.proofmanagement.io.Logger;

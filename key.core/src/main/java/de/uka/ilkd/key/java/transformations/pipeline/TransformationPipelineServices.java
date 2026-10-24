@@ -14,16 +14,15 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.JmlSpec;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.parsing.Position;
 
 import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.*;
@@ -339,8 +338,8 @@ public class TransformationPipelineServices {
         var result = parser.parseJmlClassLevel(spec);
         result.getProblems().forEach(p -> LOGGER.warn("Could not parse class level JML '{}': {}",
             spec, p.getMessage()));
-        result.getResult().ifPresent(root ->
-            root.getChildren().forEach(child -> addClassSpec(clazz, new JmlSpec(child))));
+        result.getResult().ifPresent(
+            root -> root.getChildren().forEach(child -> addClassSpec(clazz, new JmlSpec(child))));
     }
 
     /**
@@ -355,8 +354,8 @@ public class TransformationPipelineServices {
         var result = parser.parseJmlClassLevel(spec);
         result.getProblems().forEach(p -> LOGGER.warn("Could not parse JML '{}': {}", spec,
             p.getMessage()));
-        result.getResult().ifPresent(root ->
-            root.getChildren().forEach(child -> addSpec(node, new JmlSpec(child))));
+        result.getResult().ifPresent(
+            root -> root.getChildren().forEach(child -> addSpec(node, new JmlSpec(child))));
         LOGGER.info("Generated specification {} for {}", spec, node);
     }
 

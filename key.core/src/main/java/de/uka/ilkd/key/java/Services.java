@@ -88,7 +88,8 @@ public class Services implements TermServices, LogicServices, ProofServices {
 
     /**
      * the class-axiom/invariant computer (derived-spec synthesis). Owned here (not by the
-     * specification repository) since it synthesizes derived specification elements from inputs that
+     * specification repository) since it synthesizes derived specification elements from inputs
+     * that
      * live on the services and the AST; see {@link ClassAxiomComputer}. Shared by
      * {@link #copy(boolean)} copies like the specification repository.
      */

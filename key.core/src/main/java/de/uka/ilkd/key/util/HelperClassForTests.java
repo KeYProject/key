@@ -187,14 +187,16 @@ public class HelperClassForTests {
                 // Assert.assertNotNull(containerKJT);
                 // Search observer function
                 ImmutableSet<IObserverFunction> targets =
-                    environment.getServices().getContractRegistry().getContractTargets(containerKJT);
+                    environment.getServices().getContractRegistry()
+                            .getContractTargets(containerKJT);
                 IObserverFunction target =
                     CollectionUtil.search(targets,
                         element -> targetName.equals(element.toString()));
                 // Assert.assertNotNull(target);
                 // Find first contract.
                 ImmutableSet<Contract> contracts =
-                    environment.getServices().getContractRegistry().getContracts(containerKJT, target);
+                    environment.getServices().getContractRegistry().getContracts(containerKJT,
+                        target);
                 // Assert.assertFalse(contracts.isEmpty());
                 Contract contract = contracts.iterator().next();
                 // Start proof

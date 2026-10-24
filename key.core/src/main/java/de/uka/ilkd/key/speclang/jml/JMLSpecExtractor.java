@@ -20,7 +20,6 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
-import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
@@ -40,7 +39,6 @@ import de.uka.ilkd.key.speclang.translation.SLWarningException;
 import org.key_project.util.collection.*;
 import org.key_project.util.parsing.Location;
 
-import com.github.javaparser.ast.jml.body.JmlBodyClauseKind;
 import com.github.javaparser.ast.jml.body.JmlClassAccessibleDeclaration;
 import com.github.javaparser.ast.jml.body.JmlClassExprDeclaration;
 import com.github.javaparser.ast.jml.body.JmlRepresentsDeclaration;

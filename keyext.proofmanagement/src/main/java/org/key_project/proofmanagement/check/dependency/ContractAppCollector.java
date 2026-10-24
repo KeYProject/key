@@ -17,10 +17,10 @@ import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.*;
-import de.uka.ilkd.key.speclang.ContractRegistry;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractAxiom;
+import de.uka.ilkd.key.speclang.ContractRegistry;
 
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;

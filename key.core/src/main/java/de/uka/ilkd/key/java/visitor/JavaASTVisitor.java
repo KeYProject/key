@@ -23,7 +23,6 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.util.collection.ImmutableSet;
 
 /**
  * Extends the JavaASTWalker to use the visitor mechanism. The methods inherited by the Visitor
