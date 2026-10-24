@@ -52,6 +52,11 @@ public class SuperArrayDeclaration extends TypeDeclaration {
     }
 
 
+    // This class has no children (getChildCount() == 0) and deliberately returns null, but the
+    // base contract NonTerminalProgramElement.getChildAt(int) is @NonNull and cannot be widened
+    // without ripple across the whole AST, so the honestly-annotated override is exempted from
+    // the check.
+    @SuppressWarnings("NullAway")
     public @Nullable ProgramElement getChildAt(int i) {
         return null;
     }

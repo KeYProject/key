@@ -32,12 +32,12 @@ public abstract class LoopStatement extends JavaStatement
     /**
      * Inits.
      */
-    protected final ILoopInit inits;
+    protected final @Nullable ILoopInit inits;
 
     /**
      * Updates.
      */
-    protected final IForUpdates updates;
+    protected final @Nullable IForUpdates updates;
 
 
     /**
@@ -135,7 +135,7 @@ public abstract class LoopStatement extends JavaStatement
      * @param comments
      *        the comments attached to this statement.
      */
-    public LoopStatement(ILoopInit inits, IGuard guard, IForUpdates updates,
+    public LoopStatement(@Nullable ILoopInit inits, IGuard guard, @Nullable IForUpdates updates,
             Statement body,
             ExtList comments) {
         super(comments);
@@ -206,8 +206,9 @@ public abstract class LoopStatement extends JavaStatement
         this.attachedJml = ImmutableList.nil();
     }
 
-    public LoopStatement(PositionInfo pi, List<Comment> comments, ILoopInit inits,
-            IForUpdates updates, IGuard guard, Statement body,
+    public LoopStatement(PositionInfo pi, @Nullable List<Comment> comments,
+            @Nullable ILoopInit inits,
+            @Nullable IForUpdates updates, IGuard guard, Statement body,
             ImmutableList<TextualJMLConstruct> attachedJml) {
         super(pi, comments);
         this.inits = inits;
@@ -432,7 +433,7 @@ public abstract class LoopStatement extends JavaStatement
      *
      * @return the expression mutable list.
      */
-    public IForUpdates getIForUpdates() {
+    public @Nullable IForUpdates getIForUpdates() {
         return updates;
     }
 
@@ -441,7 +442,7 @@ public abstract class LoopStatement extends JavaStatement
      *
      * @return the loop initializer
      */
-    public ILoopInit getILoopInit() {
+    public @Nullable ILoopInit getILoopInit() {
         return inits;
     }
 

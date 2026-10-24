@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
@@ -42,6 +43,11 @@ public class ParameterDeclaration extends VariableDeclaration {
     /**
      * Parameter declaration.
      */
+    // The parameterless constructor deliberately leaves the varSpec field unset (null): it
+    // builds an "empty" parameter stub whose consumers all fail on it (getVariableSpecification
+    // throws on the stub). Every non-default constructor requires a variable specification, so
+    // the @NonNull field contract is intentionally not met only here.
+    @SuppressWarnings("NullAway")
     public ParameterDeclaration() {
         this.varSpec = null;
         this.varArgParameter = false;
@@ -108,8 +114,10 @@ public class ParameterDeclaration extends VariableDeclaration {
     public ParameterDeclaration(ExtList children, boolean parentIsInterfaceDeclaration,
             boolean parameterIsVarArg) {
         super(children, parentIsInterfaceDeclaration);
-        this.varSpec =
-            new ImmutableArray<>(children.get(VariableSpecification.class));
+        final VariableSpecification spec = Objects.requireNonNull(
+            children.get(VariableSpecification.class),
+            "a parameter declaration requires a variable specification");
+        this.varSpec = new ImmutableArray<>(spec);
         this.varArgParameter = parameterIsVarArg;
     }
 
