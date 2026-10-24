@@ -8,9 +8,12 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A JML set statement in textual form.
  */
+@NullMarked
 public final class TextualJMLSetStatement extends TextualJMLConstruct {
 
     private final JmlParser.Set_statementContext assignment;

@@ -8,11 +8,14 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A JML field or local variable (!) declaration (ghost or model) in textual form. For simiplicity,
  * at the moment this class is also used for local variable declarations, which has the caveat that
  * visibility modifiers are also allowed there.
  */
+@NullMarked
 public final class TextualJMLFieldDecl extends TextualJMLConstruct {
 
     private final JmlParser.Field_declarationContext decl;

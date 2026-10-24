@@ -15,6 +15,10 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public interface OperationContract extends Contract {
 
     @Override
@@ -48,7 +52,7 @@ public interface OperationContract extends Contract {
      * @param services the services object.
      * @return the modifiable clause.
      */
-    JTerm getModifiable(LocationVariable heapVar, LocationVariable selfVar,
+    JTerm getModifiable(LocationVariable heapVar, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, Services services);
 
     /**
@@ -61,7 +65,7 @@ public interface OperationContract extends Contract {
      * @param services the services object.
      * @return the modifiable clause.
      */
-    JTerm getModifiable(LocationVariable heapVar, JTerm heapTerm, JTerm selfTerm,
+    JTerm getModifiable(LocationVariable heapVar, JTerm heapTerm, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Services services);
 
     /**
@@ -73,7 +77,7 @@ public interface OperationContract extends Contract {
      * @param services the services object.
      * @return the free modifiable clause.
      */
-    JTerm getFreeModifiable(LocationVariable heapVar, LocationVariable selfVar,
+    JTerm getFreeModifiable(LocationVariable heapVar, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Services services);
 
@@ -88,19 +92,21 @@ public interface OperationContract extends Contract {
      * @return the free modifiable clause.
      */
     JTerm getFreeModifiable(LocationVariable heapVar, JTerm heapTerm,
-            JTerm selfTerm,
+            @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms,
             Services services);
 
-    JTerm getFreePre(LocationVariable heap, LocationVariable selfVar,
+    JTerm getFreePre(LocationVariable heap, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
-    JTerm getFreePre(List<LocationVariable> heapContext, LocationVariable selfVar,
+    @Nullable
+    JTerm getFreePre(List<LocationVariable> heapContext,
+            @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
-    JTerm getFreePre(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+    JTerm getFreePre(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
             Services services);
 }

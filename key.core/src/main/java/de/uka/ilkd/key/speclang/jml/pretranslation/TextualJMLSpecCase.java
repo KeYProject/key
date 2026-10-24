@@ -17,6 +17,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.*;
@@ -26,6 +27,7 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
  * A JML specification case (i.e., more or less an operation contract) in textual form. Is also used
  * for block contracts.
  */
+@NullMarked
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private final Behavior behavior;
     private ArrayList<Entry> clauses = new ArrayList<>(16);
@@ -122,7 +124,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     static class Entry {
         final Object clauseType;
         final LabeledParserRuleContext ctx;
-        final Name heap;
+        final @Nullable Name heap;
 
         Entry(Object clauseType, LabeledParserRuleContext ctx, Name heap) {
             this.clauseType = clauseType;
@@ -207,7 +209,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return behavior;
     }
 
-    public String getName() {
+    public @Nullable String getName() {
         return name;
     }
 

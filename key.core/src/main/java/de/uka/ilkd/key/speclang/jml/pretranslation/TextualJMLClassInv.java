@@ -9,17 +9,20 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
  * A JML class invariant declaration in textual form.
  */
+@NullMarked
 public final class TextualJMLClassInv extends TextualJMLConstruct {
     private final ParserRuleContext inv;
     private final boolean free;
 
     public TextualJMLClassInv(ImmutableList<JMLModifier> modifiers, ParserRuleContext inv,
-            String name, boolean free) {
+            @Nullable String name, boolean free) {
         super(modifiers, name);
         assert inv != null;
         this.inv = inv;
@@ -58,7 +61,7 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
         return modifiers.hashCode() + inv.hashCode();
     }
 
-    public String getName() {
+    public @Nullable String getName() {
         return name;
     }
 

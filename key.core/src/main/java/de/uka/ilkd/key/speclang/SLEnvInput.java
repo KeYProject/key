@@ -39,6 +39,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,7 @@ import org.slf4j.LoggerFactory;
 /**
  * EnvInput for standalone specification language front ends.
  */
+@NullMarked
 public final class SLEnvInput extends AbstractEnvInput {
     private static final Logger LOGGER = LoggerFactory.getLogger(SLEnvInput.class);
 
@@ -360,7 +362,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     // -------------------------------------------------------------------------
 
     @Override
-    public ImmutableSet<PositionedString> read() throws ProofInputException {
+    public @Nullable ImmutableSet<PositionedString> read() throws ProofInputException {
         if (initConfig == null) {
             throw new IllegalStateException("InitConfig not set.");
         }
@@ -375,7 +377,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     @Override
-    public Path getInitialFile() {
+    public @Nullable Path getInitialFile() {
         return null;
     }
 }

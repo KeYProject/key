@@ -14,10 +14,14 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.*;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Resolver manager for JML.
  */
+@NullMarked
 public final class JMLResolverManager extends SLResolverManager {
 
     public JMLResolverManager(
@@ -32,7 +36,7 @@ public final class JMLResolverManager extends SLResolverManager {
 
 
     @Override
-    public Modifier getSpecVisibility(MemberDeclaration md) {
+    public @Nullable Modifier getSpecVisibility(MemberDeclaration md) {
         if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md, ModifierKind.JML_SPEC_PUBLIC)) {
             return new Modifier(ModifierKind.PUBLIC);
         } else if (JMLInfoExtractor.hasJMLModifier((FieldDeclaration) md,

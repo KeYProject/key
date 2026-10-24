@@ -25,35 +25,40 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public final class ContractAxiom extends ClassAxiom {
 
     private final String name;
     private final IObserverFunction target;
     private final KeYJavaType kjt;
-    private final ModifierKind visibility;
+    private final @Nullable ModifierKind visibility;
     private final JTerm originalPre;
     private final JTerm originalFreePre;
     private final JTerm originalPost;
     private final JTerm originalFreePost;
-    private final JTerm originalMby;
-    private final LocationVariable originalSelfVar;
+    private final @Nullable JTerm originalMby;
+    private final @Nullable LocationVariable originalSelfVar;
     private final LocationVariable originalResultVar;
     private final ImmutableList<LocationVariable> originalParamVars;
     private final Map<LocationVariable, LocationVariable> atPreVars;
 
     public ContractAxiom(String name, IObserverFunction target, KeYJavaType kjt,
-            ModifierKind visibility, JTerm pre, JTerm freePre, JTerm post, JTerm freePost,
-            JTerm mby, Map<LocationVariable, LocationVariable> atPreVars, LocationVariable selfVar,
+            @Nullable ModifierKind visibility, JTerm pre, JTerm freePre, JTerm post, JTerm freePost,
+            @Nullable JTerm mby, Map<LocationVariable, LocationVariable> atPreVars,
+            @Nullable LocationVariable selfVar,
             LocationVariable resultVar, ImmutableList<LocationVariable> paramVars) {
         this(name, null, target, kjt, visibility, pre, freePre, post, freePost, mby, atPreVars,
             selfVar, resultVar, paramVars);
     }
 
-    public ContractAxiom(String name, String displayName, IObserverFunction target, KeYJavaType kjt,
-            ModifierKind visibility, JTerm originalPre, JTerm originalFreePre,
-            JTerm originalPost, JTerm originalFreePost, JTerm originalMby,
-            Map<LocationVariable, LocationVariable> atPreVars, LocationVariable selfVar,
+    public ContractAxiom(String name, @Nullable String displayName, IObserverFunction target,
+            KeYJavaType kjt,
+            @Nullable ModifierKind visibility, JTerm originalPre, JTerm originalFreePre,
+            JTerm originalPost, JTerm originalFreePost, @Nullable JTerm originalMby,
+            Map<LocationVariable, LocationVariable> atPreVars, @Nullable LocationVariable selfVar,
             LocationVariable resultVar, ImmutableList<LocationVariable> paramVars) {
 
         assert name != null;

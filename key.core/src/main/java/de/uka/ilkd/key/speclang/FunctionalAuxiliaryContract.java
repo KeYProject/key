@@ -27,6 +27,9 @@ import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.MapUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class is only used to generate a proof obligation for an {@link AuxiliaryContract}.
  *
@@ -34,6 +37,7 @@ import org.key_project.util.java.MapUtil;
  *
  * @param <T> the type of {@link AuxiliaryContract} for which this class generated POs.
  */
+@NullMarked
 public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> implements Contract {
 
 
@@ -146,18 +150,19 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     }
 
     @Override
-    public JTerm getMby() {
+    public @Nullable JTerm getMby() {
         return contract.getMby();
     }
 
     @Override
-    public JTerm getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+    public @Nullable JTerm getMby(LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
             Services services) {
         return contract.getMby(selfVar, services);
     }
 
     @Override
-    public JTerm getMby(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
+    public @Nullable JTerm getMby(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
             Services services) {
         return contract.getMby(heapTerms, selfTerm, atPres, services);
@@ -179,7 +184,7 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     }
 
     @Override
-    public JTerm getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
+    public @Nullable JTerm getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         TermBuilder tb = services.getTermBuilder();
@@ -206,7 +211,8 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
     }
 
     @Override
-    public JTerm getPre(List<LocationVariable> heapContext, Map<LocationVariable, JTerm> heapTerms,
+    public @Nullable JTerm getPre(List<LocationVariable> heapContext,
+            Map<LocationVariable, JTerm> heapTerms,
             JTerm selfTerm, ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
             Services services) {
         TermBuilder tb = services.getTermBuilder();

@@ -37,11 +37,13 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A class axiom that connects an observer symbol representing a Java method (i.e., an object of
  * type IProgramMethod), with the corresponding method body.
  */
+@NullMarked
 public final class QueryAxiom extends ClassAxiom {
 
     /**

@@ -14,11 +14,13 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A JML depends / accessible clause for a model field in textual form. Note that such clauses for
  * *methods* are part of TextualJMLSpecCase.
  */
+@NullMarked
 public final class TextualJMLDepends extends TextualJMLConstruct {
     private final Map<Name, ImmutableList<LabeledParserRuleContext>> depends =
         new LinkedHashMap<>();

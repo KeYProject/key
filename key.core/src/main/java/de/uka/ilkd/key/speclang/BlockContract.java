@@ -17,6 +17,9 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * A block contract.
@@ -30,6 +33,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author wacker, lanzinger
  */
+@NullMarked
 public interface BlockContract extends AuxiliaryContract {
 
     /**
@@ -77,5 +81,6 @@ public interface BlockContract extends AuxiliaryContract {
      * @return the {@code LoopContract} from which this contract was generated, or {@code null}.
      * @see LoopContract#toBlockContract()
      */
+    @Nullable
     LoopContract toLoopContract();
 }
