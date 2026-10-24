@@ -39,7 +39,6 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
@@ -141,7 +140,7 @@ public class QueryExpand implements BuiltInRule {
 
         final IProgramMethod method = (IProgramMethod) query.op();
 
-        final ImmutableArray<ProgramVariable> args =
+        final ImmutableList<ProgramVariable> args =
             getRegisteredArgumentVariables(method.getParameters(), services);
 
         final TermBuilder tb = services.getTermBuilder();
@@ -196,7 +195,7 @@ public class QueryExpand implements BuiltInRule {
                 lvTrms[i] = tb.var(instVars[i]);
                 lvSorts[i] = instVars[i].sort();
             }
-            ImmutableArray<Sort> imArrlvSorts = new ImmutableArray<>(lvSorts);
+            ImmutableList<Sort> imArrlvSorts = ImmutableList.of(lvSorts);
             placeHolderResult =
                 new JFunction(new Name(logicResultName), query.sort(), imArrlvSorts);
             placeHolderResultTrm = tb.func(placeHolderResult, lvTrms, null); // I'm not sure about
@@ -257,8 +256,8 @@ public class QueryExpand implements BuiltInRule {
     }
 
 
-    private ImmutableArray<ProgramVariable> getRegisteredArgumentVariables(
-            ImmutableArray<ParameterDeclaration> paramDecls, TermServices services) {
+    private ImmutableList<ProgramVariable> getRegisteredArgumentVariables(
+            ImmutableList<ParameterDeclaration> paramDecls, TermServices services) {
 
         final Namespace<IProgramVariable> progvarsNS = services.getNamespaces().programVariables();
         final ProgramVariable[] args = new ProgramVariable[paramDecls.size()];
@@ -273,7 +272,7 @@ public class QueryExpand implements BuiltInRule {
             i++;
         }
 
-        return new ImmutableArray<>(args);
+        return ImmutableList.of(args);
     }
 
 
@@ -591,7 +590,7 @@ public class QueryExpand implements BuiltInRule {
 
         }
 
-        final ImmutableArray<QuantifiableVariable> newBoundVars = term.boundVars();
+        final ImmutableList<QuantifiableVariable> newBoundVars = term.boundVars();
 
         final JTerm result;
         if (changedSubTerm) {

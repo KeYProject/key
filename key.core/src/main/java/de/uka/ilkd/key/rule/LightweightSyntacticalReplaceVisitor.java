@@ -22,7 +22,7 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleApp;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * <p>
@@ -174,8 +174,8 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
         return instantiatedOp;
     }
 
-    private ImmutableArray<QuantifiableVariable> instantiateBoundVariables(JTerm visited) {
-        ImmutableArray<QuantifiableVariable> vBoundVars = visited.boundVars();
+    private ImmutableList<QuantifiableVariable> instantiateBoundVariables(JTerm visited) {
+        ImmutableList<QuantifiableVariable> vBoundVars = visited.boundVars();
         if (!vBoundVars.isEmpty()) {
             final QuantifiableVariable[] newVars = new QuantifiableVariable[vBoundVars.size()];
             boolean varsChanged = false;
@@ -195,7 +195,7 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
             }
 
             if (varsChanged) {
-                vBoundVars = new ImmutableArray<>(newVars);
+                vBoundVars = ImmutableList.of(newVars);
             }
         }
         return vBoundVars;
@@ -229,7 +229,7 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
             final Operator newOp = instantiateOperator(visitedOp, jb);
 
             // instantiate bound variables
-            final ImmutableArray<QuantifiableVariable> boundVars = //
+            final ImmutableList<QuantifiableVariable> boundVars = //
                 instantiateBoundVariables(visited);
 
             // instantiate sub terms

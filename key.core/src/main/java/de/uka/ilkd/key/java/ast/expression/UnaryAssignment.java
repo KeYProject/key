@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -65,7 +65,7 @@ public final class UnaryAssignment extends Operator
 
     public UnaryAssignment(PositionInfo pi, List<Comment> c, UnaryAssignmentKind kind,
             Expression sub) {
-        super(pi, c, new ImmutableArray<>(sub));
+        super(pi, c, ImmutableList.of(sub));
         this.kind = Objects.requireNonNull(kind);
     }
 

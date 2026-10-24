@@ -6,7 +6,7 @@ package org.key_project.prover.rules.instantiation.caches;
 
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.Semisequent;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.Nullable;
@@ -23,24 +23,24 @@ public final class AssumesFormulaInstantiationCache {
     private static final int SIZE = 64; // power of two
 
     @SuppressWarnings("unchecked")
-    private final Pair<Semisequent, ImmutableArray<AssumesFormulaInstantiation>>[] antecCache =
+    private final Pair<Semisequent, ImmutableList<AssumesFormulaInstantiation>>[] antecCache =
         new Pair[SIZE];
     @SuppressWarnings("unchecked")
-    private final Pair<Semisequent, ImmutableArray<AssumesFormulaInstantiation>>[] succCache =
+    private final Pair<Semisequent, ImmutableList<AssumesFormulaInstantiation>>[] succCache =
         new Pair[SIZE];
 
     private static int indexFor(Semisequent s) {
         return System.identityHashCode(s) & (SIZE - 1);
     }
 
-    public @Nullable ImmutableArray<AssumesFormulaInstantiation> get(boolean antec, Semisequent s) {
-        final Pair<Semisequent, ImmutableArray<AssumesFormulaInstantiation>> p =
+    public @Nullable ImmutableList<AssumesFormulaInstantiation> get(boolean antec, Semisequent s) {
+        final Pair<Semisequent, ImmutableList<AssumesFormulaInstantiation>> p =
             (antec ? antecCache : succCache)[indexFor(s)];
         return p != null && p.first == s ? p.second : null;
     }
 
     public void put(boolean antec, Semisequent s,
-            ImmutableArray<AssumesFormulaInstantiation> value) {
+            ImmutableList<AssumesFormulaInstantiation> value) {
         (antec ? antecCache : succCache)[indexFor(s)] = new Pair<>(s, value);
     }
 }

@@ -21,7 +21,6 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Position;
 
@@ -126,9 +125,9 @@ public class TacletInstantiationModel {
         int size = asize + ifseq.succedent().size();
 
         if (size > 0) {
-            ImmutableArray<AssumesFormulaInstantiation> antecCand =
+            ImmutableList<AssumesFormulaInstantiation> antecCand =
                 AssumesFormulaInstSeq.createList(seq, true, services);
-            ImmutableArray<AssumesFormulaInstantiation> succCand =
+            ImmutableList<AssumesFormulaInstantiation> succCand =
                 AssumesFormulaInstSeq.createList(seq, false, services);
 
             Iterator<SequentFormula> it = ifseq.iterator();

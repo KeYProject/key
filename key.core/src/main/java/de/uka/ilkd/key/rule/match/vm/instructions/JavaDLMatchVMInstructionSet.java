@@ -20,7 +20,7 @@ import org.key_project.prover.rules.matcher.vm.instruction.GotoNextInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.GotoNextSiblingInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchIdentityInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The factory for the Java-DL match instructions: static creation methods for every instruction
@@ -69,7 +69,7 @@ public final class JavaDLMatchVMInstructionSet {
         return new MatchProgramSVInstruction(sv);
     }
 
-    public static MatchInstruction matchTermLabelSV(ImmutableArray<TermLabel> labels) {
+    public static MatchInstruction matchTermLabelSV(ImmutableList<TermLabel> labels) {
         return new MatchTermLabelInstruction(labels);
     }
 
@@ -78,7 +78,7 @@ public final class JavaDLMatchVMInstructionSet {
     }
 
     public static MatchInstruction matchAndBindVariables(
-            ImmutableArray<QuantifiableVariable> boundVars) {
+            ImmutableList<QuantifiableVariable> boundVars) {
         return new BindVariablesInstruction(boundVars);
     }
 

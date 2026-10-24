@@ -7,7 +7,7 @@ package org.key_project.logic.op;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import static org.key_project.logic.op.Function.FunctionKind.DEFINITIONAL_SKOLEM;
 import static org.key_project.logic.op.Function.FunctionKind.ORDINARY;
@@ -34,8 +34,8 @@ public abstract class Function extends AbstractSortedOperator {
     /// rule applications, or [#UNRECORDED].
     private final int introductionTime;
 
-    protected Function(Name name, ImmutableArray<Sort> argSorts, Sort sort,
-            ImmutableArray<Boolean> whereToBind, boolean isRigid, boolean unique,
+    protected Function(Name name, ImmutableList<Sort> argSorts, Sort sort,
+            ImmutableList<Boolean> whereToBind, boolean isRigid, boolean unique,
             FunctionKind kind, int introductionTime) {
         super(name, argSorts, sort, whereToBind, toModifier(isRigid, unique, kind));
         this.introductionTime = introductionTime;

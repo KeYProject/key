@@ -28,7 +28,6 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -401,7 +400,7 @@ public class TriggersSet {
         }
 
         private Set<JTerm> combineSubterms(JTerm originalTerm, Set<JTerm>[] possibleSubs,
-                JTerm[] chosenSubs, ImmutableArray<QuantifiableVariable> boundVars, int i,
+                JTerm[] chosenSubs, ImmutableList<QuantifiableVariable> boundVars, int i,
                 TermServices services) {
             final Set<JTerm> result = new LinkedHashSet<>();
             if (i >= possibleSubs.length) {

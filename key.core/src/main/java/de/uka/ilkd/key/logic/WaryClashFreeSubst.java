@@ -10,7 +10,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.WarySubstOp;
 
 import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 public class WaryClashFreeSubst extends ClashFreeSubst {
@@ -163,7 +163,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 
         final JTerm[] newSubterms = new JTerm[t.arity()];
         @SuppressWarnings("unchecked")
-        final ImmutableArray<QuantifiableVariable>[] newBoundVars = new ImmutableArray[t.arity()];
+        final ImmutableList<QuantifiableVariable>[] newBoundVars = new ImmutableList[t.arity()];
 
         final int targetPos = UpdateApplication.targetPos();
         for (int i = 0; i < t.arity(); i++) {

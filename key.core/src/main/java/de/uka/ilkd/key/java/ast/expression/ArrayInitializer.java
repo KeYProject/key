@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -27,7 +27,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
         implements Expression, ExpressionContainer {
 
 
-    protected final ImmutableArray<Expression> children;
+    protected final ImmutableList<Expression> children;
     protected final KeYJavaType kjt;
 
     /**
@@ -41,7 +41,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
         super(list);
         assert kjt != null;
         this.kjt = kjt;
-        this.children = new ImmutableArray<>(list.collect(Expression.class));
+        this.children = ImmutableList.of(list.collect(Expression.class));
     }
 
 
@@ -55,10 +55,10 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
         super();
         assert kjt != null;
         this.kjt = kjt;
-        this.children = new ImmutableArray<>(expressions);
+        this.children = ImmutableList.of(expressions);
     }
 
-    public ArrayInitializer(PositionInfo pi, List<Comment> c, ImmutableArray<Expression> children,
+    public ArrayInitializer(PositionInfo pi, List<Comment> c, ImmutableList<Expression> children,
             KeYJavaType keyJavaType) {
         super(pi, c);
         this.kjt = keyJavaType;
@@ -115,7 +115,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
      *
      * @return the wrapped argument array
      */
-    public ImmutableArray<Expression> getArguments() {
+    public ImmutableList<Expression> getArguments() {
         return children;
     }
 

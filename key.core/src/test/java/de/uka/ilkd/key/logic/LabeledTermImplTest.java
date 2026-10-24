@@ -10,7 +10,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.rule.TacletForTests;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,8 +35,8 @@ public class LabeledTermImplTest {
         JTerm unlabeledTerm =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
 
-        ImmutableArray<TermLabel> labels =
-            new ImmutableArray<>(ParameterlessTermLabel.ANON_HEAP_LABEL);
+        ImmutableList<TermLabel> labels =
+            ImmutableList.of(ParameterlessTermLabel.ANON_HEAP_LABEL);
 
         JTerm labeledTerm = tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE),
             tf.createTerm(Junctor.FALSE), labels);
@@ -61,7 +61,7 @@ public class LabeledTermImplTest {
         JTerm oneLabelChanged =
             services.getTermBuilder().label(oneLabel, ParameterlessTermLabel.ANON_HEAP_LABEL);
         JTerm twoLabels = services.getTermBuilder().label(unlabeled,
-            new ImmutableArray<>(ParameterlessTermLabel.ANON_HEAP_LABEL, sedLabel));
+            ImmutableList.of(ParameterlessTermLabel.ANON_HEAP_LABEL, sedLabel));
         JTerm oneLabelAdded0 =
             services.getTermBuilder().addLabel(oneLabel, ParameterlessTermLabel.ANON_HEAP_LABEL);
         JTerm oneLabelAdded1 = services.getTermBuilder().addLabel(oneLabelAdded0,

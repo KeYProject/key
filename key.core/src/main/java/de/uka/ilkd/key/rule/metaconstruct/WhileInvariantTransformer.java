@@ -35,7 +35,6 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import com.github.javaparser.ast.key.KeyTransactionStatement;
@@ -248,15 +247,15 @@ public final class WhileInvariantTransformer {
      * @param applicationSequent The {@link Sequent} to rewrite.
      * @return The {@link TermLabel}s to add to the loop body modality {@link JTerm}.
      */
-    private ImmutableArray<TermLabel> computeLoopBodyModalityLabels(TermLabelState termLabelState,
+    private ImmutableList<TermLabel> computeLoopBodyModalityLabels(TermLabelState termLabelState,
             Services services, PosInOccurrence applicationPos,
             Rule rule, RuleApp ruleApp,
             Goal goal, Operator loopBodyModality, JTerm result, JavaBlock mainJavaBlock,
-            Sequent applicationSequent, ImmutableArray<TermLabel> newTermOriginalLabels) {
+            Sequent applicationSequent, ImmutableList<TermLabel> newTermOriginalLabels) {
         return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
             ruleApp, goal, "LoopBodyModality", null,
             tf.createTerm(loopBodyModality,
-                new ImmutableArray<>(result), null, newTermOriginalLabels));
+                ImmutableList.of(result), null, newTermOriginalLabels));
     }
 
     /**
@@ -344,7 +343,7 @@ public final class WhileInvariantTransformer {
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
                 ruleApp, goal, "ReturnCaseModality", null,
                 tf.createTerm(JModality.getModality(modality.kind(), returnJavaBlock),
-                    new ImmutableArray<>(post),
+                    ImmutableList.of(post),
                     null, post.getLabels())));
 
         return services.getTermBuilder()
@@ -372,7 +371,7 @@ public final class WhileInvariantTransformer {
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
                 ruleApp, goal, "BreakCaseModality", null,
                 tf.createTerm(JModality.getModality(modality.kind(), executeJavaBlock),
-                    new ImmutableArray<>(post),
+                    ImmutableList.of(post),
                     null, post.getLabels())));
         return services.getTermBuilder()
                 .imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(breakFlag),
@@ -403,14 +402,14 @@ public final class WhileInvariantTransformer {
 
         if (al.size() == 0) {
             if (contFlagTerm == null) {
-                ImmutableArray<TermLabel> labels =
+                ImmutableList<TermLabel> labels =
                     computeLoopBodyImplicatonLabels(termLabelState, services, applicationPos, rule,
                         ruleApp, goal, inv.op(), inv.subs(), applicationSequent);
                 return TB.label(inv, labels);
             } else {
-                ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState,
+                ImmutableList<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState,
                     services, applicationPos, rule, ruleApp, goal, Junctor.IMP,
-                    new ImmutableArray<>(contFlagTerm, inv), applicationSequent);
+                    ImmutableList.of(contFlagTerm, inv), applicationSequent);
                 return TB.imp(contFlagTerm, inv, labels);
             }
         } else {
@@ -419,9 +418,9 @@ public final class WhileInvariantTransformer {
                 premiss = TB.imp(contFlagTerm, premiss);
             }
 
-            ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState,
+            ImmutableList<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState,
                 services, applicationPos, rule, ruleApp, goal, Junctor.IMP,
-                new ImmutableArray<>(premiss, inv), applicationSequent);
+                ImmutableList.of(premiss, inv), applicationSequent);
             return TB.imp(premiss, contFlagTerm == null ? inv : TB.imp(contFlagTerm, inv), labels);
         }
     }
@@ -440,10 +439,10 @@ public final class WhileInvariantTransformer {
      * @param applicationSequent The {@link Sequent} to rewrite.
      * @return The {@link TermLabel}s to add to the new {@link JTerm}.
      */
-    private ImmutableArray<TermLabel> computeLoopBodyImplicatonLabels(TermLabelState termLabelState,
+    private ImmutableList<TermLabel> computeLoopBodyImplicatonLabels(TermLabelState termLabelState,
             Services services, PosInOccurrence applicationPos,
             Rule rule, RuleApp ruleApp,
-            Goal goal, Operator operator, ImmutableArray<JTerm> subs, Sequent applicationSequent) {
+            Goal goal, Operator operator, ImmutableList<JTerm> subs, Sequent applicationSequent) {
         return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
             ruleApp, goal, "LoopBodyImplication", null,
             tf.createTerm(operator, subs, null, post.getLabels()));
@@ -460,7 +459,7 @@ public final class WhileInvariantTransformer {
             TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule,
                 ruleApp, goal, "ThrowCaseModality", null,
                 tf.createTerm(JModality.getModality(modality.kind(), throwJavaBlock),
-                    new ImmutableArray<>(post), null,
+                    ImmutableList.of(post), null,
                     post.getLabels())));
         return TB.imp(TB.equals(typeConv.convertToLogicElement(excFlag),
             typeConv.getBooleanLDT().getTrueTerm()), throwException);

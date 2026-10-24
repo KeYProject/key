@@ -31,7 +31,6 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -259,7 +258,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         private HashSet<ProgramElement> findMergePoints(StatementBlock toSearch,
                 Services services) {
             HashSet<ProgramElement> result = new HashSet<>();
-            ImmutableArray<? extends Statement> stmts = toSearch.getBody();
+            ImmutableList<? extends Statement> stmts = toSearch.getBody();
 
             if (stmts.size() > 0) {
                 // Recursive step: Go deeper in the first statement
@@ -438,7 +437,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
                     result.add(tryBody);
                 }
 
-                ImmutableArray<Branch> branches = elem.getBranchList();
+                ImmutableList<Branch> branches = elem.getBranchList();
                 for (Branch branch : branches) {
                     result.addAll(getBodies(branch));
                 }
@@ -507,7 +506,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
         private LinkedList<StatementBlock> getBodies(Case elem) {
             LinkedList<StatementBlock> result = new LinkedList<>();
 
-            ImmutableArray<Statement> caseBodies = elem.getBody();
+            ImmutableList<Statement> caseBodies = elem.getBody();
             for (Statement body : caseBodies) {
                 if (body instanceof StatementBlock) {
                     result.add((StatementBlock) body);
