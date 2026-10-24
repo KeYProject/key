@@ -7,7 +7,8 @@ while keeping the user in control through per-call approval and question dialogs
 
 The module lives in `keyext.llm` (main classes `org.key_project.key.llm.*`). The chat window is
 deliberately thin: all prompt assembly happens in `ExtendedPrompt`, an agent turn is driven by
-`AgentLoop`, and the input markup is resolved by `PromptResolver`.
+`AgentLoop`, the input markup is resolved by `PromptResolver`, and a per-session `TurnScheduler`
+turns queued messages and background results into turns (see [section 11](#11-architecture-code-pointers)).
 
 ---
 
@@ -31,10 +32,12 @@ local commands such as `/skills` (see [Input markup](#4-input-markup)).
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│ [attach proof context] [Prompts]          [Clear history] [Stop]         │
+│ [attach proof context] [Prompts]   [Clear history] [Stop] [2 queued]     │
 ├──────────────────────────────────────────────────────────────────────────┤
 │ history of inputs / answers / errors / tool activity                    │
 │  · right-click a message for actions (e.g. "into input")                │
+│  · a running tool call is shown as a live row with [Background] [Cancel]│
+│  · backgrounded calls appear as job rows while they run                 │
 ├──────────────────────────────────────────────────────────────────────────┤
 │ tabs: [Prompt] [Files]                                                   │
 │  Prompt tab: multi-line input box                       "Ctrl+Enter to send" │
@@ -45,13 +48,17 @@ local commands such as `/skills` (see [Input markup](#4-input-markup)).
 ![The KeY-Agent panel, docked as a tab in the lower left of the main window](docs/images/agent/llm-panel.png)
 
 - **Sending.** `Ctrl+Enter` sends the current input (there is no send button). `Shift+Enter` and
-  plain Enter insert a line break.
-- **Running a turn.** While a turn is running, the *Stop* button cancels it. Only one turn runs at
-  a time.
+  plain Enter insert a line break. Input is **always accepted**: while a turn runs or is parked,
+  your message is queued and processed in order (see [Backgrounding](#74-backgrounding)); the
+  toolbar shows the number of queued messages.
+- **Running a turn.** The *Stop* button cancels the *active* turn only (queued messages are not
+  affected). Only one turn runs at a time.
 - **Files.** The *Files* tab lists the files of the current Java model (bounded); ticking a file
   attaches it to the conversation. Attached files are reported by the `$selectedFiles` token.
 - **Tool activity.** After a turn, the tool calls that were executed are summarized in the chat
-  (can be turned off in the settings).
+  (can be turned off in the settings). While a call runs it is shown as a live row with
+  *Background*/*Cancel* buttons (see [section 7.4](#74-backgrounding)); calls you moved into the
+  background are tracked as job rows until they finish.
 
 ---
 
@@ -194,42 +201,51 @@ question, an approval request, an error, or the maximum number of tool rounds is
 
 The built-in tool set (`KeYAgentTools`):
 
-| Tool                | Approval | Description                                                         |
-|---------------------|----------|---------------------------------------------------------------------|
-| `get_proof_context` | auto     | a text block describing the current proof state                     |
-| `list_files`        | auto     | bounded listing of the files of the current Java model              |
-| `read_file`         | auto     | read a text file of the model directory (respects size limits)      |
-| `file_info`         | auto     | metadata (size, last modified, kind) of a file                      |
-| `run_command`       | ask      | run a shell command in the model directory (blocklist + approval)   |
-| `ask_user`          | auto     | ask the user a question; the turn pauses until it is answered       |
-| `use_skill`         | auto     | activate a user-defined skill by name (only if enabled in settings) |
-| `spawn_subagent`    | ask      | delegate a task to a sub-agent (only if enabled in settings)        |
-| `get_subagent_logs` | auto     | list the recorded sub-agent runs (role, mode, per-task status and the tools that were called) |
-| `tryclose`          | auto     | apply the `tryclose` proof-script command (TryClose macro) to the current branch, all open goals, or a goal by index |
-| `auto`              | auto     | apply KeY's automatic proof strategy ('Auto' button) with an arbitrary step limit |
-| `list_proofs`       | auto     | enumerate all open proofs with an identifier usable in the taclet tools' `proof` parameter |
-| `list_taclets`      | auto     | list the taclets available for a proof (optional substring filter) |
-| `list_taclet_options` | auto   | list the taclet options (choices) of a proof with their selected and possible values |
-| `export_taclet`     | auto     | export a taclet as a parseable KeY rule declaration |
-| `export_taclets`    | auto     | export several or all taclets of a proof as parseable declarations (optional filter, capped output) |
-| `add_taclet`        | ask      | register a new taclet for a proof from a `\taclet` declaration (future rule applications only) |
-| `remove_taclet`     | ask      | remove a taclet from a proof's rule set (past rule applications are not affected) |
-| `list_tools`        | auto     | dump the Markdown documentation of every available tool (metadata + this list) |
+| Tool                | Category       | Approval | Backgroundable | Description                                                         |
+|---------------------|----------------|----------|----------------|---------------------------------------------------------------------|
+| `get_proof_context` | Proof          | auto     |                | a text block describing the current proof state                     |
+| `tryclose`          | Proof          | auto     |                | apply the `tryclose` proof-script command (TryClose macro) to the current branch, all open goals, or a goal by index |
+| `auto`              | Proof          | auto     | ✓              | apply KeY's automatic proof strategy ('Auto' button) with an arbitrary step limit |
+| `list_proofs`       | Proof          | auto     |                | enumerate all open proofs with an identifier usable in the taclet tools' `proof` parameter |
+| `list_files`        | Files          | auto     |                | bounded listing of the files of the current Java model              |
+| `read_file`         | Files          | auto     |                | read a text file of the model directory (respects size limits)      |
+| `file_info`         | Files          | auto     |                | metadata (size, last modified, kind) of a file                      |
+| `run_command`       | Shell          | ask      | ✓              | run a shell command in the model directory (blocklist + approval)   |
+| `list_taclets`      | Taclets        | auto     |                | list the taclets available for a proof (optional substring filter) |
+| `list_taclet_options` | Taclets     | auto     |                | list the taclet options (choices) of a proof with their selected and possible values |
+| `export_taclet`     | Taclets        | auto     |                | export a taclet as a parseable KeY rule declaration |
+| `export_taclets`    | Taclets        | auto     |                | export several or all taclets of a proof as parseable declarations (optional filter, capped output) |
+| `add_taclet`        | Taclets        | ask      |                | register a new taclet for a proof from a `\taclet` declaration (future rule applications only) |
+| `remove_taclet`     | Taclets        | ask      |                | remove a taclet from a proof's rule set (past rule applications are not affected) |
+| `ask_user`          | Interaction    | auto     |                | ask the user a question; the turn pauses until it is answered       |
+| `use_skill`         | Interaction    | auto     |                | activate a user-defined skill by name (only if enabled in settings) |
+| `spawn_subagent`    | Sub-agents     | ask      | ✓              | delegate a task to a sub-agent (only if enabled in settings)        |
+| `get_subagent_logs` | Sub-agents     | auto     |                | list the recorded sub-agent runs (role, mode, per-task status and the tools that were called) |
+| `list_tools`        | Documentation  | auto     |                | dump the Markdown documentation of every available tool (metadata + this list) |
+
+**Categories.** Every tool carries a `category` (Proof, Files, Shell, Taclets, Interaction,
+Sub-agents, Documentation, General) and a `backgroundable` flag — pure KeY-side *metadata*: the
+model only ever sees the standard OpenAI name/description/parameters. The category groups and
+sorts the tools in the [Tools panel](#tools-sub-panel-llm-settings--tools) and in the Markdown
+documentation; the backgroundable flag controls whether a running call may be moved into the
+background (see [section 7.4](#74-backgrounding)). Tools contributed by external MCP clients
+default to *General* / not backgroundable.
 
 The tool set is **modular and self-describing**: every tool is contributed by an
 `AgentToolProvider` that is discovered via the Java `ServiceLoader` (service file
 `META-INF/services/org.key_project.key.llm.mcp.AgentToolProvider`) and aggregated by
 `KeYAgentTools`. Plugins add tools by providing another provider — no changes to the core
 classes are needed. The metadata of all tools (name, description, parameter schema, default
-approval) is available programmatically via `KeYAgentTools.agents()` / `agent(name)` and as an
-OpenAI-format tool list via `getTools()`; `list_tools` renders it as Markdown for the model.
+approval, category, backgroundable) is available programmatically via `KeYAgentTools.agents()` /
+`agent(name)` and as an OpenAI-format tool list via `getTools()`; `list_tools` renders it as
+Markdown for the model (grouped by category, one `## <Category>` section each).
 
 The same documentation can be printed from the command line without a GUI (useful for keeping
 the docs in sync or for scripts):
 
 ```sh
-java -cp <classpath> org.key_project.key.llm.mcp.KeYAgentTools        # Markdown document
-java -cp <classpath> org.key_project.key.llm.mcp.KeYAgentTools --json # OpenAI-format tool list
+java -cp <classpath> org.key_project.key.llm.mcp.KeYAgentTools        # Markdown document, grouped by category
+java -cp <classpath> org.key_project.key.llm.mcp.KeYAgentTools --json # OpenAI-format tool list, extended with "category" and "backgroundable"
 ```
 
 ### 7.1 Questions
@@ -295,6 +311,28 @@ spawn_subagent { "role": "goal-solver", "task": "Close all open goals of the cur
   filter), the chat panel shows the per-task lines indented under the `spawn_subagent` row in
   the tool-activity summary, and *Clear history* clears the log together with the conversation.
 
+### 7.4 Backgrounding
+
+Long-running calls (`auto` proof search, `run_command` builds/tests, `spawn_subagent`
+delegations) can be **moved into the background** while they run:
+
+- While a foreground tool call runs, its live row in the chat panel shows a **Background**
+  button. Clicking it hands the running call to a background job: the agent parks that turn and
+  immediately continues with your queued messages.
+- The call keeps executing on the shared tool-dispatch pool; while it runs it is shown as a job
+  row in the chat (with *Cancel job* — cancelling marks the job, the call itself runs to
+  completion, and its result is reported to the agent as cancelled).
+- When the call finishes, its output is enqueued and the parked turn resumes with it (a
+  *"In the background"* box marks where the turn parked).
+- Only tools marked **backgroundable** offer the button (by default `auto`, `run_command`,
+  `spawn_subagent`); per-tool overrides and the concurrency limit live in the [Tools panel](#tools-sub-panel-llm-settings--tools). While a turn is parked on a question or an approval, further
+  prompts are *deferred* (they do not start new turns); while it is parked on a background job
+  they are processed normally.
+- Backgrounding needs no extra user input — the call is already executing anyway; only the turn
+  that awaits it pauses. The queued messages, the answers to questions and the decisions on
+  approvals of parked turns all flow through the same per-session turn queue and are processed
+  in order.
+
 ---
 
 ## 8. Proof context
@@ -342,6 +380,7 @@ are edited in their own panels.
 | System prompt | built-in KeY-Agent prompt |
 | Allow the agent to ask questions | `true` |
 | Max tool rounds | `8` |
+| Max background jobs | `4` |
 | Send temperature | `false` (`temperature` 0.2) |
 | Send max output tokens | `false` (`4096`) |
 | Agent may use skills (`use_skill`) | `false` |
@@ -373,10 +412,17 @@ max model listing entries `1000`.
 ### Tools (sub-panel: LLM Settings → Tools)
 
 ![Tool approval settings: one permission row per tool](docs/images/agent/llm-settings-tools.png)
-One row per tool with a short explanation and a radio group selecting its permission:
-**Default** (the tool's own behavior, `auto` or `ask`), **With approval** (always ask),
-**Without approval (always)** or **Disabled** (not sent to the model). Read-only tools default to
-`auto`, `run_command` to `ask`.
+The tools are grouped into **category sections** (Proof, Files, Shell, Taclets, Interaction,
+Sub-agents, Documentation, General — in that order, tools by name within a section). One row per
+tool shows a short explanation, a radio group selecting its permission — **Default** (the tool's
+own behavior, `auto` or `ask`), **With approval** (always ask), **Without approval (always)** or
+**Disabled** (not sent to the model) — and a **may run in background** checkbox. Read-only tools
+default to `auto`, `run_command` to `ask`; the background checkbox follows the tool's metadata
+(default on for `auto`, `run_command`, `spawn_subagent`; overriding it adds/removes the tool in
+the `backgroundToolsEnabled`/`backgroundToolsDisabled` settings). While such a call runs it can
+be moved to the background, the agent then continues with your queued messages and the result is
+delivered when the call finishes (see [section 7.4](#74-backgrounding)). The number of concurrent
+background jobs is capped by *Max background jobs* (Agent behavior section).
 
 ### User interface
 Auto-scroll output (`true`) and show tool activity (`true`).
@@ -409,6 +455,10 @@ history and selected models are part of the proof session and are not persisted 
 |---------------------|----------------------------------------------------|
 | Chat panel (thin UI)| `org.key_project.key.llm.LlmPrompt`                |
 | Agent turn driver   | `org.key_project.key.llm.AgentLoop`                |
+| Turn scheduling     | `org.key_project.key.llm.TurnScheduler` (worker thread + `TurnScheduler.TurnListener` / `ToolObserver`) |
+| Message queue       | `org.key_project.key.llm.TurnQueue` (user prompts, answers, approvals, background results) |
+| Background jobs     | `org.key_project.key.llm.BackgroundJobRegistry` + `BackgroundJob` |
+| Tool dispatch       | `org.key_project.key.llm.ToolDispatcher` (dispatch pool + proof-state lock) |
 | Request assembly    | `org.key_project.key.llm.ExtendedPrompt`           |
 | Input markup        | `org.key_project.key.llm.PromptResolver`           |
 | Autocompletion      | `org.key_project.key.llm.AutocompleteInput` + `AutocompleteProviders` |
