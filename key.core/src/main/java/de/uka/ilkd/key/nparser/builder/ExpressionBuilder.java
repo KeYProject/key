@@ -32,6 +32,7 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExceptionTools;
+import de.uka.ilkd.key.util.LimitedObservers;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 import de.uka.ilkd.key.util.parsing.BuildingIssue;
@@ -1418,8 +1419,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             op = lookupVarfuncId(ctx, varfuncid,
                 null);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
-                op = getServices().getSpecificationRepository()
-                        .limitObs((ObserverFunction) op).first;
+                op = LimitedObservers.limitObs((ObserverFunction) op, getServices()).first;
             } else {
                 semanticError(ctx, "Cannot can be limited: " + op);
             }
@@ -1694,8 +1694,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             op = lookupVarfuncId(ctx, sortId.name().toString() + "::" + firstName,
                 null);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
-                op = getServices().getSpecificationRepository()
-                        .limitObs((ObserverFunction) op).first;
+                op = LimitedObservers.limitObs((ObserverFunction) op, getServices()).first;
             } else {
                 semanticError(ctx, "Cannot can be limited: " + op);
             }

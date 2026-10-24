@@ -22,25 +22,19 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.util.LimitedObservers;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
-import org.key_project.logic.sort.Sort;
-import org.key_project.prover.rules.ApplicationRestriction;
-import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.Sequent;
-import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.Nullable;
@@ -56,13 +50,6 @@ public class SpecificationRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpecificationRepository.class);
 
     public static final String CONTRACT_COMBINATION_MARKER = "§";
-
-    /**
-     * @see #limitObs(IObserverFunction)
-     * @see #unlimitObs(IObserverFunction)
-     */
-    public static final String LIMIT_SUFFIX = "$lmtd";
-
 
     private final ContractFactory cf;
 
@@ -96,12 +83,6 @@ public class SpecificationRepository {
         Collections.synchronizedMap(new LinkedHashMap<>());
     private final Map<MergePointStatement, ImmutableSet<MergeContract>> mergeContracts =
         Collections.synchronizedMap(new LinkedHashMap<>());
-    private final Map<IObserverFunction, IObserverFunction> unlimitedToLimited =
-        new LinkedHashMap<>();
-    private final Map<IObserverFunction, IObserverFunction> limitedToUnlimited =
-        new LinkedHashMap<>();
-    private final Map<IObserverFunction, ImmutableSet<Taclet>> unlimitedToLimitTaclets =
-        new LinkedHashMap<>();
 
     /**
      * <p>
@@ -134,79 +115,6 @@ public class SpecificationRepository {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private static String getUniqueNameForObserver(IObserverFunction obs) {
-        var sb = new StringBuilder(obs.name().toString());
-
-        if (obs.isStatic()) {
-            sb.append("_static_");
-        }
-
-        for (KeYJavaType pType : obs.getParamTypes()) {
-            sb.append(pType.getFullName());
-        }
-
-        return sb.toString();
-    }
-
-    private static Taclet getLimitedToUnlimitedTaclet(IObserverFunction limited,
-            IObserverFunction unlimited, TermServices services) {
-        final TermBuilder tb = services.getTermBuilder();
-        assert limited.arity() == unlimited.arity();
-
-        // create schema terms
-        final JTerm[] subs = new JTerm[limited.arity()];
-        for (int i = 0; i < subs.length; i++) {
-            final TermSV argSV = SchemaVariableFactory.createTermSV(new Name("t" + i),
-                limited.argSort(i), false, false);
-            subs[i] = tb.var(argSV);
-        }
-        final JTerm limitedTerm = tb.func(limited, subs);
-        final JTerm unlimitedTerm = tb.func(unlimited, subs);
-
-        // create taclet
-        final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
-        tacletBuilder.setFind(limitedTerm);
-        tacletBuilder.addTacletGoalTemplate(
-            new RewriteTacletGoalTemplate(JavaDLSequentKit.getInstance().getEmptySequent(),
-                ImmutableList.nil(), unlimitedTerm));
-        tacletBuilder.setName(
-            MiscTools.toValidTacletName("unlimit " + getUniqueNameForObserver(unlimited)));
-        // tacletBuilder.addRuleSet(new RuleSet(new Name("unlimitObserver")));
-        return tacletBuilder.getTaclet();
-    }
-
-    private static Taclet getUnlimitedToLimitedTaclet(IObserverFunction limited,
-            IObserverFunction unlimited, TermServices services) {
-        assert limited.arity() == unlimited.arity();
-
-        final TermBuilder tb = services.getTermBuilder();
-        // create schema terms
-        final JTerm[] subs = new JTerm[limited.arity()];
-        for (int i = 0; i < subs.length; i++) {
-            final TermSV argSV = SchemaVariableFactory.createTermSV(new Name("t" + i),
-                limited.argSort(i), false, false);
-            subs[i] = tb.var(argSV);
-        }
-        final JTerm limitedTerm = tb.func(limited, subs);
-        final JTerm unlimitedTerm = tb.func(unlimited, subs);
-
-        // create taclet
-        final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
-        tacletBuilder.setFind(tb.func(unlimited, subs));
-        final SequentFormula cf = new SequentFormula(tb.equals(limitedTerm, unlimitedTerm));
-        final Sequent addedSeq =
-            JavaDLSequentKit.createAnteSequent(ImmutableList.singleton(cf));
-        tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(addedSeq,
-            ImmutableList.nil(), tb.func(unlimited, subs)));
-        tacletBuilder.setApplicationRestriction(
-            new ApplicationRestriction(ApplicationRestriction.IN_SEQUENT_STATE));
-        tacletBuilder.setName(
-            MiscTools.toValidTacletName("limit " + getUniqueNameForObserver(unlimited)));
-        tacletBuilder.addRuleSet(new RuleSet(new Name("limitObserver")));
-
-        return tacletBuilder.getTaclet();
-    }
-
     private static JModality.JavaModalityKind getMatchModalityKind(
             final JModality.JavaModalityKind kind) {
         if (kind.transaction()) {
@@ -222,7 +130,7 @@ public class SpecificationRepository {
         assert obs != null;
         assert kjt != null;
         if (!(obs instanceof IProgramMethod pm) || obs.getContainerType().equals(kjt)) {
-            return unlimitObs(obs);
+            return LimitedObservers.unlimitObs(obs);
         }
         if (pm.isConstructor()) {
             assert pm.getContainerType().equals(kjt);
@@ -1591,51 +1499,6 @@ public class SpecificationRepository {
             }
         }
     }
-
-    public synchronized Pair<IObserverFunction, ImmutableSet<Taclet>> limitObs(
-            IObserverFunction obs) {
-        assert limitedToUnlimited.get(obs) == null : " observer is already limited: " + obs;
-        // TODO Was the exact class match "obs.getClass() !=
-        // ObserverFunction.class" correctly converted into IProtramMethod?
-        // Wojtek: I guess so, but why are IProgramMethods excluded from
-        // limiting?
-        // This kills limiting for model methods...
-        // if(!(obs instanceof IObserverFunction && !(obs instanceof
-        // IProgramMethod))) {
-        // return null;
-        // }
-
-        IObserverFunction limited = unlimitedToLimited.get(obs);
-        ImmutableSet<Taclet> taclets = unlimitedToLimitTaclets.get(obs);
-
-        if (limited == null) {
-            final String baseName =
-                ((ProgramElementName) obs.name()).getProgramName() + LIMIT_SUFFIX;
-            final Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
-            limited = new ObserverFunction(baseName, obs.sort(), obs.getType(), heapSort,
-                obs.getContainerType(), obs.isStatic(), obs.getParamTypes(),
-                obs.getHeapCount(services), obs.getStateCount());
-            unlimitedToLimited.put(obs, limited);
-            limitedToUnlimited.put(limited, obs);
-
-            assert taclets == null;
-            taclets = DefaultImmutableSet.<Taclet>nil()
-                    .add(getLimitedToUnlimitedTaclet(limited, obs, services))
-                    .add(getUnlimitedToLimitedTaclet(limited, obs, services));
-            unlimitedToLimitTaclets.put(obs, taclets);
-        }
-
-        return new Pair<>(Objects.requireNonNull(limited), Objects.requireNonNull(taclets));
-    }
-
-    public synchronized IObserverFunction unlimitObs(IObserverFunction obs) {
-        IObserverFunction result = limitedToUnlimited.get(obs);
-        if (result == null) {
-            result = obs;
-        }
-        return result;
-    }
-
 
     // region Support SetStatement and JmlAssert
     // JmlAssert/SetStatement specs now live on the AST nodes themselves (JmlSpecCarrier):
