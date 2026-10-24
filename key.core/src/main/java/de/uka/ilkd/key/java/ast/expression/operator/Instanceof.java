@@ -16,7 +16,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Instanceof.
@@ -48,7 +48,7 @@ public class Instanceof extends TypeOperator {
     }
 
     public Instanceof(PositionInfo pi, List<Comment> c, Expression lhs, TypeReference type) {
-        super(pi, c, new ImmutableArray<>(lhs), type);
+        super(pi, c, ImmutableList.of(lhs), type);
     }
 
     /**
