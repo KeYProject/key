@@ -19,7 +19,6 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
@@ -319,7 +318,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             for (int i = 1; i < contracts.length; i++) {
                 assert contracts[i].getBlock().equals(head.getBlock());
 
-                baseName.append(SpecificationRepository.CONTRACT_COMBINATION_MARKER)
+                baseName.append(ContractFactory.CONTRACT_COMBINATION_MARKER)
                         .append(contracts[i].getBaseName());
             }
 

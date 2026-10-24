@@ -118,10 +118,10 @@ public class Main {
         for (KeYJavaType type : kjts) {
             if (!KeYTypeUtil.isLibraryClass(type)) {
                 ImmutableSet<IObserverFunction> targets =
-                    env.getSpecificationRepository().getContractTargets(type);
+                    env.getServices().getContractRegistry().getContractTargets(type);
                 for (IObserverFunction target : targets) {
                     ImmutableSet<Contract> contracts =
-                        env.getSpecificationRepository().getContracts(type, target);
+                        env.getServices().getContractRegistry().getContracts(type, target);
                     for (Contract contract : contracts) {
                         proofContracts.add(contract);
                     }

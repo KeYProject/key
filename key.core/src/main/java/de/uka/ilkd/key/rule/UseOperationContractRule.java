@@ -253,15 +253,15 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             Services services, IProgramMethod pm, KeYJavaType kjt,
             JModality.JavaModalityKind modalityKind) {
         ImmutableSet<FunctionalOperationContract> result =
-            services.getSpecificationRepository().getOperationContracts(kjt, pm, modalityKind);
+            services.getContractRegistry().getOperationContracts(kjt, pm, modalityKind);
 
         // in box modalities, diamond contracts may be applied as well
         if (modalityKind == JModality.JavaModalityKind.BOX) {
             result = result.union(
-                services.getSpecificationRepository().getOperationContracts(kjt, pm,
+                services.getContractRegistry().getOperationContracts(kjt, pm,
                     JModality.JavaModalityKind.DIA));
         } else if (modalityKind == JModality.JavaModalityKind.BOX_TRANSACTION) {
-            result = result.union(services.getSpecificationRepository().getOperationContracts(kjt,
+            result = result.union(services.getContractRegistry().getOperationContracts(kjt,
                 pm, JModality.JavaModalityKind.DIA_TRANSACTION));
         }
 

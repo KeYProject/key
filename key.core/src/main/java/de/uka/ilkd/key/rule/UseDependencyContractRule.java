@@ -390,7 +390,7 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
     public static ImmutableSet<Contract> getApplicableContracts(Services services, KeYJavaType kjt,
             IObserverFunction target) {
         ImmutableSet<Contract> result =
-            services.getSpecificationRepository().getContracts(kjt, target);
+            services.getContractRegistry().getContracts(kjt, target);
         for (Contract contract : result) {
             if (!(contract instanceof DependencyContract)) {
                 result = result.remove(contract);

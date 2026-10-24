@@ -253,7 +253,7 @@ public final class KeYFacade {
                 baseContractName = chooseContract.substring(0, ind);
             }
             final Contract contract = initConfig.getServices()
-                    .getSpecificationRepository()
+                    .getContractRegistry()
                     .getContractByName(baseContractName);
             if (contract == null) {
                 throw new RuntimeException("Contract not found: " + baseContractName);

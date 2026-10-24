@@ -15,8 +15,8 @@ import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.consistency.TrivialFileRepo;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.ContractRegistry;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -54,7 +54,7 @@ public class MissingProofsChecker implements Checker {
          */
         try {
             InitConfig ic = pi.prepare(slenv);
-            SpecificationRepository specRepo = ic.getServices().getSpecificationRepository();
+            ContractRegistry specRepo = ic.getServices().getContractRegistry();
             Set<Contract> contracts = specRepo.getAllContracts().toSet();
 
             // Remove all contracts that have a corresponding proof file from set.
