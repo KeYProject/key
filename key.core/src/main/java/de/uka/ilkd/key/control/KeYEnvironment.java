@@ -343,10 +343,10 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
         for (KeYJavaType type : kjts) {
             if (!KeYTypeUtil.isLibraryClass(type)) {
                 ImmutableSet<IObserverFunction> targets =
-                    getSpecificationRepository().getContractTargets(type);
+                    getServices().getContractRegistry().getContractTargets(type);
                 for (IObserverFunction target : targets) {
                     ImmutableSet<Contract> contracts =
-                        getSpecificationRepository().getContracts(type, target);
+                        getServices().getContractRegistry().getContracts(type, target);
                     for (Contract contract : contracts) {
                         proofContracts.add(contract);
                     }

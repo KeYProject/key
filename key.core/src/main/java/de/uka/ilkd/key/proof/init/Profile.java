@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.ClassAxiomComputer;
+import de.uka.ilkd.key.speclang.ContractRegistry;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.QuantifierTheorySupport;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.QuantifierTheorySupports;
@@ -190,6 +191,13 @@ public interface Profile {
     /// suitable for the given profile. For example WD requires a special instance.
     default ClassAxiomComputer createClassAxiomComputer(Services services) {
         return new ClassAxiomComputer(services);
+    }
+
+    /// Create an instance of the contract registry (per-node derived-spec cache for contracts
+    /// and initially clauses) suitable for the given profile. For example WD requires a special
+    /// instance.
+    default ContractRegistry createContractRegistry(Services services) {
+        return new ContractRegistry(services);
     }
 
     /// Returns the implementation of a [UseDependencyContractRule] for this profile.

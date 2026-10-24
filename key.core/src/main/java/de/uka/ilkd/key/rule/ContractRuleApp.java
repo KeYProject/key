@@ -92,7 +92,7 @@ public class ContractRuleApp extends AbstractContractRuleApp<UseOperationContrac
         var m = ((JModality) programTerm().op()).<JModality.JavaModalityKind>kind();
         heapContext = HeapContext.getModifiableHeaps(goal.proof().getServices(), m.transaction());
         final FunctionalOperationContract combinedContract =
-            services.getSpecificationRepository().combineOperationContracts(contracts);
+            services.getContractRegistry().combineOperationContracts(contracts);
         return setContract(combinedContract);
     }
 

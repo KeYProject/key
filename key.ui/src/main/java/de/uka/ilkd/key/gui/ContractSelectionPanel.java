@@ -322,7 +322,7 @@ public class ContractSelectionPanel extends JPanel {
                             + "Contract:\n" + contract.getPlainText(services));
                 }
             }
-            return services.getSpecificationRepository().combineOperationContracts(contracts);
+            return services.getContractRegistry().combineOperationContracts(contracts);
         }
     }
 }

@@ -35,8 +35,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.ContractRegistry;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 
 import org.key_project.logic.Name;
@@ -103,7 +103,7 @@ public final class ProofManagementDialog extends JDialog {
                 final ClassTree.Entry entry = classTree.getSelectedEntry();
                 if (entry.kjt != null && entry.target != null) {
                     final ImmutableSet<Contract> contracts = initConfig.getServices()
-                            .getSpecificationRepository().getContracts(entry.kjt, entry.target);
+                            .getContractRegistry().getContracts(entry.kjt, entry.target);
                     final Contract c = contracts.iterator().next();
                     if (contracts.size() == 1 && c == contractPanelByMethod.getContract()) {
                         startButton.doClick();
@@ -287,10 +287,10 @@ public final class ProofManagementDialog extends JDialog {
         };
 
         for (KeYJavaType javaType : allJavaTypes) {
-            Stream<IObserverFunction> targets = servicesLocal.getSpecificationRepository()
+            Stream<IObserverFunction> targets = servicesLocal.getContractRegistry()
                     .getContractTargets(javaType).stream().sorted(compareFunction)
                     // has contract
-                    .filter(targetTmp -> !servicesLocal.getSpecificationRepository()
+                    .filter(targetTmp -> !servicesLocal.getContractRegistry()
                             .getContracts(javaType, targetTmp).isEmpty());
             Optional<IObserverFunction> t = targets.findFirst();
             if (t.isPresent()) {
@@ -390,8 +390,8 @@ public final class ProofManagementDialog extends JDialog {
         KeYJavaType javaType = allJavaTypes.get();
         Name methodName = new Name(cid.methodName);
         Optional<IObserverFunction> target =
-            servicesLocal.getSpecificationRepository().getContractTargets(javaType).stream()
-                    .filter(targetTmp -> !servicesLocal.getSpecificationRepository()
+            servicesLocal.getContractRegistry().getContractTargets(javaType).stream()
+                    .filter(targetTmp -> !servicesLocal.getContractRegistry()
                             .getContracts(javaType, targetTmp).isEmpty())
                     .filter(it -> it.name().equals(methodName)).findAny();
         if (!target.isPresent()) {
@@ -402,7 +402,7 @@ public final class ProofManagementDialog extends JDialog {
 
         if (!isInstanceMethodOfAbstractClass(javaType, method)) {
             Optional<Contract> contract =
-                initConfig.getServices().getSpecificationRepository().getContracts(javaType, method)
+                initConfig.getServices().getContractRegistry().getContracts(javaType, method)
                         .stream().filter(it -> it.getName().equals(cid.contractName)).findAny();
             contract.ifPresent(value -> contractPanelByMethod.selectContract(value));
         }
@@ -542,7 +542,7 @@ public final class ProofManagementDialog extends JDialog {
             if (entry != null && entry.target != null
                     && !isInstanceMethodOfAbstractClass(entry.kjt, entry.target)) {
                 final ImmutableSet<Contract> contracts = initConfig.getServices()
-                        .getSpecificationRepository().getContracts(entry.kjt, entry.target);
+                        .getContractRegistry().getContracts(entry.kjt, entry.target);
                 pan.setContracts(contracts, "Contracts");
 
                 pan.setGrayOutAuxiliaryContracts(Objects.equals(
@@ -566,7 +566,7 @@ public final class ProofManagementDialog extends JDialog {
         // target icons
 
         Services services = initConfig.getServices();
-        SpecificationRepository specRepos = services.getSpecificationRepository();
+        ContractRegistry specRepos = services.getContractRegistry();
 
 
         var kjts = services.getJavaInfo().getAllKeYJavaTypes();

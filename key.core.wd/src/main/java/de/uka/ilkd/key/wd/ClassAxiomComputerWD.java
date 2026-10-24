@@ -29,8 +29,8 @@ public class ClassAxiomComputerWD extends ClassAxiomComputer {
     public void addClassInvariant(ClassInvariant inv) {
         super.addClassInvariant(inv);
 
-        final SpecificationRepositoryWD specRepo =
-            (SpecificationRepositoryWD) services.getSpecificationRepository();
+        final ContractRegistryWD specRepo =
+            (ContractRegistryWD) services.getContractRegistry();
         final KeYJavaType kjt = inv.getKJT();
         final IObserverFunction target = inv.isStatic() ? services.getJavaInfo().getStaticInv(kjt)
                 : services.getJavaInfo().getInv();

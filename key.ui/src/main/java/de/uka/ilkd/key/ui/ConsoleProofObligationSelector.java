@@ -48,7 +48,7 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
 
     private void initializeContractsArray() {
         ImmutableSet<Contract> contracts =
-            initConfig.getServices().getSpecificationRepository().getAllContracts();
+            initConfig.getServices().getContractRegistry().getAllContracts();
         this.contracts = new ArrayList<>();
         // int i = 0;
 
