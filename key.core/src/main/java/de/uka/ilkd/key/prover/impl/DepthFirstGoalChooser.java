@@ -9,12 +9,14 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Helper class for managing a list of goals on which rules are applied. The class provides methods
  * for removing a goal, and for updating the internal data structures after a rule has been applied.
  */
+@NullMarked
 public class DepthFirstGoalChooser extends DefaultGoalChooser {
     /*
      * (non-Javadoc)
@@ -68,7 +70,7 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
     }
 
     @Override
-    protected void updateGoalListHelp(Object node, ImmutableList<Goal> newGoals) {
+    protected void updateGoalListHelp(@Nullable Object node, ImmutableList<Goal> newGoals) {
         ImmutableList<Goal> prevGoalList = ImmutableList.nil();
         boolean newGoalsInserted = false;
 

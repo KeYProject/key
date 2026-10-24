@@ -6,11 +6,14 @@ package de.uka.ilkd.key.axiom_abstraction.boollattice;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A domain element of the simple boolean lattice.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public abstract class BooleanDomainElem extends AbstractDomainElement {
 
     /**

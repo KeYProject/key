@@ -6,11 +6,14 @@ package de.uka.ilkd.key.axiom_abstraction.signanalysis;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A domain element for sign analysis.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public abstract class SignAnalysisDomainElem extends AbstractDomainElement {
 
     /**

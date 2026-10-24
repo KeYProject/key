@@ -14,6 +14,7 @@ import de.uka.ilkd.key.util.parsing.BuildingIssue;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  */
 @SuppressWarnings("unchecked")
+@NullMarked
 abstract class AbstractBuilder<T> extends JavaKeYParserBaseVisitor<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractBuilder.class);
     private @Nullable List<BuildingIssue> buildingIssues = null;

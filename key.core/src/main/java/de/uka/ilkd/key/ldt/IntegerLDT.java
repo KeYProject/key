@@ -23,6 +23,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import org.slf4j.LoggerFactory;
  * convert java number types to their logic counterpart.
  */
 @SuppressWarnings("unused")
+@NullMarked
 public final class IntegerLDT extends LDT {
     private static final Logger LOGGER = LoggerFactory.getLogger(IntegerLDT.class);
 
@@ -642,7 +644,7 @@ public final class IntegerLDT extends LDT {
     }
 
 
-    public Function getInBounds(Type t) {
+    public @Nullable Function getInBounds(Type t) {
         if (t == PrimitiveType.JAVA_BYTE) {
             return inByte;
         } else if (t == PrimitiveType.JAVA_CHAR) {
@@ -664,7 +666,7 @@ public final class IntegerLDT extends LDT {
      * @param t the type
      * @return in range function
      */
-    public Function getSpecInBounds(Type t) {
+    public @Nullable Function getSpecInBounds(Type t) {
         if (t == PrimitiveType.JAVA_BYTE) {
             return inRangeByte;
         } else if (t == PrimitiveType.JAVA_CHAR) {
@@ -686,7 +688,7 @@ public final class IntegerLDT extends LDT {
      * @param t the type
      * @return the cast
      */
-    public Function getSpecCast(Type t) {
+    public @Nullable Function getSpecCast(Type t) {
         if (t == PrimitiveType.JAVA_BYTE) {
             return moduloByte;
         } else if (t == PrimitiveType.JAVA_CHAR) {
@@ -712,7 +714,7 @@ public final class IntegerLDT extends LDT {
      * @return the function symbol for the given operation
      */
     @Override
-    public Function getFunctionFor(Operator op, Services serv,
+    public @Nullable Function getFunctionFor(Operator op, Services serv,
             ExecutionContext ec) {
         // Dead in all examples, removed in commit 1e72a5709053a87cae8d2
         return null;
@@ -794,7 +796,7 @@ public final class IntegerLDT extends LDT {
     }
 
     @Override
-    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+    public @Nullable Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (!containsFunction((Function) t.op())) {
             return null;
         }
@@ -813,7 +815,7 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public Type getType(JTerm t) {
+    public @Nullable Type getType(JTerm t) {
         assert false : "IntegerLDT: Cannot get Java type for term: " + t;
         return null;
     }

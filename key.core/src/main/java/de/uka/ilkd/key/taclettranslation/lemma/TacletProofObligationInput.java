@@ -24,6 +24,7 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,19 +36,20 @@ import org.slf4j.LoggerFactory;
  *
  * @author mattias ulbrich
  */
+@NullMarked
 public class TacletProofObligationInput implements IPersistablePO {
     static final Logger LOGGER = LoggerFactory.getLogger(TacletProofObligationInput.class);
     public static final String AXIOM_FILE = "axiomFile";
 
     private final String tacletName;
-    private ProofAggregate proofObligation;
-    private Throwable ex;
+    private @Nullable ProofAggregate proofObligation;
+    private @Nullable Throwable ex;
 
     // The following may all possibly be null
-    private String definitionFile;
-    private String tacletFile;
-    private String[] axiomFiles;
-    private String baseDir;
+    private @Nullable String definitionFile;
+    private @Nullable String tacletFile;
+    private @Nullable String[] axiomFiles;
+    private @Nullable String baseDir;
 
     /**
      * This filter is used to filter out precisely that taclet which has the required name.
@@ -99,7 +101,7 @@ public class TacletProofObligationInput implements IPersistablePO {
         }
     };
 
-    private final InitConfig environmentConfig;
+    private final @Nullable InitConfig environmentConfig;
 
 
     /**
@@ -108,7 +110,7 @@ public class TacletProofObligationInput implements IPersistablePO {
      * @param tacletName the name of the taclet which is to be created
      * @param initConfig the initconfig under which the PO is to be examined
      */
-    public TacletProofObligationInput(String tacletName, InitConfig initConfig) {
+    public TacletProofObligationInput(String tacletName, @Nullable InitConfig initConfig) {
         this.tacletName = tacletName;
         this.environmentConfig = initConfig;
     }
@@ -237,7 +239,7 @@ public class TacletProofObligationInput implements IPersistablePO {
      * {@inheritDoc}
      */
     @Override
-    public KeYJavaType getContainerType() {
+    public @Nullable KeYJavaType getContainerType() {
         return null;
     }
 }

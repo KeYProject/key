@@ -17,8 +17,10 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public final class SetLDT extends ParametricLDT {
     public static final Name NAME = new Name("Set");
 
@@ -108,7 +110,7 @@ public final class SetLDT extends ParametricLDT {
     }
 
     @Override
-    public JTerm translateLiteral(Literal lit, Services services) {
+    public @Nullable JTerm translateLiteral(Literal lit, Services services) {
         return null;
     }
 
@@ -123,7 +125,7 @@ public final class SetLDT extends ParametricLDT {
     }
 
     @Override
-    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+    public @Nullable Expression translateTerm(JTerm t, ExtList children, Services services) {
         return null;
     }
 }

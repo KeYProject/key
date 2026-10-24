@@ -10,6 +10,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -17,6 +18,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author weigl
  */
+@NullMarked
 public abstract class AbstractPropertiesSettings extends AbstractSettings {
 
     private static final String SET_DELIMITER = ",";

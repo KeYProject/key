@@ -21,8 +21,10 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class TacletSoundnessPOLoader {
     private final boolean loadAsLemmata;
 
@@ -33,10 +35,10 @@ public class TacletSoundnessPOLoader {
      * obligations and once for adding them to the already existing proof obligation. This is
      * necessary in order to omit name clashes.
      */
-    private final InitConfig originalConfig;
+    private final @Nullable InitConfig originalConfig;
 
     private final List<LoaderListener> listeners = new LinkedList<>();
-    private ProofAggregate resultingProof;
+    private @Nullable ProofAggregate resultingProof;
     private ImmutableSet<Taclet> resultingTaclets = DefaultImmutableSet.nil();
     private ImmutableSet<Taclet> resultingTacletsForOriginalProof = DefaultImmutableSet.nil();
 
@@ -105,8 +107,8 @@ public class TacletSoundnessPOLoader {
     }
 
 
-    public TacletSoundnessPOLoader(LoaderListener listener, TacletFilter filter,
-            boolean loadAsLemmata, TacletLoader loader, InitConfig originalConfig,
+    public TacletSoundnessPOLoader(@Nullable LoaderListener listener, TacletFilter filter,
+            boolean loadAsLemmata, TacletLoader loader, @Nullable InitConfig originalConfig,
             boolean isOnlyUsedForProvingTaclets) {
         super();
         this.tacletLoader = loader;
@@ -319,7 +321,7 @@ public class TacletSoundnessPOLoader {
         }
     }
 
-    public ProofAggregate getResultingProof() {
+    public @Nullable ProofAggregate getResultingProof() {
         return resultingProof;
     }
 

@@ -7,6 +7,7 @@ package de.uka.ilkd.key.nparser;
 import org.key_project.util.parsing.Location;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This struct encapsulate the information of a proofscript found in key files.
@@ -16,5 +17,6 @@ import org.jspecify.annotations.NonNull;
  * @author Alexander Weigl
  * @version 1 (23.04.24)
  */
+@NullMarked
 public record ProofScriptEntry(@NonNull String script, @NonNull Location location) {
 }

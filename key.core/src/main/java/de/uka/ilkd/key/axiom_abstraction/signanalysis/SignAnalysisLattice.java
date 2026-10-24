@@ -9,11 +9,14 @@ import java.util.Iterator;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A lattice for sign analysis of integers.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class SignAnalysisLattice extends AbstractDomainLattice {
 
     /**

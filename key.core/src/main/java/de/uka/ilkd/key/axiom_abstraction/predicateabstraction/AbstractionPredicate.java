@@ -26,12 +26,16 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Interface for predicates used for predicate abstraction. An abstraction predicate is a mapping
  * from program variables or constants to formulae instantiated for the respective variable.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Named {
 
     /**
@@ -46,7 +50,7 @@ public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Na
      *
      * This field is needed to save proofs with abstraction predicates.
      */
-    private JTerm predicateFormWithPlaceholder = null;
+    private @Nullable JTerm predicateFormWithPlaceholder = null;
 
     /**
      * The placeholder variable occurring in {@link #predicateFormWithPlaceholder} which is to be
@@ -55,7 +59,7 @@ public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Na
      *
      * This field is needed to save proofs with abstraction predicates.s
      */
-    private LocationVariable placeholderVariable = null;
+    private @Nullable LocationVariable placeholderVariable = null;
 
     /**
      * Creates a new {@link AbstractionPredicate}. Constructor is hidden since elements fo this
@@ -119,7 +123,7 @@ public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Na
 
         AbstractionPredicate result = new AbstractionPredicate(fInputSort) {
             private final Name name = new Name("abstrPred_" + predicate.op());
-            private Function<JTerm, JTerm> mapping = null;
+            private @Nullable Function<JTerm, JTerm> mapping = null;
 
             @Override
             public JTerm apply(JTerm input) {

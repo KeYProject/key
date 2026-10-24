@@ -16,12 +16,15 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import org.key_project.util.bitops.ImmutableFixedLengthBitSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A super class for predicates abstraction lattices. Implements basic join functionality and a
  * template for an iterator initializing ImmutableFixedLengthBitSets.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public abstract class AbstractPredicateAbstractionLattice extends AbstractDomainLattice {
 
     /**

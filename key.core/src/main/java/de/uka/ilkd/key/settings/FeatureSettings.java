@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (04.12.23)
  */
+@NullMarked
 public class FeatureSettings extends AbstractSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(FeatureSettings.class);
     private static final String CATEGORY = "Feature";

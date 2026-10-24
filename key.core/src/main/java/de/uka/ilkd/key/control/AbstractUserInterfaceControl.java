@@ -29,6 +29,8 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.engine.TaskStartedInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public abstract class AbstractUserInterfaceControl
         implements UserInterfaceControl, ProblemLoaderControl, ProverTaskListener {
     private static final Logger LOGGER =
@@ -59,7 +62,7 @@ public abstract class AbstractUserInterfaceControl
      * {@inheritDoc}
      */
     @Override
-    public void addProverTaskListener(ProverTaskListener ptl) {
+    public void addProverTaskListener(@Nullable ProverTaskListener ptl) {
         if (ptl != null) {
             proverTaskListener.add(ptl);
         }
@@ -69,7 +72,7 @@ public abstract class AbstractUserInterfaceControl
      * {@inheritDoc}
      */
     @Override
-    public void removeProverTaskListener(ProverTaskListener ptl) {
+    public void removeProverTaskListener(@Nullable ProverTaskListener ptl) {
         if (ptl != null) {
             proverTaskListener.remove(ptl);
         }
@@ -208,10 +211,12 @@ public abstract class AbstractUserInterfaceControl
      * {@inheritDoc}
      */
     @Override
-    public AbstractProblemLoader load(Profile profile, Path file, List<Path> classPath,
-            Path bootClassPath, List<Path> includes, Properties poPropertiesToForce,
+    public AbstractProblemLoader load(@Nullable Profile profile, Path file,
+            @Nullable List<Path> classPath,
+            @Nullable Path bootClassPath, @Nullable List<Path> includes,
+            @Nullable Properties poPropertiesToForce,
             boolean forceNewProfileOfNewProofs,
-            Consumer<Proof> callback) throws ProblemLoaderException {
+            @Nullable Consumer<Proof> callback) throws ProblemLoaderException {
         AbstractProblemLoader loader = null;
         try {
             loader = new SingleThreadProblemLoader(file, classPath, bootClassPath, includes,

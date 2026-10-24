@@ -29,6 +29,10 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public final class DefaultTacletSetTranslation
         implements TacletSetTranslation, TranslationListener {
 
@@ -87,7 +91,7 @@ public final class DefaultTacletSetTranslation
 
 
     @Override
-    public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts) {
+    public ImmutableList<TacletFormula> getTranslation(@Nullable ImmutableSet<Sort> sorts) {
 
         // only translate once.
         if (!translate) {

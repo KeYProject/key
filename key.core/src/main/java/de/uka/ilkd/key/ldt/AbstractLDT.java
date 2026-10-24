@@ -19,8 +19,10 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public abstract class AbstractLDT implements Named {
     protected final Name name;
 
@@ -127,7 +129,7 @@ public abstract class AbstractLDT implements Named {
     ///
     /// @param lit the Literal to be translated
     /// @return the Term that represents the given literal in its logic form
-    public abstract JTerm translateLiteral(Literal lit, Services services);
+    public abstract @Nullable JTerm translateLiteral(Literal lit, Services services);
 
     /// returns the function symbol for the given _Java_ operator.
     ///
@@ -156,5 +158,6 @@ public abstract class AbstractLDT implements Named {
     public abstract boolean hasLiteralFunction(Function f);
 
     /// Is called whenever `hasLiteralFunction()` returns true.
-    public abstract Expression translateTerm(JTerm t, ExtList children, Services services);
+    public abstract @Nullable Expression translateTerm(JTerm t, ExtList children,
+            Services services);
 }

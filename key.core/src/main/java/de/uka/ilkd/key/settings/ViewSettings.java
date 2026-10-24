@@ -9,6 +9,8 @@ import java.util.Properties;
 import java.util.Set;
 import javax.swing.*;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class encapsulates information about: 1) relative font size in the prover view 2) the
  * maximal number of lines a tooltip with instantiated SchemaVariables is allowed to have. If this
@@ -20,6 +22,7 @@ import javax.swing.*;
  * @author unknown
  * @author weigl
  */
+@NullMarked
 public class ViewSettings extends AbstractPropertiesSettings {
 
     private static final String CLUTTER_RULES = "clutterRules";

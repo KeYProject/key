@@ -24,6 +24,7 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.op.QuantifiableVariable;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This visitor finds all contracts and invariant clauses in {@link KeyAst}.
@@ -31,6 +32,7 @@ import org.jspecify.annotations.NonNull;
  * @author Alexander Weigl
  * @version 1 (12/4/19)
  */
+@NullMarked
 public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     private final DeclarationBuilder declarationBuilder;
     private final List<Contract> contracts = new ArrayList<>();

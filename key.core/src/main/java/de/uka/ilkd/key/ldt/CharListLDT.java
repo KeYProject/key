@@ -20,9 +20,10 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-
+@NullMarked
 public final class CharListLDT extends LDT {
 
     public static final Name NAME = new Name("CharList");
@@ -187,7 +188,7 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public JTerm translateLiteral(Literal lit, Services services) {
+    public @Nullable JTerm translateLiteral(Literal lit, Services services) {
         final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
         final TermBuilder tb = services.getTermBuilder();
         final JTerm term_empty = tb.func(seqLDT.getSeqEmpty());

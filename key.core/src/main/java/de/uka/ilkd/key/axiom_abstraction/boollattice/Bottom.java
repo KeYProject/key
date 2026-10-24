@@ -11,11 +11,14 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The Bottom element of the boolean lattice, representing no boolean at all.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class Bottom extends BooleanDomainElem {
 
     private static final Bottom INSTANCE = new Bottom();

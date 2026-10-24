@@ -10,11 +10,14 @@ import de.uka.ilkd.key.logic.TermBuilder;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The Pos element of the sign lattice, representing all strictly positive numbers.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class Pos extends SignAnalysisDomainElem {
 
     private static final Pos INSTANCE = new Pos();
