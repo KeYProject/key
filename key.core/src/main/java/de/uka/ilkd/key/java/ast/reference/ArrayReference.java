@@ -56,7 +56,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      */
     public ArrayReference(ReferencePrefix accessPath, Expression[] initializers) {
         this.prefix = accessPath;
-        this.inits = ImmutableList.of(initializers);
+        this.inits = ImmutableList.ofFixedSize(initializers);
     }
 
     /**
@@ -79,10 +79,10 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
             this.prefix = new ArrayReference(e1, accessPath);
             e1 = new Expression[1];
             e1[0] = e[e.length - 1];
-            this.inits = ImmutableList.of(e1);
+            this.inits = ImmutableList.ofFixedSize(e1);
         } else {
             this.prefix = accessPath;
-            this.inits = ImmutableList.of(e);
+            this.inits = ImmutableList.ofFixedSize(e);
         }
     }
 
@@ -107,10 +107,10 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
             System.arraycopy(e, 0, e1, 0, e1.length);
             this.prefix = new ArrayReference(e1, accessPath);
             e1[0] = e[e.length - 1];
-            this.inits = ImmutableList.of(e1);
+            this.inits = ImmutableList.ofFixedSize(e1);
         } else {
             this.prefix = accessPath;
-            this.inits = ImmutableList.of(e);
+            this.inits = ImmutableList.ofFixedSize(e);
         }
     }
 

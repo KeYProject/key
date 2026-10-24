@@ -40,7 +40,7 @@ public class ParenthesizedExpression extends Operator
     }
 
     public ParenthesizedExpression(PositionInfo pi, List<Comment> c, Expression expr) {
-        super(pi, c, ImmutableList.of(expr));
+        super(pi, c, ImmutableList.ofFixedSize(expr));
     }
 
     /**
