@@ -26,6 +26,7 @@ public class RecognitionException extends Exception implements HasLocation {
     }
 
     @Override
+    @SuppressWarnings("NullAway") // an input may not name a file (e.g. standard input)
     public Location getLocation() {
         return new Location(SourceNames.getURIFromTokenSource(input.getSourceName()), position);
     }

@@ -6,6 +6,7 @@ package org.key_project.util.java;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.jspecify.annotations.Nullable;
 
@@ -56,6 +57,7 @@ public final class XMLUtil {
             } else {
                 assert tagSB != null
                         : "@AssumeAssertion(nullness): tagSB must have been intialised already";
+                tagSB = Objects.requireNonNull(tagSB, "tagSB must have been intialised");
                 tagSB.append(sign);
                 if (sign == '>' && !inAttribute) {
                     inTag = false;
