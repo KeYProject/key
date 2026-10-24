@@ -21,6 +21,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Support for the integer theory.
  *
@@ -28,6 +31,7 @@ import org.key_project.util.collection.ImmutableSet;
  * instantiation) and provides no derived triggers. For cost prediction it decides an arithmetic
  * comparison from itself or from an assumed comparison, through {@link HandleArith}.
  */
+@NullMarked
 final class IntegerTheorySupport implements QuantifierTheorySupport {
 
     /**
@@ -39,7 +43,8 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
      * @return the verdict
      */
     @Override
-    public CandidateVerdict verdictOn(JTerm candidate, JTerm enclosing, Services services) {
+    public CandidateVerdict verdictOn(JTerm candidate, @Nullable JTerm enclosing,
+            Services services) {
         final Operator op = candidate.op();
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         return op == integerLDT.getLessOrEquals() || op == integerLDT.getGreaterOrEquals()
@@ -144,7 +149,8 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
      * require substituting before solving.
      */
     @Override
-    public ImmutableMap<QuantifiableVariable, Term> solveForVariable(JTerm pattern, JTerm instance,
+    public @Nullable ImmutableMap<QuantifiableVariable, Term> solveForVariable(JTerm pattern,
+            JTerm instance,
             ImmutableMap<QuantifiableVariable, Term> varMap, Services services) {
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         final Sort integerSort = integerLDT.targetSort();
@@ -188,7 +194,7 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
     }
 
     /** Divides every coefficient by the divisor, or returns null when a division is not exact. */
-    private static Polynomial divideExactly(Polynomial p, BigInteger divisor) {
+    private static @Nullable Polynomial divideExactly(Polynomial p, BigInteger divisor) {
         if (divisor.signum() == 0 || p.getConstantTerm().remainder(divisor).signum() != 0) {
             return null;
         }

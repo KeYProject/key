@@ -18,11 +18,14 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Given a monomial and a polynomial, this projection computes the gcd of all numerical
  * coefficients. The constant term of the polynomial is ignored. The result is guaranteed to be
  * non-negative.
  */
+@NullMarked
 @StableCost
 public class CoeffGcdProjection implements ProjectionToTerm<Goal> {
 

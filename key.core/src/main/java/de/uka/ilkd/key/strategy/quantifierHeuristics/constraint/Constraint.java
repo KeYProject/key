@@ -8,6 +8,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.JTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Abstract constraint interface for constraints offering unification of terms and joins. There are
  * no public constructors to build up a new Constraint use the BOTTOM constraint (static final class
@@ -17,6 +19,7 @@ import de.uka.ilkd.key.logic.JTerm;
  * constrains should only be representated by the TOP element.
  */
 
+@NullMarked
 @Deprecated
 public interface Constraint {
 

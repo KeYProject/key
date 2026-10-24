@@ -11,12 +11,14 @@ import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 import org.key_project.logic.Named;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Interface for creating Strategy instances. The strategy name and the name of the strategy factory
  * are assumed to be the same (you have to refactor if you want to change this).
  */
+@NullMarked
 public interface StrategyFactory extends Named {
     /**
      * Create strategy for a proof.
@@ -25,7 +27,7 @@ public interface StrategyFactory extends Named {
      * @param strategyProperties the StrategyProperties to customize the strategy
      * @return the newly created strategy
      */
-    Strategy<@NonNull Goal> create(Proof proof, StrategyProperties strategyProperties);
+    Strategy<Goal> create(Proof proof, StrategyProperties strategyProperties);
 
     /**
      * Returns the {@link StrategySettingsDefinition} which describes how an user interface has to
@@ -33,5 +35,6 @@ public interface StrategyFactory extends Named {
      *
      * @return The {@link StrategySettingsDefinition} which describes the user interface.
      */
+    @Nullable
     StrategySettingsDefinition getSettingsDefinition();
 }

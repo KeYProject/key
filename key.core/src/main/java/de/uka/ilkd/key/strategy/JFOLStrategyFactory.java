@@ -13,8 +13,11 @@ import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /// Factory for [JFOLStrategy]. Additionally, handles all strategy settings
 /// relevant to it.
+@NullMarked
 public class JFOLStrategyFactory implements StrategyFactory {
     public static final String TOOL_TIP_QUANTIFIER_NONE =
         "<html>Do not instantiate quantified formulas automatically</html>";

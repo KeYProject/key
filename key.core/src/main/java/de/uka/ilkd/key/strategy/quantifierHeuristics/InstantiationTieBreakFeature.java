@@ -22,6 +22,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Orders quantifier instantiation candidates whose predicted cost is equal, so the choice within a
@@ -34,6 +35,7 @@ import org.jspecify.annotations.NonNull;
  * bands, so the prediction
  * itself is never overridden.
  */
+@NullMarked
 public class InstantiationTieBreakFeature implements Feature {
 
     private final ProjectionToTerm<Goal> varInst;

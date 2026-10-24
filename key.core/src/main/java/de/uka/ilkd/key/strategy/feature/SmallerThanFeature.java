@@ -12,11 +12,14 @@ import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Abstract superclass for features comparing terms (in particular polynomials or monomials) using
  * the term ordering
  */
+@NullMarked
 public abstract class SmallerThanFeature extends BinaryTacletAppFeature {
 
     private final TermOrdering termOrdering = new LexPathOrdering();

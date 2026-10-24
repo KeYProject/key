@@ -28,6 +28,8 @@ import org.key_project.logic.op.Operator;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
@@ -43,6 +45,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  * summary is memoised in {@link de.uka.ilkd.key.java.ServiceCaches}. The per-sequent aggregation is
  * memoised once more in a thread-local, so all quantified formulas of one sequent reuse it.
  */
+@NullMarked
 abstract class PolarityOccurrenceTieBreak implements QuantifierInstantiationTieBreak {
 
     /** The largest tie-break value; an instance in this many or more formulas gets the value 0. */

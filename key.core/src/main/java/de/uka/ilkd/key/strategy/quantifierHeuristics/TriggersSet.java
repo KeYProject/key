@@ -32,9 +32,13 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Selects and stores the triggers for a quantified formula in prenex conjunctive normal form.
  */
+@NullMarked
 public class TriggersSet {
 
     /** The quantified formula in prenex CNF. */
@@ -346,7 +350,7 @@ public class TriggersSet {
          * @param services access to the theory operators and term construction
          * @return what the search below {@code term} produced
          */
-        private Search searchTriggers(JTerm term, JTerm enclosing, Collected found,
+        private Search searchTriggers(JTerm term, @Nullable JTerm enclosing, Collected found,
                 Services services) {
             if (!mightContainTriggers(term)) {
                 return Search.OPEN;
@@ -439,7 +443,7 @@ public class TriggersSet {
          * discards the candidate; otherwise a single {@code PREFER_ENCLOSING} keeps the search
          * going past it.
          */
-        private TriggerSupport.CandidateVerdict verdictOn(JTerm term, JTerm enclosing,
+        private TriggerSupport.CandidateVerdict verdictOn(JTerm term, @Nullable JTerm enclosing,
                 Services services) {
             TriggerSupport.CandidateVerdict combined = TriggerSupport.CandidateVerdict.ACCEPTABLE;
             for (final TriggerSupport support : supports) {
@@ -466,7 +470,7 @@ public class TriggersSet {
          * @param services access to the theory operators and term construction
          * @return what the registration produced for the enclosing term
          */
-        private Search registerCandidate(JTerm term, JTerm enclosing, Collected found,
+        private Search registerCandidate(JTerm term, @Nullable JTerm enclosing, Collected found,
                 Services services) {
             final TriggerSupport.CandidateVerdict verdict = verdictOn(term, enclosing, services);
             if (verdict == TriggerSupport.CandidateVerdict.FORBIDDEN) {

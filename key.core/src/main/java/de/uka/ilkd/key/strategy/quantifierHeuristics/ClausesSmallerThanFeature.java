@@ -16,11 +16,14 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Ordering used to sort the clauses in a quantified formula. This ordering should only be applied
  * if at least one of the two clauses contains more than one literal (otherwise, use
  * <code>LiteralsSmallerThanFeature</code>).
  */
+@NullMarked
 public class ClausesSmallerThanFeature extends SmallerThanFeature {
 
     private final ProjectionToTerm<Goal> left, right;

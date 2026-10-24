@@ -43,6 +43,7 @@ import org.key_project.prover.strategy.costbased.termfeature.IsNonRigidTermFeatu
 import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.strategy.FOLCost.*;
 
@@ -52,6 +53,7 @@ import static de.uka.ilkd.key.strategy.FOLCost.*;
 /// In particular, instantiation of quantifiers is not supported by this
 /// strategy, as the current E-matching depends on the theory of integers.
 /// For that reason, instantiation can be found [JFOLStrategy].
+@NullMarked
 public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
     public static final Name NAME = new Name("FOL Strategy");
 
@@ -274,10 +276,10 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
      *         all (it is discarded by the strategy).
      */
     @Override
-    public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(@NonNull RuleApp app,
-            @NonNull PosInOccurrence pio,
+    public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pio,
             @NonNull GOAL goal,
-            @NonNull MutableState mState) {
+            MutableState mState) {
         return costComputationF.computeCost(app, pio, goal, mState);
     }
 

@@ -11,7 +11,10 @@ import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /// Creates [SymExStrategy]. Handles strategy settings for symbolic execution.
+@NullMarked
 public class SymExStrategyFactory implements StrategyFactory {
     public static final String TOOL_TIP_LOOP_INVARIANT =
         """

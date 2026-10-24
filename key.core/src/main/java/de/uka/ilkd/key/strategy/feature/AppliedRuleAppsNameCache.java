@@ -16,6 +16,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.GenerationalCache;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 
 /**
@@ -37,6 +38,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Julian Wiesler
  */
+@NullMarked
 public class AppliedRuleAppsNameCache {
     /**
      * The applied rules of a leaf node, by rule name and then by application fingerprint. A leaf

@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import org.jspecify.annotations.NullMarked;
+
+
 /**
  * How a uni-trigger is matched against the sequent.
  *
@@ -18,6 +21,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
  * The kind is decided once, when the trigger is registered, and the matching stage chooses the
  * matcher by the kind alone.
  */
+@NullMarked
 enum TriggerKind {
 
     /**

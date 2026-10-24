@@ -9,9 +9,12 @@ import de.uka.ilkd.key.java.Services;
 import org.key_project.logic.Term;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Two kind of matching algorithm are coded in two nested classes BaseMatching TwosideMatching
  */
+@NullMarked
 class Matching {
 
     private Matching() {}

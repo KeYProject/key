@@ -13,6 +13,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Counts how often a rule has already been applied on the branch leading to a goal, and admits a
  * further application only while that count stays within a limit.
@@ -25,6 +27,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
  * pilot prune heavily.
  * </p>
  */
+@NullMarked
 public final class BranchMultiplicationCountFeature extends BinaryTacletAppFeature {
 
     /**

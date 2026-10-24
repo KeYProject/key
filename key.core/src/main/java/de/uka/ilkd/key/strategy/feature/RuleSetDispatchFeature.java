@@ -27,6 +27,8 @@ import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -35,6 +37,7 @@ import org.jspecify.annotations.NonNull;
  * feature term (if existing) is evaluated. The result of the feature is the sum of the results of
  * the different rule set features.
  */
+@NullMarked
 public class RuleSetDispatchFeature implements Feature {
 
     private static final Feature[] NO_FEATURES = new Feature[0];
@@ -121,7 +124,7 @@ public class RuleSetDispatchFeature implements Feature {
      * @return The {@link Feature} used for the given {@link RuleSet} or {@code null} if not
      *         available.
      */
-    public Feature get(RuleSet ruleSet) {
+    public @Nullable Feature get(RuleSet ruleSet) {
         return rulesetToFeature.get(ruleSet);
     }
 
@@ -132,7 +135,7 @@ public class RuleSetDispatchFeature implements Feature {
      * @return The {@link Feature} used for the given {@link RuleSet} or {@code null} if not
      *         available.
      */
-    public Feature remove(RuleSet ruleSet) {
+    public @Nullable Feature remove(RuleSet ruleSet) {
         featuresByTaclet.clear();
         return rulesetToFeature.remove(ruleSet);
     }

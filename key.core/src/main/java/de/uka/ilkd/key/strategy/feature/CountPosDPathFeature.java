@@ -13,6 +13,8 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Feature that returns the maximum number of positive literals occurring within a d-path of the
@@ -20,6 +22,7 @@ import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
  * Giese.
  */
 // Reads the whole find formula (its d-paths); reusable only while that formula is unchanged.
+@NullMarked
 @WeakStableCost
 public class CountPosDPathFeature extends AbstractBetaFeature {
 

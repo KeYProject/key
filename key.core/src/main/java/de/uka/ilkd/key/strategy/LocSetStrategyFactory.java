@@ -9,7 +9,10 @@ import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /// Creates [LocSetStrategy].
+@NullMarked
 public class LocSetStrategyFactory implements StrategyFactory {
     @Override
     public LocSetStrategy create(Proof proof, StrategyProperties strategyProperties) {

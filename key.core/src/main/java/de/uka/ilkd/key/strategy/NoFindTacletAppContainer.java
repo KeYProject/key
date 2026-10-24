@@ -9,9 +9,12 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Instances of this class are immutable
  */
+@NullMarked
 public class NoFindTacletAppContainer extends TacletAppContainer {
 
     NoFindTacletAppContainer(NoPosTacletApp p_app, RuleAppCost p_ageFreeCost,
