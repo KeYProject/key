@@ -143,6 +143,24 @@ public interface KeYGuiExtension {
     }
 
     /**
+     * This interface describes the UI extension point on the right side of the main window. Panels
+     * are stacked as tabs with the Source view in the right column.
+     *
+     * @author Alexander Weigl
+     */
+    interface RightPanel {
+        /**
+         * Initialization and return of the sub components.
+         * <p>
+         * Called before any other method; can be used to construct the UI.
+         *
+         * @param window parent of this extension
+         * @param mediator the current mediator
+         */
+        Collection<TabPanel> getPanels(MainWindow window, KeYMediator mediator);
+    }
+
+    /**
      * This interface describes the UI extension for adding various context menus.
      *
      * @author Alexander Weigl
