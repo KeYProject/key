@@ -167,8 +167,8 @@ public class MethodDeclaration extends JavaDeclaration
             @Nullable TypeReference returnType,
             ProgramElementName name,
             ParameterDeclaration[] parameters,
-            Throws exceptions,
-            StatementBlock body,
+            @Nullable Throws exceptions,
+            @Nullable StatementBlock body,
             boolean parentIsInterfaceDeclaration) {
         this(modifiers,
             returnType,
@@ -204,8 +204,8 @@ public class MethodDeclaration extends JavaDeclaration
             @Nullable TypeReference returnType,
             ProgramElementName name,
             ImmutableArray<ParameterDeclaration> parameters,
-            Throws exceptions,
-            StatementBlock body,
+            @Nullable Throws exceptions,
+            @Nullable StatementBlock body,
             boolean parentIsInterfaceDeclaration) {
         super(modifiers);
         this.returnType = returnType;

@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ast.LoopInitializer;
@@ -103,7 +104,11 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
             initialized = find(PipelineConstants.IMPLICIT_INITIALIZED, implicitFields);
         }
 
-        result.addLast(assign(attribute(new ThisReference(), initialized), BooleanLiteral.FALSE));
+        result.addLast(assign(attribute(new ThisReference(),
+            Objects.requireNonNull(initialized,
+                "no field '" + PipelineConstants.IMPLICIT_INITIALIZED
+                    + "' in the object model")),
+            BooleanLiteral.FALSE));
         return result;
     }
 
@@ -207,7 +212,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final Modifier[] modifiers =
             Modifier.createModifierList(ModifierKind.PRIVATE, ModifierKind.STATIC);
 
-        final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
+        final KeYJavaType arrayType = Objects.requireNonNull(
+            arrayTypeReference.getKeYJavaType(), "no KeYJavaType for array type reference");
 
         final ProgramVariable paramLength =
             new LocationVariable(new ProgramElementName("length"), integerType, true);
@@ -284,7 +290,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      */
     private StatementBlock getCreateArrayHelperBody(
             ProgramVariable length,
-            ImmutableList<Field> fields, boolean createTransient, ProgramVariable transientType) {
+            ImmutableList<Field> fields, boolean createTransient,
+            @Nullable ProgramVariable transientType) {
         assert !createTransient;
 
         final ThisReference thisRef = new ThisReference();
@@ -295,7 +302,10 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
             new ProgramElementName(PipelineConstants.IMPLICIT_OBJECT_PREPARE), null));
 
         body.add(
-            assign(attribute(thisRef, findInObjectFields(PipelineConstants.IMPLICIT_INITIALIZED)),
+            assign(attribute(thisRef,
+                Objects.requireNonNull(findInObjectFields(PipelineConstants.IMPLICIT_INITIALIZED),
+                    "no field '" + PipelineConstants.IMPLICIT_INITIALIZED
+                        + "' in the object model")),
                 BooleanLiteral.TRUE));
 
         body.add(new Return(thisRef));
@@ -310,7 +320,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
             ProgramVariable length, ImmutableList<Field> fields) {
 
         final Modifier[] modifiers = Modifier.createModifierList(ModifierKind.PRIVATE);
-        final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
+        final KeYJavaType arrayType = Objects.requireNonNull(
+            arrayTypeReference.getKeYJavaType(), "no KeYJavaType for array type reference");
 
         final MethodDeclaration md = new MethodDeclaration(modifiers, arrayTypeReference,
             new ProgramElementName(IMPLICIT_ARRAY_CREATION_HELPER), new ParameterDeclaration[0],
@@ -331,7 +342,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final Modifier[] modifiers =
             Modifier.createModifierList(ModifierKind.PROTECTED, ModifierKind.STATIC);
 
-        final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
+        final KeYJavaType arrayType = Objects.requireNonNull(
+            arrayTypeReference.getKeYJavaType(), "no KeYJavaType for array type reference");
 
         final ProgramVariable paramLength =
             new LocationVariable(new ProgramElementName("length"), integerType);
@@ -354,7 +366,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      */
     private Expression getDefaultValue(Type type) {
         if (type instanceof PrimitiveType) {
-            return type.getDefaultValue();
+            return Objects.requireNonNull(type.getDefaultValue(),
+                "no default value for type " + type);
         }
         return NullLiteral.NULL;
     }

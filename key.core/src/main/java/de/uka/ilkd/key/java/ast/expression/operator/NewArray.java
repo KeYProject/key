@@ -51,7 +51,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      * Array initializer.
      */
 
-    protected final ArrayInitializer arrayInitializer;
+    protected final @Nullable ArrayInitializer arrayInitializer;
 
     /**
      * the key java type of this array
@@ -95,7 +95,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      */
     public NewArray(
             Expression[] arguments, TypeReference typeRef, KeYJavaType keyJavaType,
-            ArrayInitializer init, int dimensions) {
+            @Nullable ArrayInitializer init, int dimensions) {
         super(arguments, typeRef);
         this.arrayInitializer = init;
         this.dimensions = dimensions;
@@ -162,7 +162,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      * @return the array initializer.
      */
 
-    public ArrayInitializer getArrayInitializer() {
+    public @Nullable ArrayInitializer getArrayInitializer() {
         return arrayInitializer;
     }
 

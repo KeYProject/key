@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -410,7 +411,7 @@ public class TriggersSet {
             final Set<JTerm> result = new LinkedHashSet<>();
             if (i >= possibleSubs.length) {
                 final JTerm combined = services.getTermFactory().createTerm(originalTerm.op(),
-                    chosenSubs, boundVars, null);
+                    new ImmutableArray<>(chosenSubs), boundVars);
                 result.add(combined);
                 return result;
             }
@@ -495,7 +496,8 @@ public class TriggersSet {
                 // The derived triggers of an earlier occurrence are registered once; this
                 // literal counts them as its own, classified against this clause's variables.
                 for (final JTerm derivedTerm : derived) {
-                    found.add(termToTrigger.get(derivedTerm), isElement(derivedTerm));
+                    found.add(Objects.requireNonNull(termToTrigger.get(derivedTerm),
+                        "derived triggers are registered before reuse"), isElement(derivedTerm));
                 }
             }
             // A preferred-enclosing candidate is registered like any other, but leaves the
