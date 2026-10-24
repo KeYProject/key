@@ -39,7 +39,6 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstDirect;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.GenerationalCache;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Immutables;
 
@@ -391,7 +390,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                 pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
             // TODO: pos.subTerm() == in should be true which is currently not the case (labels are
             // missing)
-            ImmutableArray<TermLabel> labels =
+            ImmutableList<TermLabel> labels =
                 TermLabelManager.instantiateLabels(new TermLabelState(), services, in, pos, this,
                     ruleApp, goal, null, null, result);
             if (labels != null && !labels.isEmpty()) {
