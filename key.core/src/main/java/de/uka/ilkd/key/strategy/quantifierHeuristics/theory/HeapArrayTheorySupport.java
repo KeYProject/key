@@ -18,6 +18,9 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Support for the heap theory and array reads.
  *
@@ -28,6 +31,7 @@ import org.key_project.util.collection.ImmutableSet;
  * writes as candidate
  * instances for the index it reads.
  */
+@NullMarked
 final class HeapArrayTheorySupport implements QuantifierTheorySupport {
 
     /**
@@ -47,7 +51,8 @@ final class HeapArrayTheorySupport implements QuantifierTheorySupport {
      * @return the verdict
      */
     @Override
-    public CandidateVerdict verdictOn(JTerm candidate, JTerm enclosing, Services services) {
+    public CandidateVerdict verdictOn(JTerm candidate, @Nullable JTerm enclosing,
+            Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         if (heapLDT.isSelectOp(candidate.op())
                 && candidate.sub(2).op() == heapLDT.getCreated()) {

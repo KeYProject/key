@@ -32,12 +32,15 @@ import org.key_project.prover.strategy.costbased.feature.ScaleFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.strategy.SymExCost.*;
 
 /// Strategy for symbolic execution rules.
 ///
 /// Do not create directly. Use [SymExStrategyFactory] instead.
+@NullMarked
 public class SymExStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
     public static final Name NAME = new Name("SymExStrategy");
 
@@ -80,7 +83,7 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
     }
 
     @Override
-    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
+    public @Nullable RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
         return switch (aspect) {
             case StrategyAspect.Cost -> costComputationDispatcher;
             case StrategyAspect.Instantiation -> instantiationDispatcher;

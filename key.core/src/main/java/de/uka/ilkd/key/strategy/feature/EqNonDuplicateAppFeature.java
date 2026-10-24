@@ -11,6 +11,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Binary feature that returns zero iff a certain Taclet app has not already been performed.
@@ -18,6 +20,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
  * meta-constructs correctly (these constructs return equal, but not identical formulas in case of a
  * failure), but is less efficient.
  */
+@NullMarked
 public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     public static final Feature INSTANCE = new EqNonDuplicateAppFeature();

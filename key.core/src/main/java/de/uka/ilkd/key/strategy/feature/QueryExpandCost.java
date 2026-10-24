@@ -24,6 +24,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +35,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  *
  * @author gladisch
  */
+@NullMarked
 public class QueryExpandCost implements Feature {
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryExpandCost.class);
 

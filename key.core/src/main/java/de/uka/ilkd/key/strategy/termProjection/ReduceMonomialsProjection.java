@@ -15,9 +15,12 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Projection for dividing one monomial by another.
  */
+@NullMarked
 @StableCost
 public class ReduceMonomialsProjection implements ProjectionToTerm<Goal> {
 

@@ -39,6 +39,7 @@ import org.key_project.prover.strategy.costbased.termfeature.TermPredicateTermFe
 import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGenerator;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.strategy.HeapSelectCost.*;
 import static de.uka.ilkd.key.strategy.JavaCardDLCost.*;
@@ -48,6 +49,7 @@ import static de.uka.ilkd.key.strategy.JavaCardDLCost.*;
 /// strategy.
 ///
 /// Do not create directly, instead use [JavaCardDLStrategyFactory].
+@NullMarked
 public class JavaCardDLStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
     public static final AtomicLong PERF_COMPUTE = new AtomicLong();
     public static final AtomicLong PERF_APPROVE = new AtomicLong();
@@ -115,7 +117,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
                 || approvalDispatcher.get(rs) != null;
     }
 
-    protected Feature setupGlobalF(@NonNull Feature dispatcher) {
+    protected Feature setupGlobalF(Feature dispatcher) {
         final String queryProp =
             strategyProperties.getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
         final Feature queryF;
@@ -610,7 +612,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
 
 
     @Override
-    public @NonNull Name name() {
+    public Name name() {
         return new Name(JAVA_CARD_DL_STRATEGY);
     }
 
@@ -628,10 +630,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
      *         all (it is discarded by the strategy).
      */
     @Override
-    public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(@NonNull RuleApp app,
-            @NonNull PosInOccurrence pio,
+    public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pio,
             @NonNull GOAL goal,
-            @NonNull MutableState mState) {
+            MutableState mState) {
         var time = System.nanoTime();
         try {
             return costComputationF.computeCost(app, pio, goal, mState);

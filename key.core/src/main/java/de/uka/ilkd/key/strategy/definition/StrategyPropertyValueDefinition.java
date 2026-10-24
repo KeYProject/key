@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.definition;
 
+import org.jspecify.annotations.NullMarked;
+
+
 /**
  * Defines a single value a user can select in the user interface control defined by a
  * {@link OneOfStrategyPropertyDefinition}.
@@ -11,6 +14,7 @@ package de.uka.ilkd.key.strategy.definition;
  * @author Martin Hentschel
  * @see OneOfStrategyPropertyDefinition
  */
+@NullMarked
 public class StrategyPropertyValueDefinition {
     /**
      * The value used by KeY's API.

@@ -30,6 +30,7 @@ import org.key_project.prover.strategy.costbased.feature.AutomatedRuleFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /// Combines a list of component strategies [ComponentStrategy] into a unified strategy. Theory
 /// combination
@@ -42,6 +43,7 @@ import org.jspecify.annotations.NonNull;
 /// a conflict resolution [#resolveConflict(RuleSetDispatchFeature, RuleSet, List)].
 ///
 /// Do not create directly. Use [ModularJavaDLStrategyFactory] instead.
+@NullMarked
 public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
     public static final Name NAME = new Name("Modular JavaDL Strategy");
 

@@ -12,12 +12,14 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * For debugging purposes. Wraps a feature and prints the computed value
  */
+@NullMarked
 public class PrintFeature implements Feature {
     private static final Logger LOGGER = LoggerFactory.getLogger(PrintFeature.class);
 

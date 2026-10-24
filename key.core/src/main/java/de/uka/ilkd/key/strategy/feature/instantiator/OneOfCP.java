@@ -17,7 +17,9 @@ import org.key_project.prover.strategy.costbased.feature.instantiator.CPBranch;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class OneOfCP implements Feature {
 
     private final Feature[] features;

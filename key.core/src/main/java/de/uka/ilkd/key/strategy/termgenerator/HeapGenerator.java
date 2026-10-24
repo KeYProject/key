@@ -20,6 +20,8 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The heap generator returns an iterator over all terms of sort heap that
  * <ol>
@@ -28,6 +30,7 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
  * <li>depending on the mode: heaps just occurring in updates are included or ignored</li>
  * </ol>
  */
+@NullMarked
 public class HeapGenerator implements TermGenerator<Goal> {
 
     public static final TermGenerator<Goal> INSTANCE = new HeapGenerator(true);

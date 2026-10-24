@@ -13,6 +13,8 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * <p>
  * Instances of this class defines how a user interfaces has to look like which edits
@@ -35,6 +37,7 @@ import org.key_project.util.collection.ImmutableArray;
  * @see OneOfStrategyPropertyDefinition
  * @see StrategyPropertyValueDefinition
  */
+@NullMarked
 public class StrategySettingsDefinition {
     /**
      * This class represents an attribute in the strategy settings.

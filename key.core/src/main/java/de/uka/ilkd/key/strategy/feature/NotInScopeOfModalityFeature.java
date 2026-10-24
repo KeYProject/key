@@ -16,6 +16,7 @@ import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 
 /**
@@ -23,6 +24,7 @@ import org.jspecify.annotations.NonNull;
  * program block or an update). Note that terms and formulas within (but not behind) updates are not
  * in the scope of the update
  */
+@NullMarked
 public class NotInScopeOfModalityFeature extends BinaryFeature {
 
     public static final Feature INSTANCE = new NotInScopeOfModalityFeature();

@@ -16,11 +16,15 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A trigger built from several uni-trigger {@link #elements} that, taken together, bind all
  * universal variables of a clause. A match requires matching every element and merging their
  * substitutions into one that is consistent and total on {@link #clauseVariables}.
  */
+@NullMarked
 class MultiTrigger implements Trigger {
 
     /** The uni-trigger elements that jointly have to cover {@link #clauseVariables}. */
@@ -103,7 +107,7 @@ class MultiTrigger implements Trigger {
      * substitution containing all bindings of both; otherwise (a conflicting binding) returns
      * {@code null}.
      */
-    private Substitution mergeIfCompatible(Substitution left, Substitution right) {
+    private @Nullable Substitution mergeIfCompatible(Substitution left, Substitution right) {
         final ImmutableMap<QuantifiableVariable, Term> rightMap = right.getVarMap();
         ImmutableMap<QuantifiableVariable, Term> mergedMap = rightMap;
 

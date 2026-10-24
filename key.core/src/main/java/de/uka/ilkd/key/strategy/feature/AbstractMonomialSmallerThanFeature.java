@@ -11,6 +11,9 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeature {
 
     private final Function mul;

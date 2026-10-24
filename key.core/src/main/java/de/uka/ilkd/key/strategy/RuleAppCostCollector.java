@@ -7,10 +7,13 @@ package de.uka.ilkd.key.strategy;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Interface for collecting <code>RuleApp</code>s, together with their assigned cost. This interface
  * is used in the signature of the method <code>Strategy.instantiateApp</code>
  */
+@NullMarked
 public interface RuleAppCostCollector {
     void collect(RuleApp app, RuleAppCost cost);
 }
