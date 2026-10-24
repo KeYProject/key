@@ -7,7 +7,7 @@ package org.key_project.logic;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 
 public class TermCreationException extends RuntimeException {
@@ -20,7 +20,7 @@ public class TermCreationException extends RuntimeException {
     }
 
     private static String getErrorMessage(Operator op, Term failed) {
-        ImmutableArray<? extends Term> subs = failed.subs();
+        ImmutableList<? extends Term> subs = failed.subs();
         for (int i = 0, n = subs.size(); i < n; i++) {
             Term sub = subs.get(i);
             assert sub == failed.subs().get(i);
@@ -52,7 +52,7 @@ public class TermCreationException extends RuntimeException {
         return sb.toString();
     }
 
-    private static String subsToString(ImmutableArray<? extends Term> subs) {
+    private static String subsToString(ImmutableList<? extends Term> subs) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0, n = subs.size(); i < n; i++) {
             sb.append(i + 1).append(".) ");
