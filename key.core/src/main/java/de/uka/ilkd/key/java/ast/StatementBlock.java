@@ -72,7 +72,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      */
     public StatementBlock(ExtList children) {
         super(children);
-        body = ImmutableList.of(children.collect(Statement.class));
+        body = ImmutableList.ofFixedSize(children.collect(Statement.class));
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -93,11 +93,11 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
 
     public StatementBlock(Statement as) {
-        this(ImmutableList.of(as));
+        this(ImmutableList.ofFixedSize(as));
     }
 
     public StatementBlock(Statement... body) {
-        this(ImmutableList.of(body));
+        this(ImmutableList.ofFixedSize(body));
     }
 
     public StatementBlock(PositionInfo pi, List<Comment> c, ImmutableList<Statement> body,
