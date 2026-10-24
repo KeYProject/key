@@ -24,10 +24,13 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.speclang.MergeContract;
 import de.uka.ilkd.key.speclang.jml.JmlSpec;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.Nullable;
 
@@ -43,6 +46,33 @@ public class MergePointStatement extends JavaStatement
     protected final IProgramVariable identifier;
 
     private final @Nullable JmlSpec context;
+
+    /**
+     * The merge contracts belonging to this merge point, attached to the node; former
+     * {@code mergeContracts} map.
+     */
+    private ImmutableSet<MergeContract> mergeContracts = DefaultImmutableSet.nil();
+
+    /**
+     * Returns the merge contracts belonging to this merge point.
+     */
+    public ImmutableSet<MergeContract> getMergeContracts() {
+        return mergeContracts;
+    }
+
+    /**
+     * Registers the given merge contract on this merge point.
+     */
+    public void addMergeContract(MergeContract contract) {
+        this.mergeContracts = this.mergeContracts.add(contract);
+    }
+
+    /**
+     * Deletes all merge contracts registered on this merge point.
+     */
+    public void removeMergeContracts() {
+        this.mergeContracts = DefaultImmutableSet.nil();
+    }
 
     @Override
     public ImmutableList<JmlSpec> getAttachedJml() {

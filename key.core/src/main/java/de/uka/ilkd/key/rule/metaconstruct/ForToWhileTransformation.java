@@ -114,10 +114,10 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             }
 
             // copy loop invariant to the created while loop
-            LoopSpecification li = services.getSpecificationRepository().getLoopSpec(x);
+            LoopSpecification li = x.getLoopInvariant();
             if (li != null) {
                 li = li.setLoop((While) outerBlockStatements[initSize]);
-                services.getSpecificationRepository().addLoopInvariant(li);
+                ((While) outerBlockStatements[initSize]).setLoopInvariant(li);
             }
 
             addChild(outerBlock);

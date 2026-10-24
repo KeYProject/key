@@ -105,8 +105,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
                 .getActiveStatement(TermBuilder.goBelowUpdates((JTerm) pio.subTerm()).javaBlock());
 
         final Services services = goal.proof().getServices();
-        final MergeContract mc =
-            services.getSpecificationRepository().getMergeContracts(mps).iterator().next();
+        final MergeContract mc = mps.getMergeContracts().iterator().next();
 
         final Node node = goal.node();
 
