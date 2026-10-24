@@ -7,13 +7,18 @@ package org.key_project.key.llm;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dialog;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,16 +30,19 @@ import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Editor for a file-backed user library (prompts or skills) shown as its own settings-tree node
- * below "LLM Settings" (see {@code LlmExtension.LlmSettingsProvider}). The entries are listed in a
- * simple vertical list (name in bold, description below); entries are selectable, created and
- * edited in a modal dialog opened by {@code New} or {@code Edit} (or a double click), deleted with
- * {@code Delete} and the whole library can be exported to or imported from a ZIP archive of
+ * Lightweight editor for a file-backed user library (prompts or skills) shown as its own
+ * settings-tree node below "LLM Settings" (see {@code LlmExtension.LlmSettingsProvider}). The
+ * entries are the Markdown files of the library; they are listed by name and description, and
+ * edited as regular files: {@code New} only asks for the file name and creates a template file
+ * with prefilled front matter, {@code Edit} opens the file in the system editor (falling back to
+ * a plain text dialog when no desktop integration is available). Entries are deleted with
+ * {@code Delete}, and the whole library can be exported to or imported from a ZIP archive of
  * Markdown files (one {@code <name>.md} per entry, see {@link LibraryZip}).
- *
  * <p>
- * Like every KeY settings panel it renders the standard header (title + optional subtitle) via
- * {@link SimpleSettingsPanel}.
+ * Below the list the library's search path is editable: an ordered list of directories holding
+ * the files (first occurrence of a name wins, new files are created in the first directory).
+ * Entries may use {@code ~} (home directory), {@code $(pwd)} and relative paths (working
+ * directory); an empty list selects the default directory.
  *
  * @param <E> the library element type
  * @author Alexander Weigl
@@ -46,11 +54,9 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
     private final JPanel listBox = new JPanel();
     private final JButton btnEdit = new JButton("Edit");
     private final JButton btnDelete = new JButton("Delete");
+    private final DefaultListModel<String> searchPathModel = new DefaultListModel<>();
+    private final JList<String> searchPathList = new JList<>(searchPathModel);
     private int selectedIndex = -1;
-    private @Nullable JComponent form;
-
-    protected final JTextField txtName = new JTextField(20);
-    protected final JTextField txtDescription = new JTextField(20);
 
     protected LibraryEditorPanel(String description, String subHeader) {
         title = description;
@@ -67,11 +73,17 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
         actions.add(button("New", this::newEntry));
         actions.add(btnEdit);
         actions.add(btnDelete);
+        actions.add(button("Reload", this::reload));
         actions.add(button("Export...", this::exportLibrary));
         actions.add(button("Import...", this::importLibrary));
 
+        var south = new JPanel();
+        south.setLayout(new BoxLayout(south, BoxLayout.Y_AXIS));
+        south.add(buildSearchPathPanel());
+        south.add(actions);
+
         pCenter.add(listBox, BorderLayout.CENTER);
-        pCenter.add(actions, BorderLayout.SOUTH);
+        pCenter.add(south, BorderLayout.SOUTH);
         updateButtonState();
     }
 
@@ -79,6 +91,32 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
         var b = new JButton(text);
         b.addActionListener(e -> action.run());
         return b;
+    }
+
+    /** The search path editor: list of directories plus add/remove and a short explanation. */
+    private JComponent buildSearchPathPanel() {
+        searchPathList.setVisibleRowCount(3);
+
+        var buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+        buttons.add(new JLabel("Directories (first one receives new files):"));
+        buttons.add(button("Add directory...", this::addSearchDir));
+        buttons.add(button("Remove", this::removeSearchDir));
+
+        var hint = new JLabel("Search order: \"~\" is the home directory, \"$(pwd)\" and relative"
+            + " paths are resolved against the working directory. The first occurrence of a name"
+            + " wins. Empty list = default directory: " + defaultDirectory());
+        hint.setForeground(UIManager.getColor("Label.disabledForeground"));
+        hint.setBorder(BorderFactory.createEmptyBorder(0, 10, 2, 10));
+
+        var scroll = new JScrollPane(searchPathList);
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+
+        var panel = new JPanel(new BorderLayout(0, 2));
+        panel.setBorder(BorderFactory.createTitledBorder("Search path"));
+        panel.add(buttons, BorderLayout.NORTH);
+        panel.add(scroll, BorderLayout.CENTER);
+        panel.add(hint, BorderLayout.SOUTH);
+        return panel;
     }
 
     private void updateButtonState() {
@@ -89,12 +127,7 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
 
     // ------------------------------------------------------------------ for subclasses
 
-    /** Stores the edit form built by the subclass; it is shown in the modal editor dialog. */
-    protected final void setFormComponent(JComponent form) {
-        this.form = form;
-    }
-
-    /** Reloads the list from the library and clears the selection. */
+    /** Reloads the list (and the search path) from the library and clears the selection. */
     protected final void reload() {
         items.clear();
         items.addAll(loadAll());
@@ -117,7 +150,15 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
         selectedIndex = -1;
         listBox.revalidate();
         listBox.repaint();
+        refreshSearchPath();
         updateButtonState();
+    }
+
+    private void refreshSearchPath() {
+        searchPathModel.clear();
+        for (var dir : searchDirs()) {
+            searchPathModel.addElement(dir);
+        }
     }
 
     /** Selects the entry with the given name. */
@@ -144,17 +185,20 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
 
     protected abstract String descriptionOf(E e);
 
-    /** Fills the form from {@code e}, or clears it when {@code e} is {@code null}. */
-    protected abstract void populateForm(@Nullable E e);
-
-    /** Builds an element from the current form values. */
-    protected abstract E formData();
-
-    /** Persists the element; returns {@code null} on success or an error message. */
+    /** Persists an element (create or replace); returns {@code null} on success or an error. */
     protected abstract String store(E e);
 
     /** Deletes the entry with the given name; returns {@code null} on success or an error. */
     protected abstract String removeByName(String name);
+
+    /**
+     * Creates a new entry file for the given name, prefilled with a template (front matter with
+     * the name and a placeholder body). Returns {@code null} on success or an error message.
+     */
+    protected abstract String createEntry(String name);
+
+    /** The file backing the entry with the given name, or {@code null} when it has none. */
+    protected abstract @Nullable Path fileOf(String name);
 
     /** Serializes one entry to its Markdown document (for the ZIP export). */
     protected abstract String toMarkdown(E e);
@@ -162,90 +206,182 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
     /** Parses one entry from its Markdown document; {@code null} when the entry is invalid. */
     protected abstract @Nullable E fromMarkdown(String markdown);
 
-    // ----------------------------------------------------------------------- editor actions
+    /** The raw search path directories of the library (as configured, not expanded). */
+    protected abstract List<String> searchDirs();
 
-    private void newEntry() {
-        openEditor(null);
+    /** Persists the search path directories of the library. */
+    protected abstract void setSearchDirs(List<String> dirs);
+
+    /** The default directory used when the search path is empty (for the hint text). */
+    protected abstract Path defaultDirectory();
+
+    // ------------------------------------------------------------- search path actions
+
+    private void addSearchDir() {
+        var value = JOptionPane.showInputDialog(this,
+            "Directory to search for " + title.toLowerCase() + ":\n"
+                + "(\"~\" = home directory, \"$(pwd)\" = working directory)",
+            "");
+        if (value == null) {
+            return;
+        }
+        value = value.strip();
+        if (value.isEmpty()) {
+            return;
+        }
+        var dirs = new ArrayList<>(searchDirs());
+        if (!dirs.contains(value)) {
+            dirs.add(value);
+            setSearchDirs(dirs);
+            reload();
+        }
     }
 
-    private void editSelected() {
-        if (selectedIndex >= 0 && selectedIndex < items.size()) {
-            openEditor(items.get(selectedIndex));
+    private void removeSearchDir() {
+        int index = searchPathList.getSelectedIndex();
+        if (index < 0) {
+            return;
         }
+        var dirs = new ArrayList<>(searchDirs());
+        dirs.remove(index);
+        setSearchDirs(dirs);
+        reload();
+    }
+
+    // ----------------------------------------------------------------------- editor actions
+
+    /**
+     * Asks for the file name of the new entry and creates a template file for it.
+     */
+    private void newEntry() {
+        var name = JOptionPane.showInputDialog(this,
+            "Name of the new " + singular(title).toLowerCase()
+                + " (used as the file name and as the trigger):",
+            "");
+        if (name == null) {
+            return;
+        }
+        name = name.strip();
+        if (name.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter a name.",
+                "New " + singular(title), JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        var error = createEntry(name);
+        if (error != null) {
+            JOptionPane.showMessageDialog(this, error, "New " + singular(title),
+                JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        reload();
+        selectByName(name);
+    }
+
+    /** Opens the file of the selected entry in the system editor (or a fallback dialog). */
+    private void editSelected() {
+        if (selectedIndex < 0 || selectedIndex >= items.size()) {
+            return;
+        }
+        var name = nameOf(items.get(selectedIndex));
+        var file = fileOf(name);
+        if (file == null) {
+            JOptionPane.showMessageDialog(this, "No file for '" + name + "' was found.",
+                "Edit " + singular(title), JOptionPane.ERROR_MESSAGE);
+            reload();
+            return;
+        }
+        if (!openExternally(file)) {
+            openTextDialog(file);
+        }
+    }
+
+    /**
+     * Opens {@code file} with the system's default text editor. Returns {@code false} when the
+     * desktop integration is unavailable (headless, unsupported) or fails.
+     */
+    private static boolean openExternally(Path file) {
+        if (GraphicsEnvironment.isHeadless() || !Desktop.isDesktopSupported()) {
+            return false;
+        }
+        try {
+            var desktop = Desktop.getDesktop();
+            if (!desktop.isSupported(Desktop.Action.OPEN)) {
+                return false;
+            }
+            desktop.open(file.toFile());
+            return true;
+        } catch (IOException | RuntimeException ex) {
+            return false;
+        }
+    }
+
+    /** Fallback editor: shows the raw Markdown document in a plain dialog and writes it back. */
+    private void openTextDialog(Path file) {
+        String content;
+        try {
+            content = Files.readString(file, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Could not read " + file + ": " + e.getMessage(),
+                "Edit " + singular(title), JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        var area = new JTextArea(content, 24, 80);
+        area.setFont(new Font(Font.MONOSPACED, Font.PLAIN, area.getFont().getSize()));
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+
+        var owner = SwingUtilities.getWindowAncestor(this);
+        var dialog =
+            new JDialog(owner, "Edit " + file, Dialog.ModalityType.APPLICATION_MODAL);
+        var save = new JButton("Save");
+        save.addActionListener(ev -> {
+            try {
+                Files.writeString(file, area.getText(), StandardCharsets.UTF_8);
+                dialog.dispose();
+                reload();
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(dialog,
+                    "Could not write " + file + ": " + ex.getMessage(), "Save failed",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        var cancel = new JButton("Cancel");
+        cancel.addActionListener(ev -> dialog.dispose());
+        dialog.getRootPane().setDefaultButton(save);
+        var buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
+        buttons.add(save);
+        buttons.add(cancel);
+
+        var contentPane = dialog.getContentPane();
+        contentPane.add(new JScrollPane(area), BorderLayout.CENTER);
+        contentPane.add(buttons, BorderLayout.SOUTH);
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        dialog.pack();
+        dialog.setLocationRelativeTo(owner);
+        dialog.setVisible(true);
     }
 
     private void deleteCurrent() {
         if (selectedIndex < 0 || selectedIndex >= items.size()) {
             return;
         }
-        var error = removeByName(nameOf(items.get(selectedIndex)));
+        var name = nameOf(items.get(selectedIndex));
+        var confirm = JOptionPane.showConfirmDialog(this,
+            "Delete '" + name + "' from all search path directories?", "Delete " + singular(title),
+            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+        var error = removeByName(name);
         if (error != null) {
             JOptionPane.showMessageDialog(this, error, "Delete failed",
                 JOptionPane.ERROR_MESSAGE);
-            return;
         }
         reload();
     }
 
-    /**
-     * Opens the modal editor dialog, pre-filled from {@code entry} (a fresh empty form when
-     * {@code null}). Confirming persists immediately and selects the entry in the list.
-     */
-    private void openEditor(@Nullable E entry) {
-        if (form == null) {
-            return;
-        }
-        final var editing = entry == null ? null : nameOf(entry);
-        populateForm(entry);
-
-        var owner = SwingUtilities.getWindowAncestor(this);
-        var dialog = new JDialog(owner,
-            (entry == null ? "New " : "Edit ") + singular(title),
-            Dialog.ModalityType.APPLICATION_MODAL);
-        var status = new JLabel(" ");
-        status.setForeground(Color.RED);
-
-        var ok = new JButton("OK");
-        var cancel = new JButton("Cancel");
-        ok.addActionListener(ev -> {
-            var data = formData();
-            var newName = nameOf(data);
-            if (newName == null || newName.isBlank()) {
-                status.setText("Please enter a name.");
-                return;
-            }
-            var error = store(data);
-            if (error != null) {
-                status.setText(error);
-                return;
-            }
-            if (editing != null && !editing.equals(newName)) {
-                removeByName(editing);
-            }
-            dialog.dispose();
-            reload();
-            selectByName(newName);
-        });
-        cancel.addActionListener(ev -> dialog.dispose());
-        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        dialog.getRootPane().setDefaultButton(ok);
-
-        var buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 4, 0));
-        buttons.add(ok);
-        buttons.add(cancel);
-        var south = new JPanel(new BorderLayout(4, 0));
-        south.add(status, BorderLayout.CENTER);
-        south.add(buttons, BorderLayout.EAST);
-
-        var content = dialog.getContentPane();
-        content.add(form, BorderLayout.CENTER);
-        content.add(south, BorderLayout.SOUTH);
-        dialog.pack();
-        dialog.setLocationRelativeTo(owner);
-        dialog.setVisible(true);
-    }
-
     private void exportLibrary() {
+        reload(); // pick up external changes before exporting
         var chooser = new JFileChooser();
         chooser.setDialogTitle("Export " + title.toLowerCase());
         chooser.setFileFilter(new FileNameExtensionFilter("ZIP archives", "zip"));
@@ -359,8 +495,8 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
     // --------------------------------------------------------------------------- list entries
 
     /**
-     * One entry of the list: the name in bold with the description (if any) below it. Single clicks
-     * select the entry, double clicks open the editor dialog.
+     * One entry of the list: the name in bold with the description (if any) below it. Single
+     * clicks select the entry, double clicks open it for editing.
      */
     private final class EntryRow extends JPanel {
         private final E entry;
@@ -396,7 +532,7 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
                 public void mouseClicked(MouseEvent e) {
                     selectRow(index);
                     if (e.getClickCount() == 2) {
-                        openEditor(entry);
+                        editSelected();
                     }
                 }
             });

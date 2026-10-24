@@ -263,7 +263,9 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         JLabel infoButton = createHelpLabel(info);
         pCenter.add(infoButton, new CC().wrap());
         pCenter.add(new JLabel());
-        pCenter.add(panel);
+        // the panel spans the input and help columns and terminates the row; without the wrap,
+        // every following row is shifted by one column
+        pCenter.add(panel, new CC().span(2).wrap());
 
         return list;
     }
@@ -339,7 +341,9 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         JLabel infoButton = createHelpLabel(info);
         pCenter.add(infoButton, new CC().wrap());
         pCenter.add(new JLabel());
-        pCenter.add(panel);
+        // the panel spans the input and help columns and terminates the row; without the wrap,
+        // every following row is shifted by one column
+        pCenter.add(panel, new CC().span(2).wrap());
 
         return list;
     }
@@ -358,7 +362,9 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
 
         JScrollPane field = new JScrollPane(list);
 
-        var panel = new JPanel(new MigLayout(new LC().fillX()));
+        // only the text field column grows; the add/remove buttons keep their size and hug the
+        // right edge
+        var panel = new JPanel(new MigLayout(new LC().fillX(), new AC().grow(1000f, 0)));
         panel.add(field, new CC().span(3).growX().wrap());
         panel.add(txtAdd, new CC().growX());
         panel.add(btnAdd, new CC().gapAfter("16px"));
@@ -371,7 +377,9 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         JLabel infoButton = createHelpLabel(info);
         pCenter.add(infoButton, new CC().wrap());
         pCenter.add(new JLabel());
-        pCenter.add(panel);
+        // the panel spans the input and help columns and terminates the row; without the wrap,
+        // every following row is shifted by one column
+        pCenter.add(panel, new CC().span(2).wrap());
 
         list.addListSelectionListener(e -> {
             try {

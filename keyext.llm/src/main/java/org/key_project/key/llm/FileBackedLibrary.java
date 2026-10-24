@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 
 import de.uka.ilkd.key.settings.PathConfig;
@@ -18,10 +19,17 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Shared plumbing for the file-backed user libraries (prompts and skills). Content is stored as
- * Markdown files with a YAML front matter ({@link MarkdownFrontMatter}) under
- * {@code <key-config-dir>/llm/prompts|skills/<name>.md}. Legacy {@code <name>.json} files from
- * older KeY versions are migrated to Markdown automatically on first access. Names are validated
- * so they cannot escape the library directory.
+ * Markdown files with a YAML front matter ({@link MarkdownFrontMatter}) named
+ * {@code <name>.md}. The library is looked up along a configurable <em>search path</em>: the
+ * ordered list of directories returned by {@link #configuredSearchPath()} (entries may use
+ * {@code ~}, {@code $(pwd)} and relative paths, see {@link #expandPath(String)}); when it is
+ * empty, the default directory {@code <key-config-dir>/llm/<subDirectory()>} is used.
+ * <p>
+ * The search order defines the priority: if the same name exists in several directories, the
+ * first occurrence wins. New entries are created in the first directory of the search path,
+ * while {@link #delete(String)} removes a name from all directories. Legacy
+ * {@code <name>.json} files from older KeY versions are migrated to Markdown automatically on
+ * first access. Names are validated so they cannot escape the library directories.
  *
  * @author Alexander Weigl
  */
@@ -53,10 +61,17 @@ abstract class FileBackedLibrary<E> {
     /** Validates a new/replacement name. Returns {@code null} when valid. */
     protected abstract String validate(E element);
 
+    /**
+     * The user-configured search path, in raw (unexpanded) form. An empty list selects the
+     * default directory ({@link #defaultDir()}).
+     */
+    protected abstract List<String> configuredSearchPath();
+
     private static final java.util.regex.Pattern NAME =
         java.util.regex.Pattern.compile("[a-zA-Z0-9_-]+");
 
-    protected Path baseDir() {
+    /** The default (legacy) library directory, used when the search path is empty. */
+    protected Path defaultDir() {
         if (PathConfig.currentPaths != null) {
             return PathConfig.currentPaths.keyConfigDir.resolve("llm").resolve(subDirectory());
         }
@@ -64,31 +79,64 @@ abstract class FileBackedLibrary<E> {
                 .resolve(subDirectory());
     }
 
-    public synchronized List<E> all() {
-        var dir = baseDir();
-        migrateLegacy(dir);
-        var result = new ArrayList<E>();
-        try {
-            if (!Files.isDirectory(dir)) {
-                return result;
-            }
-            try (var stream = Files.list(dir)) {
-                stream.filter(p -> p.toString().endsWith(MD_SUFFIX))
-                        .sorted(Comparator.comparing(Path::toString)).forEach(p -> {
-                            try {
-                                var markdown = Files.readString(p, StandardCharsets.UTF_8);
-                                var e = fromMarkdown(markdown);
-                                if (e != null) {
-                                    result.add(e);
-                                }
-                            } catch (IOException ex) {
-                                // skip unreadable file
-                            }
-                        });
-            }
-        } catch (IOException e) {
-            // treat as empty library
+    /**
+     * Expands a search path entry: {@code $(pwd)} is replaced by the working directory, a
+     * leading {@code ~} by the home directory, and relative paths are resolved against the
+     * working directory.
+     */
+    static Path expandPath(String raw) {
+        String home = System.getProperty("user.home", ".");
+        String pwd = System.getProperty("user.dir", ".");
+        var text = raw.strip().replace("$(pwd)", pwd);
+        if (text.equals("~")) {
+            text = home;
+        } else if (text.startsWith("~/")) {
+            text = home + text.substring(1);
         }
+        var path = Path.of(text);
+        return path.isAbsolute() ? path : Path.of(pwd).resolve(path);
+    }
+
+    /** The expanded search path; the default directory when no (valid) entry is configured. */
+    List<Path> searchDirs() {
+        var result = new ArrayList<Path>();
+        for (var entry : configuredSearchPath()) {
+            if (entry != null && !entry.isBlank()) {
+                result.add(expandPath(entry));
+            }
+        }
+        return result.isEmpty() ? List.of(defaultDir()) : List.copyOf(result);
+    }
+
+    public synchronized List<E> all() {
+        var seen = new HashSet<String>();
+        var result = new ArrayList<E>();
+        for (var dir : searchDirs()) {
+            migrateLegacy(dir);
+            try {
+                if (!Files.isDirectory(dir)) {
+                    continue;
+                }
+                try (var stream = Files.list(dir)) {
+                    stream.filter(p -> p.toString().endsWith(MD_SUFFIX))
+                            .sorted(Comparator.comparing(Path::toString)).forEach(p -> {
+                                try {
+                                    var markdown = Files.readString(p, StandardCharsets.UTF_8);
+                                    var e = fromMarkdown(markdown);
+                                    // the first directory in the search order wins
+                                    if (e != null && seen.add(nameOf(e))) {
+                                        result.add(e);
+                                    }
+                                } catch (IOException ex) {
+                                    // skip unreadable file
+                                }
+                            });
+                }
+            } catch (IOException e) {
+                // skip unreadable directory
+            }
+        }
+        result.sort(Comparator.comparing(this::nameOf));
         return result;
     }
 
@@ -137,33 +185,67 @@ abstract class FileBackedLibrary<E> {
         return get(name) != null;
     }
 
-    /** Saves (creates or replaces) an element. Returns {@code null} on success or an error text. */
+    /**
+     * Returns the file backing the entry with the given name: the first {@code <name>.md} found
+     * along the search path, or {@code null} when the entry does not exist as a file.
+     */
+    public synchronized @Nullable Path fileOf(String name) {
+        for (var dir : searchDirs()) {
+            var file = dir.resolve(name + MD_SUFFIX);
+            if (Files.exists(file)) {
+                return file;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Saves (creates or replaces) an element in the <em>first</em> directory of the search path.
+     * Files with the same name in lower-priority directories are left untouched (they are merely
+     * shadowed and can be removed with {@link #delete(String)}). Returns {@code null} on success
+     * or an error text.
+     */
     public synchronized String save(E element) {
         var error = validate(element);
         if (error != null) {
             return error;
         }
         try {
-            Files.createDirectories(baseDir());
+            var dir = searchDirs().get(0);
+            Files.createDirectories(dir);
             var name = nameOf(element);
-            var target = baseDir().resolve(name + MD_SUFFIX);
-            Files.writeString(target, toMarkdown(element), StandardCharsets.UTF_8);
+            Files.writeString(dir.resolve(name + MD_SUFFIX), toMarkdown(element),
+                StandardCharsets.UTF_8);
             // drop a stale legacy file of the same name
-            Files.deleteIfExists(baseDir().resolve(name + JSON_SUFFIX));
+            Files.deleteIfExists(dir.resolve(name + JSON_SUFFIX));
             return null;
         } catch (IOException e) {
-            return "Could not write library file: " + e.getMessage();
+            return "Could not write the library file: " + e.getMessage();
         }
     }
 
+    /**
+     * Deletes the entry with the given name from <em>every</em> directory of the search path
+     * (Markdown and legacy JSON files). Returns {@code null} on success (at least one file was
+     * removed, or nothing existed) or an error text.
+     */
     public synchronized String delete(String name) {
-        try {
-            boolean any = Files.deleteIfExists(baseDir().resolve(name + MD_SUFFIX))
-                    | Files.deleteIfExists(baseDir().resolve(name + JSON_SUFFIX));
-            return any ? null : "No such entry: " + name;
-        } catch (IOException e) {
-            return "Could not delete " + name + ": " + e.getMessage();
+        boolean any = false;
+        String firstError = null;
+        for (var dir : searchDirs()) {
+            try {
+                any |= Files.deleteIfExists(dir.resolve(name + MD_SUFFIX))
+                        | Files.deleteIfExists(dir.resolve(name + JSON_SUFFIX));
+            } catch (IOException e) {
+                if (firstError == null) {
+                    firstError = "Could not delete " + name + " in " + dir + ": " + e.getMessage();
+                }
+            }
         }
+        if (any) {
+            return null;
+        }
+        return firstError != null ? firstError : "No such entry: " + name;
     }
 
     public synchronized void reload() {
