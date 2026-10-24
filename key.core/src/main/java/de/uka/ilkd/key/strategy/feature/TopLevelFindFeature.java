@@ -14,11 +14,14 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Feature for investigating whether the focus of a rule application is a top-level formula, a
  * top-level formula of the antecedent or a top-level formula of the succedent. The {@code …_UPDATE}
  * variants also accept a focus that sits below a prefix of update applications only.
  */
+@NullMarked
 @StableCost
 public final class TopLevelFindFeature extends BinaryTacletAppFeature {
 

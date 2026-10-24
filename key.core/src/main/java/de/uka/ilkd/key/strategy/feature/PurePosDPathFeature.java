@@ -13,6 +13,8 @@ import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Binary feature that returns zero iff the find-formula of a rule contains a d-path consisting only
@@ -20,6 +22,7 @@ import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
  * Martin Giese.
  */
 // Reads the whole find formula (its d-paths); reusable only while that formula is unchanged.
+@NullMarked
 @WeakStableCost
 public class PurePosDPathFeature extends AbstractBetaFeature {
 

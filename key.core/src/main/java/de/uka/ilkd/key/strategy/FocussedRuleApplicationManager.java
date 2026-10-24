@@ -17,11 +17,15 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A rule app manager that ensures that rules are only applied to a certain subterm within the proof
  * (within a goal). The real work is delegated to a second manager (delegate pattern), this class
  * only filters rule applications
  */
+@NullMarked
 public class FocussedRuleApplicationManager
         implements DelegationBasedRuleApplicationManager<Goal> {
 
@@ -31,7 +35,7 @@ public class FocussedRuleApplicationManager
     private final FormulaTag focussedFormula;
     private final PosInOccurrence focussedSubterm;
 
-    private Goal goal;
+    private @Nullable Goal goal;
 
     // Until <code>next</code> was called for the first time only rule
     // applications for the focussed formula are accepted, after that also
@@ -41,7 +45,8 @@ public class FocussedRuleApplicationManager
     // <code>QueueRuleApplicationManager</code>)
     private boolean onlyModifyFocussedFormula;
 
-    private FocussedRuleApplicationManager(RuleApplicationManager<Goal> delegate, Goal goal,
+    private FocussedRuleApplicationManager(RuleApplicationManager<Goal> delegate,
+            @Nullable Goal goal,
             FormulaTag focussedFormula,
             PosInOccurrence focussedSubterm,
             boolean onlyModifyFocussedFormula) {
@@ -149,7 +154,7 @@ public class FocussedRuleApplicationManager
                 && pio2.sequentFormula().equals(pio1.sequentFormula());
     }
 
-    private PosInOccurrence getPIOForFocussedSubterm() {
+    private @Nullable PosInOccurrence getPIOForFocussedSubterm() {
         final PosInOccurrence formula =
             goal.getFormulaTagManager().getPosForTag(focussedFormula);
 

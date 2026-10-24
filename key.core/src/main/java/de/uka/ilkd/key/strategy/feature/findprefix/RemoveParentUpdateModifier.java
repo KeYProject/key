@@ -8,6 +8,8 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * If the parent operator of the find term is an update application, then change the position (on
@@ -16,6 +18,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
  *
  * @author christoph
  */
+@NullMarked
 public class RemoveParentUpdateModifier implements Modifier {
 
 

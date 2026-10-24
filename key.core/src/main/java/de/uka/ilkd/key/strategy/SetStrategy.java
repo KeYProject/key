@@ -27,6 +27,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.strategy.SetCosts.COMMUTE;
@@ -34,6 +35,7 @@ import static de.uka.ilkd.key.strategy.SetCosts.DIST;
 
 /// Strategy for the sort generic theory of sets.
 /// Do not create directly; use [SetStrategyFactory] instead.
+@NullMarked
 public class SetStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
     public static final Name NAME = new Name("Set Strategy");
 

@@ -10,6 +10,8 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  *
@@ -21,6 +23,7 @@ import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
  *
  * @author gladisch</quote>
  */
+@NullMarked
 public class IsInductionVariable extends BinaryTermFeature {
 
     public static final TermFeature INSTANCE = new IsInductionVariable();

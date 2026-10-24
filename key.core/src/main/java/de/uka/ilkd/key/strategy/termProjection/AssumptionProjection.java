@@ -14,11 +14,14 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Term projection that delivers the assumptions of a taclet application (the formulas that the
  * \assumes clause of the taclet refers to).
  */
+@NullMarked
 @StableCost
 public class AssumptionProjection implements ProjectionToTerm<Goal> {
 

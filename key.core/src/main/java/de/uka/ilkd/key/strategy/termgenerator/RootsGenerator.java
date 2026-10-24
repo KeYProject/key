@@ -25,6 +25,8 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 
@@ -35,6 +37,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  * addition or multiplication) and {@code l} is a literal. The generator will then produce at most
  * one formula that describes the solutions of the formula using linear (in)equations.
  */
+@NullMarked
 public class RootsGenerator implements TermGenerator<Goal> {
 
     private final ProjectionToTerm<Goal> powerRelation;

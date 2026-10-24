@@ -11,11 +11,14 @@ import org.key_project.logic.op.Operator;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Checks, whether the position in occurrence has antecedent/succedent polarity.
  *
  * @author christoph
  */
+@NullMarked
 class AntecSuccPrefixChecker implements Checker {
 
     private enum Polarity {

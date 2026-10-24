@@ -27,6 +27,9 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
 
 
@@ -39,6 +42,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAM
  * constraint would not be satisfiable (cycles, unification failed) the Constraint TOP of interface
  * Constraint is returned.
  */
+@NullMarked
 public class EqualityConstraint implements Constraint {
 
     /**
@@ -47,9 +51,9 @@ public class EqualityConstraint implements Constraint {
     private final HashMap<Metavariable, JTerm> map;
 
     /** cache for return values of getInstantiation */
-    private HashMap<Metavariable, JTerm> instantiationCache = null;
+    private @Nullable HashMap<Metavariable, JTerm> instantiationCache = null;
 
-    private Integer hashCode = null;
+    private @Nullable Integer hashCode = null;
 
     /** Don't use this constructor, use Constraint.BOTTOM instead */
     public EqualityConstraint() {
@@ -170,7 +174,7 @@ public class EqualityConstraint implements Constraint {
         return t;
     }
 
-    private synchronized JTerm getInstantiationIfExisting(Metavariable p_mv) {
+    private synchronized @Nullable JTerm getInstantiationIfExisting(Metavariable p_mv) {
         if (instantiationCache == null) {
             return null;
         }

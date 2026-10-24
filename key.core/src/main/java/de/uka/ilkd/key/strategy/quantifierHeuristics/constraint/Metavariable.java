@@ -14,6 +14,9 @@ import org.key_project.logic.Named;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public final class Metavariable extends JAbstractSortedOperator
         implements Comparable<Metavariable>, TerminalSyntaxElement, Named {
 

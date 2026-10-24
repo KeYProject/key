@@ -11,7 +11,10 @@ import de.uka.ilkd.key.ldt.SetLDT;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
+import org.jspecify.annotations.NullMarked;
+
 /// Term features for location sets
+@NullMarked
 class LocSetTermFeatures extends SetTermFeatures {
 
     LocSetTermFeatures(SetLDT sets, LocSetLDT locSets, HeapLDT heaps) {

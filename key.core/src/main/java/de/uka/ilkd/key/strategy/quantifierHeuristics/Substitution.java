@@ -20,6 +20,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +29,7 @@ import org.slf4j.LoggerFactory;
  * This class decribes a substitution,which store a map(varMap) from quantifiable variable to a
  * term(instance).
  */
+@NullMarked
 public class Substitution {
     private static final Logger LOGGER = LoggerFactory.getLogger(Substitution.class);
 
@@ -58,7 +61,7 @@ public class Substitution {
         return varMap;
     }
 
-    public Term getSubstitutedTerm(QuantifiableVariable var) {
+    public @Nullable Term getSubstitutedTerm(QuantifiableVariable var) {
         return varMap.get(var);
     }
 

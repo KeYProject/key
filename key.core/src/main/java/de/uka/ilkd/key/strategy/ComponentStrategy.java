@@ -12,8 +12,10 @@ import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 
 import org.key_project.prover.rules.RuleSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public interface ComponentStrategy extends Strategy<Goal> {
     enum StrategyAspect {
         Cost, Instantiation, Approval;

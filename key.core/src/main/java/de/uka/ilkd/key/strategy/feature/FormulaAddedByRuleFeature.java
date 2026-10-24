@@ -17,12 +17,14 @@ import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 
 /**
  * Binary feature that returns zero iff the find-formula of the concerned rule app was introduced by
  * a certain kind rule of rule (described via a <code>RuleFilter</code>)
  */
+@NullMarked
 public class FormulaAddedByRuleFeature extends BinaryFeature {
 
     private final RuleFilter filter;

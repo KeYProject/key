@@ -14,10 +14,13 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This feature checks that the position of application is not contained in the if-formulas. If the
  * rule application is admissible, zero is returned.
  */
+@NullMarked
 @StableCost
 public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
 

@@ -24,11 +24,14 @@ import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Checks whether the product of two monomials has the same variables as the left side of
  * an inequation in the sequent. Required to bound the number of cross-multiplications.
  */
+@NullMarked
 @VolatileCost
 public final class IsBoundedByInequationFeature extends BinaryTacletAppFeature {
 
