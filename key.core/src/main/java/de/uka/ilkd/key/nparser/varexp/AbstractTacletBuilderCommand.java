@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.nparser.varexp;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Simple default implementation for {@link TacletBuilderCommand}.
@@ -12,6 +13,7 @@ import org.jspecify.annotations.NonNull;
  * @author Alexander Weigl
  * @version 1 (12/9/19)
  */
+@NullMarked
 public abstract class AbstractTacletBuilderCommand implements TacletBuilderCommand {
     private final @NonNull String triggerName;
     private final @NonNull ArgumentType[] argumentsTypes;

@@ -38,6 +38,7 @@ import org.key_project.util.collection.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -49,6 +50,7 @@ import org.jspecify.annotations.Nullable;
  * @author weigl
  * @version 1
  */
+@NullMarked
 public class DefaultBuilder extends AbstractBuilder<Object> {
     public static final String LIMIT_SUFFIX = "$lmtd";
 
@@ -90,13 +92,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return ctx.getText();
     }
 
-    protected Named lookup(Name n) {
+    protected @Nullable Named lookup(Name n) {
         final Namespace<?>[] lookups =
             { programVariables(), variables(), schemaVariables(), functions() };
         return doLookup(n, lookups);
     }
 
-    protected <T> T doLookup(Name n, Namespace<?>... lookups) {
+    protected <T> @Nullable T doLookup(Name n, Namespace<?>... lookups) {
         for (Namespace<?> lookup : lookups) {
             Object l;
             if (lookup != null && (l = lookup.lookup(n)) != null) {
@@ -202,7 +204,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      * is not found for the first time, the name is expanded with "java.lang." and the look up
      * restarts
      */
-    protected Sort lookupSort(String name) {
+    protected @Nullable Sort lookupSort(String name) {
         Sort result = sorts().lookup(new Name(name));
         if (result == null) {
             if (name.equals(NullSort.NAME.toString())) {
@@ -472,7 +474,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     }
 
 
-    protected String processDocumentation(TerminalNode terminalNode) {
+    protected @Nullable String processDocumentation(TerminalNode terminalNode) {
         if (terminalNode != null)
             return processDocumentation(terminalNode.getSymbol());
         return null;
@@ -482,7 +484,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return maindoc.stream().map(this::processDocumentation).collect(Collectors.joining("\n\n"));
     }
 
-    protected String processDocumentation(Token doc) {
+    protected @Nullable String processDocumentation(Token doc) {
         if (doc == null) {
             return null;
         }

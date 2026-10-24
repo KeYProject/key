@@ -22,6 +22,9 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Complete this class if you want to add support for the JML \real type.
  *
@@ -29,6 +32,7 @@ import org.key_project.util.ExtList;
  *
  * @author bruns
  */
+@NullMarked
 public final class RealLDT extends LDT {
 
     public static final Name NAME = new Name("real");
@@ -93,7 +97,7 @@ public final class RealLDT extends LDT {
     }
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.ast.expression.Operator op,
+    public @Nullable Function getFunctionFor(de.uka.ilkd.key.java.ast.expression.Operator op,
             Services services,
             ExecutionContext ec) {
         assert false;
@@ -109,7 +113,7 @@ public final class RealLDT extends LDT {
 
 
     @Override
-    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+    public @Nullable Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (t.op() instanceof JFunction func && func == realNumbers) {
             // \R(unscaledValue, scale) encodes the value unscaledValue * 10^(-scale). Both operands
             // are unbounded signed numerals, so the value is never squeezed through an int.
@@ -139,7 +143,7 @@ public final class RealLDT extends LDT {
 
 
     @Override
-    public Type getType(JTerm t) {
+    public @Nullable Type getType(JTerm t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_REAL;
         } else {

@@ -10,11 +10,13 @@ import java.io.StringWriter;
 import java.util.Properties;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This interface is implemented by classes that are used to store settings for different proposes
  * (like active heuristics, which LDTs to use etc.)
  */
+@NullMarked
 public interface Settings {
 
     /**

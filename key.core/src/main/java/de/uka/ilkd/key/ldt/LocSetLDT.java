@@ -24,9 +24,11 @@ import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
+@NullMarked
 public final class LocSetLDT extends LDT {
 
     public static final Name NAME = new Name("LocSet");
@@ -206,7 +208,7 @@ public final class LocSetLDT extends LDT {
 
 
     @Override
-    public Function getFunctionFor(Operator op, Services serv,
+    public @Nullable Function getFunctionFor(Operator op, Services serv,
             ExecutionContext ec) {
         if (!(op instanceof LogicFunctionalOperator lfo)) {
             assert false;
@@ -231,7 +233,7 @@ public final class LocSetLDT extends LDT {
 
 
     @Override
-    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+    public @Nullable Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (t.op().equals(empty)) {
             return EmptySetLiteral.LOCSET;
         }
@@ -241,7 +243,7 @@ public final class LocSetLDT extends LDT {
 
 
     @Override
-    public Type getType(JTerm t) {
+    public @Nullable Type getType(JTerm t) {
         assert false;
         return null;
     }

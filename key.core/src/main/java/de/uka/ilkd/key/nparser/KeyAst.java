@@ -41,6 +41,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -54,6 +55,7 @@ import org.jspecify.annotations.Nullable;
  * @author Alexander Weigl
  * @version 1 (5.12.19)
  */
+@NullMarked
 public abstract class KeyAst<T extends ParserRuleContext> {
 
     public final @NonNull T ctx;
@@ -242,7 +244,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             }
 
             @Override
-            public Void visitProofCmd(JmlParser.ProofCmdContext ctx) {
+            public @Nullable Void visitProofCmd(JmlParser.ProofCmdContext ctx) {
                 if (ctx.obtain != null) {
                     KeYJavaType type = io.translateType(ctx.typespec());
                     ProgramElementName name = new ProgramElementName(ctx.var.getText());
@@ -256,7 +258,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             private ImmutableList<JmlParser.ExpressionContext> collectedTerms = ImmutableList.of();
 
             @Override
-            public Void visitExpression(JmlParser.ExpressionContext ctx) {
+            public @Nullable Void visitExpression(JmlParser.ExpressionContext ctx) {
                 collectedTerms = collectedTerms.prepend(ctx);
                 return null;
             }
@@ -268,7 +270,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             super(ctx);
         }
 
-        public static JMLProofScript fromContext(JmlParser.AssertionProofContext ctx) {
+        public static @Nullable JMLProofScript fromContext(JmlParser.AssertionProofContext ctx) {
             if (ctx == null) {
                 return null;
             } else {
@@ -402,7 +404,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             super(ctx);
         }
 
-        public Path getJavaSourceLocation() {
+        public @Nullable Path getJavaSourceLocation() {
             try {
                 JavaKeYParser.String_valueContext value =
                     ctx.programSource(0).oneProgramSource().string_value(0);

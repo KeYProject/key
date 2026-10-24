@@ -14,9 +14,12 @@ import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public abstract class TacletVisitor implements DefaultVisitor {
-    private String failureDescription = null;
+    private @Nullable String failureDescription = null;
 
     private void visit(Semisequent semiseq) {
         for (SequentFormula aSemiseq : semiseq) {
@@ -30,14 +33,14 @@ public abstract class TacletVisitor implements DefaultVisitor {
         visit(seq.succedent());
     }
 
-    public String visit(Taclet taclet, boolean visitAddrules) {
+    public @Nullable String visit(Taclet taclet, boolean visitAddrules) {
         visit(taclet.assumesSequent());
         visitFindPart(taclet);
         visitGoalTemplates(taclet, visitAddrules);
         return failureDescription;
     }
 
-    public String visit(Taclet taclet) {
+    public @Nullable String visit(Taclet taclet) {
         return visit(taclet, false);
     }
 

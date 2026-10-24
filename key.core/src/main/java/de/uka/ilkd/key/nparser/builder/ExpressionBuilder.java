@@ -55,6 +55,7 @@ import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +66,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author weigl
  */
+@NullMarked
 public class ExpressionBuilder extends DefaultBuilder {
     public static final Logger LOGGER = LoggerFactory.getLogger(ExpressionBuilder.class);
 
@@ -74,12 +76,12 @@ public class ExpressionBuilder extends DefaultBuilder {
     /**
      * The current abbreviation used for resolving "@name" terms.
      */
-    private AbbrevMap abbrevMap;
+    private @Nullable AbbrevMap abbrevMap;
 
     /**
      * Altlast.
      */
-    private JTerm quantifiedArrayGuard;
+    private @Nullable JTerm quantifiedArrayGuard;
 
     /**
      * A list of terms, that are marked for having an already set heap.
@@ -605,7 +607,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitTermorseq(JavaKeYParser.TermorseqContext ctx) {
+    public @Nullable Object visitTermorseq(JavaKeYParser.TermorseqContext ctx) {
         JTerm head = accept(ctx.head);
         Sequent s = accept(ctx.s);
         ImmutableList<SequentFormula> ss = accept(ctx.ss);
@@ -904,7 +906,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return result;
     }
 
-    private Operator getAttributeInPrefixSort(Sort prefixSort, String attributeName) {
+    private @Nullable Operator getAttributeInPrefixSort(Sort prefixSort, String attributeName) {
         final JavaInfo javaInfo = getJavaInfo();
 
         Operator result = schemaVariables().lookup(new Name(attributeName));
@@ -1064,7 +1066,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitBracket_access_star(JavaKeYParser.Bracket_access_starContext ctx) {
+    public @Nullable Object visitBracket_access_star(JavaKeYParser.Bracket_access_starContext ctx) {
         JTerm reference = pop();
         JTerm rangeFrom = toZNotation("0", functions());
         JTerm lt = getServices().getTermBuilder().dotLength(reference);
@@ -1450,7 +1452,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return op;
     }
 
-    private JTerm visitAccesstermAsJava(JavaKeYParser.AccesstermContext ctx) {
+    private @Nullable JTerm visitAccesstermAsJava(JavaKeYParser.AccesstermContext ctx) {
         String firstName = accept(ctx.firstName);
         if (isPackage(firstName) || isClass(firstName)) {
             // consume suffix as long as it is part of a java class or package
@@ -1902,6 +1904,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return result.toString();
     }
 
+    @Nullable
     KeYJavaType getTypeByClassName(String s) {
         KeYJavaType kjt = null;
         try {
@@ -2005,12 +2008,12 @@ public class ExpressionBuilder extends DefaultBuilder {
         return result;
     }
 
-    private IProgramMethod getStaticQuery(String className, String methodName) {
+    private @Nullable IProgramMethod getStaticQuery(String className, String methodName) {
         KeYJavaType kjt = getTypeByClassName(className);
         return getStaticQuery(kjt, methodName);
     }
 
-    private IProgramMethod getStaticQuery(KeYJavaType kjt, String methodName) {
+    private @Nullable IProgramMethod getStaticQuery(KeYJavaType kjt, String methodName) {
         if (kjt != null) {
             final JavaInfo javaInfo = getJavaInfo();
             final String name = kjt.getFullName() + "::" + methodName;
@@ -2057,7 +2060,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitProofScript(JavaKeYParser.ProofScriptContext ctx) {
+    public @Nullable Object visitProofScript(JavaKeYParser.ProofScriptContext ctx) {
         return null;// Do not traverse into proof scripts.
     }
 
@@ -2065,7 +2068,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         this.abbrevMap = abbrevMap;
     }
 
-    public AbbrevMap getAbbrevMap() {
+    public @Nullable AbbrevMap getAbbrevMap() {
         return abbrevMap;
     }
 
@@ -2083,6 +2086,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 }
 
 
-record JavaQuery(String packageName, String className, List<String> attributeNames,
-        KeYJavaType kjt) {
+@NullMarked
+record JavaQuery(@Nullable String packageName, @Nullable String className,
+        List<String> attributeNames, @Nullable KeYJavaType kjt) {
 }

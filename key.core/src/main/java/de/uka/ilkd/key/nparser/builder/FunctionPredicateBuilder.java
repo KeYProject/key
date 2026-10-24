@@ -24,6 +24,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -39,24 +41,25 @@ import org.jspecify.annotations.NonNull;
  * @author Alexander Weigl
  * @version 1
  */
+@NullMarked
 public class FunctionPredicateBuilder extends DefaultBuilder {
     public FunctionPredicateBuilder(Services services, NamespaceSet nss) {
         super(services, nss);
     }
 
     @Override
-    public Object visitFile(JavaKeYParser.FileContext ctx) {
+    public @Nullable Object visitFile(JavaKeYParser.FileContext ctx) {
         return accept(ctx.decls());
     }
 
     @Override
-    public Object visitDecls(JavaKeYParser.DeclsContext ctx) {
+    public @Nullable Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         mapMapOf(ctx.pred_decls(), ctx.func_decls(), ctx.transform_decls(), ctx.datatype_decls());
         return null;
     }
 
     @Override
-    public Object visitDatatype_decl(JavaKeYParser.Datatype_declContext ctx) {
+    public @Nullable Object visitDatatype_decl(JavaKeYParser.Datatype_declContext ctx) {
         // weigl: all datatypes are free ==> functions are unique!
         // boolean freeAdt = ctx.FREE() != null;
         Sort sort;
@@ -143,7 +146,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitPred_decl(JavaKeYParser.Pred_declContext ctx) {
+    public @Nullable Object visitPred_decl(JavaKeYParser.Pred_declContext ctx) {
         String pred_name = accept(ctx.funcpred_name());
         List<GenericParameter> params = ctx.formal_sort_param_decls() == null ? null
                 : visitFormal_sort_param_decls(ctx.formal_sort_param_decls());
@@ -193,7 +196,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
     }
 
     @Override
-    public Object visitFunc_decl(JavaKeYParser.Func_declContext ctx) {
+    public @Nullable Object visitFunc_decl(JavaKeYParser.Func_declContext ctx) {
         boolean unique = ctx.UNIQUE() != null;
         Sort retSort = accept(ctx.sortId());
         String funcName = accept(ctx.funcpred_name());
@@ -249,7 +252,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
 
     @Override
-    public Object visitTransform_decl(JavaKeYParser.Transform_declContext ctx) {
+    public @Nullable Object visitTransform_decl(JavaKeYParser.Transform_declContext ctx) {
         Sort retSort = ctx.FORMULA() != null ? JavaDLTheory.FORMULA : accept(ctx.sortId());
         String trans_name = accept(ctx.funcpred_name());
         List<Sort> argSorts = accept(ctx.arg_sorts_or_formula());
