@@ -431,7 +431,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
     }
 
 
-    public void setJavaModel(JavaModel javaModel) {
+    public void setJavaModel(@Nullable JavaModel javaModel) {
         assert this.javaModel == null;
         this.javaModel = javaModel;
     }
@@ -521,9 +521,9 @@ public class Services implements TermServices, LogicServices, ProofServices {
     public Lookup createLookup() {
         Lookup lookup = new Lookup();
         lookup.register(getJavaInfo());
-        lookup.register(getJavaModel());
+        lookup.register(Objects.requireNonNull(getJavaModel(), "no Java model in services"));
         lookup.register(getProfile());
-        lookup.register(getProof());
+        lookup.register(Objects.requireNonNull(getProof(), "no proof in services"));
         lookup.register(getNamespaces());
         lookup.register(getTermBuilder());
         lookup.register(getVariableNamer());
@@ -532,7 +532,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
 
     public JavaService getJavaService() {
         assert javaService != null : "Java Services needs to initialized in advanced.";
-        return javaService;
+        return Objects.requireNonNull(javaService, "Java services not initialized");
     }
 
     /**
@@ -580,9 +580,12 @@ public class Services implements TermServices, LogicServices, ProofServices {
         // TODO weigl: where to put this code. The implementation of services.getProfile() is
         // stupid.
         var resourcePath = "JavaRedux/JAVALANG.TXT";
-        var url = KeYResourceManager.getManager().getResourceFile(JavaService.class, resourcePath);
+        var url = Objects.requireNonNull(
+            KeYResourceManager.getManager().getResourceFile(JavaService.class, resourcePath),
+            "resource not found: " + resourcePath);
         try {
-            return Paths.get(url.toURI()).getParent();
+            return Objects.requireNonNull(Paths.get(url.toURI()).getParent(),
+                "resource has no parent: " + resourcePath);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
