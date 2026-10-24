@@ -35,8 +35,8 @@ public abstract class JAbstractSortedOperator extends AbstractSortedOperator
 
     protected JAbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, Boolean[] whereToBind,
             boolean isRigid) {
-        this(name, ImmutableList.of(argSorts), sort,
-            ImmutableList.of(whereToBind), isRigid);
+        this(name, ImmutableList.ofFixedSize(argSorts), sort,
+            ImmutableList.ofFixedSize(whereToBind), isRigid);
     }
 
     protected JAbstractSortedOperator(Name name, ImmutableList<Sort> argSorts, Sort sort,
@@ -45,7 +45,7 @@ public abstract class JAbstractSortedOperator extends AbstractSortedOperator
     }
 
     protected JAbstractSortedOperator(Name name, Sort[] argSorts, Sort sort, boolean isRigid) {
-        this(name, ImmutableList.of(argSorts), sort, null, isRigid);
+        this(name, ImmutableList.ofFixedSize(argSorts), sort, null, isRigid);
     }
 
     protected JAbstractSortedOperator(Name name, Sort sort, boolean isRigid) {
