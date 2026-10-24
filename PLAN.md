@@ -244,6 +244,16 @@ already verified — see `JML_MAPPING.md` and §3).
 
 ### Phase 4 — Delete `SpecificationRepository`: specs are rewritten via the AST
 
+> **Progress (see HANDOFF §5.2/§7.3):** slices 1–2 DONE (`7f369e5c29` statement
+> specs → AST nodes; `806c2b1ba6` limited observers → `LimitedObservers`);
+> full-suite baseline measured + A/B-verified (40 failures at slices-1–2 HEAD
+> identical to Phase-3 HEAD — zero regressions), IntSemantics fixture fix
+> landed (`14a26a43d0`), leaving **34 recorded pre-existing jmltk gaps**.
+> NEXT = **slice 3: loop/block/merge specs → AST nodes** (repo keys
+> `(loop,line)` and `BlockContractKey(block,parentClass,line)` become node
+> state; `CreatingASTVisitor` hooks `performActionOnLoopInvariant/BlockContract/
+> LoopContract/MergeContract(old,new)` already carry specs through rewrites).
+
 Rationale: with Phases 0–3 done, the *parsed* JML lives on the Java AST
 (`attachedJml` on declarations, `getContracts()` on statements, `JmlStatementSpec`
 on statements), and internal mechanisms (KeYJavaPipeline transformations,
