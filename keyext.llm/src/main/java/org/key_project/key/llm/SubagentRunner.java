@@ -56,13 +56,6 @@ final class SubagentRunner {
 
     private static final ThreadLocal<Integer> DEPTH = ThreadLocal.withInitial(() -> 0);
 
-    /**
-     * Serializes every tool dispatch, so concurrent parallel sub-agents never race on the shared
-     * proof state or the GUI mediator. Nested {@code spawn_subagent} calls happen outside the
-     * lock, so parallel nesting cannot deadlock.
-     */
-    private static final Object DISPATCH_LOCK = new Object();
-
     private SubagentRunner() {
     }
 
@@ -302,14 +295,12 @@ final class SubagentRunner {
                     thread.add(LlmMessage.tool(id, outcome).toOpenAiMap());
                     continue;
                 }
-                synchronized (DISPATCH_LOCK) {
-                    try {
-                        var result = parent.getMcpClient().callTool(name, callArguments);
-                        thread.add(LlmMessage.tool(id, AgentLoop.stringify(result)).toOpenAiMap());
-                    } catch (Exception e) {
-                        thread.add(LlmMessage.tool(id,
-                            "Error calling " + name + ": " + e.getMessage()).toOpenAiMap());
-                    }
+                try {
+                    var text = parent.getToolDispatcher().callNow(parent, name, callArguments);
+                    thread.add(LlmMessage.tool(id, text).toOpenAiMap());
+                } catch (Exception e) {
+                    thread.add(LlmMessage.tool(id,
+                        "Error calling " + name + ": " + e.getMessage()).toOpenAiMap());
                 }
             }
         }

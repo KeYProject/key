@@ -55,7 +55,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Alexander Weigl
  */
-public class LlmPrompt extends JPanel implements TabPanel {
+public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnListener {
     private static final org.slf4j.Logger LOGGER =
         org.slf4j.LoggerFactory.getLogger(LlmPrompt.class);
 
@@ -78,19 +78,26 @@ public class LlmPrompt extends JPanel implements TabPanel {
 
     private final KeyAction actionSwitchOrientation = new SwitchOrientationAction();
     private final JButton btnStop = new JButton("Stop");
+    private final JLabel lblQueued = new JLabel("");
     private final JCheckBox chkProofContext = new JCheckBox("attach proof context");
     private final JPanel tblFiles = new JPanel(new MigLayout(new LC().fillX().wrapAfter(1)));
+
+    /** The live row of the tool call currently running in the foreground (with Background). */
+    private @Nullable JPanel runningToolRow;
+    private @Nullable String runningToolId;
+    /** The rows of the currently running background jobs. */
+    private final List<JPanel> jobRows = new ArrayList<>();
 
     private final MainWindow mainWindow;
     private final KeYMediator mediator;
 
-    /** The active agent turn, or {@code null} when idle. */
-    private @Nullable AgentLoop activeLoop;
-    private boolean running = false;
-
     public LlmPrompt(MainWindow mainWindow, @NonNull KeYMediator mediator) {
         this.mainWindow = mainWindow;
         this.mediator = mediator;
+
+        // hear about results, queue and background jobs of the current session's scheduler
+        LlmUtils.getSession(mediator.getSelectedProof()).getTurnScheduler().setListener(this);
+        lblQueued.setForeground(Color.GRAY);
 
         setLayout(new BorderLayout());
         add(buildToolbar(), BorderLayout.NORTH);
@@ -145,17 +152,13 @@ public class LlmPrompt extends JPanel implements TabPanel {
         var toolbar = new JToolBar();
         toolbar.setFloatable(false);
         btnStop.setEnabled(false);
-        btnStop.addActionListener(e -> {
-            if (activeLoop != null) {
-                activeLoop.cancel();
-            }
-            setRunning(false);
-        });
+        btnStop.addActionListener(e -> schedulerOfCurrentSession().requestStop());
         chkProofContext.addActionListener(e -> {
             var session = LlmUtils.getSession(mediator.getSelectedProof());
             session.setAttachProofContext(chkProofContext.isSelected());
         });
         toolbar.add(chkProofContext);
+        toolbar.add(lblQueued);
         toolbar.add(new JButton(new PromptsMenuAction()));
         toolbar.add(Box.createHorizontalGlue());
         toolbar.add(new JButton(new ClearHistoryAction()));
@@ -317,7 +320,7 @@ public class LlmPrompt extends JPanel implements TabPanel {
         return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
-    /** Dispatches the outcome of the agent loop; must run on the EDT. */
+    /** Dispatches the outcome of a turn step (must run on the EDT). */
     private void renderAgentResult(AgentResult result) {
         switch (result) {
             case AgentResult.Done done -> {
@@ -327,6 +330,8 @@ public class LlmPrompt extends JPanel implements TabPanel {
             case AgentResult.NeedsInput needsInput -> addQuestionBox(needsInput.question());
             case AgentResult.NeedsApproval needsApproval ->
                 addApprovalBox(needsApproval.toolCall());
+            case AgentResult.PausedForBackground paused ->
+                addBackgroundBox(paused);
             case AgentResult.Failed failed -> {
                 LOGGER.error("Agent turn failed", failed.error());
                 addError(failed.error() == null ? "Unknown error"
@@ -346,6 +351,21 @@ public class LlmPrompt extends JPanel implements TabPanel {
         scrollToEnd();
     }
 
+    /** Renders a note that a running tool call was moved into the background. */
+    private void addBackgroundBox(AgentResult.PausedForBackground paused) {
+        var box = new JPanel(new MigLayout(new LC().insets("6 10 6 10")));
+        box.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY),
+            BorderFactory.createEmptyBorder(6, 8, 6, 8)));
+        box.setBackground(COLOR_BG_ACTION.get());
+        var label = new JLabel("<html><b>In the background:</b> <code>"
+            + escapeHtml(paused.toolName()) + "</code> · job <code>" + paused.jobId()
+            + "</code><br/>You can keep chatting; the result will be delivered when it"
+            + " finishes.</html>");
+        box.add(label);
+        pOutput.add(box, new CC().growX());
+        scrollToEnd();
+    }
+
     private void scrollToEnd() {
         if (LlmSettings.INSTANCE.getAutoScrollOutput()) {
             SwingUtilities.invokeLater(() -> scrpOutput.getVerticalScrollBar()
@@ -355,11 +375,11 @@ public class LlmPrompt extends JPanel implements TabPanel {
 
     // ----------------------------------------------------------------- turn management
 
+    /**
+     * Submits the raw input to the current session's {@link TurnScheduler}. Input is always
+     * accepted: while another turn runs or is parked, the prompt is queued and processed in order.
+     */
     private void beginTurn(String text) {
-        if (running) {
-            addError("An agent turn is already running; stop it first.");
-            return;
-        }
         if (text.isBlank()) {
             return;
         }
@@ -392,57 +412,156 @@ public class LlmPrompt extends JPanel implements TabPanel {
 
         addInput(text);
         txtInput.setText("");
-        setRunning(true);
-        final var loop = new AgentLoop(session, new DefaultChatCompletionsClient());
-        activeLoop = loop;
-        runOnBackground(() -> loop.begin(text, proof, node, skill));
+        var scheduler = session.getTurnScheduler();
+        scheduler.setListener(this);
+        scheduler.submitPrompt(text, proof, node, skill);
     }
 
     void answerQuestion(String answer) {
-        final var loop = activeLoop;
-        if (loop == null || running) {
-            return;
-        }
-        setRunning(true);
-        runOnBackground(() -> loop.answerQuestion(answer));
+        schedulerOfCurrentSession().answer(answer);
     }
 
     void decideApproval(boolean allow, boolean always) {
-        final var loop = activeLoop;
-        if (loop == null || running) {
-            return;
-        }
-        setRunning(true);
-        runOnBackground(() -> loop.decideApproval(allow, always));
+        schedulerOfCurrentSession().decide(allow, always);
     }
 
     void skipTurn() {
-        if (activeLoop != null) {
-            activeLoop.cancel();
-        }
-        setRunning(false);
+        schedulerOfCurrentSession().requestStop();
     }
 
-    private void runOnBackground(Supplier<AgentResult> action) {
-        var thread = new Thread(() -> {
-            AgentResult result;
-            try {
-                result = action.get();
-            } catch (Exception e) {
-                result = new AgentResult.Failed(e);
+    private TurnScheduler schedulerOfCurrentSession() {
+        var session = LlmUtils.getSession(mediator.getSelectedProof());
+        var scheduler = session.getTurnScheduler();
+        scheduler.setListener(this);
+        return scheduler;
+    }
+
+    // --------------------------------------------------------------- TurnScheduler.TurnListener
+
+    @Override
+    public void onResult(AgentResult result) {
+        onEdt(() -> {
+            removeRunningToolRow();
+            setRunning(false);
+            renderAgentResult(result);
+        });
+    }
+
+    @Override
+    public void onPaused(AgentResult result) {
+        onEdt(() -> {
+            if (result instanceof AgentResult.PausedForBackground) {
+                removeRunningToolRow();
             }
-            final var r = result;
-            SwingUtilities.invokeLater(() -> {
-                setRunning(false);
-                renderAgentResult(r);
-            });
-        }, "keey-agent-loop");
-        thread.setDaemon(true);
-        thread.start();
+            setRunning(true);
+            renderAgentResult(result);
+        });
+    }
+
+    @Override
+    public void onQueueChanged(int queued) {
+        onEdt(() -> lblQueued.setText(queued > 0 ? queued + " queued" : ""));
+    }
+
+    @Override
+    public void onJobsChanged(List<BackgroundJob> jobs) {
+        onEdt(() -> rebuildJobRows(jobs));
+    }
+
+    @Override
+    public void onToolStarted(AgentResult.ToolCallInfo info) {
+        onEdt(() -> showRunningTool(info));
+    }
+
+    @Override
+    public void onToolFinished(String toolCallId, String outcome) {
+        onEdt(() -> {
+            if (java.util.Objects.equals(toolCallId, runningToolId)) {
+                removeRunningToolRow();
+            }
+        });
+    }
+
+    /** Runs {@code action} on the EDT (directly when already there, queued otherwise). */
+    private void onEdt(Runnable action) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            action.run();
+        } else {
+            SwingUtilities.invokeLater(action);
+        }
+    }
+
+    /**
+     * Renders the live row of the tool call currently running in the foreground, with the
+     * "Background" button (enabled when the tool may run in the background and a slot is free).
+     */
+    private void showRunningTool(AgentResult.ToolCallInfo info) {
+        removeRunningToolRow();
+        runningToolId = info.id();
+        var session = LlmUtils.getSession(mediator.getSelectedProof());
+        var row = new JPanel(new MigLayout(new LC().insets("3 10 3 10")));
+        row.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        row.setBackground(COLOR_BG_INPUT.get());
+        var label = new JLabel("<html><i>Running: " + escapeHtml(info.name() + "("
+            + clip(info.arguments(), 80) + ")…") + "</i></html>");
+        row.add(label);
+        if (session.isBackgroundAllowed(info.name()) && session.getBackgroundJobs()
+                .canStartMore(LlmSettings.INSTANCE.getMaxBackgroundJobs())) {
+            var background = new JButton("Background");
+            background.setToolTipText("Move the running call into the background; you can keep"
+                + " chatting and its result is delivered when it finishes.");
+            background.addActionListener(e -> schedulerOfCurrentSession().requestBackground());
+            row.add(background);
+        }
+        var cancel = new JButton("Cancel");
+        cancel.setToolTipText("Stop the agent turn (the call itself keeps running).");
+        cancel.addActionListener(e -> schedulerOfCurrentSession().requestStop());
+        row.add(cancel);
+        pOutput.add(row, new CC().growX());
+        runningToolRow = row;
+        scrollToEnd();
+    }
+
+    private void removeRunningToolRow() {
+        if (runningToolRow != null) {
+            pOutput.remove(runningToolRow);
+            runningToolRow = null;
+        }
+        runningToolId = null;
+        pOutput.revalidate();
+        pOutput.repaint();
+    }
+
+    /** Rebuilds the rows of the running background jobs (each with a Cancel job action). */
+    private void rebuildJobRows(List<BackgroundJob> jobs) {
+        for (var row : jobRows) {
+            pOutput.remove(row);
+        }
+        jobRows.clear();
+        for (var job : jobs) {
+            var row = new JPanel(new MigLayout(new LC().insets("3 10 3 10")));
+            row.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+            row.setBackground(COLOR_BG_ACTION.get());
+            var label = new JLabel("<html><i>Background: " + escapeHtml(job.toolName() + "("
+                + clip(job.arguments(), 80) + ")…") + (job.isCancelled() ? " (cancelling)" : "")
+                + "</i></html>");
+            label.setToolTipText("Running in the background since it was moved out of the"
+                + " foreground turn; the result is delivered when it finishes.\nJob " + job.jobId());
+            row.add(label);
+            var cancel = new JButton("Cancel job");
+            cancel.addActionListener(e -> schedulerOfCurrentSession().cancelJob(job.jobId()));
+            row.add(cancel);
+            pOutput.add(row, new CC().growX());
+            jobRows.add(row);
+        }
+        if (!jobs.isEmpty()) {
+            scrollToEnd();
+        }
+        pOutput.revalidate();
+        pOutput.repaint();
     }
 
     private void setRunning(boolean value) {
-        running = value;
         btnStop.setEnabled(value);
         btnStop.setToolTipText(value ? "Stop the running agent turn" : null);
     }

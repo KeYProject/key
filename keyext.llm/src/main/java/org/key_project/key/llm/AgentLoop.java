@@ -7,6 +7,11 @@ package org.key_project.key.llm;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -22,20 +27,27 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * The KeY-Agent driver: runs one conversation turn as a bounded tool-calling loop and pauses for
- * user interaction (questions and tool approvals).
+ * user interaction (questions, tool approvals and user-initiated backgrounding of running calls).
  * <p>
  * Life cycle:
  * <ol>
  * <li>{@link #begin begin(...)} runs until a final answer ({@link AgentResult.Done}), a question
- * ({@link AgentResult.NeedsInput}), an approval request ({@link AgentResult.NeedsApproval})
- * or an error ({@link AgentResult.Failed}) occurs.</li>
+ * ({@link AgentResult.NeedsInput}), an approval request ({@link AgentResult.NeedsApproval}), a
+ * background pause ({@link AgentResult.PausedForBackground}) or an error
+ * ({@link AgentResult.Failed}) occurs.</li>
  * <li>On a question, the UI shows it and calls {@link #answerQuestion(String)}.</li>
  * <li>On an approval request, the UI asks the user and calls
  * {@link #decideApproval(boolean, boolean)}.</li>
+ * <li>On a background pause, the running tool call continues on the {@link ToolDispatcher} pool;
+ * its output is enqueued into the session's {@link TurnQueue} and this loop is resumed with
+ * {@link #submitBackgroundOutput(String, String)}.</li>
  * </ol>
- * All assistant/tool messages of one turn are appended to the session's per-proof
- * {@link LlmSession#getContext() context} while they occur, so the next turn continues naturally.
- * The number of tool rounds is bounded by {@code maxToolRounds}.
+ * <p>
+ * Every tool call is submitted to the {@link ToolDispatcher} and awaited on this loop's thread, so
+ * the loop can honor {@link #cancel() cancellation} and {@link #requestBackground() backgrounding}
+ * while the call runs. The messages of one round are staged (see {@code staged}) and committed to
+ * the session's context only when the round resolves (a backgrounded round must not leave dangling
+ * {@code tool_calls} in the context while other turns are built from it).
  *
  * @author Alexander Weigl
  */
@@ -44,10 +56,13 @@ public class AgentLoop {
     private final ChatCompletionsClient completions;
 
     private final List<Map<String, Object>> thread = new ArrayList<>();
+    /** The messages of the current round, committed to the context when the round resolves. */
+    private final List<LlmMessage> staged = new ArrayList<>();
     private final List<ToolActivity> activities = new ArrayList<>();
     private AgentRequest request;
     private int rounds = 0;
     private boolean cancelled = false;
+    private volatile boolean backgroundRequested = false;
     private @Nullable Pending pending;
 
     private interface Pending {
@@ -58,6 +73,26 @@ public class AgentLoop {
     }
 
     private record PendingQuestion(String toolCallId, Question question) implements Pending {
+    }
+
+    private record PendingBackground(String jobId, String toolCallId, String name, String arguments)
+            implements Pending {
+    }
+
+    /** The outcome of awaiting a dispatched tool call on this loop's thread. */
+    private sealed interface AwaitResult permits AwaitDone, AwaitBackgrounded, AwaitCancelled {
+    }
+
+    /** The tool finished; {@code content} is the tool-result text (or an error message). */
+    private record AwaitDone(String content) implements AwaitResult {
+    }
+
+    /** The user moved the call into the background (the {@link BackgroundJob} carries it). */
+    private record AwaitBackgrounded(String jobId) implements AwaitResult {
+    }
+
+    /** The turn was cancelled while the call was running (the call itself keeps running). */
+    private record AwaitCancelled() implements AwaitResult {
     }
 
     public AgentLoop(LlmSession session, ChatCompletionsClient completions) {
@@ -91,9 +126,11 @@ public class AgentLoop {
         request = ExtendedPrompt.build(session, proof, node, resolved.text(), effective);
         thread.clear();
         thread.addAll(request.messages());
+        staged.clear();
         activities.clear();
         rounds = 0;
         cancelled = false;
+        backgroundRequested = false;
         pending = null;
         return loop();
     }
@@ -127,16 +164,55 @@ public class AgentLoop {
         if (always) {
             session.getMcpClient().allowWithoutApproval(p.name());
         }
-        try {
-            var result = session.getMcpClient().callTool(p.name(), p.arguments());
-            addToolResult(p.toolCallId(), stringify(result), true);
-        } catch (Exception e) {
-            addToolResult(p.toolCallId(), "Error: " + e.getMessage(), false);
+        // the approved tool runs like any other: dispatched, so it can be backgrounded too
+        var future = session.getToolDispatcher().submit(session, p.name(), p.arguments());
+        return switch (await(future, p.toolCallId(), p.name(), p.arguments())) {
+            case AwaitDone d -> {
+                addToolResult(p.toolCallId(), d.content(), true);
+                yield loop();
+            }
+            case AwaitBackgrounded bg -> new AgentResult.PausedForBackground(bg.jobId(),
+                p.name(), p.arguments());
+            case AwaitCancelled ignored -> done("(Turn cancelled by the user.)");
+        };
+    }
+
+    /**
+     * Resumes this (parked) turn after a background tool call finished: validates that the job
+     * belongs to this loop's pending background state, appends the tool result, commits the round
+     * and continues the loop.
+     */
+    public AgentResult submitBackgroundOutput(String jobId, String content) {
+        if (!(pending instanceof PendingBackground pb) || !pb.jobId().equals(jobId)) {
+            return new AgentResult.Failed(
+                new IllegalStateException("no pending background job " + jobId));
         }
+        if (cancelled) {
+            // the turn was stopped while the job was running; discard the round (it is staged
+            // and therefore not part of the context)
+            pending = null;
+            return done("(Turn cancelled by the user.)");
+        }
+        pending = null;
+        var msg = LlmMessage.tool(pb.toolCallId(), content);
+        thread.add(msg.toOpenAiMap());
+        staged.add(msg);
+        activities.add(new ToolActivity(pb.name(), pb.arguments(), content));
+        commitRound();
         return loop();
     }
 
-    /** Requests cancellation; takes effect after the current HTTP call returns. */
+    /**
+     * Requests that the currently running (foreground) tool call be moved into the background.
+     * Takes effect on this loop's next await poll. The call keeps running on the dispatcher pool;
+     * the loop parks with {@link AgentResult.PausedForBackground} and is resumed when the job's
+     * output arrives.
+     */
+    public void requestBackground() {
+        backgroundRequested = true;
+    }
+
+    /** Requests cancellation; takes effect after the current await poll or HTTP call returns. */
     public void cancel() {
         cancelled = true;
     }
@@ -164,14 +240,11 @@ public class AgentLoop {
         int maxRounds = Math.max(1, request.maxToolRounds());
         while (true) {
             if (cancelled || Thread.currentThread().isInterrupted()) {
-                return new AgentResult.Done("(Turn cancelled by the user.)",
-                    List.copyOf(activities));
+                return done("(Turn cancelled by the user.)");
             }
             if (rounds >= maxRounds) {
-                return new AgentResult.Done(
-                    "(Stopped: the maximum number of tool rounds (" + maxRounds
-                        + ") was reached without a final answer.)",
-                    List.copyOf(activities));
+                return done("(Stopped: the maximum number of tool rounds (" + maxRounds
+                    + ") was reached without a final answer.)");
             }
 
             final Map<String, Object> response;
@@ -203,106 +276,185 @@ public class AgentLoop {
             rounds++;
             var assistantMsg = LlmMessage.assistant(content, casts(toolCalls));
             thread.add(assistantMsg.toOpenAiMap());
-            session.getContext().addMessage(assistantMsg);
+            staged.add(assistantMsg);
 
             var interrupted = processBatch(casts(toolCalls));
             if (interrupted != null) {
-                return interrupted; // NEEDS_INPUT or NEEDS_APPROVAL
+                return interrupted; // NEEDS_INPUT, NEEDS_APPROVAL, PAUSED_FOR_BACKGROUND or cancelled
             }
-            // otherwise the batch results were appended to the thread; loop with the follow-up
+            // the round resolved: commit its messages to the context
+            commitRound();
         }
     }
 
     /**
-     * Executes a batch of tool calls. Returns a non-null result when the turn must pause for the
-     * user; {@code null} when the turn can continue with the collected tool results.
+     * Executes a batch of tool calls (sequentially). Returns a non-null result when the turn must
+     * pause for the user or stop; {@code null} when the turn can continue with the collected tool
+     * results.
      */
     private @Nullable AgentResult processBatch(List<Map<String, Object>> toolCalls) {
-        var results = new ArrayList<LlmMessage>();
+        backgroundRequested = false;
         for (var toolCall : toolCalls) {
-            var id = String.valueOf(toolCall.get("id"));
-            Object func = toolCall.get("function");
-            var function = func instanceof Map<?, ?> f ? f : Map.of();
-            var name = String.valueOf(function.get("name"));
-            var arguments = function.get("arguments") == null ? "{}"
-                    : String.valueOf(function.get("arguments"));
-
-            if (KeYAgentTools.TOOL_ASK_USER.equals(name)) {
-                if (!LlmSettings.INSTANCE.getAllowAgentQuestions()) {
-                    results.add(LlmMessage.tool(id,
-                        "[Asking the user is disabled in the settings]"));
-                    continue;
-                }
-                flush(results);
-                var question = parseQuestion(arguments);
-                pending = new PendingQuestion(id, question);
-                return new AgentResult.NeedsInput(question);
-            }
-
-            if (KeYAgentTools.TOOL_USE_SKILL.equals(name)) {
-                if (!LlmSettings.INSTANCE.getAgentCanUseSkills()) {
-                    results.add(LlmMessage.tool(id, "[Skills are disabled in the settings]"));
-                    continue;
-                }
-                var skillName = parseSkillName(arguments);
-                if (skillName == null || SkillLibrary.INSTANCE.get(skillName) == null) {
-                    results.add(LlmMessage.tool(id,
-                        "[Unknown skill: " + (skillName == null ? "(missing name)" : skillName)
-                            + "]"));
-                    continue;
-                }
-                session.setActiveSkill(skillName);
-                results.add(LlmMessage.tool(id,
-                    "[Skill '" + skillName + "' activated for subsequent turns]"));
-                continue;
-            }
-
-            if (KeYAgentTools.TOOL_SPAWN_SUBAGENT.equals(name)) {
-                if (!LlmSettings.INSTANCE.getSubagentsEnabled()) {
-                    results.add(LlmMessage.tool(id,
-                        "[Spawning sub-agents is disabled in the settings]"));
-                    continue;
-                }
-                // the sub-agent runs synchronously; the outcome text is the tool result
-                long seqBefore = session.getSubagentLog().latestSeq();
-                var outcome = SubagentRunner.run(session, completions, arguments,
-                    this::isCancelled);
-                results.add(LlmMessage.tool(id, outcome));
-                activities.add(subagentActivity(name, arguments, outcome, seqBefore));
-                continue;
-            }
-
-            if (session.getMcpClient().requiresApproval(name)) {
-                flush(results);
-                pending = new PendingApproval(id, name, arguments);
-                return new AgentResult.NeedsApproval(new ToolCallInfo(id, name, arguments));
-            }
-
-            try {
-                var result = session.getMcpClient().callTool(name, arguments);
-                results.add(LlmMessage.tool(id, stringify(result)));
-                activities.add(new ToolActivity(name, arguments, stringify(result)));
-            } catch (Exception e) {
-                var errorText = "Error calling " + name + ": " + e.getMessage();
-                results.add(LlmMessage.tool(id, errorText));
-                activities.add(new ToolActivity(name, arguments, errorText));
+            var interrupted = processCall(toolCall);
+            if (interrupted != null) {
+                return interrupted;
             }
         }
-        flush(results);
         return null;
     }
 
-    private void flush(List<LlmMessage> results) {
-        for (var msg : results) {
-            thread.add(msg.toOpenAiMap());
-            session.getContext().addMessage(msg);
+    private @Nullable AgentResult processCall(Map<String, Object> toolCall) {
+        var id = String.valueOf(toolCall.get("id"));
+        Object func = toolCall.get("function");
+        var function = func instanceof Map<?, ?> f ? f : Map.of();
+        var name = String.valueOf(function.get("name"));
+        var arguments = function.get("arguments") == null ? "{}"
+                : String.valueOf(function.get("arguments"));
+
+        if (KeYAgentTools.TOOL_ASK_USER.equals(name)) {
+            if (!LlmSettings.INSTANCE.getAllowAgentQuestions()) {
+                stagedTool(id, "[Asking the user is disabled in the settings]");
+                return null;
+            }
+            // mid-batch pause: the messages up to here are part of the context (pre-existing
+            // behaviour); the rest of the batch is aborted
+            commitRound();
+            var question = parseQuestion(arguments);
+            pending = new PendingQuestion(id, question);
+            return new AgentResult.NeedsInput(question);
         }
-        results.clear();
+
+        if (KeYAgentTools.TOOL_USE_SKILL.equals(name)) {
+            if (!LlmSettings.INSTANCE.getAgentCanUseSkills()) {
+                stagedTool(id, "[Skills are disabled in the settings]");
+                return null;
+            }
+            var skillName = parseSkillName(arguments);
+            if (skillName == null || SkillLibrary.INSTANCE.get(skillName) == null) {
+                stagedTool(id,
+                    "[Unknown skill: " + (skillName == null ? "(missing name)" : skillName)
+                        + "]");
+                return null;
+            }
+            session.setActiveSkill(skillName);
+            stagedTool(id, "[Skill '" + skillName + "' activated for subsequent turns]");
+            return null;
+        }
+
+        if (KeYAgentTools.TOOL_SPAWN_SUBAGENT.equals(name)) {
+            if (!LlmSettings.INSTANCE.getSubagentsEnabled()) {
+                stagedTool(id, "[Spawning sub-agents is disabled in the settings]");
+                return null;
+            }
+            long seqBefore = session.getSubagentLog().latestSeq();
+            var observer = session.getTurnObserver();
+            if (observer != null) {
+                observer.toolStarted(new ToolCallInfo(id, name, arguments));
+            }
+            // runs without the dispatch lock: the child loops serialize their own tool calls
+            var future = session.getToolDispatcher().submitTask(
+                () -> SubagentRunner.run(session, completions, arguments, this::isCancelled));
+            var outcome = await(future, id, name, arguments);
+            if (observer != null) {
+                observer.toolFinished(id, outcome instanceof AwaitDone done
+                    ? done.content() : "[moved to background]");
+            }
+            return switch (outcome) {
+                case AwaitDone d -> {
+                    stagedTool(id, d.content());
+                    activities.add(subagentActivity(name, arguments, d.content(), seqBefore));
+                    yield null;
+                }
+                case AwaitBackgrounded bg -> new AgentResult.PausedForBackground(bg.jobId(),
+                    name, arguments);
+                case AwaitCancelled ignored -> done("(Turn cancelled by the user.)");
+            };
+        }
+
+        if (session.getMcpClient().requiresApproval(name)) {
+            commitRound();
+            pending = new PendingApproval(id, name, arguments);
+            return new AgentResult.NeedsApproval(new ToolCallInfo(id, name, arguments));
+        }
+
+        var observer = session.getTurnObserver();
+        if (observer != null) {
+            observer.toolStarted(new ToolCallInfo(id, name, arguments));
+        }
+        var future = session.getToolDispatcher().submit(session, name, arguments);
+        var outcome = await(future, id, name, arguments);
+        if (observer != null) {
+            observer.toolFinished(id, outcome instanceof AwaitDone done
+                ? done.content() : "[moved to background]");
+        }
+        return switch (outcome) {
+            case AwaitDone d -> {
+                stagedTool(id, d.content());
+                activities.add(new ToolActivity(name, arguments, d.content()));
+                yield null;
+            }
+            case AwaitBackgrounded bg -> new AgentResult.PausedForBackground(bg.jobId(), name,
+                arguments);
+            case AwaitCancelled ignored -> done("(Turn cancelled by the user.)");
+        };
+    }
+
+    /**
+     * Awaits the dispatched tool call on this loop's thread, polling so that cancellation and
+     * user-initiated backgrounding take effect while the call runs. The call itself is never
+     * cancelled (proof tools are not interruptible); a cancelled turn simply discards the staged
+     * round.
+     */
+    private AwaitResult await(CompletableFuture<?> future, String toolCallId, String name,
+            String arguments) {
+        while (true) {
+            if (cancelled || Thread.currentThread().isInterrupted()) {
+                return new AwaitCancelled();
+            }
+            if (backgroundRequested && canBackground(name)) {
+                backgroundRequested = false;
+                String jobId = moveToBackground(future, toolCallId, name, arguments);
+                return new AwaitBackgrounded(jobId);
+            }
+            try {
+                Object value = future.get(100, TimeUnit.MILLISECONDS);
+                backgroundRequested = false;
+                return new AwaitDone(stringify(value));
+            } catch (TimeoutException e) {
+                // poll again: cancellation / background requests are checked at the loop head
+            } catch (CancellationException e) {
+                backgroundRequested = false;
+                return new AwaitDone("(Tool call cancelled.)");
+            } catch (ExecutionException e) {
+                backgroundRequested = false;
+                Throwable cause = e.getCause();
+                String message = cause == null || cause.getMessage() == null ? "unknown error"
+                        : cause.getMessage();
+                return new AwaitDone("Error calling " + name + ": " + message);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return new AwaitCancelled();
+            }
+        }
+    }
+
+    private boolean canBackground(String name) {
+        return session.isBackgroundAllowed(name)
+            && session.getBackgroundJobs().canStartMore(
+                LlmSettings.INSTANCE.getMaxBackgroundJobs());
+    }
+
+    /** Registers the running call as a background job and parks this loop on it. */
+    private String moveToBackground(CompletableFuture<?> future, String toolCallId, String name,
+            String arguments) {
+        var job = session.getBackgroundJobs().start(this, toolCallId, name, arguments, future);
+        pending = new PendingBackground(job.jobId(), toolCallId, name, arguments);
+        return job.jobId();
     }
 
     /**
      * Builds the tool activity of a {@code spawn_subagent} call with one indented child per task
-     * of every run recorded since {@code seqBefore} (the synchronous runs of this call).
+     * of every run recorded since {@code seqBefore} (the runs of this call).
      */
     private ToolActivity subagentActivity(String name, String arguments, String outcome,
             long seqBefore) {
@@ -321,6 +473,24 @@ public class AgentLoop {
             return s;
         }
         return s.substring(0, max) + "…";
+    }
+
+    private void stagedTool(String toolCallId, String content) {
+        var msg = LlmMessage.tool(toolCallId, content);
+        thread.add(msg.toOpenAiMap());
+        staged.add(msg);
+    }
+
+    /** Appends the staged round to the session's context (called when the round resolves). */
+    private void commitRound() {
+        if (!staged.isEmpty()) {
+            session.getContext().addMessages(staged);
+            staged.clear();
+        }
+    }
+
+    private AgentResult done(String content) {
+        return new AgentResult.Done(content, List.copyOf(activities));
     }
 
     private void addToolResult(String toolCallId, String content, boolean asActivity) {
