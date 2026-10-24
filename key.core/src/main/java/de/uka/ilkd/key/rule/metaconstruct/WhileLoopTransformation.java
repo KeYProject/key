@@ -27,7 +27,7 @@ import de.uka.ilkd.key.speclang.LoopContract;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.slf4j.Logger;
@@ -270,7 +270,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             if (buffer instanceof ProgramElement) {
                 walk((ProgramElement) buffer);
             } else {
-                final ImmutableArray<?> aope = (ImmutableArray<?>) buffer;
+                final ImmutableList<?> aope = (ImmutableList<?>) buffer;
                 for (int iterate = 0; iterate < aope.size(); iterate++) {
                     ProgramElement pe = (Statement) aope.get(iterate);
                     if (pe != null) {
