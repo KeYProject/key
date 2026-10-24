@@ -40,7 +40,6 @@ import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -880,7 +879,7 @@ public class LogicPrinter {
      * @return List of visible {@link TermLabel}s, i.e. labels that are syntactically added to a
      *         {@link JTerm} while printing.
      */
-    protected ImmutableArray<TermLabel> getVisibleTermLabels(JTerm t) {
+    protected ImmutableList<TermLabel> getVisibleTermLabels(JTerm t) {
         return t.getLabels();
     }
 
@@ -890,7 +889,7 @@ public class LogicPrinter {
 
     void printLabels(JTerm t, String left, String right) {
 
-        ImmutableArray<TermLabel> termLabelList = getVisibleTermLabels(t);
+        ImmutableList<TermLabel> termLabelList = getVisibleTermLabels(t);
         if (termLabelList.isEmpty()) {
             return;
         }
@@ -1606,7 +1605,7 @@ public class LogicPrinter {
         layouter.end();
     }
 
-    private void printVariables(ImmutableArray<QuantifiableVariable> vars,
+    private void printVariables(ImmutableList<QuantifiableVariable> vars,
             QuantifiableVariablePrintMode mode) {
         int size = vars.size();
         for (int j = 0; j != size; j++) {
@@ -1690,7 +1689,7 @@ public class LogicPrinter {
     public void printSubstTerm(String l, QuantifiableVariable v, JTerm t, int ass2, String r,
             JTerm phi, int ass3) {
         layouter.beginC().print(l);
-        printVariables(new ImmutableArray<>(v), quantifiableVariablePrintMode);
+        printVariables(ImmutableList.of(v), quantifiableVariablePrintMode);
         layouter.startTerm(2);
         maybeParens(t, ass2);
         layouter.print(r).brk(0);
@@ -1715,7 +1714,7 @@ public class LogicPrinter {
      * @param phi the quantified formula
      * @param ass associativity for phi
      */
-    public void printQuantifierTerm(String name, ImmutableArray<QuantifiableVariable> vars,
+    public void printQuantifierTerm(String name, ImmutableList<QuantifiableVariable> vars,
             JTerm phi, int ass) {
         layouter.beginC();
         layouter.keyWord(name);
