@@ -111,6 +111,10 @@ subprojects {
         options.encoding = "UTF-8"
         // Setting the release to Java 21
         options.release = 21
+        // Enable all javac lint warnings. The warnings are tagged with their category, e.g.
+        // `[deprecation]`, `[unchecked]`, `[rawtypes]`, so they can be grouped per category
+        // (see scripts/collect-warnings.sh).
+        options.compilerArgs += ['-Xlint:all']
     }
 
     tasks.withType(Javadoc).configureEach {
