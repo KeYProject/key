@@ -267,6 +267,8 @@ public abstract class TacletApp implements RuleApp {
      *        SchemaVariables
      * @return true iff the instantiation of a Bound Schemavariable contains the given Logicvariable
      */
+    @SuppressWarnings("deprecation") // bound-schema-variable matching uses deprecated
+                                     // ImmutableArray
     private static boolean contains(ImmutableArray<QuantifiableVariable> boundVars,
             LogicVariable x,
             SVInstantiations insts) {
@@ -946,6 +948,7 @@ public abstract class TacletApp implements RuleApp {
      *        program model
      * @return a list of tacletapps with the found if formula instantiations
      */
+    @SuppressWarnings("deprecation") // assume-formula instantiations are ImmutableArray-based
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
             ImmutableList<SequentFormula> ruleSuccTail,
             ImmutableList<SequentFormula> ruleAntecTail,
