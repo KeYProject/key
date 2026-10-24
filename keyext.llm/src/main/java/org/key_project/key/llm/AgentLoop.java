@@ -165,8 +165,18 @@ public class AgentLoop {
             session.getMcpClient().allowWithoutApproval(p.name());
         }
         // the approved tool runs like any other: dispatched, so it can be backgrounded too
+        var observer = session.getTurnObserver();
+        if (observer != null) {
+            observer.toolStarted(new ToolCallInfo(p.toolCallId(), p.name(), p.arguments()));
+        }
         var future = session.getToolDispatcher().submit(session, p.name(), p.arguments());
-        return switch (await(future, p.toolCallId(), p.name(), p.arguments())) {
+        var outcome = await(future, p.toolCallId(), p.name(), p.arguments());
+        if (observer != null) {
+            observer.toolFinished(p.toolCallId(), outcome instanceof AwaitDone done
+                    ? done.content()
+                    : "[moved to background]");
+        }
+        return switch (outcome) {
             case AwaitDone d -> {
                 addToolResult(p.toolCallId(), d.content(), true);
                 yield loop();
