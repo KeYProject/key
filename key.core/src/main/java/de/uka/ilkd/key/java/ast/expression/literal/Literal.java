@@ -47,7 +47,7 @@ public abstract sealed
         StringLiteral {
 
     public Literal(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
-        super(pi, comments);
+        super(pi == null ? PositionInfo.UNDEFINED : pi, comments);
     }
 
     /**
@@ -98,7 +98,7 @@ public abstract sealed
      * @return the literal's type
      */
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ,
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ,
             ExecutionContext ec) {
         return getKeYJavaType(javaServ);
     }
@@ -110,12 +110,15 @@ public abstract sealed
      *        the Services offering access to the Java model
      * @return the literal's type
      */
-    public abstract KeYJavaType getKeYJavaType(Services javaServ);
+    public abstract @Nullable KeYJavaType getKeYJavaType(Services javaServ);
 
 
     @Override
     public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
+        if (src == null) {
+            return null;
+        }
         if (this.equals(src)) {
             source.next();
             return matchCond;

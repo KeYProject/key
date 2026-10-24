@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
@@ -159,7 +160,8 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
 
     @Override
     public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
-        final ProgramElement src = source.getSource();
+        final ProgramElement src = Objects.requireNonNull(source.getSource(),
+            "source data has no source element");
 
         if (src.getClass() != getClass()) {
             return null;

@@ -41,11 +41,11 @@ public class ExecutionContext
     /**
      * the currently active method
      */
-    private final IProgramMethod methodContext;
+    private final @Nullable IProgramMethod methodContext;
 
     public ExecutionContext(
             PositionInfo pi, List<Comment> comments, TypeReference classContext,
-            @Nullable ReferencePrefix runtimeInstance, IProgramMethod methodContext) {
+            @Nullable ReferencePrefix runtimeInstance, @Nullable IProgramMethod methodContext) {
         super(pi, comments);
         this.classContext = classContext;
         this.runtimeInstance = runtimeInstance;
@@ -64,7 +64,7 @@ public class ExecutionContext
      *        a ReferencePrefix to the object that
      *        is currently active/executed
      */
-    public ExecutionContext(TypeReference classContext, IProgramMethod methodContext,
+    public ExecutionContext(TypeReference classContext, @Nullable IProgramMethod methodContext,
             @Nullable ReferencePrefix runtimeInstance) {
         this(null, null, classContext, runtimeInstance, methodContext);
     }
@@ -146,7 +146,7 @@ public class ExecutionContext
      * {@inheritDoc}
      */
     @Override
-    public IProgramMethod getMethodContext() {
+    public @Nullable IProgramMethod getMethodContext() {
         return methodContext;
     }
 

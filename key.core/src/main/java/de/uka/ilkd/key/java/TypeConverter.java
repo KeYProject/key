@@ -243,7 +243,8 @@ public final class TypeConverter {
         } else if (prefix instanceof ThisReference) {
             if (prefix.getReferencePrefix() != null
                     && (prefix.getReferencePrefix() instanceof TypeReference tr)) {
-                KeYJavaType kjt = tr.getKeYJavaType();
+                final KeYJavaType kjt = Objects.requireNonNull(tr.getKeYJavaType(),
+                    "no KeYJavaType for type reference prefix");
                 return Objects.requireNonNull(
                     findThisForSortExact(Objects.requireNonNull(kjt.getSort(),
                         "KeYJavaType " + kjt + " has no sort"), ec),
@@ -268,8 +269,10 @@ public final class TypeConverter {
             return null;
         }
         JTerm inst = convertToLogicElement(pe, context);
-        return findThisForSort(s, inst, context.getTypeReference().getKeYJavaType(), true);
-
+        return findThisForSort(s, inst,
+            Objects.requireNonNull(context.getTypeReference().getKeYJavaType(),
+                "no KeYJavaType for the type reference in the execution context"),
+            true);
     }
 
     public @Nullable JTerm findThisForSort(Sort s, @Nullable ExecutionContext ec) {
@@ -280,7 +283,10 @@ public final class TypeConverter {
             return null;
         }
         JTerm inst = convertToLogicElement(pe, context);
-        return findThisForSort(s, inst, context.getTypeReference().getKeYJavaType(), false);
+        return findThisForSort(s, inst,
+            Objects.requireNonNull(context.getTypeReference().getKeYJavaType(),
+                "no KeYJavaType for the type reference in the execution context"),
+            false);
     }
 
 
@@ -390,7 +396,9 @@ public final class TypeConverter {
     }
 
     private JTerm convertToInstanceofTerm(Instanceof io, @Nullable ExecutionContext ec) {
-        final KeYJavaType type = ((TypeReference) io.getChildAt(1)).getKeYJavaType();
+        final KeYJavaType type = Objects.requireNonNull(
+            ((TypeReference) io.getChildAt(1)).getKeYJavaType(),
+            "instanceof target type has no KeYJavaType");
         final JTerm obj = convertToLogicElement(io.getChildAt(0), ec);
         final Function instanceOfSymbol =
             getJavaDLTheory().getInstanceofSymbol(Objects.requireNonNull(type.getSort(),
@@ -654,11 +662,15 @@ public final class TypeConverter {
      */
     public KeYJavaType getKeYJavaType(Expression e, @Nullable ExecutionContext ec) {
         if (e instanceof ThisReference) {
-            return Objects.requireNonNull(ec, "no execution context for 'this'")
-                    .getTypeReference().getKeYJavaType();
+            return Objects.requireNonNull(
+                Objects.requireNonNull(ec, "no execution context for 'this'").getTypeReference()
+                        .getKeYJavaType(),
+                "no KeYJavaType for the type reference in the execution context");
         }
-        return e.getKeYJavaType(services, Objects.requireNonNull(ec,
-            "no execution context to determine type of " + e));
+        return Objects.requireNonNull(
+            e.getKeYJavaType(services, Objects.requireNonNull(ec,
+                "no execution context to determine type of " + e)),
+            "no KeYJavaType for " + e);
     }
 
 
@@ -839,11 +851,13 @@ public final class TypeConverter {
 
 
     public boolean isWidening(ArrayType from, ArrayType to) {
-        KeYJavaType toBase = to.getBaseType().getKeYJavaType();
+        final KeYJavaType toBase = Objects.requireNonNull(to.getBaseType().getKeYJavaType(),
+            "no KeYJavaType for array base type " + to);
         if (toBase == services.getJavaInfo().getJavaLangObject()) { // seems incorrect
             return true;
         }
-        KeYJavaType fromBase = from.getBaseType().getKeYJavaType();
+        final KeYJavaType fromBase = Objects.requireNonNull(from.getBaseType().getKeYJavaType(),
+            "no KeYJavaType for array base type " + from);
         if (toBase.getJavaType() instanceof PrimitiveType) {
             return toBase == fromBase;
         }
@@ -942,8 +956,10 @@ public final class TypeConverter {
 
     public boolean isAssignableTo(Expression expr, Type to, ExecutionContext ec) {
         return (to instanceof PrimitiveType && isImplicitNarrowing(expr, (PrimitiveType) to))
-                || isIdentical(expr.getKeYJavaType(services, ec), to)
-                || isWidening(expr.getKeYJavaType(services, ec), to);
+                || isIdentical(Objects.requireNonNull(expr.getKeYJavaType(services, ec),
+                    "no KeYJavaType for " + expr), to)
+                || isWidening(Objects.requireNonNull(expr.getKeYJavaType(services, ec),
+                    "no KeYJavaType for " + expr), to);
     }
 
 
@@ -1016,8 +1032,10 @@ public final class TypeConverter {
 
 
     public boolean isNarrowing(ArrayType from, ArrayType to) {
-        KeYJavaType toBase = to.getBaseType().getKeYJavaType();
-        KeYJavaType fromBase = from.getBaseType().getKeYJavaType();
+        final KeYJavaType toBase = Objects.requireNonNull(to.getBaseType().getKeYJavaType(),
+            "no KeYJavaType for array base type " + to);
+        final KeYJavaType fromBase = Objects.requireNonNull(from.getBaseType().getKeYJavaType(),
+            "no KeYJavaType for array base type " + from);
         return isReferenceType(toBase) && isReferenceType(fromBase)
                 && isNarrowing(fromBase, toBase);
     }

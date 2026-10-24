@@ -831,7 +831,9 @@ public class JavaService {
         } catch (IllegalArgumentException e) {
             if (type instanceof ArrayType ad) {
                 return new com.github.javaparser.ast.type.ArrayType(keyType2JPType(
-                    Objects.requireNonNull(ad.getBaseType().getKeYJavaType().getJavaType(),
+                    Objects.requireNonNull(
+                        Objects.requireNonNull(ad.getBaseType().getKeYJavaType(),
+                            "array base type has no KeYJavaType").getJavaType(),
                         "array base type has no Java type")));
             }
             var name = type.getFullName();

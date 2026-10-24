@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class TypeRef extends TypeReferenceImp {
@@ -47,7 +48,7 @@ public class TypeRef extends TypeReferenceImp {
         this.kjt = kjt;
     }
 
-    public TypeRef(ProgramElementName name, int dimension, ReferencePrefix prefix,
+    public TypeRef(ProgramElementName name, int dimension, @Nullable ReferencePrefix prefix,
             KeYJavaType kjt) {
         super(name, dimension, prefix);
         this.kjt = kjt;
