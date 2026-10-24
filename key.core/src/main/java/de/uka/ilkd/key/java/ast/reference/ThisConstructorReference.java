@@ -12,7 +12,7 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -45,7 +45,7 @@ public class ThisConstructorReference extends SpecialConstructorReference {
      * @param arguments
      *        an expression mutable list.
      */
-    public ThisConstructorReference(ImmutableArray<Expression> arguments) {
+    public ThisConstructorReference(ImmutableList<Expression> arguments) {
         super(arguments);
     }
 
@@ -55,7 +55,7 @@ public class ThisConstructorReference extends SpecialConstructorReference {
      * @param arguments
      *        an expression mutable list.
      */
-    public ThisConstructorReference(ImmutableArray<Expression> arguments, PositionInfo pi,
+    public ThisConstructorReference(ImmutableList<Expression> arguments, PositionInfo pi,
             List<Comment> comments) {
         super(arguments, pi, comments);
     }
