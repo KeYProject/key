@@ -14,6 +14,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Case.
@@ -25,12 +26,12 @@ public class Case extends BranchImp implements ExpressionContainer {
     /**
      * Expression.
      */
-    protected final Expression expression;
+    protected final @Nullable Expression expression;
 
     /**
      * Body.
      */
-    protected final ImmutableArray<Statement> body;
+    protected final @Nullable ImmutableArray<Statement> body;
 
     /**
      * Case.
@@ -188,7 +189,7 @@ public class Case extends BranchImp implements ExpressionContainer {
      *
      * @return the expression.
      */
-    public Expression getExpression() {
+    public @Nullable Expression getExpression() {
         return expression;
     }
 
@@ -196,7 +197,7 @@ public class Case extends BranchImp implements ExpressionContainer {
      * The body may be empty (null), to define a fall-through. Attaching an {@link EmptyStatement}
      * would create a single ";".
      */
-    public ImmutableArray<Statement> getBody() {
+    public @Nullable ImmutableArray<Statement> getBody() {
         return body;
     }
 

@@ -35,6 +35,11 @@ public class CcatchBreakWildcardParameterDeclaration extends CcatchNonstandardPa
         return 0;
     }
 
+    // Returns null by design (this clause has no children). The base contract
+    // NonTerminalProgramElement.getChildAt(int) is @NonNull and cannot be widened (it ripples into
+    // key.ncore SyntaxElement.getChild(int) + ~40 overrides; wave-7 SuperArrayDeclaration
+    // precedent), so the honest @Nullable override is exempted from the check.
+    @SuppressWarnings("NullAway")
     @Override
     public @Nullable ProgramElement getChildAt(int index) {
         return null;

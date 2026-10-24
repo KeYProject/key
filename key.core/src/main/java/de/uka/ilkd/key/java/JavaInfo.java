@@ -1063,7 +1063,8 @@ public final class JavaInfo {
                 return res;
             } else {
                 for (Field field : kpmi.getAllFieldsLocallyDeclaredIn(classType)) {
-                    if (field.getName().equals(name) || field.getProgramName().equals(name)) {
+                    if (Objects.requireNonNull(field.getName(), "field has no name").equals(name)
+                            || field.getProgramName().equals(name)) {
                         return (ProgramVariable) field.getProgramVariable();
                     }
                 }

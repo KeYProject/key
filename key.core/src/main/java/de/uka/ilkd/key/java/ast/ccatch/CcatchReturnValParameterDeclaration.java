@@ -29,6 +29,11 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
 
     private final ParameterDeclaration delegate;
 
+    // The delegate (the "\Return int v" parameter declaration) is required by every accessor of
+    // this clause (getDelegate/getVariableSpecification/getVariables dereference it; the
+    // pretty-printer visits it unconditionally). The ExtList lookup can only produce null for a
+    // malformed clause, so the required field assignment is exempted from the check here.
+    @SuppressWarnings("NullAway")
     public CcatchReturnValParameterDeclaration(ExtList children) {
         delegate = children.get(ParameterDeclaration.class);
     }
@@ -109,7 +114,7 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
     }
 
     @Override
-    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, @Nullable MatchConditions matchCond) {
         return super.match(source, matchCond);
     }
 

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -66,7 +68,9 @@ public class MatchConditions extends MatchResultInfo {
     }
 
     public MatchConditions shrinkRenameTable() {
-        return new MatchConditions((SVInstantiations) instantiations, renameTable.parent());
+        final RenameTable parent = Objects.requireNonNull(renameTable.parent(),
+            "cannot shrink the root renaming table");
+        return new MatchConditions((SVInstantiations) instantiations, parent);
     }
 
 

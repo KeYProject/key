@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -628,7 +630,7 @@ public interface AuxiliaryContract extends SpecificationElement {
         /**
          * {@code self}
          */
-        public final LocationVariable self;
+        public final @Nullable LocationVariable self;
 
         /**
          * Boolean flags that are set to {@code true} when the block terminates by a
@@ -646,12 +648,12 @@ public interface AuxiliaryContract extends SpecificationElement {
          * Boolean flag that is set to {@code true} when the block terminates by a {@code return}
          * statement.
          */
-        public final LocationVariable returnFlag;
+        public final @Nullable LocationVariable returnFlag;
 
         /**
          * Result variable to set when the block terminates by a {@code return} statement.
          */
-        public final LocationVariable result;
+        public final @Nullable LocationVariable result;
 
         /**
          * Exception variable to set when the block terminates by an uncaught {@code throw}
@@ -711,9 +713,12 @@ public interface AuxiliaryContract extends SpecificationElement {
          *        inside the block to {@code var_Before_METHOD}.
          * @param services services.
          */
-        public Variables(final LocationVariable self, final Map<Label, LocationVariable> breakFlags,
-                final Map<Label, LocationVariable> continueFlags, final LocationVariable returnFlag,
-                final LocationVariable result, final LocationVariable exception,
+        public Variables(final @Nullable LocationVariable self,
+                final Map<Label, LocationVariable> breakFlags,
+                final Map<Label, LocationVariable> continueFlags,
+                final @Nullable LocationVariable returnFlag,
+                final @Nullable LocationVariable result,
+                final LocationVariable exception,
                 final Map<LocationVariable, LocationVariable> remembranceHeaps,
                 final Map<LocationVariable, LocationVariable> remembranceLocalVariables,
                 final Map<LocationVariable, LocationVariable> outerRemembranceHeaps,
@@ -995,12 +1000,12 @@ public interface AuxiliaryContract extends SpecificationElement {
         /**
          * @see Variables#breakFlags
          */
-        private Map<Label, LocationVariable> breakFlags;
+        private Map<Label, LocationVariable> breakFlags = new LinkedHashMap<>();
 
         /**
          * @see Variables#continueFlags
          */
-        private Map<Label, LocationVariable> continueFlags;
+        private Map<Label, LocationVariable> continueFlags = new LinkedHashMap<>();
 
         /**
          * @see Variables#returnFlag
@@ -1031,9 +1036,10 @@ public interface AuxiliaryContract extends SpecificationElement {
         public Variables create() {
             createAndStoreFlags();
 
-            return new Variables(selfVar(method, new TypeRef(method.getContainerType()), false),
-                breakFlags,
-                continueFlags, returnFlag,
+            return new Variables(selfVar(method,
+                new TypeRef(Objects.requireNonNull(method.getContainerType(),
+                    "no container type")),
+                false), breakFlags, continueFlags, returnFlag,
                 // We don't need to (and shouldn't) make the variable names unique here.
                 // That is done in AuxiliaryContractBuilders.VariablesCreatorAndRegistrar
                 // when the contract is applied.
@@ -1103,7 +1109,8 @@ public interface AuxiliaryContract extends SpecificationElement {
          */
         private LocationVariable createFlag(final String name) {
             return createVariable(name,
-                new TypeRef(services.getJavaInfo().getKeYJavaType("boolean")));
+                new TypeRef(Objects.requireNonNull(services.getJavaInfo().getKeYJavaType("boolean"),
+                    "no boolean type")));
         }
 
         /**
@@ -1125,7 +1132,9 @@ public interface AuxiliaryContract extends SpecificationElement {
         private Map<LocationVariable, LocationVariable> createRemembranceHeaps(String suffix) {
             final Map<LocationVariable, LocationVariable> result =
                 new LinkedHashMap<>();
-            for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            final HeapLDT heapLDT =
+                Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "no heap LDT");
+            for (LocationVariable heap : heapLDT.getAllHeaps()) {
                 result.put(heap, locationVariable(heap + suffix, heap.sort(), true));
             }
             return result;
@@ -1156,12 +1165,20 @@ public interface AuxiliaryContract extends SpecificationElement {
             if (first instanceof For) {
                 ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
                 ProgramVariableCollector collector =
-                    new ProgramVariableCollector(new StatementBlock(inits), services);
+                    new ProgramVariableCollector(new StatementBlock(
+                        Objects.requireNonNull(inits, "no loop initializers")), services);
                 collector.start();
 
+                final HeapLDT heapLDT =
+                    Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+                        "no heap LDT");
+                final KeYJavaType heapVarType =
+                    Objects.requireNonNull(heapLDT.getHeap().getKeYJavaType(),
+                        "no heap variable type");
                 for (LocationVariable var : collector.result()) {
-                    if (!var.getKeYJavaType().equals(
-                        services.getTypeConverter().getHeapLDT().getHeap().getKeYJavaType())) {
+                    final KeYJavaType varType =
+                        Objects.requireNonNull(var.getKeYJavaType(), "no variable type: " + var);
+                    if (!varType.equals(heapVarType)) {
                         localOutVariables = localOutVariables.add(var);
                     }
                 }
@@ -1172,7 +1189,9 @@ public interface AuxiliaryContract extends SpecificationElement {
 
             for (ProgramVariable var : localOutVariables) {
                 result.put((LocationVariable) var,
-                    createVariable(var.name() + REMEMBRANCE_SUFFIX, var.getTypeReference()));
+                    createVariable(var.name() + REMEMBRANCE_SUFFIX,
+                        Objects.requireNonNull(var.getTypeReference(),
+                            "no variable type: " + var)));
             }
             return result;
         }
@@ -1207,12 +1226,21 @@ public interface AuxiliaryContract extends SpecificationElement {
                 if (first instanceof For) {
                     ImmutableArray<LoopInitializer> inits = ((For) first).getInitializers();
                     ProgramVariableCollector collector =
-                        new ProgramVariableCollector(new StatementBlock(inits), services);
+                        new ProgramVariableCollector(new StatementBlock(
+                            Objects.requireNonNull(inits, "no loop initializers")), services);
                     collector.start();
 
+                    final HeapLDT heapLDT =
+                        Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+                            "no heap LDT");
+                    final KeYJavaType heapVarType =
+                        Objects.requireNonNull(heapLDT.getHeap().getKeYJavaType(),
+                            "no heap variable type");
                     for (LocationVariable var : collector.result()) {
-                        if (!var.getKeYJavaType().equals(
-                            services.getTypeConverter().getHeapLDT().getHeap().getKeYJavaType())) {
+                        final KeYJavaType varType =
+                            Objects.requireNonNull(var.getKeYJavaType(),
+                                "no variable type: " + var);
+                        if (!varType.equals(heapVarType)) {
                             localInVariables = localInVariables.add(var);
                         }
                     }
@@ -1226,7 +1254,9 @@ public interface AuxiliaryContract extends SpecificationElement {
 
             for (LocationVariable var : localInVariables) {
                 result.put(var,
-                    createVariable(var.name() + OUTER_REMEMBRANCE_SUFFIX, var.getTypeReference()));
+                    createVariable(var.name() + OUTER_REMEMBRANCE_SUFFIX,
+                        Objects.requireNonNull(var.getTypeReference(),
+                            "no variable type: " + var)));
             }
             return result;
         }

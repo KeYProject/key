@@ -42,7 +42,7 @@ public class JmlAssert extends JavaStatement {
      * Temporary solution until full jml labels are there ...
      * (To be clarified if compatible still)
      */
-    private final String optLabel;
+    private final @Nullable String optLabel;
 
     /**
      * the condition in parse tree form
@@ -60,7 +60,8 @@ public class JmlAssert extends JavaStatement {
      * @param assertionProof the optional proof for an assert statement (not for assume)
      * @param positionInfo the position information for this statement
      */
-    public JmlAssert(TextualJMLAssertStatement.Kind kind, String label, KeyAst.Expression condition,
+    public JmlAssert(TextualJMLAssertStatement.Kind kind, @Nullable String label,
+            KeyAst.Expression condition,
             KeyAst.@Nullable JMLProofScript assertionProof,
             PositionInfo positionInfo) {
         super(positionInfo);
@@ -228,7 +229,7 @@ public class JmlAssert extends JavaStatement {
         return ImmutableList.of();
     }
 
-    public String getOptLabel() {
+    public @Nullable String getOptLabel() {
         return optLabel;
     }
 }
