@@ -9,7 +9,10 @@ import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /// Creates [StringStrategy].
+@NullMarked
 public class StringStrategyFactory implements StrategyFactory {
     @Override
     public StringStrategy create(Proof proof, StrategyProperties strategyProperties) {

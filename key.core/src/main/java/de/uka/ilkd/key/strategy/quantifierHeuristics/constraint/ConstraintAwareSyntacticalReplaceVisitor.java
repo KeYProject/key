@@ -14,12 +14,15 @@ import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * In KeY 1.x we supported a free variable calculus based on meta variables. This feature has been
  * abandoned in KeY 2.0. Until the strategy for quantifier instantiations is adapted, we cannot get
  * rid of them completely (they are used to determine triggers).
  */
+@NullMarked
 public class ConstraintAwareSyntacticalReplaceVisitor extends SyntacticalReplaceVisitor {
 
     @Deprecated

@@ -12,6 +12,9 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableMap;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A theory's own reasoning about terms and literals, as the heuristic needs it: solving an
  * equation for a variable while matching, deciding a literal when a cost is predicted, and
@@ -21,6 +24,7 @@ import org.key_project.util.collection.ImmutableMap;
  * reuses an implementation unchanged, whatever the programs behind the terms are, which is not so
  * for {@link TriggerSupport}.
  */
+@NullMarked
 public interface TheoryReasoning {
 
     /** The outcome of judging a literal for cost prediction. */
@@ -76,7 +80,8 @@ public interface TheoryReasoning {
      * @param services access to the theory's operators
      * @return the extended bindings, or null when this theory cannot solve the equation
      */
-    default ImmutableMap<QuantifiableVariable, Term> solveForVariable(JTerm pattern, JTerm instance,
+    default @Nullable ImmutableMap<QuantifiableVariable, Term> solveForVariable(JTerm pattern,
+            JTerm instance,
             ImmutableMap<QuantifiableVariable, Term> varMap, Services services) {
         return null;
     }

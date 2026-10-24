@@ -4,11 +4,15 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics.tiebreak;
 
+import org.jspecify.annotations.NullMarked;
+
+
 /**
  * Orders tied instantiation candidates by their proving-polarity connection to the sequent (see
  * {@link PolarityOccurrenceTieBreak#polarityValue}). The tie-break of the {@code Best} quantifier
  * treatment.
  */
+@NullMarked
 public final class PolarityTieBreak extends PolarityOccurrenceTieBreak {
 
     public static final PolarityTieBreak INSTANCE = new PolarityTieBreak();

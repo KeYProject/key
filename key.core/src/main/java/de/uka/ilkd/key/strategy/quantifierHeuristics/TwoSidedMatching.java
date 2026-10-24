@@ -18,6 +18,9 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Matching triggers within another quantifier expression. The unification through
  * EqualityConstraint binds a metavariable to ground non-rigid terms as well: the metavariable
@@ -25,13 +28,14 @@ import org.key_project.util.collection.ImmutableSet;
  * the taclet is applied, not on the matching. A known limitation: it is unclear whether certain
  * instantiations are lost due to too strict type checks in EqualityConstraint.
  */
+@NullMarked
 class TwoSidedMatching {
 
     private final UniTrigger trigger;
-    private final Term triggerWithMVs;
+    private final @Nullable Term triggerWithMVs;
     private final Substitution targetSubstWithMVs;
     private final Substitution triggerSubstWithMVs;
-    private final Term targetWithMVs;
+    private final @Nullable Term targetWithMVs;
 
     /**
      * creates an instance of a two sided matching
@@ -93,7 +97,7 @@ class TwoSidedMatching {
     }
 
     /** find a substitution in a allterm by using unification */
-    private Substitution match(Term triggerTerm, Term targetTerm, Services services) {
+    private @Nullable Substitution match(Term triggerTerm, Term targetTerm, Services services) {
         final Constraint c = Constraint.BOTTOM.unify((JTerm) targetTerm,
             (JTerm) triggerTerm, services);
         if (c.isSatisfiable()) {

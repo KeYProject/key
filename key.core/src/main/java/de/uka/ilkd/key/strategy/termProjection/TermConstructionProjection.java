@@ -15,6 +15,8 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Term projection for constructing a bigger term from a sequence of direct subterms and an
  * operator.
@@ -22,6 +24,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * NB: this is a rather restricted version of term construction, one can think of also allowing
  * bound variables, etc to be specified
  */
+@NullMarked
 @StableCost
 public class TermConstructionProjection implements ProjectionToTerm<Goal> {
 

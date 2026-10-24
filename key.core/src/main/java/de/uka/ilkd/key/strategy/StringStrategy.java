@@ -30,12 +30,15 @@ import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.strategy.StringCost.*;
 
 /// Strategy for string related rules.
 ///
 /// Do not create directly; use [StringStrategyFactory] instead.
+@NullMarked
 public class StringStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
     public static final Name NAME = new Name("String Strategy");
 
@@ -206,7 +209,7 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
     }
 
     @Override
-    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
+    public @Nullable RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
         return switch (aspect) {
             case StrategyAspect.Cost -> costComputationDispatcher;
             default -> null;

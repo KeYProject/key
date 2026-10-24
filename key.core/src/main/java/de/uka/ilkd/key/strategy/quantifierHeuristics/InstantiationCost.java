@@ -17,10 +17,12 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Feature that returns the number of branches after instantiated the quantifier formula.
  */
+@NullMarked
 public class InstantiationCost implements Feature {
 
     final private ProjectionToTerm<Goal> varInst;
