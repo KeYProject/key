@@ -33,6 +33,16 @@ public sealed interface AgentResult {
     record NeedsApproval(ToolCallInfo toolCall) implements AgentResult {
     }
 
+    /**
+     * A running tool call was moved into the background by the user. The turn of this loop is
+     * parked in the session; when the background job finishes, its output is enqueued into the
+     * session's {@link TurnQueue} and the turn is resumed with
+     * {@code AgentLoop.submitBackgroundOutput(jobId, content)}.
+     */
+    record PausedForBackground(String jobId, String toolName, String arguments)
+            implements AgentResult {
+    }
+
     /** The turn failed; {@code error} may be user-presentable via its message. */
     record Failed(Throwable error) implements AgentResult {
     }

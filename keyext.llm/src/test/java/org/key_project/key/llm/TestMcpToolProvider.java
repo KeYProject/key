@@ -24,8 +24,12 @@ public class TestMcpToolProvider implements McpToolProvider {
     /** Records every executed call as {@code name|arguments}. */
     public static final List<String> EXECUTED = new CopyOnWriteArrayList<>();
 
+    /** Optional artificial delay of the echo tool (backgrounding tests simulate a slow call). */
+    public static volatile long ECHO_DELAY_MS = 0;
+
     public static void reset() {
         EXECUTED.clear();
+        ECHO_DELAY_MS = 0;
     }
 
     private final McpClient client = new McpClient() {
@@ -41,6 +45,13 @@ public class TestMcpToolProvider implements McpToolProvider {
         @Override
         public Object callTool(String toolName, String arguments) {
             EXECUTED.add(toolName + "|" + arguments);
+            if (ECHO.equals(toolName) && ECHO_DELAY_MS > 0) {
+                try {
+                    Thread.sleep(ECHO_DELAY_MS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
             return switch (toolName) {
                 case ECHO -> "echo:" + arguments;
                 case NEEDS_APPROVAL -> "approved-tool-result";
