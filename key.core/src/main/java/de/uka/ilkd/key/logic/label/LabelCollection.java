@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.function.Predicate;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * <p>
@@ -34,7 +34,7 @@ public class LabelCollection {
      *
      * @param p_labels the list of {@link TermLabel}s for this collections
      */
-    public LabelCollection(ImmutableArray<TermLabel> p_labels) {
+    public LabelCollection(ImmutableList<TermLabel> p_labels) {
         for (int i = 0, sz = p_labels.size(); i < sz; i++) {
             labels.add(p_labels.get(i));
         }
