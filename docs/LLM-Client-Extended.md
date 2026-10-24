@@ -117,7 +117,12 @@ Tool dispatch details (`AgentLoop.processBatch`): `ask_user` and `use_skill` are
 by the loop itself (gated by the settings `allowAgentQuestions` / `agentCanUseSkills`);
 `spawn_subagent` is intercepted, too (gated by `subagentsEnabled`) and runs a bounded child
 loop via `SubagentRunner` (role whitelist + depth guard; `mode: parallel` fans out a `tasks`
-array over a pool, serializing tool dispatch globally — see `docs/subagents.md`); every
+array over a pool, serializing tool dispatch globally — see `docs/subagents.md`); `ask_llm`
+is intercepted the same way (gated by `askLlmEnabled`) and `AskLlmRunner` sends a fresh
+one-shot completion with a clean context (no history, no tools), returning the reply as the
+tool result. Both intercepted calls run **outside** the global dispatch lock, so an LLM
+round-trip never stalls parallel sub-agents or other sessions' tool calls — and since they
+never dispatch tools themselves, no nested locking is possible. Every
 other call goes through `session.getMcpClient()`. If `requiresApproval(name)` holds, the loop
 returns `NeedsApproval`; otherwise the tool is executed and the result is appended to both
 the internal wire thread and `session.getContext()`. `always` approvals are remembered via
@@ -194,7 +199,9 @@ public interface McpToolProvider {
   (service file `META-INF/services/...AgentToolProvider`; providers live in
   `org.key_project.key.llm.mcp.tools`): `get_proof_context`, `list_files`, `read_file`,
   `file_info`, `run_command` (gated by `ShellSafetyPolicy` blocklist, timeout and output
-  caps), `ask_user`, `use_skill`, the proof-script tools `tryclose` and `auto`, and the
+  caps), `ask_user`, `use_skill`, the delegation and self-consultation tools
+  `spawn_subagent`, `get_subagent_logs`, `ask_llm` (intercepted by the agent loop; see
+  `docs/subagents.md`), the proof-script tools `tryclose` and `auto`, and the
   taclet-management tools `list_proofs`, `list_taclets`, `list_taclet_options`,
   `export_taclet`, `export_taclets` (bounded bulk export), `add_taclet` / `remove_taclet`
   (the latter two modify a proof's rule set and require approval; they delegate to
@@ -245,7 +252,8 @@ new tools with their approval requirement.
   proof-independent settings file (`<keyConfig>/proofIndependentSettings.json`):
   `apiEndpoint` (default `https://ki-toolbox.scc.kit.edu/v1`), `authToken`, `defaultModel`
   (`azure.gpt-4.1-mini`), `availableModels`, `systemPrompt`, `maxToolRounds` (8),
-  `allowAgentQuestions`, `agentCanUseSkills`, `subagentsEnabled`, `maxSubagentTurns` (8),
+  `allowAgentQuestions`, `agentCanUseSkills`, `subagentsEnabled`, `askLlmEnabled` (true),
+  `maxSubagentTurns` (8),
   `maxSubagentDepth` (2), `maxParallelSubagents` (4),
   `sendTemperature`/`temperature` (0.2),
   `sendMaxOutputTokens`/`maxOutputTokens` (4096), `attachProofContext`,
@@ -276,6 +284,7 @@ new tools with their approval requirement.
 | `LlmToolsPanel` | per-tool approval/disablement table |
 | `LibraryEditorPanel` + editors | create/edit/delete/export/import for prompts and skills |
 | `SubagentRunner` + `subagents.*` | sequential + parallel sub-agent delegation (`spawn_subagent` child loop, role registry/whitelist, depth guard, parallel fan-out with serialized tool dispatch); see `docs/subagents.md` |
+| `AskLlmRunner` | fresh one-shot completion behind `ask_llm` (clean context, no tools; intercepted by the agent loop and the sub-agent child loop, runs without the dispatch lock) |
 | `SubagentLog` | per-session, bounded record of sub-agent runs (role, mode, per-task status/tools), exposed via the `get_subagent_logs` tool and rendered in the chat panel's tool-activity summary |
 
 ## Testing
@@ -285,7 +294,10 @@ core: `AgentLoopTest` (bounded rounds, pause/resume), `ExtendedPromptTest` (requ
 assembly), `PromptResolverTest` (markup), `LlmContextTest` (wire serialization),
 `BuiltInMCPClientTest` (registry/approvals), `ShellSafetyPolicyTest`,
 `SchemaSerializationTest`, `AutocompleteInputTest`/`AutocompleteProvidersTest`,
-`LibraryEditorPanelsTest`, `mcp/KeYAgentToolsCommandTest` (proof-script tool mapping) and
+`LibraryEditorPanelsTest`, `mcp/KeYAgentToolsCommandTest` (proof-script tool mapping),
+`SubagentLoopTest` (delegation, parallel fan-out, depth guard), `AskLlmTest`
+(self-consultation: fresh completion in parent and child loop, model/system override, disabled
+gate, error paths) and
 `mcp/AgentToolsTest` (modular discovery, metadata API, `list_tools` documentation, CLI
 rendering);
 `TestMcpToolProvider` and `TestAgentToolProvider` are service-loader test fixtures.
