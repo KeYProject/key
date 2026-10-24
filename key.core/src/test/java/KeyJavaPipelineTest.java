@@ -30,6 +30,7 @@ import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
 import com.google.common.truth.Truth;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,18 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  * @version 1 (19.02.22)
  */
 class KeyJavaPipelineTest {
+    /**
+     * Discovery anchor: with the current Gradle/JUnit Platform combination, a test class
+     * whose only test-annotated methods are {@link TestFactory} methods is not discovered
+     * at all ("No tests found for given includes"). A plain {@link Test} method makes the
+     * class visible to the engine; the actual pipeline checks are the factories below.
+     */
+    @Test
+    void pipelineTestsRegistered() {
+        // anchor only, see javadoc above
+        Assertions.assertTrue(true);
+    }
+
     public KeYJavaPipeline createPipelineTest(Path testFolder) throws IOException {
         Services services = new Services(JavaProfile.getDefaultProfile());
         var nss = services.getNamespaces();
@@ -55,6 +68,11 @@ class KeyJavaPipelineTest {
         js.parseSpecialClasses();
 
         final var jp = js.getProgramFactory().createJavaParser();
+        // JavaRedux (the default boot classpath) contains only the proof-relevant
+        // stubs; make the real JDK classes available for symbol resolution so that
+        // e.g. @java.lang.FunctionalInterface or java.util.Objects resolve.
+        js.getProgramFactory().addTypeSolver(
+            new com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver());
         try (var files = Files.list(inputFolder)) {
             var cu = new ArrayList<CompilationUnit>();
             files.forEach(it -> {
@@ -101,6 +119,11 @@ class KeyJavaPipelineTest {
     @TestFactory
     Stream<DynamicTest> innerclass() throws IOException {
         return generatePipelineTests(Paths.get("pipelineTests/innerclass").toAbsolutePath());
+    }
+
+    @TestFactory
+    Stream<DynamicTest> lambda() throws IOException {
+        return generatePipelineTests(Paths.get("pipelineTests/lambda").toAbsolutePath());
     }
 
 
