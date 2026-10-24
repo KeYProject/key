@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -72,10 +73,15 @@ public class NoPosTacletApp extends TacletApp {
         return createNoPosTacletApp(taclet, instantiations, null, services);
     }
 
+    @SuppressWarnings("NullAway") // null "assumes"-instantiations is the intentional "not yet
+                                  // matched" contract (cf. TacletApp#assumesFormulaInstantiations);
+                                  // the private ctor/storage stay @NonNull for the many callers --
+                                  // an honest @Nullable widening ripples into PosTacletApp and
+                                  // ~15 callers and belongs to a dedicated follow-up wave.
     public static @Nullable NoPosTacletApp createNoPosTacletApp(
             org.key_project.prover.rules.Taclet taclet,
             SVInstantiations instantiations,
-            ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
+            @Nullable ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
             Services services) {
         Debug.assertTrue(ifInstsCorrectSize(taclet, assumesInstantiations),
             "If instantiations list has wrong size");
@@ -255,7 +261,10 @@ public class NoPosTacletApp extends TacletApp {
 
         MatchResultInfo res;
         if (taclet() instanceof final FindTaclet findTaclet) {
-            res = findTaclet.getMatcher().matchFind(termToBeMatched, mc, services);
+            res = Objects.requireNonNull(findTaclet.getMatcher(),
+                "taclet has no initialized matcher")
+                    .matchFind(Objects.requireNonNull(termToBeMatched,
+                        "no term to match and no position given"), mc, services);
             // the following check will partly be repeated within the
             // constructor; this could be optimised
             if (res == null || !checkVarCondNotFreeIn(findTaclet,
@@ -283,7 +292,7 @@ public class NoPosTacletApp extends TacletApp {
     }
 
 
-    protected MatchResultInfo setupMatchConditions(PosInOccurrence pos) {
+    protected @Nullable MatchResultInfo setupMatchConditions(@Nullable PosInOccurrence pos) {
         var svInst = taclet() instanceof NoFindTaclet ? instantiations()
                 : instantiations().clearUpdateContext();
 
@@ -295,7 +304,8 @@ public class NoPosTacletApp extends TacletApp {
         }
 
         if (taclet() instanceof RewriteTaclet rewriteTaclet) {
-            mc = rewriteTaclet.checkPrefix(pos, mc);
+            mc = rewriteTaclet.checkPrefix(
+                Objects.requireNonNull(pos, "rewrite taclet requires the position"), mc);
         }
 
         return mc;

@@ -31,6 +31,8 @@ import org.jspecify.annotations.Nullable;
 public final class TermFactory {
 
     private static final ImmutableArray<JTerm> NO_SUBTERMS = new ImmutableArray<>();
+    private static final ImmutableArray<QuantifiableVariable> NO_BOUND_VARS =
+        new ImmutableArray<>();
     private final @Nullable Map<JTerm, JTerm> cache;
 
 
@@ -82,7 +84,7 @@ public final class TermFactory {
     }
 
     public JTerm createTerm(Operator op, JTerm[] subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
+            @Nullable ImmutableArray<QuantifiableVariable> boundVars,
             ImmutableArray<TermLabel> labels) {
         return createTerm(op, createSubtermArray(subs), boundVars, labels);
     }
@@ -113,7 +115,7 @@ public final class TermFactory {
     // private interface
     // -------------------------------------------------------------------------
 
-    private ImmutableArray<JTerm> createSubtermArray(@Nullable JTerm[] subs) {
+    private ImmutableArray<JTerm> createSubtermArray(JTerm[] subs) {
         return subs == null || subs.length == 0 ? NO_SUBTERMS : new ImmutableArray<>(subs);
     }
 
@@ -121,10 +123,12 @@ public final class TermFactory {
             @Nullable ImmutableArray<QuantifiableVariable> boundVars,
             @Nullable ImmutableArray<TermLabel> labels, String origin) {
 
+        final ImmutableArray<QuantifiableVariable> boundVarsNonNull =
+            boundVars != null ? boundVars : NO_BOUND_VARS;
         final TermImpl newTerm =
             (labels == null || labels.isEmpty()
-                    ? new TermImpl(op, subs, boundVars)
-                    : new LabeledTermImpl(op, subs, boundVars, labels, origin));
+                    ? new TermImpl(op, subs, boundVarsNonNull)
+                    : new LabeledTermImpl(op, subs, boundVarsNonNull, labels, origin));
         // Check if caching is possible. It is not possible if a non-empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
