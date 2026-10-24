@@ -65,7 +65,7 @@ the published JMLtk grammar does not (verified by probe).
 | `TextualJMLMethodDecl` (model methods) | `body.JmlMethodDeclaration` (wraps a `MethodDeclaration` + optional `JmlContract`) | grammar has `JmlMethodDeclaration`, `JmlMethodSignature`, `JmlBodyClauseKind` |
 | `TextualJMLModifierList` / `JMLModifier` | plain `Modifier` with `Modifier.DefaultKeyword.JML_*` attached to the node (`jmlModifiers` grammar: PURE, STRICTLY_PURE, MODEL, GHOST, HELPER, NON_NULL, NULLABLE, NULLABLE_BY_DEFAULT, SPEC_*, INSTANCE, NO_STATE, TWO_STATE, NONNULLELEMENTS, math modes, CODE, PEER, REP, READ_ONLY, IMMUTABLE) | `JMLModifier` enum → `DefaultKeyword` mapping already exists in the jar; no carrier class needed |
 | `TextualJMLLoopSpec` | `JmlContract` with `ContractType.LOOP_INV` attached to `WhileStmt`/`ForStmt`/`EnhancedForStmt` (loop_invariant(_free) → `JmlSimpleExprClause`, decreases → `JmlSimpleExprClause`, assignable → `JmlMultiExprClause`, loop_determines/loop_separates → info-flow) | verified on `WhileStmt` and `ForStmt` |
-| `TextualJMLAssertStatement` (assert/assume + optional label + proof script) | `stmt.JmlExpressionStmt` for `assert`/`assume`/`hence_by`/`assert_redundantly`; standalone label as `stmt.JmlLabelStmt` (JML standard prefix form `/*@ L1: assert e; @*/`) | **Gap**: KeY's inline label `assert LAB: e` and the KeY `BY …` assertion proof (`KeyAst.JMLProofScript`) are not in JMLtk's statement grammar |
+| `TextualJMLAssertStatement` (assert/assume + optional label + proof script) | `stmt.JmlExpressionStmt` for `assert`/`assume`/`hence_by`/`assert_redundantly`; standalone label as `stmt.JmlLabelStmt` (JML standard prefix form `/*@ L1: assert e; @*/`) | **Gap** (deferred): KeY's inline label `assert LAB: e` and the KeY `BY …` assertion proof (`KeyAst.JMLProofScript`) are not in JMLtk's statement grammar; upstream support planned (see Part D.3) |
 | `TextualJMLSetStatement` | `stmt.JmlExpressionStmt` (set → `JmlExpressionStmt` with SET keyword) | verified |
 | `TextualJMLMergePointDecl` | `com.github.javaparser.ast.key.KeyMergePointStmt` (`merge_point ( expr ) ;` as a **plain Java statement**, not a JML comment) | **Gap**: KeY writes `//@ merge_point;` / `//@ merge_point (…)` inside JML comments; JMLtk only parses the raw-Java form. Note JMLtk ships a full `ast.key` package (`KeyExecStmt`, `KeyMarkerStatement`, `KeyCcatch*`, `KeyLoopScopeBlockStmt`, `KeyMethodBodyStatement`, `KeyMethodSignature`, `KeyEscapeExpression`, `KeyPassiveExpression`, …) for KeY's DSL statements |
 | `LabeledParserRuleContext` (ANTLR ctx + origin term labels) | no JMLtk counterpart needed — replaced by the JML AST node + a thin KeY carrier (node + `OriginTermLabel`/location), or read from `Node.getRange()` | position mapping JMLtk `TokenRange` → KeY `Location` is a Phase-2 task |
@@ -113,7 +113,10 @@ absent.
    `JmlExpressionStmt`).
 3. **Assertion proof scripts**: KeY's `//@ assert e /_proofScript … /` /
    `BY …` (`JmlParser.g4` `assertionProof`, `KeyAst.JMLProofScript`) not in
-   JMLtk's `JmlStatement`.
+   JMLtk's `JmlStatement`. **Status: intentionally out of scope for KeY-side
+   work — JMLtk grammar support is planned upstream (near future).** KeY
+   should keep surfacing the raw `JmlDoc` text for these until the upstream
+   grammar lands.
 4. **`nowarn` / `debug` pragma-statements** (`JmlParser.g4`): tokens absent.
 5. **Datagroup / monitor clauses** (`monitors_for`, `readable_if`,
    `writable_if`, `in_group`, `maps_into`, `datagroup`): tokens absent — worse,
