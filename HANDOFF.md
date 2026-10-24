@@ -278,7 +278,10 @@ must NOT grow.
    (40 failures at HEAD = 40 at Phase-3 HEAD; zero slice regressions);
    IntSemantics fix landed (now 34 recorded gaps, see §5.2). Slice-5
    baseline re-verified at its own HEAD: speclang 285/0/12, IntSemantics
-   6/0/0. NEXT = **contract registry** (repo `contracts`/`operationContracts`/
+   6/0/0, full suite **1640/74/34** — the 34 failures are exactly the §5.2
+   recorded jmltk gaps (13 failing classes match the triage 1:1; the +2 on
+   the 1638 sample count is the earlier re-measurement artifact), zero new
+   regressions. NEXT = **contract registry** (repo `contracts`/`operationContracts`/
    `contractsByName`/`contractTargets` + `splitContract`/`getOverridingTargets`/
    `getInheritedContracts`/`prepareContract`/`contractCounters` — also
    unblocking the `ProofRegistry` contract-lookup delegation).
