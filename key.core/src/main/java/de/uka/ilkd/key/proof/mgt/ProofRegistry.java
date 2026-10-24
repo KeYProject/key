@@ -24,8 +24,8 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Bidirectional registry between {@link ProofOblInput}s and the {@link Proof}s that were started
- * from them (the proof-to-PO bookkeeping that used to live in the
- * {@link SpecificationRepository} alongside the specification elements).
+ * from them (the proof-to-PO bookkeeping that used to live in the {@code SpecificationRepository}
+ * alongside the specification elements).
  *
  * <p>
  * The registry belongs to the *proof lifecycle*, not to JML: it is owned by the
