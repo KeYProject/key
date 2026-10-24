@@ -1224,8 +1224,10 @@ public class TermLabelManager {
                 applicationPosInOccurrence, newApplicationTerm, rule, goal, hint, tacletTerm);
             goal.changeFormula(new SequentFormula(root), applicationPosInOccurrence.topLevel());
         } else if (!refactorings.childAndGrandchildRefactoringsAndParents().isEmpty()) {
-            JTerm root = replaceTerm(state, applicationPosInOccurrence, applicationTerm, tf,
-                refactorings.childAndGrandchildRefactoringsAndParents(), services,
+            JTerm root = replaceTerm(state, applicationPosInOccurrence,
+                Objects.requireNonNull(applicationTerm,
+                    "application term required for parent refactoring"),
+                tf, refactorings.childAndGrandchildRefactoringsAndParents(), services,
                 applicationPosInOccurrence, newApplicationTerm, rule, goal, hint, tacletTerm);
             goal.changeFormula(new SequentFormula(root), applicationPosInOccurrence.topLevel());
         }

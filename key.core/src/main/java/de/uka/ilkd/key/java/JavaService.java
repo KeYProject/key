@@ -158,8 +158,9 @@ public class JavaService {
      *
      * @return not null
      */
-    public JP2KeYConverter getConverter(Namespace<SchemaVariable> schemaVariables) {
-        return new JP2KeYConverter(services, schemaVariables);
+    public JP2KeYConverter getConverter(@Nullable Namespace<SchemaVariable> schemaVariables) {
+        return new JP2KeYConverter(services,
+            schemaVariables != null ? schemaVariables : new Namespace<>());
     }
 
     /**
@@ -500,7 +501,8 @@ public class JavaService {
             while (walker.step()) {
                 var currentDataLocation = walker.getCurrentLocation();
                 var name = walker.getCurrentLocation().toString();
-                try (InputStream is = walker.openCurrent(fileRepo);
+                try (InputStream is = fileRepo != null ? walker.openCurrent(fileRepo)
+                        : walker.openCurrent();
                         Reader isr = new InputStreamReader(is);
                         Reader f = new BufferedReader(isr)) {
                     var cu = unwrapParseResult(name, programFactory.parseCompilationUnit(f));
@@ -828,8 +830,9 @@ public class JavaService {
             return new PrimitiveType(p);
         } catch (IllegalArgumentException e) {
             if (type instanceof ArrayType ad) {
-                return new com.github.javaparser.ast.type.ArrayType(
-                    keyType2JPType(ad.getBaseType().getKeYJavaType().getJavaType()));
+                return new com.github.javaparser.ast.type.ArrayType(keyType2JPType(
+                    Objects.requireNonNull(ad.getBaseType().getKeYJavaType().getJavaType(),
+                        "array base type has no Java type")));
             }
             var name = type.getFullName();
             ClassOrInterfaceType scope = null;

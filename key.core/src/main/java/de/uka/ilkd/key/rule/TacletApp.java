@@ -82,9 +82,9 @@ public abstract class TacletApp implements RuleApp {
      * set of schema variables that appear in the Taclet and need to be instantiated but are not
      * instantiated yet. This means SchemaVariables in addrule-sections have to be ignored
      */
-    private volatile ImmutableSet<SchemaVariable> missingVars = null;
+    private volatile @Nullable ImmutableSet<SchemaVariable> missingVars = null;
 
-    private volatile ImmutableSet<GenericSort> missingSorts = null;
+    private volatile @Nullable ImmutableSet<GenericSort> missingSorts = null;
 
     /**
      * the update context given by the current instantiations must not be changed
@@ -94,6 +94,11 @@ public abstract class TacletApp implements RuleApp {
     /**
      * constructs a TacletApp for the given taclet, with an empty instantiation map
      */
+    @SuppressWarnings("NullAway") // null "assumes"-instantiations is the intentional "not yet
+                                  // matched" contract (cf. #assumesFormulaInstantiations); the
+                                  // field/getter stay @NonNull for the many callers -- an honest
+                                  // @Nullable widening ripples into PosTacletApp and ~15 callers
+                                  // and belongs to a dedicated follow-up wave.
     TacletApp(org.key_project.prover.rules.Taclet taclet) {
         this(taclet, de.uka.ilkd.key.rule.inst.SVInstantiations.EMPTY_SVINSTANTIATIONS, null);
     }
@@ -142,8 +147,10 @@ public abstract class TacletApp implements RuleApp {
         LinkedHashSet<QuantifiableVariable> instanceSet = new LinkedHashSet<>();
 
         for (final var prefixSchemaVar : pre.prefix()) {
-            instanceSet.add(
-                (LogicVariable) instantiations.<Term>getInstantiation(prefixSchemaVar).op());
+            instanceSet.add((LogicVariable) Objects
+                    .requireNonNull(instantiations.<Term>getInstantiation(prefixSchemaVar),
+                        "prefix schema variable is not instantiated")
+                    .op());
         }
         return instanceSet;
     }
@@ -273,7 +280,9 @@ public abstract class TacletApp implements RuleApp {
             LogicVariable x,
             SVInstantiations insts) {
         for (int i = 0; i < boundVars.size(); i++) {
-            JTerm instance = (JTerm) insts.getInstantiation((SchemaVariable) boundVars.get(i));
+            JTerm instance = (JTerm) Objects.requireNonNull(
+                insts.getInstantiation((SchemaVariable) boundVars.get(i)),
+                "bound schema variable is not instantiated");
             if (instance.op() == x) {
                 return true;
             }
@@ -290,11 +299,13 @@ public abstract class TacletApp implements RuleApp {
             org.key_project.prover.rules.Taclet taclet, SVInstantiations insts,
             SchemaVariable varSV,
             Services services) {
-        final Term instantiation = insts.getInstantiation(varSV);
+        final Term instantiation = Objects.requireNonNull(insts.getInstantiation(varSV),
+            "bound schema variable varSV is not instantiated");
         final LogicVariable newVariable = new LogicVariable(
             new Name(instantiation.op().name() + "0"), instantiation.sort());
         // __CHANGE__ How to name the new variable? TODO
-        JTerm term = getTermBelowQuantifier(taclet, varSV);
+        JTerm term = Objects.requireNonNull(getTermBelowQuantifier(taclet, varSV),
+            "no term below the unique quantifier of the bound schema variable");
         JTerm newVariableTerm = services.getTermBuilder().var(newVariable);
         return replaceInstantiation(insts, term, varSV, newVariableTerm, services);
     }
@@ -307,12 +318,17 @@ public abstract class TacletApp implements RuleApp {
             SVInstantiations insts, JTerm t, SchemaVariable u, JTerm y, Services services) {
 
         var result = (de.uka.ilkd.key.rule.inst.SVInstantiations) insts;
-        final LogicVariable x = (LogicVariable) ((Term) insts.getInstantiation(u)).op();
+        final LogicVariable x = (LogicVariable) Objects
+                .requireNonNull((Term) insts.getInstantiation(u),
+                    "bound schema variable u is not instantiated")
+                .op();
         if (t.op() instanceof SchemaVariable sv) {
             if (!(sv instanceof VariableSV)) {
                 final ClashFreeSubst cfSubst = new ClashFreeSubst(x, y, services.getTermBuilder());
-                result =
-                    result.replace(sv, cfSubst.apply(insts.getInstantiation(sv)), services);
+                result = result.replace(sv,
+                    cfSubst.apply(Objects.requireNonNull(insts.getInstantiation(sv),
+                        "bound schema variable sv is not instantiated")),
+                    services);
             }
         } else {
             for (int i = 0; i < t.arity(); i++) {
@@ -350,7 +366,9 @@ public abstract class TacletApp implements RuleApp {
     public boolean isExecutable() {
         // bugfix #1336, see bugtracker
         if (taclet instanceof RewriteTaclet rwTaclet) {
-            var newConditions = rwTaclet.checkPrefix(posInOccurrence(),
+            var newConditions = rwTaclet.checkPrefix(
+                Objects.requireNonNull(posInOccurrence(),
+                    "rewrite taclet application requires a position"),
                 MatchConditions.EMPTY_MATCHCONDITIONS);
             if (newConditions == null) {
                 return false;
@@ -388,7 +406,8 @@ public abstract class TacletApp implements RuleApp {
      * @return ImmutableSet<SchemaVariable> that need to be instantiated but are not
      */
     protected ImmutableSet<SchemaVariable> calculateNonInstantiatedSV() {
-        if (missingVars == null) {
+        ImmutableSet<SchemaVariable> result = missingVars;
+        if (result == null) {
             ImmutableSet<SchemaVariable> localMissingVars =
                 DefaultImmutableSet.nil();
             TacletSchemaVariableCollector coll =
@@ -402,9 +421,10 @@ public abstract class TacletApp implements RuleApp {
                 }
             }
             missingVars = localMissingVars;
+            result = localMissingVars;
         }
 
-        return missingVars;
+        return result;
     }
 
     /**
@@ -414,14 +434,16 @@ public abstract class TacletApp implements RuleApp {
      * @return ImmutableSet<GenericSort> that need to be instantiated but are not
      */
     protected ImmutableSet<GenericSort> calculateNonInstantiatedGenericSorts() {
-        if (missingSorts == null) {
+        ImmutableSet<GenericSort> result = missingSorts;
+        if (result == null) {
             var coll =
                 new UninstantiatedGenericSortCollector(instantiations());
             coll.visitWithoutAddrule(taclet());
-            missingSorts = Immutables.createSetFrom(coll.getSortList());
+            result = Immutables.createSetFrom(coll.getSortList());
+            missingSorts = result;
         }
 
-        return missingSorts;
+        return result;
     }
 
 
@@ -444,7 +466,8 @@ public abstract class TacletApp implements RuleApp {
         }
 
         final var newMC =
-            taclet.getMatcher().matchSV(sv, term, matchConditions(), services);
+            Objects.requireNonNull(taclet.getMatcher(), "taclet has no initialized matcher")
+                    .matchSV(sv, term, matchConditions(), services);
 
         if (newMC == null) {
             throw new IllegalInstantiationException(
@@ -503,8 +526,9 @@ public abstract class TacletApp implements RuleApp {
             return null;
 
         if (app != this) {
-            final var appMC =
-                app.taclet().getMatcher().checkConditions(app.matchConditions(), services);
+            final var appMC = Objects
+                    .requireNonNull(app.taclet().getMatcher(), "taclet has no initialized matcher")
+                    .checkConditions(app.matchConditions(), services);
             if (appMC == null) {
                 return null;
             }
@@ -523,12 +547,14 @@ public abstract class TacletApp implements RuleApp {
             return null;
 
         if (app != this) {
-            final var appMC =
-                app.taclet().getMatcher().checkConditions(app.matchConditions(), services);
+            final var appMC = Objects
+                    .requireNonNull(app.taclet().getMatcher(), "taclet has no initialized matcher")
+                    .checkConditions(app.matchConditions(), services);
             if (appMC == null) {
                 return null;
             } else {
-                app = app.setMatchConditions(appMC, services);
+                app = Objects.requireNonNull(app.setMatchConditions(appMC, services),
+                    "setMatchConditions must not return null for a matching application");
             }
         }
 
@@ -1198,7 +1224,7 @@ public abstract class TacletApp implements RuleApp {
      * @return true iff the list of if instantiations has the correct size or is null
      */
     protected static boolean ifInstsCorrectSize(org.key_project.prover.rules.Taclet p_taclet,
-            ImmutableList<AssumesFormulaInstantiation> p_list) {
+            @Nullable ImmutableList<AssumesFormulaInstantiation> p_list) {
         return p_list == null || p_list.size() == (p_taclet.assumesSequent().antecedent().size()
                 + p_taclet.assumesSequent().succedent().size());
     }

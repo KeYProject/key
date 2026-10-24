@@ -95,6 +95,8 @@ public class NodeInfo {
 
     public NodeInfo(Node node) {
         this.node = node;
+        // eager init so the field can stay @NonNull (matches the "initialize in ctor" pattern)
+        this.sequentChangeInfo = SequentChangeInfo.createSequentChangeInfo(node.sequent());
     }
 
     static {
@@ -262,11 +264,11 @@ public class NodeInfo {
      * @param app The {@link RuleApp} to check.
      * @return {@code true} symbolic execution is performed, {@code false} otherwise.
      */
-    public static boolean isSymbolicExecutionRuleApplied(RuleApp app) {
+    public static boolean isSymbolicExecutionRuleApplied(@Nullable RuleApp app) {
         return app instanceof AbstractAuxiliaryContractBuiltInRuleApp
                 || app instanceof AbstractContractRuleApp
-                || app instanceof LoopInvariantBuiltInRuleApp || app instanceof TacletApp
-                        && isSymbolicExecution(((TacletApp) app).taclet());
+                || app instanceof LoopInvariantBuiltInRuleApp || app instanceof TacletApp tacletApp
+                        && isSymbolicExecution(tacletApp.taclet());
     }
 
     public static boolean isSymbolicExecution(Taclet t) {
@@ -424,7 +426,11 @@ public class NodeInfo {
                             }
                         }
                     }
-                    res = ProofSaver.printAnything(val, node.proof().getServices());
+                    res = Objects.requireNonNull(
+                        ProofSaver.printAnything(
+                            Objects.requireNonNull(val, "no branch label instantiation found"),
+                            node.proof().getServices()),
+                        "proof saver could not print the branch label instantiation");
                 }
                 m.appendReplacement(sb, res.replace("$", "\\$"));
             }

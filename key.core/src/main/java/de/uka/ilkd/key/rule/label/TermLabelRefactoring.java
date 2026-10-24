@@ -27,6 +27,7 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -114,7 +115,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      */
     RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
+            @Nullable JTerm applicationTerm, Rule rule, Goal goal,
             Object hint, JTerm tacletTerm);
 
     /**
@@ -137,7 +138,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
      */
     void refactorLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
+            @Nullable JTerm applicationTerm, Rule rule, Goal goal,
             Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels);
 
     /**

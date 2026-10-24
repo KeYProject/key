@@ -1786,7 +1786,7 @@ public class SpecificationRepository {
             replacementMap.replaceRemembranceLocalVariables(vars.atPreVars, atPres, services);
             var replacer = new OpReplacer(replacementMap, termFactory, services.getProof());
             var newTerms = terms()
-                    .map(t -> Objects.requireNonNull(replacer.replace(t),
+                    .<JTerm>map(t -> Objects.requireNonNull(replacer.replace(t),
                         "no replacement for " + t));
             var newVars = new ProgramVariableCollection();
             newVars.selfVar = vars.selfVar;
