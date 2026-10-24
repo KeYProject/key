@@ -23,6 +23,10 @@ import org.key_project.logic.Choice;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public final class SideProofUtil {
     /**
      * Forbid instances.
@@ -120,7 +124,7 @@ public final class SideProofUtil {
      * @throws ProofInputException Occurred Exception.
      */
     public static ProofStarter createSideProof(ProofEnvironment sideProofEnvironment,
-            Sequent sequentToProve, String proofName) throws ProofInputException {
+            Sequent sequentToProve, @Nullable String proofName) throws ProofInputException {
         // Make sure that valid parameters are given
         // Create ProofStarter
         ProofStarter starter = new ProofStarter(false);

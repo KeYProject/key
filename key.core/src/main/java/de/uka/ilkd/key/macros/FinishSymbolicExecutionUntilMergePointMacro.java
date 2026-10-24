@@ -35,6 +35,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The macro FinishSymbolicExecutionUntilJionPointMacro continues automatic rule application until a
@@ -49,12 +51,13 @@ import org.jspecify.annotations.NonNull;
  * @author Dominic Scheurer
  * @see FinishSymbolicExecutionMacro
  */
+@NullMarked
 public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMacro {
 
     private HashSet<ProgramElement> blockElems = new HashSet<>();
     private final HashSet<JavaBlock> alreadySeen = new HashSet<>();
 
-    private UserInterfaceControl uic = null;
+    private @Nullable UserInterfaceControl uic = null;
 
     public FinishSymbolicExecutionUntilMergePointMacro() {
     }

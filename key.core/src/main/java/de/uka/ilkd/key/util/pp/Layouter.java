@@ -7,6 +7,7 @@ package de.uka.ilkd.key.util.pp;
 import java.util.*;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This class pretty-prints information using line breaks and indentation. For instance, it can be
@@ -159,6 +160,7 @@ import org.jspecify.annotations.NonNull;
  *
  */
 
+@NullMarked
 public class Layouter<M> {
 
     /** The Printer used for output. */

@@ -16,6 +16,7 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * The macro FinishSymbolicExecutionMacro continues automatic rule application until there is no
@@ -26,6 +27,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author mattias ulbrich
  */
+@NullMarked
 public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
     private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("notHumanReadable");

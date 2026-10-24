@@ -32,6 +32,7 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -44,6 +45,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Richard Bubel
  */
+@NullMarked
 public class ProofStarter {
 
     /**
@@ -109,7 +111,7 @@ public class ProofStarter {
          * {@inheritDoc}
          */
         @Override
-        public KeYJavaType getContainerType() {
+        public @Nullable KeYJavaType getContainerType() {
             return null;
         }
     }
@@ -173,7 +175,7 @@ public class ProofStarter {
      *
      * @throws ProofInputException if the proof obligation generation fails
      */
-    public void init(Sequent sequentToProve, ProofEnvironment env, String proofName)
+    public void init(Sequent sequentToProve, ProofEnvironment env, @Nullable String proofName)
             throws ProofInputException {
         final ProofOblInput input = new UserProvidedInput(sequentToProve, env, proofName);
         proof = input.getPO().getFirstProof();

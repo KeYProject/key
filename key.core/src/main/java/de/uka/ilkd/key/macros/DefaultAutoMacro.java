@@ -19,6 +19,8 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The macro {@link DefaultAutoMacro} runs the active proof strategy on all enabled goals
  * in the selected subtree. This is equivalent to pressing the Auto button but can be
@@ -28,6 +30,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author mattias ulbrich
  */
+@NullMarked
 public class DefaultAutoMacro extends AbstractProofMacro {
 
     @Override

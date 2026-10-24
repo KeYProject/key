@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util;
 
+import org.jspecify.annotations.NullMarked;
+
 /** this exception is shown if an assertion has failed */
+@NullMarked
 public class AssertionFailure extends RuntimeException {
 
 

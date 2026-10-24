@@ -9,6 +9,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A PositionTable describes the start and end positions of substrings of a String in order to get a
  * PosInSequent from an int describing a position in a string representing a Term or a Sequent, etc.
@@ -22,6 +25,7 @@ import org.key_project.util.collection.ImmutableList;
  * Positions are reckoned with start positions inclusive and end positions exclusive. Start and end
  * positions are relative to each subterm.
  */
+@NullMarked
 public class PositionTable {
 
     // the start positions of the direct subterms (or parts of sequent, etc.)
@@ -31,7 +35,7 @@ public class PositionTable {
     protected final int[] endPos;
 
     /** the PositionTables for the direct subterms (or parts of sequent, etc.) */
-    protected final PositionTable[] children;
+    protected final @Nullable PositionTable[] children;
 
     // the current active entry number.
     // When a new "in-order" element is started, the counter is increased.
@@ -123,7 +127,7 @@ public class PositionTable {
      * `lowest' subtable that includes <code>index</code> in its range. If the lowest subtable does
      * not correspond to a program modality, it returns null.
      */
-    public Range firstStatementRangeForIndex(int index) {
+    public @Nullable Range firstStatementRangeForIndex(int index) {
         int sub = searchEntry(index);
         if (sub == -1) {
             return getFirstStatementRange();
@@ -142,7 +146,7 @@ public class PositionTable {
      *         <i>this</i>position table. If this is not a program modality, returns null. Note that
      *         this will be overridden in the subclass {@link ModalityPositionTable}.
      */
-    public Range getFirstStatementRange() {
+    public @Nullable Range getFirstStatementRange() {
         return null;
     }
 
@@ -201,7 +205,7 @@ public class PositionTable {
     /**
      * Return of the children of this PositionTable
      */
-    public PositionTable getChild(int i) {
+    public @Nullable PositionTable getChild(int i) {
         return children[i];
     }
 

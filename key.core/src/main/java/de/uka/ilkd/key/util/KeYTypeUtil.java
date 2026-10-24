@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -26,6 +27,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public final class KeYTypeUtil {
     /**
      * Separator between packages and types.
@@ -122,7 +124,7 @@ public final class KeYTypeUtil {
      * @param kjt The {@link KeYJavaType} to check.
      * @return {@code true} is library class, {@code false} is no library class.
      */
-    public static boolean isLibraryClass(KeYJavaType kjt) {
+    public static boolean isLibraryClass(@Nullable KeYJavaType kjt) {
         return kjt != null && kjt.getJavaType() instanceof TypeDeclaration
                 && ((TypeDeclaration) kjt.getJavaType()).isLibraryClass();
     }
@@ -134,7 +136,7 @@ public final class KeYTypeUtil {
      * @return {@code true} is implicit constructor, {@code false} is no implicit constructor (e.g.
      *         method or explicit construcotr).
      */
-    public static boolean isImplicitConstructor(IProgramMethod pm) {
+    public static boolean isImplicitConstructor(@Nullable IProgramMethod pm) {
         return pm != null && PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER
                 .equals(pm.getName());
     }
@@ -147,8 +149,8 @@ public final class KeYTypeUtil {
      * @param implicitConstructor The implicit constructor.
      * @return The found explicit constructor or {@code null} if not available.
      */
-    public static @Nullable IProgramMethod findExplicitConstructor(Services services,
-            final IProgramMethod implicitConstructor) {
+    public static @Nullable IProgramMethod findExplicitConstructor(@Nullable Services services,
+            @Nullable final IProgramMethod implicitConstructor) {
         if (services != null && implicitConstructor != null) {
             Iterable<IProgramMethod> pms =
                 services.getJavaInfo().getConstructors(implicitConstructor.getContainerType());
@@ -183,7 +185,8 @@ public final class KeYTypeUtil {
      * @return The full qualified type name or {@code null} if the given
      *         {@link ParameterDeclaration} is {@code null}.
      */
-    public static String resolveType(ParameterDeclaration parameterDeclaration) {
+    public static @Nullable String resolveType(
+            @Nullable ParameterDeclaration parameterDeclaration) {
         return parameterDeclaration != null ? resolveType(parameterDeclaration.getTypeReference())
                 : null;
     }
@@ -195,7 +198,7 @@ public final class KeYTypeUtil {
      * @return The full qualified type name or {@code null} if the given {@link TypeReference} is
      *         {@code null}.
      */
-    public static String resolveType(TypeReference typeReference) {
+    public static @Nullable String resolveType(@Nullable TypeReference typeReference) {
         return typeReference != null ? resolveType(typeReference.getKeYJavaType()) : null;
     }
 
@@ -206,7 +209,7 @@ public final class KeYTypeUtil {
      * @return The full qualified type name or {@code null} if the given {@link Type} is
      *         {@code null}.
      */
-    public static String resolveType(Type type) {
+    public static @Nullable String resolveType(@Nullable Type type) {
         if (type instanceof KeYJavaType) {
             return resolveType(((KeYJavaType) type).getJavaType());
         } else if (type instanceof ArrayType arrayType) {
