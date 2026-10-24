@@ -242,8 +242,11 @@ public class SpecificationRepository {
         final List<IProgramMethod> candidatePMs =
             services.getJavaInfo().getAllProgramMethods(kjt);
         outer: for (IProgramMethod candidatePM : candidatePMs) {
-            if (Objects.requireNonNull(candidatePM.getMethodDeclaration(),
-                "method declaration of " + candidatePM + " is null").getName().equals(name)
+            final String candidateName = Objects.requireNonNull(
+                Objects.requireNonNull(candidatePM.getMethodDeclaration(),
+                    "method declaration of " + candidatePM + " is null").getName(),
+                "method declaration of " + candidatePM + " is null has no name");
+            if (candidateName.equals(name)
                     && candidatePM.getParameterDeclarationCount() == numParams) {
                 for (int i = 0; i < numParams; i++) {
                     if (!Objects.requireNonNull(candidatePM.getParameterType(i),
@@ -964,7 +967,9 @@ public class SpecificationRepository {
             // add query axioms for own class
             for (IProgramMethod pm : services.getJavaInfo().getAllProgramMethods(selfKjt)) {
                 if (!pm.isVoid() && !pm.isConstructor() && !pm.isImplicit() && !pm.isModel()) {
-                    pm = services.getJavaInfo().getToplevelPM(selfKjt, pm);
+                    pm = Objects.requireNonNull(
+                        services.getJavaInfo().getToplevelPM(selfKjt, pm),
+                        "no toplevel program method for " + pm);
 
                     var sb = new StringBuilder();
                     for (KeYJavaType pd : Objects.requireNonNull(pm.getParamTypes(),
@@ -998,7 +1003,8 @@ public class SpecificationRepository {
             for (IProgramMethod pm : services.getJavaInfo().getAllProgramMethods(kjt)) {
                 final LocationVariable selfVar = pm.isStatic() ? null : tb.selfVar(kjt, false);
                 if (!pm.isVoid() && pm.isModel()) {
-                    pm = services.getJavaInfo().getToplevelPM(kjt, pm);
+                    pm = Objects.requireNonNull(services.getJavaInfo().getToplevelPM(kjt, pm),
+                        "no toplevel program method for " + pm);
                     ImmutableList<LocationVariable> paramVars = tb.paramVars(pm, false);
                     Map<LocationVariable, LocationVariable> atPreVars = new LinkedHashMap<>();
                     List<LocationVariable> heaps = HeapContext.getModifiableHeaps(services, false);
@@ -1006,7 +1012,8 @@ public class SpecificationRepository {
                         atPreVars.put(heap,
                             tb.atPreVar(heap.name().toString(), heap.sort(), false));
                     }
-                    LocationVariable resultVar = tb.resultVar(pm, false);
+                    LocationVariable resultVar = Objects.requireNonNull(tb.resultVar(pm, false),
+                        "no result variable for model method " + pm);
 
                     // This assumes there is one operation contract for each
                     // model pm per class
@@ -1074,8 +1081,11 @@ public class SpecificationRepository {
                                 kjt, ModifierKind.PRIVATE, preFromContract,
                                 Objects.requireNonNull(freePreFromContract,
                                     "model method contract has no free pre"),
-                                postFromContract, freePostFromContract, mbyFromContract, atPreVars,
-                                selfVar, resultVar, paramVars);
+                                Objects.requireNonNull(postFromContract,
+                                    "model method contract has no post"),
+                                Objects.requireNonNull(freePostFromContract,
+                                    "model method contract has no free post"),
+                                mbyFromContract, atPreVars, selfVar, resultVar, paramVars);
                             result = result.add(modelMethodContractAxiom);
                         }
                     }
@@ -1118,7 +1128,8 @@ public class SpecificationRepository {
                 axioms.put(kjt, currentAxioms.add(ax));
             }
             // inherit represents clauses to subclasses and conjoin together
-            if (ModifierKind.allowsInheritance(ax.getVisibility())) {
+            if (ModifierKind.allowsInheritance(
+                Objects.requireNonNullElse(ax.getVisibility(), ModifierKind.JML_PACKAGE))) {
                 final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
                 for (KeYJavaType sub : subs) {
                     RepresentsAxiom subAx = ((RepresentsAxiom) ax).setKJT(sub);
@@ -1639,9 +1650,14 @@ public class SpecificationRepository {
         if (limited == null) {
             final String baseName =
                 ((ProgramElementName) obs.name()).getProgramName() + LIMIT_SUFFIX;
-            final Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
-            limited = new ObserverFunction(baseName, obs.sort(), obs.getType(), heapSort,
-                obs.getContainerType(), obs.isStatic(), obs.getParamTypes(),
+            final Sort heapSort = Objects
+                    .requireNonNull(services.getTypeConverter().getHeapLDT(), "no heap LDT")
+                    .targetSort();
+            limited = new ObserverFunction(baseName, obs.sort(),
+                Objects.requireNonNull(obs.getType(), "no type for " + obs), heapSort,
+                Objects.requireNonNull(obs.getContainerType(), "no container type for " + obs),
+                obs.isStatic(),
+                Objects.requireNonNull(obs.getParamTypes(), "no parameter types for " + obs),
                 obs.getHeapCount(services), obs.getStateCount());
             unlimitedToLimited.put(obs, limited);
             limitedToUnlimited.put(limited, obs);
@@ -1739,15 +1755,17 @@ public class SpecificationRepository {
             final TermFactory termFactory = services.getTermFactory();
             final TermReplacementMap replacementMap = new TermReplacementMap(termFactory);
             if (self != null) {
-                replacementMap.replaceSelf(vars().selfVar, self, services);
+                replacementMap.replaceSelf(Objects.requireNonNull(vars().selfVar,
+                    "no self variable to resolve self in JML statement spec"), self, services);
             }
             replacementMap.replaceRemembranceLocalVariables(vars().atPreVars, vars().atPres,
                 services);
-            replacementMap.replaceRemembranceLocalVariables(vars().atBeforeVars, vars().atBefores,
-                services);
+            replacementMap.replaceRemembranceLocalVariables(
+                Objects.requireNonNullElse(vars().atBeforeVars, Map.of()),
+                Objects.requireNonNullElse(vars().atBefores, Map.of()), services);
             final OpReplacer replacer =
                 new OpReplacer(replacementMap, termFactory, services.getProof());
-            return replacer.replace(term);
+            return Objects.requireNonNull(replacer.replace(term), "no replacement for " + term);
         }
 
         /**
@@ -1767,12 +1785,19 @@ public class SpecificationRepository {
             var replacementMap = new TermReplacementMap(termFactory);
             replacementMap.replaceRemembranceLocalVariables(vars.atPreVars, atPres, services);
             var replacer = new OpReplacer(replacementMap, termFactory, services.getProof());
-            var newTerms = terms().map(replacer::replace);
-            return new JmlStatementSpec(
-                new ProgramVariableCollection(vars.selfVar, vars.paramVars, vars.resultVar,
-                    vars.excVar,
-                    vars.atPreVars, atPres, vars.atBeforeVars, vars.atBefores),
-                newTerms);
+            var newTerms = terms()
+                    .map(t -> Objects.requireNonNull(replacer.replace(t),
+                        "no replacement for " + t));
+            var newVars = new ProgramVariableCollection();
+            newVars.selfVar = vars.selfVar;
+            newVars.paramVars = vars.paramVars;
+            newVars.resultVar = vars.resultVar;
+            newVars.excVar = vars.excVar;
+            newVars.atPreVars = vars.atPreVars;
+            newVars.atPres = atPres;
+            newVars.atBeforeVars = vars.atBeforeVars;
+            newVars.atBefores = vars.atBefores;
+            return new JmlStatementSpec(newVars, newTerms);
         }
     }
 
