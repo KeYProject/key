@@ -1,9 +1,12 @@
 # PLAN — Rewrite JML specification handling in KeY
 
 Branch: `weigl/jmltk-jml` (created from `weigl/jmltk` @ `c91b316363`)
-Status: **design doc** — approved direction: remove KeY's own JML front-end and
-the `TextualJMLConstruct` intermediate representation; use JMLtk's JML AST
-(`ast.jml`) directly.
+Status: **Phases 0+1 implemented** (HEAD `74b68f6f82`, `:key.core:compileJava`
+GREEN) — KeY consumes JMLtk's parsed JML AST via `JmlSpec` wraps while keeping
+KeY's translation semantics. **`HANDOFF.md` in the repo root is the current
+checkpoint** (state, open Phase-2 decision, next actions). Approved direction:
+remove KeY's own JML front-end and the `TextualJMLConstruct` intermediate
+representation; use JMLtk's JML AST (`ast.jml`) directly.
 
 ## 1. Goal
 
@@ -41,19 +44,24 @@ generated into `de.uka.ilkd.key.speclang.njml`.
 
 ```
 .java/.key source
-  └─ JavaParserFactory / JavaService (JMLtk, processJml=OFF) ─ Java AST, JML captured as JmlDoc
+  └─ JavaParserFactory (JMLtk, processJml=ON, JML keys policy) ─ Java AST with JML parsed
+      by JmlProcessor and attached: JmlContract on declarations/statements (NodeWithContracts),
+      JmlClassLevelDeclaration members, JmlExpressionStmt/JmlGhostStmt/KeyMergePointStmt in blocks
       └─ KeYJavaPipeline (transformations)
-          └─ JMLTransformer     ─ sanitizes JmlDoc text, calls PreParser,
-                                  stores TextualJMLConstructs in JavaParser DataKeys
-                                  (KEY_SPEC_CASE, KEY_CLASS_SPEC, KEY_LOOP_SPEC)
-          └─ JmlDocRemoval      ─ strips JmlDoc nodes afterwards
-      └─ JP2KeYConverter        ─ moves TextualJMLConstruct *into KeY AST* via
-                                  attachedJml fields (declarations, classes, loops,
-                                  blocks, MergePointStatement); JmlExpressionStmt → JmlAssert/SetStatement
+          └─ JMLTransformer     ─ relocates attached JmlContract/JmlClassLevelDeclaration into
+                                  JmlSpec wraps on DataKeys (KEY_SPEC_CASE, KEY_CLASS_SPEC),
+                                  unwraps JmlMethodDeclaration/JmlFieldDeclaration, self-marks
+                                  JML statements (KEY_ASSERT/KEY_ASSIGN/KEY_MERGE_POINT)
+          └─ JmlDocRemoval      ─ strips remaining JmlDoc nodes afterwards
+      └─ JP2KeYConverter        ─ moves List<JmlSpec> *into KeY AST* via attachedJml fields
+                                  (declarations, classes, loops, blocks, MergePointStatement);
+                                  JmlExpressionStmt → JmlAssert/SetStatement; KeyMergePointStmt →
+                                  MergePointStatement
   └─ SLEnvInput.read() → JMLSpecExtractor (SpecExtractor)
       └─ JMLSpecFactory         ─ builds Contract/ClassInvariant/ClassAxiom/InitiallyClause/
                                   LoopSpec/BlockContract/MergeContract/DependencyContract
-                                  from TextualJML* via LabeledParserRuleContext
+                                  from JmlSpec (via JmlToTextual → TextualJML* → JmlParser.g4
+                                  re-parse until Phase 2 lands a direct translator)
           └─ JmlIO → Translator → JmlTermFactory ─ JML parse trees → KeY terms (SLExpression/JTerm)
       └─ SpecificationRepository     ← Phase 4: deleted — specs stay attached to the AST
 ```
