@@ -67,7 +67,7 @@ the published JMLtk grammar does not (verified by probe).
 | `TextualJMLLoopSpec` | `JmlContract` with `ContractType.LOOP_INV` attached to `WhileStmt`/`ForStmt`/`EnhancedForStmt` (loop_invariant(_free) → `JmlSimpleExprClause`, decreases → `JmlSimpleExprClause`, assignable → `JmlMultiExprClause`, loop_determines/loop_separates → info-flow) | verified on `WhileStmt` and `ForStmt` |
 | `TextualJMLAssertStatement` (assert/assume + optional label + proof script) | `stmt.JmlExpressionStmt` for `assert`/`assume`/`hence_by`/`assert_redundantly`; standalone label as `stmt.JmlLabelStmt` (JML standard prefix form `/*@ L1: assert e; @*/`) | **Gap** (deferred): KeY's inline label `assert LAB: e` and the KeY `BY …` assertion proof (`KeyAst.JMLProofScript`) are not in JMLtk's statement grammar; upstream support planned (see Part D.3) |
 | `TextualJMLSetStatement` | `stmt.JmlExpressionStmt` (set → `JmlExpressionStmt` with SET keyword) | verified |
-| `TextualJMLMergePointDecl` | `com.github.javaparser.ast.key.KeyMergePointStmt` (`merge_point ( expr ) ;` as a **plain Java statement**, not a JML comment) | **Gap**: KeY writes `//@ merge_point;` / `//@ merge_point (…)` inside JML comments; JMLtk only parses the raw-Java form. Note JMLtk ships a full `ast.key` package (`KeyExecStmt`, `KeyMarkerStatement`, `KeyCcatch*`, `KeyLoopScopeBlockStmt`, `KeyMethodBodyStatement`, `KeyMethodSignature`, `KeyEscapeExpression`, `KeyPassiveExpression`, …) for KeY's DSL statements |
+| `TextualJMLMergePointDecl` | `com.github.javaparser.ast.key.KeyMergePointStmt` (`merge_point ( expr ) ;` as a **plain Java statement**, not a JML comment) | JMLtk parses the raw-Java form; `JP2KeYConverter` translates it back into KeY's `//@ merge_point …` statement (KeY-authored files keep the comment form). JMLtk ships a full `ast.key` package (`KeyExecStmt`, `KeyMarkerStatement`, `KeyCcatch*`, `KeyLoopScopeBlockStmt`, `KeyMethodBodyStatement`, `KeyMethodSignature`, `KeyEscapeExpression`, `KeyPassiveExpression`, …) for KeY's DSL statements |
 | `LabeledParserRuleContext` (ANTLR ctx + origin term labels) | no JMLtk counterpart needed — replaced by the JML AST node + a thin KeY carrier (node + `OriginTermLabel`/location), or read from `Node.getRange()` | position mapping JMLtk `TokenRange` → KeY `Location` is a Phase-2 task |
 | `jml/pretranslation/` package (`Behavior`, `JMLModifier`, all `TextualJML*`) | delete | replaced by `ast.jml` + `ast.key` |
 
@@ -104,9 +104,14 @@ absent.
 
 ## Part D — Verified gap list (published snapshot, live probes)
 
-1. **`merge_point`**: JMLtk parses only the raw-Java `merge_point ( expr ) ;`
-   (`ast.key.KeyMergePointStmt`); KeY's `//@ merge_point …` comment form is
-   rejected by `JmlProcessor` at method level.
+1. **`merge_point`**: JMLtk parses it only as the raw-Java statement
+   `merge_point ( expr ) ;` (`ast.key.KeyMergePointStmt`), not from inside a
+   JML comment. **Resolution:** in the new pipeline, `KeyMergePointStmt` is
+   translated in `JP2KeYConverter` back into KeY's merge-point statement,
+   i.e. the `//@ merge_point …` form KeY files are authored in
+   (`MergePointStatement` + its JML marker text). So the comment-form
+   incompatibility is neutralized on the KeY side — KeY files keep
+   `//@ merge_point`, JMLtk just delivers it as the raw statement node.
 2. **Assert labels**: KeY `//@ assert LAB: e;` (label after `assert`, per
    `JmlParser.g4` `assert_statement`) rejected; JMLtk only supports the JML
    standard prefix-label form `//@ LAB: assert e;` (`JmlLabelStmt` +
