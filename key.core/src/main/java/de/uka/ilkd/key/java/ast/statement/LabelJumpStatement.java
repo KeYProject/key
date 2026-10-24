@@ -30,7 +30,7 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      * Name.
      */
 
-    protected final Label name;
+    protected final @Nullable Label name;
 
     /**
      * Label jump statement.
@@ -75,6 +75,11 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      *
      * @return the string.
      */
+    // getName() returns null for unlabeled jumps (break;/continue;), which conflicts with the
+    // @NonNull contract of NamedModelElement.getName(); the super-interface cannot be widened
+    // without ripple (LabeledStatement and MethodDeclaration override it as well), so the
+    // override-mismatch check is scoped here.
+    @SuppressWarnings("NullAway")
     public final @Nullable String getName() {
         return (name == null) ? null : name.toString();
     }
@@ -85,7 +90,7 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      * @return the Label label
      */
 
-    public Label getLabel() {
+    public @Nullable Label getLabel() {
         return name;
     }
 
@@ -95,6 +100,10 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      *
      * @return the identifier.
      */
+    // returns null for labels that are not ProgramElementNames (and for unlabeled jumps), which
+    // conflicts with the @NonNull contract of NamedProgramElement.getProgramElementName(); the
+    // super-interface cannot be widened without ripple, so the check is scoped here.
+    @SuppressWarnings("NullAway")
     public @Nullable ProgramElementName getProgramElementName() {
         if ((name instanceof ProgramElementName) || (name == null)) {
             return (ProgramElementName) name;

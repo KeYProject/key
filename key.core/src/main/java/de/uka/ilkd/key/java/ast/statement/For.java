@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
@@ -52,8 +53,9 @@ public class For extends LoopStatement implements VariableScope {
     }
 
     public For(ExtList children) {
-        super(children.get(ILoopInit.class), children.get(IGuard.class),
-            children.get(IForUpdates.class), children.get(Statement.class), children);
+        super(children.get(ILoopInit.class), Objects.requireNonNull(children.get(IGuard.class),
+            "For requires a guard"), children.get(IForUpdates.class),
+            Objects.requireNonNull(children.get(Statement.class), "For requires a body"), children);
     }
 
     public For(PositionInfo pi, List<Comment> comments, ILoopInit inits, IForUpdates updates,
