@@ -41,7 +41,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     /**
      * Access path.
      */
-    protected final ReferencePrefix prefix;
+    protected final @Nullable ReferencePrefix prefix;
 
     /**
      * Name.
@@ -53,7 +53,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
      */
     protected final ImmutableArray<? extends Expression> arguments;
 
-    public MethodReference(ExtList args, MethodName n, ReferencePrefix p, PositionInfo pos) {
+    public MethodReference(ExtList args, MethodName n, @Nullable ReferencePrefix p,
+            PositionInfo pos) {
         super(pos);
         this.prefix = p;
         name = n;
@@ -62,7 +63,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     }
 
     public MethodReference(ImmutableArray<? extends Expression> args, MethodName n,
-            ReferencePrefix p) {
+            @Nullable ReferencePrefix p) {
         this.prefix = p;
         name = n;
         Debug.assertTrue(name != null, "Tried to reference unnamed method.");
@@ -70,7 +71,8 @@ public class MethodReference extends JavaNonTerminalProgramElement
         checkArguments();
     }
 
-    public MethodReference(ImmutableArray<Expression> args, MethodName n, ReferencePrefix p,
+    public MethodReference(ImmutableArray<Expression> args, MethodName n,
+            @Nullable ReferencePrefix p,
             @Nullable PositionInfo pos) {
         super(pos);
         this.prefix = p;
@@ -80,17 +82,17 @@ public class MethodReference extends JavaNonTerminalProgramElement
         checkArguments();
     }
 
-    public MethodReference(ExtList children, MethodName n, ReferencePrefix p) {
+    public MethodReference(ExtList children, MethodName n, @Nullable ReferencePrefix p) {
         this(new ImmutableArray<>(children.collect(Expression.class)), n, p,
             children.get(PositionInfo.class));
     }
 
-    public MethodReference(ExtList children, MethodName n, ReferencePrefix p, PositionInfo pos,
-            String scope) {
+    public MethodReference(ExtList children, MethodName n, @Nullable ReferencePrefix p,
+            PositionInfo pos, String scope) {
         this(new ImmutableArray<>(children.collect(Expression.class)), n, p, pos);
     }
 
-    public MethodReference(PositionInfo pi, List<Comment> c, ReferencePrefix prefix,
+    public MethodReference(PositionInfo pi, List<Comment> c, @Nullable ReferencePrefix prefix,
             MethodName name, ImmutableArray<Expression> args) {
         super(pi, c);
         this.arguments = args;
@@ -124,7 +126,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * @return the reference prefix.
      */
     @Override
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return prefix;
     }
 

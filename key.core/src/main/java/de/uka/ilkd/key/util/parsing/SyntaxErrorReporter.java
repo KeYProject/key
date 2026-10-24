@@ -212,7 +212,11 @@ public class SyntaxErrorReporter extends BaseErrorListener {
          */
         public Location getLocation() {
             // charPositionInLine is 0-based
-            return new Location(source, Position.fromOneZeroBased(line, charPositionInLine));
+            // A null source URI means the input has no file (e.g. standard input);
+            // Location.UNDEFINED
+            // represents exactly this case, as its fileUri component is not declared @Nullable.
+            return source == null ? Location.UNDEFINED
+                    : new Location(source, Position.fromOneZeroBased(line, charPositionInLine));
         }
     }
 
@@ -228,8 +232,13 @@ public class SyntaxErrorReporter extends BaseErrorListener {
             } else {
                 SyntaxError e = errors.get(0);
                 // e.charPositionInLine is 0 based!
+                // A null source URI means the input has no file (e.g. standard input);
+                // Location.UNDEFINED
+                // represents exactly this case, as its fileUri component is not declared @Nullable.
                 location =
-                    new Location(e.source, Position.fromOneZeroBased(e.line, e.charPositionInLine));
+                    e.source == null ? Location.UNDEFINED
+                            : new Location(e.source,
+                                Position.fromOneZeroBased(e.line, e.charPositionInLine));
             }
         }
 

@@ -48,7 +48,7 @@ public class For extends LoopStatement implements VariableScope {
         super(inits, guard, updates, body);
     }
 
-    public For(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body) {
+    public For(@Nullable ILoopInit inits, IGuard guard, IForUpdates updates, Statement body) {
         super(inits, guard, updates, body);
     }
 
@@ -88,7 +88,9 @@ public class For extends LoopStatement implements VariableScope {
 
     public ImmutableArray<VariableSpecification> getVariablesInScope() {
         if (inits != null) {
-            LoopInitializer li = inits.getInits().get(0);
+            final ImmutableArray<LoopInitializer> inits2 =
+                Objects.requireNonNull(inits.getInits(), "for-loop inits are mandatory");
+            LoopInitializer li = inits2.get(0);
             if (li instanceof LocalVariableDeclaration) {
                 return ((LocalVariableDeclaration) li).getVariables();
             }
@@ -98,7 +100,9 @@ public class For extends LoopStatement implements VariableScope {
 
     public @Nullable VariableSpecification getVariableInScope(String name) {
         if (inits != null) {
-            LoopInitializer li = inits.getInits().get(0);
+            final ImmutableArray<LoopInitializer> inits2 =
+                Objects.requireNonNull(inits.getInits(), "for-loop inits are mandatory");
+            LoopInitializer li = inits2.get(0);
             if (li instanceof LocalVariableDeclaration) {
                 ImmutableArray<VariableSpecification> vars =
                     ((LocalVariableDeclaration) li).getVariables();

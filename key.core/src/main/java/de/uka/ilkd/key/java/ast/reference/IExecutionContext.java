@@ -20,6 +20,7 @@ public interface IExecutionContext extends Reference {
      *
      * @return the type reference to the next enclosing class
      */
+    @Nullable
     TypeReference getTypeReference();
 
     /**

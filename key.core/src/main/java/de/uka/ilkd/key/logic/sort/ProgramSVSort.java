@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic.sort;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
@@ -777,7 +778,8 @@ public abstract class ProgramSVSort extends SortImpl {
             if (pm == null) {
                 return false;
             }
-            final MethodDeclaration methodDeclaration = pm.getMethodDeclaration();
+            final MethodDeclaration methodDeclaration = Objects.requireNonNull(
+                pm.getMethodDeclaration(), "method declaration of method body statement");
 
             return !(// pm.isModel() ||
             methodDeclaration.getBody() == null)
@@ -871,8 +873,8 @@ public abstract class ProgramSVSort extends SortImpl {
             if (!(check instanceof TypeReference)) {
                 return false;
             }
-            return ((TypeReference) (check)).getKeYJavaType()
-                    .getJavaType() instanceof PrimitiveType;
+            return Objects.requireNonNull(((TypeReference) (check)).getKeYJavaType(),
+                "KeYJavaType of type reference").getJavaType() instanceof PrimitiveType;
         }
 
         @Override
@@ -904,12 +906,16 @@ public abstract class ProgramSVSort extends SortImpl {
             if (!(check instanceof TypeReference)) {
                 return false;
             }
-            if (((TypeReference) (check)).getKeYJavaType().getJavaType() instanceof PrimitiveType) {
+            final KeYJavaType kjt =
+                Objects.requireNonNull(((TypeReference) (check)).getKeYJavaType(),
+                    "KeYJavaType of type reference");
+            if (kjt.getJavaType() instanceof PrimitiveType) {
                 return false;
             }
             if (matchName != null) {
-                return matchName.equals(
-                    ((TypeReference) (check)).getKeYJavaType().getJavaType().getFullName());
+                final Type javaType =
+                    Objects.requireNonNull(kjt.getJavaType(), "Java type of type reference");
+                return matchName.equals(javaType.getFullName());
             }
             return true;
         }
@@ -1013,7 +1019,11 @@ public abstract class ProgramSVSort extends SortImpl {
             if (check instanceof ProgramVariable) {
                 Namespace<Sort> ns = services.getNamespaces().sorts();
                 Sort stringSort = ns.lookup(new Name("java.lang.String"));
-                return ((ProgramVariable) check).getKeYJavaType().getSort().equals(stringSort);
+                final KeYJavaType kjt = Objects.requireNonNull(
+                    ((ProgramVariable) check).getKeYJavaType(),
+                    "KeYJavaType of string program variable");
+                return Objects.requireNonNull(kjt.getSort(), "sort of string program variable")
+                        .equals(stringSort);
             }
             return false;
         }
@@ -1318,7 +1328,8 @@ public abstract class ProgramSVSort extends SortImpl {
 
         final String elemname;
         if (pe instanceof NamedProgramElement) {
-            elemname = ((NamedProgramElement) pe).getProgramElementName().getProgramName();
+            elemname = Objects.requireNonNull(((NamedProgramElement) pe).getProgramElementName(),
+                "name of named program element").getProgramName();
         } else if (pe instanceof Named) {
             final Name n = ((Named) pe).name();
             if (n instanceof ProgramElementName) {

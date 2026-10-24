@@ -31,7 +31,7 @@ public class MethodFrame extends JavaStatement
     /**
      * result
      */
-    private final IProgramVariable resultVar;
+    private final @Nullable IProgramVariable resultVar;
 
     /**
      * Body.
@@ -54,7 +54,7 @@ public class MethodFrame extends JavaStatement
      * @param body
      *        a Statement containing the method body of the called method
      */
-    public MethodFrame(IProgramVariable resultVar, IExecutionContext execContext,
+    public MethodFrame(@Nullable IProgramVariable resultVar, IExecutionContext execContext,
             StatementBlock body) {
         this.resultVar = resultVar;
         this.body = body;
@@ -84,7 +84,7 @@ public class MethodFrame extends JavaStatement
      *        a Statement containing the method body of the called method
      * @param pos the PositionInfo where the frame was parsed
      */
-    public MethodFrame(IProgramVariable resultVar, IExecutionContext execContext,
+    public MethodFrame(@Nullable IProgramVariable resultVar, IExecutionContext execContext,
             StatementBlock body, PositionInfo pos) {
         this(resultVar, execContext, body, pos, List.of());
     }
@@ -102,7 +102,7 @@ public class MethodFrame extends JavaStatement
      * @param pi the PositionInfo where the frame was parsed
      * @param c list of comments associated with the method frame
      */
-    public MethodFrame(IProgramVariable resultVar, IExecutionContext execContext,
+    public MethodFrame(@Nullable IProgramVariable resultVar, IExecutionContext execContext,
             StatementBlock body, PositionInfo pi, List<Comment> c) {
         super(pi, c);
         this.resultVar = resultVar;
@@ -178,7 +178,7 @@ public class MethodFrame extends JavaStatement
      *
      * @return the MethodCallHeader
      */
-    public IProgramVariable getProgramVariable() {
+    public @Nullable IProgramVariable getProgramVariable() {
         return resultVar;
     }
 

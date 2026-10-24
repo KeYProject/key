@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic.op;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.TermServices;
 
@@ -90,7 +92,8 @@ public class Transformer extends JFunction {
             PIOPathIterator it = pio.iterator();
 
             while (it.next() != -1 && !trans) {
-                final var t = it.getSubTerm();
+                final var t =
+                    Objects.requireNonNull(it.getSubTerm(), "no subterm at iterator position");
                 trans = t.op() instanceof Transformer;
             }
         }
@@ -110,7 +113,8 @@ public class Transformer extends JFunction {
             Operator op;
 
             while (it.next() != -1) {
-                final var t = it.getSubTerm();
+                final var t =
+                    Objects.requireNonNull(it.getSubTerm(), "no subterm at iterator position");
                 if (t.op() instanceof Transformer trans) {
                     return trans;
                 }
