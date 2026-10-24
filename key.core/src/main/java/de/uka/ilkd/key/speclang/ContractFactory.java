@@ -17,7 +17,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
 import de.uka.ilkd.key.speclang.infflow.InformationFlowContractInfo;
 import de.uka.ilkd.key.speclang.infflow.InformationFlowContractSupplier;
