@@ -79,12 +79,28 @@ public final class AutocompleteProviders {
                     if (rel == null) {
                         continue;
                     }
-                    if (prefix.isEmpty() || rel.startsWith(prefix)) {
+                    if (matches(rel, prefix)) {
                         result.add(new AutocompleteInput.Suggestion("@" + rel + " ", "@" + rel,
                             path.getFileName().toString()));
                     }
                 }
                 return result;
+            }
+
+            /** The prefix may match the whole relative name, any of its segments or its tail. */
+            private boolean matches(String rel, String prefix) {
+                if (prefix.isEmpty()) {
+                    return true;
+                }
+                if (rel.startsWith(prefix)) {
+                    return true;
+                }
+                for (var segment : rel.split("/")) {
+                    if (segment.startsWith(prefix)) {
+                        return true;
+                    }
+                }
+                return false;
             }
         };
     }

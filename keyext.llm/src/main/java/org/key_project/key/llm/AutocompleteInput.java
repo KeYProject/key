@@ -4,7 +4,19 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.llm;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -20,22 +32,36 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultStyledDocument;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+
+import de.uka.ilkd.key.gui.utilities.LexerHighlighter;
 
 import org.jspecify.annotations.Nullable;
 
 /**
- * A text area with lightweight inline autocompletion:
+ * The prompt input box with lightweight inline autocompletion:
  * <ul>
  * <li>{@code $} - context tokens (e.g. {@code $seq}, {@code $goals}, {@code $computePath})</li>
  * <li>{@code @} - files of the current Java model</li>
  * <li>{@code /} - skills and prompts from the user libraries</li>
  * </ul>
  * The popup follows the caret; Enter/Tab accept the selected entry, Up/Down navigate, Esc closes.
- * It can be resized by dragging the handle in its bottom-right corner.
+ * It can be resized by dragging the handle in its bottom-right corner; without resizing it fits
+ * the content and the width of the input box.
+ * <p>
+ * Terms and sequents dragged in from the sequent view are inserted wrapped in verbatim marks:
+ * inline backticks for single-line content, a fenced block with the {@code key} language marker
+ * for multi-line content. When a {@link LexerHighlighter} is set (see
+ * {@link #setHighlighter(LexerHighlighter)}), {@code ```key} fences are highlighted with the KeY
+ * lexer.
  *
  * @author Alexander Weigl
  */
-public class AutocompleteInput extends JTextArea {
+public class AutocompleteInput extends JTextPane {
 
     /** A single completion proposal. */
     public record Suggestion(@Nullable String insert, String label, String detail,
@@ -60,13 +86,23 @@ public class AutocompleteInput extends JTextArea {
     private int completionStart = -1;
     private char activeTrigger;
 
+    /** The highlighter for {@code ```key} fences (or {@code null}). */
+    private @Nullable LexerHighlighter highlighter;
+    private boolean highlightScheduled;
+
+    /** Popup size chosen by the user with the resize grip; kept on re-show. */
+    private int userPopupWidth;
+    private int userPopupHeight;
+
     /** Smallest allowed popup size when the user resizes it with the grip. */
     private static final int MIN_POPUP_WIDTH = 120;
     private static final int MIN_POPUP_HEIGHT = 80;
+    /** Largest height the popup grows to on its own; the grip can exceed it. */
+    private static final int MAX_AUTO_POPUP_HEIGHT = 320;
+    /** Margin added around the popup content. */
+    private static final int POPUP_MARGIN = 24;
 
     public AutocompleteInput() {
-        setLineWrap(true);
-        setWrapStyleWord(true);
         popup.setLayout(new BorderLayout());
         popup.add(new JScrollPane(list), BorderLayout.CENTER);
         var bottom = new JPanel(new BorderLayout());
@@ -114,15 +150,18 @@ public class AutocompleteInput extends JTextArea {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 updatePopup();
+                scheduleHighlight();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
                 updatePopup();
+                scheduleHighlight();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
+                // attribute-only changes (e.g. from the highlighter) must not re-highlight
                 updatePopup();
             }
         });
@@ -158,16 +197,172 @@ public class AutocompleteInput extends JTextArea {
                 }
             }
         });
+
+        installDropHandler();
     }
+
+    // ----------------------------------------------------------------------- configuration
 
     public void addProvider(CompletionProvider provider) {
         providers.put(provider.trigger(), provider);
+    }
+
+    /**
+     * Sets the highlighter for {@code ```key} fences in the input (or {@code null} to disable).
+     * The fences are highlighted with the KeY lexer on every text change.
+     */
+    public void setHighlighter(@Nullable LexerHighlighter highlighter) {
+        this.highlighter = highlighter;
+        scheduleHighlight();
     }
 
     public List<Suggestion> suggestionsFor(char trigger, String prefix) {
         var provider = providers.get(trigger);
         return provider == null ? List.of() : provider.apply(prefix);
     }
+
+    // ---------------------------------------------------------------------------- dropping
+
+    /**
+     * Wraps dropped content into verbatim marks: single-line text in inline backticks, multi-line
+     * text in a fenced block with the KeY language marker.
+     */
+    public static String verbatim(String text) {
+        var stripped = text.strip();
+        return stripped.contains("\n")
+                ? "```key\n" + stripped + "\n```"
+                : "`" + stripped + "`";
+    }
+
+    /**
+     * Installs a drop handler that inserts dropped terms/sequents wrapped in verbatim marks
+     * ({@link #verbatim(String)}). Paste inserts plain text at the caret, cut and copy act on the
+     * current selection, as usual for text components.
+     */
+    private void installDropHandler() {
+        setTransferHandler(new TransferHandler() {
+            @Override
+            public boolean canImport(TransferSupport support) {
+                return support.isDrop() && support.isDataFlavorSupported(DataFlavor.stringFlavor);
+            }
+
+            @Override
+            public boolean importData(TransferSupport support) {
+                if (!canImport(support)) {
+                    return false;
+                }
+                try {
+                    var data = (String) support.getTransferable()
+                            .getTransferData(DataFlavor.stringFlavor);
+                    if (data == null || data.isBlank()) {
+                        return false;
+                    }
+                    int index =
+                        ((JTextComponent.DropLocation) support.getDropLocation()).getIndex();
+                    insertWrapped(index, data);
+                    return true;
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+
+            // --- clipboard actions (paste / cut / copy) ---
+
+            @Override
+            public boolean importData(JComponent comp, Transferable t) {
+                try {
+                    var data = (String) t.getTransferData(DataFlavor.stringFlavor);
+                    if (data == null) {
+                        return false;
+                    }
+                    replaceSelection(data);
+                    return true;
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+
+            @Override
+            public Transferable createTransferable(JComponent c) {
+                String selection = getSelectedText();
+                return selection == null ? null : new StringSelection(selection);
+            }
+
+            @Override
+            public int getSourceActions(JComponent c) {
+                return COPY_OR_MOVE;
+            }
+
+            @Override
+            public void exportDone(JComponent source, Transferable data, int action) {
+                if (action == MOVE) {
+                    // cut: the exported selection is removed afterwards
+                    replaceSelection("");
+                }
+            }
+        });
+    }
+
+    /** Inserts {@code data} verbatim-wrapped at {@code index}, surrounded by separating spaces. */
+    private void insertWrapped(int index, String data) {
+        var current = getText();
+        boolean spaceBefore = index > 0 && !Character.isWhitespace(current.charAt(index - 1));
+        boolean spaceAfter = index < current.length()
+                && !Character.isWhitespace(current.charAt(index));
+        var wrapped = (spaceBefore ? " " : "") + verbatim(data) + (spaceAfter ? " " : "");
+        try {
+            getDocument().insertString(index, wrapped, null);
+            setCaretPosition(index + wrapped.length());
+        } catch (BadLocationException e) {
+            getToolkit().beep();
+        }
+    }
+
+    // -------------------------------------------------------------------------- highlighting
+
+    /**
+     * Re-highlights the {@code ```key} fences (scheduled; never during a document notification).
+     */
+    private void scheduleHighlight() {
+        if (highlighter == null || highlightScheduled) {
+            return;
+        }
+        highlightScheduled = true;
+        SwingUtilities.invokeLater(() -> {
+            highlightScheduled = false;
+            applyHighlight();
+        });
+    }
+
+    private void applyHighlight() {
+        var highlighter = this.highlighter;
+        if (highlighter == null) {
+            return;
+        }
+        try {
+            var document = (DefaultStyledDocument) getDocument();
+            // reset the whole document to the plain default style first, so that typed text does
+            // not keep the token colors of its neighborhood, then re-apply the token styles
+            document.setCharacterAttributes(0, document.getLength(), defaultAttributes(), true);
+            highlighter.highlightPaneMarkdown(this);
+        } catch (RuntimeException e) {
+            // highlighting is best-effort
+        }
+    }
+
+    /** The plain attributes matching this component's default font and foreground. */
+    private MutableAttributeSet defaultAttributes() {
+        var font = getFont();
+        var set = new SimpleAttributeSet();
+        StyleConstants.setFontFamily(set, font.getFamily());
+        StyleConstants.setFontSize(set, font.getSize());
+        StyleConstants.setForeground(set, getForeground());
+        StyleConstants.setBold(set, false);
+        StyleConstants.setItalic(set, false);
+        return set;
+    }
+
+    // ------------------------------------------------------------------------ completions
 
     /**
      * The {@code $token}, {@code @file} or {@code /directive} fragment directly before the caret
@@ -247,6 +442,7 @@ public class AutocompleteInput extends JTextArea {
             list.setSelectedIndex(0);
         }
         positionPopup(state.caretOffset());
+        sizePopupToContent();
         popup.setVisible(true);
     }
 
@@ -254,24 +450,32 @@ public class AutocompleteInput extends JTextArea {
     }
 
     private CompletionState gather() {
+        if (completionStart < 0) {
+            return new CompletionState(-1, List.of());
+        }
         try {
             int caret = getCaretPosition();
-            int line = getLineOfOffset(caret);
-            int lineStart = getLineStartOffset(line);
-            String prefix = getText(lineStart, caret - lineStart);
+            String text = getText();
+            int lineStart = lineStartOf(text, caret);
+            String prefix = text.substring(lineStart, caret);
             // the word behind the trigger
             String word = prefix.substring(completionStart - lineStart + 1);
             var suggestions = suggestionsFor(activeTrigger, word);
             return new CompletionState(caret, suggestions);
-        } catch (BadLocationException e) {
+        } catch (RuntimeException e) {
             return new CompletionState(-1, List.of());
         }
+    }
+
+    /** The offset of the first character of the line containing {@code offset}. */
+    private static int lineStartOf(String text, int offset) {
+        return text.lastIndexOf('\n', offset - 1) + 1;
     }
 
     /**
      * Finds the trigger character that starts a completion at (or directly before) the caret, and
      * remembers its offset. A trigger only counts if the text between it and the caret is a
-     * plausible word for the given trigger (letters, digits, '_' and '.').
+     * plausible word for the given trigger (letters, digits, '_', '.', ':' and, for paths, '/').
      */
     private void computeCompletion() {
         completionStart = -1;
@@ -313,8 +517,11 @@ public class AutocompleteInput extends JTextArea {
     }
 
     private static boolean isWordChar(char c) {
-        return Character.isLetterOrDigit(c) || c == '_' || c == '-' || c == '.' || c == ':';
+        return Character.isLetterOrDigit(c) || c == '_' || c == '-' || c == '.' || c == ':'
+                || c == '/';
     }
+
+    // --------------------------------------------------------------------------- popup
 
     private void positionPopup(int caretOffset) {
         try {
@@ -325,6 +532,27 @@ public class AutocompleteInput extends JTextArea {
         } catch (Exception e) {
             popup.setVisible(false);
         }
+    }
+
+    /**
+     * Sizes the popup so that the entries fit without wrapping: the width follows the widest
+     * entry, but never falls below the width of the input box (or the last user-chosen width);
+     * the height follows the entries up to {@link #MAX_AUTO_POPUP_HEIGHT}. Both are capped at the
+     * screen bounds.
+     */
+    private void sizePopupToContent() {
+        var content = list.getPreferredSize();
+        var grip = resizeGrip.getPreferredSize();
+        int width = Math.max(content.width + POPUP_MARGIN, Math.max(getWidth(), userPopupWidth));
+        int height = Math.max(userPopupHeight,
+            Math.min(content.height, MAX_AUTO_POPUP_HEIGHT) + grip.height + 4);
+        Rectangle screen = getGraphicsConfiguration() != null
+                ? getGraphicsConfiguration().getBounds()
+                : new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+        Point loc = popup.getLocation();
+        width = Math.min(width, screen.x + screen.width - loc.x - 8);
+        height = Math.min(height, screen.y + screen.height - loc.y - 8);
+        popup.setSize(Math.max(MIN_POPUP_WIDTH, width), Math.max(MIN_POPUP_HEIGHT, height));
     }
 
     private void moveSelection(int delta) {
@@ -387,8 +615,9 @@ public class AutocompleteInput extends JTextArea {
                     }
                     int dx = e.getLocationOnScreen().x - pressPoint.x;
                     int dy = e.getLocationOnScreen().y - pressPoint.y;
-                    popup.setSize(Math.max(MIN_POPUP_WIDTH, sizeAtPress.width + dx),
-                        Math.max(MIN_POPUP_HEIGHT, sizeAtPress.height + dy));
+                    userPopupWidth = Math.max(MIN_POPUP_WIDTH, sizeAtPress.width + dx);
+                    userPopupHeight = Math.max(MIN_POPUP_HEIGHT, sizeAtPress.height + dy);
+                    popup.setSize(userPopupWidth, userPopupHeight);
                 }
             });
         }
