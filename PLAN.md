@@ -238,9 +238,11 @@ Fixtures: `key.core/src/test/resources/de/uka/ilkd/key/speclang/` (incl.
    `JmlMarkerDecision`/`JmlMarkerDecisionTest`.
 2. Attached-JML carrier: single `attachedJml` list of `ast.jml` nodes vs.
    typed slots per declaration kind.
-3. `merge_point`: JMLtk only parses the raw-Java `merge_point ( expr );`
-   (`ast.key.KeyMergePointStmt`); KeY writes `//@ merge_point …`. Decide:
-   jmltk grammar change, or KeY-side normalization of the comment text.
+3. `merge_point`: JMLtk parses only the raw-Java `merge_point ( expr );`
+   (`ast.key.KeyMergePointStmt`); KeY files author it as `//@ merge_point …`.
+   Resolution: `JP2KeYConverter` translates `KeyMergePointStmt` back into the
+   KeY merge-point statement (`//@ merge_point` form) — comment-form
+   incompatibility neutralized on the KeY side.
 4. Assert labels + proof scripts: JMLtk supports only JML-standard prefix
    labels (`//@ L1: assert e;`), not KeY's `assert LAB: e`, and has no
    `BY …` assertion-proof syntax. **Deferred: upstream JMLtk grammar support
