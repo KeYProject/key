@@ -1222,7 +1222,7 @@ public abstract class WellDefinednessCheck implements Contract {
 
     @Override
     public final ProofOblInput getProofObl(Services services) {
-        return services.getSpecificationRepository().getPO(this);
+        return services.getProofRegistry().getPO(this);
     }
 
     @Override

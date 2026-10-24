@@ -445,7 +445,7 @@ public final class ProofManagementDialog extends JDialog {
         // will the contracts here always be atomic?
         // it seems that way, but not completely sure
         ImmutableSet<Proof> proofs =
-            initConfig.getServices().getSpecificationRepository().getProofs(contract);
+            initConfig.getServices().getProofRegistry().getProofs(contract);
         // no proofs?
         if (proofs.isEmpty()) {
             return null;
@@ -494,7 +494,7 @@ public final class ProofManagementDialog extends JDialog {
         startedProof = true;
         // starting another proof will not execute the ProblemLoader again,
         // so we have to activate the UI here
-        if (initConfig.getServices().getSpecificationRepository().getAllProofs().size() > 1) {
+        if (initConfig.getServices().getProofRegistry().getAllProofs().size() > 1) {
             mediator.startInterface(true);
         }
     }
@@ -619,7 +619,7 @@ public final class ProofManagementDialog extends JDialog {
 
         // proof list
         DefaultListModel<ProofWrapper> model = new DefaultListModel<>();
-        for (Proof p : specRepos.getAllProofs()) {
+        for (Proof p : services.getProofRegistry().getAllProofs()) {
             model.add(0, new ProofWrapper(p));
         }
         boolean changed;

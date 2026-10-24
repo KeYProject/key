@@ -1427,7 +1427,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
     @Override
     public ProofOblInput getProofObl(Services services) {
-        return services.getSpecificationRepository().getPO(this);
+        return services.getProofRegistry().getPO(this);
     }
 
     @Override

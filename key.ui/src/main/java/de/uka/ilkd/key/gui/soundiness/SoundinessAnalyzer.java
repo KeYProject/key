@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.GeneralSettings;
@@ -295,14 +294,13 @@ public final class SoundinessAnalyzer {
         List<Contract> open = new ArrayList<>();
         ImmutableSet<Contract> dependencies = proof.mgt().getUsedContracts();
 
-        // for each dependency try to find a proof (in the same environment/specRepo)
-        // Careful: Environment is modeled via SpecificationRepository, not via proof.getEnv()!
+        // for each dependency try to find a proof (in the same environment/services)
+        // Careful: the proof↔PO registry is on Services, not on proof.getEnv()!
         // Set<ProofAggregate> envProofs = proof.getEnv().getProofs();
         Services srv = proof.getServices();
-        SpecificationRepository specRepo = srv.getSpecificationRepository();
 
         for (Contract dep : dependencies) {
-            List<Proof> prfs = specRepo.getProofs(dep).stream().toList();
+            List<Proof> prfs = srv.getProofRegistry().getProofs(dep).stream().toList();
             boolean allClosed = prfs.stream().allMatch(pr -> pr.mgt().getStatus() == CLOSED);
             if (!prfs.isEmpty() && allClosed) {
                 closed.add(dep);

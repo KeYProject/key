@@ -609,7 +609,7 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
 
         // prepare cut formula
         final ContractPO po =
-            services.getSpecificationRepository().getContractPOForProof(goal.proof());
+            services.getProofRegistry().getContractPOForProof(goal.proof());
         final JTerm mbyOk;
         if (po != null && /* po.getMbyAtPre() != null && */ mby != null) {
             // mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),

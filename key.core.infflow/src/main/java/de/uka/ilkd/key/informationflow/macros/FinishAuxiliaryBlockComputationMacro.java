@@ -37,7 +37,7 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
             PosInOccurrence posInOcc) {
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
-                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+                proof.getServices().getProofRegistry().getProofOblInput(proof);
             if (poForProof instanceof BlockExecutionPO) {
                 final Goal initiatingGoal = ((BlockExecutionPO) poForProof).getInitiatingGoal();
                 if (initiatingGoal.node().parent() != null) {
@@ -55,7 +55,7 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
         assert canApplyTo(proof, goals, posInOcc);
 
         final ProofOblInput poForProof =
-            proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+            proof.getServices().getProofRegistry().getProofOblInput(proof);
 
         // must be BlockExecutionPO otherwise canApplyTo would not have been true
         // and we assume that before calling this method, the applicability of the macro was checked

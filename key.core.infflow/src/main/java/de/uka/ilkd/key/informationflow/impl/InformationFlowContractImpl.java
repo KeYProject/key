@@ -402,7 +402,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     @Override
     public ProofOblInput getProofObl(Services services) {
-        return services.getSpecificationRepository().getPO(this);
+        return services.getProofRegistry().getPO(this);
     }
 
     @Override

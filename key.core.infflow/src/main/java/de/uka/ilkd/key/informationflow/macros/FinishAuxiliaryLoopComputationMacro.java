@@ -33,7 +33,7 @@ public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliary
             PosInOccurrence posInOcc) {
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
-                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+                proof.getServices().getProofRegistry().getProofOblInput(proof);
 
             if (poForProof instanceof LoopInvExecutionPO) {
                 final Node parentOfInitiatingGoal =
@@ -50,7 +50,7 @@ public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliary
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final Proof proof,
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener) {
         final ProofOblInput poForProof =
-            proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+            proof.getServices().getProofRegistry().getProofOblInput(proof);
         final LoopInvExecutionPO loopInvExecPO = (LoopInvExecutionPO) poForProof;
 
         final Goal initiatingGoal = loopInvExecPO.getInitiatingGoal();
