@@ -7,12 +7,12 @@ package de.uka.ilkd.key.java.ast.statement;
 import de.uka.ilkd.key.java.ast.LoopInitializer;
 import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 public interface ILoopInit extends NonTerminalProgramElement {
 
     int size();
 
-    ImmutableArray<LoopInitializer> getInits();
+    ImmutableList<LoopInitializer> getInits();
 
 }
