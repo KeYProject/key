@@ -31,6 +31,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A statement indicating a merge point.
@@ -44,7 +45,7 @@ public class MergePointStatement extends JavaStatement
     // Those are used for JML to JavaDL conversions
     protected final IProgramVariable identifier;
 
-    private final TextualJMLMergePointDecl context;
+    private final @Nullable TextualJMLMergePointDecl context;
 
     @Override
     public ImmutableList<TextualJMLConstruct> getAttachedJml() {
@@ -52,7 +53,8 @@ public class MergePointStatement extends JavaStatement
     }
 
     public MergePointStatement(
-            PositionInfo pi, List<Comment> c, TextualJMLMergePointDecl context,
+            @Nullable PositionInfo pi, @Nullable List<Comment> c,
+            @Nullable TextualJMLMergePointDecl context,
             IProgramVariable identifier) {
         super(pi, c);
         this.identifier = identifier;
@@ -70,7 +72,7 @@ public class MergePointStatement extends JavaStatement
         this.context = null;
     }
 
-    public TextualJMLMergePointDecl getContext() {
+    public @Nullable TextualJMLMergePointDecl getContext() {
         return context;
     }
 

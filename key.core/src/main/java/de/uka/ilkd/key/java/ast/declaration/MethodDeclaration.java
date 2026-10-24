@@ -42,7 +42,7 @@ public class MethodDeclaration extends JavaDeclaration
     /**
      * In case of void return type: comments associated with the method.
      */
-    protected final @Nullable Comment[] voidComments;
+    protected final Comment @Nullable [] voidComments;
     /**
      * The name of the method.
      */
@@ -94,8 +94,8 @@ public class MethodDeclaration extends JavaDeclaration
     public MethodDeclaration(
             PositionInfo pi, List<Comment> comments,
             ImmutableArray<Modifier> modArray,
-            TypeReference returnType,
-            Comment[] voidComments, ProgramElementName name,
+            @Nullable TypeReference returnType,
+            Comment @Nullable [] voidComments, ProgramElementName name,
             ImmutableArray<ParameterDeclaration> parameters, Throws exceptions,
             StatementBlock body, boolean parentIsInterfaceDeclaration,
             ImmutableList<TextualJMLConstruct> attachedJml) {
@@ -127,7 +127,7 @@ public class MethodDeclaration extends JavaDeclaration
      *        in case of void return type: comments associated with the method
      */
     public MethodDeclaration(ExtList children, boolean parentIsInterfaceDeclaration,
-            Comment[] voidComments) {
+            Comment @Nullable [] voidComments) {
         super(children);
         returnType = Objects.requireNonNull(children.get(TypeReference.class),
             "a method declaration requires a return type");
@@ -164,7 +164,7 @@ public class MethodDeclaration extends JavaDeclaration
      */
     public MethodDeclaration(
             Modifier[] modifiers,
-            TypeReference returnType,
+            @Nullable TypeReference returnType,
             ProgramElementName name,
             ParameterDeclaration[] parameters,
             Throws exceptions,
@@ -201,7 +201,7 @@ public class MethodDeclaration extends JavaDeclaration
      */
     public MethodDeclaration(
             Modifier[] modifiers,
-            TypeReference returnType,
+            @Nullable TypeReference returnType,
             ProgramElementName name,
             ImmutableArray<ParameterDeclaration> parameters,
             Throws exceptions,
@@ -357,7 +357,7 @@ public class MethodDeclaration extends JavaDeclaration
      *
      * @return the "void comments"
      */
-    public @Nullable Comment[] getVoidComments() {
+    public Comment @Nullable [] getVoidComments() {
         return voidComments;
     }
 

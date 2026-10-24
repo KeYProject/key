@@ -16,6 +16,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Super constructor reference.
@@ -29,7 +30,7 @@ public class SuperConstructorReference extends SpecialConstructorReference
      * Access path to enclosing class. As KeY normalises inner classes this should be always null
      * and may be removed in future
      */
-    protected final ReferencePrefix prefix;
+    protected final @Nullable ReferencePrefix prefix;
 
 
 
@@ -121,7 +122,7 @@ public class SuperConstructorReference extends SpecialConstructorReference
 
 
     @Override
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return prefix;
     }
 

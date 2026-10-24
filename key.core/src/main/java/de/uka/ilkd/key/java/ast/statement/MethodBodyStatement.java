@@ -178,8 +178,10 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         if (method == null) {
             resolveMethod(services);
         }
-        return Objects.requireNonNull(method, "method body statement did not resolve its method")
-                .getBody();
+        return Objects.requireNonNull(
+            Objects.requireNonNull(method, "method body statement did not resolve its method")
+                    .getBody(),
+            "method body statement resolved a method without a body");
     }
 
     /**
@@ -267,7 +269,8 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     }
 
     public KeYJavaType getBodySource() {
-        return bodySource.getKeYJavaType();
+        return Objects.requireNonNull(bodySource.getKeYJavaType(),
+            "body source type reference must resolve to a KeYJavaType");
     }
 
     public TypeReference getBodySourceAsTypeReference() {
@@ -283,7 +286,9 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     }
 
     private void resolveMethod(Services services) {
-        method = services.getJavaInfo().getProgramMethod(getBodySource(), methodReference.getName(),
+        method = services.getJavaInfo().getProgramMethod(getBodySource(),
+            Objects.requireNonNull(methodReference.getName(),
+                "method body statement needs a named method reference"),
             services.getJavaInfo().createSignature(methodReference.getArguments()),
             getBodySource());
     }

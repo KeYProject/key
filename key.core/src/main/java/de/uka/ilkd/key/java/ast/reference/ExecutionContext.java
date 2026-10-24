@@ -18,6 +18,7 @@
 package de.uka.ilkd.key.java.ast.reference;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -44,7 +45,7 @@ public class ExecutionContext
     private final @Nullable IProgramMethod methodContext;
 
     public ExecutionContext(
-            PositionInfo pi, List<Comment> comments, TypeReference classContext,
+            @Nullable PositionInfo pi, @Nullable List<Comment> comments, TypeReference classContext,
             @Nullable ReferencePrefix runtimeInstance, @Nullable IProgramMethod methodContext) {
         super(pi, comments);
         this.classContext = classContext;
@@ -78,7 +79,8 @@ public class ExecutionContext
      */
     public ExecutionContext(ExtList children) {
         super(children);
-        this.classContext = children.get(TypeReference.class);
+        this.classContext = Objects.requireNonNull(children.get(TypeReference.class),
+            "missing class context");
         children.remove(this.classContext);
         this.methodContext = children.get(IProgramMethod.class);
         this.runtimeInstance = children.get(ReferencePrefix.class);

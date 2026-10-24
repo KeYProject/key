@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -243,10 +244,16 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                 this.io = io;
             }
 
+            // The ANTLR-generated JmlParserBaseVisitor declares visitProofCmd as returning its
+            // unbound type parameter T (here Void). Void has no non-null value, so the generated
+            // superclass cannot even be implemented for T = Void without returning null; the
+            // override honestly declares its @Nullable result.
+            @SuppressWarnings("NullAway")
             @Override
             public @Nullable Void visitProofCmd(JmlParser.ProofCmdContext ctx) {
                 if (ctx.obtain != null) {
-                    KeYJavaType type = io.translateType(ctx.typespec());
+                    KeYJavaType type = Objects.requireNonNull(io.translateType(ctx.typespec()),
+                        "an obtain command requires a resolvable type");
                     ProgramElementName name = new ProgramElementName(ctx.var.getText());
                     collectedVars = collectedVars.prepend(new LocationVariable(name, type, true));
                 }
@@ -257,6 +264,10 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         private static class TermCollectionVisitor extends JmlParserBaseVisitor<Void> {
             private ImmutableList<JmlParser.ExpressionContext> collectedTerms = ImmutableList.of();
 
+            // Same generated-superclass constraint as visitProofCmd above: the ANTLR-generated
+            // JmlParserBaseVisitor declares visitExpression to return the unbound type parameter T,
+            // which has no non-null value when instantiated with Void.
+            @SuppressWarnings("NullAway")
             @Override
             public @Nullable Void visitExpression(JmlParser.ExpressionContext ctx) {
                 collectedTerms = collectedTerms.prepend(ctx);
@@ -264,7 +275,9 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             }
         }
 
-        private ImmutableList<LocationVariable> obtainedProgramVars;
+        // Lazily filled cache of the program variables obtained by \obtain commands; null until
+        // getObtainedProgramVars() runs the visitor for the first time.
+        private @Nullable ImmutableList<LocationVariable> obtainedProgramVars;
 
         public JMLProofScript(JmlParser.@NonNull AssertionProofContext ctx) {
             super(ctx);
@@ -411,7 +424,9 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                 String v = ParsingFacade.getValueDocumentation(value);
                 var location = Location.fromToken(ctx.start);
                 var keyFile = Paths.get(location.fileUri());
-                return keyFile.getParent().resolve(v);
+                final Path parent = Objects.requireNonNull(keyFile.getParent(),
+                    "expected a key file with a parent directory");
+                return parent.resolve(v);
             } catch (NullPointerException | IndexOutOfBoundsException e) {
                 {
                     return null;
@@ -420,8 +435,15 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         }
 
         /// Prints the definitions, independent of paths, to the given {@link PrintWriter}.
+        // The ANTLR-generated JavaKeYParserBaseVisitor<T> declares T without a @Nullable upper
+        // bound, so the null-returning print-only overrides below cannot be typed honestly without
+        // editing the generated superclass: the visitor is instantiated with the raw upper bound
+        // Object, and the @Nullable return types of the overrides (they never produce a result)
+        // necessarily conflict with the generated T = Object signatures. The check is scoped to
+        // this method.
+        @SuppressWarnings("NullAway")
         public void printDefinitions(PrintWriter out) {
-            ctx.accept(new JavaKeYParserBaseVisitor<@Nullable Object>() {
+            ctx.accept(new JavaKeYParserBaseVisitor<Object>() {
                 @Override
                 public @Nullable Object visitOne_include(JavaKeYParser.One_includeContext ctx) {
                     if (ctx.absfile != null) {

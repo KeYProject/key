@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.expression.operator;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Comment;
@@ -46,7 +47,8 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      */
     protected TypeOperator(ExtList children) {
         super(children);
-        typeReference = children.get(TypeReference.class);
+        typeReference = Objects.requireNonNull(children.get(TypeReference.class),
+            "a type operator requires a type reference");
     }
 
     /**
@@ -59,7 +61,8 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
      */
     protected TypeOperator(ExtList children, PositionInfo pi) {
         super(children);
-        typeReference = children.get(TypeReference.class);
+        typeReference = Objects.requireNonNull(children.get(TypeReference.class),
+            "a type operator requires a type reference");
     }
 
     protected TypeOperator(Expression unaryChild, TypeReference typeref) {
@@ -72,6 +75,10 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
         typeReference = typeref;
     }
 
+    // No TypeOperator subclass calls this constructor; it produces an "empty" operator stub with
+    // no type reference. The {@code typeReference} field stays @NonNull (see
+    // {@link #getTypeReference()}) and is left null here only for this degenerate instance.
+    @SuppressWarnings("NullAway")
     protected TypeOperator() {
         typeReference = null;
     }
@@ -123,7 +130,8 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-        return getTypeReference().getKeYJavaType();
+        return Objects.requireNonNull(getTypeReference().getKeYJavaType(),
+            "KeYJavaType of the type reference");
     }
 
 

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.statement;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -26,8 +28,10 @@ public class CatchAllStatement extends JavaNonTerminalProgramElement
 
     public CatchAllStatement(ExtList children) {
         super(children); // for comments
-        this.body = children.get(StatementBlock.class);
-        this.param = children.get(LocationVariable.class);
+        this.body = Objects.requireNonNull(children.get(StatementBlock.class),
+            "a catch-all statement requires a body");
+        this.param = Objects.requireNonNull(children.get(LocationVariable.class),
+            "a catch-all statement requires a parameter");
     }
 
 

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A model element that carries a name.
@@ -17,6 +18,7 @@ public interface NamedModelElement extends ModelElement {
      *
      * @return the name of the model element.
      */
+    @Nullable
     String getName();
 
 }

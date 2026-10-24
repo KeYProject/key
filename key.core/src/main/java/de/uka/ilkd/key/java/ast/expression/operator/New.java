@@ -22,6 +22,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The object allocation operator. There are two variants for New:
@@ -43,8 +44,8 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
         ReferenceSuffix, TypeDeclarationContainer {
 
 
-    protected final ClassDeclaration anonymousClass;
-    protected final ReferencePrefix accessPath;
+    protected final @Nullable ClassDeclaration anonymousClass;
+    protected final @Nullable ReferencePrefix accessPath;
 
 
     /**
@@ -149,7 +150,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     }
 
 
-    public ClassDeclaration getClassDeclaration() {
+    public @Nullable ClassDeclaration getClassDeclaration() {
         return anonymousClass;
     }
 
@@ -225,7 +226,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
      * @return the reference prefix.
      */
     @Override
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return accessPath;
     }
 
