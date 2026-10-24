@@ -53,7 +53,7 @@ class ScriptLineParser {
     /**
      * the file URL from which the script is taken.
      */
-    private URI fileURI;
+    private @Nullable URI fileURI;
 
     /**
      * While within a string literal, this stores the character with which the string has started.
@@ -87,7 +87,7 @@ class ScriptLineParser {
         }
     }
 
-    public ParsedCommand parseCommand() throws IOException, ScriptException {
+    public @Nullable ParsedCommand parseCommand() throws IOException, ScriptException {
         Map<String, String> result = new HashMap<>();
 
         StringBuilder cmdBuilder = new StringBuilder();

@@ -6,6 +6,9 @@ package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.proof.Node;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * Iterates reverse preorder over the whole tree starting at a given {@link Node}.
@@ -23,11 +26,12 @@ import de.uka.ilkd.key.proof.Node;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class SearchNodePreorderIterator {
     /**
      * The next element or {@code null} if no more elements exists.
      */
-    private Node next;
+    private @Nullable Node next;
 
     /**
      * Constructor.
@@ -52,7 +56,7 @@ public class SearchNodePreorderIterator {
      *
      * @return The next {@link Node}.
      */
-    public Node next() {
+    public @Nullable Node next() {
         Node oldNext = next;
         updateNext();
         return oldNext;

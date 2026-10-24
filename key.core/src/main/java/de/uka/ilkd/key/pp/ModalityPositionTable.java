@@ -5,18 +5,22 @@
 package de.uka.ilkd.key.pp;
 
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This is a position table for program modality formulae. In addition to the usual tables, it can
  * store a range of character positions for the first statement in the Java block.
  */
 
+@NullMarked
 public class ModalityPositionTable extends PositionTable {
 
     public ModalityPositionTable(int rows) {
         super(rows);
     }
 
-    private Range firstStatementRange = null;
+    private @Nullable Range firstStatementRange = null;
 
 
     public void setFirstStatementRange(Range r) {

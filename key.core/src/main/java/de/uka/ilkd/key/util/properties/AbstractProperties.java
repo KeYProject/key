@@ -10,6 +10,10 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public abstract class AbstractProperties implements Properties {
 
     private final Map<Property<?>, Set<PropertyListener>> listenerMap =
@@ -19,7 +23,7 @@ public abstract class AbstractProperties implements Properties {
         new HashSet<>();
 
     @Override
-    public void addPropertyListener(Property<?> property, PropertyListener listener) {
+    public void addPropertyListener(@Nullable Property<?> property, PropertyListener listener) {
         if (property == null) {
             globalListeners.add(listener);
         } else {
@@ -30,7 +34,7 @@ public abstract class AbstractProperties implements Properties {
     }
 
     @Override
-    public void removePropertyListener(Property<?> property, PropertyListener listener) {
+    public void removePropertyListener(@Nullable Property<?> property, PropertyListener listener) {
         if (property == null) {
             globalListeners.remove(listener);
         } else {
@@ -49,7 +53,8 @@ public abstract class AbstractProperties implements Properties {
         }
     }
 
-    protected <T> void firePropertyChange(Property<T> property, T oldValue, T newValue) {
+    protected <T> void firePropertyChange(Property<T> property, @Nullable T oldValue,
+            @Nullable T newValue) {
         if (oldValue == null || !oldValue.equals(newValue)) {
             Set<PropertyListener> list = listenerMap.get(property);
             if (list != null) {

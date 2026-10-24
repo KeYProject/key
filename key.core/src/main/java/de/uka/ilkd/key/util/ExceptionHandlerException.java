@@ -5,8 +5,11 @@
 package de.uka.ilkd.key.util;
 
 
+import org.jspecify.annotations.NullMarked;
+
 /** This Exception is only thrown by the ExceptionHandler */
 
+@NullMarked
 public class ExceptionHandlerException extends RuntimeException {
 
     /**

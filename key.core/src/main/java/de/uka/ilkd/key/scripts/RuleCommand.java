@@ -91,7 +91,7 @@ public class RuleCommand extends AbstractCommand {
         g.apply(theApp);
     }
 
-    private RuleApp makeRuleApp(Parameters p, EngineState state)
+    private @Nullable RuleApp makeRuleApp(Parameters p, EngineState state)
             throws ScriptException {
 
         final Proof proof = state.getProof();
@@ -138,7 +138,7 @@ public class RuleCommand extends AbstractCommand {
         }
     }
 
-    private TacletApp instantiateTacletApp(final Parameters p, final EngineState state,
+    private @Nullable TacletApp instantiateTacletApp(final Parameters p, final EngineState state,
             final Proof proof, final TacletApp theApp) throws ScriptException {
         TacletApp result = theApp;
 

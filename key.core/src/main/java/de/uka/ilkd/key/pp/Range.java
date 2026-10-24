@@ -4,9 +4,13 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.pp;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A class specifying a range of integer numbers e.g. character positions.
  */
+@NullMarked
 public class Range {
     int start = -1;
     int end = -1;
@@ -71,7 +75,7 @@ public class Range {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         }

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.proof.Node;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -25,6 +26,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class NodePreorderIterator {
     /**
      * The element at that the iteration has started used as end condition to make sure that only

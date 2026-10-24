@@ -10,6 +10,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.proof.Node;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,12 +24,13 @@ public class ScriptNode {
     private final Map<String, String> command;
     private final int fromPos;
     private final int toPos;
-    private final ScriptNode parent;
+    private final @Nullable ScriptNode parent;
     private final List<ScriptNode> children = new LinkedList<>();
-    private Node proofNode;
-    private Throwable encounteredException;
+    private @Nullable Node proofNode;
+    private @Nullable Throwable encounteredException;
 
-    public ScriptNode(ScriptNode parent, Map<String, String> command, int fromPos, int toPos) {
+    public ScriptNode(@Nullable ScriptNode parent, Map<String, String> command, int fromPos,
+            int toPos) {
         this.parent = parent;
         this.command = command;
         this.fromPos = fromPos;
@@ -51,7 +53,7 @@ public class ScriptNode {
         return command;
     }
 
-    public Node getProofNode() {
+    public @Nullable Node getProofNode() {
         return proofNode;
     }
 
@@ -75,7 +77,7 @@ public class ScriptNode {
         children.clear();
     }
 
-    public Throwable getEncounteredException() {
+    public @Nullable Throwable getEncounteredException() {
         return encounteredException;
     }
 
@@ -83,7 +85,7 @@ public class ScriptNode {
         this.encounteredException = encounteredException;
     }
 
-    public ScriptNode getParent() {
+    public @Nullable ScriptNode getParent() {
         return parent;
     }
 

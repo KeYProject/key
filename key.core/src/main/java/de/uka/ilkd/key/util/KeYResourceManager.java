@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
  * KeYResourceManager controls the access to the properties and resources used in the KeY system.
  * Use the static method getManager to get the unique instance.
  */
+@NullMarked
 public class KeYResourceManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeYResourceManager.class);
 
@@ -37,9 +39,9 @@ public class KeYResourceManager {
     private static final KeYResourceManager instance = new KeYResourceManager();
 
 
-    private String version = null;
-    private String sha1 = null;
-    private String branch = null;
+    private @Nullable String version = null;
+    private @Nullable String sha1 = null;
+    private @Nullable String branch = null;
 
     private KeYResourceManager() {}
 
@@ -54,7 +56,7 @@ public class KeYResourceManager {
     /**
      * reads a version string or returns "x.z.y" in case of failures
      */
-    private String readVersionString(URL url) {
+    private String readVersionString(@Nullable URL url) {
         StringBuilder result = new StringBuilder();
         if (url != null) {
             try (InputStream io = new BufferedInputStream(url.openStream())) {
