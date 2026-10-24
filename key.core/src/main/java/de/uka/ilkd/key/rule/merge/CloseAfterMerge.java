@@ -37,7 +37,6 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -203,7 +202,7 @@ public class CloseAfterMerge implements BuiltInRule {
 
         final Function predicateSymb =
             new JFunction(predicateSymbName, JavaDLTheory.FORMULA,
-                new ImmutableArray<>(argSorts));
+                ImmutableList.fromList(argSorts));
 
         final Goal mergedGoal =
             services.getProof().getOpenGoal(closeApp.getMergeState().getCorrespondingNode());
