@@ -25,7 +25,6 @@ import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
@@ -479,7 +478,7 @@ public class TermLabelManager {
             PosInOccurrence applicationPosInOccurrence, Rule rule,
             RuleApp ruleApp, Goal goal,
             Object hint, JTerm tacletTerm, JTerm newTerm) {
-        ImmutableArray<TermLabel> newLabels = instantiateLabels(state, services, applicationTerm,
+        ImmutableList<TermLabel> newLabels = instantiateLabels(state, services, applicationTerm,
             applicationPosInOccurrence, rule, ruleApp, goal, hint, tacletTerm, newTerm);
         JTerm newlyLabeledTerm = services.getTermBuilder().addLabel(newTerm, newLabels);
         return refactorTerm(state, services, applicationPosInOccurrence, newlyLabeledTerm, goal,
@@ -514,7 +513,7 @@ public class TermLabelManager {
      * @param newTerm the template for the new {@link JTerm} to create
      * @return The {@link TermLabel}s to add to the new {@link JTerm} which should be created.
      */
-    public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
+    public static ImmutableList<TermLabel> instantiateLabels(TermLabelState state,
             Services services,
             PosInOccurrence applicationPosInOccurrence, Rule rule,
             RuleApp ruleApp, Goal goal, Object hint, JTerm tacletTerm,
@@ -556,7 +555,7 @@ public class TermLabelManager {
      * @param newTerm the template for the new {@link JTerm} to create
      * @return The {@link TermLabel}s to add to the new {@link JTerm} which should be created.
      */
-    public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
+    public static ImmutableList<TermLabel> instantiateLabels(TermLabelState state,
             Services services, JTerm applicationTerm,
             PosInOccurrence applicationPosInOccurrence,
             Rule rule, RuleApp ruleApp, Goal goal, Object hint,
@@ -566,7 +565,7 @@ public class TermLabelManager {
             return manager.instantiateLabels(state, services, applicationPosInOccurrence,
                 applicationTerm, rule, ruleApp, goal, hint, tacletTerm, newTerm);
         } else {
-            return new ImmutableArray<>();
+            return ImmutableList.of();
         }
     }
 
@@ -660,7 +659,7 @@ public class TermLabelManager {
      * @param newTerm the template for the new {@link JTerm} to create
      * @return The {@link TermLabel}s to add to the new {@link JTerm} which should be created.
      */
-    public ImmutableArray<TermLabel> instantiateLabels(TermLabelState state, Services services,
+    public ImmutableList<TermLabel> instantiateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule,
             RuleApp ruleApp, Goal goal, Object hint, JTerm tacletTerm,
@@ -698,7 +697,7 @@ public class TermLabelManager {
                 modalityTerm, rule, ruleApp, hint, tacletTerm, newTerm, allRulesUpdates, newLabels);
         }
         // Return result
-        return new ImmutableArray<>(newLabels.toArray(new TermLabel[0]));
+        return ImmutableList.of(newLabels.toArray(new TermLabel[0]));
     }
 
     /**
@@ -1349,7 +1348,7 @@ public class TermLabelManager {
                 pio = pio.up();
                 JTerm newChild = newTerm;
                 newTerm = (JTerm) pio.subTerm();
-                ImmutableArray<TermLabel> newLabels;
+                ImmutableList<TermLabel> newLabels;
                 if (!parentRefactorings.isEmpty()) {
                     newLabels = performRefactoring(state, services, applicationPosInOccurrence,
                         applicationTerm, rule, goal, hint, tacletTerm, newTerm, parentRefactorings);
@@ -1358,7 +1357,7 @@ public class TermLabelManager {
                 }
                 JTerm[] newSubs = newTerm.subs().toArray(new JTerm[newTerm.arity()]);
                 newSubs[childIndex] = newChild;
-                ImmutableArray<JTerm> newSubsImmutable = new ImmutableArray<>(newSubs);
+                ImmutableList<JTerm> newSubsImmutable = ImmutableList.of(newSubs);
 
                 if (!newSubsImmutable.equals(newTerm.subs())
                         || !newLabels.equals(newTerm.getLabels())) {
@@ -1566,7 +1565,7 @@ public class TermLabelManager {
             JTerm[] newSubs = new JTerm[newApplicationTerm.arity()];
             for (int i = 0; i < newSubs.length; i++) {
                 final JTerm sub = newApplicationTerm.sub(i);
-                ImmutableArray<TermLabel> newLabels = performRefactoring(state, services,
+                ImmutableList<TermLabel> newLabels = performRefactoring(state, services,
                     applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm, sub,
                     refactorings.directChildRefactorings());
 
@@ -1616,7 +1615,7 @@ public class TermLabelManager {
         if (!refactorings.belowUpdatesRefactorings().isEmpty()) {
             Pair<ImmutableList<JTerm>, JTerm> pair =
                 TermBuilder.goBelowUpdates2(newApplicationTerm);
-            ImmutableArray<TermLabel> newLabels = performRefactoring(state, services,
+            ImmutableList<TermLabel> newLabels = performRefactoring(state, services,
                 applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm,
                 pair.second, refactorings.belowUpdatesRefactorings());
             if (newLabels != pair.second.getLabels()) {
@@ -1795,7 +1794,7 @@ public class TermLabelManager {
                 subsChanged = true;
             }
         }
-        ImmutableArray<TermLabel> newLabels =
+        ImmutableList<TermLabel> newLabels =
             performRefactoring(state, services, applicationPosInOccurrence, applicationTerm, rule,
                 goal, hint, tacletTerm, term, activeRefactorings);
         return subsChanged || newLabels != term.getLabels() ? services.getTermFactory()
@@ -1822,7 +1821,7 @@ public class TermLabelManager {
      * @param activeRefactorings The active {@link TermLabelRefactoring}s to execute.
      * @return The new {@link TermLabel} which should be used for the given {@link JTerm}.
      */
-    protected ImmutableArray<TermLabel> performRefactoring(TermLabelState state, Services services,
+    protected ImmutableList<TermLabel> performRefactoring(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
             Object hint, JTerm tacletTerm, JTerm term,
@@ -1836,7 +1835,7 @@ public class TermLabelManager {
                 rule, goal, hint, tacletTerm, term, newLabels);
         }
         if (newLabels.isModified()) {
-            return new ImmutableArray<>(newLabels.getLabels());
+            return ImmutableList.fromList(newLabels.getLabels());
         } else {
             return term.getLabels();
         }
@@ -2123,7 +2122,7 @@ public class TermLabelManager {
                 if (labelsChanged) {
                     JTerm newTerm = services.getTermFactory().createTerm(existingTerm.op(),
                         existingTerm.subs(), existingTerm.boundVars(),
-                        new ImmutableArray<>(mergedLabels));
+                        ImmutableList.fromList(mergedLabels));
                     SequentChangeInfo sci =
                         currentSequent.sequent().changeFormula(new SequentFormula(newTerm),
                             new PosInOccurrence(existingSF, PosInTerm.getTopLevel(), inAntecedent));
@@ -2163,7 +2162,7 @@ public class TermLabelManager {
         // rebuilt the whole term tree on every call (stream().map()/filter().collect() per node),
         // which was the single biggest allocator during proof search (~20%) even though the vast
         // majority of subterms have no irrelevant labels and need not change.
-        final ImmutableArray<JTerm> subs = term.subs();
+        final ImmutableList<JTerm> subs = term.subs();
         final int n = subs.size();
         JTerm[] newSubs = null; // allocated lazily, only once a sub actually changes
         for (int i = 0; i < n; i++) {
@@ -2180,8 +2179,8 @@ public class TermLabelManager {
             }
         }
 
-        final ImmutableArray<TermLabel> labels = term.getLabels();
-        ImmutableArray<TermLabel> newLabels = labels;
+        final ImmutableList<TermLabel> labels = term.getLabels();
+        ImmutableList<TermLabel> newLabels = labels;
         if (!labels.isEmpty()) {
             int relevant = 0;
             for (int i = 0, sz = labels.size(); i < sz; i++) {
@@ -2198,7 +2197,7 @@ public class TermLabelManager {
                         kept[k++] = l;
                     }
                 }
-                newLabels = new ImmutableArray<>(kept);
+                newLabels = ImmutableList.of(kept);
             }
         }
 
@@ -2206,7 +2205,7 @@ public class TermLabelManager {
             return term; // no irrelevant label anywhere in this subtree -> no allocation
         }
         return tf.createTerm(term.op(),
-            newSubs == null ? subs : new ImmutableArray<>(newSubs),
+            newSubs == null ? subs : ImmutableList.of(newSubs),
             term.boundVars(), newLabels);
     }
 }
