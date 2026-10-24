@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Meta class reference.
@@ -28,7 +29,7 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
     /**
      * Type reference.
      */
-    protected final TypeReference typeReference;
+    protected final @Nullable TypeReference typeReference;
 
     /**
      * Meta class reference.
@@ -96,7 +97,7 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
      *
      * @return the reference prefix.
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return typeReference;
     }
 
@@ -132,7 +133,7 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
      *
      * @return the type reference.
      */
-    public TypeReference getTypeReference() {
+    public @Nullable TypeReference getTypeReference() {
         return typeReference;
     }
 

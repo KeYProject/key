@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.expression.operator;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -144,7 +145,9 @@ public class Instanceof extends TypeOperator {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
+        return Objects.requireNonNull(
+            javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN),
+            "KeYJavaType of boolean");
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {

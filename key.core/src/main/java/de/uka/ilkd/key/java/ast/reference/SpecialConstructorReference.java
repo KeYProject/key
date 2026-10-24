@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.reference;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
@@ -13,6 +14,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Occurs in a constructor declaration as the first statement as this(...) or super(...) reference.
@@ -25,7 +27,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
 
 
 
-    protected final ImmutableArray<Expression> arguments;
+    protected final @Nullable ImmutableArray<Expression> arguments;
 
 
 
@@ -143,6 +145,6 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      * @return the expression mutable list.
      */
     public ImmutableArray<Expression> getArguments() {
-        return arguments;
+        return Objects.requireNonNull(arguments, "constructor reference has no arguments");
     }
 }

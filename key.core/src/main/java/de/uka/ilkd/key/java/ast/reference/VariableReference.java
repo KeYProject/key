@@ -43,7 +43,7 @@ public class VariableReference extends JavaNonTerminalProgramElement
         this.variable = Objects.requireNonNull(variable);
     }
 
-    public VariableReference(ProgramVariable variable, PositionInfo pi) {
+    public VariableReference(ProgramVariable variable, @Nullable PositionInfo pi) {
         super(pi);
         this.variable = Objects.requireNonNull(variable);
     }
@@ -135,10 +135,10 @@ public class VariableReference extends JavaNonTerminalProgramElement
      */
     public KeYJavaType getKeYJavaType(Services javaServ,
             ExecutionContext ec) {
-        return getKeYJavaType();
+        return Objects.requireNonNull(getKeYJavaType(), "variable has no KeYJavaType");
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ) {
         return getKeYJavaType();
     }
 

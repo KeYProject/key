@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.reference;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -70,7 +71,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     }
 
     public MethodReference(ImmutableArray<Expression> args, MethodName n, ReferencePrefix p,
-            PositionInfo pos) {
+            @Nullable PositionInfo pos) {
         super(pos);
         this.prefix = p;
         name = n;
@@ -305,32 +306,35 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * returns the static KeYJavaType of the methods prefix
      */
     public KeYJavaType determineStaticPrefixType(Services services, ExecutionContext ec) {
-        KeYJavaType prefixType;
+        final KeYJavaType prefixType;
         if (prefix == null) {
-            prefixType = ec.getTypeReference().getKeYJavaType();
+            prefixType = Objects.requireNonNull(ec.getTypeReference().getKeYJavaType(),
+                "no KeYJavaType for the context class");
         } else {
             if (prefix instanceof Expression) {
                 prefixType = ((Expression) prefix).getKeYJavaType(services, ec);
             } else {
-                prefixType = ((TypeReference) prefix).getKeYJavaType();
+                prefixType = Objects.requireNonNull(((TypeReference) prefix).getKeYJavaType(),
+                    "no KeYJavaType for the prefix");
             }
         }
         return prefixType;
     }
 
-    public IProgramMethod method(Services services, KeYJavaType refPrefixType,
+    public @Nullable IProgramMethod method(Services services, KeYJavaType refPrefixType,
             ExecutionContext ec) {
         final String methodName = name.toString();
         var sig = getMethodSignature(services, ec);
+        final KeYJavaType contextType = Objects.requireNonNull(
+            ec.getTypeReference().getKeYJavaType(), "no KeYJavaType in execution context");
         ProgramVariable inst = services.getJavaInfo().getAttribute(
-            PipelineConstants.IMPLICIT_ENCLOSING_THIS, ec.getTypeReference().getKeYJavaType());
+            PipelineConstants.IMPLICIT_ENCLOSING_THIS, contextType);
         IProgramMethod pm =
-            services.getJavaInfo().getProgramMethod(refPrefixType, methodName, sig,
-                ec.getTypeReference().getKeYJavaType());
+            services.getJavaInfo().getProgramMethod(refPrefixType, methodName, sig, contextType);
         while (inst != null && pm == null) {
-            KeYJavaType classType = inst.getKeYJavaType();
-            pm = services.getJavaInfo().getProgramMethod(classType, methodName, sig,
-                ec.getTypeReference().getKeYJavaType());
+            KeYJavaType classType = Objects.requireNonNull(inst.getKeYJavaType(),
+                "no KeYJavaType for the enclosing instance");
+            pm = services.getJavaInfo().getProgramMethod(classType, methodName, sig, contextType);
             if (pm != null) {
                 return pm;
             }
@@ -349,15 +353,16 @@ public class MethodReference extends JavaNonTerminalProgramElement
      *        the IList<KeYJavaType> of the arguments types
      * @return the found program method
      */
-    public IProgramMethod method(Services services, KeYJavaType classType,
+    public @Nullable IProgramMethod method(Services services, KeYJavaType classType,
             ImmutableList<KeYJavaType> signature, KeYJavaType context) {
         final String methodName = name.toString();
         return services.getJavaInfo().getProgramMethod(classType, methodName, signature, context);
     }
 
     public boolean implicit() {
-        return getProgramElementName().toString()
-                .charAt(0) == JavaDLFieldNames.IMPLICIT_NAME_PREFIX;
+        final ProgramElementName peName = Objects.requireNonNull(getProgramElementName(),
+            "method has no program element name");
+        return peName.toString().charAt(0) == JavaDLFieldNames.IMPLICIT_NAME_PREFIX;
     }
 
     public MethodName getMethodName() {
@@ -381,11 +386,11 @@ public class MethodReference extends JavaNonTerminalProgramElement
             throw new IllegalStateException(
                 "Could not determine type for method " + name.toString());
         }
-        return meth.getReturnType();
+        return Objects.requireNonNull(meth.getReturnType(), "method has no return type");
 
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ) {
         return getKeYJavaType();
     }
 
