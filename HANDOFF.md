@@ -6,14 +6,22 @@
 
 ## 1. Where things stand
 
-- **Branch:** `weigl/jmltk-jml` — **HEAD** contains Phases 0–3 (front-end swap,
-  Option-B dead-code sweep, test cleanup/runtime parity), pushed to origin.
+- **Branch:** `weigl/jmltk-jml` — **HEAD** contains Phases 0–4 (front-end swap,
+  Option-B dead-code sweep, test cleanup/runtime parity, and the first two
+  Phase-4 `SpecificationRepository` slices), pushed to origin.
 - **PR:** #3997, retitled *"JMLtk front-end: consume JMLtk's parsed JML AST
   (Phases 0+1)"*, body refreshed.
 - **Feedback loop:** testing is UNLOCKED. The Phase-3 regression slice
   `./gradlew :key.core:test --tests "de.uka.ilkd.key.speclang.*"` is **GREEN**:
   **279 tests, 0 failures, 12 skipped** (2 of them the new `@Disabled`
   specMath loads). `:key.core:compileTestJava`/`:key.ui:compileTestJava` green.
+- **Phase 4 in progress:** `SpecificationRepository` deletion, slice by slice
+  (see PLAN §Phase 4 table; each committed slice keeps compile + speclang slice
+  green). Slices 1–2 DONE (statement specs → AST nodes; limited observers →
+  `LimitedObservers`). A full `:key.core:test` baseline has been measured:
+  **1638 tests, 49 failed, 72 skipped** — but that run was invalidated by a
+  concurrent gradle invocation racing its results binary, so the failure list
+  is being re-collected cleanly (see §7 step 3).
 - **Worktree:** `/home/weigl/.local/share/opencode/worktree/fa2a33/witty-cabin`.
 - **Do NOT touch:** `/home/weigl/work/key` (~216 unstaged deletions from a
   concurrent agent).
@@ -24,7 +32,9 @@
 | `6d174cdadd` | Phase 0 — `JavaParserFactory` enables JMLtk JML processing (`setProcessJml(true)`, JML-keys policy). |
 | `74b68f6f82` | Phase 1 — front-end swap onto the JMLtk AST (see below). |
 | `08cb7a60c8` | Phase 2 (Option B) — delete dead JML front-end code (see §5). |
-| *(next)* | Phase 3 — stale-test cleanup + runtime parity (this commit). |
+| `d9ead21162` | Phase 3 — stale-test cleanup + runtime parity (see §5.1). |
+| `7f369e5c29` | Phase 4 slice 1 — `JmlStatementSpec` attached to `JmlAssert`/`SetStatement` nodes (`JmlSpecCarrier`); repo `statementMap` deleted. |
+| `806c2b1ba6` | Phase 4 slice 2 — limited observers (`limitObs`/`unlimitObs`/`LIMIT_SUFFIX`/taclets) → `de.uka.ilkd.key.util.LimitedObservers`. |
 
 ## 2. What Phase 1 did
 
@@ -213,14 +223,18 @@ Known, still-accepted degradation (unchanged from §4): parametric
 
 ## 7. First actions on resume
 
-1. `git status` should be clean after committing this Phase-3 work.
-2. Decision §5 was taken; Phase 3 (§5.1) is DONE — speclang slice green
-   (279 tests, 0 failures, 12 skipped).
-3. Next chunk: **Phase 4 — delete `SpecificationRepository`** (see PLAN §Phase
-   4 table). Plan: (a) run the current full `:key.core:test` once to enumerate
-   remaining jmltk-incompatible fixtures beyond `speclang.*` (§4 merge param
-   files, possibly more math-mode/inline-modifier fixtures) and fix or record
-   them; (b) work the repository-deletion table row by row (contracts → derived
-   from AST, JML statement specs → attached to nodes, etc.), keeping the
-   speclang slice green after each commit; (c) commit + push regularly.
+1. `git status` clean? (only HANDOFF.md/PLAN.md doc edits may be pending).
+2. Decision §5 was taken; Phase 3 (§5.1) is DONE — speclang slice green.
+3. **Phase 4 status:** slices 1–2 committed + pushed (statement specs →
+   AST nodes; limited observers → `LimitedObservers`). The first full-suite
+   baseline (1638 tests, 49 failed, 72 skipped) was corrupted by a concurrent
+   gradle run racing its results binary — a NEW clean `:key.core:test` run
+   should be running/just finished; triage its failure list: separate
+   pre-existing jmltk-incompatible fixtures (expect `testcase/merge/*`
+   parametric `merge_point`, possibly more) from real regressions, fix or
+   record each, then continue the Phase-4 table row by row (candidates:
+   loop/block/merge specs → AST nodes; proof↔PO registry → proof layer;
+   contract registry → AST/derivation; class axioms → `ClassAxiomComputer`;
+   initially clauses → `JMLSpecFactory`), keeping the speclang slice green
+   after each commit.
 4. Remember: do NOT touch `/home/weigl/work/key`.
