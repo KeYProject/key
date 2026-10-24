@@ -173,7 +173,8 @@ public class AgentLoop {
         var outcome = await(future, p.toolCallId(), p.name(), p.arguments());
         if (observer != null) {
             observer.toolFinished(p.toolCallId(), outcome instanceof AwaitDone done
-                ? done.content() : "[moved to background]");
+                    ? done.content()
+                    : "[moved to background]");
         }
         return switch (outcome) {
             case AwaitDone d -> {
@@ -289,7 +290,8 @@ public class AgentLoop {
 
             var interrupted = processBatch(casts(toolCalls));
             if (interrupted != null) {
-                return interrupted; // NEEDS_INPUT, NEEDS_APPROVAL, PAUSED_FOR_BACKGROUND or cancelled
+                return interrupted; // NEEDS_INPUT, NEEDS_APPROVAL, PAUSED_FOR_BACKGROUND or
+                                    // cancelled
             }
             // the round resolved: commit its messages to the context
             commitRound();
@@ -366,7 +368,8 @@ public class AgentLoop {
             var outcome = await(future, id, name, arguments);
             if (observer != null) {
                 observer.toolFinished(id, outcome instanceof AwaitDone done
-                    ? done.content() : "[moved to background]");
+                        ? done.content()
+                        : "[moved to background]");
             }
             return switch (outcome) {
                 case AwaitDone d -> {
@@ -376,6 +379,38 @@ public class AgentLoop {
                 }
                 case AwaitBackgrounded bg -> new AgentResult.PausedForBackground(bg.jobId(),
                     name, arguments);
+                case AwaitCancelled ignored -> done("(Turn cancelled by the user.)");
+            };
+        }
+
+        if (KeYAgentTools.TOOL_ASK_LLM.equals(name)) {
+            if (!LlmSettings.INSTANCE.getAskLlmEnabled()) {
+                stagedTool(id, "[ask_llm is disabled in the settings]");
+                return null;
+            }
+            var observer = session.getTurnObserver();
+            if (observer != null) {
+                observer.toolStarted(new ToolCallInfo(id, name, arguments));
+            }
+            // a fresh LLM query runs without the dispatch lock: an HTTP round-trip must not stall
+            // parallel sub-agents or other sessions' tool calls (the query never dispatches tools,
+            // so no nested locking is possible)
+            var future = session.getToolDispatcher().submitTask(
+                () -> AskLlmRunner.run(session, completions, arguments));
+            var outcome = await(future, id, name, arguments);
+            if (observer != null) {
+                observer.toolFinished(id, outcome instanceof AwaitDone done
+                        ? done.content()
+                        : "[moved to background]");
+            }
+            return switch (outcome) {
+                case AwaitDone d -> {
+                    stagedTool(id, d.content());
+                    activities.add(new ToolActivity(name, arguments, d.content()));
+                    yield null;
+                }
+                case AwaitBackgrounded bg -> new AgentResult.PausedForBackground(bg.jobId(), name,
+                    arguments);
                 case AwaitCancelled ignored -> done("(Turn cancelled by the user.)");
             };
         }
@@ -394,7 +429,8 @@ public class AgentLoop {
         var outcome = await(future, id, name, arguments);
         if (observer != null) {
             observer.toolFinished(id, outcome instanceof AwaitDone done
-                ? done.content() : "[moved to background]");
+                    ? done.content()
+                    : "[moved to background]");
         }
         return switch (outcome) {
             case AwaitDone d -> {
@@ -449,8 +485,8 @@ public class AgentLoop {
 
     private boolean canBackground(String name) {
         return session.isBackgroundAllowed(name)
-            && session.getBackgroundJobs().canStartMore(
-                LlmSettings.INSTANCE.getMaxBackgroundJobs());
+                && session.getBackgroundJobs().canStartMore(
+                    LlmSettings.INSTANCE.getMaxBackgroundJobs());
     }
 
     /** Registers the running call as a background job and parks this loop on it. */
