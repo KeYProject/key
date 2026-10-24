@@ -161,10 +161,13 @@ allowedTools:         # empty/absent = no restriction
 Pay special attention to integer overflow; check the goal sequent before choosing a rule.
 ```
 
-- Skills are managed in **Settings → LLM Settings → Skills**: a list of the stored skills, with
-  `New`/`Edit`/`Delete` (editing happens in a dialog) and `Export...`/`Import...` to share the
-  whole library as a ZIP archive of its Markdown files (see
-  [section 9](#9-settings-reference-settings--llm-settings)).
+- Skills are managed in **Settings → LLM Settings → Skills**: the stored skills are listed by
+  name and description. `New` only asks for the file name and creates a Markdown template file
+  with prefilled front matter; `Edit` (or a double click) opens the file in your system editor,
+  `Delete` removes the selected skill from the search path and `Reload` picks up external
+  changes. `Export...`/`Import...` share the whole library as a ZIP archive of its Markdown
+  files (see [section 9](#9-settings-reference-settings--llm-settings)). The directories holding
+  the files (the *search path*) are editable right below the list.
 - If a skill restricts `allowedTools`, only those tools are offered to the model while the skill
   is active.
 - The agent itself can activate a skill through the `use_skill` tool — this is **off by default**
@@ -188,8 +191,9 @@ Prove the selected method. Collect $proof and $seq, then try to close the goals.
 
 Templates are inserted from the *Prompts* toolbar button or via `/prompt:name`; markup inside the
 template is resolved like normal input. Prompts are managed in **Settings → LLM Settings →
-Prompts**: a list of the stored prompts with `New`/`Edit`/`Delete` (editing happens in a dialog)
-and `Export...`/`Import...` to share the whole library as a ZIP archive of its Markdown files.
+Prompts** like the skills ([section 5](#5-skills)): `New` creates a template file for the given
+name, `Edit` opens the file in the system editor, `Delete`/`Reload`/`Export...`/`Import...` and
+the editable search path work the same.
 
 ---
 
@@ -512,20 +516,32 @@ background jobs is capped by *Max background jobs* (Agent behavior section).
 Auto-scroll output (`true`) and show tool activity (`true`).
 
 ### Prompts / Skills (sub-panels)
-Editors for the user libraries described in [section 5](#5-skills) and [section 6](#6-prompts):
-the entries are shown as a selectable list (name + description), `New`/`Edit` (or double click)
-open a dialog with the full form and `Delete` removes the selected entry. `Export...` saves the
-whole library as a ZIP archive of its Markdown files (one `<name>.md` per entry), `Import...`
-merges such an archive back in (new entries are added; entries with an existing name are only
-overwritten after you confirm, otherwise they are kept). Changes are saved immediately.
+Lightweight editors for the user libraries described in [section 5](#5-skills) and
+[section 6](#6-prompts): the entries are shown as a selectable list (name + description). `New`
+asks only for the file name and creates a `<name>.md` template with prefilled front matter
+(metadata and a placeholder body), `Edit` (or a double click) opens the file in the system
+editor — with a plain text dialog as fallback when no desktop integration is available — and
+`Delete` removes the selected entry from all search path directories. `Reload` picks up external
+changes. `Export...` saves the whole library as a ZIP archive of its Markdown files (one
+`<name>.md` per entry), `Import...` merges such an archive back in (new entries are added;
+entries with an existing name are only overwritten after you confirm, otherwise they are kept).
+Below the list the **search path** is editable: an ordered list of directories holding the
+files — the first occurrence of a name wins, new files are created in the first directory.
+Entries may use `~` (home directory), `$(pwd)` or relative paths (working directory); an empty
+list selects the default directory (see [section 10](#10-storage)). Changes are saved
+immediately.
 
 ---
 
 ## 10. Storage
 
-User-defined prompts and skills are stored as **Markdown files with a YAML front matter** in the
-versioned KeY configuration directory (`llm/prompts` and `llm/skills`), e.g.
-`~/.key/v3.1/llm/prompts/<name>.md` for KeY 3.1. The front matter holds the metadata (`name`,
+User-defined prompts and skills are stored as **Markdown files with a YAML front matter**. By
+default they live in the versioned KeY configuration directory (`llm/prompts` and `llm/skills`),
+e.g. `~/.key/v3.1/llm/prompts/<name>.md` for KeY 3.1. The search path of each library can be
+configured in its settings panel (settings `promptLibraryPaths` / `skillLibraryPaths`, see
+[section 9](#9-settings-reference-settings--llm-settings)); the directories are searched in
+order, the first occurrence of a name wins and new files are created in the first directory.
+The front matter holds the metadata (`name`,
 `description`, and for skills also `enabled` and `allowedTools`); the Markdown body is the prompt
 template, respectively the skill instructions. Legacy `<name>.json` files from older KeY versions
 are converted to the Markdown format automatically on first access and then removed. The chat

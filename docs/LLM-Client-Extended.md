@@ -262,13 +262,18 @@ new tools with their approval requirement.
   `maxFileContentChars` (8000), `maxModelListingEntries` (1000), `shellEnabled`,
   `shellTimeoutSeconds` (30), `shellMaxOutputChars` (65536), `shellBlockedPatterns`,
   `toolsDisabled`, `allowedToolsWithApproval`, `allowedToolsWithoutApproval`,
+  `promptLibraryPaths`/`skillLibraryPaths` (library search path, empty = default directory),
   `autoScrollOutput`, `showToolActivity`.
-* Prompt and skill libraries are file-backed Markdown (`FileBackedLibrary`) under
-  `<keyConfig>/llm/prompts` and `<keyConfig>/llm/skills`: one `<name>.md` per entry with a YAML
+* Prompt and skill libraries are file-backed Markdown (`FileBackedLibrary`) along a configurable
+  search path: by default under `<keyConfig>/llm/prompts` and `<keyConfig>/llm/skills`, otherwise
+  the directories of `promptLibraryPaths`/`skillLibraryPaths` (in order, first occurrence of a
+  name wins, new entries are created in the first directory; entries support `~`, `$(pwd)` and
+  relative paths): one `<name>.md` per entry with a YAML
   front matter (`MarkdownFrontMatter`, keys `name`/`description` and for skills `enabled`/
   `allowedTools`) and the template/instructions as the body; legacy `<name>.json` files are
-  migrated on first access. Edited by the settings sub-panels (`PromptLibraryEditor`,
-  `SkillLibraryEditor`); records are `Prompt(name, description, template)` and
+  migrated on first access. Edited by the lightweight settings sub-panels (`PromptLibraryEditor`,
+  `SkillLibraryEditor`: file list, *New* creates a template file, *Edit* opens the file in the
+  system editor, editable search path); records are `Prompt(name, description, template)` and
   `Skill(name, description, instructions, allowedTools, enabled)`; export/import shares the whole
   library as a ZIP of `.md` entries (`LibraryZip`).
 * The conversation history itself is kept per proof in memory (`LlmSession.getContext()`) and
@@ -280,9 +285,9 @@ new tools with their approval requirement.
 |---|---|
 | `LlmExtension` | `KeYGuiExtension` wiring: registers settings, the `LlmPrompt` tab, the *Proof → LLM → Open LLM prompt* menu action (Ctrl+K) and the settings providers (`LLM Settings` with children `Tools`, `Prompts`, `Skills`) |
 | `LlmPrompt` | the chat panel; renders `LlmPromptModel` boxes (INPUT/OUTPUT/ERROR), hosts `AskUserBox`/`ApprovalBox`, `AutocompleteInput` |
-| `LlmSettingsUI` | main settings page incl. *Fetch Models* (`SwingWorker`) |
+| `LlmSettingsUI` | main settings page incl. *Fetch Models* (`SwingWorker`, timeouts in `Util`, HTTP status in the error dialog) |
 | `LlmToolsPanel` | per-tool approval/disablement table |
-| `LibraryEditorPanel` + editors | create/edit/delete/export/import for prompts and skills |
+| `LibraryEditorPanel` + editors | lightweight library editing: file list, template creation via *New*, external editing via *Edit*, `Delete`/`Reload`/export/import and the search path editor |
 | `SubagentRunner` + `subagents.*` | sequential + parallel sub-agent delegation (`spawn_subagent` child loop, role registry/whitelist, depth guard, parallel fan-out with serialized tool dispatch); see `docs/subagents.md` |
 | `AskLlmRunner` | fresh one-shot completion behind `ask_llm` (clean context, no tools; intercepted by the agent loop and the sub-agent child loop, runs without the dispatch lock) |
 | `SubagentLog` | per-session, bounded record of sub-agent runs (role, mode, per-task status/tools), exposed via the `get_subagent_logs` tool and rendered in the chat panel's tool-activity summary |
@@ -294,7 +299,8 @@ core: `AgentLoopTest` (bounded rounds, pause/resume), `ExtendedPromptTest` (requ
 assembly), `PromptResolverTest` (markup), `LlmContextTest` (wire serialization),
 `BuiltInMCPClientTest` (registry/approvals), `ShellSafetyPolicyTest`,
 `SchemaSerializationTest`, `AutocompleteInputTest`/`AutocompleteProvidersTest`,
-`LibraryEditorPanelsTest`, `mcp/KeYAgentToolsCommandTest` (proof-script tool mapping),
+`LibraryEditorPanelsTest`, `LibrarySearchPathTest` (multi-directory search path),
+`mcp/KeYAgentToolsCommandTest` (proof-script tool mapping),
 `SubagentLoopTest` (delegation, parallel fan-out, depth guard), `AskLlmTest`
 (self-consultation: fresh completion in parent and child loop, model/system override, disabled
 gate, error paths) and

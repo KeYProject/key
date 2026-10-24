@@ -5,6 +5,7 @@
 package org.key_project.key.llm;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import com.google.gson.GsonBuilder;
 import org.jspecify.annotations.Nullable;
@@ -28,6 +29,11 @@ public final class SkillLibrary extends FileBackedLibrary<Skill> {
     @Override
     protected String subDirectory() {
         return "skills";
+    }
+
+    @Override
+    protected List<String> configuredSearchPath() {
+        return LlmSettings.INSTANCE.getSkillLibraryPaths();
     }
 
     @Override
