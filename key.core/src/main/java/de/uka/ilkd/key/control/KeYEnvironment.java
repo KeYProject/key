@@ -23,7 +23,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
@@ -137,15 +136,6 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      */
     public JavaInfo getJavaInfo() {
         return getServices().getJavaInfo();
-    }
-
-    /**
-     * Returns the used {@link SpecificationRepository}.
-     *
-     * @return The used {@link SpecificationRepository}.
-     */
-    public SpecificationRepository getSpecificationRepository() {
-        return getServices().getSpecificationRepository();
     }
 
     public Profile getProfile() {

@@ -19,7 +19,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.proof.mgt.ProofRegistry;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.ClassAxiomComputer;
 import de.uka.ilkd.key.speclang.ContractRegistry;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -79,11 +78,6 @@ public class Services implements TermServices, LogicServices, ProofServices {
      * map of names to counters
      */
     private final HashMap<String, Counter> counters;
-
-    /**
-     * specification repository
-     */
-    private SpecificationRepository specRepos;
 
     /**
      * the proof↔proof-obligation registry. Owned here (not by the specification repository) since
@@ -165,7 +159,6 @@ public class Services implements TermServices, LogicServices, ProofServices {
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
         this.classAxiomComputer = profile.createClassAxiomComputer(this);
         this.contractRegistry = profile.createContractRegistry(this);
-        this.specRepos = profile.createSpecificationRepository(this);
         this.proofRegistry = new ProofRegistry(this);
         this.cee = new ConstantExpressionEvaluator();
         typeconverter = new TypeConverter(this);
@@ -186,7 +179,6 @@ public class Services implements TermServices, LogicServices, ProofServices {
         this.typeconverter = s.typeconverter;
         this.javaInfo = s.javaInfo;
         this.counters = s.counters;
-        this.specRepos = s.specRepos;
         this.proofRegistry = s.proofRegistry;
         this.classAxiomComputer = s.classAxiomComputer;
         this.contractRegistry = s.contractRegistry;
@@ -270,14 +262,9 @@ public class Services implements TermServices, LogicServices, ProofServices {
         getNameRecorder().addProposal(proposal);
     }
 
-
-    public SpecificationRepository getSpecificationRepository() {
-        return specRepos;
-    }
-
     /**
      * Returns the proof↔proof-obligation registry of this {@link Services} instance (shared by
-     * copies of this instance, like the specification repository).
+     * copies of this instance).
      *
      * @return the proof registry.
      */
@@ -341,7 +328,6 @@ public class Services implements TermServices, LogicServices, ProofServices {
     public Services copy(Profile profile, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
         Services s = new Services(profile, javaService, copyCounters(), newCaches);
-        s.specRepos = specRepos;
         s.proofRegistry = proofRegistry;
         s.classAxiomComputer = classAxiomComputer;
         s.contractRegistry = contractRegistry;

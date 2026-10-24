@@ -29,7 +29,6 @@ import de.uka.ilkd.key.proof.io.AbstractEnvInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
@@ -282,8 +281,6 @@ public final class SLEnvInput extends AbstractEnvInput {
     private ImmutableSet<PositionedString> createSpecs(SpecExtractor specExtractor)
             throws ProofInputException {
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
-        final SpecificationRepository specRepos =
-            initConfig.getServices().getSpecificationRepository();
         final ContractRegistry contractRegistry =
             initConfig.getServices().getContractRegistry();
         final JMLSpecFactory jsf = new JMLSpecFactory(initConfig.getServices());
@@ -375,7 +372,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 registerSpecs(DefaultImmutableSet.fromCollection(constructorSpecs),
                     initConfig.getServices());
             }
-            specRepos.processJavaType(kjt);
+            contractRegistry.processJavaType(kjt);
         }
 
         // add initially clauses to constructor contracts

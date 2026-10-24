@@ -17,7 +17,6 @@ import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.RuleCollection;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.ClassAxiomComputer;
@@ -84,11 +83,6 @@ public class WdProfile extends JavaProfile {
     public String description() {
         return "A profile for the verification of Java programs with incl. " +
             "well-definedness checks for JML specification. **Stability unknown**";
-    }
-
-    @Override
-    public SpecificationRepository createSpecificationRepository(Services services) {
-        return new SpecificationRepositoryWD(services);
     }
 
     @Override
