@@ -34,7 +34,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     /**
      * Prefix.
      */
-    protected final ReferencePrefix prefix;
+    protected final @Nullable ReferencePrefix prefix;
 
     /**
      * Dimensions.
@@ -79,7 +79,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
             ProgramElementName name,
             ImmutableList<Annotation> annotations,
             int dimension,
-            ReferencePrefix prefix) {
+            @Nullable ReferencePrefix prefix) {
         this.name = name;
         this.annotations = annotations;
         this.dimensions = dimension;
@@ -197,7 +197,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      *
      * @return the reference prefix.
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return prefix;
     }
 

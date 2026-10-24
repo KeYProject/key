@@ -38,10 +38,10 @@ public abstract class JAbstractSortedOperator extends AbstractSortedOperator
     }
 
     protected JAbstractSortedOperator(Name name, Sort[] argSorts, Sort sort,
-            Boolean @Nullable [] whereToBind,
+            @Nullable Boolean[] whereToBind,
             boolean isRigid) {
         this(name, new ImmutableArray<>(argSorts), sort,
-            new ImmutableArray<>(whereToBind), isRigid);
+            whereToBind == null ? null : new ImmutableArray<>(whereToBind), isRigid);
     }
 
     protected JAbstractSortedOperator(Name name, ImmutableArray<Sort> argSorts, Sort sort,

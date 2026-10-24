@@ -506,6 +506,11 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
      * @param name the name to lookup
      * @return the found NoPosTacletApp or null if no matching Taclet is there
      */
+    @SuppressWarnings("NullAway") // interface RuleIndex.lookup(Name) is declared non-null, but its
+                                  // javadoc documents "or null if no matching Taclet is there"
+                                  // (matching the @Nullable lookup(String) overload); widening the
+                                  // interface declaration belongs to key.ncore.calculus (out of
+                                  // scope here)
     @Override
     public @Nullable NoPosTacletApp lookup(Name name) {
         return allNoPosTacletAppsStream()

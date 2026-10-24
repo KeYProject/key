@@ -1315,7 +1315,8 @@ public abstract class TacletApp implements RuleApp {
                     typeRef = new TypeRef((KeYJavaType) o);
                 }
                 assert typeRef != null : "could not find TypeReference for: " + o;
-                return new LocationVariable(VariableNamer.parseName(instantiation), typeRef);
+                return new LocationVariable(VariableNamer.parseName(instantiation),
+                    Objects.requireNonNull(typeRef, "could not find TypeReference for: " + o));
             }
         }
         return null;

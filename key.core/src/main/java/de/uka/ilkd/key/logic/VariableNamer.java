@@ -319,7 +319,8 @@ public abstract class VariableNamer implements InstantiationProposer {
         String result;
         if (type instanceof ArrayType) {
             result = getBaseNameProposal(Objects.requireNonNull(
-                ((ArrayType) type).getBaseType().getKeYJavaType().getJavaType()));
+                Objects.requireNonNull(((ArrayType) type).getBaseType().getKeYJavaType(),
+                    "array base type has no KeY Java type").getJavaType()));
             result += "_arr";
         } else {
             String name = type.getName();
@@ -468,7 +469,9 @@ public abstract class VariableNamer implements InstantiationProposer {
                 if (inst instanceof Expression) {
                     final ExecutionContext ec = app.instantiations().getExecutionContext();
                     if (ec != null) {
-                        KeYJavaType kjt = ((Expression) inst).getKeYJavaType(this.services, ec);
+                        KeYJavaType kjt = Objects.requireNonNull(
+                            ((Expression) inst).getKeYJavaType(this.services, ec),
+                            "expression has no KeYJavaType");
                         basename = getBaseNameProposal(Objects.requireNonNull(kjt.getJavaType()));
                     } else {
                         // usually this should never be entered, but because of
@@ -608,9 +611,11 @@ public abstract class VariableNamer implements InstantiationProposer {
                         break;
                     } else if (c.getStatementAt(1) instanceof Assignment p2
                             && JavaAstUtils.isCopyAssignment(p2)) {
-                        Expression lhs = p2.getExpressionAt(0);
+                        Expression lhs = Objects.requireNonNull(p2.getExpressionAt(0),
+                            "assignment has no left-hand side");
                         if (lhs.equals(sv)) {
-                            SchemaVariable rhs = (SchemaVariable) p2.getExpressionAt(1);
+                            SchemaVariable rhs = (SchemaVariable) Objects.requireNonNull(
+                                p2.getExpressionAt(1), "assignment has no right-hand side");
                             name = Objects.requireNonNull(
                                 app.instantiations().getInstantiation(rhs)).toString();
                             break;

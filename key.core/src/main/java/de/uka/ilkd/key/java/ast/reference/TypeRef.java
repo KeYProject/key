@@ -16,6 +16,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class TypeRef extends TypeReferenceImp {
@@ -51,7 +52,7 @@ public class TypeRef extends TypeReferenceImp {
     }
 
     public TypeRef(ProgramElementName name, ImmutableList<Annotation> annotations,
-            int dimension, ReferencePrefix prefix,
+            int dimension, @Nullable ReferencePrefix prefix,
             KeYJavaType kjt) {
         super(name, annotations, dimension, prefix);
         this.kjt = kjt;

@@ -17,6 +17,7 @@ import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * JML {@code \real} literal.
@@ -171,7 +172,7 @@ public non-sealed class RealLiteral extends Literal {
         v.performActionOnRealLiteral(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
     }
 
