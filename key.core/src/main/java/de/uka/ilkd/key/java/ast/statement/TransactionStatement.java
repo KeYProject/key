@@ -12,7 +12,10 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import com.github.javaparser.ast.key.KeyTransactionStatement;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class TransactionStatement extends JavaStatement {
     private final KeyTransactionStatement.TransactionType type;
 
@@ -34,7 +37,7 @@ public class TransactionStatement extends JavaStatement {
     }
 
     @Override
-    public ProgramElement getChildAt(int index) {
+    public @Nullable ProgramElement getChildAt(int index) {
         return null;
     }
 
@@ -62,7 +65,7 @@ public class TransactionStatement extends JavaStatement {
         return ((TransactionStatement) o).type == this.type;
     }
 
-    public MatchConditions match(SourceData source, MatchConditions conditions) {
+    public @Nullable MatchConditions match(SourceData source, MatchConditions conditions) {
         if (this.equals(source.getSource())) {
             source.next();
             return conditions;

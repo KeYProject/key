@@ -8,12 +8,15 @@ import de.uka.ilkd.key.java.Services;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A program model element representing class types.
  *
  * @author AL
  * @author RN
  */
+@NullMarked
 public interface ClassType extends Type, Member, ClassTypeContainer {
 
     /**

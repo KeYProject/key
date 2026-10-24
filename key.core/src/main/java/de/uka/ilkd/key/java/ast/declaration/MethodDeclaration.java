@@ -21,12 +21,14 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Method declaration.
  * taken from COMPOST and changed to achieve an immutable structure
  */
+@NullMarked
 public class MethodDeclaration extends JavaDeclaration
         implements MemberDeclaration, TypeReferenceContainer, NamedProgramElement,
         ParameterContainer, Method,
@@ -90,7 +92,7 @@ public class MethodDeclaration extends JavaDeclaration
 
     public MethodDeclaration(
             PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<Modifier> modArray,
+            ImmutableArray<Modifier> modArray,
             TypeReference returnType,
             Comment[] voidComments, ProgramElementName name,
             ImmutableArray<ParameterDeclaration> parameters, Throws exceptions,
@@ -220,14 +222,12 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
 
-    @NonNull
     @Override
     public SourceElement getFirstElement() {
         return getChildAt(0);
     }
 
 
-    @NonNull
     @Override
     public SourceElement getLastElement() {
         return getChildAt(this.getChildCount() - 1).getLastElement();
@@ -360,7 +360,7 @@ public class MethodDeclaration extends JavaDeclaration
 
 
     @Override
-    public final String getName() {
+    public final @Nullable String getName() {
         return (name == null) ? null : name.toString();
     }
 

@@ -15,12 +15,13 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Field declaration. taken from COMPOST and changed to achieve an immutable structure
  */
 
+@NullMarked
 public class FieldDeclaration extends VariableDeclaration implements MemberDeclaration {
     /**
      * Field specs.
@@ -71,7 +72,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     }
 
     @Override
-    public @NonNull ImmutableArray<Modifier> getModifiers() {
+    public ImmutableArray<Modifier> getModifiers() {
         return modArray;
     }
 

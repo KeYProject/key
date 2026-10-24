@@ -6,12 +6,15 @@ package de.uka.ilkd.key.java.ast.abstraction;
 
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A program model element representing fields.
  *
  * @author AL
  * @author RN The file has been modified by the KeY team.
  */
+@NullMarked
 public interface Field extends Variable, Member {
 
     /**

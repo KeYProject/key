@@ -7,6 +7,8 @@ package de.uka.ilkd.key.java.ast.expression;
 
 import de.uka.ilkd.key.java.ast.LoopInitializer;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * An ExpressionStatement is a statement that may appear as an expression. There are three
  * subclasses: MethodReference, BinaryAssignment, and New. Strictly speaking, Java would allow any
@@ -14,5 +16,6 @@ import de.uka.ilkd.key.java.ast.LoopInitializer;
  * to awkward C code) and is even forbidden in dialects (such as Generic Java).
  */
 
+@NullMarked
 public interface ExpressionStatement extends Expression, LoopInitializer {
 }

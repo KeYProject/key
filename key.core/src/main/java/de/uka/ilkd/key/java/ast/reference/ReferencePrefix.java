@@ -6,11 +6,14 @@ package de.uka.ilkd.key.java.ast.reference;
 
 import de.uka.ilkd.key.java.ast.ProgramElement;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Reference prefix.
  *
  * @author <TT>AutoDoc</TT>
  */
+@NullMarked
 public interface ReferencePrefix extends ProgramElement {
 
     ReferencePrefix getReferencePrefix();

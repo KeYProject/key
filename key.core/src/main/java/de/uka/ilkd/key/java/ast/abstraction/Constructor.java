@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.abstraction;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A program model element representing constructors. Constructors are modelled as subtypes of
  * methods and will return the enclosing type as return type.
  */
+@NullMarked
 public interface Constructor extends Method {
 }

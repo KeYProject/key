@@ -13,7 +13,10 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.MatchConditions;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class SchemaTypeReference extends TypeReferenceImp implements AbstractProgramElement {
 
     private final String fullName;
@@ -32,7 +35,7 @@ public class SchemaTypeReference extends TypeReferenceImp implements AbstractPro
         fullName = sb.toString();
     }
 
-    public KeYJavaType getKeYJavaType() {
+    public @Nullable KeYJavaType getKeYJavaType() {
         return null;
     }
 
@@ -47,7 +50,7 @@ public class SchemaTypeReference extends TypeReferenceImp implements AbstractPro
         return new TypeRef(getKeYJavaType(services));
     }
 
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
         ProgramElement t = source.getSource();
         if (t instanceof TypeReference) {
             if (getName().equals(((TypeReference) t).getName())

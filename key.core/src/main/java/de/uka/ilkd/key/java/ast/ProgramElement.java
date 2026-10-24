@@ -10,12 +10,14 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * A part of the program syntax that carries semantics in the model. taken from COMPOST and changed
  * to achieve an immutable structure
  */
+@NullMarked
 public interface ProgramElement extends SourceElement, ModelElement {
 
 

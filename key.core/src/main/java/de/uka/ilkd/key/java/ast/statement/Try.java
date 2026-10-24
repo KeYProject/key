@@ -15,13 +15,14 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Try.
  *
  * @author <TT>AutoDoc</TT>
  */
+@NullMarked
 public class Try extends BranchStatement implements StatementContainer, ProgramPrefix {
 
     private final StatementBlock body;
@@ -144,13 +145,11 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     }
 
 
-    @NonNull
     public SourceElement getFirstElement() {
         return body.getFirstElement();
     }
 
 
-    @NonNull
     public SourceElement getLastElement() {
         return getChildAt(this.getChildCount() - 1).getLastElement();
     }

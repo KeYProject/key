@@ -16,10 +16,14 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Redundant Parentheses. Modelled as a special "identity" unary "infix" operator.
  */
 
+@NullMarked
 public class ParenthesizedExpression extends Operator
         implements ExpressionStatement, ReferencePrefix {
 
@@ -95,7 +99,7 @@ public class ParenthesizedExpression extends Operator
      *
      * @author VK
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return null;
     }
 

@@ -6,6 +6,9 @@ package de.uka.ilkd.key.java.ast;
 
 import de.uka.ilkd.key.java.Services;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class keeps track of the next element to match, which is provided by calling method
  * {@link #getSource()}. The rough idea is to store the parent ast node and the index of the child
@@ -14,6 +17,7 @@ import de.uka.ilkd.key.java.Services;
  *
  * This kind of wrapping is useful when matching list schemavariables.
  */
+@NullMarked
 public class SourceData {
 
     /**
@@ -100,7 +104,7 @@ public class SourceData {
      *
      * @return the ProgramElement to be matched next or <tt>null</tt> if there is no such element
      */
-    public ProgramElement getSource() {
+    public @Nullable ProgramElement getSource() {
         if (childPos == -1) {
             return element;
         }

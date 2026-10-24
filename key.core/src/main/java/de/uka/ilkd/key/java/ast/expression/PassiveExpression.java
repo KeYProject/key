@@ -12,10 +12,12 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Marks an active statement as inactive.
  */
+@NullMarked
 public class PassiveExpression extends ParenthesizedExpression {
 
     /**

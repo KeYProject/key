@@ -11,20 +11,19 @@ import de.uka.ilkd.key.pp.PrettyPrinter;
 import org.key_project.util.ExtList;
 import org.key_project.util.parsing.Position;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Top level implementation of a Java {@link SourceElement}. taken from COMPOST and changed to
  * achieve an immutable structure
  */
+@NullMarked
 public abstract class JavaSourceElement implements SourceElement {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaSourceElement.class);
 
-    @NonNull
     private final PositionInfo posInfo;
 
 
@@ -69,7 +68,6 @@ public abstract class JavaSourceElement implements SourceElement {
      * @return if <tt>p</tt> is <tt>null</tt> the undefined position
      *         ({@link PositionInfo#UNDEFINED}) is returned otherwise <tt>p</tt>
      */
-    @NonNull
     private static PositionInfo getPosInfo(@Nullable PositionInfo p) {
         return p == null ? PositionInfo.UNDEFINED : p;
     }
