@@ -41,6 +41,7 @@ public class EqualsAndHashCodeDelegator<T> {
     }
 
     @Override
+    @SuppressWarnings("unchecked") // cast is safe: getClass() was already checked above
     public boolean equals(Object o) {
         if (this == o) {
             return true;

@@ -93,6 +93,7 @@ public class WeakValueLinkedHashMap<K, V> {
      * {@code containsKey} to ensure the map remains up-to-date.
      * </p>
      */
+    @SuppressWarnings("unchecked") // only KeyWeakValuePair instances are ever enqueued
     private void removeEntriesWithGCValues() {
         KeyWeakValuePair<K, V> gcValue;
         while ((gcValue = (KeyWeakValuePair<K, V>) queue.poll()) != null) {
@@ -144,6 +145,12 @@ public class WeakValueLinkedHashMap<K, V> {
                 return false;
             }
             return Objects.equals(get(), weakVal.get());
+        }
+
+        @Override
+        public int hashCode() {
+            // consistent with equals(), which only compares the referenced values
+            return Objects.hashCode(get());
         }
 
     }

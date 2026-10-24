@@ -70,6 +70,7 @@ public final class ArrayUtil {
         return result;
     }
 
+    @SuppressWarnings("unchecked") // component type is obtained reflectively from the array
     private static <T extends @Nullable Object> Class<? extends T> getComponentType(T[] array) {
         Class<? extends Object[]> arrayClass = array.getClass();
         assert arrayClass.isArray() : "@AssumeAssertion(nullness): This is always the case";
@@ -215,7 +216,7 @@ public final class ArrayUtil {
                 result.add(element);
             }
         }
-        return (T[]) result.toArray((T[]) java.lang.reflect.Array
+        return result.toArray((T[]) java.lang.reflect.Array
                 .newInstance(getComponentType(array), result.size()));
     }
 

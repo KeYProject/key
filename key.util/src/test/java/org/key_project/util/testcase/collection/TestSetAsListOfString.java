@@ -36,7 +36,8 @@ public class TestSetAsListOfString {
     @Test
     public void testAdd() {
         @SuppressWarnings("unchecked")
-        ImmutableSet<String>[] newSet = new ImmutableSet[str.length + 1];
+        ImmutableSet<String>[] newSet =
+            (ImmutableSet<String>[]) new ImmutableSet<?>[str.length + 1];
         newSet[0] = DefaultImmutableSet.nil();
 
         for (int i = 1; i < str.length + 1; i++) {
@@ -71,7 +72,8 @@ public class TestSetAsListOfString {
     @Test
     public void testUnion() {
         @SuppressWarnings("unchecked")
-        ImmutableSet<String>[] newSet = new ImmutableSet[str.length + 1];
+        ImmutableSet<String>[] newSet =
+            (ImmutableSet<String>[]) new ImmutableSet<?>[str.length + 1];
         newSet[0] = DefaultImmutableSet.<String>nil().add(str[0]).add(str[1]);
         newSet[1] = DefaultImmutableSet.<String>nil().add(str[1]).add(str[2]);
         // make the union of two sets and check if in the unions
