@@ -29,6 +29,7 @@ import org.key_project.util.collection.Immutables;
 import org.key_project.util.java.CollectionUtil;
 
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,7 @@ import org.slf4j.LoggerFactory;
  * @version 1 (12/4/19)
  * @see FunctionPredicateBuilder for level-1 declarations
  */
+@NullMarked
 public class DeclarationBuilder extends DefaultBuilder {
     private final Map<String, String> category2Default = new HashMap<>();
     private static final Logger LOGGER = LoggerFactory.getLogger(DeclarationBuilder.class);

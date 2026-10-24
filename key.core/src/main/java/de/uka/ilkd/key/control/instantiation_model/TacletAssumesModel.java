@@ -28,6 +28,10 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Position;
 import org.key_project.util.parsing.RecognitionException;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInstantiation> {
 
     /**
@@ -44,7 +48,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
             }
 
             @Override
-            public SequentFormula getSequentFormula() {
+            public @Nullable SequentFormula getSequentFormula() {
                 return null;
             }
         };

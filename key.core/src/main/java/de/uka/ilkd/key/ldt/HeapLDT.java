@@ -35,6 +35,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
@@ -43,6 +44,7 @@ import org.jspecify.annotations.Nullable;
  * LDT functionality, this class is also responsible for creating and managing the constant symbols
  * representing fields.
  */
+@NullMarked
 public final class HeapLDT extends LDT {
 
     public static final Name NAME = new Name("Heap");
@@ -282,7 +284,7 @@ public final class HeapLDT extends LDT {
      * If the passed operator is an instance of "select", this method returns the sort of the
      * function (identical to its return type); otherwise, returns null.
      */
-    public Sort getSortOfSelect(org.key_project.logic.op.Operator op) {
+    public @Nullable Sort getSortOfSelect(org.key_project.logic.op.Operator op) {
         if (isSelectOp(op)) {
             return ((ParametricFunctionInstance) op).getArgs().head().sort();
         } else {
@@ -398,7 +400,7 @@ public final class HeapLDT extends LDT {
         return heaps;
     }
 
-    public LocationVariable getHeapForName(Name name) {
+    public @Nullable LocationVariable getHeapForName(Name name) {
         for (LocationVariable h : getAllHeaps()) {
             if (h.name().equals(name)) {
                 return h;
@@ -407,7 +409,7 @@ public final class HeapLDT extends LDT {
         return null;
     }
 
-    public LocationVariable getPermissionHeap() {
+    public @Nullable LocationVariable getPermissionHeap() {
         return heaps.size() > 2 ? heaps.tail().tail().head() : null;
     }
 

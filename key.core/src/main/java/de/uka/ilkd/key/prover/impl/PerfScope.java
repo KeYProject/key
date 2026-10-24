@@ -21,9 +21,11 @@ import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class PerfScope {
     private static final Logger LOGGER = LoggerFactory.getLogger(PerfScope.class);
     private static final Pair<String, AtomicLong>[] PERF_COUNTERS = new Pair[] {

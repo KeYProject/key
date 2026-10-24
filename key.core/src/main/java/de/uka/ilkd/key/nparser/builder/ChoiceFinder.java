@@ -14,6 +14,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This visitor gathers the choice information in {@link de.uka.ilkd.key.nparser.KeyAst.File} and
@@ -23,6 +24,7 @@ import org.jspecify.annotations.NonNull;
  * @version 1 (28.10.19)
  * @see ChoiceInformation
  */
+@NullMarked
 public class ChoiceFinder extends AbstractBuilder<Object> {
 
     private final @NonNull ChoiceInformation choiceInformation;

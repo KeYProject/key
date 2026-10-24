@@ -18,6 +18,9 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A {@link ProofControl} provides the user interface independent logic to apply rules on a proof.
  * This includes:
@@ -33,6 +36,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public interface ProofControl {
     boolean isMinimizeInteraction();
 
@@ -44,7 +48,7 @@ public interface ProofControl {
      * @return a list of Taclets with all applicable RewriteTaclets
      */
     ImmutableList<TacletApp> getRewriteTaclet(Goal focusedGoal,
-            PosInOccurrence pos);
+            @Nullable PosInOccurrence pos);
 
     /**
      * collects all applicable FindTaclets of the current goal (called by the SequentViewer)
@@ -52,7 +56,7 @@ public interface ProofControl {
      * @return a list of Taclets with all applicable FindTaclets
      */
     ImmutableList<TacletApp> getFindTaclet(Goal focusedGoal,
-            PosInOccurrence pos);
+            @Nullable PosInOccurrence pos);
 
     /**
      * collects all applicable NoFindTaclets of the current goal (called by the SequentViewer)
@@ -66,10 +70,10 @@ public interface ProofControl {
      *
      * @param pos the PosInSequent where to look for applicable rules
      */
-    ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos);
+    ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, @Nullable PosInOccurrence pos);
 
     boolean selectedTaclet(Taclet taclet, Goal goal,
-            PosInOccurrence pos);
+            @Nullable PosInOccurrence pos);
 
     /**
      * Apply a RuleApp and continue with update simplification or strategy application according to
@@ -90,7 +94,7 @@ public interface ProofControl {
      *        all (e.g. if a loop invariant is available do not ask the user to provide one)
      * @param interactive whether the rule was applied by the user
      */
-    void selectedBuiltInRule(Goal goal, BuiltInRule rule, PosInOccurrence pos,
+    void selectedBuiltInRule(Goal goal, BuiltInRule rule, @Nullable PosInOccurrence pos,
             boolean forced, boolean interactive);
 
     /**
@@ -172,7 +176,7 @@ public interface ProofControl {
      */
     void startAndWaitForAutoMode(Proof proof);
 
-    void startFocussedAutoMode(PosInOccurrence focus, Goal goal);
+    void startFocussedAutoMode(@Nullable PosInOccurrence focus, Goal goal);
 
     /**
      * Runs the given {@link ProofMacro} at the given {@link PosInOccurrence} on the given

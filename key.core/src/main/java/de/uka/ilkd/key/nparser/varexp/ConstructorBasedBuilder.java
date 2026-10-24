@@ -11,6 +11,9 @@ import java.util.List;
 
 import org.key_project.prover.rules.VariableCondition;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ConstructorBasedBuilder extends AbstractConditionBuilder {
     private final Class<? extends VariableCondition> clazz;
     private final boolean negationSupported;

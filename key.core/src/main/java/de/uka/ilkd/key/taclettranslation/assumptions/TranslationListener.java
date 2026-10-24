@@ -12,10 +12,13 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Listener for the classes which implement <code>TacletTranslator</code>. Use this interface to get
  * information while translating a taclet.
  */
+@NullMarked
 public interface TranslationListener {
     /**
      * Called when the translator finds a term that have a sort. You can use this event to collect

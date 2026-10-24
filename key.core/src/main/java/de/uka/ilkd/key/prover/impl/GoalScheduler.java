@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.key_project.prover.proof.ProofGoal;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -46,6 +47,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @param <T> the goal type
  */
+@NullMarked
 public final class GoalScheduler<T extends ProofGoal<T>> {
 
     /** Remaining work for one task */

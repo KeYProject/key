@@ -42,7 +42,9 @@ import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class TacletFindModel extends AbstractTableModel {
 
     /**

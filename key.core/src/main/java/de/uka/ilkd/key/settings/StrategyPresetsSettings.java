@@ -12,6 +12,7 @@ import java.util.Properties;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * User-defined strategy presets shown in the strategy options combo box.
@@ -29,6 +30,7 @@ import org.jspecify.annotations.NonNull;
  * {@link Configuration} (JSON-like) format only; the deprecated flat {@link Properties} format is
  * not supported for presets (KeY writes the {@link Configuration} format on every save anyway).
  */
+@NullMarked
 public class StrategyPresetsSettings extends AbstractSettings {
     /** Category / top-level key under which the presets are stored. */
     public static final String CATEGORY = "StrategyPresets";

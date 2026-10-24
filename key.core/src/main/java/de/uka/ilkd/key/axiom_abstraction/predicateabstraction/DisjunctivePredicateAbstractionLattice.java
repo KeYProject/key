@@ -16,6 +16,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.NotUniqueException;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A lattice for all predicates accepting the given sort. This lattice consists of 2^n + 1 elements,
  * where n is the number of applicable predicates. Each element is a disjunction of the given
@@ -27,6 +29,7 @@ import org.key_project.util.collection.NotUniqueException;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class DisjunctivePredicateAbstractionLattice extends AbstractPredicateAbstractionLattice {
     public static final String PREDICATE_NAME_CONBINATION_STRING = "_OR_";
 

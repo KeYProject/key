@@ -12,6 +12,9 @@ import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The {@link DefaultUserInterfaceControl} which allows proving in case that no specific user
  * interface is available.
@@ -22,6 +25,7 @@ import org.key_project.util.collection.ImmutableSet;
  * @author Martin Hentschel
  * @see KeYEnvironment
  */
+@NullMarked
 public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
     /**
      * The used {@link TermLabelVisibilityManager}.
@@ -46,7 +50,7 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
      *
      * @param customization An optional {@link RuleCompletionHandler}.
      */
-    public DefaultUserInterfaceControl(RuleCompletionHandler customization) {
+    public DefaultUserInterfaceControl(@Nullable RuleCompletionHandler customization) {
         proofControl = new DefaultProofControl(this, this, customization);
     }
 

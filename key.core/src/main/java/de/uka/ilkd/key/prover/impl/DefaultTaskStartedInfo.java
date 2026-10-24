@@ -6,6 +6,8 @@ package de.uka.ilkd.key.prover.impl;
 
 import org.key_project.prover.engine.TaskStartedInfo;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Default implementation of the {@link TaskStartedInfo} interface.
  *
@@ -21,6 +23,7 @@ import org.key_project.prover.engine.TaskStartedInfo;
  * @see TaskStartedInfo
  * @see TaskStartedInfo.TaskKind
  */
+@NullMarked
 public record DefaultTaskStartedInfo(TaskKind kind, String message, int size)
         implements TaskStartedInfo {
     /**
