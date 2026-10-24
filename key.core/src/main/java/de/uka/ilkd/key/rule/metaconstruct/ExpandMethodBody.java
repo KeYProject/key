@@ -24,7 +24,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Replaces the MethodBodyStatement shortcut with the full body, performs prefix adjustments in the
@@ -63,7 +63,7 @@ public class ExpandMethodBody extends ProgramTransformer {
         // result = prettyNewObjectNames(result, methDecl, classContext);
 
         // at this point all arguments should be program variables
-        ImmutableArray<? extends Expression> argsAsParam = mbs.getArguments();
+        ImmutableList<? extends Expression> argsAsParam = mbs.getArguments();
 
         final HashMap<LocationVariable, LocationVariable> map = new LinkedHashMap<>();
         for (int i = 0; i < argsAsParam.size(); i++) {
