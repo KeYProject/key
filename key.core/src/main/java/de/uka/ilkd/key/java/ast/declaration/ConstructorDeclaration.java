@@ -16,7 +16,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 
@@ -60,9 +59,9 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         super(modifiers, null, name, parameters, exceptions, body, parentIsInterfaceDeclaration);
     }
 
-    public ConstructorDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> map,
+    public ConstructorDeclaration(PositionInfo pi, List<Comment> c, ImmutableList<Modifier> map,
             TypeReference o, Comment[] comments, ProgramElementName name,
-            ImmutableArray<ParameterDeclaration> map1,
+            ImmutableList<ParameterDeclaration> map1,
             Throws exceptions, StatementBlock body, boolean parentIsInterfaceDeclaration,
             List<TextualJMLConstruct> specs) {
         super(pi, c, map, o, comments, name, map1, exceptions, body, parentIsInterfaceDeclaration,
