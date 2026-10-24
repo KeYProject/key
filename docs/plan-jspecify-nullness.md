@@ -104,27 +104,48 @@ If Wave 1 pilot looks good, later waves run with more concurrency.
 4. Commit per cluster (`feat(nullness): annotate <cluster> [PR #3470 follow-up]`).
 5. Ledger: `.superpowers/sdd/progress.md`.
 
-## Phase 2 — NullAway fast trials (after Wave 1 landed)
+## Phase 2 — NullAway fast trials (after key.core was annotated)
 
-Dependency (already added to version catalog): `com.uber.nullaway:nullaway:0.14.3`.
+Dependencies (version catalog): `com.uber.nullaway:nullaway:0.14.3`,
+`com.google.errorprone:error_prone_core:2.49.0`, and the Gradle plugins
+`net.ltgt.errorprone` 5.1.1 + `net.ltgt.nullaway` 3.3.0.
 
-Proposed wiring (apply + test only in the dedicated Phase 2 step, behind a
-property so the default build stays untouched):
-- In `build.gradle` subprojects block, add `compileOnly(libs.nullaway)` so the
-  plugin jar is on the javac classpath, and in
-  `tasks.withType(JavaCompile).configureEach`:
+Why the plugin route: NullAway 0.14.x is an Error Prone `BugChecker` — it ships
+no `com.sun.source.util.Plugin` service, so `-Xplugin:NullAway` cannot load it
+(trial confirmed: "plug-in not found"). It must run inside Error Prone.
+
+Wiring (in `build.gradle`, opt-in via `-DENABLE_NULLAWAY`, off by default):
+- root `plugins {}`: `alias(libs.plugins.errorprone) apply false`,
+  `alias(libs.plugins.nullaway) apply false`
+- subprojects: `apply plugin: "net.ltgt.errorprone"` + `"net.ltgt.nullaway"`;
+  dependencies: `errorprone(libs.errorprone.core)` + `errorprone(libs.nullaway)`
+- per `JavaCompile`:
   ```
+  options.errorprone.enabled = false
   if (System.getProperty("ENABLE_NULLAWAY")) {
-      options.compilerArgs += [
-          "-Xplugin:NullAway AnnotatedPackages=de.uka.ilkd.key,org.key_project",
-      ]
+      options.errorprone.enabled = true
+      options.errorprone.disableAllChecks = true
+      options.errorprone.nullaway.severity.set(
+          net.ltgt.gradle.errorprone.CheckSeverity.ERROR)
+      options.errorprone.nullaway.annotatedPackages.addAll(
+          ["de.uka.ilkd.key", "org.key_project"])
+      options.errorprone.nullaway.jspecifyMode.set(true)
   }
   ```
-  (exact `-Xplugin` argument syntax to be confirmed with a trial run; NullAway
-  0.14.x reads JSpecify `@NullMarked`/`@Nullable` from the classpath).
+  (`options.errorprone.nullaway` exists because the nullaway plugin registers a
+  `NullAwayOptions` extension named "nullaway" *on the ErrorProne options*;
+  ERROR severity turns the gate into "build fails until findings are zero".)
 - Trial runs: `./gradlew -DENABLE_NULLAWAY=true :key.core:compileJava`
-- Fix findings per package, then keep the property off by default until the
-  module is clean; afterwards wire into the CI job alongside EISOP.
+  (compiles the whole dependency chain: key.util → key.ncore → … → key.core,
+  so findings surface module by module in dependency order).
+- Fix findings per module/area with parallel fix subagents (line-level finding
+  lists from the previous run; agents never run Gradle), then re-run the gate
+  centrally until green. Keep the property off by default; wire into CI
+  (`code_quality.yml`) only after a module is clean (Phase 2.5).
+
+First trial (WARN, full chain): 155 findings = key.util 32, key.ncore 6,
+key.ncore.calculus 17, key.core 100 (java 63: TypeConverter/Services;
+proof 36: Proof/Goal; logic 1).
 
 ## Phase 3 — EISOP conformance (final gate)
 
