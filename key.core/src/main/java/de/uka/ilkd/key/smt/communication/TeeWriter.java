@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 
 /**
@@ -16,6 +17,7 @@ import org.jspecify.annotations.NonNull;
  * @author Alexander Weigl
  * @version 1 (10/3/21)
  */
+@NullMarked
 public class TeeWriter extends Writer {
 
     private final @NonNull Writer source;

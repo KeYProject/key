@@ -11,17 +11,21 @@ import java.util.List;
 import de.uka.ilkd.key.smt.lang.SMTTermMultOp.Op;
 import de.uka.ilkd.key.smt.lang.SMTTermQuant.Quant;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  *
  * @author Aboubakr Achraf El Ghazi
  *
  */
+@NullMarked
 public abstract class SMTTerm {
 
-    protected String comment;
+    protected @Nullable String comment;
 
-    public SMTTerm upp;
+    public @Nullable SMTTerm upp;
 
     public abstract boolean occurs(SMTTermVariable a);
 
@@ -57,11 +61,11 @@ public abstract class SMTTerm {
 
     }
 
-    public String getComment() {
+    public @Nullable String getComment() {
         return comment;
     }
 
-    public void setComment(String comment) {
+    public void setComment(@Nullable String comment) {
         this.comment = comment;
     }
 
@@ -85,7 +89,7 @@ public abstract class SMTTerm {
         return new LinkedList<>();
     }
 
-    public List<SMTTerm> getSubs() {
+    public @Nullable List<SMTTerm> getSubs() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -697,7 +701,7 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm quant(SMTTermQuant.Quant quant, List<SMTTermVariable> bindVars,
-            List<List<SMTTerm>> pats) {
+            @Nullable List<List<SMTTerm>> pats) {
         return switch (quant) {
             case FORALL -> this.forall(bindVars, pats);
             case EXISTS -> this.exists(bindVars, pats);
@@ -740,7 +744,7 @@ public abstract class SMTTerm {
         return this.forall(toList(var), pats);
     }
 
-    public SMTTerm forall(List<SMTTermVariable> bindVars, List<List<SMTTerm>> pats) {
+    public SMTTerm forall(List<SMTTermVariable> bindVars, @Nullable List<List<SMTTerm>> pats) {
         if (bindVars.isEmpty()) {
             return this;
         }
@@ -766,7 +770,7 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm forall(List<SMTTermVariable> bindVars1, List<SMTTermVariable> bindVars2,
-            List<List<SMTTerm>> pats) {
+            @Nullable List<List<SMTTerm>> pats) {
         List<SMTTermVariable> bindVars = new LinkedList<>();
         bindVars.addAll(bindVars1);
         bindVars.addAll(bindVars2);
@@ -801,7 +805,7 @@ public abstract class SMTTerm {
         return this.exists(bindVars, null);
     }
 
-    public SMTTerm exists(List<SMTTermVariable> bindVars, List<List<SMTTerm>> pats) {
+    public SMTTerm exists(List<SMTTermVariable> bindVars, @Nullable List<List<SMTTerm>> pats) {
         if (bindVars.isEmpty()) {
             return this;
         }
@@ -827,7 +831,7 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm exists(List<SMTTermVariable> bindVars1, List<SMTTermVariable> bindVars2,
-            List<List<SMTTerm>> pats) {
+            @Nullable List<List<SMTTerm>> pats) {
         List<SMTTermVariable> bindVars = new LinkedList<>();
         bindVars.addAll(bindVars1);
         bindVars.addAll(bindVars2);
@@ -1033,7 +1037,7 @@ public abstract class SMTTerm {
         return tToList;
     }
 
-    public static <T> List<T> toList(T e) {
+    public static <T> @Nullable List<T> toList(T e) {
 
         if (e == null) {
             return null;

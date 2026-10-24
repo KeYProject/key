@@ -15,11 +15,15 @@ import de.uka.ilkd.key.smt.model.*;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents a query directed to towards the z3 solver.
  *
  * @author mihai
  */
+@NullMarked
 interface Query {
     String SELECT_ID = "select_";
 
@@ -36,12 +40,14 @@ interface Query {
     /**
      * Returns the stored result.
      */
+    @Nullable
     String getResult();
 }
 
 
+@NullMarked
 abstract class AbstractQuery implements Query {
-    protected String result;
+    protected @Nullable String result;
 
     protected AbstractQuery() {
         super();
@@ -52,7 +58,7 @@ abstract class AbstractQuery implements Query {
     /**
      * @return the result
      */
-    public String getResult() {
+    public @Nullable String getResult() {
         return result;
     }
 
@@ -82,6 +88,7 @@ abstract class AbstractQuery implements Query {
  *
  * @author mihai
  */
+@NullMarked
 class ConstantQuery extends AbstractQuery {
     public ConstantQuery(String constantID) {
         super();
@@ -119,6 +126,7 @@ class ConstantQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class SeqFieldQuery extends AbstractQuery {
     private final Sequence seqID;
 
@@ -176,6 +184,7 @@ class SeqFieldQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class ArrayFieldQuery extends AbstractQuery {
     private final String heapID;
     private final String objectID;
@@ -230,6 +239,7 @@ class ArrayFieldQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class FieldQuery extends AbstractQuery {
 
     private final String heapID;
@@ -289,6 +299,7 @@ class FieldQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class LocSetQuery extends AbstractQuery {
 
 
@@ -343,6 +354,7 @@ class LocSetQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class SeqLengthQuery extends AbstractQuery {
 
     private final String seqID;
@@ -401,6 +413,7 @@ class SeqLengthQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class ObjectLengthQuery extends AbstractQuery {
 
     private final String objectID;
@@ -461,6 +474,7 @@ class ObjectLengthQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class FunValueQuery extends AbstractQuery {
 
     private final String objectId;
@@ -520,6 +534,7 @@ class FunValueQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class ExactInstanceQuery extends AbstractQuery {
     private final String objectId;
     private final Sort sort;
@@ -578,6 +593,7 @@ class ExactInstanceQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class ObjectTypeQuery extends AbstractQuery {
 
     private final String objectId;
@@ -634,6 +650,7 @@ class ObjectTypeQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 public class ModelExtractor {
 
     public static final int DEFAULT = 0;
@@ -658,10 +675,10 @@ public class ModelExtractor {
     private final List<SMTFunction> seqs;
     private final Map<String, SMTSort> objFunctions;
 
-    private ProblemTypeInformation types;
+    private @Nullable ProblemTypeInformation types;
     private final Map<String, Sort> objectSorts;
 
-    private List<Query> queries;
+    private @Nullable List<Query> queries;
     private int currentQuery;
     private int intBound;
 
@@ -925,7 +942,7 @@ public class ModelExtractor {
 
     }
 
-    public ProblemTypeInformation getTypes() {
+    public @Nullable ProblemTypeInformation getTypes() {
         return types;
     }
 

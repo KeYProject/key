@@ -20,9 +20,13 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Rosa Abbasi, Jonas Schiffl, Mattias Ulbrich
  */
+@NullMarked
 public class FloatHandler implements SMTHandler {
 
     public static final Type FLOAT = new Type("Float", "f2u", "u2f");
@@ -43,15 +47,15 @@ public class FloatHandler implements SMTHandler {
     private final Map<Operator, String> fpOperators = new HashMap<>();
     private final Set<String> roundingOperators = new HashSet<>();
 
-    private FloatLDT floatLDT;
-    private DoubleLDT doubleLDT;
-    private Services services;
+    private @Nullable FloatLDT floatLDT;
+    private @Nullable DoubleLDT doubleLDT;
+    private @Nullable Services services;
 
     private boolean sqrtNative;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) throws IOException {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) throws IOException {
 
         this.services = services;
         floatLDT = services.getTypeConverter().getFloatLDT();

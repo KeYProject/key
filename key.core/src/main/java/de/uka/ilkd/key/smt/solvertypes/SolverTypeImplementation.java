@@ -20,6 +20,7 @@ import de.uka.ilkd.key.smt.communication.Z3Socket;
 import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Alicia Appelhagen
  */
+@NullMarked
 public final class SolverTypeImplementation implements SolverType {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SolverTypeImplementation.class);
@@ -139,7 +141,7 @@ public final class SolverTypeImplementation implements SolverType {
      * The versionParameter of the solver type at hand, returned by the actual program using the
      * {@link #versionParameter} cmd parameter.
      */
-    private String installedVersion;
+    private @Nullable String installedVersion;
 
     /**
      * The names of the {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}s to be used by the
@@ -435,7 +437,7 @@ public final class SolverTypeImplementation implements SolverType {
     }
 
     @Override
-    public String getInstalledVersion() {
+    public @Nullable String getInstalledVersion() {
         return installedVersion;
     }
 
@@ -552,7 +554,7 @@ public final class SolverTypeImplementation implements SolverType {
     }
 
     @Override
-    public @NonNull AbstractSolverSocket getSocket(ModelExtractor query) {
+    public @NonNull AbstractSolverSocket getSocket(@Nullable ModelExtractor query) {
         AbstractSolverSocket socket = solverSocket.copy();
         socket.setQuery(query);
         return socket;

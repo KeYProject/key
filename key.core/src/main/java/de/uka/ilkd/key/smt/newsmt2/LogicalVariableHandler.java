@@ -15,6 +15,9 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This simple SMT translation handler takes care of logical variables.
  *
@@ -24,13 +27,14 @@ import org.key_project.logic.sort.Sort;
  *
  * @author Jonas Schiffl
  */
+@NullMarked
 public class LogicalVariableHandler implements SMTHandler {
 
     static final String VAR_PREFIX = "var_";
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         // nothing to be done
     }
 

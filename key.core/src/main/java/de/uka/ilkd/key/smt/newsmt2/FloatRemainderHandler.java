@@ -17,6 +17,9 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This handler is a fallback handler that introduces a new uninterpreted function symbol with
  * prefix "uf_" for all FP expressions.
@@ -25,17 +28,18 @@ import org.key_project.logic.sort.Sort;
  *
  * According declarations are added.
  */
+@NullMarked
 public class FloatRemainderHandler implements SMTHandler {
 
     public final static String PREFIX = "float_";
     private static final String MAP_KEY = "UNKNOWN_FLOAT_THINGS";
 
-    private Sort floatSort;
-    private Sort doubleSort;
+    private @Nullable Sort floatSort;
+    private @Nullable Sort doubleSort;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         floatSort = services.getTypeConverter().getFloatLDT().targetSort();
         doubleSort = services.getTypeConverter().getDoubleLDT().targetSort();
 

@@ -11,11 +11,14 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class is a collection of static functions to construct SExpr objects.
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class SExprs {
 
     private SExprs() {

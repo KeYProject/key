@@ -7,6 +7,9 @@ package de.uka.ilkd.key.smt;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Simple routine to prettyprint an SMT2 input.
  * <p>
@@ -20,6 +23,7 @@ import java.util.List;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public abstract class SMTBeautifier {
 
     private SMTBeautifier() {
@@ -32,8 +36,8 @@ public abstract class SMTBeautifier {
 
     // An element is either a single string or a list of elements
     private static class Element {
-        private String head;
-        private List<Element> children;
+        private @Nullable String head;
+        private @Nullable List<Element> children;
 
         public int length() {
             int result = 0;
@@ -113,7 +117,7 @@ public abstract class SMTBeautifier {
         return sb.toString();
     }
 
-    private static Element parse(String s, MutableInt pos) {
+    private static @Nullable Element parse(String s, MutableInt pos) {
         while (pos.val < s.length()) {
             switch (s.charAt(pos.val)) {
                 case ' ':
