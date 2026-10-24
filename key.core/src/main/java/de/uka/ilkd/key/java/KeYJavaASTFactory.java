@@ -34,6 +34,7 @@ import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.COPY;
@@ -41,6 +42,7 @@ import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignm
 /**
  * The KeYASTFactory helps building KeY Java AST structures.
  */
+@NullMarked
 public abstract class KeYJavaASTFactory {
 
     /**
@@ -1795,7 +1797,8 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link MethodBodyStatement} for <code>classType.methodName</code> when called
      *         with <code>arguments</code> or <code>null</code> when the former is not defined
      */
-    public static MethodBodyStatement methodBody(final JavaInfo model, final ProgramVariable result,
+    public static @Nullable MethodBodyStatement methodBody(final JavaInfo model,
+            final ProgramVariable result,
             final ReferencePrefix reference, final KeYJavaType classType, final String methodName,
             final ProgramVariable[] arguments) {
         final IProgramMethod method =

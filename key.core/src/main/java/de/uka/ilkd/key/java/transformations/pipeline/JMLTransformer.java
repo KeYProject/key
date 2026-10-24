@@ -39,7 +39,7 @@ import com.github.javaparser.ast.nodeTypes.NodeWithParameters;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.Type;
 import com.google.common.base.Strings;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +82,7 @@ import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.*;
 /// @author bubel
 /// @author pfeifer
 /// @author ulbrich
+@NullMarked
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 public final class JMLTransformer extends JavaTransformerAbstract {
     public static final EnumSet<JMLModifier> JAVA_MODS =
@@ -124,7 +125,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
      * @return the newly created FieldDeclaration
      * @throws SLTranslationException
      */
-    private @NonNull FieldDeclaration transformClassFieldDecl(TextualJMLFieldDecl decl)
+    private FieldDeclaration transformClassFieldDecl(TextualJMLFieldDecl decl)
             throws SLTranslationException {
         NodeList<Modifier> modifiers = new NodeList<>();
         for (JMLModifier m : decl.getModifiers()) {
@@ -160,7 +161,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
      *        local variable declarations!)
      * @return the newly created statement
      */
-    private @NonNull Statement transformVariableDecl(TextualJMLFieldDecl decl) {
+    private Statement transformVariableDecl(TextualJMLFieldDecl decl) {
         NodeList<Modifier> modifiers = new NodeList<>();
         for (JMLModifier m : decl.getModifiers()) {
             if (m.equals(JMLModifier.MODEL)) {
@@ -199,7 +200,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
      * @return the new method declaration
      * @throws SLTranslationException
      */
-    private @NonNull MethodDeclaration transformMethodDecl(TextualJMLMethodDecl decl,
+    private MethodDeclaration transformMethodDecl(TextualJMLMethodDecl decl,
             @Nullable TextualJMLModifierList jmlModifiers)
             throws SLTranslationException {
         // prepend Java modifiers
@@ -508,7 +509,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
     }
 
     @Override
-    public void apply(@NonNull CompilationUnit cu) {
+    public void apply(CompilationUnit cu) {
         // abort if JML is disabled
         if (!ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isUseJML()) {
             return;

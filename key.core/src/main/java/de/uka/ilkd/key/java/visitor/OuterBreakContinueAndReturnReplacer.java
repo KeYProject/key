@@ -25,6 +25,10 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 
     protected static final Boolean CHANGED = Boolean.TRUE;
@@ -33,7 +37,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     private final Map<Label, LocationVariable> breakFlags;
     private final Map<Label, LocationVariable> continueFlags;
     private final LocationVariable returnFlag;
-    private final LocationVariable returnValue;
+    private final @Nullable LocationVariable returnValue;
     private final LocationVariable exception;
 
     private final ArrayDeque<ExtList> stack = new ArrayDeque<>();
@@ -47,7 +51,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             final Iterable<Label> alwaysInnerLabels, final Label breakOutLabel,
             final Map<Label, LocationVariable> breakFlags,
             final Map<Label, LocationVariable> continueFlags, final LocationVariable returnFlag,
-            final LocationVariable returnValue, final LocationVariable exception,
+            final @Nullable LocationVariable returnValue, final LocationVariable exception,
             final Services services) {
         super(block, services);
         for (Label label : alwaysInnerLabels) {
@@ -483,7 +487,8 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
         changed();
     }
 
-    private void addOldFlag(Map<ProgramVariable, ProgramVariable> oldFlags, ProgramVariable flag) {
+    private void addOldFlag(Map<ProgramVariable, ProgramVariable> oldFlags,
+            @Nullable ProgramVariable flag) {
         if (flag == null) {
             return;
         }

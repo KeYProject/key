@@ -35,9 +35,12 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class TypeConverter {
     public static final Logger LOGGER = LoggerFactory.getLogger(TypeConverter.class);
 
@@ -57,6 +60,7 @@ public final class TypeConverter {
     private final Map<Class<? extends AbstractLDT>, AbstractLDT> ldtsByClass = new HashMap<>();
 
     /** the heap theory, kept directly because this class itself uses it throughout */
+    @Nullable
     private HeapLDT heapLDT = null;
 
     TypeConverter(Services s) {
@@ -88,12 +92,12 @@ public final class TypeConverter {
      * @return the theory instance of that class
      * @param <T> the type of the theory
      */
-    public <T extends AbstractLDT> T getLDT(Class<T> ldtClass) {
+    public <T extends AbstractLDT> @Nullable T getLDT(Class<T> ldtClass) {
         return ldtClass.cast(ldtsByClass.get(ldtClass));
     }
 
 
-    public LDT getLDTFor(Sort s) {
+    public @Nullable LDT getLDTFor(Sort s) {
         for (LDT ldt : LDTs.values()) {
             if (s.equals(ldt.targetSort())) {
                 return ldt;
@@ -131,7 +135,7 @@ public final class TypeConverter {
         return getLDT(LocSetLDT.class);
     }
 
-    public HeapLDT getHeapLDT() {
+    public @Nullable HeapLDT getHeapLDT() {
         return heapLDT;
     }
 
@@ -231,7 +235,7 @@ public final class TypeConverter {
     }
 
 
-    public JTerm findThisForSortExact(Sort s, ExecutionContext ec) {
+    public @Nullable JTerm findThisForSortExact(Sort s, ExecutionContext ec) {
         ProgramElement pe = ec.getRuntimeInstance();
         if (pe == null) {
             return null;
@@ -241,7 +245,7 @@ public final class TypeConverter {
 
     }
 
-    public JTerm findThisForSort(Sort s, ExecutionContext ec) {
+    public @Nullable JTerm findThisForSort(Sort s, ExecutionContext ec) {
         ProgramElement pe = ec.getRuntimeInstance();
         if (pe == null) {
             return null;
@@ -347,7 +351,7 @@ public final class TypeConverter {
     }
 
 
-    public JTerm convertToLogicElement(ProgramElement pe, ExecutionContext ec) {
+    public JTerm convertToLogicElement(ProgramElement pe, @Nullable ExecutionContext ec) {
         if (pe instanceof ProgramConstant pc) {
             return tb.var(pc);
         } else if (pe instanceof LocationVariable lv) {
@@ -535,7 +539,7 @@ public final class TypeConverter {
      * @param ec the ExecutionContext of expression <tt>e</tt>
      * @return the KeYJavaType of expression <tt>e</tt>
      */
-    public KeYJavaType getKeYJavaType(Expression e, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Expression e, @Nullable ExecutionContext ec) {
         if (e instanceof ThisReference) {
             return ec.getTypeReference().getKeYJavaType();
         }
@@ -596,7 +600,7 @@ public final class TypeConverter {
     }
 
 
-    private Expression translateJavaCast(JTerm term, ExtList children) {
+    private @Nullable Expression translateJavaCast(JTerm term, ExtList children) {
         if (term.op() instanceof Function function) {
             if (function instanceof ParametricFunctionInstance pfi) {
                 ParametricFunctionDecl castFunction =
@@ -649,7 +653,7 @@ public final class TypeConverter {
     /**
      * These methods are taken from recoder (and modified)
      */
-    public boolean isWidening(PrimitiveType from, PrimitiveType to) {
+    public boolean isWidening(@Nullable PrimitiveType from, @Nullable PrimitiveType to) {
         // we do not handle null's
         if (from == null || to == null) {
             return false;
@@ -839,7 +843,7 @@ public final class TypeConverter {
     }
 
 
-    public boolean isNarrowing(PrimitiveType from, PrimitiveType to) {
+    public boolean isNarrowing(@Nullable PrimitiveType from, @Nullable PrimitiveType to) {
         // we do not handle null's
         if (from == null || to == null) {
             return false;
@@ -994,7 +998,7 @@ public final class TypeConverter {
         return TC;
     }
 
-    private AbstractLDT getResponsibleLDT(Operator op, JTerm[] subs,
+    private @Nullable AbstractLDT getResponsibleLDT(Operator op, JTerm[] subs,
             Services services, ExecutionContext ec) {
         for (LDT ldt : LDTs.values()) {
             if (ldt.isResponsible(op, subs, services, ec)) {

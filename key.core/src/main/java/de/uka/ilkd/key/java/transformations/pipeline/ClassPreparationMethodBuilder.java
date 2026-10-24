@@ -33,6 +33,7 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.VoidType;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +44,7 @@ import org.slf4j.LoggerFactory;
  * <code>&lt;clprepare&gt;</code> responsible for the class
  * preparation.
  */
+@NullMarked
 public class ClassPreparationMethodBuilder extends JavaTransformerAbstract {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(ClassPreparationMethodBuilder.class);

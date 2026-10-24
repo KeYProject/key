@@ -9,6 +9,8 @@ import org.key_project.util.parsing.HasLocation;
 import org.key_project.util.parsing.Location;
 
 import com.github.javaparser.ast.Node;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This exception class is mainly thrown by Recoder2KeY and its companions.
@@ -19,8 +21,9 @@ import com.github.javaparser.ast.Node;
  * This information is then read by the KeYParser to produce helpful error messages.
  *
  */
+@NullMarked
 public class ConvertException extends RuntimeException implements HasLocation {
-    private final Location location;
+    private final @Nullable Location location;
 
     public ConvertException(String message) {
         super(message);

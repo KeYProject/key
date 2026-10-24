@@ -30,10 +30,13 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used collect all
  * LocationVariables and optional function locations.
  */
+@NullMarked
 public class ProgramVariableCollector extends JavaASTVisitor {
 
     private final LinkedHashSet<LocationVariable> result = new LinkedHashSet<>();
