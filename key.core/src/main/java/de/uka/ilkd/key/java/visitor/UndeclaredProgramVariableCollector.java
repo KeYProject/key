@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * <p>
@@ -78,7 +78,7 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
      */
     @Override
     public void performActionOnLocalVariableDeclaration(LocalVariableDeclaration x) {
-        ImmutableArray<VariableSpecification> varSpecs = x.getVariableSpecifications();
+        ImmutableList<VariableSpecification> varSpecs = x.getVariableSpecifications();
         for (VariableSpecification spec : varSpecs) {
             IProgramVariable var = spec.getProgramVariable();
             if (var != null) {
