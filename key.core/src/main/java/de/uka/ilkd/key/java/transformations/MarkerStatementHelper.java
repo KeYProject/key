@@ -9,12 +9,14 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
 
 import com.github.javaparser.ast.DataKey;
+import org.jspecify.annotations.NullMarked;
 
 /**
  *
  * @author Alexander Weigl
  * @version 1 (3/4/26)
  */
+@NullMarked
 public class MarkerStatementHelper {
     public static final int KIND_UNKNOWN = 0;
     public static final int KIND_ASSERT = 1;

@@ -43,7 +43,8 @@ import com.github.javaparser.resolution.types.ResolvedArrayType;
 import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +63,7 @@ import static de.uka.ilkd.key.java.ast.declaration.Modifier.createModifierList;
  * @since jul-07
  */
 
+@NullMarked
 public class JP2KeYTypeConverter {
     private static final Logger LOGGER = LoggerFactory.getLogger(JP2KeYTypeConverter.class);
 
@@ -70,7 +72,7 @@ public class JP2KeYTypeConverter {
      *
      * @see #initArrayMethodBuilder()
      */
-    private CreateArrayMethodBuilder arrayMethodBuilder;
+    private @Nullable CreateArrayMethodBuilder arrayMethodBuilder;
 
     private final Services services;
 
@@ -80,9 +82,9 @@ public class JP2KeYTypeConverter {
     private final KeYJPMapping jp2KeY;
     private final TypeSolver typeSolver;
 
-    private KeYJavaType __objectType;
-    private KeYJavaType __cloneableType;
-    private KeYJavaType __serializableType;
+    private @Nullable KeYJavaType __objectType;
+    private @Nullable KeYJavaType __cloneableType;
+    private @Nullable KeYJavaType __serializableType;
 
     public JP2KeYTypeConverter(Services services, TypeSolver typeSolver, KeYJPMapping jp2KeY) {
         this.jp2KeY = jp2KeY;
@@ -168,7 +170,7 @@ public class JP2KeYTypeConverter {
      * @param type type to be converted, may be null
      * @return a keytype.
      */
-    public @NonNull KeYJavaType getKeYJavaType(ResolvedType type) {
+    public KeYJavaType getKeYJavaType(ResolvedType type) {
         return getKeYJavaType(type, false);
     }
 
@@ -176,7 +178,7 @@ public class JP2KeYTypeConverter {
         return addReferenceType(ref);
     }
 
-    public @NonNull KeYJavaType getKeYJavaType(ResolvedType type, boolean cachedOnly) {
+    public @Nullable KeYJavaType getKeYJavaType(@Nullable ResolvedType type, boolean cachedOnly) {
         if (type == null) {
             throw new NullPointerException("null cannot be converted into a KJT");
         }
@@ -369,7 +371,6 @@ public class JP2KeYTypeConverter {
         return new SortImpl(name, supers, isAbstract || ct.isInterface());
     }
 
-    @NonNull
     private KeYJavaType getSuperArrayType() {
         var res = jp2KeY.getSuperArrayType();
         if (res == null) {
@@ -415,7 +416,6 @@ public class JP2KeYTypeConverter {
      * <p>
      * creates the field declaration for the public final integer field <code>length</code>
      */
-    @NonNull
     private KeYJavaType createSuperArrayType() {
         KeYJavaType integerType = getKeYJavaType(ResolvedPrimitiveType.INT);
 

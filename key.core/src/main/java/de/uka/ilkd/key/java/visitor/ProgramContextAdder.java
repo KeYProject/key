@@ -23,10 +23,13 @@ import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import org.key_project.logic.IntIterator;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A context given as {@link ContextStatementBlockInstantiation} is wrapped around a given
  * {@link ProgramElement}.
  */
+@NullMarked
 public class ProgramContextAdder {
 
     /**

@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.FileCollection;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -40,6 +41,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author mulbrich
  */
+@NullMarked
 public class JavaReduxFileCollection implements FileCollection {
 
     /**
@@ -151,12 +153,12 @@ public class JavaReduxFileCollection implements FileCollection {
         /**
          * The currently open resource. null before the first step and after the last step.
          */
-        private String current = null;
+        private @Nullable String current = null;
 
         /**
          * The URL of the current resource.
          */
-        private URL currentURL = null;
+        private @Nullable URL currentURL = null;
 
 
         private Walker(Iterator<String> iterator) {
@@ -217,7 +219,7 @@ public class JavaReduxFileCollection implements FileCollection {
         }
 
         @Override
-        public String getRelativeLocation() {
+        public @Nullable String getRelativeLocation() {
             return null;
         }
     }

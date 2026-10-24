@@ -31,7 +31,7 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.VoidType;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -40,6 +40,7 @@ import org.jspecify.annotations.Nullable;
  * methodcall <code>&lt;init&gt;<cons_args)</code>. The visibility of
  * the normalform is the same as for the original constructor.
  */
+@NullMarked
 public class ConstructorNormalformBuilder extends JavaTransformerAbstract {
     /**
      * creates the constructor normalform builder
@@ -74,8 +75,7 @@ public class ConstructorNormalformBuilder extends JavaTransformerAbstract {
      * @param cons
      *        the Constructor to be transformed
      */
-    private void normalform(@NonNull ClassOrInterfaceDeclaration cd,
-            @NonNull ConstructorDeclaration cons) {
+    private void normalform(ClassOrInterfaceDeclaration cd, ConstructorDeclaration cons) {
         final var enclosingClass = getEnclosingClass(cd);
         NodeList<Modifier> mods = new NodeList<>();
 
@@ -227,8 +227,7 @@ public class ConstructorNormalformBuilder extends JavaTransformerAbstract {
      * @param offset in case of an inner class the first statement is the initialisation
      *        of the outer this reference not an initializer
      */
-    private void addInitializers(@NonNull ClassOrInterfaceDeclaration cd,
-            BlockStmt body, int offset) {
+    private void addInitializers(ClassOrInterfaceDeclaration cd, BlockStmt body, int offset) {
         var initializers = services.getInitializers(cd);
         int i = offset + 1; // + 1 as initialisation happens after super(..) call
         for (Statement initializer : initializers) {

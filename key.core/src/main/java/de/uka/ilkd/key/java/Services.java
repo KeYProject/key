@@ -27,7 +27,7 @@ import org.key_project.prover.proof.ProofServices;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.lookup.Lookup;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +37,13 @@ import org.slf4j.LoggerFactory;
  * underlying Java model and a converter to transform Java program elements to logic (where
  * possible) and back.
  */
+@NullMarked
 public class Services implements TermServices, LogicServices, ProofServices {
     private static final Logger LOGGER = LoggerFactory.getLogger(Services.class);
     /**
      * the proof
      */
+    @Nullable
     private Proof proof;
 
     /**
@@ -85,6 +87,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
     /*
      * the Java model (with all paths)
      */
+    @Nullable
     private JavaModel javaModel;
 
     /**
@@ -104,6 +107,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
     private ITermProgramVariableCollectorFactory factory =
         TermProgramVariableCollector::new;
 
+    @Nullable
     private OriginTermLabelFactory originFactory;
 
     private final Profile profile;
@@ -207,7 +211,6 @@ public class Services implements TermServices, LogicServices, ProofServices {
     /**
      * Returns the JavaInfo associated with this Services object.
      */
-    @NonNull
     public JavaInfo getJavaInfo() {
         return Objects.requireNonNull(javaInfo);
     }
@@ -401,7 +404,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
     /**
      * Returns the proof to which this object belongs, or null if it does not belong to any proof.
      */
-    public Proof getProof() {
+    public @Nullable Proof getProof() {
         return proof;
     }
 
@@ -423,7 +426,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
      *
      * @return the {@link JavaModel} on which this services is based on
      */
-    public JavaModel getJavaModel() {
+    public @Nullable JavaModel getJavaModel() {
         return javaModel;
     }
 
@@ -508,7 +511,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
      *
      * @return the OriginTermLabelFactory to use or null if origin labels should not be created
      */
-    public OriginTermLabelFactory getOriginFactory() {
+    public @Nullable OriginTermLabelFactory getOriginFactory() {
         return originFactory;
     }
     // =================================================================================================================
@@ -527,7 +530,6 @@ public class Services implements TermServices, LogicServices, ProofServices {
         return lookup;
     }
 
-    @NonNull
     public JavaService getJavaService() {
         assert javaService != null : "Java Services needs to initialized in advanced.";
         return javaService;
@@ -542,8 +544,8 @@ public class Services implements TermServices, LogicServices, ProofServices {
         return javaService;
     }
 
-    private JavaService activateJavaPath(@NonNull Path bootClassPath,
-            @NonNull Collection<Path> libraryPaths, FileRepo fileRepo) {
+    private JavaService activateJavaPath(Path bootClassPath,
+            Collection<Path> libraryPaths, @Nullable FileRepo fileRepo) {
         if (javaService != null && javaService.getBootClassPath().equals(bootClassPath)
                 && CollectionUtil.containsSame(javaService.getLibraryPath(), libraryPaths)) {
             return javaService;
@@ -555,7 +557,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
     }
 
     public JavaService activateJava(@Nullable Path bootClassPath,
-            @NonNull Collection<Path> libraryPaths, FileRepo fileRepo) {
+            Collection<Path> libraryPaths, @Nullable FileRepo fileRepo) {
         Path path;
         if (bootClassPath != null) {
             path = bootClassPath;

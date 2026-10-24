@@ -26,10 +26,13 @@ import de.uka.ilkd.key.speclang.MergeContract;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class is implemented by visitors/walkers. Each AST node implements a visit(Visitor) method
  * that calls the doActionAt<NodeType> method. Similar to the pretty print mechanism.
  */
+@NullMarked
 public interface Visitor {
 
     void performActionOnAbstractProgramElement(AbstractProgramElement x);

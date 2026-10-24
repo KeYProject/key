@@ -10,12 +10,14 @@ import java.net.URI;
 import org.key_project.util.parsing.Position;
 
 import com.github.javaparser.ast.Node;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
  * @version 1 (16.04.23)
  */
+@NullMarked
 public class JavaBuildingIssue {
     private final Node node;
     private final String message;
