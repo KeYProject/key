@@ -65,7 +65,7 @@ public class Switch extends BranchStatement
      */
 
     public Switch(Expression e, Branch[] branches) {
-        this.branches = ImmutableList.of(branches);
+        this.branches = ImmutableList.ofFixedSize(branches);
         this.expression = e;
     }
 
@@ -79,7 +79,7 @@ public class Switch extends BranchStatement
     public Switch(ExtList children) {
         super(children);
         this.expression = children.get(Expression.class);
-        this.branches = ImmutableList.of(children.collect(Branch.class));
+        this.branches = ImmutableList.ofFixedSize(children.collect(Branch.class));
     }
 
     public Switch(PositionInfo pi, List<Comment> c, Expression expr,
