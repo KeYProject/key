@@ -104,12 +104,27 @@ If Wave 1 pilot looks good, later waves run with more concurrency.
 4. Commit per cluster (`feat(nullness): annotate <cluster> [PR #3470 follow-up]`).
 5. Ledger: `.superpowers/sdd/progress.md`.
 
-## Phase 2 — NullAway fast trials (after Wave 1 lands)
+## Phase 2 — NullAway fast trials (after Wave 1 landed)
 
-- Add NullAway + jspecify to version catalog; configure per-module opt-in via
-  system property (mirroring `ENABLE_NULLNESS`).
-- Run over `key.core`, triage findings in waves, fix + recommit.
-- Keep EISOP checker config untouched for the four small modules.
+Dependency (already added to version catalog): `com.uber.nullaway:nullaway:0.14.3`.
+
+Proposed wiring (apply + test only in the dedicated Phase 2 step, behind a
+property so the default build stays untouched):
+- In `build.gradle` subprojects block, add `compileOnly(libs.nullaway)` so the
+  plugin jar is on the javac classpath, and in
+  `tasks.withType(JavaCompile).configureEach`:
+  ```
+  if (System.getProperty("ENABLE_NULLAWAY")) {
+      options.compilerArgs += [
+          "-Xplugin:NullAway AnnotatedPackages=de.uka.ilkd.key,org.key_project",
+      ]
+  }
+  ```
+  (exact `-Xplugin` argument syntax to be confirmed with a trial run; NullAway
+  0.14.x reads JSpecify `@NullMarked`/`@Nullable` from the classpath).
+- Trial runs: `./gradlew -DENABLE_NULLAWAY=true :key.core:compileJava`
+- Fix findings per package, then keep the property off by default until the
+  module is clean; afterwards wire into the CI job alongside EISOP.
 
 ## Phase 3 — EISOP conformance (final gate)
 
