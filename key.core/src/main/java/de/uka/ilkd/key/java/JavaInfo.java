@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.JavaDLFieldNames;
@@ -433,8 +434,9 @@ public final class JavaInfo {
      * String fullName
      *
      * @param fullName a String with the type name to lookup
+     * @return the KeYJavaType for the given name or {@code null} if no such type is known
      */
-    public KeYJavaType getKeYJavaType(String fullName) {
+    public @Nullable KeYJavaType getKeYJavaType(String fullName) {
         KeYJavaType result = getPrimitiveKeYJavaType(fullName);
         return (result == null ? getTypeByClassName(fullName) : result);
     }
@@ -493,8 +495,11 @@ public final class JavaInfo {
             return true;
         }
 
-        if (ModifierKind.allowsInheritance(visibility)) {
-            return visibleTo.getSort().extendsTrans(kjt.getSort()) || visibleToPackage;
+        if (ModifierKind.allowsInheritance(visibility == null ? JML_PACKAGE : visibility)) {
+            final Sort visibleToSort = Objects.requireNonNull(visibleTo.getSort(),
+                "sort of " + visibleTo);
+            final Sort kjtSort = Objects.requireNonNull(kjt.getSort(), "sort of " + kjt);
+            return visibleToSort.extendsTrans(kjtSort) || visibleToPackage;
         }
 
         if (visibility == null || visibility == JML_PACKAGE) {
@@ -556,7 +561,7 @@ public final class JavaInfo {
     /**
      * returns the KeYJavaType belonging to the given Type t
      */
-    public KeYJavaType getKeYJavaType(Type t) {
+    public @Nullable KeYJavaType getKeYJavaType(Type t) {
         ConcurrentHashMap<Type, KeYJavaType> cache = type2KJTCache;
         if (cache == null) {
             cache = buildType2KJTCache();
@@ -611,7 +616,8 @@ public final class JavaInfo {
         return kpmi.getConstructors(kjt);
     }
 
-    public IProgramMethod getConstructor(KeYJavaType kjt, ImmutableList<KeYJavaType> signature,
+    public @Nullable IProgramMethod getConstructor(KeYJavaType kjt,
+            ImmutableList<KeYJavaType> signature,
             KeYJavaType invocationContext) {
         return kpmi.getConstructor(kjt, signature, invocationContext,
             services.getJavaService().getProgramFactory().getTypeSolver());
@@ -627,7 +633,7 @@ public final class JavaInfo {
      * @param context the KeYJavaType of the class context from <em>where</em> the method is called
      * @return a matching program method
      */
-    public IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
+    public @Nullable IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
             Iterable<KeYJavaType> signature, KeYJavaType context) {
         return kpmi.getProgramMethod(classType, methodName, signature, context);
     }
@@ -676,7 +682,7 @@ public final class JavaInfo {
      * @param args an array of ProgramVariables as the arguments of the method
      * @return a matching program method
      */
-    public IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
+    public @Nullable IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
             ProgramVariable[] args, KeYJavaType context) {
         List<KeYJavaType> types = new ArrayList<>(args.length);
         for (ProgramVariable arg : args) {
@@ -685,13 +691,13 @@ public final class JavaInfo {
         return getProgramMethod(classType, methodName, types, context);
     }
 
-    public IProgramMethod getToplevelPM(KeYJavaType kjt, String methodName,
+    public @Nullable IProgramMethod getToplevelPM(KeYJavaType kjt, String methodName,
             ImmutableList<KeYJavaType> sig) {
         return findToplevelPM(kjt, methodName, sig, kjt);
     }
 
     /* This method has been introduced as bugfix to #1487 */
-    private IProgramMethod findToplevelPM(KeYJavaType kjt, String methodName,
+    private @Nullable IProgramMethod findToplevelPM(KeYJavaType kjt, String methodName,
             ImmutableList<KeYJavaType> sig, KeYJavaType context) {
 
         List<KeYJavaType> allSupertypes = getAllSupertypes(kjt);
@@ -705,10 +711,12 @@ public final class JavaInfo {
         return getProgramMethod(kjt, methodName, sig, context);
     }
 
-    public IProgramMethod getToplevelPM(KeYJavaType kjt, IProgramMethod pm) {
+    public @Nullable IProgramMethod getToplevelPM(KeYJavaType kjt, IProgramMethod pm) {
         final String methodName = pm.getName();
+        final ImmutableArray<KeYJavaType> paramTypes =
+            Objects.requireNonNull(pm.getParamTypes(), "param types of " + methodName);
         final ImmutableList<KeYJavaType> sig = ImmutableList.<KeYJavaType>nil()
-                .append(pm.getParamTypes().toArray(new KeYJavaType[pm.getNumParams()]));
+                .append(paramTypes.toArray(new KeYJavaType[pm.getNumParams()]));
         return getToplevelPM(kjt, methodName, sig);
     }
 
@@ -722,7 +730,8 @@ public final class JavaInfo {
 
     public JTerm getStaticProgramMethodTerm(String methodName, JTerm[] args, String className) {
         List<List<KeYJavaType>> signature = termArrayToSignature(args);
-        KeYJavaType classKJT = getTypeByClassName(className);
+        KeYJavaType classKJT = Objects.requireNonNull(getTypeByClassName(className),
+            "class " + className + " not found");
         IProgramMethod pm = getProgramMethod(classKJT, methodName, signature, classKJT);
         return getTermFromProgramMethod(pm, methodName, className, args, null);
     }
@@ -741,7 +750,8 @@ public final class JavaInfo {
 
         List<List<KeYJavaType>> signature = termArrayToSignature(args);
         IProgramMethod pm = null;
-        KeYJavaType classKJT = getTypeByClassName(className);
+        KeYJavaType classKJT = Objects.requireNonNull(getTypeByClassName(className),
+            "class " + className + " not found");
         /*
          * Method is referenced from a non-static context.
          */
@@ -789,7 +799,8 @@ public final class JavaInfo {
             subs[offset++] = services.getTermBuilder().var(heap);
         }
         if (!pm.isStatic()) {
-            subs[offset++] = prefix;
+            subs[offset++] =
+                Objects.requireNonNull(prefix, "receiver of non-static program method");
         }
         for (int i = 0; offset < subs.length; i++, offset++) {
             subs[offset] = args[i];
@@ -812,7 +823,8 @@ public final class JavaInfo {
      */
     public @Nullable KeYJavaType getSuperclass(KeYJavaType type) {
         KeYJavaType result = null;
-        final ClassType javaType = (ClassType) type.getJavaType();
+        final ClassType javaType =
+            (ClassType) Objects.requireNonNull(type.getJavaType(), "java type of " + type);
 
         if (javaType.isInterface()) {
             return null;
@@ -822,16 +834,23 @@ public final class JavaInfo {
         final Iterator<KeYJavaType> it = localSupertypes.iterator();
         while (result == null && it.hasNext()) {
             final KeYJavaType keYType = it.next();
-            if (!((ClassType) keYType.getJavaType()).isInterface()) {
+            final ClassType keYTypeClass = (ClassType) Objects.requireNonNull(
+                keYType.getJavaType(), "java type of supertype " + keYType);
+            if (!keYTypeClass.isInterface()) {
                 result = keYType;
             }
         }
 
         if (result == null && ((ClassDeclaration) javaType).isAnonymousClass()) {
-            for (Sort sort : type.getSort().extendsSorts()) {
+            final Sort typeSort = Objects.requireNonNull(type.getSort(), "sort of " + type);
+            for (Sort sort : typeSort.extendsSorts()) {
                 Sort s = sort;
-                if (!((ClassType) getKeYJavaType(s).getJavaType()).isInterface()) {
-                    return getKeYJavaType(s);
+                final KeYJavaType superCandidate = Objects.requireNonNull(getKeYJavaType(s),
+                    "KeYJavaType for sort " + s);
+                final ClassType superCandidateClass = (ClassType) Objects.requireNonNull(
+                    superCandidate.getJavaType(), "java type of sort " + s);
+                if (!superCandidateClass.isInterface()) {
+                    return superCandidate;
                 }
             }
         }
@@ -1093,7 +1112,8 @@ public final class JavaInfo {
             boolean traverseSubtypes) {
         ImmutableList<ProgramVariable> result = ImmutableList.nil();
 
-        if (!(type.getSort().extendsTrans(objectSort()))) {
+        final Sort typeSort = Objects.requireNonNull(type.getSort(), "sort of " + type);
+        if (!(typeSort.extendsTrans(objectSort()))) {
             return result;
         }
 
@@ -1159,9 +1179,12 @@ public final class JavaInfo {
      */
     public Sort objectSort() {
         if (getJavaLangObject() == null) {
-            return services.getNamespaces().sorts().lookup("java.lang.Object");
+            return Objects.requireNonNull(
+                services.getNamespaces().sorts().lookup("java.lang.Object"),
+                "sort java.lang.Object not found");
         } else {
-            return getJavaLangObject().getSort();
+            return Objects.requireNonNull(getJavaLangObject().getSort(),
+                "sort of java.lang.Object");
         }
     }
 
@@ -1170,9 +1193,12 @@ public final class JavaInfo {
      */
     public Sort cloneableSort() {
         if (getJavaLangCloneable() == null) {
-            return services.getNamespaces().sorts().lookup("java.lang.Cloneable");
+            return Objects.requireNonNull(
+                services.getNamespaces().sorts().lookup("java.lang.Cloneable"),
+                "sort java.lang.Cloneable not found");
         } else {
-            return getJavaLangCloneable().getSort();
+            return Objects.requireNonNull(getJavaLangCloneable().getSort(),
+                "sort of java.lang.Cloneable");
         }
     }
 
@@ -1181,14 +1207,17 @@ public final class JavaInfo {
      */
     public Sort serializableSort() {
         if (getJavaIoSerializable() == null) {
-            return services.getNamespaces().sorts().lookup("java.io.Serializable");
+            return Objects.requireNonNull(
+                services.getNamespaces().sorts().lookup("java.io.Serializable"),
+                "sort java.io.Serializable not found");
         } else {
-            return getJavaIoSerializable().getSort();
+            return Objects.requireNonNull(getJavaIoSerializable().getSort(),
+                "sort of java.io.Serializable");
         }
     }
 
     public Sort nullSort() {
-        return getNullType().getSort();
+        return Objects.requireNonNull(getNullType().getSort(), "sort of null type");
     }
 
     /**
@@ -1208,7 +1237,7 @@ public final class JavaInfo {
             nullType = getTypeByClassName("null");
             assert nullType != null : "we should already have the nulltype in the map";
         }
-        return nullType;
+        return Objects.requireNonNull(nullType, "null type not found");
     }
 
 
@@ -1233,7 +1262,8 @@ public final class JavaInfo {
                         .readCompilationUnit("public class %s { void %s() {} }"
                                 .formatted(DEFAULT_EXECUTION_CONTEXT_CLASS,
                                     DEFAULT_EXECUTION_CONTEXT_METHOD));
-                kjt = getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
+                kjt = Objects.requireNonNull(getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS),
+                    DEFAULT_EXECUTION_CONTEXT_CLASS + " was not registered");
             }
             // The synthetic __Default__ class is registered in the (shared) model -- now at load
             // time via the ProblemInitializer warm-up -- but it is not a user class. Mark it so it
@@ -1241,8 +1271,12 @@ public final class JavaInfo {
             // user-types cache in case it was built between registering and marking the type.
             kjt.markInternal();
             userTypesCache = null;
-            defaultExecutionContext = new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt,
-                DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableList.nil()), null);
+            defaultExecutionContext = new ExecutionContext(new TypeRef(kjt),
+                Objects.requireNonNull(getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD,
+                    ImmutableList.nil()),
+                    DEFAULT_EXECUTION_CONTEXT_METHOD + " not found in "
+                        + DEFAULT_EXECUTION_CONTEXT_CLASS),
+                null);
         }
         return defaultExecutionContext;
     }
@@ -1285,7 +1319,7 @@ public final class JavaInfo {
      */
     public List<KeYJavaType> getAllSupertypes(KeYJavaType type) {
         if (type.getJavaType() instanceof ArrayType) {
-            return getSuperSorts(type.getSort())
+            return getSuperSorts(Objects.requireNonNull(type.getSort(), "sort of " + type))
                     .stream()
                     .map(this::getKeYJavaType)
                     .toList();
@@ -1314,7 +1348,8 @@ public final class JavaInfo {
      * @param classType the KeYJavaType of the class used as context
      * @return the field of the given name
      */
-    public ProgramVariable lookupVisibleAttribute(String programName, KeYJavaType classType) {
+    public @Nullable ProgramVariable lookupVisibleAttribute(String programName,
+            KeYJavaType classType) {
         return find(programName, kpmi.getAllVisibleFields(classType));
     }
 
@@ -1342,9 +1377,11 @@ public final class JavaInfo {
 
         result = ImmutableList.nil();
 
-        if (k1.getSort().extendsTrans(k2.getSort())) {
+        final Sort k1Sort = Objects.requireNonNull(k1.getSort(), "sort of " + k1);
+        final Sort k2Sort = Objects.requireNonNull(k2.getSort(), "sort of " + k2);
+        if (k1Sort.extendsTrans(k2Sort)) {
             result = getAllSubtypes(k1).prepend(k1);
-        } else if (k2.getSort().extendsTrans(k1.getSort())) {
+        } else if (k2Sort.extendsTrans(k1Sort)) {
             result = getAllSubtypes(k2).prepend(k2);
         } else {
             final ImmutableList<KeYJavaType> l1 = getAllSubtypes(k1);
@@ -1367,9 +1404,12 @@ public final class JavaInfo {
      */
     public LocationVariable getArrayLength() {
         if (length == null) {
-            final SuperArrayDeclaration sad =
-                (SuperArrayDeclaration) rec2key().getSuperArrayType().getJavaType();
-            length = (LocationVariable) sad.length().getVariables().get(0).getProgramVariable();
+            final KeYJavaType superArrayKJT = Objects.requireNonNull(rec2key().getSuperArrayType(),
+                "super array type not found");
+            final SuperArrayDeclaration sad = (SuperArrayDeclaration) Objects.requireNonNull(
+                superArrayKJT.getJavaType(), "java type of super array");
+            length = (LocationVariable) Objects.requireNonNull(sad.length(),
+                "length declaration of super array").getVariables().get(0).getProgramVariable();
             assert "length".equals(length.name().toString()) : "Wrong array length";
         }
 
@@ -1388,11 +1428,15 @@ public final class JavaInfo {
         if (inv == null
                 || inv.getHeapCount(services) != HeapContext.getModifiableHeaps(services, false)
                         .size()) {
-            inv =
-                (ObserverFunction) services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
-                    (LocationVariable) services.getJavaInfo().getCanonicalFieldProgramVariable(
+            final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter()
+                    .getHeapLDT(),
+                "heap LDT not initialised");
+            inv = (ObserverFunction) heapLDT.getFieldSymbolForPV(
+                (LocationVariable) Objects.requireNonNull(
+                    services.getJavaInfo().getCanonicalFieldProgramVariable(
                         PipelineConstants.IMPLICIT_OBJECT_INVARIANT, getJavaLangObject()),
-                    services);
+                    "field program variable for " + PipelineConstants.IMPLICIT_OBJECT_INVARIANT),
+                services);
         }
         return inv;
     }
@@ -1405,11 +1449,16 @@ public final class JavaInfo {
     public IObserverFunction getInvFree() {
         if (invFree == null || invFree.getHeapCount(services) != HeapContext
                 .getModifiableHeaps(services, false).size()) {
-            invFree =
-                (ObserverFunction) services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
-                    (LocationVariable) services.getJavaInfo().getCanonicalFieldProgramVariable(
+            final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter()
+                    .getHeapLDT(),
+                "heap LDT not initialised");
+            invFree = (ObserverFunction) heapLDT.getFieldSymbolForPV(
+                (LocationVariable) Objects.requireNonNull(
+                    services.getJavaInfo().getCanonicalFieldProgramVariable(
                         PipelineConstants.IMPLICIT_OBJECT_FREE_INVARIANT, getJavaLangObject()),
-                    services);
+                    "field program variable for "
+                        + PipelineConstants.IMPLICIT_OBJECT_FREE_INVARIANT),
+                services);
         }
         return invFree;
     }
@@ -1425,9 +1474,14 @@ public final class JavaInfo {
         // same proof environment have the same $inv symbols.
         ObserverFunction inv = staticInvs.get(target);
         if (inv == null) {
-            inv = (ObserverFunction) services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
-                (LocationVariable) services.getJavaInfo().getCanonicalFieldProgramVariable(
-                    PipelineConstants.IMPLICIT_CLASS_INVARIANT, target),
+            final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter()
+                    .getHeapLDT(),
+                "heap LDT not initialised");
+            inv = (ObserverFunction) heapLDT.getFieldSymbolForPV(
+                (LocationVariable) Objects.requireNonNull(
+                    services.getJavaInfo().getCanonicalFieldProgramVariable(
+                        PipelineConstants.IMPLICIT_CLASS_INVARIANT, target),
+                    "field program variable for " + PipelineConstants.IMPLICIT_CLASS_INVARIANT),
                 services);
             staticInvs.put(target, inv);
         }
@@ -1441,9 +1495,15 @@ public final class JavaInfo {
     public IObserverFunction getStaticInvFree(KeYJavaType target) {
         ObserverFunction inv = staticFreeInvs.get(target);
         if (inv == null) {
-            inv = (ObserverFunction) services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(
-                (LocationVariable) services.getJavaInfo().getCanonicalFieldProgramVariable(
-                    PipelineConstants.IMPLICIT_CLASS_FREE_INVARIANT, target),
+            final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter()
+                    .getHeapLDT(),
+                "heap LDT not initialised");
+            inv = (ObserverFunction) heapLDT.getFieldSymbolForPV(
+                (LocationVariable) Objects.requireNonNull(
+                    services.getJavaInfo().getCanonicalFieldProgramVariable(
+                        PipelineConstants.IMPLICIT_CLASS_FREE_INVARIANT, target),
+                    "field program variable for "
+                        + PipelineConstants.IMPLICIT_CLASS_FREE_INVARIANT),
                 services);
             staticFreeInvs.put(target, inv);
         }
@@ -1462,7 +1522,9 @@ public final class JavaInfo {
     public boolean isCanonicalProgramMethod(IProgramMethod method, KeYJavaType context)
             throws NullPointerException {
         String name = method.getName();
-        ImmutableArray<KeYJavaType> paramTypes = method.getParamTypes();
+        final ImmutableArray<KeYJavaType> paramTypes =
+            Objects.requireNonNull(method.getParamTypes(),
+                "param types of " + name);
         IProgramMethod canonicalMethod = getProgramMethod(context, name, paramTypes, context);
         if (method.isPublic()) {
             /*
@@ -1480,7 +1542,7 @@ public final class JavaInfo {
                 }
             }
         }
-        return method.equals(canonicalMethod);
+        return canonicalMethod == null ? false : method.equals(canonicalMethod);
     }
 
     /**
@@ -1530,9 +1592,10 @@ public final class JavaInfo {
 
                 // try if class is in same package
                 if (lastSep >= 0) {
-                    assert containerType != null;
+                    final KeYJavaType containerTypeNonNull = Objects.requireNonNull(containerType,
+                        "container type");
                     result = getTypeByClassName(
-                        containerType.getFullName().substring(0, lastSep) + "." + name);
+                        containerTypeNonNull.getFullName().substring(0, lastSep) + "." + name);
                 }
 
                 if (result == null) {
