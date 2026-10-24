@@ -325,7 +325,7 @@ public abstract class AbstractBetaFeature implements Feature {
         public boolean containsQuantifier;
 
         /** one of CAND_* */
-        private Candidate candidate;
+        private Candidate candidate = Candidate.CAND_NEVER;
     }
 
     /**

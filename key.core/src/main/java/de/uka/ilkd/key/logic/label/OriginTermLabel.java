@@ -10,6 +10,7 @@ import java.util.*;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.JFunction;
@@ -106,7 +107,7 @@ public class OriginTermLabel implements TermLabel {
         // iterate over its parent terms until we find one with an origin label,
         // then show that term's origin.
         while (originLabel == null && !pio.isTopLevel()) {
-            pio = pio.up();
+            pio = Objects.requireNonNull(pio.up());
             term = (JTerm) pio.subTerm();
 
             originLabel = (OriginTermLabel) term.getLabel(NAME);
@@ -235,7 +236,8 @@ public class OriginTermLabel implements TermLabel {
             if (sort.extendsTrans(JavaDLTheory.FORMULA)) {
                 return true;
             } else if (op instanceof ProgramVariable) {
-                return !sort.extendsTrans(tc.getHeapLDT().targetSort())
+                final HeapLDT heapLDT = Objects.requireNonNull(tc.getHeapLDT());
+                return !sort.extendsTrans(heapLDT.targetSort())
                         && !sort.extendsTrans(tc.getLocSetLDT().targetSort())
                         && !op.name().equals(ji.getInv().name())
                         && !op.name().toString().endsWith(SpecificationRepository.LIMIT_SUFFIX);
@@ -263,7 +265,7 @@ public class OriginTermLabel implements TermLabel {
         for (int i = 1; i <= seq.size(); ++i) {
             SequentFormula oldFormula = seq.getFormulaByNr(i);
             SequentFormula newFormula = new SequentFormula(
-                removeOriginLabels((JTerm) oldFormula.formula(), services));
+                Objects.requireNonNull(removeOriginLabels((JTerm) oldFormula.formula(), services)));
             SequentChangeInfo change =
                 seq.changeFormula(newFormula,
                     PosInOccurrence.findInSequent(seq, i,
@@ -302,7 +304,7 @@ public class OriginTermLabel implements TermLabel {
         }
 
         for (int i = 0; i < newSubs.length; ++i) {
-            newSubs[i] = removeOriginLabels(oldSubs.get(i), services);
+            newSubs[i] = Objects.requireNonNull(removeOriginLabels(oldSubs.get(i), services));
         }
 
         return tf.createTerm(term.op(), newSubs, term.boundVars(),
@@ -349,7 +351,7 @@ public class OriginTermLabel implements TermLabel {
             return new Origin(SpecType.NONE);
         }
 
-        return new FileOrigin(commonSpecType, commonFileName, commonLine);
+        return new FileOrigin(Objects.requireNonNull(commonSpecType), commonFileName, commonLine);
     }
 
     /**
@@ -387,7 +389,7 @@ public class OriginTermLabel implements TermLabel {
             }
         }
 
-        return new NodeOrigin(commonSpecType, commonRuleName, commonNr);
+        return new NodeOrigin(commonSpecType, Objects.requireNonNull(commonRuleName), commonNr);
     }
 
     /**
