@@ -57,6 +57,9 @@ public class LlmSettings extends AbstractPropertiesSettings {
         createIntegerProperty("maxOutputTokens", 4096);
     private final PropertyEntry<Boolean> agentCanUseSkills =
         createBooleanProperty("agentCanUseSkills", false);
+    /** Whether the agent may consult a fresh LLM instance ({@code ask_llm}). */
+    private final PropertyEntry<Boolean> askLlmEnabled =
+        createBooleanProperty("askLlmEnabled", true);
 
     // --- sub-agents ---
     private final PropertyEntry<Boolean> subagentsEnabled =
@@ -136,6 +139,7 @@ public class LlmSettings extends AbstractPropertiesSettings {
         setSendMaxOutputTokens(other.getSendMaxOutputTokens());
         setMaxOutputTokens(other.getMaxOutputTokens());
         setAgentCanUseSkills(other.getAgentCanUseSkills());
+        setAskLlmEnabled(other.getAskLlmEnabled());
         setSubagentsEnabled(other.getSubagentsEnabled());
         setMaxSubagentTurns(other.getMaxSubagentTurns());
         setMaxSubagentDepth(other.getMaxSubagentDepth());
@@ -261,6 +265,15 @@ public class LlmSettings extends AbstractPropertiesSettings {
 
     public void setAgentCanUseSkills(boolean v) {
         this.agentCanUseSkills.set(v);
+    }
+
+    /** Whether the agent may consult a fresh LLM instance via {@code ask_llm}. */
+    public boolean getAskLlmEnabled() {
+        return askLlmEnabled.get();
+    }
+
+    public void setAskLlmEnabled(boolean enabled) {
+        this.askLlmEnabled.set(enabled);
     }
 
     /** Whether the agent may delegate tasks to sub-agents ({@code spawn_subagent}). */

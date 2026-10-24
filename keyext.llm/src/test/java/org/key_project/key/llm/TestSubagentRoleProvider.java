@@ -19,6 +19,8 @@ public class TestSubagentRoleProvider implements SubagentRoleProvider {
     public static final String ECHO_ROLE = "echo-role";
     public static final String SPAWNER_ROLE = "spawner-role";
     public static final String PARALLEL_SPAWNER_ROLE = "parallel-spawner-role";
+    /** A role that may consult a fresh LLM instance via {@code ask_llm}. */
+    public static final String ASK_LLM_ROLE = "ask-llm-role";
 
     @Override
     public List<SubagentRole> get() {
@@ -33,6 +35,9 @@ public class TestSubagentRoleProvider implements SubagentRoleProvider {
                 "test role that may spawn sub-agents in parallel",
                 "You may delegate work to sub-agents.",
                 List.of(KeYAgentTools.TOOL_SPAWN_SUBAGENT, TestMcpToolProvider.ECHO), null, 4,
-                true));
+                true),
+            new SubagentRole(ASK_LLM_ROLE, "test role that may consult the LLM",
+                "Consult a fresh LLM instance if needed, then answer.",
+                List.of(KeYAgentTools.TOOL_ASK_LLM), null, 4, false));
     }
 }
