@@ -13,15 +13,18 @@
   (Phases 0+1)"*, body refreshed.
 - **Feedback loop:** testing is UNLOCKED. The Phase-3 regression slice
   `./gradlew :key.core:test --tests "de.uka.ilkd.key.speclang.*"` is **GREEN**:
-  **279 tests, 0 failures, 12 skipped** (2 of them the new `@Disabled`
+  **285 tests, 0 failures, 12 skipped** (2 of them the new `@Disabled`
   specMath loads). `:key.core:compileTestJava`/`:key.ui:compileTestJava` green.
 - **Phase 4 in progress:** `SpecificationRepository` deletion, slice by slice
   (see PLAN §Phase 4 table; each committed slice keeps compile + speclang slice
   green). Slices 1–2 DONE (statement specs → AST nodes; limited observers →
-  `LimitedObservers`). A full `:key.core:test` baseline has been measured:
-  **1638 tests, 49 failed, 72 skipped** — but that run was invalidated by a
-  concurrent gradle invocation racing its results binary, so the failure list
-  is being re-collected cleanly (see §7 step 3).
+  `LimitedObservers`).
+- **Full-suite baseline (clean, re-measured, no concurrent gradle):**
+  **1638 tests, 40 failed, 72 skipped** at slices-1–2 HEAD. A/B against the
+  Phase-3 HEAD worktree re-running the same 14 failing classes: **identical 40
+  failures, set-diff NONE in both directions** → zero slice regressions.
+  IntSemanticsTest fixture fix (6/6 now green) brought the count to **34
+  remaining failures, all recorded pre-existing jmltk gaps** — see §5.2.
 - **Worktree:** `/home/weigl/.local/share/opencode/worktree/fa2a33/witty-cabin`.
 - **Do NOT touch:** `/home/weigl/work/key` (~216 unstaged deletions from a
   concurrent agent).
@@ -35,6 +38,7 @@
 | `d9ead21162` | Phase 3 — stale-test cleanup + runtime parity (see §5.1). |
 | `7f369e5c29` | Phase 4 slice 1 — `JmlStatementSpec` attached to `JmlAssert`/`SetStatement` nodes (`JmlSpecCarrier`); repo `statementMap` deleted. |
 | `806c2b1ba6` | Phase 4 slice 2 — limited observers (`limitObs`/`unlimitObs`/`LIMIT_SUFFIX`/taclets) → `de.uka.ilkd.key.util.LimitedObservers`. |
+| `14a26a43d0` | Phase 4 triage — drop class-level `code_*_math`/`spec_*_math` pragmas from `intSemantics` fixtures (jmltk parity, same pattern as Phase 3); IntSemanticsTest 6/6. |
 
 ## 2. What Phase 1 did
 
@@ -210,6 +214,42 @@ Known, still-accepted degradation (unchanged from §4): parametric
 `merge_point` (`merge_proc`/`merge_params`) — `testcase/merge/A.java`,
 `Gcd.java` will still fail to load under jmltk; not swept yet.
 
+## 5.2 FAILURE TRIAGE — full-suite baseline (40 → 34) — RECORDED, NOT FIXED
+
+Baseline at slices-1–2 HEAD (clean run, no concurrent gradle): **1638 tests,
+40 failed, 72 skipped**. A/B proof: the Phase-3 HEAD worktree
+(`/tmp/opencode/key-phase3-baseline` @ `d9ead21162`) re-ran the 14 failing
+classes → **identical 40 failures**; set-diff NONE in both directions. Zero
+slice regressions. After the IntSemantics fixture fix (`14a26a43d0`,
+6/6 green) the count stood at **34**, all pre-existing jmltk-incompatible
+constructs — RECORD ONLY, no fixture changes (the offending constructs are
+rejected inside the jmltk dependency or are behavioral proof differences):
+
+| # | Tests (count) | Root cause (recorded, not fixture-fixable) |
+|---|---|---|
+| (a) | merge family: `MergeRuleTests` (9), `MtMergePointTest` (1), `TestTacletEquality` init (1) | jmltk's method-level JML grammar has **no** `//@ merge_point` at all — not even the plain form: `testcase/merge/A.java:17` `//@ merge_point;` and `Gcd.java` lines 38/43/44/45/71 (incl. `merge_proc`/parametric `merge_params {conjunctive:(int x)->{…}}`) die with "Could not handle the JML comment" from `JmlProcessor.java:251` (verified in jmltk sources at `/tmp/opencode/jmltk-src`). jmltk only knows the **Java-statement form** `merge_point(expr);` (`KeyMergePointStmt`) handled in Phase 1 — all comment-form merge fixtures are dead words under jmltk. |
+| (b) | `JmlScriptTest` (7) | `\by {…}` assertion-proof scripts (`by`-clauses) — unsupported by JMLtk (PLAN §7.4: upstream grammar support planned; KeY keeps raw `JmlDoc` until then). |
+| (c) | `Issue3452Test.testNoStateParsedCorrectly` (1) | `\seq(0)` inside a model-method body (`Issue3452Fixture.java:17`): "In an embedded DL expression, `\seq` is not a known DL function name." — jmltk rejects. |
+| (d) | `ScDeterminismTest` (7) | 4× Load failed on **comma-separated `represents`**: `heap/simple/src/MySubclass.java:4` `//@ represents footprint = this.*, o.*;`, `heap/list/src/ArrayList.java:6` `//@ private represents footprint = array, array[*], size;` (jmltk has no comma-storage-ref `represents`); plus 2× `dependency_contracts.key`/`selection_sort.key` (also load MySubclass) — total 4 load fails: `ArrayList_add`, `ArrayList_get_dep`, `dependency_contracts`, `selection_sort`. 3× proof did-not-close on `\sum` comprehensions: `arrayMax.key`, `sum1.key`, `polishFlagSort.key`. |
+| (e) | `RealProofMtEquivalenceTest` (1) | `heap/comprehensions/sum0.key` (provable=true) — `\sum` comprehension proof fails to close under jmltk. |
+| (f) | `TestProofStarter` (2) | `testDirectProof` + the second (`\sum`-using CC proof): same `\sum` comprehension gap. |
+| (g) | `LoopScopeInvRuleTests.testDoAutomaticProofOfBenchmarkWithLabeledBreaksAndContinues` (1) | Labeled `break k;`/`continue l;` (outer-block labels) proof does not close under jmltk. |
+| (h) | `TestCopyingReplayer.testJavaProof` (1), `TestEqualsModProofIrrelevancy.testJavaProof` (1) | `key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof` replay fails (assert-level `\by`/loop proof-script constructs — see (b); the replayed proof text differs). |
+| (i) | `ParallelProverDeterminismTest.sequentialAndOneWorkerProofsAreIdentical` (1) | `IllegalArgumentException: flags have to have the same size` @ `ReplacementMap.replaceFlags` via `BlockContractImpl$Combinator.combine` — a real behavioral error in block-contract combination on the `SimplifiedLinkedList.remove`-style example; pre-existing (identical at Phase-3 HEAD), NOT a slice regression, but may be a real KeY bug worth a follow-up issue. |
+| (j) | `KeyJavaPipelineTest` init (1) | `pipelineTests/records/input/RecordOverwriting.java:1` `/*@ nullable */ record MyRecord(...)` — record-declaration-level `/*@ nullable */` rejected ("Not JML construct supported" @ line 1 col 5); goldens across all 17 transform stages carry the annotation → record, don't touch. (`SimpleRecord`'s component-level `/*@ nullable */` is fine.) |
+
+IntSemantics (the 6 pragma-load failures) were the ONE fixable category —
+same class-level `code_*_math`/`spec_*_math` pragma pattern Phase 3 removed
+from `specMath`; the removal is safe because the int semantics are set by the
+`.key` `intRules` choice, not the (self-documented "ignored") pragma comments.
+
+**Decision (taken):** record-only — do NOT `@Disabled` (Phase-3 precedent only
+disabled the two specMath loads whose *entire point* was the unexpressible
+math mode; these 34 failures are distributed across 11 test classes covering
+real proof machinery, and disabling them would hide genuine gaps from CI).
+The full suite's 34-failure count is the accepted pre-existing baseline and
+must NOT grow.
+
 ## 6. Useful references (may vanish — re-verify before trusting paths)
 
 - Extracted jmltk SNAPSHOT jar: `/tmp/opencode/jmljar/` (from gradle cache
@@ -226,15 +266,26 @@ Known, still-accepted degradation (unchanged from §4): parametric
 1. `git status` clean? (only HANDOFF.md/PLAN.md doc edits may be pending).
 2. Decision §5 was taken; Phase 3 (§5.1) is DONE — speclang slice green.
 3. **Phase 4 status:** slices 1–2 committed + pushed (statement specs →
-   AST nodes; limited observers → `LimitedObservers`). The first full-suite
-   baseline (1638 tests, 49 failed, 72 skipped) was corrupted by a concurrent
-   gradle run racing its results binary — a NEW clean `:key.core:test` run
-   should be running/just finished; triage its failure list: separate
-   pre-existing jmltk-incompatible fixtures (expect `testcase/merge/*`
-   parametric `merge_point`, possibly more) from real regressions, fix or
-   record each, then continue the Phase-4 table row by row (candidates:
-   loop/block/merge specs → AST nodes; proof↔PO registry → proof layer;
-   contract registry → AST/derivation; class axioms → `ClassAxiomComputer`;
-   initially clauses → `JMLSpecFactory`), keeping the speclang slice green
-   after each commit.
-4. Remember: do NOT touch `/home/weigl/work/key`.
+   AST nodes; limited observers → `LimitedObservers`); full-suite baseline
+   measured + A/B-verified (40 failures at HEAD = 40 at Phase-3 HEAD; zero
+   slice regressions); IntSemantics fix landed (now 34 recorded gaps, see
+   §5.2). NEXT = **slice 3: loop/block/merge specs → AST nodes** —
+   attach `LoopSpecification` to `LoopStatement`, `BlockContract` (keyed by
+   `BlockContractKey(block,parentClass,line)`) to `StatementBlock`, loop
+   contracts to `LoopStatement`, `MergeContract` to `MergePointStatement`
+   (already in Phase 1 these nodes carry `attachedJml`/`JmlSpec`; consume it
+   and delete the repo's `loopInvs`/`blockContracts`/`loopContracts`/
+   `loopContractsOnLoops`/`mergeContracts` maps). ~26 readers to update:
+   `InnerBreakAndContinueReplacer`, `OuterBreakContinueAndReturnReplacer`,
+   `ProgVarReplaceVisitor`, `FunctionalBlockContractPO`,
+   `AbstractBlockContractRule`/`AbstractLoopContractRule`/
+   `AbstractLoopInvariantRule`, `HasLoopInvariantCondition`,
+   `LoopFreeInvariantCondition`, `LoopInvariantCondition`,
+   `LoopVariantCondition`, `LoopApplyHeadRule`, `LoopInvariantBuiltInRuleApp`,
+   `MergeRuleBuiltInRuleApp`, … — keep compile + speclang slice green.
+4. Then: proof↔PO registry (→ proof layer; entangled with `splitContract`/
+   `getOverridingTargets`), class invariants/axioms (`ClassAxiomComputer` +
+   identity memo), contract registry (`contracts`/`operationContracts`/
+   `contractsByName`/`contractTargets`), initially clauses (→
+   `JMLSpecFactory` at load), `addSpecs` collapse, `map(...)`.
+5. Remember: do NOT touch `/home/weigl/work/key`.
