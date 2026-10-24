@@ -30,7 +30,6 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -296,8 +295,8 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         return instantiatedOp;
     }
 
-    private ImmutableArray<QuantifiableVariable> instantiateBoundVariables(JTerm visited) {
-        ImmutableArray<QuantifiableVariable> vBoundVars = visited.boundVars();
+    private ImmutableList<QuantifiableVariable> instantiateBoundVariables(JTerm visited) {
+        ImmutableList<QuantifiableVariable> vBoundVars = visited.boundVars();
         if (!vBoundVars.isEmpty()) {
             final QuantifiableVariable[] newVars = new QuantifiableVariable[vBoundVars.size()];
             boolean varsChanged = false;
@@ -317,7 +316,7 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             }
 
             if (varsChanged) {
-                vBoundVars = new ImmutableArray<>(newVars);
+                vBoundVars = ImmutableList.of(newVars);
             }
         }
         return vBoundVars;
@@ -354,20 +353,20 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             final Operator newOp = instantiateOperator(visitedOp, jb);
 
             // instantiate bound variables
-            final ImmutableArray<QuantifiableVariable> boundVars =
+            final ImmutableList<QuantifiableVariable> boundVars =
                 instantiateBoundVariables(visited);
 
             // instantiate sub terms
             final JTerm[] neededsubs = neededSubs(newOp != null ? newOp.arity() : 0);
             if (boundVars != visited.boundVars() || jblockChanged || (newOp != visitedOp)
                     || (!subStack.isEmpty() && subStack.peek() == newMarker)) {
-                final ImmutableArray<TermLabel> labels = instantiateLabels(visited, newOp,
-                    new ImmutableArray<>(neededsubs), boundVars, visited.getLabels());
+                final ImmutableList<TermLabel> labels = instantiateLabels(visited, newOp,
+                    ImmutableList.of(neededsubs), boundVars, visited.getLabels());
                 final JTerm newTerm = tb.tf().createTerm(newOp, neededsubs, boundVars, labels);
                 pushNew(resolveSubst(newTerm));
             } else {
                 JTerm t;
-                final ImmutableArray<TermLabel> labels = instantiateLabels(visited, visitedOp,
+                final ImmutableList<TermLabel> labels = instantiateLabels(visited, visitedOp,
                     visited.subs(), visited.boundVars(), visited.getLabels());
                 if (!visited.hasLabels() && labels != null && labels.isEmpty()) {
                     t = visited;
@@ -385,10 +384,10 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         }
     }
 
-    private ImmutableArray<TermLabel> instantiateLabels(JTerm tacletTerm, Operator newTermOp,
-            ImmutableArray<JTerm> newTermSubs,
-            ImmutableArray<QuantifiableVariable> newTermBoundVars,
-            ImmutableArray<TermLabel> newTermOriginalLabels) {
+    private ImmutableList<TermLabel> instantiateLabels(JTerm tacletTerm, Operator newTermOp,
+            ImmutableList<JTerm> newTermSubs,
+            ImmutableList<QuantifiableVariable> newTermBoundVars,
+            ImmutableList<TermLabel> newTermOriginalLabels) {
         return TermLabelManager.instantiateLabels(termLabelState, services,
             applicationPosInOccurrence, rule, ruleApp, goal, labelHint, tacletTerm,
             tb.tf().createTerm(newTermOp, newTermSubs, newTermBoundVars, newTermOriginalLabels));
