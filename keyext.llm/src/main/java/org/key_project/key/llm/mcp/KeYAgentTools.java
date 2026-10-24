@@ -5,12 +5,12 @@
 package org.key_project.key.llm.mcp;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.TreeMap;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import com.google.gson.GsonBuilder;
 import org.jspecify.annotations.Nullable;
@@ -118,9 +118,9 @@ public final class KeYAgentTools implements McpClient {
         return tools.get(name);
     }
 
-    /** Renders the documentation of every registered tool as Markdown. */
+    /** Renders the documentation of every registered tool as Markdown, grouped by category. */
     public String toolsMarkdown() {
-        return agents().stream().map(AgentTool::toMarkdown).collect(Collectors.joining("\n\n"));
+        return buildToolsDocumentation(agents());
     }
 
     /** The full Markdown tool documentation (heading + approval legend + every tool block). */
@@ -173,9 +173,18 @@ public final class KeYAgentTools implements McpClient {
         var registry = new KeYAgentTools();
         if (json) {
             return new GsonBuilder().setPrettyPrinting().create()
-                    .toJson(registry.getTools().stream().map(Tool::toMap).toList());
+                    .toJson(registry.agents().stream().map(AgentTool::asTool)
+                            .map(KeYAgentTools::toolJson).toList());
         }
         return registry.toolsDocumentation();
+    }
+
+    /** The OpenAI-format map of a tool extended with the KeY-side category/background metadata. */
+    private static Map<String, Object> toolJson(Tool tool) {
+        var m = new java.util.LinkedHashMap<>(tool.toMap());
+        m.put("category", tool.category().label());
+        m.put("backgroundable", tool.backgroundable());
+        return m;
     }
 
     // ------------------------------------------------------------------- McpClient
@@ -223,6 +232,11 @@ public final class KeYAgentTools implements McpClient {
         }
 
         @Override
+        public ToolCategory category() {
+            return ToolCategory.DOCUMENTATION;
+        }
+
+        @Override
         public String description() {
             return "Dumps the Markdown documentation of every tool currently available to the"
                 + " agent - name, approval requirement, description and parameters, including"
@@ -236,14 +250,32 @@ public final class KeYAgentTools implements McpClient {
         }
     }
 
-    /** Renders the Markdown document describing the given tools (heading + legend + blocks). */
+    /**
+     * Renders the Markdown document describing the given tools (heading + legend + blocks),
+     * grouped and sorted by {@link ToolCategory}.
+     */
     private static String buildToolsDocumentation(List<AgentTool> toolList) {
         var sb = new StringBuilder();
         sb.append("# KeY-Agent tools\n\n");
         sb.append("All tools currently available to the agent.\n\n");
         sb.append("**Approval**: `AUTO` tools run without asking the user; `ASK` tools prompt"
-            + " the user before the first execution in a turn.\n\n");
-        toolList.forEach(t -> sb.append(t.toMarkdown()).append("\n\n"));
+            + " the user before the first execution in a turn. "
+            + "**Background**: tools marked \u201ccan run in background\u201d may be moved to the"
+            + " background while they run, so you can keep asking questions.\n\n");
+        ToolCategory current = null;
+        for (var tool : toolList.stream().sorted(byCategoryAndName()).toList()) {
+            if (tool.category() != current) {
+                current = tool.category();
+                sb.append("## ").append(current.label()).append("\n\n");
+            }
+            sb.append(tool.toMarkdown()).append("\n\n");
+        }
         return sb.toString().stripTrailing();
+    }
+
+    /** Sorts tools by category (declaration order) and then by name. */
+    private static Comparator<AgentTool> byCategoryAndName() {
+        return Comparator.comparing((AgentTool t) -> t.category().ordinal())
+                .thenComparing(AgentTool::name);
     }
 }

@@ -5,6 +5,7 @@
 package org.key_project.key.llm;
 
 import java.awt.FlowLayout;
+import java.util.Comparator;
 import java.util.EnumMap;
 import javax.swing.*;
 
@@ -12,15 +13,17 @@ import de.uka.ilkd.key.gui.settings.SettingsPanel;
 
 import org.key_project.key.llm.mcp.BuiltInMCPClient;
 import org.key_project.key.llm.mcp.Tool;
+import org.key_project.key.llm.mcp.ToolCategory;
 
 import net.miginfocom.swing.MigLayout;
 
 /**
  * Settings panel for the KeY-Agent tool permissions. It is shown as its own node ("Tools") under
  * "LLM Settings" in the settings dialog and edits a working copy of {@link LlmSettings}. Every tool
- * gets one row with a short explanation and a radio group selecting its permission (default, with
- * approval, without approval, disabled); {@link #getModel()} hands the copy to the settings
- * provider for applying.
+ * gets one row with a short explanation, a radio group selecting its permission (default, with
+ * approval, without approval, disabled) and a checkbox whether it may run in the background; the
+ * tools are grouped and sorted by their {@link ToolCategory}. {@link #getModel()} hands the copy to
+ * the settings provider for applying.
  *
  * @author Alexander Weigl
  */
@@ -36,11 +39,21 @@ public class LlmToolsPanel extends SettingsPanel {
         this.model = model;
 
         setHeaderText("Tools");
-        setSubHeaderText("Control which tools the KeY-Agent may call and whether they require"
-            + " approval. Disabled tools are not sent to the model at all.");
+        setSubHeaderText("Control which tools the KeY-Agent may call, whether they require"
+            + " approval and whether they may run in the background. Disabled tools are not sent"
+            + " to the model at all.");
 
         var mcpClient = new BuiltInMCPClient();
-        for (var tool : mcpClient.getAllTools()) {
+        var sorted = mcpClient.getAllTools().stream()
+                .sorted(Comparator.comparing((Tool t) -> t.category().ordinal())
+                        .thenComparing(t -> t.function().name()))
+                .toList();
+        ToolCategory current = null;
+        for (var tool : sorted) {
+            if (tool.category() != current) {
+                current = tool.category();
+                addSeparator(current.label());
+            }
             addTitledComponent(tool.function().name(), toolBlock(tool),
                 tool.function().description());
         }
@@ -80,9 +93,17 @@ public class LlmToolsPanel extends SettingsPanel {
             entry.getValue().addActionListener(e -> applyPermission(name, permission));
         }
 
+        var background = new JCheckBox("may run in background");
+        background.setSelected(model.isBackgroundAllowed(name, tool.backgroundable()));
+        background.setToolTipText("While such a call is running it can be moved to the"
+            + " background; the agent then continues with your queued messages and the result is"
+            + " delivered when the call finishes.");
+        background.addActionListener(e -> applyBackground(name, background.isSelected()));
+
         var block = new JPanel(new MigLayout("insets 0, gapy 2"));
         block.add(description, "span, growx, wrap");
         block.add(radios, "span, growx");
+        block.add(background, "span, growx");
         return block;
     }
 
@@ -132,6 +153,23 @@ public class LlmToolsPanel extends SettingsPanel {
                 with.remove(toolName);
                 without.remove(toolName);
             }
+        }
+    }
+
+    /**
+     * Writes the chosen background permission into the (mutually exclusive) tool sets of the
+     * working copy: checked means "may run in background", unchecked (after an explicit toggle)
+     * "must not run in the background".
+     */
+    private void applyBackground(String toolName, boolean allowed) {
+        var enabled = model.getBackgroundToolsEnabled();
+        var disabled = model.getBackgroundToolsDisabled();
+        if (allowed) {
+            enabled.add(toolName);
+            disabled.remove(toolName);
+        } else {
+            disabled.add(toolName);
+            enabled.remove(toolName);
         }
     }
 
