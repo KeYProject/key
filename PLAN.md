@@ -244,16 +244,17 @@ already verified — see `JML_MAPPING.md` and §3).
 
 ### Phase 4 — Delete `SpecificationRepository`: specs are rewritten via the AST
 
-> **Progress (see HANDOFF §5.2/§7.3):** slices 1–3 DONE (`7f369e5c29` statement
+> **Progress (see HANDOFF §5.2/§7.3):** slices 1–4 DONE (`7f369e5c29` statement
 > specs → AST nodes; `806c2b1ba6` limited observers → `LimitedObservers`;
-> `ae716ed74a` loop/block/merge specs → AST nodes); full-suite baseline
+> `ae716ed74a` loop/block/merge specs → AST nodes; `c81c034dd1` proof↔PO
+> registry → `ProofRegistry`/`Services`); full-suite baseline
 > measured + A/B-verified (40 failures at slices-1–2 HEAD identical to
 > Phase-3 HEAD — zero regressions), IntSemantics fixture fix landed
 > (`14a26a43d0`), leaving **34 recorded pre-existing jmltk gaps**.
-> NEXT = **slice 4: proof↔PO registry → proof layer** (repo `proofs` map +
-> `registerProof`/`removeProof`/`getProofs`/`getPO`/`getPOForProof`/
-> `getProofOblInput`/`getContractPOForProof`/`getTargetOfProof` + the
-> `getOverridingTargets`/`splitContract` entanglement that lands nearby).
+> NEXT = **class invariants/axioms** (repo `invs`/`axioms` maps +
+> `getClassAxioms` incl. the synthesized invariant-definition / `QueryAxiom` /
+> model-method axioms and the `allClassAxiomsCache` → `ClassAxiomComputer` with
+> a per-`KeYJavaType` identity memo; `addClassAxiom(s)` moves along).
 
 Rationale: with Phases 0–3 done, the *parsed* JML lives on the Java AST
 (`attachedJml` on declarations, `getContracts()` on statements, `JmlStatementSpec`
@@ -280,7 +281,7 @@ What the repository does today (`SpecificationRepository.java`, 1757 lines):
 | Initially clauses: `initiallyClauses`, `addInitiallyClause`, `createContractsFromInitiallyClauses` (postcondition on all constructors, + inheritance) | `Map<KJT, Set<InitiallyClause>>` | Derivation step in `JMLSpecFactory` (initially → constructor postconditions) run at load time from `attachedJml` — no repository. |
 | Loop invariants: `loopInvs`, `getLoopSpec`, `addLoopInvariant`, `copyLoopInvariant` (`(loop,line)` keys) | `Map<(LoopStatement,line), LoopSpecification>` | ✅ DONE (slice 3, `ae716ed74a`) — attached to the `LoopStatement` node (`setLoopInvariant`); `copyLoopInvariant` is `LoopStatement.copyLoopInvariantTo`, carried by the AST rewrites. |
 | Block/loop/merge contracts: `blockContracts`, `loopContracts`, `loopContractsOnLoops`, `mergeContracts`, `get/add/remove{Block,Loop,Merge}Contract`, `getLoopContracts(LoopStatement, modality)` | `(block/loop,file,line)` keys | ✅ DONE (slice 3, `ae716ed74a`) — attached to `StatementBlock`/`LoopStatement`/`MergePointStatement` nodes; modality filtering is a pure helper (`AbstractAuxiliaryContractRule.get{Block,Loop}Contracts`). |
-| Proof↔PO registry: `proofs`, `registerProof`, `removeProof`, `getProofs(po/contract/kjt+target)`, `getPO(Contract)`, `getPOForProof`, `getProofOblInput`, `getContractPOForProof`, `getTargetOfProof` | `Map<PO, Set<Proof>>` | Proof-lifecycle bookkeeping is orthogonal to JML; moves to the proof management layer (`ProofEnvironment`/`ProofCorrectnessMgt`), which already own the lifecycle — a local `Map<PO, Set<Proof>>` there, or derive via `PO.getProofs()`. |
+| Proof↔PO registry: `proofs`, `registerProof`, `removeProof`, `getProofs(po/contract/kjt+target)`, `getPO(Contract)`, `getPOForProof`, `getProofOblInput`, `getContractPOForProof`, `getTargetOfProof` | `Map<PO, Set<Proof>>` | ✅ DONE (slice 4, `c81c034dd1`) — moved verbatim to a new `de.uka.ilkd.key.proof.mgt.ProofRegistry` owned by `Services` (shared by `Services.copy()` like `specRepos`, so side-proof envs and env-less loader paths keep the same registry); the contract-based lookups temporarily delegate `splitContract`/`getOverridingTargets` to the still-alive repository (they move with the contract registry). |
 | Limited observers: `limitObs`/`unlimitObs`, `LIMIT_SUFFIX` `$lmtd`, limit/unlimit taclets | `Map<IObserverFunction,…>` | ✅ DONE (slice 2, `806c2b1ba6`) — moved to `de.uka.ilkd.key.util.LimitedObservers` (stateless + thread-safe static memo; taclet builders move along). |
 | JML statement specs: `statementMap` (`IdentityHashMap<Statement,JmlStatementSpec>`), `getStatementSpec`/`addStatementSpec`, `JmlStatementSpec` record with `getTerm`/`updateVariables` | global identity map | ✅ DONE (slice 1, `7f369e5c29`) — attached to the `JmlAssert`/`SetStatement` AST nodes via `JmlSpecCarrier`; consumers read it off the node. |
 | `map(UnaryOperator, Services)` (apply a term transformation to *all* specs, e.g. for at-pre/WD transforms) | walks every map | Becomes the *reason* the rewrite is safe to delete: transformations run on the AST-attached spec; `IntroAtPreDefsOp`/WD re-walk the affected AST instead of the global snapshot. |
