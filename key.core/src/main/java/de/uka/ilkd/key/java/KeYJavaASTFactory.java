@@ -137,8 +137,8 @@ public abstract class KeYJavaASTFactory {
      * @return a {@link LocalVariableDeclaration} of <code>var</code> with static type
      *         <code>type</code> and initial value <code>init</code>
      */
-    public static LocalVariableDeclaration declare(IProgramVariable var, @Nullable Expression init,
-            TypeReference typeRef) {
+    public static LocalVariableDeclaration declare(IProgramVariable var,
+            @Nullable Expression init, TypeReference typeRef) {
         return declare(new Modifier[0], var, init, typeRef);
     }
 

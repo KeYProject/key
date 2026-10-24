@@ -96,11 +96,15 @@ public class AppliedRuleAppsNameCache {
         if (nodeCache == null) {
             // Try to use parent cache to initialize the new cache
             HashMap<Name, HashMap<Integer, List<RuleApp>>> parentCache =
-                node.root() ? null : cache.get(node.parent());
+                node.root() ? null
+                        : cache.get(Objects.requireNonNull(node.parent(),
+                            "a non-root node has a parent"));
             nodeCache = new HashMap<>();
 
             if (parentCache != null) {
-                if (node.parent().childrenCount() <= 1) {
+                final Node par = Objects.requireNonNull(node.parent(),
+                    "a node inheriting its parent's cache cannot be the root");
+                if (par.childrenCount() <= 1) {
                     // Parent cache will be removed, reuse it
                     nodeCache = parentCache;
                 } else {
@@ -113,6 +117,134 @@ public class AppliedRuleAppsNameCache {
                             buckets.put(bucket.getKey(), new ArrayList<>(bucket.getValue()));
                         }
                         nodeCache.put(entry.getKey(), buckets);
+                    }
+                }
+
+                // Parent did not have a rule applied when we calculated this, add the rule
+                // applied
+                // there
+                add(nodeCache, par.getAppliedRuleApp());
+
+                // If this is an inner node, we hope we will never revisit it, remove it from
+                // the
+                // cache
+                if (par.childrenCount() <= 1) {
+                    cache.remove(par);
+                }
+            } else {
+                // Check all earlier rule applications
+                Node current = node;
+                while (!current.root()) {
+                    final Node par = Objects.requireNonNull(current.parent(),
+                        "a non-root node has a parent");
+                    add(nodeCache, par.getAppliedRuleApp());
+                    current = par;
+                }
+            }
+
+            final HashMap<Name, HashMap<Integer, List<RuleApp>>> present =
+                cache.putIfAbsent(node, nodeCache);
+            if (present != null) {
+                nodeCache = present;
+            }
+        }
+
+        return nodeCache;
+    }
+
+<<<<<<< HEAD
+            if (parentCache != null) {
+                if (node.parent().childrenCount() <= 1) {
+                    // Parent cache will be removed, reuse it
+                    nodeCache = parentCache;
+||||||| parent of 442dfdd0 (fix(nullness): drive NullAway findings to zero — key.core ripple layer 12, contract-rule consumers + TermLabelManager optional args (Phase 2 wave 12))
+                if (parentCache != null) {
+                    if (node.parent().childrenCount() <= 1) {
+                        // Parent cache will be removed, reuse it
+                        nodeCache = parentCache;
+                    } else {
+                        // Copy the parent cache
+                        for (Map.Entry<Name, HashMap<Integer, List<RuleApp>>> entry : parentCache
+                                .entrySet()) {
+                            HashMap<Integer, List<RuleApp>> buckets = new HashMap<>();
+                            for (Map.Entry<Integer, List<RuleApp>> bucket : entry.getValue()
+                                    .entrySet()) {
+                                buckets.put(bucket.getKey(), new ArrayList<>(bucket.getValue()));
+                            }
+                            nodeCache.put(entry.getKey(), buckets);
+                        }
+                    }
+
+                    // Parent did not have a rule applied when we calculated this, add the rule
+                    // applied
+                    // there
+                    add(nodeCache, node.parent().getAppliedRuleApp());
+
+                    // If this is an inner node, we hope we will never revisit it, remove it from
+                    // the
+                    // cache
+                    if (node.parent().childrenCount() <= 1) {
+                        cache.remove(node.parent());
+                    }
+=======
+                if (parentCache != null) {
+                    final Node par = Objects.requireNonNull(node.parent(),
+                        "a node inheriting its parent's cache cannot be the root");
+                    if (par.childrenCount() <= 1) {
+                        // Parent cache will be removed, reuse it
+                        nodeCache = parentCache;
+                    } else {
+                        // Copy the parent cache
+                        for (Map.Entry<Name, HashMap<Integer, List<RuleApp>>> entry : parentCache
+                                .entrySet()) {
+                            HashMap<Integer, List<RuleApp>> buckets = new HashMap<>();
+                            for (Map.Entry<Integer, List<RuleApp>> bucket : entry.getValue()
+                                    .entrySet()) {
+                                buckets.put(bucket.getKey(), new ArrayList<>(bucket.getValue()));
+                            }
+                            nodeCache.put(entry.getKey(), buckets);
+                        }
+                    }
+
+                    // Parent did not have a rule applied when we calculated this, add the rule
+                    // applied
+                    // there
+                    add(nodeCache, par.getAppliedRuleApp());
+
+                    // If this is an inner node, we hope we will never revisit it, remove it from
+                    // the
+                    // cache
+                    if (par.childrenCount() <= 1) {
+                        cache.remove(par);
+                    }
+>>>>>>> 442dfdd0 (fix(nullness): drive NullAway findings to zero — key.core ripple layer 12, contract-rule consumers + TermLabelManager optional args (Phase 2 wave 12))
+                } else {
+<<<<<<< HEAD
+                    // Copy the parent cache
+                    for (Map.Entry<Name, HashMap<Integer, List<RuleApp>>> entry : parentCache
+                            .entrySet()) {
+                        HashMap<Integer, List<RuleApp>> buckets = new HashMap<>();
+                        for (Map.Entry<Integer, List<RuleApp>> bucket : entry.getValue()
+                                .entrySet()) {
+                            buckets.put(bucket.getKey(), new ArrayList<>(bucket.getValue()));
+                        }
+                        nodeCache.put(entry.getKey(), buckets);
+||||||| parent of 442dfdd0 (fix(nullness): drive NullAway findings to zero — key.core ripple layer 12, contract-rule consumers + TermLabelManager optional args (Phase 2 wave 12))
+                    // Check all earlier rule applications
+                    Node current = node;
+                    while (!current.root()) {
+                        final Node par = current.parent();
+                        add(nodeCache, par.getAppliedRuleApp());
+                        current = par;
+=======
+                    // Check all earlier rule applications
+                    Node current = node;
+                    while (!current.root()) {
+                        final Node par = Objects.requireNonNull(current.parent(),
+                            "a non-root node has a parent");
+                        add(nodeCache, par.getAppliedRuleApp());
+                        current = par;
+>>>>>>> 442dfdd0 (fix(nullness): drive NullAway findings to zero — key.core ripple layer 12, contract-rule consumers + TermLabelManager optional args (Phase 2 wave 12))
                     }
                 }
 
