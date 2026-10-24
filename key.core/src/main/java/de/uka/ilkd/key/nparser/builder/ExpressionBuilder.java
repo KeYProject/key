@@ -1235,8 +1235,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
         List<QuantifiableVariable> vs = accept(ctx.bound_variables());
         JTerm a1 = accept(ctx.sub);
-        JTerm a = getTermFactory().createTerm(op, ImmutableList.of(a1),
-            ImmutableList.of(vs.toArray(new QuantifiableVariable[0])), null);
+        JTerm a = getTermFactory().createTerm(op, ImmutableList.ofFixedSize(a1),
+            ImmutableList.ofFixedSize(vs.toArray(new QuantifiableVariable[0])), null);
         unbindVars(orig);
         return a;
     }
@@ -1676,7 +1676,8 @@ public class ExpressionBuilder extends DefaultBuilder {
             orig = variables();
             List<QuantifiableVariable> bv = accept(ctx.call().boundVars);
             boundVars =
-                bv != null ? ImmutableList.of(bv.toArray(new QuantifiableVariable[0])) : null;
+                bv != null ? ImmutableList.ofFixedSize(bv.toArray(new QuantifiableVariable[0]))
+                        : null;
             args = visitArguments(ctx.call().argument_list());
             if (boundVars != null) {
                 unbindVars(orig);
