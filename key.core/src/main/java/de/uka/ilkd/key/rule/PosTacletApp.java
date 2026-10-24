@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -40,7 +41,7 @@ public class PosTacletApp extends TacletApp {
      * stores the information where the Taclet is to be applied. This means where the find section
      * of the taclet matches
      */
-    private final @MonotonicNonNull PosInOccurrence pos;
+    private final PosInOccurrence pos;
 
     /**
      * creates a PosTacletApp for the given taclet with some known instantiations and a position
@@ -60,7 +61,7 @@ public class PosTacletApp extends TacletApp {
 
     public static @Nullable PosTacletApp createPosTacletApp(FindTaclet taclet,
             SVInstantiations instantiations,
-            ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
+            @Nullable ImmutableList<AssumesFormulaInstantiation> assumesInstantiations,
             PosInOccurrence pos, Services services) {
         assert ifInstsCorrectSize(taclet, assumesInstantiations)
                 : "If instantiations list has wrong size";
@@ -87,7 +88,8 @@ public class PosTacletApp extends TacletApp {
      * @param pos the PosInOccurrence storing the position where to apply the Taclet
      */
     private PosTacletApp(FindTaclet taclet, SVInstantiations instantiations,
-            ImmutableList<AssumesFormulaInstantiation> ifInstantiations, PosInOccurrence pos) {
+            @Nullable ImmutableList<AssumesFormulaInstantiation> ifInstantiations,
+            PosInOccurrence pos) {
         super(taclet, instantiations, ifInstantiations);
         this.pos = pos;
     }
@@ -117,8 +119,8 @@ public class PosTacletApp extends TacletApp {
 
     @Override
     protected Set<QuantifiableVariable> contextVars(SchemaVariable sv) {
-        final TacletPrefix prefix = taclet().getPrefix(sv);
-        assert prefix != null : "prefix should not be null for taclets with a find";
+        final TacletPrefix prefix = Objects.requireNonNull(taclet().getPrefix(sv),
+            "prefix should not be null for taclets with a find");
         if (prefix.context()) {
             return varsBoundAboveFindPos(taclet(), posInOccurrence());
         } else {

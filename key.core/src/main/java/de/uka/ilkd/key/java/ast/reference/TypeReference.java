@@ -23,6 +23,7 @@ import org.jspecify.annotations.Nullable;
 public interface TypeReference extends TypeReferenceInfix, TypeReferenceContainer,
         PackageReferenceContainer, MemberReference, NonTerminalProgramElement, SourceElement {
 
+    @Nullable
     String getName();
 
     ProgramElementName getProgramElementName();

@@ -318,7 +318,8 @@ public final class ProgramSV extends JOperatorSV
      *        like (static)types etc.
      * @return true if the SchemaVariable can stand for the given element
      */
-    private boolean check(@Nullable ProgramElement match, ExecutionContext ec, Services services) {
+    private boolean check(@Nullable ProgramElement match, @Nullable ExecutionContext ec,
+            Services services) {
         if (match == null) {
             return false;
         }

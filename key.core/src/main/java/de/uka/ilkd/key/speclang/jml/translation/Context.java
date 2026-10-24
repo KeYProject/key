@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang.jml.translation;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -45,7 +47,7 @@ public record Context(@NonNull SpecMathMode specMathMode, @NonNull KeYJavaType c
      * @param tb term builder
      */
     public static Context inMethod(@NonNull IProgramMethod pm, TermBuilder tb) {
-        var classType = pm.getContainerType();
+        var classType = Objects.requireNonNull(pm.getContainerType(), "no container type");
         var selfVar = createSelfVar(tb, classType, pm.isStatic());
         return inMethodWithSelfVar(pm, selfVar);
     }
@@ -59,7 +61,8 @@ public record Context(@NonNull SpecMathMode specMathMode, @NonNull KeYJavaType c
     public static Context inMethodWithSelfVar(@NonNull IProgramMethod pm,
             @Nullable LocationVariable selfVar) {
         var mode = JMLInfoExtractor.getSpecMathModeOrDefault(pm);
-        return new Context(mode, pm.getContainerType(), selfVar);
+        return new Context(mode, Objects.requireNonNull(pm.getContainerType(), "no container type"),
+            selfVar);
     }
 
     /**

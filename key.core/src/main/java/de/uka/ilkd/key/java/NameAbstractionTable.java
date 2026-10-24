@@ -36,7 +36,8 @@ public class NameAbstractionTable {
      * @param pe2 SourceElement to be added
      */
     public void add(SourceElement pe1, SourceElement pe2) {
-        if (declarations0 == null) {
+        if (declarations0 == null || declarations1 == null) {
+            // the two lists are maintained together; if either is unset, (re)initialize both
             declarations0 = new LinkedList<>();
             declarations1 = new LinkedList<>();
         }
@@ -53,7 +54,7 @@ public class NameAbstractionTable {
      * @return true if the pe1 and pe2 have been assigned to the same name
      */
     public boolean sameAbstractName(SourceElement pe0, SourceElement pe1) {
-        if (declarations0 != null) {
+        if (declarations0 != null && declarations1 != null) {
             final Iterator<SourceElement> it0 = declarations0.iterator();
             final Iterator<SourceElement> it1 = declarations1.iterator();
 

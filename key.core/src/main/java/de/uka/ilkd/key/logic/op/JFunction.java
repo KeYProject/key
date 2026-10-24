@@ -53,6 +53,12 @@ public class JFunction extends Function implements Sorted, Operator {
      * @param introductionTime the introduction time of the symbol, or a
      *        {@link Function#UNRECORDED}, if none available (e.g. existed from the beginning)
      */
+    @SuppressWarnings("NullAway") // key.ncore Function#Function(Name, ImmutableArray, Sort,
+                                  // ImmutableArray, boolean, boolean, FunctionKind, int) leaves its
+                                  // whereToBind parameter unannotated although its package
+                                  // (org.key_project.logic.op) is @NullMarked, so it counts as
+                                  // @NonNull here; an honest @Nullable widening of that parameter
+                                  // is tracked as follow-up work.
     JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
             @Nullable ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
             FunctionKind kind, int introductionTime) {
@@ -88,7 +94,7 @@ public class JFunction extends Function implements Sorted, Operator {
         this(name, sort, argSorts, whereToBind, unique, true, kind, introductionTime);
     }
 
-    public JFunction(Name name, Sort sort, Sort[] argSorts, @Nullable Boolean[] whereToBind,
+    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean @Nullable [] whereToBind,
             boolean unique) {
         this(name, sort, new ImmutableArray<>(argSorts),
             whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique);
@@ -103,7 +109,7 @@ public class JFunction extends Function implements Sorted, Operator {
     }
 
     public JFunction(Name name, Sort sort, Sort... argSorts) {
-        this(name, sort, argSorts, null, false);
+        this(name, sort, new ImmutableArray<>(argSorts), null, false);
     }
 
     public JFunction(Name name, Sort sort) {

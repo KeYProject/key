@@ -47,12 +47,12 @@ public class ConvertException extends RuntimeException implements HasLocation {
     }
 
     @Override
-    public Location getLocation() {
+    public @Nullable Location getLocation() {
         return location;
     }
 
     @Override
-    public String getMessage() {
+    public @Nullable String getMessage() {
         // Only append the location if it actually carries information; otherwise the
         // bare "[<unknown>:??]" suffix just clutters the message.
         if (location == null || location.equals(Location.UNDEFINED)) {

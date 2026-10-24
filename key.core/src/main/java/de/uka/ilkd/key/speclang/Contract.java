@@ -180,6 +180,7 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return the measured-by term
      */
+    @Nullable
     JTerm getMby(@Nullable LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Services services);
 
@@ -193,6 +194,7 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return the measured-by term
      */
+    @Nullable
     JTerm getMby(Map<LocationVariable, JTerm> heapTerms, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
             Services services);
@@ -247,6 +249,7 @@ public interface Contract extends SpecificationElement {
      * @param services the services instance
      * @return the proof obligation according to the specification repository
      */
+    @Nullable
     ProofOblInput getProofObl(Services services);
 
     /**

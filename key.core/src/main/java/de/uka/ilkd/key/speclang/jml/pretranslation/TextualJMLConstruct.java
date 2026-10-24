@@ -5,13 +5,14 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Location;
-import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NullMarked;
@@ -25,7 +26,7 @@ import org.jspecify.annotations.Nullable;
 public abstract class TextualJMLConstruct {
 
     protected final ImmutableList<JMLModifier> modifiers;
-    private Location location = new Location(null, Position.UNDEFINED);
+    private Location location = Location.UNDEFINED;
     private boolean loopContract;
 
     /**
@@ -91,7 +92,7 @@ public abstract class TextualJMLConstruct {
     }
 
     protected void setPosition(LabeledParserRuleContext ps) {
-        setPosition(ps.first);
+        setPosition(Objects.requireNonNull(ps.first, "no parser rule context"));
     }
 
 }

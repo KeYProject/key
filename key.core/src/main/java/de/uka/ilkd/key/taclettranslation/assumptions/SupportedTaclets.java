@@ -79,12 +79,12 @@ public final class SupportedTaclets {
                 item.setMode(SelectionMode.all);
             }
         }
-        validateSelectionMode((TreeItem) model.getRoot());
+        validateSelectionMode((TreeItem) getTreeModel().getRoot());
     }
 
     public String[] getNamesOfSelectedTaclets() {
         List<String> list = new LinkedList<>();
-        Enumeration<?> en = ((TreeItem) model.getRoot()).breadthFirstEnumeration();
+        Enumeration<?> en = ((TreeItem) getTreeModel().getRoot()).breadthFirstEnumeration();
         while (en.hasMoreElements()) {
             TreeItem item = (TreeItem) en.nextElement();
             if (item.isLeaf() && item.isSelected()) {
@@ -99,8 +99,8 @@ public final class SupportedTaclets {
 
 
     public boolean atLeastOneTacletIsSelected() {
-        return ((TreeItem) model.getRoot()).mode == SelectionMode.all
-                || ((TreeItem) model.getRoot()).mode == SelectionMode.user;
+        return ((TreeItem) getTreeModel().getRoot()).mode == SelectionMode.all
+                || ((TreeItem) getTreeModel().getRoot()).mode == SelectionMode.user;
     }
 
 
@@ -164,7 +164,7 @@ public final class SupportedTaclets {
 
     public void selectCategory(Category cat) {
         selectNothing();
-        selectCategory(cat, (TreeItem) model.getRoot());
+        selectCategory(cat, (TreeItem) getTreeModel().getRoot());
         validateSelectionModes();
     }
 

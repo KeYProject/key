@@ -76,7 +76,7 @@ public abstract class TacletApp implements RuleApp {
     /**
      * chosen instantiations for the assumes-sequent formulas
      */
-    protected final ImmutableList<AssumesFormulaInstantiation> assumesFormulaInstantiations;
+    protected final @Nullable ImmutableList<AssumesFormulaInstantiation> assumesFormulaInstantiations;
 
     /**
      * set of schema variables that appear in the Taclet and need to be instantiated but are not
@@ -94,18 +94,13 @@ public abstract class TacletApp implements RuleApp {
     /**
      * constructs a TacletApp for the given taclet, with an empty instantiation map
      */
-    @SuppressWarnings("NullAway") // null "assumes"-instantiations is the intentional "not yet
-                                  // matched" contract (cf. #assumesFormulaInstantiations); the
-                                  // field/getter stay @NonNull for the many callers -- an honest
-                                  // @Nullable widening ripples into PosTacletApp and ~15 callers
-                                  // and belongs to a dedicated follow-up wave.
     TacletApp(org.key_project.prover.rules.Taclet taclet) {
         this(taclet, de.uka.ilkd.key.rule.inst.SVInstantiations.EMPTY_SVINSTANTIATIONS, null);
     }
 
     TacletApp(org.key_project.prover.rules.Taclet taclet,
             SVInstantiations instantiations,
-            ImmutableList<AssumesFormulaInstantiation> assumesFormulaInstantiations) {
+            @Nullable ImmutableList<AssumesFormulaInstantiation> assumesFormulaInstantiations) {
         this.taclet = taclet;
         this.assumesFormulaInstantiations = assumesFormulaInstantiations;
         this.matchConditions = new MatchConditions(
@@ -188,7 +183,7 @@ public abstract class TacletApp implements RuleApp {
         return matchConditions;
     }
 
-    public ImmutableList<AssumesFormulaInstantiation> assumesFormulaInstantiations() {
+    public @Nullable ImmutableList<AssumesFormulaInstantiation> assumesFormulaInstantiations() {
         return assumesFormulaInstantiations;
     }
 
