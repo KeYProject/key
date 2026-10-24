@@ -11,6 +11,9 @@ import java.util.Set;
 
 import de.uka.ilkd.key.smt.lang.*;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class OverflowChecker {
     private final SMTSort intsort;
 

@@ -26,6 +26,9 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
@@ -43,19 +46,20 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class SeqDefHandler implements SMTHandler {
 
     private static final String SEQLEN = DefinedSymbolsHandler.PREFIX + "seqLen";
     private static final String SEQGET = DefinedSymbolsHandler.PREFIX + "seqGet";
 
     public static final String SEQ_DEF_PREFIX = "seqDef";
-    private SeqLDT seqLDT;
+    private @Nullable SeqLDT seqLDT;
     private boolean enabled;
-    private TermFactory termFactory;
+    private @Nullable TermFactory termFactory;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         enabled = !HandlerUtil.PROPERTY_NOBINDERS.get(masterHandler.getTranslationState());
         seqLDT = services.getTypeConverter().getSeqLDT();
         termFactory = services.getTermFactory();

@@ -13,6 +13,8 @@ import de.uka.ilkd.key.smt.lang.SMTSort;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
  * @author mihai
  *
  */
+@NullMarked
 public class Model {
     private static final Logger LOGGER = LoggerFactory.getLogger(Model.class);
 
@@ -53,7 +56,7 @@ public class Model {
     /**
      * Type information from the SMT specification.
      */
-    private ProblemTypeInformation types;
+    private @Nullable ProblemTypeInformation types;
 
     /**
      * creates an empty SMT model
@@ -208,7 +211,7 @@ public class Model {
     /**
      * @return the types
      */
-    public ProblemTypeInformation getTypes() {
+    public @Nullable ProblemTypeInformation getTypes() {
         return types;
     }
 
@@ -335,7 +338,7 @@ public class Model {
      * @param val the original any value in binary/hexadecimal
      * @return the formatted value
      */
-    public String processAnyValue(String val) {
+    public @Nullable String processAnyValue(String val) {
         if (val == null) {
             return null;
         }
@@ -595,7 +598,7 @@ public class Model {
      * @param ref the reference to the object
      * @return the object the ref parameter is referring to or null otherwise
      */
-    public ObjectVal findObject(String ref) {
+    public @Nullable ObjectVal findObject(String ref) {
         String[] l = ref.split("\\.");
         String objName = l[0];
         String nullString = "#o0";
@@ -655,7 +658,7 @@ public class Model {
      * @param heap the heap
      * @return set of reachable objects
      */
-    public Set<ObjectVal> getReachableObjects(String name, Heap heap) {
+    public @Nullable Set<ObjectVal> getReachableObjects(String name, Heap heap) {
 
         Set<ObjectVal> result = new HashSet<>();
         ArrayDeque<ObjectVal> scheduled = new ArrayDeque<>();
@@ -743,7 +746,7 @@ public class Model {
      * @param heap the heap
      * @return the object of the given name found in the heap
      */
-    public ObjectVal getObject(String name, Heap heap) {
+    public @Nullable ObjectVal getObject(String name, Heap heap) {
         for (ObjectVal o : heap.getObjects()) {
             if (o.getName().startsWith(name)) {
                 return o;

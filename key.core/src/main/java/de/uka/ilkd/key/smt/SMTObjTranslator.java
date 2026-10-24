@@ -29,11 +29,14 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.smt.SMTProblem.sequentToTerm;
 
+@NullMarked
 public class SMTObjTranslator implements SMTTranslator {
     private static final Logger LOGGER = LoggerFactory.getLogger(SMTObjTranslator.class);
 
@@ -79,7 +82,7 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Assertions regarding Any2Object, Any2BInt, Object2Any, etc. functions.
      */
-    private List<SMTTerm> castAssertions;
+    private @Nullable List<SMTTerm> castAssertions;
     /**
      * Assertions regarding the wellformed function.
      */
@@ -87,20 +90,20 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * The select function. select : Heap x Object x Field -> Any
      */
-    private SMTFunction selectFunction;
+    private @Nullable SMTFunction selectFunction;
     /**
      * The wellformed predicate. wellformed : Heap -> Bool
      */
-    private SMTFunction wellformedFunction;
+    private @Nullable SMTFunction wellformedFunction;
     /**
      * The SMT sorts used in this translation. Use the String constants LOCSET_SORT, HEAP_SORT, etc.
      * to get wanted sort. Initialized in
      */
-    private Map<String, SMTSort> sorts;
+    private @Nullable Map<String, SMTSort> sorts;
     /**
      * Type bits for the SMTSorts that are subtypes of any.
      */
-    private Map<SMTSort, SMTTermNumber> sortNumbers;
+    private @Nullable Map<SMTSort, SMTTermNumber> sortNumbers;
     /**
      * Stores the sort of each field. First column is field name, second is field sort.
      */
@@ -141,11 +144,11 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * The null constant.
      */
-    private SMTTerm nullConstant;
+    private @Nullable SMTTerm nullConstant;
     /**
      * The empty constant.
      */
-    private SMTTerm emptyConstant;
+    private @Nullable SMTTerm emptyConstant;
     /**
      * List of current quantified variables.
      */
@@ -183,7 +186,7 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * The elementOf predicate.
      */
-    private SMTFunction elementOfFunction;
+    private @Nullable SMTFunction elementOfFunction;
     /**
      * The constant counter counts the number of heap and field constants in order to determine the
      * size of their sorts.
@@ -1340,7 +1343,7 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * @return the type predicate corresponding to the given sort name
      */
-    private SMTFunction getTypePredicate(String sortName) {
+    private @Nullable SMTFunction getTypePredicate(String sortName) {
         return typePredicates.get(getTypePredicateName(sortName));
     }
 
