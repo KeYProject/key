@@ -27,7 +27,7 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1412,7 +1412,7 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Translates a function call of function f with argument subs.
      */
-    private SMTTerm translateCall(Function fun, ImmutableArray<? extends Term> subs)
+    private SMTTerm translateCall(Function fun, ImmutableList<? extends Term> subs)
             throws IllegalFormulaException {
         String name = fun.name().toString();
         // handle sort constants
@@ -1718,7 +1718,7 @@ public class SMTObjTranslator implements SMTTranslator {
     /**
      * Creates an SMTTermCall using the given function and arguments.
      */
-    private SMTTerm call(SMTFunction function, ImmutableArray<? extends Term> subs)
+    private SMTTerm call(SMTFunction function, ImmutableList<? extends Term> subs)
             throws IllegalFormulaException {
         List<SMTTerm> subTerms = new LinkedList<>();
         int i = 0;
