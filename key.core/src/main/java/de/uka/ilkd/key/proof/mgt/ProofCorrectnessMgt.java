@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.util.LimitedObservers;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -137,7 +138,7 @@ public final class ProofCorrectnessMgt {
 
     @Deprecated
     public boolean contractApplicableFor(KeYJavaType kjt, IObserverFunction target) {
-        target = specRepos.unlimitObs(target);
+        target = LimitedObservers.unlimitObs(target);
 
         // get the target which is being verified in the passed goal
         final IObserverFunction targetUnderVerification = specRepos.getTargetOfProof(proof);
