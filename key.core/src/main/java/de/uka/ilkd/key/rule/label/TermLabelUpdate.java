@@ -20,6 +20,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -66,7 +67,7 @@ public interface TermLabelUpdate extends RuleSpecificTask {
      */
     void updateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, JTerm modalityTerm,
+            @Nullable JTerm applicationTerm, @Nullable JTerm modalityTerm,
             Rule rule, RuleApp ruleApp, Object hint, JTerm tacletTerm,
             JTerm newTerm,
             Set<TermLabel> labels);
