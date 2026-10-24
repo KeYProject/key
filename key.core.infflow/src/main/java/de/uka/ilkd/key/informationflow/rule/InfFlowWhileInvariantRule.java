@@ -172,7 +172,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         final JTerm baseHeap = anonUpdateData.loopHeapAtPre();
         final JTerm selfTerm = inst.selfTerm();
 
-        services.getSpecificationRepository().addLoopInvariant(spec);
+        spec.getLoop().setLoopInvariant(spec);
         ruleApp.setLoopInvariant(spec);
         WhileInvariantRule.WhileInvariantRuleApplier.instantiate(ruleApp, services);
 

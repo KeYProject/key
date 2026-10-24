@@ -53,28 +53,25 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         if (done()) {
             return;
         }
-        if (node instanceof LoopStatement && services != null) {
-            LoopSpecification li =
-                services.getSpecificationRepository().getLoopSpec((LoopStatement) node);
+        // The translated specifications are attached to the AST nodes themselves (former
+        // SpecificationRepository identity maps); dispatch them to the visitor hooks here.
+        if (node instanceof LoopStatement loop) {
+            LoopSpecification li = loop.getLoopInvariant();
             if (li != null) {
                 performActionOnLoopInvariant(li);
             }
-        } else if (node instanceof StatementBlock && services != null) {
-            ImmutableSet<BlockContract> bcs =
-                services.getSpecificationRepository().getBlockContracts((StatementBlock) node);
-            for (BlockContract bc : bcs) {
+        } else if (node instanceof StatementBlock block) {
+            for (BlockContract bc : block.getBlockContracts()) {
                 performActionOnBlockContract(bc);
             }
 
-            ImmutableSet<LoopContract> lcs =
-                services.getSpecificationRepository().getLoopContracts((StatementBlock) node);
-            for (LoopContract lc : lcs) {
+            for (LoopContract lc : block.getLoopContracts()) {
                 performActionOnLoopContract(lc);
             }
-        } else if (node instanceof MergePointStatement && services != null) {
-            ImmutableSet<MergeContract> mcs =
-                services.getSpecificationRepository().getMergeContracts((MergePointStatement) node);
-            mcs.forEach(this::performActionOnMergeContract);
+        } else if (node instanceof MergePointStatement mps) {
+            for (MergeContract mc : mps.getMergeContracts()) {
+                performActionOnMergeContract(mc);
+            }
         }
     }
 

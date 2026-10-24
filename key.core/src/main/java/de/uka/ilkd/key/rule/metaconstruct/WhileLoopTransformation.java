@@ -308,22 +308,14 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             @Override
             ProgramElement createNewElement(ExtList changeList) {
                 StatementBlock newBlock = KeYJavaASTFactory.block(changeList);
-                ImmutableSet<BlockContract> bcs =
-                    services.getSpecificationRepository().getBlockContracts(x);
-                if (bcs != null) {
-                    for (BlockContract bc : bcs) {
-                        bc = bc.setBlock(newBlock);
-                        services.getSpecificationRepository().addBlockContract(bc);
-                    }
+                for (BlockContract bc : x.getBlockContracts()) {
+                    bc = bc.setBlock(newBlock);
+                    newBlock.addBlockContract(bc);
                 }
 
-                ImmutableSet<LoopContract> lcs =
-                    services.getSpecificationRepository().getLoopContracts(x);
-                if (lcs != null) {
-                    for (LoopContract lc : lcs) {
-                        lc = lc.setBlock(newBlock);
-                        services.getSpecificationRepository().addLoopContract(lc);
-                    }
+                for (LoopContract lc : x.getLoopContracts()) {
+                    lc = lc.setBlock(newBlock);
+                    newBlock.addLoopContract(lc);
                 }
 
                 return newBlock;
@@ -507,7 +499,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         } else if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             For newLoop = KeYJavaASTFactory.forLoop(changeList);
-            services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+            x.copyLoopInvariantTo(newLoop);
             addChild(newLoop);
             changed();
         } else {
@@ -538,7 +530,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             if (changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
                 EnhancedFor newLoop = KeYJavaASTFactory.enhancedForLoop(changeList);
-                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                x.copyLoopInvariantTo(newLoop);
                 addChild(newLoop);
                 changed();
             } else {
@@ -601,15 +593,11 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 Statement body =
                     (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
                 While newLoop = KeYJavaASTFactory.whileLoop(guard, body, x.getPositionInfo());
-                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                x.copyLoopInvariantTo(newLoop);
 
-                ImmutableSet<LoopContract> lcs =
-                    services.getSpecificationRepository().getLoopContracts(x);
-                if (lcs != null) {
-                    for (LoopContract lc : lcs) {
-                        lc = lc.setLoop(newLoop);
-                        services.getSpecificationRepository().addLoopContract(lc);
-                    }
+                for (LoopContract lc : x.getLoopContracts()) {
+                    lc = lc.setLoop(newLoop);
+                    newLoop.addLoopContract(lc);
                 }
                 addChild(newLoop);
                 changed();
@@ -639,7 +627,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             }
             Statement resultStatement = null;
             While newLoop = KeYJavaASTFactory.whileLoop(guard, x.getBody(), x.getPositionInfo());
-            services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+            x.copyLoopInvariantTo(newLoop);
             StatementBlock block = KeYJavaASTFactory.block(unwindedBody, newLoop);
 
             if (outerLabelNeeded() && breakOuterLabel != null) {
@@ -659,7 +647,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 Guard g = changeList.removeFirstOccurrence(Guard.class);
                 Expression guard = g == null ? null : g.getExpression();
                 Do newLoop = KeYJavaASTFactory.doLoop(guard, body, x.getPositionInfo());
-                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                x.copyLoopInvariantTo(newLoop);
                 addChild(newLoop);
                 changed();
             } else {
