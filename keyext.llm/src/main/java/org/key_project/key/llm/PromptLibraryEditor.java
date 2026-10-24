@@ -4,52 +4,29 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.llm;
 
+import java.nio.file.Path;
 import java.util.List;
-import javax.swing.*;
-
-import de.uka.ilkd.key.gui.settings.SettingsPanel;
 
 import org.jspecify.annotations.Nullable;
 
 /**
  * Embedded editor for the user-defined prompts ({@link PromptLibrary}) shown in the LLM settings
- * panel. The form follows the usual KeY settings layout: label, input and help icon per row.
+ * panel. Prompts are regular Markdown files: "New" creates a template file with prefilled
+ * metadata, "Edit" opens the file in the system editor.
  *
  * @author Alexander Weigl
  */
 public class PromptLibraryEditor extends LibraryEditorPanel<Prompt> {
-    /** Explanations shown as help icons behind the form fields. */
-    static final String HELP_NAME =
-        "A unique short identifier (letters, digits, '_', '-'). It is also the file name and the"
-            + " trigger for /prompt:NAME.";
-    static final String HELP_DESCRIPTION =
-        "A short summary shown in the chat (/prompts).";
-    static final String HELP_TEMPLATE =
-        "The prompt text inserted into the chat when the prompt is used. Placeholders such as"
-            + " $seq, $goals or file references @path are resolved at insertion time.";
-
-    private final JTextArea template = new JTextArea(8, 50);
+    /** Body of the file created by "New". */
+    static final String NEW_TEMPLATE =
+        "Describe the task for the agent here. Tokens such as $seq or $goals and file"
+            + " references like @src/Main.java are resolved at insertion time.";
 
     public PromptLibraryEditor() {
         super("Prompts",
-            "Reusable prompt templates for the chat; insert them with /prompt:NAME. Changes are"
-                + " saved immediately.");
-        template.setLineWrap(true);
-        template.setWrapStyleWord(true);
-        setFormComponent(buildForm());
+            "Reusable prompt templates for the chat; insert them with /prompt:NAME. The files"
+                + " live in the search path below and can be edited with any text editor.");
         reload();
-    }
-
-    private JComponent buildForm() {
-        return new SettingsPanel() {
-            {
-                // the form lives in its own dialog; no extra header here
-                pNorth.setVisible(false);
-                addTitledComponent("Name", txtName, HELP_NAME);
-                addTitledComponent("Description", txtDescription, HELP_DESCRIPTION);
-                addTitledComponent("Template", new JScrollPane(template), HELP_TEMPLATE);
-            }
-        };
     }
 
     @Override
@@ -68,18 +45,6 @@ public class PromptLibraryEditor extends LibraryEditorPanel<Prompt> {
     }
 
     @Override
-    protected void populateForm(@Nullable Prompt e) {
-        txtName.setText(e == null ? "" : e.name());
-        txtDescription.setText(e == null ? "" : e.description());
-        template.setText(e == null ? "" : e.template());
-    }
-
-    @Override
-    protected Prompt formData() {
-        return new Prompt(txtName.getText(), txtDescription.getText().strip(), template.getText());
-    }
-
-    @Override
     protected String store(Prompt e) {
         return PromptLibrary.INSTANCE.save(e);
     }
@@ -90,6 +55,19 @@ public class PromptLibraryEditor extends LibraryEditorPanel<Prompt> {
     }
 
     @Override
+    protected String createEntry(String name) {
+        if (PromptLibrary.INSTANCE.exists(name)) {
+            return "A prompt named '" + name + "' already exists.";
+        }
+        return PromptLibrary.INSTANCE.save(new Prompt(name, "", NEW_TEMPLATE));
+    }
+
+    @Override
+    protected @Nullable Path fileOf(String name) {
+        return PromptLibrary.INSTANCE.fileOf(name);
+    }
+
+    @Override
     protected String toMarkdown(Prompt e) {
         return PromptLibrary.serialize(e);
     }
@@ -97,5 +75,20 @@ public class PromptLibraryEditor extends LibraryEditorPanel<Prompt> {
     @Override
     protected @Nullable Prompt fromMarkdown(String markdown) {
         return PromptLibrary.parse(markdown);
+    }
+
+    @Override
+    protected List<String> searchDirs() {
+        return LlmSettings.INSTANCE.getPromptLibraryPaths();
+    }
+
+    @Override
+    protected void setSearchDirs(List<String> dirs) {
+        LlmSettings.INSTANCE.setPromptLibraryPaths(dirs);
+    }
+
+    @Override
+    protected Path defaultDirectory() {
+        return PromptLibrary.INSTANCE.defaultDir();
     }
 }

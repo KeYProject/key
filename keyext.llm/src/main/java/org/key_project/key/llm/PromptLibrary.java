@@ -5,6 +5,7 @@
 package org.key_project.key.llm;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import com.google.gson.GsonBuilder;
 import org.jspecify.annotations.Nullable;
@@ -29,6 +30,11 @@ public final class PromptLibrary extends FileBackedLibrary<Prompt> {
     @Override
     protected String subDirectory() {
         return "prompts";
+    }
+
+    @Override
+    protected List<String> configuredSearchPath() {
+        return LlmSettings.INSTANCE.getPromptLibraryPaths();
     }
 
     @Override

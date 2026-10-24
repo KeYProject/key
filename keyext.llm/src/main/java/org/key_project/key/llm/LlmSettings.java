@@ -114,6 +114,19 @@ public class LlmSettings extends AbstractPropertiesSettings {
     private final PropertyEntry<Integer> maxBackgroundJobs =
         createIntegerProperty("maxBackgroundJobs", 4);
 
+    // --- prompt & skill libraries ---
+    /**
+     * Search path of the prompt library: the directories (in order) whose {@code <name>.md} files
+     * hold the user-defined prompts. Empty means the default directory
+     * {@code <key-config-dir>/llm/prompts}. Entries may use {@code ~} (home directory),
+     * {@code $(pwd)} or relative paths (working directory).
+     */
+    private final PropertyEntry<List<String>> promptLibraryPaths =
+        createStringListProperty("promptLibraryPaths", "");
+    /** Search path of the skill library (see {@link #promptLibraryPaths}). */
+    private final PropertyEntry<List<String>> skillLibraryPaths =
+        createStringListProperty("skillLibraryPaths", "");
+
     // --- ui ---
     private final PropertyEntry<Boolean> autoScrollOutput =
         createBooleanProperty("autoScrollOutput", true);
@@ -163,6 +176,8 @@ public class LlmSettings extends AbstractPropertiesSettings {
         setBackgroundToolsEnabled(new TreeSet<>(other.getBackgroundToolsEnabled()));
         setBackgroundToolsDisabled(new TreeSet<>(other.getBackgroundToolsDisabled()));
         setMaxBackgroundJobs(other.getMaxBackgroundJobs());
+        setPromptLibraryPaths(new ArrayList<>(other.getPromptLibraryPaths()));
+        setSkillLibraryPaths(new ArrayList<>(other.getSkillLibraryPaths()));
         setAutoScrollOutput(other.getAutoScrollOutput());
         setShowToolActivity(other.getShowToolActivity());
     }
@@ -497,6 +512,26 @@ public class LlmSettings extends AbstractPropertiesSettings {
             return true;
         }
         return metadataDefault;
+    }
+
+    // --- prompt & skill libraries ---
+
+    /** The raw (unexpanded) directories of the prompt library search path; empty = default. */
+    public List<String> getPromptLibraryPaths() {
+        return promptLibraryPaths.get();
+    }
+
+    public void setPromptLibraryPaths(List<String> v) {
+        promptLibraryPaths.set(v);
+    }
+
+    /** The raw (unexpanded) directories of the skill library search path; empty = default. */
+    public List<String> getSkillLibraryPaths() {
+        return skillLibraryPaths.get();
+    }
+
+    public void setSkillLibraryPaths(List<String> v) {
+        skillLibraryPaths.set(v);
     }
 
     // --- ui ---
