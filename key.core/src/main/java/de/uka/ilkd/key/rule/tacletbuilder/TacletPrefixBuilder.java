@@ -37,7 +37,7 @@ public class TacletPrefixBuilder {
     }
 
     private void addVarsBoundHere(JTerm visited, int subTerm) {
-        ImmutableArray<QuantifiableVariable> bdVars = visited.varsBoundHere(subTerm);
+        ImmutableList<QuantifiableVariable> bdVars = visited.varsBoundHere(subTerm);
         for (int i = 0; i < bdVars.size(); i++) {
             QuantifiableVariable boundVar = bdVars.get(i);
             if (boundVar instanceof VariableSV boundSV) {
