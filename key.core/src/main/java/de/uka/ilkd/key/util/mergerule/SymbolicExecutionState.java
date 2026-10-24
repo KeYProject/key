@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util.mergerule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -74,7 +76,8 @@ public class SymbolicExecutionState extends Pair<JTerm, JTerm> {
 
     @Override
     public String toString() {
-        final Services services = getCorrespondingNode().proof().getServices();
+        final Services services = Objects.requireNonNull(getCorrespondingNode(),
+            "corresponding node must be set").proof().getServices();
 
         return "SymbolicExecutionStateWithProgCnt [Symbolic State=("
             + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("

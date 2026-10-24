@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
@@ -70,7 +71,7 @@ public final class PrimitiveType implements Type {
     private @Nullable ProgramElementName arrayElementName = null;
 
 
-    public static PrimitiveType getPrimitiveType(String name) {
+    public static @Nullable PrimitiveType getPrimitiveType(String name) {
         if (!typeMap.containsKey(name) && name.startsWith("\\dl_")) {
             var pt = new PrimitiveType(name, null, null);
             typeMap.put(name, pt);
@@ -83,13 +84,15 @@ public final class PrimitiveType implements Type {
         return Collections.unmodifiableCollection(ldtMap.values());
     }
 
-    public static PrimitiveType getPrimitiveTypeByLDT(Name ldtName) {
+    public static @Nullable PrimitiveType getPrimitiveTypeByLDT(Name ldtName) {
         return ldtMap.get(ldtName);
     }
 
     private final String name;
     private final @Nullable Literal defaultValue;
-    private final Name ldtName;
+    // ldtName is optional: PROGRAM_SV (cf. {@link #PROGRAM_SV}) and dynamically loaded "\dl_" types
+    // have no corresponding LDT; the Javadoc of {@link #getCorrespondingLDTName()} documents this.
+    private final @Nullable Name ldtName;
 
     // defaultValue is optional: PROGRAM_SV and dynamically-loaded "\dl_" types have no default
     // value (getDefaultValue() is @Nullable on the Type interface, as in NullType).
@@ -175,8 +178,8 @@ public final class PrimitiveType implements Type {
                 case "\\real" -> arrayElementName = new ProgramElementName("[R");
             }
         }
-        assert arrayElementName != null;
-        return arrayElementName;
+        return Objects.requireNonNull(arrayElementName,
+            "no array element name defined for primitive type " + name);
     }
 
     /**
@@ -199,7 +202,7 @@ public final class PrimitiveType implements Type {
      *
      * @return may be null if no name set
      */
-    public Name getCorrespondingLDTName() {
+    public @Nullable Name getCorrespondingLDTName() {
         return ldtName;
     }
 

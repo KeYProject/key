@@ -10,12 +10,14 @@ import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public interface ILoopInit extends NonTerminalProgramElement {
 
     int size();
 
+    @Nullable
     ImmutableArray<LoopInitializer> getInits();
 
 }

@@ -164,18 +164,20 @@ public class StrategySettings extends AbstractSettings {
      * @see de.uka.ilkd.key.gui.Settings#writeSettings(java.util.Properties)
      */
     public void writeSettings(Properties props) {
-        if (getStrategy() == null) {
+        Name strategy = getStrategy();
+        if (strategy == null) {
             // It would be better to return the name of the default factory defined by the profile
             // used by the proof
             // in which this strategy settings is used or just not to save the strategy because it
             // is
             // not defined.
-            setStrategy(JavaCardDLStrategyFactory.NAME);
+            strategy = JavaCardDLStrategyFactory.NAME;
+            setStrategy(strategy);
         }
         if (maxSteps < 0) {
             setMaxSteps(10000);
         }
-        props.setProperty("[" + CATEGORY + "]" + STRATEGY_KEY, getStrategy().toString());
+        props.setProperty("[" + CATEGORY + "]" + STRATEGY_KEY, strategy.toString());
         props.setProperty("[" + CATEGORY + "]" + STEPS_KEY, String.valueOf(getMaxSteps()));
         props.setProperty("[" + CATEGORY + "]" + TIMEOUT_KEY, String.valueOf(getTimeout()));
         strategyProperties.write(props);
@@ -217,14 +219,16 @@ public class StrategySettings extends AbstractSettings {
     @Override
     public void writeSettings(Configuration props) {
         props = props.getOrCreateSection(CATEGORY);
-        if (getStrategy() == null) {
-            setStrategy(JavaCardDLStrategyFactory.NAME);
+        Name strategy = getStrategy();
+        if (strategy == null) {
+            strategy = JavaCardDLStrategyFactory.NAME;
+            setStrategy(strategy);
         }
         if (maxSteps < 0) {
             setMaxSteps(10000);
         }
 
-        props.set(STRATEGY_KEY, getStrategy().toString());
+        props.set(STRATEGY_KEY, strategy.toString());
         props.set(STEPS_KEY, getMaxSteps());
         props.set(TIMEOUT_KEY, getTimeout());
 

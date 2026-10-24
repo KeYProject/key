@@ -38,7 +38,10 @@ public class PositionedString {
     }
 
     public PositionedString(String text, @Nullable URI fileName) {
-        this(text, new Location(fileName, Position.UNDEFINED));
+        // A null file name means the source has no file (e.g. standard input); Location.UNDEFINED
+        // represents exactly this case, as its fileUri component is not declared @Nullable.
+        this(text,
+            fileName == null ? Location.UNDEFINED : new Location(fileName, Position.UNDEFINED));
     }
 
     public PositionedString(String text) {

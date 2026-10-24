@@ -7,6 +7,7 @@ package de.uka.ilkd.key.proof.mgt;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -47,7 +48,8 @@ public class ProofEnvironment {
      * retrieves the java model underlying this environment.
      */
     public JavaModel getJavaModel() {
-        return initConfig.getServices().getJavaModel();
+        return Objects.requireNonNull(initConfig.getServices().getJavaModel(),
+            "no Java model in services");
     }
 
 

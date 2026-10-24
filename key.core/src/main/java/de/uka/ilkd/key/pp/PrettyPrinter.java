@@ -1101,7 +1101,8 @@ public class PrettyPrinter implements Visitor {
         endMultilineBracket();
 
         if (includeBranches) {
-            boolean newBlock = handleBlockOrSingleStatement(x.getThen().getBody());
+            boolean newBlock = handleBlockOrSingleStatement(Objects.requireNonNull(
+                x.getThen().getBody(), "then branch requires a body"));
             if (x.getElse() != null) {
                 handleContinuationAfterNewBlock(newBlock);
             }
@@ -1527,7 +1528,8 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnThen(Then x) {
-        handleBlockOrSingleStatement(x.getBody());
+        handleBlockOrSingleStatement(
+            Objects.requireNonNull(x.getBody(), "then branch requires a body"));
     }
 
     @Override
@@ -1544,7 +1546,8 @@ public class PrettyPrinter implements Visitor {
             layouter.print(" ");
             performActionOnIf((If) body);
         } else {
-            handleBlockOrSingleStatement(body);
+            handleBlockOrSingleStatement(
+                Objects.requireNonNull(body, "else body must not be null"));
         }
     }
 
@@ -1692,7 +1695,8 @@ public class PrettyPrinter implements Visitor {
         if (x.hasParameterDeclaration()) {
             performActionOnParameterDeclaration(x.getParameterDeclaration());
         } else if (x.hasNonStdParameterDeclaration()) {
-            x.getNonStdParameterDeclaration().visit(this);
+            Objects.requireNonNull(x.getNonStdParameterDeclaration(),
+                "ccatch non-standard parameter declaration must not be null").visit(this);
         }
         endMultilineBracket();
         layouter.print(" ");

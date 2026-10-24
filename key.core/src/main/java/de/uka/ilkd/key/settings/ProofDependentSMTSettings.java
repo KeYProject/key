@@ -45,7 +45,7 @@ public class ProofDependentSMTSettings extends AbstractSettings {
     private boolean useLegacyTranslation = false;
 
 
-    private SupportedTaclets supportedTaclets;
+    private SupportedTaclets supportedTaclets = SupportedTaclets.REFERENCE;
 
     private ProofDependentSMTSettings() {
         setSupportedTaclets(SupportedTaclets.REFERENCE);

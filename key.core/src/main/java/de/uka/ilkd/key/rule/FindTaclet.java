@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.*;
 
 import org.key_project.logic.ChoiceExpr;
@@ -129,12 +131,12 @@ public abstract class FindTaclet extends Taclet {
         if (!super.equals(o)) {
             return false;
         }
-        return find.equals(((FindTaclet) o).find);
+        return Objects.requireNonNull(find).equals(((FindTaclet) o).find);
     }
 
     /** {@inheritDoc} */
     public int hashCode() {
-        return 13 * super.hashCode() + find.hashCode();
+        return 13 * super.hashCode() + Objects.requireNonNull(find).hashCode();
     }
 
     /**
