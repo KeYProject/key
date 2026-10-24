@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang.jml.translation;
 
+import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,9 +16,12 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.*;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.HeapLDT.SplitFieldName;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -27,6 +31,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -39,6 +44,7 @@ import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
+import de.uka.ilkd.key.speclang.jml.JmlSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.njml.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -53,6 +59,11 @@ import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.*;
 import org.key_project.util.parsing.Location;
 
+import com.github.javaparser.ast.jml.body.JmlMethodDeclaration;
+import com.github.javaparser.ast.jml.clauses.ContractType;
+import com.github.javaparser.ast.jml.clauses.JmlContract;
+import com.github.javaparser.ast.key.KeyMergePointStmt;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -1148,6 +1159,10 @@ public class JMLSpecFactory {
             context.selfVar(), textualInv.isFree());
     }
 
+    public ClassInvariant createJMLClassInvariant(@NonNull KeYJavaType kjt, JmlSpec specification) {
+        return createJMLClassInvariant(kjt, JmlToTextual.toClassInv(specification));
+    }
+
     public InitiallyClause createJMLInitiallyClause(@NonNull KeYJavaType kjt,
             ModifierKind visibility, @NonNull LabeledParserRuleContext original) {
         var context = Context.inClass(kjt, false, tb);
@@ -1167,6 +1182,11 @@ public class JMLSpecFactory {
     public InitiallyClause createJMLInitiallyClause(KeYJavaType kjt,
             TextualJMLInitially textualInv) {
         return createJMLInitiallyClause(kjt, getVisibility(textualInv), textualInv.getInv());
+    }
+
+    public InitiallyClause createJMLInitiallyClause(@NonNull KeYJavaType kjt,
+            JmlSpec specification) {
+        return createJMLInitiallyClause(kjt, JmlToTextual.toInitially(specification));
     }
 
     public ClassAxiom createJMLRepresents(@NonNull KeYJavaType kjt, ModifierKind visibility,
@@ -1221,6 +1241,11 @@ public class JMLSpecFactory {
             null, repFormula, context.selfVar(), ImmutableList.nil(), null);
     }
 
+    public ClassAxiom createJMLRepresents(@NonNull KeYJavaType kjt, JmlSpec specification)
+            throws SLTranslationException {
+        return createJMLRepresents(kjt, JmlToTextual.toRepresents(specification));
+    }
+
     /**
      * Creates a class axiom from a textual JML representation. As JML axioms are always without
      * modifiers, they are implicitly non-static and public.
@@ -1247,6 +1272,14 @@ public class JMLSpecFactory {
                 : "class axiom \"" + textual.getName() + "\" in " + kjt.getFullName();
         return new ClassAxiomImpl(name, displayName, kjt, ModifierKind.PUBLIC, ax,
             context.selfVar());
+    }
+
+    public ClassAxiom createJMLClassAxiom(@NonNull KeYJavaType kjt, JmlSpec specification) {
+        TextualJMLClassAxiom textual = JmlToTextual.toClassAxiom(specification);
+        if (textual == null) {
+            return null;
+        }
+        return createJMLClassAxiom(kjt, textual);
     }
 
     public Contract createJMLDependencyContract(KeYJavaType kjt, LocationVariable targetHeap,
@@ -1279,6 +1312,10 @@ public class JMLSpecFactory {
             }
         }
         return createJMLDependencyContract(kjt, targetHeap, dep);
+    }
+
+    public Contract createJMLDependencyContract(@NonNull KeYJavaType kjt, JmlSpec specification) {
+        return createJMLDependencyContract(kjt, JmlToTextual.toDepends(specification));
     }
 
     /**
@@ -1326,11 +1363,253 @@ public class JMLSpecFactory {
         return result;
     }
 
+    private static final String THROWABLE = "java.lang.Throwable";
+    private static final String ERROR = "java.lang.Error";
+    private static final String RUNTIME_EXCEPTION = "java.lang.RuntimeException";
+    /**
+     * The default signals only clause for errors and runtime exceptions.
+     **/
+    private static final String DEFAULT_SIGNALS_ONLY =
+        format("signals_only %s, %s;", ERROR, RUNTIME_EXCEPTION);
+    /**
+     * This is the term label for implicit specification clauses. This is important for
+     * well-definedness checks. Hence, do not change its usages unless you understand and have
+     * thought about the semantics of the corresponding well-definedness checks.
+     **/
+    private static final TermLabel IMPL_TERM_LABEL =
+        ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL;
+
+    // includes unchecked exceptions (instances of Error or RuntimeException)
+    // (see resolution to issue #1379)
+    private ParserRuleContext getDefaultSignalsOnly(IProgramMethod pm) {
+        if (pm.getThrown() == null) {
+            return JmlFacade.parseClause(DEFAULT_SIGNALS_ONLY);
+        }
+
+        ImmutableArray<TypeReference> exceptions = pm.getThrown().getExceptions();
+
+        if (exceptions == null) {
+            return JmlFacade.parseClause(DEFAULT_SIGNALS_ONLY);
+        }
+
+        StringBuilder b = new StringBuilder();
+        b.append(ERROR).append(", ").append(RUNTIME_EXCEPTION);
+
+        for (int i = 0; i < exceptions.size(); i++) {
+            if (services.getJavaInfo().isSubtype(exceptions.get(i).getKeYJavaType(),
+                services.getJavaInfo().getKeYJavaType(THROWABLE))) {
+                b.append(", ").append(exceptions.get(i).getKeYJavaType().getFullName());
+            }
+        }
+
+        if (b.isEmpty()) {
+            b.append("\\nothing");
+        }
+        return JmlFacade.parseClause("signals_only " + b + ";");
+    }
+
+    /**
+     * Creates operation contracts out of the passed JML specification (a {@link JmlContract} or a
+     * model method declaration in the JMLtk AST). Before translating, implicit clauses are added
+     * (specification of purity, invariants to pre- and post-conditions, non-null pre- and
+     * post-conditions and a default signals-only clause), mirroring the semantics of the old
+     * textual JML transformation.
+     *
+     * @param pm corresponding program method
+     * @param specification JMLtk specification attached to the method
+     * @param addInvariant whether to add static invariants to pre- and post-conditions
+     * @return created JML operation contracts
+     * @throws SLTranslationException a translation exception
+     */
+    public ImmutableSet<Contract> createJMLOperationContracts(IProgramMethod pm,
+            JmlSpec specification, boolean addInvariant) throws SLTranslationException {
+        if (pm == null || specification == null) {
+            throw new NullPointerException();
+        }
+        final ImmutableList<JmlSpec> attached = pm.getMethodDeclaration().getAttachedJml();
+
+        // Model method declaration: the method definition is a specification (a source of an
+        // AXIOMS clause). A model method without any contract gets a synthetic MODEL_BEHAVIOR
+        // specification that carries the AXIOMS clause.
+        ParserRuleContext modelMethodDefinition = null;
+        boolean isModel = pm.getMethodDeclaration().containsModifier(ModifierKind.JML_MODEL);
+        for (JmlSpec s : attached) {
+            if (s.node() instanceof JmlMethodDeclaration) {
+                if (isModel) {
+                    modelMethodDefinition = JmlToTextual.toMethodDecl(s).getMethodDefinition();
+                }
+                break;
+            }
+        }
+
+        if (specification.node() instanceof JmlMethodDeclaration) {
+            // Model method without specification: create a specCase to attach the AXIOMS clause
+            // for its definition.
+            if (attached.size() == 1 && modelMethodDefinition != null) {
+                TextualJMLSpecCase specCase =
+                    new TextualJMLSpecCase(ImmutableList.of(), Behavior.MODEL_BEHAVIOR);
+                specCase.addClause(TextualJMLSpecCase.ClauseHd.AXIOMS, modelMethodDefinition);
+                return enrichOperationContract(pm, specCase, addInvariant);
+            }
+            return DefaultImmutableSet.nil();
+        }
+        if (!(specification.node() instanceof JmlContract)) {
+            return DefaultImmutableSet.nil();
+        }
+
+        ImmutableSet<Contract> result = DefaultImmutableSet.nil();
+        for (TextualJMLSpecCase specCase : JmlToTextual.toSpecCases(specification)) {
+            if (modelMethodDefinition != null) {
+                specCase.addClause(TextualJMLSpecCase.ClauseHd.AXIOMS, modelMethodDefinition);
+            }
+            result = result.union(enrichOperationContract(pm, specCase, addInvariant));
+        }
+        return result;
+    }
+
+    /**
+     * Adds the implicit clauses (purity, invariants, non-null pre- and post-conditions, default
+     * signals-only) and translates the given textual specification case into KeY contracts.
+     */
+    private ImmutableSet<Contract> enrichOperationContract(IProgramMethod pm,
+            TextualJMLSpecCase specCase, boolean addInvariant) throws SLTranslationException {
+        // determine purity
+        final boolean isStrictlyPure = JMLInfoExtractor.isStrictlyPure(pm);
+        final boolean isPure = JMLInfoExtractor.isPure(pm);
+        final boolean isHelper = JMLInfoExtractor.isHelper(pm);
+
+        // add purity. Strict purity overrides purity.
+        if (isStrictlyPure || pm.isModel()) {
+            for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
+                specCase.addClause(TextualJMLSpecCase.ClauseHd.ASSIGNABLE, heap.name(),
+                    JmlFacade.parseExpr("\\strictly_nothing"));
+            }
+        } else if (isPure) {
+            for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
+                specCase.addClause(TextualJMLSpecCase.ClauseHd.ASSIGNABLE, heap.name(),
+                    JmlFacade.parseExpr("\\nothing"));
+            }
+        }
+
+        // add invariants
+        if (!isHelper && pm.getStateCount() > 0 && (!pm.isStatic() || addInvariant)) {
+            // for a static method translate \inv once again, otherwise use
+            // the internal symbol
+            final String invString =
+                pm.isStatic() ? "\\inv" : PipelineConstants.IMPLICIT_OBJECT_INVARIANT;
+            final String invFreeString = pm.isStatic() ? "\\inv_free"
+                    : PipelineConstants.IMPLICIT_OBJECT_FREE_INVARIANT;
+
+            KeYJavaType classType = pm.getContainerType();
+            boolean hasFreeInvariant = services.getSpecificationRepository()
+                    .getClassInvariants(classType).stream()
+                    .anyMatch(ClassInvariant::isFree);
+
+            if (!pm.isConstructor()) {
+                specCase.addClause(REQUIRES, new LabeledParserRuleContext(
+                    JmlFacade.parseExpr(invString), IMPL_TERM_LABEL));
+                if (hasFreeInvariant) {
+                    specCase.addClause(TextualJMLSpecCase.ClauseHd.REQUIRES_FREE,
+                        new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
+                }
+            } else if (addInvariant) {
+                // add static invariant to constructor's precondition
+                specCase.addClause(REQUIRES, new LabeledParserRuleContext(
+                    JmlFacade.parseExpr(format("%s.\\inv", pm.getName())),
+                    IMPL_TERM_LABEL));
+                if (hasFreeInvariant) {
+                    specCase.addClause(TextualJMLSpecCase.ClauseHd.REQUIRES_FREE,
+                        new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(format("%s.\\inv_free", pm.getName())),
+                            IMPL_TERM_LABEL));
+                }
+            }
+            if (specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
+                specCase.addClause(ENSURES, new LabeledParserRuleContext(
+                    JmlFacade.parseExpr(invString), IMPL_TERM_LABEL));
+                if (hasFreeInvariant) {
+                    specCase.addClause(TextualJMLSpecCase.ClauseHd.ENSURES_FREE,
+                        new LabeledParserRuleContext(
+                            JmlFacade.parseExpr(invFreeString), IMPL_TERM_LABEL));
+                }
+            }
+            if (specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
+                specCase.addClause(SIGNALS, new LabeledParserRuleContext(
+                    JmlFacade.parseClause(format("signals (Throwable e) %s;", invString)),
+                    IMPL_TERM_LABEL));
+            }
+        }
+
+        // location for the implicit non-null clauses
+        TypeDeclaration td = (TypeDeclaration) pm.getContainerType().getJavaType();
+        URI fileName = td != null ? td.getPositionInfo().getURI().orElse(null) : null;
+        Location location = new Location(fileName, pm.getStartPosition());
+
+        // add non-null preconditions
+        for (int j = 0, n = pm.getParameterDeclarationCount(); j < n; j++) {
+            final VariableSpecification paramDecl =
+                pm.getParameterDeclarationAt(j).getVariableSpecification();
+            if (!JMLInfoExtractor.parameterIsNullable(pm, j)) {
+                // no additional precondition for primitive types!
+                // createNonNullPos... takes care of that
+                final ImmutableSet<LabeledParserRuleContext> nonNullParams =
+                    JMLSpecExtractor.createNonNullPositionedString(paramDecl.getName(),
+                        paramDecl.getProgramVariable().getKeYJavaType(), false, location, services);
+                for (LabeledParserRuleContext nonNull : nonNullParams) {
+                    specCase.addClause(REQUIRES, nonNull);
+                }
+            }
+        }
+
+        // add non-null postcondition
+        KeYJavaType resultType = pm.getReturnType();
+        if (!pm.isVoid() && !pm.isConstructor() && !JMLInfoExtractor.resultIsNullable(pm)
+                && specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
+            final ImmutableSet<LabeledParserRuleContext> resultNonNull =
+                JMLSpecExtractor.createNonNullPositionedString("\\result", resultType, false,
+                    location, services);
+            for (LabeledParserRuleContext nonNull : resultNonNull) {
+                specCase.addClause(ENSURES, nonNull);
+            }
+        }
+
+        // add implicit signals-only if omitted
+        if (specCase.getSignalsOnly().isEmpty()
+                && specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR && !pm.isModel()) {
+            specCase.addClause(TextualJMLSpecCase.Clause.SIGNALS_ONLY, getDefaultSignalsOnly(pm));
+        }
+
+        // translate contract
+        return createJMLOperationContracts(pm, specCase);
+    }
+
     public ImmutableSet<MergeContract> createJMLMergeContracts(final IProgramMethod method,
             final MergePointStatement mps, final TextualJMLMergePointDecl mergePointDecl)
             throws SLTranslationException {
+        return createJMLMergeContracts(method, mps, mergePointDecl.getMergeProc(),
+            mergePointDecl.getLocation());
+    }
 
-        final JmlParser.Merge_point_statementContext ctx = mergePointDecl.getMergeProc();
+    public ImmutableSet<MergeContract> createJMLMergeContracts(final IProgramMethod method,
+            final MergePointStatement mps, final JmlSpec specification)
+            throws SLTranslationException {
+        // The JmlSpec wraps the KeyMergePointStmt (a Java statement `merge_point(<expr>);`).
+        // Re-parse it as KeY's textual merge point statement.
+        String text;
+        if (specification.node() instanceof KeyMergePointStmt kms) {
+            text = "merge_point " + kms.getExpr() + ";";
+        } else {
+            text = "merge_point;";
+        }
+        final JmlParser.Merge_point_statementContext ctx =
+            JmlFacade.createParser(JmlFacade.createLexer(text)).merge_point_statement();
+        return createJMLMergeContracts(method, mps, ctx, Location.UNDEFINED);
+    }
+
+    private ImmutableSet<MergeContract> createJMLMergeContracts(final IProgramMethod method,
+            final MergePointStatement mps, final JmlParser.Merge_point_statementContext ctx,
+            final Location location) throws SLTranslationException {
 
         // default merge procedure is MergeByIfThenElse
         final String mergeProcStr = ctx.proc == null ? MergeByIfThenElse.instance().toString()
@@ -1339,8 +1618,7 @@ public class JMLSpecFactory {
         MergeProcedure mergeProc = MergeProcedure.getProcedureByName(mergeProcStr);
         if (mergeProc == null) {
             throw new SLTranslationException(
-                format("Unknown merge procedure: \"%s\"", mergeProcStr),
-                mergePointDecl.getLocation());
+                format("Unknown merge procedure: \"%s\"", mergeProcStr), location);
         }
         ImmutableSet<MergeContract> result = DefaultImmutableSet.nil();
 
@@ -1427,6 +1705,36 @@ public class JMLSpecFactory {
     }
 
     /**
+     * Creates the set of block contracts for the JML contract wrapped by the given
+     * {@link JmlSpec}. All sub-contracts (nested specification blocks) are translated as well.
+     *
+     * @param method the method containing the block.
+     * @param labels all labels belonging to the block.
+     * @param block the block which the block contracts belong to.
+     * @param specification the JML contract (a block contract).
+     * @return a set of block contracts for the block.
+     * @throws SLTranslationException translation exception
+     */
+    public ImmutableSet<BlockContract> createJMLBlockContracts(IProgramMethod method,
+            List<Label> labels, StatementBlock block, JmlSpec specification)
+            throws SLTranslationException {
+        if (!(specification.node() instanceof JmlContract contract)) {
+            return DefaultImmutableSet.nil();
+        }
+        // loop contracts and loop invariants are no block contracts
+        if (contract.getType() == ContractType.LOOP
+                || contract.getType() == ContractType.LOOP_INV) {
+            return DefaultImmutableSet.nil();
+        }
+        ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
+        for (TextualJMLSpecCase specificationCase : JmlToTextual.toSpecCases(specification)) {
+            result =
+                result.union(createJMLBlockContracts(method, labels, block, specificationCase));
+        }
+        return result;
+    }
+
+    /**
      * Creates a set of loop contracts for a loop from a textual specification case.
      *
      * @param method the method containing the block.
@@ -1458,6 +1766,31 @@ public class JMLSpecFactory {
             clauses.diverges, clauses.assignables, clauses.assignablesFree, clauses.hasAssignable,
             clauses.hasFreeAssignable, clauses.decreases, services)
                 .create();
+    }
+
+    /**
+     * Creates the set of loop contracts for the JML loop contract wrapped by the given
+     * {@link JmlSpec}.
+     *
+     * @param method the method containing the loop.
+     * @param labels all labels belonging to the loop.
+     * @param loop the loop which the loop contracts belong to.
+     * @param specification the JML loop contract ({@link ContractType#LOOP}).
+     * @return a set of loop contracts for the loop.
+     * @throws SLTranslationException translation exception
+     */
+    public ImmutableSet<LoopContract> createJMLLoopContracts(final IProgramMethod method,
+            final List<Label> labels, final LoopStatement loop, final JmlSpec specification)
+            throws SLTranslationException {
+        if (!(specification.node() instanceof JmlContract contract)
+                || contract.getType() != ContractType.LOOP) {
+            return DefaultImmutableSet.nil();
+        }
+        ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
+        for (TextualJMLSpecCase specificationCase : JmlToTextual.toSpecCases(specification)) {
+            result = result.union(createJMLLoopContracts(method, labels, loop, specificationCase));
+        }
+        return result;
     }
 
     /**
@@ -1493,6 +1826,31 @@ public class JMLSpecFactory {
             clauses.diverges, clauses.assignables, clauses.assignablesFree, clauses.hasAssignable,
             clauses.hasFreeAssignable, clauses.decreases, services)
                 .create();
+    }
+
+    /**
+     * Creates the set of loop contracts for the JML loop contract wrapped by the given
+     * {@link JmlSpec}; the contracts are attached to the given block.
+     *
+     * @param method the method containing the block.
+     * @param labels all labels belonging to the block.
+     * @param block the block which the loop contracts belong to.
+     * @param specification the JML loop contract ({@link ContractType#LOOP}).
+     * @return a set of loop contracts for the block.
+     * @throws SLTranslationException translation exception
+     */
+    public ImmutableSet<LoopContract> createJMLLoopContracts(IProgramMethod method,
+            List<Label> labels, StatementBlock block, JmlSpec specification)
+            throws SLTranslationException {
+        if (!(specification.node() instanceof JmlContract contract)
+                || contract.getType() != ContractType.LOOP) {
+            return DefaultImmutableSet.nil();
+        }
+        ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
+        for (TextualJMLSpecCase specificationCase : JmlToTextual.toSpecCases(specification)) {
+            result = result.union(createJMLLoopContracts(method, labels, block, specificationCase));
+        }
+        return result;
     }
 
     private ProgramVariableCollection createProgramVariablesForStatement(Statement statement,
@@ -1862,6 +2220,11 @@ public class JMLSpecFactory {
             textualLoopSpec.getFreeInvariants(), textualLoopSpec.getAssignablesInit(),
             textualLoopSpec.getAssignablesFreeInit(), textualLoopSpec.getInfFlowSpecs(),
             textualLoopSpec.getVariant());
+    }
+
+    public LoopSpecification createJMLLoopInvariant(IProgramMethod pm, LoopStatement loop,
+            JmlSpec specification) {
+        return createJMLLoopInvariant(pm, loop, JmlToTextual.toLoopSpec(specification));
     }
 
     /**
