@@ -88,7 +88,7 @@ public final class StripedLruCache<K, V> {
             n <<= 1;
         }
         this.mask = n - 1;
-        this.segments = new EvictingMap[n];
+        this.segments = (EvictingMap<K, V>[]) new EvictingMap<?, ?>[n];
         this.locks = new Object[n];
         final int perSegment = Math.max(1, (maxEntries + n - 1) / n);
         for (int i = 0; i < n; i++) {

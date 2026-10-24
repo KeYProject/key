@@ -20,6 +20,9 @@ public class TermCreationException extends RuntimeException {
     }
 
     private static String getErrorMessage(Operator op, Term failed) {
+        // Term.subs() still returns the deprecated ImmutableArray; there is no non-deprecated
+        // accessor on Term to migrate to without touching Term's API.
+        @SuppressWarnings("deprecation")
         ImmutableArray<? extends Term> subs = failed.subs();
         for (int i = 0, n = subs.size(); i < n; i++) {
             Term sub = subs.get(i);
@@ -52,6 +55,8 @@ public class TermCreationException extends RuntimeException {
         return sb.toString();
     }
 
+    // ImmutableArray is deprecated but still returned by Term.subs(); no migration available here.
+    @SuppressWarnings("deprecation")
     private static String subsToString(ImmutableArray<? extends Term> subs) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0, n = subs.size(); i < n; i++) {
