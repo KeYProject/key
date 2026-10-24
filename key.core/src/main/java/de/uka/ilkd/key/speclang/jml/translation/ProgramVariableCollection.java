@@ -115,5 +115,8 @@ public class ProgramVariableCollection {
      * Create an empty collection.
      */
     public ProgramVariableCollection() {
+        this.paramVars = ImmutableList.of();
+        this.atPreVars = Map.of();
+        this.atPres = Map.of();
     }
 }

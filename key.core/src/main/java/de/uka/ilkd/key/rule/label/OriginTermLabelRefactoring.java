@@ -51,7 +51,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm) {
+            Object hint, @Nullable JTerm tacletTerm) {
         if (rule instanceof BuiltInRule
                 && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
             return RefactoringScope.NONE;
@@ -65,7 +65,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     @Override
     public void refactorLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels) {
+            Object hint, @Nullable JTerm tacletTerm, JTerm term, LabelCollection labels) {
         if (services.getProof() == null) {
             return;
         }
