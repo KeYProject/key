@@ -97,7 +97,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
             return false;
         }
         final ProofOblInput poForProof =
-            services.getSpecificationRepository().getProofOblInput(proof);
+            services.getProofRegistry().getProofOblInput(proof);
         return (poForProof instanceof AbstractInfFlowPO)
                 && super.canApplyTo(proof, goals, posInOcc);
     }
