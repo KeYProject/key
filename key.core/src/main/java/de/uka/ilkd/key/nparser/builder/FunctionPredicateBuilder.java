@@ -20,7 +20,6 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -119,7 +118,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                     dtFnNamespace.add(fn);
                 } else {
                     var fn = new ParametricFunctionDecl(new Name(argName), genericParams,
-                        new ImmutableArray<>(sort), argSort, null, false, true, false);
+                        ImmutableList.of(sort), argSort, null, false, true, false);
                     dtPfnNamespace.add(fn);
                 }
             }
@@ -128,7 +127,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                 functions().addSafely(fn);
                 docsSpace().setDocumentation(fn, doc);
             } else {
-                var fn = new ParametricFunctionDecl(name, genericParams, new ImmutableArray<>(args),
+                var fn = new ParametricFunctionDecl(name, genericParams, ImmutableList.of(args),
                     sort, null, true, true, false);
                 namespaces().parametricFunctions().add(fn);
                 docsSpace().setDocumentation(fn, doc);
@@ -174,9 +173,9 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                     "Cannot declare parametric predicate %s: Predicate already exists", name);
             }
             var d = new ParametricFunctionDecl(name, ImmutableList.fromList(params),
-                new ImmutableArray<>(argSorts),
+                ImmutableList.fromList(argSorts),
                 JavaDLTheory.FORMULA,
-                whereToBind == null ? null : new ImmutableArray<>(whereToBind1), false, true,
+                whereToBind == null ? null : ImmutableList.of(whereToBind1), false, true,
                 false);
             nss.parametricFunctions().addSafely(d);
             return null;
@@ -226,8 +225,8 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                     "Cannot declare parametric function %s: Function already exists", name);
             }
             var d = new ParametricFunctionDecl(name, ImmutableList.fromList(params),
-                new ImmutableArray<>(argSorts),
-                retSort, whereToBind == null ? null : new ImmutableArray<>(whereToBind1),
+                ImmutableList.fromList(argSorts),
+                retSort, whereToBind == null ? null : ImmutableList.of(whereToBind1),
                 unique, true, false);
             nss.parametricFunctions().add(d);
             return null;
@@ -254,7 +253,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         String trans_name = accept(ctx.funcpred_name());
         List<Sort> argSorts = accept(ctx.arg_sorts_or_formula());
         Transformer t =
-            new Transformer(new Name(trans_name), retSort, new ImmutableArray<>(argSorts));
+            new Transformer(new Name(trans_name), retSort, ImmutableList.fromList(argSorts));
         if (lookup(t.name()) == null) {
             functions().add(t);
         }
