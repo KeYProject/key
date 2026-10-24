@@ -9,7 +9,6 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 
 import org.key_project.util.parsing.HasLocation;
 import org.key_project.util.parsing.Location;
-import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -36,7 +35,7 @@ public class SLTranslationException extends ProofInputException implements HasLo
     }
 
     public SLTranslationException(String message) {
-        this(message, null, new Location(null, Position.UNDEFINED));
+        this(message, null, Location.UNDEFINED);
     }
 
     @Override

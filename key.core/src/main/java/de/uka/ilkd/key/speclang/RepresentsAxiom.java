@@ -8,11 +8,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -84,8 +86,8 @@ public final class RepresentsAxiom extends ClassAxiom {
     @Override
     public SpecificationElement map(UnaryOperator<JTerm> op, Services services) {
         return new RepresentsAxiom(name, displayName, target, kjt, visibility,
-            op.apply(originalPre), op.apply(originalRep), originalSelfVar, originalParamVars,
-            atPreVars);
+            originalPre != null ? op.apply(originalPre) : null, op.apply(originalRep),
+            originalSelfVar, originalParamVars, atPreVars);
     }
 
     @Override
@@ -120,14 +122,15 @@ public final class RepresentsAxiom extends ClassAxiom {
             Services services) {
         assert heapVar != null;
         // assert (selfVar == null) == target.isStatic();
-        final Map<ProgramVariable, JAbstractSortedOperator> map =
-            new LinkedHashMap<>();
-        map.put(services.getTypeConverter().getHeapLDT().getHeap(), heapVar);
+        final HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
+        final Map<ProgramVariable, JAbstractSortedOperator> map = new LinkedHashMap<>();
+        map.put(heapLDT.getHeap(), heapVar);
         if (selfVar != null) {
             map.put(originalSelfVar, selfVar);
         }
         final OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
-        return or.replace(originalRep);
+        return Objects.requireNonNull(or.replace(originalRep), "no replacement for term");
     }
 
     @Override
