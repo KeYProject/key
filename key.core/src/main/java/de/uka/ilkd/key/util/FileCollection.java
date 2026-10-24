@@ -11,6 +11,9 @@ import java.util.NoSuchElementException;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class encapsulates a collection of files which is arbitrarily organised. It is iterable and
  * allows to open all files (not directories) during the iteration as streams.
@@ -30,6 +33,7 @@ import de.uka.ilkd.key.proof.io.consistency.FileRepo;
  * @author MU
  */
 
+@NullMarked
 public interface FileCollection {
 
     /**
@@ -43,7 +47,7 @@ public interface FileCollection {
      * @return a freshly created walker
      * @throws IOException during opening resources
      */
-    Walker createWalker(String extension) throws IOException;
+    Walker createWalker(@Nullable String extension) throws IOException;
 
     /**
      * create a {@link Walker} object that allows to iterate the file collection.
@@ -56,7 +60,7 @@ public interface FileCollection {
      * @return a freshly created walker
      * @throws IOException during opening resources
      */
-    Walker createWalker(String[] extensions) throws IOException;
+    Walker createWalker(@Nullable String[] extensions) throws IOException;
 
 
     /**

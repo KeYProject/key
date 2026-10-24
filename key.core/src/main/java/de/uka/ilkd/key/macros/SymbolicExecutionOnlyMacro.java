@@ -29,6 +29,7 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.Streams;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A proof macro that performs symbolic execution only, without applying any reasoning rules.
@@ -74,6 +75,7 @@ import org.jspecify.annotations.NonNull;
  * @see FilterSymbexStrategy
  */
 
+@NullMarked
 public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
 
     private static final List<String> ADMITTED_RULES;

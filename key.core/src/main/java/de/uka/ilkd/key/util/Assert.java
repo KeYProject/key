@@ -9,6 +9,8 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Special assert statements intended for use with KeY. Raises
  * {@link AssertionFailure} (which is a subtype of {@link Exception})
@@ -17,6 +19,7 @@ import org.key_project.logic.sort.Sort;
  * @author daniel
  *
  */
+@NullMarked
 public final class Assert {
     private static boolean assertionsEnabled() {
         // This class is only used by FunctionalOperationContractImpl

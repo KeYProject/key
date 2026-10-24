@@ -17,6 +17,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class is used by LogicPrinter.java to print out final-terms, i.e. terms
  * of the following form: T::final(heap, object, field)
@@ -25,6 +27,7 @@ import org.key_project.logic.sort.Sort;
  *
  * @author Julian Wiesler <wiesleju@gmail.com>
  */
+@NullMarked
 class FinalPrinter extends FieldPrinter {
 
     FinalPrinter(Services services) {

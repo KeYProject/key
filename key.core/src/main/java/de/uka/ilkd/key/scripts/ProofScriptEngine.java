@@ -198,7 +198,7 @@ public class ProofScriptEngine {
         this.stateMap.setObserver(monitor);
     }
 
-    public static ProofScriptCommand getCommand(String commandName) {
+    public static @Nullable ProofScriptCommand getCommand(String commandName) {
         return COMMANDS.get(commandName);
     }
 

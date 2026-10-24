@@ -4,12 +4,15 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * {@code Debug} offers some methods for assertions, debug output and so on.
  */
+@NullMarked
 public final class Debug {
     private static final Logger LOGGER = LoggerFactory.getLogger(Debug.class);
 
@@ -80,7 +83,7 @@ public final class Debug {
      * @param iterable The iterable object to check
      * @param message String describes the failed assertion
      */
-    public static void assertDeepNonNull(Iterable<?> iterable, String message) {
+    public static void assertDeepNonNull(@Nullable Iterable<?> iterable, String message) {
         if (ENABLE_ASSERTION) {
             if (iterable == null) {
                 fail("Null pointer: " + message);

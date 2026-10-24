@@ -68,7 +68,7 @@ public class SelectCommand extends AbstractCommand {
             node -> getFirstSubtreeGoal(node, proof), proof);
     }
 
-    private static Goal getFirstSubtreeGoal(Node node, Proof proof) {
+    private static @Nullable Goal getFirstSubtreeGoal(Node node, Proof proof) {
         Goal goal;
         if (node.leaf() && //
                 (goal = EngineState.getGoal(proof.openGoals(), node)) != null) {
@@ -95,7 +95,8 @@ public class SelectCommand extends AbstractCommand {
             node -> EngineState.getGoal(proof.openGoals(), node), proof);
     }
 
-    private Goal findGoalWith(Function<Node, Boolean> filter, Function<Node, Goal> goalRetriever,
+    private Goal findGoalWith(Function<Node, Boolean> filter,
+            Function<Node, @Nullable Goal> goalRetriever,
             Proof proof) throws ScriptException {
         Deque<Node> choices = new LinkedList<>();
         Node node = proof.root();

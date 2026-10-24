@@ -4,11 +4,14 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.pp;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This exception is thrown when a String is expected be a valid regular expression, but is not.
  *
  * @author jschiffl
  */
+@NullMarked
 public class IllegalRegexException extends Exception {
 
     private static final long serialVersionUID = 1113541L;

@@ -13,11 +13,15 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.StripedLruCache;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Caches whether a Term contains a modality operation.
  *
  * @author Julian Wiesler
  */
+@NullMarked
 public class ModalityCache {
     /** Number of independently locked segments of {@link #termCache}. */
     private static final int CACHE_STRIPES = 16;
@@ -53,7 +57,7 @@ public class ModalityCache {
      * long-lived worker-pool threads. Caching more than one sequent did not help: the autopilot
      * rarely revisits nodes.
      */
-    private volatile SequentResult lastSequent;
+    private volatile @Nullable SequentResult lastSequent;
 
     /**
      * Constructor

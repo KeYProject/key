@@ -7,9 +7,12 @@ package de.uka.ilkd.key.pp;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Identity Filter not doing anything
  */
+@NullMarked
 public class IdentitySequentPrintFilter extends SequentPrintFilter {
 
     /**

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This class captures a proof macro which is meant to fully automise KeY proof workflow.
@@ -30,6 +31,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author mattias ulbrich
  */
+@NullMarked
 public class TranscendentalFloatSMTMacro extends SequentialProofMacro {
 
 

@@ -13,12 +13,15 @@ import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This filter takes a search string and yields a sequent containing only sequent formulas that
  * match the search.
  *
  * @author jschiffl
  */
+@NullMarked
 public class HideSequentPrintFilter extends SearchSequentPrintFilter {
 
     /**

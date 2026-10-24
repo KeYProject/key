@@ -146,7 +146,7 @@ public class EngineState {
         }
     }
 
-    protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
+    protected static @Nullable Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
         for (Goal goal : openGoals) {
             if (goal.node() == node) {
                 return goal;
@@ -228,7 +228,7 @@ public class EngineState {
         return currNode;
     }
 
-    private Goal findGoalFromRoot(final Node rootNode, boolean checkAutomatic) {
+    private @Nullable Goal findGoalFromRoot(final Node rootNode, boolean checkAutomatic) {
         final Deque<Node> choices = new LinkedList<>();
 
         Goal result = null;

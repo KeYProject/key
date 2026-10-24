@@ -18,12 +18,16 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class is used by LogicPrinter.java to print out select-terms, i.e. terms of the following
  * form: T::select(heap, object, field)
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
+@NullMarked
 class SelectPrinter extends FieldPrinter {
 
     private final NotationInfo ni;
@@ -36,7 +40,7 @@ class SelectPrinter extends FieldPrinter {
     /*
      * Print a term of the form: T::select(heap, object, field).
      */
-    public void printSelect(LogicPrinter lp, JTerm t, JTerm tacitHeap) {
+    public void printSelect(LogicPrinter lp, JTerm t, @Nullable JTerm tacitHeap) {
         assert t.boundVars().isEmpty();
         assert t.arity() == 3;
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();

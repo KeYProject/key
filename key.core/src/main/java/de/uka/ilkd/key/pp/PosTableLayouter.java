@@ -10,9 +10,12 @@ import java.util.ArrayDeque;
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
     private static final Logger LOGGER = LoggerFactory.getLogger(PosTableLayouter.class);
 
@@ -200,7 +203,7 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
      * LogicPrinter. Subclasses may overwrite this method with a null returning body if position
      * information is not computed there.
      */
-    public InitialPositionTable getInitialPositionTable() {
+    public @Nullable InitialPositionTable getInitialPositionTable() {
         if (pure) {
             return null;
         }

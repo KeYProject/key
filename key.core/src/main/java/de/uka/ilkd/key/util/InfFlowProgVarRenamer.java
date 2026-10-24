@@ -22,11 +22,14 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.UpdateableOperator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  *
  * @author christoph
  */
+@NullMarked
 public class InfFlowProgVarRenamer extends TermBuilder {
     /** The set of terms on which the renaming should be applied. */
     private final JTerm[] terms;
@@ -47,7 +50,8 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private final Goal goalForVariableRegistration;
 
 
-    public InfFlowProgVarRenamer(JTerm[] terms, Map<JTerm, JTerm> preInitialisedReplaceMap,
+    public InfFlowProgVarRenamer(JTerm[] terms,
+            @Nullable Map<JTerm, JTerm> preInitialisedReplaceMap,
             String postfix, Goal goalForVariableRegistration, Services services) {
         super(services.getTermFactory(), services);
         this.terms = terms;
@@ -88,7 +92,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     }
 
 
-    private JTerm renameFormulasWithoutPrograms(JTerm term) {
+    private @Nullable JTerm renameFormulasWithoutPrograms(@Nullable JTerm term) {
         if (term == null) {
             return null;
         }
@@ -198,7 +202,7 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     }
 
 
-    private JTerm applyRenamingsToPrograms(JTerm term,
+    private @Nullable JTerm applyRenamingsToPrograms(@Nullable JTerm term,
             Map<LocationVariable, LocationVariable> progVarReplaceMap) {
 
         if (term == null) {

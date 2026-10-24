@@ -18,12 +18,14 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Common superclass of {@link StorePrinter} and {@link SelectPrinter}.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
+@NullMarked
 class FieldPrinter {
 
     // protected final LogicPrinter lp;

@@ -26,6 +26,8 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The macro {@link AutoMacro} is a customizable {@link ProofMacro} for use in proof scripts. It is
@@ -52,6 +54,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public class AutoMacro extends StrategyProofMacro {
     /** argument name */
     private static final String BREAKPOINT_PARAM_NAME = "breakpoint";
@@ -250,7 +253,7 @@ public class AutoMacro extends StrategyProofMacro {
             return super.isApprovedApp(app, pio, goal);
         }
 
-        private boolean isJavaPIO(PosInOccurrence pio) {
+        private boolean isJavaPIO(@Nullable PosInOccurrence pio) {
             if(pio==null) return false;var term = (JTerm) pio.subTerm();return term.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
         }
 
