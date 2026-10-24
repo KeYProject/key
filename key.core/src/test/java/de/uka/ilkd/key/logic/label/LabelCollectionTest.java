@@ -5,7 +5,7 @@
 package de.uka.ilkd.key.logic.label;
 
 import org.key_project.logic.Name;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ class LabelCollectionTest {
             paramA,
             paramB,
         };
-        this.collection = new LabelCollection(new ImmutableArray<>(labels));
+        this.collection = new LabelCollection(ImmutableList.of(labels));
     }
 
 
