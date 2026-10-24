@@ -1694,7 +1694,7 @@ public class PrettyPrinter implements Visitor {
         if (services == null) {
             layouter.print(jmlAssert.getCondition().getText().trim());
         } else {
-            var spec = services.getSpecificationRepository().getStatementSpec(jmlAssert);
+            var spec = jmlAssert.getSpec();
             if (spec == null) {
                 layouter.print(jmlAssert.getCondition().getText().trim());
             } else {
@@ -1725,8 +1725,7 @@ public class PrettyPrinter implements Visitor {
         layouter.brk();
 
         if (services != null) {
-            var spec =
-                Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
+            var spec = Objects.requireNonNull(x.getSpec());
             JTerm target = spec.term(SetStatement.INDEX_TARGET);
             JTerm value = spec.term(SetStatement.INDEX_VALUE);
             layouter.print(printInLogicPrinter(target));

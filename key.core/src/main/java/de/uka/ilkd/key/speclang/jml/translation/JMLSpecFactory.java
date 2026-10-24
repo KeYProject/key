@@ -1882,9 +1882,7 @@ public class JMLSpecFactory {
         ImmutableList<LocationVariable> varsInProof = jmlAssert.collectVariablesInProof(io);
         io.parameters(pv.paramVars.prepend(varsInProof));
         ImmutableList<JTerm> terms = jmlAssert.collectTerms().map(io::translateTerm);
-        services.getSpecificationRepository().addStatementSpec(
-            jmlAssert,
-            new SpecificationRepository.JmlStatementSpec(pv, terms));
+        jmlAssert.setSpec(new JmlStatementSpec(pv, terms));
     }
 
     public @Nullable String checkSetStatementAssignee(JTerm assignee) {
@@ -1943,9 +1941,7 @@ public class JMLSpecFactory {
                 setStatementContext.getStartLocation());
         }
 
-        services.getSpecificationRepository().addStatementSpec(
-            statement,
-            new SpecificationRepository.JmlStatementSpec(pv, ImmutableList.of(assignee, value)));
+        statement.setSpec(new JmlStatementSpec(pv, ImmutableList.of(assignee, value)));
     }
 
     /**
