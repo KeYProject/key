@@ -16,6 +16,9 @@ import org.key_project.prover.rules.Rule;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * <p>
@@ -33,6 +36,7 @@ import org.key_project.prover.sequent.Sequent;
  * @see TermLabel
  * @see TermLabelManager
  */
+@NullMarked
 public interface TermLabelPolicy {
     /**
      * Decides to keep (add to term which will be created) or to drop (do not add label to new term)
@@ -58,9 +62,10 @@ public interface TermLabelPolicy {
      * @return The {@link TermLabel} to keep which might be a different one (e.g. with changed
      *         parameters) or {@code null} if the {@link TermLabel} should be dropped.
      */
+    @Nullable
     TermLabel keepLabel(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm,
+            @Nullable JTerm applicationTerm, Rule rule, @Nullable Goal goal,
+            @Nullable Object hint, @Nullable JTerm tacletTerm,
             JTerm newTerm, TermLabel label);
 }

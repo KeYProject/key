@@ -10,12 +10,14 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+
 
 
 /**
  * Simple container class containing the information resulting from a Taclet.match-call
  */
+@NullMarked
 public class MatchConditions extends MatchResultInfo {
 
     public static final MatchConditions EMPTY_MATCHCONDITIONS =
@@ -28,8 +30,8 @@ public class MatchConditions extends MatchResultInfo {
         this.renameTable = RenameTable.EMPTY_TABLE;
     }
 
-    public MatchConditions(@NonNull SVInstantiations p_instantiations,
-            @NonNull RenameTable p_renameTable) {
+    public MatchConditions(SVInstantiations p_instantiations,
+            RenameTable p_renameTable) {
         super(p_instantiations);
         assert p_instantiations != null;
         assert p_renameTable != null;

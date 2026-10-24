@@ -35,6 +35,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -164,7 +165,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule
     }
 
     @Override
-    public JTerm getLastFocusTerm() {
+    public @Nullable JTerm getLastFocusTerm() {
         return lastFocusTerm.get();
     }
 
@@ -174,7 +175,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule
     }
 
     @Override
-    public Instantiation getLastInstantiation() {
+    public @Nullable Instantiation getLastInstantiation() {
         return lastInstantiation.get();
     }
 
@@ -184,7 +185,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule
     }
 
     @Override
-    protected void setLastInstantiation(Instantiation lastInstantiation) {
+    protected void setLastInstantiation(@Nullable Instantiation lastInstantiation) {
         this.lastInstantiation.set(lastInstantiation);
     }
 

@@ -12,6 +12,7 @@ import org.key_project.prover.rules.matcher.compiler.ProgramMatchPlan;
 import org.key_project.prover.rules.matcher.vm.MatchProgram;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.rule.match.vm.SyntaxElementMatchProgramGenerator.buildProgramInstruction;
@@ -29,6 +30,7 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  * falling back to the monolithic {@code MatchProgramInstruction} when conversion is off or
  * unavailable).
  */
+@NullMarked
 public final class JavaProgramMatchHook implements ProgramMatchHook {
 
     private final JavaProgramElement prog;

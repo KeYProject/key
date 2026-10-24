@@ -11,7 +11,9 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
 
 /**
  * Matches a parametric function instance "up to generic arguments": the source operator must be an
@@ -19,6 +21,7 @@ import org.jspecify.annotations.Nullable;
  * matched afterward by their own instructions (a generic-sort match or an identity check per
  * argument).
  */
+@NullMarked
 public class SimilarParametricFunctionInstruction implements MatchInstruction {
     private final ParametricFunctionInstance pfi;
 

@@ -21,6 +21,9 @@ import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  * A variable condition that is satisfied if the two arguments are
@@ -41,6 +44,7 @@ import org.key_project.util.collection.ImmutableSet;
  * @author Mattias Ulbrich, 2019
  * @see de.uka.ilkd.key.rule.metaconstruct.ObserverEqualityMetaConstruct
  */
+@NullMarked
 public final class SameObserverCondition implements VariableCondition {
 
     /**
@@ -72,7 +76,7 @@ public final class SameObserverCondition implements VariableCondition {
 
     // explanation see class javadoc.
     @Override
-    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
             MatchResultInfo mc,
             LogicServices p_services) {
         final Services services = (Services) p_services;

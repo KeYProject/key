@@ -57,6 +57,8 @@ import org.key_project.util.collection.*;
 
 import com.github.javaparser.ast.key.KeyTransactionStmt;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
@@ -66,6 +68,7 @@ import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
  *
  * @author wacker, lanzinger
  */
+@NullMarked
 public final class AuxiliaryContractBuilders {
 
     /**
@@ -329,7 +332,7 @@ public final class AuxiliaryContractBuilders {
          *        the variables are instead added to the {@code services}' namespace.
          * @param placeholderVariables the placeholders from which to create the variables.
          */
-        public VariablesCreatorAndRegistrar(final @NonNull Goal goal,
+        public VariablesCreatorAndRegistrar(final Goal goal,
                 final Variables placeholderVariables) {
             this.goal = goal;
             this.placeholderVariables = placeholderVariables;
@@ -340,7 +343,7 @@ public final class AuxiliaryContractBuilders {
          * @param services services.
          * @param placeholderVariables the placeholders from which to create the variables.
          */
-        public VariablesCreatorAndRegistrar(final @NonNull Services services,
+        public VariablesCreatorAndRegistrar(final Services services,
                 final Variables placeholderVariables) {
             this.goal = null;
             this.placeholderVariables = placeholderVariables;
@@ -488,8 +491,8 @@ public final class AuxiliaryContractBuilders {
          * @param placeholderVariable a placeholder variable
          * @return a newly created and registered variable with the same name.
          */
-        private LocationVariable createAndRegisterVariable(
-                final ProgramVariable placeholderVariable) {
+        private @Nullable LocationVariable createAndRegisterVariable(
+                final @Nullable ProgramVariable placeholderVariable) {
             if (placeholderVariable != null) {
                 String newName =
                     services.getTermBuilder().newName(placeholderVariable.name().toString());

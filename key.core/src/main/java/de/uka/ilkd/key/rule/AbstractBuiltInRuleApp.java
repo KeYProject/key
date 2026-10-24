@@ -113,7 +113,7 @@ public abstract class AbstractBuiltInRuleApp<T extends BuiltInRule> implements I
     }
 
     @Override
-    public List<LocationVariable> getHeapContext() {
+    public @Nullable List<LocationVariable> getHeapContext() {
         return null;
     }
 

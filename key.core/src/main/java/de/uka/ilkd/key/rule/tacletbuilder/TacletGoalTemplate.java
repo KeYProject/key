@@ -14,11 +14,15 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * this class contains the goals of the schematic theory specific rules (Taclet). There are new
  * sequents that have to be added, new rules and rule variables. The replacewith-goal is implemented
  * in subclasses
  */
+@NullMarked
 public class TacletGoalTemplate
         extends org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate {
 
@@ -59,7 +63,7 @@ public class TacletGoalTemplate
      * @return term (or sequent) to be placed instead of the findexp-term. REMARK: returns 'null' if
      *         there is no replace-with part ! Overwritten in subclasses !
      */
-    public Object replaceWithExpressionAsObject() {
+    public @Nullable Object replaceWithExpressionAsObject() {
         return null;
     }
 

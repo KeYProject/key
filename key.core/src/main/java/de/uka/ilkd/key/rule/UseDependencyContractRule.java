@@ -39,13 +39,14 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 
 
+@NullMarked
 public final class UseDependencyContractRule implements BuiltInRule, ComplexJustificationable {
 
     public static final UseDependencyContractRule INSTANCE = new UseDependencyContractRule();
@@ -146,7 +147,7 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
     }
 
 
-    private static PosInOccurrence getFreshLocsStep(
+    private static @Nullable PosInOccurrence getFreshLocsStep(
             PosInOccurrence heapPos, Sequent seq,
             Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
@@ -176,7 +177,7 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
     }
 
 
-    private static Pair<JTerm, ImmutableList<PosInOccurrence>> getChangedLocsForStep(
+    private static @Nullable Pair<JTerm, ImmutableList<PosInOccurrence>> getChangedLocsForStep(
             JTerm heapTerm,
             JTerm stepHeap, Sequent seq, Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
@@ -459,7 +460,7 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
         final var services = goal.getOverlayServices();
         // collect information
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();

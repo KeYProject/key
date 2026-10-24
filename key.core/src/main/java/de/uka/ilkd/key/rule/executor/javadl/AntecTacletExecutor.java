@@ -21,11 +21,15 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Executes a Taclet which matches on a formula in the antecedent
  *
  * @author Richard Bubel
  */
+@NullMarked
 public class AntecTacletExecutor extends FindTacletExecutor {
 
     public AntecTacletExecutor(AntecTaclet taclet) {
@@ -78,7 +82,7 @@ public class AntecTacletExecutor extends FindTacletExecutor {
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState,
             SequentChangeInfo currentSequent,
-            PosInOccurrence whereToAdd,
+            @Nullable PosInOccurrence whereToAdd,
             PosInOccurrence posOfFind,
             MatchResultInfo matchCond, Goal goal, TacletApp ruleApp, Services services) {
         addToAntec(add.antecedent(), currentSequent, whereToAdd, posOfFind, matchCond, goal,

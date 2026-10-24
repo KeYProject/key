@@ -12,11 +12,15 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Matching VM instruction that matches all operator schema variables that
  * are not a {@link VariableSV} or a {@link ProgramSV}.
  * For those see {@link MatchVariableSVInstruction} and {@link MatchProgramSVInstruction}.
  */
+@NullMarked
 public class MatchNonVariableSVInstruction extends MatchSchemaVariableInstruction {
 
     protected MatchNonVariableSVInstruction(OperatorSV op) {
@@ -25,7 +29,7 @@ public class MatchNonVariableSVInstruction extends MatchSchemaVariableInstructio
     }
 
     @Override
-    protected MatchResultInfo match(JTerm instantiationCandidate, MatchResultInfo mc,
+    protected @Nullable MatchResultInfo match(JTerm instantiationCandidate, MatchResultInfo mc,
             LogicServices services) {
         return addInstantiation(instantiationCandidate, mc, services);
     }

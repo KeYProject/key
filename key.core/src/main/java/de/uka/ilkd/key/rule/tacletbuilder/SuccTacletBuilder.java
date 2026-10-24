@@ -14,8 +14,11 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /** class builds SuccTaclet objects. */
+@NullMarked
 public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
     /**
      * sets the <I>find</I> of the Taclet that is to build to the given sequent.

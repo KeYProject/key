@@ -9,7 +9,10 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 
 import org.key_project.prover.rules.TacletApplPart;
 
+import org.jspecify.annotations.NullMarked;
+
 /** class builds RewriteTaclet objects. */
+@NullMarked
 public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBuilder<T> {
 
 

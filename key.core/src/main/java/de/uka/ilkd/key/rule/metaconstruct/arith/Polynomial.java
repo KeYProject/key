@@ -19,9 +19,13 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Class for analysing and modifying polynomial expressions over the integers
  */
+@NullMarked
 public class Polynomial {
 
     /**
@@ -316,7 +320,7 @@ public class Polynomial {
         return oldParts.prepend(m);
     }
 
-    private static ImmutableList<Monomial> addPartHelp(ImmutableList<Monomial> oldParts,
+    private static @Nullable ImmutableList<Monomial> addPartHelp(ImmutableList<Monomial> oldParts,
             Monomial m) {
         if (oldParts.isEmpty()) {
             return null;

@@ -36,6 +36,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Split an array creation expression with explicit array initializer, creating a creation
  * expression with dimension expression and a list of assignments (-> Java language specification,
@@ -43,6 +45,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * This meta construct delivers the creation expression
  */
+@NullMarked
 public class InitArrayCreation extends InitArray {
 
     private final SchemaVariable newObjectSV;

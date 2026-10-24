@@ -37,7 +37,9 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Implements the rule which translates the toplevel formula
@@ -58,6 +60,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public final class ObserverToUpdateRule implements BuiltInRule {
     /**
      * The single instance.
@@ -152,7 +155,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal,
+    public ImmutableList<Goal> apply(Goal goal,
             RuleApp ruleApp) {
         final var services = goal.getOverlayServices();
         Union<Instantiation, ModelFieldInstantiation> inst =
@@ -290,7 +293,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         return result;
     }
 
-    private JTerm makeCall(Services services, IObserverFunction op, JTerm receiver,
+    private JTerm makeCall(Services services, IObserverFunction op, @Nullable JTerm receiver,
             ImmutableList<JTerm> methodArgs) {
 
         JTerm[] args = new JTerm[op.arity()];
@@ -324,7 +327,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         public FieldReference fieldReference;
         public JTerm update;
         public ProgramVariable modelField;
-        public JTerm receiver;
+        public @Nullable JTerm receiver;
         public ObserverFunction observerSymbol;
         LocationVariable assignmentTarget;
         JTerm modality;
@@ -333,7 +336,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     /*
      * Fill a ModelFieldInstantiation by inspecting the focussed term.
      */
-    private static ModelFieldInstantiation matchModelField(JTerm focusTerm, Services services) {
+    private static @Nullable ModelFieldInstantiation matchModelField(JTerm focusTerm,
+            Services services) {
 
         // see UseOperationContractRule.doInstantiation
         ModelFieldInstantiation result = new ModelFieldInstantiation();
@@ -408,8 +412,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
 
     }
 
-    private static Union<Instantiation, ModelFieldInstantiation> instantiate(JTerm focusTerm,
-            Services services) {
+    private static @Nullable Union<Instantiation, ModelFieldInstantiation> instantiate(
+            JTerm focusTerm, Services services) {
         // result cached (per worker thread)?
         if (focusTerm == lastFocusTerm.get()) {
             return lastInstantiation.get();

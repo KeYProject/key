@@ -14,6 +14,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
  * @author mulbrich
  * @since 2006-12-14
  */
+@NullMarked
 public final class EnumTypeCondition extends VariableConditionAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(EnumTypeCondition.class);
 

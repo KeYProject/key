@@ -15,12 +15,15 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This variable condition checks if an instantiation is a constant formula or term, i.e. its arity
  * is equal to zero.
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public class ConstantCondition extends VariableConditionAdapter {
 
     private final JAbstractSortedOperator t;

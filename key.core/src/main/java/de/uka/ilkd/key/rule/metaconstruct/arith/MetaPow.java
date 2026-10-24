@@ -14,12 +14,15 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Computes the pow function for literals. Computation fails if second argument is negative or
  * exceeds Integer.MAX_VALUE (the latter due to restrictions of class BigInteger).
  *
  */
+@NullMarked
 public final class MetaPow extends AbstractTermTransformer {
 
     public MetaPow() {

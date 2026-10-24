@@ -20,9 +20,12 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Class for analysing and modifying monomial expressions over the integers
  */
+@NullMarked
 public class Monomial {
 
     private final ImmutableList<Term> parts;

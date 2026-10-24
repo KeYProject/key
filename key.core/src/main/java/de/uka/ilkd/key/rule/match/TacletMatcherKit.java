@@ -9,6 +9,8 @@ import de.uka.ilkd.key.rule.match.vm.VMTacletMatcher;
 
 import org.key_project.prover.rules.TacletMatcher;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Abstract factory for taclet matchers: {@link #getKit()} returns the active factory, and
@@ -16,6 +18,7 @@ import org.key_project.prover.rules.TacletMatcher;
  * applies. The factory is selected by the system property {@code taclet.match}; the only
  * supported value is {@code vm}, the match-plan based {@link VMTacletMatcher}.
  */
+@NullMarked
 public abstract class TacletMatcherKit {
 
     /**

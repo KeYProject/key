@@ -19,6 +19,8 @@ import de.uka.ilkd.key.rule.merge.MergeProcedure;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(MergeWithPredicateAbstraction.class);
@@ -93,7 +96,8 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
     }
 
     @Override
-    public AbstractDomainLattice getAbstractDomainForSort(final Sort s, final Services services) {
+    public @Nullable AbstractDomainLattice getAbstractDomainForSort(final Sort s,
+            final Services services) {
         return instantiateAbstractDomain(s, predicates.get(s), latticeType, services);
     }
 
@@ -107,8 +111,8 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      * @param services The {@link Services} object.
      * @return The corresponding {@link AbstractDomainLattice}.
      */
-    public static AbstractDomainLattice instantiateAbstractDomain(final Sort s,
-            final List<AbstractionPredicate> applicablePredicates,
+    public static @Nullable AbstractDomainLattice instantiateAbstractDomain(final Sort s,
+            @Nullable final List<AbstractionPredicate> applicablePredicates,
             Class<? extends AbstractPredicateAbstractionLattice> latticeType,
             final Services services) {
 

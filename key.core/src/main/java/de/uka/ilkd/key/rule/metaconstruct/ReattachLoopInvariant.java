@@ -15,6 +15,8 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Construct for re-attaching a loop invariant that otherwise would get lost after a transformation,
  * for instance, the loop scope-based unwinding rule. Copied from the 2015 TimSort tweaks branch (by
@@ -23,6 +25,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
  *
  * @author Richard Bubel
  */
+@NullMarked
 public class ReattachLoopInvariant extends ProgramTransformer {
     public ReattachLoopInvariant(LoopStatement ls) {
         super("#reattachLoopInvariant", ls);

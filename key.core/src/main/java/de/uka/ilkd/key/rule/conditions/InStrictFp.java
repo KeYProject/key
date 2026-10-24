@@ -15,10 +15,13 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * This variable condition checks if a context is affected by the strictfp modifier
  */
+@NullMarked
 public final class InStrictFp extends VariableConditionAdapter {
 
     private final boolean negated;

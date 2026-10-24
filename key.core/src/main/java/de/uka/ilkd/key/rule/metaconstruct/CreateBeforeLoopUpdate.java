@@ -16,6 +16,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.UpdateableOperator;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Initializes the "before loop" update needed for the modifiable clause.
@@ -33,6 +35,7 @@ import org.key_project.logic.op.UpdateableOperator;
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
 
     public CreateBeforeLoopUpdate() {

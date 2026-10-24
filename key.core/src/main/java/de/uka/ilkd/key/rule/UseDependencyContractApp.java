@@ -19,11 +19,15 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class UseDependencyContractApp<T extends UseDependencyContractRule>
         extends AbstractContractRuleApp<T> {
 
     private final PosInOccurrence step;
-    private List<LocationVariable> heapContext;
+    private @Nullable List<LocationVariable> heapContext;
 
     public UseDependencyContractApp(UseDependencyContractRule builtInRule, PosInOccurrence pio) {
         this(builtInRule, pio, null, null);
@@ -170,7 +174,7 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
     }
 
     @Override
-    public List<LocationVariable> getHeapContext() {
+    public @Nullable List<LocationVariable> getHeapContext() {
         return heapContext;
     }
 

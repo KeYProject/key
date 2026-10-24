@@ -19,10 +19,13 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Replaces a declaration of multiple variables by two variable declarations where the first one
  * declares a single variable and the second one the remaining variables.
  */
+@NullMarked
 public class MultipleVarDecl extends ProgramTransformer {
 
     public MultipleVarDecl(SchemaVariable sv) {
