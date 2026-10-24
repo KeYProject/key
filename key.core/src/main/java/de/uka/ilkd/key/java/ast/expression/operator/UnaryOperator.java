@@ -39,7 +39,7 @@ public final class UnaryOperator extends Operator
     public final UnaryOperatorKind kind;
 
     public UnaryOperator(PositionInfo pi, List<Comment> c, UnaryOperatorKind op, Expression child) {
-        super(pi, c, ImmutableList.of(child));
+        super(pi, c, ImmutableList.ofFixedSize(child));
         this.kind = Objects.requireNonNull(op);
     }
 

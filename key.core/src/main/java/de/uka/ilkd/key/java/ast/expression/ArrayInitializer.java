@@ -41,7 +41,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
         super(list);
         assert kjt != null;
         this.kjt = kjt;
-        this.children = ImmutableList.of(list.collect(Expression.class));
+        this.children = ImmutableList.ofFixedSize(list.collect(Expression.class));
     }
 
 
@@ -55,7 +55,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
         super();
         assert kjt != null;
         this.kjt = kjt;
-        this.children = ImmutableList.of(expressions);
+        this.children = ImmutableList.ofFixedSize(expressions);
     }
 
     public ArrayInitializer(PositionInfo pi, List<Comment> c, ImmutableList<Expression> children,
