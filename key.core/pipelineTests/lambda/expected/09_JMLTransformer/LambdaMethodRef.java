@@ -6,8 +6,77 @@ class LambdaMethodRef {
 
     static class Box {
 
+        int size;
+
+        //@ //@ requires size >= 0;
+        //@ //@ ensures this.size == size;
+
+
+        /*@  
+          @ requires size [@5,34:35='>=',<235>,9:26] 0;
+          @ ensures this.size == size;
+
+          @*/
         Box(int size) {
+            this.size = size;
         }
+    }
+
+    static class Owner {
+
+        int size;
+
+        Owner(int size) {
+            this.size = size;
+        }
+
+        //@ //@ ensures \result == this.size;
+
+
+        /*@  
+          @ ensures \result == this.size;
+
+          @*/
+        int sizeOf() {
+            return size;
+        }
+    }
+
+    /**
+     * Functional interface with model methods; the target type of the constructor
+     * reference {@code Box::new} below (Csiky 6.2.4 "Application: Method References").
+     */
+    interface BoxFactory {
+
+        //@ //@ model boolean preCondition(Integer size);
+        //@ //@ model two_state boolean postCondition(Integer size, Box __result);
+
+
+        Box make(Integer size);
+
+        //@ model booleanpreCondition(Integersize);
+        /*@ model */ boolean preCondition(Integer size);
+
+        //@ model two_state booleanpostCondition(Integersize,Box__result);
+        /*@ model */ /*@ two_state */ boolean postCondition(Integer size, Box __result);
+    }
+
+    /**
+     * Target type of the unbound instance method reference {@code Owner::sizeOf}.
+     */
+    interface IntGetter {
+
+        //@ //@ model boolean preCondition(Owner owner);
+        //@ //@ model two_state boolean postCondition(Owner owner, Integer __result);
+
+
+        Integer get(Owner owner);
+
+        //@ model booleanpreCondition(Ownerowner);
+        /*@ model */ boolean preCondition(Owner owner);
+
+        //@ model two_state booleanpostCondition(Ownerowner,Integer__result);
+        /*@ model */ /*@ two_state */ boolean postCondition(Owner owner, Integer __result);
     }
 
     Predicate<Object> nullTest() {
@@ -26,9 +95,14 @@ class LambdaMethodRef {
         return p;
     }
 
-    Function<Integer, Box> factory() {
-        Function<Integer, Box> f = new Function__2();
+    BoxFactory factory() {
+        BoxFactory f = new BoxFactory__1();
         return f;
+    }
+
+    IntGetter unbound() {
+        IntGetter g = new IntGetter__1();
+        return g;
     }
 
     private static final class Predicate__1 implements java.util.function.Predicate<java.lang.Object> {
@@ -64,13 +138,41 @@ class LambdaMethodRef {
         }
     }
 
-    private static final class Function__2 implements java.util.function.Function<java.lang.Integer, LambdaMethodRef.Box> {
+    private static final class BoxFactory__1 implements LambdaMethodRef.BoxFactory {
 
-        public LambdaMethodRef.Box apply(java.lang.Integer p0) {
+        public LambdaMethodRef.Box make(java.lang.Integer p0) {
             return new Box(p0);
         }
 
-        public Function__2() {
+        public BoxFactory__1() {
         }
+
+        //@ model boolean preCondition(java.lang.Integer p0) { return p0 >= 0; }
+
+
+        //@ model two_state boolean postCondition(java.lang.Integer p0, LambdaMethodRef.Box __result) { return __result.size == p0; }
+
+
+        //@ model booleanpreCondition(java.lang.Integerp0){returnp0 [@22,62:63='>=',<235>,2:61] 0;}
+        /*@ model */ boolean preCondition(java.lang.Integer p0);
+
+        //@ model two_state booleanpostCondition(java.lang.Integerp0,LambdaMethodRef.Box__result){return__result.size == p0;}
+        /*@ model */ /*@ two_state */ boolean postCondition(java.lang.Integer p0, LambdaMethodRef.Box __result);
+    }
+
+    private static final class IntGetter__1 implements LambdaMethodRef.IntGetter {
+
+        public java.lang.Integer get(LambdaMethodRef.Owner p0) {
+            return p0.sizeOf();
+        }
+
+        public IntGetter__1() {
+        }
+
+        //@ model two_state boolean postCondition(LambdaMethodRef.Owner p0, java.lang.Integer __result) { return __result == p0.size; }
+
+
+        //@ model two_state booleanpostCondition(LambdaMethodRef.Ownerp0,java.lang.Integer__result){return__result == p0.size;}
+        /*@ model */ /*@ two_state */ boolean postCondition(LambdaMethodRef.Owner p0, java.lang.Integer __result);
     }
 }

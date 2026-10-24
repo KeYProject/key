@@ -19,6 +19,7 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.InitializerDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
@@ -47,7 +48,9 @@ import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.VoidType;
+import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedMethodLikeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedParameterDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedLambdaConstraintType;
@@ -249,6 +252,18 @@ public class LambdaReplacer extends JavaTransformerAbstract {
             creation.setType(texpr.getType().asClassOrInterfaceType().clone());
             params.forEach(p -> creation.addArgument(new NameExpr(p.getNameAsString())));
             body = creation;
+            LambdaExpr lambda =
+                new LambdaExpr(new NodeList<>(params), new ExpressionStmt(body), false);
+            // Copy the JML contract of the referenced constructor onto the synthetic lambda
+            // (6.2.4 "Application: Method References"). The clause text of a constructor
+            // refers to the object under construction via `this`; that object is the result
+            // of the synthetic lambda, so `this` is rewritten to `\result` here (which the
+            // contract conversion of Def. 8 maps to the `__result` parameter).
+            LambdaContractSpec spec = constructorContract(texpr, sam, params);
+            if (spec != null) {
+                lambda.setData(LambdaContractSpec.KEY, spec);
+            }
+            return lambda;
         } else {
             ResolvedMethodDeclaration method = mr.resolve();
             boolean isStatic = method.isStatic();
@@ -300,13 +315,42 @@ public class LambdaReplacer extends JavaTransformerAbstract {
                 new LambdaExpr(new NodeList<>(params), new ExpressionStmt(body), false);
             // Copy the JML contract of the target method onto the synthetic lambda; the
             // desugaring step turns it into model methods on the generated class (6.2.5).
-            LambdaContractSpec spec = contractFromMethodReference(method, params, paramOffset);
+            LambdaContractSpec spec =
+                contractFromMethodReference(method, params, paramOffset, false);
             if (spec != null) {
                 lambda.setData(LambdaContractSpec.KEY, spec);
             }
             return lambda;
         }
-        return new LambdaExpr(new NodeList<>(params), new ExpressionStmt(body), false);
+    }
+
+    /**
+     * Resolves the constructor referenced by {@code T::new} and copies its JML contract onto
+     * the synthetic lambda (6.2.4 "Application: Method References"). The constructor is matched
+     * by arity against the functional method; overloads of the same arity resolve to the first
+     * declared one.
+     */
+    private @Nullable LambdaContractSpec constructorContract(TypeExpr type,
+            ResolvedMethodDeclaration sam, List<Parameter> params) {
+        ResolvedConstructorDeclaration ctor = null;
+        try {
+            ResolvedType rt = type.getType().resolve();
+            if (rt.isReferenceType()) {
+                var td = rt.asReferenceType().getTypeDeclaration();
+                if (td.isPresent()) {
+                    for (ResolvedConstructorDeclaration c : td.get().getConstructors()) {
+                        if (c.getNumberOfParams() == params.size()) {
+                            ctor = c;
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (RuntimeException e) {
+            // Constructor cannot be resolved (e.g. a class-file type): no contract available.
+            return null;
+        }
+        return ctor == null ? null : contractFromMethodReference(ctor, params, 0, true);
     }
 
     /**
@@ -315,27 +359,39 @@ public class LambdaReplacer extends JavaTransformerAbstract {
      * method's parameter names; these are renamed to the parameter names of the synthetic
      * lambda, which are the names the generated SAM method uses (Def. 8, cb). Returns
      * {@code null} if the target method declares no contract.
+     *
+     * @param constructor whether the target is a constructor reference (then {@code this}/{@code
+     *        super} of the clause text denote the object under construction, i.e. the result of
+     *        the synthetic lambda, and are rewritten to {@code \result}); for an unbound
+     *        instance method reference ({@code paramOffset == 1}) the receiver {@code this} is
+     *        the first synthetic parameter instead
      */
     private @Nullable LambdaContractSpec contractFromMethodReference(
-            ResolvedMethodDeclaration method, List<Parameter> params, int paramOffset) {
+            ResolvedMethodLikeDeclaration method, List<Parameter> params, int paramOffset,
+            boolean constructor) {
         Optional<? extends Node> ast;
         try {
             ast = method.toAst();
         } catch (RuntimeException e) {
             return null;
         }
-        if (ast.isEmpty() || !(ast.get() instanceof MethodDeclaration md)) {
+        if (ast.isEmpty()) {
             return null;
         }
+        Node node = ast.get();
+        if (!(node instanceof MethodDeclaration) && !(node instanceof ConstructorDeclaration)) {
+            return null;
+        }
+        Node decl = node;
         Optional<ClassOrInterfaceDeclaration> owner =
-            md.findAncestor(ClassOrInterfaceDeclaration.class);
+            decl.findAncestor(ClassOrInterfaceDeclaration.class);
         if (owner.isEmpty()) {
             return null;
         }
         NodeList<BodyDeclaration<?>> members = owner.get().getMembers();
         int idx = -1;
         for (int i = 0; i < members.size(); i++) {
-            if (members.get(i) == md) {
+            if (members.get(i) == decl) {
                 idx = i;
                 break;
             }
@@ -343,7 +399,7 @@ public class LambdaReplacer extends JavaTransformerAbstract {
         if (idx <= 0) {
             return null;
         }
-        // The contract spans all JML comments directly preceding the method declaration.
+        // The contract spans all JML comments directly preceding the target declaration.
         List<JmlDoc> docs = new ArrayList<>();
         for (int i = idx - 1; i >= 0 && members.get(i) instanceof JmlDocDeclaration jd; i--) {
             docs.addAll(0, jd.getJmlComments());
@@ -353,6 +409,14 @@ public class LambdaReplacer extends JavaTransformerAbstract {
             return null;
         }
         Map<String, String> rename = new HashMap<>();
+        if (constructor) {
+            // The object under construction is the result of the synthetic lambda.
+            rename.put("this", "\\result");
+        } else if (paramOffset == 1) {
+            // Unbound instance method reference: the receiver of the target method (`this`)
+            // becomes the first synthetic parameter of the lambda.
+            rename.put("this", params.get(0).getNameAsString());
+        }
         for (int i = 0; i < method.getNumberOfParams() && i + paramOffset < params.size(); i++) {
             String target = method.getParam(i).getName();
             String synthetic = params.get(i + paramOffset).getNameAsString();
