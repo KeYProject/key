@@ -72,7 +72,7 @@ public final class UnaryOperator extends Operator
     }
 
     @Override
-    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, @Nullable MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         if (src instanceof UnaryOperator other) {
             if (this.kind.equals(other.getKind())) {

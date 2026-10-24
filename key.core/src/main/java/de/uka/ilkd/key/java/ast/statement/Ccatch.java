@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.ccatch.CcatchNonstandardParameterDeclaration;
@@ -24,7 +25,12 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
 
     private final StatementBlock body;
 
-    public Ccatch(PositionInfo pi, List<Comment> comments, @Nullable ParameterDeclaration parameter,
+    // BranchImp's (PositionInfo, List<Comment>) constructor is over-narrow: it merely forwards to
+    // the @Nullable-annotated JavaNonTerminalProgramElement ctor, but BranchImp is outside this
+    // wave's file set and cannot be widened here, so the check is scoped to this ctor.
+    @SuppressWarnings("NullAway")
+    public Ccatch(@Nullable PositionInfo pi, @Nullable List<Comment> comments,
+            @Nullable ParameterDeclaration parameter,
             @Nullable CcatchNonstandardParameterDeclaration nonStdParameter, StatementBlock body) {
         super(pi, comments);
         this.parameter = parameter;
@@ -69,7 +75,8 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
         parameter = children.get(ParameterDeclaration.class);
         nonStdParameter =
             children.get(CcatchNonstandardParameterDeclaration.class);
-        body = children.get(StatementBlock.class);
+        body = Objects.requireNonNull(children.get(StatementBlock.class),
+            "ccatch statement requires a body");
     }
 
     @Override
@@ -114,8 +121,12 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
      * @throws ArrayIndexOutOfBoundsException
      *         if <tt>index</tt> is out of bounds
      */
+    // the parameter and the non-standard parameter may legitimately be absent (a ccatch declares
+    // exactly one of them); the base contract NonTerminalProgramElement.getChildAt(int) is
+    // over-narrow; honest @Nullable override per SuperArrayDeclaration precedent (wave 7).
+    @SuppressWarnings("NullAway")
     @Override
-    public ProgramElement getChildAt(int index) {
+    public @Nullable ProgramElement getChildAt(int index) {
         if (hasParameterDeclaration()) {
             if (index == 0) {
                 return parameter;
@@ -184,8 +195,12 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
      * @throws ArrayIndexOutOfBoundsException
      *         if <tt>index</tt> is out of bounds.
      */
+    // the parameter may be absent (see hasParameterDeclaration()); the base contract
+    // ParameterContainer.getParameterDeclarationAt(int) is over-narrow, so the honest @Nullable
+    // override is exempted from the check.
+    @SuppressWarnings("NullAway")
     @Override
-    public ParameterDeclaration getParameterDeclarationAt(int index) {
+    public @Nullable ParameterDeclaration getParameterDeclarationAt(int index) {
         if (hasParameterDeclaration() && index == 0) {
             return parameter;
         }
@@ -202,7 +217,8 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
      * @throws ArrayIndexOutOfBoundsException
      *         if <tt>index</tt> is out of bounds.
      */
-    public CcatchNonstandardParameterDeclaration getNonStdParameterDeclarationAt(int index) {
+    public @Nullable CcatchNonstandardParameterDeclaration getNonStdParameterDeclarationAt(
+            int index) {
         if (hasNonStdParameterDeclaration() && index == 0) {
             return nonStdParameter;
         }
@@ -223,7 +239,7 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
      *
      * @return the parameter declaration.
      */
-    public ParameterDeclaration getParameterDeclaration() {
+    public @Nullable ParameterDeclaration getParameterDeclaration() {
         return parameter;
     }
 
@@ -232,7 +248,7 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
      *
      * @return the parameter declaration.
      */
-    public CcatchNonstandardParameterDeclaration getNonStdParameterDeclaration() {
+    public @Nullable CcatchNonstandardParameterDeclaration getNonStdParameterDeclaration() {
         return nonStdParameter;
     }
 

@@ -323,7 +323,7 @@ public abstract class VariableNamer implements InstantiationProposer {
                     "array base type has no KeY Java type").getJavaType()));
             result += "_arr";
         } else {
-            String name = type.getName();
+            String name = Objects.requireNonNull(type.getName(), "type has no name: " + type);
             name = MiscTools.filterAlphabetic(name);
             if (!name.isEmpty()) {
                 result = name.substring(0, 1).toLowerCase();
@@ -605,7 +605,9 @@ public abstract class VariableNamer implements InstantiationProposer {
                         ((LocalVariableDeclaration) c.getStatementAt(0)).getVariables().get(0);
 
                     if (v.hasInitializer()) {
-                        ProgramElement rhs = instantiateExpression(v.getInitializer(),
+                        ProgramElement rhs = instantiateExpression(
+                            Objects.requireNonNull(v.getInitializer(),
+                                "variable initializer missing"),
                             app.instantiations(), services);
                         name = ProofSaver.printProgramElement(rhs);
                         break;
