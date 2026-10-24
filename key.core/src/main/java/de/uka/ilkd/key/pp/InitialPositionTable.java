@@ -9,6 +9,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * An InitialPositionTable is a PositionTable that describes the beginning of the element/subelement
  * relationship. Thus, an InitialPositionTable describes the information on where the
@@ -20,6 +23,7 @@ import org.key_project.util.collection.ImmutableList;
  * a sequent are located one level below. In other words the whole sequent is not represented by an
  * empty position list but by the list [0].
  */
+@NullMarked
 public class InitialPositionTable extends PositionTable {
 
     private ImmutableList<Range> updateRanges = ImmutableList.nil();
@@ -43,7 +47,7 @@ public class InitialPositionTable extends PositionTable {
      * @param filter the sequent print filter from that was used to print the sequent
      *
      */
-    public PosInSequent getPosInSequent(int index, SequentPrintFilter filter) {
+    public @Nullable PosInSequent getPosInSequent(int index, SequentPrintFilter filter) {
         if (index < startPos[0] || index >= endPos[0]) {
             return null;
         }
@@ -86,7 +90,7 @@ public class InitialPositionTable extends PositionTable {
      * @param filter the current filter
      * @return the path for the given pio
      */
-    public ImmutableList<Integer> pathForPosition(PosInOccurrence pio,
+    public @Nullable ImmutableList<Integer> pathForPosition(PosInOccurrence pio,
             SequentPrintFilter filter) {
         ImmutableList<Integer> p = ImmutableList.nil();
         p = prependPathInFormula(p, pio);

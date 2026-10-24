@@ -20,6 +20,8 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left untouched.
  *
@@ -32,6 +34,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author mattias ulbrich
  */
+@NullMarked
 public class TryCloseMacro extends AbstractProofMacro {
 
     private static class TryCloseProgressBarListener extends ProgressBarListener {

@@ -48,6 +48,7 @@ import org.key_project.util.parsing.Location;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +76,7 @@ import org.slf4j.LoggerFactory;
  * @author Mattias Ulbrich
  */
 
+@NullMarked
 public class ApplyScriptsMacro extends AbstractProofMacro {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplyScriptsMacro.class);
     public static final Property<Map<LocationVariable, JFunction>> USER_DATA_JML_OBTAIN_VAR_MAP =
@@ -82,7 +84,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
 
     private final @Nullable ProofMacro fallBackMacro;
 
-    public ApplyScriptsMacro(ProofMacro fallBackMacro) {
+    public ApplyScriptsMacro(@Nullable ProofMacro fallBackMacro) {
         this.fallBackMacro = fallBackMacro;
     }
 
@@ -153,7 +155,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         }
     }
 
-    private static JmlAssert getJmlAssert(Node node) {
+    private static @Nullable JmlAssert getJmlAssert(@Nullable Node node) {
         if (node == null || node.parent() == null) {
             return null;
         }
@@ -310,7 +312,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
 
     }
 
-    private Map<LocationVariable, JFunction> makeObtainVarMap(
+    private Map<LocationVariable, @Nullable JFunction> makeObtainVarMap(
             ImmutableList<LocationVariable> locationVariables) {
         HashMap<LocationVariable, JFunction> result = new LinkedHashMap<>();
         for (LocationVariable lv : locationVariables) {

@@ -12,11 +12,13 @@ import de.uka.ilkd.key.logic.JTerm;
 import org.key_project.logic.op.Operator;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * @author Alexander Weigl
  * @version 1 (06.02.25)
  */
+@NullMarked
 public class TermUtil {
 
     /**

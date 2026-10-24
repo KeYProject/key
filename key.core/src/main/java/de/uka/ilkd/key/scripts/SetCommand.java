@@ -146,7 +146,8 @@ public class SetCommand extends AbstractCommand {
         proof.setActiveStrategy(strategy);
     }
 
-    private static Strategy getStrategy(EngineState state, StrategyProperties properties) {
+    private static @Nullable Strategy getStrategy(EngineState state,
+            StrategyProperties properties) {
         final Profile profile = state.getProof().getServices().getProfile();
         final Proof proof = state.getProof();
 

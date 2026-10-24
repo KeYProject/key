@@ -19,6 +19,9 @@ import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * <p>
@@ -78,6 +81,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
  * with them.</li>
  * </ul>
  */
+@NullMarked
 public final class NotationInfo {
     // Priorities of operators (roughly corresponding to the grammatical structure in the parser.
     static final int PRIORITY_TOP = 0;
@@ -452,6 +456,7 @@ public final class NotationInfo {
         scm = am;
     }
 
+    @Nullable
     Notation getNotation(Class<?> c) {
         return notationTable.get(c);
     }
