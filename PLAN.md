@@ -256,7 +256,11 @@ already verified — see `JML_MAPPING.md` and §3).
 > WD `processJavaType` → `ContractRegistryWD`); full-suite baseline
 > measured + A/B-verified (40 failures at slices-1–2 HEAD identical to
 > Phase-3 HEAD — zero regressions), IntSemantics fixture fix landed
-> (`14a26a43d0`), leaving **34 recorded pre-existing jmltk gaps**.
+> (`14a26a43d0`), leaving **34 recorded pre-existing jmltk gaps**. CI fix
+> `e17111ed30` runs `spotlessApply` over the 25 PR-diff files the
+> `spotlessJavaCheck` job flagged (CodeQuality green again); the other red CI
+> jobs (caching/slicing/infflow/integration proofs) are pre-existing — same set
+> at slice-3-era commits, untouched by slices 7–9 (see HANDOFF §1).
 
 Rationale: with Phases 0–3 done, the *parsed* JML lives on the Java AST
 (`attachedJml` on declarations, `getContracts()` on statements, `JmlStatementSpec`
