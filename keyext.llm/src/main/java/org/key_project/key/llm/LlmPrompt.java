@@ -6,9 +6,11 @@ package org.key_project.key.llm;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -123,16 +125,9 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
         txtInput.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,
             InputEvent.CTRL_DOWN_MASK), "sendPrompt");
         txtInput.getActionMap().put("sendPrompt", new SendPromptAction());
-        // Ctrl+Space expands the $token / @file / /directive at the caret in place.
-        txtInput.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,
-            InputEvent.CTRL_DOWN_MASK), "expandAtCaret");
-        txtInput.getActionMap().put("expandAtCaret",
-            new KeyAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    expandAtCaret();
-                }
-            });
+        // Ctrl+Space expands the $token / @file / /directive at the caret in place. The hook is
+        // invoked directly from the input's key listener, before any key binding processing.
+        txtInput.setExpandHook(this::expandAtCaret);
 
         // simple KeY syntax highlighting for ```key fenced blocks typed into the prompt
         txtInput.setHighlighter(new LexerHighlighter.KeYLexerHighlighter());
@@ -665,7 +660,26 @@ class OutputBox<T> extends JPanel {
         output.setWrapStyleWord(true);
         output.setComponentPopupMenu(menu);
         setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
-        add(new JScrollPane(output), BorderLayout.CENTER);
+        // The box shows its full text: the inner scroll pane never scrolls, but it swallows all
+        // mouse wheel events over the box. Forward them to the conversation scroll pane.
+        var scroll = new JScrollPane(output);
+        scroll.addMouseWheelListener(this::forwardWheel);
+        output.addMouseWheelListener(this::forwardWheel);
+        add(scroll, BorderLayout.CENTER);
+    }
+
+    /** Forwards a mouse wheel event to the enclosing conversation scroll pane. */
+    private void forwardWheel(MouseWheelEvent e) {
+        var ancestor = SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
+        if (ancestor instanceof JScrollPane conversation) {
+            Point point = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), conversation);
+            Point screen = e.getLocationOnScreen();
+            var forwarded = new MouseWheelEvent(conversation, e.getID(), e.getWhen(),
+                e.getModifiers(), point.x, point.y, screen.x, screen.y, e.getClickCount(),
+                e.isPopupTrigger(), e.getScrollType(), e.getScrollAmount(), e.getWheelRotation(),
+                e.getPreciseWheelRotation());
+            conversation.dispatchEvent(forwarded);
+        }
     }
 
     @Override
