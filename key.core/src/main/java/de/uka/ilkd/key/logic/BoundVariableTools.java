@@ -127,7 +127,7 @@ public class BoundVariableTools {
             final QuantifiableVariable[] newVars = new QuantifiableVariable[oldVars.size()];
             if (resolveCollisions(oldVars, newVars, criticalVars)) {
                 changed = true;
-                newBoundVars[i] = ImmutableList.of(newVars);
+                newBoundVars[i] = ImmutableList.ofFixedSize(newVars);
                 newSubs[i] =
                     renameVariables(originalTerm.sub(i), oldVars, newBoundVars[i], services);
             } else {
@@ -253,6 +253,6 @@ public class BoundVariableTools {
             }
         }
 
-        return ImmutableList.of(res);
+        return ImmutableList.ofFixedSize(res);
     }
 }
