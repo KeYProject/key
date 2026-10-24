@@ -17,9 +17,10 @@
   specMath loads). `:key.core:compileTestJava`/`:key.ui:compileTestJava` green.
 - **Phase 4 in progress:** `SpecificationRepository` deletion, slice by slice
   (see PLAN §Phase 4 table; each committed slice keeps compile + speclang slice
-  green). Slices 1–4 DONE (statement specs → AST nodes; limited observers →
+  green). Slices 1–5 DONE (statement specs → AST nodes; limited observers →
   `LimitedObservers`; loop/block/merge specs → AST nodes; proof↔PO registry →
-  `ProofRegistry`/`Services`).
+  `ProofRegistry`/`Services`; class invariants/axioms → `ClassAxiomComputer`/
+  `Services`).
 - **Full-suite baseline (clean, re-measured, no concurrent gradle):**
   **1638 tests, 40 failed, 72 skipped** at slices-1–2 HEAD. A/B against the
   Phase-3 HEAD worktree re-running the same 14 failing classes: **identical 40
@@ -42,6 +43,7 @@
 | `14a26a43d0` | Phase 4 triage — drop class-level `code_*_math`/`spec_*_math` pragmas from `intSemantics` fixtures (jmltk parity, same pattern as Phase 3); IntSemanticsTest 6/6. |
 | `ae716ed74a` | Phase 4 slice 3 — loop invariants, block/loop/merge contracts attached to their AST nodes (`LoopStatement`/`StatementBlock`/`MergePointStatement`); repo loop/block/merge maps + helpers deleted. |
 | `c81c034dd1` | Phase 4 slice 4 — proof↔PO registry (`proofs` map, `registerProof`/`removeProof`/`getProofs`/`getPO`/`getPOForProof`/`getProofOblInput`/`getContractPOForProof`/`getTargetOfProof`/`getAllProofs`) → new `de.uka.ilkd.key.proof.mgt.ProofRegistry` owned by/`Services`, shared in all copy paths; repo proof block + `proofs` field deleted; redundant pre-env register in `DefaultUserInterfaceControl` dropped. |
+| `1b0f1f94ee` | Phase 4 slice 5 — class invariants/axioms (`invs`/`axioms`/`allClassAxiomsCache` maps, `getClassInvariants`/`addClassInvariant(s)`, `getClassAxioms` incl. synthesized invDef/staticInv/free/Query/ContractAxioms + model-method axioms, `getClassAxiomsForType`, `addClassAxiom(s)`) → new `de.uka.ilkd.key.speclang.ClassAxiomComputer` owned by `Services` (created via `Profile.createClassAxiomComputer`; WD variant `ClassAxiomComputerWD` keeps invariant→`ClassWellDefinedness` registration); repo class-axiom surface deleted (~340 lines); callers rewired (AbstractPO/WellDefinednessPO selectClassAxioms, KeYFile, JMLSpecFactory, ClassAxiomImpl, macros/testgen/proofmanagement). |
 
 ## 2. What Phase 1 did
 
@@ -268,22 +270,19 @@ must NOT grow.
 
 1. `git status` clean? (only HANDOFF.md/PLAN.md doc edits may be pending).
 2. Decision §5 was taken; Phase 3 (§5.1) is DONE — speclang slice green.
-3. **Phase 4 status:** slices 1–4 committed + pushed (statement specs →
+3. **Phase 4 status:** slices 1–5 committed + pushed (statement specs →
    AST nodes; limited observers → `LimitedObservers`; loop/block/merge specs
    → AST nodes, `ae716ed74a`; proof↔PO registry → `ProofRegistry`/`Services`,
-   `c81c034dd1`); full-suite baseline measured + A/B-verified
+   `c81c034dd1`; class invariants/axioms → `ClassAxiomComputer`/`Services`,
+   `1b0f1f94ee`); full-suite baseline measured + A/B-verified
    (40 failures at HEAD = 40 at Phase-3 HEAD; zero slice regressions);
-   IntSemantics fix landed (now 34 recorded gaps, see §5.2). Slice-4
+   IntSemantics fix landed (now 34 recorded gaps, see §5.2). Slice-5
    baseline re-verified at its own HEAD: speclang 285/0/12, IntSemantics
-   6/0/0. NEXT = **class invariants/axioms** (repo `invs`/`axioms` +
-   `getClassAxioms` incl. synthesized axioms + `allClassAxiomsCache` →
-   `ClassAxiomComputer` with per-`KeYJavaType` identity memo; the
-   `ProofRegistry` contract-lookups still delegate `splitContract`/
-   `getOverridingTargets` to the repo — they move with the contract registry).
-4. Then: contract registry (`contracts`/`operationContracts`/
+   6/0/0. NEXT = **contract registry** (repo `contracts`/`operationContracts`/
    `contractsByName`/`contractTargets` + `splitContract`/`getOverridingTargets`/
-   `getInheritedContracts`/`prepareContract`/`contractCounters`), initially
-   clauses (→ `JMLSpecFactory` at load), `addSpecs` collapse, `map(...)`,
-   delete `SpecificationRepository.java` + `Services`/`KeYEnvironment` repo
-   accessors.
+   `getInheritedContracts`/`prepareContract`/`contractCounters` — also
+   unblocking the `ProofRegistry` contract-lookup delegation).
+4. Then: initially clauses (→ `JMLSpecFactory` at load), `addSpecs` collapse,
+   `map(...)`, delete `SpecificationRepository.java` + `Services`/`KeYEnvironment`
+   repo accessors.
 5. Remember: do NOT touch `/home/weigl/work/key`.
