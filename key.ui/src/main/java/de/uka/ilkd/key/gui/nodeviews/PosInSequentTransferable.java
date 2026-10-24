@@ -14,6 +14,9 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
+import org.key_project.prover.sequent.Sequent;
+
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +46,7 @@ public class PosInSequentTransferable implements Transferable {
     private final PosInSequent pis;
 
     /** the highlighted term as parseable string */
-    private String stringSelection;
+    private @Nullable String stringSelection;
 
 
     /**
@@ -53,10 +56,25 @@ public class PosInSequentTransferable implements Transferable {
      *        term or formula, not the complete sequent)
      */
     public PosInSequentTransferable(PosInSequent pis, Services serv) {
+        this(pis, serv, null);
+    }
+
+    /**
+     * creates an instance of this transferable
+     *
+     * @param pis the PosInSequent to be transfered
+     * @param serv the services (term printing)
+     * @param wholeSequent the displayed sequent; provides the string flavor when {@code pis}
+     *        denotes the whole sequent
+     */
+    public PosInSequentTransferable(PosInSequent pis, Services serv,
+            @Nullable Sequent wholeSequent) {
         this.pis = pis;
         if (!pis.isSequent()) {
             this.stringSelection =
                 ProofSaver.printTerm((JTerm) pis.getPosInOccurrence().subTerm(), serv);
+        } else if (wholeSequent != null) {
+            this.stringSelection = wholeSequent.toString();
         }
     }
 

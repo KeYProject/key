@@ -39,9 +39,9 @@ local commands such as `/skills` (see [Input markup](#4-input-markup)).
 │  · a running tool call is shown as a live row with [Background] [Cancel]│
 │  · backgrounded calls appear as job rows while they run                 │
 ├──────────────────────────────────────────────────────────────────────────┤
-│ tabs: [Prompt] [Files]                                                   │
-│  Prompt tab: multi-line input box                       "Ctrl+Enter to send" │
-│  Files tab  : checkboxes to attach model files to the conversation    │
+│ multi-line prompt input with completion             "Ctrl+Enter to send"│
+│  · drag terms/sequents from the sequent view into the prompt            │
+│  · ```key fenced blocks are highlighted with the KeY syntax             │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -54,8 +54,9 @@ Source view](docs/images/agent/llm-panel.png)
   toolbar shows the number of queued messages.
 - **Running a turn.** The *Stop* button cancels the *active* turn only (queued messages are not
   affected). Only one turn runs at a time.
-- **Files.** The *Files* tab lists the files of the current Java model (bounded); ticking a file
-  attaches it to the conversation. Attached files are reported by the `$selectedFiles` token.
+- **Files.** The files of the current Java model are referenced with `@path` (see
+  [section 4.2](#42-file-references-path)); file references are attached to the conversation and
+  reported by the `$selectedFiles` token.
 - **Tool activity.** After a turn, the tool calls that were executed are summarized in the chat
   (can be turned off in the settings). While a call runs it is shown as a live row with
   *Background*/*Cancel* buttons (see [section 7.4](#74-backgrounding)); calls you moved into the
@@ -97,7 +98,8 @@ Without a loaded proof, proof-dependent tokens resolve to explicit placeholders 
 ### 4.2 File references `@path`
 
 `@src/MyClass.java` embeds the contents of the file as a code block. Paths are relative to the
-Java model directory.
+Java model directory; for proofs without a Java model (e.g. `.key` problems) the directory of the
+initial source file, or the working directory, is used instead.
 
 ### 4.3 Commands and directives `/…`
 
@@ -126,9 +128,29 @@ Typing a trigger character opens the completion popup:
 | `Esc`          | close the popup                           |
 | mouse click    | accept the clicked entry                  |
 
-The popup never steals the keyboard focus, so you can select an entry and keep typing.
+The popup never steals the keyboard focus, so you can select an entry and keep typing. It fits
+its content (no wrapped entries), is at least as wide as the input box, and grows up to a limit;
+dragging the handle in its bottom-right corner resizes it, and the chosen size is kept.
 
-### 4.5 Inline expansion (Ctrl+Space)
+### 4.5 Drag and drop from the sequent view
+
+Terms, formulas or the whole sequent can be dragged from the sequent view into the prompt input.
+While dragging, the mouse cursor follows the drop target (it shows a copy mark over the input).
+The dropped text is inserted at the drop position wrapped in verbatim marks: single-line content
+in backticks (`` `a + b` ``), multi-line content in a fenced block with the KeY language marker:
+
+````
+```key
+seq ::  a <= b  ==>  b <= a
+```
+````
+
+### 4.6 KeY syntax highlighting
+
+Fenced blocks marked with the `key` language (as produced by drag and drop) are highlighted in
+the prompt input with the KeY lexer — keywords, terms and formulas get the usual KeY colors.
+
+### 4.7 Inline expansion (Ctrl+Space)
 
 Pressing **Ctrl+Space** right after a fragment replaces the fragment with its *currently resolved*
 content, so you can edit the actual value instead of the reference:
