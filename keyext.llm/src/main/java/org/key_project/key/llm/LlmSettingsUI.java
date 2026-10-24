@@ -8,9 +8,11 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 import javax.swing.*;
@@ -19,6 +21,8 @@ import javax.swing.event.DocumentListener;
 
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
+
+import org.apache.hc.client5.http.HttpResponseException;
 
 /**
  * Settings UI of the KeY LLM integration: connection, agent behavior, prompt/context budgets,
@@ -227,16 +231,31 @@ public class LlmSettingsUI extends SettingsPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            var baseUrl = txtApiBaseUrl.getText().strip();
+            while (baseUrl.endsWith("/")) {
+                baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+            }
+            if (baseUrl.isEmpty()) {
+                JOptionPane.showMessageDialog(LlmSettingsUI.this,
+                    "Please enter an API base URL first.", "Fetch Models",
+                    JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            var url = baseUrl + "/openai/models";
             setEnabled(false);
             var worker = new SwingWorker<List<String>, Void>() {
                 @Override
                 protected List<String> doInBackground() throws Exception {
-                    var data =
-                        Util.httpGet(txtApiBaseUrl.getText() + "/openai/models",
-                            txtAuthToken.getText());
+                    var data = Util.httpGet(url, txtAuthToken.getText());
+                    if (data == null) {
+                        throw new IOException("The server returned an empty response.");
+                    }
+                    if (!data.has("data") || !data.get("data").isJsonArray()) {
+                        throw new IOException("Unexpected response (no 'data' array): " + data);
+                    }
                     var result = new ArrayList<String>(32);
-                    if (data != null && data.has("data")) {
-                        for (var model : data.getAsJsonArray("data")) {
+                    for (var model : data.getAsJsonArray("data")) {
+                        if (model.isJsonObject() && model.getAsJsonObject().has("id")) {
                             result.add(model.getAsJsonObject().get("id").getAsString());
                         }
                     }
@@ -246,10 +265,10 @@ public class LlmSettingsUI extends SettingsPanel {
                 @Override
                 protected void done() {
                     try {
-                        var seq = resultNow();
+                        var seq = get();
                         if (seq.isEmpty()) {
                             JOptionPane.showMessageDialog(LlmSettingsUI.this,
-                                "No models were returned.", "Fetch Models",
+                                "The server returned no models.", "Fetch Models",
                                 JOptionPane.WARNING_MESSAGE);
                             return;
                         }
@@ -263,11 +282,29 @@ public class LlmSettingsUI extends SettingsPanel {
                         model.setAvailableModels(sorted);
                     } catch (Exception ex) {
                         JOptionPane.showMessageDialog(LlmSettingsUI.this,
-                            "Could not fetch models: " + ex.getMessage(), "Fetch Models",
-                            JOptionPane.ERROR_MESSAGE);
+                            "Could not fetch models from\n" + url + ".\n\n" + reasonOf(ex),
+                            "Fetch Models failed", JOptionPane.ERROR_MESSAGE);
                     } finally {
                         setEnabled(true);
                     }
+                }
+
+                /**
+                 * A readable reason for a failed fetch: the root cause of a worker failure
+                 * (e.g. the HTTP status), or the exception's own message.
+                 */
+                private String reasonOf(Exception ex) {
+                    var cause = ex instanceof ExecutionException execution ? execution.getCause()
+                            : ex;
+                    if (cause == null) {
+                        cause = ex;
+                    }
+                    if (cause instanceof HttpResponseException http) {
+                        return "HTTP " + http.getStatusCode() + ": " + http.getMessage()
+                            + "\n(check the API base URL and the auth token)";
+                    }
+                    var message = cause.getMessage();
+                    return message != null && !message.isBlank() ? message : cause.toString();
                 }
             };
             worker.execute();
