@@ -6,7 +6,10 @@ package de.uka.ilkd.key.proof.proofevent;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 /** Information about one modification of one node */
+@NullMarked
 public interface NodeChange {
 
     /**

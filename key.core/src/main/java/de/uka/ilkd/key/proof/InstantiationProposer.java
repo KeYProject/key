@@ -10,10 +10,13 @@ import de.uka.ilkd.key.rule.TacletApp;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Provides proposals for schema variable instantiations.
  */
+@NullMarked
 public interface InstantiationProposer {
 
     /**
@@ -26,6 +29,7 @@ public interface InstantiationProposer {
      * @param previousProposals a list of other proposals which should be taken into account (e.g.
      *        for name uniqueness), or null
      */
-    String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
-            ImmutableList<String> previousProposals);
+    @Nullable
+    String getProposal(TacletApp app, SchemaVariable var, Services services,
+            Node undoAnchor, @Nullable ImmutableList<String> previousProposals);
 }

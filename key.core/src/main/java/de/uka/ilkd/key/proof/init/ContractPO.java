@@ -7,10 +7,12 @@ package de.uka.ilkd.key.proof.init;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.speclang.Contract;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * An obligation for some kind of contract.
  */
+@NullMarked
 public interface ContractPO extends ProofOblInput {
 
     Contract getContract();

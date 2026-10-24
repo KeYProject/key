@@ -19,6 +19,9 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROPERTY;
 
 
@@ -26,6 +29,7 @@ import static de.uka.ilkd.key.logic.equality.TermLabelsProperty.TERM_LABELS_PROP
  * Replaces operators in a term by other operators with the same signature, or subterms of the term
  * by other terms with the same sort. Does not replace in java blocks.
  */
+@NullMarked
 public class OpReplacer {
 
     /**
@@ -66,7 +70,7 @@ public class OpReplacer {
      * @param proof the currently loaded proof
      */
     public OpReplacer(Map<? extends SyntaxElement, ? extends SyntaxElement> map, TermFactory tf,
-            Proof proof) {
+            @Nullable Proof proof) {
         assert map != null;
 
         this.map = map instanceof ReplacementMap
@@ -226,7 +230,7 @@ public class OpReplacer {
      * @param term the term in which to perform the replacement.
      * @return the transformed term.
      */
-    public JTerm replace(JTerm term) {
+    public @Nullable JTerm replace(@Nullable JTerm term) {
         if (term == null) {
             return null;
         }
@@ -288,7 +292,8 @@ public class OpReplacer {
      * @param terms the terms in which to perform the replacement.
      * @return the list of transformed terms.
      */
-    public ImmutableList<InfFlowSpec> replaceInfFlowSpec(ImmutableList<InfFlowSpec> terms) {
+    public ImmutableList<InfFlowSpec> replaceInfFlowSpec(
+            @Nullable ImmutableList<InfFlowSpec> terms) {
         ImmutableList<InfFlowSpec> result = ImmutableList.nil();
         if (terms == null) {
             return result;

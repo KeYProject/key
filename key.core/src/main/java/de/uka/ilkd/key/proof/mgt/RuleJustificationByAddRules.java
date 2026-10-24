@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.mgt;
 
-
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
@@ -12,7 +11,10 @@ import de.uka.ilkd.key.rule.Taclet;
 
 import org.key_project.prover.rules.RuleApp;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public record RuleJustificationByAddRules(Node node, boolean isAxiom) implements RuleJustification {
 
     public RuleJustificationByAddRules {
@@ -22,7 +24,7 @@ public record RuleJustificationByAddRules(Node node, boolean isAxiom) implements
     @Override
     public boolean isAxiomJustification() { return isAxiom; }
 
-    public RuleApp motherTaclet() { return node.getAppliedRuleApp(); }
+    public @Nullable RuleApp motherTaclet() { return node.getAppliedRuleApp(); }
 
     public String toString() {
         String mother;

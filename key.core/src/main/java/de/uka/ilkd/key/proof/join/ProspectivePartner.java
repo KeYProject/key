@@ -10,20 +10,24 @@ import de.uka.ilkd.key.proof.Node;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents the partners of a join operation.
  *
  * @author Benjamin Niedermann
  */
+@NullMarked
 public class ProspectivePartner {
     private final JTerm[] updates = new JTerm[2];
     private final JTerm commonFormula;
     private final SequentFormula[] formula =
         new SequentFormula[2];
     private final Node[] nodes = new Node[2];
-    private JTerm commonPredicate = null;
-    private Node commonParent = null;
-    private SequentFormula formulaForHiding = null;
+    private @Nullable JTerm commonPredicate = null;
+    private @Nullable Node commonParent = null;
+    private @Nullable SequentFormula formulaForHiding = null;
 
     /**
      * Constructs a new prospective partner object, i.e. a structure comprising the information
@@ -67,7 +71,7 @@ public class ProspectivePartner {
         this.commonPredicate = commonPredicate;
     }
 
-    public JTerm getCommonPredicate() {
+    public @Nullable JTerm getCommonPredicate() {
         return commonPredicate;
     }
 
@@ -86,11 +90,11 @@ public class ProspectivePartner {
         this.formulaForHiding = formulaForHiding;
     }
 
-    public SequentFormula getFormulaForHiding() {
+    public @Nullable SequentFormula getFormulaForHiding() {
         return formulaForHiding;
     }
 
-    public Node getCommonParent() {
+    public @Nullable Node getCommonParent() {
         return commonParent;
     }
 

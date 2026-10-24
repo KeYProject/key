@@ -11,15 +11,19 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This FileRepo is able to build a proof bundle but is not able to guarantee consistency between
  * the saved proof and the source code because it does not cache the source code.
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class SimpleFileRepo extends AbstractFileRepo {
     @Override
-    protected Path getSaveName(Path path) {
+    protected @Nullable Path getSaveName(Path path) {
         // we have to return paths that are relative!
 
         Path norm = path.normalize(); // TODO: is this necessary?
@@ -41,7 +45,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
         return null;
     }
 
-    private Path getJavaFilePath(Path javaFile) {
+    private @Nullable Path getJavaFilePath(Path javaFile) {
         // assumes that javaFile is an actual *.java file, path has to be absolute and normalized
         // return value: the path of the file relative to its proof bundle root
 
@@ -85,7 +89,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
         return Paths.get("classpath").resolve(rel);
     }
 
-    private Path getClassFilePath(Path classFile) {
+    private @Nullable Path getClassFilePath(Path classFile) {
         // copy to classpath folder (*.class files may only occur in classpath)
 
         // class file may be in subdirectories
@@ -106,7 +110,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
     }
 
     @Override
-    protected InputStream getInputStreamInternal(Path p) throws FileNotFoundException {
+    protected @Nullable InputStream getInputStreamInternal(Path p) throws FileNotFoundException {
         Path concrete;
         if (p.isAbsolute()) { // p is absolute -> directly read
             concrete = p.normalize();

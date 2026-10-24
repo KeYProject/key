@@ -36,6 +36,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
 /**
@@ -43,6 +46,7 @@ import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
  *
  * @author lanzinger
  */
+@NullMarked
 public class FunctionalBlockContractPO extends AbstractPO implements ContractPO {
 
     /**
@@ -64,7 +68,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     /**
      * The initial proof configuration.
      */
-    private InitConfig proofConfig;
+    private @Nullable InitConfig proofConfig;
 
     /**
      *
@@ -244,7 +248,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         }
@@ -380,7 +384,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
     }
 
     @Override
-    protected InitConfig getCreatedInitConfigForSingleProof() {
+    protected @Nullable InitConfig getCreatedInitConfigForSingleProof() {
         return proofConfig;
     }
 

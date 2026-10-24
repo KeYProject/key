@@ -7,13 +7,17 @@ package de.uka.ilkd.key.proof;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class NameRecorder {
 
     private ImmutableList<Name> pre = ImmutableList.nil();
 
     private ImmutableList<Name> post = ImmutableList.nil();
 
-    public void setProposals(ImmutableList<Name> proposals) {
+    public void setProposals(@Nullable ImmutableList<Name> proposals) {
         if (proposals == null) {
             pre = ImmutableList.nil();
         } else {
@@ -48,7 +52,7 @@ public class NameRecorder {
      *
      * @return the first proposal
      */
-    public Name getProposal() {
+    public @Nullable Name getProposal() {
         Name proposal = null;
 
         if (pre != null && !pre.isEmpty()) {

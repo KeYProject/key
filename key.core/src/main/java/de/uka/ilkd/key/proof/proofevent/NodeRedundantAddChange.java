@@ -6,9 +6,12 @@ package de.uka.ilkd.key.proof.proofevent;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * An instance of this class informs the listerns if a formula has been tried to add to the sequent
  */
+@NullMarked
 public class NodeRedundantAddChange implements NodeChange {
 
     /** the PosInOccurrence of the formula that has been tried to add */

@@ -8,12 +8,16 @@ import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Node in an intermediate proof representation. Responsible for storing information about children
  * of nodes.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public abstract class NodeIntermediate {
 
     /**
@@ -30,7 +34,7 @@ public abstract class NodeIntermediate {
         return children;
     }
 
-    public void setChildren(LinkedList<NodeIntermediate> children) {
+    public void setChildren(@Nullable LinkedList<NodeIntermediate> children) {
         this.children = children;
         this.subtreeSize = -1;
     }

@@ -14,6 +14,8 @@ import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Methods for computing conflicts affecting a delayed cut application. Relies on the given
  * {@link ApplicationCheck} object.
@@ -21,6 +23,7 @@ import org.key_project.prover.sequent.SequentFormula;
  * @see ApplicationCheck
  * @author Benjamin Niedermann
  */
+@NullMarked
 public enum LateApplicationCheck {
     INSTANCE;
 

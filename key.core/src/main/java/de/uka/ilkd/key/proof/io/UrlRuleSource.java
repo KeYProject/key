@@ -20,7 +20,9 @@ import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class UrlRuleSource extends RuleSource {
 
     private final URL url;

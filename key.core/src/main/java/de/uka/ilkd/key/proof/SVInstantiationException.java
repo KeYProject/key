@@ -4,7 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof;
 
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public abstract class SVInstantiationException extends Exception {
 
     /**

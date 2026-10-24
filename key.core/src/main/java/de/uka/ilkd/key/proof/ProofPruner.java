@@ -16,15 +16,19 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class is responsible for pruning a proof tree at a certain cutting point. It has been
  * introduced to encapsulate the methods that are needed for pruning. Since the class has
  * influence on the internal state of the proof it should not be moved to a new file, in order
  * to restrict the access to it.
  */
+@NullMarked
 class ProofPruner {
     private final Proof proof;
-    private Node firstLeaf = null;
+    private @Nullable Node firstLeaf = null;
 
     ProofPruner(Proof proof) {
         this.proof = proof;

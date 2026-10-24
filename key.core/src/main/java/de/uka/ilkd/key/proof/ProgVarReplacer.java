@@ -25,10 +25,12 @@ import org.key_project.prover.rules.instantiation.ListInstantiation;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Replaces program variables.
  */
+@NullMarked
 public final class ProgVarReplacer {
 
     /**

@@ -19,6 +19,9 @@ import org.key_project.prover.rules.Taclet;
 import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Cache that is used for accelerating <code>TermTacletAppIndex</code>. Basically, this is a mapping
  * from terms to objects of <code>TermTacletAppIndex</code>, following the idea that the same
@@ -51,6 +54,7 @@ import org.key_project.util.collection.ImmutableList;
  * subformula or subterm, roughly following the state design pattern. The transition function is
  * realised by the method <code>ITermTacletAppIndexCache.descend</code>.
  */
+@NullMarked
 public class TermTacletAppIndexCacheSet {
     /**
      * max. instances of <code>ITermTacletAppIndexCache</code> that are kept in this set (e.g., for
@@ -68,7 +72,7 @@ public class TermTacletAppIndexCacheSet {
         }
 
         @Override
-        public TermTacletAppIndex getIndexForTerm(Term t) {
+        public @Nullable TermTacletAppIndex getIndexForTerm(Term t) {
             return null;
         }
 
@@ -328,7 +332,7 @@ public class TermTacletAppIndexCacheSet {
         }
 
         @Override
-        public TermTacletAppIndex getIndexForTerm(Term t) {
+        public @Nullable TermTacletAppIndex getIndexForTerm(Term t) {
             return null;
         }
 

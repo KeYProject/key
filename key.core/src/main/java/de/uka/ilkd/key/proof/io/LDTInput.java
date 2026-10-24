@@ -39,7 +39,7 @@ public class LDTInput implements EnvInput {
     private final LDTInputListener listener;
     private final Profile profile;
 
-    private InitConfig initConfig = null;
+    private @Nullable InitConfig initConfig = null;
 
     /**
      * creates a representation of the LDT files to be used as input to the KeY prover.
@@ -106,7 +106,7 @@ public class LDTInput implements EnvInput {
 
     // no class path elements here
     @Override
-    public Path readBootClassPath() {
+    public @Nullable Path readBootClassPath() {
         return null;
     }
 
@@ -195,7 +195,7 @@ public class LDTInput implements EnvInput {
     }
 
     @Override
-    public Path getInitialFile() {
+    public @Nullable Path getInitialFile() {
         return null;
     }
 }

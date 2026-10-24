@@ -36,6 +36,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -43,6 +44,7 @@ import org.jspecify.annotations.Nullable;
  * functions, heuristics, and variables namespaces, information on the underlying java model, and a
  * set of rules.
  */
+@NullMarked
 public class InitConfig {
 
     /**
@@ -80,16 +82,16 @@ public class InitConfig {
     private Map<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new LinkedHashMap<>();
 
     /** HashMap for quick lookups taclet name->taclet */
-    private Map<Name, Taclet> activatedTacletCache = null;
+    private @Nullable Map<Name, Taclet> activatedTacletCache = null;
     private boolean defaultsComputed;
 
     /** the fileRepo which is responsible for consistency between source code and proof */
-    private FileRepo fileRepo;
+    private @Nullable FileRepo fileRepo;
 
     // weigl this field is never set
-    private String originalKeYFileName;
+    private @Nullable String originalKeYFileName;
 
-    private ProofSettings settings;
+    private @Nullable ProofSettings settings;
 
     private KeyAst.@Nullable Declarations header;
 
@@ -164,7 +166,7 @@ public class InitConfig {
     }
 
 
-    public Profile getProfile() {
+    public @Nullable Profile getProfile() {
         return services.getProfile();
     }
 
@@ -257,7 +259,7 @@ public class InitConfig {
         return taclets;
     }
 
-    public Taclet lookupActiveTaclet(Name name) {
+    public @Nullable Taclet lookupActiveTaclet(Name name) {
         if (activatedTacletCache == null) {
             fillActiveTacletCache();
         }
@@ -424,7 +426,7 @@ public class InitConfig {
     }
 
 
-    public ProofSettings getSettings() {
+    public @Nullable ProofSettings getSettings() {
         return settings;
     }
 
@@ -475,7 +477,7 @@ public class InitConfig {
             + getTaclets() + "\n" + "Built-In:" + builtInRules() + "\n";
     }
 
-    public FileRepo getFileRepo() {
+    public @Nullable FileRepo getFileRepo() {
         return fileRepo;
     }
 

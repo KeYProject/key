@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.init;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Reading prover input failed
  */
+@NullMarked
 public class ProofInputException extends Exception {
     private static final long serialVersionUID = 1028674319098864943L;
 

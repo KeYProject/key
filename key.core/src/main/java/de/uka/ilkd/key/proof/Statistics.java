@@ -19,6 +19,8 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.EnhancedStringBuffer;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Instances of this class encapsulate statistical information about proofs, such as the number of
  * nodes, or the number of interactions.
@@ -26,6 +28,7 @@ import org.key_project.util.collection.Pair;
  * @author bruns
  *
  */
+@NullMarked
 public class Statistics {
     public final int nodes;
     public final int branches;

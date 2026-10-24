@@ -72,6 +72,8 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,6 +96,7 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class IntermediateProofReplayer {
     /**
      * Set as {@link #getStatus()} if the proof contains SMT steps that didn't reload successfully.
@@ -137,7 +140,7 @@ public class IntermediateProofReplayer {
     private final HashMap<Integer, HashSet<PartnerNode>> joinPartnerNodes = new HashMap<>();
 
     /** The current open goal */
-    private Goal currGoal = null;
+    private @Nullable Goal currGoal = null;
 
     /**
      * Constructs a new {@link IntermediateProofReplayer}.
@@ -172,7 +175,7 @@ public class IntermediateProofReplayer {
     /**
      * @return the lastSelectedGoal
      */
-    public Goal getLastSelectedGoal() {
+    public @Nullable Goal getLastSelectedGoal() {
         return currGoal;
     }
 
@@ -920,7 +923,7 @@ public class IntermediateProofReplayer {
      * @return The instantiated taclet.
      */
     public static TacletApp constructInsts(@NonNull TacletApp app, Goal currGoal,
-            Collection<String> loadedInsts, Services services) {
+            @Nullable Collection<String> loadedInsts, Services services) {
         if (loadedInsts == null) {
             return app;
         }
@@ -979,7 +982,8 @@ public class IntermediateProofReplayer {
      * @param name The name to search for.
      * @return The found schema variable, or null if it is not present in the set.
      */
-    private static SchemaVariable lookupName(ImmutableSet<SchemaVariable> set, String name) {
+    private static @Nullable SchemaVariable lookupName(ImmutableSet<SchemaVariable> set,
+            String name) {
         for (SchemaVariable v : set) {
             if (v.name().toString().equals(name)) {
                 return v;
@@ -1143,9 +1147,9 @@ public class IntermediateProofReplayer {
     public static class Result {
         private final String status;
         private final List<Throwable> errors;
-        private Goal lastSelectedGoal = null;
+        private @Nullable Goal lastSelectedGoal = null;
 
-        public Result(String status, List<Throwable> errors, Goal lastSelectedGoal) {
+        public Result(String status, List<Throwable> errors, @Nullable Goal lastSelectedGoal) {
             this.status = status;
             this.errors = errors;
             this.lastSelectedGoal = lastSelectedGoal;
@@ -1159,7 +1163,7 @@ public class IntermediateProofReplayer {
             return errors;
         }
 
-        public Goal getLastSelectedGoal() {
+        public @Nullable Goal getLastSelectedGoal() {
             return lastSelectedGoal;
         }
     }

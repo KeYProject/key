@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import de.uka.ilkd.key.proof.io.EnvInput;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import org.slf4j.LoggerFactory;
  * @author Mattias Ulbrich
  * @see ProblemInitializer
  */
+@NullMarked
 public class BaseConfigCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseConfigCache.class);

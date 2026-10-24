@@ -22,18 +22,21 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The proof obligation for dependency contracts.
  */
+@NullMarked
 public final class DependencyContractPO extends AbstractPO implements ContractPO {
 
-    private JTerm mbyAtPre;
+    private @Nullable JTerm mbyAtPre;
 
     private final DependencyContract contract;
 
-    private InitConfig proofConfig;
-    private TermBuilder tb;
+    private @Nullable InitConfig proofConfig;
+    private @Nullable TermBuilder tb;
 
 
     // -------------------------------------------------------------------------
@@ -52,7 +55,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
     // internal methods
     // -------------------------------------------------------------------------
 
-    private JTerm buildFreePre(List<LocationVariable> heaps, LocationVariable selfVar,
+    private JTerm buildFreePre(List<LocationVariable> heaps, @Nullable LocationVariable selfVar,
             KeYJavaType selfKJT, ImmutableList<LocationVariable> paramVars, JTerm wellFormedHeaps,
             Services services) throws ProofInputException {
         // "self != null"
@@ -276,7 +279,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
 
     @Override
-    public JTerm getMbyAtPre() {
+    public @Nullable JTerm getMbyAtPre() {
         return mbyAtPre;
     }
 
@@ -310,7 +313,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
 
     @Override
-    protected InitConfig getCreatedInitConfigForSingleProof() {
+    protected @Nullable InitConfig getCreatedInitConfigForSingleProof() {
         return proofConfig;
     }
 

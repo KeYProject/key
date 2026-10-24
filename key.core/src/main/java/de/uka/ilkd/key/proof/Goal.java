@@ -46,6 +46,7 @@ import org.key_project.prover.strategy.DelegationBasedRuleApplicationManager;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.proof.RuleAppIndexMode.INTERACTIVE;
@@ -62,6 +63,7 @@ import static de.uka.ilkd.key.proof.RuleAppIndexMode.INTERACTIVE;
  * methods for setting back several proof steps. The sequent has to be changed using the methods of
  * Goal.
  */
+@NullMarked
 public final class Goal implements ProofGoal<Goal> {
 
     public static final AtomicLong PERF_APP_EXECUTE = new AtomicLong();
@@ -662,7 +664,7 @@ public final class Goal implements ProofGoal<Goal> {
      * @return new goal(s)
      */
     @Override
-    public ImmutableList<Goal> apply(final RuleApp ruleApp) {
+    public @Nullable ImmutableList<Goal> apply(final RuleApp ruleApp) {
         final PendingRuleApp pending = computeRuleApp(ruleApp);
         if (pending == null) {
             return null;
