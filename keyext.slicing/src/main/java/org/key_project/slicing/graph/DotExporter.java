@@ -64,8 +64,9 @@ public final class DotExporter {
 
         // output each edge of the dependency graph
         List<Node> queue = new ArrayList<>();
-        if (proof.root() != null) { // may be null for proofs with no steps
-            queue.add(proof.root());
+        Node root = proof.root();
+        if (root != null) { // may be null for proofs with no steps
+            queue.add(root);
         }
         while (!queue.isEmpty()) {
             Node node = queue.remove(queue.size() - 1);

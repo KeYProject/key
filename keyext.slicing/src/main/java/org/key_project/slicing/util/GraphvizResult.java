@@ -50,7 +50,7 @@ public record GraphvizResult(@Nullable BufferedImage image, @Nullable String err
      * @return the rendered image (null if error is present)
      */
     @Override
-    public BufferedImage image() { return image; }
+    public @Nullable BufferedImage image() { return image; }
 
     /**
      * @return whether this result indicates an error
@@ -61,5 +61,5 @@ public record GraphvizResult(@Nullable BufferedImage image, @Nullable String err
      * @return the error message (null if image was rendered)
      */
     @Override
-    public String error() { return error; }
+    public @Nullable String error() { return error; }
 }

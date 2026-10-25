@@ -15,6 +15,7 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.util.helper.FindResources;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -31,27 +32,46 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * partial graph (which would otherwise produce an unsound/broken sliced proof).
  */
 public class SliceRefusedWhenTrackerIncompleteTest {
-    private static final Path testCaseDirectory = FindResources.getTestCasesDirectory();
+    private static final Path testCaseDirectory = requireTestCasesDirectory();
+
+    private static Path requireTestCasesDirectory() {
+        Path directory = FindResources.getTestCasesDirectory();
+        if (directory == null) {
+            throw new NullPointerException("Test case directory not found.");
+        }
+        return directory;
+    }
 
     @Test
     void analyzeRefusesAfterTrackerMarkedIncomplete() throws Exception {
         final boolean oldValue = GeneralSettings.noPruningClosed;
         GeneralSettings.noPruningClosed = false;
-        final AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
+        final AtomicReference<@Nullable DependencyTracker> tracker = new AtomicReference<>();
         final KeYEnvironment<?> env = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
             testCaseDirectory.resolve("cutExample.proof"), null, null, null, null, null,
             proof -> tracker.set(new DependencyTracker(proof)), true);
         try {
             final Proof proof = env.getLoadedProof();
+            if (proof == null) {
+                throw new NullPointerException("No proof loaded from 'cutExample.proof'.");
+            }
             assertTrue(proof.closed(), "the loaded example proof is closed");
 
+            final DependencyTracker dependencyTracker = tracker.get();
+            if (dependencyTracker == null) {
+                throw new NullPointerException("No dependency tracker registered for the proof.");
+            }
+
             // a complete tracker yields a slice
-            final AnalysisResults before = tracker.get().analyze(true, false);
+            final AnalysisResults before = dependencyTracker.analyze(true, false);
+            if (before == null) {
+                throw new NullPointerException("A complete tracker must yield analysis results.");
+            }
             assertNotNull(before, "a complete tracker must yield analysis results");
 
             // simulate the multi-core prover having suspended this listener for a run
-            tracker.get().markIncompleteAfterParallelRun();
-            assertNull(tracker.get().analyze(true, false),
+            dependencyTracker.markIncompleteAfterParallelRun();
+            assertNull(dependencyTracker.analyze(true, false),
                 "a slice must be refused once the dependency graph is known incomplete");
         } finally {
             env.dispose();

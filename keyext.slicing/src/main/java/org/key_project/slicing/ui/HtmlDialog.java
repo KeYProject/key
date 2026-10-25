@@ -25,12 +25,18 @@ public class HtmlDialog extends JDialog {
 
     /**
      * Construct and show a new dialog for the provided HTML.
+     * <p>
+     * The UI calls below operate on {@code this} while the receiver is still under initialization
+     * (EISOP initialization check); safe here since the dialog is completed before it becomes
+     * visible and the {@code dispose} calls only run after user interaction, suppressed with a
+     * scoped key.
      *
      * @param window parent window
      * @param title title of the new dialog
      * @param html HTML to show
      * @param linkPressedCallback if the user clicks on a link, this callback receives the URL
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public HtmlDialog(Window window, String title, String html,
             @Nullable Consumer<String> linkPressedCallback) {
         super(window, title);
