@@ -75,6 +75,13 @@ public class IsabelleSettingsProvider extends SettingsPanel implements SettingsP
      */
     private final IsabelleTranslationSettings settings;
 
+    /**
+     * The settings-widget calls below operate on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since the widget setup is purely
+     * local to this class and the fields are assigned before first use, suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public IsabelleSettingsProvider() {
         super();
         setHeaderText(getDescription());

@@ -7,7 +7,6 @@ package org.key_project.isabelletranslation;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -72,8 +71,16 @@ public class IsabelleTranslationSettings extends AbstractSettings {
     /**
      * The default path for translations
      */
-    private static final Path DEFAULT_TRANSLATION_PATH =
-        PathConfig.currentPaths.keyConfigDir.resolve("IsabelleTranslations");
+    private static final Path DEFAULT_TRANSLATION_PATH = getDefaultTranslationPath();
+
+    private static Path getDefaultTranslationPath() {
+        PathConfig.KeyPaths currentPaths = PathConfig.currentPaths;
+        if (currentPaths == null) {
+            throw new NullPointerException("KeY key paths are not set up.");
+        }
+        return currentPaths.keyConfigDir.resolve("IsabelleTranslations");
+    }
+
     /**
      * default timeout setting
      */
@@ -88,7 +95,17 @@ public class IsabelleTranslationSettings extends AbstractSettings {
         return config;
     }
 
+    /**
+     * The {@code readSettings} call and the {@code this::save} method reference operate on
+     * {@code this} while the receiver is still under initialization (EISOP initialization check);
+     * the {@link Configuration} overrides the defaults assigned just above, and the shutdown
+     * hook only ever runs after construction has completed, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:methodref.receiver.bound.invalid" })
     private IsabelleTranslationSettings(Configuration load) {
+        isabellePath = DEFAULT_ISABELLE_PATH;
+        translationPath = DEFAULT_TRANSLATION_PATH;
         readSettings(load);
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
@@ -119,19 +136,31 @@ public class IsabelleTranslationSettings extends AbstractSettings {
 
     protected void createSessionFiles() {
         Path sessionRootPath = Path.of(translationPath + "/ROOT");
-        BufferedReader sessionReader = new BufferedReader(
-            new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("ROOT"))));
+        InputStream rootStream = getClass().getResourceAsStream("ROOT");
+        if (rootStream == null) {
+            throw new NullPointerException("Resource 'ROOT' not found.");
+        }
+        BufferedReader sessionReader =
+            new BufferedReader(new InputStreamReader(rootStream));
         String sessionRoot =
             sessionReader.lines().collect(Collectors.joining(System.lineSeparator()));
 
         Path sessionDocumentPath = Path.of(translationPath + "/document/root.tex");
-        BufferedReader sessionDocumentReader = new BufferedReader(new InputStreamReader(
-            Objects.requireNonNull(getClass().getResourceAsStream("root.tex"))));
+        InputStream rootTexStream = getClass().getResourceAsStream("root.tex");
+        if (rootTexStream == null) {
+            throw new NullPointerException("Resource 'root.tex' not found.");
+        }
+        BufferedReader sessionDocumentReader = new BufferedReader(
+            new InputStreamReader(rootTexStream));
         String sessionDocument =
             sessionDocumentReader.lines().collect(Collectors.joining(System.lineSeparator()));
 
         try {
-            Files.createDirectories(sessionDocumentPath.getParent());
+            Path parent = sessionDocumentPath.getParent();
+            if (parent == null) {
+                throw new NullPointerException("No parent directory for document file.");
+            }
+            Files.createDirectories(parent);
             Files.write(sessionRootPath, sessionRoot.getBytes());
             Files.write(sessionDocumentPath, sessionDocument.getBytes());
             LOGGER.info("Created Isabelle session files at: {}", translationPath);
@@ -158,8 +187,16 @@ public class IsabelleTranslationSettings extends AbstractSettings {
 
     @Override
     public void readSettings(Properties props) {
-        isabellePath = Path.of(props.getProperty(isabellePathKey));
-        Path newTranslationPath = Path.of(props.getProperty(translationPathKey));
+        String isabellePathString = props.getProperty(isabellePathKey);
+        if (isabellePathString == null) {
+            throw new NullPointerException("Property '" + isabellePathKey + "' not set.");
+        }
+        isabellePath = Path.of(isabellePathString);
+        String translationPathString = props.getProperty(translationPathKey);
+        if (translationPathString == null) {
+            throw new NullPointerException("Property '" + translationPathKey + "' not set.");
+        }
+        Path newTranslationPath = Path.of(translationPathString);
         if (!newTranslationPath.equals(translationPath)) {
             translationPath = newTranslationPath;
             createSessionFiles();

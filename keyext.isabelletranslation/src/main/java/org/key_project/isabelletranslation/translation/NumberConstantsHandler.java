@@ -23,8 +23,8 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class NumberConstantsHandler implements IsabelleHandler {
 
-    private Function numberSymbol;
-    private Services services;
+    private @Nullable Function numberSymbol;
+    private @Nullable Services services;
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
@@ -45,8 +45,13 @@ public class NumberConstantsHandler implements IsabelleHandler {
         // of KeY
         assert (term instanceof JTerm);
 
+        Services theseServices = services;
+        if (theseServices == null) {
+            throw new NullPointerException("NumberConstantsHandler has not been initialized");
+        }
+
         String string = AbstractTermTransformer
-                .convertToDecimalString((JTerm) term, services);
+                .convertToDecimalString((JTerm) term, theseServices);
         return new StringBuilder("(").append(string).append("::int)");
     }
 

@@ -163,10 +163,12 @@ public class IsabelleResourceController {
                 // Should not occur. If it was possible to create instances during creation, it
                 // should be possible now.
                 shutdownGracefully();
-                LOGGER.error(e.getMessage());
+                String message = e.getMessage();
+                LOGGER.error(message == null ? "null" : message);
             } catch (InterruptedException e) {
                 shutdownGracefully();
-                LOGGER.error(e.getMessage());
+                String message = e.getMessage();
+                LOGGER.error(message == null ? "null" : message);
                 Thread.currentThread().interrupt();
             }
         } else {

@@ -34,9 +34,19 @@ public class IsabelleRuleApp extends AbstractExternalSolverRuleApp<IsabelleRule>
         this(rule, pio, ifInsts, successfulSolverName, "Isabelle: " + successfulSolverName);
     }
 
+    /**
+     * The {@code pio} argument may be {@code null} at runtime ("apply without a specific proof
+     * position", the whole built-in-rule-app hierarchy stores it in a {@code @Nullable} field,
+     * see {@link de.uka.ilkd.key.rule.AbstractBuiltInRuleApp#posInOccurrence()}); the
+     * {@link AbstractExternalSolverRuleApp} constructor cannot express this, suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private IsabelleRuleApp(IsabelleRule rule, @Nullable PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> ifInsts, String successfulSolverName, String title) {
-        super(rule, pio, ifInsts, successfulSolverName, title);
+            @Nullable ImmutableList<PosInOccurrence> ifInsts, String successfulSolverName,
+            String title) {
+        super(rule, pio, ifInsts == null ? ImmutableList.nil() : ifInsts, successfulSolverName,
+            title);
     }
 
     @Override
