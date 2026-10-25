@@ -62,13 +62,13 @@ public class WellDefinednessMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy<@NonNull Goal> createStrategy(Proof proof,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         return new WellDefinednessStrategy();
     }
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         if (proof == null || proof.isDisposed()
                 || !WellDefinednessCheck.isOn(proof.getServices())) {
             return false;
@@ -85,8 +85,8 @@ public class WellDefinednessMacro extends StrategyProofMacro {
             while (n != null) {
                 // Applicable in a well-definedness branch (e.g. of a loop statement or a block
                 // contract)
-                if (n.getNodeInfo().getBranchLabel() != null
-                        && n.getNodeInfo().getBranchLabel().equals(WD_BRANCH)) {
+                final String branchLabel = n.getNodeInfo().getBranchLabel();
+                if (branchLabel != null && branchLabel.equals(WD_BRANCH)) {
                     return true;
                 }
                 n = n.parent();

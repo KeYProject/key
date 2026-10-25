@@ -43,9 +43,36 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
         this.inv = inv;
     }
 
+    /**
+     * Resolves the target of a loop invariant for the well-definedness check.
+     *
+     * @param inv the loop invariant
+     * @return the target of the loop invariant
+     */
+    private static IObserverFunction requireTarget(LoopSpecification inv) {
+        final IObserverFunction target = inv.getTarget();
+        if (target == null) {
+            throw new NullPointerException(
+                "No target of the loop invariant for the well-definedness check.");
+        }
+        return target;
+    }
+
+    /**
+     * Creates a contract to check well-definedness of a loop invariant.
+     *
+     * @param inv the loop invariant
+     * @param params the parameters of the loop
+     * @param services the services instance
+     *        <p>
+     *        The setter invocations below happen while {@code this} is still under construction;
+     *        they
+     *        are safe since all involved methods are final, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public LoopWellDefinedness(LoopSpecification inv, ImmutableSet<LocationVariable> params,
             Services services) {
-        super(inv.getName(), inv.getLoop().getStartPosition().line(), inv.getTarget(),
+        super(inv.getName(), inv.getLoop().getStartPosition().line(), requireTarget(inv),
             inv.getOrigVars().add(convertParams(params)), Type.LOOP_INVARIANT, services);
         final LocationVariable h = getHeap();
         this.inv = inv;
@@ -74,10 +101,15 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
 
     @Override
     public LoopWellDefinedness map(UnaryOperator<JTerm> op, Services services) {
+        final JTerm accessible = getAccessible();
+        final JTerm mby = getMby();
+        final JTerm represents = getRepresents();
         return new LoopWellDefinedness(getName(), id(), type(), getTarget(), getHeap(),
             getOrigVars(), getRequires().map(op), op.apply(getModifiable()),
-            op.apply(getAccessible()), getEnsures().map(op), op.apply(getMby()),
-            op.apply(getRepresents()), inv.map(op, services), services.getTermBuilder());
+            accessible == null ? null : op.apply(accessible), getEnsures().map(op),
+            mby == null ? null : op.apply(mby),
+            represents == null ? null : op.apply(represents), inv.map(op, services),
+            services.getTermBuilder());
     }
 
     @Override
@@ -105,7 +137,7 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    public ModifierKind getVisibility() {
+    public @Nullable ModifierKind getVisibility() {
         return inv.getVisibility();
     }
 
@@ -121,7 +153,8 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
         assert this.getStatement().getName().equals(lwd.getStatement().getName());
         assert this.getStatement().getLoop().getStartPosition().line() == lwd.getStatement()
                 .getLoop().getStartPosition().line();
-        assert this.getStatement().getTarget().equals(lwd.getStatement().getTarget());
+        final IObserverFunction target = this.getStatement().getTarget();
+        assert target != null && target.equals(lwd.getStatement().getTarget());
         assert this.getStatement().getKJT().equals(lwd.getStatement().getKJT());
 
         super.combine(lwd, services);
