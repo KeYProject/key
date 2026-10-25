@@ -499,13 +499,16 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
 
         // configure contract
         DependencyContract contract =
-            (DependencyContract) ((UseDependencyContractApp) ruleApp).getInstantiation();
+            (DependencyContract) Objects.requireNonNull(
+                ((UseDependencyContractApp) ruleApp).getInstantiation(),
+                "no contract in applied dependency contract app");
 
         assert contract != null;
 
         // get step
-        final PosInOccurrence step =
-            ((UseDependencyContractApp) ruleApp).step();
+        final PosInOccurrence step = Objects.requireNonNull(
+            ((UseDependencyContractApp) ruleApp).step(),
+            "no step in applied dependency contract app");
 
         final boolean twoState = target.getStateCount() == 2;
         final int obsHeapCount = target.getHeapCount(services);

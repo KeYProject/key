@@ -99,7 +99,15 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
     // internal methods
     // -------------------------------------------------------------------------
 
-    private static @Nullable Pair<Expression, MethodOrConstructorReference> getMethodCall(
+    /**
+     * The method or constructor reference matched as the active statement, together with the
+     * expression the resulting value is assigned to — {@code null} for constructor calls and
+     * method-reference statements, which have no result expression.
+     */
+    private record MethodCall(@Nullable Expression actualResult, MethodOrConstructorReference mr) {
+    }
+
+    private static @Nullable MethodCall getMethodCall(
             JavaBlock jb,
             Services services) {
         final Expression actualResult;
@@ -150,7 +158,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
                 && !(rp instanceof TypeReference)) {
             return null;
         } else {
-            return new Pair<Expression, MethodOrConstructorReference>(actualResult, mr);
+            return new MethodCall(actualResult, mr);
         }
     }
 
@@ -461,13 +469,12 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         }
 
         // active statement must be method call or new
-        final @Nullable Pair<Expression, MethodOrConstructorReference> methodCall =
-            getMethodCall(progPost.javaBlock(), services);
+        final MethodCall methodCall = getMethodCall(progPost.javaBlock(), services);
         if (methodCall == null) {
             return null;
         }
-        final Expression actualResult = methodCall.first;
-        final MethodOrConstructorReference mr = methodCall.second;
+        final Expression actualResult = methodCall.actualResult();
+        final MethodOrConstructorReference mr = methodCall.mr();
         assert mr != null;
         // arguments of method call must be simple expressions
         final ExecutionContext ec =
