@@ -20,18 +20,23 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A contract for checking the well-definedness of a jml loop invariant.
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public class LoopWellDefinedness extends StatementWellDefinedness {
 
     private final LoopSpecification inv;
 
     private LoopWellDefinedness(String name, int id, Type type, IObserverFunction target,
             LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
-            JTerm accessible, Condition ensures, JTerm mby, JTerm rep, LoopSpecification inv,
+            @Nullable JTerm accessible, Condition ensures, @Nullable JTerm mby, @Nullable JTerm rep,
+            LoopSpecification inv,
             TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);

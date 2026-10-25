@@ -17,11 +17,14 @@ import de.uka.ilkd.key.wd.WellDefinednessCheck;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  *
  * @author Alexander Weigl
  * @version 1 (1/1/26)
  */
+@NullMarked
 public class WDTacletGenerator implements TacletPOGenerator {
     /**
      * Generate well-definedness taclets to resolve formulas as WD(pv.{@literal $inv}) or
