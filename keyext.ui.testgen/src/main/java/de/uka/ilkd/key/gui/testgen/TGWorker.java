@@ -23,6 +23,8 @@ import de.uka.ilkd.key.testgen.smt.testgen.StopRequest;
 
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * <strong>The worker must be started using method {@link TGWorker#start()} and not
  * via the standard {@link #execute()}</strong>.
@@ -31,7 +33,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
     private final TGInfoDialog tgInfoDialog;
     private boolean stop;
     private final MainWindowTestGenerator testGenerator;
-    private Proof originalProof;
+    private @Nullable Proof originalProof;
 
     public TGWorker(TGInfoDialog tgInfoDialog) {
         this.tgInfoDialog = tgInfoDialog;
@@ -74,7 +76,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
         return MainWindow.getInstance().getMediator();
     }
 
-    public Proof getOriginalProof() {
+    public @Nullable Proof getOriginalProof() {
         return originalProof;
     }
 

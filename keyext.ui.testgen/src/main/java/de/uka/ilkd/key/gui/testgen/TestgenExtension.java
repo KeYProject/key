@@ -20,6 +20,7 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.testgen.macros.TestGenMacro;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -31,8 +32,8 @@ public class TestgenExtension
         implements KeYGuiExtension, KeYGuiExtension.KeyboardShortcuts, KeYGuiExtension.MainMenu,
         KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, KeYGuiExtension.Settings {
 
-    private TestGenerationAction actionTestGeneration;
-    private CounterExampleAction actionCounterExample;
+    private @Nullable TestGenerationAction actionTestGeneration;
+    private @Nullable CounterExampleAction actionCounterExample;
 
     private void init(MainWindow window) {
         this.actionCounterExample = new CounterExampleAction(window);
