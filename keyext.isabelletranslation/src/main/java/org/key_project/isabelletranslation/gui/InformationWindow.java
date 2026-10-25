@@ -34,6 +34,13 @@ public class InformationWindow extends JDialog {
 
     private @Nullable JTabbedPane tabbedPane;
 
+    /**
+     * The dialog-widget calls below operate on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since the widget setup is purely
+     * local to this class (the lazy tabbed pane is created before it is used), suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public InformationWindow(Dialog parent, Collection<Information> information,
             String title) {
         super(parent);
