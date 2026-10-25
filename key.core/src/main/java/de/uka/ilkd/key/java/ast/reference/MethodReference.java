@@ -306,11 +306,20 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     /**
      * returns the static KeYJavaType of the methods prefix
+     *
+     * @param services the Services object
+     * @param ec the execution context, or {@code null} if none is available (the context is only
+     *        used when the reference has no explicit prefix)
      */
-    public KeYJavaType determineStaticPrefixType(Services services, ExecutionContext ec) {
+    public KeYJavaType determineStaticPrefixType(Services services, @Nullable ExecutionContext ec) {
         final KeYJavaType prefixType;
         if (prefix == null) {
-            prefixType = Objects.requireNonNull(ec.getTypeReference().getKeYJavaType(),
+            // an implicit prefix resolves through the context class; without a context this
+            // cannot be determined (same failure point as the unannotated implementation)
+            prefixType = Objects.requireNonNull(
+                Objects.requireNonNull(ec, "no execution context for an implicit method prefix")
+                        .getTypeReference()
+                        .getKeYJavaType(),
                 "no KeYJavaType for the context class");
         } else {
             if (prefix instanceof Expression) {
@@ -384,8 +393,11 @@ public class MethodReference extends JavaNonTerminalProgramElement
         v.performActionOnMethodReference(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
-        IProgramMethod meth = method(services, determineStaticPrefixType(services, ec), ec);
+    public KeYJavaType getKeYJavaType(Services services, @Nullable ExecutionContext ec) {
+        final ExecutionContext context = Objects.requireNonNull(ec,
+            "execution context required for method reference");
+        IProgramMethod meth = method(services, determineStaticPrefixType(services, context),
+            context);
         if (meth == null) {
             throw new IllegalStateException(
                 "Could not determine type for method " + name.toString());

@@ -201,7 +201,7 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
 
 
     @Override
-    public @Nullable KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         return getKeYJavaType();
     }
 

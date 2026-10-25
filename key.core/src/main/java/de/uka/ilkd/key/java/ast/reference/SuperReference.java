@@ -189,9 +189,11 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * returns the KeYJavaType
      */
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         final KeYJavaType contextType = Objects.requireNonNull(
-            ec.getTypeReference().getKeYJavaType(), "no KeYJavaType in execution context");
+            Objects.requireNonNull(ec, "execution context required for 'super'").getTypeReference()
+                    .getKeYJavaType(),
+            "no KeYJavaType in execution context");
         return Objects.requireNonNull(javaServ.getJavaInfo().getSuperclass(contextType),
             "no superclass for " + contextType);
     }

@@ -165,11 +165,11 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
     private static KeYJavaType getStaticPrefixType(MethodOrConstructorReference mr,
             Services services, @Nullable ExecutionContext ec) {
         if (mr instanceof MethodReference) {
-            // determining the static prefix type of a method reference requires an
-            // execution context (used for the implicit prefix and the context type)
-            final ExecutionContext sigEc = Objects.requireNonNull(ec,
-                "no execution context to determine the static prefix type");
-            return ((MethodReference) mr).determineStaticPrefixType(services, sigEc);
+            // The execution context is optional (absent e.g. for method references in a
+            // .key problem section): determineStaticPrefixType resolves the prefix type from
+            // the context only if the reference has no explicit prefix; otherwise it resolves
+            // the prefix's own type, exactly as the unannotated implementation did.
+            return ((MethodReference) mr).determineStaticPrefixType(services, ec);
         } else {
             // the constructor type reference does not require an execution context
             return ((New) mr).getKeYJavaType(services);

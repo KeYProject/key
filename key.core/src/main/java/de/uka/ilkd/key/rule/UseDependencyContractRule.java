@@ -582,8 +582,9 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
                         TB.reachableValue(subStep, paramTerm,
                             Objects.requireNonNull(target.getParamType(i++), "no parameter type")));
                 }
-                final JTerm dep =
-                    contract.getDep(heap, atPre, subStep, selfTerm, paramTerms, atPres, services);
+                final JTerm dep = Objects.requireNonNull(
+                    contract.getDep(heap, atPre, subStep, selfTerm, paramTerms, atPres, services),
+                    "no dependency clause for the heap");
                 final JTerm ds = TB.disjoint(changedLocs.first, dep);
                 if (disjoint == null) {
                     disjoint = ds;

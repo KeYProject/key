@@ -19,7 +19,11 @@ import org.jspecify.annotations.Nullable;
 public interface Expression extends ProgramElement {
     /**
      * returns the {@link KeYJavaType} of an expression
+     *
+     * @param ec the execution context in which the expression is evaluated, if any; expressions
+     *        that do not depend on a context (e.g. variables with declared types) resolve their
+     *        own type when no context is available and {@code ec} may be {@code null}
      */
     @Nullable
-    KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec);
+    KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec);
 }

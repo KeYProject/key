@@ -130,11 +130,12 @@ public class VariableReference extends JavaNonTerminalProgramElement
      * @param javaServ
      *        the java services
      * @param ec
-     *        the execution context
+     *        the execution context (may be {@code null}; variables with declared types resolve
+     *        their own type without a context)
      * @return the KeY java type
      */
     public KeYJavaType getKeYJavaType(Services javaServ,
-            ExecutionContext ec) {
+            @Nullable ExecutionContext ec) {
         return Objects.requireNonNull(getKeYJavaType(), "variable has no KeYJavaType");
     }
 

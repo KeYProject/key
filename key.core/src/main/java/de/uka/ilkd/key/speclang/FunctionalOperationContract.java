@@ -38,7 +38,30 @@ public interface FunctionalOperationContract extends OperationContract {
 
     boolean isReadOnlyContract(Services services);
 
+    @Nullable
     JTerm getEnsures(LocationVariable heap);
+
+    /**
+     * Returns the precondition of the contract.
+     *
+     * @param heap the heap variable.
+     * @param selfVar the self variable.
+     * @param paramVars the list of parameter variables.
+     * @param atPreVars the map of old variables.
+     * @param services the services object.
+     * @return the precondition.
+     */
+    @Override
+    @Nullable
+    JTerm getPre(LocationVariable heap, @Nullable LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            Map<LocationVariable, LocationVariable> atPreVars, Services services);
+
+    @Override
+    @Nullable
+    JTerm getPre(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            Services services);
 
     /**
      * Returns the postcondition of the contract.
@@ -52,6 +75,7 @@ public interface FunctionalOperationContract extends OperationContract {
      * @param services the services object.
      * @return the post condition.
      */
+    @Nullable
     JTerm getPost(LocationVariable heap, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, @Nullable LocationVariable resultVar,
             @Nullable LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
@@ -76,6 +100,7 @@ public interface FunctionalOperationContract extends OperationContract {
      * @param services the services object.
      * @return the postcondition.
      */
+    @Nullable
     JTerm getPost(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, @Nullable JTerm resultTerm, @Nullable JTerm excTerm,
             Map<LocationVariable, JTerm> atPres, Services services);
@@ -86,11 +111,13 @@ public interface FunctionalOperationContract extends OperationContract {
             @Nullable JTerm excTerm,
             Map<LocationVariable, JTerm> atPres, Services services);
 
+    @Nullable
     JTerm getFreePost(LocationVariable heap, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, @Nullable LocationVariable resultVar,
             @Nullable LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services);
 
+    @Nullable
     JTerm getFreePost(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, @Nullable JTerm resultTerm, @Nullable JTerm excTerm,
             Map<LocationVariable, JTerm> atPres, Services services);
@@ -106,6 +133,79 @@ public interface FunctionalOperationContract extends OperationContract {
             @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, @Nullable LocationVariable resultVar,
             @Nullable LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+            Services services);
+
+    /**
+     * Returns the modifiable clause of the contract.
+     *
+     * @param heapVar the heap variable.
+     * @param selfVar the self variable.
+     * @param paramVars the list of parameter variables.
+     * @param services the services object.
+     * @return the modifiable clause.
+     */
+    @Override
+    @Nullable
+    JTerm getModifiable(LocationVariable heapVar, @Nullable LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services);
+
+    /**
+     * Returns the modifiable clause of the contract.
+     *
+     * @param heapVar the heap variable
+     * @param heapTerm the heap variable term.
+     * @param selfTerm the self variable term.
+     * @param paramTerms the list of parameter variable terms.
+     * @param services the services object.
+     * @return the modifiable clause.
+     */
+    @Override
+    @Nullable
+    JTerm getModifiable(LocationVariable heapVar, JTerm heapTerm, @Nullable JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, Services services);
+
+    /**
+     * Returns the free modifiable clause of the contract.
+     *
+     * @param heapVar the heap variable.
+     * @param selfVar the self variable.
+     * @param paramVars the list of parameter variables.
+     * @param services the services object.
+     * @return the free modifiable clause.
+     */
+    @Override
+    @Nullable
+    JTerm getFreeModifiable(LocationVariable heapVar, @Nullable LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, Services services);
+
+    @Override
+    @Nullable
+    JTerm getFreeModifiable(LocationVariable heapVar, JTerm heapTerm,
+            @Nullable JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms,
+            Services services);
+
+    /**
+     * Returns the dependency set of the contract.
+     *
+     * @param heap the heap variable
+     * @param atPre boolean whether old heap should be used
+     * @param selfVar self variable
+     * @param paramVars parameter variables
+     * @param atPreVars variables at previous heap
+     * @param services services object
+     * @return the dependency set
+     */
+    @Override
+    @Nullable
+    JTerm getDep(LocationVariable heap, boolean atPre, @Nullable LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars,
+            @Nullable Map<LocationVariable, LocationVariable> atPreVars, Services services);
+
+    @Override
+    @Nullable
+    JTerm getDep(LocationVariable heap, boolean atPre, JTerm heapTerm, @Nullable JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, @Nullable Map<LocationVariable, JTerm> atPres,
             Services services);
 
     /**

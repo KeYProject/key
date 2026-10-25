@@ -270,7 +270,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      * @return a schema variable that is substituted by "p" somewhere in this taclet (that is, these
      *         schema variables occur as arguments of a substitution operator)
      */
-    public SchemaVariable getNameCorrespondent(SchemaVariable p, Services services) {
+    public @Nullable SchemaVariable getNameCorrespondent(SchemaVariable p, Services services) {
         // should be synchronized
         if (svNameCorrespondences == null) {
             final SVNameCorrespondenceCollector c = new SVNameCorrespondenceCollector(
@@ -280,8 +280,9 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
             svNameCorrespondences = c.getCorrespondences();
         }
 
-        return Objects.requireNonNull(svNameCorrespondences.get(p),
-            "no name correspondence for schema variable " + p);
+        // The correspondence map may not contain the schema variable (the taclet has no
+        // name correspondence declared for it); callers handle an absent correspondence.
+        return svNameCorrespondences.get(p);
     }
 
     public Set<SchemaVariable> collectSchemaVars() {

@@ -21,6 +21,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Type operator.
@@ -125,7 +126,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
         return typeReference;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         return getKeYJavaType(javaServ);
     }
 

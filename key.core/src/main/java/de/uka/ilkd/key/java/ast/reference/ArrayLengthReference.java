@@ -84,7 +84,7 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
             "no KeYJavaType for int");
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         return getKeYJavaType(javaServ);
     }
 

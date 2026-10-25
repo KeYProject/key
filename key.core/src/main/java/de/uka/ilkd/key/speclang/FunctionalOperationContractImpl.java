@@ -496,7 +496,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
-    public JTerm getPre(LocationVariable heap, @Nullable LocationVariable selfVar,
+    public @Nullable JTerm getPre(LocationVariable heap, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
@@ -510,10 +510,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             getReplaceMap(selfVar, paramVars, null, null, atPreVars, services);
         final OpReplacer or =
             new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
-        return Objects.requireNonNull(
-            or.replace(Objects.requireNonNull(originalPres.get(heap),
-                "no precondition for heap: " + heap)),
-            "no replacement for precondition");
+        return or.replace(originalPres.get(heap));
     }
 
     @Override
@@ -523,18 +520,19 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         JTerm result = null;
         for (LocationVariable heap : heapContext) {
-            final JTerm p = getPre(heap, selfVar, paramVars, atPreVars, services);
+            final @Nullable JTerm p = getPre(heap, selfVar, paramVars, atPreVars, services);
             if (result == null) {
                 result = p;
             } else {
-                result = tb.and(result, p);
+                result = tb.and(result,
+                    Objects.requireNonNull(p, "no precondition for heap: " + heap));
             }
         }
         return result;
     }
 
     @Override
-    public JTerm getPre(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
+    public @Nullable JTerm getPre(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
             Services services) {
         assert heapTerm != null;
@@ -551,10 +549,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             getReplaceMap(heapTerms, selfTerm, paramTerms, null, null, atPres, services);
         final OpReplacer or =
             new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
-        return Objects.requireNonNull(
-            or.replace(Objects.requireNonNull(originalPres.get(heap),
-                "no precondition for heap: " + heap)),
-            "no replacement for precondition");
+        return or.replace(originalPres.get(heap));
     }
 
     @Override
@@ -565,7 +560,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Services services) {
         JTerm result = null;
         for (LocationVariable heap : heapContext) {
-            final JTerm p = getPre(heap,
+            final @Nullable JTerm p = getPre(heap,
                 Objects.requireNonNull(heapTerms.get(heap), "no heap term for heap: " + heap),
                 selfTerm, paramTerms, atPres, services);
             if (p == null) {
@@ -581,7 +576,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
-    public JTerm getFreePre(LocationVariable heap, @Nullable LocationVariable selfVar,
+    public @Nullable JTerm getFreePre(LocationVariable heap, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
@@ -595,9 +590,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             getReplaceMap(selfVar, paramVars, null, null, atPreVars, services);
         final OpReplacer or =
             new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
-        return Objects.requireNonNull(or.replace(Objects.requireNonNull(originalFreePres.get(heap),
-            "no free precondition for heap: " + heap)),
-            "no replacement for free precondition");
+        return or.replace(originalFreePres.get(heap));
     }
 
     @Override
@@ -607,7 +600,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         JTerm result = null;
         for (LocationVariable heap : heapContext) {
-            final JTerm p = getFreePre(heap, selfVar, paramVars, atPreVars, services);
+            final @Nullable JTerm p = getFreePre(heap, selfVar, paramVars, atPreVars, services);
             if (result == null) {
                 result = p;
             } else if (p != null) {
@@ -618,7 +611,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
-    public JTerm getFreePre(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
+    public @Nullable JTerm getFreePre(LocationVariable heap, JTerm heapTerm,
+            @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
             Services services) {
         assert heapTerm != null;
@@ -635,33 +629,27 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             getReplaceMap(heapTerms, selfTerm, paramTerms, null, null, atPres, services);
         final OpReplacer or =
             new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
-        return Objects.requireNonNull(or.replace(Objects.requireNonNull(originalFreePres.get(heap),
-            "no free precondition for heap: " + heap)),
-            "no replacement for free precondition");
+        return or.replace(originalFreePres.get(heap));
     }
 
     @Override
-    public JTerm getRequires(LocationVariable heap) {
-        return Objects.requireNonNull(originalPres.get(heap),
-            "no precondition for heap: " + heap);
+    public @Nullable JTerm getRequires(LocationVariable heap) {
+        return originalPres.get(heap);
     }
 
     @Override
-    public JTerm getEnsures(LocationVariable heap) {
-        return Objects.requireNonNull(originalPosts.get(heap),
-            "no postcondition for heap: " + heap);
+    public @Nullable JTerm getEnsures(LocationVariable heap) {
+        return originalPosts.get(heap);
     }
 
     @Override
-    public JTerm getModifiable(LocationVariable heap) {
-        return Objects.requireNonNull(originalModifiables.get(heap),
-            "no modifiable clause for heap: " + heap);
+    public @Nullable JTerm getModifiable(LocationVariable heap) {
+        return originalModifiables.get(heap);
     }
 
     @Override
-    public JTerm getAccessible(LocationVariable heap) {
-        return Objects.requireNonNull(originalDeps.get(heap),
-            "no accessible clause for heap: " + heap);
+    public @Nullable JTerm getAccessible(LocationVariable heap) {
+        return originalDeps.get(heap);
     }
 
     @Override
@@ -1097,7 +1085,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
-    public JTerm getPost(LocationVariable heap, @Nullable LocationVariable selfVar,
+    public @Nullable JTerm getPost(LocationVariable heap, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, @Nullable LocationVariable resultVar,
             @Nullable LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
@@ -1113,9 +1101,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             getReplaceMap(selfVar, paramVars, resultVar, excVar, atPreVars, services);
         final OpReplacer or =
             new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
-        return Objects.requireNonNull(or.replace(Objects.requireNonNull(originalPosts.get(heap),
-            "no postcondition for heap: " + heap)),
-            "no replacement for postcondition");
+        return or.replace(originalPosts.get(heap));
     }
 
     @Override
@@ -1126,12 +1112,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Services services) {
         JTerm result = null;
         for (LocationVariable heap : heapContext) {
-            final JTerm p =
+            final @Nullable JTerm p =
                 getPost(heap, selfVar, paramVars, resultVar, excVar, atPreVars, services);
             if (result == null) {
                 result = p;
             } else {
-                result = tb.and(result, p);
+                result = tb.and(result,
+                    Objects.requireNonNull(p, "no postcondition for heap: " + heap));
             }
         }
         return result;
@@ -1139,7 +1126,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
-    public JTerm getPost(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
+    public @Nullable JTerm getPost(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, @Nullable JTerm resultTerm, @Nullable JTerm excTerm,
             Map<LocationVariable, JTerm> atPres, Services services) {
         assert heapTerm != null;
@@ -1158,9 +1145,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             getReplaceMap(heapTerms, selfTerm, paramTerms, resultTerm, excTerm, atPres, services);
         final OpReplacer or =
             new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
-        return Objects.requireNonNull(or.replace(Objects.requireNonNull(originalPosts.get(heap),
-            "no postcondition for heap: " + heap)),
-            "no replacement for postcondition");
+        return or.replace(originalPosts.get(heap));
     }
 
     @Override
@@ -1171,7 +1156,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Map<LocationVariable, JTerm> atPres, Services services) {
         JTerm result = null;
         for (LocationVariable heap : heapContext) {
-            final JTerm p = getPost(heap,
+            final @Nullable JTerm p = getPost(heap,
                 Objects.requireNonNull(heapTerms.get(heap), "no heap term for heap: " + heap),
                 selfTerm, paramTerms, resultTerm, excTerm, atPres, services);
             if (p == null) {
@@ -1187,7 +1172,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
-    public JTerm getFreePost(LocationVariable heap, @Nullable LocationVariable selfVar,
+    public @Nullable JTerm getFreePost(LocationVariable heap, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, @Nullable LocationVariable resultVar,
             @Nullable LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             Services services) {
@@ -1203,13 +1188,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             getReplaceMap(selfVar, paramVars, resultVar, excVar, atPreVars, services);
         final OpReplacer or =
             new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
-        return Objects.requireNonNull(or.replace(Objects.requireNonNull(originalFreePosts.get(heap),
-            "no free postcondition for heap: " + heap)),
-            "no replacement for free postcondition");
+        return or.replace(originalFreePosts.get(heap));
     }
 
     @Override
-    public JTerm getFreePost(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
+    public @Nullable JTerm getFreePost(LocationVariable heap, JTerm heapTerm,
+            @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, @Nullable JTerm resultTerm, @Nullable JTerm excTerm,
             Map<LocationVariable, JTerm> atPres, Services services) {
         assert heapTerm != null;
@@ -1228,9 +1212,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             getReplaceMap(heapTerms, selfTerm, paramTerms, resultTerm, excTerm, atPres, services);
         final OpReplacer or =
             new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
-        return Objects.requireNonNull(or.replace(Objects.requireNonNull(originalFreePosts.get(heap),
-            "no free postcondition for heap: " + heap)),
-            "no replacement for free postcondition");
+        return or.replace(originalFreePosts.get(heap));
     }
 
     @Override
@@ -1242,7 +1224,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Services services) {
         JTerm result = null;
         for (LocationVariable heap : heapContext) {
-            final JTerm p = getFreePost(heap, Objects.requireNonNull(heapTerms.get(heap),
+            final @Nullable JTerm p = getFreePost(heap, Objects.requireNonNull(heapTerms.get(heap),
                 "no heap term for heap: " + heap), selfTerm, paramTerms, resultTerm, excTerm,
                 atPres, services);
             if (p == null) {
@@ -1265,12 +1247,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Services services) {
         JTerm result = null;
         for (LocationVariable heap : heapContext) {
-            final JTerm p =
+            final @Nullable JTerm p =
                 getFreePost(heap, selfVar, paramVars, resultVar, excVar, atPreVars, services);
             if (result == null) {
                 result = p;
             } else {
-                result = tb.and(result, p);
+                result = tb.and(result,
+                    Objects.requireNonNull(p, "no free postcondition for heap: " + heap));
             }
         }
         return result;
@@ -1337,7 +1320,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return baseModifiable.op() == services.getTypeConverter().getLocSetLDT().getEmpty();
     }
 
-    public JTerm getAnyModifiable(JTerm modifiable, @Nullable LocationVariable selfVar,
+    public @Nullable JTerm getAnyModifiable(@Nullable JTerm modifiable,
+            @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
@@ -1348,30 +1332,26 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             getReplaceMap(selfVar, paramVars, null, null, null, services);
         final OpReplacer or =
             new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
-        return Objects.requireNonNull(or.replace(modifiable),
-            "no replacement for modifiable clause");
+        return or.replace(modifiable);
     }
 
     @Override
-    public JTerm getModifiable(LocationVariable heap, @Nullable LocationVariable selfVar,
+    public @Nullable JTerm getModifiable(LocationVariable heap, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, Services services) {
-        return getAnyModifiable(
-            Objects.requireNonNull(this.originalModifiables.get(heap),
-                "no modifiable clause for heap: " + heap),
-            selfVar, paramVars, services);
+        return getAnyModifiable(this.originalModifiables.get(heap), selfVar, paramVars,
+            services);
     }
 
     @Override
-    public JTerm getFreeModifiable(LocationVariable heap, @Nullable LocationVariable selfVar,
+    public @Nullable JTerm getFreeModifiable(LocationVariable heap,
+            @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, Services services) {
-        return getAnyModifiable(
-            Objects.requireNonNull(this.originalFreeModifiables.get(heap),
-                "no free modifiable clause for heap: " + heap),
-            selfVar, paramVars, services);
+        return getAnyModifiable(this.originalFreeModifiables.get(heap), selfVar, paramVars,
+            services);
     }
 
-    private JTerm getAnyModifiable(LocationVariable heap, JTerm modifiable, JTerm heapTerm,
-            @Nullable JTerm selfTerm,
+    private @Nullable JTerm getAnyModifiable(LocationVariable heap, @Nullable JTerm modifiable,
+            JTerm heapTerm, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Services services) {
         assert heapTerm != null;
         assert (selfTerm == null) == (originalSelfVar == null);
@@ -1387,8 +1367,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             getReplaceMap(heapTerms, selfTerm, paramTerms, null, null, null, services);
         final OpReplacer or =
             new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
-        return Objects.requireNonNull(or.replace(modifiable),
-            "no replacement for modifiable clause");
+        return or.replace(modifiable);
     }
 
     @Override
@@ -1410,25 +1389,23 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
     @Override
-    public JTerm getModifiable(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
+    public @Nullable JTerm getModifiable(LocationVariable heap, JTerm heapTerm,
+            @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Services services) {
-        return getAnyModifiable(heap,
-            Objects.requireNonNull(this.originalModifiables.get(heap),
-                "no modifiable clause for heap: " + heap),
-            heapTerm, selfTerm, paramTerms, services);
+        return getAnyModifiable(heap, this.originalModifiables.get(heap), heapTerm, selfTerm,
+            paramTerms, services);
     }
 
     @Override
-    public JTerm getFreeModifiable(LocationVariable heap, JTerm heapTerm,
+    public @Nullable JTerm getFreeModifiable(LocationVariable heap, JTerm heapTerm,
             @Nullable JTerm selfTerm, ImmutableList<JTerm> paramTerms, Services services) {
-        return getAnyModifiable(heap,
-            Objects.requireNonNull(this.originalFreeModifiables.get(heap),
-                "no free modifiable clause for heap: " + heap),
-            heapTerm, selfTerm, paramTerms, services);
+        return getAnyModifiable(heap, this.originalFreeModifiables.get(heap), heapTerm, selfTerm,
+            paramTerms, services);
     }
 
     @Override
-    public JTerm getDep(LocationVariable heap, boolean atPre, @Nullable LocationVariable selfVar,
+    public @Nullable JTerm getDep(LocationVariable heap, boolean atPre,
+            @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             @Nullable Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
@@ -1454,13 +1431,11 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             }
         }
         OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
-        return Objects.requireNonNull(or.replace(Objects.requireNonNull(
-            originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap),
-            "no accessible clause for heap: " + heap)), "no replacement for accessible clause");
+        return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
     }
 
     @Override
-    public JTerm getDep(LocationVariable heap, boolean atPre, JTerm heapTerm,
+    public @Nullable JTerm getDep(LocationVariable heap, boolean atPre, JTerm heapTerm,
             @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, @Nullable Map<LocationVariable, JTerm> atPres,
             Services services) {
@@ -1489,9 +1464,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             }
         }
         OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
-        return Objects.requireNonNull(or.replace(Objects.requireNonNull(
-            originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap),
-            "no accessible clause for heap: " + heap)), "no replacement for accessible clause");
+        return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
     }
 
     @Override

@@ -21,6 +21,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /** The most weird ternary C operator ?: */
 
@@ -98,7 +99,7 @@ public class Conditional extends Operator {
         v.performActionOnConditional(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         final TypeConverter tc = javaServ.getTypeConverter();
         final KeYJavaType type1 = tc.getKeYJavaType(getExpressionAt(1), ec);
         final KeYJavaType type2 = tc.getKeYJavaType(getExpressionAt(2), ec);

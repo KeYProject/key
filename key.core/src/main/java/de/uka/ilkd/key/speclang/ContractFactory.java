@@ -496,7 +496,7 @@ public class ContractFactory {
     }
 
     private static @Nullable JTerm combineMeasuredBy(@Nullable JTerm mby, @Nullable JTerm otherMby,
-            LocationVariable h, JTerm otherPre, Services services) {
+            LocationVariable h, @Nullable JTerm otherPre, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT =
             Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
@@ -506,14 +506,17 @@ public class ContractFactory {
             // measured-by-clause, assume no clause at all
             if (mby == null || otherMby == null) {
                 if (mby != null) {
-                    mby = tb.ife(otherPre, mby, tb.zero());
+                    mby = tb.ife(Objects.requireNonNull(otherPre,
+                        "no precondition for the measured-by heap"), mby, tb.zero());
                 } else if (otherMby != null) {
-                    mby = tb.ife(otherPre, otherMby, tb.zero());
+                    mby = tb.ife(Objects.requireNonNull(otherPre,
+                        "no precondition for the measured-by heap"), otherMby, tb.zero());
                 } else {
                     mby = null;
                 }
             } else {
-                mby = tb.ife(otherPre, otherMby, mby);
+                mby = tb.ife(Objects.requireNonNull(otherPre,
+                    "no precondition for the measured-by heap"), otherMby, mby);
             }
         }
         return mby;
@@ -522,7 +525,7 @@ public class ContractFactory {
     private static void combineModifiable(FunctionalOperationContractImpl t,
             Map<LocationVariable, Boolean> hasModifiable, Map<LocationVariable, JTerm> modifiables,
             Map<LocationVariable, JTerm> uniformModifiable, FunctionalOperationContract other,
-            LocationVariable h, JTerm otherPre, Services services) {
+            LocationVariable h, @Nullable JTerm otherPre, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         if (Objects.requireNonNull(hasModifiable.get(h), "no modifiable entry for " + h)
                 || t.hasModifiable(h)
@@ -538,8 +541,9 @@ public class ContractFactory {
                 } else if (modifiable2 == null) {
                     intersectedModifiable = modifiable1;
                 } else {
-                    intersectedModifiable =
-                        tb.intersect(modifiable1, tb.ife(otherPre, modifiable2, tb.allLocs()));
+                    intersectedModifiable = tb.intersect(modifiable1,
+                        tb.ife(Objects.requireNonNull(otherPre,
+                            "no precondition for the modifiable heap"), modifiable2, tb.allLocs()));
 
                     // check if the other modifiable is the same as the one in the uniform store.
                     // To obtain meaningful results, check for equality ignoring all term labels!
@@ -709,18 +713,22 @@ public class ContractFactory {
                     pres.put(h, pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
                 }
                 if (otherPost != null) {
-                    final JTerm oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
+                    final JTerm oPost = tb.imp(Objects.requireNonNull(
+                        atPreify(otherPre, t.originalAtPreVars),
+                        "no precondition for the heap of the postcondition"), otherPost);
                     posts.put(h, posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost));
                 }
                 if (otherFreePost != null) {
-                    final JTerm oFreePost =
-                        tb.imp(atPreify(otherPre, t.originalAtPreVars), otherFreePost);
+                    final JTerm oFreePost = tb.imp(Objects.requireNonNull(
+                        atPreify(otherPre, t.originalAtPreVars),
+                        "no precondition for the heap of the free postcondition"), otherFreePost);
                     freePosts.put(h,
                         freePosts.get(h) == null ? oFreePost : tb.and(freePosts.get(h), oFreePost));
                 }
                 if (otherAxiom != null) {
-                    final JTerm oAxiom =
-                        tb.imp(atPreify(otherPre, t.originalAtPreVars), otherAxiom);
+                    final JTerm oAxiom = tb.imp(Objects.requireNonNull(
+                        atPreify(otherPre, t.originalAtPreVars),
+                        "no precondition for the heap of the axiom clause"), otherAxiom);
                     axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
                 }
             }
@@ -798,15 +806,14 @@ public class ContractFactory {
             JTerm oriPost = t.originalPosts.get(h);
             JTerm oriFreePost = t.originalFreePosts.get(h);
             if (oriPost != null) {
-                posts.put(h, tb.imp(
-                    atPreify(Objects.requireNonNull(t.originalPres.get(h)), t.originalAtPreVars),
-                    oriPost));
+                posts.put(h, tb.imp(Objects.requireNonNull(
+                    atPreify(t.originalPres.get(h), t.originalAtPreVars),
+                    "no precondition for the heap of the postcondition"), oriPost));
             }
             if (oriFreePost != null) {
-                freePosts.put(h, tb.imp(
-                    atPreify(Objects.requireNonNull(t.originalFreePres.get(h)),
-                        t.originalAtPreVars),
-                    oriFreePost));
+                freePosts.put(h, tb.imp(Objects.requireNonNull(
+                    atPreify(t.originalFreePres.get(h), t.originalAtPreVars),
+                    "no precondition for the heap of the free postcondition"), oriFreePost));
             }
             JTerm origModifiable = t.originalModifiables.get(h);
             if (origModifiable != null) {
@@ -829,10 +836,9 @@ public class ContractFactory {
             for (LocationVariable h : heapLDT.getAllHeaps()) {
                 JTerm oriAxiom = t.originalAxioms.get(h);
                 if (oriAxiom != null) {
-                    axioms.put(h, tb.imp(
-                        atPreify(Objects.requireNonNull(t.originalPres.get(h)),
-                            t.originalAtPreVars),
-                        oriAxiom));
+                    axioms.put(h, tb.imp(Objects.requireNonNull(
+                        atPreify(t.originalPres.get(h), t.originalAtPreVars),
+                        "no precondition for the heap of the axiom clause"), oriAxiom));
                 }
             }
         }
@@ -900,16 +906,17 @@ public class ContractFactory {
         }
     }
 
-    private JTerm atPreify(JTerm t, Map<LocationVariable, LocationVariable> atPreVars) {
+    private @Nullable JTerm atPreify(@Nullable JTerm t,
+            Map<LocationVariable, LocationVariable> atPreVars) {
         final Map<JTerm, JTerm> map = new LinkedHashMap<>(atPreVars.size());
         for (LocationVariable h : atPreVars.keySet()) {
             if (atPreVars.get(h) != null) {
                 map.put(tb.var(h), tb.var(atPreVars.get(h)));
             }
         }
-        return Objects.requireNonNull(
-            new OpReplacer(map, services.getTermFactory(), services.getProof()).replace(t),
-            "no replacement for term");
+        // The replacer tolerates a null argument (mirroring the raw map accesses of the callers):
+        // a heap without a precondition clause yields a null formula here.
+        return new OpReplacer(map, services.getTermFactory(), services.getProof()).replace(t);
     }
 
     /**
