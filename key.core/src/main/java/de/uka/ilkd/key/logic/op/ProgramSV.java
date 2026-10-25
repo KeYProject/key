@@ -324,10 +324,9 @@ public final class ProgramSV extends JOperatorSV
         if (match == null) {
             return false;
         }
-        // the schema variable can only be matched in the context of an enclosing program, which
-        // provides the execution context
-        return ((ProgramSVSort) sort())
-                .canStandFor(match, Objects.requireNonNull(ec, "no execution context"), services);
+        // the execution context may be absent (e.g. matching outside an enclosing program);
+        // canStandFor does not require it
+        return ((ProgramSVSort) sort()).canStandFor(match, ec, services);
     }
 
     @Override
