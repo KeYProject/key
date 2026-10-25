@@ -26,6 +26,8 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This macro resolves the well-definedness transformer, i.e. it applies exactly all applicable
@@ -37,6 +39,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public class WellDefinednessMacro extends StrategyProofMacro {
 
     public static final String WD_PREFIX = "wd_";
@@ -48,7 +51,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
     }
 
     @Override
-    public String getCategory() {
+    public @Nullable String getCategory() {
         return null;
     }
 
