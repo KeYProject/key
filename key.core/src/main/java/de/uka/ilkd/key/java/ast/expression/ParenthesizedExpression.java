@@ -108,7 +108,7 @@ public class ParenthesizedExpression extends Operator
         return this;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         // Expression.getKeYJavaType is honestly @Nullable, but the parenthesized expression of a
         // type-checked program always resolves (TypeConverter requires it), and Operator's
         // abstract contract here is @NonNull, so narrow at the deref.

@@ -64,9 +64,16 @@ public record BuildingIssue(String message, @Nullable Throwable cause, boolean i
                 uri = null;
             }
         }
-        // A null file URI means the source has no file (e.g. standard input); Location.UNDEFINED
-        // represents exactly this case, as its fileUri component is not declared @Nullable.
-        return uri == null ? Location.UNDEFINED : new Location(uri, position);
+        // A source may not resolve to a file URI (e.g. "memory:/" Java block fragments), but the
+        // position is still meaningful — the underline must anchor on the offending code, not on
+        // the surrounding token. Location's fileUri component may be null (see Location javadoc);
+        // like Location.UNDEFINED / Location.fromToken, the null file is a legitimate value.
+        return location(uri, position);
+    }
+
+    @SuppressWarnings("NullAway") // missing file URI != missing position (see Location javadoc)
+    private static Location location(@Nullable URI uri, Position position) {
+        return new Location(uri, position);
     }
 
     public PositionedString asPositionedString() {

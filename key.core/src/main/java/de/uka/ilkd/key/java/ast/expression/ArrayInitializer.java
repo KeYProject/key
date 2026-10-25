@@ -16,6 +16,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An ArrayInitializer is a valid expression exclusively for initializing ArrayTypes. Any other
@@ -123,7 +124,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
 
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         return kjt;
     }
 }

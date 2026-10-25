@@ -50,8 +50,10 @@ public interface OperationContract extends Contract {
      * @param selfVar the self variable.
      * @param paramVars the list of parameter variables.
      * @param services the services object.
-     * @return the modifiable clause.
+     * @return the modifiable clause, or {@code null} if the contract has no modifiable clause for
+     *         the given heap.
      */
+    @Nullable
     JTerm getModifiable(LocationVariable heapVar, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, Services services);
 
@@ -63,8 +65,10 @@ public interface OperationContract extends Contract {
      * @param selfTerm the self variable term.
      * @param paramTerms the list of parameter variable terms.
      * @param services the services object.
-     * @return the modifiable clause.
+     * @return the modifiable clause, or {@code null} if the contract has no modifiable clause for
+     *         the given heap.
      */
+    @Nullable
     JTerm getModifiable(LocationVariable heapVar, JTerm heapTerm, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Services services);
 
@@ -75,8 +79,10 @@ public interface OperationContract extends Contract {
      * @param selfVar the self variable.
      * @param paramVars the list of parameter variables.
      * @param services the services object.
-     * @return the free modifiable clause.
+     * @return the free modifiable clause, or {@code null} if the contract has none for the given
+     *         heap.
      */
+    @Nullable
     JTerm getFreeModifiable(LocationVariable heapVar, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Services services);
@@ -89,13 +95,16 @@ public interface OperationContract extends Contract {
      * @param selfTerm the self variable term.
      * @param paramTerms the list of parameter variable terms.
      * @param services the services object.
-     * @return the free modifiable clause.
+     * @return the free modifiable clause, or {@code null} if the contract has none for the given
+     *         heap.
      */
+    @Nullable
     JTerm getFreeModifiable(LocationVariable heapVar, JTerm heapTerm,
             @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms,
             Services services);
 
+    @Nullable
     JTerm getFreePre(LocationVariable heap, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
@@ -106,6 +115,7 @@ public interface OperationContract extends Contract {
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
+    @Nullable
     JTerm getFreePre(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
             Services services);

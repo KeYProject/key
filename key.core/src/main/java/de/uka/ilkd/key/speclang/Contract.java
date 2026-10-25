@@ -72,8 +72,11 @@ public interface Contract extends SpecificationElement {
      * @param paramVars parameter variables
      * @param atPreVars variables at previous heap
      * @param services services object
-     * @return precondition
+     * @return precondition, or {@code null} if the contract has no precondition clause for the
+     *         given heap (this is a regular situation, e.g. for a contract that does not mention
+     *         the heap at all; callers must treat it as "no precondition")
      */
+    @Nullable
     JTerm getPre(LocationVariable heap, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
@@ -102,8 +105,10 @@ public interface Contract extends SpecificationElement {
      * @param paramTerms parameter terms
      * @param atPres terms of variables at previous heap
      * @param services services object
-     * @return the precondition
+     * @return the precondition, or {@code null} if the contract has no precondition clause for
+     *         the given heap
      */
+    @Nullable
     JTerm getPre(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
             Services services);
@@ -134,8 +139,10 @@ public interface Contract extends SpecificationElement {
      * @param paramVars parameter variables
      * @param atPreVars variables at previous heap
      * @param services services object
-     * @return the dependency set
+     * @return the dependency set, or {@code null} if the contract has no {@code \deps} clause for
+     *         the given heap
      */
+    @Nullable
     JTerm getDep(LocationVariable heap, boolean atPre, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             @Nullable Map<LocationVariable, LocationVariable> atPreVars, Services services);
@@ -150,16 +157,21 @@ public interface Contract extends SpecificationElement {
      * @param paramTerms terms of parameter variables
      * @param atPres terms of variables at previous heap
      * @param services services object
-     * @return the dependency set
+     * @return the dependency set, or {@code null} if the contract has no {@code \deps} clause for
+     *         the given heap
      */
+    @Nullable
     JTerm getDep(LocationVariable heap, boolean atPre, JTerm heapTerm, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, @Nullable Map<LocationVariable, JTerm> atPres,
             Services services);
 
+    @Nullable
     JTerm getRequires(LocationVariable heap);
 
+    @Nullable
     JTerm getModifiable(LocationVariable heap);
 
+    @Nullable
     JTerm getAccessible(LocationVariable heap);
 
     @Nullable

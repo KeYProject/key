@@ -120,7 +120,7 @@ public class LogicFunctionalOperator extends Operator
     }
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         return javaServ.getJavaInfo().getPrimitiveKeYJavaType(function.returnType);
     }
 

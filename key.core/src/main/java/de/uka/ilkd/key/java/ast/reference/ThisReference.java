@@ -159,8 +159,10 @@ public class ThisReference extends JavaNonTerminalProgramElement
         return this;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-        return Objects.requireNonNull(ec.getTypeReference().getKeYJavaType(),
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
+        return Objects.requireNonNull(
+            Objects.requireNonNull(ec, "execution context required for 'this'").getTypeReference()
+                    .getKeYJavaType(),
             "no KeYJavaType in execution context");
     }
 
