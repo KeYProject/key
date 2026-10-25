@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.io.intermediate.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.ClassAxiom;
@@ -88,6 +89,9 @@ public class ContractAppCollector extends NodeIntermediateWalker {
     protected void doAction(NodeIntermediate node) {
         if (node instanceof AppNodeIntermediate appNode) {
             AppIntermediate appIntermediate = appNode.getIntermediateRuleApp();
+            if (appIntermediate == null) {
+                throw new NullPointerException("No intermediate rule application for " + appNode);
+            }
             String ruleName = appIntermediate.getRuleName();
 
             // relevant rules are:
@@ -126,14 +130,26 @@ public class ContractAppCollector extends NodeIntermediateWalker {
         String className = name.substring(classStart);
 
         // get type of class from JavaInfo
-        Services services = proof.getInitConfig().getServices();
+        InitConfig initConfig = proof.getInitConfig();
+        if (initConfig == null) {
+            throw new NullPointerException("Proof has no initial configuration.");
+        }
+        Services services = initConfig.getServices();
         KeYJavaType classType = services.getJavaInfo().getKeYJavaType(className);
 
         if (classType == null) {
             // since className does not include package prefix, we have to search the complete list
             var allTypes = services.getJavaInfo().getAllKeYJavaTypes();
             for (KeYJavaType t : allTypes) {
-                if (t.getJavaType().getName().equals(className)) {
+                var javaType = t.getJavaType();
+                if (javaType == null) {
+                    throw new NullPointerException("KeYJavaType " + t + " has no Java type.");
+                }
+                var typeName = javaType.getName();
+                if (typeName == null) {
+                    throw new NullPointerException("Java type of " + t + " has no name.");
+                }
+                if (typeName.equals(className)) {
                     // found match
                     classType = t;
                     break;
@@ -192,12 +208,20 @@ public class ContractAppCollector extends NodeIntermediateWalker {
         // The string may still contain multiple contracts, syntax: contract1#contract2#...
         // split and add all
         SpecificationRepository specRepo = proof.getServices().getSpecificationRepository();
-        Contract c = specRepo.getContractByName(biApp.getContract());
+        String contractName = biApp.getContract();
+        if (contractName == null) {
+            throw new NullPointerException("Built-in rule application has no contract.");
+        }
+        Contract c = specRepo.getContractByName(contractName);
+        if (c == null) {
+            throw new NullPointerException("No contract found for " + contractName);
+        }
         ImmutableSet<Contract> contracts = specRepo.splitContract(c);
 
         // load information about the modality under which the contract was applied
+        String modality = biApp.getModality();
         JModality.JavaModalityKind modalityKind =
-            JModality.JavaModalityKind.getKind(biApp.getModality());
+            modality == null ? null : JModality.JavaModalityKind.getKind(modality);
         DependencyGraph.EdgeType edgeType;
         if (modalityKind == null) {
             // in default case (e.g. legacy proofs without saved modality information)

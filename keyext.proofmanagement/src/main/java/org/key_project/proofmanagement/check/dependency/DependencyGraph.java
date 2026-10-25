@@ -176,7 +176,11 @@ public class DependencyGraph {
         if (allSCCs == null) {
             recalculateSCCs();
         }
-        return allSCCs;
+        Set<SCC> sccs = allSCCs;
+        if (sccs == null) {
+            throw new NullPointerException("SCC computation did not produce any components.");
+        }
+        return sccs;
     }
 
     /**
@@ -220,6 +224,11 @@ public class DependencyGraph {
      * @param node the node to start from
      */
     private void calculateSCCForNode(DependencyNode node) {
+        // allSCCs is guaranteed to be set by recalculateSCCs before this method is called
+        Set<SCC> sccs = allSCCs;
+        if (sccs == null) {
+            throw new NullPointerException("SCC computation not initialized.");
+        }
         // each SCC is identified by its first visited node (lowlink)
         // each node has a unique index
 
@@ -240,7 +249,7 @@ public class DependencyGraph {
         }
 
         if (node.getLowLink() == node.getIndex()) { // back to "root" of SCC? -> store SCC
-            SCC scc = new SCC(allSCCs.size());
+            SCC scc = new SCC(sccs.size());
             DependencyNode w;
             do {
                 w = stack.pop();
@@ -248,7 +257,7 @@ public class DependencyGraph {
                 scc.nodes.add(w);
                 node2SCC.put(w, scc);
             } while (!w.equals(node));
-            allSCCs.add(scc);
+            sccs.add(scc);
         }
     }
 

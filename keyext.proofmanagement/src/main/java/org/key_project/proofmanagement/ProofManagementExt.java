@@ -38,6 +38,12 @@ public class ProofManagementExt implements
     }
 
     private static class CheckAction extends KeyAction {
+        /**
+         * The {@code this}-modifying action setup calls below happen while the receiver is still
+         * under initialization (EISOP initialization check); safe here since the action is only
+         * used after the constructor completed, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         private CheckAction() {
             putValue(NAME, "Check proof bundle ...");
             // putValue(SMALL_ICON, IconFactory.INTERLOG_TRY_APPLY.get());
@@ -85,6 +91,18 @@ public class ProofManagementExt implements
      * }
      */
 
+    /**
+     * Standalone entry point for manually testing the check dialog.
+     * <p>
+     * The {@code null} parent passed to {@link CheckConfigDialog} is deliberate: a standalone
+     * dialog has no owner frame, which the Swing {@code JDialog} constructor accepts (a
+     * {@code null} owner simply omits the parent relation and {@code setLocationRelativeTo(null)}
+     * centers the dialog on the screen). The legacy unannotated parameter type cannot express
+     * this, suppressed with a scoped key.
+     *
+     * @param args ignored command line arguments
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static void main(String[] args) {
         JDialog checkConfigDialog = new CheckConfigDialog(null, "Check configuration", true);
         checkConfigDialog.setVisible(true);

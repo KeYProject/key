@@ -41,10 +41,16 @@ public abstract class DependencyGraphBuilder {
         for (CheckerData.ProofEntry line : proofEntries) {
 
             Proof proof = line.proof;
+            if (proof == null) {
+                throw new NullPointerException("Proof not loaded for proof entry.");
+            }
             String contractName = proof.name().toString();
             Services services = proof.getServices();
             SpecificationRepository specRepo = services.getSpecificationRepository();
             Contract contract = specRepo.getContractByName(contractName);
+            if (contract == null) {
+                throw new NullPointerException("No contract found for " + contractName);
+            }
 
             // create fresh node for current contract
             DependencyNode node = new DependencyNode(contract);
@@ -55,8 +61,23 @@ public abstract class DependencyGraphBuilder {
         for (CheckerData.ProofEntry line : proofEntries) {
             // get current node and root of proof
             Proof proof = line.proof;
+            if (proof == null) {
+                throw new NullPointerException("Proof not loaded for proof entry.");
+            }
             DependencyNode currentNode = graph.getNodeByName(proof.name().toString());
-            BranchNodeIntermediate node = line.parseResult.parsedResult();
+            if (currentNode == null) {
+                throw new NullPointerException("No dependency node for proof "
+                    + proof.name() + ".");
+            }
+            var parseResult = line.parseResult;
+            if (parseResult == null) {
+                throw new NullPointerException("No parse result for proof " + proof.name() + ".");
+            }
+            BranchNodeIntermediate node = parseResult.parsedResult();
+            if (node == null) {
+                throw new NullPointerException("Parse result has no root for proof "
+                    + proof.name() + ".");
+            }
 
             // collect all contracts the current proof refers to
             Services services = proof.getServices();
@@ -74,6 +95,9 @@ public abstract class DependencyGraphBuilder {
                 // particularly those from JavaRedux shipped with KeY.
                 if (dependentNode == null) {
                     Contract contract = specRepo.getContractByName(depName);
+                    if (contract == null) {
+                        throw new NullPointerException("No contract found for " + depName);
+                    }
                     dependentNode = new DependencyNode(contract);
                     graph.addNode(dependentNode);
                 }

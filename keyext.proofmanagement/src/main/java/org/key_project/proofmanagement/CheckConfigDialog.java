@@ -97,6 +97,13 @@ class CheckConfigDialog extends JDialog {
      * @author Wolfram Pfeifer
      */
     private class BlockingGlassPane extends JComponent {
+        /**
+         * The {@code this}-modifying listener/cursor calls below happen while the receiver is
+         * still under initialization (EISOP initialization check); safe here since the pane's
+         * state is fully default-initialized and the listeners only fire after construction,
+         * suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         BlockingGlassPane() {
             addMouseListener(new MouseInputAdapter() {
                 @Override
@@ -175,6 +182,21 @@ class CheckConfigDialog extends JDialog {
         }
     }
 
+    /**
+     * Creates the configuration dialog for the check command.
+     * <p>
+     * The window-configuration setters and the {@code this}-passing listener registrations below
+     * happen while the receiver is still under initialization (EISOP initialization check); safe
+     * here since the dialog's fields are fully initialized above and the listeners/actions only
+     * fire after the constructor completes (all registered widgets are contained in this dialog),
+     * suppressed with scoped keys.
+     *
+     * @param parent the parent frame, or {@code null} for a standalone dialog
+     * @param title the dialog title
+     * @param modal whether the dialog is modal
+     */
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:method.invocation.invalid" })
     public CheckConfigDialog(Frame parent, String title, boolean modal) {
         super(parent, title, modal);
 
@@ -218,7 +240,11 @@ class CheckConfigDialog extends JDialog {
             KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose file");
             fc.setFileFilter(KeYFileChooser.PROOF_BUNDLE_FILTER);
             if (fc.showOpenDialog(CheckConfigDialog.this) == JFileChooser.APPROVE_OPTION) {
-                bundleFileField.setText(fc.getSelectedFile().toString());
+                var selectedFile = fc.getSelectedFile();
+                if (selectedFile == null) {
+                    throw new NullPointerException("No bundle file selected.");
+                }
+                bundleFileField.setText(selectedFile.toString());
                 runButton.setEnabled(true);
             }
         });
@@ -254,7 +280,11 @@ class CheckConfigDialog extends JDialog {
             fc.setFileFilter(KeYFileChooser.PROOF_MANAGEMENT_REPORT_FILTER);
             fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             if (fc.showOpenDialog(CheckConfigDialog.this) == JFileChooser.APPROVE_OPTION) {
-                reportFileField.setText(fc.getSelectedFile().toString());
+                var selectedFile = fc.getSelectedFile();
+                if (selectedFile == null) {
+                    throw new NullPointerException("No report location selected.");
+                }
+                reportFileField.setText(selectedFile.toString());
             }
         });
         chooseReportLocationButton.setPreferredSize(buttonDim);

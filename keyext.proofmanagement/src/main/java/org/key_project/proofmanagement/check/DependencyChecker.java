@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.speclang.Contract;
 
 import org.key_project.proofmanagement.check.dependency.DependencyGraph;
@@ -69,6 +70,7 @@ public class DependencyChecker implements Checker {
     public void check(ProofBundleHandler pbh, CheckerData checkerData)
             throws ProofManagementException {
         this.data = checkerData;
+        CheckerData data = checkerData;
         data.addCheck("dependency");
         data.print("Running dependency checker ...");
 
@@ -78,6 +80,9 @@ public class DependencyChecker implements Checker {
         // build dependency graph
         KeYFacade.ensureDependencyGraphBuilt(data);
         DependencyGraph graph = data.getDependencyGraph();
+        if (graph == null) {
+            throw new NullPointerException("Dependency graph not built.");
+        }
 
         // check if graph contains illegal cycles
         if (hasIllegalCycles(graph)) {
@@ -139,10 +144,16 @@ public class DependencyChecker implements Checker {
                                 && closed.containsAll(userDeps)) {
                             closed.add(n);
 
+                            Proof proof = entry.proof;
+                            if (proof == null) {
+                                throw new NullPointerException(
+                                    "Proof not loaded for closed proof entry.");
+                            }
+
                             // update status in data object
                             entry.dependencyState = CheckerData.DependencyState.OK;
                             data.print(LogLevel.INFO, "Proof is closed and has no" +
-                                " unproven dependencies: " + entry.proof.name());
+                                " unproven dependencies: " + proof.name());
 
                             changed = true;
                         }
@@ -163,15 +174,22 @@ public class DependencyChecker implements Checker {
             if (entry.dependencyState == CheckerData.DependencyState.UNKNOWN
                     && entry.replayState == CheckerData.ReplayState.SUCCESS) {
                 Contract c = entry.contract;
+                if (c == null) {
+                    throw new NullPointerException("Proof entry has no contract.");
+                }
+                Proof proof = entry.proof;
+                if (proof == null) {
+                    throw new NullPointerException("Proof not loaded for replayed proof entry.");
+                }
 
                 if (MissingProofsChecker.isInternalContract(c, data)) {
                     // unproven internal dependencies only result in a warning
                     data.print(LogLevel.INFO, "Unproven internal dependencies found for proof "
-                        + entry.proof.name());
+                        + proof.name());
                 } else {
                     entry.dependencyState = CheckerData.DependencyState.UNPROVEN_DEP;
                     data.print(LogLevel.WARNING, "Unproven dependencies found for proof "
-                        + entry.proof.name());
+                        + proof.name());
                     hasUnprovenDeps = true;
                 }
             }
@@ -187,6 +205,10 @@ public class DependencyChecker implements Checker {
      * @return true iff the graph is legal
      */
     private boolean hasIllegalCycles(DependencyGraph graph) {
+        CheckerData data = this.data;
+        if (data == null) {
+            throw new NullPointerException("Checker data not initialized.");
+        }
 
         for (DependencyGraph.SCC scc : graph.getAllSCCs()) {
             // IMPORTANT: we do not check that the modalities inside a cycle match,
@@ -203,6 +225,10 @@ public class DependencyChecker implements Checker {
                     // (if node has dependencies it has been parsed,
                     // thus also a proof entry exists)
                     // assert entry != null;
+                    if (entry == null) {
+                        throw new NullPointerException(
+                            "No proof entry for contract " + n.getContract().getName());
+                    }
                     entry.dependencyState = CheckerData.DependencyState.ILLEGAL_CYCLE;
                 }
                 return true; // cycle found
@@ -240,6 +266,10 @@ public class DependencyChecker implements Checker {
      * @return true iff termination is ensured for all contracts in SCC
      */
     private boolean terminationEnsured(DependencyGraph.SCC scc) {
+        CheckerData data = this.data;
+        if (data == null) {
+            throw new NullPointerException("Checker data not initialized.");
+        }
         for (DependencyNode node : scc.getNodes()) {
             for (DependencyNode next : scc.internalEdges(node).keySet()) {
                 // cycle is illegal if:
