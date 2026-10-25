@@ -64,6 +64,9 @@ public abstract class NodeIntermediateWalker {
 
         while (!queue.isEmpty()) {
             NodeIntermediate node = queue.pollFirst();
+            if (node == null) {
+                throw new NullPointerException("No node available.");
+            }
             doAction(node);
             queue.addAll(node.getChildren());
         }

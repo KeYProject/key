@@ -68,7 +68,11 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
     // IMPORTANT: get... methods return paths to unzipped files!
     @Override
     public String getBundleName() {
-        return zipPath.getFileName().toString();
+        Path fileName = zipPath.getFileName();
+        if (fileName == null) {
+            throw new NullPointerException("Bundle path has no file name: " + zipPath);
+        }
+        return fileName.toString();
     }
 
     @Override

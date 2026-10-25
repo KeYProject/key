@@ -196,7 +196,11 @@ public abstract class ProofBundleHandler implements Closeable {
 
         @Override
         public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
-            current = current.getParent(); // ascend in tree
+            PathNode parent = current.getParent(); // ascend in tree
+            if (parent == null) {
+                throw new NullPointerException("Cannot ascend above the tree root.");
+            }
+            current = parent;
             return FileVisitResult.CONTINUE;
         }
     }

@@ -132,7 +132,10 @@ public final class CheckerData implements Logger {
      */
     public void addChoices(Map<String, String> choices) {
         // if no id is found, a NPE is thrown
-        int referenceId = referenceChoices.get(choices);
+        Integer referenceId = referenceChoices.get(choices);
+        if (referenceId == null) {
+            throw new NullPointerException("No id found for choices " + choices);
+        }
         choices2Id.putIfAbsent(choices, referenceId);
     }
 
@@ -291,14 +294,26 @@ public final class CheckerData implements Logger {
         public IntermediatePresentationProofFileParser.@Nullable Result parseResult;
         public AbstractProblemLoader.@Nullable ReplayResult replayResult;
 
-        public Integer settingsId() {
+        /**
+         * Returns the settings id for the default choices of this entry's proof, or
+         * {@code null} if no matching id has been registered yet.
+         */
+        public @Nullable Integer settingsId() {
+            Proof proof = this.proof;
+            if (proof == null) {
+                throw new NullPointerException("No proof for settings lookup.");
+            }
             return choices2Id.get(proof.getSettings().getChoiceSettings().getDefaultChoices());
         }
     }
 
     public @Nullable ProofEntry getProofEntryByContract(Contract contract) {
         for (ProofEntry p : proofEntries) {
-            if (p.contract.equals(contract)) {
+            Contract c = p.contract;
+            if (c == null) {
+                throw new NullPointerException("Proof entry has no contract.");
+            }
+            if (c.equals(contract)) {
                 return p;
             }
         }
@@ -504,7 +519,11 @@ public final class CheckerData implements Logger {
 
     public List<Path> getProofPaths() throws ProofManagementException {
         if (proofPaths == null) {
-            proofPaths = pbh.getProofFiles();
+            ProofBundleHandler handler = pbh;
+            if (handler == null) {
+                throw new NullPointerException("No proof bundle handler set.");
+            }
+            proofPaths = handler.getProofFiles();
         }
         return proofPaths;
     }
