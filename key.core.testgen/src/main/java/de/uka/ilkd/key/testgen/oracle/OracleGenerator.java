@@ -4,10 +4,13 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.testgen.oracle;
 
+import java.math.BigInteger;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.SortImpl;
@@ -68,6 +71,13 @@ public class OracleGenerator {
 
     public static final String PRE_STRING = "_pre";
 
+    /**
+     * The {@code initOps}, {@code initTrue} and {@code initFalse} calls below are made on
+     * {@code this} while the receiver is still under initialization (EISOP initialization
+     * check); safe here since the methods only assign the fields declared above, suppressed
+     * with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public OracleGenerator(Services services, ReflectionClassCreator rflCreator, boolean useRFL) {
         this.services = services;
         initOps();
@@ -139,14 +149,25 @@ public class OracleGenerator {
         Sort s = c.sort();
 
         Sort nullSort = services.getJavaInfo().getNullType().getSort();
-        Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
         Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         Sort boolSort = services.getTypeConverter().getBooleanLDT().targetSort();
 
         if (s.equals(nullSort)) {
             return false;
         }
-        return s.extendsTrans(objSort) || s.equals(intSort) || s.equals(boolSort);
+        return s.extendsTrans(objectSort()) || s.equals(intSort) || s.equals(boolSort);
+    }
+
+    /**
+     * @return the sort of {@code java.lang.Object}; required for {@link Sort#extendsTrans}
+     *         comparisons.
+     */
+    private Sort objectSort() {
+        Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
+        if (objSort == null) {
+            throw new NullPointerException("No sort for java.lang.Object.");
+        }
+        return objSort;
     }
 
     private Set<Term> getConstants(Term t) {
@@ -264,13 +285,23 @@ public class OracleGenerator {
         }
         // integers
         else if (op == services.getTypeConverter().getIntegerLDT().getNumberSymbol()) {
-            long num = NumberTranslation.translate(term.sub(0)).longValue();
+            BigInteger number = NumberTranslation.translate(term.sub(0));
+            if (number == null) {
+                throw new NullPointerException(
+                    "Could not translate the integer literal '" + term.sub(0) + "'.");
+            }
+            long num = number.longValue();
             return new OracleConstant(Long.toString(num), term.sort());
         }
         // forall
         else if (op == Quantifier.ALL || op == Quantifier.EX) {
-            Sort field = services.getTypeConverter().getHeapLDT().getFieldSort();
-            Sort heap = services.getTypeConverter().getHeapLDT().targetSort();
+            HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+            if (heapLDT == null) {
+                throw new NullPointerException(
+                    "No heap type defined in the services type converter.");
+            }
+            Sort field = heapLDT.getFieldSort();
+            Sort heap = heapLDT.targetSort();
             Sort varSort = term.boundVars().get(0).sort();
             if (varSort.equals(field) || varSort.equals(heap)) {
                 return OracleConstant.TRUE;
@@ -321,8 +352,7 @@ public class OracleGenerator {
             return OracleConstant.FALSE;
         } else if (term.arity() == 0) {
             return new OracleConstant(name, term.sort());
-        } else if (op instanceof ParametricFunctionInstance pfi
-                && pfi.getBase() == services.getTypeConverter().getHeapLDT().getSelect()) {
+        } else if (op instanceof ParametricFunctionInstance pfi && isHeapSelect(pfi)) {
             return translateSelect(term, initialSelect);
         } else if (name.equals("arr")) {
             OracleTerm index = generateOracle(term.sub(0), initialSelect);
@@ -333,7 +363,14 @@ public class OracleGenerator {
         } else if (name.endsWith("::" + PipelineConstants.IMPLICIT_OBJECT_INVARIANT)) {
             if (fun instanceof IObserverFunction obs) {
 
-                Sort s = obs.getContainerType().getSort();
+                KeYJavaType containerType = obs.getContainerType();
+                if (containerType == null) {
+                    throw new NullPointerException("Observer function has no container type.");
+                }
+                Sort s = containerType.getSort();
+                if (s == null) {
+                    throw new NullPointerException("Container type has no sort.");
+                }
                 OracleMethod m;
 
                 if (invariants.containsKey(s)) {
@@ -427,6 +464,9 @@ public class OracleGenerator {
             methodName = pm.getName();
         }
         Sort returnType = pm.getReturnType().getSort();
+        if (returnType == null) {
+            throw new NullPointerException("Method return type has no sort.");
+        }
 
         List<OracleVariable> args = new LinkedList<>();
 
@@ -462,7 +502,7 @@ public class OracleGenerator {
             initialSelect);
 
         if (!initialSelect && isPreHeap(heapTerm)
-                && term.sort().extendsTrans(services.getJavaInfo().getJavaLangObject().getSort())) {
+                && term.sort().extendsTrans(objectSort())) {
             return new OracleConstant(OLD_MAP + ".get(" + value + ")",
                 term.sort());
         }
@@ -579,6 +619,10 @@ public class OracleGenerator {
 
     private String getSetName(Sort s) {
 
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        if (heapLDT == null) {
+            throw new NullPointerException("No heap type defined in the services type converter.");
+        }
         if (s.equals(JavaDLTheory.FORMULA)) {
             return ALL_BOOLS;
         } else if (s.equals(services.getTypeConverter().getIntegerLDT().targetSort())) {
@@ -586,10 +630,10 @@ public class OracleGenerator {
         } else if (s.equals(services.getTypeConverter().getLocSetLDT().targetSort())) {
             throw new RuntimeException("Not implemented yet.");
             // return TestCaseGenerator.ALL_LOCSETS
-        } else if (s.equals(services.getTypeConverter().getHeapLDT().getFieldSort())) {
+        } else if (s.equals(heapLDT.getFieldSort())) {
             throw new RuntimeException("Not implemented yet.");
             // return TestCaseGenerator.ALL_FIELDS
-        } else if (s.equals(services.getTypeConverter().getHeapLDT().targetSort())) {
+        } else if (s.equals(heapLDT.targetSort())) {
             throw new RuntimeException("Not implemented yet.");
             // return TestCaseGenerator.ALL_HEAPS
         } else if (s.equals(services.getTypeConverter().getSeqLDT().targetSort())) {
@@ -599,6 +643,18 @@ public class OracleGenerator {
 
 
         return ALL_OBJECTS;
+    }
+
+    /**
+     * @param pfi a parametric function instance
+     * @return whether {@code pfi} is the heap {@code select} function
+     */
+    private boolean isHeapSelect(ParametricFunctionInstance pfi) {
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        if (heapLDT == null) {
+            throw new NullPointerException("No heap type defined in the services type converter.");
+        }
+        return pfi.getBase() == heapLDT.getSelect();
     }
 
     private OracleMethod createQuantifierMethod(Term term, boolean initialSelect) {
