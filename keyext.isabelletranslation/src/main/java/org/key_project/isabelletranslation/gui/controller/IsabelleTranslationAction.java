@@ -21,12 +21,14 @@ import org.key_project.isabelletranslation.translation.IllegalFormulaException;
 import org.key_project.isabelletranslation.translation.IsabelleTranslator;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Action to translate the selected goal.
  */
+@NullMarked
 public class IsabelleTranslationAction extends MainWindowAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleTranslationAction.class);

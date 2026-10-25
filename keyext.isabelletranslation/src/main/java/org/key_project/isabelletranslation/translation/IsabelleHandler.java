@@ -12,6 +12,9 @@ import de.uka.ilkd.key.java.Services;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class is a slightly adjusted version of {@link de.uka.ilkd.key.smt.newsmt2.SMTHandler}. It
  * largely has the same functionality.
@@ -20,6 +23,7 @@ import org.key_project.logic.op.Operator;
  * @author Jonas Schiffl
  * @author Nils Buchholz
  */
+@NullMarked
 public interface IsabelleHandler {
 
     /**
@@ -55,8 +59,8 @@ public interface IsabelleHandler {
      * @param handlerOptions arbitrary options for the handler to take into account
      * @throws IOException if resources cannot be read.
      */
-    void init(IsabelleMasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) throws IOException;
+    void init(IsabelleMasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) throws IOException;
 
     /**
      * Query if this handler can translate a term.

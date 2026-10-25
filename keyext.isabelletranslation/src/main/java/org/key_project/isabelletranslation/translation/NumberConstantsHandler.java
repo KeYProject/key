@@ -14,9 +14,13 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This handler is responsible to render number constants Z(3(2(1(#)))) as "123".
  */
+@NullMarked
 public class NumberConstantsHandler implements IsabelleHandler {
 
     private Function numberSymbol;
@@ -24,7 +28,7 @@ public class NumberConstantsHandler implements IsabelleHandler {
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
-            Properties handlerSnippets,
+            @Nullable Properties handlerSnippets,
             String[] handlerOptions) {
         this.services = services;
         numberSymbol = services.getTypeConverter().getIntegerLDT().getNumberSymbol();

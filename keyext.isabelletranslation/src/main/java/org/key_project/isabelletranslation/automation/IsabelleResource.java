@@ -7,11 +7,14 @@ package org.key_project.isabelletranslation.automation;
 import de.unruh.isabelle.control.Isabelle;
 import de.unruh.isabelle.pure.Theory;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * An IsabelleResource is a bundling of an Isabelle instance and a {@link Theory} derived from that
  * instance.
  * It can be used to provide solvers with these values for computation.
  */
+@NullMarked
 public interface IsabelleResource {
     /**
      * Checks if the resource has been destroyed. If this is true the resource should not be used

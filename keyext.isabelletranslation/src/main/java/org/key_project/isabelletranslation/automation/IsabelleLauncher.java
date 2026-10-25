@@ -12,6 +12,7 @@ import org.key_project.isabelletranslation.IsabelleTranslationSettings;
 import org.key_project.isabelletranslation.gui.controller.IsabelleLauncherProgressDialogMediator;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,7 @@ import org.slf4j.LoggerFactory;
  * This class allows for the launch of automated proof searches in Isabelle for a list of isabelle
  * problems.
  */
+@NullMarked
 public class IsabelleLauncher implements IsabelleSolverListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleLauncher.class);
 

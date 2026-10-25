@@ -19,6 +19,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import org.key_project.isabelletranslation.gui.IsabelleProgressModel.ProcessColumn.ProcessData;
 import org.key_project.util.java.SwingUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +29,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Adapted version of {@link de.uka.ilkd.key.gui.smt.ProgressDialog} used for SMT.
  */
+@NullMarked
 public class IsabelleProgressDialog extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleProgressDialog.class);
 
@@ -38,19 +41,19 @@ public class IsabelleProgressDialog extends JDialog {
      * Button to apply the results of running the Isabelle solvers.
      * May close some open goals if the solvers found proofs.
      */
-    private JButton applyButton;
+    private @Nullable JButton applyButton;
     /**
      * Button to stop the launched Isabelle solvers.
      */
-    private JButton stopButton;
+    private @Nullable JButton stopButton;
     /**
      * Scroll pane listing the open goals and the results of running each Isabelle solver on them.
      */
-    private JScrollPane scrollPane;
+    private @Nullable JScrollPane scrollPane;
     /**
      * Overall progress of the Isabelle solvers (# goals processed / total goals).
      */
-    private JProgressBar progressBar;
+    private @Nullable JProgressBar progressBar;
     private final IsabelleProgressDialogListener listener;
 
     /**
@@ -245,6 +248,7 @@ public class IsabelleProgressDialog extends JDialog {
 /**
  * The table displaying the progress of solver instances
  */
+@NullMarked
 class ProgressTable extends JTable {
     private static final int NUMBER_OF_VISIBLE_ROWS = 8;
 
@@ -260,8 +264,8 @@ class ProgressTable extends JTable {
      * Panel displaying the total progress of all solver instances "x/y instances completed"
      */
     public static class ProgressPanel extends JPanel {
-        private JProgressBar progressBar;
-        private JButton infoButton;
+        private @Nullable JProgressBar progressBar;
+        private @Nullable JButton infoButton;
 
         private JProgressBar getProgressBar() {
             if (progressBar == null) {
@@ -313,7 +317,7 @@ class ProgressTable extends JTable {
             getProgressBar().setValue(value);
         }
 
-        public void setText(String text) {
+        public void setText(@Nullable String text) {
             getProgressBar().setString(text);
             getProgressBar().setStringPainted(text != null && !text.isEmpty());
         }
@@ -321,7 +325,7 @@ class ProgressTable extends JTable {
 
 
     private final ProgressPanel progressPanelRenderer = new ProgressPanel();
-    private ProgressPanel progressPanelEditor;
+    private @Nullable ProgressPanel progressPanelEditor;
 
 
     private class ProgressCellEditor extends AbstractCellEditor implements TableCellEditor {
@@ -338,7 +342,7 @@ class ProgressTable extends JTable {
 
 
         @Override
-        public Object getCellEditorValue() {
+        public @Nullable Object getCellEditorValue() {
             return null;
         }
 

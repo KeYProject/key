@@ -17,15 +17,19 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This handles translation of quantifiers.
  */
+@NullMarked
 public class QuantifierHandler implements IsabelleHandler {
     private final Map<Operator, String> supportedOperators = new HashMap<>();
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
-            Properties handlerSnippets, String[] handlerOptions) throws IOException {
+            @Nullable Properties handlerSnippets, String[] handlerOptions) throws IOException {
         supportedOperators.put(Quantifier.ALL, "\\<forall>");
         supportedOperators.put(Quantifier.EX, "\\<exists>");
     }

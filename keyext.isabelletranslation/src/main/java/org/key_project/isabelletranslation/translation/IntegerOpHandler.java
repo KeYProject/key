@@ -15,11 +15,15 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class handles translation of the integer operators.
  *
  * @author Nils Buchholz
  */
+@NullMarked
 public class IntegerOpHandler implements IsabelleHandler {
     private final Map<Operator, String> supportedOperators = new HashMap<>();
 
@@ -27,7 +31,7 @@ public class IntegerOpHandler implements IsabelleHandler {
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
-            Properties handlerSnippets,
+            @Nullable Properties handlerSnippets,
             String[] handlerOptions) {
         supportedOperators.clear();
         integerLDT = services.getTypeConverter().getIntegerLDT();

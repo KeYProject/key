@@ -20,6 +20,8 @@ import de.unruh.isabelle.pure.Implicits;
 import de.unruh.isabelle.pure.Theory;
 import de.unruh.isabelle.pure.ToplevelState;
 import de.unruh.isabelle.pure.Transition;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
@@ -32,6 +34,7 @@ import scala.concurrent.duration.Duration;
 /**
  * Implementation of {@link IsabelleSolver} using Sledgehammer.
  */
+@NullMarked
 public class IsabelleSledgehammerSolver implements IsabelleSolver {
     /**
      * Needed for UI
@@ -41,12 +44,12 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
     /**
      * The result of this solver.
      */
-    private IsabelleResult result;
+    private @Nullable IsabelleResult result;
 
     /**
      *
      */
-    private IsabelleResource isabelleResource;
+    private @Nullable IsabelleResource isabelleResource;
 
     /**
      * The problem that is related to this solver
@@ -66,16 +69,16 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
     /**
      * If there was an exception while executing the solver it is stored in this attribute.
      */
-    private Throwable exception;
+    private @Nullable Throwable exception;
 
     /**
      * The timeout in seconds for this solver run.
      */
     private int timeout;
 
-    private Instant startTime;
+    private @Nullable Instant startTime;
 
-    private java.time.Duration computationTime;
+    private java.time.@Nullable Duration computationTime;
 
     private final IsabelleResourceController resourceController;
 
@@ -112,7 +115,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
     }
 
     @Override
-    public Throwable getException() {
+    public @Nullable Throwable getException() {
         return exception;
     }
 
@@ -138,7 +141,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
     }
 
     @Override
-    public Instant getStartTime() {
+    public @Nullable Instant getStartTime() {
         return startTime;
     }
 
@@ -163,12 +166,12 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
     }
 
     @Override
-    public String getRawSolverInput() {
+    public @Nullable String getRawSolverInput() {
         return problem.getTranslation();
     }
 
     @Override
-    public IsabelleResult getFinalResult() {
+    public @Nullable IsabelleResult getFinalResult() {
         return this.result;
     }
 
@@ -419,7 +422,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
     }
 
     @Override
-    public java.time.Duration getComputationTime() {
+    public java.time.@Nullable Duration getComputationTime() {
         return computationTime;
     }
 
