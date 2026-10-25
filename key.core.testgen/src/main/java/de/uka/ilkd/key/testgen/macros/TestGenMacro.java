@@ -39,8 +39,13 @@ public class TestGenMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy<@NonNull Goal> createStrategy(Proof proof, PosInOccurrence posInOcc) {
-        return new TestGenStrategy(proof.getActiveStrategy(), unwindLimit);
+    protected Strategy<@NonNull Goal> createStrategy(Proof proof,
+            @Nullable PosInOccurrence posInOcc) {
+        Strategy<@NonNull Goal> activeStrategy = proof.getActiveStrategy();
+        if (activeStrategy == null) {
+            throw new NullPointerException("Proof has no active strategy.");
+        }
+        return new TestGenStrategy(activeStrategy, unwindLimit);
     }
 
     @Override
@@ -54,8 +59,7 @@ public class TestGenMacro extends StrategyProofMacro {
     }
 
     @Override
-    @Nullable
-    public String getCategory() {
+    public @Nullable String getCategory() {
         return null;
     }
 }

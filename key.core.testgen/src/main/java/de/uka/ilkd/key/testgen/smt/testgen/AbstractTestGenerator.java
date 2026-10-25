@@ -9,13 +9,16 @@ import java.util.*;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.*;
@@ -57,8 +60,7 @@ public abstract class AbstractTestGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTestGenerator.class);
     private final UserInterfaceControl ui;
     private final Proof originalProof;
-    @Nullable
-    private SolverLauncher launcher;
+    private @Nullable SolverLauncher launcher;
     private List<Proof> proofs = new ArrayList<>();
 
     /**
@@ -76,13 +78,17 @@ public abstract class AbstractTestGenerator {
             throws InterruptedException {
         TestGenerationSettings settings = TestGenerationSettings.getInstance();
 
-        if (!SolverTypes.Z3_CE_SOLVER.isInstalled(true)) {
+        SolverType z3Solver = SolverTypes.Z3_CE_SOLVER;
+        if (z3Solver == null) {
+            throw new NullPointerException("Z3 counter-example solver is not registered.");
+        }
+        if (!z3Solver.isInstalled(true)) {
             log.writeln("Could not find the z3 SMT solver. Aborting.");
             return;
         }
-        if (!SolverTypes.Z3_CE_SOLVER.isSupportedVersion()) {
+        if (!z3Solver.isSupportedVersion()) {
             log.writeln("Warning: z3 supported minimum supported version is: "
-                + SolverTypes.Z3_CE_SOLVER.getMinimumSupportedVersion());
+                + z3Solver.getMinimumSupportedVersion());
         }
         if (originalProof.closed() && settings.includePostCondition()) {
             log.writeln("Cannot generate test cases from closed proof with "
@@ -93,7 +99,7 @@ public abstract class AbstractTestGenerator {
         if (settings.getApplySymbolicExecution()) {
             log.writeln("Applying TestGen Macro (bounded symbolic execution)...");
             try {
-                TestGenMacro macro = new TestGenMacro();
+                ProofMacro macro = new TestGenMacro();
                 macro.applyTo(ui, originalProof, originalProof.openEnabledGoals(), null, null);
                 log.writeln("Finished symbolic execution.");
             } catch (InterruptedException e) {
@@ -121,7 +127,7 @@ public abstract class AbstractTestGenerator {
                 if (stopRequest != null && stopRequest.shouldStop()) {
                     return;
                 }
-                final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
+                final ProofMacro macro = new SemanticsBlastingMacro();
                 TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
                 final ProverTaskListener ptl = ui.getProofControl().getDefaultProverTaskListener();
                 try {
@@ -179,15 +185,19 @@ public abstract class AbstractTestGenerator {
             }
         });
         final List<SolverType> solvers = new LinkedList<>();
-        solvers.add(SolverTypes.Z3_CE_SOLVER);
-        SolverTypes.Z3_CE_SOLVER.checkForSupport();
+        solvers.add(z3Solver);
+        z3Solver.checkForSupport();
         if (stopRequest != null && stopRequest.shouldStop()) {
             return;
         }
         if (Thread.interrupted()) {
             return;
         }
-        launcher.launch(solvers, problems, proof.getServices());
+        SolverLauncher activeLauncher = launcher;
+        if (activeLauncher == null) {
+            throw new NullPointerException("Solver launcher was not initialized.");
+        }
+        activeLauncher.launch(solvers, problems, proof.getServices());
     }
 
     protected void handleAllProofsPerformed(UserInterfaceControl ui) {
@@ -223,7 +233,11 @@ public abstract class AbstractTestGenerator {
         final List<Node> nodes = new LinkedList<>();
         final ImmutableList<Goal> oldGoals = originalProof.openGoals();
         if (originalProof.closed()) {
-            getNodesWithEmptyModalities(originalProof.root(), nodes);
+            Node root = originalProof.root();
+            if (root == null) {
+                throw new NullPointerException("Proof has no root node.");
+            }
+            getNodesWithEmptyModalities(root, nodes);
         } else {
             for (final Goal goal : oldGoals) {
                 nodes.add(goal.node());
@@ -257,8 +271,8 @@ public abstract class AbstractTestGenerator {
      * @param nodes the nodes to be added
      */
     private void getNodesWithEmptyModalities(Node root, List<Node> nodes) {
-        if (root.getAppliedRuleApp() != null) {
-            final RuleApp app = root.getAppliedRuleApp();
+        RuleApp app = root.getAppliedRuleApp();
+        if (app != null) {
             if (app.rule().name().toString().equals("emptyModality")) {
                 nodes.add(root);
             }
@@ -305,7 +319,11 @@ public abstract class AbstractTestGenerator {
         // Check if a proof with the same sequent already exists.
         if (otherProofs != null) {
             for (final Proof otherProof : otherProofs) {
-                if (otherProof.root().sequent().equals(newSequent)) {
+                Node otherRoot = otherProof.root();
+                if (otherRoot == null) {
+                    throw new NullPointerException("Other proof has no root node.");
+                }
+                if (otherRoot.sequent().equals(newSequent)) {
                     // Found and skip duplicate proof for node
                     return null;
                 }
@@ -320,8 +338,16 @@ public abstract class AbstractTestGenerator {
             new Choice("ban", "runtimeExceptions"));
         ProofStarter starter = SideProofUtil.createSideProof(env, newSequent, newName);
         Proof proof = starter.getProof();
-        proof.getServices().getSpecificationRepository().registerProof(
-            proof.getServices().getSpecificationRepository().getProofOblInput(oldProof), proof);
+        if (proof == null) {
+            throw new NullPointerException("Side proof was not created.");
+        }
+        SpecificationRepository specRepository =
+            proof.getServices().getSpecificationRepository();
+        ProofOblInput proofOblInput = specRepository.getProofOblInput(oldProof);
+        if (proofOblInput == null) {
+            throw new NullPointerException("No proof obligation available for the old proof.");
+        }
+        specRepository.registerProof(proofOblInput, proof);
         OneStepSimplifier.refreshOSS(proof);
         return proof;
     }
@@ -390,16 +416,22 @@ public abstract class AbstractTestGenerator {
         final List<SMTSolver> output = new ArrayList<>();
         for (final SMTSolver solver : problemSolvers) {
             try {
-                final SMTSolverResult.ThreeValuedTruth res = solver.getFinalResult().isValid();
+                SMTSolverResult result = solver.getFinalResult();
+                if (result == null) {
+                    throw new NullPointerException("Solver provided no result.");
+                }
+                final SMTSolverResult.ThreeValuedTruth res = result.isValid();
                 if (res == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
                     unknown++;
-                    if (solver.getException() != null) {
-                        LOGGER.warn("Solver returned exception", solver.getException());
+                    Throwable exception = solver.getException();
+                    if (exception != null) {
+                        LOGGER.warn("Solver returned exception", exception);
                     }
                 } else if (res == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) {
                     solvedPaths++;
-                    if (solver.getSocket().getQuery() != null) {
-                        final Model m = solver.getSocket().getQuery().getModel();
+                    ModelExtractor query = solver.getSocket().getQuery();
+                    if (query != null) {
+                        final Model m = query.getModel();
                         if (TestgenUtils.modelIsOK(m)) {
                             output.add(solver);
                         } else {
@@ -452,6 +484,10 @@ public abstract class AbstractTestGenerator {
      * @return {@code true} solver is available, {@code false} solver is not available.
      */
     public static boolean isSolverAvailable() {
-        return SolverTypes.Z3_CE_SOLVER.isInstalled(true);
+        SolverType z3Solver = SolverTypes.Z3_CE_SOLVER;
+        if (z3Solver == null) {
+            throw new NullPointerException("Z3 counter-example solver is not registered.");
+        }
+        return z3Solver.isInstalled(true);
     }
 }
