@@ -60,7 +60,7 @@ final class Mapping extends Record {
 
     @Override()
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    public final non_null String toString() {
+    public final /*@ non_null */ String toString() {
         return "Mapping[" + "from=" + from + "," + "to=" + to + "]";
     }
 }
