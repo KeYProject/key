@@ -180,16 +180,18 @@ public final class OneStepSimplifier implements BuiltInRule {
             final Taclet tac = app.taclet();
             final InitConfig initConfig = Objects.requireNonNull(proof.getInitConfig(),
                 "one step simplification requires the proof's init config");
-            final RuleJustification justification = Objects.requireNonNull(
-                initConfig.getJustifInfo().getJustification(tac),
-                "one step simplification requires a justification for every taclet");
+            // The justification may legitimately be absent (e.g. for built-in rules without a
+            // registered justification); such taclets are simply not eligible for one-step
+            // simplification, mirroring the long-standing behavior of skipping them.
+            final @Nullable RuleJustification justification =
+                initConfig.getJustifInfo().getJustification(tac);
+            final @Nullable ApplicationRestriction restriction = tac.applicationRestriction();
             if (!(tac instanceof RewriteTaclet) || !tac.hasReplaceWith()
                     || !tac.assumesSequent().isEmpty() || tac.goalTemplates().size() != 1
                     || !tac.goalTemplates().head().sequent().isEmpty() || !tac.varsNew().isEmpty()
                     || !tac.varsNewDependingOn().isEmpty()
-                    || !Objects.requireNonNull(tac.applicationRestriction())
-                            .equals(ApplicationRestriction.NONE)
-                    || !justification.isAxiomJustification()) {
+                    || restriction == null || !restriction.equals(ApplicationRestriction.NONE)
+                    || justification == null || !justification.isAxiomJustification()) {
                 continue;
             }
 
