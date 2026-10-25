@@ -14,6 +14,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.plugins.caching.CachingExtension;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
@@ -77,7 +78,11 @@ public final class CloseByReference extends KeyAction {
                 mediator.getCurrentlyOpenedProofs(), n);
             if (c != null) {
                 matches.add(n.serialNr());
-                n.proof().closeGoal(n.proof().getOpenGoal(n));
+                Goal goal = n.proof().getOpenGoal(n);
+                if (goal == null) {
+                    throw new NullPointerException("No open goal for node " + n.serialNr() + ".");
+                }
+                n.proof().closeGoal(goal);
                 n.register(c, ClosedBy.class);
             } else {
                 mismatches.add(n.serialNr());

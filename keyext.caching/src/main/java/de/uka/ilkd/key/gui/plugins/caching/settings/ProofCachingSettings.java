@@ -37,21 +37,27 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
     /**
      * Whether proof caching is enabled.
      */
-    private final AbstractPropertiesSettings.PropertyEntry<Boolean> enabled =
-        createBooleanProperty(ENABLED_KEY, true);
+    private final AbstractPropertiesSettings.PropertyEntry<Boolean> enabled;
     /**
      * Behaviour when disposing a proof that is referenced elsewhere.
      */
-    private final AbstractPropertiesSettings.PropertyEntry<String> dispose =
-        createStringProperty(DISPOSE_KEY, DISPOSE_COPY);
+    private final AbstractPropertiesSettings.PropertyEntry<String> dispose;
     /**
      * Behaviour when pruning a proof that is referenced elsewhere.
      */
-    private final AbstractPropertiesSettings.PropertyEntry<String> prune =
-        createStringProperty(PRUNE_KEY, PRUNE_COPY);
+    private final AbstractPropertiesSettings.PropertyEntry<String> prune;
 
+    /**
+     * The {@code createXProperty} calls below are made on {@code this} while the receiver is
+     * still under initialization (EISOP initialization check); safe here since no subclass state
+     * is involved in these superclass factory methods, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ProofCachingSettings() {
         super("ProofCaching");
+        this.enabled = createBooleanProperty(ENABLED_KEY, true);
+        this.dispose = createStringProperty(DISPOSE_KEY, DISPOSE_COPY);
+        this.prune = createStringProperty(PRUNE_KEY, PRUNE_COPY);
     }
 
     public boolean getEnabled() {

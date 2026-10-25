@@ -48,12 +48,15 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
      * Construct a new button.
      *
      * @param mediator the mediator
+     *        <p>
+     *        The configuration calls below are made on {@code this} while the receiver is still
+     *        under initialization (EISOP initialization check); safe here since the members are
+     *        initialized above, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ReferenceSearchButton(KeYMediator mediator) {
         super("Proof Caching");
         this.mediator = mediator;
-        mediator.addKeYSelectionListener(this);
-        addActionListener(this);
         setEnabled(false);
         // Reflect the prover mode live: when the user switches to the multi-core prover the button
         // greys out (proof caching is single-core only), and back when they return to single-core.
@@ -62,10 +65,23 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
             evt -> updateState(mediator.getSelectedProof()));
     }
 
+    /**
+     * Register this button as a selection listener of the mediator and as its own action
+     * listener. This must happen after construction has finished: registering the not yet fully
+     * initialized {@code this} inside the constructor is rejected by the nullness initialization
+     * check, suppressed with a scoped key.
+     */
+    public void registerListeners() {
+        mediator.addKeYSelectionListener(this);
+        addActionListener(this);
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         Proof p = mediator.getSelectedProof();
+        if (p == null) {
+            throw new NullPointerException("No proof selected for reference search.");
+        }
         for (Goal goal : p.openEnabledGoals()) {
             ClosedBy c = ReferenceSearcher.findPreviousProof(mediator.getCurrentlyOpenedProofs(),
                 goal.node());

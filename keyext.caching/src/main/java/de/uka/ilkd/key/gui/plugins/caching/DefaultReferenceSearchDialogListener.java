@@ -11,6 +11,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.IssueDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
 
@@ -45,6 +46,9 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
     public void copyButtonClicked(ReferenceSearchDialog dialog) {
         mediator.stopInterface(true);
         Proof p = mediator.getSelectedProof();
+        if (p == null) {
+            throw new NullPointerException("No proof selected for copying cached goals.");
+        }
         new Thread(() -> {
             try {
                 mediator.initiateAutoMode(p, true, false);
@@ -63,7 +67,11 @@ public class DefaultReferenceSearchDialogListener implements ReferenceSearchDial
                 IssueDialog.showExceptionDialog(dialog, new CachingException(e));
             } finally {
                 mediator.finishAutoMode(p, true, false, () -> {
-                    mediator.getSelectionModel().setSelectedNode(p.root());
+                    Node root = p.root();
+                    if (root == null) {
+                        throw new NullPointerException("Proof has no root node.");
+                    }
+                    mediator.getSelectionModel().setSelectedNode(root);
                 });
             }
         }).start();

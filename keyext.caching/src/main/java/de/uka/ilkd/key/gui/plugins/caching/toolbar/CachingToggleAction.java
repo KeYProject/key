@@ -25,6 +25,12 @@ public class CachingToggleAction extends MainWindowAction {
     private static final String DESCRIPTION =
         "Enable or disable proof caching for currently open proofs.";
 
+    /**
+     * The setters below are called on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since all fields are set before
+     * the calls, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public CachingToggleAction(MainWindow mainWindow) {
         super(mainWindow);
 

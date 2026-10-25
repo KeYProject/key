@@ -43,12 +43,20 @@ class ReferenceSearchTable extends JTable implements TableModel {
      * @param mediator the mediator
      */
     public ReferenceSearchTable(Proof proof, KeYMediator mediator) {
-        this.setModel(this);
         this.goals = proof.allGoals().stream()
                 .filter(g -> !g.node().isClosed() || g.node().lookup(ClosedBy.class) != null)
                 .collect(Collectors.toList());
         Collections.reverse(this.goals);
         this.mediator = mediator;
+    }
+
+    /**
+     * Install this table as its own model and configure the column layout.
+     * This is done after construction, since configuring the table inside the constructor
+     * is rejected by the nullness initialization check (the table is fully initialized here).
+     */
+    void init() {
+        setModel(this);
         getColumnModel().getColumn(1).setMinWidth(200);
     }
 
