@@ -24,6 +24,9 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A contract for checking the well-definedness of a specification for a method or model field.
  * Additionally to the general well-definedness contract, it consists of other definitions for the
@@ -31,18 +34,20 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public final class MethodWellDefinedness extends WellDefinednessCheck {
 
     private final Contract contract;
 
-    private JTerm globalDefs;
-    private JTerm axiom;
+    private @Nullable JTerm globalDefs;
+    private @Nullable JTerm axiom;
     private final boolean modelField;
 
     private MethodWellDefinedness(String name, int id, Type type, IObserverFunction target,
             LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
-            JTerm accessible, Condition ensures, JTerm mby, JTerm rep, Contract contract,
-            JTerm globalDefs, JTerm axiom, boolean model, TermBuilder tb) {
+            @Nullable JTerm accessible, Condition ensures, @Nullable JTerm mby, @Nullable JTerm rep,
+            Contract contract,
+            @Nullable JTerm globalDefs, @Nullable JTerm axiom, boolean model, TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
         this.contract = contract;
@@ -194,6 +199,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
+    @Nullable
     Function generateMbyAtPreFunc(Services services) {
         return hasMby()
                 ? new JFunction(new Name(TB.newName("mbyAtPre")),
@@ -211,7 +217,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @return the measured by at pre equation for the precondition
      */
     JTerm generateMbyAtPreDef(LocationVariable self, ImmutableList<LocationVariable> params,
-            Function mbyAtPreFunc, Services services) {
+            @Nullable Function mbyAtPreFunc, Services services) {
         final JTerm mbyAtPreDef;
         if (hasMby()) {
             final JTerm mbyAtPre = TB.func(mbyAtPreFunc);
@@ -433,12 +439,12 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public JTerm getGlobalDefs() {
+    public @Nullable JTerm getGlobalDefs() {
         return this.globalDefs;
     }
 
     @Override
-    public JTerm getAxiom() {
+    public @Nullable JTerm getAxiom() {
         return this.axiom;
     }
 

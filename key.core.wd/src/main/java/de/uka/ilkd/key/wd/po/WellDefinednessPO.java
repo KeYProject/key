@@ -31,6 +31,9 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * The proof obligation for well-definedness checks.
@@ -51,12 +54,13 @@ import org.key_project.util.collection.ImmutableSet;
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public class WellDefinednessPO extends AbstractPO implements ContractPO {
 
     private final WellDefinednessCheck check;
-    private JTerm mbyAtPre;
-    private InitConfig proofConfig;
-    private TermBuilder tb;
+    private @Nullable JTerm mbyAtPre;
+    private @Nullable InitConfig proofConfig;
+    private @Nullable TermBuilder tb;
 
     /**
      * Constructor
@@ -81,7 +85,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         return anonHeap;
     }
 
-    private static LocationVariable createSelf(IProgramMethod pm, KeYJavaType selfKJT,
+    private static LocationVariable createSelf(@Nullable IProgramMethod pm, KeYJavaType selfKJT,
             TermServices services) {
         if (pm == null) {
             return services.getTermBuilder().selfVar(selfKJT, false);
@@ -90,7 +94,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         }
     }
 
-    private static LocationVariable createResult(IProgramMethod pm, TermServices services) {
+    private static @Nullable LocationVariable createResult(@Nullable IProgramMethod pm,
+            TermServices services) {
         if (pm == null) {
             return null;
         } else {
@@ -98,7 +103,8 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
         }
     }
 
-    private static LocationVariable createException(IProgramMethod pm, TermServices services) {
+    private static @Nullable LocationVariable createException(@Nullable IProgramMethod pm,
+            TermServices services) {
         if (pm == null) {
             return null;
         } else {
@@ -285,7 +291,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     @Override
-    public JTerm getMbyAtPre() {
+    public @Nullable JTerm getMbyAtPre() {
         return this.mbyAtPre;
     }
 
@@ -310,20 +316,21 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
      * @author Michael Kirsten
      */
     public static class Variables {
-        public final LocationVariable self;
-        public final LocationVariable result;
-        public final LocationVariable exception;
+        public final @Nullable LocationVariable self;
+        public final @Nullable LocationVariable result;
+        public final @Nullable LocationVariable exception;
         public final Map<LocationVariable, LocationVariable> atPres;
         public final ImmutableList<LocationVariable> params;
         public final LocationVariable heap;
         public final LocationVariable heapAtPre;
-        public final JTerm anonHeap;
+        public final @Nullable JTerm anonHeap;
 
-        public Variables(final LocationVariable self, final LocationVariable result,
-                final LocationVariable exception,
+        public Variables(final @Nullable LocationVariable self,
+                final @Nullable LocationVariable result,
+                final @Nullable LocationVariable exception,
                 final Map<LocationVariable, LocationVariable> atPres,
                 final ImmutableList<LocationVariable> params, final LocationVariable heap,
-                final JTerm anonHeap) {
+                final @Nullable JTerm anonHeap) {
             this.self = self;
             this.result = result;
             this.exception = exception;
@@ -335,8 +342,9 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
             this.anonHeap = anonHeap;
         }
 
-        private Variables(final LocationVariable self, final LocationVariable result,
-                final LocationVariable exception,
+        private Variables(final @Nullable LocationVariable self,
+                final @Nullable LocationVariable result,
+                final @Nullable LocationVariable exception,
                 final Map<LocationVariable, LocationVariable> atPres,
                 final ImmutableList<LocationVariable> params, final LocationVariable heap,
                 final Function anonHeap, TermServices services) {
@@ -346,7 +354,7 @@ public class WellDefinednessPO extends AbstractPO implements ContractPO {
     }
 
     @Override
-    protected InitConfig getCreatedInitConfigForSingleProof() {
+    protected @Nullable InitConfig getCreatedInitConfigForSingleProof() {
         return proofConfig;
     }
 

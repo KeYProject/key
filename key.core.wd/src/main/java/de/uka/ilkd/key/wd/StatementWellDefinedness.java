@@ -22,6 +22,9 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A contract for checking the well-definedness of a jml statement. Contrary to jml specifications
  * for methods, model fields and class invariants, the well-definedness of jml statements is checked
@@ -34,6 +37,7 @@ import org.key_project.util.collection.ImmutableSet;
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public abstract class StatementWellDefinedness extends WellDefinednessCheck {
 
     StatementWellDefinedness(String name, int id, IObserverFunction target,
@@ -77,7 +81,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    final Function generateMbyAtPreFunc(Services services) {
+    final @Nullable Function generateMbyAtPreFunc(Services services) {
         return null;
     }
 
@@ -125,10 +129,11 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services The current services reference
      * @return The proof sequent for the well-definedness check
      */
-    public SequentFormula generateSequent(LocationVariable self,
-            LocationVariable exception,
-            LocationVariable result, LocationVariable heap, LocationVariable heapAtPre,
-            JTerm anonHeap,
+    public SequentFormula generateSequent(@Nullable LocationVariable self,
+            @Nullable LocationVariable exception,
+            @Nullable LocationVariable result, LocationVariable heap,
+            @Nullable LocationVariable heapAtPre,
+            @Nullable JTerm anonHeap,
             ImmutableSet<LocationVariable> ps, JTerm leadingUpdate, JTerm localAnonUpdate,
             Services services) {
         final ImmutableList<LocationVariable> params = convertParams(ps);
@@ -158,7 +163,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return The proof sequent for the well-definedness check
      */
-    public SequentFormula generateSequent(LocationVariable self, LocationVariable heap,
+    public SequentFormula generateSequent(@Nullable LocationVariable self, LocationVariable heap,
             JTerm anonHeap, ImmutableSet<LocationVariable> ps, JTerm leadingUpdate,
             JTerm localAnonUpdate, Services services) {
         return generateSequent(self, null, null, heap, null, anonHeap, ps, leadingUpdate,
@@ -174,12 +179,12 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public final JTerm getGlobalDefs() {
+    public final @Nullable JTerm getGlobalDefs() {
         return null;
     }
 
     @Override
-    public final JTerm getAxiom() {
+    public final @Nullable JTerm getAxiom() {
         return null;
     }
 
@@ -206,7 +211,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         final JTerm wdRest;
         final JTerm anonWdPost;
 
-        private SequentTerms(JTerm context, JTerm pre, JTerm anonHeap, JTerm modifiable,
+        private SequentTerms(JTerm context, JTerm pre, @Nullable JTerm anonHeap, JTerm modifiable,
                 ImmutableList<JTerm> rest, JTerm anonWdPost, TermServices services) {
             this.context = context;
             this.pre = pre;
