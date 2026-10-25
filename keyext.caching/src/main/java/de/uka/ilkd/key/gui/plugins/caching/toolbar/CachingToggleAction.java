@@ -11,11 +11,14 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Action to enable/disable Proof Caching.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class CachingToggleAction extends MainWindowAction {
     public static final Icon ICON =
         IconFactory.keyCachedClosed((int) IconFactory.DEFAULT_SIZE, (int) IconFactory.DEFAULT_SIZE);
