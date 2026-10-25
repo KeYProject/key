@@ -16,11 +16,14 @@ import de.uka.ilkd.key.speclang.Contract;
 import org.key_project.proofmanagement.check.CheckerData;
 import org.key_project.proofmanagement.io.Logger;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A builder providing a static factory method for building dependency graphs.
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public abstract class DependencyGraphBuilder {
     /**
      * Builds a new DependencyGraph from the given proof entries.

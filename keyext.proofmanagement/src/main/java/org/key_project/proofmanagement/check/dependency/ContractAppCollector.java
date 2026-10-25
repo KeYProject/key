@@ -26,6 +26,8 @@ import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_INSENSITIVE;
 import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_SENSITIVE;
 
@@ -47,6 +49,7 @@ import static org.key_project.proofmanagement.check.dependency.DependencyGraph.E
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class ContractAppCollector extends NodeIntermediateWalker {
     /**
      * the proof we search for contract applications (needed to get the SpecificationRepository,

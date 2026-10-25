@@ -14,6 +14,7 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.help.HelpInfo;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * @author Wolfram Pfeifer
@@ -24,6 +25,7 @@ import org.jspecify.annotations.NonNull;
     description = "Allows to run soundness checks on proof bundles.",
     experimental = false)
 @HelpInfo(path = "https://github.com/KeYProject/key/blob/main/keyext.proofmanagement/README.md")
+@NullMarked
 public class ProofManagementExt implements
         KeYGuiExtension, KeYGuiExtension.MainMenu {
 

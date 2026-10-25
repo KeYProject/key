@@ -40,11 +40,15 @@ import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class provides static methods to access the prover (KeY).
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public final class KeYFacade {
     // prevents from instantiating this class
     private KeYFacade() {
@@ -110,7 +114,8 @@ public final class KeYFacade {
         return line;
     }
 
-    private static CheckerData.ProofEntry findProofLine(Path proofPath, CheckerData data) {
+    private static @Nullable CheckerData.ProofEntry findProofLine(Path proofPath,
+            CheckerData data) {
         for (CheckerData.ProofEntry line : data.getProofEntries()) {
             if (line.proofFile != null && line.proofFile.equals(proofPath)) {
                 return line;
@@ -151,7 +156,7 @@ public final class KeYFacade {
         return true;
     }
 
-    private static Proof[] loadProofFile(Path path, CheckerData.ProofEntry line)
+    private static @Nullable Proof[] loadProofFile(Path path, CheckerData.ProofEntry line)
             throws Exception {
         Profile profile = AbstractProfile.getDefaultProfile();
 
@@ -228,8 +233,8 @@ public final class KeYFacade {
      * @throws IOException
      *         Occurred Exception.
      */
-    private static IPersistablePO.LoadedPOContainer createProofObligationContainer(KeYFile keyFile,
-            InitConfig initConfig, Configuration properties) throws Exception {
+    private static IPersistablePO.@Nullable LoadedPOContainer createProofObligationContainer(
+            KeYFile keyFile, InitConfig initConfig, Configuration properties) throws Exception {
         final String chooseContract = keyFile.chooseContract();
         final Configuration proofObligation = keyFile.getProofObligation();
 
@@ -319,8 +324,8 @@ public final class KeYFacade {
         }
     }
 
-    private static ReplayResult replayProof(CheckerData.ProofEntry line, EnvInput envInput,
-            Logger logger) throws ProofInputException {
+    private static ReplayResult replayProof(CheckerData.ProofEntry line,
+            @Nullable EnvInput envInput, Logger logger) throws ProofInputException {
         Proof proof = line.proof;
         logger.print(LogLevel.INFO, "Starting replay of proof " + proof.name());
 

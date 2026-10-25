@@ -14,6 +14,7 @@ import java.util.Map;
 import org.key_project.proofmanagement.check.CheckerData;
 import org.key_project.proofmanagement.check.PathNode;
 
+import org.jspecify.annotations.NullMarked;
 import org.stringtemplate.v4.*;
 import org.stringtemplate.v4.misc.MapModelAdaptor;
 import org.stringtemplate.v4.misc.ObjectModelAdaptor;
@@ -25,6 +26,7 @@ import org.stringtemplate.v4.misc.STNoSuchPropertyException;
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public final class HTMLReport {
     /** to prevent from instantiating */
     private HTMLReport() {
