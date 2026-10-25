@@ -15,6 +15,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 import org.key_project.isabelletranslation.automation.IsabelleProblem;
+import org.key_project.isabelletranslation.automation.IsabelleResult;
 import org.key_project.isabelletranslation.automation.IsabelleRule;
 import org.key_project.isabelletranslation.automation.IsabelleSolver;
 
@@ -39,8 +40,13 @@ public class IsabelleProofApplyUserAction extends UserAction {
         originalProofNodes = proof.openGoals().stream().map(Goal::node).toList();
         originalSelectedNode = mediator.getSelectedNode();
         this.solvers = solvers;
-        this.numberOfGoalsClosed =
-            (int) solvers.stream().filter(solver -> solver.getFinalResult().isSuccessful()).count();
+        this.numberOfGoalsClosed = (int) solvers.stream().filter(solver -> {
+            IsabelleResult result = solver.getFinalResult();
+            if (result == null) {
+                throw new NullPointerException("Solver has no final result.");
+            }
+            return result.isSuccessful();
+        }).count();
     }
 
     @Override
@@ -54,14 +60,22 @@ public class IsabelleProofApplyUserAction extends UserAction {
             IsabelleProblem problem = solver.getProblem();
             Goal goal = problem.getGoal();
 
-            if (goalsClosed.contains(goal) || !solver.getFinalResult().isSuccessful()) {
+            IsabelleResult result = solver.getFinalResult();
+            if (result == null) {
+                throw new NullPointerException("Solver has no final result.");
+            }
+            if (goalsClosed.contains(goal) || !result.isSuccessful()) {
                 continue;
             }
 
             goalsClosed.add(goal);
 
-            IBuiltInRuleApp app = IsabelleRule.INSTANCE.createApp(solver.name(),
-                solver.getFinalResult().getSuccessfulTactic());
+            String successfulTactic = result.getSuccessfulTactic();
+            if (successfulTactic == null) {
+                throw new NullPointerException("Successful solver result has no tactic.");
+            }
+            IBuiltInRuleApp app =
+                IsabelleRule.INSTANCE.createApp(solver.name(), successfulTactic);
             app.tryToInstantiate(goal);
             goal.apply(app);
         }
@@ -72,12 +86,19 @@ public class IsabelleProofApplyUserAction extends UserAction {
         for (Node n : originalProofNodes) {
             n.proof().pruneProof(n);
         }
-        mediator.getSelectionModel().setSelectedNode(originalSelectedNode);
+        Node node = originalSelectedNode;
+        if (node == null) {
+            throw new NullPointerException("No previously selected node to restore.");
+        }
+        mediator.getSelectionModel().setSelectedNode(node);
     }
 
     @Override
     public boolean canUndo() {
-        return goalsClosed.stream().allMatch(g -> proof.find(g.node()))
-                && proof.find(originalSelectedNode);
+        Node node = originalSelectedNode;
+        if (node == null) {
+            throw new NullPointerException("No previously selected node to check.");
+        }
+        return goalsClosed.stream().allMatch(g -> proof.find(g.node())) && proof.find(node);
     }
 }

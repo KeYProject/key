@@ -7,6 +7,7 @@ package org.key_project.isabelletranslation.automation;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.proof.Goal;
 
@@ -124,9 +125,21 @@ public class IsabelleProblem {
         File translationFile = new File(settings.getTranslationPath() + "/Translation.thy");
         File translationPreambleFile =
             new File(settings.getTranslationPath() + "/TranslationPreamble.thy");
-        Files.createDirectories(translationFile.toPath().getParent());
-        Files.write(translationPreambleFile.toPath(), this.getPreamble().getBytes());
-        Files.write(translationFile.toPath(), this.getTranslation().getBytes());
+        Path translationDirectory = translationFile.toPath().getParent();
+        if (translationDirectory == null) {
+            throw new NullPointerException("Translation file has no parent directory.");
+        }
+        Files.createDirectories(translationDirectory);
+        String preamble = this.getPreamble();
+        if (preamble == null) {
+            throw new NullPointerException("Problem " + name + " has no preamble.");
+        }
+        String translation = this.getTranslation();
+        if (translation == null) {
+            throw new NullPointerException("Problem " + name + " has no translation.");
+        }
+        Files.write(translationPreambleFile.toPath(), preamble.getBytes());
+        Files.write(translationFile.toPath(), translation.getBytes());
         LOGGER.info("Saved to: {} and {}", translationFile.toPath(),
             translationPreambleFile.toPath());
     }

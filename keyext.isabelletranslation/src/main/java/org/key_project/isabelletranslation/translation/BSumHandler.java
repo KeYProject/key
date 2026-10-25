@@ -46,8 +46,12 @@ public class BSumHandler implements IsabelleHandler {
 
     @Override
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
-        StringBuilder result =
-            QuantifierHandler.makeBoundedVarRef(trans, term, supportedOperators.get(term.op()));
+        String name = supportedOperators.get(term.op());
+        if (name == null) {
+            throw new NullPointerException("No translation registered for operator "
+                + term.op().name());
+        }
+        StringBuilder result = QuantifierHandler.makeBoundedVarRef(trans, term, name);
         result.append("=");
         result.append(trans.translate(term.sub(0))).append("..<")
                 .append(trans.translate(term.sub(1))).append(". ");

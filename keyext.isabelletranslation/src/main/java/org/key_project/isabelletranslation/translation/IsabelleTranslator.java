@@ -47,6 +47,20 @@ public class IsabelleTranslator {
     }
 
     /**
+     * Returns the sort representing the Java {@code null} value.
+     *
+     * @return the null sort
+     * @throws NullPointerException if the {@code Null} sort is not defined in the namespaces,
+     *         which previously caused a NullPointerException when the nullable field was used
+     */
+    private Sort getNullSort() {
+        if (nullSort == null) {
+            throw new NullPointerException("Sort 'Null' is not defined in the namespaces");
+        }
+        return nullSort;
+    }
+
+    /**
      * Translates the given goal.
      *
      * @param goal goal to translate
@@ -207,7 +221,8 @@ public class IsabelleTranslator {
                     String s2Val =
                         "(" + masterHandler.translateSortName(s2) + "\\<^sub>v\\<^sub>a\\<^sub>l::"
                             + masterHandler.translateSortName(s2) + ")";
-                    if (nullSort.extendsTrans(s) && nullSort.extendsTrans(s2)) {
+                    Sort ns = getNullSort();
+                    if (ns.extendsTrans(s) && ns.extendsTrans(s2)) {
                         sortsAssumptions.append("assumes disjointModNull_")
                                 .append(masterHandler.translateSortName(s)).append("_")
                                 .append(masterHandler.translateSortName(s2))
@@ -264,8 +279,16 @@ public class IsabelleTranslator {
         // Ensure that a sort is not implemented before its parents
         // Instead push it to the end of the queue
         Sort sort = sortImplementationQueue.poll();
-        for (Sort parent : sortParentsMap.get(sort)) {
-            if (!sortImplemented.get(parent)) {
+        if (sort == null) {
+            // cannot happen: the queue is guaranteed to be non-empty (checked above)
+            throw new NullPointerException("sort implementation queue unexpectedly empty");
+        }
+        Set<Sort> parents = sortParentsMap.get(sort);
+        if (parents == null) {
+            throw new NullPointerException("No parents registered for sort " + sort.name());
+        }
+        for (Sort parent : parents) {
+            if (!isSortImplemented(parent, sortImplemented)) {
                 sortImplementationQueue.add(sort);
                 addSortsDefinitions(translationTheory, sortImplementationQueue, sortImplemented,
                     sortParentsMap, masterHandler);
@@ -274,7 +297,8 @@ public class IsabelleTranslator {
         }
 
         // Ensure an array sort is not implemented before its elementsort
-        if ((sort instanceof ArraySort) && !sortImplemented.get(((ArraySort) sort).elementSort())) {
+        if (sort instanceof ArraySort
+                && !isSortImplemented(((ArraySort) sort).elementSort(), sortImplemented)) {
             sortImplementationQueue.add(sort);
             addSortsDefinitions(translationTheory, sortImplementationQueue, sortImplemented,
                 sortParentsMap, masterHandler);
@@ -290,7 +314,7 @@ public class IsabelleTranslator {
                 .append(sort.name()).append(" *)").append(LINE_ENDING);
         // Lemma showing there is at least one element in this sort
         translationTheory.append("lemma ex_").append(UNIV).append(":");
-        translationTheory.append(getUnivSpec(masterHandler, sortParentsMap.get(sort), "{bottom}"))
+        translationTheory.append(getUnivSpec(masterHandler, parents, "{bottom}"))
                 .append(LINE_ENDING);
         translationTheory.append("  by simp").append(LINE_ENDING).append(LINE_ENDING);
 
@@ -302,7 +326,7 @@ public class IsabelleTranslator {
         // Use specification to specify the properties of the universe of this sort (subset of
         // parents)
         translationTheory.append("specification (").append(UNIV).append(") ");
-        translationTheory.append(getUnivSpec(masterHandler, sortParentsMap.get(sort), UNIV))
+        translationTheory.append(getUnivSpec(masterHandler, parents, UNIV))
                 .append(LINE_ENDING);
         translationTheory.append("  using ex_").append(UNIV).append(" by blast")
                 .append(LINE_ENDING);
@@ -312,7 +336,7 @@ public class IsabelleTranslator {
         // Reformulate specification as lemma for easier use by Isabelle
         String UNIV_spec_lemma_name = UNIV + "_specification";
         translationTheory.append("lemma ").append(UNIV_spec_lemma_name).append(":")
-                .append(getUnivSpec(masterHandler, sortParentsMap.get(sort), UNIV))
+                .append(getUnivSpec(masterHandler, parents, UNIV))
                 .append(LINE_ENDING);
         translationTheory.append("  by (metis (mono_tags, lifting) ").append(UNIV)
                 .append("_def someI_ex ex_").append(UNIV).append(")").append(LINE_ENDING);
@@ -338,8 +362,7 @@ public class IsabelleTranslator {
         // Improves performance and shortens proofs. Used in schema
         String IsabelleTypeUniverseOfSort = "(UNIV::" + sortName + " set)";
         translationTheory.append("lemma ").append(sortName).append("_type_specification[simp]:")
-                .append(getUnivSpec(masterHandler, sortParentsMap.get(sort),
-                    IsabelleTypeUniverseOfSort))
+                .append(getUnivSpec(masterHandler, parents, IsabelleTypeUniverseOfSort))
                 .append(LINE_ENDING);
         translationTheory.append("  using ").append(UNIV_spec_lemma_name)
                 .append(" using type_definition.Rep_range type_definition_").append(sortName)
@@ -349,7 +372,7 @@ public class IsabelleTranslator {
         // extra coercions for all other parent types
         // may lead to extra performance if left out, because Isabelle will only need to deal with
         // comparisons in any
-        for (Sort parentSort : sortParentsMap.get(sort)) {
+        for (Sort parentSort : parents) {
             if (parentSort == JavaDLTheory.ANY) {
                 continue;
             }
@@ -382,7 +405,7 @@ public class IsabelleTranslator {
         translationTheory.append("end").append(LINE_ENDING).append(LINE_ENDING);
 
         // coercion of null sort to this sort
-        if (nullSort.extendsTrans(sort)) {
+        if (getNullSort().extendsTrans(sort)) {
             String null_to_sort_name = "Null2" + sortName;
             translationTheory.append("fun ").append(null_to_sort_name).append(" where \"")
                     .append(null_to_sort_name)
@@ -422,6 +445,24 @@ public class IsabelleTranslator {
         sortImplemented.put(sort, true);
         addSortsDefinitions(translationTheory, sortImplementationQueue, sortImplemented,
             sortParentsMap, masterHandler);
+    }
+
+    /**
+     * Checks whether the given sort has already been implemented, i.e. whether its declaration was
+     * already added to the translation theory.
+     *
+     * @param sort the sort to check
+     * @param sortImplemented the map holding the implementation state of all sorts
+     * @return true if the sort has been implemented
+     * @throws NullPointerException if no implementation state is registered for the sort, which
+     *         previously caused a NullPointerException when the map result was unboxed
+     */
+    private static boolean isSortImplemented(Sort sort, Map<Sort, Boolean> sortImplemented) {
+        Boolean implemented = sortImplemented.get(sort);
+        if (implemented == null) {
+            throw new NullPointerException("No implementation state for sort " + sort.name());
+        }
+        return implemented;
     }
 
     /**

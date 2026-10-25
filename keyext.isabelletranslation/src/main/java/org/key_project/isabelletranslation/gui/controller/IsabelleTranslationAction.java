@@ -12,7 +12,9 @@ import javax.swing.*;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.isabelletranslation.IsabelleTranslationSettings;
 import org.key_project.isabelletranslation.automation.IsabelleLauncher;
@@ -33,6 +35,12 @@ public class IsabelleTranslationAction extends MainWindowAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleTranslationAction.class);
 
+    /**
+     * The {@code setName} call below operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since the change is purely local,
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public IsabelleTranslationAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Translate to Isabelle");
@@ -43,16 +51,24 @@ public class IsabelleTranslationAction extends MainWindowAction {
         LOGGER.info("Translating...");
 
         KeYMediator mediator = getMediator();
-        solveGoals(ImmutableList.of(getMediator().getSelectedGoal()), mediator, mainWindow);
+        Goal goal = getMediator().getSelectedGoal();
+        if (goal == null) {
+            throw new NullPointerException("No goal selected for translation.");
+        }
+        solveGoals(ImmutableList.of(goal), mediator, mainWindow);
     }
 
     static void solveGoals(ImmutableList<Goal> goals, KeYMediator mediator, MainWindow mainWindow) {
         IsabelleTranslationSettings settings = IsabelleTranslationSettings.getInstance();
-        IsabelleTranslator translator = new IsabelleTranslator(mediator.getServices());
+        Services services = mediator.getServices();
+        if (services == null) {
+            throw new NullPointerException("No services available for translation.");
+        }
+        IsabelleTranslator translator = new IsabelleTranslator(services);
 
         List<IsabelleProblem> translations = new ArrayList<>();
         Map<Goal, IllegalFormulaException> translationExceptions = new HashMap<>();
-        for (Goal goal : Objects.requireNonNull(goals)) {
+        for (Goal goal : goals) {
             try {
                 translations.add(translator.translateProblem(goal));
             } catch (IllegalFormulaException e) {
@@ -65,9 +81,12 @@ public class IsabelleTranslationAction extends MainWindowAction {
         Thread thread = new Thread(() -> {
             IsabelleLauncher launcher = new IsabelleLauncher(settings);
 
+            Proof proof = mediator.getSelectedProof();
+            if (proof == null) {
+                throw new NullPointerException("No proof selected for translation.");
+            }
             IsabelleLauncherProgressDialogMediator progressDialogMediator =
-                new IsabelleLauncherProgressDialogMediator(
-                    mediator.getSelectedProof(), launcher);
+                new IsabelleLauncherProgressDialogMediator(proof, launcher);
 
             launcher.addListener(progressDialogMediator);
             try {
