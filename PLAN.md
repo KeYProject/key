@@ -1,7 +1,7 @@
 # PLAN — Rewrite JML specification handling in KeY
 
 Branch: `weigl/jmltk-jml` (created from `weigl/jmltk` @ `c91b316363`)
-Status: **Phases 0+1 implemented** (HEAD `74b68f6f82`, `:key.core:compileJava`
+Status: **Phases 0+1 implemented** (HEAD `131e5b4fae`, `:key.core:compileJava`
 GREEN) — KeY consumes JMLtk's parsed JML AST via `JmlSpec` wraps while keeping
 KeY's translation semantics. **`HANDOFF.md` in the repo root is the current
 checkpoint** (state, open Phase-2 decision, next actions). Approved direction:
@@ -245,22 +245,23 @@ already verified — see `JML_MAPPING.md` and §3).
 ### Phase 4 — Delete `SpecificationRepository`: specs are rewritten via the AST
 
 > **Progress (see HANDOFF §5.2/§7.3):** Phase 4 **COMPLETE** (slices 1–9:
-> `7f369e5c29` statement specs → AST nodes; `806c2b1ba6` limited observers →
-> `LimitedObservers`; `ae716ed74a` loop/block/merge specs → AST nodes;
-> `c81c034dd1` proof↔PO registry → `ProofRegistry`/`Services`; `1b0f1f94ee`
-> class invariants/axioms → `ClassAxiomComputer`/`Services`; `005320b2ec`
-> contract registry → `ContractRegistry`/`Services`; `fd32802417` initially
-> clauses → `JMLSpecFactory` load path; `2ae5b95be0` `addSpecs` collapse +
-> `map(...)` removal; `e50d64b699` `SpecificationRepository.java` + the
+> `ecb458a172` statement specs → AST nodes; `061c91d746` limited observers →
+> `LimitedObservers`; `3956a5850e` loop/block/merge specs → AST nodes;
+> `2531dba5f0` proof↔PO registry → `ProofRegistry`/`Services`; `4bb3ed0fbb`
+> class invariants/axioms → `ClassAxiomComputer`/`Services`; `6e03ad54ce`
+> contract registry → `ContractRegistry`/`Services`; `02d7aea325` initially
+> clauses → `JMLSpecFactory` load path; `588af4b1ea` `addSpecs` collapse +
+> `map(...)` removal; `def0449010` `SpecificationRepository.java` + the
 > `Services`/`KeYEnvironment` accessors + `SpecificationRepositoryWD` deleted,
 > WD `processJavaType` → `ContractRegistryWD`); full-suite baseline
 > measured + A/B-verified (40 failures at slices-1–2 HEAD identical to
 > Phase-3 HEAD — zero regressions), IntSemantics fixture fix landed
-> (`14a26a43d0`), leaving **34 recorded pre-existing jmltk gaps**. CI fix
-> `e17111ed30` runs `spotlessApply` over the 25 PR-diff files the
-> `spotlessJavaCheck` job flagged (CodeQuality green again); the other red CI
-> jobs (caching/slicing/infflow/integration proofs) are pre-existing — same set
-> at slice-3-era commits, untouched by slices 7–9 (see HANDOFF §1).
+> (`12ad668937`), leaving **34 recorded pre-existing jmltk gaps**. Formatting
+> is folded into the rewritten branch history (each commit is
+> `spotlessApply`-clean, so `spotlessJavaCheck`/CodeQuality is green with no
+> fix-up commit); the other red CI jobs (caching/slicing/infflow/integration
+> proofs) are pre-existing — same set at slice-3-era commits, untouched by
+> slices 7–9 (see HANDOFF §1).
 
 Rationale: with Phases 0–3 done, the *parsed* JML lives on the Java AST
 (`attachedJml` on declarations, `getContracts()` on statements, `JmlStatementSpec`
@@ -278,20 +279,20 @@ What the repository does today (`SpecificationRepository.java`, 1757 lines):
 
 | Responsibility | Where it lives now | Where it moves |
 |---|---|---|
-| Contract registry: `contracts`, `operationContracts`, `contractTargets`, `contractsByName`, `getContracts/getOperationContracts/getContractTargets/getAllContracts/getContractByName` | `Map<Pair<KJT,obs>, Set<Contract>>` + name index | ✅ DONE (slice 6, `005320b2ec`) — moved to new `de.uka.ilkd.key.speclang.ContractRegistry` owned by `Services` (created via `Profile.createContractRegistry`; `WdProfile` returns `ContractRegistryWD`; shared by `Services.copy`). The registry is the successor home until specs migrate to the AST-attached per-node derived cache. |
-| Contract combination/split: `combineOperationContracts` (`cf.union` sorted), `splitContract` (`§`-joined names), `CONTRACT_COMBINATION_MARKER` | name-based maps | ✅ DONE (slice 6, `005320b2ec`) — `combineOperationContracts`/`splitContract` moved to `ContractRegistry`; `CONTRACT_COMBINATION_MARKER` (`§`) to `ContractFactory` (public constant, refs in `BlockContractImpl`/`LoopContractImpl`/`FunctionalAuxiliaryContract`/`ProofRegistry` updated); combination stays deterministic by sorting. |
-| Contract ids: `prepareContract`/`contractCounters` (`setID`) | per-type-name counter | ✅ DONE (slice 6, `005320b2ec`) — still on `ContractRegistry` (`prepareContract` + per-method `contractCounters` keep ids `.0`-stable across type-load order); the final move to `JMLSpecFactory`/`ContractFactory` at derivation time is a later cleanup. |
-| Inheritance over overriding methods: `getOverridingMethods`, `getOverridingTargets`, `getCanonicalFormForKJT`, `getInheritedContracts` | method-name+param matching over `JavaInfo` | ✅ DONE (slice 6, `005320b2ec`) — moved to `ContractRegistry` (pure `JavaInfo`-based resolution; `ProofRegistry` and all callers rewired). |
-| Class invariants: `invs`, `getClassInvariants`, `addClassInvariant` (+ inherit to subtypes, `PartialInvAxiom` creation) | `Map<KJT, Set<ClassInvariant>>` | ✅ DONE (slice 5, `1b0f1f94ee`) — `invs` map + `getClassInvariants`/`addClassInvariant(s)` moved to `ClassAxiomComputer` (Services-owned; WD variant `ClassAxiomComputerWD` keeps registering `ClassWellDefinedness` checks). |
-| Class axioms: `axioms`, `addClassAxiom` (represents conjoining), `getClassAxioms` incl. synthesized invariant-definition axioms (`invDef`/`staticInvDef`/`freeInvDef`/`freeStaticInvDef`), `QueryAxiom`s, model-method axioms (`getModelMethodAxioms`, `ContractAxiom`), `getVisibleAxiomsOfOtherClasses`, enclosing-class recursion (`getEnclosingKJT`), `allClassAxiomsCache` | `Map<KJT, Set<ClassAxiom>>` + cache | ✅ DONE (slice 5, `1b0f1f94ee`) — moved to `de.uka.ilkd.key.speclang.ClassAxiomComputer` (per-`KeYJavaType` identity memo preserving the singleton requirement; operation-contract lookup is a documented temporary bridge to the still-alive repo). |
-| Initially clauses: `initiallyClauses`, `addInitiallyClause`, `createContractsFromInitiallyClauses` (postcondition on all constructors, + inheritance) | `Map<KJT, Set<InitiallyClause>>` | ✅ DONE (slice 7, `fd32802417`) — moved to `JMLSpecFactory`: the factory collects `InitiallyClause`s during loading (`addInitiallyClause(s)` on the per-load factory that `SLEnvInput.createSpecs` already owns) and derives the constructor contracts at the end of loading (`createContractsFromInitiallyClauses()`; derived contracts register via `services.getContractRegistry()` with `addContractNoInheritance`/`unregisterContract`/`cf.addPost`/`cf.func` — same ordering as before). `ContractRegistry` loses the map + 4 methods; `unregisterContract` becomes public; repo `addSpecs` no longer dispatches `InitiallyClause`. |
-| Loop invariants: `loopInvs`, `getLoopSpec`, `addLoopInvariant`, `copyLoopInvariant` (`(loop,line)` keys) | `Map<(LoopStatement,line), LoopSpecification>` | ✅ DONE (slice 3, `ae716ed74a`) — attached to the `LoopStatement` node (`setLoopInvariant`); `copyLoopInvariant` is `LoopStatement.copyLoopInvariantTo`, carried by the AST rewrites. |
-| Block/loop/merge contracts: `blockContracts`, `loopContracts`, `loopContractsOnLoops`, `mergeContracts`, `get/add/remove{Block,Loop,Merge}Contract`, `getLoopContracts(LoopStatement, modality)` | `(block/loop,file,line)` keys | ✅ DONE (slice 3, `ae716ed74a`) — attached to `StatementBlock`/`LoopStatement`/`MergePointStatement` nodes; modality filtering is a pure helper (`AbstractAuxiliaryContractRule.get{Block,Loop}Contracts`). |
-| Proof↔PO registry: `proofs`, `registerProof`, `removeProof`, `getProofs(po/contract/kjt+target)`, `getPO(Contract)`, `getPOForProof`, `getProofOblInput`, `getContractPOForProof`, `getTargetOfProof` | `Map<PO, Set<Proof>>` | ✅ DONE (slice 4, `c81c034dd1`) — moved verbatim to a new `de.uka.ilkd.key.proof.mgt.ProofRegistry` owned by `Services` (shared by `Services.copy()` copies, so side-proof envs and env-less loader paths keep the same registry); the contract-based lookups temporarily delegate `splitContract`/`getOverridingTargets` to the still-alive repository (they moved with the contract registry in slice 6). |
-| Limited observers: `limitObs`/`unlimitObs`, `LIMIT_SUFFIX` `$lmtd`, limit/unlimit taclets | `Map<IObserverFunction,…>` | ✅ DONE (slice 2, `806c2b1ba6`) — moved to `de.uka.ilkd.key.util.LimitedObservers` (stateless + thread-safe static memo; taclet builders move along). |
-| JML statement specs: `statementMap` (`IdentityHashMap<Statement,JmlStatementSpec>`), `getStatementSpec`/`addStatementSpec`, `JmlStatementSpec` record with `getTerm`/`updateVariables` | global identity map | ✅ DONE (slice 1, `7f369e5c29`) — attached to the `JmlAssert`/`SetStatement` AST nodes via `JmlSpecCarrier`; consumers read it off the node. |
-| `map(UnaryOperator, Services)` (apply a term transformation to *all* specs, e.g. for at-pre/WD transforms) | walks every map | ✅ DONE (slices 8–9, `2ae5b95be0`/`e50d64b699`) — deleted from the repo/registry/computer surface (it had zero callers): transformations run on the AST-attached spec; `IntroAtPreDefsOp`/WD re-walk the affected AST instead of the global snapshot. |
-| `addSpecs` dispatcher, `processJavaType` no-op | — | ✅ DONE (slices 8–9) — `addSpecs` collapsed into the `SLEnvInput` output handling (`registerSpecs` helper, `2ae5b95be0`); `processJavaType` moved to `ContractRegistry` (empty default; WD override in `ContractRegistryWD` with the former `SpecificationRepositoryWD` body, `e50d64b699`). |
+| Contract registry: `contracts`, `operationContracts`, `contractTargets`, `contractsByName`, `getContracts/getOperationContracts/getContractTargets/getAllContracts/getContractByName` | `Map<Pair<KJT,obs>, Set<Contract>>` + name index | ✅ DONE (slice 6, `6e03ad54ce`) — moved to new `de.uka.ilkd.key.speclang.ContractRegistry` owned by `Services` (created via `Profile.createContractRegistry`; `WdProfile` returns `ContractRegistryWD`; shared by `Services.copy`). The registry is the successor home until specs migrate to the AST-attached per-node derived cache. |
+| Contract combination/split: `combineOperationContracts` (`cf.union` sorted), `splitContract` (`§`-joined names), `CONTRACT_COMBINATION_MARKER` | name-based maps | ✅ DONE (slice 6, `6e03ad54ce`) — `combineOperationContracts`/`splitContract` moved to `ContractRegistry`; `CONTRACT_COMBINATION_MARKER` (`§`) to `ContractFactory` (public constant, refs in `BlockContractImpl`/`LoopContractImpl`/`FunctionalAuxiliaryContract`/`ProofRegistry` updated); combination stays deterministic by sorting. |
+| Contract ids: `prepareContract`/`contractCounters` (`setID`) | per-type-name counter | ✅ DONE (slice 6, `6e03ad54ce`) — still on `ContractRegistry` (`prepareContract` + per-method `contractCounters` keep ids `.0`-stable across type-load order); the final move to `JMLSpecFactory`/`ContractFactory` at derivation time is a later cleanup. |
+| Inheritance over overriding methods: `getOverridingMethods`, `getOverridingTargets`, `getCanonicalFormForKJT`, `getInheritedContracts` | method-name+param matching over `JavaInfo` | ✅ DONE (slice 6, `6e03ad54ce`) — moved to `ContractRegistry` (pure `JavaInfo`-based resolution; `ProofRegistry` and all callers rewired). |
+| Class invariants: `invs`, `getClassInvariants`, `addClassInvariant` (+ inherit to subtypes, `PartialInvAxiom` creation) | `Map<KJT, Set<ClassInvariant>>` | ✅ DONE (slice 5, `4bb3ed0fbb`) — `invs` map + `getClassInvariants`/`addClassInvariant(s)` moved to `ClassAxiomComputer` (Services-owned; WD variant `ClassAxiomComputerWD` keeps registering `ClassWellDefinedness` checks). |
+| Class axioms: `axioms`, `addClassAxiom` (represents conjoining), `getClassAxioms` incl. synthesized invariant-definition axioms (`invDef`/`staticInvDef`/`freeInvDef`/`freeStaticInvDef`), `QueryAxiom`s, model-method axioms (`getModelMethodAxioms`, `ContractAxiom`), `getVisibleAxiomsOfOtherClasses`, enclosing-class recursion (`getEnclosingKJT`), `allClassAxiomsCache` | `Map<KJT, Set<ClassAxiom>>` + cache | ✅ DONE (slice 5, `4bb3ed0fbb`) — moved to `de.uka.ilkd.key.speclang.ClassAxiomComputer` (per-`KeYJavaType` identity memo preserving the singleton requirement; operation-contract lookup is a documented temporary bridge to the still-alive repo). |
+| Initially clauses: `initiallyClauses`, `addInitiallyClause`, `createContractsFromInitiallyClauses` (postcondition on all constructors, + inheritance) | `Map<KJT, Set<InitiallyClause>>` | ✅ DONE (slice 7, `02d7aea325`) — moved to `JMLSpecFactory`: the factory collects `InitiallyClause`s during loading (`addInitiallyClause(s)` on the per-load factory that `SLEnvInput.createSpecs` already owns) and derives the constructor contracts at the end of loading (`createContractsFromInitiallyClauses()`; derived contracts register via `services.getContractRegistry()` with `addContractNoInheritance`/`unregisterContract`/`cf.addPost`/`cf.func` — same ordering as before). `ContractRegistry` loses the map + 4 methods; `unregisterContract` becomes public; repo `addSpecs` no longer dispatches `InitiallyClause`. |
+| Loop invariants: `loopInvs`, `getLoopSpec`, `addLoopInvariant`, `copyLoopInvariant` (`(loop,line)` keys) | `Map<(LoopStatement,line), LoopSpecification>` | ✅ DONE (slice 3, `3956a5850e`) — attached to the `LoopStatement` node (`setLoopInvariant`); `copyLoopInvariant` is `LoopStatement.copyLoopInvariantTo`, carried by the AST rewrites. |
+| Block/loop/merge contracts: `blockContracts`, `loopContracts`, `loopContractsOnLoops`, `mergeContracts`, `get/add/remove{Block,Loop,Merge}Contract`, `getLoopContracts(LoopStatement, modality)` | `(block/loop,file,line)` keys | ✅ DONE (slice 3, `3956a5850e`) — attached to `StatementBlock`/`LoopStatement`/`MergePointStatement` nodes; modality filtering is a pure helper (`AbstractAuxiliaryContractRule.get{Block,Loop}Contracts`). |
+| Proof↔PO registry: `proofs`, `registerProof`, `removeProof`, `getProofs(po/contract/kjt+target)`, `getPO(Contract)`, `getPOForProof`, `getProofOblInput`, `getContractPOForProof`, `getTargetOfProof` | `Map<PO, Set<Proof>>` | ✅ DONE (slice 4, `2531dba5f0`) — moved verbatim to a new `de.uka.ilkd.key.proof.mgt.ProofRegistry` owned by `Services` (shared by `Services.copy()` copies, so side-proof envs and env-less loader paths keep the same registry); the contract-based lookups temporarily delegate `splitContract`/`getOverridingTargets` to the still-alive repository (they moved with the contract registry in slice 6). |
+| Limited observers: `limitObs`/`unlimitObs`, `LIMIT_SUFFIX` `$lmtd`, limit/unlimit taclets | `Map<IObserverFunction,…>` | ✅ DONE (slice 2, `061c91d746`) — moved to `de.uka.ilkd.key.util.LimitedObservers` (stateless + thread-safe static memo; taclet builders move along). |
+| JML statement specs: `statementMap` (`IdentityHashMap<Statement,JmlStatementSpec>`), `getStatementSpec`/`addStatementSpec`, `JmlStatementSpec` record with `getTerm`/`updateVariables` | global identity map | ✅ DONE (slice 1, `ecb458a172`) — attached to the `JmlAssert`/`SetStatement` AST nodes via `JmlSpecCarrier`; consumers read it off the node. |
+| `map(UnaryOperator, Services)` (apply a term transformation to *all* specs, e.g. for at-pre/WD transforms) | walks every map | ✅ DONE (slices 8–9, `588af4b1ea`/`def0449010`) — deleted from the repo/registry/computer surface (it had zero callers): transformations run on the AST-attached spec; `IntroAtPreDefsOp`/WD re-walk the affected AST instead of the global snapshot. |
+| `addSpecs` dispatcher, `processJavaType` no-op | — | ✅ DONE (slices 8–9) — `addSpecs` collapsed into the `SLEnvInput` output handling (`registerSpecs` helper, `588af4b1ea`); `processJavaType` moved to `ContractRegistry` (empty default; WD override in `ContractRegistryWD` with the former `SpecificationRepositoryWD` body, `def0449010`). |
 | Thread-safety (synchronized maps for the parallel prover's lock-free phase) | explicit sync on hot maps | ✅ DONE (slices 8–9) — attached + derived specs are immutable after load; the parallel-prover mutation concern disappeared with the global registry (the last `synchronized` walkers were `map(...)`, now deleted). |
 
 Transition notes:
@@ -308,7 +309,7 @@ Transition notes:
 - Contract `id` determinism: `prepareContract`'s counter moved to
   `ContractFactory` must keep ids stable across re-parse (proof digests,
   `.key` files, proof reuse compare ids — see `ContentOrderNumberingTest`).
-- Deliverable: **REACHED** (`e50d64b699`) — `SpecificationRepository.java` deleted;
+- Deliverable: **REACHED** (`def0449010`) — `SpecificationRepository.java` deleted;
   `Services`/`KeYEnvironment` expose no repository; the `key.core`/`key.ui`/
   `key.core.wd`/testgen/infflow suites stay at their recorded baselines with
   contract/loop/block/WD behaviors unchanged (only mechanical lookups were
