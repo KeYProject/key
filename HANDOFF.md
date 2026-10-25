@@ -1,20 +1,40 @@
 # HANDOFF — JMLtk front-end rewrite (PR #3997, branch `weigl/jmltk-jml`)
 
-> Checkpoint taken 2026-10-24 (session end — user went to sleep). This file is
-> the durable handoff for the next session. Read `PLAN.md` for the full
-> architecture; this file records the *current state* and the open decision.
+> HISTORICAL checkpoint log from the rewrite sessions (last checkpoint
+> 2026-10-24). Superseded by the final state in §§1–2 below; read `PLAN.md`
+> for the full architecture. This file records the *history*.
 
 ## 1. Where things stand
 
-- **Branch:** `weigl/jmltk-jml` — **HEAD** contains Phases 0–4 (front-end swap,
-  Option-B dead-code sweep, test cleanup/runtime parity, and the nine
-  Phase-4 `SpecificationRepository` slices), pushed to origin.
+- **Branch:** `weigl/jmltk-jml` — **COMPLETE** at HEAD `d7fdfe737c` (pushed to
+  origin): Phases 0–4 (front-end swap, Option-B dead-code sweep, test
+  cleanup/runtime parity, the nine Phase-4 `SpecificationRepository` slices)
+  plus the **rebase onto `jmltk = 1.1.0-SNAPSHOT`** and the final carrier
+  removal. `jmltk` stays pinned to `1.1.0-SNAPSHOT`.
+- **Final architecture:** JMLtk's typed JML AST is the single source of truth.
+  `JmlSpec.java`, the `attachedJml` carrier fields,
+  `getAssociatedSpecificationComments()` and the data-key spec relocation
+  (`KEY_SPEC_CASE`/`KEY_CLASS_SPEC`) are all **deleted**. `JMLTransformer`
+  unwraps `JmlMethodDeclaration`/`JmlFieldDeclaration` into the member list
+  (remembered via the `KEY_JML_WRAPPER` data key); `JP2KeYConverter` registers
+  the KeY→JMLtk reverse mappings (`KeYJPMapping.registerReverse`) and skips
+  pure class-level JML spec members; `JMLSpecExtractor` reads contracts,
+  model-method definitions, class-level specs and loop/block contracts back
+  from the JMLtk AST via the mapping (details: PLAN.md §2.2/§4).
 - **PR:** #3997, retitled *"JMLtk front-end: consume JMLtk's parsed JML AST
   (Phases 0+1)"*, body refreshed.
-- **Feedback loop:** testing is UNLOCKED. The Phase-3 regression slice
-  `./gradlew :key.core:test --tests "de.uka.ilkd.key.speclang.*"` is **GREEN**:
-  **285 tests, 0 failures, 12 skipped** (2 of them the new `@Disabled`
-  specMath loads). `:key.core:compileTestJava`/`:key.ui:compileTestJava` green.
+- **Feedback loop — GREEN:** `./gradlew :key.core:test --tests
+  "de.uka.ilkd.key.speclang.*"` → **279 tests, 0 failures, 12 skipped**
+  (re-verified after formatting). Whole-build `compileJava`/`compileTestJava`
+  green; `spotlessCheck` green; commit `git diff --check`-clean.
+  `:key.core:compileTestJava`/`:key.ui:compileTestJava` green.
+- **Rebase note:** the intermediate rebase step (`6e1bacf94b`, jmltk
+  `1.1.0-SNAPSHOT`) no longer compiles (`getAssociatedSpecificationComments()`
+  removed upstream); it was replaced by the final commit above, which reads
+  the specs directly from the JMLtk AST instead of carrying them. Re-rooting
+  the branch also fixed the `Float._isNaN` resolution cluster, the
+  `ContractLoadingTests.issues1658` set-statement NPE and the `WrongEquals`
+  case — the slice is fully green at HEAD.
 - **Phase 4 in progress:** `SpecificationRepository` deletion, slice by slice
   (see PLAN §Phase 4 table; each committed slice kept compile + speclang slice
   green). Slices 1–9 DONE (statement specs → AST nodes; limited observers →
@@ -23,7 +43,7 @@
   `Services`; contract registry → `ContractRegistry`/`Services`; initially
   clauses → `JMLSpecFactory` load path; `addSpecs` collapse + `map(...)`
   removal; final deletion). **`SpecificationRepository.java` is DELETED**
-  (`def0449010`): all specs live on the AST nodes or in the Services-owned
+  (`2a43925e8e`): all specs live on the AST nodes or in the Services-owned
   components (`ContractRegistry`, `ClassAxiomComputer`, `ProofRegistry`,
   `JMLSpecFactory`). The repo is **finished**.
 - **Full-suite baseline (clean, re-measured, no concurrent gradle):**
@@ -39,8 +59,8 @@
   `scripts/format_branch_with_spotless.sh`, so `spotlessJavaCheck`/CodeQuality
   is green with no fix-up commit). The remaining red jobs are all
   **pre-existing** — verified identical at
-  slice-3/4-era commits (`3956a5850e`/`2531dba5f0`) and pre-slice-8
-  (`a6d6d32e92`), i.e. slices 7–9 introduced **zero** new failures: unit-tests
+  slice-3/4-era commits (`0ca80f062b`/`8746c00939`) and pre-slice-8
+  (`5f61cce8f0`), i.e. slices 7–9 introduced **zero** new failures: unit-tests
   key.core = the 34 recorded §5.2 gaps (CI 1638 completed/34 failed, matches
   local full suite); key.core.infflow = 3 pre-existing `InfFlowProfileLoadingTest`;
   keyext.caching = `ProofCachingSingleRunTest`+`TestReferenceSearcher`;
@@ -55,52 +75,78 @@
 ### Commits
 | Commit | Content |
 |---|---|
-| `6d174cdadd` | Phase 0 — `JavaParserFactory` enables JMLtk JML processing (`setProcessJml(true)`, JML-keys policy). |
-| `131e5b4fae` | Phase 1 — front-end swap onto the JMLtk AST (see below). |
-| `6a864df642` | Phase 2 (Option B) — delete dead JML front-end code (see §5). |
-| `649c00f9b8` | Phase 3 — stale-test cleanup + runtime parity (see §5.1). |
-| `ecb458a172` | Phase 4 slice 1 — `JmlStatementSpec` attached to `JmlAssert`/`SetStatement` nodes (`JmlSpecCarrier`); repo `statementMap` deleted. |
-| `061c91d746` | Phase 4 slice 2 — limited observers (`limitObs`/`unlimitObs`/`LIMIT_SUFFIX`/taclets) → `de.uka.ilkd.key.util.LimitedObservers`. |
-| `12ad668937` | Phase 4 triage — drop class-level `code_*_math`/`spec_*_math` pragmas from `intSemantics` fixtures (jmltk parity, same pattern as Phase 3); IntSemanticsTest 6/6. |
-| `3956a5850e` | Phase 4 slice 3 — loop invariants, block/loop/merge contracts attached to their AST nodes (`LoopStatement`/`StatementBlock`/`MergePointStatement`); repo loop/block/merge maps + helpers deleted. |
-| `2531dba5f0` | Phase 4 slice 4 — proof↔PO registry (`proofs` map, `registerProof`/`removeProof`/`getProofs`/`getPO`/`getPOForProof`/`getProofOblInput`/`getContractPOForProof`/`getTargetOfProof`/`getAllProofs`) → new `de.uka.ilkd.key.proof.mgt.ProofRegistry` owned by/`Services`, shared in all copy paths; repo proof block + `proofs` field deleted; redundant pre-env register in `DefaultUserInterfaceControl` dropped. |
-| `4bb3ed0fbb` | Phase 4 slice 5 — class invariants/axioms (`invs`/`axioms`/`allClassAxiomsCache` maps, `getClassInvariants`/`addClassInvariant(s)`, `getClassAxioms` incl. synthesized invDef/staticInv/free/Query/ContractAxioms + model-method axioms, `getClassAxiomsForType`, `addClassAxiom(s)`) → new `de.uka.ilkd.key.speclang.ClassAxiomComputer` owned by `Services` (created via `Profile.createClassAxiomComputer`; WD variant `ClassAxiomComputerWD` keeps invariant→`ClassWellDefinedness` registration); repo class-axiom surface deleted (~340 lines); callers rewired (AbstractPO/WellDefinednessPO selectClassAxioms, KeYFile, JMLSpecFactory, ClassAxiomImpl, macros/testgen/proofmanagement). |
-| `6e03ad54ce` | Phase 4 slice 6 — contract registry: contracts/initially clauses out of `SpecificationRepository` into new `de.uka.ilkd.key.speclang.ContractRegistry` (Services-owned, via `Profile.createContractRegistry`; WD variant `ContractRegistryWD` absorbs the `SpecificationRepositoryWD` hooks: wdChecks, register/unregister overrides, getWdChecks/getAllWdChecks/getWdMethodChecks/getWdClassChecks, WD contract filters, map, addWdStatement, ClassAxiomComputer bridges); `CONTRACT_COMBINATION_MARKER` (`§`) → `ContractFactory`; `TacletPOGenerator.generate` now takes `Services`; repo shrinks to a thin dispatcher (`map`/`addSpecs`/empty `processJavaType`). |
-| `02d7aea325` | Phase 4 slice 7 — initially clauses out of `ContractRegistry` into the `JMLSpecFactory` load path: factory gains the `initiallyClauses` map + `addInitiallyClause(s)`/`createContractsFromInitiallyClauses()` (+ private derivation helper; derived constructor contracts register via `services.getContractRegistry()` with `addContractNoInheritance`/`unregisterContract`/`cf.addPost`/`cf.func`); `SLEnvInput.createSpecs` partitions `InitiallyClause` out of the class specs and calls the derivation at the end of loading (same ordering); registry drops field + 4 methods, `map(...)` no longer maps initially clauses, `unregisterContract` becomes public (WD override bumped); repo `addSpecs` stops dispatching `InitiallyClause`. |
-| `588af4b1ea` | Phase 4 slice 8 — `addSpecs` collapse + `map(...)` removal: the dispatch moves into a private `SLEnvInput.registerSpecs` helper (Contract → registry, ClassInvariant/ClassAxiom → computer, loop/block/merge → AST nodes; same order); `SpecificationRepository.map`, `ContractRegistry.map`+`mapValueSets`, `ClassAxiomComputer.map`+`mapValueSets` and the `ContractRegistryWD` map override deleted (zero callers anywhere, main or test; per-element `SpecificationElement.map` stays); repo shrinks to ctor + empty `processJavaType`; thread-safety comment updated (no state mutated during proving). |
-| `def0449010` | Phase 4 slice 9 — **`SpecificationRepository.java` deleted** (final): `processJavaType` moves to `ContractRegistry` (empty default) + `ContractRegistryWD` (override with the former `SpecificationRepositoryWD` body: RepresentsAxiom → WD checks); `SLEnvInput.createSpecs` calls `contractRegistry.processJavaType(kjt)`; deleted `Services.specRepos` field + `getSpecificationRepository()` + copy paths, `KeYEnvironment.getSpecificationRepository()`, `Profile.createSpecificationRepository`, `WdProfile` override and `SpecificationRepositoryWD.java`; imports/javadoc links cleaned (PROOF of Phase-4 completion). |
+| `9d1494b2cd` | Phase 0 — `JavaParserFactory` enables JMLtk JML processing (`setProcessJml(true)`, JML-keys policy). |
+| `6d941e99e8` | Phase 1 — front-end swap onto the JMLtk AST (see below). |
+| `dfd2280fa7` | Phase 2 (Option B) — delete dead JML front-end code (see §5). |
+| `d70a683c7a` | Phase 3 — stale-test cleanup + runtime parity (see §5.1). |
+| `bd33eb2331` | Phase 4 slice 1 — `JmlStatementSpec` attached to `JmlAssert`/`SetStatement` nodes (`JmlSpecCarrier`); repo `statementMap` deleted. |
+| `63def34696` | Phase 4 slice 2 — limited observers (`limitObs`/`unlimitObs`/`LIMIT_SUFFIX`/taclets) → `de.uka.ilkd.key.util.LimitedObservers`. |
+| `2938f9ae8d` | Phase 4 triage — drop class-level `code_*_math`/`spec_*_math` pragmas from `intSemantics` fixtures (jmltk parity, same pattern as Phase 3); IntSemanticsTest 6/6. |
+| `0ca80f062b` | Phase 4 slice 3 — loop invariants, block/loop/merge contracts attached to their AST nodes (`LoopStatement`/`StatementBlock`/`MergePointStatement`); repo loop/block/merge maps + helpers deleted. |
+| `8746c00939` | Phase 4 slice 4 — proof↔PO registry (`proofs` map, `registerProof`/`removeProof`/`getProofs`/`getPO`/`getPOForProof`/`getProofOblInput`/`getContractPOForProof`/`getTargetOfProof`/`getAllProofs`) → new `de.uka.ilkd.key.proof.mgt.ProofRegistry` owned by/`Services`, shared in all copy paths; repo proof block + `proofs` field deleted; redundant pre-env register in `DefaultUserInterfaceControl` dropped. |
+| `7c99a1cb92` | Phase 4 slice 5 — class invariants/axioms (`invs`/`axioms`/`allClassAxiomsCache` maps, `getClassInvariants`/`addClassInvariant(s)`, `getClassAxioms` incl. synthesized invDef/staticInv/free/Query/ContractAxioms + model-method axioms, `getClassAxiomsForType`, `addClassAxiom(s)`) → new `de.uka.ilkd.key.speclang.ClassAxiomComputer` owned by `Services` (created via `Profile.createClassAxiomComputer`; WD variant `ClassAxiomComputerWD` keeps invariant→`ClassWellDefinedness` registration); repo class-axiom surface deleted (~340 lines); callers rewired (AbstractPO/WellDefinednessPO selectClassAxioms, KeYFile, JMLSpecFactory, ClassAxiomImpl, macros/testgen/proofmanagement). |
+| `4332456092` | Phase 4 slice 6 — contract registry: contracts/initially clauses out of `SpecificationRepository` into new `de.uka.ilkd.key.speclang.ContractRegistry` (Services-owned, via `Profile.createContractRegistry`; WD variant `ContractRegistryWD` absorbs the `SpecificationRepositoryWD` hooks: wdChecks, register/unregister overrides, getWdChecks/getAllWdChecks/getWdMethodChecks/getWdClassChecks, WD contract filters, map, addWdStatement, ClassAxiomComputer bridges); `CONTRACT_COMBINATION_MARKER` (`§`) → `ContractFactory`; `TacletPOGenerator.generate` now takes `Services`; repo shrinks to a thin dispatcher (`map`/`addSpecs`/empty `processJavaType`). |
+| `5905ac02d2` | Phase 4 slice 7 — initially clauses out of `ContractRegistry` into the `JMLSpecFactory` load path: factory gains the `initiallyClauses` map + `addInitiallyClause(s)`/`createContractsFromInitiallyClauses()` (+ private derivation helper; derived constructor contracts register via `services.getContractRegistry()` with `addContractNoInheritance`/`unregisterContract`/`cf.addPost`/`cf.func`); `SLEnvInput.createSpecs` partitions `InitiallyClause` out of the class specs and calls the derivation at the end of loading (same ordering); registry drops field + 4 methods, `map(...)` no longer maps initially clauses, `unregisterContract` becomes public (WD override bumped); repo `addSpecs` stops dispatching `InitiallyClause`. |
+| `36190b66bd` | Phase 4 slice 8 — `addSpecs` collapse + `map(...)` removal: the dispatch moves into a private `SLEnvInput.registerSpecs` helper (Contract → registry, ClassInvariant/ClassAxiom → computer, loop/block/merge → AST nodes; same order); `SpecificationRepository.map`, `ContractRegistry.map`+`mapValueSets`, `ClassAxiomComputer.map`+`mapValueSets` and the `ContractRegistryWD` map override deleted (zero callers anywhere, main or test; per-element `SpecificationElement.map` stays); repo shrinks to ctor + empty `processJavaType`; thread-safety comment updated (no state mutated during proving). |
+| `2a43925e8e` | Phase 4 slice 9 — **`SpecificationRepository.java` deleted** (final): `processJavaType` moves to `ContractRegistry` (empty default) + `ContractRegistryWD` (override with the former `SpecificationRepositoryWD` body: RepresentsAxiom → WD checks); `SLEnvInput.createSpecs` calls `contractRegistry.processJavaType(kjt)`; deleted `Services.specRepos` field + `getSpecificationRepository()` + copy paths, `KeYEnvironment.getSpecificationRepository()`, `Profile.createSpecificationRepository`, `WdProfile` override and `SpecificationRepositoryWD.java`; imports/javadoc links cleaned (PROOF of Phase-4 completion). |
 
-## 2. What Phase 1 did
+## 2. What the final front-end looks like (as shipped, HEAD `d7fdfe737c`)
 
-- **`JmlSpec`** (`speclang/jml/JmlSpec.java`, NEW): `record JmlSpec(@NonNull
-  Node node)` — the carrier for JMLtk AST nodes in KeY's AST.
-- **KeY AST swap:** `JavaDeclaration`/`MethodDeclaration`/`ConstructorDeclaration`/
-  `ClassDeclaration`/`InterfaceDeclaration`/`TypeDeclaration`/`StatementBlock`/
-  loops (`While`/`For`/`EnhancedFor`/`Do`)/`MergePointStatement` carry
-  `ImmutableList<JmlSpec>`/`List<JmlSpec>`. **`KEY_LOOP_SPEC` deleted**; loops
-  use the merged `getSpec(n)` (LOOP contracts + LOOP_INV invariants both attach
-  to the loop node).
-- **`JMLTransformer`** rewritten: JMLtk already attaches parsed JML to the Java
-  AST; the transformer only (a) relocates `JmlContract`s into
-  `KEY_SPEC_CASE`/`KEY_CLASS_SPEC` (`DataKey<List<JmlSpec>>`), (b) unwraps
-  `JmlMethodDeclaration`/`JmlFieldDeclaration` wrappers, (c) self-marks JML
-  statements (`JmlExpressionStmt` → KEY_ASSIGN (set) / KEY_ASSERT (else),
-  ghosts → `JML_GHOST` modifier, `KeyMergePointStmt` → KEY_MERGE_POINT).
-  `JmlDocSanitizer`/`StringConstructor` deleted.
-- **`JMLSpecExtractor`** rewritten: only dispatches `JmlSpec`s to the factory
-  (class specs via node `instanceof`; method specs per-spec). Keeps
-  `createNonNullPositionedString` (public static) + `arrayDepth`.
-- **`JMLSpecFactory`**: `JmlSpec` overloads for every entry point; the
-  implicit-clause enrichment moved here from the old extractor
-  (`createJMLOperationContracts(pm, JmlSpec, addInvariant)` +
-  `enrichOperationContract`): purity assignables (`\strictly_nothing`/
-  `\nothing` per modifiable heap), `\inv` requires/ensures/signals, non-null
-  pre/post, default signals-only, synthetic `MODEL_BEHAVIOR` only when a
-  `JmlMethodDeclaration` is the sole attached spec. `getDefaultSignalsOnly` +
-  `IMPL_TERM_LABEL` duplicated here with `ParameterlessTermLabel.
-  IMPLICIT_SPECIFICATION_LABEL` (typed `TermLabel`).
-- **`JmlToTextual`** (`translation/JmlToTextual.java`, NEW — the bridge):
-  re-serializes each JMLtk clause/declaration against the matching
+> The Phase-1 design below this section described a `JmlSpec` carrier +
+> `attachedJml` transfer. The rebase onto `jmltk 1.1.0-SNAPSHOT` replaced it
+> with the carrier-free design described here (that is also what survived into
+> the branch tip): the JMLtk AST is the single source of truth and the
+> KeY↔JMLtk reverse mapping is the only bridge.
+
+- **No carrier in the KeY AST.** `JmlSpec.java` is **deleted**; `ProgramElement`
+  and the declaration/statement classes no longer carry `attachedJml`/JML
+  lists; `getAssociatedSpecificationComments()` is gone (upstream also removed
+  it); `createComments` returns `Collections.emptyList()`.
+- **Reverse mapping** (`java/KeYJPMapping.java`): `registerReverse` maps the
+  KeY `TypeDeclaration` → JMLtk `JmlTypeDeclaration` and each converted KeY
+  method/constructor → its **contract carrier**. The carrier is the
+  `JmlMethodDeclaration`/`JmlFieldDeclaration` wrapper for model/ghost members
+  and the `NodeWithContracts` node itself for regular ones.
+- **`JMLTransformer`** re-processes method bodies and class members:
+  - unwraps `JmlMethodDeclaration`/`JmlFieldDeclaration` into their contained
+    declarations and remembers the wrapper on the inner node via the
+    `KEY_JML_WRAPPER` data key — required because Javaparser's symbol
+    resolution ignores wrapped declarations (this was the root cause of the
+    `Float._isNaN` resolution cluster in the slice);
+  - pure class-level JML specs (`JmlClassExprDeclaration`,
+    `JmlRepresentsDeclaration`, `JmlClassAccessibleDeclaration`) stay on the
+    JMLtk type — they are not moved anywhere;
+  - self-marks JML statements (`JmlExpressionStmt` → KEY_ASSIGN (set) /
+    KEY_ASSERT (else), `JmlGhostStmt` ghosts → `JML_GHOST` modifier,
+    `KeyMergePointStmt` → KEY_MERGE_POINT).
+- **`JP2KeYConverter`**: converts the Java declarations, skipping pure
+  class-level JML spec members (`jmlJavaMembers`); `visit(MethodDeclaration)`
+  picks the contract carrier (`jmlWrapperOf(n)` via the data key) and calls
+  `registerReverse`; `visit(JmlExpressionStmt)` re-parses with KeY grammar
+  (`expressionEOF()` / `set_statement()`) → `JmlAssert`/`SetStatement`;
+  `visit(KeyMergePointStmt)` → `MergePointStatement` when marked.
+- **`JMLSpecExtractor`** rewritten: resolves the JMLtk type/method through
+  `KeYJPMapping.nodeFromKeY` and reads the specs off it — method contracts and
+  model-method definitions (`JmlToTextual.toMethodDecl(wrapper).
+  getMethodDefinition()`) from the contract carrier, class-level specs from
+  the JMLtk type members, `extractLoopInvariant` scans
+  `JmlContract`s (`ContractType.LOOP_INV`) on loop statements, block/loop
+  contracts from the attached contracts, merge contracts from
+  `KeyMergePointStmt` carriers. Keeps `createNonNullPositionedString` +
+  `arrayDepth`.
+- **`JMLSpecFactory`**: direct-class overloads replacing the `JmlSpec` ones:
+  `createJMLOperationContracts(pm, JmlContract, ParserRuleContext
+  modelMethodDefinition, boolean addInvariant)` and
+  `createJMLModelMethodContracts(pm, ParserRuleContext, boolean addInvariant)`
+  (the model method definition becomes the AXIOMS clause, synthesizing
+  `MODEL_BEHAVIOR`); the implicit-clause enrichment moved here from the old
+  extractor (`enrichOperationContract`): purity assignables
+  (`\strictly_nothing`/`\nothing` per modifiable heap), `\inv`
+  requires/ensures/signals, non-null pre/post, default signals-only.
+  `getDefaultSignalsOnly` + `IMPL_TERM_LABEL` duplicated here with
+  `ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL` (typed `TermLabel`).
+- **`JmlToTextual`** (`translation/JmlToTextual.java` — the bridge): unchanged
+  in role; re-serializes each JMLtk clause/declaration against the matching
   `JmlParser.g4` rule (`class_invariant`, `initially_clause`, `class_axiom`,
   `represents_clause`, `accessible_clause`, `method_declaration`,
   `requires_clause`, `ensures_clause`, `variant_function`, `returns_clause`,
@@ -109,19 +155,18 @@
   `signals_only_clause`, `separates_clause`, `determines_clause`,
   `loop_invariant`, `loop_assignable_clause`, `loop_determines_clause`) and
   hands the resulting parse trees to the existing `TextualJML*` translation.
-  Heap semantics: unqualified clauses fall back to **base heap** (mirrors old
-  `TextualTranslator.visitTargetHeap`); `JmlSimpleExprClause.getHeaps()` is a
-  `NodeList<SimpleName>`, `JmlMultiExprClause.getHeaps()` is an
-  `Optional<NodeList<SimpleName>>` (both handled).
-- **`JP2KeYConverter`**: `visit(JmlExpressionStmt)` re-parses with KeY grammar
-  (`expressionEOF()` / `set_statement()`) → `JmlAssert`/`SetStatement`;
-  `visit(KeyMergePointStmt)` → `MergePointStatement(pi, c, new JmlSpec(n), loc)`
-  when marked, else bare expr. Loops pass merged `getSpec(n)`.
-- **`SpecialJavaPrinter`**: `print(List<JmlSpec>)` prints `/*@ node.toString() */`.
-- **`JMLInfoExtractor`**: `getJMLComments(TypeDeclaration)` →
-  `ImmutableList<JmlSpec>`.
-- **`MarkerStatementHelper`**: `KEY_ASSIGN`/`KEY_ASSERT` = `DataKey<JmlExpressionStmt>`,
-  `KEY_MERGE_POINT` = `DataKey<KeyMergePointStmt>`; `KIND_*` ints kept.
+  Heap semantics: unqualified clauses fall back to **base heap**;
+  `JmlSimpleExprClause.getHeaps()` is a `NodeList<SimpleName>`,
+  `JmlMultiExprClause.getHeaps()` is an `Optional<NodeList<SimpleName>>`.
+- **`SpecialJavaPrinter`**: JML printing goes through the KeY AST nodes'
+  own comments (no `print(List<JmlSpec>)`).
+- **`JMLInfoExtractor`**: the `attachedJml` accessor (`getJMLComments(TypeDeclaration)`)
+  is removed; JML modifier info (pure, strictlyPure, model, nullableByDefault,
+  math mode, …) is read from the converted KeY declaration's own JML modifier
+  flags (the JMLtk `JML_*` modifiers are converted into the KeY AST as before).
+- **`MarkerStatementHelper`**: `KEY_ASSIGN`/`KEY_ASSERT` =
+  `DataKey<JmlExpressionStmt>`, `KEY_MERGE_POINT` = `DataKey<KeyMergePointStmt>`;
+  `KIND_*` ints kept.
 
 ## 3. Semantics that MUST be preserved (verified during Phase 1)
 
@@ -131,9 +176,14 @@
   `extractLoopInvariant` scans reverse for `LOOP_INV`, keeps the "Missing
   decreases" warning; `extractMergeContracts` filters
   `node() instanceof KeyMergePointStmt`.
-- Model method detection in factory: `pm.getMethodDeclaration().
-  containsModifier(ModifierKind.JML_MODEL)` → first attached
-  `JmlMethodDeclaration` → `JmlToTextual.toMethodDecl(s).getMethodDefinition()`.
+- Model method detection (extractor): resolve `mapping().nodeFromKeY(
+  pm.getMethodDeclaration())`; if the result is a `JmlMethodDeclaration`
+  wrapper (registered via the reverse mapping), the model method definition is
+  `JmlToTextual.toMethodDecl(wrapper).getMethodDefinition()` (guarded by the
+  wrapper's inner declaration carrying the `JML_MODEL` modifier) and the
+  optional contract is `wrapper.getContract()`. The factory's
+  `createJMLModelMethodContracts`/`createJMLOperationContracts` synthesize
+  `MODEL_BEHAVIOR` and pass the definition as the AXIOMS clause.
 - Enrichment guards: `!isHelper && pm.getStateCount() > 0 &&
   (!pm.isStatic() || addInvariant)`; constructor inv requires via
   `"%s.\\inv".formatted(pm.getName())`; signals inv only when behavior
@@ -248,9 +298,9 @@ Known, still-accepted degradation (unchanged from §4): parametric
 
 Baseline at slices-1–2 HEAD (clean run, no concurrent gradle): **1638 tests,
 40 failed, 72 skipped**. A/B proof: the Phase-3 HEAD worktree
-(`/tmp/opencode/key-phase3-baseline` @ `649c00f9b8`) re-ran the 14 failing
+(`/tmp/opencode/key-phase3-baseline` @ `d70a683c7a`) re-ran the 14 failing
 classes → **identical 40 failures**; set-diff NONE in both directions. Zero
-slice regressions. After the IntSemantics fixture fix (`12ad668937`,
+slice regressions. After the IntSemantics fixture fix (`2938f9ae8d`,
 6/6 green) the count stood at **34**, all pre-existing jmltk-incompatible
 constructs — RECORD ONLY, no fixture changes (the offending constructs are
 rejected inside the jmltk dependency or are behavioral proof differences):
@@ -293,16 +343,19 @@ must NOT grow.
 
 ## 7. First actions on resume
 
-1. `git status` clean? (only HANDOFF.md/PLAN.md doc edits may be pending).
+> **ALL COMPLETE** — see §1. History of the resume list:
+
+1. `git status` clean? (only HANDOFF.md/PLAN.md doc edits may be pending). — ✅
+   clean at HEAD `d7fdfe737c` (docs updated in a separate commit).
 2. Decision §5 was taken; Phase 3 (§5.1) is DONE — speclang slice green.
 3. **Phase 4: COMPLETE** — slices 1–9 committed + pushed
-   (`ecb458a172` statement specs → AST nodes; `061c91d746` limited observers;
-   `3956a5850e` loop/block/merge specs → AST nodes; `2531dba5f0` proof↔PO
-   registry → `ProofRegistry`/`Services`; `4bb3ed0fbb` class
-   invariants/axioms → `ClassAxiomComputer`/`Services`; `6e03ad54ce` contract
-   registry → `ContractRegistry`/`Services`; `02d7aea325` initially clauses →
-   `JMLSpecFactory` load path; `588af4b1ea` `addSpecs` collapse + `map(...)`
-   removal; `def0449010` **`SpecificationRepository.java` deleted** +
+   (`bd33eb2331` statement specs → AST nodes; `63def34696` limited observers;
+   `0ca80f062b` loop/block/merge specs → AST nodes; `8746c00939` proof↔PO
+   registry → `ProofRegistry`/`Services`; `7c99a1cb92` class
+   invariants/axioms → `ClassAxiomComputer`/`Services`; `4332456092` contract
+   registry → `ContractRegistry`/`Services`; `5905ac02d2` initially clauses →
+   `JMLSpecFactory` load path; `36190b66bd` `addSpecs` collapse + `map(...)`
+   removal; `2a43925e8e` **`SpecificationRepository.java` deleted** +
    `Services`/`KeYEnvironment` accessors + `SpecificationRepositoryWD`, WD
    `processJavaType` → `ContractRegistryWD`). Baseline measured + A/B-verified
    (40 failures at slices-1–2 HEAD = 40 at Phase-3 HEAD; zero regressions);
@@ -314,13 +367,12 @@ must NOT grow.
    key.core.testgen 15/2/0, key.core.wd 1/0/0, key.ui 44/1/0 green;
    key.core.infflow 4/3 fail = only the 3 pre-existing
    `InfFlowProfileLoadingTest` failures (verified pre-existing at Phase-3 HEAD
-   `649c00f9b8` and slice-5 HEAD — stale bracket-vs-paren contract naming in
+   `d70a683c7a` and slice-5 HEAD — stale bracket-vs-paren contract naming in
    the `.m.key` example, unrelated / out of scope). Regenerated test fixture
-   `TestGeneric0.java` restored after each testgen run. A final full
-   `key.core:test` run at the completion HEAD confirms the recorded baseline
-   still holds (see commit message).
-4. If a future slice of Phase 4 is resumed: nothing remains in
-   `SpecificationRepository` — the plan table rows are all ✅; only the docs/PR
-   refresh and any requested follow-ups (e.g. `JMLSpecFactory` id-counter
-   cleanup) are open.
+   `TestGeneric0.java` restored after each testgen run.
+4. **Rebase onto `jmltk 1.1.0-SNAPSHOT`: COMPLETE** — the intermediate rebase
+   step compiles and the `de.uka.ilkd.key.speclang.*` slice is GREEN
+   (**279/0/12**) at HEAD `d7fdfe737c`; the `JmlSpec`/`attachedJml` carrier
+   removal and the reverse-mapping design are described in §2. Remaining
+   follow-up (optional, not done): `JMLSpecFactory` id-counter cleanup.
 5. Remember: do NOT touch `/home/weigl/work/key`.
