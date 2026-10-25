@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
  * work.
  */
 
+@NullMarked
 public class ExceptionalHandler {
     public void handle(Throwable t) {
         Logger log = LoggerFactory.getLogger(ExceptionalHandler.class);

@@ -7,10 +7,14 @@ package de.uka.ilkd.key.gui.fonticons;
 import java.awt.*;
 import java.io.IOException;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
+@NullMarked
 public enum FontAwesomeSolid implements IconFont {
     AD('\uf641'), ADDRESS_BOOK('\uf2b9'), ADDRESS_CARD('\uf2bb'), ADJUST('\uf042'),
     AIR_FRESHENER('\uf5d0'), ALIGN_CENTER('\uf037'), ALIGN_JUSTIFY('\uf039'), ALIGN_LEFT('\uf036'),
@@ -254,7 +258,7 @@ public enum FontAwesomeSolid implements IconFont {
     WINDOW_RESTORE('\uf2d2'), WINE_BOTTLE('\uf72f'), WINE_GLASS('\uf4e3'), WINE_GLASS_ALT('\uf5ce'),
     WON_SIGN('\uf159'), WRENCH('\uf0ad'), X_RAY('\uf497'), YEN_SIGN('\uf157'), YIN_YANG('\uf6ad');
 
-    private static Font font;
+    private static @Nullable Font font;
     private final char unicode;
 
     FontAwesomeSolid(char c) {

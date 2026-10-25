@@ -17,6 +17,9 @@ import de.uka.ilkd.key.gui.ProofSelectionDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class OpenFileAction extends MainWindowAction {
     public File lastSelectedPath;
 

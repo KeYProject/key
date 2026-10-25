@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -25,6 +26,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @param <T> a type of {@link SequentView} on which this menu is shown.
  */
+@NullMarked
 public class SequentViewMenu<T extends SequentView> extends JMenu {
     /**
      * The position of the selected term.
@@ -103,7 +105,6 @@ public class SequentViewMenu<T extends SequentView> extends JMenu {
     protected void createNameCreationInfoSection() {
         add(new JMenuItem(actionNameCreationInfo));
     }
-
 
     class CopyToClipboardAction extends KeyAction {
         public CopyToClipboardAction() {

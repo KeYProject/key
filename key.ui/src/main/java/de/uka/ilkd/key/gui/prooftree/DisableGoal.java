@@ -13,6 +13,8 @@ import javax.swing.ListSelectionModel;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Action enabling or disabling a selected set of goals. The component to which this action is
  * registered must implement the {@link ListSelectionModel} interface.
@@ -20,6 +22,7 @@ import de.uka.ilkd.key.proof.Goal;
  * @author bubel
  *
  */
+@NullMarked
 public abstract class DisableGoal extends AbstractAction {
 
     public static final Icon KEY_HOLE_DISABLED_PULL_DOWN_MENU =

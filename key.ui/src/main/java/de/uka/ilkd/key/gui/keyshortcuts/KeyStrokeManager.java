@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Manager of the configurable {@link KeyStroke}s for proof macros and GUI actions.
  * <p>
@@ -31,6 +34,7 @@ import javax.swing.*;
  * @author bruns
  * @author weigl, 2019-05
  */
+@NullMarked
 public final class KeyStrokeManager {
     /**
      * This constant holds the typical key to be used for shortcuts (usually
@@ -143,7 +147,7 @@ public final class KeyStrokeManager {
         return KeyStrokeSettings.getInstance();
     }
 
-    static Action findAction(String clazz) {
+    static @Nullable Action findAction(String clazz) {
         return actions.getOrDefault(clazz, new WeakReference<>(null)).get();
     }
 

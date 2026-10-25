@@ -9,6 +9,7 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.pp.PosInSequent;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -17,6 +18,7 @@ import org.jspecify.annotations.Nullable;
  * Reacts on mouse events to highlight the selected part of the sequent, and it pops up a menu
  * showing all applicable actions at the highlighted position.
  */
+@NullMarked
 public class InnerNodeViewListener extends SequentViewListener<InnerNodeView> {
 
     /**

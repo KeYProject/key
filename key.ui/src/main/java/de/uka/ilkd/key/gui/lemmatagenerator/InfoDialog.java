@@ -10,13 +10,15 @@ import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class InfoDialog {
-    private JTextPane infoText;
-    private JCheckBox showAgainBox;
+    private @Nullable JTextPane infoText;
+    private @Nullable JCheckBox showAgainBox;
 
-    private Box box;
-
-
+    private @Nullable Box box;
 
     public boolean showDialog(String text, Component parent) {
         getInfoText().setText(text);
@@ -26,7 +28,6 @@ public class InfoDialog {
             options[0]);
         return n == 1;
     }
-
 
     public boolean showThisDialogNextTime() {
         return !showAgainBox.isSelected();
@@ -57,7 +58,5 @@ public class InfoDialog {
         }
         return showAgainBox;
     }
-
-
 
 }

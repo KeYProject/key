@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.tacletmatch.classic;
 
-
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.Collection;
@@ -21,6 +20,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,12 +35,13 @@ import org.slf4j.LoggerFactory;
  * display, program-variable info, status area, button panel) that the shared base shed when the
  * redesigned dialog replaced this one — kept here so the classic dialog stays self-contained.
  */
+@NullMarked
 public abstract class ApplyTacletDialog extends de.uka.ilkd.key.gui.ApplyTacletDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplyTacletDialog.class);
 
     protected final boolean checkAfterEachInput = true;
 
-    private JTextArea statusArea;
+    private @Nullable JTextArea statusArea;
 
     protected ApplyTacletDialog(Frame parent, TacletInstantiationModel[] model,
             KeYMediator mediator) {

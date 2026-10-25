@@ -7,6 +7,9 @@ package de.uka.ilkd.key.gui.fonticons;
 import java.awt.*;
 import java.io.IOException;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public interface IconFont {
     Font getFont() throws IOException, FontFormatException;
 

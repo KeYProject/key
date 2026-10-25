@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.tacletmatch.classic;
 
-
-
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -19,6 +17,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +26,7 @@ import org.slf4j.LoggerFactory;
  * dialog offers the possibility to select the wanted match of the if sequent or to enter the
  * if-sequent instantiation manually
  */
+@NullMarked
 public class TacletIfSelectionDialog extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(TacletIfSelectionDialog.class);
 
@@ -37,7 +37,6 @@ public class TacletIfSelectionDialog extends JPanel {
     private JPanel ifPanel = new JPanel();
     private final TacletInstantiationModel model;
     private final TacletMatchCompletionDialog owner;
-
 
     /**
      * creates a new dialog
@@ -147,7 +146,6 @@ public class TacletIfSelectionDialog extends JPanel {
         ifPanel.validate();
     }
 
-
     private void updateInputField(JPanel parent, JComboBox<?> cb) {
         TacletAssumesModel icm = (TacletAssumesModel) cb.getModel();
         int nr = parent.getComponentCount();
@@ -189,7 +187,6 @@ public class TacletIfSelectionDialog extends JPanel {
             }
         }
     }
-
 
     static class IfComboRenderer implements ListCellRenderer<AssumesFormulaInstantiation> {
 

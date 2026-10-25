@@ -16,6 +16,8 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This action is responsible for the invocation of an SMT solver For example the toolbar button is
  * parameterized with an instance of this action
@@ -23,6 +25,7 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
  * @author ?
  * @author Alicia Appelhagen (move from MainWindow to own class)
  */
+@NullMarked
 public class SMTInvokeAction extends MainWindowAction {
 
     private static final long serialVersionUID = -8176122007799747342L;

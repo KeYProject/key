@@ -22,6 +22,7 @@ import de.uka.ilkd.key.gui.fonticons.IconProvider;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.KeYConstants;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author weigl
  */
+@NullMarked
 public class CreateGithubIssueAction extends MainWindowAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateGithubIssueAction.class);
     private static final String URL = "https://github.com/keyproject/key/issues/new";

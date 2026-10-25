@@ -13,6 +13,8 @@ import javax.swing.Action;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Single source of truth for greying out the <em>single-core-only</em> GUI contributions while the
  * multi-core prover is active (proof caching, proof slicing, ...).
@@ -31,6 +33,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
  * may use {@link #setEnabledRecursively(Component, boolean)} as the shared disabling primitive.
  *
  */
+@NullMarked
 public final class SingleCoreFeatureGate {
 
     /** Standard tooltip for a control disabled because the multi-core prover is active. */

@@ -12,11 +12,14 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Toggles the tooltips of the proof tree.
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class ToggleProofTreeTooltipAction extends MainWindowAction {
     /** This action's name. */
     public static final String NAME = "Show Tooltips in Proof Tree";

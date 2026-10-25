@@ -8,11 +8,14 @@ import javax.swing.JFrame;
 
 import de.uka.ilkd.key.gui.notification.actions.GeneralFailureJTextPaneDisplay;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This task notifies the user about an unexpected error.
  *
  * @author bubel
  */
+@NullMarked
 public class GeneralFailureNotification extends NotificationTask {
 
     public GeneralFailureNotification(JFrame comp) {

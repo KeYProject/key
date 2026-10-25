@@ -18,11 +18,13 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /*
  * Abstract parent class of SequentSearchBar and ProofTreeSearchPanel. Might be used for additional
  * search bars.
  */
+@NullMarked
 public abstract class SearchBar extends JPanel {
     protected final JTextField searchField = new JTextField(20);
     private final JButton prev;

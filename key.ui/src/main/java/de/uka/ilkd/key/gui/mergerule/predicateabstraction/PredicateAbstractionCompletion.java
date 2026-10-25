@@ -23,11 +23,14 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Completion class for {@link MergeWithPredicateAbstraction}.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class PredicateAbstractionCompletion
         extends MergeProcedureCompletion<MergeWithPredicateAbstraction> {
 

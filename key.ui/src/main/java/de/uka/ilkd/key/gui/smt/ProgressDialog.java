@@ -21,12 +21,15 @@ import de.uka.ilkd.key.smt.SMTFocusResults;
 
 import org.key_project.util.java.SwingUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Dialog showing launched SMT processes and results.
  */
+@NullMarked
 public class ProgressDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
@@ -37,13 +40,13 @@ public class ProgressDialog extends JDialog {
      * Button to apply the results of running the SMT solver.
      * May close some open goals if the solver returned unsat.
      */
-    private JButton applyButton;
+    private @Nullable JButton applyButton;
     /**
      * Button to evaluate the unsat core provided by the SMT solver.
      *
      * @see SMTFocusResults
      */
-    private JButton focusButton;
+    private @Nullable JButton focusButton;
     /**
      * Button to stop the launched SMT solvers.
      */
@@ -120,7 +123,6 @@ public class ProgressDialog extends JDialog {
             buttonBox.add(getApplyButton());
             buttonBox.add(Box.createHorizontalStrut(5));
         }
-
 
         GridBagConstraints constraints = new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
             GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 0, 5), 0, 0);
@@ -232,8 +234,6 @@ public class ProgressDialog extends JDialog {
         }
     }
 
-
-
     public static void main(String[] args) throws InterruptedException {
         final ProgressModel model = new ProgressModel();
         model.addColumn(new ProgressModel.TitleColumn("Summary", "1", "2", "3", "4"));
@@ -260,6 +260,7 @@ public class ProgressDialog extends JDialog {
 }
 
 
+@NullMarked
 class ProgressTable extends JTable {
 
     private static final long serialVersionUID = 1L;
@@ -268,7 +269,6 @@ class ProgressTable extends JTable {
     public interface ProgressTableListener {
         void infoButtonClicked(int column, int row);
     }
-
 
     public static class ProgressPanel extends JPanel {
         private static final long serialVersionUID = 1L;
@@ -330,18 +330,12 @@ class ProgressTable extends JTable {
         }
     }
 
-
-
     private final ProgressPanel progressPanelRenderer = new ProgressPanel();
     private ProgressPanel progressPanelEditor;
-
-
 
     private class ProgressCellEditor extends AbstractCellEditor implements TableCellEditor {
 
         private static final long serialVersionUID = 1L;
-
-
 
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
@@ -354,16 +348,12 @@ class ProgressTable extends JTable {
             return getProgressPanelEditor();
         }
 
-
-
         @Override
         public Object getCellEditorValue() {
             return null;
         }
 
     }
-
-
 
     private void prepareProgressPanel(ProgressPanel panel, final ProcessData data) {
         panel.setValue(data.getProgress());
@@ -372,7 +362,6 @@ class ProgressTable extends JTable {
         panel.progressBar.setBackground(data.getBackgroundColor());
         panel.progressBar.setForeground(data.getForegroundColor());
         panel.progressBar.setUI(new BasicProgressBarUI() {
-
 
             @Override
             protected Color getSelectionForeground() {
@@ -391,11 +380,8 @@ class ProgressTable extends JTable {
             return progressPanelRenderer;
         };
 
-
     private final TableCellEditor editor = new ProgressCellEditor();
     private final Point currentEditorCell = new Point();
-
-
 
     public ProgressTable(int resolution, ProgressTableListener listener, String... titles) {
         this.setDefaultRenderer(ProgressModel.ProcessColumn.class, renderer);
@@ -412,9 +398,7 @@ class ProgressTable extends JTable {
         panel.infoButton.addActionListener(
             e -> listener.infoButtonClicked(currentEditorCell.x - 1, currentEditorCell.y));
 
-
     }
-
 
     public void setModel(ProgressModel model, String... titles) {
 
@@ -430,8 +414,6 @@ class ProgressTable extends JTable {
         for (int i = 0; i < model.getRowCount(); i++) {
             this.setRowHeight(progressPanelRenderer.getPreferredSize().height + 5);
         }
-
-
 
     }
 
@@ -459,7 +441,6 @@ class ProgressTable extends JTable {
         TableColumn col = colModel.getColumn(vColIndex);
         int width = 0;
 
-
         TableCellRenderer renderer = col.getHeaderRenderer();
         if (renderer == null) {
             renderer = table.getTableHeader().getDefaultRenderer();
@@ -467,7 +448,6 @@ class ProgressTable extends JTable {
         Component comp =
             renderer.getTableCellRendererComponent(table, col.getHeaderValue(), false, false, 0, 0);
         width = comp.getPreferredSize().width;
-
 
         for (int r = 0; r < table.getRowCount(); r++) {
             renderer = table.getCellRenderer(r, vColIndex);
@@ -481,15 +461,12 @@ class ProgressTable extends JTable {
         col.setPreferredWidth(width);
     }
 
-
-
     private ProgressPanel getProgressPanelEditor() {
         if (progressPanelEditor == null) {
             progressPanelEditor = new ProgressPanel();
         }
         return progressPanelEditor;
     }
-
 
     @Override
     public void tableChanged(TableModelEvent e) {

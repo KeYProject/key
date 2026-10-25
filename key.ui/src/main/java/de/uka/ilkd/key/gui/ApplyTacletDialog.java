@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui;
 
-
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -14,6 +13,8 @@ import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Common superclass for taclet-instantiation dialogs. It owns the shared
  * {@link TacletInstantiationModel}s and the Apply/Cancel buttons, requests modal access to the
@@ -21,6 +22,7 @@ import de.uka.ilkd.key.gui.utilities.GuiUtilities;
  * presentation are left to the subclass
  * ({@link de.uka.ilkd.key.gui.tacletmatch.TacletMatchDialog}).
  */
+@NullMarked
 public abstract class ApplyTacletDialog extends JDialog {
 
     private static final long serialVersionUID = -411398660828882035L;

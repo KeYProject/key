@@ -21,11 +21,13 @@ import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * @author Alexander Weigl
  * @version 1 (10.05.19)
  */
+@NullMarked
 public class StandardUISettings extends SettingsPanel implements SettingsProvider {
     private static final String INFO_CLUTTER_RULESET =
         "Comma separated list of rule set names, containing clutter rules.";
@@ -155,7 +157,6 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
                     default.""",
             false, emptyValidator());
     }
-
 
     @Override
     public String getDescription() {

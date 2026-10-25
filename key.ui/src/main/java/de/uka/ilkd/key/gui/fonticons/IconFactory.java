@@ -16,9 +16,12 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class IconFactory {
     public static final IconFontProvider QUIT = new IconFontProvider(FontAwesomeSolid.WINDOW_CLOSE);
     public static final IconFontProvider RECENT_FILES =
@@ -203,7 +206,7 @@ public final class IconFactory {
     private IconFactory() {
     }
 
-    public static Image getImage(String s) {
+    public static @Nullable Image getImage(String s) {
         ImageIcon ii = createImageIcon(s);
         return ii != null ? ii.getImage() : null;
     }
@@ -215,7 +218,7 @@ public final class IconFactory {
      *        this class)
      * @return the newly created image
      */
-    private static ImageIcon createImageIcon(String filename) {
+    private static @Nullable ImageIcon createImageIcon(String filename) {
         filename = "/de/uka/ilkd/key/gui/" + filename;
         URL iconURL = IconFactory.class.getResource(filename);
         if (iconURL == null) {
@@ -395,12 +398,12 @@ public final class IconFactory {
      *        {@code null} for just the play button
      * @return the composite icon with letter overlay
      */
-    public static Icon automationWithOverlay(int size, String letter) {
+    public static Icon automationWithOverlay(int size, @Nullable String letter) {
         Icon baseIcon = autoModeStartLogo(size);
         return iconWithOverlay(baseIcon, letter);
     }
 
-    public static Icon iconWithOverlay(Icon baseIcon, String letter) {
+    public static Icon iconWithOverlay(Icon baseIcon, @Nullable String letter) {
         BufferedImage image =
             new BufferedImage(
                 baseIcon.getIconWidth() + TOOLBAR_INDICATOR_EXTRA_SPACE + 2 * TOOLBAR_EXTRA_WIDTH,
@@ -575,6 +578,7 @@ public final class IconFactory {
 /**
  * @see <https://atelierbram.github.io/syntax-highlighting/atelier-schemes/dune/>
  */
+@NullMarked
 class DuneColorScheme {
     public static final Color base00 = hex("#20201d");
     public static final Color base01 = hex("#292824");

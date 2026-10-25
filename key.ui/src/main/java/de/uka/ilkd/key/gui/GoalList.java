@@ -43,9 +43,12 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class GoalList extends JList<Goal> implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoalList.class);
 
@@ -63,7 +66,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
     private final GoalListModel goalListModel;
     // clear this cache whenever some display settings are changed?
     private final WeakHashMap<Sequent, String> seqToString = new WeakHashMap<>();
-    private KeYMediator mediator;
+    private @Nullable KeYMediator mediator;
     /**
      * interactive prover listener
      */
@@ -258,7 +261,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         /**
          * the proof the model belongs to
          */
-        private Proof proof;
+        private @Nullable Proof proof;
         /**
          *
          */
@@ -275,7 +278,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         /**
          * the proof this view belongs to has changed
          */
-        private void setProof(Proof p) {
+        private void setProof(@Nullable Proof p) {
             clear();
             if (proof != null) {
                 proof.removeProofTreeListener(proofTreeListener);
@@ -619,7 +622,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
          * of rows
          */
         private int delegateSize;
-        private Proof proof = null;
+        private @Nullable Proof proof = null;
 
         public SelectingGoalListModel(GoalListModel delegate) {
             this.delegate = delegate;
@@ -629,7 +632,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             return entries.size();
         }
 
-        public Goal getElementAt(int i) {
+        public @Nullable Goal getElementAt(int i) {
             if (i < 0 || i >= getSize()) {
                 return null;
             }
@@ -643,7 +646,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         /**
          * the proof this view belongs to has changed; this also updates the delegate model
          */
-        protected void setProof(Proof p) {
+        protected void setProof(@Nullable Proof p) {
             delegate.removeListDataListener(delegateListener);
 
             proof = p;
@@ -804,7 +807,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             GoalList.this.setToolTipText("GOAL");
         }
 
-        public Component getListCellRendererComponent(JList<?> list, Object value, // value
+        public Component getListCellRendererComponent(JList<?> list, @Nullable Object value, // value
                 // to
                 // display
                 int index, // cell index

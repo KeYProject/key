@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.ui;
 
-
 import java.io.*;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -50,12 +49,15 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.parsing.Location;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of {@link UserInterfaceControl} used by command line interface of KeY.
  */
+@NullMarked
 public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceControl {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsoleUserInterfaceControl.class);
 
@@ -70,16 +72,14 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     // for a progress bar
     int progressMax = 0;
 
-
     // flag to indicate that a file should merely be loaded not proved. (for
     // "reload" testing)
     private final boolean loadOnly;
 
-
     /**
      * Current key problem file that is attempted to be proven.
      */
-    private Path keyProblemFile = null;
+    private @Nullable Path keyProblemFile = null;
 
     /**
      * We want to record whether there was a proof that could not be proven. {@link Main} calls
@@ -192,7 +192,6 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             }
         }
     }
-
 
     @Override
     public void taskStarted(TaskStartedInfo info) {
@@ -473,7 +472,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+    public @Nullable TermLabelVisibilityManager getTermLabelVisibilityManager() {
         return null;
     }
 }

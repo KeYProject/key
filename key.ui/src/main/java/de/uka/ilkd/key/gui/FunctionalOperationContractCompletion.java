@@ -14,11 +14,13 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This class completes the instantiation for a functional operation contract applications. The user
  * is queried for the contract to apply. If in forced mode the combined contracts will be used.
  */
+@NullMarked
 public class FunctionalOperationContractCompletion implements InteractiveRuleApplicationCompletion {
 
     @Override

@@ -19,12 +19,15 @@ import de.uka.ilkd.key.pp.PosInSequent;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class provides means to run macros with key bindings such that these can be bound to the
  * main window making them independent of any menu.
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class MacroKeyBinding extends AbstractAction {
     private static final long serialVersionUID = 1529344940571000989L;
 

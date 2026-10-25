@@ -29,18 +29,21 @@ import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.lang.String.format;
 
+@NullMarked
 public class TacletOptionsSettings extends SimpleSettingsPanel implements SettingsProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(TacletOptionsSettings.class);
 
     private static final long serialVersionUID = 1455572432081960150L;
     private static final String EXPLANATIONS_RESOURCE =
         "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
-    private static Properties explanationMap;
+    private static @Nullable Properties explanationMap;
     private HashMap<String, String> category2Choice;
     private HashMap<String, Set<String>> category2Choices;
     private ChoiceSettings settings;
@@ -50,7 +53,6 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     private JLabel noProofLoadedHeader;
 
     private Proof loadedProof = null;
-
 
     public TacletOptionsSettings() {
         setHeaderText(getDescription());
@@ -131,7 +133,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @param choice The choice to check.
      * @return The additional information or {@code null} if no information are available.
      */
-    public static String getInformation(String choice) {
+    public static @Nullable String getInformation(String choice) {
         if ("JavaCard:on".equals(choice)) {
             return "Sound if a JavaCard program is proven.";
         } else if ("JavaCard:off".equals(choice)) {
@@ -152,7 +154,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @param choice The choice to search.
      * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
      */
-    public static ChoiceEntry findChoice(List<ChoiceEntry> choices, final String choice) {
+    public static @Nullable ChoiceEntry findChoice(List<ChoiceEntry> choices,
+            final @Nullable String choice) {
         return choices.stream().filter(it -> it.getChoice().equals(choice)).findAny().orElse(null);
     }
 
@@ -162,7 +165,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @param choices The choices.
      * @return The created {@link ChoiceEntry}s.
      */
-    public static List<ChoiceEntry> createChoiceEntries(Collection<String> choices) {
+    public static List<ChoiceEntry> createChoiceEntries(@Nullable Collection<String> choices) {
         if (choices == null) {
             return Collections.emptyList();
         }
@@ -296,7 +299,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         return button;
     }
 
-    private JLabel createTitleRow(String cat, ChoiceEntry entry) {
+    private JLabel createTitleRow(String cat, @Nullable ChoiceEntry entry) {
         JLabel lbl = new JLabel(createCatTitleText(cat, entry));
         lbl.setFont(lbl.getFont().deriveFont(14f));
 
@@ -306,7 +309,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         return lbl;
     }
 
-    private String createCatTitleText(String cat, ChoiceEntry entry) {
+    private String createCatTitleText(String cat, @Nullable ChoiceEntry entry) {
         // if no proof is loaded, we do not want to display current settings
         if (warnNoProof) {
             return cat;
@@ -326,7 +329,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @param cat The category of the choice
      * @param entry The current choice
      */
-    private void checkForDifferingOptions(JLabel lbl, String cat, ChoiceEntry entry) {
+    private void checkForDifferingOptions(JLabel lbl, String cat, @Nullable ChoiceEntry entry) {
         if (loadedProof != null) {
             String choiceOfLoadedProof =
                 loadedProof.getSettings().getChoiceSettings().getDefaultChoices().get(cat);
@@ -413,7 +416,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         /**
          * An optionally information.
          */
-        private final String information;
+        private final @Nullable String information;
 
         /**
          * Constructor.
@@ -423,7 +426,8 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
          * @param incomplete Is incomplete?
          * @param information An optionally information.
          */
-        public ChoiceEntry(String choice, boolean unsound, boolean incomplete, String information) {
+        public ChoiceEntry(String choice, boolean unsound, boolean incomplete,
+                @Nullable String information) {
             assert choice != null;
             this.choice = choice;
             this.unsound = unsound;
@@ -463,7 +467,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
          *
          * @return The optionally information.
          */
-        public String getInformation() {
+        public @Nullable String getInformation() {
             return information;
         }
 
@@ -486,7 +490,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@Nullable Object obj) {
             if (obj instanceof ChoiceEntry other) {
                 return choice.equals(other.getChoice()) && incomplete == other.isIncomplete()
                         && unsound == other.isUnsound()

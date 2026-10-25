@@ -9,6 +9,10 @@ import javax.swing.tree.MutableTreeNode;
 
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class EnvNode extends DefaultMutableTreeNode implements TaskTreeNode {
 
     /**
@@ -34,20 +38,19 @@ public class EnvNode extends DefaultMutableTreeNode implements TaskTreeNode {
         return env;
     }
 
-    public Proof proof() {
+    public @Nullable Proof proof() {
         return getChildCount() > 0 ? ((TaskTreeNode) getChildAt(0)).proof() : null;
     }
 
-    public Proof[] allProofs() {
+    public @Nullable Proof[] allProofs() {
         return new Proof[0];
     }
-
 
     public void insertNode(TaskTreeModel model, MutableTreeNode parentNode) {
         model.insertNodeInto(this, parentNode, model.getChildCount(parentNode));
     }
 
-    public ProofStatus getStatus() {
+    public @Nullable ProofStatus getStatus() {
         return null;
     }
 

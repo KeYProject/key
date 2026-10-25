@@ -9,6 +9,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.util.ThreadUtilities;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@NullMarked
 public final class Watchdog {
     private static final Logger LOGGER = LoggerFactory.getLogger(Watchdog.class);
     /**

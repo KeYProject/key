@@ -15,6 +15,9 @@ import javax.swing.JTextArea;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.util.KeYConstants;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class SystemInfoAction extends MainWindowAction {
 
     private static final long serialVersionUID = -4197309658998177157L;
@@ -80,7 +83,6 @@ public class SystemInfoAction extends MainWindowAction {
             return sb.toString();
         }
     }
-
 
     @SuppressWarnings("finally")
     private String getEnv() {

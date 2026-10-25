@@ -28,10 +28,12 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderLis
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public abstract class LemmaGenerationAction extends MainWindowAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(LemmaGenerationAction.class);
 
@@ -40,8 +42,6 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
     }
 
     private static final long serialVersionUID = 1L;
-
-
 
     protected LemmaGenerationAction(MainWindow mainWindow) {
         super(mainWindow);
@@ -78,8 +78,6 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
     private abstract static class AbstractLoaderListener implements LoaderListener {
         private final MainWindow mainWindow;
 
-
-
         private AbstractLoaderListener(MainWindow mainWindow) {
             super();
             this.mainWindow = mainWindow;
@@ -112,7 +110,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             SwingUtilities.invokeLater(() -> doStopped(p, taclets, addAsAxioms));
         }
 
-        protected abstract void doStopped(ProofAggregate p, ImmutableSet<Taclet> taclets,
+        protected abstract void doStopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
                 boolean addAsAxioms);
 
         @Override
@@ -124,7 +122,6 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
     }
 
     public static class ProveKeYTaclets extends LemmaGenerationAction {
-
 
         private static final long serialVersionUID = 1L;
 
@@ -140,7 +137,6 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 new TacletLoader.KeYsTacletsLoader(mainWindow.getUserInterface(),
                     mainWindow.getUserInterface(), mainWindow.getMediator().getProfile());
 
-
             LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                 @Override
                 public void doStopped(Throwable exception) {
@@ -149,7 +145,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 }
 
                 @Override
-                public void doStopped(ProofAggregate p, ImmutableSet<Taclet> taclets,
+                public void doStopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
                         boolean addAxioms) {
                     getMediator().startInterface(true);
                     if (p != null) {
@@ -188,7 +184,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
     static public class ProveUserDefinedTaclets extends LemmaGenerationAction {
 
         private static final long serialVersionUID = 1L;
-        private LoadUserTacletsDialog chooser;
+        private @Nullable LoadUserTacletsDialog chooser;
 
         public ProveUserDefinedTaclets(MainWindow mainWindow) {
             super(mainWindow);
@@ -218,8 +214,6 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 mainWindow.getUserInterface(), mainWindow.getUserInterface(), problemInitializer,
                 profile, fileForLemmata, filesForAxioms);
 
-
-
             LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                 @Override
                 public void doStopped(Throwable exception) {
@@ -229,7 +223,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 }
 
                 @Override
-                public void doStopped(ProofAggregate p, ImmutableSet<Taclet> taclets,
+                public void doStopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
                         boolean addAxioms) {
                     getMediator().startInterface(true);
                     if (p != null) {
@@ -294,8 +288,6 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 mainWindow.getUserInterface(), mainWindow.getUserInterface(), problemInitializer,
                 fileForLemmata, filesForAxioms, proof.getInitConfig().copy());
 
-
-
             LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                 @Override
                 public void doStopped(Throwable exception) {
@@ -304,7 +296,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 }
 
                 @Override
-                public void doStopped(ProofAggregate p, ImmutableSet<Taclet> taclets,
+                public void doStopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
                         boolean addAxioms) {
                     getMediator().startInterface(true);
                     if (p != null) {

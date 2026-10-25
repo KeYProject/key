@@ -20,12 +20,16 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Traces the proof nodes selected by the user. Allows navigating forwards and backwards to
  * show previous proof nodes.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class SelectionHistory implements KeYSelectionListener, ProofDisposedListener {
     /**
      * The KeY mediator.
@@ -41,7 +45,7 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
      * These don't have to be stored as weak references because the user cannot dispose a
      * referenced proof without navigating to it again (thereby clearing this list).
      */
-    private final Deque<Node> selectionHistoryForward = new ArrayDeque<>();
+    private final Deque<@Nullable Node> selectionHistoryForward = new ArrayDeque<>();
 
     /**
      * Listeners watching this object for changes.
@@ -69,7 +73,7 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
      *
      * @return a node
      */
-    public Node previousNode() {
+    public @Nullable Node previousNode() {
         if (!selectedNodes.isEmpty()) {
             // remove current selection
             Node currentSelection = selectedNodes.removeLast().get();
@@ -112,7 +116,7 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
         }
     }
 
-    public Node nextNode() {
+    public @Nullable Node nextNode() {
         if (!selectionHistoryForward.isEmpty()) {
             Node currentSelection = mediator.getSelectionModel().getSelectedNode();
             // navigate to the next selection stored in the history

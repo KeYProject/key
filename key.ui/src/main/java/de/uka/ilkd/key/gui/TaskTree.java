@@ -35,6 +35,8 @@ import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,7 @@ import org.slf4j.LoggerFactory;
  * Task tree panel, showing all currently opened proofs.
  * Usually located in the top left panel.
  */
+@NullMarked
 public class TaskTree extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskTree.class);
 
@@ -166,7 +169,7 @@ public class TaskTree extends JPanel {
     /**
      * returns the first selected task which is instance of a task tree node
      */
-    public TaskTreeNode getSelectedTask() {
+    public @Nullable TaskTreeNode getSelectedTask() {
         TreePath path = delegateView.getSelectionModel().getSelectionPath();
         if (path != null && path.getLastPathComponent() instanceof TaskTreeNode) {
             return (TaskTreeNode) path.getLastPathComponent();
@@ -238,7 +241,7 @@ public class TaskTree extends JPanel {
      *
      * @param proof The proof to remove.
      */
-    public synchronized void removeProof(Proof proof) {
+    public synchronized void removeProof(@Nullable Proof proof) {
         if (proof != null) {
             ProofEnvironment env = proof.getEnv();
             // Search EnvNode which contains the environment of the given proof.
@@ -265,7 +268,6 @@ public class TaskTree extends JPanel {
             }
         }
     }
-
 
     /**
      * inner class implementing the mouse listener that is responsible for this gui component
@@ -311,7 +313,6 @@ public class TaskTree extends JPanel {
         }
     }
 
-
     /**
      * a prooftree listener, so that it is known when the proof has closed
      */
@@ -344,19 +345,18 @@ public class TaskTree extends JPanel {
         }
     } // end of prooftreelistener
 
-
     private static final class TaskTreeIconCellRenderer extends DefaultTreeCellRenderer {
         private static final Icon KEY_ICON = IconFactory.keyHole(20, 20);
         private static final Icon KEY_CLOSED_ICON = IconFactory.keyHoleClosed(20);
         private static final Icon KEY_ALMOST_CLOSED_ICON = IconFactory.keyHoleAlmostClosed(20, 20);
         private static final Icon KEY_CACHED_CLOSED_ICON = IconFactory.keyCachedClosed(20, 20);
 
-
         private TaskTreeIconCellRenderer() {
         }
 
         @Override
-        public Component getTreeCellRendererComponent(JTree list, Object value, boolean selected,
+        public Component getTreeCellRendererComponent(JTree list, @Nullable Object value,
+                boolean selected,
                 boolean expanded, boolean leaf, int row, boolean hasFocus) {
             Object newValue;
             if (value instanceof TaskTreeNode) {
@@ -392,7 +392,6 @@ public class TaskTree extends JPanel {
             return this;
         }
     }
-
 
     class TaskTreeSelectionListener implements KeYSelectionListener {
         /** focused node has changed */

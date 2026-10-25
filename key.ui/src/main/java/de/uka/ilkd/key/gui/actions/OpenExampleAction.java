@@ -13,9 +13,12 @@ import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Opens a file dialog allowing to select the example to be loaded
  */
+@NullMarked
 public final class OpenExampleAction extends MainWindowAction {
 
     /**

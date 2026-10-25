@@ -7,16 +7,20 @@ package de.uka.ilkd.key.gui.actions.useractions;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Virtual user action to undo loading a proof.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class ProofLoadUserAction extends UserAction {
     /**
      * The proof loaded in this action.
      */
-    private Proof proofLoaded;
+    private @Nullable Proof proofLoaded;
 
     /**
      * Construct a new user action of this kind.

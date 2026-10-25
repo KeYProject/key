@@ -12,10 +12,13 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.FeatureSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Alexander Weigl
  * @version 1 (04.12.23)
  */
+@NullMarked
 public class FeatureSettingsPanel extends SettingsPanel implements SettingsProvider {
     private final Map<FeatureSettings.Feature, JCheckBox> checkboxes = new IdentityHashMap<>();
 

@@ -11,6 +11,8 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Provides a Label in the status line for the indication of the current enabled keys for the JML
  * condition evaluation.
@@ -19,6 +21,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
  * @see GeneralSettings#getJmlEnabledKeys()
  */
 @KeYGuiExtension.Info(experimental = false, name = "JML Enabled Keys Indicator for the Status Line")
+@NullMarked
 public class JmlEnabledKeysIndicator implements KeYGuiExtension, KeYGuiExtension.StatusLine {
     private final GeneralSettings settings =
         ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();

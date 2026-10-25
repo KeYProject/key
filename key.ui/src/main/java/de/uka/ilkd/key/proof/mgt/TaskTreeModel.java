@@ -13,7 +13,10 @@ import javax.swing.tree.MutableTreeNode;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class TaskTreeModel extends DefaultTreeModel {
 
     /**
@@ -72,7 +75,7 @@ public class TaskTreeModel extends DefaultTreeModel {
         }
     }
 
-    public synchronized TaskTreeNode getTaskForProof(Proof p) {
+    public synchronized @Nullable TaskTreeNode getTaskForProof(@Nullable Proof p) {
         if (p == null) {
             return null;
         }

@@ -20,6 +20,9 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This action is one part of the previous UndoLastStepAction: It undoes the last rule application
  * on the currently selected branch. It now also works on closed branches if the flag
@@ -30,6 +33,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author Pfeifer (enabled goalBack in closed branches)
  */
+@NullMarked
 public final class GoalBackAction extends MainWindowAction {
 
     /**
@@ -153,7 +157,7 @@ public final class GoalBackAction extends MainWindowAction {
      *         open/closedGoals lists. This may be the case if the flag "--no-pruning-closed" is set
      *         (which means that the closedGoals list is empty) and the given subtree is closed.
      */
-    private Goal findNewestGoal(Node subtree) {
+    private @Nullable Goal findNewestGoal(@Nullable Node subtree) {
         if (subtree == null) {
             return null;
         }

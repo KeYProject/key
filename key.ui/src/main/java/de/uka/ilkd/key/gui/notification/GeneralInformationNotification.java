@@ -8,12 +8,15 @@ import javax.swing.JFrame;
 
 import de.uka.ilkd.key.gui.notification.actions.GeneralInformationJTextPaneDisplay;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This notification task is used to inform the user about a non-error situation (e.g. statistics
  * (how many goals have been closed) etc.)
  *
  * @author bubel
  */
+@NullMarked
 public class GeneralInformationNotification extends NotificationTask {
 
     public GeneralInformationNotification(JFrame comp) {

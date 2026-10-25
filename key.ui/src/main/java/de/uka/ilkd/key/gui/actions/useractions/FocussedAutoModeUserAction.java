@@ -9,11 +9,14 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * User action for "Apply rules automatically here" (i.e. focussed auto mode).
  *
  * @author Arne Keller
  */
+@NullMarked
 public class FocussedAutoModeUserAction extends ProofModifyingUserAction {
     /**
      * Focussed pio to apply rules on.
@@ -31,7 +34,6 @@ public class FocussedAutoModeUserAction extends ProofModifyingUserAction {
         super(mediator, proof);
         this.focus = focus;
     }
-
 
     @Override
     public String name() {

@@ -18,6 +18,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 @KeYGuiExtension.Info(name = "Heap-Indicator",
     description = "Shows an indication of the current heap consumption in the status line of key",
     experimental = false)
+@NullMarked
 public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLine {
     @Override
     public List<JComponent> getStatusLineComponents() {
@@ -43,7 +45,6 @@ public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLin
         private final Action actionRunGc = new RunGcAction();
 
         private final Action actionShowMonitoring = new ShowMonitoringAction();
-
 
         private JPopupMenu createPopupMenu() {
             var j = new JPopupMenu("Heap");

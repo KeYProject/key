@@ -22,11 +22,13 @@ import de.uka.ilkd.key.pp.*;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /*
  * Search bar implementing search function for SequentView.
  */
 
+@NullMarked
 public class SequentViewSearchBar extends SearchBar {
     @Serial
     private static final long serialVersionUID = 9102464983776181771L;

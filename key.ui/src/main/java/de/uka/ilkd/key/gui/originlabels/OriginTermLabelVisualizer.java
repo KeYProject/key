@@ -39,12 +39,15 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This UI component visualizes the {@link OriginTermLabel}s of a term and its sub-terms.
  *
  * @author lanzinger
  */
+@NullMarked
 public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
     private static final long serialVersionUID = -9190616436091589798L;
@@ -94,7 +97,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     private JTree tree;
 
     /** The currently highlighted position. */
-    private PosInOccurrence highlight;
+    private @Nullable PosInOccurrence highlight;
 
     /** The button for the {@link #nodeLinkAction} */
 
@@ -180,7 +183,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     private Services services;
 
     /** The position of the term being shown in this window. */
-    private PosInOccurrence termPio;
+    private @Nullable PosInOccurrence termPio;
 
     /** The sequent containing the term being shown in this window. */
     private Sequent sequent;
@@ -193,7 +196,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
      *        visualized.
      * @param services services.
      */
-    public OriginTermLabelVisualizer(PosInOccurrence pos, Node node, Services services) {
+    public OriginTermLabelVisualizer(@Nullable PosInOccurrence pos, Node node,
+            Services services) {
         super(node,
             "Origin for node " + node.serialNr() + ": " + (pos == null ? "whole sequent"
                     : LogicPrinter.quickPrintTerm((JTerm) pos.subTerm(), services).replaceAll(
@@ -410,7 +414,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
      * @param pio a pio on the sequent.
      * @return a pio on {@code this.termPio.subTerm()}.
      */
-    private PosInOccurrence convertPio(PosInOccurrence pio) {
+    private @Nullable PosInOccurrence convertPio(@Nullable PosInOccurrence pio) {
         if (termPio == null) {
             return pio;
         } else if (pio == null) {
@@ -428,7 +432,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
     }
 
-    private DefaultTreeModel buildModel(PosInOccurrence pos) {
+    private DefaultTreeModel buildModel(@Nullable PosInOccurrence pos) {
         TreeNode root = new TreeNode(pos);
         DefaultTreeModel result = new DefaultTreeModel(root);
         buildModel(root, pos, result);
@@ -436,7 +440,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     }
 
     private void buildModel(TreeNode parentNode,
-            PosInOccurrence parentPos,
+            @Nullable PosInOccurrence parentPos,
             DefaultTreeModel treeModel) {
         if (parentPos == null) {
             int index = 0;
@@ -479,11 +483,11 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
     }
 
-    private void highlightInTree(TreePath path) {
+    private void highlightInTree(@Nullable TreePath path) {
         tree.getSelectionModel().setSelectionPath(path);
     }
 
-    private void highlightInView(PosInOccurrence pio) {
+    private void highlightInView(@Nullable PosInOccurrence pio) {
         if (pio == null) {
             view.removeUserSelectionHighlight();
             return;
@@ -501,7 +505,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     }
 
     private ImmutableList<Integer> getPosTablePath(
-            PosInOccurrence pos) {
+            @Nullable PosInOccurrence pos) {
         if (pos == null) {
             return ImmutableList.<Integer>singleton(0);
         }
@@ -549,7 +553,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         return result;
     }
 
-    private String getTooltipText(PosInOccurrence pio) {
+    private @Nullable String getTooltipText(@Nullable PosInOccurrence pio) {
         if (pio == null) {
             return null;
         }
@@ -617,7 +621,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             return origin.specType.toString();
         }
 
-        private String getShortTermText(JTerm term) {
+        private String getShortTermText(@Nullable JTerm term) {
             String text;
 
             if (term == null) {
@@ -638,10 +642,10 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
     private static class TreeNode extends DefaultMutableTreeNode {
         private static final long serialVersionUID = -406981141537547226L;
-        private final PosInOccurrence pos;
-        private JTerm term;
+        private final @Nullable PosInOccurrence pos;
+        private @Nullable JTerm term;
 
-        private TreeNode(PosInOccurrence pos) {
+        private TreeNode(@Nullable PosInOccurrence pos) {
             super(pos);
             this.pos = pos;
 
@@ -652,9 +656,9 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     }
 
     private static class TermViewLogicPrinter extends SequentViewLogicPrinter {
-        private final PosInOccurrence pos;
+        private final @Nullable PosInOccurrence pos;
 
-        TermViewLogicPrinter(PosInOccurrence pos, NotationInfo ni,
+        TermViewLogicPrinter(@Nullable PosInOccurrence pos, NotationInfo ni,
                 Services services) {
             super(ni, services, PosTableLayouter.positionTable(), new TermLabelVisibilityManager());
             this.pos = pos;
@@ -691,7 +695,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         private InitialPositionTable posTable = new InitialPositionTable();
         private final Node node;
 
-        TermView(PosInOccurrence pos, Node node,
+        TermView(@Nullable PosInOccurrence pos, Node node,
                 MainWindow mainWindow) {
             super(mainWindow);
             this.node = node;
@@ -712,7 +716,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
 
         @Override
-        protected synchronized PosInSequent getPosInSequent(Point p) {
+        protected synchronized @Nullable PosInSequent getPosInSequent(@Nullable Point p) {
             PosInSequent pis = super.getPosInSequent(p);
             PosInOccurrence pio = convertPio(pis == null ? null : pis.getPosInOccurrence());
             return pio == null ? null : PosInSequent.createCfmaPos(pio);

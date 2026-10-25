@@ -18,14 +18,15 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-
 
 /**
  * @author Benjamin Niedermann
  * @author M. Ulbrich (revisions)
  * @author Wolfram Pfeifer (renamed, reformatting/cleanup, smaller bugfixes)
  */
+@NullMarked
 public class LoadUserTacletsDialog extends JPanel {
     private static final long serialVersionUID = 1L;
 
@@ -75,12 +76,12 @@ public class LoadUserTacletsDialog extends JPanel {
     }
 
     private class UserTacletFileBox extends Box {
-        private Path chosenFile;
-        private JButton chooseFileButton;
-        private JTextField fileField;
-        private final String title;
+        private @Nullable Path chosenFile;
+        private @Nullable JButton chooseFileButton;
+        private @Nullable JTextField fileField;
+        private final @Nullable String title;
 
-        public UserTacletFileBox(String title) {
+        public UserTacletFileBox(@Nullable String title) {
 
             super(BoxLayout.Y_AXIS);
             this.title = title;
@@ -133,35 +134,35 @@ public class LoadUserTacletsDialog extends JPanel {
             getFileField().setText(chosenFile.toString());
         }
 
-        public Path getChosenFile() {
+        public @Nullable Path getChosenFile() {
             return chosenFile;
         }
     }
 
     private static final Dimension MAX_DIM = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
-    private JList<Path> axiomsList;
-    private JButton addAxiomFileButton;
-    private JButton removeAxiomFileButton;
-    private JButton helpButton;
-    private UserTacletFileBox userTacletFileBox;
-    private JPanel axiomFilePanel;
-    private JPanel buttonPanel;
-    private JScrollPane scrollPane;
-    private JDialog helpWindow;
+    private @Nullable JList<Path> axiomsList;
+    private @Nullable JButton addAxiomFileButton;
+    private @Nullable JButton removeAxiomFileButton;
+    private @Nullable JButton helpButton;
+    private @Nullable UserTacletFileBox userTacletFileBox;
+    private @Nullable JPanel axiomFilePanel;
+    private @Nullable JPanel buttonPanel;
+    private @Nullable JScrollPane scrollPane;
+    private @Nullable JDialog helpWindow;
 
-    private JButton okButton;
-    private JButton cancelButton;
+    private @Nullable JButton okButton;
+    private @Nullable JButton cancelButton;
 
-    private JCheckBox lemmaCheckbox;
+    private @Nullable JCheckBox lemmaCheckbox;
 
     private boolean closedByOkButton = false;
     private final DefaultListModel<Path> listModel = new DefaultListModel<>();
     private boolean firstTimeAddingAxioms = true;
     private final Mode mode;
-    private JDialog dialog;
-    private JPanel justificationPanel;
-    private JPanel cardPanel;
+    private @Nullable JDialog dialog;
+    private @Nullable JPanel justificationPanel;
+    private @Nullable JPanel cardPanel;
 
     /**
      * Creates a new dialog for loading user-defined taclets
@@ -193,7 +194,7 @@ public class LoadUserTacletsDialog extends JPanel {
         return IntStream.range(0, listModel.size()).mapToObj(listModel::get).toList();
     }
 
-    public Path getFileForTaclets() {
+    public @Nullable Path getFileForTaclets() {
         return userTacletFileBox.getChosenFile();
     }
 

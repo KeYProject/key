@@ -6,6 +6,9 @@ package de.uka.ilkd.key.gui.fonticons;
 
 import javax.swing.*;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public abstract class IconProvider {
     Icon load() {
         return load(16);

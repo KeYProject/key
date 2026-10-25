@@ -7,10 +7,14 @@ package de.uka.ilkd.key.gui.fonticons;
 import java.awt.*;
 import java.io.IOException;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Alexander Weigl
  * @version 1 (22.07.19)
  */
+@NullMarked
 public enum MaterialDesignRegular implements IconFont {
     _3D_ROTATION('\ue84d'), AC_UNIT('\ueb3b'),
 
@@ -1827,7 +1831,7 @@ public enum MaterialDesignRegular implements IconFont {
     ZOOM_OUT('\ue900'), ZOOM_OUT_MAP('\ue56b');
 
     private final char codepoint;
-    private Font font;
+    private @Nullable Font font;
 
     MaterialDesignRegular(char c) {
         codepoint = c;

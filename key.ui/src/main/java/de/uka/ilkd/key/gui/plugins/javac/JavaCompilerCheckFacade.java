@@ -25,6 +25,7 @@ import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (14.10.22)
  */
+@NullMarked
 public class JavaCompilerCheckFacade {
     private JavaCompilerCheckFacade() {
         /* This utility class should not be instantiated */
@@ -303,6 +305,7 @@ public class JavaCompilerCheckFacade {
  *
  * @author Alexander Weigl
  */
+@NullMarked
 class JavaFileManagerDelegate implements StandardJavaFileManager {
     /**
      * The file manager most calls are delegated to.
@@ -328,7 +331,6 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
             Iterable<? extends File> files) {
         return fileManager.getJavaFileObjectsFromFiles(files);
     }
-
 
     @Override
     @Deprecated(since = "13")
@@ -441,7 +443,6 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
         return fileManager.getJavaFileForOutput(location, className, kind, sibling);
     }
 
-
     @Override
     public FileObject getFileForInput(Location location, String packageName, String relativeName)
             throws IOException {
@@ -453,7 +454,6 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
             FileObject sibling) throws IOException {
         return fileManager.getFileForOutput(location, packageName, relativeName, sibling);
     }
-
 
     @Override
     public void flush() throws IOException {
@@ -508,6 +508,7 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
  *
  * @author Alexander Weigl
  */
+@NullMarked
 class IgnoreOutputJavaFileObject extends SimpleJavaFileObject {
     public IgnoreOutputJavaFileObject(final String name, Kind kind) throws URISyntaxException {
         super(new URI("memory://" + name + ".class"), kind);

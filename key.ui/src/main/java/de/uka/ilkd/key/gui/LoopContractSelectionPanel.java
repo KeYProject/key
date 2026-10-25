@@ -14,10 +14,14 @@ import de.uka.ilkd.key.speclang.LoopContractImpl;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This panel used to select which {@link LoopContract}s to use for an
  * {@link AbstractLoopContractBuiltInRuleApp}.
  */
+@NullMarked
 public class LoopContractSelectionPanel extends AuxiliaryContractSelectionPanel<LoopContract> {
 
     private static final long serialVersionUID = 5832235501095794321L;
@@ -27,7 +31,7 @@ public class LoopContractSelectionPanel extends AuxiliaryContractSelectionPanel<
     }
 
     @Override
-    public LoopContract computeContract(Services services, List<LoopContract> selection) {
+    public @Nullable LoopContract computeContract(Services services, List<LoopContract> selection) {
         if (selection.isEmpty()) {
             return null;
         } else if (selection.size() == 1) {

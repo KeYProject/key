@@ -21,10 +21,14 @@ import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
+@NullMarked
 public class SettingsUi extends JPanel {
     private static final long serialVersionUID = -217841876110516940L;
     private static int calculatedWidth = 0;
@@ -107,7 +111,7 @@ public class SettingsUi extends JPanel {
         root.setDividerLocation(0.3d);
     }
 
-    private void setSettingsPanel(JComponent comp) {
+    private void setSettingsPanel(@Nullable JComponent comp) {
         SwingUtilities.updateComponentTreeUI(comp);
         root.setRightComponent(comp);
 
@@ -193,6 +197,7 @@ public class SettingsUi extends JPanel {
         treeSettingsPanels.setSelectionPath(path);
     }
 
+    @Nullable
     SettingsTreeNode findNode(SettingsProvider provider) {
         LinkedList<SettingsTreeNode> nodes = new LinkedList<>();
         nodes.offer((SettingsTreeNode) treeModel.getRoot());
@@ -208,8 +213,9 @@ public class SettingsUi extends JPanel {
 }
 
 
+@NullMarked
 class SettingsTreeNode implements TreeNode {
-    final SettingsProvider provider;
+    final @Nullable SettingsProvider provider;
     final List<SettingsTreeNode> children;
 
     SettingsTreeNode(SettingsProvider cur, List<SettingsProvider> providers) {
@@ -240,7 +246,7 @@ class SettingsTreeNode implements TreeNode {
     }
 
     @Override
-    public TreeNode getParent() {
+    public @Nullable TreeNode getParent() {
         return null;
     }
 

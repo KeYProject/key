@@ -12,12 +12,14 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  *
  * @author christoph
  */
+@NullMarked
 public class AutoDismissDialog {
 
     public static final int DEFAULT_DELAY = 5000;
@@ -31,9 +33,8 @@ public class AutoDismissDialog {
     private final int delay, rate, delayStartToDispose;
     private final int steps;
 
-
-    public AutoDismissDialog(Frame parent, String message, final int delay, final int rate,
-            final int delayStartToDispose, final int delayDisposeToEnd) {
+    public AutoDismissDialog(@Nullable Frame parent, String message, final int delay,
+            final int rate, final int delayStartToDispose, final int delayDisposeToEnd) {
         dialog = new JDialog(parent, "Message", false);
         messagePanel = new JPanel();
         messagePanel.add(new JLabel(message));
@@ -48,17 +49,14 @@ public class AutoDismissDialog {
         dialog.pack();
     }
 
-
-    public AutoDismissDialog(Frame parent, String message) {
+    public AutoDismissDialog(@Nullable Frame parent, String message) {
         this(parent, message, DEFAULT_DELAY, DEFAULT_RATE, DEFAULT_DELAY_START_TO_DISPOSE,
             DEFAULT_DELAY_DISPOSE_TO_END);
     }
 
-
     public AutoDismissDialog(String message) {
         this(null, message);
     }
-
 
     public void show() {
         timer.schedule(new TimerTask() {

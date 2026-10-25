@@ -24,7 +24,10 @@ import de.uka.ilkd.key.util.KeYTypeUtil;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class ClassTree extends JTree {
 
     /**
@@ -74,19 +77,17 @@ public class ClassTree extends JTree {
         });
     }
 
-
     public ClassTree(boolean addContractTargets, boolean skipLibraryClasses, Services services) {
         this(addContractTargets, skipLibraryClasses, services,
             new LinkedHashMap<>());
     }
 
-
-
     // -------------------------------------------------------------------------
     // internal methods
     // -------------------------------------------------------------------------
 
-    private static DefaultMutableTreeNode getChildByString(DefaultMutableTreeNode parentNode,
+    private static @Nullable DefaultMutableTreeNode getChildByString(
+            DefaultMutableTreeNode parentNode,
             String childString) {
         int numChildren = parentNode.getChildCount();
         for (int i = 0; i < numChildren; i++) {
@@ -100,8 +101,8 @@ public class ClassTree extends JTree {
         return null;
     }
 
-
-    private static DefaultMutableTreeNode getChildByTarget(DefaultMutableTreeNode parentNode,
+    private static @Nullable DefaultMutableTreeNode getChildByTarget(
+            DefaultMutableTreeNode parentNode,
             IObserverFunction target) {
         int numChildren = parentNode.getChildCount();
         for (int i = 0; i < numChildren; i++) {
@@ -114,7 +115,6 @@ public class ClassTree extends JTree {
         }
         return null;
     }
-
 
     private static void insertIntoTree(DefaultMutableTreeNode rootNode, KeYJavaType kjt,
             boolean addContractTargets, Services services) {
@@ -180,7 +180,6 @@ public class ClassTree extends JTree {
         }
     }
 
-
     private static void compressLinearPaths(DefaultMutableTreeNode root) {
 
         int numChildren = root.getChildCount();
@@ -202,8 +201,6 @@ public class ClassTree extends JTree {
             }
         }
     }
-
-
 
     /**
      * <p>
@@ -244,7 +241,6 @@ public class ClassTree extends JTree {
         return sb.toString();
     }
 
-
     private static DefaultMutableTreeNode createTree(boolean addContractTargets,
             boolean skipLibraryClasses, Services services) {
         // get all classes
@@ -267,8 +263,7 @@ public class ClassTree extends JTree {
         return rootNode;
     }
 
-
-    private void open(KeYJavaType kjt, IObserverFunction target) {
+    private void open(KeYJavaType kjt, @Nullable IObserverFunction target) {
         // get tree path to class
         ArrayList<DefaultMutableTreeNode> pathVector = new ArrayList<>();
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) getModel().getRoot();
@@ -337,7 +332,8 @@ public class ClassTree extends JTree {
      * @return The first found {@link DefaultMutableTreeNode} with the given text or {@code null} if
      *         no {@link DefaultMutableTreeNode} was found.
      */
-    protected DefaultMutableTreeNode searchNode(DefaultMutableTreeNode parent, String text) {
+    protected @Nullable DefaultMutableTreeNode searchNode(DefaultMutableTreeNode parent,
+            String text) {
         for (int i = 0; i < parent.getChildCount(); i++) {
             DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) parent.getChildAt(i);
             Entry e = (Entry) childNode.getUserObject();
@@ -349,8 +345,6 @@ public class ClassTree extends JTree {
         return null;
     }
 
-
-
     // -------------------------------------------------------------------------
     // public interface
     // -------------------------------------------------------------------------
@@ -359,29 +353,23 @@ public class ClassTree extends JTree {
         open(kjt, null);
     }
 
-
     public void select(KeYJavaType kjt, IObserverFunction target) {
         open(kjt, target);
     }
-
 
     public DefaultMutableTreeNode getRootNode() {
         return (DefaultMutableTreeNode) getModel().getRoot();
     }
 
-
-    public DefaultMutableTreeNode getSelectedNode() {
+    public @Nullable DefaultMutableTreeNode getSelectedNode() {
         TreePath path = getSelectionPath();
         return path != null ? (DefaultMutableTreeNode) path.getLastPathComponent() : null;
     }
 
-
-    public Entry getSelectedEntry() {
+    public @Nullable Entry getSelectedEntry() {
         DefaultMutableTreeNode node = getSelectedNode();
         return node != null ? (Entry) node.getUserObject() : null;
     }
-
-
 
     // -------------------------------------------------------------------------
     // inner classes
@@ -389,8 +377,8 @@ public class ClassTree extends JTree {
 
     static class Entry {
         public String string;
-        public KeYJavaType kjt = null;
-        public IObserverFunction target = null;
+        public @Nullable KeYJavaType kjt = null;
+        public @Nullable IObserverFunction target = null;
         public int numMembers = 0;
         public int numSelectedMembers = 0;
 

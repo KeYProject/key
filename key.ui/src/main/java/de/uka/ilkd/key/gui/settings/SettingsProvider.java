@@ -10,6 +10,9 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A settings provider is an entry in an {@link SettingsUi}.
  * <p>
@@ -21,6 +24,7 @@ import de.uka.ilkd.key.gui.MainWindow;
  * @version 1 (08.04.19)
  * @since 2.8.0
  */
+@NullMarked
 public interface SettingsProvider {
     /**
      * A textual human readable description of the settings panel. Used at the overview tree at the
@@ -79,7 +83,7 @@ public interface SettingsProvider {
      * @deprecated unused currently
      */
     @Deprecated
-    default Icon getIcon() {
+    default @Nullable Icon getIcon() {
         return null;
     }
 

@@ -9,11 +9,14 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Tab component for {@link JTabbedPane} with a close button.
  *
  * @author lanzinger
  */
+@NullMarked
 public class ClosableTabComponent extends JPanel {
 
     private static final long serialVersionUID = -7205139488676599833L;

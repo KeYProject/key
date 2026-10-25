@@ -7,12 +7,15 @@ package de.uka.ilkd.key.gui.utilities;
 import java.util.Objects;
 import java.util.function.Function;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Caches a computation using a single value cache
  *
  * @param <A> arguments for the computation
  * @param <T> return type
  */
+@NullMarked
 public class Cached<A, T> {
     private A args = null;
     private T value = null;

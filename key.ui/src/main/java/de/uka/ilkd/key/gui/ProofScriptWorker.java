@@ -23,7 +23,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.scripts.ScriptException;
 
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -48,7 +47,7 @@ public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScript
     /**
      * The proof script engine.
      */
-    private @MonotonicNonNull ProofScriptEngine engine;
+    private @Nullable ProofScriptEngine engine;
 
     private final JDialog monitor = new JDialog(MainWindow.getInstance(),
         "Running Script ...", ModalityType.MODELESS);

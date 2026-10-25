@@ -30,6 +30,8 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,11 +43,12 @@ import org.slf4j.LoggerFactory;
 // TODO: This class should not know/use the AbstractMediatorUserInterfaceControl and the
 // KeYMediator.
 // Refactor the implementation and use events to update the user interface.
+@NullMarked
 public class MediatorProofControl extends AbstractProofControl {
     private static final Logger LOGGER = LoggerFactory.getLogger(MediatorProofControl.class);
 
     private final AbstractMediatorUserInterfaceControl ui;
-    private AutoModeWorker worker;
+    private @Nullable AutoModeWorker worker;
 
     /**
      * True while an automode/macro run is active or still winding down; released only when the
@@ -184,11 +187,11 @@ public class MediatorProofControl extends AbstractProofControl {
         private final List<Node> initialGoals;
         private final ImmutableList<Goal> goals;
         private final ProverCore<Proof, Goal> applyStrategy;
-        private ProofSearchInformation<Proof, Goal> info;
+        private @Nullable ProofSearchInformation<Proof, Goal> info;
         private volatile boolean backgroundStarted = false;
 
         public AutoModeWorker(final Proof proof, final ImmutableList<Goal> goals,
-                ProverTaskListener ptl) {
+                @Nullable ProverTaskListener ptl) {
             this.proof = proof;
             this.goals = goals;
             this.initialGoals = goals.stream().map(Goal::node).collect(Collectors.toList());

@@ -17,6 +17,9 @@ import de.uka.ilkd.key.smt.model.*;
 
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class CETree {
     /**
      * A comparator that sort ignoRiNG cASe. Used to sort labels.
@@ -36,8 +39,6 @@ public class CETree {
      * The SMT model.
      */
     private final Model model;
-
-
 
     public CETree(Model model) {
         super();
@@ -61,7 +62,6 @@ public class CETree {
     public JTree getTreeComponent() {
         return tree;
     }
-
 
     private DefaultMutableTreeNode constructTree() {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Model");
@@ -128,7 +128,6 @@ public class CETree {
                 arrayFields.add(arrayField);
             }
         }
-
 
         // Fun Values
         DefaultMutableTreeNode functionValues = new DefaultMutableTreeNode("Functions");
@@ -237,7 +236,6 @@ public class CETree {
             addSequenceProperties(s, sequence);
         }
 
-
     }
 
     public static String computeSequenceName(Sequence s) {
@@ -293,14 +291,10 @@ public class CETree {
 
     private class CEMouseAdapter extends MouseAdapter {
 
-
-
         public CEMouseAdapter() {
             super();
 
         }
-
-
 
         public void mousePressed(MouseEvent e) {
             int selRow = tree.getRowForLocation(e.getX(), e.getY());
@@ -342,7 +336,6 @@ public class CETree {
                                     return;
                                 }
 
-
                                 // search for object
                                 ObjectVal val = null;
                                 for (ObjectVal o : heap.getObjects()) {
@@ -357,7 +350,6 @@ public class CETree {
                                 addObjectProperties(val, node);
 
                             }
-
 
                         } else if (value.startsWith("#l")) {
                             LocationSet locset = null;
@@ -387,12 +379,9 @@ public class CETree {
 
                             addSequenceProperties(sequence, node);
 
-
                         }
 
                         tree.expandPath(selPath);
-
-
 
                     }
 

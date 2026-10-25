@@ -11,6 +11,9 @@ import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ShowUsedContractsAction extends MainWindowAction {
 
     /**

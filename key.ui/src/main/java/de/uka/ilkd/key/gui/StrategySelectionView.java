@@ -39,6 +39,8 @@ import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +65,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public final class StrategySelectionView extends JPanel implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(StrategySelectionView.class);
 
@@ -90,7 +93,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     /**
      * The {@link KeYMediator} which provides the active proof.
      */
-    private KeYMediator mediator;
+    private @Nullable KeYMediator mediator;
 
     /**
      * Allows access to shown UI controls generated according to {@link #DEFINITION}.
@@ -121,7 +124,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
      * The combo box popup list, cached once the delete handler is installed, so the delete action
      * can keep the popup selection aligned with the combo box.
      */
-    private JList<?> presetPopupList;
+    private @Nullable JList<?> presetPopupList;
 
     /**
      * Width (in pixels) of the clickable delete zone drawn at the right edge of user-defined preset
@@ -539,7 +542,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
      * @param selectName the name of the preset to select afterwards, or {@code null} to select the
      *        first entry ("Defaults")
      */
-    private void rebuildPresetCombo(String selectName) {
+    private void rebuildPresetCombo(@Nullable String selectName) {
         JComboBox<PresetEntry> combo = components.getStrategyPredefSettingsCmb();
         if (combo == null) {
             return;
@@ -732,7 +735,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         rebuildPresetCombo(newName);
     }
 
-    private void deleteUserPreset(PresetEntry entry) {
+    private void deleteUserPreset(@Nullable PresetEntry entry) {
         if (entry == null || !entry.userDefined()) {
             return;
         }
@@ -827,7 +830,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         });
     }
 
-    public void setMediator(KeYMediator mediator) {
+    public void setMediator(@Nullable KeYMediator mediator) {
         if (this.mediator != null) {
             this.mediator.removeKeYSelectionListener(mediatorListener);
         }
@@ -843,7 +846,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     /**
      * performs a refresh of all elements in this tab
      */
-    public void refresh(Proof proof) {
+    public void refresh(@Nullable Proof proof) {
         if (proof == null) {
             enableAll(false);
         } else {
@@ -988,7 +991,6 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         refresh(proof);
     }
 
-
     @Override
     public String getTitle() {
         return "Proof Search Strategy";
@@ -1003,7 +1005,6 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     public Icon getIcon() {
         return IconFactory.PROOF_SEARCH_STRATEGY.get(MainWindow.TAB_ICON_SIZE);
     }
-
 
     /**
      * A single entry of the preset combo box: either the built-in "Defaults", one of the profile's
@@ -1080,7 +1081,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
 
         @Override
         public Component getListCellRendererComponent(JList<? extends PresetEntry> list,
-                PresetEntry value, int index, boolean isSelected, boolean cellHasFocus) {
+                @Nullable PresetEntry value, int index, boolean isSelected, boolean cellHasFocus) {
             Color bg = isSelected ? list.getSelectionBackground() : list.getBackground();
             Color fg = isSelected ? list.getSelectionForeground() : list.getForeground();
             panel.setBackground(bg);
@@ -1143,7 +1144,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         /**
          * The {@link MaxRuleAppSlider} in which the maximal number of steps is edited.
          */
-        private MaxRuleAppSlider maxRuleAppSlider;
+        private @Nullable MaxRuleAppSlider maxRuleAppSlider;
         /**
          * The {@link JButton} which restores default values.
          */
@@ -1157,14 +1158,14 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         /**
          * The menu button offering save / stash / rename actions for presets.
          */
-        private JButton presetMenuButton;
+        private @Nullable JButton presetMenuButton;
 
         /**
          * Returns the {@link MaxRuleAppSlider} in which the maximal number of steps is edited.
          *
          * @return The {@link MaxRuleAppSlider} in which the maximal number of steps is edited.
          */
-        public MaxRuleAppSlider getMaxRuleAppSlider() {
+        public @Nullable MaxRuleAppSlider getMaxRuleAppSlider() {
             return maxRuleAppSlider;
         }
 
@@ -1239,7 +1240,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         /**
          * @return the menu button offering save / stash / rename actions
          */
-        public JButton getPresetMenuButton() {
+        public @Nullable JButton getPresetMenuButton() {
             return presetMenuButton;
         }
 
