@@ -17,6 +17,8 @@ import org.key_project.exploration.ProofExplorationService;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Action to edit formulas in the actions mode
  *
@@ -24,6 +26,7 @@ import org.key_project.prover.sequent.SequentFormula;
  * @author Sarah Grebing
  * @version 2 (25.05.18)
  */
+@NullMarked
 public class EditFormulaAction extends ExplorationAction {
     private final transient PosInSequent posInSeq;
 
