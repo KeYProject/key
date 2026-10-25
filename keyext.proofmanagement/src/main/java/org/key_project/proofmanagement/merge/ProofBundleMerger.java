@@ -15,6 +15,9 @@ import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ProofBundleMerger {
     private ProofBundleMerger() {
     }

@@ -6,11 +6,14 @@ package org.key_project.proofmanagement.check;
 
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A checker for a proof related property.
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public interface Checker {
     /**
      * Checks the given proof bundle for consistency.

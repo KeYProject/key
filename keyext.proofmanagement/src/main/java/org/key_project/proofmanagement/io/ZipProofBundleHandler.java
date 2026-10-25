@@ -15,6 +15,9 @@ import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.proofmanagement.check.ProofManagementException;
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A ProofBundleHandler for a proof bundle stored inside a zip file
  * (usually the file extension will be "zproof").
@@ -27,6 +30,7 @@ import org.key_project.util.java.IOUtil;
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class ZipProofBundleHandler extends ProofBundleHandler {
     /** path of the actual proof bundle file */
     private final Path zipPath;
@@ -107,13 +111,13 @@ public class ZipProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
-    public Path getBootclasspath() throws IOException {
+    public @Nullable Path getBootclasspath() throws IOException {
         // return getFiles(fs.getPath("/bootclasspath"), ProofBundleHandler.BOOTCLASSPATH_MATCHER);
         return dbh.getBootclasspath();
     }
 
     @Override
-    public Path getTopLevelProjectFile() {
+    public @Nullable Path getTopLevelProjectFile() {
         return dbh.getTopLevelProjectFile();
     }
 
