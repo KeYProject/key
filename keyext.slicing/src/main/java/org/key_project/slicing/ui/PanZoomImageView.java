@@ -59,11 +59,18 @@ public class PanZoomImageView extends JComponent
     /**
      * Construct a new image view for the given image and initial dimensions.
      * The component will react to resize events.
+     * <p>
+     * The UI calls below operate on {@code this} while the receiver is still under initialization
+     * (EISOP initialization check); safe here since the event listeners only fire after the
+     * constructor has completed (the timer lambda only runs once started, after the constructor),
+     * suppressed with scoped keys.
      *
      * @param img image to display
      * @param width width of the component
      * @param height height of the component
      */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public PanZoomImageView(BufferedImage img, int width, int height) {
         this.image = img;
 
@@ -80,17 +87,26 @@ public class PanZoomImageView extends JComponent
         at = AffineTransform.getScaleInstance(scale, scale);
         at.translate(x, y);
 
-        this.timer = new Timer(150, e -> {
+        Timer timer = new Timer(150, e -> {
             if (quickRender && System.currentTimeMillis() - lastPaint > 100) {
                 quickRender = false;
                 repaint();
-                this.timer.stop();
+                stopTimer();
             }
         });
+        this.timer = timer;
         addComponentListener(new ResizeListener());
         addMouseListener(this);
         addMouseMotionListener(this);
         addMouseWheelListener(this);
+    }
+
+    /**
+     * Stop the timer that schedules redraws.
+     * Safe to call after construction; the timer field is assigned before the timer can fire.
+     */
+    private void stopTimer() {
+        this.timer.stop();
     }
 
     @Override

@@ -53,6 +53,7 @@ import org.key_project.util.EqualsAndHashCodeDelegator;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -207,7 +208,7 @@ public final class DependencyAnalyzer {
         if (!doDependencyAnalysis && doDeduplicateRuleApps) {
             executionTime.start(DUPLICATE_ANALYSIS_SETUP);
             // mark everything as 'useful' to evaluate the second algorithm in isolation
-            proof.breadthFirstSearch(proof.root(), ((proof1, visitedNode) -> {
+            proof.breadthFirstSearch(root(), ((proof1, visitedNode) -> {
                 if (visitedNode.getAppliedRuleApp() == null) {
                     if (!visitedNode.isClosed()) {
                         usefulSteps.add(visitedNode);
@@ -251,14 +252,32 @@ public final class DependencyAnalyzer {
     }
 
     /**
+     * Get the root node of the analyzed proof.
+     * A proof always has a root node when it can be analyzed; the proof API declares
+     * {@link Proof#root()} nullable, so guard with a crash-equivalent check.
+     *
+     * @return the root node of the analyzed proof
+     */
+    private Node root() {
+        Node root = proof.root();
+        if (root == null) {
+            throw new NullPointerException("No root node of the proof to analyze.");
+        }
+        return root;
+    }
+
+    /**
      * Mark useless proof steps ({@link NodeInfo#isUselessApplication()}) based
      * on whether they are contained in {@link #usefulSteps}.
      */
     private void markUselessProofSteps() {
         Queue<Node> queue = new ArrayDeque<>();
-        queue.add(proof.root());
+        queue.add(root());
         while (!queue.isEmpty()) {
             Node node = queue.poll();
+            if (node == null) {
+                throw new NullPointerException("No node obtained from queue of proof steps.");
+            }
             node.getNodeInfo().setUselessApplication(!usefulSteps.contains(node));
             node.childrenIterator().forEachRemaining(queue::add);
         }
@@ -266,16 +285,22 @@ public final class DependencyAnalyzer {
 
     private RuleStatistics getRuleStatistics() {
         RuleStatistics rules = new RuleStatistics();
-        proof.breadthFirstSearch(proof.root(), (theProof, node) -> {
-            if (node.getAppliedRuleApp() == null) {
+        proof.breadthFirstSearch(root(), (theProof, node) -> {
+            RuleApp ruleApp = node.getAppliedRuleApp();
+            if (ruleApp == null) {
                 return;
             }
             boolean branches = node.childrenCount() > 1;
-            Rule rule = node.getAppliedRuleApp().rule();
+            Rule rule = ruleApp.rule();
             if (usefulSteps.contains(node)) {
                 rules.addApplication(rule, branches);
             } else {
-                if (node.lookup(DependencyNodeData.class).inputs.stream().map(it -> it.first)
+                DependencyNodeData data = node.lookup(DependencyNodeData.class);
+                if (data == null) {
+                    throw new NullPointerException(
+                        "No dependency data of node " + node.serialNr() + ".");
+                }
+                if (data.inputs.stream().map(it -> it.first)
                         .anyMatch(usefulFormulas::contains)) {
                     rules.addInitialUselessApplication(rule, branches);
                 } else {
@@ -302,8 +327,9 @@ public final class DependencyAnalyzer {
             // closed goal & has previous step
             // => mark output (closed goal) of parent node as useful
             boolean considerOutputs = false;
-            if (node.getAppliedRuleApp() == null && node.parent() != null) {
-                node = node.parent();
+            Node parent = node.parent();
+            if (node.getAppliedRuleApp() == null && parent != null) {
+                node = parent;
                 considerOutputs = true;
             }
             if (usefulSteps.contains(node)) {
@@ -311,6 +337,10 @@ public final class DependencyAnalyzer {
             }
             usefulSteps.add(node);
             DependencyNodeData data = node.lookup(DependencyNodeData.class);
+            if (data == null) {
+                throw new NullPointerException(
+                    "No dependency data of node " + node.serialNr() + ".");
+            }
             data.inputs.forEach(it -> usefulFormulas.add(it.first));
 
             for (Pair<GraphNode, Boolean> in : data.inputs) {
@@ -334,7 +364,7 @@ public final class DependencyAnalyzer {
 
         // unmark all 'useful' steps in useless branches
         executionTime.start(DEPENDENCY_ANALYSIS4);
-        proof.breadthFirstSearch(proof.root(), (proof1, node) -> {
+        proof.breadthFirstSearch(root(), (proof1, node) -> {
             if (!usefulSteps.contains(node)) {
                 return;
             }
@@ -370,6 +400,10 @@ public final class DependencyAnalyzer {
                 PosInOccurrence pio =
                     PosInOccurrence.findInSequent(seq, i, PosInTerm.getTopLevel());
                 GraphNode node = graph.getGraphNode(proof, goal.node().getBranchLocation(), pio);
+                if (node == null) {
+                    throw new NullPointerException(
+                        "No graph node for formula " + i + " of an open goal.");
+                }
                 usefulFormulas.add(node);
                 graph.incomingEdgesOf(node).forEach(queue::add);
             }
@@ -384,11 +418,15 @@ public final class DependencyAnalyzer {
      */
     private void analyzeDependenciesBranches() {
         // analyze branching proof steps: they are only useful if all of their outputs were used
-        proof.breadthFirstSearch(proof.root(), (proof1, node) -> {
+        proof.breadthFirstSearch(root(), (proof1, node) -> {
             if (node.childrenCount() <= 1) {
                 return;
             }
             DependencyNodeData data = node.lookup(DependencyNodeData.class);
+            if (data == null) {
+                throw new NullPointerException(
+                    "No dependency data of branch node " + node.serialNr() + ".");
+            }
             Map<BranchLocation, Collection<GraphNode>> groupedOutputs = new HashMap<>();
             node.childrenIterator().forEachRemaining(
                 x -> groupedOutputs.put(x.getBranchLocation(), new ArrayList<>()));
@@ -398,7 +436,12 @@ public final class DependencyAnalyzer {
                     // (always leads to cutWasUseful = false)
                     return;
                 }
-                groupedOutputs.get(n.getBranchLocation()).add(n);
+                Collection<GraphNode> outputGroup = groupedOutputs.get(n.getBranchLocation());
+                if (outputGroup == null) {
+                    throw new NullPointerException(
+                        "No output group for branch location " + n.getBranchLocation() + ".");
+                }
+                outputGroup.add(n);
             });
             boolean cutWasUseful = groupedOutputs.values().stream()
                     .allMatch(l -> l.stream().anyMatch(usefulFormulas::contains));
@@ -474,9 +517,14 @@ public final class DependencyAnalyzer {
                 if (!(produced instanceof TrackedFormula)) {
                     return;
                 }
+                RuleApp proofRuleApp = proofNode.getAppliedRuleApp();
+                if (proofRuleApp == null) {
+                    throw new NullPointerException(
+                        "No rule application for proof step " + proofNode.serialNr() + ".");
+                }
                 foundDupes
                         .computeIfAbsent(
-                            new EqualsAndHashCodeDelegator<>(proofNode.getAppliedRuleApp(),
+                            new EqualsAndHashCodeDelegator<>(proofRuleApp,
                                 EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy,
                                 EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy),
                             _a -> new LinkedHashSet<>())
@@ -499,8 +547,8 @@ public final class DependencyAnalyzer {
                 LOGGER.trace("input {} found duplicate; attempt to merge:",
                     node.toString(false, false));
 
-                List<Node> apps = new ArrayList<>(steps);
-                List<BranchLocation> locs = apps.stream()
+                List<@Nullable Node> apps = new ArrayList<>(steps);
+                List<BranchLocation> locs = steps.stream()
                         .map(Node::getBranchLocation)
                         .collect(Collectors.toList());
                 for (int idxA = 0; idxA < apps.size() - 1; idxA++) {
@@ -591,7 +639,8 @@ public final class DependencyAnalyzer {
     /**
      * Checks whether the two provided nodes can be merged into a single node.
      *
-     * @param apps list of all similar rule applications
+     * @param apps list of all similar rule applications (may contain {@code null} entries for
+     *        steps that have been merged away)
      * @param idxA index of first node in <code>apps</code>
      * @param stepA first node
      * @param stepB second node
@@ -600,7 +649,7 @@ public final class DependencyAnalyzer {
      * @param mergeBase common prefix of <code>locA</code> and <code>locB</code>
      * @return whether a merge is valid
      */
-    private boolean canMergeStepsInto(List<Node> apps, int idxA, Node stepA, Node stepB,
+    private boolean canMergeStepsInto(List<@Nullable Node> apps, int idxA, Node stepA, Node stepB,
             BranchLocation locA, BranchLocation locB, BranchLocation mergeBase) {
         // calculate the step index of the merged rule application
         BranchLocation differingSuffix = locA.size() == mergeBase.size() ? locB : locA;
@@ -716,16 +765,22 @@ public final class DependencyAnalyzer {
      * Checks whether any proof steps use an input formula consumed by <code>stepA</code> or
      * <code>stepB</code>. In that case, the two steps may not be merged.
      *
-     * @param apps list of all similar apps
+     * @param apps list of all similar apps (may contain {@code null} entries for steps that have
+     *        been merged away)
      * @param idxA index of stepA
      * @param stepA first proof step
      * @param stepB second proof step
      * @param mergeBase merge base of stepA and stepB
      * @return whether the merge is obstructed
      */
-    private boolean otherStepsRequireConsumedInputs(List<Node> apps, int idxA, Node stepA,
+    private boolean otherStepsRequireConsumedInputs(List<@Nullable Node> apps, int idxA, Node stepA,
             Node stepB, BranchLocation mergeBase) {
-        boolean consumesInput = graph.edgesOf(apps.get(idxA)).stream()
+        Node stepAIndex = apps.get(idxA);
+        if (stepAIndex == null) {
+            throw new NullPointerException(
+                "No proof step at index " + idxA + " of the list of similar rule applications.");
+        }
+        boolean consumesInput = graph.edgesOf(stepAIndex).stream()
                 .anyMatch(AnnotatedEdge::replacesInputNode);
         if (consumesInput) {
             // are any of the inputs used by any other edge?

@@ -103,7 +103,11 @@ public class RuleStatistics {
      * @return whether that rule creates new branches
      */
     public boolean branches(String rule) {
-        return ruleBranched.get(rule);
+        Boolean branches = ruleBranched.get(rule);
+        if (branches == null) {
+            throw new NullPointerException("No branch information recorded for rule " + rule + ".");
+        }
+        return branches;
     }
 
     /**
