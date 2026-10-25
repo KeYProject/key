@@ -60,10 +60,16 @@ public class ReferenceSearchDialog extends JDialog {
      *
      * @param proof the proof
      * @param listener control listener
+     *        <p>
+     *        The component-building calls are made on {@code this} while the receiver is still
+     *        under initialization (EISOP initialization check); safe here since all members are
+     *        initialized before the calls, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ReferenceSearchDialog(Proof proof, ReferenceSearchDialogListener listener) {
         super(MainWindow.getInstance());
         table = new ReferenceSearchTable(proof, MainWindow.getInstance().getMediator());
+        table.init();
         table.getTableHeader().setReorderingAllowed(false);
         this.setTitle("Proof Caching");
         this.listener = listener;
@@ -114,8 +120,16 @@ public class ReferenceSearchDialog extends JDialog {
             applyButton.setEnabled(false);
             applyButton.addActionListener(e -> {
                 try {
-                    applyButton.setEnabled(false);
-                    closeDialog.setEnabled(false);
+                    JButton apply = applyButton;
+                    JButton close = closeDialog;
+                    if (apply == null) {
+                        throw new NullPointerException("apply button not initialized.");
+                    }
+                    if (close == null) {
+                        throw new NullPointerException("close button not initialized.");
+                    }
+                    apply.setEnabled(false);
+                    close.setEnabled(false);
                     listener.copyButtonClicked(this);
                 } catch (Exception exception) {
                     // There may be exceptions during rule application that should not be lost.

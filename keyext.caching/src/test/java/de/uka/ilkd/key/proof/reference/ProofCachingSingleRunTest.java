@@ -6,7 +6,6 @@ package de.uka.ilkd.key.proof.reference;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
@@ -15,6 +14,8 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
@@ -40,16 +41,32 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * unrelated enabled goal from the work lists, so the proof closes in one pass.
  */
 class ProofCachingSingleRunTest {
-    private static final Path testCaseDirectory =
-        Objects.requireNonNull(FindResources.getTestCasesDirectory());
+    private static final Path testCaseDirectory = requireTestCasesDirectory();
+
+    private static Path requireTestCasesDirectory() {
+        Path directory = FindResources.getTestCasesDirectory();
+        if (directory == null) {
+            throw new NullPointerException("Test case directory not found.");
+        }
+        return directory;
+    }
+
     private static final Path BIN = testCaseDirectory.resolve(
         "../../../../../key.ui/examples/heap/WeideEtAl_02_BinarySearch/BinarySearch_search.key");
 
     private static ApplyStrategyInfo<Proof, Goal> auto(Proof p, ImmutableList<Goal> goals) {
         int maxSteps = p.getSettings().getStrategySettings().getMaxSteps();
         long timeout = p.getSettings().getStrategySettings().getTimeout();
+        InitConfig initConfig = p.getInitConfig();
+        if (initConfig == null) {
+            throw new NullPointerException("No init config for the proof to prove automatically.");
+        }
+        Profile profile = initConfig.getProfile();
+        if (profile == null) {
+            throw new NullPointerException("No profile in the init config of the proof.");
+        }
         ApplyStrategy s = new ApplyStrategy(
-            p.getInitConfig().getProfile().<Proof, Goal>getSelectedGoalChooserBuilder().create());
+            profile.<Proof, Goal>getSelectedGoalChooserBuilder().create());
         return s.start(p, goals, maxSteps, timeout, false);
     }
 
@@ -58,8 +75,14 @@ class ProofCachingSingleRunTest {
         GeneralSettings.noPruningClosed = false;
         KeYEnvironment<DefaultUserInterfaceControl> e1 = KeYEnvironment.load(BIN);
         Proof src = e1.getLoadedProof();
+        if (src == null) {
+            throw new NullPointerException("No cache-source proof loaded from '" + BIN + "'.");
+        }
         KeYEnvironment<DefaultUserInterfaceControl> e2 = KeYEnvironment.load(BIN);
         Proof p2 = e2.getLoadedProof();
+        if (p2 == null) {
+            throw new NullPointerException("No cache-target proof loaded from '" + BIN + "'.");
+        }
         try {
             auto(src, src.openEnabledGoals());
             assertTrue(src.closed(), "cache source proof must close");
@@ -70,6 +93,9 @@ class ProofCachingSingleRunTest {
             // mirror CachingExtension.ruleApplied: disable cache-hit new goals of a split
             RuleAppListener caching = ev -> {
                 ImmutableList<Goal> ng = ev.getNewGoals();
+                if (ng == null) {
+                    return;
+                }
                 if (ng.size() <= 1) {
                     return;
                 }
