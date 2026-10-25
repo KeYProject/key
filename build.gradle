@@ -131,6 +131,9 @@ subprojects {
         if (System.getProperty("ENABLE_NULLAWAY")) {
             options.errorprone.enabled = true
             options.errorprone.disableAllChecks = true
+            // Report more than the javac default (100) errors so the full
+            // NullAway finding set is visible in one pass.
+            options.compilerArgs.addAll(["-Xmaxerrs", "10000"])
             // NullAway options live as a "nullaway" extension on the
             // ErrorProne options of each JavaCompile task.
             options.errorprone.nullaway.severity.set(
