@@ -16,10 +16,12 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.*;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.replay.AbstractProofReplayer;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
@@ -114,24 +116,49 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
             progressMonitor.setProgress(1);
         }
 
-        Path bootClassPath = originalProof.getEnv().getJavaModel().getBootClassPath();
-        AbstractProblemLoader problemLoader = new SingleThreadProblemLoader(
-            tmpFile,
-            originalProof.getEnv().getJavaModel().getClassPath(),
-            bootClassPath,
-            null,
-            originalProof.getEnv().getInitConfigForEnvironment().getProfile(),
-            false,
-            control, false, null);
+        ProofEnvironment environment = originalProof.getEnv();
+        if (environment == null) {
+            throw new NullPointerException(
+                "No proof environment of the original proof " + originalProof.name() + ".");
+        }
+        AbstractProblemLoader problemLoader = createProblemLoader(tmpFile, environment, control);
         problemLoader.load();
         if (progressMonitor != null) {
             progressMonitor.setProgress(2);
         }
         Files.delete(tmpFile);
         Proof proof = problemLoader.getProof();
+        if (proof == null) {
+            throw new NullPointerException("Could not reload the original proof obligation.");
+        }
 
         return new SlicingProofReplayer(originalProof, proof, results,
             progressMonitor);
+    }
+
+    /**
+     * Create a problem loader that reloads the original proof obligation from a temporary file.
+     * Class path, boot class path, includes, profile of new proofs and forced proof options may
+     * be {@code null} at runtime (the KeY problem loader accepts these as "not specified");
+     * the non-null parameter types of {@link SingleThreadProblemLoader} cannot express this,
+     * suppressed with a scoped key.
+     *
+     * @param tmpFile file with the saved proof obligation
+     * @param environment environment of the original proof
+     * @param control the problem loader control
+     * @return a problem loader for the provided parameters
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private static AbstractProblemLoader createProblemLoader(Path tmpFile,
+            ProofEnvironment environment, ProblemLoaderControl control) {
+        return new SingleThreadProblemLoader(
+            tmpFile,
+            environment.getJavaModel().getClassPath(),
+            environment.getJavaModel().getBootClassPath(),
+            null,
+            environment.getInitConfigForEnvironment().getProfile(),
+            false,
+            control, false, null);
     }
 
     /**
@@ -157,7 +184,11 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
         // second pair field indicates whether the next steps of the node should be added to the
         // queue (false if the step is part of a branch stack)
         Deque<Pair<Node, Boolean>> stepsToApply = new ArrayDeque<>();
-        stepsToApply.addLast(new Pair<>(originalProof.root(), true));
+        Node root = originalProof.root();
+        if (root == null) {
+            throw new NullPointerException("No root node of the original proof.");
+        }
+        stepsToApply.addLast(new Pair<>(root, true));
         Map<Node, Boolean> appliedSteps = new IdentityHashMap<>();
 
         while (!stepsToApply.isEmpty()) {
@@ -200,10 +231,18 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
                 // open goal intentionally left open, go to next branch
                 continue;
             }
-            proof.getServices().getNameRecorder().setProposals(
-                node.getNameRecorder().getProposals());
+            NameRecorder nameRecorder = node.getNameRecorder();
+            if (nameRecorder == null) {
+                throw new NullPointerException(
+                    "No name recorder for node " + node.serialNr() + ".");
+            }
+            proof.getServices().getNameRecorder().setProposals(nameRecorder.getProposals());
 
             ImmutableList<Goal> nextGoals = reApplyRuleApp(node, openGoal);
+            if (nextGoals == null) {
+                throw new NullPointerException(
+                    "No goals produced by re-applying the rule on node " + node.serialNr() + ".");
+            }
             for (Goal newGoal : nextGoals) {
                 boolean closedGoal = newGoal.node().isClosed();
                 if (!closedGoal) {
@@ -227,9 +266,15 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
     private Path saveProof(Proof currentProof, Proof proof) throws IOException {
         Path tempDir = Files.createTempDirectory("KeYslice");
         String filename;
-        if (currentProof.getProofFile() != null) {
+        Path proofFile = currentProof.getProofFile();
+        if (proofFile != null) {
+            Path fileName = proofFile.getFileName();
+            if (fileName == null) {
+                throw new NullPointerException(
+                    "Proof file " + proofFile + " has no file name.");
+            }
             filename =
-                MiscTools.removeFileExtension(currentProof.getProofFile().getFileName().toString());
+                MiscTools.removeFileExtension(fileName.toString());
         } else {
             filename = MiscTools.removeFileExtension(currentProof.name().toString());
             // make sure that no special chars are in name (e.g., "Taclet: seqPerm ..." for taclet

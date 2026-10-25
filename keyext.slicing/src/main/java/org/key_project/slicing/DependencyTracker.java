@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationByAddRules;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeAddFormula;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeRemoveFormula;
@@ -90,9 +91,16 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     /**
      * Construct a new tracker for a proof.
      * This tracker is added as a RuleAppListener and ProofTreeListener to the proof.
+     * <p>
+     * The {@code this}-passing registrations below happen while the receiver is still under
+     * initialization (EISOP initialization check); safe here since the tracker's state is fully
+     * default-initialized before any of its listeners can fire (no rule is applied and no tree
+     * event is fired while the proof is registered), suppressed with scoped keys.
      *
      * @param proof the proof to track
      */
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:type.arguments.not.inferred" })
     public DependencyTracker(Proof proof) {
         this.proof = proof;
         proof.addProofTreeListener(this);
@@ -119,8 +127,9 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     private static Set<PosInOccurrence> inputsOfRuleApp(
             RuleApp ruleApp, Node node) {
         Set<PosInOccurrence> inputs = new HashSet<>();
-        if (ruleApp.posInOccurrence() != null) {
-            inputs.add(ruleApp.posInOccurrence().topLevel());
+        PosInOccurrence posInOccurrence = ruleApp.posInOccurrence();
+        if (posInOccurrence != null) {
+            inputs.add(posInOccurrence.topLevel());
         }
         inputs.addAll(RuleAppUtil.assumesInstantiationsOfRuleApp(ruleApp, node));
         return inputs;
@@ -142,13 +151,31 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
 
         // check whether the rule of this proof step was added by another proof step
         // -> if so, add that dynamically added taclet as a dependency
-        if (n.getAppliedRuleApp() instanceof TacletApp tacletApp) {
+        if (ruleApp instanceof TacletApp tacletApp) {
             final var taclet = tacletApp.taclet();
-            final var justification =
-                n.proof().getInitConfig().getJustifInfo().getJustification(taclet);
-            if (justification instanceof RuleJustificationByAddRules) {
-                input.add(new Pair<>(dynamicRules.get(taclet), false));
+            Proof proof = n.proof();
+            if (proof == null) {
+                throw new NullPointerException(
+                    "No proof for node " + n.serialNr() + " in dependency tracking.");
             }
+            InitConfig initConfig = proof.getInitConfig();
+            if (initConfig == null) {
+                throw new NullPointerException(
+                    "No init config for proof of node " + n.serialNr() + ".");
+            }
+            final var justification =
+                initConfig.getJustifInfo().getJustification(taclet);
+            if (justification instanceof RuleJustificationByAddRules) {
+                AddedRule addedRule = dynamicRules.get(taclet);
+                if (addedRule == null) {
+                    throw new NullPointerException(
+                        "No dynamically added rule node for taclet " + taclet + ".");
+                }
+                input.add(new Pair<>(addedRule, false));
+            }
+        }
+        if (ruleApp == null) {
+            throw new NullPointerException("No rule application for node " + n.serialNr() + ".");
         }
 
         Set<PosInOccurrence> declared = inputsOfRuleApp(ruleApp, n);
@@ -303,8 +330,14 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
                 "dependency tracker received rule application on wrong proof");
         }
         RuleAppInfo ruleAppInfo = e.getRuleAppInfo();
+        if (ruleAppInfo == null) {
+            throw new NullPointerException("No rule application info for the applied rule.");
+        }
         RuleApp ruleApp = ruleAppInfo.getRuleApp();
         ImmutableList<Goal> goalList = e.getNewGoals();
+        if (goalList == null) {
+            throw new NullPointerException("No new goals for the applied rule.");
+        }
         Node n = ruleAppInfo.getOriginalNode();
 
         // outputs: new graph nodes
@@ -313,9 +346,20 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         // record any rules added by this rule application
         for (NodeReplacement newNode : ruleAppInfo.getReplacementNodes()) {
             for (NoPosTacletApp newRule : newNode.getNode().getLocalIntroducedRules()) {
+                Node ruleApplicationNode = newNode.getNode();
+                Proof nodeProof = ruleApplicationNode.proof();
+                if (nodeProof == null) {
+                    throw new NullPointerException(
+                        "No proof for node " + ruleApplicationNode.serialNr() + ".");
+                }
+                InitConfig initConfig = nodeProof.getInitConfig();
+                if (initConfig == null) {
+                    throw new NullPointerException(
+                        "No init config for the proof of node " + ruleApplicationNode.serialNr()
+                            + ".");
+                }
                 final var justification =
-                    newNode.getNode().proof().getInitConfig().getJustifInfo()
-                            .getJustification(newRule.taclet());
+                    initConfig.getJustifInfo().getJustification(newRule.taclet());
                 if (justification instanceof RuleJustificationByAddRules justAddRule &&
                         justAddRule.node() == n) {
                     AddedRule ruleNode = new AddedRule(newRule.rule().name().toString());
@@ -390,6 +434,9 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             throw new IllegalStateException("dependency tracker received node of wrong proof");
         }
         RuleApp ruleApp = n.getAppliedRuleApp();
+        if (ruleApp == null) {
+            throw new NullPointerException("No rule application for node " + n.serialNr() + ".");
+        }
         var goalList = n.children();
 
         // outputs: new graph nodes
@@ -399,8 +446,18 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
         for (final Node newNode : goalList) {
             for (NoPosTacletApp newRule : newNode.getLocalIntroducedRules()) {
                 final Taclet newTaclet = newRule.taclet();
+                Proof nodeProof = newNode.proof();
+                if (nodeProof == null) {
+                    throw new NullPointerException(
+                        "No proof for node " + newNode.serialNr() + ".");
+                }
+                InitConfig initConfig = nodeProof.getInitConfig();
+                if (initConfig == null) {
+                    throw new NullPointerException(
+                        "No init config for the proof of node " + newNode.serialNr() + ".");
+                }
                 var justification =
-                    newNode.proof().getInitConfig().getJustifInfo().getJustification(newTaclet);
+                    initConfig.getJustifInfo().getJustification(newTaclet);
                 if (justification instanceof RuleJustificationByAddRules justAddRule
                         && justAddRule.node() == n) {
                     AddedRule ruleNode = new AddedRule(newTaclet.name().toString());
@@ -470,7 +527,11 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     public void proofIsBeingPruned(ProofTreeEvent e) {
         // clean up removed formulas / nodes /...
         analysisResults = null;
-        graph.prune(e.getNode());
+        Node pruneTarget = e.getNode();
+        if (pruneTarget == null) {
+            throw new NullPointerException("No prune target in pruning proof tree event.");
+        }
+        graph.prune(pruneTarget);
     }
 
     /**
@@ -550,6 +611,9 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
             return null;
         }
         GraphNode graphNode = graph.getGraphNode(proof, currentNode.getBranchLocation(), pio);
+        if (graphNode == null) {
+            return null;
+        }
         Stream<Node> incoming = graph.incomingEdgesOf(graphNode);
         return incoming.findFirst().orElse(null);
     }

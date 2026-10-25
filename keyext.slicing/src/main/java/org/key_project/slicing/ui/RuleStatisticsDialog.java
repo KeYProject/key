@@ -34,10 +34,15 @@ public class RuleStatisticsDialog extends JDialog {
 
     /**
      * Construct and show a new dialog based on the provided analysis results.
+     * <p>
+     * The UI-creating calls below operate on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since the widget setup is purely
+     * local to this class, suppressed with a scoped key.
      *
      * @param window main window
      * @param results the results to show
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public RuleStatisticsDialog(Window window, AnalysisResults results) {
         super(window, "Rule Statistics");
 

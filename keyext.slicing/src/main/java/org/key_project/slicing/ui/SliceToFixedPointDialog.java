@@ -27,6 +27,7 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.slicing.analysis.AnalysisResults;
 
 import org.jspecify.annotations.NullMarked;
@@ -63,7 +64,7 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
     /**
      * Function that provides the analysis results of the last loaded proof.
      */
-    private final Function<Void, AnalysisResults> analyzeButton;
+    private final Function<Void, @Nullable AnalysisResults> analyzeButton;
     /**
      * Function that slices the currently loaded proof.
      */
@@ -85,14 +86,21 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
 
     /**
      * Construct a new dialog.
+     * <p>
+     * The listener registrations and UI calls below operate on {@code this} while the receiver is
+     * still under initialization (EISOP initialization check); safe here since the dialog is
+     * completed before it becomes visible and the listener callbacks only run after the
+     * constructor has completed, suppressed with scoped keys.
      *
      * @param mediator KeY mediator
      * @param window main window
      * @param analyzeCallback function that provides analysis results on the last loaded proof
      * @param sliceButton function that slices the last loaded proof
      */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public SliceToFixedPointDialog(KeYMediator mediator, Window window,
-            Function<Void, AnalysisResults> analyzeCallback,
+            Function<Void, @Nullable AnalysisResults> analyzeCallback,
             Runnable sliceButton) {
         super(window, "Slice to fixed point");
 
@@ -153,8 +161,8 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
      * @param analyzeCallback callback to provide analysis results
      * @return function that provides analysis results
      */
-    private Function<Void, AnalysisResults> wrapAnalysisCallback(
-            Function<Void, AnalysisResults> analyzeCallback) {
+    private Function<Void, @Nullable AnalysisResults> wrapAnalysisCallback(
+            Function<Void, @Nullable AnalysisResults> analyzeCallback) {
         return x -> {
             AnalysisResults results = null;
             try {
@@ -165,7 +173,12 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
             if (results != null) {
                 try {
                     // record useless rule applications in map
-                    Deque<Node> queue = new ArrayDeque<>(List.of(results.proof.root()));
+                    Node root = results.proof.root();
+                    if (root == null) {
+                        throw new NullPointerException(
+                            "No root node of the proof to slice.");
+                    }
+                    Deque<Node> queue = new ArrayDeque<>(List.of(root));
                     while (!queue.isEmpty()) {
                         Node node = queue.pop();
                         node.childrenIterator().forEachRemaining(queue::add);
@@ -173,7 +186,12 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
                                 || results.usefulSteps.contains(node)) {
                             continue;
                         }
-                        String name = node.getAppliedRuleApp().rule().displayName();
+                        RuleApp ruleApp = node.getAppliedRuleApp();
+                        if (ruleApp == null) {
+                            throw new NullPointerException(
+                                "No rule application for node " + node.serialNr() + ".");
+                        }
+                        String name = ruleApp.rule().displayName();
                         if (node.childrenCount() > 1) {
                             name = name + "*";
                         }
@@ -182,9 +200,14 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
                             (k, v) -> v == null ? 1 : v + 1);
                     }
                     Path filename = results.proof.getProofFile();
-                    String label = filename != null
-                            ? filename.getFileName().toString()
-                            : results.proof.name().toString();
+                    String label;
+                    if (filename != null) {
+                        Path fileName = filename.getFileName();
+                        label = fileName != null ? fileName.toString()
+                                : results.proof.name().toString();
+                    } else {
+                        label = results.proof.name().toString();
+                    }
                     tableRows.add(List.of(
                         label,
                         String.valueOf(results.totalSteps),
@@ -229,23 +252,30 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
      * @param proof the currently selected proof
      */
     void start(Proof proof) {
-        worker = new SliceToFixedPointWorker(proof, null, analyzeButton, sliceButton, () -> {
-        });
-        worker.execute();
+        SliceToFixedPointWorker newWorker =
+            new SliceToFixedPointWorker(proof, null, analyzeButton, sliceButton, () -> {
+            });
+        worker = newWorker;
+        newWorker.execute();
     }
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-        if (e.getSource().getSelectedProof() != null
-                && e.getSource().getSelectedProof().closed()) {
-            if (e.getSource().getSelectedProof() == worker.getSlicedProof()) {
+        Proof selectedProof = e.getSource().getSelectedProof();
+        if (selectedProof != null && selectedProof.closed()) {
+            SliceToFixedPointWorker currentWorker = worker;
+            if (currentWorker == null) {
+                throw new NullPointerException("No active slicing worker.");
+            }
+            if (selectedProof == currentWorker.getSlicedProof()) {
                 return; // no need to slice this one again
             }
             // pass previously sliced proof to worker, so that it is disposed of later
-            worker = new SliceToFixedPointWorker(e.getSource().getSelectedProof(),
-                worker.getSlicedProof(), analyzeButton, sliceButton, () -> {
+            SliceToFixedPointWorker newWorker = new SliceToFixedPointWorker(selectedProof,
+                currentWorker.getSlicedProof(), analyzeButton, sliceButton, () -> {
                 });
-            worker.execute();
+            worker = newWorker;
+            newWorker.execute();
         }
     }
 }

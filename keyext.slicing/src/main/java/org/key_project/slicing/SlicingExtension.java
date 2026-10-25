@@ -125,7 +125,11 @@ public class SlicingExtension implements KeYGuiExtension,
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-        createTrackerForProof(e.getSource().getSelectedProof());
+        Proof selectedProof = e.getSource().getSelectedProof();
+        if (selectedProof == null) {
+            return;
+        }
+        createTrackerForProof(selectedProof);
     }
 
     @Override
@@ -163,13 +167,14 @@ public class SlicingExtension implements KeYGuiExtension,
         }
         trackers.computeIfAbsent(newProof, proof -> {
             if (proof == null) {
-                return null;
+                throw new NullPointerException("Cannot track a null proof.");
             }
             proof.addProofDisposedListener(this);
             DependencyTracker tracker = new DependencyTracker(proof);
-            if (leftPanel != null) {
-                proof.addRuleAppListener(e -> leftPanel.ruleAppliedOnProof(proof, tracker));
-                proof.addProofTreeListener(leftPanel);
+            SlicingLeftPanel panel = leftPanel;
+            if (panel != null) {
+                proof.addRuleAppListener(e -> panel.ruleAppliedOnProof(proof, tracker));
+                proof.addProofTreeListener(panel);
                 if (enableSafeModeForNextProof) {
                     SlicingSettingsProvider.getSlicingSettings()
                             .deactivateAggressiveDeduplicate(proof);

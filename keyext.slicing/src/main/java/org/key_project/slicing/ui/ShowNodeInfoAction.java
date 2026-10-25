@@ -17,6 +17,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.proof.Node;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.slicing.graph.DependencyGraph.Edge;
@@ -54,6 +55,7 @@ public class ShowNodeInfoAction extends MainWindowAction {
      * @param tracker dependency tracker
      * @param node node to show info on
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ShowNodeInfoAction(MainWindow mw, DependencyTracker tracker, GraphNode node) {
         super(mw);
         setName("Show dependency graph info");
@@ -78,9 +80,15 @@ public class ShowNodeInfoAction extends MainWindowAction {
         Function<Edge, Collection<String>> nodeToTableRow = n -> {
             proofSteps.add(n.fromNode());
             graphNodes.add(n.toNode());
-            var ruleName = n.fromNode().getAppliedRuleApp().rule().displayName();
+            Node fromNode = n.fromNode();
+            RuleApp ruleApp = fromNode.getAppliedRuleApp();
+            if (ruleApp == null) {
+                throw new NullPointerException(
+                    "No rule application for proof step " + fromNode.serialNr() + ".");
+            }
+            var ruleName = ruleApp.rule().displayName();
             return List.of(
-                Integer.toString(n.fromNode().serialNr()),
+                Integer.toString(fromNode.serialNr()),
                 analysisResults != null && !analysisResults.usefulSteps.contains(n.fromNode())
                         ? "<strike>" + ruleName + "</strike>"
                         : ruleName,
@@ -180,9 +188,14 @@ public class ShowNodeInfoAction extends MainWindowAction {
             HtmlFactory.generateTable(headers1, clickable, Optional.empty(), inputs, idxFactory);
         var html2 =
             HtmlFactory.generateTable(headers2, clickable2, Optional.empty(), outputs, idxFactory);
+        RuleApp ruleApp = proofStep.getAppliedRuleApp();
+        if (ruleApp == null) {
+            throw new NullPointerException(
+                "No rule application for proof step " + proofStep.serialNr() + ".");
+        }
         var html = "<h1>Inputs</h1>"
             + html1
-            + "<h1>This step</h1>" + "<p>" + proofStep.getAppliedRuleApp().rule().displayName()
+            + "<h1>This step</h1>" + "<p>" + ruleApp.rule().displayName()
             + "</p>"
             // TODO: useful / useless / unknown
             + "<h1>Outputs</h1>"

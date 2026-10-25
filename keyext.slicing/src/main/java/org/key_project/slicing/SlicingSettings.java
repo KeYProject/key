@@ -39,19 +39,15 @@ public class SlicingSettings extends AbstractPropertiesSettings {
     /**
      * Always track dependencies config key.
      */
-    private final PropertyEntry<Boolean> alwaysTrack =
-        createBooleanProperty(KEY_ALWAYS_TRACK, true);
-
+    private final PropertyEntry<Boolean> alwaysTrack;
     /**
      * Aggressive rule deduplication config key.
      */
-    private final PropertyEntry<Boolean> aggressiveDeduplicate =
-        createBooleanProperty(KEY_AGGRESSIVE_DEDUPLICATE, true);
+    private final PropertyEntry<Boolean> aggressiveDeduplicate;
     /**
      * Path to dot executable config key.
      */
-    private final PropertyEntry<String> dotExecutable =
-        createStringProperty(KEY_DOT_EXECUTABLE, "");
+    private final PropertyEntry<String> dotExecutable;
 
     /**
      * Override map for aggressive deduplication config.
@@ -60,8 +56,17 @@ public class SlicingSettings extends AbstractPropertiesSettings {
      */
     private final Map<Proof, Boolean> aggressiveDeduplicateOverride = new WeakHashMap<>();
 
+    /**
+     * The {@code createXProperty} calls below are made on {@code this} while the receiver is
+     * still under initialization (EISOP initialization check); safe here since no subclass state
+     * is involved in these superclass factory methods, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SlicingSettings() {
         super(CATEGORY);
+        alwaysTrack = createBooleanProperty(KEY_ALWAYS_TRACK, true);
+        aggressiveDeduplicate = createBooleanProperty(KEY_AGGRESSIVE_DEDUPLICATE, true);
+        dotExecutable = createStringProperty(KEY_DOT_EXECUTABLE, "");
     }
 
     public boolean getAlwaysTrack() {
@@ -77,7 +82,10 @@ public class SlicingSettings extends AbstractPropertiesSettings {
      * @return whether aggressive deduplication is turned on for this proof
      */
     public boolean getAggressiveDeduplicate(@Nullable Proof proof) {
-        if (aggressiveDeduplicateOverride.containsKey(proof)) {
+        // only {@link #deactivateAggressiveDeduplicate} adds keys, so a {@code null} proof
+        // can never be present in the override map; the null check satisfies the map key
+        // nullness contract without changing semantics
+        if (proof != null && aggressiveDeduplicateOverride.containsKey(proof)) {
             return aggressiveDeduplicate.get() && aggressiveDeduplicateOverride.get(proof);
         } else {
             return aggressiveDeduplicate.get();
