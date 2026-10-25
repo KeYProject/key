@@ -78,7 +78,7 @@ class TestGenStrategy extends FilterStrategy {
      */
     private final ModalityCache modalityCache = new ModalityCache();
 
-    private static boolean isUnwindRule(org.key_project.prover.rules.Rule rule) {
+    private static boolean isUnwindRule(@Nullable Rule rule) {
         if (rule == null) {
             return false;
         }
