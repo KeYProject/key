@@ -128,9 +128,13 @@ public class Model {
      */
     private void processLocSetNames() {
 
-        SMTSort locsetSort = this.getTypes().getSort(SMTObjTranslator.LOCSET_SORT);
-        SMTSort objectSort = this.getTypes().getSort(SMTObjTranslator.OBJECT_SORT);
-        SMTSort fieldSort = this.getTypes().getSort(SMTObjTranslator.FIELD_SORT);
+        ProblemTypeInformation types = Objects.requireNonNull(this.getTypes(), "types");
+        SMTSort locsetSort = Objects.requireNonNull(types.getSort(SMTObjTranslator.LOCSET_SORT),
+            "location set sort");
+        SMTSort objectSort = Objects.requireNonNull(types.getSort(SMTObjTranslator.OBJECT_SORT),
+            "object sort");
+        SMTSort fieldSort = Objects.requireNonNull(types.getSort(SMTObjTranslator.FIELD_SORT),
+            "field sort");
         // for all locsets
         for (LocationSet ls : locsets) {
             String name = ls.getName();
@@ -318,7 +322,11 @@ public class Model {
         int x = Integer.parseInt(val, 2);
 
         if (s.getId().equals(SMTObjTranslator.BINT_SORT)) {
-            long intBound = types.getSort(SMTObjTranslator.BINT_SORT).getBound();
+            long intBound = Objects
+                    .requireNonNull(Objects.requireNonNull(types, "types")
+                            .getSort(SMTObjTranslator.BINT_SORT),
+                        "bint sort")
+                    .getBound();
             if (x >= intBound / 2) {
                 x = (int) (x - intBound);
             }
@@ -338,17 +346,19 @@ public class Model {
      * @param val the original any value in binary/hexadecimal
      * @return the formatted value
      */
-    public @Nullable String processAnyValue(String val) {
+    public @Nullable String processAnyValue(@Nullable String val) {
         if (val == null) {
             return null;
         }
+        ProblemTypeInformation types = Objects.requireNonNull(this.types, "types");
         // if val is in hexadecimal transform it to binary first
         if (val.startsWith("#x")) {
             val = val.replace("#", "");
             val = val.replace("x", "");
             int x = Integer.parseInt(val, 16);
 
-            long anySize = types.getSort(SMTObjTranslator.ANY_SORT).getBitSize();
+            long anySize = Objects.requireNonNull(types.getSort(SMTObjTranslator.ANY_SORT),
+                "any sort").getBitSize();
             StringBuilder binString = new StringBuilder(Integer.toBinaryString(x));
 
             while (binString.length() < anySize) {
@@ -365,9 +375,12 @@ public class Model {
          */
 
         // val is of type bint
-        if (val.startsWith(types.getPrefixForSort(types.getSort(SMTObjTranslator.BINT_SORT)))) {
-            long intBound = types.getSort(SMTObjTranslator.BINT_SORT).getBound();
-            long intSize = types.getSort(SMTObjTranslator.BINT_SORT).getBitSize();
+        if (val.startsWith(types.getPrefixForSort(Objects.requireNonNull(
+            types.getSort(SMTObjTranslator.BINT_SORT), "bint sort")))) {
+            SMTSort bintSort = Objects.requireNonNull(types.getSort(SMTObjTranslator.BINT_SORT),
+                "bint sort");
+            long intBound = bintSort.getBound();
+            long intSize = bintSort.getBitSize();
             val = val.substring(3);
             val = val.substring(val.length() - (int) intSize);
             int x = Integer.parseInt(val, 2);
@@ -385,22 +398,26 @@ public class Model {
             } else {
                 val = "true";
             }
-        } else if (val
-                .startsWith(types.getPrefixForSort(types.getSort(SMTObjTranslator.SEQ_SORT)))) {
+        } else if (val.startsWith(types.getPrefixForSort(Objects.requireNonNull(
+            types.getSort(SMTObjTranslator.SEQ_SORT), "sequence sort")))) {
             // val is of type sequence
-            val = formatAny(val, types.getSort(SMTObjTranslator.SEQ_SORT));
-        } else if (val
-                .startsWith(types.getPrefixForSort(types.getSort(SMTObjTranslator.HEAP_SORT)))) {
+            val = formatAny(val, Objects.requireNonNull(types.getSort(SMTObjTranslator.SEQ_SORT),
+                "sequence sort"));
+        } else if (val.startsWith(types.getPrefixForSort(Objects.requireNonNull(
+            types.getSort(SMTObjTranslator.HEAP_SORT), "heap sort")))) {
             // val is of type heap - should never happen!
-            val = formatAny(val, types.getSort(SMTObjTranslator.HEAP_SORT));
-        } else if (val
-                .startsWith(types.getPrefixForSort(types.getSort(SMTObjTranslator.LOCSET_SORT)))) {
+            val = formatAny(val, Objects.requireNonNull(types.getSort(SMTObjTranslator.HEAP_SORT),
+                "heap sort"));
+        } else if (val.startsWith(types.getPrefixForSort(Objects.requireNonNull(
+            types.getSort(SMTObjTranslator.LOCSET_SORT), "location set sort")))) {
             // val is of type location set
-            val = formatAny(val, types.getSort(SMTObjTranslator.LOCSET_SORT));
+            val = formatAny(val, Objects.requireNonNull(types.getSort(SMTObjTranslator.LOCSET_SORT),
+                "location set sort"));
         } else {
             // val can only be of type object
             val = val.substring(3);
-            long objSize = types.getSort(SMTObjTranslator.OBJECT_SORT).getBitSize();
+            long objSize = Objects.requireNonNull(types.getSort(SMTObjTranslator.OBJECT_SORT),
+                "object sort").getBitSize();
             val = val.substring(val.length() - (int) objSize);
             val = "#o" + Integer.parseInt(val, 2);
         }
@@ -411,6 +428,8 @@ public class Model {
      * Transforms the values of array fields of objects from binary/hexidecimal to human readable
      * form.
      */
+    @SuppressWarnings("NullAway") // sparse array elements are legitimately null in the model;
+                                  // ObjectVal.setArrayValue tolerates null at runtime
     public void processArrayValues() {
         for (Heap h : heaps) {
             for (ObjectVal o : h.getObjects()) {
@@ -436,6 +455,8 @@ public class Model {
     /**
      * Transforms values of sequences from binary/hexadecimal to human readable form
      */
+    @SuppressWarnings("NullAway") // sequence entries may be null when unset, and Sequence.set
+                                  // tolerates null at runtime
     public void processSeqValues() {
         for (Sequence s : sequences) {
             for (int i = 0; i < s.getLength(); ++i) {
@@ -451,7 +472,7 @@ public class Model {
      * @param original the name for which an alias is created
      * @return the alias
      */
-    private String getAliasedName(String original) {
+    private String getAliasedName(@Nullable String original) {
         return original + "/" + reversedConstants.get(original);
     }
 
@@ -577,7 +598,9 @@ public class Model {
                 heap = h;
             }
         }
-        ObjectVal o = getObject(constants.get(objName), heap);
+        heap = Objects.requireNonNull(heap, "heap");
+        ObjectVal o = Objects.requireNonNull(
+            getObject(Objects.requireNonNull(constants.get(objName), objName), heap), "object");
         int i = 1;
         while (!o.getName().equals(nullString) && i < l.length) {
             result.add(o);
@@ -585,7 +608,7 @@ public class Model {
             if (pointed == null) {
                 break;
             }
-            o = getObject(pointed, heap);
+            o = Objects.requireNonNull(getObject(pointed, heap), "object");
             i++;
         }
 
@@ -609,7 +632,9 @@ public class Model {
                 heap = h;
             }
         }
-        ObjectVal o = getObject(constants.get(objName), heap);
+        heap = Objects.requireNonNull(heap, "heap");
+        ObjectVal o = Objects.requireNonNull(
+            getObject(Objects.requireNonNull(constants.get(objName), objName), heap), "object");
         int i = 1;
         while (!o.getName().equals(nullString) && i < l.length) {
             String pointed = o.getFieldUsingSimpleName(l[i]);
@@ -617,7 +642,7 @@ public class Model {
                 break;
             }
 
-            o = getObject(pointed, heap);
+            o = Objects.requireNonNull(getObject(pointed, heap), "object");
             i++;
         }
 
@@ -631,10 +656,11 @@ public class Model {
         Set<String> objConstants = new HashSet<>();
         for (var pair : constants.entrySet()) {
             var c = pair.getKey();
-            if (types.getTypeForConstant(c) == null) {
+            SMTSort type = Objects.requireNonNull(types, "types").getTypeForConstant(c);
+            if (type == null) {
                 continue;
             }
-            if (types.getTypeForConstant(c).getId().equals(SMTObjTranslator.OBJECT_SORT)) {
+            if (type.getId().equals(SMTObjTranslator.OBJECT_SORT)) {
                 objConstants.add(pair.getValue());
             }
         }
@@ -785,11 +811,12 @@ public class Model {
         for (var pair : constants.entrySet()) {
             var c = pair.getKey();
             var value = constants.get(c);
-            SMTSort s = types.getTypeForConstant(c);
+            SMTSort s = Objects.requireNonNull(types, "types").getTypeForConstant(c);
             if (s == null) {
                 LOGGER.warn("No sort for: {}", c);
             } else {
-                newConstants.put(c, processConstantValue(value, s));
+                newConstants.put(c,
+                    processConstantValue(Objects.requireNonNull(value, "value"), s));
             }
 
         }

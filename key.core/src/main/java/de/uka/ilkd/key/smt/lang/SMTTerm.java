@@ -7,6 +7,7 @@ package de.uka.ilkd.key.smt.lang;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.smt.lang.SMTTermMultOp.Op;
 import de.uka.ilkd.key.smt.lang.SMTTermQuant.Quant;
@@ -733,15 +734,15 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm forall(SMTTermVariable var) {
-        return this.forall(toList(var), null);
+        return this.forall(Objects.requireNonNull(toList(var), "bindVars"), null);
     }
 
     public SMTTerm forall(SMTTermVariable var, SMTTerm pat) {
-        return this.forall(toList(var), toList(toList(pat)));
+        return this.forall(Objects.requireNonNull(toList(var), "bindVars"), toList(toList(pat)));
     }
 
     public SMTTerm forall(SMTTermVariable var, List<List<SMTTerm>> pats) {
-        return this.forall(toList(var), pats);
+        return this.forall(Objects.requireNonNull(toList(var), "bindVars"), pats);
     }
 
     public SMTTerm forall(List<SMTTermVariable> bindVars, @Nullable List<List<SMTTerm>> pats) {
@@ -794,11 +795,11 @@ public abstract class SMTTerm {
     }
 
     public SMTTerm exists(SMTTermVariable var) {
-        return this.exists(toList(var), null);
+        return this.exists(Objects.requireNonNull(toList(var), "bindVars"), null);
     }
 
     public SMTTerm exists(SMTTermVariable var, SMTTerm pat) {
-        return this.exists(toList(var), toList(toList(pat)));
+        return this.exists(Objects.requireNonNull(toList(var), "bindVars"), toList(toList(pat)));
     }
 
     public SMTTerm exists(List<SMTTermVariable> bindVars) {
@@ -1037,7 +1038,7 @@ public abstract class SMTTerm {
         return tToList;
     }
 
-    public static <T> @Nullable List<T> toList(T e) {
+    public static <T> @Nullable List<T> toList(@Nullable T e) {
 
         if (e == null) {
             return null;

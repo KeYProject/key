@@ -6,6 +6,7 @@ package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -121,7 +122,7 @@ public class SMTProblem {
         }
         if (valid != null && invalid != null) {
             throw new IllegalStateException("FATAL ERROR: The results are inconsistent for goal "
-                + goal.node().serialNr() + "!");
+                + Objects.requireNonNull(goal, "goal").node().serialNr() + "!");
         }
         if (valid != null) {
             return valid;
@@ -184,7 +185,8 @@ public class SMTProblem {
 
         ImmutableList<JTerm> ante = ImmutableList.nil();
 
-        final TermBuilder tb = goal.proof().getServices().getTermBuilder();
+        final TermBuilder tb =
+            Objects.requireNonNull(goal, "goal").proof().getServices().getTermBuilder();
         ante = ante.append(tb.tt());
         for (SequentFormula f : s.antecedent()) {
             ante = ante.append((JTerm) f.formula());

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof.proofevent;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.Node;
 
@@ -176,11 +177,11 @@ public class NodeReplacement {
     }
 
     private void addNodeChange(NodeChange p_nc) {
-        changes = changes.prepend(p_nc);
+        changes = Objects.requireNonNull(changes, "changes").prepend(p_nc);
     }
 
     private void removeNodeChanges(SequentFormula p_cf, boolean p_inAntec) {
-        Iterator<NodeChange> it = changes.iterator();
+        Iterator<NodeChange> it = Objects.requireNonNull(changes, "changes").iterator();
         changes = ImmutableList.nil();
         NodeChange oldNC;
         PosInOccurrence oldPio;

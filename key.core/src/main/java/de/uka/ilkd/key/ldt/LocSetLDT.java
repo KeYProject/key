@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.ldt;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
@@ -72,8 +73,12 @@ public final class LocSetLDT extends LDT {
         disjoint = getInstantiatedFunction("disjoint", services);
         createdInHeap = addFunction(services, "createdInHeap");
         pair = getInstantiatedFunction("pair", services, ImmutableList.fromList(List.of(
-            new GenericArgument(services.getNamespaces().sorts().lookup("java.lang.Object")),
-            new GenericArgument(services.getNamespaces().sorts().lookup("Field")))));
+            new GenericArgument(Objects.requireNonNull(
+                services.getNamespaces().sorts().lookup("java.lang.Object"),
+                "LocSetLDT: sort 'java.lang.Object' not found")),
+            new GenericArgument(Objects.requireNonNull(
+                services.getNamespaces().sorts().lookup("Field"),
+                "LocSetLDT: sort 'Field' not found")))));
     }
 
     private Function getInstantiatedFunction(String name, Services services,
@@ -87,8 +92,9 @@ public final class LocSetLDT extends LDT {
             name,
             services,
             ImmutableList.fromList(List.of(
-                new GenericArgument(
-                    services.getNamespaces().sortAliases().lookup("Loc").aliasedSort()))));
+                new GenericArgument(Objects.requireNonNull(
+                    services.getNamespaces().sortAliases().lookup("Loc"),
+                    "LocSetLDT: sort alias 'Loc' not found").aliasedSort()))));
     }
 
     public Function getEmpty() {
@@ -184,7 +190,7 @@ public final class LocSetLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(Operator op, JTerm sub,
+    public boolean isResponsible(Operator op, @Nullable JTerm sub,
             TermServices services, ExecutionContext ec) {
         if (op instanceof LogicFunctionalOperator lfo) {
             // getFunctionFor does not support all loc set functions, e.g. array range etc.
