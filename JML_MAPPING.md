@@ -1,51 +1,61 @@
-# JML_MAPPING — TextualJMLConstruct usage in KeY ↔ JMLtk AST equivalents
+# JML_MAPPING — JML constructs: KeY front-end ↔ JMLtk AST equivalents
 
-Branch: `weigl/jmltk-jml`. Status: verified against the published
-`jmlparser-core:3.28.2-J8.0-K13.5-SNAPSHOT` (live probes) and the JMLtk grammar
-(`javaparser-core/src/main/javacc/java.jj`, origin/main).
+Branch: `weigl/jmltk-jml`. Status: **updated for the shipped architecture**
+(HEAD `d7fdfe737c`): JML is parsed by JMLtk and consumed from its typed AST
+directly; there is no `TextualJML*` production from comments and no
+`attachedJml`/`JmlSpec` carrier (see PLAN.md §2.2/§4). Doing so was verified
+against the published `jmlparser-core:3.28.2-J8.0-K13.5-SNAPSHOT` (live
+probes) and the JMLtk grammar (`javaparser-core/src/main/javacc/java.jj`,
+origin/main).
 
-This document is the concrete basis for the rewrite in `PLAN.md`: it lists every
-place KeY works with `TextualJML*` and which `com.github.javaparser.ast.jml`
-(and `ast.key`) class replaces it. "Gap" = construct KeY currently parses that
-the published JMLtk grammar does not (verified by probe).
+This document is the concrete basis for the rewrite in `PLAN.md`: it maps
+every JML construct KeY supports to its `com.github.javaparser.ast.jml`
+(and `ast.key`) class. Parts B–D (construct mapping, clause mapping, gap
+list) are the reference. Part A is HISTORICAL for the deleted producers but
+its consumer entries were rewritten to the shipped design. "Gap" = construct
+KeY currently parses that the published JMLtk grammar does not (verified by
+probe).
 
 ---
 
-## Part A — KeY code working with TextualJML*
+## Part A — KeY code working with JML (shipped design)
 
-### A.1 Producers (construct creation)
+### A.1 Producers (JML parsing)
 
 | File | What it produces |
 |---|---|
-| `speclang/njml/PreParser.java` | entry point: JML *text* → `ImmutableList<TextualJMLConstruct>` (parses with KeY's ANTLR grammar, wraps in `TextualJMLConstruct` subclasses) |
-| `speclang/njml/TextualTranslator.java` | ANTLR visitor → `TextualJMLSpecCase` (clauses via `TextualJMLSpecCase.Clause/ClauseHd`), `TextualJMLClassInv/ClassAxiom/Initially/Represents/Depends/FieldDecl/MethodDecl/LoopSpec/AssertStatement/SetStatement`, `TextualJMLModifierList`, `Behavior`. Creates `TextualJMLDepends` from `accessible lhs: rhs \measured_by` (class-level "depends" on model fields) |
-| `java/transformations/pipeline/JMLTransformer.java` | runs `PreParser` over JML comment text; attaches results to JavaParser `DataKey`s: `KEY_SPEC_CASE` (`List<TextualJMLConstruct>`), `KEY_CLASS_SPEC` (same), `KEY_LOOP_SPEC` (`List<TextualJMLLoopSpec>`); also *executes* model/ghost field declarations and model methods into real (KeY-side synthesized) declarations, builds `JmlAssert`/`set` statement transformations |
-| `java/transformations/MarkerStatementHelper.java` | `DataKey<TextualJMLMergePointDecl> KEY_MERGE_POINT`, `DataKey<TextualJMLAssertStatement> KEY_ASSERT` on transformed statement nodes |
+| JMLtk `JmlProcessor` (via `JavaParserFactory`, `setProcessJml(true)`) | the **single** JML parser: attaches `JmlContract` (via `NodeWithContracts`), `JmlClassLevelDeclaration` members, `JmlMethodDeclaration`/`JmlFieldDeclaration` wrappers, and `JmlExpressionStmt`/`JmlGhostStmt`/`KeyMergePointStmt` statements directly to the Java AST |
+| `java/transformations/pipeline/JMLTransformer.java` | re-processes method bodies: unwraps `JmlMethodDeclaration`/`JmlFieldDeclaration` into their contained declarations (remembered via the `KEY_JML_WRAPPER` data key), self-marks JML statements (`KEY_ASSERT`/`KEY_ASSIGN`/`KEY_MERGE_POINT`) |
+| `speclang/jml/translation/JmlToTextual.java` | produces the `TextualJML*` **semantics** layer: re-serializes each JMLtk clause/declaration and re-parses it with KeY's `JmlParser.g4` rules for `Translator`/`JmlTermFactory` |
 
 ### A.2 Carriers between JMLtk AST and KeY AST
 
 | File | Role |
 |---|---|
-| `java/loader/JP2KeYConverter.java` | moves the `TextualJML*` lists out of JavaParser `DataKey`s into KeY's own AST via `attachedJml` (see A.3); builds KeY `JmlAssert` statements from `KEY_ASSERT`; `KeyMergePointStmt`-relevant code from `KEY_MERGE_POINT`; helpers `getSpec(Node)` / `getLoopSpec(Node)` / `getClassSpec(Node)` |
-| `java/ast/ProgramElement.java` (+ `declaration/*`, `statement/*`) | KeY AST nodes carrying `attachedJml : ImmutableList<TextualJMLConstruct>` |
+| `java/KeYJPMapping.java` (`registerReverse`, `nodeFromKeY`) | the **only** bridge: `JP2KeYConverter` registers KeY `TypeDeclaration` → JMLtk `JmlTypeDeclaration` and KeY method/ctor → contract carrier; the extractor resolves the JMLtk nodes back from the KeY AST. No `attachedJml`, no `JmlSpec` |
+| `java/loader/JP2KeYConverter.java` | converts the Java declarations (skipping pure class-level JML spec members); `JmlExpressionStmt` → `JmlAssert`/`SetStatement` and `KeyMergePointStmt` → `MergePointStatement` via KeY-grammar re-parse; keeps model/ghost wrappers reachable as the contract carrier |
 
-### A.3 KeY AST nodes with `attachedJml`
+### A.3 KeY AST nodes with JML
 
-`ProgramElement` + subclasses: `TypeDeclaration`, `ClassDeclaration`, `InterfaceDeclaration`, `JavaDeclaration`, `MethodDeclaration`, `ConstructorDeclaration`, `StatementBlock`, `LoopStatement` (`While`/`For`/`EnhancedFor`/`Do`), `MergePointStatement`, `JmlAssert`.
+None carry JML: the KeY AST has no `attachedJml`. JML lives on the JMLtk AST
+and is reached via the reverse mapping / the nodes' own position in it.
 
 ### A.4 Consumers
 
 | File | Consumes |
 |---|---|
-| `speclang/jml/JMLSpecExtractor.java` | the `attachedJml` dispatcher. Class level: `TextualJMLClassInv` → invariant (+free), `TextualJMLInitially`, `TextualJMLRepresents`, `TextualJMLDepends`, `TextualJMLClassAxiom`. Method level: `TextualJMLMethodDecl` → model methods, `TextualJMLSpecCase` → operation contracts. Blocks: trailing `TextualJMLSpecCase` → block contracts; `TextualJMLMergePointDecl` → merge-point contracts. Loops: `TextualJMLLoopSpec` → loop spec, trailing `TextualJMLSpecCase` → loop contracts |
-| `speclang/jml/translation/JMLSpecFactory.java` | the semantic core. Translates `TextualJMLSpecCase` (behavior, `Clause/ClauseHd` clause lists holding `LabeledParserRuleContext`s) + `JMLModifier` lists (spec math modes, visibility) into `Contract`/`ClassInvariant`/`ClassAxiom`/`InitiallyClause`/`LoopSpecification`/`Represents`... via `JmlIO`/`Translator`/`JmlTermFactory`. `JmlFacade.parseClause("assignable \\nothing;")` synthesizes defaults |
-| `speclang/jml/JMLInfoExtractor.java` | `TextualJMLModifierList`/modifiers on methods/classes/fields → `JMLModifiers` (pure, strictlyPure, helper, specMathMode, nullableByDefault) |
-| `java/ast/statement/JmlAssert.java`, `rule/JmlAssertRule.java` | `TextualJMLAssertStatement.Kind` (ASSERT/ASSUME) + `KeyAst.JMLProofScript` (assertion proof) + label → KeY proof rules |
-| `speclang/AbstractAuxiliaryContractImpl.java`, `BlockContractImpl.java`, `LoopContractImpl.java` | indirect only (via `JMLSpecFactory`/term translation); no direct `TextualJML*` fields |
+| `speclang/jml/JMLSpecExtractor.java` | resolves the JMLtk type/method via `KeYJPMapping.nodeFromKeY` and reads the specs off it: class level (`JmlClassExprDeclaration` → invariant/axiom/initially, `JmlRepresentsDeclaration`, `JmlClassAccessibleDeclaration`), method level (contract carrier; model methods via `JmlToTextual.toMethodDecl(wrapper).getMethodDefinition()`), blocks/loops (attached `JmlContract`, `extractLoopInvariant` scans for `LOOP_INV`), merge points (carrier is `KeyMergePointStmt`) |
+| `speclang/jml/translation/JMLSpecFactory.java` | the semantic core. Direct-class overloads (`createJMLOperationContracts(pm, JmlContract, ParserRuleContext modelMethodDefinition, boolean addInvariant)`, `createJMLModelMethodContracts(pm, ParserRuleContext modelMethodDefinition, boolean addInvariant)`, …) build `Contract`/`ClassInvariant`/`ClassAxiom`/`InitiallyClause`/`LoopSpecification`/`Represents`… via `JmlToTextual` → `JmlIO`/`Translator`/`JmlTermFactory`. `JmlFacade.parseClause("assignable \\nothing;")` synthesizes defaults |
+| `speclang/jml/JMLInfoExtractor.java` | reads `JMLModifiers`-relevant modifiers off the JMLtk nodes (pure, model, helper, specMathMode, nullableByDefault) |
+| `java/ast/statement/JmlAssert.java`, `rule/JmlAssertRule.java` | `JmlAssert` (built by the converter from `JmlExpressionStmt`) + `KeyAst.JMLProofScript` + label → KeY proof rules |
+| `speclang/AbstractAuxiliaryContractImpl.java`, `BlockContractImpl.java`, `LoopContractImpl.java` | indirect only (via `JMLSpecFactory`/term translation); no direct JML fields |
 
-### A.5 Tests exercising the IR
+### A.5 Tests exercising the front-end
 
-`ContractFactoryTest`, `SetStatementTest`, `njml/NJmlTranslatorTests`, `njml/MethodlevelTranslatorTest`, `njml/TextualTranslatorTest`, `jml/TestJMLPreTranslator`, `jml/pretranslation/TextualJMLAssertStatementTest`.
+`njml/ClasslevelTranslatorTest`, `njml/ExpressionTranslatorTest`,
+`njml/ModifiersTest`, `njml/ContractLoadingTests`, `njml/JMLParserExceptionTest`,
+`jml/TestJMLTranslator`, `jml/JmlMarkerDecisionTest`, `SetStatementTest`,
+`ContractFactoryTest`, `ContentOrderNumberingTest`.
 
 ---
 
@@ -143,7 +153,7 @@ contracts on `while`/`for`, block contracts on `{ … }`, labeled clauses,
 
 ---
 
-## Part E — Integration notes for the rewrite (Phase 1/2)
+## Part E — Integration notes (as shipped)
 
 - `JavaParserFactory`/`JavaService` must build the parser with
   `new ParserConfiguration().setProcessJml(true)` (and `setJmlKeys` for
@@ -162,7 +172,14 @@ contracts on `while`/`for`, block contracts on `{ … }`, labeled clauses,
   - statements inside `BlockStmt.getStatements()` hold `JmlExpressionStmt`,
     `JmlGhostStmt`, `JmlLabelStmt` (+ following statement), `JmlUnreachableStmt`
   - KeY DSL statements exist as raw `ast.key` statement nodes
-- `JP2KeYConverter`'s `attachedJml` becomes a carrier of `ast.jml`/`ast.key`
-  nodes; `JMLSpecFactory` + a new JML-AST→`JTerm` translator replace
-  `Translator`/`JmlTermFactory`. Position mapping: JMLtk `TokenRange` →
-  KeY `Location` (block-mapping logic reuse).
+- There is no carrier between the ASTs. (HISTORICAL plan text: "`JP2KeYConverter`'s
+  `attachedJml` becomes a carrier of `ast.jml`/`ast.key` nodes; `JMLSpecFactory`
+  + a new JML-AST→`JTerm` translator replace `Translator`/`JmlTermFactory`.")
+  What shipped: the KeY↔JMLtk reverse mapping (`KeYJPMapping.registerReverse` /
+  `nodeFromKeY`) is the only bridge; `JMLSpecFactory` consumes the typed classes
+  directly and the `JmlToTextual` → `JmlParser.g4` →
+  `Translator`/`JmlTermFactory` chain provides the semantics ("Option B" —
+  the originally planned direct JML-AST→`JTerm` translator was not built).
+  Position mapping: JMLtk `TokenRange` → KeY `Location` (block-mapping logic
+  reuse); note that re-parse/building errors currently report
+  `<unknown>:1:…`-style positions instead (recorded parity gap, HANDOFF §5.1).
