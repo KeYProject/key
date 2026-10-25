@@ -1,5 +1,19 @@
 description = "Well-defined calculus for JML specifciation and Java using the KeY theorem prover"
 
+checkerFramework {
+    if(System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        extraJavacArgs = [
+                "-AonlyDefs=^de\\.uka\\.ilkd\\.key\\.wd",
+                "-Xmaxerrs", "10000",
+                "-AstubNoWarnIfNotFound",
+                "-Werror",
+                "-Aversion",
+        ]
+    }
+}
 
 dependencies {
     api(project(":key.core"))
