@@ -6,12 +6,15 @@ package org.key_project.slicing.graph;
 
 import de.uka.ilkd.key.proof.BranchLocation;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Graph node used if a rule application did not use any input formulas.
  * This is required to ensure that all rule application are present in the graph.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class PseudoInput extends GraphNode {
     /**
      * Construct a new pseudo input node.

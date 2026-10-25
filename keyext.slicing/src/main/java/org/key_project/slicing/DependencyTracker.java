@@ -48,12 +48,16 @@ import org.key_project.util.collection.IdentityHashSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Tracks proof steps as they are applied on the proof.
  * Each proof step is recorded in the dependency graph ({@link DependencyGraph}).
  *
  * @author Arne Keller
  */
+@NullMarked
 public class DependencyTracker implements RuleAppListener, ProofTreeListener {
     /**
      * The proof this tracker monitors.
@@ -73,7 +77,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      *
      * @see DependencyAnalyzer
      */
-    private AnalysisResults analysisResults = null;
+    private @Nullable AnalysisResults analysisResults = null;
     /**
      * Set once the dependency graph became incomplete and can no longer be trusted, after which
      * {@link #analyze} refuses to return results (so no slice is built from a partial graph). Two
@@ -514,7 +518,8 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @param doDeduplicateRuleApps whether to de-duplicate rule applications
      * @return analysis results (null if proof is not closed)
      */
-    public AnalysisResults analyze(boolean doDependencyAnalysis, boolean doDeduplicateRuleApps) {
+    public @Nullable AnalysisResults analyze(boolean doDependencyAnalysis,
+            boolean doDeduplicateRuleApps) {
         if (trackingDisabled) {
             // the dependency graph is incomplete (tracking failure, or the multi-core prover
             // suspended this listener for a run); do not return a slice built from a partial graph
@@ -539,7 +544,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      * @param pio a sequent formula
      * @return the node that added this formula, or null
      */
-    public Node getNodeThatProduced(Node currentNode,
+    public @Nullable Node getNodeThatProduced(Node currentNode,
             PosInOccurrence pio) {
         if (proof == null) {
             return null;
@@ -554,7 +559,7 @@ public class DependencyTracker implements RuleAppListener, ProofTreeListener {
      *
      * @return analysis results or null (if not yet computed)
      */
-    public AnalysisResults getAnalysisResults() {
+    public @Nullable AnalysisResults getAnalysisResults() {
         return analysisResults;
     }
 

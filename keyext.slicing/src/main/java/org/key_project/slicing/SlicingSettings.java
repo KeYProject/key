@@ -10,11 +10,15 @@ import java.util.WeakHashMap;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Settings for the proof slicing extension.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class SlicingSettings extends AbstractPropertiesSettings {
 
     public static final String CATEGORY = "ProofSlicing";
@@ -72,7 +76,7 @@ public class SlicingSettings extends AbstractPropertiesSettings {
      * @param proof proof
      * @return whether aggressive deduplication is turned on for this proof
      */
-    public boolean getAggressiveDeduplicate(Proof proof) {
+    public boolean getAggressiveDeduplicate(@Nullable Proof proof) {
         if (aggressiveDeduplicateOverride.containsKey(proof)) {
             return aggressiveDeduplicate.get() && aggressiveDeduplicateOverride.get(proof);
         } else {

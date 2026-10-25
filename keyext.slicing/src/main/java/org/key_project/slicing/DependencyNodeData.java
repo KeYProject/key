@@ -10,12 +10,15 @@ import java.util.List;
 import org.key_project.slicing.graph.GraphNode;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Stores the dependency graph nodes touched by a proof step.
  * Added to a node using {@link de.uka.ilkd.key.proof.Node#register(Object, Class)}.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class DependencyNodeData {
     /**
      * List of graph nodes required to instantiate the proof step. Each boolean indicates whether

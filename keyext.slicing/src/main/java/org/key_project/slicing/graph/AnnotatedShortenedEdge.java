@@ -8,11 +8,14 @@ import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.prover.rules.RuleApp;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * An annotated edge representing a chain of real proof nodes.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class AnnotatedShortenedEdge extends AnnotatedEdge {
     /**
      * The initial node in this shortened chain.

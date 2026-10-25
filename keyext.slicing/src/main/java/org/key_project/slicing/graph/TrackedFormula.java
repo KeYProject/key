@@ -14,6 +14,8 @@ import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A sequent formula tracked by the dependency graph.
  * The position in the sequent (antecedent / succedent)
@@ -21,6 +23,7 @@ import org.key_project.prover.sequent.SequentFormula;
  *
  * @author Arne Keller
  */
+@NullMarked
 public class TrackedFormula extends GraphNode {
     /**
      * Symbol used to indicate the position of the formula in the sequent.

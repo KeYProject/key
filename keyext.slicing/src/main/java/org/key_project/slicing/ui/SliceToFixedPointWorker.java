@@ -11,6 +11,8 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.slicing.analysis.AnalysisResults;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +21,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@NullMarked
 final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
     /**
      * Logger.
@@ -32,7 +35,7 @@ final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
     /**
      * The proof to dispose after successfully completing analysis + slicing.
      */
-    private Proof proofToDispose;
+    private @Nullable Proof proofToDispose;
     /**
      * Function that provides analysis results for the {@link #proof}.
      */
@@ -57,7 +60,7 @@ final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
      * @param doneCallback called if the proof can not be sliced further
      */
     public SliceToFixedPointWorker(Proof proofToSlice,
-            Proof proofToDispose,
+            @Nullable Proof proofToDispose,
             Function<Void, AnalysisResults> analyzeButton,
             Runnable sliceButton,
             Runnable doneCallback) {
@@ -69,7 +72,7 @@ final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
     }
 
     @Override
-    protected Void doInBackground() {
+    protected @Nullable Void doInBackground() {
         LOGGER.info("analyzing proof {} (ID: {})", proof.name(), System.identityHashCode(proof));
         if (isCancelled()) {
             doneCallback.run();
