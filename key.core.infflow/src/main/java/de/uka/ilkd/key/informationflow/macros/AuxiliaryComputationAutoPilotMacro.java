@@ -10,11 +10,14 @@ import de.uka.ilkd.key.macros.SequentialOnLastGoalProofMacro;
 import de.uka.ilkd.key.macros.SequentialProofMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  *
  * @author christoph scheben
  */
+@NullMarked
 public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
 
     @Override

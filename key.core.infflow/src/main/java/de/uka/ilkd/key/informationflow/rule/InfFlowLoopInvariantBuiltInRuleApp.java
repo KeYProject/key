@@ -19,12 +19,14 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
  * @version 1 (7/28/25)
  */
+@NullMarked
 public class InfFlowLoopInvariantBuiltInRuleApp
         extends LoopInvariantBuiltInRuleApp<InfFlowWhileInvariantRule> {
 
@@ -86,7 +88,7 @@ public class InfFlowLoopInvariantBuiltInRuleApp
         this.infFlowVars = vars;
     }
 
-    public IFProofObligationVars getInformationFlowProofObligationVars() {
+    public @Nullable IFProofObligationVars getInformationFlowProofObligationVars() {
         return infFlowVars;
     }
 }

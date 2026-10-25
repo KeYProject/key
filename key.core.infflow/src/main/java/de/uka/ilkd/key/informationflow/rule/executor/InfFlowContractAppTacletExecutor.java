@@ -23,7 +23,9 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor {
     /**
      * Strategy property which saves the list of formulas which where added by information flow

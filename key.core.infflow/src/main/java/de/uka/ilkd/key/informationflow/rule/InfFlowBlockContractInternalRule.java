@@ -52,6 +52,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
@@ -74,6 +75,7 @@ import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
  *
  * @author wacker, lanzinger
  */
+@NullMarked
 public class InfFlowBlockContractInternalRule extends BlockContractInternalRule {
 
     /**
@@ -366,7 +368,7 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
      * TODO These could be moved into a separate class (like BlockContractBuilders) to allow them to
      * be reused in other classes.
      */
-    protected static @Nullable JTerm buildAfterVar(JTerm varTerm, String suffix,
+    protected static @Nullable JTerm buildAfterVar(@Nullable JTerm varTerm, String suffix,
             Services services) {
         if (varTerm == null) {
             return null;
@@ -387,7 +389,8 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
     }
 
 
-    protected static ImmutableList<JTerm> buildLocalOutsAtPre(ImmutableList<JTerm> varTerms,
+    protected static @Nullable ImmutableList<JTerm> buildLocalOutsAtPre(
+            @Nullable ImmutableList<JTerm> varTerms,
             Services services) {
         if (varTerms == null || varTerms.isEmpty()) {
             return varTerms;
@@ -409,7 +412,8 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
         return renamedLocalOuts;
     }
 
-    protected static ImmutableList<JTerm> buildLocalOutsAtPost(ImmutableList<JTerm> varTerms,
+    protected static @Nullable ImmutableList<JTerm> buildLocalOutsAtPost(
+            @Nullable ImmutableList<JTerm> varTerms,
             Services services) {
         if (varTerms == null || varTerms.isEmpty()) {
             return varTerms;
@@ -432,7 +436,8 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
     }
 
     protected static JTerm buildInfFlowPreAssumption(ProofObligationVars instVars,
-            ImmutableList<JTerm> localOuts, ImmutableList<JTerm> localOutsAtPre, JTerm baseHeap,
+            ImmutableList<JTerm> localOuts, @Nullable ImmutableList<JTerm> localOutsAtPre,
+            JTerm baseHeap,
             final TermBuilder tb) {
         JTerm beforeAssumptions = tb.equals(instVars.pre.heap, baseHeap);
         Iterator<JTerm> outsAtPre = localOutsAtPre.iterator();
@@ -443,7 +448,8 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
     }
 
     protected static JTerm buildInfFlowPostAssumption(ProofObligationVars instVars,
-            ImmutableList<JTerm> localOuts, ImmutableList<JTerm> localOutsAtPost, JTerm baseHeap,
+            ImmutableList<JTerm> localOuts, @Nullable ImmutableList<JTerm> localOutsAtPost,
+            JTerm baseHeap,
             JTerm applPredTerm, final TermBuilder tb) {
         JTerm resultEq =
             instVars.pre.result != null ? tb.equals(instVars.post.result, instVars.pre.result)
@@ -481,7 +487,7 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
 
     public static class InfFlowBlockContractInternalBuiltInRuleApp
             extends BlockContractInternalBuiltInRuleApp<InfFlowBlockContractInternalRule> {
-        protected IFProofObligationVars infFlowVars;
+        protected @Nullable IFProofObligationVars infFlowVars;
 
         public InfFlowBlockContractInternalBuiltInRuleApp(InfFlowBlockContractInternalRule rule,
                 PosInOccurrence occurrence) {
@@ -500,7 +506,7 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
          *
          * @return set of four sets of ProofObligationVars necessary for information flow proofs.
          */
-        public IFProofObligationVars getInformationFlowProofObligationVars() {
+        public @Nullable IFProofObligationVars getInformationFlowProofObligationVars() {
             return infFlowVars;
         }
 

@@ -23,8 +23,11 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.COPY;
 
+@NullMarked
 public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override

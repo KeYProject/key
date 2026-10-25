@@ -27,6 +27,9 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Immutable class.
@@ -34,6 +37,7 @@ import org.key_project.util.collection.ImmutableSet;
  *
  * @author christoph
  */
+@NullMarked
 public class BasicSnippetData {
 
     /**
@@ -58,7 +62,7 @@ public class BasicSnippetData {
      */
     private final EnumMap<Key, Object> contractContents = new EnumMap<>(Key.class) {
         @Override
-        public Object put(Key key, Object value) {
+        public Object put(Key key, @Nullable Object value) {
             assert value == null || key.getType().isInstance(value);
             return super.put(key, value);
         }
@@ -242,6 +246,7 @@ public class BasicSnippetData {
     }
 
 
+    @Nullable
     Object get(Key contentKey) {
         return contractContents.get(contentKey);
     }

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,7 @@ import static de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo.PROPERTY_ST
 /**
  * Abstract to customize {@link AbstractPO} and {@link AbstractOperationPO}.
  */
+@NullMarked
 public abstract class AbstractInfFlowPO extends AbstractOperationPO implements InfFlowPO {
 
     protected AbstractInfFlowPO(InitConfig initConfig, String name) {

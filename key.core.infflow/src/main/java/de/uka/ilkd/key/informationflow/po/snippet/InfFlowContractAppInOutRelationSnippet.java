@@ -13,10 +13,13 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  *
  * @author christoph
  */
+@NullMarked
 class InfFlowContractAppInOutRelationSnippet extends InfFlowInputOutputRelationSnippet {
 
     // In case of the application of an information flow contract we can

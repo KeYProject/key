@@ -9,6 +9,8 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Generate term "self != null".
@@ -16,6 +18,7 @@ import de.uka.ilkd.key.util.MiscTools;
  *
  * @author christoph
  */
+@NullMarked
 class BlockCallWithPreconditionPredicateSnippet extends TwoStateMethodPredicateSnippet {
 
     @Override

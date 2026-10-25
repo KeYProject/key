@@ -16,10 +16,13 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Implements the rule which inserts loop invariants for a method call.
  */
+@NullMarked
 public final class InfFlowLoopInvariantTacletBuilder
         extends AbstractInfFlowContractAppTacletBuilder {
 

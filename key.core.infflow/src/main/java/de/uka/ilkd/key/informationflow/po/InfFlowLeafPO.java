@@ -5,10 +5,14 @@
 package de.uka.ilkd.key.informationflow.po;
 
 
+import org.jspecify.annotations.NullMarked;
+
+
 /**
  *
  * @author christoph
  */
+@NullMarked
 public interface InfFlowLeafPO extends InfFlowPO {
 
 }

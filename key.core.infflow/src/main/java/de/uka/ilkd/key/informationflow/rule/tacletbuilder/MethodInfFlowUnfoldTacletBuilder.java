@@ -14,11 +14,14 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  *
  * @author christoph
  */
+@NullMarked
 public class MethodInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletBuilder {
 
     private InformationFlowContract contract;

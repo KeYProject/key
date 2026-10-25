@@ -24,6 +24,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
@@ -34,29 +35,32 @@ import org.jspecify.annotations.Nullable;
  * @author christoph
  *         <p/>
  */
+@NullMarked
 public class StateVars {
 
     public final ImmutableList<JTerm> termList;
 
-    public final ImmutableList<JTerm> paddedTermList;
+    /** Contains all {@link #termList} terms plus possibly <code>null</code> padding entries. */
+    public final ImmutableList<@Nullable JTerm> paddedTermList;
 
-    public final JTerm self;
+    public final @Nullable JTerm self;
 
-    public final JTerm guard;
+    public final @Nullable JTerm guard;
 
     public final ImmutableList<JTerm> localVars;
 
-    public final JTerm result;
+    public final @Nullable JTerm result;
 
-    public final JTerm exception;
+    public final @Nullable JTerm exception;
 
     public final JTerm heap;
 
-    public final JTerm mbyAtPre;
+    public final @Nullable JTerm mbyAtPre;
 
 
-    public StateVars(JTerm self, JTerm guard, ImmutableList<JTerm> localVars, JTerm result,
-            JTerm exception, JTerm heap, JTerm mbyAtPre) {
+    public StateVars(@Nullable JTerm self, @Nullable JTerm guard, ImmutableList<JTerm> localVars,
+            @Nullable JTerm result,
+            @Nullable JTerm exception, JTerm heap, @Nullable JTerm mbyAtPre) {
         this.self = self;
         this.guard = guard;
         this.localVars = localVars;
@@ -75,7 +79,7 @@ public class StateVars {
         terms = appendIfNotNull(terms, mbyAtPre);
         termList = terms;
 
-        ImmutableList<JTerm> allTerms = ImmutableList.nil();
+        ImmutableList<@Nullable JTerm> allTerms = ImmutableList.nil();
         allTerms = allTerms.append(heap);
         allTerms = allTerms.append(self);
         allTerms = allTerms.append(guard);
@@ -87,13 +91,14 @@ public class StateVars {
     }
 
 
-    public StateVars(JTerm self, ImmutableList<JTerm> localVars, JTerm result, JTerm exception,
-            JTerm heap, JTerm mbyAtPre) {
+    public StateVars(@Nullable JTerm self, ImmutableList<JTerm> localVars,
+            @Nullable JTerm result, @Nullable JTerm exception,
+            JTerm heap, @Nullable JTerm mbyAtPre) {
         this(self, null, localVars, result, exception, heap, mbyAtPre);
     }
 
 
-    private ImmutableList<JTerm> appendIfNotNull(ImmutableList<JTerm> list, JTerm t) {
+    private ImmutableList<JTerm> appendIfNotNull(ImmutableList<JTerm> list, @Nullable JTerm t) {
         if (t != null) {
             return list.append(t);
         } else {
@@ -112,13 +117,15 @@ public class StateVars {
     }
 
 
-    public StateVars(JTerm self, JTerm guard, ImmutableList<JTerm> localVars, JTerm heap) {
+    public StateVars(@Nullable JTerm self, @Nullable JTerm guard, ImmutableList<JTerm> localVars,
+            JTerm heap) {
         this(self, guard, localVars, null, null, heap, null);
     }
 
 
-    public StateVars(JTerm self, JTerm guard, ImmutableList<JTerm> localVars, JTerm result,
-            JTerm exception, JTerm heap) {
+    public StateVars(@Nullable JTerm self, @Nullable JTerm guard, ImmutableList<JTerm> localVars,
+            @Nullable JTerm result,
+            @Nullable JTerm exception, JTerm heap) {
         this(self, guard, localVars, result, exception, heap, null);
     }
 
@@ -130,7 +137,7 @@ public class StateVars {
     }
 
 
-    public StateVars(JTerm self, ImmutableList<JTerm> localVars, JTerm heap) {
+    public StateVars(@Nullable JTerm self, ImmutableList<JTerm> localVars, JTerm heap) {
         this(self, localVars, null, null, heap);
     }
 
@@ -156,7 +163,8 @@ public class StateVars {
     }
 
 
-    private static JTerm copyVariable(JTerm t, String postfix, Services services) {
+    private static @Nullable JTerm copyVariable(@Nullable JTerm t, String postfix,
+            Services services) {
         if (t != null) {
             final TermBuilder tb = services.getTermBuilder();
             JTerm tWithoutLables = tb.unlabel(t);
@@ -169,7 +177,8 @@ public class StateVars {
     }
 
 
-    private static JTerm newVariable(JTerm t, String name, Services services) {
+    private static @Nullable JTerm newVariable(@Nullable JTerm t, String name,
+            Services services) {
         if (t == null) {
             return null;
         }
@@ -186,7 +195,8 @@ public class StateVars {
     }
 
 
-    private static JTerm copyHeapSymbol(JTerm t, String postfix, Services services) {
+    private static @Nullable JTerm copyHeapSymbol(@Nullable JTerm t, String postfix,
+            Services services) {
         if (t != null) {
             final TermBuilder tb = services.getTermBuilder();
             JTerm tWithoutLables = tb.unlabel(t);
@@ -199,7 +209,8 @@ public class StateVars {
     }
 
 
-    private static JTerm newHeapSymbol(JTerm t, String name, Services services) {
+    private static @Nullable JTerm newHeapSymbol(@Nullable JTerm t, String name,
+            Services services) {
         if (t == null) {
             return null;
         }
@@ -217,7 +228,8 @@ public class StateVars {
     }
 
 
-    private static JTerm newFunction(JTerm t, String name, Services services) {
+    private static @Nullable JTerm newFunction(@Nullable JTerm t, String name,
+            Services services) {
         if (t == null) {
             return null;
         }
@@ -228,7 +240,8 @@ public class StateVars {
     }
 
 
-    private static JTerm copyFunction(JTerm t, String postfix, Services services) {
+    private static @Nullable JTerm copyFunction(@Nullable JTerm t, String postfix,
+            Services services) {
         if (t != null) {
             final TermBuilder tb = services.getTermBuilder();
             JTerm tWithoutLables = tb.unlabel(t);
@@ -298,7 +311,8 @@ public class StateVars {
     }
 
 
-    private static JTerm buildSelfVar(Services services, IProgramMethod pm, KeYJavaType kjt,
+    private static @Nullable JTerm buildSelfVar(Services services, IProgramMethod pm,
+            KeYJavaType kjt,
             String postfix) {
         if (pm.isStatic()) {
             return null;
@@ -319,7 +333,8 @@ public class StateVars {
     }
 
 
-    private static JTerm buildResultVar(IProgramMethod pm, Services services, String postfix) {
+    private static @Nullable JTerm buildResultVar(IProgramMethod pm, Services services,
+            String postfix) {
         if (pm.isVoid() || pm.isConstructor()) {
             return null;
         }
@@ -364,7 +379,7 @@ public class StateVars {
     }
 
 
-    static void register(ProgramVariable pv, Services services) {
+    static void register(@Nullable ProgramVariable pv, Services services) {
         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);
@@ -379,7 +394,7 @@ public class StateVars {
     }
 
 
-    static void register(Function f, Services services) {
+    static void register(@Nullable Function f, Services services) {
         Namespace<Function> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != JavaDLTheory.UPDATE;

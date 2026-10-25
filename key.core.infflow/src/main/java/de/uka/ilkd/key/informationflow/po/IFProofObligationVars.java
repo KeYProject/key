@@ -13,6 +13,9 @@ import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * This class contains the set of four sets of ProofObligationVars necessary for information flow
@@ -21,6 +24,7 @@ import de.uka.ilkd.key.logic.JTerm;
  * @author christoph
  *
  */
+@NullMarked
 public class IFProofObligationVars {
 
     public final ProofObligationVars c1, c2, symbExecVars;
@@ -64,7 +68,8 @@ public class IFProofObligationVars {
     }
 
 
-    private void linkStateVarsToCopies(StateVars ifVars, StateVars seVars, Map<JTerm, JTerm> map) {
+    private void linkStateVarsToCopies(StateVars ifVars, StateVars seVars,
+            @Nullable Map<JTerm, JTerm> map) {
         final Iterator<JTerm> ifVarsIt = ifVars.termList.iterator();
         for (final JTerm symbTerm : seVars.termList) {
             final JTerm ifTerm;
@@ -80,7 +85,7 @@ public class IFProofObligationVars {
     }
 
 
-    public Map<JTerm, JTerm> getMapFor(ProofObligationVars vars) {
+    public @Nullable Map<JTerm, JTerm> getMapFor(ProofObligationVars vars) {
         return infFlowToSymbExecVarsMaps.get(vars);
     }
 
