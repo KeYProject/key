@@ -23,7 +23,7 @@
   `Services`; contract registry → `ContractRegistry`/`Services`; initially
   clauses → `JMLSpecFactory` load path; `addSpecs` collapse + `map(...)`
   removal; final deletion). **`SpecificationRepository.java` is DELETED**
-  (`e50d64b699`): all specs live on the AST nodes or in the Services-owned
+  (`def0449010`): all specs live on the AST nodes or in the Services-owned
   components (`ContractRegistry`, `ClassAxiomComputer`, `ProofRegistry`,
   `JMLSpecFactory`). The repo is **finished**.
 - **Full-suite baseline (clean, re-measured, no concurrent gradle):**
@@ -33,11 +33,14 @@
   IntSemanticsTest fixture fix (6/6 now green) brought the count to **34
   remaining failures, all recorded pre-existing jmltk gaps** — see §5.2.
 - **Worktree:** `/home/weigl/.local/share/opencode/worktree/fa2a33/witty-cabin`.
-- **CI status after the Phase-4 slices + spotless fix:** `formatting` failed all
-  along (violations across the branch); fixed in `e17111ed30` → CodeQuality
-  green. The remaining red jobs are all **pre-existing** — verified identical at
-  slice-3/4-era commits (`ae716ed74a`/`c81c034dd1`) and pre-slice-8
-  (`d1321bec5d`), i.e. slices 7–9 introduced **zero** new failures: unit-tests
+- **CI status after the Phase-4 slices:** `formatting` failed all along
+  (violations across the branch); the fix is folded into the rewritten branch
+  history (each commit is `spotlessApply`-clean via
+  `scripts/format_branch_with_spotless.sh`, so `spotlessJavaCheck`/CodeQuality
+  is green with no fix-up commit). The remaining red jobs are all
+  **pre-existing** — verified identical at
+  slice-3/4-era commits (`3956a5850e`/`2531dba5f0`) and pre-slice-8
+  (`a6d6d32e92`), i.e. slices 7–9 introduced **zero** new failures: unit-tests
   key.core = the 34 recorded §5.2 gaps (CI 1638 completed/34 failed, matches
   local full suite); key.core.infflow = 3 pre-existing `InfFlowProfileLoadingTest`;
   keyext.caching = `ProofCachingSingleRunTest`+`TestReferenceSearcher`;
@@ -53,20 +56,19 @@
 | Commit | Content |
 |---|---|
 | `6d174cdadd` | Phase 0 — `JavaParserFactory` enables JMLtk JML processing (`setProcessJml(true)`, JML-keys policy). |
-| `74b68f6f82` | Phase 1 — front-end swap onto the JMLtk AST (see below). |
-| `08cb7a60c8` | Phase 2 (Option B) — delete dead JML front-end code (see §5). |
-| `d9ead21162` | Phase 3 — stale-test cleanup + runtime parity (see §5.1). |
-| `7f369e5c29` | Phase 4 slice 1 — `JmlStatementSpec` attached to `JmlAssert`/`SetStatement` nodes (`JmlSpecCarrier`); repo `statementMap` deleted. |
-| `806c2b1ba6` | Phase 4 slice 2 — limited observers (`limitObs`/`unlimitObs`/`LIMIT_SUFFIX`/taclets) → `de.uka.ilkd.key.util.LimitedObservers`. |
-| `14a26a43d0` | Phase 4 triage — drop class-level `code_*_math`/`spec_*_math` pragmas from `intSemantics` fixtures (jmltk parity, same pattern as Phase 3); IntSemanticsTest 6/6. |
-| `ae716ed74a` | Phase 4 slice 3 — loop invariants, block/loop/merge contracts attached to their AST nodes (`LoopStatement`/`StatementBlock`/`MergePointStatement`); repo loop/block/merge maps + helpers deleted. |
-| `c81c034dd1` | Phase 4 slice 4 — proof↔PO registry (`proofs` map, `registerProof`/`removeProof`/`getProofs`/`getPO`/`getPOForProof`/`getProofOblInput`/`getContractPOForProof`/`getTargetOfProof`/`getAllProofs`) → new `de.uka.ilkd.key.proof.mgt.ProofRegistry` owned by/`Services`, shared in all copy paths; repo proof block + `proofs` field deleted; redundant pre-env register in `DefaultUserInterfaceControl` dropped. |
-| `1b0f1f94ee` | Phase 4 slice 5 — class invariants/axioms (`invs`/`axioms`/`allClassAxiomsCache` maps, `getClassInvariants`/`addClassInvariant(s)`, `getClassAxioms` incl. synthesized invDef/staticInv/free/Query/ContractAxioms + model-method axioms, `getClassAxiomsForType`, `addClassAxiom(s)`) → new `de.uka.ilkd.key.speclang.ClassAxiomComputer` owned by `Services` (created via `Profile.createClassAxiomComputer`; WD variant `ClassAxiomComputerWD` keeps invariant→`ClassWellDefinedness` registration); repo class-axiom surface deleted (~340 lines); callers rewired (AbstractPO/WellDefinednessPO selectClassAxioms, KeYFile, JMLSpecFactory, ClassAxiomImpl, macros/testgen/proofmanagement). |
-| `005320b2ec` | Phase 4 slice 6 — contract registry: contracts/initially clauses out of `SpecificationRepository` into new `de.uka.ilkd.key.speclang.ContractRegistry` (Services-owned, via `Profile.createContractRegistry`; WD variant `ContractRegistryWD` absorbs the `SpecificationRepositoryWD` hooks: wdChecks, register/unregister overrides, getWdChecks/getAllWdChecks/getWdMethodChecks/getWdClassChecks, WD contract filters, map, addWdStatement, ClassAxiomComputer bridges); `CONTRACT_COMBINATION_MARKER` (`§`) → `ContractFactory`; `TacletPOGenerator.generate` now takes `Services`; repo shrinks to a thin dispatcher (`map`/`addSpecs`/empty `processJavaType`). |
-| `fd32802417` | Phase 4 slice 7 — initially clauses out of `ContractRegistry` into the `JMLSpecFactory` load path: factory gains the `initiallyClauses` map + `addInitiallyClause(s)`/`createContractsFromInitiallyClauses()` (+ private derivation helper; derived constructor contracts register via `services.getContractRegistry()` with `addContractNoInheritance`/`unregisterContract`/`cf.addPost`/`cf.func`); `SLEnvInput.createSpecs` partitions `InitiallyClause` out of the class specs and calls the derivation at the end of loading (same ordering); registry drops field + 4 methods, `map(...)` no longer maps initially clauses, `unregisterContract` becomes public (WD override bumped); repo `addSpecs` stops dispatching `InitiallyClause`. |
-| `2ae5b95be0` | Phase 4 slice 8 — `addSpecs` collapse + `map(...)` removal: the dispatch moves into a private `SLEnvInput.registerSpecs` helper (Contract → registry, ClassInvariant/ClassAxiom → computer, loop/block/merge → AST nodes; same order); `SpecificationRepository.map`, `ContractRegistry.map`+`mapValueSets`, `ClassAxiomComputer.map`+`mapValueSets` and the `ContractRegistryWD` map override deleted (zero callers anywhere, main or test; per-element `SpecificationElement.map` stays); repo shrinks to ctor + empty `processJavaType`; thread-safety comment updated (no state mutated during proving). |
-| `e50d64b699` | Phase 4 slice 9 — **`SpecificationRepository.java` deleted** (final): `processJavaType` moves to `ContractRegistry` (empty default) + `ContractRegistryWD` (override with the former `SpecificationRepositoryWD` body: RepresentsAxiom → WD checks); `SLEnvInput.createSpecs` calls `contractRegistry.processJavaType(kjt)`; deleted `Services.specRepos` field + `getSpecificationRepository()` + copy paths, `KeYEnvironment.getSpecificationRepository()`, `Profile.createSpecificationRepository`, `WdProfile` override and `SpecificationRepositoryWD.java`; imports/javadoc links cleaned (PROOF of Phase-4 completion). |
-| `e17111ed30` | CI fix — `spotlessJavaCheck` had been failing for the whole branch; run `spotlessApply` on the 25 affected files (all within the PR diff: import ordering in key.ui/proofmanagement, javadoc/line reflow + statement wrapping in key.core/key.core.wd) and commit. CI `CodeQuality` (formatting + checkerFramework) is GREEN again. |
+| `131e5b4fae` | Phase 1 — front-end swap onto the JMLtk AST (see below). |
+| `6a864df642` | Phase 2 (Option B) — delete dead JML front-end code (see §5). |
+| `649c00f9b8` | Phase 3 — stale-test cleanup + runtime parity (see §5.1). |
+| `ecb458a172` | Phase 4 slice 1 — `JmlStatementSpec` attached to `JmlAssert`/`SetStatement` nodes (`JmlSpecCarrier`); repo `statementMap` deleted. |
+| `061c91d746` | Phase 4 slice 2 — limited observers (`limitObs`/`unlimitObs`/`LIMIT_SUFFIX`/taclets) → `de.uka.ilkd.key.util.LimitedObservers`. |
+| `12ad668937` | Phase 4 triage — drop class-level `code_*_math`/`spec_*_math` pragmas from `intSemantics` fixtures (jmltk parity, same pattern as Phase 3); IntSemanticsTest 6/6. |
+| `3956a5850e` | Phase 4 slice 3 — loop invariants, block/loop/merge contracts attached to their AST nodes (`LoopStatement`/`StatementBlock`/`MergePointStatement`); repo loop/block/merge maps + helpers deleted. |
+| `2531dba5f0` | Phase 4 slice 4 — proof↔PO registry (`proofs` map, `registerProof`/`removeProof`/`getProofs`/`getPO`/`getPOForProof`/`getProofOblInput`/`getContractPOForProof`/`getTargetOfProof`/`getAllProofs`) → new `de.uka.ilkd.key.proof.mgt.ProofRegistry` owned by/`Services`, shared in all copy paths; repo proof block + `proofs` field deleted; redundant pre-env register in `DefaultUserInterfaceControl` dropped. |
+| `4bb3ed0fbb` | Phase 4 slice 5 — class invariants/axioms (`invs`/`axioms`/`allClassAxiomsCache` maps, `getClassInvariants`/`addClassInvariant(s)`, `getClassAxioms` incl. synthesized invDef/staticInv/free/Query/ContractAxioms + model-method axioms, `getClassAxiomsForType`, `addClassAxiom(s)`) → new `de.uka.ilkd.key.speclang.ClassAxiomComputer` owned by `Services` (created via `Profile.createClassAxiomComputer`; WD variant `ClassAxiomComputerWD` keeps invariant→`ClassWellDefinedness` registration); repo class-axiom surface deleted (~340 lines); callers rewired (AbstractPO/WellDefinednessPO selectClassAxioms, KeYFile, JMLSpecFactory, ClassAxiomImpl, macros/testgen/proofmanagement). |
+| `6e03ad54ce` | Phase 4 slice 6 — contract registry: contracts/initially clauses out of `SpecificationRepository` into new `de.uka.ilkd.key.speclang.ContractRegistry` (Services-owned, via `Profile.createContractRegistry`; WD variant `ContractRegistryWD` absorbs the `SpecificationRepositoryWD` hooks: wdChecks, register/unregister overrides, getWdChecks/getAllWdChecks/getWdMethodChecks/getWdClassChecks, WD contract filters, map, addWdStatement, ClassAxiomComputer bridges); `CONTRACT_COMBINATION_MARKER` (`§`) → `ContractFactory`; `TacletPOGenerator.generate` now takes `Services`; repo shrinks to a thin dispatcher (`map`/`addSpecs`/empty `processJavaType`). |
+| `02d7aea325` | Phase 4 slice 7 — initially clauses out of `ContractRegistry` into the `JMLSpecFactory` load path: factory gains the `initiallyClauses` map + `addInitiallyClause(s)`/`createContractsFromInitiallyClauses()` (+ private derivation helper; derived constructor contracts register via `services.getContractRegistry()` with `addContractNoInheritance`/`unregisterContract`/`cf.addPost`/`cf.func`); `SLEnvInput.createSpecs` partitions `InitiallyClause` out of the class specs and calls the derivation at the end of loading (same ordering); registry drops field + 4 methods, `map(...)` no longer maps initially clauses, `unregisterContract` becomes public (WD override bumped); repo `addSpecs` stops dispatching `InitiallyClause`. |
+| `588af4b1ea` | Phase 4 slice 8 — `addSpecs` collapse + `map(...)` removal: the dispatch moves into a private `SLEnvInput.registerSpecs` helper (Contract → registry, ClassInvariant/ClassAxiom → computer, loop/block/merge → AST nodes; same order); `SpecificationRepository.map`, `ContractRegistry.map`+`mapValueSets`, `ClassAxiomComputer.map`+`mapValueSets` and the `ContractRegistryWD` map override deleted (zero callers anywhere, main or test; per-element `SpecificationElement.map` stays); repo shrinks to ctor + empty `processJavaType`; thread-safety comment updated (no state mutated during proving). |
+| `def0449010` | Phase 4 slice 9 — **`SpecificationRepository.java` deleted** (final): `processJavaType` moves to `ContractRegistry` (empty default) + `ContractRegistryWD` (override with the former `SpecificationRepositoryWD` body: RepresentsAxiom → WD checks); `SLEnvInput.createSpecs` calls `contractRegistry.processJavaType(kjt)`; deleted `Services.specRepos` field + `getSpecificationRepository()` + copy paths, `KeYEnvironment.getSpecificationRepository()`, `Profile.createSpecificationRepository`, `WdProfile` override and `SpecificationRepositoryWD.java`; imports/javadoc links cleaned (PROOF of Phase-4 completion). |
 
 ## 2. What Phase 1 did
 
@@ -246,9 +248,9 @@ Known, still-accepted degradation (unchanged from §4): parametric
 
 Baseline at slices-1–2 HEAD (clean run, no concurrent gradle): **1638 tests,
 40 failed, 72 skipped**. A/B proof: the Phase-3 HEAD worktree
-(`/tmp/opencode/key-phase3-baseline` @ `d9ead21162`) re-ran the 14 failing
+(`/tmp/opencode/key-phase3-baseline` @ `649c00f9b8`) re-ran the 14 failing
 classes → **identical 40 failures**; set-diff NONE in both directions. Zero
-slice regressions. After the IntSemantics fixture fix (`14a26a43d0`,
+slice regressions. After the IntSemantics fixture fix (`12ad668937`,
 6/6 green) the count stood at **34**, all pre-existing jmltk-incompatible
 constructs — RECORD ONLY, no fixture changes (the offending constructs are
 rejected inside the jmltk dependency or are behavioral proof differences):
@@ -294,13 +296,13 @@ must NOT grow.
 1. `git status` clean? (only HANDOFF.md/PLAN.md doc edits may be pending).
 2. Decision §5 was taken; Phase 3 (§5.1) is DONE — speclang slice green.
 3. **Phase 4: COMPLETE** — slices 1–9 committed + pushed
-   (`7f369e5c29` statement specs → AST nodes; `806c2b1ba6` limited observers;
-   `ae716ed74a` loop/block/merge specs → AST nodes; `c81c034dd1` proof↔PO
-   registry → `ProofRegistry`/`Services`; `1b0f1f94ee` class
-   invariants/axioms → `ClassAxiomComputer`/`Services`; `005320b2ec` contract
-   registry → `ContractRegistry`/`Services`; `fd32802417` initially clauses →
-   `JMLSpecFactory` load path; `2ae5b95be0` `addSpecs` collapse + `map(...)`
-   removal; `e50d64b699` **`SpecificationRepository.java` deleted** +
+   (`ecb458a172` statement specs → AST nodes; `061c91d746` limited observers;
+   `3956a5850e` loop/block/merge specs → AST nodes; `2531dba5f0` proof↔PO
+   registry → `ProofRegistry`/`Services`; `4bb3ed0fbb` class
+   invariants/axioms → `ClassAxiomComputer`/`Services`; `6e03ad54ce` contract
+   registry → `ContractRegistry`/`Services`; `02d7aea325` initially clauses →
+   `JMLSpecFactory` load path; `588af4b1ea` `addSpecs` collapse + `map(...)`
+   removal; `def0449010` **`SpecificationRepository.java` deleted** +
    `Services`/`KeYEnvironment` accessors + `SpecificationRepositoryWD`, WD
    `processJavaType` → `ContractRegistryWD`). Baseline measured + A/B-verified
    (40 failures at slices-1–2 HEAD = 40 at Phase-3 HEAD; zero regressions);
@@ -312,7 +314,7 @@ must NOT grow.
    key.core.testgen 15/2/0, key.core.wd 1/0/0, key.ui 44/1/0 green;
    key.core.infflow 4/3 fail = only the 3 pre-existing
    `InfFlowProfileLoadingTest` failures (verified pre-existing at Phase-3 HEAD
-   `d9ead21162` and slice-5 HEAD — stale bracket-vs-paren contract naming in
+   `649c00f9b8` and slice-5 HEAD — stale bracket-vs-paren contract naming in
    the `.m.key` example, unrelated / out of scope). Regenerated test fixture
    `TestGeneric0.java` restored after each testgen run. A final full
    `key.core:test` run at the completion HEAD confirms the recorded baseline
