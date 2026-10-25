@@ -14,9 +14,12 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.exploration.ProofExplorationService;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Action for the user to visually delete formulas from the sequent (using hide)
  */
+@NullMarked
 public class DeleteFormulaAction extends ExplorationAction {
 
     private final PosInSequent posInSeq;

@@ -36,6 +36,8 @@ import org.key_project.exploration.actions.*;
 import org.key_project.exploration.ui.ExplorationStepsList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Entry point for the Proof Exploration Extension.
@@ -43,6 +45,7 @@ import org.jspecify.annotations.NonNull;
  * @author Alexander Weigl
  * @version 1 (16.04.19)
  */
+@NullMarked
 @KeYGuiExtension.Info(name = "Exploration",
     description = "Author: Sarah Grebing <grebing@ira.uka.de>, Alexander Weigl <weigl@ira.uka.de>",
     experimental = true, optional = true, priority = 10000)
@@ -52,9 +55,9 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
         KeYGuiExtension.LeftPanel, KeYGuiExtension.StatusLine, ProofDisposedListener {
     private final ExplorationModeModel model = new ExplorationModeModel();
 
-    private JToolBar explorationToolbar;
+    private @Nullable JToolBar explorationToolbar;
 
-    private ExplorationStepsList leftPanel;
+    private @Nullable ExplorationStepsList leftPanel;
 
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
@@ -174,6 +177,7 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
 }
 
 
+@NullMarked
 class ExplorationRenderer implements Styler<GUIAbstractTreeNode> {
     public static final ColorSettings.ColorProperty DARK_PURPLE_COLOR =
         ColorSettings.define("[proofTree]darkPurple", "", new Color(112, 17, 191));

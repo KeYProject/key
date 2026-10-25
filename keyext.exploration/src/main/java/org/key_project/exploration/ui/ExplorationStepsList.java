@@ -26,6 +26,7 @@ import org.key_project.exploration.Icons;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -34,6 +35,7 @@ import org.jspecify.annotations.Nullable;
  * @author Sarah Grebing
  */
 @HelpInfo(path = "/Using Key/Exploration/")
+@NullMarked
 public class ExplorationStepsList extends JPanel implements TabPanel {
     private final JLabel hasExplorationSteps = new JLabel();
     private final PruneExplorationAction actionPruneExploration = new PruneExplorationAction();
@@ -51,7 +53,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         treeExploration.setSelectionPath(selectionPath);
     };
 
-    private transient Proof currentProof;
+    private @Nullable transient Proof currentProof;
     private boolean enabled;
 
 
@@ -85,7 +87,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         }
     }
 
-    public Proof getProof() { return currentProof; }
+    public @Nullable Proof getProof() { return currentProof; }
 
     private void createModel(@Nullable Proof model) {
         listModelExploration.clear();
@@ -260,7 +262,7 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         }
     }
 
-    private TreePath getTreePath(Node n) {
+    private @Nullable TreePath getTreePath(Node n) {
         MyTreeNode rootNode = (MyTreeNode) treeModelExploration.getRoot();
         Enumeration<TreeNode> treeNodeEnumeration = rootNode.depthFirstEnumeration();
         while (treeNodeEnumeration.hasMoreElements()) {
