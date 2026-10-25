@@ -110,13 +110,17 @@ public class WdFunctionalBlockContractPO extends FunctionalBlockContractPO {
      */
     public static JTerm setUpWdGoal(final @Nullable Goal goal, final BlockContract contract,
             final JTerm update,
-            final JTerm anonUpdate, final LocationVariable heap, @Nullable final Function anonHeap,
+            final JTerm anonUpdate, final LocationVariable heap, final @Nullable Function anonHeap,
             final ImmutableSet<LocationVariable> localIns,
             Services services,
             AuxiliaryContract.@Nullable Variables variables,
             @Nullable PosInOccurrence occurrence) {
         // FIXME: Handling of \old-references needs to be investigated,
         // however only completeness is lost, soundness is guaranteed
+        if (variables == null) {
+            throw new NullPointerException(
+                "No auxiliary contract variables for the well-definedness goal.");
+        }
         final BlockWellDefinedness bwd =
             new BlockWellDefinedness(contract, variables, localIns, services);
         ((SpecificationRepositoryWD) services.getSpecificationRepository()).addWdStatement(bwd);
@@ -128,6 +132,10 @@ public class WdFunctionalBlockContractPO extends FunctionalBlockContractPO {
 
         if (goal != null) {
             goal.setBranchLabel(WellDefinednessMacro.WD_BRANCH);
+            if (occurrence == null) {
+                throw new NullPointerException(
+                    "No position of occurrence for the well-definedness goal.");
+            }
             goal.changeFormula(wdBlock, occurrence);
         }
 

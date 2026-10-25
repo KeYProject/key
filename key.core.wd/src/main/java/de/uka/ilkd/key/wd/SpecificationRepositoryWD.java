@@ -12,8 +12,10 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.*;
@@ -64,8 +66,12 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
                 && Objects.equals(targetMethod.getContainerType(),
                     services.getJavaInfo().getJavaLangObject())) {
             // Create or extend a well-definedness check for a class invariant
-            final JTerm deps =
-                contract.getAccessible(services.getTypeConverter().getHeapLDT().getHeap());
+            final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+            if (heapLDT == null) {
+                throw new NullPointerException(
+                    "No heap type defined in the services type converter.");
+            }
+            final JTerm deps = contract.getAccessible(heapLDT.getHeap());
             final JTerm mby = contract.getMby();
             final String invName = "JML model class invariant in " + targetKJT.getName();
             final ClassInvariant inv = new ClassInvariantImpl(invName, invName, targetKJT,
@@ -77,7 +83,12 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
                 assert cwds.size() == 1;
                 final ClassWellDefinedness oldCwd = cwds.iterator().next();
                 unregisterContract(oldCwd);
-                oldCwd.addInv(cwd.getInvariant().getInv(oldCwd.getOrigVars().self, services));
+                final LocationVariable self = oldCwd.getOrigVars().self;
+                if (self == null) {
+                    throw new NullPointerException(
+                        "No self variable for the class invariant well-definedness check.");
+                }
+                oldCwd.addInv(cwd.getInvariant().getInv(self, services));
                 cwd = oldCwd.combine(cwd, services);
             }
             registerContract(cwd, targetPair);
@@ -171,7 +182,12 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
             IObserverFunction target) {
         assert kjt != null;
         assert target != null;
-        target = getCanonicalFormForKJT(target, kjt);
+        final IObserverFunction canonicalTarget = getCanonicalFormForKJT(target, kjt);
+        if (canonicalTarget == null) {
+            throw new NullPointerException(
+                "No canonical form for the well-definedness target.");
+        }
+        target = canonicalTarget;
         final Pair<KeYJavaType, IObserverFunction> pair = new Pair<>(kjt, target);
         final ImmutableSet<WellDefinednessCheck> result = wdChecks.get(pair);
         return result == null ? DefaultImmutableSet.nil() : result;
@@ -324,7 +340,12 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
                 reps = reps.add((RepresentsAxiom) ax);
             }
         }
-        final ProgramVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        if (heapLDT == null) {
+            throw new NullPointerException(
+                "No heap type defined in the services type converter.");
+        }
+        final ProgramVariable heap = heapLDT.getHeap();
         for (RepresentsAxiom rep : reps) {
             boolean dep = false;
             for (MethodWellDefinedness ch : getWdMethodChecks(kjt)) {
@@ -364,7 +385,8 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
         }
 
         // inherit non-private, non-static invariants
-        if (!inv.isStatic() && ModifierKind.allowsInheritance(inv.getVisibility())) {
+        final ModifierKind visibility = inv.getVisibility();
+        if (!inv.isStatic() && visibility != null && ModifierKind.allowsInheritance(visibility)) {
             final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
             for (KeYJavaType sub : subs) {
                 ClassInvariant subInv = inv.setKJT(sub);
@@ -378,7 +400,12 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
                 } else {
                     for (ClassWellDefinedness cwd : subCwds) {
                         unregisterContract(cwd);
-                        cwd.addInv(subInv.getInv(cwd.getOrigVars().self, services));
+                        final LocationVariable self = cwd.getOrigVars().self;
+                        if (self == null) {
+                            throw new NullPointerException(
+                                "No self variable for the class invariant well-definedness check.");
+                        }
+                        cwd.addInv(subInv.getInv(self, services));
                         registerContract(cwd);
                     }
                 }

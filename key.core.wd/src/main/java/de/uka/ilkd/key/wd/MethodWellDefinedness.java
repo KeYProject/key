@@ -11,6 +11,7 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -22,6 +23,7 @@ import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
@@ -42,6 +44,15 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     private @Nullable JTerm globalDefs;
     private @Nullable JTerm axiom;
     private final boolean modelField;
+
+    private static KeYJavaType requireContainerType(IObserverFunction target) {
+        final KeYJavaType container = target.getContainerType();
+        if (container == null) {
+            throw new NullPointerException(
+                "No container type for the well-definedness target.");
+        }
+        return container;
+    }
 
     private MethodWellDefinedness(String name, int id, Type type, IObserverFunction target,
             LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
@@ -83,7 +94,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     public MethodWellDefinedness(DependencyContract contract, Services services) {
         super(
             ContractFactory.generateContractTypeName("JML model field", contract.getKJT(),
-                contract.getTarget(), contract.getTarget().getContainerType()),
+                contract.getTarget(), requireContainerType(contract.getTarget())),
             contract.id(), contract.getTarget(), contract.getOrigVars(), Type.OPERATION_CONTRACT,
             services);
         assert contract != null;
@@ -105,19 +116,26 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     public MethodWellDefinedness(RepresentsAxiom rep, Services services) {
         super(
             ContractFactory.generateContractTypeName("JML model field", rep.getKJT(),
-                rep.getTarget(), rep.getTarget().getContainerType()),
+                rep.getTarget(), requireContainerType(rep.getTarget())),
             0, rep.getTarget(), rep.getOrigVars(), Type.OPERATION_CONTRACT, services);
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        if (heapLDT == null) {
+            throw new NullPointerException(
+                "No heap type defined in the services type converter.");
+        }
         Map<LocationVariable, JTerm> pres = new LinkedHashMap<>();
-        pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
-            rep.getOrigVars().self == null ? TB.tt() : TB.inv(TB.var(rep.getOrigVars().self)));
+        final LocationVariable repSelf = rep.getOrigVars().self;
+        pres.put(heapLDT.getHeap(),
+            repSelf == null ? TB.tt() : TB.inv(TB.var(repSelf)));
         Map<LocationVariable, JTerm> deps = new LinkedHashMap<>();
         for (LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             deps.put(heap, TB.allLocs());
         }
+        final KeYJavaType containerType = requireContainerType(rep.getTarget());
         this.contract = new DependencyContractImpl("JML model field",
             ContractFactory.generateContractName("JML model field", rep.getKJT(), rep.getTarget(),
-                rep.getTarget().getContainerType(), 0),
-            rep.getKJT(), rep.getTarget(), rep.getTarget().getContainerType(), pres, null, deps,
+                containerType, 0),
+            rep.getKJT(), rep.getTarget(), containerType, pres, null, deps,
             rep.getOrigVars().self, rep.getOrigVars().params, rep.getOrigVars().atPres, null, 0);
         this.modelField = true;
         final OriginalVariables origVars = contract.getOrigVars();
@@ -172,7 +190,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
      * @param exc the exception variable
      * @return true if the term guarantees exc to be equal to null
      */
-    private boolean findExcNull(JTerm t, ProgramVariable exc) {
+    private boolean findExcNull(JTerm t, @Nullable ProgramVariable exc) {
         assert t != null;
         if (t.op().equals(Junctor.AND)) {
             assert t.arity() == 2;
@@ -192,8 +210,16 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     private ImmutableList<JOperatorSV> paramsSV() {
         ImmutableList<JOperatorSV> paramsSV = ImmutableList.nil();
         for (var pv : getOrigVars().params) {
+            final KeYJavaType pvKJT = pv.getKeYJavaType();
+            if (pvKJT == null) {
+                throw new NullPointerException("No KeYJavaType for a well-definedness parameter.");
+            }
+            final Sort pvSort = pvKJT.getSort();
+            if (pvSort == null) {
+                throw new NullPointerException("No sort for a well-definedness parameter.");
+            }
             paramsSV = paramsSV.append(
-                SchemaVariableFactory.createTermSV(pv.name(), pv.getKeYJavaType().getSort()));
+                SchemaVariableFactory.createTermSV(pv.name(), pvSort));
         }
         return paramsSV;
     }
@@ -220,13 +246,22 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
             @Nullable Function mbyAtPreFunc, Services services) {
         final JTerm mbyAtPreDef;
         if (hasMby()) {
-            final JTerm mbyAtPre = TB.func(mbyAtPreFunc);
+            final Function mbyAtPreFunction = mbyAtPreFunc;
+            if (mbyAtPreFunction == null) {
+                throw new NullPointerException(
+                    "No measured-by-at-pre function generated for the well-definedness check.");
+            }
+            final JTerm mbyAtPre = TB.func(mbyAtPreFunction);
             assert params != null;
             ImmutableList<LocationVariable> paramVars = ImmutableList.nil();
             for (var pv : params) {
                 paramVars = paramVars.append(pv);
             }
             final JTerm mby = contract.getMby(self, paramVars, services);
+            if (mby == null) {
+                throw new NullPointerException(
+                    "No measured-by term for the well-definedness check.");
+            }
             mbyAtPreDef = TB.equals(mbyAtPre, mby);
         } else {
             mbyAtPreDef = TB.tt();
@@ -255,11 +290,18 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     @Override
     public MethodWellDefinedness map(UnaryOperator<JTerm> op, Services services) {
         // TODO Auto-generated method stub
+        final JTerm accessible = getAccessible();
+        final JTerm mby = getMby();
+        final JTerm represents = getRepresents();
+        final JTerm globalDefs = this.globalDefs;
+        final JTerm axiom = this.axiom;
         return new MethodWellDefinedness(getName(), id(), type(), getTarget(), getHeap(),
             getOrigVars(), getRequires().map(op), op.apply(getModifiable()),
-            op.apply(getAccessible()), getEnsures().map(op), op.apply(getMby()),
-            op.apply(getRepresents()), contract.map(op, services), op.apply(globalDefs),
-            op.apply(axiom), modelField, services.getTermBuilder());
+            accessible == null ? null : op.apply(accessible), getEnsures().map(op),
+            mby == null ? null : op.apply(mby),
+            represents == null ? null : op.apply(represents), contract.map(op, services),
+            globalDefs == null ? null : op.apply(globalDefs),
+            axiom == null ? null : op.apply(axiom), modelField, services.getTermBuilder());
     }
 
     public Contract getMethodContract() {
@@ -276,26 +318,37 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         final String prefix;
         final IObserverFunction target = getTarget();
         final String methodName = target.name().toString();
-        final String tName = getKJT().getJavaType().getFullName() + " "
+        final var javaType = getKJT().getJavaType();
+        if (javaType == null) {
+            throw new NullPointerException(
+                "No Java type for the well-definedness target.");
+        }
+        final String tName = javaType.getFullName() + " "
             + methodName.substring(methodName.indexOf("::") + 2).replace("$", "");
         final boolean isStatic = target.isStatic();
         final boolean twoState = target.getStateCount() == 2;
         final LocationVariable heap = getHeap();
-        final LocationVariable heapAtPre;
-        if (getOrigVars().atPres != null && getOrigVars().atPres.get(heap) != null) {
-            heapAtPre = getOrigVars().atPres.get(heap);
-        } else {
-            heapAtPre = heap;
-        }
+        final LocationVariable mapHeapAtPre =
+            getOrigVars().atPres != null ? getOrigVars().atPres.get(heap) : null;
+        final LocationVariable heapAtPre = mapHeapAtPre != null ? mapHeapAtPre : heap;
         final var heapSV = SchemaVariableFactory.createTermSV(heap.name(), heap.sort());
         final var heapAtPreSV =
             SchemaVariableFactory.createTermSV(heapAtPre.name(), heapAtPre.sort());
+        final Sort selfSort = getKJT().getSort();
+        if (selfSort == null) {
+            throw new NullPointerException(
+                "No sort for the well-definedness target.");
+        }
         final var selfSV =
-            SchemaVariableFactory.createTermSV(new Name("callee"), getKJT().getSort());
+            SchemaVariableFactory.createTermSV(new Name("callee"), selfSort);
         final ImmutableList<JOperatorSV> paramsSV = paramsSV();
         StringBuilder ps = new StringBuilder();
         for (ProgramVariable pv : getOrigVars().params) {
-            ps.append(" ").append(pv.getKeYJavaType().getFullName());
+            final KeYJavaType pvKJT = pv.getKeYJavaType();
+            if (pvKJT == null) {
+                throw new NullPointerException("No KeYJavaType for a well-definedness parameter.");
+            }
+            ps.append(" ").append(pvKJT.getFullName());
         }
         final JTerm[] args = getArgs(selfSV, heapSV, heapAtPreSV, isStatic, twoState, paramsSV);
         if (isNormal(services)) {
@@ -421,18 +474,29 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         assert this.getMethodContract().getKJT().equals(mwd.getMethodContract().getKJT());
 
         super.combine(mwd, services);
-        if (this.getGlobalDefs() != null && mwd.getGlobalDefs() != null) {
-            final JTerm defs = mwd.replace(mwd.getGlobalDefs(), this.getOrigVars());
-            this.globalDefs = TB.andSC(defs, this.getGlobalDefs());
-        } else if (mwd.getGlobalDefs() != null) {
-            final JTerm defs = mwd.replace(mwd.getGlobalDefs(), this.getOrigVars());
+        final JTerm thisGlobalDefs = getGlobalDefs();
+        final JTerm mwdGlobalDefs = mwd.getGlobalDefs();
+        if (thisGlobalDefs != null && mwdGlobalDefs != null) {
+            final JTerm defs = mwd.replace(mwdGlobalDefs, this.getOrigVars());
+            this.globalDefs = TB.andSC(defs, thisGlobalDefs);
+        } else if (mwdGlobalDefs != null) {
+            final JTerm defs = mwd.replace(mwdGlobalDefs, this.getOrigVars());
             this.globalDefs = defs;
         }
-        if (this.getAxiom() != null && mwd.getAxiom() != null) {
-            final JTerm ax = mwd.replace(mwd.getAxiom(), this.getOrigVars());
-            this.axiom = TB.andSC(ax, this.getAxiom());
-        } else if (mwd.getGlobalDefs() != null) {
-            final JTerm ax = mwd.replace(mwd.getAxiom(), this.getOrigVars());
+        final JTerm thisAxiom = getAxiom();
+        final JTerm mwdAxiom = mwd.getAxiom();
+        if (thisAxiom != null && mwdAxiom != null) {
+            final JTerm ax = mwd.replace(mwdAxiom, this.getOrigVars());
+            this.axiom = TB.andSC(ax, thisAxiom);
+        } else if (mwdGlobalDefs != null) {
+            // NB: the original condition tests the global defs of the other contract; it is
+            // deliberately preserved here (crash-equivalence on the absent-axiom path).
+            final JTerm axiomTerm = mwdAxiom;
+            if (axiomTerm == null) {
+                throw new NullPointerException(
+                    "Cannot merge well-definedness axioms without an axiom term.");
+            }
+            final JTerm ax = mwd.replace(axiomTerm, this.getOrigVars());
             this.axiom = ax;
         }
         return this;
@@ -474,7 +538,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public ModifierKind getVisibility() {
+    public @Nullable ModifierKind getVisibility() {
         return contract.getVisibility();
     }
 

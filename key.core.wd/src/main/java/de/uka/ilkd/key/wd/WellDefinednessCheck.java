@@ -12,6 +12,7 @@ import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -34,6 +35,7 @@ import de.uka.ilkd.key.wd.po.WellDefinednessPO.Variables;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
@@ -70,9 +72,9 @@ public abstract class WellDefinednessCheck implements Contract {
     private final LocationVariable heap;
     private final OriginalVariables origVars;
 
-    private Condition requires;
-    private JTerm modifiable;
-    private Condition ensures;
+    private @Nullable Condition requires;
+    private @Nullable JTerm modifiable;
+    private @Nullable Condition ensures;
     private @Nullable JTerm accessible;
     private @Nullable JTerm mby;
     private @Nullable JTerm represents;
@@ -81,11 +83,16 @@ public abstract class WellDefinednessCheck implements Contract {
 
     WellDefinednessCheck(String name, int id, IObserverFunction target, OriginalVariables origVars,
             Type type, Services services) {
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        if (heapLDT == null) {
+            throw new NullPointerException(
+                "No heap type defined in the services type converter.");
+        }
         this.id = id;
         this.name = name + " WD." + id;
         this.type = type;
         this.target = target;
-        this.heap = services.getTypeConverter().getHeapLDT().getHeap();
+        this.heap = heapLDT.getHeap();
         this.origVars = origVars;
         this.TB = services.getTermBuilder();
     }
@@ -197,19 +204,27 @@ public abstract class WellDefinednessCheck implements Contract {
             ImmutableList<LocationVariable> heaps) {
         var map = getSchemaMap(selfVar, resultVar, excVar, atPreVars, paramVars, origVars, heaps);
         final OpReplacer or = new OpReplacer(map, TB.tf());
-        return or.replace(t);
+        final JTerm replaced = or.replace(t);
+        if (replaced == null) {
+            throw new NullPointerException("Schema variable replacement produced no term.");
+        }
+        return replaced;
     }
 
     private JTerm replace(JTerm t, @Nullable LocationVariable selfVar,
             @Nullable LocationVariable resultVar,
             @Nullable LocationVariable excVar,
-            @Nullable Map<LocationVariable, LocationVariable> atPreVars,
+            @Nullable Map<LocationVariable, ? extends @Nullable LocationVariable> atPreVars,
             ImmutableList<LocationVariable> paramVars, OriginalVariables origVars,
             ImmutableList<LocationVariable> heaps) {
         Map<LocationVariable, LocationVariable> map =
             getReplaceMap(selfVar, resultVar, excVar, atPreVars, paramVars, origVars, heaps);
         final OpReplacer or = new OpReplacer(map, TB.tf());
-        return or.replace(t);
+        final JTerm replaced = or.replace(t);
+        if (replaced == null) {
+            throw new NullPointerException("Variable replacement produced no term.");
+        }
+        return replaced;
     }
 
     private static Map<LocationVariable, JOperatorSV> getSchemaMap(@Nullable JOperatorSV selfVar,
@@ -250,9 +265,11 @@ public abstract class WellDefinednessCheck implements Contract {
         if (atPreVars != null && vars.atPres != null && !atPreVars.isEmpty()
                 && !vars.atPres.isEmpty()) {
             for (LocationVariable h : heaps) {
-                if (atPreVars.get(h) != null && vars.atPres.get(h) != null) {
-                    assert vars.atPres.get(h).sort().equals(atPreVars.get(h).sort());
-                    result.put(vars.atPres.get(h), atPreVars.get(h));
+                final JOperatorSV atPreVar = atPreVars.get(h);
+                final LocationVariable varAtPre = vars.atPres.get(h);
+                if (atPreVar != null && varAtPre != null) {
+                    assert varAtPre.sort().equals(atPreVar.sort());
+                    result.put(varAtPre, atPreVar);
                 }
             }
         }
@@ -262,7 +279,7 @@ public abstract class WellDefinednessCheck implements Contract {
     private static Map<LocationVariable, LocationVariable> getReplaceMap(
             @Nullable LocationVariable selfVar,
             @Nullable LocationVariable resultVar, @Nullable LocationVariable excVar,
-            @Nullable Map<LocationVariable, LocationVariable> atPreVars,
+            @Nullable Map<LocationVariable, ? extends @Nullable LocationVariable> atPreVars,
             @Nullable ImmutableList<LocationVariable> paramVars, OriginalVariables vars,
             ImmutableList<LocationVariable> heaps) {
         final Map<LocationVariable, LocationVariable> result =
@@ -299,9 +316,11 @@ public abstract class WellDefinednessCheck implements Contract {
         if (atPreVars != null && vars.atPres != null && !atPreVars.isEmpty()
                 && !vars.atPres.isEmpty()) {
             for (LocationVariable h : heaps) {
-                if (atPreVars.get(h) != null && vars.atPres.get(h) != null) {
-                    assert vars.atPres.get(h).sort().equals(atPreVars.get(h).sort());
-                    result.put(vars.atPres.get(h), atPreVars.get(h));
+                final @Nullable LocationVariable atPreVar = atPreVars.get(h);
+                final LocationVariable varAtPre = vars.atPres.get(h);
+                if (atPreVar != null && varAtPre != null) {
+                    assert varAtPre.sort().equals(atPreVar.sort());
+                    result.put(varAtPre, atPreVar);
                 }
             }
         }
@@ -388,7 +407,9 @@ public abstract class WellDefinednessCheck implements Contract {
             sig.append(origVars.exception);
             sig.append(")");
         }
-        final String printMby = hasMby() ? LogicPrinter.quickPrintTerm(this.mby, services) : null;
+        final JTerm mbyTerm = this.mby;
+        final String printMby =
+            mbyTerm != null ? LogicPrinter.quickPrintTerm(mbyTerm, services) : null;
         String mby = "";
         if (printMby != null) {
             mby = mby + (includeHtmlMarkup ? "<br><b>" : "\n") + "measured-by"
@@ -416,8 +437,9 @@ public abstract class WellDefinednessCheck implements Contract {
                     + (includeHtmlMarkup ? "</b>" : "");
         }
         String globalUpdates = "";
-        if (getGlobalDefs() != null) {
-            final String printUpdates = LogicPrinter.quickPrintTerm(getGlobalDefs(), services);
+        final JTerm globalDefs = getGlobalDefs();
+        if (globalDefs != null) {
+            final String printUpdates = LogicPrinter.quickPrintTerm(globalDefs, services);
             globalUpdates = (includeHtmlMarkup ? "<br><b>" : "\n") + "defs"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printUpdates, false)
@@ -432,16 +454,18 @@ public abstract class WellDefinednessCheck implements Contract {
                             : printPres);
         }
         String deps = "";
-        if (getAccessible() != null) {
-            String printDeps = LogicPrinter.quickPrintTerm(getAccessible(), services);
+        final JTerm accessible = getAccessible();
+        if (accessible != null) {
+            String printDeps = LogicPrinter.quickPrintTerm(accessible, services);
             deps += (includeHtmlMarkup ? "<br><b>" : "\n") + "dep"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printDeps, false)
                         : printDeps);
         }
         String reps = "";
-        if (getRepresents() != null) {
-            String printReps = LogicPrinter.quickPrintTerm(getRepresents(), services);
+        final JTerm represents = getRepresents();
+        if (represents != null) {
+            String printReps = LogicPrinter.quickPrintTerm(represents, services);
             reps += (includeHtmlMarkup ? "<br><b>" : "\n") + "rep"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printReps, false)
@@ -456,8 +480,9 @@ public abstract class WellDefinednessCheck implements Contract {
                         : printPosts);
         }
         String axioms = "";
-        if (getAxiom() != null) {
-            String printAxioms = LogicPrinter.quickPrintTerm(getAxiom(), services);
+        final JTerm axiom = getAxiom();
+        if (axiom != null) {
+            String printAxioms = LogicPrinter.quickPrintTerm(axiom, services);
             axioms += (includeHtmlMarkup ? "<br><b>" : "\n") + "axiom"
                 + (includeHtmlMarkup ? "</b> " : ": ")
                 + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printAxioms, false)
@@ -492,10 +517,19 @@ public abstract class WellDefinednessCheck implements Contract {
             TermServices services) {
         final IObserverFunction target = getTarget();
         final KeYJavaType selfKJT = target.getContainerType();
+        if (selfKJT == null) {
+            throw new NullPointerException(
+                "No container type for the well-definedness target.");
+        }
         final JTerm notNull =
             target.isStatic() ? TB.tt() : TB.not(TB.equals(TB.var(self), TB.NULL()));
         final JTerm created = TB.created(TB.var(heap), TB.var(self));
-        final JTerm selfExactType = TB.exactInstance(selfKJT.getSort(), TB.var(self));
+        final Sort selfSort = selfKJT.getSort();
+        if (selfSort == null) {
+            throw new NullPointerException(
+                "No sort for the container type of the well-definedness target.");
+        }
+        final JTerm selfExactType = TB.exactInstance(selfSort, TB.var(self));
         return TB.andSC(pre, notNull, created, selfExactType);
     }
 
@@ -533,8 +567,15 @@ public abstract class WellDefinednessCheck implements Contract {
      * @return The term representing the general assumption.
      */
     private JTerm generateSelfExactType(@Nullable JAbstractSortedOperator selfVar) {
-        return selfVar == null || isConstructor() ? TB.tt()
-                : TB.exactInstance(getKJT().getSort(), TB.tf().createTerm(selfVar));
+        if (selfVar == null || isConstructor()) {
+            return TB.tt();
+        }
+        final Sort selfSort = getKJT().getSort();
+        if (selfSort == null) {
+            throw new NullPointerException(
+                "No sort for the container type of the well-definedness target.");
+        }
+        return TB.exactInstance(selfSort, TB.tf().createTerm(selfVar));
     }
 
     /**
@@ -549,9 +590,13 @@ public abstract class WellDefinednessCheck implements Contract {
             final Iterator<LocationVariable> origParams = getOrigVars().params.iterator();
             for (JAbstractSortedOperator paramVar : paramVars) {
                 assert origParams.hasNext();
+                final KeYJavaType paramKJT = origParams.next().getKeYJavaType();
+                if (paramKJT == null) {
+                    throw new NullPointerException(
+                        "No KeYJavaType for a well-definedness parameter.");
+                }
                 paramsOK = TB.and(paramsOK,
-                    TB.reachableValue(TB.tf().createTerm(paramVar),
-                        origParams.next().getKeYJavaType()));
+                    TB.reachableValue(TB.tf().createTerm(paramVar), paramKJT));
             }
         } else {
             throw new RuntimeException("Unequal number of params!");
@@ -600,7 +645,12 @@ public abstract class WellDefinednessCheck implements Contract {
         final JTerm mbyAtPreDef;
         if (type().equals(Type.OPERATION_CONTRACT)) {
             MethodWellDefinedness mwd = (MethodWellDefinedness) this;
-            mbyAtPreDef = mwd.generateMbyAtPreDef(self, params, mbyAtPreFunc, services);
+            final LocationVariable selfVar = self;
+            if (selfVar == null) {
+                throw new NullPointerException(
+                    "No self variable for a well-definedness operation contract.");
+            }
+            mbyAtPreDef = mwd.generateMbyAtPreDef(selfVar, params, mbyAtPreFunc, services);
         } else {
             mbyAtPreDef = TB.tt();
         }
@@ -689,7 +739,11 @@ public abstract class WellDefinednessCheck implements Contract {
             i++;
         }
         final OpReplacer or = new OpReplacer(map, services.getTermFactory());
-        final JTerm goal = services.getTermBuilder().orSC(goal1, or.replace(goal2));
+        final JTerm replacedGoal2 = or.replace(goal2);
+        if (replacedGoal2 == null) {
+            throw new NullPointerException("Taclet goal replacement produced no term.");
+        }
+        final JTerm goal = services.getTermBuilder().orSC(goal1, replacedGoal2);
         final RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<>();
         tb.setFind(find1);
         tb.setName(MiscTools.toValidTacletName(name));
@@ -772,7 +826,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     final void setRequires(@Nullable JTerm req) {
-        this.requires = split(req);
+        this.requires = req == null ? null : split(req);
     }
 
     final void setModifiable(@Nullable JTerm modifiables, TermServices services) {
@@ -841,7 +895,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     final void setEnsures(@Nullable JTerm ens) {
-        this.ensures = split(ens);
+        this.ensures = ens == null ? null : split(ens);
     }
 
     final Type type() {
@@ -915,11 +969,13 @@ public abstract class WellDefinednessCheck implements Contract {
         assert this.modelField() == wdc.modelField();
         assert this.getBehaviour().equals(wdc.getBehaviour());
 
-        if (this.getAccessible() != null && wdc.getAccessible() != null) {
-            final JTerm acc = wdc.replace(wdc.getAccessible(), this.getOrigVars());
-            combineAccessible(acc, this.getAccessible(), services);
-        } else if (wdc.getAccessible() != null) {
-            final JTerm acc = wdc.replace(wdc.getAccessible(), this.getOrigVars());
+        final JTerm thisAccessible = this.getAccessible();
+        final JTerm wdcAccessible = wdc.getAccessible();
+        if (thisAccessible != null && wdcAccessible != null) {
+            final JTerm acc = wdc.replace(wdcAccessible, this.getOrigVars());
+            combineAccessible(acc, thisAccessible, services);
+        } else if (wdcAccessible != null) {
+            final JTerm acc = wdc.replace(wdcAccessible, this.getOrigVars());
             setAccessible(acc);
         }
         if (this.getModifiable() != null && wdc.getModifiable() != null) {
@@ -933,18 +989,22 @@ public abstract class WellDefinednessCheck implements Contract {
         addEnsures(ens);
         final Condition req = wdc.replace(wdc.getRequires(), this.getOrigVars());
         addRequires(req);
-        if (this.getRepresents() != null && wdc.getRepresents() != null) {
-            final JTerm rep = wdc.replace(wdc.getRepresents(), this.getOrigVars());
-            this.represents = TB.andSC(rep, getRepresents());
-        } else if (wdc.getRepresents() != null) {
-            final JTerm rep = wdc.replace(wdc.getRepresents(), this.getOrigVars());
+        final JTerm thisRepresents = getRepresents();
+        final JTerm wdcRepresents = wdc.getRepresents();
+        if (thisRepresents != null && wdcRepresents != null) {
+            final JTerm rep = wdc.replace(wdcRepresents, this.getOrigVars());
+            this.represents = TB.andSC(rep, thisRepresents);
+        } else if (wdcRepresents != null) {
+            final JTerm rep = wdc.replace(wdcRepresents, this.getOrigVars());
             this.represents = rep;
         }
-        if (this.hasMby() && wdc.hasMby()) {
-            final JTerm mby = wdc.replace(wdc.getMby(), this.getOrigVars());
-            setMby(TB.pair(mby, this.getMby()));
-        } else if (wdc.hasMby()) {
-            final JTerm mby = wdc.replace(wdc.getMby(), this.getOrigVars());
+        final JTerm thisMby = this.getMby();
+        final JTerm wdcMby = wdc.getMby();
+        if (thisMby != null && wdcMby != null) {
+            final JTerm mby = wdc.replace(wdcMby, this.getOrigVars());
+            setMby(TB.pair(mby, thisMby));
+        } else if (wdcMby != null) {
+            final JTerm mby = wdc.replace(wdcMby, this.getOrigVars());
             setMby(mby);
         }
         return this;
@@ -955,7 +1015,7 @@ public abstract class WellDefinednessCheck implements Contract {
      *
      * @return true if on and false if off
      */
-    public static boolean isOn(Profile profile) {
+    public static boolean isOn(@Nullable Profile profile) {
         return profile instanceof WdProfile;
     }
 
@@ -1021,7 +1081,12 @@ public abstract class WellDefinednessCheck implements Contract {
         JTerm res = TB.andSC(preTerms);
         if (target instanceof IProgramMethod && ((IProgramMethod) target).isConstructor()
                 && !JMLInfoExtractor.isHelper((IProgramMethod) target)) {
-            final JTerm constructorPre = appendFreePre(res, self, heap, services);
+            final LocationVariable selfVar = self;
+            if (selfVar == null) {
+                throw new NullPointerException(
+                    "No self variable for a constructor's well-definedness check.");
+            }
+            final JTerm constructorPre = appendFreePre(res, selfVar, heap, services);
             return new TermAndFunc(constructorPre, freePre.func);
         } else {
             return new TermAndFunc(res, freePre.func);
@@ -1061,7 +1126,17 @@ public abstract class WellDefinednessCheck implements Contract {
             TermServices services) {
         final JTerm reachable;
         if (result != null) {
-            reachable = TB.reachableValue(TB.var(result), origVars.result.getKeYJavaType());
+            final ProgramVariable origResult = origVars.result;
+            if (origResult == null) {
+                throw new NullPointerException(
+                    "No result variable for the well-definedness post-condition.");
+            }
+            final KeYJavaType resultKJT = origResult.getKeYJavaType();
+            if (resultKJT == null) {
+                throw new NullPointerException(
+                    "No KeYJavaType for the well-definedness result variable.");
+            }
+            reachable = TB.reachableValue(TB.var(result), resultKJT);
         } else {
             reachable = TB.tt();
         }
@@ -1086,10 +1161,17 @@ public abstract class WellDefinednessCheck implements Contract {
         assert anonHeap != null
                 || TB.strictlyNothing().equalsModProperty(modifiable,
                     IRRELEVANT_TERM_LABELS_PROPERTY);
-        final JTerm havocUpd =
-            TB.strictlyNothing().equalsModProperty(modifiable, IRRELEVANT_TERM_LABELS_PROPERTY)
-                    ? TB.skip()
-                    : TB.elementary(heap, TB.anon(TB.var(heap), modifiable, anonHeap));
+        final JTerm havocUpd;
+        if (TB.strictlyNothing().equalsModProperty(modifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
+            havocUpd = TB.skip();
+        } else {
+            final JTerm anonHeapTerm = anonHeap;
+            if (anonHeapTerm == null) {
+                throw new NullPointerException(
+                    "No anonymous heap for the well-definedness anonymisation update.");
+            }
+            havocUpd = TB.elementary(heap, TB.anon(TB.var(heap), modifiable, anonHeapTerm));
+        }
         final JTerm oldUpd =
             heapAtPre != heap ? TB.elementary(TB.var(heapAtPre), TB.var(heap)) : TB.skip();
         return TB.parallel(oldUpd, havocUpd);
@@ -1118,12 +1200,20 @@ public abstract class WellDefinednessCheck implements Contract {
 
     public final Condition getRequires() {
         assert this.requires != null;
-        return this.requires;
+        final Condition requires = this.requires;
+        if (requires == null) {
+            throw new NullPointerException("Well-definedness requires clause is not set.");
+        }
+        return requires;
     }
 
     public final JTerm getModifiable() {
         assert this.modifiable != null;
-        return this.modifiable;
+        final JTerm modifiable = this.modifiable;
+        if (modifiable == null) {
+            throw new NullPointerException("Well-definedness modifiable clause is not set.");
+        }
+        return modifiable;
     }
 
     public final @Nullable JTerm getAccessible() {
@@ -1132,7 +1222,11 @@ public abstract class WellDefinednessCheck implements Contract {
 
     public final Condition getEnsures() {
         assert this.ensures != null;
-        return this.ensures;
+        final Condition ensures = this.ensures;
+        if (ensures == null) {
+            throw new NullPointerException("Well-definedness ensures clause is not set.");
+        }
+        return ensures;
     }
 
     public final JTerm getEnsures(@Nullable LocationVariable heap) {
@@ -1199,9 +1293,9 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     @Override
-    public final @Nullable String proofToString(Services services) {
+    public final String proofToString(Services services) {
         assert false;
-        return null;
+        throw new AssertionError("proofToString is not supported for well-definedness checks.");
     }
 
     @Override
@@ -1231,7 +1325,12 @@ public abstract class WellDefinednessCheck implements Contract {
 
     @Override
     public final ProofOblInput getProofObl(Services services) {
-        return services.getSpecificationRepository().getPO(this);
+        final ProofOblInput po = services.getSpecificationRepository().getPO(this);
+        if (po == null) {
+            throw new NullPointerException(
+                "No proof obligation registered for the well-definedness check.");
+        }
+        return po;
     }
 
     @Override
@@ -1267,7 +1366,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     @Override
-    public final boolean equals(Object o) {
+    public final boolean equals(@Nullable Object o) {
         if (!(o instanceof WellDefinednessCheck wd)
                 || !wd.getKJT().equals(getKJT())) {
             return false;
