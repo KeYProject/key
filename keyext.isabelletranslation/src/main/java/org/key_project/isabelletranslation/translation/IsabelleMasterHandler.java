@@ -20,6 +20,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This class is responsible for translating the sequent of a given goal.
@@ -30,6 +31,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Nils Buchholz
  */
+@NullMarked
 public class IsabelleMasterHandler {
 
     /**

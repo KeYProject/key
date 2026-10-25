@@ -18,6 +18,10 @@ import org.key_project.isabelletranslation.automation.IsabelleProblem;
 import org.key_project.isabelletranslation.automation.IsabelleRule;
 import org.key_project.isabelletranslation.automation.IsabelleSolver;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class IsabelleProofApplyUserAction extends UserAction {
     private final Collection<IsabelleSolver> solvers;
 
@@ -27,7 +31,7 @@ public class IsabelleProofApplyUserAction extends UserAction {
 
     private final Collection<Node> originalProofNodes;
 
-    private final Node originalSelectedNode;
+    private final @Nullable Node originalSelectedNode;
 
     public IsabelleProofApplyUserAction(KeYMediator mediator, Proof proof,
             Collection<IsabelleSolver> solvers) {

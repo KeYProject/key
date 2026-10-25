@@ -16,12 +16,15 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Settings object used for Isabelle translation.
  */
+@NullMarked
 public class IsabelleTranslationSettings extends AbstractSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleTranslationSettings.class);
 
@@ -33,7 +36,7 @@ public class IsabelleTranslationSettings extends AbstractSettings {
     /**
      * The settings instance
      */
-    private static IsabelleTranslationSettings INSTANCE;
+    private static @Nullable IsabelleTranslationSettings INSTANCE;
 
     /**
      * Key to get Isabelle path in JSON
