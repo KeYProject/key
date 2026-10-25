@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Sun Aug 16 12:25:27 CEST 2026
+# Date: Sat Oct 24 15:29:23 CEST 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -7538,7 +7538,7 @@ eval_order_access4 {
 \find(#allmodal ((modal operator))|{{ ..
   #v.#a = #nse;
 ... }}| (post))
-\varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#v (program Variable))),  \not \static(#a (program Variable)))
+\varcond(\new(#v1 (program Variable), \typeof(#nse (program NonSimpleExpression))), \new(#v0 (program Variable), \typeof(#v (program Variable))),  \not \static(#a (program Variable)), \not\isThisReference (#v (program Variable)))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#v) #v0 = #v;
   #typeof(#nse) #v1 = #nse;
