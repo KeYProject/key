@@ -28,6 +28,9 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.parsing.Position;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Lets the user instantiate the taclet's {@code \assumes} sequent in one of two ways, chosen with a
  * toggle:
@@ -41,6 +44,7 @@ import org.key_project.util.parsing.Position;
  * with the existing schema-variable bindings.</li>
  * </ul>
  */
+@NullMarked
 public class AssumesSelectionPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
@@ -260,7 +264,7 @@ public class AssumesSelectionPanel extends JPanel {
         return p;
     }
 
-    private Timer debounce;
+    private @Nullable Timer debounce;
 
     private void scheduleValidation() {
         if (!manualMode) {

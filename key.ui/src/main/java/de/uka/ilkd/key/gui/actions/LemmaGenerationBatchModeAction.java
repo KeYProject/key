@@ -9,6 +9,9 @@ import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class LemmaGenerationBatchModeAction extends MainWindowAction {
 
     private static final String DESCRIPTION =

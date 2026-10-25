@@ -57,6 +57,8 @@ import org.key_project.util.collection.Pair;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,13 +77,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author Wolfram Pfeifer, lanzinger
  */
+@NullMarked
 public final class SourceView extends JComponent {
     private static final Logger LOGGER = LoggerFactory.getLogger(SourceView.class);
 
     /**
      * the only instance of this singleton
      */
-    private static SourceView instance;
+    private static @Nullable SourceView instance;
 
     /**
      * ToolTip for the textPanes containing the source code.
@@ -151,7 +154,7 @@ public final class SourceView extends JComponent {
     /**
      * Lines to highlight (contains all highlights of the current proof) and corresponding Nodes.
      */
-    private LinkedList<Pair<Node, PositionInfo>> lines;
+    private @Nullable LinkedList<Pair<Node, PositionInfo>> lines;
 
     /** The symbolic execution highlights. */
     private final Set<Highlight> symbExHighlights = new HashSet<>();
@@ -227,7 +230,7 @@ public final class SourceView extends JComponent {
 
     }
 
-    private void ensureProofJavaSourceCollectionExists(Proof proof) {
+    private void ensureProofJavaSourceCollectionExists(@Nullable Proof proof) {
         if (proof != null && proof.lookup(ProofJavaSourceCollection.class) == null) {
             final var sources = new ProofJavaSourceCollection();
             proof.register(sources, ProofJavaSourceCollection.class);
@@ -248,7 +251,6 @@ public final class SourceView extends JComponent {
                 }
             });
         }
-
 
     }
 
@@ -607,7 +609,7 @@ public final class SourceView extends JComponent {
      * @return {@code true} if this source view did not already contain the file.
      * @throws IOException if the file cannot be opened.
      */
-    private boolean addFile(URI fileURI) throws IOException {
+    private boolean addFile(@Nullable URI fileURI) throws IOException {
         final Proof proof = mainWindow.getMediator().getSelectedProof();
         // quick fix: fileName could be null (see bug #1520)
         if (proof == null || fileURI == null || tabs.containsKey(fileURI)) {
@@ -692,7 +694,7 @@ public final class SourceView extends JComponent {
         }
     }
 
-    private void addPosToList(PositionInfo pos, LinkedList<Pair<Node, PositionInfo>> list,
+    private void addPosToList(@Nullable PositionInfo pos, LinkedList<Pair<Node, PositionInfo>> list,
             Node node) {
         if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
                 && pos.getURI().isPresent()) {
@@ -709,7 +711,7 @@ public final class SourceView extends JComponent {
      * @return a linked list of pairs of PositionInfo objects containing the start and end positions
      *         for the highlighting and Nodes.
      */
-    private LinkedList<Pair<Node, PositionInfo>> constructLinesSet(Node node) {
+    private @Nullable LinkedList<Pair<Node, PositionInfo>> constructLinesSet(@Nullable Node node) {
         LinkedList<Pair<Node, PositionInfo>> list = new LinkedList<>();
 
         if (node == null) {
@@ -836,7 +838,7 @@ public final class SourceView extends JComponent {
      * @param node the current node
      * @return a String containing the path information to display
      */
-    private static String collectPathInformation(Node node) {
+    private static String collectPathInformation(@Nullable Node node) {
         while (node != null) {
             if (node.getNodeInfo() != null && node.getNodeInfo().getBranchLabel() != null) {
                 String label = node.getNodeInfo().getBranchLabel();
@@ -870,6 +872,7 @@ public final class SourceView extends JComponent {
     private final static class TabbedPane extends JTabbedPane {
         private static final long serialVersionUID = -5438740208669700183L;
 
+        @Nullable
         Tab getSelectedTab() {
             return (Tab) getSelectedComponent();
         }
@@ -925,7 +928,7 @@ public final class SourceView extends JComponent {
         /**
          * The highlight for the user's selection.
          */
-        private Highlight selectionHL;
+        private @Nullable Highlight selectionHL;
 
         /**
          * Maps line numbers to highlights.
@@ -1245,7 +1248,7 @@ public final class SourceView extends JComponent {
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@Nullable Object obj) {
             if (this == obj) {
                 return true;
             }

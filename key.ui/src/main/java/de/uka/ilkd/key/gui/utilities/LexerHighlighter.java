@@ -88,7 +88,6 @@ public abstract class LexerHighlighter {
         highlightPaneAll(contentPane, 0, -1);
     }
 
-
     private void highlightToken(StyledDocument sd, int startIdx, Token tok) {
         var attribute = getStyle(tok.getType());
         if (attribute != null) {
@@ -122,7 +121,6 @@ public abstract class LexerHighlighter {
         public static final ColorSettings.ColorProperty COLOR_MODALITY =
             ColorSettings.define("infotree.syntax.modality", "", Color.PINK, Color.PINK);
 
-
         private final AttributeSet STYLE_OPERATORS = define(COLOR_OPERATORS.get(), false, false);
         private final AttributeSet STYLE_ERROR = define(COLOR_ERROR.get(), false, false);
         private final AttributeSet STYLE_LITERALS = define(COLOR_LITERALS.get(), false, true);
@@ -131,7 +129,6 @@ public abstract class LexerHighlighter {
         private final AttributeSet STYLE_COMMENT = define(COLOR_COMMENT.get(), false, true);
         private final AttributeSet STYLE_MODALITY = define(COLOR_MODALITY.get(), false, true);
         private final AttributeSet STYLE_DEFAULT = define(COLOR_IDENTIFIER.get(), false, false);
-
 
         @Override
         protected @Nullable AttributeSet getStyle(int tokType) {

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.util.KeYConstants;
 
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author bruns
  */
+@NullMarked
 public final class QuickSaveAction extends MainWindowAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(QuickSaveAction.class);
     private static final long serialVersionUID = -7084304175671744403L;

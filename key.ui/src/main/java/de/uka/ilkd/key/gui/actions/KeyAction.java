@@ -10,6 +10,8 @@ import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MASK;
 
 /**
@@ -20,6 +22,7 @@ import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MAS
  * @author Alexander Weigl
  * @version 1 (13.02.19)
  */
+@NullMarked
 public abstract class KeyAction extends AbstractAction {
     private static final long serialVersionUID = -3939943174392925224L;
 

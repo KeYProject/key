@@ -9,10 +9,14 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
+@NullMarked
 public class DefaultSettingsProvider implements SettingsProvider {
     private String description;
     private JPanel panel;
@@ -55,7 +59,7 @@ public class DefaultSettingsProvider implements SettingsProvider {
     public void applySettings(MainWindow window) throws InvalidSettingsInputException {}
 
     @Override
-    public Icon getIcon() {
+    public @Nullable Icon getIcon() {
         return icon;
     }
 

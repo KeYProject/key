@@ -21,6 +21,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
 
 import net.miginfocom.layout.CC;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Extension adapter for Heatmap
@@ -31,6 +32,7 @@ import org.jspecify.annotations.NonNull;
     description = "Colorize the formulae on the sequence based on the most recent changes\n"
         + "Developer: Jonas Schiffl <jonas.schiffl@kit.edu>",
     experimental = false)
+@NullMarked
 public class HeatmapExt implements KeYGuiExtension, KeYGuiExtension.MainMenu,
         KeYGuiExtension.Toolbar, KeYGuiExtension.Settings {
     private final List<Action> actions = new ArrayList<>(2);
@@ -75,6 +77,7 @@ public class HeatmapExt implements KeYGuiExtension, KeYGuiExtension.MainMenu,
  *
  * @author weigl, jschiffl
  */
+@NullMarked
 class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider {
     private static final long serialVersionUID = 7783431483026950930L;
 
@@ -139,7 +142,6 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
         final boolean enableHeatmap;
         final boolean sequent;
         final boolean newest;
-
 
         HeatmapMode(String shortText, String description, boolean enableHeatmap, boolean sequent,
                 boolean newest) {
@@ -221,7 +223,6 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
             }
         }
     }
-
 
     @Override
     public int getPriorityOfSettings() {

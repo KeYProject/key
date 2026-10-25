@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.settings;
 
-
 import java.awt.*;
 import java.text.Format;
 import javax.swing.*;
@@ -21,7 +20,8 @@ import de.uka.ilkd.key.gui.fonticons.IconProvider;
 
 import org.key_project.util.java.StringUtil;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author weigl
  */
+@NullMarked
 public class SimpleSettingsPanel extends JPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleSettingsPanel.class);
@@ -110,20 +111,20 @@ public class SimpleSettingsPanel extends JPanel {
         return checkBox;
     }
 
-    protected JScrollPane createTextArea(String text, Validator<String> validator) {
+    protected JScrollPane createTextArea(String text, @Nullable Validator<String> validator) {
         JTextArea area = new JTextArea(text);
         area.setRows(5);
         area.getDocument().addDocumentListener(new DocumentValidatorAdapter(area, validator));
         return new JScrollPane(area);
     }
 
-    protected JTextArea createTextAreaWithoutScroll(String text, Validator<String> validator) {
+    protected JTextArea createTextAreaWithoutScroll(String text,
+            @Nullable Validator<String> validator) {
         JTextArea area = new JTextArea(text);
         area.setRows(5);
         area.getDocument().addDocumentListener(new DocumentValidatorAdapter(area, validator));
         return area;
     }
-
 
     protected JTextField createTextField(String text, final @Nullable Validator<String> validator) {
         JTextField field = new JTextField(text);
@@ -186,7 +187,7 @@ public class SimpleSettingsPanel extends JPanel {
         return spinner;
     }
 
-    public static JLabel createHelpLabel(String s) {
+    public static JLabel createHelpLabel(@Nullable String s) {
         if (s == null || s.isEmpty()) {
             s = "";
         } else {
@@ -205,7 +206,7 @@ public class SimpleSettingsPanel extends JPanel {
         return s;
     }
 
-    public static JLabel createHelpTextLabel(String s) {
+    public static JLabel createHelpTextLabel(@Nullable String s) {
         if (s == null || s.isEmpty()) {
             s = "";
         }
@@ -228,10 +229,10 @@ public class SimpleSettingsPanel extends JPanel {
 
     @SuppressWarnings("unchecked")
     private class ValidatorSpinnerAdapter<T> implements ChangeListener {
-        private final Validator<T> validator;
+        private final @Nullable Validator<T> validator;
         private final JSpinner model;
 
-        public ValidatorSpinnerAdapter(JSpinner model, Validator<T> validator) {
+        public ValidatorSpinnerAdapter(JSpinner model, @Nullable Validator<T> validator) {
             this.model = model;
             this.validator = validator;
         }

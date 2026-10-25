@@ -11,9 +11,12 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 
+import org.jspecify.annotations.NullMarked;
+
 /*
  * Menu option for showing the sequent search bar. Keyboard shortcut: STRG+F.
  */
+@NullMarked
 public class SearchInSequentAction extends MainWindowAction {
 
     private static final long serialVersionUID = -9002009635814787502L;

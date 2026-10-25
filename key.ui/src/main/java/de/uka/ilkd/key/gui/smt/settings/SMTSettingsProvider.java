@@ -21,6 +21,8 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
 /**
@@ -29,6 +31,7 @@ import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
+@NullMarked
 public class SMTSettingsProvider extends SettingsPanel implements SettingsProvider {
     public static final String PROGRESS_MODE_USER =
         "Progress dialog remains open after executing solvers";
@@ -118,7 +121,6 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
 
     private transient ProofIndependentSMTSettings settings;
     private final transient List<SettingsProvider> children = new ArrayList<>();
-
 
     public SMTSettingsProvider() {
         saveToFilePanel = getSaveToFilePanel();

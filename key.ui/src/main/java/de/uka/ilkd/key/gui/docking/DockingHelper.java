@@ -34,7 +34,9 @@ import bibliothek.gui.dock.common.intern.action.CDecorateableAction;
 import bibliothek.gui.dock.control.focus.DefaultFocusRequest;
 import bibliothek.gui.dock.control.focus.FocusRequest;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class DockingHelper {
     public final static List<String> LEFT_TOP_PANEL = new LinkedList<>();
     public final static List<String> RIGHT_PANEL = new LinkedList<>();
@@ -155,7 +157,6 @@ public class DockingHelper {
             cur.setVisible(true);
         }
     }
-
 
     /**
      * Constructs a dockable for the given component.

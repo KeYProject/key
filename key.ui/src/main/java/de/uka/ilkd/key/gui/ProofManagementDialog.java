@@ -45,10 +45,12 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class ProofManagementDialog extends JDialog {
 
     private static final long serialVersionUID = 3543411893273433386L;
@@ -65,17 +67,17 @@ public final class ProofManagementDialog extends JDialog {
     private static final ImageIcon KEY_CACHED_CLOSED = IconFactory.keyCachedClosed(20, 20);
     private static final Icon KEY_CLOSED = IconFactory.keyHoleClosed(20);
     private boolean startedProof;
-    private JTabbedPane tabbedPane;
-    private Map<Pair<KeYJavaType, IObserverFunction>, Icon> targetIcons;
-    private ClassTree classTree;
-    private JList<ProofWrapper> proofList;
-    private ContractSelectionPanel contractPanelByMethod;
-    private ContractSelectionPanel contractPanelByProof;
-    private JButton startButton;
-    private JButton cancelButton;
+    private @Nullable JTabbedPane tabbedPane;
+    private @Nullable Map<Pair<KeYJavaType, IObserverFunction>, Icon> targetIcons;
+    private @Nullable ClassTree classTree;
+    private @Nullable JList<ProofWrapper> proofList;
+    private @Nullable ContractSelectionPanel contractPanelByMethod;
+    private @Nullable ContractSelectionPanel contractPanelByProof;
+    private @Nullable JButton startButton;
+    private @Nullable JButton cancelButton;
     private final KeYMediator mediator;
     private final InitConfig initConfig;
-    private ProofEnvironment env;
+    private @Nullable ProofEnvironment env;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -303,7 +305,7 @@ public final class ProofManagementDialog extends JDialog {
     /**
      * Shows the dialog and selects the passed proof.
      */
-    public static void showInstance(InitConfig initConfig, Proof selectedProof) {
+    public static void showInstance(InitConfig initConfig, @Nullable Proof selectedProof) {
         showInstance(initConfig, null, null, selectedProof);
     }
 
@@ -321,8 +323,8 @@ public final class ProofManagementDialog extends JDialog {
      * @param selectedKJT the selected {@link KeYJavaType}
      * @param selectedTarget the selected target
      */
-    public static void showInstance(InitConfig initConfig, KeYJavaType selectedKJT,
-            IObserverFunction selectedTarget) {
+    public static void showInstance(InitConfig initConfig, @Nullable KeYJavaType selectedKJT,
+            @Nullable IObserverFunction selectedTarget) {
         showInstance(initConfig, selectedKJT, selectedTarget, null);
     }
 
@@ -333,8 +335,8 @@ public final class ProofManagementDialog extends JDialog {
         return showInstance(initConfig, null, null, null);
     }
 
-    private static boolean showInstance(InitConfig initConfig, KeYJavaType selectedKJT,
-            IObserverFunction selectedTarget, Proof selectedProof) {
+    private static boolean showInstance(InitConfig initConfig, @Nullable KeYJavaType selectedKJT,
+            @Nullable IObserverFunction selectedTarget, @Nullable Proof selectedProof) {
         MainWindow mainWindow = MainWindow.getInstance();
         ProofManagementDialog dialog = new ProofManagementDialog(mainWindow, initConfig);
 
@@ -344,7 +346,6 @@ public final class ProofManagementDialog extends JDialog {
         if (previouslySelectedContracts != null) {
             dialog.select(previouslySelectedContracts);
         }
-
 
         dialog.updateGlobalStatus();
 
@@ -429,7 +430,7 @@ public final class ProofManagementDialog extends JDialog {
         }
     }
 
-    private Contract getSelectedContract() {
+    private @Nullable Contract getSelectedContract() {
         return getActiveContractPanel().getContract();
     }
 
@@ -529,7 +530,6 @@ public final class ProofManagementDialog extends JDialog {
         validate();
     }
 
-
     private boolean isInstanceMethodOfAbstractClass(KeYJavaType p_class, IObserverFunction obs) {
         return p_class.getJavaType() instanceof InterfaceDeclaration
                 || (p_class.getSort().isAbstract() && !obs.isStatic());
@@ -567,7 +567,6 @@ public final class ProofManagementDialog extends JDialog {
 
         Services services = initConfig.getServices();
         SpecificationRepository specRepos = services.getSpecificationRepository();
-
 
         var kjts = services.getJavaInfo().getAllKeYJavaTypes();
         for (KeYJavaType kjt : kjts) {
@@ -644,7 +643,6 @@ public final class ProofManagementDialog extends JDialog {
         updateStartButton();
     }
 
-
     // -------------------------------------------------------------------------
     // inner classes
     // -------------------------------------------------------------------------
@@ -665,7 +663,6 @@ public final class ProofManagementDialog extends JDialog {
         }
 
     }
-
 
     /**
      * Stores the identification of a {@link Contract}, i.e. type, method, contract name.

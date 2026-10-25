@@ -6,11 +6,14 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Use this class in case no proof is loaded.
  *
  * @author Kai Wallisch
  */
+@NullMarked
 public class EmptySequent extends SequentView {
     public EmptySequent(MainWindow mainWindow) {
         super(mainWindow);

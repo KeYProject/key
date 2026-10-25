@@ -20,6 +20,7 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author bubel
  */
+@NullMarked
 public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofClosedJTextPaneDisplay.class);
 

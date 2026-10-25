@@ -13,7 +13,9 @@ import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.Contract;
 
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class ContractConfigurator extends JDialog {
 
     /**
@@ -26,7 +28,6 @@ public class ContractConfigurator extends JDialog {
 
     private boolean successful = false;
 
-
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
@@ -37,13 +38,11 @@ public class ContractConfigurator extends JDialog {
         init(services, contracts, title, allowMultipleContracts);
     }
 
-
     public ContractConfigurator(Frame owner, Services services, Contract[] contracts, String title,
             boolean allowMultipleContracts) {
         super(owner, "Contract Configurator", true);
         init(services, contracts, title, allowMultipleContracts);
     }
-
 
     // -------------------------------------------------------------------------
     // internal methods
@@ -99,15 +98,12 @@ public class ContractConfigurator extends JDialog {
         buttonPanel.add(cancelButton);
         GuiUtilities.attachClickOnEscListener(cancelButton);
 
-
         // show
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         pack();
         setLocationRelativeTo(getOwner());
         setVisible(true);
     }
-
-
 
     // -------------------------------------------------------------------------
     // public interface
@@ -119,7 +115,6 @@ public class ContractConfigurator extends JDialog {
     public boolean wasSuccessful() {
         return successful;
     }
-
 
     /**
      * Returns the selected contract.

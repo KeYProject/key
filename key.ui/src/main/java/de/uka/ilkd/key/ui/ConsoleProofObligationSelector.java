@@ -23,9 +23,12 @@ import de.uka.ilkd.key.util.KeYTypeUtil;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class ConsoleProofObligationSelector implements ProofObligationSelector {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(ConsoleProofObligationSelector.class);
@@ -62,7 +65,6 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
         }
     }
 
-
     protected void printAvailableProofObligations() {
         LOGGER.info("Available Contracts: ");
         for (int i = 0; i < contracts.size(); i++) {
@@ -76,14 +78,13 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
         LOGGER.info(TAB + "PO:" + contracts.get(i).getDisplayName());
     }
 
-    protected ProofOblInput createPOForSelectedContract() {
+    protected @Nullable ProofOblInput createPOForSelectedContract() {
         final Contract contract = selectContract();
         LOGGER.info("Contract: " + contract);
         return contract == null ? null : contract.createProofObl(initConfig, contract);
     }
 
-    protected void findOrStartProof(ProofOblInput po) {
-
+    protected void findOrStartProof(@Nullable ProofOblInput po) {
 
         Proof proof = findPreferablyClosedProof(po);
 
@@ -105,10 +106,9 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
             mediator.getSelectionModel().setSelectedProof(proof);
         }
 
-
     }
 
-    private Proof findPreferablyClosedProof(ProofOblInput po) {
+    private @Nullable Proof findPreferablyClosedProof(ProofOblInput po) {
         ImmutableSet<Proof> proofs =
             initConfig.getServices().getSpecificationRepository().getProofs(po);
 
@@ -135,14 +135,12 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
         return true;
     }
 
-
     private Contract selectContract() {
         printAvailableProofObligations();
 
         LOGGER.info("Choose PO, enter number between 0 and " + (contracts.size() - 1));
         int cNr = readContractNumber();
         return contracts.get(cNr);
-
 
     }
 
@@ -171,6 +169,5 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
             new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
         return Integer.parseInt(br.readLine());
     }
-
 
 }

@@ -30,6 +30,8 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Overview of how the selected taclet matched the sequent: the schematic find pattern, the concrete
  * sub-term it was matched against, and the schema-variable bindings that the match determined.
@@ -41,6 +43,7 @@ import org.key_project.util.collection.ImmutableList;
  * given a stable colour, used both for its binding chip and to highlight the sub-term it matched
  * inside the concrete matched term.
  */
+@NullMarked
 public class MatchInfoPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;

@@ -36,9 +36,11 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class ShowProofStatistics extends MainWindowAction {
     private static final String CSV_SEPERATOR = ";";
     private static final Logger LOGGER = LoggerFactory.getLogger(ShowProofStatistics.class);

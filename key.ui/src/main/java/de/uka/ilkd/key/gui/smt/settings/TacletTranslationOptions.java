@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.smt.settings;
 
-
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -14,6 +13,9 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class TacletTranslationOptions extends SettingsPanel implements SettingsProvider {
     private static final long serialVersionUID = 5273966151509876358L;
     private static final String infoFileChooserPanel =
@@ -25,7 +27,6 @@ public class TacletTranslationOptions extends SettingsPanel implements SettingsP
                 \t%d: date
                 \t%t: time
                 \t%i: the goal's number
-
 
                 Example: ./home/translations/Taclet%d_%t_%i_%s.txt
 
@@ -39,7 +40,6 @@ public class TacletTranslationOptions extends SettingsPanel implements SettingsP
                 Rule of thumb: Most of the taclets can be translated by using 2-3 different generic sorts.""";
     private final JTextField fileChooserPanel;
     private final JSpinner maxNumberOfGenerics;
-
 
     public TacletTranslationOptions() {
         setHeaderText("Taclet Translation Options for SMT");

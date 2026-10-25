@@ -13,11 +13,14 @@ import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A window to contain a {@link AuxiliaryContractSelectionPanel}.
  *
  * @param <T>
  */
+@NullMarked
 public class AuxiliaryContractConfigurator<T extends AuxiliaryContract> extends JDialog {
 
     private static final long serialVersionUID = 4882043118399402599L;

@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author weigl
  */
+@NullMarked
 public class RunAllProofsAction extends MainWindowAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(RunAllProofsAction.class);
 
@@ -63,7 +65,6 @@ public class RunAllProofsAction extends MainWindowAction {
      * Files to loaded
      */
     private List<Path> files;
-
 
     /**
      * Loads the key file given in the file by environment variable {@link #ENV_VARIABLE}. If the

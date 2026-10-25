@@ -6,11 +6,14 @@ package de.uka.ilkd.key.gui.notification.events;
 
 import de.uka.ilkd.key.gui.notification.NotificationEventID;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * An exit key event indicating that KeY is currently shut down.
  *
  * @author bubel
  */
+@NullMarked
 public class ExitKeYEvent extends NotificationEvent {
 
     /**

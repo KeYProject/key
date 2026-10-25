@@ -8,12 +8,15 @@ import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Action to show a dialog with the taclet options valid for the currently
  * selected proof.
  *
  * Now defers to the "Show Active Settings" action to show the taclet options.
  */
+@NullMarked
 public class ShowActiveTactletOptionsAction extends MainWindowAction {
 
     private static final long serialVersionUID = -7012564698194718532L;

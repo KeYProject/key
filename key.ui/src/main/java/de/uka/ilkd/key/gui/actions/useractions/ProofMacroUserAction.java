@@ -10,11 +10,15 @@ import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * User action to apply a proof macro.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class ProofMacroUserAction extends ProofModifyingUserAction {
     /**
      * The macro to execute in this action.
@@ -23,20 +27,21 @@ public class ProofMacroUserAction extends ProofModifyingUserAction {
     /**
      * The position to apply the macro on.
      */
-    private final PosInOccurrence pio;
+    private final @Nullable PosInOccurrence pio;
 
     /// Root of the subtree to run the macro from. If null, it is run from the selected node.
-    private final Node node;
+    private final @Nullable Node node;
 
-    public ProofMacroUserAction(KeYMediator mediator, ProofMacro macro, PosInOccurrence pio) {
+    public ProofMacroUserAction(KeYMediator mediator, ProofMacro macro,
+            @Nullable PosInOccurrence pio) {
         super(mediator, mediator.getSelectedProof());
         this.macro = macro;
         this.pio = pio;
         this.node = mediator.getSelectedNode();
     }
 
-    public ProofMacroUserAction(KeYMediator mediator, ProofMacro macro, Node node,
-            PosInOccurrence pio) {
+    public ProofMacroUserAction(KeYMediator mediator, ProofMacro macro, @Nullable Node node,
+            @Nullable PosInOccurrence pio) {
         super(mediator, mediator.getSelectedProof());
         this.macro = macro;
         this.pio = pio;

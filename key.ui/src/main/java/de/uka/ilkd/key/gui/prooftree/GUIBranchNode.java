@@ -13,6 +13,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.Taclet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Branch node indicating the start of a new proof branch.
@@ -20,12 +22,12 @@ import org.jspecify.annotations.NonNull;
  * @author early KeY team
  * @see ProofTreeView
  */
+@NullMarked
 class GUIBranchNode extends GUIAbstractTreeNode {
 
     private final Object label;
 
-    private ArrayList<TreeNode> childrenCache = null;
-
+    private @Nullable ArrayList<TreeNode> childrenCache = null;
 
     public GUIBranchNode(GUIProofTreeModel tree, Node subTree, Object label) {
         super(tree, subTree);

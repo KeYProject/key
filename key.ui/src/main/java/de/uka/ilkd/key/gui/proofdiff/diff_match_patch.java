@@ -11,6 +11,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /*
  * Functions for diff, match and patch. Computes the difference between two texts to create a patch.
  * Applies the patch onto another text, allowing for errors.
@@ -21,6 +24,7 @@ import java.util.regex.Pattern;
 /**
  * Class containing the diff, match and patch methods. Also contains the behaviour settings.
  */
+@NullMarked
 public class diff_match_patch {
 
     // Defaults.
@@ -76,9 +80,7 @@ public class diff_match_patch {
         }
     }
 
-
     // DIFF FUNCTIONS
-
 
     /**
      * The data structure representing a diff is a Linked list of Diff objects:
@@ -1497,9 +1499,7 @@ public class diff_match_patch {
         return diffs;
     }
 
-
     // MATCH FUNCTIONS
-
 
     /**
      * Locate the best instance of 'pattern' in 'text' near 'loc'. Returns -1 if no match found.
@@ -1674,9 +1674,7 @@ public class diff_match_patch {
         return s;
     }
 
-
     // PATCH FUNCTIONS
-
 
     /**
      * Increase the context until it is unique, but don't let the pattern expand beyond
@@ -2258,7 +2256,6 @@ public class diff_match_patch {
         return patches;
     }
 
-
     /**
      * Class representing one diff operation.
      */
@@ -2314,7 +2311,7 @@ public class diff_match_patch {
          * @return true or false.
          */
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@Nullable Object obj) {
             if (this == obj) {
                 return true;
             }
@@ -2335,7 +2332,6 @@ public class diff_match_patch {
             }
         }
     }
-
 
     /**
      * Class representing one patch operation.

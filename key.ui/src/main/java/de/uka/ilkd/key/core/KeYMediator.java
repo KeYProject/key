@@ -42,6 +42,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.lookup.Lookup;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -50,6 +51,7 @@ import org.jspecify.annotations.Nullable;
  * <strong>Attention: </strong> Logic to apply rules has to be implemented user interface
  * independent in the {@link ProofControl}!
  */
+@NullMarked
 public class KeYMediator {
 
     /** The user interface */
@@ -79,12 +81,12 @@ public class KeYMediator {
      */
     private final Collection<Consumer<Proof>> proofLoadListeners = new ArrayList<>();
 
-    private TacletFilter filterForInteractiveProving;
+    private @Nullable TacletFilter filterForInteractiveProving;
 
     /**
      * An optional used {@link AutoSaver}.
      */
-    private AutoSaver autoSaver = AutoSaver.getDefaultInstance();
+    private @Nullable AutoSaver autoSaver = AutoSaver.getDefaultInstance();
 
     /**
      * Currently opened proofs.
@@ -140,7 +142,7 @@ public class KeYMediator {
     }
 
     /** returns the Services with the java service classes */
-    public Services getServices() {
+    public @Nullable Services getServices() {
         Proof selectedProof = getSelectedProof();
         return selectedProof != null ? selectedProof.getServices() : null;
     }
@@ -221,7 +223,7 @@ public class KeYMediator {
      * @param newProof the proof to select.
      * @param previousProof the previously selected proof
      */
-    void setProof(Proof newProof, Proof previousProof) {
+    void setProof(@Nullable Proof newProof, @Nullable Proof previousProof) {
         if (previousProof == newProof) {
             return;
         }
@@ -414,7 +416,7 @@ public class KeYMediator {
      *
      * @param p the proof that was just loaded and is about to be replayed
      */
-    public synchronized void fireProofLoaded(Proof p) {
+    public synchronized void fireProofLoaded(@Nullable Proof p) {
         if (p == null) {
             return;
         }
@@ -437,7 +439,7 @@ public class KeYMediator {
      *
      * @return the current selected goal
      */
-    public Goal getSelectedGoal() {
+    public @Nullable Goal getSelectedGoal() {
         return keySelectionModel.getSelectedGoal();
     }
 
@@ -455,7 +457,7 @@ public class KeYMediator {
      *
      * @return the current selected node
      */
-    public Node getSelectedNode() {
+    public @Nullable Node getSelectedNode() {
         return keySelectionModel.getSelectedNode();
     }
 
@@ -556,7 +558,7 @@ public class KeYMediator {
      * @param selection a Runnable that selects the correct node after unfreezing the interface
      */
     public void finishAutoMode(Proof proof, boolean fullStop, boolean interactive,
-            Runnable selection) {
+            @Nullable Runnable selection) {
         setInteractive(interactive);
         startInterface(fullStop);
         getUI().getProofControl().fireAutoModeStopped(new ProofEvent(proof));
@@ -566,7 +568,6 @@ public class KeYMediator {
             selection.run();
         }
     }
-
 
     /**
      * Checks if the auto mode is currently running.
@@ -587,7 +588,7 @@ public class KeYMediator {
      * @return null or the previous data
      * @see #register(Object, Class)
      */
-    public <T> T lookup(Class<T> service) {
+    public <T> @Nullable T lookup(Class<T> service) {
         try {
             if (userData == null) {
                 return null;
@@ -786,13 +787,12 @@ public class KeYMediator {
     // return ui;
     // }
 
-
     /**
      * Returns the {@link AutoSaver} to use.
      *
      * @return The {@link AutoSaver} to use or {@code null} if no {@link AutoSaver} should be used.
      */
-    public AutoSaver getAutoSaver() {
+    public @Nullable AutoSaver getAutoSaver() {
         return autoSaver;
     }
 

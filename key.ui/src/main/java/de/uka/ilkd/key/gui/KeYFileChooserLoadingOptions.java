@@ -20,12 +20,14 @@ import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// Panel for loading options to be used in {@link KeYFileChooser}
 /// @see KeYFileChooser#addLoadingOptions()
 /// @author weigl
+@NullMarked
 public class KeYFileChooserLoadingOptions extends JPanel {
     private final JLabel lblProfile = new JLabel("Profile:");
     private final JComboBox<ProfileWrapper> cboProfile = new JComboBox<>();
@@ -48,7 +50,6 @@ public class KeYFileChooserLoadingOptions extends JPanel {
 
     private final Map<Profile, KeYGuiExtension.OptionPanel> additionalOptionPanels =
         KeYGuiExtensionFacade.createAdditionalOptionPanels();
-
 
     private KeYGuiExtension.@Nullable OptionPanel currentOptionPanel = null;
 

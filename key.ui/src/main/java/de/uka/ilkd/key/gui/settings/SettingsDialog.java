@@ -15,6 +15,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
  * @version 1 (08.04.19)
  * @see SettingsUi
  */
+@NullMarked
 public class SettingsDialog extends JDialog {
     private static final long serialVersionUID = -3204453471778351602L;
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsDialog.class);

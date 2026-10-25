@@ -7,6 +7,10 @@ package de.uka.ilkd.key.gui.fonticons;
 import java.awt.*;
 import java.io.IOException;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public enum FontAwesomeRegular implements IconFont {
     ADDRESS_BOOK('\uf2b9'), ADDRESS_CARD('\uf2bb'), ANGRY('\uf556'),
     ARROW_ALT_CIRCLE_DOWN('\uf358'), ARROW_ALT_CIRCLE_LEFT('\uf359'),
@@ -49,7 +53,7 @@ public enum FontAwesomeRegular implements IconFont {
     USER_CIRCLE('\uf2bd'), WINDOW_CLOSE('\uf410'), WINDOW_MAXIMIZE('\uf2d0'),
     WINDOW_MINIMIZE('\uf2d1'), WINDOW_RESTORE('\uf2d2');
 
-    private static Font font;
+    private static @Nullable Font font;
     private final char unicode;
 
     FontAwesomeRegular(char c) {

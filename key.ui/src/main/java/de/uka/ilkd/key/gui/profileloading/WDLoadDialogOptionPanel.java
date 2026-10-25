@@ -14,12 +14,14 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.wd.WdProfile;
 
 import net.miginfocom.layout.CC;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// Additional UI components for the selection of the WD semantics.
 ///
 /// @author weigl
 @KeYGuiExtension.Info(experimental = false)
+@NullMarked
 public class WDLoadDialogOptionPanel implements KeYGuiExtension, KeYGuiExtension.LoadOptionPanel {
     @Override
     public OptionPanel get() {
@@ -56,7 +58,6 @@ public class WDLoadDialogOptionPanel implements KeYGuiExtension, KeYGuiExtension
                 Cf. "Efficient Well-Definedness Checking" by Ádám Darvas,
                 Farhad Mehta, and Arsenii Rudich.
                 """;
-
 
         private static final String DESCRIPTION_Y_WD_SEMANTIC = """
                 Complete and along the lines of classical logic, where the

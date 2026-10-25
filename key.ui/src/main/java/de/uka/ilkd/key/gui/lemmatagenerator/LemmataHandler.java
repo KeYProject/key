@@ -31,10 +31,12 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInf
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class LemmataHandler implements TacletFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(LemmataHandler.class);
 
@@ -71,7 +73,6 @@ public class LemmataHandler implements TacletFilter {
         TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(
             null, new Listener(), problemInitializer, profile, file, filesForAxioms);
 
-
         LoaderListener loaderListener = new LoaderListener() {
 
             @Override
@@ -102,18 +103,15 @@ public class LemmataHandler implements TacletFilter {
             @Override
             public void progressStarted(Object sender) {
 
-
             }
 
             @Override
             public void reportStatus(Object sender, String string) {
 
-
             }
 
             @Override
             public void resetStatus(Object sender) {
-
 
             }
         };
@@ -131,8 +129,6 @@ public class LemmataHandler implements TacletFilter {
         }
         return list;
     }
-
-
 
     private void handleException(Throwable exception) {
         printException(exception);

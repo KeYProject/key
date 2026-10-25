@@ -14,6 +14,8 @@ import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Extension that adds soundiness report functionality to the UI.
  * Adds context menu item to proof list and enables soundiness analysis.
@@ -27,6 +29,7 @@ import de.uka.ilkd.key.proof.Proof;
     experimental = false,
     optional = true,
     priority = 1000)
+@NullMarked
 public class SoundinessExtension implements KeYGuiExtension, KeYGuiExtension.ContextMenu {
 
     @Override

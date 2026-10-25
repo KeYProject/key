@@ -7,6 +7,9 @@ package de.uka.ilkd.key.gui.fonticons;
 import java.awt.*;
 import java.io.IOException;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /*
  * Copyright (c) 2016 jIconFont <BR> <BR> Permission is hereby granted, free of charge, to any
  * person obtaining a copy of this software and associated documentation files (the "Software"), to
@@ -21,6 +24,7 @@ import java.io.IOException;
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
+@NullMarked
 public enum Typicons implements IconFont {
 
     ADJUST_BRIGHTNESS('\uE000'), ADJUST_CONTRAST('\uE001'), ANCHOR('\uE003'),
@@ -120,7 +124,7 @@ public enum Typicons implements IconFont {
     ZOOM_IN('\uE14B'), ZOOM_IN_OUTLINE('\uE14A'), ZOOM_OUT('\uE14D'), ZOOM_OUTLINE('\uE14E'),
     ZOOM_OUT_OUTLINE('\uE14C');
 
-    private static Font font;
+    private static @Nullable Font font;
     private final char character;
 
     Typicons(char character) {

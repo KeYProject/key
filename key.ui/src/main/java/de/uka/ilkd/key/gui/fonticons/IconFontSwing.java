@@ -9,9 +9,11 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class IconFontSwing {
     private static final Logger LOGGER = LoggerFactory.getLogger(IconFontSwing.class);
 

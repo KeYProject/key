@@ -4,18 +4,21 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.core;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An event that indicates that the users focused node or proof has changed
  */
 
+@NullMarked
 public class KeYSelectionEvent<Sel> {
 
     /** the source of this event */
     private final KeYSelectionModel source;
 
     /** the previously selected item */
-    private final Sel previousSelection;
+    private final @Nullable Sel previousSelection;
 
     /**
      * creates a new SelectedNodeEvent
@@ -23,7 +26,7 @@ public class KeYSelectionEvent<Sel> {
      * @param source the SelectedNodeModel where the event had its origin
      * @param previousSelection the previous selected item
      */
-    public KeYSelectionEvent(KeYSelectionModel source, Sel previousSelection) {
+    public KeYSelectionEvent(KeYSelectionModel source, @Nullable Sel previousSelection) {
         this.source = source;
         this.previousSelection = previousSelection;
     }
@@ -36,7 +39,6 @@ public class KeYSelectionEvent<Sel> {
     public KeYSelectionEvent(KeYSelectionModel source) {
         this(source, null);
     }
-
 
     /**
      * returns the KeYSelectionModel that caused this event
@@ -52,7 +54,7 @@ public class KeYSelectionEvent<Sel> {
      *
      * @return the previous selected item
      */
-    public Sel getPreviousSelection() {
+    public @Nullable Sel getPreviousSelection() {
         return previousSelection;
     }
 }

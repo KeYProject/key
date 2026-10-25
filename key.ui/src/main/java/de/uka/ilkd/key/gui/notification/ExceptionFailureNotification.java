@@ -8,6 +8,9 @@ import java.awt.Frame;
 
 import de.uka.ilkd.key.gui.notification.actions.ExceptionFailureNotificationDialog;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ExceptionFailureNotification extends NotificationTask {
 
     public ExceptionFailureNotification(Frame parentComponent) {

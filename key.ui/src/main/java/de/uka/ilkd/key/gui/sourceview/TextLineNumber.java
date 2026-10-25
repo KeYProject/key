@@ -19,6 +19,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class will display line numbers for a related text component. The text component must use
  * the same line height for each line. TextLineNumber supports wrapped lines and will highlight the
@@ -26,6 +29,7 @@ import javax.swing.text.*;
  *
  * This class was designed to be used as a component added to the row header of a JScrollPane.
  */
+@NullMarked
 public class TextLineNumber extends JPanel
         implements CaretListener, DocumentListener, PropertyChangeListener {
     private static final long serialVersionUID = 8451761988608017887L;
@@ -55,7 +59,7 @@ public class TextLineNumber extends JPanel
     private int lastHeight;
     private int lastLine;
 
-    private HashMap<String, FontMetrics> fonts;
+    private @Nullable HashMap<String, FontMetrics> fonts;
 
     /**
      * Create a line number component for a text component. This minimum display width will be based

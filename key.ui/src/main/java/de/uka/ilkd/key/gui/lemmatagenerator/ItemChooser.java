@@ -19,6 +19,8 @@ import de.uka.ilkd.key.gui.lemmatagenerator.ItemChooser.ItemFilter;
 import de.uka.ilkd.key.gui.lemmatagenerator.SelectionPanel.Side;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The panel ItemChooser offers the user the possibility to select certain items a list. It consists
@@ -29,17 +31,16 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInf
  * information in which of both tables it should be shown.
  */
 
-
-
+@NullMarked
 class ItemChooser<T> extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    private SelectionPanel<T> suppliedList;
-    private SelectionPanel<T> selectedList;
-    private JPanel middlePanel;
-    private JPanel contentPanel;
-    private JButton leftButton;
-    private JButton rightButton;
+    private @Nullable SelectionPanel<T> suppliedList;
+    private @Nullable SelectionPanel<T> selectedList;
+    private @Nullable JPanel middlePanel;
+    private @Nullable JPanel contentPanel;
+    private @Nullable JButton leftButton;
+    private @Nullable JButton rightButton;
     private List<TableItem<T>> items = new LinkedList<>();
     private final List<ItemFilter<T>> filtersForMovingItems =
         new LinkedList<>();
@@ -47,12 +48,9 @@ class ItemChooser<T> extends JPanel {
     // this data structure is shared with suppliedList and selectedList.
     private final List<ItemFilter<T>> userFilter = new LinkedList<>();
 
-
     public interface ItemFilter<T> {
         boolean include(T itemData);
     }
-
-
 
     static private final Dimension MAX = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
@@ -83,8 +81,6 @@ class ItemChooser<T> extends JPanel {
         }
         return contentPanel;
     }
-
-
 
     private JPanel getMiddlePanel() {
         if (middlePanel == null) {
@@ -119,8 +115,6 @@ class ItemChooser<T> extends JPanel {
 
     }
 
-
-
     private void cut(SelectionPanel<T> srcList, SelectionPanel<T> destList) {
         List<TableItem<T>> tableItems = srcList.getSelectedItems();
         for (TableItem<T> item : tableItems) {
@@ -138,10 +132,7 @@ class ItemChooser<T> extends JPanel {
         srcList.update();
         destList.update();
 
-
     }
-
-
 
     private SelectionPanel<T> getSuppliedList() {
         if (suppliedList == null) {
@@ -157,7 +148,6 @@ class ItemChooser<T> extends JPanel {
         return selectedList;
     }
 
-
     public void setItems(List<T> dataForItems, String columnName) {
 
         items = new LinkedList<>();
@@ -171,15 +161,11 @@ class ItemChooser<T> extends JPanel {
             model.addRow(new Object[] { item });
         }
 
-
-
         getSuppliedList().setModel(model);
         getSelectedList().setModel(model);
         getSuppliedList().selectAll();
 
     }
-
-
 
     public List<T> getDataOfSelectedItems() {
 
@@ -229,7 +215,6 @@ class ItemChooser<T> extends JPanel {
         filtersForMovingItems.remove(filter);
     }
 
-
     public void update() {
         getSelectedList().update();
         getSuppliedList().update();
@@ -237,25 +222,23 @@ class ItemChooser<T> extends JPanel {
 }
 
 
+@NullMarked
 class SelectionPanel<T> extends JPanel {
     enum Side {
         LEFT, RIGHT
     }
 
     private static final long serialVersionUID = 1L;
-    private JTextField textField;
-    private JTable list;
-    private JScrollPane scrollPane;
+    private @Nullable JTextField textField;
+    private @Nullable JTable list;
+    private @Nullable JScrollPane scrollPane;
     private final Side side;
     private RowFilter<ItemModel, Integer> filter;
 
     private String findPattern = "";
     private final List<ItemFilter<T>> userFilters;
 
-
-
     static private final Dimension MAX = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
-
 
     private JScrollPane getScrollPane() {
         if (scrollPane == null) {
@@ -285,7 +268,6 @@ class SelectionPanel<T> extends JPanel {
         this.add(box);
         this.setBorder(BorderFactory.createTitledBorder(title));
 
-
     }
 
     private JTextField getTextField() {
@@ -308,8 +290,6 @@ class SelectionPanel<T> extends JPanel {
         return textField;
     }
 
-
-
     void addItems(List<TacletInfo> infoList) {
         for (TacletInfo info : infoList) {
             getModel().addRow(new Object[] { info });
@@ -324,7 +304,6 @@ class SelectionPanel<T> extends JPanel {
         findPattern = textField.getText().toLowerCase();
         update();
 
-
     }
 
     private JTable getList() {
@@ -333,10 +312,7 @@ class SelectionPanel<T> extends JPanel {
             ItemModel model = new ItemModel("");
             setModel(model);
 
-
-
         }
-
 
         return list;
     }
@@ -344,7 +320,6 @@ class SelectionPanel<T> extends JPanel {
     DefaultTableModel getModel() {
         return (DefaultTableModel) getList().getModel();
     }
-
 
     List<T> getSelectedValues() {
 
@@ -371,7 +346,6 @@ class SelectionPanel<T> extends JPanel {
     void setSelectionInterval(int anchor, int lead) {
         getList().getSelectionModel().setSelectionInterval(anchor, lead);
     }
-
 
     void createFilter() {
         filter = new RowFilter<>() {
@@ -402,16 +376,13 @@ class SelectionPanel<T> extends JPanel {
 
     }
 
-
     void setModel(ItemModel model) {
-
 
         getList().setSelectionModel(new DefaultListSelectionModel());
         TableRowSorter<ItemModel> sorter = new TableRowSorter<>(model);
         getList().setModel(model);
         sorter.setMaxSortKeys(1);
         sorter.setSortsOnUpdates(true);
-
 
         sorter.setRowFilter(filter);
         sorter.setComparator(0, Comparator
@@ -426,7 +397,6 @@ class SelectionPanel<T> extends JPanel {
         getList().clearSelection();
     }
 
-
     public Side getSide() {
         return side;
     }
@@ -436,13 +406,12 @@ class SelectionPanel<T> extends JPanel {
         ((TableRowSorter<ItemModel>) getList().getRowSorter()).setRowFilter(filter);
     }
 
-
-
 }
 
 // SOME DATA STRUCTURES FOR THE ITEM CHOOSER.
 
 
+@NullMarked
 class ItemModel extends DefaultTableModel {
     private static final long serialVersionUID = 1L;
 
@@ -458,7 +427,7 @@ class ItemModel extends DefaultTableModel {
 }
 
 
-
+@NullMarked
 class TableItem<T> {
 
     private final T data;

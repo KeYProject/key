@@ -10,6 +10,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Settings pane to choose between the legacy single-threaded prover and the multi-core (parallel)
  * prover, and to configure the worker-thread count of the latter.
@@ -20,6 +22,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
  * elsewhere by a listener on {@link GeneralSettings#PARALLEL_PROVER_ENABLED}.
  *
  */
+@NullMarked
 public class ParallelProverSettingsProvider extends SettingsPanel implements SettingsProvider {
 
     private static final String DESCRIPTION = "Prover (Single / Multi-Core)";

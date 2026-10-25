@@ -38,9 +38,9 @@ import de.uka.ilkd.key.util.ThreadUtilities;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskStartedInfo;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Provides a basic implementation of {@link UserInterfaceControl} for user interfaces in which a
@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserInterfaceControl
         implements RuleCompletionHandler, ProofEnvironmentListener, ProofDisposedListener {
     private static final Logger LOGGER =

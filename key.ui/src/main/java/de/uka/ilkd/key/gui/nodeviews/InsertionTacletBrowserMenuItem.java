@@ -20,9 +20,12 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public abstract class InsertionTacletBrowserMenuItem extends JMenu implements TacletMenuItem {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(InsertionTacletBrowserMenuItem.class);
@@ -45,7 +48,7 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
     /** the parent frame of the selection dialog to be displayed */
     protected final JFrame parent;
     /** the selected taclet to be applied */
-    private TacletApp selectedTaclet;
+    private @Nullable TacletApp selectedTaclet;
     /** the services */
     protected final Services services;
 
@@ -110,10 +113,10 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
         listenerList.add(listener);
     }
 
-    protected abstract Sequent checkTaclet(Taclet t);
+    protected abstract @Nullable Sequent checkTaclet(Taclet t);
 
-    /** @return the selected taclet to be applied */
-    public TacletApp connectedTo() {
+    /** @return the selected taclet to be applied (may be {@code null} if no selection was made) */
+    public @Nullable TacletApp connectedTo() {
         return selectedTaclet;
     }
 
@@ -147,13 +150,11 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
         scrollPane.setPreferredSize(new Dimension(300, 100));
         scrollPane.setMinimumSize(new Dimension(150, 50));
 
-
         selectionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         if (getAppSize() > 0) { // should always be true
             selectionList.setSelectedIndex(0);
         }
-
 
         final JTextArea displayHiddenFormula = new JTextArea();
 

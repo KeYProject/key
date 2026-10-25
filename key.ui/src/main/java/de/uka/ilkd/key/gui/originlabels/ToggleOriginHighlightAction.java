@@ -12,11 +12,14 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Action to toggle {@link ViewSettings#isHighlightOrigin()}.
  *
  * @author lanzinger
  */
+@NullMarked
 public class ToggleOriginHighlightAction extends MainWindowAction {
     private static final long serialVersionUID = 9018136291828393238L;
 

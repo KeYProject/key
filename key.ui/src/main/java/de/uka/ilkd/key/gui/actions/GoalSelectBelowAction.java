@@ -9,9 +9,12 @@ import java.awt.event.ActionEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Action to select the next goal below in the proof tree.
  */
+@NullMarked
 public final class GoalSelectBelowAction extends MainWindowAction {
 
     private static final long serialVersionUID = 4574670781882014092L;

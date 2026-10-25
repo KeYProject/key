@@ -4,11 +4,14 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.notification;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Notifies the user when a proof task is abandoned.
  *
  * @author bubel
  */
+@NullMarked
 public class AbandonNotification extends NotificationTask {
 
     /*

@@ -14,9 +14,11 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.KeYConstants;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import picocli.CommandLine;
 
+@NullMarked
 public class LemmataAutoModeOptions {
     public static final int DEFAULT_TIMEOUT = -1;
     public static final int DEFAULT_MAXRULES = 10000;
@@ -65,7 +67,6 @@ public class LemmataAutoModeOptions {
     @CommandLine.Option(names = "--jr-signature", paramLabel = "FILE",
         description = "read definitions from given file")
     public @Nullable Path signature = null;
-
 
     private final Collection<String> filesForAxioms = new LinkedList<>();
 
@@ -149,6 +150,5 @@ public class LemmataAutoModeOptions {
     public Collection<String> getFilesForAxioms() {
         return filesForAxioms;
     }
-
 
 }

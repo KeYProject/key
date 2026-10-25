@@ -24,6 +24,9 @@ import de.uka.ilkd.key.speclang.Contract;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.proof.mgt.ProofStatus.CLOSED;
 import static de.uka.ilkd.key.proof.mgt.ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
 
@@ -34,6 +37,7 @@ import static de.uka.ilkd.key.proof.mgt.ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
  * @author Wolfram Pfeifer
  * @since 3.0
  */
+@NullMarked
 public final class SoundinessAnalyzer {
 
     private static final String GENERAL_DISCLAIMER =
@@ -241,7 +245,6 @@ public final class SoundinessAnalyzer {
         }
         html.append("</ul></p>");
 
-
         // Compartment 5: Source Analysis
         // html.append("<h2>5. Source Analysis</h2>");
         // if (sourceStats.javaFileCount() == 0 && sourceStats.keyFileCount() == 0) {
@@ -284,7 +287,6 @@ public final class SoundinessAnalyzer {
         // html.append("</ul>");
         // }
 
-
         html.append("</body></html>");
         return html.toString();
     }
@@ -313,7 +315,7 @@ public final class SoundinessAnalyzer {
         return new DependencyStats(proofStatus, closed, open);
     }
 
-    private static String escapeHtml(String text) {
+    private static String escapeHtml(@Nullable String text) {
         if (text == null) {
             return "";
         }
@@ -386,7 +388,6 @@ public final class SoundinessAnalyzer {
         // "Increase step limit for more complex proofs"
         // ));
         // }
-
 
         return warnings;
     }
@@ -503,7 +504,7 @@ public final class SoundinessAnalyzer {
         }
     }
 
-    private record TacletOptionEntry(String choice, String impact, String[] features,
+    private record TacletOptionEntry(String choice, @Nullable String impact, String[] features,
             boolean unsound, boolean incomplete) {
         String cssClass() {
             return unsound ? "unsound" : incomplete ? "incomplete" : "default";

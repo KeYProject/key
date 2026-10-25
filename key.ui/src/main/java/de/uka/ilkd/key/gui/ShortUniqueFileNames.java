@@ -7,6 +7,8 @@ package de.uka.ilkd.key.gui;
 import java.io.File;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Algorithm to construct short unique file names for a set of paths.
  *
@@ -14,6 +16,7 @@ import java.util.List;
  *
  * @author Julian Wiesler
  */
+@NullMarked
 public final class ShortUniqueFileNames {
     private ShortUniqueFileNames() {
 

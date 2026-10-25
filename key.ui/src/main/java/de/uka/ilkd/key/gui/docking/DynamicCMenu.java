@@ -18,6 +18,7 @@ import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CMenu;
 import bibliothek.gui.dock.common.action.core.CommonDecoratableDockAction;
 import bibliothek.gui.dock.common.intern.action.CDecorateableAction;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * CMenu that gets (re-)generated when the action gets fired using the provided supplier.
@@ -26,6 +27,7 @@ import bibliothek.gui.dock.common.intern.action.CDecorateableAction;
  *
  * @author Julian Wiesler
  */
+@NullMarked
 public class DynamicCMenu extends CDecorateableAction<DynamicCMenu.Action> {
     /**
      * constructor

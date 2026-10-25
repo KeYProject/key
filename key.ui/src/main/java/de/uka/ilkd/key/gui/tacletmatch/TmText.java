@@ -4,11 +4,15 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.tacletmatch;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * GUI-independent text helpers for the taclet-match dialog: abbreviation, tooltip escaping and
  * line/column-to-offset mapping. Kept free of any AWT/Swing dependency so the logic can be reused
  * and unit-tested headlessly; the panels only deal with the resulting strings/offsets.
  */
+@NullMarked
 final class TmText {
 
     private TmText() {}
@@ -16,7 +20,7 @@ final class TmText {
     /**
      * the first line of {@code s} ({@code ""} for {@code null}); the whole string if single-line.
      */
-    static String firstLine(String s) {
+    static String firstLine(@Nullable String s) {
         if (s == null) {
             return "";
         }
@@ -31,20 +35,20 @@ final class TmText {
      * a
      * multi-line formula reads as one continuous line instead of a stub followed by blank gaps.
      */
-    static String collapseToLine(String s, int limit) {
+    static String collapseToLine(@Nullable String s, int limit) {
         String oneLine = (s == null ? "" : s).replaceAll("\\s+", " ").trim();
         return oneLine.length() > limit ? oneLine.substring(0, limit) + " …" : oneLine;
     }
 
     /** an escaped, fixed-width HTML tooltip body for possibly long or multi-line {@code s}. */
-    static String htmlTooltip(String s) {
+    static String htmlTooltip(@Nullable String s) {
         String esc = (s == null ? "" : s).replace("&", "&amp;").replace("<", "&lt;")
                 .replace(">", "&gt;").replace("\n", "<br>");
         return "<html><div style='width:480px'>" + esc + "</div></html>";
     }
 
     /** the number of lines in {@code s} (newline count + 1; {@code 1} for {@code null}/empty). */
-    static int lineCount(String s) {
+    static int lineCount(@Nullable String s) {
         if (s == null || s.isEmpty()) {
             return 1;
         }

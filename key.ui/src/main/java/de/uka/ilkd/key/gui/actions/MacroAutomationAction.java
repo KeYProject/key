@@ -13,6 +13,8 @@ import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Automation action that executes a proof macro.
  * <p>
@@ -23,6 +25,7 @@ import de.uka.ilkd.key.ui.MediatorProofControl;
  *
  * @see ProofMacro
  */
+@NullMarked
 public class MacroAutomationAction extends AutoModeAction {
 
     private static final long serialVersionUID = 1L;

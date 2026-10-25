@@ -14,6 +14,7 @@ import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * The information window is used to present detailed information about the execution of a solver.
@@ -21,6 +22,7 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
  * solver - the translation of the taclets - the messages that were sent between KeY and the
  * external solvers.
  */
+@NullMarked
 public class InformationWindow extends JDialog {
 
     private static final long serialVersionUID = 1L;
@@ -38,7 +40,6 @@ public class InformationWindow extends JDialog {
                    - Chosen bit sizes too small. Example: Bit size of Integer is 3 but literal 9 appears in proof obligation.
                    - Finite type instances: Example: There is no maximum integer.
                    - Removal of axioms. Example: There is a location set which contains location (o, f)""";
-
 
     public static class Information {
         private final String content;
@@ -139,13 +140,11 @@ public class InformationWindow extends JDialog {
         return scrPreview;
     }
 
-
     private JTabbedPane getTabbedPane() {
         if (tabbedPane == null) {
             tabbedPane = new JTabbedPane();
         }
         return tabbedPane;
     }
-
 
 }

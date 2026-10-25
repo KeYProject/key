@@ -11,6 +11,8 @@ import de.uka.ilkd.key.gui.extension.ExtensionManager;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.settings.FeatureSettings;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,18 +20,19 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (07.04.19)
  */
+@NullMarked
 public class Extension<T> implements Comparable<Extension<T>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Extension.class);
     private final Class<T> clazz;
-    private final KeYGuiExtension.Info info;
-    private T instance = null;
+    private final KeYGuiExtension.@Nullable Info info;
+    private @Nullable T instance = null;
 
     public Extension(Class<T> clazz) {
         this.clazz = clazz;
         this.info = clazz.getAnnotation(KeYGuiExtension.Info.class);
     }
 
-    public T getInstance() {
+    public @Nullable T getInstance() {
         if (instance == null) {
             try {
                 instance = clazz.getDeclaredConstructor().newInstance();
@@ -83,7 +86,6 @@ public class Extension<T> implements Comparable<Extension<T>> {
     public int compareTo(Extension o) {
         return Integer.compare(getPriority(), o.getPriority());
     }
-
 
     @Override
     public boolean equals(Object o) {

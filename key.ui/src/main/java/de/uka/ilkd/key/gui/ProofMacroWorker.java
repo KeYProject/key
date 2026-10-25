@@ -23,6 +23,8 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * It decouples proof macros from the GUI event thread. It registers with the mediator to receive
  * Stop-Button events
  */
+@NullMarked
 public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
         implements InterruptListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofMacroWorker.class);
@@ -59,16 +62,16 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
     /**
      * This position may be null if no subterm selected
      */
-    private final PosInOccurrence posInOcc;
+    private final @Nullable PosInOccurrence posInOcc;
     /**
      * The resulting information of the task or null if the task was cancelled an exception was
      * thrown
      */
-    private ProofMacroFinishedInfo info;
+    private @Nullable ProofMacroFinishedInfo info;
     /**
      * The thrown exception leading to cancellation of the task
      */
-    private Exception exception;
+    private @Nullable Exception exception;
     private final List<InteractionListener> interactionListeners = new ArrayList<>();
 
     /** Whether {@link #doInBackground()} has begun; distinguishes cancel-before-start. */
@@ -89,7 +92,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
      * @param posInOcc the position, possibly null
      */
     public ProofMacroWorker(Node node, ProofMacro macro, KeYMediator mediator,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         assert macro != null;
         assert mediator != null;
         this.node = node;
@@ -177,8 +180,8 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
     }
 
     protected void emitProofMacroFinished(Node node, ProofMacro macro,
-            PosInOccurrence posInOcc,
-            ProofMacroFinishedInfo info) {
+            @Nullable PosInOccurrence posInOcc,
+            @Nullable ProofMacroFinishedInfo info) {
         interactionListeners.forEach((l) -> l.runMacro(node, macro, posInOcc, info));
     }
 

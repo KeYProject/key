@@ -17,6 +17,8 @@ import javax.swing.text.*;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.gui.sourceview.JavaDocument.*;
 
 /**
@@ -27,6 +29,7 @@ import static de.uka.ilkd.key.gui.sourceview.JavaDocument.*;
  * @see JavaDocument
  * @author Wolfram Pfeifer, Mattias Ulbrich
  */
+@NullMarked
 public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
     /**
      * Enum to indicate the current mode (environment) of the parser. Examples are STRING ("..."),

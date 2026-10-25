@@ -11,6 +11,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.SingleProof;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class ProofAggregateTask extends DefaultMutableTreeNode implements TaskTreeNode {
 
     /**
@@ -51,11 +55,11 @@ public class ProofAggregateTask extends DefaultMutableTreeNode implements TaskTr
         return proofList;
     }
 
-    public Proof proof() {
+    public @Nullable Proof proof() {
         return proofs[0].proof();
     }
 
-    public Proof[] allProofs() {
+    public @Nullable Proof[] allProofs() {
         return getProofList().getProofs();
     }
 

@@ -14,6 +14,8 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +29,7 @@ import org.slf4j.LoggerFactory;
  * {@link de.uka.ilkd.key.pp.PosInSequent} as a parsable string</li>
  * </ul>
  */
+@NullMarked
 public class PosInSequentTransferable implements Transferable {
     private static final Logger LOGGER = LoggerFactory.getLogger(PosInSequentTransferable.class);
 
@@ -44,7 +47,6 @@ public class PosInSequentTransferable implements Transferable {
 
     /** the highlighted term as parseable string */
     private String stringSelection;
-
 
     /**
      * creates an instance of this transferable
@@ -76,7 +78,7 @@ public class PosInSequentTransferable implements Transferable {
      * @see
      * java.awt.datatransfer.Transferable#isDataFlavorSupported(java.awt.datatransfer.DataFlavor)
      */
-    public boolean isDataFlavorSupported(DataFlavor flavor) {
+    public boolean isDataFlavorSupported(@Nullable DataFlavor flavor) {
         return flavor != null && (flavor.equals(POS_IN_SEQUENT_TRANSFER)
                 || flavor.equals(DataFlavor.stringFlavor));
     }
@@ -88,7 +90,7 @@ public class PosInSequentTransferable implements Transferable {
      *
      * @throws UnsupportedFlavorException if the flavor is not supported
      */
-    public Object getTransferData(DataFlavor flavor)
+    public Object getTransferData(@Nullable DataFlavor flavor)
             throws UnsupportedFlavorException, IOException {
         if (flavor != null) {
             if (flavor.equals(POS_IN_SEQUENT_TRANSFER)) {

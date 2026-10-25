@@ -19,6 +19,8 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Status-line indicator showing the active prover mode: {@code SC} for the single-core (legacy)
  * prover, or {@code MT N×} for the multi-core prover with {@code N} worker threads. Left-clicking
@@ -33,6 +35,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
  */
 @KeYGuiExtension.Info(experimental = false, name = "Prover Mode in Status Line", optional = false,
     description = "Shows and toggles the single-core / multi-core prover mode in the status line.")
+@NullMarked
 public class ParallelProverStatusIndicator
         implements KeYGuiExtension, KeYGuiExtension.StatusLine, KeYGuiExtension.Startup {
 

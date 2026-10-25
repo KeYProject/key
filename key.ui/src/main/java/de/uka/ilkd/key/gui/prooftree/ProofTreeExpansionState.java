@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.prooftree;
 
-
 /*
  * http://www.chka.de/swing/tree/expansion/ExpansionState.java This code is provided by Christian
  * Kaufhold <ch-kaufhold@gmx.de> under LGPL
@@ -18,6 +17,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Cache/Access JTree's expansion state. The interface of JTree to access the expanded paths is
@@ -84,6 +84,7 @@ import org.jspecify.annotations.NonNull;
  * @author Wolfram Pfeifer: optimized, migrated from older Java version, renamed, and tailored to
  *         ProofTreeView, removed unnecessary serialization stuff and unused code
  */
+@NullMarked
 class ProofTreeExpansionState extends AbstractSet<TreePath> {
 
     /** the JTree of the ProofTreeView */
@@ -292,7 +293,6 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         tree.collapsePath(path);
     }
 
-
     /**
      * Expands the given JTree completely.
      *
@@ -346,7 +346,6 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
         // inform the listeners for drawing
         tree.fireTreeExpanded(path);
     }
-
 
     /**
      * The "extremal paths" of the tree model's subtree starting at path. The extremal paths are
@@ -469,7 +468,6 @@ class ProofTreeExpansionState extends AbstractSet<TreePath> {
             tree.collapsePath(path);
         }
     }
-
 
     /**
      * Try to expand exactly the given paths given in paths (assumes them to be valid in the current

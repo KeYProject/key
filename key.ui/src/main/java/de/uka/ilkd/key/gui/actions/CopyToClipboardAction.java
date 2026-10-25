@@ -11,12 +11,15 @@ import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.pp.PosInSequent;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Copy a term that is currently selected (i.e., under the mouse cursor) in the current goal view to
  * the default system clip board.
  *
  * @author bruns
  */
+@NullMarked
 public class CopyToClipboardAction extends MainWindowAction {
 
     private static final long serialVersionUID = -6193181877353785015L;
