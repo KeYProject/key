@@ -11,7 +11,6 @@ import de.uka.ilkd.key.java.loader.JavaParserFactory;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.JmlSpec;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -22,6 +21,8 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.jml.NodeWithContracts;
+import com.github.javaparser.ast.jml.clauses.JmlContract;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
@@ -31,7 +32,6 @@ import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -59,37 +59,6 @@ public class TransformationPipelineServices {
             TransformerCache cache) {
         this.cache = cache;
         this.javaParserFactory = javaParserFactory;
-    }
-
-    static void addSpec(Node nextMember, @NonNull JmlSpec specCase) {
-        if (!nextMember.containsData(JMLTransformer.KEY_SPEC_CASE)) {
-            nextMember.setData(JMLTransformer.KEY_SPEC_CASE, new ArrayList<>(4));
-        }
-        List<JmlSpec> specList = nextMember.getData(JMLTransformer.KEY_SPEC_CASE);
-        specList.add(specCase);
-    }
-
-    static void addClassSpec(TypeDeclaration<?> td, @NonNull JmlSpec c) {
-        if (!td.containsData(JMLTransformer.KEY_CLASS_SPEC)) {
-            td.setData(JMLTransformer.KEY_CLASS_SPEC, new ArrayList<>(4));
-        }
-        List<JmlSpec> specList = td.getData(JMLTransformer.KEY_CLASS_SPEC);
-        specList.add(c);
-    }
-
-    public static List<JmlSpec> getClassSpec(Node td) {
-        if (!td.containsData(JMLTransformer.KEY_CLASS_SPEC)) {
-            return Collections.emptyList();
-
-        }
-        return td.getData(JMLTransformer.KEY_CLASS_SPEC);
-    }
-
-    public static List<JmlSpec> getSpec(Node n) {
-        if (!n.containsData(JMLTransformer.KEY_SPEC_CASE)) {
-            return Collections.emptyList();
-        }
-        return n.getData(JMLTransformer.KEY_SPEC_CASE);
     }
 
     public void addWarning(PositionedString warning) {
@@ -327,35 +296,25 @@ public class TransformationPipelineServices {
     }
 
     /**
-     * Attaches a class level specification by parsing the given JML text with JMLtk and
-     * attaching the parsed constructs to the given class.
+     * Attaches a specification by parsing the given JML text with JMLtk and attaching the
+     * resulting contracts to the given node (which must be able to carry contracts).
      */
-    public void attachTypeSpec(TypeDeclaration<?> clazz, @Nullable String spec) {
+    public void attachSpec(NodeWithContracts<?> node, @Nullable String spec) {
         if (spec == null) {
             return;
         }
         var parser = getParser();
-        var result = parser.parseJmlClassLevel(spec);
-        result.getProblems().forEach(p -> LOGGER.warn("Could not parse class level JML '{}': {}",
-            spec, p.getMessage()));
-        result.getResult().ifPresent(
-            root -> root.getChildren().forEach(child -> addClassSpec(clazz, new JmlSpec(child))));
-    }
-
-    /**
-     * Attaches a specification by parsing the given JML text with JMLtk and attaching the parsed
-     * constructs to the given node.
-     */
-    public void attachSpec(Node node, @Nullable String spec) {
-        if (spec == null) {
-            return;
-        }
-        var parser = getParser();
-        var result = parser.parseJmlClassLevel(spec);
+        var result = parser.parseJmlMethodLevel(spec);
         result.getProblems().forEach(p -> LOGGER.warn("Could not parse JML '{}': {}", spec,
             p.getMessage()));
-        result.getResult().ifPresent(
-            root -> root.getChildren().forEach(child -> addSpec(node, new JmlSpec(child))));
+        result.getResult().ifPresent(root -> root.getChildren().forEach(child -> {
+            if (child instanceof JmlContract contract) {
+                node.addContract(contract);
+            } else {
+                LOGGER.warn("Ignoring non-contract construct {} in generated JML '{}'",
+                    child.getClass().getSimpleName(), spec);
+            }
+        }));
         LOGGER.info("Generated specification {} for {}", spec, node);
     }
 

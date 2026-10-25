@@ -38,7 +38,6 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.rule.metaconstruct.*;
-import de.uka.ilkd.key.speclang.jml.JmlSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.njml.JmlFacade;
 import de.uka.ilkd.key.speclang.njml.JmlLexer;
@@ -51,7 +50,6 @@ import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Position;
 
 import com.github.javaparser.Range;
@@ -63,6 +61,9 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.comments.TraditionalJavadocComment;
 import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.jml.body.JmlClassLevelDeclaration;
+import com.github.javaparser.ast.jml.body.JmlFieldDeclaration;
+import com.github.javaparser.ast.jml.body.JmlMethodDeclaration;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt.JmlStmtKind;
 import com.github.javaparser.ast.key.*;
@@ -294,7 +295,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         ImmutableArray<Statement> body = map(n.getStatements());
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
-        return new StatementBlock(pi, c, body, ImmutableList.fromList(getSpec(n)));
+        return addToMapping(n, new StatementBlock(pi, c, body));
     }
 
     @Override
@@ -355,7 +356,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         boolean isLibrary = mapping.isParsingLibraries();
         ImmutableArray<de.uka.ilkd.key.java.ast.declaration.Modifier> modArray =
             map(n.getModifiers());
-        ImmutableArray<MemberDeclaration> members = map(n.getMembers());
+        // Pure class-level JML specification constructs (invariants, initially clauses, axioms,
+        // represents, accessible) have no KeY AST counterpart as members; they stay on the
+        // JMLtk type and are consumed by JMLSpecExtractor via KeYJPMapping.nodeFromKeY.
+        // Declarations containing real Java declarations (model/ghost methods and fields)
+        // are converted to regular KeY members.
+        ImmutableArray<MemberDeclaration> members = jmlJavaMembers(n.getMembers());
         boolean parentIsInterface = false;
 
         ImmutableArray<TypeReference> e = map(n.getExtendedTypes());
@@ -367,11 +373,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         if (n.isInterface()) {
             td = new InterfaceDeclaration(
                 pi, c, modArray, name, fullName, members,
-                parentIsInterface, isLibrary, extending, getClassSpec(n));
+                parentIsInterface, isLibrary, extending);
         } else {
             td = new ClassDeclaration(pi, c, modArray, name, fullName, members, parentIsInterface,
                 isLibrary, extending, implementing, n.isInnerClass(), n.isLocalClassDeclaration(),
-                false, ImmutableList.fromList(getClassSpec(n)));
+                false);
         }
         kjt.setJavaType(td);
         mapping.registerType(ref, kjt);
@@ -399,6 +405,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     private boolean parentIsInterface(@NonNull Node n) {
         if (n.getParentNode().isPresent()) {
             Node parent = n.getParentNode().get();
+            // The JMLtk JmlMethodDeclaration/JmlFieldDeclaration wrappers sit between the
+            // contained declaration and its containing type.
+            if (parent instanceof JmlClassLevelDeclaration) {
+                parent = parent.getParentNode().orElse(null);
+            }
             if (parent instanceof ClassOrInterfaceDeclaration) {
                 return ((ClassOrInterfaceDeclaration) parent).isInterface();
             }
@@ -444,16 +455,46 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     private static List<Comment> createComments(Node n) {
-        ArrayList<Comment> comments = new ArrayList<Comment>();
-        // if (n.containsData(JMLCommentTransformer.BEFORE_COMMENTS)) {
-        // comments.addAll(n.getData(JMLCommentTransformer.BEFORE_COMMENTS).stream()
-        // .map(c -> new Comment(c.asString(), createPositionInfo(c))).toList());
-        // }
-        comments.addAll(n.getAssociatedSpecificationComments()
-                .map(l -> l.stream().map(c -> new Comment(c.asString(), createPositionInfo(c)))
-                        .toList())
-                .orElse(Collections.emptyList()));
-        return comments;
+        // JMLtk 1.1.0 removed Node#getAssociatedSpecificationComments(): the parsed JML
+        // specification is now part of the JMLtk AST itself (typed nodes such as JmlContract
+        // and JmlClassLevelDeclaration), from which KeY reads it via KeYJPMapping. There are
+        // no raw specification comments to carry over into the KeY AST, hence no comments.
+        return Collections.emptyList();
+    }
+
+    /**
+     * Converts a type's member list to KeY members, skipping pure class-level JML specification
+     * constructs (invariants, initially clauses, axioms, represents, accessible). Such
+     * constructs have no KeY AST counterpart: they stay on the JMLtk type and are consumed by
+     * the {@code JMLSpecExtractor} via {@code KeYJPMapping.nodeFromKeY}. Members containing real
+     * Java declarations (model/ghost methods and fields, i.e. {@link JmlMethodDeclaration} and
+     * {@link JmlFieldDeclaration} wrappers) are converted as usual.
+     */
+    private ImmutableArray<MemberDeclaration> jmlJavaMembers(
+            NodeList<? extends Visitable> members) {
+        List<MemberDeclaration> result = new ArrayList<>(members.size());
+        for (Node member : members) {
+            if (member instanceof JmlClassLevelDeclaration
+                    && !(member instanceof JmlMethodDeclaration)
+                    && !(member instanceof JmlFieldDeclaration)) {
+                continue;
+            }
+            result.add((MemberDeclaration) Objects.requireNonNull(member.accept(this, null)));
+        }
+        return new ImmutableArray<>(result);
+    }
+
+    /**
+     * Returns the {@link JmlMethodDeclaration}/{@link JmlFieldDeclaration} wrapper that the
+     * pipeline unwrapped from the given declaration, if any. The pipeline remembers the wrapper
+     * on the contained declaration so that the specification (contract, method definition) can
+     * still be resolved back from the KeY declaration via the mapping.
+     */
+    @Nullable
+    private static Node jmlWrapperOf(Node n) {
+        return n.containsData(JMLTransformer.KEY_JML_WRAPPER)
+                ? n.getData(JMLTransformer.KEY_JML_WRAPPER)
+                : null;
     }
 
     @SuppressWarnings("unchecked")
@@ -505,8 +546,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 createProgramElementName(n.getName()),
                 map(n.getParameters()),
                 thr,
-                body != null ? accept(body) : new StatementBlock(), isInInterface,
-                getSpec(n));
+                body != null ? accept(body) : new StatementBlock(), isInInterface);
+        // Resolve the KeY declaration back to the JMLtk node that carries the contracts
+        // (CallableDeclaration is a NodeWithContracts).
+        mapping.registerReverse(cd, n);
 
         ClassOrInterfaceDeclaration clazz = getContainingClass(n);
         try {
@@ -568,9 +611,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         List<Comment> c = createComments(n);
         Object guard = accept(n.getCondition());
         Object body = accept(n.getBody());
-        List<JmlSpec> loopSpecs = getSpec(n);
-        return new Do(pi, c, new Guard((Expression) guard),
-            (Statement) body, loopSpecs);
+        return addToMapping(n,
+            new Do(pi, c, new Guard((Expression) guard), (Statement) body));
     }
 
     @Override
@@ -773,6 +815,21 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
+    public Object visit(JmlMethodDeclaration n, Void arg) {
+        // A model method appears in the JMLtk class members as a JmlMethodDeclaration wrapping
+        // the real MethodDeclaration. Convert the inner declaration as a regular member; the
+        // reverse mapping registered in visit(MethodDeclaration) lets the JMLSpecExtractor find
+        // the wrapper again (with its contract and definition).
+        return accept(n.getMethodDeclaration());
+    }
+
+    @Override
+    public Object visit(JmlFieldDeclaration n, Void arg) {
+        // Ghost/model field: convert the contained FieldDeclaration as a regular member.
+        return accept(n.getDecl());
+    }
+
+    @Override
     public Object visit(FieldDeclaration n, Void arg) {
         ProgramElement existing = mapping.nodeToKeY(n);
         if (existing != null) {
@@ -813,8 +870,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         LocalVariableDeclaration decl = accept(n.getVariable());
         ILoopInit init = new LoopInit(new LoopInitializer[] { decl });
         Guard guard = new Guard(null, null, accept(n.getIterable()));
-        List<JmlSpec> loopSpecs = getSpec(n);
-        return new EnhancedFor(pi, c, init, guard, accept(n.getBody()), loopSpecs);
+        return addToMapping(n,
+            new EnhancedFor(pi, c, init, guard, accept(n.getBody())));
     }
 
     @Override
@@ -845,24 +902,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         } else if (!n.getUpdate().isEmpty()) {
             forUpdates = new ForUpdates(updates);
         }
-        List<JmlSpec> loopSpecs = getSpec(n);
-        return new For(pi, c, forInit, forUpdates, forGuard, accept(n.getBody()), loopSpecs);
-    }
-
-    public static List<JmlSpec> getSpec(Node n) {
-        try {
-            return n.getData(JMLTransformer.KEY_SPEC_CASE);
-        } catch (IllegalStateException e) {
-            return List.of();
-        }
-    }
-
-    public static List<JmlSpec> getClassSpec(Node n) {
-        try {
-            return n.getData(JMLTransformer.KEY_CLASS_SPEC);
-        } catch (IllegalStateException e) {
-            return List.of();
-        }
+        return addToMapping(n,
+            new For(pi, c, forInit, forUpdates, forGuard, accept(n.getBody())));
     }
 
     @Override
@@ -947,7 +988,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(MethodDeclaration n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
-
         ImmutableArray<TypeReference> t = map(n.getThrownExceptions());
         Throws thr = t.isEmpty() ? null : new Throws(null, null, t);
         boolean isInInterface = parentIsInterface(n);
@@ -962,7 +1002,18 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 map(n.getParameters()),
                 thr,
                 accepto(n.getBody()),
-                isInInterface, ImmutableList.fromList(getSpec(n)));
+                isInInterface);
+        // Model method contracts and the method definition live on the JmlMethodDeclaration
+        // wrapper; for regular methods the MethodDeclaration node itself carries the contracts
+        // (CallableDeclaration is a NodeWithContracts). The pipeline (JMLTransformer) unwraps
+        // the wrapper into a regular member and remembers it on the inner declaration, so the
+        // wrapper is looked up from there first.
+        Node contractCarrier = jmlWrapperOf(n);
+        if (contractCarrier == null) {
+            Node parent = n.getParentNode().orElse(null);
+            contractCarrier = parent instanceof JmlMethodDeclaration ? parent : n;
+        }
+        mapping.registerReverse(md, contractCarrier);
 
         ResolvedReferenceTypeDeclaration containing = getContainingClass(n).resolve();
         final HeapLDT heapLDT = typeConverter.getTypeConverter().getHeapLDT();
@@ -1067,10 +1118,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         ClassDeclaration decl = null;
         if (n.getAnonymousClassBody().isPresent()) {
             // TODO: Add pipeline step for anonymous classes
-            ImmutableArray<MemberDeclaration> bodies = map(n.getAnonymousClassBody().get());
+            // JML class-level constructs inside an anonymous class body stay on the JMLtk AST
+            // (they are not supported by KeY's anonymous-class translation).
+            ImmutableArray<MemberDeclaration> bodies =
+                jmlJavaMembers(n.getAnonymousClassBody().get());
             decl = new ClassDeclaration(pi, c, new ImmutableArray<>(), null, null,
                 bodies, true, false, null, null,
-                true, false, true, ImmutableList.of());
+                true, false, true);
         }
         return new New(pi, c, args, type, decl);
     }
@@ -1528,8 +1582,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         List<Comment> c = createComments(n);
         Guard guard = new Guard((Expression) accept(n.getCondition()));
         Statement body = accept(n.getBody());
-        List<JmlSpec> loopSpecs = getSpec(n);
-        return new While(pi, c, guard, body, loopSpecs);
+        return addToMapping(n, new While(pi, c, guard, body));
     }
 
     @Override
@@ -1804,7 +1857,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             var loc = new LocationVariable(
                 services.getVariableNamer().getTemporaryNameProposal("x"),
                 services.getNamespaces().sorts().lookup("boolean"));
-            return new MergePointStatement(pi, c, new JmlSpec(n), loc);
+            return addToMapping(n, new MergePointStatement(pi, c, loc));
         } else {
             return accept(n.getExpr());
         }

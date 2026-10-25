@@ -6,17 +6,13 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.List;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
-import de.uka.ilkd.key.speclang.jml.JmlSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.DataKey;
 import com.github.javaparser.ast.Modifier;
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.CallableDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
@@ -24,11 +20,9 @@ import com.github.javaparser.ast.body.InitializerDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
-import com.github.javaparser.ast.jml.NodeWithContracts;
 import com.github.javaparser.ast.jml.body.JmlClassLevelDeclaration;
 import com.github.javaparser.ast.jml.body.JmlFieldDeclaration;
 import com.github.javaparser.ast.jml.body.JmlMethodDeclaration;
-import com.github.javaparser.ast.jml.clauses.JmlContract;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt.JmlStmtKind;
 import com.github.javaparser.ast.jml.stmt.JmlGhostStmt;
@@ -39,7 +33,6 @@ import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.LabeledStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,14 +48,16 @@ import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.KEY_MER
 /// specifications are attached to the corresponding Java AST nodes directly. This transformer
 /// only needs to
 ///
-/// * expose the attached JML as [JmlSpec] wrapped nodes via the data keys
-/// [JMLTransformer#KEY_SPEC_CASE] (method/block/loop contracts) and
-/// [JMLTransformer#KEY_CLASS_SPEC] (class level specifications such as invariants,
-/// initially clauses, model field and model method declarations),
-/// * replace the JMLtk wrapper declarations (`JmlMethodDeclaration`, `JmlFieldDeclaration`)
-/// by the contained real declarations,
+/// * re-process the bodies of (model) methods for method level JML statements,
 /// * self-mark JML statements (`JmlExpressionStmt`, `KeyMergePointStmt`, `JmlGhostStmt`)
 /// so that the [de.uka.ilkd.key.java.loader.JP2KeYConverter] can recognize them.
+///
+/// The JMLtk wrapper declarations (`JmlMethodDeclaration`, `JmlFieldDeclaration`) and the class
+/// level specifications (`JmlClassExprDeclaration`, `JmlRepresentsDeclaration`,
+/// `JmlClassAccessibleDeclaration`) stay in the JMLtk type: the
+/// [de.uka.ilkd.key.java.loader.JP2KeYConverter] converts the contained Java declarations and
+/// the [de.uka.ilkd.key.speclang.jml.JMLSpecExtractor] reads the specifications directly from
+/// the JMLtk AST via `KeYJPMapping`.
 ///
 /// The removal of the raw `JmlDoc*` nodes is left to [JmlDocRemoval].
 ///
@@ -83,11 +78,14 @@ public final class JMLTransformer extends JavaTransformerAbstract {
         EnumSet.of(JMLModifier.ABSTRACT, JMLModifier.FINAL, JMLModifier.PRIVATE,
             JMLModifier.PROTECTED, JMLModifier.PUBLIC, JMLModifier.STATIC);
 
-    /// KEY for contracts
-    public static final DataKey<List<JmlSpec>> KEY_SPEC_CASE = new DataKey<>() {
-    };
-    /// KEY for class level specification
-    public static final DataKey<List<JmlSpec>> KEY_CLASS_SPEC = new DataKey<>() {
+    /**
+     * Data key for the {@link JmlMethodDeclaration}/{@link JmlFieldDeclaration} wrapper that the
+     * pipeline unwraps from a (model) method or (ghost/model) field. The wrapper remains the
+     * carrier of the parsed JML specification (contract, method definition); it is remembered
+     * on the contained declaration so that the converter can register the reverse mapping and
+     * the {@code JMLSpecExtractor} can read the specification back via {@code KeYJPMapping}.
+     */
+    public static final DataKey<JmlClassLevelDeclaration<?>> KEY_JML_WRAPPER = new DataKey<>() {
     };
 
 
@@ -122,56 +120,58 @@ public final class JMLTransformer extends JavaTransformerAbstract {
 
     /**
      * Transform all class level JML constructs of the given type declaration. JMLtk already
-     * attached the parsed JML to the Java AST; here we only relocate it into the KeY
-     * {@link DataKey}s and unwrap the JML wrapper declarations.
+     * attached the parsed JML to the Java AST: contracts sit on {@code NodeWithContracts} nodes,
+     * model/ghost methods and fields are wrapped in {@code JmlMethodDeclaration}/
+     * {@code JmlFieldDeclaration} wrappers, and class level specifications are
+     * {@code JmlClassExprDeclaration}/{@code JmlRepresentsDeclaration}/
+     * {@code JmlClassAccessibleDeclaration} members of the type.
+     * <p>
+     * The wrapper declarations are unwrapped into their contained real declarations so that the
+     * Java symbol solver sees the (model) methods and (ghost/model) fields again — Javaparser's
+     * resolution ignores nodes that are not direct {@code MethodDeclaration}/
+     * {@code FieldDeclaration} members. The wrapper is remembered on the contained declaration
+     * via {@link #KEY_JML_WRAPPER}; the
+     * {@link de.uka.ilkd.key.java.loader.JP2KeYConverter} registers it as the reverse mapping
+     * target of the resulting KeY declaration and the
+     * {@link de.uka.ilkd.key.speclang.jml.JMLSpecExtractor} reads the specifications from it via
+     * {@code KeYJPMapping}. Class level specifications stay on the JMLtk type.
      *
      * @param td the given type declaration (typically a class declaration)
      */
     private void transformType(TypeDeclaration<?> td) {
         for (BodyDeclaration<?> member : new ArrayList<>(td.getMembers())) {
             switch (member) {
-                // The JMLtk wrapper for a (model) method declaration: contain the "real" method
-                // declaration plus a method definition. The contracts were already attached to
-                // the inner method declaration.
+                // The JMLtk wrapper for a (model) method declaration: contains the "real"
+                // method declaration plus the contract (wrapper.getContract()). Unwrap it and
+                // remember the wrapper, which remains the carrier of the specification.
                 case JmlMethodDeclaration methodDecl -> {
                     var method = methodDecl.getMethodDeclaration();
-                    // the model method definition itself is a specification
-                    TransformationPipelineServices.addSpec(method, new JmlSpec(methodDecl));
-                    moveContracts(method);
-                    replaceMember(td, methodDecl, method);
+                    method.setData(KEY_JML_WRAPPER, methodDecl);
                     transformCallableBody(method);
+                    replaceMember(td, methodDecl, method);
                 }
-                // Ghost/model field declarations
+                // Ghost/model field declarations: unwrap and remember the wrapper.
                 case JmlFieldDeclaration fieldDecl -> {
-                    replaceMember(td, fieldDecl, fieldDecl.getDecl());
+                    var decl = fieldDecl.getDecl();
+                    decl.setData(KEY_JML_WRAPPER, fieldDecl);
+                    replaceMember(td, fieldDecl, decl);
                 }
                 // Class level specifications: invariants, initially clauses, axioms,
-                // represents clauses and accessible-clauses. After the JmlMethodDeclaration and
-                // JmlFieldDeclaration arms above, this catches exactly JmlClassExprDeclaration,
-                // JmlRepresentsDeclaration and JmlClassAccessibleDeclaration.
-                case JmlClassLevelDeclaration<?> classSpec -> {
-                    TransformationPipelineServices.addClassSpec(td, new JmlSpec(member));
-                    member.remove();
+                // represents clauses and accessible-clauses. They stay on the JMLtk type and
+                // are read by the JMLSpecExtractor. Since the JmlMethodDeclaration and
+                // JmlFieldDeclaration arms above come first, this catches exactly
+                // JmlClassExprDeclaration, JmlRepresentsDeclaration and
+                // JmlClassAccessibleDeclaration.
+                case JmlClassLevelDeclaration<?> ignored -> {
                 }
                 // Regular Java declarations with attached JML contracts
-                case CallableDeclaration<?> callable -> {
-                    moveContracts(callable);
-                    transformCallableBody(callable);
-                }
+                case CallableDeclaration<?> callable -> transformCallableBody(callable);
                 case TypeDeclaration<?> inner -> transformType(inner);
                 case InitializerDeclaration init -> transformMethodLevelCommentsAt(init.getBody());
                 default -> {
                     // Fields, enums, records: JML is handled by JmlProcessor already
                 }
             }
-        }
-    }
-
-    private void transformCallableBody(CallableDeclaration<?> callable) {
-        if (callable instanceof MethodDeclaration method) {
-            method.getBody().ifPresent(this::transformMethodLevelCommentsAt);
-        } else if (callable instanceof ConstructorDeclaration constructor) {
-            constructor.getBody().ifPresent(this::transformMethodLevelCommentsAt);
         }
     }
 
@@ -186,6 +186,14 @@ public final class JMLTransformer extends JavaTransformerAbstract {
         }
     }
 
+    private void transformCallableBody(CallableDeclaration<?> callable) {
+        if (callable instanceof MethodDeclaration method) {
+            method.getBody().ifPresent(this::transformMethodLevelCommentsAt);
+        } else if (callable instanceof ConstructorDeclaration constructor) {
+            constructor.getBody().ifPresent(this::transformMethodLevelCommentsAt);
+        }
+    }
+
     /**
      * Processes the statements of the given block. JMLtk already attached method level JML
      * constructs: contracts (loop invariants and loop contracts) were attached to the following
@@ -196,7 +204,6 @@ public final class JMLTransformer extends JavaTransformerAbstract {
      * @param block the given block
      */
     private void transformMethodLevelCommentsAt(BlockStmt block) {
-        moveContracts(block);
         for (Statement stmt : new ArrayList<>(block.getStatements())) {
             // JMLtk attaches contracts to the innermost statement after a JML comment,
             // ignoring labels.
@@ -220,8 +227,6 @@ public final class JMLTransformer extends JavaTransformerAbstract {
                 markExpressionStatement(expr);
             } else if (inner instanceof KeyMergePointStmt mergePoint) {
                 mergePoint.setData(KEY_MERGE_POINT, mergePoint);
-            } else if (inner instanceof NodeWithContracts<?> nodeWithContracts) {
-                moveContracts(nodeWithContracts);
             }
         }
     }
@@ -230,7 +235,6 @@ public final class JMLTransformer extends JavaTransformerAbstract {
         if (ifStmt.getThenStmt().isBlockStmt()) {
             transformMethodLevelCommentsAt(ifStmt.getThenStmt().asBlockStmt());
         }
-        @Nullable
         Statement elseStmt = ifStmt.getElseStmt().orElse(null);
         if (elseStmt != null) {
             if (elseStmt.isBlockStmt()) {
@@ -257,19 +261,6 @@ public final class JMLTransformer extends JavaTransformerAbstract {
             expr.setData(KEY_ASSIGN, expr);
         } else {
             expr.setData(KEY_ASSERT, expr);
-        }
-    }
-
-    /**
-     * Moves the contracts attached to a {@link NodeWithContracts} (methods, blocks, loops) into
-     * the {@link #KEY_SPEC_CASE} data key so that the converter can attach them to the KeY AST.
-     */
-    private static void moveContracts(NodeWithContracts<?> node) {
-        if (!node.getContracts().isEmpty()) {
-            for (JmlContract contract : new ArrayList<>(node.getContracts())) {
-                TransformationPipelineServices.addSpec((Node) node, new JmlSpec(contract));
-            }
-            node.setContracts(new NodeList<>());
         }
     }
 }

@@ -43,7 +43,6 @@ import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
-import de.uka.ilkd.key.speclang.jml.JmlSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.njml.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -58,7 +57,9 @@ import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.*;
 import org.key_project.util.parsing.Location;
 
-import com.github.javaparser.ast.jml.body.JmlMethodDeclaration;
+import com.github.javaparser.ast.jml.body.JmlClassAccessibleDeclaration;
+import com.github.javaparser.ast.jml.body.JmlClassExprDeclaration;
+import com.github.javaparser.ast.jml.body.JmlRepresentsDeclaration;
 import com.github.javaparser.ast.jml.clauses.ContractType;
 import com.github.javaparser.ast.jml.clauses.JmlContract;
 import com.github.javaparser.ast.key.KeyMergePointStmt;
@@ -1166,7 +1167,8 @@ public class JMLSpecFactory {
             context.selfVar(), textualInv.isFree());
     }
 
-    public ClassInvariant createJMLClassInvariant(@NonNull KeYJavaType kjt, JmlSpec specification) {
+    public ClassInvariant createJMLClassInvariant(@NonNull KeYJavaType kjt,
+            JmlClassExprDeclaration specification) {
         return createJMLClassInvariant(kjt, JmlToTextual.toClassInv(specification));
     }
 
@@ -1192,7 +1194,7 @@ public class JMLSpecFactory {
     }
 
     public InitiallyClause createJMLInitiallyClause(@NonNull KeYJavaType kjt,
-            JmlSpec specification) {
+            JmlClassExprDeclaration specification) {
         return createJMLInitiallyClause(kjt, JmlToTextual.toInitially(specification));
     }
 
@@ -1248,8 +1250,8 @@ public class JMLSpecFactory {
             null, repFormula, context.selfVar(), ImmutableList.nil(), null);
     }
 
-    public ClassAxiom createJMLRepresents(@NonNull KeYJavaType kjt, JmlSpec specification)
-            throws SLTranslationException {
+    public ClassAxiom createJMLRepresents(@NonNull KeYJavaType kjt,
+            JmlRepresentsDeclaration specification) throws SLTranslationException {
         return createJMLRepresents(kjt, JmlToTextual.toRepresents(specification));
     }
 
@@ -1281,7 +1283,8 @@ public class JMLSpecFactory {
             context.selfVar());
     }
 
-    public ClassAxiom createJMLClassAxiom(@NonNull KeYJavaType kjt, JmlSpec specification) {
+    public ClassAxiom createJMLClassAxiom(@NonNull KeYJavaType kjt,
+            JmlClassExprDeclaration specification) {
         TextualJMLClassAxiom textual = JmlToTextual.toClassAxiom(specification);
         if (textual == null) {
             return null;
@@ -1321,7 +1324,8 @@ public class JMLSpecFactory {
         return createJMLDependencyContract(kjt, targetHeap, dep);
     }
 
-    public Contract createJMLDependencyContract(@NonNull KeYJavaType kjt, JmlSpec specification) {
+    public Contract createJMLDependencyContract(@NonNull KeYJavaType kjt,
+            JmlClassAccessibleDeclaration specification) {
         return createJMLDependencyContract(kjt, JmlToTextual.toDepends(specification));
     }
 
@@ -1416,52 +1420,25 @@ public class JMLSpecFactory {
     }
 
     /**
-     * Creates operation contracts out of the passed JML specification (a {@link JmlContract} or a
-     * model method declaration in the JMLtk AST). Before translating, implicit clauses are added
-     * (specification of purity, invariants to pre- and post-conditions, non-null pre- and
-     * post-conditions and a default signals-only clause), mirroring the semantics of the old
-     * textual JML transformation.
+     * Creates operation contracts out of the passed JML contract. Before translating, implicit
+     * clauses are added (specification of purity, invariants to pre- and post-conditions,
+     * non-null pre- and post-conditions and a default signals-only clause), mirroring the
+     * semantics of the old textual JML transformation.
      *
      * @param pm corresponding program method
-     * @param specification JMLtk specification attached to the method
+     * @param specification the JMLtk contract attached to the method
+     * @param modelMethodDefinition the textual definition of the model method, used as an
+     *        AXIOMS clause, or {@code null} for regular methods
      * @param addInvariant whether to add static invariants to pre- and post-conditions
      * @return created JML operation contracts
      * @throws SLTranslationException a translation exception
      */
     public ImmutableSet<Contract> createJMLOperationContracts(IProgramMethod pm,
-            JmlSpec specification, boolean addInvariant) throws SLTranslationException {
+            @NonNull JmlContract specification,
+            @Nullable ParserRuleContext modelMethodDefinition, boolean addInvariant)
+            throws SLTranslationException {
         if (pm == null || specification == null) {
             throw new NullPointerException();
-        }
-        final ImmutableList<JmlSpec> attached = pm.getMethodDeclaration().getAttachedJml();
-
-        // Model method declaration: the method definition is a specification (a source of an
-        // AXIOMS clause). A model method without any contract gets a synthetic MODEL_BEHAVIOR
-        // specification that carries the AXIOMS clause.
-        ParserRuleContext modelMethodDefinition = null;
-        boolean isModel = pm.getMethodDeclaration().containsModifier(ModifierKind.JML_MODEL);
-        for (JmlSpec s : attached) {
-            if (s.node() instanceof JmlMethodDeclaration) {
-                if (isModel) {
-                    modelMethodDefinition = JmlToTextual.toMethodDecl(s).getMethodDefinition();
-                }
-                break;
-            }
-        }
-
-        if (specification.node() instanceof JmlMethodDeclaration) {
-            // Model method without specification: create a specCase to attach the AXIOMS clause
-            // for its definition.
-            if (attached.size() == 1 && modelMethodDefinition != null) {
-                TextualJMLSpecCase specCase =
-                    new TextualJMLSpecCase(ImmutableList.of(), Behavior.MODEL_BEHAVIOR);
-                specCase.addClause(TextualJMLSpecCase.ClauseHd.AXIOMS, modelMethodDefinition);
-                return enrichOperationContract(pm, specCase, addInvariant);
-            }
-            return DefaultImmutableSet.nil();
-        }
-        if (!(specification.node() instanceof JmlContract)) {
-            return DefaultImmutableSet.nil();
         }
 
         ImmutableSet<Contract> result = DefaultImmutableSet.nil();
@@ -1472,6 +1449,25 @@ public class JMLSpecFactory {
             result = result.union(enrichOperationContract(pm, specCase, addInvariant));
         }
         return result;
+    }
+
+    /**
+     * Creates a synthetic MODEL_BEHAVIOR contract for a model method that has a method
+     * definition but no explicit specification. The definition serves as an AXIOMS clause.
+     *
+     * @param pm corresponding program method
+     * @param modelMethodDefinition the textual definition of the model method
+     * @param addInvariant whether to add static invariants to pre- and post-conditions
+     * @return created JML operation contracts
+     * @throws SLTranslationException a translation exception
+     */
+    public ImmutableSet<Contract> createJMLModelMethodContracts(IProgramMethod pm,
+            @NonNull ParserRuleContext modelMethodDefinition, boolean addInvariant)
+            throws SLTranslationException {
+        TextualJMLSpecCase specCase =
+            new TextualJMLSpecCase(ImmutableList.of(), Behavior.MODEL_BEHAVIOR);
+        specCase.addClause(TextualJMLSpecCase.ClauseHd.AXIOMS, modelMethodDefinition);
+        return enrichOperationContract(pm, specCase, addInvariant);
     }
 
     /**
@@ -1592,16 +1588,11 @@ public class JMLSpecFactory {
     }
 
     public ImmutableSet<MergeContract> createJMLMergeContracts(final IProgramMethod method,
-            final MergePointStatement mps, final JmlSpec specification)
+            final MergePointStatement mps, final KeyMergePointStmt mergePointStmt)
             throws SLTranslationException {
-        // The JmlSpec wraps the KeyMergePointStmt (a Java statement `merge_point(<expr>);`).
-        // Re-parse it as KeY's textual merge point statement.
-        String text;
-        if (specification.node() instanceof KeyMergePointStmt kms) {
-            text = "merge_point " + kms.getExpr() + ";";
-        } else {
-            text = "merge_point;";
-        }
+        // Re-parse the merge point statement (a Java statement `merge_point(<expr>);`) as KeY's
+        // textual merge point statement.
+        String text = "merge_point " + mergePointStmt.getExpr() + ";";
         final JmlParser.Merge_point_statementContext ctx =
             JmlFacade.createParser(JmlFacade.createLexer(text)).merge_point_statement();
         return createJMLMergeContracts(method, mps, ctx, Location.UNDEFINED);
@@ -1705,8 +1696,8 @@ public class JMLSpecFactory {
     }
 
     /**
-     * Creates the set of block contracts for the JML contract wrapped by the given
-     * {@link JmlSpec}. All sub-contracts (nested specification blocks) are translated as well.
+     * Creates the set of block contracts for the given JML contract. All sub-contracts (nested
+     * specification blocks) are translated as well.
      *
      * @param method the method containing the block.
      * @param labels all labels belonging to the block.
@@ -1716,14 +1707,11 @@ public class JMLSpecFactory {
      * @throws SLTranslationException translation exception
      */
     public ImmutableSet<BlockContract> createJMLBlockContracts(IProgramMethod method,
-            List<Label> labels, StatementBlock block, JmlSpec specification)
+            List<Label> labels, StatementBlock block, JmlContract specification)
             throws SLTranslationException {
-        if (!(specification.node() instanceof JmlContract contract)) {
-            return DefaultImmutableSet.nil();
-        }
         // loop contracts and loop invariants are no block contracts
-        if (contract.getType() == ContractType.LOOP
-                || contract.getType() == ContractType.LOOP_INV) {
+        if (specification.getType() == ContractType.LOOP
+                || specification.getType() == ContractType.LOOP_INV) {
             return DefaultImmutableSet.nil();
         }
         ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
@@ -1769,8 +1757,7 @@ public class JMLSpecFactory {
     }
 
     /**
-     * Creates the set of loop contracts for the JML loop contract wrapped by the given
-     * {@link JmlSpec}.
+     * Creates the set of loop contracts for the given JML loop contract.
      *
      * @param method the method containing the loop.
      * @param labels all labels belonging to the loop.
@@ -1780,10 +1767,9 @@ public class JMLSpecFactory {
      * @throws SLTranslationException translation exception
      */
     public ImmutableSet<LoopContract> createJMLLoopContracts(final IProgramMethod method,
-            final List<Label> labels, final LoopStatement loop, final JmlSpec specification)
+            final List<Label> labels, final LoopStatement loop, final JmlContract specification)
             throws SLTranslationException {
-        if (!(specification.node() instanceof JmlContract contract)
-                || contract.getType() != ContractType.LOOP) {
+        if (specification.getType() != ContractType.LOOP) {
             return DefaultImmutableSet.nil();
         }
         ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
@@ -1829,8 +1815,8 @@ public class JMLSpecFactory {
     }
 
     /**
-     * Creates the set of loop contracts for the JML loop contract wrapped by the given
-     * {@link JmlSpec}; the contracts are attached to the given block.
+     * Creates the set of loop contracts for the given JML loop contract; the contracts are
+     * attached to the given block.
      *
      * @param method the method containing the block.
      * @param labels all labels belonging to the block.
@@ -1840,10 +1826,9 @@ public class JMLSpecFactory {
      * @throws SLTranslationException translation exception
      */
     public ImmutableSet<LoopContract> createJMLLoopContracts(IProgramMethod method,
-            List<Label> labels, StatementBlock block, JmlSpec specification)
+            List<Label> labels, StatementBlock block, JmlContract specification)
             throws SLTranslationException {
-        if (!(specification.node() instanceof JmlContract contract)
-                || contract.getType() != ContractType.LOOP) {
+        if (specification.getType() != ContractType.LOOP) {
             return DefaultImmutableSet.nil();
         }
         ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
@@ -2219,7 +2204,7 @@ public class JMLSpecFactory {
     }
 
     public LoopSpecification createJMLLoopInvariant(IProgramMethod pm, LoopStatement loop,
-            JmlSpec specification) {
+            JmlContract specification) {
         return createJMLLoopInvariant(pm, loop, JmlToTextual.toLoopSpec(specification));
     }
 

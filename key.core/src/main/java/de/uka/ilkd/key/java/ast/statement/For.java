@@ -11,11 +11,9 @@ import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.speclang.jml.JmlSpec;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * For.
@@ -54,12 +52,7 @@ public class For extends LoopStatement implements VariableScope {
 
     public For(PositionInfo pi, List<Comment> comments, ILoopInit inits, IForUpdates updates,
             IGuard guard, Statement body) {
-        super(pi, comments, inits, updates, guard, body, ImmutableList.nil());
-    }
-
-    public <T> For(PositionInfo pi, List<Comment> comments, ILoopInit inits, IForUpdates updates,
-            IGuard guard, Statement body, List<JmlSpec> specs) {
-        super(pi, comments, inits, updates, guard, body, ImmutableList.fromList(specs));
+        super(pi, comments, inits, updates, guard, body);
     }
 
     public SourceElement getLastElement() {
