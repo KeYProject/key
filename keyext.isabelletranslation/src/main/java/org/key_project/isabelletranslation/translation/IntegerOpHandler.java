@@ -27,32 +27,42 @@ import org.jspecify.annotations.Nullable;
 public class IntegerOpHandler implements IsabelleHandler {
     private final Map<Operator, String> supportedOperators = new HashMap<>();
 
-    private IntegerLDT integerLDT;
+    private @Nullable IntegerLDT integerLDT;
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
             @Nullable Properties handlerSnippets,
             String[] handlerOptions) {
         supportedOperators.clear();
-        integerLDT = services.getTypeConverter().getIntegerLDT();
+        IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
+        if (ldt == null) {
+            throw new NullPointerException("No IntegerLDT found in the services");
+        }
+        integerLDT = ldt;
 
-        supportedOperators.put(integerLDT.getAdd(), "+");
-        supportedOperators.put(integerLDT.getMul(), "*");
-        supportedOperators.put(integerLDT.getSub(), "-");
-        supportedOperators.put(integerLDT.getDiv(), "euclDiv");
-        supportedOperators.put(integerLDT.getMod(), "euclMod");
-        supportedOperators.put(integerLDT.getNeg(), "-");
+        supportedOperators.put(ldt.getAdd(), "+");
+        supportedOperators.put(ldt.getMul(), "*");
+        supportedOperators.put(ldt.getSub(), "-");
+        supportedOperators.put(ldt.getDiv(), "euclDiv");
+        supportedOperators.put(ldt.getMod(), "euclMod");
+        supportedOperators.put(ldt.getNeg(), "-");
 
-        supportedOperators.put(integerLDT.getJDivision(), "jDiv");
-        supportedOperators.put(integerLDT.getJModulo(), "jMod");
+        supportedOperators.put(ldt.getJDivision(), "jDiv");
+        supportedOperators.put(ldt.getJModulo(), "jMod");
 
-        supportedOperators.put(integerLDT.getLessOrEquals(), "<=");
-        supportedOperators.put(integerLDT.getLessThan(), "<");
-        supportedOperators.put(integerLDT.getGreaterOrEquals(), ">=");
-        supportedOperators.put(integerLDT.getGreaterThan(), ">");
+        supportedOperators.put(ldt.getLessOrEquals(), "<=");
+        supportedOperators.put(ldt.getLessThan(), "<");
+        supportedOperators.put(ldt.getGreaterOrEquals(), ">=");
+        supportedOperators.put(ldt.getGreaterThan(), ">");
 
+        // the handlerSnippets are null if no preamble snippets file exists; without them the
+        // preamble cannot be constructed, mirroring the previous NPE on entrySet()
+        // (crash-equivalent)
+        if (handlerSnippets == null) {
+            throw new NullPointerException("No preamble snippets for IntegerOpHandler");
+        }
         masterHandler.addPreamblesLocales(handlerSnippets);
-        masterHandler.addPredefinedSort(integerLDT.targetSort(), "int");
+        masterHandler.addPredefinedSort(ldt.targetSort(), "int");
     }
 
     @Override
@@ -65,9 +75,14 @@ public class IntegerOpHandler implements IsabelleHandler {
         List<StringBuilder> children = trans.translate(term.subs());
         Operator op = term.op();
 
+        IntegerLDT ldt = integerLDT;
+        if (ldt == null) {
+            throw new NullPointerException("IntegerOpHandler has not been initialized");
+        }
+
         // negation has a special pattern in Isabelle and thus can't be translated like the other
         // functions
-        if (op == integerLDT.getNeg()) {
+        if (op == ldt.getNeg()) {
             return new StringBuilder("(-").append(children.get(0)).append(")");
         }
 

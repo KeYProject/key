@@ -41,7 +41,12 @@ public class QuantifierHandler implements IsabelleHandler {
 
     @Override
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
-        StringBuilder result = makeBoundedVarRef(trans, term, supportedOperators.get(term.op()));
+        String name = supportedOperators.get(term.op());
+        if (name == null) {
+            throw new NullPointerException("No translation registered for operator "
+                + term.op().name());
+        }
+        StringBuilder result = makeBoundedVarRef(trans, term, name);
         result.append(". (");
         result.append(trans.translate(term.sub(0))).append("))");
         return result;

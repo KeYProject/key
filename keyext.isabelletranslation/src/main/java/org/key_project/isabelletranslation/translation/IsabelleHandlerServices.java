@@ -103,7 +103,9 @@ public class IsabelleHandlerServices {
         if (handlerNames.length == 0) {
             InputStream stream =
                 IsabelleHandlerServices.class.getResourceAsStream(DEFAULT_HANDLERS);
-            assert stream != null;
+            if (stream == null) {
+                throw new NullPointerException("Resource '" + DEFAULT_HANDLERS + "' not found.");
+            }
             BufferedReader reader =
                 new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
             handlerNames = reader.lines().toArray(String[]::new);
@@ -132,12 +134,14 @@ public class IsabelleHandlerServices {
                     }
                 }
             } catch (ClassNotFoundException e) {
+                String message = e.getMessage();
                 LOGGER.warn("Could not load IsabelleHandler:{}{}", System.lineSeparator(),
-                    e.getMessage());
+                    message == null ? "null" : message);
             } catch (NoSuchMethodException | InvocationTargetException | InstantiationException
                     | IllegalAccessException e) {
+                String message = e.getMessage();
                 LOGGER.warn("Could not create IsabelleHandler:{}{}", System.lineSeparator(),
-                    e.getMessage());
+                    message == null ? "null" : message);
             }
         }
         // TODO make sure that the order of handlers in result is the same as the order

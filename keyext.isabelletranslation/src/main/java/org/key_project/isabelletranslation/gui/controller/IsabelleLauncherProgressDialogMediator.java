@@ -83,24 +83,29 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
     private int finishedCounter = 0;
 
     /**
-     * The solvers started by the launcher
+     * The solvers started by the launcher.
+     * Only set by {@link #prepareDialog(Collection)} when the launcher starts.
      */
-    private Collection<IsabelleSolver> solvers;
+    private @Nullable Collection<IsabelleSolver> solvers;
 
     /**
-     * The {@link IsabelleProgressModel} associated with the launcher
+     * The {@link IsabelleProgressModel} associated with the launcher.
+     * Only set by {@link #prepareDialog(Collection)} when the launcher starts.
      */
-    private IsabelleProgressModel progressModel;
+    private @Nullable IsabelleProgressModel progressModel;
 
     /**
-     * Stores which solvers have processed their problem
+     * Stores which solvers have processed their problem.
+     * Populated by {@link #prepareDialog(Collection)} when the launcher starts; the empty initial
+     * array keeps the field non-null before that point.
      */
-    private boolean[][] finishedSolvers;
+    private boolean[][] finishedSolvers = new boolean[0][0];
 
     /**
-     * The dialog used
+     * The dialog used.
+     * Only set by {@link #prepareDialog(Collection)} when the launcher starts.
      */
-    private IsabelleProgressDialog progressDialog;
+    private @Nullable IsabelleProgressDialog progressDialog;
 
     @Override
     public void launcherStopped(IsabelleLauncher launcher,
@@ -108,9 +113,9 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
         timer.cancel();
 
         setProgressText(finishedInstances.size());
-        progressModel.setEditable(true);
+        getProgressModel().setEditable(true);
         refreshDialog();
-        progressDialog.setModus(IsabelleProgressDialog.Modus.SOLVERS_DONE);
+        getProgressDialog().setModus(IsabelleProgressDialog.Modus.SOLVERS_DONE);
     }
 
     @Override
@@ -151,7 +156,7 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
      */
     protected void applyEvent() {
         applyResults();
-        progressDialog.dispose();
+        getProgressDialog().dispose();
     }
 
     /**
@@ -162,12 +167,28 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
         // ensure that the goal closing does not lag the UI
         mediator.stopInterface(true);
         try {
-            new IsabelleProofApplyUserAction(mediator, proof, solvers).actionPerformed(null);
+            invokeApplyAction(
+                new IsabelleProofApplyUserAction(mediator, proof, getSolvers()));
         } finally {
             mediator.startInterface(true);
             // switch to new open goal
             mediator.getSelectionModel().defaultSelection();
         }
+    }
+
+    /**
+     * Programmatically invokes the given action via {@code actionPerformed(null)}.
+     * The inherited {@code actionPerformed} does not use its event argument (it only
+     * fires the mediator action event and delegates to {@code apply()}), so {@code null} is
+     * legal at runtime; the non-null event parameter type of the
+     * {@link java.awt.event.ActionListener} contract cannot express this, suppressed with a
+     * scoped key.
+     *
+     * @param userAction the action to invoke
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private void invokeApplyAction(IsabelleProofApplyUserAction userAction) {
+        userAction.actionPerformed(null);
     }
 
     /**
@@ -179,16 +200,20 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
         int x = 0;
         int y = solver.getSolverIndex();
 
-        if (!finishedSolvers[x][y]) {
+        boolean[][] finished = getFinishedSolvers();
+        if (!finished[x][y]) {
             finishedCounter++;
-            progressDialog.setProgress(finishedCounter);
-            JProgressBar bar = progressDialog.getProgressBar();
+            getProgressDialog().setProgress(finishedCounter);
+            JProgressBar bar = getProgressDialog().getProgressBar();
             bar.setValue(finishedCounter);
             setProgressText(finishedCounter);
-            finishedSolvers[x][y] = true;
+            finished[x][y] = true;
         }
 
         IsabelleResult result = solver.getFinalResult();
+        if (result == null) {
+            throw new NullPointerException("Solver has no final result.");
+        }
 
         switch (result.getType()) {
             case INTERRUPTED:
@@ -217,8 +242,8 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
      */
     private void interrupted(int x, int y) {
         if (userStopFlag) {
-            progressModel.setProgress(0, x, y);
-            progressModel.setText("Interrupted by user.", x, y);
+            getProgressModel().setProgress(0, x, y);
+            getProgressModel().setText("Interrupted by user.", x, y);
         } else {
             throw new RuntimeException("Solver was interrupted for unknown reasons!");
         }
@@ -231,12 +256,16 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
      * @param y The solver index as reported by {@link IsabelleSolver#getSolverIndex()}
      */
     private void successfullyStopped(IsabelleSolver solver, int x, int y) {
-        progressModel.setProgress(0, x, y);
-        progressModel.setTextColor(GREEN.get(), x, y);
+        getProgressModel().setProgress(0, x, y);
+        getProgressModel().setTextColor(GREEN.get(), x, y);
 
-        String timeInfo = solver.getComputationTime().toMillis() / 1000d + "s";
+        java.time.Duration computationTime = solver.getComputationTime();
+        if (computationTime == null) {
+            throw new NullPointerException("Solver has no computation time.");
+        }
+        String timeInfo = computationTime.toMillis() / 1000d + "s";
 
-        progressModel.setText("Valid (" + timeInfo + ")", x, y);
+        getProgressModel().setText("Valid (" + timeInfo + ")", x, y);
     }
 
     /**
@@ -246,9 +275,9 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
      * @param y The solver index as reported by {@link IsabelleSolver#getSolverIndex()}
      */
     private void encounteredError(int x, int y) {
-        progressModel.setProgress(0, x, y);
-        progressModel.setTextColor(RED.get(), x, y);
-        progressModel.setText("Exception!", x, y);
+        getProgressModel().setProgress(0, x, y);
+        getProgressModel().setTextColor(RED.get(), x, y);
+        getProgressModel().setText("Exception!", x, y);
     }
 
     /**
@@ -258,8 +287,8 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
      * @param y The solver index as reported by {@link IsabelleSolver#getSolverIndex()}
      */
     private void timedOut(int x, int y) {
-        progressModel.setProgress(0, x, y);
-        progressModel.setText("Timeout.", x, y);
+        getProgressModel().setProgress(0, x, y);
+        getProgressModel().setText("Timeout.", x, y);
     }
 
     /**
@@ -269,9 +298,9 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
      * @param y The solver index as reported by {@link IsabelleSolver#getSolverIndex()}
      */
     private void unknownStopped(int x, int y) {
-        progressModel.setProgress(0, x, y);
-        progressModel.setTextColor(Color.BLUE, x, y);
-        progressModel.setText("Unknown.", x, y);
+        getProgressModel().setProgress(0, x, y);
+        getProgressModel().setTextColor(Color.BLUE, x, y);
+        getProgressModel().setText("Unknown.", x, y);
     }
 
     /**
@@ -283,7 +312,7 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
      *        indicate the launcher is still preparing.
      */
     private void setProgressText(int value) {
-        JProgressBar bar = progressDialog.getProgressBar();
+        JProgressBar bar = getProgressDialog().getProgressBar();
         if (value < 0) {
             bar.setString("Preparing... (this might take a few seconds)");
             bar.setStringPainted(true);
@@ -299,7 +328,7 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
      * launcher has stopped.
      */
     protected void discardEvent() {
-        progressDialog.dispose();
+        getProgressDialog().dispose();
     }
 
     /**
@@ -313,6 +342,35 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
         this.launcher = launcher;
     }
 
+    private Collection<IsabelleSolver> getSolvers() {
+        Collection<IsabelleSolver> startedSolvers = solvers;
+        if (startedSolvers == null) {
+            throw new NullPointerException("Launcher did not start any solvers.");
+        }
+        return startedSolvers;
+    }
+
+    private IsabelleProgressModel getProgressModel() {
+        IsabelleProgressModel model = progressModel;
+        if (model == null) {
+            throw new NullPointerException(
+                "Progress model was not created (launcher not started).");
+        }
+        return model;
+    }
+
+    private boolean[][] getFinishedSolvers() {
+        return finishedSolvers;
+    }
+
+    private IsabelleProgressDialog getProgressDialog() {
+        IsabelleProgressDialog dialog = progressDialog;
+        if (dialog == null) {
+            throw new NullPointerException("Dialog was not created (launcher not started).");
+        }
+        return dialog;
+    }
+
     /**
      * Prepares the dialog. Opens the dialog.
      * Assigns the titles of all solver types to their columns.
@@ -322,7 +380,8 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
      */
     private void prepareDialog(Collection<IsabelleSolver> solvers) {
         this.solvers = solvers;
-        progressModel = new IsabelleProgressModel();
+        IsabelleProgressModel model = new IsabelleProgressModel();
+        progressModel = model;
 
         String[] captions = new String[solvers.size()];
 
@@ -332,24 +391,23 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
             i++;
         }
 
-        progressModel.addColumn(new IsabelleProgressModel.TitleColumn(captions));
+        model.addColumn(new IsabelleProgressModel.TitleColumn(captions));
         finishedSolvers = new boolean[1][solvers.size()];
-        progressModel.addColumn(new IsabelleProgressModel.ProcessColumn(solvers.size()));
+        model.addColumn(new IsabelleProgressModel.ProcessColumn(solvers.size()));
 
-
-        progressDialog = new IsabelleProgressDialog(progressModel,
+        IsabelleProgressDialog dialog = new IsabelleProgressDialog(model,
             new IsabelleProgressDialogListenerImpl(), false,
             RESOLUTION, solvers.size(), "", "Isabelle");
+        progressDialog = dialog;
 
-
-        SwingUtilities.invokeLater(() -> progressDialog.setVisible(true));
+        SwingUtilities.invokeLater(() -> dialog.setVisible(true));
     }
 
     /**
      * Refreshes the progress of all solvers.
      */
     private void refreshDialog() {
-        for (IsabelleSolver solver : solvers) {
+        for (IsabelleSolver solver : getSolvers()) {
             refreshProgressOfSolver(solver);
         }
     }
@@ -378,10 +436,10 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
      */
     private void running(IsabelleSolver solver) {
         long progress = calculateProgress(solver);
-        progressModel.setProgress((int) progress, 0, solver.getSolverIndex());
+        getProgressModel().setProgress((int) progress, 0, solver.getSolverIndex());
 
         float remainingTime = calculateRemainingTime(solver);
-        progressModel.setText(remainingTimeFormat.format(remainingTime) + " sec.", 0,
+        getProgressModel().setText(remainingTimeFormat.format(remainingTime) + " sec.", 0,
             solver.getSolverIndex());
     }
 
@@ -395,7 +453,9 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
     private long calculateProgress(IsabelleSolver solver) {
         Duration maxDuration = Duration.ofSeconds(solver.getTimeout());
         Instant startTime = solver.getStartTime();
-
+        if (startTime == null) {
+            throw new NullPointerException("Solver was not started.");
+        }
         return (long) Math.floor(RESOLUTION
                 * (Duration.between(startTime, Instant.now()).toMillis()
                         / (double) maxDuration.toMillis()));
@@ -408,7 +468,11 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
      * @return The remaining time in seconds
      */
     private float calculateRemainingTime(IsabelleSolver solver) {
-        Instant timeoutTime = solver.getStartTime().plusSeconds(solver.getTimeout());
+        Instant startTime = solver.getStartTime();
+        if (startTime == null) {
+            throw new NullPointerException("Solver was not started.");
+        }
+        Instant timeoutTime = startTime.plusSeconds(solver.getTimeout());
         return Duration.between(Instant.now(), timeoutTime).toMillis() / 1000f;
     }
 
@@ -419,7 +483,7 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
      * @param solver the solver whose progress bar will be updated
      */
     private void parsing(IsabelleSolver solver) {
-        progressModel.setText("Parsing...", 0, solver.getSolverIndex());
+        getProgressModel().setText("Parsing...", 0, solver.getSolverIndex());
     }
 
     /**
@@ -432,7 +496,8 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
 
     private @Nullable IsabelleSolver getSolver(int column, int row) {
         // This needs to be changed, if different kinds of Isabelle solvers are supported
-        return solvers.stream().filter(s -> (s.getSolverIndex() == row)).findFirst().orElse(null);
+        return getSolvers().stream().filter(s -> (s.getSolverIndex() == row)).findFirst()
+                .orElse(null);
     }
 
     /**
@@ -441,7 +506,7 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
      * @param solver the solver whose progress bar will be updated
      */
     private void preparing(IsabelleSolver solver) {
-        progressModel.setText("Preparing...", 0, solver.getSolverIndex());
+        getProgressModel().setText("Preparing...", 0, solver.getSolverIndex());
     }
 
     /**
@@ -484,17 +549,27 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
         Collection<InformationWindow.Information> information = new HashSet<>();
         String informationTitle = solver.name() + ": " + solver.getProblem().getName();
 
+        String rawInput = solver.getRawSolverInput();
         information.add(new InformationWindow.Information("Translation theory",
-            solver.getRawSolverInput(), informationTitle));
-        if (solver.getFinalResult().isError()) {
+            rawInput == null ? "" : rawInput, informationTitle));
+        IsabelleResult finalResult = solver.getFinalResult();
+        if (finalResult == null) {
+            throw new NullPointerException("Solver has no final result.");
+        }
+        if (finalResult.isError()) {
+            Exception exception = finalResult.getException();
+            if (exception == null) {
+                throw new NullPointerException("Error result has no exception.");
+            }
+            String message = exception.getMessage();
             information.add(new InformationWindow.Information("Exception",
-                solver.getFinalResult().getException().getMessage(), informationTitle));
+                message == null ? "" : message, informationTitle));
         } else {
             information.add(new InformationWindow.Information("Raw Solver Output",
                 solver.getRawSolverOutput(), informationTitle));
         }
 
-        new InformationWindow(progressDialog, information,
+        new InformationWindow(getProgressDialog(), information,
             "Information for " + informationTitle);
     }
 }
