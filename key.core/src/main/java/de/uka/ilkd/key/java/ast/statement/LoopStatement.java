@@ -11,12 +11,10 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.speclang.jml.JmlSpec;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.parsing.Position;
 
@@ -56,8 +54,6 @@ public abstract class LoopStatement extends JavaStatement
     @NonNull
     protected final Statement body;
 
-    protected final ImmutableList<JmlSpec> attachedJml;
-
     /**
      * The translated loop invariant, attached directly to this loop node. Used to live in the
      * {@code SpecificationRepository}'s {@code (loop, line)} map; it is now node-attached so that
@@ -83,7 +79,6 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
-        this.attachedJml = ImmutableList.nil();
     }
 
     public LoopStatement(Expression guard, @NonNull Statement body, ExtList comments,
@@ -93,7 +88,6 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
-        this.attachedJml = ImmutableList.nil();
     }
 
     public LoopStatement(Expression guard, @NonNull Statement body) {
@@ -101,7 +95,6 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
-        this.attachedJml = ImmutableList.nil();
     }
 
     public LoopStatement(Expression guard, @NonNull Statement body, PositionInfo pos) {
@@ -110,7 +103,6 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
-        this.attachedJml = ImmutableList.nil();
     }
 
 
@@ -136,7 +128,6 @@ public abstract class LoopStatement extends JavaStatement
         }
         this.inits = new LoopInit(inits);
         this.guard = new Guard(guard);
-        this.attachedJml = ImmutableList.nil();
     }
 
     /**
@@ -161,7 +152,6 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = updates;
         this.inits = inits;
         this.guard = guard;
-        this.attachedJml = ImmutableList.nil();
     }
 
 
@@ -173,7 +163,6 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = updates;
         this.inits = inits;
         this.guard = guard;
-        this.attachedJml = ImmutableList.nil();
     }
 
 
@@ -199,7 +188,6 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = updates;
         this.inits = inits;
         this.guard = guard;
-        this.attachedJml = ImmutableList.nil();
     }
 
 
@@ -221,30 +209,21 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = updates;
         this.inits = inits;
         this.guard = guard;
-        this.attachedJml = ImmutableList.nil();
     }
 
     public LoopStatement(PositionInfo pi, List<Comment> comments, ILoopInit inits,
-            IForUpdates updates, @NonNull IGuard guard, @NonNull Statement body,
-            ImmutableList<JmlSpec> attachedJml) {
+            IForUpdates updates, @NonNull IGuard guard, @NonNull Statement body) {
         super(pi, comments);
         this.inits = inits;
         this.updates = updates;
         this.guard = guard;
         this.body = body;
-        this.attachedJml = attachedJml;
     }
 
     static private ExtList add(ExtList e, Object o) {
         e.add(o);
         return e;
     }
-
-    @Override
-    public ImmutableList<JmlSpec> getAttachedJml() {
-        return attachedJml;
-    }
-
 
     /**
      * Returns the number of children of this node.

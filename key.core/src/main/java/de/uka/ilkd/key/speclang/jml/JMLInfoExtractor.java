@@ -78,10 +78,6 @@ public final class JMLInfoExtractor {
         return specMathMode;
     }
 
-    private static ImmutableList<JmlSpec> getJMLComments(TypeDeclaration decl) {
-        return decl.getAttachedJml();
-    }
-
     private static ImmutableList<Comment> getJMLComments(MethodDeclaration method) {
         ImmutableList<Comment> coms = ImmutableList.nil();
 
@@ -210,8 +206,6 @@ public final class JMLInfoExtractor {
      * @return modifiers
      */
     public static TypeDeclaration.JMLModifiers parseClass(TypeDeclaration td) {
-        var comments = getJMLComments(td);
-
         var pure = td.containsModifier(ModifierKind.JML_PURE);
         var strictlyPure = td.containsModifier(ModifierKind.JML_STRICTLY_PURE);
         var nullableByDefault = td.containsModifier(ModifierKind.JML_NULLABLE_BY_DEFAULT);

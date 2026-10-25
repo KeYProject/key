@@ -12,7 +12,6 @@ import java.util.Optional;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
-import de.uka.ilkd.key.speclang.jml.JmlSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassAxiom;
@@ -69,8 +68,9 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.REQUIRES_FREE;
 
 /**
- * Converts a {@link JmlSpec} (a JMLtk AST node) into KeY's textual JML representation
- * ({@link TextualJMLConstruct}), which the rest of the KeY translation pipeline consumes.
+ * Converts a JMLtk AST node (a {@link JmlContract} or a class level declaration) into KeY's
+ * textual JML representation ({@link TextualJMLConstruct}), which the rest of the KeY
+ * translation pipeline consumes.
  * <p>
  * This is necessary because the KeY specific translation consumes parse trees of KeY's own JML
  * grammar ({@code JmlParser.g4}). The individual constructs are therefore re-serialized to text
@@ -105,17 +105,6 @@ public final class JmlToTextual {
      *
      * @return one spec case per (sub-)contract
      */
-    public static ImmutableList<TextualJMLSpecCase> toSpecCases(JmlSpec spec) {
-        if (!(spec.node() instanceof JmlContract contract)) {
-            throw new IllegalArgumentException(
-                "Expected a JmlContract but got " + spec.node().getClass().getSimpleName());
-        }
-        return toSpecCases(contract);
-    }
-
-    /**
-     * Converts the given contract into textual spec cases, main contract plus sub-contracts.
-     */
     public static ImmutableList<TextualJMLSpecCase> toSpecCases(JmlContract contract) {
         ImmutableList<TextualJMLSpecCase> result = ImmutableList.of();
         result = result.append(toSpecCase(contract));
@@ -129,11 +118,7 @@ public final class JmlToTextual {
      * Converts a loop invariant contract (jmltk {@link ContractType#LOOP_INV}) into a textual
      * loop specification.
      */
-    public static TextualJMLLoopSpec toLoopSpec(JmlSpec spec) {
-        if (!(spec.node() instanceof JmlContract contract)) {
-            throw new IllegalArgumentException(
-                "Expected a JmlContract but got " + spec.node().getClass().getSimpleName());
-        }
+    public static TextualJMLLoopSpec toLoopSpec(JmlContract contract) {
         TextualJMLLoopSpec loopSpec = new TextualJMLLoopSpec(mapModifiers(contract.getModifiers()));
         for (JmlClause clause : contract.getClauses()) {
             try {
@@ -145,25 +130,22 @@ public final class JmlToTextual {
         return loopSpec;
     }
 
-    public static TextualJMLClassInv toClassInv(JmlSpec spec) {
-        JmlClassExprDeclaration decl =
-            classExpr(spec, JmlBodyClauseKind.INVARIANT, JmlBodyClauseKind.INVARIANT_FREE);
+    public static TextualJMLClassInv toClassInv(JmlClassExprDeclaration decl) {
+        checkKind(decl, JmlBodyClauseKind.INVARIANT, JmlBodyClauseKind.INVARIANT_FREE);
         boolean free = decl.getKind() == JmlBodyClauseKind.INVARIANT_FREE;
         var ctx = parse(JmlParser::class_invariant,
             (free ? "invariant_free " : "invariant ") + decl.getInvariant() + ";");
         return new TextualJMLClassInv(mapModifiers(decl.getModifiers()), ctx, free);
     }
 
-    public static TextualJMLInitially toInitially(JmlSpec spec) {
-        JmlClassExprDeclaration decl = classExpr(spec, JmlBodyClauseKind.INITIALLY);
+    public static TextualJMLInitially toInitially(JmlClassExprDeclaration decl) {
+        checkKind(decl, JmlBodyClauseKind.INITIALLY);
         var ctx = parse(JmlParser::initially_clause, "initially " + decl.getInvariant() + ";");
         return new TextualJMLInitially(mapModifiers(decl.getModifiers()),
             new LabeledParserRuleContext(ctx));
     }
 
-    public static TextualJMLClassAxiom toClassAxiom(JmlSpec spec) {
-        JmlClassExprDeclaration decl = classExpr(spec, JmlBodyClauseKind.AXIOM,
-            JmlBodyClauseKind.CONSTRAINT, JmlBodyClauseKind.CONSTRAINT_REDUNDANTLY);
+    public static TextualJMLClassAxiom toClassAxiom(JmlClassExprDeclaration decl) {
         if (decl.getKind() != JmlBodyClauseKind.AXIOM) {
             LOGGER.warn("Skipping unsupported class level construct: {}", decl.getKind());
             return null;
@@ -173,22 +155,14 @@ public final class JmlToTextual {
             new LabeledParserRuleContext(ctx));
     }
 
-    public static TextualJMLRepresents toRepresents(JmlSpec spec) {
-        if (!(spec.node() instanceof JmlRepresentsDeclaration decl)) {
-            throw new IllegalArgumentException("Expected a JmlRepresentsDeclaration but got "
-                + spec.node().getClass().getSimpleName());
-        }
+    public static TextualJMLRepresents toRepresents(JmlRepresentsDeclaration decl) {
         var ctx = parse(JmlParser::represents_clause,
             "represents " + decl.getName() + " = " + decl.getExpr() + ";");
         return new TextualJMLRepresents(mapModifiers(decl.getModifiers()),
             new LabeledParserRuleContext(ctx));
     }
 
-    public static TextualJMLDepends toDepends(JmlSpec spec) {
-        if (!(spec.node() instanceof JmlClassAccessibleDeclaration decl)) {
-            throw new IllegalArgumentException("Expected a JmlClassAccessibleDeclaration but got "
-                + spec.node().getClass().getSimpleName());
-        }
+    public static TextualJMLDepends toDepends(JmlClassAccessibleDeclaration decl) {
         StringBuilder text = new StringBuilder("accessible ");
         text.append(decl.getVariable()).append(": ");
         text.append(exprList(decl.getExpressions()));
@@ -204,12 +178,7 @@ public final class JmlToTextual {
     /**
      * Re-serializes a model method declaration into KeY's textual form.
      */
-    public static TextualJMLMethodDecl toMethodDecl(JmlSpec spec) {
-        if (!(spec.node() instanceof JmlMethodDeclaration decl)) {
-            throw new IllegalArgumentException(
-                "Expected a JmlMethodDeclaration but got "
-                    + spec.node().getClass().getSimpleName());
-        }
+    public static TextualJMLMethodDecl toMethodDecl(JmlMethodDeclaration decl) {
         MethodDeclaration m = decl.getMethodDeclaration();
         StringBuilder text = new StringBuilder();
         text.append(m.getType()).append(' ').append(m.getName()).append('(');
@@ -586,14 +555,10 @@ public final class JmlToTextual {
         return ctx;
     }
 
-    private static JmlClassExprDeclaration classExpr(JmlSpec spec, JmlBodyClauseKind... kinds) {
-        if (!(spec.node() instanceof JmlClassExprDeclaration decl)) {
-            throw new IllegalArgumentException("Expected a JmlClassExprDeclaration but got "
-                + spec.node().getClass().getSimpleName());
-        }
+    private static void checkKind(JmlClassExprDeclaration decl, JmlBodyClauseKind... kinds) {
         for (JmlBodyClauseKind kind : kinds) {
             if (decl.getKind() == kind) {
-                return decl;
+                return;
             }
         }
         throw new IllegalArgumentException(

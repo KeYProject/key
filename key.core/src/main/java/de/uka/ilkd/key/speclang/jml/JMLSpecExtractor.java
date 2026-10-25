@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.java.KeYJPMapping;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.Label;
@@ -31,6 +32,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
+import de.uka.ilkd.key.speclang.jml.translation.JmlToTextual;
 import de.uka.ilkd.key.speclang.njml.JmlFacade;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -39,21 +41,31 @@ import de.uka.ilkd.key.speclang.translation.SLWarningException;
 import org.key_project.util.collection.*;
 import org.key_project.util.parsing.Location;
 
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.ast.jml.NodeWithContracts;
 import com.github.javaparser.ast.jml.body.JmlClassAccessibleDeclaration;
 import com.github.javaparser.ast.jml.body.JmlClassExprDeclaration;
+import com.github.javaparser.ast.jml.body.JmlMethodDeclaration;
 import com.github.javaparser.ast.jml.body.JmlRepresentsDeclaration;
 import com.github.javaparser.ast.jml.clauses.ContractType;
 import com.github.javaparser.ast.jml.clauses.JmlContract;
 import com.github.javaparser.ast.key.KeyMergePointStmt;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.Nullable;
 
 import static java.lang.String.format;
 
 /**
- * Extracts JML class invariants and operation contracts from the JMLtk AST (attached as
- * {@link JmlSpec} to the Java AST). This is the public interface to the jml package.
+ * Extracts JML class invariants and operation contracts from the JMLtk AST. The JMLtk AST is the
+ * single source of truth for the specifications: contracts are attached to the corresponding
+ * nodes ({@link NodeWithContracts}) and class level specifications are members of the JMLtk type.
+ * The KeY elements are resolved back to their JMLtk counterparts via
+ * {@link de.uka.ilkd.key.java.KeYJPMapping#nodeFromKeY}. This is the public interface to the jml
+ * package.
  * <p>
  * The actual translation into KeY specifications is delegated to the {@link JMLSpecFactory}; this
- * class only distributes the attached JML constructs to the right factory methods.
+ * class only distributes the JML constructs to the right factory methods.
  */
 public final class JMLSpecExtractor implements SpecExtractor {
 
@@ -77,6 +89,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
         FinalHeapResolution.rememberIfFinalEnabled(initConfig);
         this.services = initConfig.getServices();
         this.jsf = new JMLSpecFactory(services);
+    }
+
+    private KeYJPMapping mapping() {
+        return services.getJavaInfo().rec2key();
     }
 
     /**
@@ -191,40 +207,38 @@ public final class JMLSpecExtractor implements SpecExtractor {
             }
         }
 
-        // create class specifications out of the attached JML constructs and add them to result
-        var constructs = td.getAttachedJml();
-        for (JmlSpec c : constructs) {
-            try {
-                if (c.node() instanceof JmlClassExprDeclaration decl) {
-                    switch (decl.getKind()) {
-                        case INVARIANT, INVARIANT_FREE -> {
-                            ClassInvariant inv = jsf.createJMLClassInvariant(kjt, c);
-                            result = result.add(inv);
+        // create class specifications out of the JML class level declarations in the JMLtk type
+        // and add them to result. The JMLtk type is the single source of truth: invariants,
+        // initially clauses, axioms, represents clauses and accessible-clauses are members of it,
+        // and it is resolved through the KeY-JMLtk mapping.
+        if (mapping().nodeFromKeY(
+            td) instanceof com.github.javaparser.ast.body.TypeDeclaration<?> jmlType) {
+            for (BodyDeclaration<?> member : jmlType.getMembers()) {
+                try {
+                    if (member instanceof JmlClassExprDeclaration decl) {
+                        switch (decl.getKind()) {
+                            case INVARIANT, INVARIANT_FREE -> result =
+                                result.add(jsf.createJMLClassInvariant(kjt, decl));
+                            case INITIALLY -> result =
+                                result.add(jsf.createJMLInitiallyClause(kjt, decl));
+                            case AXIOM -> result =
+                                result.add(jsf.createJMLClassAxiom(kjt, decl));
+                            default -> {
+                                // DO NOTHING (there may be other class level constructs which are
+                                // not specifications, e.g. invariants_redundantly)
+                            }
                         }
-                        case INITIALLY -> {
-                            InitiallyClause inc = jsf.createJMLInitiallyClause(kjt, c);
-                            result = result.add(inc);
-                        }
-                        case AXIOM -> {
-                            ClassAxiom ax = jsf.createJMLClassAxiom(kjt, c);
-                            result = result.add(ax);
-                        }
-                        default -> {
-                            // DO NOTHING (there may be other class level constructs which are
-                            // not specifications, e.g. invariants_redundantly)
-                        }
+                    } else if (member instanceof JmlRepresentsDeclaration rep) {
+                        result = result.add(jsf.createJMLRepresents(kjt, rep));
+                    } else if (member instanceof JmlClassAccessibleDeclaration acc) {
+                        result = result.add(jsf.createJMLDependencyContract(kjt, acc));
                     }
-                } else if (c.node() instanceof JmlRepresentsDeclaration) {
-                    ClassAxiom rep = jsf.createJMLRepresents(kjt, c);
-                    result = result.add(rep);
-                } else if (c.node() instanceof JmlClassAccessibleDeclaration) {
-                    Contract depContract = jsf.createJMLDependencyContract(kjt, c);
-                    result = result.add(depContract);
+                    // DO NOTHING for other JML constructs (JmlMethodDeclaration,
+                    // JmlFieldDeclaration) and regular Java members, which are not class level
+                    // specifications themselves.
+                } catch (SLWarningException e) {
+                    warnings = warnings.append(e.getWarning());
                 }
-                // DO NOTHING for other JML constructs (JmlMethodDeclaration, JmlFieldDeclaration)
-                // which are not specifications themselves.
-            } catch (SLWarningException e) {
-                warnings = warnings.append(e.getWarning());
             }
         }
         return result;
@@ -247,21 +261,60 @@ public final class JMLSpecExtractor implements SpecExtractor {
             throws SLTranslationException {
         List<SpecificationElement> result = new ArrayList<>();
 
-        // get the attached JML constructs
-        ImmutableList<JmlSpec> constructs = pm.getMethodDeclaration().getAttachedJml();
-
-        for (JmlSpec c : constructs) {
-            try {
-                ImmutableSet<Contract> contracts =
-                    jsf.createJMLOperationContracts(pm, c, addInvariant);
-                for (Contract contract : contracts) {
-                    result.add(contract);
+        // Resolve the JMLtk carrier of the specification: a model method is wrapped in a
+        // JmlMethodDeclaration (carrying the optional contract and the method definition), a
+        // regular method/constructor is itself a NodeWithContracts.
+        Node node = mapping().nodeFromKeY(pm.getMethodDeclaration());
+        if (node instanceof JmlMethodDeclaration wrapper) {
+            // Model method: the method definition is a specification (a source of an AXIOMS
+            // clause), so it is re-serialized for the translation.
+            ParserRuleContext modelMethodDefinition = null;
+            if (wrapper.getMethodDeclaration()
+                    .hasModifier(com.github.javaparser.ast.Modifier.DefaultKeyword.JML_MODEL)) {
+                modelMethodDefinition = JmlToTextual.toMethodDecl(wrapper).getMethodDefinition();
+            }
+            if (wrapper.getContract().isPresent()) {
+                addOperationContracts(result, pm, wrapper.getContract().get(),
+                    modelMethodDefinition, addInvariant);
+            } else if (modelMethodDefinition != null) {
+                // model method without an explicit contract: the method definition itself serves
+                // as the specification
+                try {
+                    for (Contract contract : jsf.createJMLModelMethodContracts(pm,
+                        modelMethodDefinition, addInvariant)) {
+                        result.add(contract);
+                    }
+                } catch (SLWarningException e) {
+                    warnings = warnings.append(e.getWarning());
                 }
-            } catch (SLWarningException e) {
-                warnings = warnings.append(e.getWarning());
+            }
+        } else if (node instanceof NodeWithContracts<?> carrier) {
+            for (JmlContract contract : carrier.getContracts()) {
+                addOperationContracts(result, pm, contract, null, addInvariant);
             }
         }
         return result;
+    }
+
+    /**
+     * Translates a single JML contract into operation contracts for the given method and adds
+     * them to the result list.
+     *
+     * @param modelMethodDefinition the textual definition of a model method used as an AXIOMS
+     *        clause, or {@code null} for regular methods
+     */
+    private void addOperationContracts(List<SpecificationElement> result, IProgramMethod pm,
+            JmlContract contract, @Nullable ParserRuleContext modelMethodDefinition,
+            boolean addInvariant) throws SLTranslationException {
+        try {
+            ImmutableSet<Contract> contracts = jsf.createJMLOperationContracts(pm, contract,
+                modelMethodDefinition, addInvariant);
+            for (Contract c : contracts) {
+                result.add(c);
+            }
+        } catch (SLWarningException e) {
+            warnings = warnings.append(e.getWarning());
+        }
     }
 
     @Override
@@ -322,15 +375,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
     public ImmutableSet<MergeContract> extractMergeContracts(IProgramMethod method,
             MergePointStatement mps, ImmutableList<LocationVariable> methodParams)
             throws SLTranslationException {
-        // In cases of specifications immediately following each other (like a
-        // merge_point and a block contract / loop invariant), it might happen
-        // that we're passed multiple constructs here. Therefore, we filter the
-        // merge point specific parts here
-        var constructs = mps.getAttachedJml();
-        for (var construct : constructs) {
-            if (construct.node() instanceof KeyMergePointStmt) {
-                return jsf.createJMLMergeContracts(method, mps, construct);
-            }
+        // Resolve the JMLtk KeyMergePointStmt through the mapping: it carries the merge point
+        // expression from which the textual merge contract is re-derived.
+        if (mapping().nodeFromKeY(mps) instanceof KeyMergePointStmt kms) {
+            return jsf.createJMLMergeContracts(method, mps, kms);
         }
         return ImmutableSet.empty();
     }
@@ -339,15 +387,17 @@ public final class JMLSpecExtractor implements SpecExtractor {
             final List<Label> labels, final StatementBlock block)
             throws SLTranslationException {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
-        for (JmlSpec construct : block.getAttachedJml()) {
-            if (construct.node() instanceof JmlContract contract
-                    && contract.getType() != ContractType.LOOP
-                    && contract.getType() != ContractType.LOOP_INV) {
-                try {
-                    result = result
-                            .union(jsf.createJMLBlockContracts(method, labels, block, construct));
-                } catch (final SLWarningException exception) {
-                    warnings = warnings.append(exception.getWarning());
+        if (mapping().nodeFromKeY(block) instanceof NodeWithContracts<?> carrier) {
+            for (JmlContract contract : carrier.getContracts()) {
+                // loop contracts and loop invariants are no block contracts
+                if (contract.getType() != ContractType.LOOP
+                        && contract.getType() != ContractType.LOOP_INV) {
+                    try {
+                        result = result.union(jsf.createJMLBlockContracts(method, labels, block,
+                            contract));
+                    } catch (final SLWarningException exception) {
+                        warnings = warnings.append(exception.getWarning());
+                    }
                 }
             }
         }
@@ -358,14 +408,15 @@ public final class JMLSpecExtractor implements SpecExtractor {
             final List<Label> labels, final LoopStatement loop)
             throws SLTranslationException {
         ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
-        for (JmlSpec construct : loop.getAttachedJml()) {
-            if (construct.node() instanceof JmlContract contract
-                    && contract.getType() == ContractType.LOOP) {
-                try {
-                    result = result
-                            .union(jsf.createJMLLoopContracts(method, labels, loop, construct));
-                } catch (final SLWarningException exception) {
-                    warnings = warnings.append(exception.getWarning());
+        if (mapping().nodeFromKeY(loop) instanceof NodeWithContracts<?> carrier) {
+            for (JmlContract contract : carrier.getContracts()) {
+                if (contract.getType() == ContractType.LOOP) {
+                    try {
+                        result = result.union(jsf.createJMLLoopContracts(method, labels, loop,
+                            contract));
+                    } catch (final SLWarningException exception) {
+                        warnings = warnings.append(exception.getWarning());
+                    }
                 }
             }
         }
@@ -376,14 +427,15 @@ public final class JMLSpecExtractor implements SpecExtractor {
             final List<Label> labels, final StatementBlock block)
             throws SLTranslationException {
         ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
-        for (JmlSpec construct : block.getAttachedJml()) {
-            if (construct.node() instanceof JmlContract contract
-                    && contract.getType() == ContractType.LOOP) {
-                try {
-                    result = result
-                            .union(jsf.createJMLLoopContracts(method, labels, block, construct));
-                } catch (final SLWarningException exception) {
-                    warnings = warnings.append(exception.getWarning());
+        if (mapping().nodeFromKeY(block) instanceof NodeWithContracts<?> carrier) {
+            for (JmlContract contract : carrier.getContracts()) {
+                if (contract.getType() == ContractType.LOOP) {
+                    try {
+                        result = result.union(jsf.createJMLLoopContracts(method, labels, block,
+                            contract));
+                    } catch (final SLWarningException exception) {
+                        warnings = warnings.append(exception.getWarning());
+                    }
                 }
             }
         }
@@ -394,25 +446,24 @@ public final class JMLSpecExtractor implements SpecExtractor {
     public LoopSpecification extractLoopInvariant(IProgramMethod pm, LoopStatement loop) {
         LoopSpecification result = null;
 
-        ImmutableList<JmlSpec> constructs = loop.getAttachedJml();
+        if (mapping().nodeFromKeY(loop) instanceof NodeWithContracts<?> carrier) {
+            // create JML loop invariant out of the last loop invariant contract
+            for (int i = carrier.getContracts().size() - 1; i >= 0; i--) {
+                JmlContract c = carrier.getContracts().get(i);
+                if (c.getType() == ContractType.LOOP_INV) {
+                    result = jsf.createJMLLoopInvariant(pm, loop, c);
 
-        // create JML loop invariant out of the last loop invariant contract
-        for (int i = constructs.size() - 1; i >= 0; i--) {
-            JmlSpec c = constructs.get(i);
-            if (c.node() instanceof JmlContract contract
-                    && contract.getType() == ContractType.LOOP_INV) {
-                result = jsf.createJMLLoopInvariant(pm, loop, c);
-
-                // Check that a decreases clause exists
-                if (result.getInternalVariant() == null) {
-                    PositionInfo info = loop.getPositionInfo();
-                    warnings = warnings.append(
-                        new PositionedString(
-                            "Missing \"decreases\" for loop invariant. " +
-                                "Termination of this loop will not be provable.",
-                            new Location(info.getURI().orElse(null), info.getStartPosition())));
+                    // Check that a decreases clause exists
+                    if (result.getInternalVariant() == null) {
+                        PositionInfo info = loop.getPositionInfo();
+                        warnings = warnings.append(
+                            new PositionedString(
+                                "Missing \"decreases\" for loop invariant. " +
+                                    "Termination of this loop will not be provable.",
+                                new Location(info.getURI().orElse(null), info.getStartPosition())));
+                    }
+                    break;
                 }
-                break;
             }
         }
         return result;
