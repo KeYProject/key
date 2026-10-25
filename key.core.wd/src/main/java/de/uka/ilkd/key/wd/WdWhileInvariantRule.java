@@ -13,6 +13,7 @@ import de.uka.ilkd.key.wd.macro.WellDefinednessMacro;
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
@@ -65,7 +66,12 @@ public class WdWhileInvariantRule extends WhileInvariantRule {
             LocationVariable heap = heapContext.getFirst();
             final SequentFormula wdInv = lwd.generateSequent(self, heap, anonHeap, localIns,
                 inst.u(), localAnonUpdate, services);
-            goal.changeFormula(wdInv, ruleApp.posInOccurrence());
+            final PosInOccurrence posInOcc = ruleApp.posInOccurrence();
+            if (posInOcc == null) {
+                throw new NullPointerException(
+                    "No position of occurrence for the loop invariant rule application.");
+            }
+            goal.changeFormula(wdInv, posInOcc);
         }
     }
 }
