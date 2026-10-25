@@ -8,11 +8,14 @@ import java.io.Serializable;
 
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Settings for the javac extention.
  *
  * @author Daniel Grévent
  */
+@NullMarked
 public class JavacSettings extends AbstractPropertiesSettings implements Serializable {
 
     /**

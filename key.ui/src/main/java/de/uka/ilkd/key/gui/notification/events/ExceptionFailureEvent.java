@@ -6,6 +6,9 @@ package de.uka.ilkd.key.gui.notification.events;
 
 import de.uka.ilkd.key.gui.notification.NotificationEventID;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ExceptionFailureEvent extends GeneralFailureEvent {
 
     private final Throwable error;

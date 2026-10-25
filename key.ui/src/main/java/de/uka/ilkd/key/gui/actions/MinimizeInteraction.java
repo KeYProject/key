@@ -4,16 +4,18 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.actions;
 
-
 import java.beans.PropertyChangeListener;
 import java.util.EventObject;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Option to specify all instantiations manually (does not apply to the automatic solver).
  */
+@NullMarked
 public class MinimizeInteraction extends KeYMenuCheckBox {
     public static final String NAME = "Minimize Interaction";
     public static final String TOOL_TIP =

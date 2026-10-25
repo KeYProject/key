@@ -20,10 +20,13 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Alexander Weigl
  * @version 1 (10.05.19)
  */
+@NullMarked
 public class ColorSettingsProvider extends SimpleSettingsPanel implements SettingsProvider {
     private final JTable tblColors = new JTable();
     private ColorSettingsTableModel modelColor;
@@ -169,10 +172,10 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
         }
     }
 
-
 }
 
 
+@NullMarked
 class HexColorCellEditor extends DefaultCellEditor {
     HexColorCellEditor(JTextField textField) {
         super(textField);

@@ -18,6 +18,9 @@ import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A button consisting of an action component (normal button) and a selection menu (dropdown
  * button). Selecting an entry from the dropdown executes an action based on that entry,
@@ -30,12 +33,13 @@ import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
  *
  * @author Arne Keller
  */
+@NullMarked
 public class UndoHistoryButton {
 
     /**
      * The dropdown opening button.
      */
-    private JButton selectionComponent;
+    private @Nullable JButton selectionComponent;
     /**
      * The action starting button.
      */
@@ -56,7 +60,7 @@ public class UndoHistoryButton {
     /**
      * The dropdown menu that opens when clicking the selection button.
      */
-    private JPopupMenu menu;
+    private @Nullable JPopupMenu menu;
 
     /**
      * True iff the next time the selection button's action is carried out it should open the popup

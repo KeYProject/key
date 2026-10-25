@@ -44,6 +44,7 @@ import bibliothek.gui.dock.common.action.CDropDownButton;
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +58,7 @@ import org.slf4j.LoggerFactory;
 @KeYGuiExtension.Info(name = "Keyboard Taclet Control",
     description = "This extension control over the application of taclets via the keyboard.",
     optional = true)
+@NullMarked
 public class KeyboardTacletExtension implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
     private KeyboardTacletPanel panel;
 
@@ -86,6 +88,7 @@ public class KeyboardTacletExtension implements KeYGuiExtension, KeYGuiExtension
 
 
 // @SuppressWarnings("WeakerAccess")
+@NullMarked
 class KeyboardTacletPanel extends JPanel implements TabPanel {
     private static final String PROP_MODEL = "taclets";
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyboardTacletPanel.class);
@@ -159,7 +162,6 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
             updateListener.propertyChange(e);
         });
     }
-
 
     private void checkForApplicability() {
         if (model != null) {
@@ -266,7 +268,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         return this;
     }
 
-    public void setGoal(Goal selectedGoal) {
+    public void setGoal(@Nullable Goal selectedGoal) {
         if (this.lastGoal != selectedGoal) {
             lastGoal = selectedGoal;
             buildModel();
@@ -389,6 +391,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
  *
  */
 @SuppressWarnings("WeakerAccess")
+@NullMarked
 class KeyboardTacletModel {
     public static final String PROP_CURRENT_PREFIX = "currentPrefix";
     public static final String PROP_CURRENT_POS = "currentPos";

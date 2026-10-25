@@ -14,10 +14,14 @@ import de.uka.ilkd.key.speclang.BlockContractImpl;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This panel used to select which {@link BlockContract}s to use for an
  * {@link AbstractBlockContractBuiltInRuleApp}.
  */
+@NullMarked
 public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel<BlockContract> {
 
     private static final long serialVersionUID = 1681443715264203991L;
@@ -25,7 +29,6 @@ public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel
     public BlockContractSelectionPanel(final Services services, final boolean multipleSelection) {
         super(services, multipleSelection);
     }
-
 
     /**
      * The static access is used e.g. by the eclipse plugins.
@@ -40,7 +43,7 @@ public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel
      * @param selection The selected contracts.
      * @return The selected {@link BlockContract} or {@code null} if not available.
      */
-    public static BlockContract computeBlockContract(Services services,
+    public static @Nullable BlockContract computeBlockContract(Services services,
             List<BlockContract> selection) {
         if (selection.isEmpty()) {
             return null;
@@ -68,7 +71,8 @@ public class BlockContractSelectionPanel extends AuxiliaryContractSelectionPanel
      * @return The selected {@link BlockContract} or {@code null} if not available.
      */
     @Override
-    public BlockContract computeContract(Services services, List<BlockContract> selection) {
+    public @Nullable BlockContract computeContract(Services services,
+            List<BlockContract> selection) {
         return computeBlockContract(services, selection);
     }
 }

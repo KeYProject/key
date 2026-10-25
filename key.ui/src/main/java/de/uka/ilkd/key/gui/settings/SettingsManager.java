@@ -23,6 +23,8 @@ import de.uka.ilkd.key.gui.smt.settings.SMTSettingsProvider;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.*;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +32,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
+@NullMarked
 public class SettingsManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(SettingsManager.class);
 
@@ -43,7 +46,7 @@ public class SettingsManager {
     public static final ParallelProverSettingsProvider PARALLEL_PROVER_SETTINGS =
         new ParallelProverSettingsProvider();
 
-    private static SettingsManager INSTANCE;
+    private static @Nullable SettingsManager INSTANCE;
     private final List<SettingsProvider> settingsProviders = new LinkedList<>();
 
     static SettingsManager createWithExtensions() {

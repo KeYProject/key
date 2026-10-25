@@ -16,6 +16,9 @@ import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContractImpl;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This panel used to select which {@code T}(s) to use for a {@link AbstractAuxiliaryContractRule}.
  *
@@ -25,6 +28,7 @@ import de.uka.ilkd.key.speclang.LoopContractImpl;
  * @see BlockContractImpl#combine(org.key_project.util.collection.ImmutableSet, Services)
  * @see LoopContractImpl#combine(org.key_project.util.collection.ImmutableSet, Services)
  */
+@NullMarked
 public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContract> extends JPanel {
 
     private static final long serialVersionUID = 129743953718747490L;
@@ -106,7 +110,7 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
         contractList.addMouseListener(ml);
     }
 
-    public void setContracts(final T[] contracts, final String title) {
+    public void setContracts(final T[] contracts, final @Nullable String title) {
         contractList.setListData(contracts);
         contractList.setSelectedIndex(0);
         if (title != null) {
@@ -115,10 +119,10 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
         updateUI();
     }
 
-    public T getContract() {
+    public @Nullable T getContract() {
         final List<T> selection = contractList.getSelectedValuesList();
         return computeContract(services, selection);
     }
 
-    public abstract T computeContract(Services services2, List<T> selection);
+    public abstract @Nullable T computeContract(Services services2, List<T> selection);
 }

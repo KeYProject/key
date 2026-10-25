@@ -19,12 +19,15 @@ import de.uka.ilkd.key.proof.join.ProspectivePartner;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The menu item for the "delayed-cut" join rule.
  *
  * @author Benjamin Niedermann
  * @see JoinProcessor
  */
+@NullMarked
 public class JoinMenuItem extends JMenuItem {
 
     private static final long serialVersionUID = -2602116358650063634L;
@@ -54,7 +57,6 @@ public class JoinMenuItem extends JMenuItem {
 
     private void start(ProspectivePartner partner, Proof proof, final KeYMediator mediator) {
 
-
         JoinProcessor processor = new JoinProcessor(partner, proof);
 
         processor.addListener(new Listener() {
@@ -74,14 +76,12 @@ public class JoinMenuItem extends JMenuItem {
                             .startAutoMode(mediator.getSelectedProof(), goals);
                 });
 
-
             }
         });
 
         Thread thread = new Thread(processor, "ProofJoinProcessor");
         thread.start();
     }
-
 
     @Override
     public String toString() {

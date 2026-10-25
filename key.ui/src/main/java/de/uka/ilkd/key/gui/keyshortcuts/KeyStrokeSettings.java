@@ -22,6 +22,8 @@ import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +40,7 @@ import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MAS
  * @author Alexander Weigl, Wolfram Pfeifer (overhaul, v2)
  * @version 2 (04.08.23)
  */
+@NullMarked
 public class KeyStrokeSettings extends AbstractPropertiesSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyStrokeSettings.class);
 
@@ -47,7 +50,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     /**
      * singleton instance
      */
-    private static KeyStrokeSettings INSTANCE = null;
+    private static @Nullable KeyStrokeSettings INSTANCE = null;
 
     /**
      * default {@link KeyStroke}s
@@ -178,7 +181,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         props.forEach((k, v) -> this.properties.put(k.toString(), v));
     }
 
-    void setKeyStroke(String key, KeyStroke stroke, boolean override) {
+    void setKeyStroke(String key, @Nullable KeyStroke stroke, boolean override) {
         var old = getKeyStroke(key, null);
         if (override || (old == null)) {
             properties.put(key, stroke != null ? stroke.toString() : "");
@@ -186,7 +189,8 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         }
     }
 
-    KeyStroke getKeyStroke(String key, KeyStroke defaultValue) {
+    @Nullable
+    KeyStroke getKeyStroke(String key, @Nullable KeyStroke defaultValue) {
         try {
             KeyStroke ks = KeyStroke.getKeyStroke(properties.get(key).toString());
             if (ks != null) {

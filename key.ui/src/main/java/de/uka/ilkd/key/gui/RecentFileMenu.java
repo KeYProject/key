@@ -23,6 +23,7 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
 
 import com.google.common.html.HtmlEscapers;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ import static de.uka.ilkd.key.gui.actions.QuickSaveAction.QUICK_SAVE_PATH;
  *
  * @author Ute Platzer, with a lot of input from Volker Braun.
  */
+@NullMarked
 public class RecentFileMenu {
     private static final Logger LOGGER = LoggerFactory.getLogger(RecentFileMenu.class);
 
@@ -63,7 +65,7 @@ public class RecentFileMenu {
      */
     private final List<RecentFileEntry> recentFiles = new ArrayList<>();
 
-    private RecentFileEntry mostRecentFile;
+    private @Nullable RecentFileEntry mostRecentFile;
 
     /**
      * Create a new RecentFiles list.
@@ -261,7 +263,6 @@ public class RecentFileMenu {
                     + "</html>");
         }
     }
-
 
     /**
      * write the recent file names to the given properties file. the file will be read (if it

@@ -23,6 +23,7 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import net.miginfocom.layout.CC;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Settings panel where extensions are disabled / enabled.
@@ -30,6 +31,7 @@ import net.miginfocom.layout.CC;
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
+@NullMarked
 public class ExtensionManager extends SettingsPanel implements SettingsProvider {
     private static final ExtensionSettings EXTENSION_SETTINGS = new ExtensionSettings();
     private HashMap<JCheckBox, Extension<?>> map;
@@ -40,7 +42,6 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
         setSubHeaderText("Settings will be applied on next restart");
         lblSubhead.setIcon(IconFactory.WARNING_INCOMPLETE.get());
         lblSubhead.setBackground(Color.orange.darker());
-
 
         JLabel lblExplainExperimental =
             new JLabel("<html>The flask marks extensions " + "that are only available, <br>"

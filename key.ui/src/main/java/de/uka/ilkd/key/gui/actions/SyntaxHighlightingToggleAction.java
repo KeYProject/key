@@ -12,8 +12,11 @@ import javax.swing.JCheckBoxMenuItem;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.settings.ViewSettings.SYNTAX_HIGHLIGHTING;
 
+@NullMarked
 public class SyntaxHighlightingToggleAction extends MainWindowAction {
     private static final long serialVersionUID = 6987252955535709994L;
 

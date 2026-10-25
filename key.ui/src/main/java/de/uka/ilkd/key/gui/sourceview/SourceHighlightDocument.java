@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.sourceview;
 
-
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -12,6 +11,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This document knows about syntax highlighting.
@@ -25,6 +25,7 @@ import javax.swing.text.*;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class SourceHighlightDocument extends DefaultStyledDocument {
 
     /**

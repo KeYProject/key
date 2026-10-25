@@ -19,6 +19,7 @@ import org.key_project.util.java.SwingUtil;
 
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (10.04.19)
  */
+@NullMarked
 public class HelpFacade {
     private static final Logger LOGGER = LoggerFactory.getLogger(HelpFacade.class);
     /**
@@ -105,7 +107,6 @@ public class HelpFacade {
             }
         }
     }
-
 
     /**
      * Opens documentation given for the given class.

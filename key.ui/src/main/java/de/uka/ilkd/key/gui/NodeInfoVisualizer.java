@@ -19,6 +19,8 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * <p>
  * A UI component showing additional information about a {@link Node} in the current {@link Proof}.
@@ -26,6 +28,7 @@ import org.key_project.logic.Name;
  *
  * @author lanzinger
  */
+@NullMarked
 public abstract class NodeInfoVisualizer extends JComponent
         implements Comparable<NodeInfoVisualizer> {
     private static final long serialVersionUID = 4205276651552216532L;

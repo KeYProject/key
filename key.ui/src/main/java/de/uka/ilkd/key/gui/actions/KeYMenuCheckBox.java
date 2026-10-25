@@ -9,11 +9,14 @@ import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class can be used for adding Checkboxes to the menu.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
+@NullMarked
 public abstract class KeYMenuCheckBox extends JCheckBoxMenuItem {
 
     /**

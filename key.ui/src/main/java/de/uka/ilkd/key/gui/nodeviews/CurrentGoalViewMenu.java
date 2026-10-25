@@ -46,6 +46,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * The menu shown by a {@link CurrentGoalViewListener} when the user clicks on a
@@ -53,6 +54,7 @@ import org.jspecify.annotations.NonNull;
  * <p>
  * Shows all {@link Taclet}s that are applicable at a selected position.
  */
+@NullMarked
 public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> {
     private static final String INTRODUCE_AXIOM_TACLET_NAME = "introduceAxiom";
 
@@ -77,7 +79,6 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     private final KeyAction actionFocussedAutoMode = new FocussedRuleApplicationAction();
     private final Comparator<? super TacletApp> sortTacletByName =
         Comparator.comparing(it -> it.taclet().displayName());
-
 
     /**
      * Creates an empty menu.
@@ -709,7 +710,6 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         public EnableAbbreviationAction() {
             setName("Enable abbreviation");
         }
-
 
         @Override
         protected void apply(@NonNull PosInOccurrence occ) {

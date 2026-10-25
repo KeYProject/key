@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.smt;
 
-
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -15,6 +14,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A button consisting of an action component (normal button) and a selection component (dropdown
@@ -31,16 +33,17 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
  * @author Christoph Scheben (2011)
  * @author Alicia Appelhagen (2022)
  */
+@NullMarked
 public class DropdownSelectionButton {
 
     /**
      * The dropdown opening button.
      */
-    private JButton selectionComponent;
+    private @Nullable JButton selectionComponent;
     /**
      * The action starting button.
      */
-    private JButton actionComponent;
+    private @Nullable JButton actionComponent;
     /**
      * The actions that can be selected.
      */
@@ -94,7 +97,7 @@ public class DropdownSelectionButton {
     /**
      * The dropdown menu that opens when clicking the selection button.
      */
-    private JPopupMenu menu;
+    private @Nullable JPopupMenu menu;
 
     /**
      * True iff the next time the selection button's action is carried out it should open the popup
@@ -254,14 +257,13 @@ public class DropdownSelectionButton {
         return false;
     }
 
-
     /**
      * Set the executedAction to be the given one and update the action button. Notify the
      * ChangeListeners of this change.
      *
      * @param item the new executedAction
      */
-    public void setSelectedItem(Action item) {
+    public void setSelectedItem(@Nullable Action item) {
         if (item == null) {
             return;
         }
@@ -376,7 +378,7 @@ public class DropdownSelectionButton {
      * @param maxChoice the maximum amount of actions that can be selected, this is assumed to be at
      *        least 1 (otherwise it is changed to be 1)
      */
-    public void setItems(Action[] it, Function<Action[], Action> reduce, int maxChoice) {
+    public void setItems(@Nullable Action[] it, Function<Action[], Action> reduce, int maxChoice) {
         items = it;
         if (it == null) {
             items = new Action[0];
@@ -663,7 +665,6 @@ public class DropdownSelectionButton {
             }
             super.processMouseEvent(e);
         }
-
 
     }
 

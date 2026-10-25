@@ -19,11 +19,14 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofScriptWorker;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The Class ProofScriptInputAction.
  *
  * @author lanzinger
  */
+@NullMarked
 public class ProofScriptInputAction extends AbstractAction {
 
     private static final long serialVersionUID = -1193756128644859298L;

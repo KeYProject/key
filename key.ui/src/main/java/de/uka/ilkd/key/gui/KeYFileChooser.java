@@ -16,6 +16,9 @@ import de.uka.ilkd.key.core.Main;
 
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Extends the usual Swing file chooser by a bookmark panel and predefined filters. This class is a
  * singleton, the only instance is created lazily and can be obtained via
@@ -28,6 +31,7 @@ import org.key_project.util.java.IOUtil;
  * @author Wolfram Pfeifer: refactoring: extend JFileChooser instead of wrapping it (avoids the need
  *         for delegating many methods)
  */
+@NullMarked
 public final class KeYFileChooser extends JFileChooser {
 
     /** default file filter for loading files */
@@ -94,13 +98,13 @@ public final class KeYFileChooser extends JFileChooser {
     /** The Constant for the home directory. */
     private final static File HOME_DIR = IOUtil.getHomeDirectory();
 
-    private static KeYFileChooser INSTANCE;
+    private static @Nullable KeYFileChooser INSTANCE;
 
     /** indicates whether the dialog is used for saving or loading */
     private boolean saveDialog;
 
     /** this is used to reset the path if the user presses the cancel button */
-    private File resetFile = null;
+    private @Nullable File resetFile = null;
 
     public KeYFileChooser(File initDir) {
         super(initDir);
@@ -162,7 +166,7 @@ public final class KeYFileChooser extends JFileChooser {
     }
 
     @Override
-    public void setDialogTitle(String title) {
+    public void setDialogTitle(@Nullable String title) {
         super.setDialogTitle(Objects.requireNonNullElse(title, "Select file to load"));
     }
 
@@ -185,7 +189,8 @@ public final class KeYFileChooser extends JFileChooser {
      * @param extension the desired file name extension (usually ".proof")
      * @return either of {@link #APPROVE_OPTION}, {@link #CANCEL_OPTION}, or {@link #ERROR_OPTION}
      */
-    public int showSaveDialog(Component parent, File originalFile, String extension) {
+    public int showSaveDialog(Component parent, @Nullable File originalFile,
+            @Nullable String extension) {
         File selectedFile;
         if (originalFile == null) {
             selectedFile = getCurrentDirectory();
@@ -220,7 +225,6 @@ public final class KeYFileChooser extends JFileChooser {
             resetFile = selectedFile;
         }
 
-
         setSelectedFile(resetFile);
         setSaveDialog(true);
 
@@ -234,7 +238,7 @@ public final class KeYFileChooser extends JFileChooser {
      * @param selectedFile the file or directory that shall be currently selected
      * @return either of {@link #APPROVE_OPTION}, {@link #CANCEL_OPTION}, or {@link #ERROR_OPTION}
      */
-    public int showSaveDialog(Component parent, File selectedFile) {
+    public int showSaveDialog(Component parent, @Nullable File selectedFile) {
         if (selectedFile != null) {
             if (selectedFile.isDirectory()) {
                 setSelectedFile(null);

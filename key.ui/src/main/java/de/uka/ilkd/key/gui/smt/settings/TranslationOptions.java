@@ -13,10 +13,14 @@ import de.uka.ilkd.key.gui.settings.SettingsPanel;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
+@NullMarked
 class TranslationOptions extends SettingsPanel implements SettingsProvider {
     private static final long serialVersionUID = 7299370317491756605L;
     private static final String infoUseExplicitTypeHierarchy =
@@ -75,8 +79,7 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
     private final JCheckBox useConstantsForIntegers;
     private final JSpinner minField;
     private final JSpinner maxField;
-    private ProofDependentSMTSettings settings;
-
+    private @Nullable ProofDependentSMTSettings settings;
 
     public TranslationOptions() {
         setHeaderText(getDescription());
@@ -91,7 +94,7 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
 
     }
 
-    public void setSmtSettings(ProofDependentSMTSettings settings) {
+    public void setSmtSettings(@Nullable ProofDependentSMTSettings settings) {
         this.settings = settings;
         if (settings == null) {
             setEnabled(false);
@@ -105,7 +108,6 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
             maxField.setValue(settings.getMaxInteger());
         }
     }
-
 
     protected JCheckBox createUseExplicitTypeHierachy() {
         return addCheckBox("Use an explicit type hierarchy.", infoUseExplicitTypeHierarchy, false,

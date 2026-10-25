@@ -19,9 +19,12 @@ import de.uka.ilkd.key.speclang.HeapContext;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Interactive completion for {@link BlockContractExternalBuiltInRuleApp}.
  */
+@NullMarked
 public class BlockContractExternalCompletion implements InteractiveRuleApplicationCompletion {
 
     private final MainWindow mainWindow;

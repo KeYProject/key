@@ -13,12 +13,16 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * User action that modifies the proof in some way.
  * On undo: prunes proof to previous collection of open goals, selects previously active node.
  *
  * @author Arne Keller
  */
+@NullMarked
 public abstract class ProofModifyingUserAction extends UserAction {
     /**
      * The open goals of the proof, before the user action is applied.
@@ -28,7 +32,7 @@ public abstract class ProofModifyingUserAction extends UserAction {
     /**
      * The node selected before the user action is performed.
      */
-    private final Node originalSelection;
+    private final @Nullable Node originalSelection;
 
     /**
      * Save the current state of the proof.

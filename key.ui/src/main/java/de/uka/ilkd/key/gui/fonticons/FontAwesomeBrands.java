@@ -7,10 +7,14 @@ package de.uka.ilkd.key.gui.fonticons;
 import java.awt.*;
 import java.io.IOException;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Alexander Weigl
  * @version 1 (22.07.19)
  */
+@NullMarked
 public enum FontAwesomeBrands implements IconFont {
     _500PX('\uf26e'), ACCESSIBLE_ICON('\uf368'), ACCUSOFT('\uf369'),
     ACQUISITIONS_INCORPORATED('\uf6af'), ADN('\uf170'), ADOBE('\uf778'), ADVERSAL('\uf36a'),
@@ -117,7 +121,7 @@ public enum FontAwesomeBrands implements IconFont {
     YANDEX_INTERNATIONAL('\uf414'), YARN('\uf7e3'), YELP('\uf1e9'), YOAST('\uf2b1'),
     YOUTUBE('\uf167'), YOUTUBE_SQUARE('\uf431'), ZHIHU('\uf63f');
 
-    private static Font font;
+    private static @Nullable Font font;
     private final char unicode;
 
     FontAwesomeBrands(char c) {

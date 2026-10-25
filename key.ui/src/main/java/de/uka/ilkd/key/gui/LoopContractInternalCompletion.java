@@ -19,9 +19,12 @@ import de.uka.ilkd.key.speclang.LoopContract;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Interactive completion for {@link LoopContractInternalBuiltInRuleApp}.
  */
+@NullMarked
 public class LoopContractInternalCompletion implements InteractiveRuleApplicationCompletion {
 
     private final MainWindow mainWindow;

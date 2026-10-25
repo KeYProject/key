@@ -19,10 +19,13 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * this class extends JMenuItem. The objective is to store the Taclet of each item in the item for
  * easier access to the Taclet if the item has been selected
  */
+@NullMarked
 class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     @Serial
     private static final long serialVersionUID = -5537139155045230424L;

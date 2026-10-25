@@ -14,6 +14,7 @@ import javax.swing.tree.MutableTreeNode;
 import de.uka.ilkd.key.gui.smt.OptionContentNode;
 import de.uka.ilkd.key.settings.*;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A swing model for {@link ShowActiveSettingsAction}.
@@ -21,6 +22,7 @@ import de.uka.ilkd.key.settings.*;
  * @author Mihai Herda, 2018
  */
 
+@NullMarked
 public class SettingsTreeModel extends DefaultTreeModel {
     private final ProofSettings proofSettings;
     private final ProofIndependentSettings independentSettings;
@@ -60,7 +62,6 @@ public class SettingsTreeModel extends DefaultTreeModel {
         setRoot(root);
     }
 
-
     public JComponent getStartComponent() {
         return generateScrollPane("Here are all settings.");
     }
@@ -80,7 +81,6 @@ public class SettingsTreeModel extends DefaultTreeModel {
         configurationTable(node, c);
         return node;
     }
-
 
     private JComponent generateScrollPane(String text) {
         JTextArea ta = new JTextArea(5, 20);
@@ -127,7 +127,6 @@ public class SettingsTreeModel extends DefaultTreeModel {
             configurationTable(parent, value);
         }
     }
-
 
     private OptionContentNode generateOptionContentNode(String title, String text) {
         return new OptionContentNode(title, generateScrollPane(text));

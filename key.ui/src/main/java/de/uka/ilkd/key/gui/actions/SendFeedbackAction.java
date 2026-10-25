@@ -41,6 +41,7 @@ import org.key_project.util.Streams;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.parsing.Location;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +56,7 @@ import org.slf4j.LoggerFactory;
  * @author Kai Wallisch, Mattias Ulbrich
  *
  */
+@NullMarked
 public class SendFeedbackAction extends AbstractAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SendFeedbackAction.class);
 
@@ -310,7 +312,6 @@ public class SendFeedbackAction extends AbstractAction {
         }
     }
 
-
     private static class JavaSourceItem extends SendFeedbackItem {
         public JavaSourceItem() {
             super("Send Java source");
@@ -351,7 +352,6 @@ public class SendFeedbackAction extends AbstractAction {
             }
         }
     }
-
 
     private void saveZIP(String message) {
         try {
@@ -425,7 +425,6 @@ public class SendFeedbackAction extends AbstractAction {
         }
     }
 
-
     private void saveMetaDataToFile(File zipFile, String message) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(zipFile)) {
             saveMetaData(fos, message);
@@ -451,14 +450,14 @@ public class SendFeedbackAction extends AbstractAction {
         new LastLoadedProblemItem(), new VersionItem(), new SystemPropertiesItem(),
         new OpenGoalItem(), new OpenProofItem(), new SettingsItem(), new JavaSourceItem() };
 
-    private final Throwable throwable;
+    private final @Nullable Throwable throwable;
     private final Window parent;
 
     public SendFeedbackAction(final Window parent) {
         this(parent, null);
     }
 
-    public SendFeedbackAction(final Window parent, final Throwable exception) {
+    public SendFeedbackAction(final Window parent, final @Nullable Throwable exception) {
         this.parent = parent;
         putValue(NAME, "Send feedback...");
         this.throwable = exception;

@@ -28,6 +28,8 @@ import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +45,7 @@ import org.slf4j.LoggerFactory;
 @KeYGuiExtension.Info(name = "Java Compiler Check", optional = true,
     description = "Checks the loaded Java files for problems with Javac",
     experimental = false)
+@NullMarked
 public class JavacExtension
         implements KeYGuiExtension, KeYGuiExtension.StatusLine, KeYGuiExtension.Startup,
         KeYSelectionListener, KeYGuiExtension.Settings {
@@ -96,7 +99,7 @@ public class JavacExtension
      */
     private final JButton lblStatus = new JButton("Javac");
 
-    private KeYMediator mediator;
+    private @Nullable KeYMediator mediator;
 
     /**
      * Initialize the extension. Adds interactivity to the {@link #lblStatus}.
@@ -128,7 +131,7 @@ public class JavacExtension
         });
     }
 
-    private void loadProof(Proof selectedProof) throws RuntimeException {
+    private void loadProof(@Nullable Proof selectedProof) throws RuntimeException {
         try {
             if (selectedProof != null) {
                 JavacData data = selectedProof.getUserData().get(JavacData.class);
@@ -181,7 +184,7 @@ public class JavacExtension
      *
      * @param data data to use
      */
-    private void updateLabel(JavacData data) {
+    private void updateLabel(@Nullable JavacData data) {
         if (data == null || data.issues == null) {
             lblStatus.setText("Javac");
             lblStatus.setIcon(null);
@@ -248,10 +251,12 @@ public class JavacExtension
  *
  * @author Alexander Weigl
  */
+@NullMarked
 class JavacData {
     /**
      * The diagnostics emitted by the compiler.
      */
+    @Nullable
     List<PositionedIssueString> issues = null;
     /**
      * True if there was no Java source file to compile.

@@ -7,10 +7,13 @@ package de.uka.ilkd.key.gui.smt;
 import javax.swing.JComponent;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Mihai Herda, 2018
  */
 
+@NullMarked
 public class OptionContentNode extends DefaultMutableTreeNode {
     private static final long serialVersionUID = 1L;
     private final JComponent component;

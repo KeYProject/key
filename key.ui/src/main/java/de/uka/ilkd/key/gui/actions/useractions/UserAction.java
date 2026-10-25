@@ -10,6 +10,8 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Abstract concept of an action performed by the user.
  * Has a name and may be applied or undone.
@@ -17,6 +19,7 @@ import de.uka.ilkd.key.proof.Proof;
  *
  * @author Arne Keller
  */
+@NullMarked
 public abstract class UserAction extends KeyAction {
     /**
      * KeY mediator. Used to register the execution of this user action.

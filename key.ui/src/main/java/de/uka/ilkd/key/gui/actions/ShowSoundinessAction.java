@@ -10,12 +10,15 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.soundiness.SoundinessDialog;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Action to show the soundiness report for the currently selected proof.
  *
  * @author opencode
  * @since 3.0
  */
+@NullMarked
 public class ShowSoundinessAction extends MainWindowAction {
 
     private static final long serialVersionUID = 1L;

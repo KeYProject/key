@@ -17,10 +17,13 @@ import de.uka.ilkd.key.util.Levensthein;
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.Semisequent;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Alexander Weigl
  * @version 1 (24.05.19)
  */
+@NullMarked
 public class ProofDifference {
     private static final Integer THRESHOLD = 25;
     private List<String> leftAntec = new LinkedList<>(), rightAntec = new LinkedList<>(),

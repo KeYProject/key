@@ -9,11 +9,14 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import javax.swing.JPanel;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Creates the layout for SequentViews.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
+@NullMarked
 class SequentViewPanel extends JPanel {
 
     private static final long serialVersionUID = -4052156449188977483L;

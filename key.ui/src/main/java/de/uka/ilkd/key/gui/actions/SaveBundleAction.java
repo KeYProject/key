@@ -14,12 +14,15 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Saves the currently selected proof as a zip archive with file extension "zproof". The bundle
  * contains all files needed to successfully reload the proof.
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public final class SaveBundleAction extends MainWindowAction {
 
     private static final long serialVersionUID = 5275664295885839738L;

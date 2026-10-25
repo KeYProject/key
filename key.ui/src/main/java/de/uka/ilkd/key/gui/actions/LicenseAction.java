@@ -16,6 +16,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Shows the license dialog.
  * <p>
@@ -23,6 +25,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
  *
  * @author weigl
  */
+@NullMarked
 public class LicenseAction extends MainWindowAction {
     public static final String KEY_FALLBACK =
         (KeYConstants.COPYRIGHT + "\nKeY is protected by the "

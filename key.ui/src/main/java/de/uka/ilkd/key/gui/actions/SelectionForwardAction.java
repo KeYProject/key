@@ -11,11 +11,14 @@ import de.uka.ilkd.key.gui.SelectionHistory;
 import de.uka.ilkd.key.gui.SelectionHistoryChangeListener;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Action to navigate forward in proof node selection history.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class SelectionForwardAction extends MainWindowAction
         implements SelectionHistoryChangeListener {
     /**

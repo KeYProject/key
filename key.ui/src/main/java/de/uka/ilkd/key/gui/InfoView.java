@@ -54,7 +54,6 @@ import org.key_project.prover.rules.RuleApp;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -71,14 +70,12 @@ public class InfoView extends JSplitPane implements TabPanel {
     public static final Icon INFO_ICON =
         IconFactory.INFO_VIEW.get(MainWindow.TAB_ICON_SIZE);
 
-
     private final JTree infoTree = new JTree();
     private final JTextPane contentPane = createInfoArea();
     private final ProofDisposedListener proofDisposedListener;
     private final InfoNodeFactory nodeFactory = new InfoNodeFactory();
 
     private LexerHighlighter lexerHighlighter = new LexerHighlighter.KeYLexerHighlighter();
-
 
     private final KeYSelectionListener selectionListener = new KeYSelectionListener() {
         @Override
@@ -126,7 +123,6 @@ public class InfoView extends JSplitPane implements TabPanel {
 
         // Setting a name for this causes PreferenceSaver to include this class.
         setName("infoViewPane");
-
 
         InfoNodeFactory.InfoTreeNode root = nodeFactory.create("No proof loaded",
             () -> "In this pane, the available logical rules will be displayed and/or explained.",
@@ -229,7 +225,6 @@ public class InfoView extends JSplitPane implements TabPanel {
         mediator = m;
     }
 
-
     @Override
     public String getTitle() {
         return "Info";
@@ -270,7 +265,6 @@ public class InfoView extends JSplitPane implements TabPanel {
         return description;
     }
 
-
     public static class InfoNodeFactory {
         private static final String LEMMAS = "Lemmas";
         private static final String TACLET_BASE = "Taclet Base";
@@ -280,7 +274,6 @@ public class InfoView extends JSplitPane implements TabPanel {
                 + "in the category.";
         private static final String DEFAULT_FUNCTIONS_LABEL =
             "Display descriptions for documented interpreted function and predicate symbols.";
-
 
         private InfoTreeNode createInfoTreeRoot(Goal g) {
             return create("This is the root node of InfoTreeModel.It should not be visible.",
@@ -329,7 +322,7 @@ public class InfoView extends JSplitPane implements TabPanel {
         }
 
         private InfoTreeNode createNodePS(MetaSpace docs,
-                @MonotonicNonNull Collection<ParametricSortDecl> sorts) {
+                Collection<ParametricSortDecl> sorts) {
             return create("Parametric Sorts", () -> "",
                 () -> sorts.stream().map(element -> create(element.name().toString(),
                     () -> "%s\n\n---\nparams:%s\n\n---\nextends: %s\n\n---\n".formatted(
@@ -516,7 +509,6 @@ public class InfoView extends JSplitPane implements TabPanel {
                             () -> "" + docs.findDocumentation(it), List::of))
                         .toList());
         }
-
 
         private InfoTreeNode create(Taclet taclet, MetaSpace metaSpace) {
             return create(taclet.name().toString(),

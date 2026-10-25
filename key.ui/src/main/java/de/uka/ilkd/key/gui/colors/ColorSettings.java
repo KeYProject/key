@@ -19,6 +19,7 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,13 +32,13 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (10.05.19)
  */
+@NullMarked
 public class ColorSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
 
     public static final Path SETTINGS_FILE_NEW = PathConfig.getSettingsFile("colors.json");
 
-
-    private static ColorSettings INSTANCE;
+    private static @Nullable ColorSettings INSTANCE;
     private final Map<String, Object> properties = new TreeMap<>();
     private final List<ColorProperty> propertyEntries = new ArrayList<>(64);
 
@@ -164,7 +165,6 @@ public class ColorSettings {
 
         private Color lightValue;
         private Color darkValue;
-
 
         public ColorProperty(String key, String description, Color defaultValue) {
             this(key, description, defaultValue, defaultValue);

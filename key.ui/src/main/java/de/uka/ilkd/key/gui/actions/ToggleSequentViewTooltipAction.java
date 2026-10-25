@@ -13,6 +13,8 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Toggles the tooltips on the sequent view.
  *
@@ -20,6 +22,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
  *
  * @see SequentView#getToolTipText()
  */
+@NullMarked
 public class ToggleSequentViewTooltipAction extends MainWindowAction {
     /** This action's name. */
     public static final String NAME = "Show Tooltips in Sequent View";

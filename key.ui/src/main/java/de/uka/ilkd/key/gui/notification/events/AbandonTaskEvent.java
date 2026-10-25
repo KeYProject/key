@@ -6,11 +6,14 @@ package de.uka.ilkd.key.gui.notification.events;
 
 import de.uka.ilkd.key.gui.notification.NotificationEventID;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Emitted after removing a proof task
  *
  * @author bubel
  */
+@NullMarked
 public class AbandonTaskEvent extends NotificationEvent {
 
     /**

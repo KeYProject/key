@@ -21,6 +21,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
 /**
@@ -47,8 +50,8 @@ import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
  *
  * @author mattias ulbrich
  */
+@NullMarked
 public class ProofMacroMenu extends JMenu {
-
 
     private static final long serialVersionUID = -5946657022043894399L;
 
@@ -77,7 +80,7 @@ public class ProofMacroMenu extends JMenu {
      * @param posInOcc the pos in occurrence, can be <code>null</code> if not available.
      */
     public ProofMacroMenu(KeYMediator mediator,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         super("Strategy Macros");
 
         // Macros are grouped according to their category.
@@ -138,7 +141,7 @@ public class ProofMacroMenu extends JMenu {
     }
 
     private static JMenuItem createMenuItem(final ProofMacro macro, final KeYMediator mediator,
-            final PosInOccurrence posInOcc) {
+            final @Nullable PosInOccurrence posInOcc) {
 
         JMenuItem menuItem = new JMenuItem(macro.getName());
         menuItem.setToolTipText(macro.getDescription());

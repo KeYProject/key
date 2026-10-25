@@ -10,9 +10,12 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Saves the current selected proof.
  */
+@NullMarked
 public final class SaveFileAction extends MainWindowAction {
 
     /**

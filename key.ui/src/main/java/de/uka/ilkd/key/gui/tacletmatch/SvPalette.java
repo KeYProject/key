@@ -8,6 +8,8 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Stable colour assignment for schema variables shared across the taclet-match dialog panels, so a
  * variable carries the same colour in the match overview, the instantiation panel and (later) the
@@ -17,6 +19,7 @@ import javax.swing.border.EmptyBorder;
  * The colours are fixed light chip backgrounds with dark text (highlighter style), readable on both
  * light and dark look-and-feels; theming them to the active L&amp;F is left for later.
  */
+@NullMarked
 public final class SvPalette {
 
     private static final int[] BG =

@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.ui;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public interface Verbosity {
     int SILENT = 0;
     int NORMAL = 1;

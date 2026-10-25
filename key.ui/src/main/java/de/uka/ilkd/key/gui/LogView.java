@@ -27,6 +27,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
  * @version 1 (1/5/22)
  */
 @KeYGuiExtension.Info(experimental = false, name = "Log View")
+@NullMarked
 public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
     private static final Logger LOGGER = LoggerFactory.getLogger(LogView.class);
 
@@ -83,7 +85,6 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
             }
         }
     }
-
 
     private static class ShowLogAction extends KeyAction {
         public ShowLogAction() {
@@ -215,7 +216,6 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
             txtMessageSearch.addActionListener(update);
             txtPackageSearch.addActionListener(update);
         }
-
 
         public void refresh() {
             if (pause) {

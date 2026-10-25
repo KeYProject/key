@@ -25,6 +25,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -33,6 +34,7 @@ import org.jspecify.annotations.Nullable;
  * @author Alexander Weigl
  * @version 1 (07.02.19)
  */
+@NullMarked
 public final class KeYGuiExtensionFacade {
     private static final Set<String> forbiddenPlugins = new HashSet<>();
     private static List<Extension<?>> extensions = new LinkedList<>();
@@ -159,7 +161,7 @@ public final class KeYGuiExtensionFacade {
         return defaultMenu;
     }
 
-    private static JMenu findMenu(JPopupMenu menu, Iterator<String> mpath) {
+    private static @Nullable JMenu findMenu(JPopupMenu menu, Iterator<String> mpath) {
         if (mpath.hasNext()) {
             String cur = mpath.next();
             Component[] children = menu.getComponents();
@@ -340,7 +342,6 @@ public final class KeYGuiExtensionFacade {
         return getExtensionInstances(KeYGuiExtension.Startup.class);
     }
 
-
     // region keyboard shortcuts
     public static List<KeYGuiExtension.KeyboardShortcuts> getKeyboardShortcutsExtensions() {
         return getExtensionInstances(KeYGuiExtension.KeyboardShortcuts.class);
@@ -398,7 +399,6 @@ public final class KeYGuiExtensionFacade {
                 .collect(Collectors.toList());
     }
     // endregion
-
 
     public static Stream<String> getTermInfoStrings(MainWindow mainWindow, PosInSequent mousePos) {
         return getExtensionInstances(KeYGuiExtension.TermInfo.class).stream()

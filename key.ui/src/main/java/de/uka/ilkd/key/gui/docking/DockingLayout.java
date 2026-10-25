@@ -31,6 +31,7 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.util.IconManager;
 import bibliothek.gui.dock.util.Priority;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +43,7 @@ import org.slf4j.LoggerFactory;
  */
 @KeYGuiExtension.Info(name = "Docking Helpers", optional = false, experimental = false,
     priority = 1)
+@NullMarked
 public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Startup,
         KeYGuiExtension.MainMenu {
     private static final Logger LOGGER = LoggerFactory.getLogger(DockingLayout.class);
@@ -155,6 +157,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
 }
 
 
+@NullMarked
 final class SaveLayoutAction extends MainWindowAction {
     private static final long serialVersionUID = -2646217961498111734L;
     private final String layoutName;
@@ -180,6 +183,7 @@ final class SaveLayoutAction extends MainWindowAction {
 }
 
 
+@NullMarked
 final class LoadLayoutAction extends MainWindowAction {
     private static final long serialVersionUID = 3378477658914832831L;
     private final String layoutName;
@@ -210,6 +214,7 @@ final class LoadLayoutAction extends MainWindowAction {
 }
 
 
+@NullMarked
 final class ResetLayoutAction extends MainWindowAction {
     private static final long serialVersionUID = 8772915552504055750L;
 

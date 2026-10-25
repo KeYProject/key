@@ -43,6 +43,8 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +54,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public class AbstractionPredicatesChoiceDialog extends JDialog {
     private static final String AVAILABLE_PROGRAM_VARIABLES_DESCR = "Available Program Variables: ";
     private static final long serialVersionUID = 1L;
@@ -65,10 +68,10 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(AbstractionPredicatesChoiceDialog.class);
 
-    private Goal goal = null;
+    private @Nullable Goal goal = null;
 
-    private ArrayList<Pair<Sort, Name>> registeredPlaceholders = new ArrayList<>();
-    private ArrayList<AbstractionPredicate> registeredPredicates = new ArrayList<>();
+    private @Nullable ArrayList<Pair<Sort, Name>> registeredPlaceholders = new ArrayList<>();
+    private @Nullable ArrayList<AbstractionPredicate> registeredPredicates = new ArrayList<>();
     private final ArrayList<AbstractDomainElemChoice> abstrPredicateChoices = new ArrayList<>();
 
     private Class<? extends AbstractPredicateAbstractionLattice> latticeType =
@@ -82,7 +85,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     /**
      * @return The abstraction predicates set by the user. Is null iff the user pressed cancel.
      */
-    private ArrayList<AbstractionPredicate> getRegisteredPredicates() {
+    private @Nullable ArrayList<AbstractionPredicate> getRegisteredPredicates() {
         return registeredPredicates;
     }
 
@@ -506,7 +509,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @return A String representation of the given abstraction predicate.
      */
     private String abstrPredToStringRepr(
-            Optional<AbstractPredicateAbstractionDomainElement> domElem) {
+            @Nullable Optional<AbstractPredicateAbstractionDomainElement> domElem) {
         if (domElem == null) {
             return "";
         }
@@ -555,7 +558,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     // /////// STATIC METHODS ////// //
     // ///////////////////////////// //
 
-    private static URL getURLForResourceFile(Class<?> cl, String filename) {
+    private static @Nullable URL getURLForResourceFile(Class<?> cl, String filename) {
         URL url = cl.getResource(filename);
         LOGGER.debug("Load Resource:" + filename + " of class " + cl);
         if (url == null && cl.getSuperclass() != null) {
@@ -590,12 +593,12 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @author Dominic Steinhoefel
      */
     static class Result {
-        private final ArrayList<AbstractionPredicate> registeredPredicates;
+        private final @Nullable ArrayList<AbstractionPredicate> registeredPredicates;
         private final Class<? extends AbstractPredicateAbstractionLattice> latticeType;
         private final LinkedHashMap<ProgramVariable, AbstractDomainElement> abstractDomElemUserChoices =
             new LinkedHashMap<>();
 
-        public Result(ArrayList<AbstractionPredicate> registeredPredicates,
+        public Result(@Nullable ArrayList<AbstractionPredicate> registeredPredicates,
                 Class<? extends AbstractPredicateAbstractionLattice> latticeType,
                 List<AbstractDomainElemChoice> userChoices) {
             this.registeredPredicates = registeredPredicates;
@@ -612,7 +615,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         /**
          * @return The abstraction predicates set by the user. Is null iff the user pressed cancel.
          */
-        public ArrayList<AbstractionPredicate> getRegisteredPredicates() {
+        public @Nullable ArrayList<AbstractionPredicate> getRegisteredPredicates() {
             return registeredPredicates;
         }
 
@@ -785,7 +788,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @param proofFileName The file name of the proof file to load.
      * @return The loaded proof.
      */
-    static de.uka.ilkd.key.proof.Proof loadProof(String proofFileName) {
+    static de.uka.ilkd.key.proof.@Nullable Proof loadProof(String proofFileName) {
         Path proofFile = Paths.get("examples/", proofFileName);
 
         try {

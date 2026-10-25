@@ -14,11 +14,15 @@ import javax.swing.text.PlainDocument;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @deprecated weigl, 2019-05-10: integrated into the
  *             {@link de.uka.ilkd.key.gui.settings.StandardUISettings}
  */
 @Deprecated
+@NullMarked
 public class ViewSelector extends JDialog {
 
     /**
@@ -41,11 +45,9 @@ public class ViewSelector extends JDialog {
         setLocationRelativeTo(parent);
     }
 
-
     private void updateButtons() {
 
     }
-
 
     /** lays out the selector */
     protected void layoutViewSelector() {
@@ -151,8 +153,6 @@ public class ViewSelector extends JDialog {
 
     }
 
-
-
     // INNER CLASS TO READ ONLY NUMBERS FOR MAX APPs
     static class NumberDocument extends PlainDocument {
 
@@ -161,7 +161,8 @@ public class ViewSelector extends JDialog {
          */
         private static final long serialVersionUID = -5423315366275141764L;
 
-        public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+        public void insertString(int offs, @Nullable String str, AttributeSet a)
+                throws BadLocationException {
             if (str == null) {
                 return;
             }
@@ -191,7 +192,5 @@ public class ViewSelector extends JDialog {
             return new NumberDocument();
         }
     }
-
-
 
 }

@@ -44,9 +44,12 @@ import de.uka.ilkd.key.proof.ModelEvent;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(TacletMatchCompletionDialog.class);
 
@@ -117,7 +120,6 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             }
         }
     }
-
 
     /**
      * update the status by the current model element.
@@ -256,7 +258,6 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         }
     }
 
-
     /**
      * save the preferences of this window prior to closing it.
      */
@@ -268,13 +269,10 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         super.closeDlg();
     }
 
-
     class ButtonListener implements ActionListener {
-
 
         public ButtonListener() {
         }
-
 
         private void errorPositionKnown(String errorMessage, int row, int col,
                 boolean inIfSequent) {
@@ -306,7 +304,6 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                 ed.requestFocus();
             }
         }
-
 
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == cancelButton) {
@@ -364,7 +361,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
          * if-sequent or a manual entered instantiation. The value is null if and only if the taclet
          * has no if-sequent
          */
-        private TacletIfSelectionDialog ifSelectionPanel;
+        private @Nullable TacletIfSelectionDialog ifSelectionPanel;
 
         private DataTable(TacletMatchCompletionDialog owner, int modelNr, KeYMediator mediator) {
 
@@ -377,7 +374,6 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
             // And now the Drag'n'drop stuff ...
             DropTarget aDropTarget = new DropTarget(this, new DropTargetListener() {
-
 
                 public void dragEnter(DropTargetDragEvent event) {}
 
@@ -451,18 +447,15 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                 public void dropActionChanged(DropTargetDragEvent dtde) {}
             });
 
-
             this.setDropTarget(aDropTarget);
             new TableRowResizer(this);
 
         } // end constructor
 
-
         /** Provide sane single-click editing in table */
         public javax.swing.table.TableCellEditor getCellEditor(int row, int col) {
             return iEditor;
         }
-
 
         public TableCellRenderer getCellRenderer(int row, int col) {
             return iRenderer;
@@ -491,7 +484,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
          *
          * @return the if selection panel, null if not available
          */
-        private TacletIfSelectionDialog getIfSelectionPanel() {
+        private @Nullable TacletIfSelectionDialog getIfSelectionPanel() {
             return ifSelectionPanel;
         }
 
@@ -593,7 +586,6 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                         if (transferable.isDataFlavorSupported(
                             PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER)) {
 
-
                             try {
                                 event.acceptDrop(DnDConstants.ACTION_MOVE);
                                 PosInSequent pis = (PosInSequent) transferable.getTransferData(
@@ -615,8 +607,6 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                 event.rejectDrop();
                             }
 
-
-
                         } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                             event.acceptDrop(DnDConstants.ACTION_MOVE);
                             try {
@@ -634,8 +624,6 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                         }
 
                     }
-
-
 
                     public void dropActionChanged(DropTargetDragEvent dtde) {}
                 });
@@ -665,7 +653,6 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             public void requestFocus() {
                 textarea.requestFocus();
             }
-
 
             public Component getTableCellEditorComponent(JTable table, Object value,
                     boolean isSelected, int row, int column) {

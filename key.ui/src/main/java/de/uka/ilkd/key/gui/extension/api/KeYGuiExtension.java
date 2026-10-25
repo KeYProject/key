@@ -25,8 +25,8 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.settings.Configuration;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A marker interface for extension of the KeY GUI. Every extension should implement this interface

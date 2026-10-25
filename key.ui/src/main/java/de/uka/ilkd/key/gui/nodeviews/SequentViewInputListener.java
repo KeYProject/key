@@ -34,6 +34,8 @@ import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
+@NullMarked
 public class SequentViewInputListener implements MouseMotionListener, MouseListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(SequentViewInputListener.class);
 
@@ -157,7 +160,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
      *
      * @param pos the position of the term whose origin should be highlighted.
      */
-    public void highlightOriginInSourceView(PosInSequent pos) {
+    public void highlightOriginInSourceView(@Nullable PosInSequent pos) {
         if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHighlightOrigin()) {
             // Don't highlight anything and delete existing highlights.
             pos = null;

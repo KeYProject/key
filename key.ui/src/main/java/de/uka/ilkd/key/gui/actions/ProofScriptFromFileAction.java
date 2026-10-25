@@ -18,6 +18,8 @@ import de.uka.ilkd.key.gui.ProofScriptWorker;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,13 +28,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class ProofScriptFromFileAction extends AbstractAction {
     private static final long serialVersionUID = -3181592516055470032L;
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptFromFileAction.class);
 
     private final KeYMediator mediator;
 
-    private static Path lastDirectory;
+    private static @Nullable Path lastDirectory;
 
     /**
      * Instantiates a new proof script from file action.

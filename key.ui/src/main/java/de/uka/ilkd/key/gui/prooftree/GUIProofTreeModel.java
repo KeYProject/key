@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.*;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,13 +38,14 @@ import org.slf4j.LoggerFactory;
  * (There is also one at the root.)
  */
 
+@NullMarked
 public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(GUIProofTreeModel.class);
 
     private static final long serialVersionUID = 4253914848471158358L;
     private @Nullable Proof proof;
     private final ProofTreeListener proofTreeListener;
-    private NodeFilter activeNodeFilter = null;
+    private @Nullable NodeFilter activeNodeFilter = null;
 
     private final EventListenerList listenerList = new EventListenerList();
 
@@ -108,7 +110,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
 
     class ProofTreeListener extends ProofTreeAdapter {
 
-        private Node pruningInProcess;
+        private @Nullable Node pruningInProcess;
 
         @Override
         public void proofStructureChanged(ProofTreeEvent e) {
@@ -166,7 +168,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * tree is updated automatically after this is set to false.
      */
     public synchronized void setBatchGoalStateChange(boolean value,
-            Collection<Node> nodesToUpdate) {
+            @Nullable Collection<Node> nodesToUpdate) {
         if (!value && batchGoalStateChange) {
             if (nodesToUpdate == null || nodesToUpdate.isEmpty()) {
                 updateTree((GUIAbstractTreeNode) null);
@@ -200,7 +202,6 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
             proof.addProofTreeListener(proofTreeListener);
         }
     }
-
 
     /**
      * Sets whether this object should respond to changes in the proof immediately.
@@ -259,7 +260,6 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
         return ProofTreeViewFilter.HIDE_CLOSED_SUBTREES.isActive();
     }
 
-
     /**
      *
      * @return whether {@link ProofTreeViewFilter#HIDE_INTERACTIVE_GOALS} is active.
@@ -292,7 +292,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * @param filter the filter
      * @param active whether to activate the filter
      */
-    public synchronized void setFilter(ProofTreeViewFilter filter, boolean active) {
+    public synchronized void setFilter(@Nullable ProofTreeViewFilter filter, boolean active) {
         if (filter == null) {
             if (activeNodeFilter != null) {
                 activeNodeFilter.setActive(false);
@@ -322,7 +322,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * @return the child of {@code parent} at index {@code index}
      */
     @Override
-    public synchronized Object getChild(Object parent, int index) {
+    public synchronized @Nullable Object getChild(Object parent, int index) {
         if (bypassNodeFilter()) {
             TreeNode guiParent = (TreeNode) parent;
             if (guiParent.getChildCount() > index) {
@@ -422,7 +422,6 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
         }
     }
 
-
     /**
      * Take the appropriate actions after a change in the Proof. Currently, this means throwing all
      * cached Information away and fire an indiscriminating TreeStructureChanged event. This should
@@ -430,7 +429,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      *
      * @param trn tree node to update.
      */
-    private synchronized void updateTree(GUIAbstractTreeNode trn) {
+    private synchronized void updateTree(@Nullable GUIAbstractTreeNode trn) {
         if (proof == null) {
             return;
         }
@@ -466,7 +465,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
         fireTreeStructureChanged(path);
     }
 
-    public synchronized void updateTree(Node p_node) {
+    public synchronized void updateTree(@Nullable Node p_node) {
         if (p_node == null) {
             updateTree((GUIAbstractTreeNode) null);
         } else {
@@ -543,7 +542,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * Return the GUIProofTreeNode corresponding to node n, if one has already been generated, and
      * null otherwise.
      */
-    public GUIAbstractTreeNode find(Node n) {
+    public @Nullable GUIAbstractTreeNode find(Node n) {
         return proofTreeNodes.get(n);
     }
 
@@ -563,7 +562,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * Return the GUIBranchNode corresponding to the subtree rooted at n, if one has already been
      * generated, and null otherwise.
      */
-    public GUIBranchNode findBranch(Node n) {
+    public @Nullable GUIBranchNode findBranch(Node n) {
         return branchNodes.get(n);
     }
 
@@ -582,7 +581,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
         }
     }
 
-    public NodeFilter getActiveNodeFilter() {
+    public @Nullable NodeFilter getActiveNodeFilter() {
         return activeNodeFilter;
     }
 

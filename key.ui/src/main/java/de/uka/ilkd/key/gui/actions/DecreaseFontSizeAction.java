@@ -12,6 +12,9 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class DecreaseFontSizeAction extends MainWindowAction implements ConfigChangeListener {
 
     /**

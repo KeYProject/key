@@ -7,6 +7,8 @@ package de.uka.ilkd.key.gui.fonticons;
 import java.awt.*;
 import java.io.IOException;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Copyright (c) 2016 jIconFont <BR>
  * <BR>
@@ -25,6 +27,7 @@ import java.io.IOException;
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+@NullMarked
 public enum Entypo implements IconFont {
     ADDRESS('\uE723'), ADJUST('\u25D1'), AIR('\uE753'), ARCHIVE('\uE738'), ARROW_COMBO('\uE74F'),
     ATTENTION('\u26A0'), BACK_IN_TIME('\uE771'), BASKET('\uE73D'), BEHANCE('\uF34E'),

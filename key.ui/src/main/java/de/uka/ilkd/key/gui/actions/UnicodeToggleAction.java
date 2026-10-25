@@ -15,6 +15,9 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class UnicodeToggleAction extends MainWindowAction {
     private static final long serialVersionUID = 6078839876754730405L;
 

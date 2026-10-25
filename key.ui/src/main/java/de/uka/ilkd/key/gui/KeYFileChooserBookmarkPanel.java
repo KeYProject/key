@@ -19,6 +19,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This is a Panel used as accessory for the JFileChooser.
@@ -31,6 +32,7 @@ import org.jspecify.annotations.NonNull;
  * @author weigl
  * @see ViewSettings#getFolderBookmarks()
  */
+@NullMarked
 public class KeYFileChooserBookmarkPanel extends JPanel {
     private final @NonNull JFileChooser chooser;
 
@@ -39,7 +41,6 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
 
     private final DefaultListModel<File> bookmarks = new DefaultListModel<>();
     private final JList<File> listBookmarks = new JList<>(bookmarks);
-
 
     private final KeyAction actionAddBookmark = new AddBookmarkAction();
     private final KeyAction actionRemoveBookmark = new RemoveBookmarkAction();

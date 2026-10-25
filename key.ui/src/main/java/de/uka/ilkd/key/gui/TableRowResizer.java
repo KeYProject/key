@@ -11,6 +11,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A mouse listener for resizing the height of the JTable rows. Taken from here:
  * https://stackoverflow.com/questions/4387995/adjusting-individual-row-height-using-cursor-on-jtable
@@ -19,6 +21,7 @@ import javax.swing.event.MouseInputAdapter;
  *
  */
 
+@NullMarked
 public class TableRowResizer extends MouseInputAdapter {
     public static final Cursor resizeCursor = Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR);
 

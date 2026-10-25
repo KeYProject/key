@@ -41,11 +41,15 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 
 import org.key_project.prover.engine.TaskStartedInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
 /**
  * Factory for popup menus on proof nodes in the {@link ProofTreeView}.
  */
+@NullMarked
 public final class ProofTreePopupFactory {
     public static final int ICON_SIZE = 16;
     public static final FeatureSettings.Feature FEATURE_DELAY_CUT =
@@ -108,13 +112,10 @@ public final class ProofTreePopupFactory {
 
         initMacroMenu(menu, ctx);
 
-
         final var delayedCut = new DelayedCut(ctx);
         if (FeatureSettings.isFeatureActivated(FEATURE_DELAY_CUT)) {
             menu.add(delayedCut);
         }
-
-
 
         menu.addSeparator();
 
@@ -173,11 +174,14 @@ public final class ProofTreePopupFactory {
      */
 
     public static class ProofTreeContext {
+        @Nullable
         GUIProofTreeModel delegateModel;
         ProofTreeView proofTreeView;
         MainWindow window;
+        @Nullable
         Proof proof;
         KeYMediator mediator;
+        @Nullable
         Node invokedNode;
         TreePath path, branch;
         JTree delegateView;
@@ -516,8 +520,6 @@ public final class ProofTreePopupFactory {
 
         }
     }
-
-
 
     static class RunStrategyOnNode extends ProofTreeAction {
         private static final long serialVersionUID = -7028621462695539683L;

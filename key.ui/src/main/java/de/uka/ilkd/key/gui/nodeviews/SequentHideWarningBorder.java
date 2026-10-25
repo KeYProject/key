@@ -16,6 +16,8 @@ import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A special purpose border that prints a warning window if the search bar filtering removes
  * formulas from the display.
@@ -24,6 +26,7 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class SequentHideWarningBorder extends TitledBorder {
     private static final long serialVersionUID = 5688994897006894795L;
 

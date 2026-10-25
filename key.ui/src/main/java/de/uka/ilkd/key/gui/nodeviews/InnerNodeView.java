@@ -33,12 +33,15 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Sequent view for an inner node.
  */
+@NullMarked
 public final class InnerNodeView extends SequentView implements ProofDisposedListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(InnerNodeView.class);
 
@@ -53,21 +56,20 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
 
     private static final long serialVersionUID = -6542881446084654358L;
 
-
     private InitialPositionTable posTable;
 
     private final InnerNodeViewListener listener;
 
     private JTextPane tacletInfo = new JTextPane();
 
-    private Node node;
-    private final RuleApp ruleApp;
+    private @Nullable Node node;
+    private final @Nullable RuleApp ruleApp;
 
     public InnerNodeView(Node node, MainWindow mainWindow) {
         this(node.proof(), node, node.getAppliedRuleApp(), node.sequent(), mainWindow);
     }
 
-    public InnerNodeView(Proof proof, Node node, RuleApp ruleApp,
+    public InnerNodeView(Proof proof, Node node, @Nullable RuleApp ruleApp,
             Sequent sequent,
             MainWindow mainWindow) {
         super(mainWindow);
@@ -162,7 +164,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
      *         highlighted.
      * @throws BadLocationException
      */
-    private Range highlightPos(PosInOccurrence pos,
+    private @Nullable Range highlightPos(PosInOccurrence pos,
             HighlightPainter light)
             throws BadLocationException {
         ImmutableList<Integer> path = posTable.pathForPosition(pos, getFilter());

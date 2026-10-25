@@ -18,6 +18,7 @@ import java.util.zip.ZipFile;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public final class ProofSelectionDialog extends JDialog {
 
     private static final long serialVersionUID = -586107341789859969L;
@@ -131,8 +133,6 @@ public final class ProofSelectionDialog extends JDialog {
                     .filter(e -> e.getName().endsWith(".proof")).map(e -> Paths.get(e.getName()))
                     .collect(Collectors.toList());
         }
-
-
 
         // show the list in a JList
         DefaultListModel<Path> model = new DefaultListModel<>();

@@ -15,6 +15,8 @@ import javax.swing.text.*;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This document performs syntax highlighting when strings are inserted. However, only inserting the
  * whole String at once is supported, otherwise the syntax highlighting will be faulty.
@@ -25,6 +27,7 @@ import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class JavaDocument extends DefaultStyledDocument {
     // highlighting colors (same as in HTMLSyntaxHighlighter of SequentView for consistency)
     /** highlight color for Java keywords (dark red/violet) */
@@ -327,7 +330,6 @@ public class JavaDocument extends DefaultStyledDocument {
             }
         }
     }
-
 
     private void checkSpaceTab(char c) {
         token += c;

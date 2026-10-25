@@ -53,6 +53,7 @@ import org.key_project.util.collection.Pair;
 import org.key_project.util.java.SwingUtil;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +64,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceControl {
     private static final Logger LOGGER = LoggerFactory.getLogger(WindowUserInterfaceControl.class);
 
@@ -94,7 +96,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             }
         };
     }
-
 
     public void loadProblem(Path file, Consumer<ProblemLoader> configure) {
         ProblemLoader problemLoader = getProblemLoader(file, null, null, null, getMediator());
@@ -176,7 +177,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         SwingUtilities.invokeLater(() -> taskFinishedInternal(info));
     }
 
-    private void taskFinishedInternal(TaskFinishedInfo info) {
+    private void taskFinishedInternal(@Nullable TaskFinishedInfo info) {
         if (info != null && info.getSource() instanceof ProverCore) {
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
@@ -350,7 +351,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     }
 
     @Override
-    public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
+    public @Nullable IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal,
+            boolean forced) {
         if (mainWindow.getMediator().isInAutoMode()) {
             return AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, forced);
         }
@@ -372,14 +374,15 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         return mainWindow.getMediator();
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public AbstractProblemLoader load(Profile profile, Path file, List<Path> classPath,
-            Path bootClassPath, List<Path> includes, Properties poPropertiesToForce,
-            boolean forceNewProfileOfNewProofs, Consumer<Proof> callback)
+    public AbstractProblemLoader load(@Nullable Profile profile, Path file,
+            @Nullable List<Path> classPath,
+            @Nullable Path bootClassPath, @Nullable List<Path> includes,
+            @Nullable Properties poPropertiesToForce,
+            boolean forceNewProfileOfNewProofs, @Nullable Consumer<Proof> callback)
             throws ProblemLoaderException {
         if (file != null) {
             mainWindow.getRecentFiles().addRecentFile(file.toAbsolutePath().toString(), profile,
@@ -404,7 +407,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param fileExtension the respective file extension
      * @return the saved proof as a file
      */
-    public Path saveProof(Proof proof, String fileExtension) {
+    public @Nullable Path saveProof(Proof proof, String fileExtension) {
         final MainWindow mainWindow = MainWindow.getInstance();
         final KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose filename to save proof");
         fc.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
@@ -467,7 +470,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         }
     }
 
-    protected static Pair<Path, String> fileName(Proof proof, String fileExtension) {
+    protected static Pair<Path, String> fileName(@Nullable Proof proof, String fileExtension) {
         // TODO: why do we use GUI components here?
         final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
 
@@ -554,8 +557,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             ((KeYUserProblemFile) poContainer.getProofOblInput()).close();
         }
     }
-
-
 
     /**
      * Loads the given location and returns all required references as {@link KeYEnvironment} with
