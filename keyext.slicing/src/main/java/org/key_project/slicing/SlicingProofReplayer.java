@@ -29,12 +29,16 @@ import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Proof slicer: constructs a new proof based on the original proof by omitting some steps that
  * are not required to complete the proof (as indicated by the provided analysis results).
  *
  * @author Arne Keller
  */
+@NullMarked
 public final class SlicingProofReplayer extends AbstractProofReplayer {
     /**
      * The proof to slice.
@@ -55,7 +59,7 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
     /**
      * Progress monitor, used to report slicing progress. May be null.
      */
-    private final ProgressMonitor progressMonitor;
+    private final @Nullable ProgressMonitor progressMonitor;
 
     /**
      * Construct a new slicing proof replayer.
@@ -66,7 +70,7 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
      * @param progressMonitor progress monitor (may be null)
      */
     private SlicingProofReplayer(Proof originalProof,
-            Proof proof, AnalysisResults results, ProgressMonitor progressMonitor) {
+            Proof proof, AnalysisResults results, @Nullable ProgressMonitor progressMonitor) {
         super(originalProof, proof);
         this.originalProof = originalProof;
         this.proof = proof;
@@ -97,7 +101,7 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
     public static SlicingProofReplayer constructSlicer(ProblemLoaderControl control,
             Proof originalProof,
             AnalysisResults results,
-            ProgressMonitor progressMonitor)
+            @Nullable ProgressMonitor progressMonitor)
             throws Exception {
         boolean loadInUI = MainWindow.hasInstance();
         if (loadInUI) {

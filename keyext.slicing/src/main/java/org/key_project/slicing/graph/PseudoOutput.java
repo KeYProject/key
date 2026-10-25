@@ -6,12 +6,15 @@ package org.key_project.slicing.graph;
 
 import de.uka.ilkd.key.proof.BranchLocation;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Graph node used if a rule application did not produce any outputs.
  * This is required to ensure that all rule application are present in the graph.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class PseudoOutput extends GraphNode {
     /**
      * Construct a new pseudo output node.

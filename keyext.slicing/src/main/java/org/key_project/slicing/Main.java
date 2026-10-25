@@ -24,6 +24,7 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 
 import org.key_project.slicing.analysis.AnalysisResults;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -37,6 +38,7 @@ import picocli.CommandLine.Parameters;
  *
  * @author Arne Keller
  */
+@NullMarked
 public final class Main implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 

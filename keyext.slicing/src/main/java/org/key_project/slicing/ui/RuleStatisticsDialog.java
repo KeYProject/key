@@ -18,11 +18,14 @@ import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.RuleStatistics.RuleStatisticEntry;
 import org.key_project.slicing.analysis.AnalysisResults;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Dialog that displays the results of the dependency analysis algorithm.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class RuleStatisticsDialog extends JDialog {
     /**
      * The rule statistics displayed in this dialog.

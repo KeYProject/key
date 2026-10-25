@@ -12,11 +12,14 @@ import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.slicing.graph.GraphNode;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Context menu action to display the dependency graph "around" a formula.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class ShowGraphAction extends MainWindowAction {
 
     private static final long serialVersionUID = -9022480738622934631L;

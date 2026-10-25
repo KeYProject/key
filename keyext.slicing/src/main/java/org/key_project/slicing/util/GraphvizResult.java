@@ -6,6 +6,9 @@ package org.key_project.slicing.util;
 
 import java.awt.image.BufferedImage;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Result of running an external graph renderer.
  * Either an image or an error.
@@ -14,7 +17,8 @@ import java.awt.image.BufferedImage;
  * @param error The error message.
  * @author Arne Keller
  */
-public record GraphvizResult(BufferedImage image, String error) {
+@NullMarked
+public record GraphvizResult(@Nullable BufferedImage image, @Nullable String error) {
     public GraphvizResult {
         if ((image != null) == (error != null)) {
             throw new IllegalArgumentException("result must either be an image or an error");
@@ -33,7 +37,7 @@ public record GraphvizResult(BufferedImage image, String error) {
      * @param error error text
      * @return new result object with that error attached
      */
-    public static GraphvizResult makeError(String error) {
+    public static GraphvizResult makeError(@Nullable String error) {
         return new GraphvizResult(null, error);
     }
 

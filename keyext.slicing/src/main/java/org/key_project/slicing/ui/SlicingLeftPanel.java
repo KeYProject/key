@@ -50,6 +50,8 @@ import org.key_project.slicing.util.GraphvizDotExecutor;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +61,7 @@ import org.slf4j.LoggerFactory;
  * @author Arne Keller
  */
 @HelpInfo(path = "/user/ProofSlicing/")
+@NullMarked
 public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionListener,
         ProofTreeListener {
     /**
@@ -86,7 +89,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     /**
      * The proof currently shown in the KeY UI.
      */
-    private transient Proof currentProof = null;
+    private transient @Nullable Proof currentProof = null;
     /**
      * "Export as DOT" button.
      */
@@ -399,7 +402,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         new PreviewDialog(MainWindow.getInstance(), text);
     }
 
-    private AnalysisResults analyzeProof() {
+    private @Nullable AnalysisResults analyzeProof() {
         if (currentProof == null) {
             return null;
         }
@@ -487,7 +490,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         timings.removeAll();
     }
 
-    private void displayResults(AnalysisResults results) {
+    private void displayResults(@Nullable AnalysisResults results) {
         if (results == null) {
             resetLabels();
             return;
