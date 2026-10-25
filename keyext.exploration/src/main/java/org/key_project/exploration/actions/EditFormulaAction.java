@@ -7,6 +7,7 @@ package org.key_project.exploration.actions;
 import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -34,6 +35,11 @@ public class EditFormulaAction extends ExplorationAction {
         this(pis, MainWindow.getInstance());
     }
 
+    /**
+     * The setter calls below happen on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public EditFormulaAction(PosInSequent pis, MainWindow mainWindow) {
         super(mainWindow);
         setName("Edit formula");
@@ -51,12 +57,25 @@ public class EditFormulaAction extends ExplorationAction {
             return;
         }
 
-        TermBuilder tb = getMediator().getServices().getTermBuilder();
+        Services services = getMediator().getServices();
+        if (services == null) {
+            throw new NullPointerException("No services available.");
+        }
+        TermBuilder tb = services.getTermBuilder();
         PosInOccurrence pio = posInSeq.getPosInOccurrence();
+        if (pio == null) {
+            throw new NullPointerException("No formula position in the sequent.");
+        }
         JTerm term = (JTerm) pio.subTerm();
         SequentFormula sf = pio.sequentFormula();
         Goal g = getMediator().getSelectedGoal();
+        if (g == null) {
+            throw new NullPointerException("No goal selected.");
+        }
         JTerm newTerm = promptForTerm(mainWindow, term);
+        if (newTerm == null) {
+            throw new NullPointerException("No replacement term entered.");
+        }
 
         if (newTerm.equals(term)) {
             return;
@@ -66,6 +85,9 @@ public class EditFormulaAction extends ExplorationAction {
         final JTerm formula = (JTerm) sf.formula();
         Node toBeSelected = api.applyChangeFormula(g, pio, formula,
             tb.replace(formula, pio.posInTerm(), newTerm));
+        if (toBeSelected == null) {
+            throw new NullPointerException("No node to be selected after the change.");
+        }
         getMediator().getSelectionModel().setSelectedNode(toBeSelected);
     }
 }

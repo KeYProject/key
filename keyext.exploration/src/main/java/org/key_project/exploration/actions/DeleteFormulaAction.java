@@ -28,13 +28,19 @@ public class DeleteFormulaAction extends ExplorationAction {
         this(pis, MainWindow.getInstance());
     }
 
+    /**
+     * The setter calls below happen on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public DeleteFormulaAction(PosInSequent pis, MainWindow mainWindow) {
         super(mainWindow);
         setName("Delete formula");
         this.posInSeq = pis;
         // only enable if position is in sequent and a toplevel formula
-        if (pis.getPosInOccurrence() != null) {
-            setEnabled(!pis.isSequent() & pis.getPosInOccurrence().isTopLevel());
+        PosInOccurrence pio = pis.getPosInOccurrence();
+        if (pio != null) {
+            setEnabled(!pis.isSequent() & pio.isTopLevel());
         } else {
             setEnabled(false);
         }
@@ -43,17 +49,19 @@ public class DeleteFormulaAction extends ExplorationAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (posInSeq.isSequent() || (posInSeq.getPosInOccurrence() != null
-                && !posInSeq.getPosInOccurrence().isTopLevel())) {
+        PosInOccurrence pio = posInSeq.getPosInOccurrence();
+        if (posInSeq.isSequent() || (pio != null && !pio.isTopLevel())) {
             return;
         }
 
-        PosInOccurrence pio = posInSeq.getPosInOccurrence();
         if (pio == null) {
             return;
         }
         JTerm term = (JTerm) pio.subTerm();
         Goal g = getMediator().getSelectedGoal();
+        if (g == null) {
+            throw new NullPointerException("No goal selected.");
+        }
         ProofExplorationService service = ProofExplorationService.get(getMediator());
         service.soundHide(g, pio, term);
     }
