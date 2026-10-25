@@ -14,6 +14,8 @@ import de.uka.ilkd.key.speclang.Contract;
 
 import org.key_project.proofmanagement.io.Logger;
 
+import org.jspecify.annotations.NullMarked;
+
 import static org.key_project.proofmanagement.check.dependency.DependencyGraph.EdgeType.TERMINATION_SENSITIVE;
 
 /**
@@ -22,6 +24,7 @@ import static org.key_project.proofmanagement.check.dependency.DependencyGraph.E
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class DependencyNode {
     /** the contract represented by this node */
     private final Contract contract;

@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.proofmanagement.check;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ProofManagementException extends Exception {
     public ProofManagementException(String message) {
         super(message);

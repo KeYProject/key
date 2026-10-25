@@ -14,6 +14,8 @@ import javax.swing.event.MouseInputAdapter;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +25,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 class CheckConfigDialog extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckConfigDialog.class);
 
@@ -39,7 +42,7 @@ class CheckConfigDialog extends JDialog {
 
     private final Component glassPane = new BlockingGlassPane();
 
-    private transient SwingWorker<Void, Void> checkWorker;
+    private transient @Nullable SwingWorker<Void, Void> checkWorker;
 
     private class ProofManagementCheckWorker extends SwingWorker<Void, Void> {
         @Override
