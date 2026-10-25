@@ -64,6 +64,12 @@ public class TestgenOptionsPanel extends SettingsPanel implements SettingsProvid
     private transient TestGenerationSettings settings =
         new TestGenerationSettings(TestGenerationSettings.getInstance());
 
+    /**
+     * The component-building getters are invoked on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here since final fields are
+     * assigned before use, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public TestgenOptionsPanel() {
         setHeaderText(getDescription());
         symbolicEx = getSymbolicEx();
