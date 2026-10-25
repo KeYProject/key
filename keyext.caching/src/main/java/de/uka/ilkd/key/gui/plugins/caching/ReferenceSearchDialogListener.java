@@ -4,11 +4,14 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.plugins.caching;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Interface to receive callbacks from the {@link ReferenceSearchDialog}.
  *
  * @author Arne Keller
  */
+@NullMarked
 public interface ReferenceSearchDialogListener {
     /**
      * Button to close the dialog has been activated.

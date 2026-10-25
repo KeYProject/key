@@ -11,11 +11,14 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Action to remove caching information on a goal closed by caching.
  *
  * @author Arne Keller
  */
+@NullMarked
 public final class RemoveCachingInformationAction extends KeyAction {
 
     /**

@@ -18,11 +18,14 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Action to search for suitable references on a single node.
  *
  * @author Arne Keller
  */
+@NullMarked
 public final class CloseByReference extends KeyAction {
     /**
      * The caching extension.

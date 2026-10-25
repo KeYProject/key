@@ -48,6 +48,8 @@ import org.key_project.prover.engine.impl.DefaultProver;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +58,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@NullMarked
 @KeYGuiExtension.Info(name = "Proof Caching", optional = true,
     description = "Functionality related to reusing previous proof results in similar proofs",
     experimental = false)
@@ -82,8 +85,8 @@ public class CachingExtension
      */
     private final Set<Proof> trackedProofs = new HashSet<>();
     private ReferenceSearchButton referenceSearchButton;
-    private CachingToggleAction toggleAction = null;
-    private CachingPruneHandler cachingPruneHandler = null;
+    private @Nullable CachingToggleAction toggleAction = null;
+    private @Nullable CachingPruneHandler cachingPruneHandler = null;
 
     private void initActions(MainWindow mainWindow) {
         if (toggleAction == null) {

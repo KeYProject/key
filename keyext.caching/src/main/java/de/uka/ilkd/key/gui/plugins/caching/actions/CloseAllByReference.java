@@ -18,11 +18,14 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Proof context menu action to perform proof caching for all open goals on that proof.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class CloseAllByReference extends KeyAction {
     /**
      * The caching extension.
