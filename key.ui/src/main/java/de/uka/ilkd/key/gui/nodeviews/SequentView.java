@@ -38,6 +38,7 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,7 @@ import org.slf4j.LoggerFactory;
 /*
  * Parent class of CurrentGoalView and InnerNodeView.
  */
+@NullMarked
 public abstract class SequentView extends JEditorPane {
     private static final Logger LOGGER = LoggerFactory.getLogger(SequentView.class);
 
@@ -120,7 +122,7 @@ public abstract class SequentView extends JEditorPane {
 
     private final ConfigChangeListener configChangeListener;
     protected SequentPrintFilter filter;
-    private SequentViewLogicPrinter printer;
+    private @Nullable SequentViewLogicPrinter printer;
     public boolean refreshHighlightning = true;
 
     // the default tag of the highlight
@@ -278,7 +280,7 @@ public abstract class SequentView extends JEditorPane {
      * @param range the Range to be highlighted
      * @param highlighter the Object painting the highlight
      */
-    public void paintHighlight(Range range, Object highlighter) {
+    public void paintHighlight(@Nullable Range range, Object highlighter) {
         try {
             if (range != null) {
                 getHighlighter().changeHighlight(highlighter, range.start(), range.end());
@@ -365,7 +367,7 @@ public abstract class SequentView extends JEditorPane {
     /**
      * Get a PosInSequent object for a given coordinate of the displayed sequent.
      */
-    protected synchronized @Nullable PosInSequent getPosInSequent(Point p) {
+    protected synchronized @Nullable PosInSequent getPosInSequent(@Nullable Point p) {
         String seqText = getText();
         if (seqText != null && !seqText.isEmpty()) {
             final InitialPositionTable initialPositionTable = getInitialPositionTable();
@@ -382,7 +384,7 @@ public abstract class SequentView extends JEditorPane {
      *
      * @return The LogicPrinter that is used.
      */
-    public SequentViewLogicPrinter getLogicPrinter() {
+    public @Nullable SequentViewLogicPrinter getLogicPrinter() {
         return printer;
     }
 
@@ -399,7 +401,7 @@ public abstract class SequentView extends JEditorPane {
         printer = p;
     }
 
-    public String getHighlightedText(PosInSequent pos) {
+    public String getHighlightedText(@Nullable PosInSequent pos) {
         if (pos == null) {
             return "";
         }
@@ -513,7 +515,7 @@ public abstract class SequentView extends JEditorPane {
     /**
      * Get the character range to be highlighted for the given coordinate in the displayed sequent.
      */
-    synchronized Range getHighlightRange(Point p) {
+    synchronized @Nullable Range getHighlightRange(Point p) {
         String seqText = getText();
         if (seqText.length() > 0) {
             int characterIndex = correctedViewToModel(p);
@@ -548,7 +550,7 @@ public abstract class SequentView extends JEditorPane {
      * Get the character range to be highlighted for the first statement in a java block at the
      * given coordinate in the displayed sequent. Returns null if there is no java block there.
      */
-    protected synchronized Range getFirstStatementRange(Point p) {
+    protected synchronized @Nullable Range getFirstStatementRange(Point p) {
         if (getDocument().getLength() > 0) {
             int characterIndex = correctedViewToModel(p);
             Range result =
@@ -677,7 +679,6 @@ public abstract class SequentView extends JEditorPane {
             LOGGER.debug("Error while setting permanent highlight", e);
         }
     }
-
 
     public void highlight(Point p) {
         if (p == null) {

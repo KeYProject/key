@@ -13,12 +13,14 @@ import javax.swing.Icon;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
  * @version 1 (20.05.19)
  */
+@NullMarked
 public class Style {
     private String text;
 

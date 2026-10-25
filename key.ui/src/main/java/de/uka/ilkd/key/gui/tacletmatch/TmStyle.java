@@ -14,11 +14,15 @@ import javax.swing.border.TitledBorder;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Shared styling for the taclet-match dialog panels. Uses the active look-and-feel's fonts and
  * colours (so it follows Metal or FlatLaf), only nudging sizes and spacing for readability and
  * clearer section separation.
  */
+@NullMarked
 final class TmStyle {
 
     /** logic/term text is rendered a couple of points larger than the default for legibility */
@@ -27,7 +31,7 @@ final class TmStyle {
     private TmStyle() {}
 
     /** a monospaced font for logic/term text, slightly larger than the component's default. */
-    static Font mono(Component c) {
+    static Font mono(@Nullable Component c) {
         int size = (c != null && c.getFont() != null) ? c.getFont().getSize() : 12;
         return new Font(Font.MONOSPACED, Font.PLAIN, size + FONT_BUMP);
     }
@@ -109,7 +113,7 @@ final class TmStyle {
      * @param what what the toggle reveals, for the tooltip (e.g. "the full sequent"); {@code null}
      *        for a generic "Show more/less"
      */
-    static JButton disclosure(String what) {
+    static JButton disclosure(@Nullable String what) {
         JButton b = new JButton();
         b.setFocusable(false);
         b.setBorderPainted(false);

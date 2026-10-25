@@ -46,6 +46,10 @@ import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 import org.key_project.logic.Term;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class SolverListener implements SolverLauncherListener {
     private ProgressDialog progressDialog;
     private ProgressModel progressModel;
@@ -117,7 +121,6 @@ public class SolverListener implements SolverLauncherListener {
                 addInformation("Error-Message",
                     solver.getException().toString() + "\n\n" + writer);
 
-
             }
             addInformation("Solver Input", solver.getRawSolverInput());
             if (solver.getTacletTranslation() != null) {
@@ -184,7 +187,6 @@ public class SolverListener implements SolverLauncherListener {
         }
     }
 
-
     public SolverListener(DefaultSMTSettings settings, Proof smtProof) {
         this.settings = settings;
         this.smtProof = smtProof;
@@ -193,7 +195,6 @@ public class SolverListener implements SolverLauncherListener {
     @Override
     public void launcherStopped(SolverLauncher launcher, Collection<SMTSolver> problemSolvers) {
         timer.cancel();
-
 
         storeInformation();
         progressModel.setEditable(true);
@@ -300,9 +301,7 @@ public class SolverListener implements SolverLauncherListener {
             x++;
         }
 
-
         boolean ce = solverTypes.contains(SolverTypes.Z3_CE_SOLVER);
-
 
         progressDialog =
             new ProgressDialog(progressModel, new ProgressDialogListenerImpl(launcher, ce), ce,
@@ -312,8 +311,7 @@ public class SolverListener implements SolverLauncherListener {
 
     }
 
-
-    private InternSMTProblem getProblem(int col, int row) {
+    private @Nullable InternSMTProblem getProblem(int col, int row) {
         for (InternSMTProblem problem : problems) {
             if (problem.problemIndex == row && problem.solverIndex == col) {
                 return problem;
@@ -378,7 +376,6 @@ public class SolverListener implements SolverLauncherListener {
         long temp = (startTime - currentTime) / 100;
         return Math.max((float) temp / 10.0f, 0);
     }
-
 
     private boolean refreshProgessOfProblem(InternSMTProblem problem) {
         SolverState state = problem.solver.getState();
@@ -486,7 +483,6 @@ public class SolverListener implements SolverLauncherListener {
             progressModel.setText("Valid" + timeInfo, x, y);
         }
 
-
     }
 
     private void unsuccessfullyStopped(InternSMTProblem problem, int x, int y) {
@@ -576,7 +572,6 @@ public class SolverListener implements SolverLauncherListener {
         return path;
     }
 
-
     public static String computeSolverTypeWarningMessage(SolverType type) {
         return ("""
                 You are using a version of %s which has not been tested for this version of KeY.
@@ -588,10 +583,8 @@ public class SolverListener implements SolverLauncherListener {
 
     private class ProgressDialogListenerImpl implements ProgressDialogListener {
 
-
         private final SolverLauncher launcher;
         private final boolean counterexample;
-
 
         public ProgressDialogListenerImpl(SolverLauncher launcher, boolean counterexample) {
             super();

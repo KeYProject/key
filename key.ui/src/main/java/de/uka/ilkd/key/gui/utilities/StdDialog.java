@@ -12,6 +12,8 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A dialog offering three buttons at the lower border: Help (optional), Okay and Cancel. The
@@ -23,21 +25,22 @@ import de.uka.ilkd.key.gui.MainWindow;
  * If you want to see how the dialog looks like execute the method <code>main</code> at the bottom
  * of this file.
  */
+@NullMarked
 public class StdDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
-    private JButton helpButton;
-    private JButton okButton;
-    private JButton cancelButton;
+    private @Nullable JButton helpButton;
+    private @Nullable JButton okButton;
+    private @Nullable JButton cancelButton;
     private boolean okButtonHasBeenPressed = false;
     private boolean cancelButtonHasBeenPressed = false;
-    private Box contentBox;
+    private @Nullable Box contentBox;
 
     public StdDialog(String title, int strut, boolean helpButton) {
         this(title, null, strut, helpButton);
     }
 
-    public StdDialog(String title, JComponent content, int strut, boolean helpButton) {
+    public StdDialog(String title, @Nullable JComponent content, int strut, boolean helpButton) {
         this.setTitle(title);
         this.setModal(true);
         // content.setMaximumSize(new Dimension(Integer.MAX_VALUE,Integer.MAX_VALUE));
@@ -88,8 +91,6 @@ public class StdDialog extends JDialog {
         content.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         this.pack();
     }
-
-
 
     public boolean okButtonHasBeenPressed() {
         return okButtonHasBeenPressed;
@@ -145,6 +146,5 @@ public class StdDialog extends JDialog {
         dialog.setModal(true);
         dialog.setVisible(true);
     }
-
 
 }

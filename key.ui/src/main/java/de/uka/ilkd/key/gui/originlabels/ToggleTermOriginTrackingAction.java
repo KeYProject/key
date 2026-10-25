@@ -15,11 +15,14 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Action to toggle {@link TermLabelSettings#getUseOriginLabels()}.
  *
  * @author lanzinger
  */
+@NullMarked
 public class ToggleTermOriginTrackingAction extends MainWindowAction {
     /**
      * Create a new action.

@@ -12,7 +12,10 @@ import javax.swing.plaf.FontUIResource;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /** this class is used to set some default gui properties */
+@NullMarked
 public class Config {
 
     /** name of different fonts */
@@ -92,7 +95,6 @@ public class Config {
         UIManager.put(KEY_FONT_PROOF_LIST_VIEW,
             new FontUIResource("Default", Font.PLAIN, (int) (sizeFactor * SIZES[2])));
     }
-
 
     public void addConfigChangeListener(ConfigChangeListener listener) {
         synchronized (listenerList) {

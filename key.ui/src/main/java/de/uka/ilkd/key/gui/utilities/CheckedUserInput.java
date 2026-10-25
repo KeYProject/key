@@ -11,6 +11,8 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class offers a simple solution for receiving checked user input. It describes a panel
@@ -20,10 +22,9 @@ import javax.swing.event.DocumentListener;
  * If you want to see how the component looks like, execute the method <code>main</code> at the
  * bottom of this file.
  */
+@NullMarked
 public class CheckedUserInput extends JPanel {
     private static final long serialVersionUID = 1L;
-
-
 
     public interface CheckedUserInputInspector {
 
@@ -34,8 +35,8 @@ public class CheckedUserInput extends JPanel {
          * @return <code>null</code> if the user input is valid, otherwise a string describing the
          *         error.
          */
+        @Nullable
         String check(String toBeChecked);
-
 
     }
 
@@ -43,18 +44,15 @@ public class CheckedUserInput extends JPanel {
      * Used for observing the checked user input.
      */
     public interface CheckedUserInputListener {
-        void userInputChanged(String input, boolean valid, String reason);
-
+        void userInputChanged(String input, boolean valid, @Nullable String reason);
 
     }
 
+    private @Nullable TrafficLight trafficLight;
+    private @Nullable JTextPane inputFieldForFormula;
+    private @Nullable ClickableMessageBox infoBox;
 
-    private TrafficLight trafficLight;
-    private JTextPane inputFieldForFormula;
-    private ClickableMessageBox infoBox;
-
-    private JScrollPane detailScrollPane;
-
+    private @Nullable JScrollPane detailScrollPane;
 
     private CheckedUserInputInspector inspector;
     private final List<CheckedUserInputListener> listeners =
@@ -79,7 +77,6 @@ public class CheckedUserInput extends JPanel {
         pane.setMinimumSize(dim);
         this.add(horzBox);
         this.add(Box.createVerticalStrut(2));
-
 
         if (showInformation) {
             horzBox = Box.createHorizontalBox();
@@ -114,7 +111,6 @@ public class CheckedUserInput extends JPanel {
         return detailScrollPane;
     }
 
-
     private TrafficLight getTrafficLight() {
         if (trafficLight == null) {
             trafficLight = new TrafficLight(10);
@@ -137,8 +133,6 @@ public class CheckedUserInput extends JPanel {
         }
         return infoBox;
     }
-
-
 
     private JTextPane getInputFieldForFormula() {
         if (inputFieldForFormula == null) {
@@ -180,7 +174,6 @@ public class CheckedUserInput extends JPanel {
         listeners.add(listener);
     }
 
-
     public void removeListener(CheckedUserInputListener listener) {
         listeners.remove(listener);
     }
@@ -189,12 +182,12 @@ public class CheckedUserInput extends JPanel {
         return getInputFieldForFormula().getText();
     }
 
-    public void setInput(String input) {
+    public void setInput(@Nullable String input) {
         getInputFieldForFormula().setText((input == null) ? "" : input);
         checkInput();
     }
 
-    private void setValid(String result) {
+    private void setValid(@Nullable String result) {
         getInfoBox().clear();
         if (result != null) {
             String[] segments = result.split("#");
@@ -205,8 +198,9 @@ public class CheckedUserInput extends JPanel {
 
     }
 
-    public static String showAsDialog(String title, String description, final String helpText,
-            String defaultInput, CheckedUserInputInspector inspector, boolean showInformation
+    public static @Nullable String showAsDialog(String title, @Nullable String description,
+            @Nullable String helpText, String defaultInput, CheckedUserInputInspector inspector,
+            boolean showInformation
 
     ) {
         CheckedUserInput userInput = new CheckedUserInput(inspector, showInformation);
@@ -237,8 +231,6 @@ public class CheckedUserInput extends JPanel {
         }
         return null;
     }
-
-
 
     public static void main(String[] args) {
         showAsDialog("Checked user input embedded in a dialog.", "type 'test'",

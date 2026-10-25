@@ -42,6 +42,7 @@ import de.uka.ilkd.key.util.KeYConstants;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,10 +57,10 @@ import picocli.CommandLine.Parameters;
  * This has been extracted from MainWindow to keep GUI and control further
  * apart.
  */
+@NullMarked
 public final class Main implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
     private static Path workingDir;
-
 
     // @Option(names = "--help", description = "display this text")
     // private boolean showHelp = false;
@@ -165,14 +166,12 @@ public final class Main implements Callable<Integer> {
             + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ", i.e., no timeout)")
     private int timeout = -1;
 
-
     @CommandLine.ArgGroup(
         heading = "Options for justify rules. autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument       The JUSTIFY_RULES option has a number of additional parameters you can set. The following options only apply if --jr-enable is used.")
     private @Nullable LemmataAutoModeOptions justifyRulesOptions;
 
     @Option(names = { "--verbose", "-v" }, arity = "*", defaultValue = "2")
     private int verbosity = 2;
-
 
     /**
      * The user interface modes KeY can operate in.
@@ -207,9 +206,7 @@ public final class Main implements Callable<Integer> {
      */
     private boolean loadOnly = false;
 
-
     private ProofMacro autoMacro = new SkipMacro();
-
 
     /**
      * <p>
@@ -524,7 +521,7 @@ public final class Main implements Callable<Integer> {
         }
     }
 
-    private static File createTempDirectory() throws IOException {
+    private static @Nullable File createTempDirectory() throws IOException {
         final File tempDir = File.createTempFile("keyheap-examples-", null);
         tempDir.delete();
         if (!tempDir.mkdir()) {
@@ -547,10 +544,9 @@ public final class Main implements Callable<Integer> {
      *
      * @return {@link File} object representing working directory.
      */
-    public static Path getWorkingDir() {
+    public static @Nullable Path getWorkingDir() {
         return workingDir;
     }
-
 
     /**
      * Perform necessary actions before loading any problem files. Currently only

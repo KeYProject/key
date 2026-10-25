@@ -22,12 +22,15 @@ import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Listener object to record various user actions (currently only rule applications)
  * in the undo buffer.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class StateChangeListener implements InteractionListener {
     /**
      * The KeY mediator.

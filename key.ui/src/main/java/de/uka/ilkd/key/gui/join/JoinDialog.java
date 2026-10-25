@@ -30,6 +30,10 @@ import de.uka.ilkd.key.proof.join.ProspectivePartner;
 
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class JoinDialog extends StdDialog {
     private static final Color GREEN = new Color(0, 128, 0);
 
@@ -52,18 +56,17 @@ public class JoinDialog extends StdDialog {
 
             """;
 
-
     private static class ContentPanel extends Box {
         private static final long serialVersionUID = 1L;
 
-        private SequentViewer sequentViewer1;
-        private SequentViewer sequentViewer2;
-        private JList<ContentItem> choiceList;
-        private CheckedUserInput predicateInput;
-        private JLabel joinHeadline;
-        private JLabel infoPredicate;
-        private ClickableMessageBox infoBox;
-        private JScrollPane infoBoxPane = null;
+        private @Nullable SequentViewer sequentViewer1;
+        private @Nullable SequentViewer sequentViewer2;
+        private @Nullable JList<ContentItem> choiceList;
+        private @Nullable CheckedUserInput predicateInput;
+        private @Nullable JLabel joinHeadline;
+        private @Nullable JLabel infoPredicate;
+        private @Nullable ClickableMessageBox infoBox;
+        private @Nullable JScrollPane infoBoxPane = null;
 
         private final Proof proof;
         private final PredicateEstimator estimator;
@@ -87,8 +90,6 @@ public class JoinDialog extends StdDialog {
             public CheckedUserInputInspector getInspector() {
                 return inspector;
             }
-
-
 
             public boolean isApplicable() {
                 return applicable;
@@ -119,7 +120,6 @@ public class JoinDialog extends StdDialog {
             }
         }
 
-
         public ContentPanel(List<ProspectivePartner> partnerList, final Proof proof,
                 PredicateEstimator estimator, final CheckedUserInputListener listener,
                 Services services) {
@@ -140,7 +140,6 @@ public class JoinDialog extends StdDialog {
                 refreshInfoBox(reason);
             });
 
-
             if (!partnerList.isEmpty()) {
                 fill(partnerList, services);
             }
@@ -152,15 +151,12 @@ public class JoinDialog extends StdDialog {
             getHeadline().setText("<html><b>Join Goal " + node.serialNr() + "</b></html>");
             getSequentViewer1().setSequent(node.sequent(), proof.getServices());
 
-
-
             DefaultListModel<ContentItem> model = new DefaultListModel<>();
             for (final ProspectivePartner partner : partnerList) {
 
                 Result result = estimator.estimate(partner, proof);
                 partner.setCommonPredicate(result.getPredicate());
                 partner.setCommonParent(result.getCommonParent());
-
 
                 ApplicationCheck check = new ApplicationCheck.NoNewSymbolsCheck();
 
@@ -175,10 +171,8 @@ public class JoinDialog extends StdDialog {
                 model.addElement(new ContentItem(partner, services, applicable));
             }
 
-
             getChoiceList().setModel(model);
             getChoiceList().setSelectedIndex(0);
-
 
         }
 
@@ -188,7 +182,6 @@ public class JoinDialog extends StdDialog {
             }
             ContentItem item = choiceList.getModel().getElementAt(index);
             getSequentViewer2().setSequent(item.getSequent(), proof.getServices());
-
 
             getPredicateInput().setInput(item.getPredicate(proof));
             getPredicateInput().setInspector(item.getInspector());
@@ -206,18 +199,14 @@ public class JoinDialog extends StdDialog {
 
         private void create() {
 
-
             Box box = createHorizontalBox();
-
 
             box.add(getHeadline());
             box.add(createHorizontalGlue());
 
-
             this.add(createVerticalStrut(5));
             this.add(box);
             this.add(createVerticalStrut(5));
-
 
             box = createHorizontalBox();
             Box vertBox = createVerticalBox();
@@ -225,10 +214,8 @@ public class JoinDialog extends StdDialog {
             vertBox.add(new JScrollPane(getSequentViewer1()));
             box.add(vertBox);
 
-
             vertBox = createVerticalBox();
             JLabel label = new JLabel("<html><b>with</b></html>");
-
 
             label.setFont(this.getFont());
             vertBox.add(createLeftAlignedComponent(label));
@@ -250,11 +237,9 @@ public class JoinDialog extends StdDialog {
             this.add(getInfoBoxPane());
             this.add(createVerticalStrut(5));
 
-
-
         }
 
-        private void refreshInfoBox(String reason) {
+        private void refreshInfoBox(@Nullable String reason) {
             ContentItem item = getSelectedItem();
             getInfoBox().clear();
             if (!item.isApplicable()) {
@@ -290,7 +275,6 @@ public class JoinDialog extends StdDialog {
             if (infoBox == null) {
                 infoBox = new ClickableMessageBox();
 
-
                 infoBox.setBackground(this.getBackground());
 
                 infoBox.add(object -> JOptionPane.showMessageDialog(infoBox, object.toString(),
@@ -299,7 +283,6 @@ public class JoinDialog extends StdDialog {
             }
             return infoBox;
         }
-
 
         private JLabel getInfoPredicate() {
             if (infoPredicate == null) {
@@ -336,7 +319,6 @@ public class JoinDialog extends StdDialog {
             return joinHeadline;
         }
 
-
         private SequentViewer getSequentViewer1() {
             if (sequentViewer1 == null) {
                 sequentViewer1 = new SequentViewer();
@@ -369,7 +351,5 @@ public class JoinDialog extends StdDialog {
 
         return content.getSelectedPartner();
     }
-
-
 
 }

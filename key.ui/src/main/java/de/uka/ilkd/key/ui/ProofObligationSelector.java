@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.ui;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Created by weigl on 17.08.16.
  */
+@NullMarked
 public interface ProofObligationSelector {
     boolean selectProofObligation();
 }

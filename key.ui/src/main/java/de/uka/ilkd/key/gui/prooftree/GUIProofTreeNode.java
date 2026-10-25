@@ -14,10 +14,13 @@ import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 class GUIProofTreeNode extends GUIAbstractTreeNode {
 
-    private GUIAbstractTreeNode[] children;
+    private @Nullable GUIAbstractTreeNode[] children;
 
     public GUIProofTreeNode(GUIProofTreeModel tree, Node node) {
         super(tree, node);
@@ -34,7 +37,7 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
     }
 
     @Override
-    public TreeNode getParent() {
+    public @Nullable TreeNode getParent() {
         if (parent != null) {
             return parent;
         }

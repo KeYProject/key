@@ -21,14 +21,18 @@ import de.uka.ilkd.key.rule.UseDependencyContractRule;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class completes the instantiation for a dependency contract applications. The user is
  * queried for the heap with which to instantiate the app.
  */
+@NullMarked
 public class DependencyContractCompletion implements InteractiveRuleApplicationCompletion {
 
     @Override
-    public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
+    public @Nullable IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
         UseDependencyContractApp cApp = (UseDependencyContractApp) app;
 
         Services services = goal.proof().getServices();
@@ -54,7 +58,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
      * @param services
      * @return
      */
-    private static PosInOccurrence letUserChooseStep(
+    private static @Nullable PosInOccurrence letUserChooseStep(
             List<LocationVariable> heapContext,
             List<PosInOccurrence> steps, boolean forced,
             Services services) {
@@ -90,7 +94,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         return findCorrespondingStep(steps, resultHeaps);
     }
 
-    public static PosInOccurrence findCorrespondingStep(
+    public static @Nullable PosInOccurrence findCorrespondingStep(
             List<PosInOccurrence> steps,
             JTerm[] resultHeaps) {
         // find corresponding step

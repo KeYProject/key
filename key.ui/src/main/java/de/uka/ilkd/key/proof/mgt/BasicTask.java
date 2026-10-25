@@ -10,12 +10,15 @@ import javax.swing.tree.MutableTreeNode;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Captures a node in the TaskTree which contains exactly one proof. Such a node is the only one
  * with a one to one mapping between TaskTreeNode and Proof. It may be a sub task of a more complex
  * task such as ProofListTask.
  */
+@NullMarked
 public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode {
 
     /**
@@ -45,12 +48,12 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode {
     }
 
     /* returns the single proof of this task */
-    public Proof proof() {
+    public @Nullable Proof proof() {
         return proof.getFirstProof();
     }
 
     /** returns all proofs attached to this basic task */
-    public Proof[] allProofs() {
+    public @Nullable Proof[] allProofs() {
         return new Proof[] { proof() };
     }
 
@@ -66,7 +69,6 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode {
     public ProofStatus getStatus() {
         return proof().mgt().getStatus();
     }
-
 
     /** returns the upper most task this basic task belongs to. */
     public TaskTreeNode getRootTask() {

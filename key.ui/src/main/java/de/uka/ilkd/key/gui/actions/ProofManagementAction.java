@@ -15,9 +15,12 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Shows the proof management dialog
  */
+@NullMarked
 public final class ProofManagementAction extends MainWindowAction {
 
     /**

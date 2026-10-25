@@ -19,12 +19,15 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * UI for configuring the {@link KeyStroke}s inside KeY.
  *
  * @author Alexander Weigl
  * @version 1 (09.05.19)
  */
+@NullMarked
 public class ShortcutSettings extends SimpleSettingsPanel implements SettingsProvider {
     @Serial
     private static final long serialVersionUID = -7609149706562761596L;
@@ -69,7 +72,6 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         List<RowSorter.SortKey> sortKeys = new ArrayList<>(25);
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         sorter.setSortKeys(sortKeys);
-
 
         JTextField txtCaptureShortcut = new JTextField();
         DefaultCellEditor cellEditor = new DefaultCellEditor(txtCaptureShortcut);

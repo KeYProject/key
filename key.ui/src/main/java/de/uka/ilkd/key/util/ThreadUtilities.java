@@ -8,15 +8,17 @@ import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.SwingUtilities;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class ThreadUtilities {
     private static final Logger LOGGER = LoggerFactory.getLogger(ThreadUtilities.class);
 
     private ThreadUtilities() {
     }
-
 
     /**
      * Invoke a runnable object on the AWT event thread and wait for the execution to finish.
@@ -61,7 +63,7 @@ public final class ThreadUtilities {
      *
      * @return array of threads, some entries may be null
      */
-    public static Thread[] getThreads() {
+    public static @Nullable Thread[] getThreads() {
         ThreadGroup rootGroup = Thread.currentThread().getThreadGroup();
         ThreadGroup parentGroup;
         while ((parentGroup = rootGroup.getParent()) != null) {

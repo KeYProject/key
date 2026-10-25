@@ -42,6 +42,8 @@ import de.uka.ilkd.key.pp.PosInSequent;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +55,7 @@ import org.slf4j.LoggerFactory;
  * writes
  * its input back to the shared {@link TacletFindModel}, refreshing the dialog status on change.
  */
+@NullMarked
 public class SVInstantiationPanel extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(SVInstantiationPanel.class);
 
@@ -69,7 +72,7 @@ public class SVInstantiationPanel extends JPanel {
     private final List<Row> rows = new ArrayList<>();
 
     /** debounce for refreshing the status/preview while typing */
-    private Timer refreshTimer;
+    private @Nullable Timer refreshTimer;
 
     public SVInstantiationPanel(TacletInstantiationModel model, KeYMediator mediator,
             Runnable onChange) {
@@ -247,7 +250,7 @@ public class SVInstantiationPanel extends JPanel {
         });
     }
 
-    private static void insertAtCaret(JTextComponent field, String s) {
+    private static void insertAtCaret(JTextComponent field, @Nullable String s) {
         if (s == null) {
             return;
         }

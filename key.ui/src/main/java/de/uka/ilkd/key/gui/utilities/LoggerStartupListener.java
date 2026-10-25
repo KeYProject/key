@@ -17,12 +17,14 @@ import ch.qos.logback.classic.spi.LoggerContextListener;
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.spi.LifeCycle;
+import org.jspecify.annotations.NullMarked;
 
 /// This class provides the `LOG_DIR` [de.uka.ilkd.key.settings.PathConfig.KeyPaths#logDirectory] to
 /// the
 /// `logback.xml` configuration.
 ///
 /// @author weigl
+@NullMarked
 public class LoggerStartupListener extends ContextAwareBase
         implements LoggerContextListener, LifeCycle {
     private boolean started = false;

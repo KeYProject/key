@@ -14,10 +14,14 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
+@NullMarked
 class SolverOptions extends SettingsPanel implements SettingsProvider {
     private static final String[] SOLVER_SUPPORT_TEXT = { SMTSettingsProvider.SOLVER_SUPPORTED,
         SMTSettingsProvider.SOLVER_MAY_SUPPORTED, SMTSettingsProvider.SOLVER_UNSUPPORTED };
@@ -75,7 +79,7 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         }
     }
 
-    private JTextArea createSolverInformation() {
+    private @Nullable JTextArea createSolverInformation() {
         String info = solverType.getInfo();
         if (info != null && !info.isEmpty()) {
             JTextArea solverInfo =
@@ -140,7 +144,6 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
             SMTSettingsProvider.INFO_SOLVER_COMMAND, e -> {
             });
     }
-
 
     protected JTextField createSolverInstalled() {
         final boolean installed = solverType.isInstalled(true);

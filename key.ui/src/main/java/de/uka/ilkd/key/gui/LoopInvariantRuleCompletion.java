@@ -17,16 +17,20 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.prover.rules.RuleAbortException;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class completes the instantiations of the loop invariant rule applications.
  *
  * If in forced mode then the loop invariant dialog will not be shown if the supplied invariant is
  * complete.
  */
+@NullMarked
 public class LoopInvariantRuleCompletion implements InteractiveRuleApplicationCompletion {
 
     @Override
-    public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
+    public @Nullable IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
         Services services = goal.proof().getServices();
         // fixing #1090: Local variables must be accessible
         services = services.getOverlay(goal.getLocalNamespaces());

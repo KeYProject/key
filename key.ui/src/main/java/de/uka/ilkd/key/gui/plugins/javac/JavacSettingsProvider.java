@@ -14,12 +14,14 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import net.miginfocom.layout.CC;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Settings for the javac extension.
  *
  * @author Daniel Grévent
  */
+@NullMarked
 public class JavacSettingsProvider extends SettingsPanel implements SettingsProvider {
     /**
      * Singleton instance of the javac settings.
@@ -89,7 +91,6 @@ public class JavacSettingsProvider extends SettingsPanel implements SettingsProv
         return JAVAC_SETTINGS;
     }
 
-
     @Override
     public JPanel getPanel(MainWindow window) {
         JavacSettings settings = getJavacSettings();
@@ -109,7 +110,6 @@ public class JavacSettingsProvider extends SettingsPanel implements SettingsProv
         settings.setProcessors(processors.getText());
         settings.setClassPaths(paths.getText());
     }
-
 
     @Override
     public int getPriorityOfSettings() {

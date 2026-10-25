@@ -17,6 +17,8 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Listener for a {@link CurrentGoalView}.
  *
@@ -26,6 +28,7 @@ import org.key_project.util.collection.ImmutableList;
  * Additionally it performs all necessary actions for draging some highlighted sequent part into
  * some other GUI component (e.g. some Taclet rule instantiation dialog)
  */
+@NullMarked
 final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
         implements DragGestureListener {
 

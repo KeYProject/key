@@ -46,6 +46,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,7 @@ import org.slf4j.LoggerFactory;
  * The proof tree view, showing the nodes of the proof.
  * Usually shown as a tab in the lower left panel.
  */
+@NullMarked
 public class ProofTreeView extends JPanel implements TabPanel {
     public static final ColorSettings.ColorProperty GRAY_COLOR =
         ColorSettings.define("[proofTree]gray", "", Color.DARK_GRAY, Color.LIGHT_GRAY);
@@ -117,7 +119,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     /**
      * the model that is displayed by the delegateView
      */
-    private GUIProofTreeModel delegateModel;
+    private @Nullable GUIProofTreeModel delegateModel;
 
     /**
      * the mediator is stored here
@@ -132,12 +134,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
     /**
      * The (currently selected) proof this view shows.
      */
-    private Proof proof;
+    private @Nullable Proof proof;
 
     /**
      * the expansion state of the proof tree
      */
-    private ProofTreeExpansionState expansionState;
+    private @Nullable ProofTreeExpansionState expansionState;
 
     /**
      * listener
@@ -173,7 +175,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * Roots of subtrees containing all nodes to which rules have been applied; this is used when
      * auto mode is active
      */
-    private ImmutableList<Node> modifiedSubtrees = null;
+    private @Nullable ImmutableList<Node> modifiedSubtrees = null;
 
     /**
      * the search dialog
@@ -610,7 +612,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
      *
      * @param p the Proof that has been loaded
      */
-    private void setProof(Proof p) {
+    private void setProof(@Nullable Proof p) {
         if (proof == p) {
             return; // proof is already loaded
         }
@@ -738,7 +740,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     /**
      * moves the scope of the tree view to the given node so that it is visible
      */
-    public void makeNodeVisible(Node n) {
+    public void makeNodeVisible(@Nullable Node n) {
         if (n == null) {
             return;
         }
@@ -856,7 +858,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
      * Selects the given Branchnode in the ProofTreeView and displays the first child in the main
      * view.
      */
-    TreePath selectBranchNode(GUIBranchNode node) {
+    @Nullable
+    TreePath selectBranchNode(@Nullable GUIBranchNode node) {
         if (node == null) {
             return null;
         }
@@ -945,7 +948,6 @@ public class ProofTreeView extends JPanel implements TabPanel {
             centerComponent.setBorder(
                 BorderFactory.createEmptyBorder(6, 0, 0, 0));
         }
-
 
         final var panel = new JPanel(new BorderLayout(0, 8));
         panel.add(inputPanel, BorderLayout.NORTH);
@@ -1135,7 +1137,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
         return List.of(ProofTreeSettingsMenuFactory.create(this));
     }
 
-    public GUIProofTreeModel getDelegateModel() {
+    public @Nullable GUIProofTreeModel getDelegateModel() {
         return delegateModel;
     }
     // INNER CLASSES
@@ -1183,12 +1185,12 @@ public class ProofTreeView extends JPanel implements TabPanel {
         /**
          * node of the last known current goal
          */
-        private Node lastGoalNode;
+        private @Nullable Node lastGoalNode;
 
         /**
          * makes selected node visible of lastGoalNode
          */
-        public void makeSelectedNodeVisible(Node selectedNode) {
+        public void makeSelectedNodeVisible(@Nullable Node selectedNode) {
             if (selectedNode != null) {
                 if (proof != selectedNode.proof()) {
                     return;

@@ -36,6 +36,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * The DragNDropInstantiator interprets drag-and-drop actions as taclet instantiations. The
@@ -66,11 +69,11 @@ import org.key_project.util.collection.ImmutableList;
  * taclets from which she/he can select one.
  * </p>
  */
+@NullMarked
 public class DragNDropInstantiator extends DropTargetAdapter {
 
     /** the sequentview where dnd has been initiated */
     private final CurrentGoalView seqView;
-
 
     DragNDropInstantiator(CurrentGoalView seqView) {
         this.seqView = seqView;
@@ -139,7 +142,6 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         ImmutableList<PosTacletApp> applicableApps =
             getAllApplicableApps(sourcePos, targetPos, services);
 
-
         if (applicableApps.isEmpty() && !targetPos.isSequent()
                 && targetPos.getPosInOccurrence().posInTerm() != PosInTerm.getTopLevel()) {
             // if no applicable taclet is found we relax the target position a bit
@@ -182,7 +184,6 @@ public class DragNDropInstantiator extends DropTargetAdapter {
     private ImmutableList<PosTacletApp> getAllApplicableApps(final PosInSequent sourcePos,
             final PosInSequent targetPos, final Services services) {
         final Sequent sequent = seqView.getMediator().getSelectedGoal().sequent();
-
 
         ImmutableList<PosTacletApp> applicableApps = ImmutableList.nil();
         if (targetPos.isSequent()) {
@@ -268,7 +269,6 @@ public class DragNDropInstantiator extends DropTargetAdapter {
 
     }
 
-
     /**
      * retrieves all taclets applicable on the given position and select those that fulfill the
      * given filter condition. The filter selects taclets satisfying certain syntactic categories
@@ -347,7 +347,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * @return the {@link ImmutableList<PosTacletApp>} that have been matched successfully
      */
     private ImmutableList<PosTacletApp> completeIfInstantiations(ImmutableList<PosTacletApp> apps,
-            Sequent seq, PosInOccurrence assumesPIO, Services services) {
+            Sequent seq, @Nullable PosInOccurrence assumesPIO, Services services) {
 
         ImmutableList<PosTacletApp> result = ImmutableList.nil();
 
@@ -396,7 +396,6 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         return result;
     }
 
-
     /**
      * tries to complete the (partial) taclet instantiation of the applications given in
      * <tt>apps</tt>. The resulting applications are returned.
@@ -412,7 +411,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      * @return the {@link ImmutableList<PosTacletApp>} that have been matched successfully
      */
     private ImmutableList<PosTacletApp> completeInstantiations(ImmutableList<PosTacletApp> apps,
-            PosInOccurrence missingSVPIO, Services services) {
+            @Nullable PosInOccurrence missingSVPIO, Services services) {
 
         ImmutableList<PosTacletApp> result = ImmutableList.nil();
         if (missingSVPIO == null) {
@@ -446,7 +445,6 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         }
         return result;
     }
-
 
     /**
      * applies the given app
@@ -518,7 +516,6 @@ public class DragNDropInstantiator extends DropTargetAdapter {
          * @return true if filter condition is fulfilled
          */
         boolean satisfiesFilterCondition(Taclet taclet);
-
 
         /**
          * This filter selects all Taclet which have an <tt>assumes</tt>, <tt>find</tt> and at least
@@ -595,7 +592,6 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                         && goalTemplatesContainAddrules(taclet.goalTemplates());
             }
         }
-
 
         /**
          * This filter selects all Taclet which have no <tt>assume</tt>, but a <tt>find</tt>.

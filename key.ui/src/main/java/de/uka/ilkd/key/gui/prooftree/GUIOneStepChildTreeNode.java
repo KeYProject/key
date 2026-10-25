@@ -13,6 +13,8 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import org.key_project.prover.rules.RuleApp;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A special kind of gui proof tree node to show intermediate steps of the
@@ -20,6 +22,7 @@ import org.jspecify.annotations.NonNull;
  *
  * These nodes are leaves.
  */
+@NullMarked
 public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
 
     private final RuleApp app;
@@ -35,7 +38,7 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
     }
 
     @Override
-    public TreeNode getChildAt(int childIndex) {
+    public @Nullable TreeNode getChildAt(int childIndex) {
         return null;
     }
 

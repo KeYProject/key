@@ -20,6 +20,8 @@ import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +38,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * In-place highlighting of each schema variable inside the matched term is a planned follow-up.
  */
+@NullMarked
 public class TacletMatchDialog extends ApplyTacletDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(TacletMatchDialog.class);
 
@@ -58,7 +61,7 @@ public class TacletMatchDialog extends ApplyTacletDialog {
     private final ResultPreviewPanel[] previews;
 
     /** the tabbed pane selecting between instantiation alternatives */
-    private JTabbedPane alternatives;
+    private @Nullable JTabbedPane alternatives;
 
     /** single-line footer status (icon + message) */
     private JLabel statusLabel;
@@ -90,7 +93,7 @@ public class TacletMatchDialog extends ApplyTacletDialog {
      * persisted: on a restart the main window may sit elsewhere, so a stale absolute position would
      * be worse than a fresh placement beside the sequent).
      */
-    private static Point sessionLocation;
+    private static @Nullable Point sessionLocation;
 
     /**
      * Places the dialog so it does not sit on top of the sequent view. The user frequently needs to

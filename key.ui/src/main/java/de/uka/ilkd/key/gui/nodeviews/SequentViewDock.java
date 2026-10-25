@@ -20,11 +20,13 @@ import de.uka.ilkd.key.proof.Proof;
 import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * @author Alexander Weigl
  * @version 1 (24.05.19)
  */
+@NullMarked
 public class SequentViewDock extends DefaultMultipleCDockable {
     private final SequentView sequentView;
     private final Node node;

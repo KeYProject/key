@@ -18,6 +18,9 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Proof-of-concept implementation of a textual sequent comparison.
  * <p>
@@ -29,6 +32,7 @@ import de.uka.ilkd.key.proof.Proof;
  * @author mattias ulbrich
  */
 
+@NullMarked
 public class ProofDiffFrame extends JFrame {
     /**
      * The action to show a new frame of this class. Is used in {@link MainWindow}.
@@ -300,10 +304,8 @@ public class ProofDiffFrame extends JFrame {
         return LogicPrinter.quickPrintSequent(node.sequent(), proof.getServices());
     }
 
-
-
     // This must have been implemented already, somewhere
-    private Node findNode(Node node, int number) {
+    private @Nullable Node findNode(Node node, int number) {
         if (node.serialNr() == number) {
             return node;
         }

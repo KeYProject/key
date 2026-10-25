@@ -15,6 +15,7 @@ import java.util.Properties;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Used for displaying files in the examples list w/o prefix
  */
+@NullMarked
 public class Example {
     private static final Logger LOGGER = LoggerFactory.getLogger(Example.class);
     /**

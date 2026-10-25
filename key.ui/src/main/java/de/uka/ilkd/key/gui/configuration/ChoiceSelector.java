@@ -29,9 +29,12 @@ import de.uka.ilkd.key.settings.ChoiceSettings;
 
 import org.key_project.util.java.ArrayUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class ChoiceSelector extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChoiceSelector.class);
     private static final long serialVersionUID = -4470713015801365801L;
@@ -42,13 +45,12 @@ public class ChoiceSelector extends JDialog {
     private Map<String, Set<String>> category2Choices;
     private boolean changed = false;
 
-
     /** the JList with the categories of choices */
     private JList<String> catList;
     /** the JList with the choices for one category */
     private JList<ChoiceEntry> choiceList;
     private JTextArea explanationArea;
-    private static Properties explanationMap;
+    private static @Nullable Properties explanationMap;
 
     /**
      * Creates a new dialog for choosing taclet options.
@@ -169,11 +171,10 @@ public class ChoiceSelector extends JDialog {
         setResizable(false);
     }
 
-
     /**
      * is called to set the selected choice in <code>category2DefaultChoice</code>
      */
-    private void setDefaultChoice(String sel) {
+    private void setDefaultChoice(@Nullable String sel) {
         String category = catList.getSelectedValue();
         if (sel != null) {
             category2DefaultChoice.put(category, sel);
@@ -264,7 +265,7 @@ public class ChoiceSelector extends JDialog {
      * @param choice The choice to check.
      * @return The additional information or {@code null} if no information are available.
      */
-    public static String getInformation(String choice) {
+    public static @Nullable String getInformation(String choice) {
         if ("JavaCard:on".equals(choice)) {
             return "Sound if a JavaCard program is proven.";
         } else if ("JavaCard:off".equals(choice)) {
@@ -285,7 +286,8 @@ public class ChoiceSelector extends JDialog {
      * @param choice The choice to search.
      * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
      */
-    public static ChoiceEntry findChoice(ChoiceEntry[] choices, final String choice) {
+    public static @Nullable ChoiceEntry findChoice(@Nullable ChoiceEntry[] choices,
+            @Nullable final String choice) {
         return ArrayUtil.search(choices, element -> element.choice().equals(choice));
     }
 
@@ -295,7 +297,7 @@ public class ChoiceSelector extends JDialog {
      * @param choices The choices.
      * @return The created {@link ChoiceEntry}s.
      */
-    public static ChoiceEntry[] createChoiceEntries(Set<String> choices) {
+    public static @Nullable ChoiceEntry[] createChoiceEntries(@Nullable Set<String> choices) {
         if (choices != null) {
             ChoiceEntry[] entries = new ChoiceEntry[choices.size()];
             int i = 0;
@@ -330,7 +332,7 @@ public class ChoiceSelector extends JDialog {
      * @author Martin Hentschel
      */
     public record ChoiceEntry(String choice, boolean unsound, boolean incomplete,
-            String information) {
+            @Nullable String information) {
 
         /**
          * Text shown to the user in case of incompletness.

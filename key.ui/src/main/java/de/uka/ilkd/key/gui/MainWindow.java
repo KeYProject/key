@@ -81,6 +81,7 @@ import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.util.SystemInfo;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,6 +89,7 @@ import org.slf4j.LoggerFactory;
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
 @HelpInfo()
+@NullMarked
 public final class MainWindow extends JFrame {
 
     /**
@@ -112,7 +114,7 @@ public final class MainWindow extends JFrame {
         "Activates the 'Run All Proofs' action that allows you to run multiple proofs inside the UI.",
         false);
 
-    private static MainWindow instance = null;
+    private static @Nullable MainWindow instance = null;
     /**
      * Search bar for Sequent Views.
      */
@@ -204,7 +206,7 @@ public final class MainWindow extends JFrame {
     /**
      * action for opening the most recent KeY file
      */
-    private OpenMostRecentFileAction openMostRecentFileAction;
+    private @Nullable OpenMostRecentFileAction openMostRecentFileAction;
     /**
      * action for editing the most recent KeY file
      */
@@ -231,7 +233,6 @@ public final class MainWindow extends JFrame {
     private LemmaGenerationAction loadKeYTaclets;
     private LemmaGenerationBatchModeAction lemmaGenerationBatchModeAction;
 
-
     /**
      * actions for changing the selection on the proof tree
      */
@@ -239,7 +240,7 @@ public final class MainWindow extends JFrame {
     private GoalSelectBelowAction goalSelectBelowAction;
     private DropdownSelectionButton smtComponent;
     private DropdownSelectionButton.EmptyAction noSolverSelected;
-    private ChangeListener selectAllListener;
+    private @Nullable ChangeListener selectAllListener;
     private JCheckBoxMenuItem selectAll;
     private JSeparator separator;
     private DropdownSelectionButton automationComponent;
@@ -308,7 +309,6 @@ public final class MainWindow extends JFrame {
             applyMacOsWorkaround();
         }
         setIconImages(IconFactory.applicationLogos());
-
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         proofListener = new MainProofListener();
@@ -987,7 +987,6 @@ public final class MainWindow extends JFrame {
         return menuBar;
     }
 
-
     private JMenu createFileMenu() {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
@@ -1079,7 +1078,7 @@ public final class MainWindow extends JFrame {
      * @param selected a specific proof that the menu should work on, may be null
      * @return the menu
      */
-    public JMenu createProofMenu(Proof selected) {
+    public JMenu createProofMenu(@Nullable Proof selected) {
         JMenu proof = new JMenu("Proof");
         proof.setMnemonic(KeyEvent.VK_P);
 
@@ -1423,7 +1422,7 @@ public final class MainWindow extends JFrame {
         return userInterface;
     }
 
-    public Action getOpenMostRecentFileAction() {
+    public @Nullable Action getOpenMostRecentFileAction() {
         return openMostRecentFileAction;
     }
 
@@ -1663,6 +1662,7 @@ public final class MainWindow extends JFrame {
      * This has been partly taken from the GlassPaneDemo of the Java Tutorial
      */
     private static class GlassPaneListener extends MouseInputAdapter {
+        @Nullable
         Component currentComponent = null;
         final Component glassPane;
         final Container contentPane;
@@ -1736,7 +1736,6 @@ public final class MainWindow extends JFrame {
                     glassPane.setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 }
 
-
             }
         }
 
@@ -1770,7 +1769,7 @@ public final class MainWindow extends JFrame {
      */
     class MainGUIListener implements GUIListener {
 
-        private Set<Component> doNotReenable;
+        private @Nullable Set<Component> doNotReenable;
 
         private void enableMenuBar(JMenuBar m, boolean b) {
             for (int i = 0; i < m.getMenuCount(); i++) {
@@ -1867,6 +1866,7 @@ public final class MainWindow extends JFrame {
     class MainProofListener
             implements AutoModeListener, KeYSelectionListener, PropertyChangeListener {
 
+        @Nullable
         Proof proof = null;
 
         /**
@@ -1948,7 +1948,7 @@ public final class MainWindow extends JFrame {
             handleProof(e.getSource().getSelectedProof());
         }
 
-        private void handleProof(Proof p) {
+        private void handleProof(@Nullable Proof p) {
             if (p != null) {
                 enable(!p.closed());
             } else {

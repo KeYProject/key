@@ -19,6 +19,7 @@ import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This Dialog contains options for highlighting sequent formulae or terms according to their age,
@@ -29,6 +30,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
  *
  */
 
+@NullMarked
 public class HeatmapOptionsDialog extends JDialog {
 
     /**
@@ -114,8 +116,6 @@ public class HeatmapOptionsDialog extends JDialog {
         // set up spinner for age value
 
         JSpinner valueSpinner = setupSpinner();
-
-
 
         for (int i = 0; i < NUMRADIOBUTTONS; i++) {
             radioButtons[i] = new JRadioButton(BUTTON_NAMES[i]);

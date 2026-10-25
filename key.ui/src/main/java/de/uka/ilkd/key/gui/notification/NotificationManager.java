@@ -13,12 +13,16 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ProofEvent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The notificatin manager controls the list of active notification tasks. It receives KeY System
  * events and looks for an appropriate task
  *
  * @author bubel
  */
+@NullMarked
 public class NotificationManager {
 
     /** list of notification tasks */
@@ -85,7 +89,7 @@ public class NotificationManager {
      * @param eventID The {@link NotificationEventID} to remove its {@link NotificationTask}.
      * @return The removed {@link NotificationTask} or {@code null} if none was available.
      */
-    public NotificationTask removeNotificationTask(NotificationEventID eventID) {
+    public @Nullable NotificationTask removeNotificationTask(NotificationEventID eventID) {
         return notificationTasks.remove(eventID);
     }
 

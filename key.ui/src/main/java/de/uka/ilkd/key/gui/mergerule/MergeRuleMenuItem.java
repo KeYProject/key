@@ -19,12 +19,15 @@ import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The menu item for the state merging rule.
  *
  * @author Dominic Scheurer
  * @see MergeRule
  */
+@NullMarked
 public class MergeRuleMenuItem extends JMenuItem {
     private static final long serialVersionUID = -8509570987542243690L;
 

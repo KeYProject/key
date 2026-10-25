@@ -10,6 +10,10 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public final class AbandonTaskAction extends MainWindowAction {
 
     /**
@@ -17,9 +21,9 @@ public final class AbandonTaskAction extends MainWindowAction {
      */
     private static final long serialVersionUID = 915588190956945751L;
 
-    private final Proof proof;
+    private final @Nullable Proof proof;
 
-    public AbandonTaskAction(MainWindow mainWindow, Proof proof) {
+    public AbandonTaskAction(MainWindow mainWindow, @Nullable Proof proof) {
         super(mainWindow);
         setName("Abandon Proof");
         setIcon(IconFactory.abandon(16));

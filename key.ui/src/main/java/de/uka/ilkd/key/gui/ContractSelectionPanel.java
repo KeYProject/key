@@ -22,10 +22,13 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A panel for selecting contracts.
  */
+@NullMarked
 public class ContractSelectionPanel extends JPanel {
 
     /**
@@ -54,7 +57,6 @@ public class ContractSelectionPanel extends JPanel {
      * @see Contract#isAuxiliary()
      */
     private boolean grayOutAuxiliaryContracts = false;
-
 
     // -------------------------------------------------------------------------
     // constructors
@@ -190,12 +192,11 @@ public class ContractSelectionPanel extends JPanel {
         scrollPane.setViewportView(contractList);
     }
 
-
     // -------------------------------------------------------------------------
     // internal methods
     // -------------------------------------------------------------------------
 
-    private Proof getClosedProof(Contract c) {
+    private @Nullable Proof getClosedProof(Contract c) {
         ImmutableSet<Proof> proofs = services.getSpecificationRepository().getProofs(c);
 
         for (Proof proof : proofs) {
@@ -215,7 +216,6 @@ public class ContractSelectionPanel extends JPanel {
         contractList.addMouseListener(ml);
     }
 
-
     public void addListSelectionListener(ListSelectionListener lsl) {
         contractList.addListSelectionListener(lsl);
     }
@@ -231,8 +231,7 @@ public class ContractSelectionPanel extends JPanel {
         this.grayOutAuxiliaryContracts = grayOutAuxiliaryContracts;
     }
 
-
-    public void setContracts(Contract[] contracts, String title) {
+    public void setContracts(@Nullable Contract[] contracts, @Nullable String title) {
         if (contracts == null || contracts.length == 0) {
             this.contracts = new Contract[0];
             contractList.setListData(this.contracts);
@@ -274,7 +273,6 @@ public class ContractSelectionPanel extends JPanel {
         updateUI();
     }
 
-
     public void setContracts(ImmutableSet<Contract> contracts, String title) {
         setContracts(contracts.toArray(new Contract[contracts.size()]), title);
     }
@@ -288,7 +286,7 @@ public class ContractSelectionPanel extends JPanel {
         contractList.setSelectedValue(contract, true);
     }
 
-    public Contract getContract() {
+    public @Nullable Contract getContract() {
         final List<Contract> selection = contractList.getSelectedValuesList();
         return computeContract(services, selection);
     }
@@ -305,7 +303,7 @@ public class ContractSelectionPanel extends JPanel {
      * @param selection The selected contracts.
      * @return The selected {@link Contract} or {@code null} if not available.
      */
-    public static Contract computeContract(Services services, List<Contract> selection) {
+    public static @Nullable Contract computeContract(Services services, List<Contract> selection) {
         if (selection.isEmpty()) {
             return null;
         } else if (selection.size() == 1) {

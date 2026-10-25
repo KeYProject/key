@@ -15,6 +15,8 @@ import javax.swing.text.Document;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.JTextComponent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author mulbrich
  */
+@NullMarked
 public class BracketMatchingTextArea extends JTextArea implements CaretListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(BracketMatchingTextArea.class);
 
@@ -87,7 +90,6 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      */
     private Object theDiffParensHighlight;
 
-
     /**
      * Constructs a new TextArea. A default model is set, the initial string is null, and
      * rows/columns are set to 0.
@@ -107,7 +109,8 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * @param columns the number of columns >= 0
      * @exception IllegalArgumentException if the rows or columns arguments are negative.
      */
-    public BracketMatchingTextArea(Document doc, String text, int rows, int columns) {
+    public BracketMatchingTextArea(@Nullable Document doc, @Nullable String text, int rows,
+            int columns) {
         super(doc, text, rows, columns);
         init();
     }
@@ -118,7 +121,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      *
      * @param doc the model to use
      */
-    public BracketMatchingTextArea(Document doc) {
+    public BracketMatchingTextArea(@Nullable Document doc) {
         super(doc);
         init();
     }
@@ -145,7 +148,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * @param columns the number of columns >= 0
      * @exception IllegalArgumentException if the rows or columns arguments are negative.
      */
-    public BracketMatchingTextArea(String text, int rows, int columns) {
+    public BracketMatchingTextArea(@Nullable String text, int rows, int columns) {
         super(text, rows, columns);
         init();
     }
@@ -156,7 +159,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      *
      * @param text the text to be displayed, or null
      */
-    public BracketMatchingTextArea(String text) {
+    public BracketMatchingTextArea(@Nullable String text) {
         super(text);
         init();
     }

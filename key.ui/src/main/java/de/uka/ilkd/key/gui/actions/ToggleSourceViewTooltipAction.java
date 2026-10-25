@@ -12,6 +12,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Toggles the tooltips of the source view.
  *
@@ -19,6 +21,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
  *
  * @see de.uka.ilkd.key.gui.sourceview.SourceView#getToolTipText()
  */
+@NullMarked
 public class ToggleSourceViewTooltipAction extends MainWindowAction {
     /** This action's name. */
     public static final String NAME = "Show Tooltips in Source View";

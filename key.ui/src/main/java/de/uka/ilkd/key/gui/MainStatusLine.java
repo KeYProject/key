@@ -11,6 +11,8 @@ import javax.swing.border.BevelBorder;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Status line of the KeY MainWindow.
  * <p>
@@ -28,6 +30,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
  * @see MainWindow
  * @see de.uka.ilkd.key.gui.extension.api.KeYGuiExtension.StatusLine
  */
+@NullMarked
 class MainStatusLine extends JPanel {
     private final JLabel lblStatusText = new JLabel();
     private final JProgressBar progressBar = new JProgressBar();

@@ -18,9 +18,12 @@ import de.uka.ilkd.key.gui.smt.OptionContentNode;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * for debugging - opens a window with the settings from current Proof and the default settings
  */
+@NullMarked
 public class ShowActiveSettingsAction extends MainWindowAction {
     public ShowActiveSettingsAction(MainWindow mainWindow) {
         super(mainWindow);

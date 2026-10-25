@@ -11,11 +11,14 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * User action to start auto mode on a specific goal.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class RunStrategyOnNodeUserAction extends ProofModifyingUserAction {
 
     /**

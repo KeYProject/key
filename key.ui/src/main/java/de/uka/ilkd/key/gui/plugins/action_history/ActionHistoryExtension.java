@@ -25,12 +25,15 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Entry point for the Action History functionality.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class ActionHistoryExtension implements UserActionListener,
         ProofDisposedListener, KeYSelectionListener {
     /**
@@ -55,7 +58,7 @@ public class ActionHistoryExtension implements UserActionListener,
     /**
      * The currently shown proof.
      */
-    private Proof currentProof = null;
+    private @Nullable Proof currentProof = null;
 
     private List<UserAction> getActions() {
         List<UserAction> actions = userActions.get(currentProof);

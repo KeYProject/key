@@ -8,10 +8,13 @@ import java.awt.*;
 import java.util.ArrayList;
 import javax.swing.*;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Alexander Weigl
  * @version 1 (15.03.19)
  */
+@NullMarked
 public class ShowIcons extends JFrame {
     private static final long serialVersionUID = 8775474163870717215L;
     // private Box box = new Box(BoxLayout.Y_AXIS);
@@ -19,11 +22,9 @@ public class ShowIcons extends JFrame {
     private final JPanel search = new JPanel();
     private final ArrayList<JLabel> icons = new ArrayList<>();
 
-
     public ShowIcons() {
         setTitle("ShowIcons");
         setLayout(new BorderLayout());
-
 
         JLabel lblSearch = new JLabel("Search:");
         JTextField txtSearch = new JTextField(25);

@@ -21,11 +21,15 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.instantiation.InstantiationEntry;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Pretty-printing for the taclet-match dialog. Term labels are never shown here: the dialog
  * displays
  * the logical content (find/matched/bindings/preview), where origin and other labels are noise.
  */
+@NullMarked
 final class TmPrint {
 
     /** a label visibility that hides every term label */
@@ -50,7 +54,7 @@ final class TmPrint {
     }
 
     /** a printed term together with the position table that maps its sub-terms to char ranges. */
-    record Positioned(String text, InitialPositionTable positions) {
+    record Positioned(String text, @Nullable InitialPositionTable positions) {
     }
 
     /**

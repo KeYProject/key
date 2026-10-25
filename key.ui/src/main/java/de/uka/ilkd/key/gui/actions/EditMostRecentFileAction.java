@@ -15,13 +15,14 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Opens the last opened file in an editor (well, it tries)
  */
+@NullMarked
 public final class EditMostRecentFileAction extends MainWindowAction
         implements KeYSelectionListener {
 

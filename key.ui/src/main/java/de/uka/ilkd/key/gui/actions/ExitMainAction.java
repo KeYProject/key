@@ -15,9 +15,11 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class ExitMainAction extends MainWindowAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExitMainAction.class);
 
@@ -58,7 +60,6 @@ public class ExitMainAction extends MainWindowAction {
             exitMainWithoutInteraction();
         }
     }
-
 
     /**
      * makes all GUI settings persistence; this method is also called by the Eclipse integration to

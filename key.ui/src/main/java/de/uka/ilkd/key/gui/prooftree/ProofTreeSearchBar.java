@@ -18,7 +18,10 @@ import de.uka.ilkd.key.gui.SearchBar;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
     private final ProofTreeView proofTreeView;
     private int startRow = 0;
@@ -29,7 +32,7 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
      * needed to reach them); when deselected, the search only highlights matches without hiding
      * anything. Created in {@link #createUI()}.
      */
-    private JToggleButton collapseToggle;
+    private @Nullable JToggleButton collapseToggle;
 
     /** whether the {@link ProofTreeViewFilter#SEARCH} filter is currently applied to the model */
     private boolean filterApplied = false;
@@ -164,7 +167,7 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
         reset();
     }
 
-    private List<Pair<GUIAbstractTreeNode, String>> cache;
+    private @Nullable List<Pair<GUIAbstractTreeNode, String>> cache;
 
     public synchronized void reset() {
         cache = null;

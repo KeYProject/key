@@ -20,12 +20,16 @@ import de.uka.ilkd.key.smt.*;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * User action to apply the results of running SMT solvers.
  * Closes zero or more goals.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class SMTProofApplyUserAction extends UserAction {
     /**
      * Results of running the SMT solvers (one entry for each open goal).
@@ -40,7 +44,7 @@ public class SMTProofApplyUserAction extends UserAction {
      */
     private final Collection<Node> originalProofNodes;
 
-    private final Node originalSelectedNode;
+    private final @Nullable Node originalSelectedNode;
 
     public SMTProofApplyUserAction(KeYMediator mediator, Proof proof,
             Collection<SolverListener.InternSMTProblem> smtProblems) {

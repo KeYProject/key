@@ -9,6 +9,9 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.*;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A simple utility which stores and loads user manipulatable properties of swing components in the
  * system's preferences.
@@ -27,6 +30,7 @@ import javax.swing.*;
  *
  * @author mattias ulbrich
  */
+@NullMarked
 public class PreferenceSaver {
 
     /**
@@ -52,7 +56,7 @@ public class PreferenceSaver {
      * get a saver for a component.
      */
     @SuppressWarnings("unchecked")
-    private static <C extends Component> Saver<C> getSaver(C component) {
+    private static <C extends Component> @Nullable Saver<C> getSaver(C component) {
         for (Saver<?> saver : SAVERS) {
             if (saver.supportedClass().isInstance(component)) {
                 return (Saver<C>) saver;

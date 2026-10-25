@@ -9,6 +9,10 @@ import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public interface TaskTreeNode extends MutableTreeNode {
 
     TaskTreeNode[] NO_CHILDREN = new TaskTreeNode[0];
@@ -17,14 +21,17 @@ public interface TaskTreeNode extends MutableTreeNode {
 
     String shortDescr();
 
+    @Nullable
     Proof proof();
 
+    @Nullable
     Proof[] allProofs();
 
     void insertNode(TaskTreeModel model, MutableTreeNode parent);
 
     TreeNode[] getPath();
 
+    @Nullable
     ProofStatus getStatus();
 
     void decoupleFromEnv();

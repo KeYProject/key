@@ -10,6 +10,9 @@ import javax.swing.JCheckBoxMenuItem;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ToggleConfirmExitAction extends MainWindowAction {
 
     /**

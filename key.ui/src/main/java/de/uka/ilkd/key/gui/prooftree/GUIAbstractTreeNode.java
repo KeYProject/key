@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.prooftree;
 
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -15,7 +14,10 @@ import javax.swing.tree.TreeNode;
 import de.uka.ilkd.key.proof.Node;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public abstract class GUIAbstractTreeNode implements TreeNode {
 
     private final GUIProofTreeModel tree;
@@ -24,7 +26,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
     // and ProofTreeView.delegateView.lastPathComponent
     private final WeakReference<Node> noderef;
 
-    protected TreeNode parent;
+    protected @Nullable TreeNode parent;
 
     protected GUIProofTreeModel getProofTreeModel() {
         return tree;
@@ -40,7 +42,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
     public abstract int getChildCount();
 
     @Override
-    public TreeNode getParent() {
+    public @Nullable TreeNode getParent() {
         if (parent == null && this != tree.getRoot()
                 && !(getNode() != null && ProofTreeViewFilter.hiddenByGlobalFilters(getNode()))) {
             Node n = getNode();
@@ -74,7 +76,6 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
     public Enumeration<TreeNode> children() {
         return new ChildEnumeration();
     }
-
 
     public TreeNode[] getPath() {
         LinkedList<TreeNode> path = new LinkedList<>();
@@ -116,8 +117,6 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
         return label;
     }
 
-
-
     private class ChildEnumeration implements Enumeration<TreeNode> {
         int current = 0;
 
@@ -131,7 +130,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
 
     }
 
-    public Node getNode() {
+    public @Nullable Node getNode() {
         return noderef.get();
     }
 

@@ -18,6 +18,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class HeatmapToggleAction extends MainWindowAction {
     private static final long serialVersionUID = 1L;
 

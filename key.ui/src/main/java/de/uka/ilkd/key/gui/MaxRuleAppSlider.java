@@ -10,6 +10,10 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class MaxRuleAppSlider extends JSlider {
     /**
      *
@@ -19,7 +23,7 @@ public class MaxRuleAppSlider extends JSlider {
     private static final LinkedList<MaxRuleAppSlider> allInstances =
         new LinkedList<>();
     private final String text;
-    private KeYMediator mediator;
+    private @Nullable KeYMediator mediator;
 
     public MaxRuleAppSlider(KeYMediator mediator, String text) {
         super(HORIZONTAL, 0, MAX_RULE_APPS_LOG10 * 9, 0);

@@ -21,6 +21,9 @@ import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class extends the functionality of the {@link AbstractProblemLoader}. It allows to do the
  * loading process as {@link SwingWorker} {@link Thread} and it opens the proof obligation browser
@@ -28,19 +31,20 @@ import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public final class ProblemLoader extends AbstractProblemLoader {
     // TODO: Rename in MultiThreadProblemLoader analog to SingleThreadProblemLoader because it uses
     // multiple Threads
     // (UI and SwingWorker)?
 
-    private final ProverTaskListener ptl;
+    private final @Nullable ProverTaskListener ptl;
 
     private final KeYMediator mediator;
 
     public ProblemLoader(Path file, List<Path> classPath, Path bootClassPath, List<Path> includes,
             Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs, KeYMediator mediator,
             boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
-            Properties poPropertiesToForce, ProverTaskListener ptl) {
+            @Nullable Properties poPropertiesToForce, @Nullable ProverTaskListener ptl) {
         super(file, classPath, bootClassPath, includes, profileOfNewProofs,
             forceNewProfileOfNewProofs, mediator.getUI(),
             askUiToSelectAProofObligationIfNotDefinedByLoadedFile, poPropertiesToForce);
@@ -70,7 +74,7 @@ public final class ProblemLoader extends AbstractProblemLoader {
         fireTaskFinished(runTime, message);
     }
 
-    private Throwable doWork() {
+    private @Nullable Throwable doWork() {
         try {
             load(mediator::fireProofLoaded);
             return null;
@@ -85,7 +89,7 @@ public final class ProblemLoader extends AbstractProblemLoader {
         }
     }
 
-    private void fireTaskFinished(long runningTime, final Throwable message) {
+    private void fireTaskFinished(long runningTime, final @Nullable Throwable message) {
         if (ptl != null) {
             final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, message,
                 getProof(), runningTime, (getProof() != null ? getProof().countNodes() : 0),
@@ -94,8 +98,6 @@ public final class ProblemLoader extends AbstractProblemLoader {
             ptl.taskFinished(tfi);
         }
     }
-
-
 
     @Override
     protected void selectAndLoadProof(ProblemLoaderControl control, InitConfig initConfig) {
@@ -115,12 +117,12 @@ public final class ProblemLoader extends AbstractProblemLoader {
      * {@link ProverTaskListener#taskFinished(TaskFinishedInfo)} on the registered listener.
      */
     public void runAsynchronously() {
-        final SwingWorker<Throwable, Void> worker = new SwingWorker<>() {
+        final SwingWorker<@Nullable Throwable, Void> worker = new SwingWorker<>() {
 
             private long runTime;
 
             @Override
-            protected Throwable doInBackground() {
+            protected @Nullable Throwable doInBackground() {
                 long currentTime = System.currentTimeMillis();
                 final Throwable message = doWork();
                 runTime = System.currentTimeMillis() - currentTime;

@@ -10,12 +10,15 @@ import javax.swing.border.EmptyBorder;
 
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Modal dialog displaying a soundiness report as HTML for a proof.
  *
  * @author opencode
  * @since 3.0
  */
+@NullMarked
 public class SoundinessDialog extends JDialog {
 
     /**

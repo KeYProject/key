@@ -21,11 +21,15 @@ import org.key_project.prover.rules.conditions.NewDependingOn;
 import org.key_project.prover.rules.conditions.NewVarcond;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The methods of class TacletDescriber have been extracted from class {@link InnerNodeView}. They
  * compute the text to show for a rule application which consists of the sequent including the
  * applied rule.
  */
+@NullMarked
 class TacletDescriber {
 
     private static void writeSVModifiers(StringBuffer out, SchemaVariable psv) {
@@ -131,7 +135,8 @@ class TacletDescriber {
      * @param app The {@link RuleApp} to use.
      * @return The text to show.
      */
-    public static String getTacletDescription(KeYMediator mediator, RuleApp app, int width) {
+    public static String getTacletDescription(KeYMediator mediator, @Nullable RuleApp app,
+            int width) {
         StringBuilder s = new StringBuilder();
 
         if (app != null) {

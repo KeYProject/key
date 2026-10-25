@@ -25,11 +25,14 @@ import org.key_project.logic.Name;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This menu can be used to toggle TermLabel visibility for the SequentView.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
+@NullMarked
 public class TermLabelMenu extends JMenu {
     public static final String TERM_LABEL_MENU = "Term Labels";
 

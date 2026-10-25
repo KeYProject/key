@@ -19,6 +19,9 @@ import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Shows the sequent(s) that applying the taclet with the current instantiations would produce. The
  * result is computed with the executor's side-effect-free
@@ -26,6 +29,7 @@ import org.key_project.util.collection.ImmutableList;
  * the proof. It refreshes, debounced, whenever the instantiations change; while they are incomplete
  * it shows a hint instead.
  */
+@NullMarked
 public class ResultPreviewPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
@@ -35,7 +39,7 @@ public class ResultPreviewPanel extends JPanel {
     private final Goal goal;
 
     private final JPanel body = new JPanel();
-    private Timer debounce;
+    private @Nullable Timer debounce;
 
     public ResultPreviewPanel(TacletInstantiationModel model, KeYMediator mediator, Goal goal) {
         this.model = model;

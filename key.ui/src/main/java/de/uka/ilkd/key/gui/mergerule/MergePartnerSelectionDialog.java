@@ -33,12 +33,16 @@ import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * JDialog for selecting a subset of candidate goals as partners for a {@link MergeRule}
  * application.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class MergePartnerSelectionDialog extends JDialog {
 
     private static final long serialVersionUID = -1460097562546341922L;
@@ -70,18 +74,18 @@ public class MergePartnerSelectionDialog extends JDialog {
     private static final Comparator<MergePartner> GOAL_COMPARATOR =
         Comparator.comparingInt(o -> o.getGoal().node().serialNr());
 
-    private LinkedList<MergePartner> candidates = null;
-    private Services services = null;
-    private Pair<Goal, PosInOccurrence> mergeGoalPio = null;
+    private @Nullable LinkedList<MergePartner> candidates = null;
+    private @Nullable Services services = null;
+    private @Nullable Pair<Goal, PosInOccurrence> mergeGoalPio = null;
 
     /** The chosen goals. */
-    private SortedSet<MergePartner> chosenGoals = new TreeSet<>(GOAL_COMPARATOR);
+    private @Nullable SortedSet<MergePartner> chosenGoals = new TreeSet<>(GOAL_COMPARATOR);
 
     /** The chosen merge method. */
     private MergeProcedure chosenRule = MergeProcedure.getMergeProcedures().head();
 
     /** The chosen distinguishing formula */
-    private JTerm chosenDistForm = null;
+    private @Nullable JTerm chosenDistForm = null;
 
     private JEditorPane txtPartner1 = null;
     private JEditorPane txtPartner2 = null;
@@ -353,7 +357,7 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @return The chosen distinguishing formula. If null, an automatic generation of the
      *         distinguishing formula should be performed.
      */
-    public JTerm getChosenDistinguishingFormula() {
+    public @Nullable JTerm getChosenDistinguishingFormula() {
         return isSuitableDistFormula() ? chosenDistForm : null;
     }
 
@@ -461,7 +465,7 @@ public class MergePartnerSelectionDialog extends JDialog {
     /**
      * @return The candidate chosen at the moment (by the combo box).
      */
-    private MergePartner getSelectedCandidate() {
+    private @Nullable MergePartner getSelectedCandidate() {
         return getNthCandidate(cmbCandidates.getSelectedIndex());
     }
 
@@ -471,7 +475,7 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @param n Index of the merge candidate.
      * @return The n-th candidate in the list.
      */
-    private MergePartner getNthCandidate(int n) {
+    private @Nullable MergePartner getNthCandidate(int n) {
         int i = 0;
         for (MergePartner elem : candidates) {
             if (i == n) {

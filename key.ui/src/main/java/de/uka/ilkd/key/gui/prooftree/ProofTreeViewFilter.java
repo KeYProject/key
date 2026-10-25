@@ -13,12 +13,16 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Filters for the proof tree view.
  *
  * @author bruns
  * @author lanzinger
  */
+@NullMarked
 public abstract class ProofTreeViewFilter {
 
     /**
@@ -155,7 +159,7 @@ public abstract class ProofTreeViewFilter {
          *         filters.
          * @see #countChild(TreeNode, TreeNode, int)
          */
-        public Object getChild(Object parent, int index) {
+        public @Nullable Object getChild(Object parent, int index) {
             TreeNode child;
             int count = -1;
             for (int i = 0; i < ((TreeNode) parent).getChildCount(); i++) {
@@ -190,7 +194,6 @@ public abstract class ProofTreeViewFilter {
             }
             return -1;
         }
-
 
         /**
          * Decides whether a child should be counted while iterating all children. A child should
@@ -396,7 +399,7 @@ public abstract class ProofTreeViewFilter {
          *
          * @param query the search query, as entered into the proof tree's search bar.
          */
-        void setQuery(String query) {
+        void setQuery(@Nullable String query) {
             this.query = query == null ? "" : query.toLowerCase();
             containsMatchCache.clear();
         }

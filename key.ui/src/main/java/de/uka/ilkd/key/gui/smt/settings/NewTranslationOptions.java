@@ -25,12 +25,15 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerServices;
 
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This is the dialog for the new smt translation mechnism (newsmt2) which aims at a higher degree
  * of flexibility.
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
 
     /**
@@ -62,7 +65,6 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
             throw new RuntimeException(ex);
         }
     }
-
 
     @Override
     public String getDescription() {

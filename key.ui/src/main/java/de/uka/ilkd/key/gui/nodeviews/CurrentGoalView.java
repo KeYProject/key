@@ -25,6 +25,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * as the application of rules. It offers services for highlighting formulas, selecting applicable
  * rules (in particular taclets) and drag'n drop instantiation of taclets.
  */
+@NullMarked
 public final class CurrentGoalView extends SequentView implements Autoscroll {
     private static final Logger LOGGER = LoggerFactory.getLogger(CurrentGoalView.class);
 

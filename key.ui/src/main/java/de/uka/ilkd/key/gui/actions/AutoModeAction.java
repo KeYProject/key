@@ -21,6 +21,10 @@ import de.uka.ilkd.key.proof.*;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class AutoModeAction extends MainWindowAction {
 
     private static final KeyStroke START_KEY =
@@ -31,7 +35,7 @@ public class AutoModeAction extends MainWindowAction {
     private static final Icon STOP_ICON =
         IconFactory.iconWithOverlay(IconFactory.autoModeStopLogo(MainWindow.TOOLBAR_ICON_SIZE), "");
 
-    private Proof associatedProof;
+    private @Nullable Proof associatedProof;
 
     private final ProofTreeListener ptl = new ProofTreeAdapter() {
 

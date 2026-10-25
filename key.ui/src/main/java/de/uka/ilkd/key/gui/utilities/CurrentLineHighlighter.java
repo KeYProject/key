@@ -9,6 +9,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Swing highlighter that highlights the current line in a JTextComponent.
  *
@@ -17,13 +20,14 @@ import javax.swing.text.JTextComponent;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class CurrentLineHighlighter implements Highlighter {
     private static final Color DEFAULT_COLOR = new Color(0, 0, 0, 15);
 
     private final Highlighter delegate;
     private final Color color;
 
-    private JTextComponent component;
+    private @Nullable JTextComponent component;
 
     public CurrentLineHighlighter(Highlighter delegate) {
         this(delegate, DEFAULT_COLOR);

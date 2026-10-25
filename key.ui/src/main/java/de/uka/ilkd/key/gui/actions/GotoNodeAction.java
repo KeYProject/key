@@ -9,11 +9,14 @@ import java.awt.event.ActionEvent;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.jspecify.annotations.NullMarked;
+
 /// Menu option for selecting the proof node with the given node number.
 ///
 /// Keyboard shortcut: Ctrl + G (see {@link de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeSettings})
 ///
 /// @author Wolfram Pfeifer
+@NullMarked
 public class GotoNodeAction extends MainWindowAction {
 
     public GotoNodeAction(MainWindow mainWindow) {

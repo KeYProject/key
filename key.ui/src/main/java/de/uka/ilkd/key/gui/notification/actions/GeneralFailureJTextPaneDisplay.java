@@ -10,11 +10,14 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Displays a string in a {@link javax.swing.JOptionPane} error message window.
  *
  * @author bubel
  */
+@NullMarked
 public class GeneralFailureJTextPaneDisplay extends ShowDisplayPane {
 
     /**
