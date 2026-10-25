@@ -111,7 +111,7 @@ public final class Main {
          * bundlePath the path of the bundle (directory or zip file)
          */
         @Parameters(paramLabel = "FILE")
-        public Path bundlePath;
+        public @Nullable Path bundlePath;
 
         @Override
         public Integer call() throws Exception {
@@ -119,7 +119,11 @@ public final class Main {
             // <bundle_path>
             // we accumulate results in this variable
             CheckerData globalResult = new CheckerData(LogLevel.DEBUG);
-            try (ProofBundleHandler pbh = ProofBundleHandler.createBundleHandler(bundlePath)) {
+            Path bundle = bundlePath;
+            if (bundle == null) {
+                throw new NullPointerException("No bundle path provided.");
+            }
+            try (ProofBundleHandler pbh = ProofBundleHandler.createBundleHandler(bundle)) {
                 globalResult.setPbh(pbh);
                 // add file tree to result
                 globalResult.setFileTree(pbh.getFileTree());
@@ -145,13 +149,21 @@ public final class Main {
                     generateReport(globalResult, reportPath);
                 }
             } catch (IOException e) {
-                globalResult.print(LogLevel.ERROR, e.getMessage());
+                String message = e.getMessage();
+                if (message == null) {
+                    throw new NullPointerException("No error message available.");
+                }
+                globalResult.print(LogLevel.ERROR, message);
                 globalResult.print("Error while accessing the proof bundle!");
                 globalResult.print("ProofManagement interrupted due to critical error.");
                 e.printStackTrace();
                 return -1;
             } catch (ProofManagementException e) {
-                globalResult.print(LogLevel.ERROR, e.getMessage());
+                String message = e.getMessage();
+                if (message == null) {
+                    throw new NullPointerException("No error message available.");
+                }
+                globalResult.print(LogLevel.ERROR, message);
                 globalResult.print("ProofManagement interrupted due to critical error.");
                 e.printStackTrace();
                 return -1;
@@ -177,7 +189,7 @@ public final class Main {
 
         @Option(names = { "--output", "-o" }, required = true, description = "Output file",
             paramLabel = "FILE")
-        public Path output;
+        public @Nullable Path output;
 
         // at least three files!
         @Parameters(arity = "2..*", paramLabel = "FILE")
@@ -191,7 +203,11 @@ public final class Main {
             CheckerData logger = new CheckerData(LogLevel.DEBUG);
 
             try {
-                ProofBundleMerger.merge(arguments, output, force, logger);
+                Path out = output;
+                if (out == null) {
+                    throw new NullPointerException("No output path provided.");
+                }
+                ProofBundleMerger.merge(arguments, out, force, logger);
             } catch (ProofManagementException e) {
                 System.err.println("Error when trying to merge the bundles: ");
                 e.printStackTrace();

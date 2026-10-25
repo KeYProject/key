@@ -34,17 +34,27 @@ public final class HTMLReport {
 
     /**
      * Prints out the given check results to a target path.
+     * <p>
+     * The {@code null} template attribute values added to the {@link ST} below are deliberate:
+     * StringTemplate treats a {@code null} attribute as an unset/optional attribute (renders it
+     * as empty); the unannotated (non-null) value parameter of {@code ST.add} cannot express
+     * this, suppressed with a scoped key.
      *
      * @param data the check results to print
      * @param target the target path of the output
      * @throws IOException if an error occurs when accessing to the target path or the string
      *         template resources
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static void print(CheckerData data, Path target) throws IOException {
 
         ST st = prepareStringTemplate();
 
-        st.add("title", data.getPbh().getBundleName() + " - Proof Management Report");
+        ProofBundleHandler pbh = data.getPbh();
+        if (pbh == null) {
+            throw new NullPointerException("No proof bundle handler set.");
+        }
+        st.add("title", pbh.getBundleName() + " - Proof Management Report");
 
         PathNode fileTree = data.getFileTree();
 
@@ -74,6 +84,9 @@ public final class HTMLReport {
     @SuppressWarnings("rawtypes")
     private static ST prepareStringTemplate() throws IOException {
         ClassLoader classLoader = HTMLReport.class.getClassLoader();
+        if (classLoader == null) {
+            throw new NullPointerException("No class loader for " + HTMLReport.class.getName());
+        }
         URL url = classLoader.getResource("report/html");
 
         if (url == null) {

@@ -35,7 +35,11 @@ public class PathNode extends Node<Path> {
 
     @Override
     public String toString() {
-        return getContent().getFileName().toString();
+        Path fileName = getContent().getFileName();
+        if (fileName == null) {
+            throw new NullPointerException("Path has no file name: " + getContent());
+        }
+        return fileName.toString();
     }
 
     @Override

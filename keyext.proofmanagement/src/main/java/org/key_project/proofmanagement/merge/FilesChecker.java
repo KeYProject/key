@@ -64,7 +64,7 @@ public class FilesChecker {
         if (bcp == null) {
             return Collections.emptyList();
         }
-        try (var files = Files.walk(pbh.getBootclasspath())) {
+        try (var files = Files.walk(bcp)) {
             return files.toList();
         }
     }
