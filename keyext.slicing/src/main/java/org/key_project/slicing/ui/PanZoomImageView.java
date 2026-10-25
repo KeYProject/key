@@ -16,6 +16,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import javax.swing.*;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A simple image view that may be panned and zoomed by the user.
  *
@@ -23,6 +25,7 @@ import javax.swing.*;
  *
  * @author Arne Keller
  */
+@NullMarked
 public class PanZoomImageView extends JComponent
         implements MouseListener, MouseMotionListener, MouseWheelListener {
     /**

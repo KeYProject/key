@@ -10,11 +10,14 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.proof.Node;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Context menu action to select the proof step that created a formula.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class ShowCreatedByAction extends MainWindowAction {
 
     private static final long serialVersionUID = 1475202264543002419L;

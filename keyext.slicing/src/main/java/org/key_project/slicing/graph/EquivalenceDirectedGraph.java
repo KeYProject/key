@@ -13,6 +13,8 @@ import java.util.Map;
 import org.key_project.util.EqualsAndHashCodeDelegator;
 import org.key_project.util.collection.DirectedGraph;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A directed graph, extended to store equivalence groups of vertices.
  * Equivalence groups are identified using equality modulo proof irrelevancy.
@@ -20,6 +22,7 @@ import org.key_project.util.collection.DirectedGraph;
  *
  * @author Arne Keller
  */
+@NullMarked
 public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, AnnotatedEdge> {
     /**
      * Vertices in this graph, grouped using equality modulo proof irrelevancy.

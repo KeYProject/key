@@ -17,6 +17,8 @@ import javax.swing.*;
 import org.key_project.slicing.SlicingSettings;
 import org.key_project.slicing.SlicingSettingsProvider;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +28,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@NullMarked
 public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
     /**
      * Logger.
@@ -44,11 +47,11 @@ public class GraphvizDotExecutor extends SwingWorker<GraphvizResult, Void> {
     /**
      * Execution error.
      */
-    private String error;
+    private @Nullable String error;
     /**
      * The rendered graph.
      */
-    private BufferedImage img;
+    private @Nullable BufferedImage img;
     /**
      * Graph to be rendered (dot format).
      */

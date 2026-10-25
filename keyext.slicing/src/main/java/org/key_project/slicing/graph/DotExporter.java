@@ -20,11 +20,15 @@ import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.analysis.AnalysisResults;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Exports a {@link DependencyGraph} in DOT format.
  *
  * @author Arne Keller
  */
+@NullMarked
 public final class DotExporter {
     /**
      * Overrides node shape for specified classes of graph nodes.
@@ -51,7 +55,7 @@ public final class DotExporter {
     public static String exportDot(
             Proof proof,
             DependencyGraph graph,
-            AnalysisResults analysisResults,
+            @Nullable AnalysisResults analysisResults,
             boolean abbreviateFormulas) {
         StringBuilder buf = new StringBuilder();
         buf.append("digraph {\n");
@@ -98,7 +102,7 @@ public final class DotExporter {
      */
     public static String exportDotAround(
             DependencyGraph graph,
-            AnalysisResults analysisResults,
+            @Nullable AnalysisResults analysisResults,
             boolean abbreviateFormulas,
             boolean omitBranch,
             GraphNode graphNode) {
@@ -154,7 +158,7 @@ public final class DotExporter {
      * @param node the node to describe
      * @param data dependency graph data on the node
      */
-    private static void outputEdge(StringBuilder buf, AnalysisResults analysisResults,
+    private static void outputEdge(StringBuilder buf, @Nullable AnalysisResults analysisResults,
             boolean abbreviateFormulas, boolean omitBranch, Node node, DependencyNodeData data) {
         for (Pair<GraphNode, Boolean> in : data.inputs) {
             String inString = in.first.toString(abbreviateFormulas, omitBranch);
@@ -199,7 +203,7 @@ public final class DotExporter {
         }
     }
 
-    private static void outputEdge(StringBuilder buf, AnalysisResults analysisResults,
+    private static void outputEdge(StringBuilder buf, @Nullable AnalysisResults analysisResults,
             boolean abbreviateFormulas, boolean omitBranch, Node node, DependencyNodeData data,
             Collection<AnnotatedEdge> edges) {
         for (var edge : edges) {

@@ -17,6 +17,8 @@ import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +36,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@NullMarked
 public class DependencyGraph {
     private static final Logger LOGGER = LoggerFactory.getLogger(DependencyGraph.class);
 
@@ -362,7 +365,8 @@ public class DependencyGraph {
      * @param pio formula
      * @return graph node, null if not found
      */
-    public GraphNode getGraphNode(Proof proof, BranchLocation locationGuess, PosInOccurrence pio) {
+    public @Nullable GraphNode getGraphNode(Proof proof, BranchLocation locationGuess,
+            PosInOccurrence pio) {
         if (proof == null) {
             return null;
         }
@@ -460,7 +464,7 @@ public class DependencyGraph {
      *
      * @return the proof
      */
-    public Proof proof() {
+    public @Nullable Proof proof() {
         return this.edgeDataReversed.keySet().stream().map(Node::proof).findFirst().orElse(null);
     }
 }
