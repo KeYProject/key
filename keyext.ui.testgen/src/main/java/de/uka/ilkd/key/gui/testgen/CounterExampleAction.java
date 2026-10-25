@@ -22,6 +22,7 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.testgen.smt.counterexample.AbstractCounterExampleGenerator;
@@ -41,6 +42,12 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
     private static final String TOOLTIP_EXTRA = ". Install Z3 to enable this functionality!";
     private boolean haveZ3CE = false;
 
+    /**
+     * The setters below are called on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since all fields are set before
+     * the calls, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public CounterExampleAction(MainWindow mainWindow) {
         super(mainWindow);
         setName(NAME);
@@ -128,7 +135,11 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
      * @return whether Z3 is installed
      */
     private boolean checkZ3CE() {
-        haveZ3CE = SolverTypes.Z3_CE_SOLVER.isInstalled(false);
+        SolverType z3ce = SolverTypes.Z3_CE_SOLVER;
+        if (z3ce == null) {
+            throw new NullPointerException("Z3 counter-example solver is not registered.");
+        }
+        haveZ3CE = z3ce.isInstalled(false);
         if (!haveZ3CE) {
             setEnabled(false);
             setTooltip(TOOLTIP + TOOLTIP_EXTRA);

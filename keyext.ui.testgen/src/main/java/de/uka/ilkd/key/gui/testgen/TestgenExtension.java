@@ -43,7 +43,12 @@ public class TestgenExtension
     @Override
     public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         init(mainWindow);
-        return Arrays.asList(actionCounterExample, actionTestGeneration);
+        TestGenerationAction tg = actionTestGeneration;
+        CounterExampleAction ce = actionCounterExample;
+        if (tg == null || ce == null) {
+            throw new NullPointerException("Test-generation actions not initialized.");
+        }
+        return Arrays.asList(ce, tg);
     }
 
     @Override
@@ -56,8 +61,13 @@ public class TestgenExtension
     @Override
     public @NonNull JToolBar getToolbar(MainWindow mainWindow) {
         JToolBar tb = new JToolBar("test generation");
-        tb.add(actionCounterExample);
-        tb.add(actionTestGeneration);
+        TestGenerationAction tg = actionTestGeneration;
+        CounterExampleAction ce = actionCounterExample;
+        if (tg == null || ce == null) {
+            throw new NullPointerException("Test-generation actions not initialized.");
+        }
+        tb.add(ce);
+        tb.add(tg);
         return tb;
     }
 
