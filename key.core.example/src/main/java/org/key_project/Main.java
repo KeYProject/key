@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
@@ -166,8 +167,12 @@ public class Main {
             ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
                     .setActiveStrategyProperties(sp);
             proof.getSettings().getStrategySettings().setMaxSteps(maxSteps);
-            proof.setActiveStrategy(proof.getServices().getProfile()
-                    .getDefaultStrategyFactory().create(proof, sp));
+            StrategyFactory defaultStrategyFactory =
+                proof.getServices().getProfile().getDefaultStrategyFactory();
+            if (defaultStrategyFactory == null) {
+                throw new NullPointerException("Profile has no default strategy factory.");
+            }
+            proof.setActiveStrategy(defaultStrategyFactory.create(proof, sp));
             // Start auto mode
             env.getUi().getProofControl().startAndWaitForAutoMode(proof);
             // Show proof result
