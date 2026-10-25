@@ -10,6 +10,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.plugins.caching.settings.CachingSettingsProvider;
 import de.uka.ilkd.key.gui.plugins.caching.settings.ProofCachingSettings;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
@@ -56,7 +57,11 @@ public class CachingPruneHandler implements ProofTreeListener {
                 if (c == null || c.proof() != proofToBePruned) {
                     continue;
                 }
-                var commonAncestor = e.getNode().commonAncestor(c.node());
+                Node node = e.getNode();
+                if (node == null) {
+                    throw new NullPointerException("No node available in the prune event.");
+                }
+                var commonAncestor = node.commonAncestor(c.node());
                 if (commonAncestor == c.node()) {
                     boolean copySteps = CachingSettingsProvider.getCachingSettings().getPrune()
                             .equals(ProofCachingSettings.PRUNE_COPY);

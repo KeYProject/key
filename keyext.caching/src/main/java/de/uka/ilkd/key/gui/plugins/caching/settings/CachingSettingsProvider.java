@@ -66,7 +66,12 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
 
     /**
      * Construct a new settings provider.
+     * <p>
+     * The component-building calls are made on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since all fields are assigned by
+     * these calls, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public CachingSettingsProvider() {
         setHeaderText("Proof Caching Options");
 

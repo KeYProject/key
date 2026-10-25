@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.proof.reference;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Node;
@@ -14,6 +13,7 @@ import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
@@ -58,7 +58,8 @@ public final class ReferenceSearcher {
             }
             // conservative check: all user-defined rules in a previous proof
             // have to also be available in the new proof
-            var proofFile = p.getProofFile() != null ? p.getProofFile().toString() : "////";
+            var proofFilePath = p.getProofFile();
+            var proofFile = proofFilePath != null ? proofFilePath.toString() : "////";
             var tacletIndex = p.allGoals().head().ruleAppIndex().tacletIndex();
             var newTacletIndex = newNode.proof().allGoals().head().ruleAppIndex().tacletIndex();
             Set<NoPosTacletApp> newTaclets = newTacletIndex.allNoPosTacletApps();
@@ -86,16 +87,24 @@ public final class ReferenceSearcher {
                 continue;
             }
             Set<Node> checkedNodes = new HashSet<>();
-            Queue<Node> nodesToCheck = p.closedGoals().stream().map(goal -> {
+            Queue<Node> nodesToCheck = new ArrayDeque<>();
+            p.closedGoals().forEach(goal -> {
                 // first, find the initial node in this branch
                 Node n = goal.node();
-                if (n.parent() != null
-                        && n.parent().getAppliedRuleApp().rule() == CloseAfterMerge.INSTANCE) {
-                    // cannot reference this kind of branch
-                    return null;
+                Node parent = n.parent();
+                if (parent != null) {
+                    RuleApp appliedRuleApp = parent.getAppliedRuleApp();
+                    if (appliedRuleApp == null) {
+                        throw new NullPointerException(
+                            "Node " + n.serialNr() + " has no applied rule app.");
+                    }
+                    if (appliedRuleApp.rule() == CloseAfterMerge.INSTANCE) {
+                        // cannot reference this kind of branch
+                        return;
+                    }
                 }
-                return n;
-            }).filter(Objects::nonNull).collect(Collectors.toCollection(ArrayDeque::new));
+                nodesToCheck.add(n);
+            });
             var depTracker = p.lookup(DependencyTracker.class);
             AnalysisResults results = null;
             // only try to get analysis results if it is a pure proof
@@ -118,11 +127,13 @@ public final class ReferenceSearcher {
                 checkedNodes.add(n);
 
                 // find the first node in the branch
-                while (n.parent() != null && n.parent().childrenCount() == 1) {
-                    n = n.parent();
+                Node parent = n.parent();
+                while (parent != null && parent.childrenCount() == 1) {
+                    n = parent;
+                    parent = n.parent();
                 }
-                if (n.parent() != null) {
-                    nodesToCheck.add(n.parent());
+                if (parent != null) {
+                    nodesToCheck.add(parent);
                 }
                 Sequent seq = n.sequent();
                 if (results != null) {
