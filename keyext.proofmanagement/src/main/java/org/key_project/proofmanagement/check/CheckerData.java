@@ -31,11 +31,15 @@ import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This container serves for accumulating data given to checkers and results returned by them.
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public final class CheckerData implements Logger {
 
     public CheckerData(LogLevel minLogLevel) {
@@ -57,11 +61,11 @@ public final class CheckerData implements Logger {
     private final List<String> messages = new ArrayList<>();
 
     // TODO: side effects: may be changed by checkers (e.g. remove paths of taclet proofs)
-    private List<Path> proofPaths;
+    private @Nullable List<Path> proofPaths;
 
     ////////////////////////////////// results from dependency checker
 
-    private DependencyGraph dependencyGraph;
+    private @Nullable DependencyGraph dependencyGraph;
 
     ////////////////////////////////// results from missing proofs checker
 
@@ -170,12 +174,12 @@ public final class CheckerData implements Logger {
     private SettingsState settingsState = SettingsState.UNKNOWN;
     private GlobalState globalState = GlobalState.UNKNOWN;
 
-    private ProofBundleHandler pbh;
-    private PathNode fileTree;
+    private @Nullable ProofBundleHandler pbh;
+    private @Nullable PathNode fileTree;
     private final List<ProofEntry> proofEntries = new ArrayList<>();
-    private SLEnvInput slenv;
+    private @Nullable SLEnvInput slenv;
 
-    public SLEnvInput getSlenv() {
+    public @Nullable SLEnvInput getSlenv() {
         return slenv;
     }
 
@@ -276,23 +280,23 @@ public final class CheckerData implements Logger {
             return replayState == ReplayState.SUCCESS;
         }
 
-        public Path proofFile;
-        public KeYUserProblemFile envInput;
-        public ProblemInitializer problemInitializer;
-        public Proof proof;
+        public @Nullable Path proofFile;
+        public @Nullable KeYUserProblemFile envInput;
+        public @Nullable ProblemInitializer problemInitializer;
+        public @Nullable Proof proof;
 
-        public Contract contract;
-        public URL sourceFile;
-        public String shortSrc;
-        public IntermediatePresentationProofFileParser.Result parseResult;
-        public AbstractProblemLoader.ReplayResult replayResult;
+        public @Nullable Contract contract;
+        public @Nullable URL sourceFile;
+        public @Nullable String shortSrc;
+        public IntermediatePresentationProofFileParser.@Nullable Result parseResult;
+        public AbstractProblemLoader.@Nullable ReplayResult replayResult;
 
         public Integer settingsId() {
             return choices2Id.get(proof.getSettings().getChoiceSettings().getDefaultChoices());
         }
     }
 
-    public ProofEntry getProofEntryByContract(Contract contract) {
+    public @Nullable ProofEntry getProofEntryByContract(Contract contract) {
         for (ProofEntry p : proofEntries) {
             if (p.contract.equals(contract)) {
                 return p;
@@ -337,7 +341,7 @@ public final class CheckerData implements Logger {
         return messages;
     }
 
-    public PathNode getFileTree() {
+    public @Nullable PathNode getFileTree() {
         return fileTree;
     }
 
@@ -345,11 +349,11 @@ public final class CheckerData implements Logger {
         return proofEntries;
     }
 
-    public DependencyGraph getDependencyGraph() {
+    public @Nullable DependencyGraph getDependencyGraph() {
         return dependencyGraph;
     }
 
-    public ProofBundleHandler getPbh() {
+    public @Nullable ProofBundleHandler getPbh() {
         return pbh;
     }
 

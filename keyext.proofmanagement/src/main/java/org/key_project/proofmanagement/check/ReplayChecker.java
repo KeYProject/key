@@ -6,11 +6,14 @@ package org.key_project.proofmanagement.check;
 
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Checks that all files stored in the bundle can successfully be replayed.
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class ReplayChecker implements Checker {
 
     @Override

@@ -9,12 +9,15 @@ import java.util.LinkedList;
 
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Walks an intermediate proof representation tree as created when loading a *.proof file.
  *
  * @author Jakob Laenge
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public abstract class NodeIntermediateWalker {
     /** the root where the walker starts */
     private final NodeIntermediate root;

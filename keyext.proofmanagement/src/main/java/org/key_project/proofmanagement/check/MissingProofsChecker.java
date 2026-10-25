@@ -23,6 +23,8 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Checks that there exists a proof for every contract.
  * Has to be combined with other checkers to ensure that the proofs are actually replayable
@@ -30,6 +32,7 @@ import org.key_project.proofmanagement.io.ProofBundleHandler;
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class MissingProofsChecker implements Checker {
 
     @Override

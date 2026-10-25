@@ -19,6 +19,8 @@ import org.key_project.logic.Name;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import org.jspecify.annotations.NullMarked;
+
 // TODO: precise user feedback
 
 /**
@@ -27,6 +29,7 @@ import org.key_project.proofmanagement.io.ProofBundleHandler;
  * @author Jonas Krämer
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class SettingsChecker implements Checker {
 
     // TODO: it is not checked that this is a equivalence relation, but thats probably okay.

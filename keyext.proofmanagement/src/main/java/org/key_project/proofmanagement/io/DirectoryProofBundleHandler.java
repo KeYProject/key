@@ -17,11 +17,15 @@ import java.util.stream.Stream;
 import org.key_project.proofmanagement.check.PathNode;
 import org.key_project.proofmanagement.check.ProofManagementException;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * ProofBundleHandler for a directory that respects the bundle file hierarchy.
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class DirectoryProofBundleHandler extends ProofBundleHandler {
     /** the path of the root directory of the bundle */
     private final Path rootPath;
@@ -99,7 +103,7 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
-    public Path getBootclasspath() throws IOException {
+    public @Nullable Path getBootclasspath() throws IOException {
         Path bootclasspath = rootPath.resolve(Paths.get("bootclasspath"));
         if (Files.isDirectory(bootclasspath)) {
             return bootclasspath;
@@ -108,7 +112,7 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
     }
 
     @Override
-    public Path getTopLevelProjectFile() {
+    public @Nullable Path getTopLevelProjectFile() {
         Path projectFile = rootPath.resolve(Paths.get("project.key"));
         if (Files.isRegularFile(projectFile)) {
             return projectFile;

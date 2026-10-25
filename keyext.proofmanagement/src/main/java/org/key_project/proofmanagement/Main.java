@@ -15,6 +15,7 @@ import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 import org.key_project.proofmanagement.merge.ProofBundleMerger;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -50,6 +51,7 @@ import picocli.CommandLine.Parameters;
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 @Command(subcommands = { Main.BundleCommand.class, Main.CheckCommand.class,
     Main.MergeCommand.class })
 public final class Main {
