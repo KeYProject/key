@@ -9,6 +9,7 @@ import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
@@ -63,6 +64,9 @@ public class TestTestgen extends TestCommons {
 
     public SolverType getSolverType() {
         SolverType type = SolverTypes.Z3_CE_SOLVER;
+        if (type == null) {
+            throw new NullPointerException("Z3 counter-example solver is not registered.");
+        }
         String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
         if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
             type.setSolverCommand(solverPathProperty);
@@ -78,8 +82,10 @@ public class TestTestgen extends TestCommons {
             KeYEnvironment.load(file, null, null, null);
         try {
             Proof proof = env.getLoadedProof();
-            assertNotNull(proof);
-            TestGenMacro macro = new TestGenMacro();
+            if (proof == null) {
+                throw new NullPointerException("No proof was loaded from " + file + ".");
+            }
+            final ProofMacro macro = new TestGenMacro();
             macro.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, null);
             assertEquals(5, proof.openGoals().size());
         } finally {

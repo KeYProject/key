@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.testgen.smt.testgen.TGPhase;
@@ -79,11 +80,19 @@ public class TGMain implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        if (SolverTypes.Z3_CE_SOLVER.checkForSupport()) {
+        SolverType z3 = SolverTypes.Z3_CE_SOLVER;
+        if (z3 == null) {
+            throw new NullPointerException("Z3 counter-example solver is not registered.");
+        }
+        if (z3.checkForSupport()) {
             LOGGER.error("Z3 not found! Bye.");
             return 1;
         } else {
-            LOGGER.info("Z3 found; Version {}", SolverTypes.Z3_CE_SOLVER.getInstalledVersion());
+            String installedVersion = z3.getInstalledVersion();
+            if (installedVersion == null) {
+                throw new NullPointerException("Z3 solver reports no installed version.");
+            }
+            LOGGER.info("Z3 found; Version {}", installedVersion);
         }
 
         var settings = new TestGenerationSettings();

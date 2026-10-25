@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -18,7 +19,6 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 import de.uka.ilkd.key.testcase.HelperClassForTestgenTests;
 import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +61,9 @@ public class TestCE extends TestCommons {
     public SolverType getSolverType() {
         SolverType type = SolverTypes.Z3_CE_SOLVER;
         // SolverType type = SolverType.Z3_SOLVER;
+        if (type == null) {
+            throw new NullPointerException("Z3 counter-example solver is not registered.");
+        }
         String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
         if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
             type.setSolverCommand(solverPathProperty);
@@ -134,16 +137,18 @@ public class TestCE extends TestCommons {
             KeYEnvironment.load(file, null, null, null);
         try {
             Proof proof = env.getLoadedProof();
-            Assertions.assertNotNull(proof);
-            FinishSymbolicExecutionMacro se = new FinishSymbolicExecutionMacro();
+            if (proof == null) {
+                throw new NullPointerException("No proof was loaded from " + file + ".");
+            }
+            final ProofMacro se = new FinishSymbolicExecutionMacro();
             se.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, null);
-            TryCloseMacro close = new TryCloseMacro();
+            final ProofMacro close = new TryCloseMacro();
             close.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, null);
             // should not be provable
             assertFalse(proof.openGoals().isEmpty());
             // there should be a counterexample for each goal...
             for (Goal g : proof.openGoals()) {
-                SemanticsBlastingMacro sb = new SemanticsBlastingMacro();
+                final ProofMacro sb = new SemanticsBlastingMacro();
                 sb.applyTo(env.getUi(), g.node(), null, null);
                 assertTrue(correctResult(g, false));
             }

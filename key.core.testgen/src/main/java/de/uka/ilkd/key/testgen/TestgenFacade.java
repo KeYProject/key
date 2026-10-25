@@ -12,6 +12,7 @@ import java.util.concurrent.Callable;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
@@ -42,7 +43,7 @@ public record TestgenFacade(TestGenerationSettings settings) {
 
     public static void generateTestcases(KeYEnvironment<?> env, Proof proof,
             TestGenerationSettings settings,
-            TestGenerationLifecycleListener log) throws InterruptedException {
+            TestGenerationLifecycleListener log) throws Exception {
         final TGReporter reporter = new TGReporter(log);
 
         final TestCaseGenerator tg = new TestCaseGenerator(proof, settings, reporter);
@@ -79,18 +80,22 @@ public record TestgenFacade(TestGenerationSettings settings) {
             }
         });
 
-        var solvers = List.of(SolverTypes.Z3_CE_SOLVER);
+        SolverType z3ce = SolverTypes.Z3_CE_SOLVER;
+        if (z3ce == null) {
+            throw new NullPointerException("Z3 counter-example solver is not registered.");
+        }
+        final List<SolverType> solvers = List.of(z3ce);
         final ProverTaskListener ptl = env.getUi().getProofControl().getDefaultProverTaskListener();
 
         if (settings.getApplySymbolicExecution()) {
-            final FinishSymbolicExecutionMacro symbex = new FinishSymbolicExecutionMacro();
+            final ProofMacro symbex = new FinishSymbolicExecutionMacro();
             symbex.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, ptl);
         }
 
-        final TestGenMacro tgMacro = new TestGenMacro(settings.getMaximalUnwinds());
+        final ProofMacro tgMacro = new TestGenMacro(settings.getMaximalUnwinds());
         tgMacro.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, ptl);
 
-        final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
+        final ProofMacro macro = new SemanticsBlastingMacro();
         macro.applyTo(env.getUi(), proof, proof.openEnabledGoals(), null, ptl);
 
         final Collection<SMTProblem> problems = SMTProblem.createSMTProblems(proof);
