@@ -93,6 +93,12 @@ public class TGInfoDialog extends JDialog {
         }
     };
 
+    /**
+     * The window-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here since members are
+     * initialized above, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public TGInfoDialog(Window owner) {
         super(owner);
 
