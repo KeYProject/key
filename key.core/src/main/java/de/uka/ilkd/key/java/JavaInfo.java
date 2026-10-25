@@ -1020,7 +1020,8 @@ public final class JavaInfo {
      * @throws IllegalArgumentException if the qualified class name is empty or null
      * @throws UnknownJavaTypeException if the qualified name refers to an unknown type
      */
-    public @Nullable ProgramVariable getAttribute(String programName, String qualifiedClassName) {
+    public @Nullable ProgramVariable getAttribute(String programName,
+            @Nullable String qualifiedClassName) {
         if (qualifiedClassName == null || qualifiedClassName.isEmpty()) {
             throw new IllegalArgumentException("Missing qualified classname");
         }

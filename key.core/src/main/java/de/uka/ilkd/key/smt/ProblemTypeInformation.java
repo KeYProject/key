@@ -7,6 +7,7 @@ package de.uka.ilkd.key.smt;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -109,8 +110,10 @@ public class ProblemTypeInformation {
     }
 
     public Set<String> getFieldsForSort(String name) {
-        JavaInfo info = services.getJavaInfo();
-        Sort s = info.getKeYJavaType(name).getSort();
+        JavaInfo info = Objects.requireNonNull(services, "services").getJavaInfo();
+        KeYJavaType kjt = Objects.requireNonNull(info.getKeYJavaType(name),
+            "KeYJavaType for " + name);
+        Sort s = Objects.requireNonNull(kjt.getSort(), "Sort for " + name);
         return getFieldsForSort(s);
     }
 
@@ -124,7 +127,7 @@ public class ProblemTypeInformation {
         Set<String> result = new HashSet<>();
         result.add(Util.processName("java.lang.Object::#$created"));
 
-        JavaInfo info = services.getJavaInfo();
+        JavaInfo info = Objects.requireNonNull(services, "services").getJavaInfo();
 
         KeYJavaType kjt = info.getKeYJavaType(s);
 
@@ -132,7 +135,8 @@ public class ProblemTypeInformation {
 
             for (KeYJavaType sp : info.getAllSupertypes(kjt)) {
                 if (!sp.equals(kjt)) {
-                    result.addAll(getFieldsForSort(sp.getSort()));
+                    result.addAll(getFieldsForSort(Objects.requireNonNull(sp.getSort(),
+                        "Sort of " + sp)));
                 }
             }
 
@@ -175,9 +179,9 @@ public class ProblemTypeInformation {
     }
 
     public String getPrefixForSort(SMTSort sort) {
-        SMTTermNumber n = sortNumbers.get(sort);
+        SMTTermNumber n = Objects.requireNonNull(sortNumbers, "sortNumbers").get(sort);
 
-        long val = n.getIntValue();
+        long val = Objects.requireNonNull(n, "Number for sort " + sort).getIntValue();
 
         StringBuilder s = new StringBuilder(Long.toBinaryString(val));
 
@@ -195,7 +199,7 @@ public class ProblemTypeInformation {
     }
 
     public @Nullable SMTSort getSort(String sortName) {
-        return sorts.get(sortName);
+        return Objects.requireNonNull(sorts, "sorts").get(sortName);
     }
 
 
