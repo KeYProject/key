@@ -80,7 +80,12 @@ public class ProofBundleMerger {
 
                                 // skip existing (we know due to our previous check that its equal)
                                 if (!Files.exists(internal)) {
-                                    Files.createDirectories(internal.getParent());
+                                    Path parentDir = internal.getParent();
+                                    if (parentDir == null) {
+                                        throw new NullPointerException(
+                                            "No parent directory for " + internal + ".");
+                                    }
+                                    Files.createDirectories(parentDir);
                                     Files.copy(sourceFile, internal,
                                         StandardCopyOption.REPLACE_EXISTING);
                                 }

@@ -62,7 +62,11 @@ public class DirectoryProofBundleHandler extends ProofBundleHandler {
 
     @Override
     public String getBundleName() {
-        return rootPath.getFileName().toString();
+        Path fileName = rootPath.getFileName();
+        if (fileName == null) {
+            throw new NullPointerException("Bundle path has no file name: " + rootPath);
+        }
+        return fileName.toString();
     }
 
     @Override
