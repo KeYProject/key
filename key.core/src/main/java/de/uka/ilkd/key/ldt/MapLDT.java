@@ -51,7 +51,7 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, JTerm sub, TermServices services,
+    public boolean isResponsible(Operator op, @Nullable JTerm sub, TermServices services,
             ExecutionContext ec) {
         return false;
     }

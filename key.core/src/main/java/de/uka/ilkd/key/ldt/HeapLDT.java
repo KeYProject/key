@@ -574,7 +574,7 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+    public @Nullable Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (t.op() instanceof ParametricFunctionInstance pfi
                 && pfi.getBase() == (select)) {
             ProgramVariable heap = (ProgramVariable) children.removeFirst();
@@ -599,7 +599,7 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public Type getType(JTerm t) {
+    public @Nullable Type getType(JTerm t) {
         assert false;
         return null;
     }
