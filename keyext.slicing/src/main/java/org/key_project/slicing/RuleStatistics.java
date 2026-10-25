@@ -12,11 +12,14 @@ import java.util.stream.Collectors;
 
 import org.key_project.prover.rules.Rule;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Simple data object to store a mapping of rules to various counters.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class RuleStatistics {
     /**
      * Mapping of rule name to number of proof steps that used this rule, the number of proof steps

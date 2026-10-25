@@ -29,6 +29,8 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.slicing.analysis.AnalysisResults;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +41,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@NullMarked
 public class SliceToFixedPointDialog extends JDialog implements KeYSelectionListener {
     /**
      * Logger.
@@ -69,7 +72,7 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
     /**
      * Current slicing worker.
      */
-    private SliceToFixedPointWorker worker;
+    private @Nullable SliceToFixedPointWorker worker;
 
     /**
      * Table data to display. Contains statistics on sliced away rule applications.

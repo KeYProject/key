@@ -8,11 +8,14 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.proof.BranchLocation;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Graph node that represents a rule added by some rule application.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class AddedRule extends GraphNode {
     /**
      * The name of the added rule.

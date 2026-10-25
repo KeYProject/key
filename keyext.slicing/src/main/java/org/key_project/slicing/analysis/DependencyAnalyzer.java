@@ -52,6 +52,7 @@ import org.key_project.slicing.util.ExecutionTime;
 import org.key_project.util.EqualsAndHashCodeDelegator;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +61,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@NullMarked
 public final class DependencyAnalyzer {
     /**
      * Execution timings key for total time taken by the analyzer.

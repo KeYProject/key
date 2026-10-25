@@ -27,12 +27,15 @@ import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.util.ExecutionTime;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Results of the dependency analysis algorithm.
  *
  * @see DependencyTracker#analyze(boolean, boolean)
  * @author Arne Keller
  */
+@NullMarked
 public final class AnalysisResults {
     /**
      * The analyzed proof.

@@ -11,11 +11,14 @@ import java.util.stream.Stream;
 
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Simple class to measure the running time of various 'activities'.
  *
  * @author Arne Keller
  */
+@NullMarked
 public final class ExecutionTime {
     /**
      * Mapping: activity name -> start time (milliseconds since unix epoch).
