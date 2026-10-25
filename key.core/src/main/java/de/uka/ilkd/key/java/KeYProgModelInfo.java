@@ -379,12 +379,14 @@ public class KeYProgModelInfo {
                 return pm;
             }
         }
-        TypeDeclaration cd = (TypeDeclaration) ct.getJavaType();
+        TypeDeclaration cd = (TypeDeclaration) Objects.requireNonNull(ct.getJavaType(),
+            "no Java type for the class declaring the implicit method");
         ImmutableArray<MemberDeclaration> members = cd.getMembers();
         for (int i = 0; i < members.size(); i++) {
             final MemberDeclaration member = members.get(i);
             if (member instanceof IProgramMethod pm
-                    && pm.getMethodDeclaration().getName().equals(name)) {
+                    && Objects.requireNonNull(pm.getMethodDeclaration(),
+                        "no method declaration for the implicit method").getName().equals(name)) {
                 return pm;
             }
         }
@@ -414,7 +416,7 @@ public class KeYProgModelInfo {
 
     // TODO: copied from TransformationPipeLineServices we should have some utility class to avoid
     // copy-and-past
-    public ClassOrInterfaceType getType(String... names) {
+    public @Nullable ClassOrInterfaceType getType(String... names) {
         ClassOrInterfaceType type = null;
         for (String name : names) {
             type = new ClassOrInterfaceType(type, name);
@@ -525,7 +527,8 @@ public class KeYProgModelInfo {
      */
     private List<Field> getVisibleArrayFields(KeYJavaType arrayType) {
         final ImmutableArray<MemberDeclaration> members =
-            ((ArrayDeclaration) arrayType.getJavaType()).getMembers();
+            ((ArrayDeclaration) Objects.requireNonNull(arrayType.getJavaType(),
+                "no Java type for the array type")).getMembers();
         List<Field> result = new ArrayList<>();
         for (MemberDeclaration member : members) {
             if (member instanceof FieldDeclaration) {

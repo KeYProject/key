@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic.op;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.Constructor;
@@ -66,8 +68,9 @@ public final class ProgramMethod extends ObserverFunction
 
     public ProgramMethod(MethodDeclaration method, KeYJavaType container, KeYJavaType kjt,
             PositionInfo pi, Sort heapSort, int heapCount) {
-        super(method.getProgramElementName().toString(), kjt.getSort(), kjt, heapSort, container,
-            method.isStatic(), getParamTypes(method), heapCount, method.getStateCount());
+        super(method.getProgramElementName().toString(), Objects.requireNonNull(kjt.getSort(),
+            "no sort for the method's KeYJavaType"), kjt, heapSort, container, method.isStatic(),
+            getParamTypes(method), heapCount, method.getStateCount());
         this.method = method;
         this.returnType = kjt;
         this.pi = pi;
@@ -86,8 +89,10 @@ public final class ProgramMethod extends ObserverFunction
     private static ImmutableArray<KeYJavaType> getParamTypes(MethodDeclaration md) {
         KeYJavaType[] result = new KeYJavaType[md.getParameterDeclarationCount()];
         for (int i = 0; i < result.length; i++) {
-            result[i] = md.getParameterDeclarationAt(i).getVariableSpecification()
-                    .getProgramVariable().getKeYJavaType();
+            result[i] = Objects.requireNonNull(
+                md.getParameterDeclarationAt(i).getVariableSpecification().getProgramVariable()
+                        .getKeYJavaType(),
+                "no KeYJavaType for the parameter program variable");
         }
         return new ImmutableArray<>(result);
     }
@@ -111,7 +116,7 @@ public final class ProgramMethod extends ObserverFunction
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#getParameterType(int)
      */
     @Override
-    public KeYJavaType getParameterType(int i) {
+    public @Nullable KeYJavaType getParameterType(int i) {
         return method.getParameterDeclarationAt(i).getVariableSpecification().getProgramVariable()
                 .getKeYJavaType();
     }
@@ -122,7 +127,7 @@ public final class ProgramMethod extends ObserverFunction
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#getBody()
      */
     @Override
-    public StatementBlock getBody() {
+    public @Nullable StatementBlock getBody() {
         return getMethodDeclaration().getBody();
     }
 
@@ -257,6 +262,10 @@ public final class ProgramMethod extends ObserverFunction
     }
 
     @Override
+    // getChildAt never yields a child (getChildCount()==0); honest @Nullable conflicts with the
+    // @NonNull NonTerminalProgramElement base — base widening deferred to the getChildAt-base item
+    // (see progress ledger)
+    @SuppressWarnings("NullAway")
     public @Nullable ProgramElement getChildAt(int i) {
         return null;
     }
@@ -396,7 +405,7 @@ public final class ProgramMethod extends ObserverFunction
      * @see de.uka.ilkd.key.logic.op.IProgramMethod#getThrown()
      */
     @Override
-    public Throws getThrown() {
+    public @Nullable Throws getThrown() {
         return getMethodDeclaration().getThrown();
     }
 

@@ -122,6 +122,7 @@ public interface FunctionalOperationContract extends OperationContract {
             ImmutableList<JTerm> paramTerms, @Nullable JTerm resultTerm, @Nullable JTerm excTerm,
             Map<LocationVariable, JTerm> atPres, Services services);
 
+    @Nullable
     String getBaseName();
 
     JTerm getPre();

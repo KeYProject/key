@@ -41,7 +41,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
     // constructors
     // -------------------------------------------------------------------------
 
-    public ObserverFunction(String baseName, Sort sort, KeYJavaType type, Sort heapSort,
+    public ObserverFunction(String baseName, Sort sort, @Nullable KeYJavaType type, Sort heapSort,
             KeYJavaType container, boolean isStatic, ImmutableArray<KeYJavaType> paramTypes,
             int heapCount, int stateCount) {
         super(createName(baseName, Objects.requireNonNull(container)), sort,
@@ -57,7 +57,9 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
     }
 
     public static ProgramElementName createName(String baseName, KeYJavaType container) {
-        return new ProgramElementName(baseName, container.getSort().toString());
+        return new ProgramElementName(baseName,
+            Objects.requireNonNull(container.getSort(), "no sort for the container type")
+                    .toString());
     }
 
 
@@ -77,13 +79,15 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
             result[offset] = heapSort;
         }
         if (!isStatic) {
-            result[offset] = container.getSort();
+            result[offset] = Objects.requireNonNull(container.getSort(),
+                "no sort for the container type");
             assert result[offset] != null : "Bad KJT: " + container;
             offset++;
         }
 
         for (int i = 0, n = paramTypes.size(); i < n; i++) {
-            result[i + offset] = paramTypes.get(i).getSort();
+            result[i + offset] = Objects.requireNonNull(paramTypes.get(i).getSort(),
+                "no sort for the parameter type");
         }
 
         return result;
