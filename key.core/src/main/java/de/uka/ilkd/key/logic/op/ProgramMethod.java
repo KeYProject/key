@@ -227,6 +227,10 @@ public final class ProgramMethod extends ObserverFunction
         return method.isModel();
     }
 
+    public boolean isLemma() {
+        return method.isLemma();
+    }
+
     /**
      * Test whether the declaration is strictfp.
      */
