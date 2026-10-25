@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.exploration.ProofExplorationService;
@@ -26,6 +27,12 @@ public class AddFormulaToSuccedentAction extends ExplorationAction {
         this(MainWindow.getInstance());
     }
 
+    /**
+     * The {@link #setName(String)} call happens on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public AddFormulaToSuccedentAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Add formula to succedent");
@@ -38,8 +45,12 @@ public class AddFormulaToSuccedentAction extends ExplorationAction {
             return;
         }
         ProofExplorationService service = ProofExplorationService.get(getMediator());
+        Goal goal = getMediator().getSelectedGoal();
+        if (goal == null) {
+            throw new NullPointerException("No goal selected.");
+        }
         @NonNull
-        Node toBeSelected = service.soundAddition(getMediator().getSelectedGoal(), t, false);
+        Node toBeSelected = service.soundAddition(goal, t, false);
         getMediator().getSelectionModel().setSelectedNode(toBeSelected);
     }
 }

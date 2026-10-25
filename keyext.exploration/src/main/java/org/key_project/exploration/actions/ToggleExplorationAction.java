@@ -28,6 +28,12 @@ public class ToggleExplorationAction extends KeyAction {
     public static final String MENU_PATH = "View.Exploration";
     private final transient ExplorationModeModel model;
 
+    /**
+     * The setter/initializer calls below happen on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ToggleExplorationAction(ExplorationModeModel model, MainWindow mainWindow) {
         this.model = model;
 
