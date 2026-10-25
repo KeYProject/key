@@ -12,11 +12,14 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.speclang.LoopContract;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  *
  * @author Alexander Weigl
  * @version 1 (8/7/25)
  */
+@NullMarked
 public class InfFlowLoopContractInternalRule extends LoopContractInternalRule {
     @Override
     protected boolean contractApplied(LoopContract contract, Goal goal) {

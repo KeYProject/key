@@ -26,11 +26,15 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliaryComputationMacro {
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
@@ -48,7 +52,8 @@ public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliary
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener) {
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener) {
         final ProofOblInput poForProof =
             proof.getServices().getSpecificationRepository().getProofOblInput(proof);
         final LoopInvExecutionPO loopInvExecPO = (LoopInvExecutionPO) poForProof;

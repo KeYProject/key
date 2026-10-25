@@ -8,12 +8,15 @@ import de.uka.ilkd.key.informationflow.ProofObligationVars;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Generate conjunction of... - "p_i.<created> = TRUE | p_i = null" for object parameters, and -
  * "inBounds(p_i)" for integer parameters
  *
  * @author christoph
  */
+@NullMarked
 class BasicParamsOkSnippet implements FactoryMethod {
 
     @Override

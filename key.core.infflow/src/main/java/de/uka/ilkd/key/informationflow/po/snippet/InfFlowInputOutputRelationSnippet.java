@@ -17,11 +17,15 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Generate term "self != null".
  *
  * @author christoph
  */
+@NullMarked
 class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         implements InfFlowFactoryMethod {
     @Override
@@ -162,9 +166,9 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     private static class SearchVisitor implements DefaultVisitor {
 
         private boolean termFound = false;
-        private final JTerm[] searchTerms;
+        private final JTerm @Nullable [] searchTerms;
 
-        public SearchVisitor(JTerm... searchTerms) {
+        public SearchVisitor(JTerm @Nullable... searchTerms) {
             this.searchTerms = searchTerms;
         }
 

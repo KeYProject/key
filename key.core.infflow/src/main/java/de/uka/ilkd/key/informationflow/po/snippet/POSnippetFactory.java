@@ -13,10 +13,13 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * @author christoph
  */
+@NullMarked
 public class POSnippetFactory {
 
     public static BasicPOSnippetFactory getBasicFactory(FunctionalOperationContract contract,

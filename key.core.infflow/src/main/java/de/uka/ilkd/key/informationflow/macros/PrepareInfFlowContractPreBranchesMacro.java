@@ -23,6 +23,8 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -30,6 +32,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author christoph
  */
+@NullMarked
 public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
     private static final String INF_FLOW_RULENAME_PREFIX = "Use_information_flow_contract";
@@ -59,7 +62,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy<@NonNull Goal> createStrategy(Proof proof,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         return new RemovePostStrategy(proof);
     }
 

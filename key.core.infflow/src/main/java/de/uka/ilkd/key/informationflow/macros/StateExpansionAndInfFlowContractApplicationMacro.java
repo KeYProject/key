@@ -16,10 +16,13 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  *
  * @author christoph scheben
  */
+@NullMarked
 public class StateExpansionAndInfFlowContractApplicationMacro extends SequentialProofMacro {
 
     @Override

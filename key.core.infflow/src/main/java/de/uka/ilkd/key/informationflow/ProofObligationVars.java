@@ -22,6 +22,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
@@ -29,6 +30,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author christoph
  */
+@NullMarked
 public class ProofObligationVars {
 
     /** Variables for the pre and post condition. */
@@ -38,7 +40,7 @@ public class ProofObligationVars {
     public final JTerm exceptionParameter;
 
     /** The formal parameters of a method. */
-    public final ImmutableList<JTerm> formalParams;
+    public final @Nullable ImmutableList<JTerm> formalParams;
 
     /**
      * If this object was created form another ProofObligationVars object by adding a postfix to the
@@ -70,7 +72,7 @@ public class ProofObligationVars {
 
 
     public ProofObligationVars(StateVars pre, StateVars post, JTerm exceptionParameter,
-            ImmutableList<JTerm> formalParams, Services services) {
+            @Nullable ImmutableList<JTerm> formalParams, Services services) {
         this.pre = pre;
         this.post = post;
         this.exceptionParameter = exceptionParameter;
@@ -151,7 +153,7 @@ public class ProofObligationVars {
     }
 
 
-    static void register(ProgramVariable pv, Services services) {
+    static void register(@Nullable ProgramVariable pv, Services services) {
         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);

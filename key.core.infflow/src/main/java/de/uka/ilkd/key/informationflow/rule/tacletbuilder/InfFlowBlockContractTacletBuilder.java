@@ -19,10 +19,13 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Implements the rule which inserts operation contracts for a method call.
  */
+@NullMarked
 public final class InfFlowBlockContractTacletBuilder
         extends AbstractInfFlowContractAppTacletBuilder {
 

@@ -26,6 +26,9 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 
@@ -33,6 +36,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  *
  * @author christoph
  */
+@NullMarked
 public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
         implements StartSideProofMacro {
 
@@ -57,7 +61,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         if (goals == null || posInOcc == null || goals.isEmpty() || goals.head().node() == null
                 || goals.head().node().parent() == null) {
             return false;
@@ -91,7 +95,8 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception {
         final var blockRuleApp =
             (InfFlowBlockContractInternalBuiltInRuleApp) goals.head().node().parent()

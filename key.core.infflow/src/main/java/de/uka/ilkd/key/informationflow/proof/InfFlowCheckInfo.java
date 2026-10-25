@@ -10,9 +10,12 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /// Helper class to access Information Flow information in the [StrategySettings]
 /// @author christoph
+@NullMarked
 public class InfFlowCheckInfo {
     public static final String PROPERTY_STRATEGY_INF_FLOW_CHECK = "INF_FLOW_CHECK_PROPERTY";
     public static final String INF_FLOW_CHECK_TRUE = "INF_FLOW_CHECK_TRUE";

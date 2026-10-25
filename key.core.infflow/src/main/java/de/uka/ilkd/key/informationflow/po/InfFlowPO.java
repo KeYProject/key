@@ -9,6 +9,9 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 
 import org.key_project.logic.Named;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public interface InfFlowPO extends ProofOblInput {
 
     /**
