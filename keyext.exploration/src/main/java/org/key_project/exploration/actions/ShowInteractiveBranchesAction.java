@@ -24,6 +24,12 @@ import org.jspecify.annotations.NullMarked;
 public class ShowInteractiveBranchesAction extends KeyAction {
     private final transient ExplorationModeModel model;
 
+    /**
+     * The setter/initializer calls below happen on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ShowInteractiveBranchesAction(ExplorationModeModel model, MainWindow mainWindow) {
         this.model = model;
         setName("Hide justification");

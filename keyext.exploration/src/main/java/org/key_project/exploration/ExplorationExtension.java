@@ -113,10 +113,11 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
 
             @Override
             public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-                Proof oldProof = leftPanel.getProof();
+                ExplorationStepsList panel = leftPanel();
+                Proof oldProof = panel.getProof();
                 Proof newProof = mediator.getSelectedProof();
                 if (oldProof != newProof) {
-                    leftPanel.setProof(newProof);
+                    panel.setProof(newProof);
                     if (oldProof != null) {
                         oldProof.removeProofTreeListener(proofTreeListener);
                     }
@@ -131,30 +132,42 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
         window.getProofTreeView().getRenderer().add(new ExplorationRenderer());
     }
 
-    private void initLeftPanel(@NonNull MainWindow window) {
-        leftPanel = new ExplorationStepsList(window);
-        leftPanel.setEnabled(model.isExplorationModeSelected());
+    private @NonNull ExplorationStepsList leftPanel() {
+        ExplorationStepsList panel = leftPanel;
+        if (panel == null) {
+            throw new NullPointerException("Exploration steps list is not initialized.");
+        }
+        return panel;
+    }
+
+    private @NonNull ExplorationStepsList initLeftPanel(@NonNull MainWindow window) {
+        ExplorationStepsList panel = new ExplorationStepsList(window);
+        leftPanel = panel;
+        panel.setEnabled(model.isExplorationModeSelected());
         model.addPropertyChangeListener(ExplorationModeModel.PROP_EXPLORE_MODE,
-            e -> leftPanel.setEnabled(model.isExplorationModeSelected()));
+            e -> panel.setEnabled(model.isExplorationModeSelected()));
+        return panel;
     }
 
     @Override
     public @NonNull Collection<TabPanel> getPanels(@NonNull MainWindow window,
             @NonNull KeYMediator mediator) {
-        if (leftPanel == null) {
-            initLeftPanel(window);
+        ExplorationStepsList panel = leftPanel;
+        if (panel == null) {
+            panel = initLeftPanel(window);
         }
 
-        return Collections.singleton(leftPanel);
+        return Collections.singleton(panel);
     }
 
     @Override
     public List<JComponent> getStatusLineComponents() {
-        if (leftPanel == null) {
-            initLeftPanel(MainWindow.getInstance());
+        ExplorationStepsList panel = leftPanel;
+        if (panel == null) {
+            panel = initLeftPanel(MainWindow.getInstance());
         }
 
-        return Collections.singletonList(leftPanel.getHasExplorationSteps());
+        return Collections.singletonList(panel.getHasExplorationSteps());
     }
 
     @Override
@@ -165,8 +178,9 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
 
     @Override
     public void proofDisposing(ProofDisposedEvent e) {
-        if (e.getSource() == leftPanel.getProof()) {
-            leftPanel.setProof(null);
+        ExplorationStepsList panel = leftPanel();
+        if (e.getSource() == panel.getProof()) {
+            panel.setProof(null);
         }
     }
 
@@ -187,12 +201,18 @@ class ExplorationRenderer implements Styler<GUIAbstractTreeNode> {
     @Override
     public void style(@NonNull Style style, GUIAbstractTreeNode treeNode) {
         Node node = treeNode.getNode();
+        if (node == null) {
+            // the underlying proof node has already been garbage collected
+            return;
+        }
         ExplorationNodeData data = node.lookup(ExplorationNodeData.class);
 
         if (data != null) {
             style.border = DARK_PURPLE_COLOR.get();
             style.background = LIGHT_PURPLE_COLOR.get();
-            style.tooltip.setTitle("Exploration Action Performed");
+            if (style.tooltip != null) {
+                style.tooltip.setTitle("Exploration Action Performed");
+            }
         }
     }
 }
