@@ -18,11 +18,14 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Table showing the results of searching for proof references.
  *
  * @author Arne Keller
  */
+@NullMarked
 class ReferenceSearchTable extends JTable implements TableModel {
     /**
      * The mediator.
