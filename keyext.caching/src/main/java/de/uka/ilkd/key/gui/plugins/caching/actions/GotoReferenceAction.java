@@ -43,7 +43,11 @@ public final class GotoReferenceAction extends KeyAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Node ref = node.lookup(ClosedBy.class).node();
+        ClosedBy c = node.lookup(ClosedBy.class);
+        if (c == null) {
+            throw new NullPointerException("No reference found for node " + node.serialNr() + ".");
+        }
+        Node ref = c.node();
         mediator.getSelectionModel().setSelectedNode(ref);
     }
 }
