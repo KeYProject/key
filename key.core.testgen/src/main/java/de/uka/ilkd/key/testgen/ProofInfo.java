@@ -221,7 +221,7 @@ public record ProofInfo(Proof proof, Services services) {
         return result.toString();
     }
 
-    public JavaBlock getJavaBlock(JTerm t) {
+    public @Nullable JavaBlock getJavaBlock(JTerm t) {
         if (t.containsJavaBlockRecursive()) {
             if (!t.javaBlock().isEmpty()) {
                 return t.javaBlock();
