@@ -24,6 +24,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
