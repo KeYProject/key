@@ -23,11 +23,14 @@ import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  *
  * @author christoph
  */
+@NullMarked
 class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override

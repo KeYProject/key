@@ -30,6 +30,9 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class InfFlowProofSymbols {
 
     private boolean isFreshContract;

@@ -8,6 +8,9 @@ import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
 import de.uka.ilkd.key.speclang.infflow.InformationFlowContractInfo;
 import de.uka.ilkd.key.speclang.infflow.InformationFlowContractSupplier;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class InformationFlowContractImplSupplier implements InformationFlowContractSupplier {
     @Override
     public InformationFlowContract create(InformationFlowContractInfo info) {

@@ -25,6 +25,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The abstract class ExhaustiveProofMacro can be used to create compound macros which either apply
  * the macro given by {@link #getProofMacro()} directly, or --if not directly applicable-- search on
@@ -33,10 +36,11 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
-    private PosInOccurrence getApplicablePosInOcc(Proof proof,
-            Goal goal, PosInOccurrence posInOcc,
+    private @Nullable PosInOccurrence getApplicablePosInOcc(Proof proof,
+            Goal goal, @Nullable PosInOccurrence posInOcc,
             ProofMacro macro) {
         if (posInOcc == null || posInOcc.subTerm() == null) {
             return null;
@@ -75,7 +79,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         final Services services = proof.getServices();
 
         final Map<Node, PosInOccurrence> applicableOnNodeAtPos =
@@ -108,8 +112,8 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc,
-            ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception {
 
         final Map<Node, PosInOccurrence> applicableOnNodeAtPos =

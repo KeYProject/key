@@ -26,6 +26,7 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * The macro SelfcompositionStateExpansionMacro applies rules to extract the self-composed states
@@ -36,6 +37,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author christoph
  */
+@NullMarked
 public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExpansionMacro {
 
     @Override

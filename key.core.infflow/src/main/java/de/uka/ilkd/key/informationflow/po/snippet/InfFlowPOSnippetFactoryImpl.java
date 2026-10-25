@@ -17,6 +17,7 @@ import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
 
 import org.key_project.logic.TermCreationException;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author christoph
  */
+@NullMarked
 class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(InfFlowPOSnippetFactoryImpl.class);

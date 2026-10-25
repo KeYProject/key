@@ -33,6 +33,10 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowCompositePO {
 
     private final LoopSpecification loopInvariant;
@@ -220,7 +224,8 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
     }
 
     @Override
-    protected JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+    protected @Nullable JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm,
+            @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Services services) {
         // information flow contracts do not have global defs
         return null;

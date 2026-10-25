@@ -31,6 +31,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -41,6 +43,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author christoph
  */
+@NullMarked
 public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
     @Override
@@ -91,7 +94,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
     @Override
     protected UseInformationFlowContractMacro.PropExpansionStrategy createStrategy(Proof proof,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         return new UseInformationFlowContractMacro.PropExpansionStrategy(getAdmittedRuleNames());
     }
 

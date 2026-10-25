@@ -6,11 +6,14 @@ package de.uka.ilkd.key.informationflow.proof;
 
 import de.uka.ilkd.key.proof.Statistics;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Statistics for additional side proofs as, e.g., performed by information flow macro
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public final class SideProofStatistics extends Statistics {
 
     /**

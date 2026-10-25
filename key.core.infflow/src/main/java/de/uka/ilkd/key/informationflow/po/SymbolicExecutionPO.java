@@ -28,11 +28,15 @@ import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  *
  * @author christoph
  */
+@NullMarked
 public class SymbolicExecutionPO extends AbstractInfFlowPO
         implements ContractPO, InfFlowCompositePO {
 
@@ -105,7 +109,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
 
 
     @Override
-    public JTerm getMbyAtPre() {
+    public @Nullable JTerm getMbyAtPre() {
         if (contract.hasMby()) {
             return symbExecVars.pre.mbyAtPre;
         } else {
@@ -219,7 +223,8 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
     }
 
     @Override
-    protected JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+    protected @Nullable JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm,
+            @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Services services) {
         // information flow contracts do not have global defs
         return null;

@@ -20,6 +20,9 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
 
     /**

@@ -23,6 +23,8 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -34,11 +36,12 @@ import org.jspecify.annotations.NonNull;
  *
  * @author christoph
  */
+@NullMarked
 public class InfFlowContractAppTaclet extends RewriteTaclet {
 
     public static final String USE_IF = "Use information flow contract for ";
 
-    public static boolean hasType(Rule rule) {
+    public static boolean hasType(@Nullable Rule rule) {
         return rule != null && rule.name().toString().startsWith(USE_IF);
     }
 

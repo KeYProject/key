@@ -12,11 +12,14 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Generate term "MyClass::exactInstance(self) = TRUE".
  *
  * @author christoph
  */
+@NullMarked
 class BasicSelfExactTypeSnippet implements FactoryMethod {
 
     @Override

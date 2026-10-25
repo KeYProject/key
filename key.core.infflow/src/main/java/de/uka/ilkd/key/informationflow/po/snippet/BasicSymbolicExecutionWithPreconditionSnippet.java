@@ -8,11 +8,14 @@ import de.uka.ilkd.key.informationflow.ProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.snippet.BasicSnippetData.Key;
 import de.uka.ilkd.key.logic.JTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  *
  * @author christoph
  */
+@NullMarked
 class BasicSymbolicExecutionWithPreconditionSnippet extends ReplaceAndRegisterMethod
         implements FactoryMethod {
 

@@ -24,6 +24,9 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Generate term "self != null".
@@ -31,6 +34,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author christoph
  */
+@NullMarked
 abstract class ReplaceAndRegisterMethod {
 
     final JTerm replace(JTerm term, ProofObligationVars origVars, ProofObligationVars poVars,
@@ -105,7 +109,8 @@ abstract class ReplaceAndRegisterMethod {
     }
 
 
-    final JTerm replace(JTerm term, JTerm[] origVars, JTerm[] poVars, TermBuilder tb) {
+    final JTerm replace(JTerm term, JTerm @Nullable [] origVars, JTerm @Nullable [] poVars,
+            TermBuilder tb) {
         LinkedHashMap<JTerm, JTerm> map = new LinkedHashMap<>();
 
         assert origVars.length == poVars.length;
@@ -124,7 +129,7 @@ abstract class ReplaceAndRegisterMethod {
     }
 
 
-    final void register(ProgramVariable pv, Services services) {
+    final void register(@Nullable ProgramVariable pv, Services services) {
         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);
@@ -139,7 +144,7 @@ abstract class ReplaceAndRegisterMethod {
     }
 
 
-    final void register(Function f, Services services) {
+    final void register(@Nullable Function f, Services services) {
         Namespace<Function> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != JavaDLTheory.UPDATE;

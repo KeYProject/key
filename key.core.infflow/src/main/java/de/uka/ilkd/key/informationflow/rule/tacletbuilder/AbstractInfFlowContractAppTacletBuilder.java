@@ -34,11 +34,14 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Builds the rule which inserts information flow contract applications.
  *
  * @author christoph
  */
+@NullMarked
 abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTacletBuilder {
 
     private JTerm[] contextUpdates;

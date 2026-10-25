@@ -36,10 +36,14 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  * @author christoph
  */
+@NullMarked
 class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
@@ -103,8 +107,8 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
     }
 
     private JavaBlock buildJavaBlock(BasicSnippetData d, ImmutableList<JTerm> formalPars,
-            ProgramVariable selfVar, ProgramVariable resultVar, ProgramVariable exceptionVar,
-            LocationVariable eVar) {
+            @Nullable ProgramVariable selfVar, @Nullable ProgramVariable resultVar,
+            @Nullable ProgramVariable exceptionVar, LocationVariable eVar) {
         IObserverFunction targetMethod =
             (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
         if (!(targetMethod instanceof IProgramMethod pm)) {

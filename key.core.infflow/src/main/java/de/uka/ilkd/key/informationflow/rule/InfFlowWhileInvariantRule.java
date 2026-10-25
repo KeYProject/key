@@ -45,6 +45,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
@@ -246,7 +247,8 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
             loopInvApplPredTerm, informationFlowInvariantApp);
     }
 
-    private static JTerm buildAtPostVar(JTerm varTerm, String suffix, Services services) {
+    private static @Nullable JTerm buildAtPostVar(@Nullable JTerm varTerm, String suffix,
+            Services services) {
         if (varTerm == null) {
             return null;
         }
@@ -264,7 +266,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         return tb.var(varAtPostVar);
     }
 
-    private static JTerm buildBeforeVar(JTerm varTerm, Services services) {
+    private static @Nullable JTerm buildBeforeVar(@Nullable JTerm varTerm, Services services) {
         if (varTerm == null) {
             return null;
         }
@@ -279,7 +281,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         return tb.var(varAtPreVar);
     }
 
-    private static JTerm buildAfterVar(JTerm varTerm, Services services) {
+    private static @Nullable JTerm buildAfterVar(@Nullable JTerm varTerm, Services services) {
         if (varTerm == null) {
             return null;
         }
@@ -294,7 +296,8 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         return tb.var(varAtPostVar);
     }
 
-    private static ImmutableList<JTerm> buildLocalOutsAtPre(ImmutableList<JTerm> varTerms,
+    private static @Nullable ImmutableList<JTerm> buildLocalOutsAtPre(
+            @Nullable ImmutableList<JTerm> varTerms,
             Services services) {
         if (varTerms == null || varTerms.isEmpty()) {
             return varTerms;
@@ -316,7 +319,8 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         return localOuts;
     }
 
-    private static ImmutableList<JTerm> buildLocalOutsAtPost(ImmutableList<JTerm> varTerms,
+    private static @Nullable ImmutableList<JTerm> buildLocalOutsAtPost(
+            @Nullable ImmutableList<JTerm> varTerms,
             Services services) {
         if (varTerms == null || varTerms.isEmpty()) {
             return varTerms;

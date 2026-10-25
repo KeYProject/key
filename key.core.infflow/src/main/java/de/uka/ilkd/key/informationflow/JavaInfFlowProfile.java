@@ -12,9 +12,12 @@ import de.uka.ilkd.key.rule.*;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This profile sets up KeY for verification of JavaCard programs.
  */
+@NullMarked
 public class JavaInfFlowProfile extends JavaProfile {
     public static final String NAME = "Java InfFlow Profile";
     public static final String PROFILE_ID = "java-infflow";
