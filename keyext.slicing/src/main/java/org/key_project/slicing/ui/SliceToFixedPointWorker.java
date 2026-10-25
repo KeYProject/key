@@ -39,7 +39,7 @@ final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
     /**
      * Function that provides analysis results for the {@link #proof}.
      */
-    private final Function<Void, AnalysisResults> analyzeButton;
+    private final Function<Void, @Nullable AnalysisResults> analyzeButton;
     /**
      * Callback that starts slicing the {@link #proof}.
      */
@@ -61,7 +61,7 @@ final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
      */
     public SliceToFixedPointWorker(Proof proofToSlice,
             @Nullable Proof proofToDispose,
-            Function<Void, AnalysisResults> analyzeButton,
+            Function<Void, @Nullable AnalysisResults> analyzeButton,
             Runnable sliceButton,
             Runnable doneCallback) {
         this.proof = proofToSlice;
@@ -79,14 +79,21 @@ final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
             return null;
         }
         AnalysisResults results = analyzeButton.apply(null);
+        if (results == null) {
+            throw new NullPointerException(
+                "No analysis results for proof " + proof.name() + ".");
+        }
         if (!results.indicateSlicingPotential()) {
             LOGGER.info("analysis: no more slicing possible");
             doneCallback.run();
         } else {
-            if (proofToDispose != null) {
-                LOGGER.info("disposing intermediate proof slice {} (ID: {})", proofToDispose.name(),
-                    System.identityHashCode(proofToDispose));
-                proofToDispose.dispose();
+            // capture the field locally: it may be reassigned while this worker runs
+            Proof proofToDisposeLocal = proofToDispose;
+            if (proofToDisposeLocal != null) {
+                LOGGER.info("disposing intermediate proof slice {} (ID: {})",
+                    proofToDisposeLocal.name(),
+                    System.identityHashCode(proofToDisposeLocal));
+                proofToDisposeLocal.dispose();
             }
             proofToDispose = proof;
             LOGGER.info("slicing proof {} (ID: {})", proof.name(), System.identityHashCode(proof));

@@ -7,6 +7,7 @@ package org.key_project.slicing.ui;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -36,10 +37,17 @@ public class PreviewDialog extends JDialog implements WindowListener {
     /**
      * Create a new preview dialog to show the graph provided in DOT syntax.
      * Automatically starts dot, displays resulting image once complete.
+     * <p>
+     * The UI calls below operate on {@code this} while the receiver is still under initialization
+     * (EISOP initialization check); safe here since the dialog is shown only after its content is
+     * set up and the worker callbacks only fire after the constructor has completed, suppressed
+     * with scoped keys.
      *
      * @param window parent window
      * @param dot graph in DOT format
      */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public PreviewDialog(Window window, String dot) {
         super(window, "Preview");
 
@@ -88,12 +96,22 @@ public class PreviewDialog extends JDialog implements WindowListener {
 
     private void workerDone(GraphvizResult result) {
         if (result.hasImage()) {
+            BufferedImage image = result.image();
+            if (image == null) {
+                throw new NullPointerException(
+                    "No image in graph rendering result despite hasImage().");
+            }
             getContentPane().removeAll();
-            PanZoomImageView pziv = new PanZoomImageView(result.image(), 800, 600);
+            PanZoomImageView pziv = new PanZoomImageView(image, 800, 600);
             pziv.setPreferredSize(new Dimension(800, 600));
             getContentPane().add(pziv, BorderLayout.CENTER);
         } else if (result.hasError()) {
-            JLabel label = new JLabel(result.error());
+            String error = result.error();
+            if (error == null) {
+                throw new NullPointerException(
+                    "No error message in graph rendering result despite hasError().");
+            }
+            JLabel label = new JLabel(error);
             label.setBorder(new EmptyBorder(0, 10, 10, 10));
             getContentPane().add(label, BorderLayout.SOUTH);
         } else {

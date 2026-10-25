@@ -73,7 +73,14 @@ public class DependencyGraph {
             throw new IllegalStateException("tried to use DependencyGraph with wrong proof");
         }
         DependencyTracker tracker = p.lookup(DependencyTracker.class);
-        var nodeIterator = p.root().subtreeIterator();
+        if (tracker == null) {
+            throw new NullPointerException("No dependency tracker registered for the proof.");
+        }
+        Node root = p.root();
+        if (root == null) {
+            throw new NullPointerException("No root node in the proof to track.");
+        }
+        var nodeIterator = root.subtreeIterator();
         while (nodeIterator.hasNext()) {
             var node = nodeIterator.next();
             if (node.getAppliedRuleApp() == null || edgeDataReversed.containsKey(node)) {
@@ -192,7 +199,7 @@ public class DependencyGraph {
     public Stream<ClosedGoal> goalsInBranch(BranchLocation location) {
         return graph.vertexSet().stream()
                 .filter(ClosedGoal.class::isInstance)
-                .map(ClosedGoal.class::cast)
+                .map(it -> (ClosedGoal) it)
                 .filter(it -> it.branchLocation.hasPrefix(location));
     }
 
@@ -397,7 +404,16 @@ public class DependencyGraph {
         // first, create a copy of the graph
         var nGraph = new DependencyGraph(this);
         // get all nodes in the proof
-        var allNodes = proof().root().subtreeIterator();
+        Proof proof = proof();
+        if (proof == null) {
+            throw new NullPointerException(
+                "Dependency graph is empty, cannot remove chains from it.");
+        }
+        Node root = proof.root();
+        if (root == null) {
+            throw new NullPointerException("No root node in the proof.");
+        }
+        var allNodes = root.subtreeIterator();
         // take the outputs "produced" by the nodes
         var toCheck = StreamSupport.stream(Spliterators.spliteratorUnknownSize(allNodes, 0), false)
                 .flatMap(this::outputsOf).toList();
@@ -451,8 +467,13 @@ public class DependencyGraph {
             var edge3 = new AnnotatedShortenedEdge(initialNode, endNode, edge.replacesInputNode());
             nGraph.graph.addEdge(startGraphNode, endGraphNode, edge3);
             nGraph.edgeDataReversed.remove(startNode);
-            nGraph.edgeDataReversed.get(endNode).remove(edge2);
-            nGraph.edgeDataReversed.get(endNode).add(edge3);
+            var endNodeEdges = nGraph.edgeDataReversed.get(endNode);
+            if (endNodeEdges == null) {
+                throw new NullPointerException(
+                    "No edge data recorded for end node " + endNode.serialNr() + ".");
+            }
+            endNodeEdges.remove(edge2);
+            endNodeEdges.add(edge3);
             removed++;
         }
         LOGGER.debug("removeChains: {} nodes deleted", removed);

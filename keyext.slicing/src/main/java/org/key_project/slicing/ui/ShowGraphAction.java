@@ -41,6 +41,7 @@ public class ShowGraphAction extends MainWindowAction {
      * @param tracker dependency tracker of the active proof
      * @param node the graph node to show a graph around
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ShowGraphAction(MainWindow mw, DependencyTracker tracker, GraphNode node) {
         super(mw);
         setName("Show dependency graph around this formula");

@@ -15,6 +15,7 @@ import de.uka.ilkd.key.rule.EqualityModuloProofIrrelevancy;
 import org.key_project.prover.sequent.SequentFormula;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A sequent formula tracked by the dependency graph.
@@ -88,7 +89,7 @@ public class TrackedFormula extends GraphNode {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

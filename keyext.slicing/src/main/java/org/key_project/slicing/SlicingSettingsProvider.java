@@ -67,7 +67,12 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
 
     /**
      * Construct a new settings provider.
+     * <p>
+     * The settings-widget calls below operate on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since the widget setup is purely
+     * local to this class, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SlicingSettingsProvider() {
         setHeaderText("Proof Slicing Options");
 

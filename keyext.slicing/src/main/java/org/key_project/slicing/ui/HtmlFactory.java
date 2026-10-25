@@ -72,6 +72,10 @@ public final class HtmlFactory {
                 }
                 stats.append(">");
                 if (clickable[i]) {
+                    if (indexFactory == null) {
+                        throw new NullPointerException(
+                            "No index factory provided for clickable column " + i + ".");
+                    }
                     stats.append("<a href='#");
                     stats.append(i);
                     stats.append("_");
