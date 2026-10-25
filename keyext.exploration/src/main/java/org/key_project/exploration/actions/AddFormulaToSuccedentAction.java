@@ -13,12 +13,14 @@ import de.uka.ilkd.key.proof.Node;
 import org.key_project.exploration.ProofExplorationService;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * @author Alexander Weigl
  * @author Sarah Grebing
  * @version 1 (24.05.18)
  */
+@NullMarked
 public class AddFormulaToSuccedentAction extends ExplorationAction {
     public AddFormulaToSuccedentAction() {
         this(MainWindow.getInstance());

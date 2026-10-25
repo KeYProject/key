@@ -21,6 +21,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -56,6 +57,7 @@ import org.jspecify.annotations.Nullable;
  * @version 1 (20.08.19)
  */
 
+@NullMarked
 @SuppressWarnings("ClassCanBeRecord")
 public class ProofExplorationService {
     private final @NonNull Proof proof;
@@ -143,7 +145,7 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    public Node applyChangeFormula(@NonNull Goal g,
+    public @Nullable Node applyChangeFormula(@NonNull Goal g,
             @NonNull PosInOccurrence pio,
             @NonNull JTerm term, @NonNull JTerm newTerm) {
         TacletApp app = soundChange(pio, term, newTerm);

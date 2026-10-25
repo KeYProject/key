@@ -17,6 +17,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * The central place to store global information for Proof Exploration.
@@ -28,6 +29,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @see ExplorationExtension
  */
+@NullMarked
 public class ExplorationModeModel {
 
     public static final String PROP_EXPLORE_MODE = "exploreModeSelected";

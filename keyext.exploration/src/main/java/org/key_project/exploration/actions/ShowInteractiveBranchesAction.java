@@ -14,10 +14,13 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import org.key_project.exploration.ExplorationModeModel;
 import org.key_project.exploration.Icons;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Alexander Weigl
  * @version 1 (22.07.19)
  */
+@NullMarked
 public class ShowInteractiveBranchesAction extends KeyAction {
     private final transient ExplorationModeModel model;
 

@@ -15,12 +15,15 @@ import de.uka.ilkd.key.proof.Proof;
 import org.key_project.exploration.ExplorationModeModel;
 import org.key_project.exploration.Icons;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Toggles the Exploration Mode.
  *
  * @author Alexander Weigl
  * @version 1 (22.07.19)
  */
+@NullMarked
 public class ToggleExplorationAction extends KeyAction {
     public static final String MENU_PATH = "View.Exploration";
     private final transient ExplorationModeModel model;
