@@ -219,7 +219,8 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.ast.expression.Operator op, Services serv,
+    public @Nullable Function getFunctionFor(de.uka.ilkd.key.java.ast.expression.Operator op,
+            Services serv,
             ExecutionContext ec) {
         assert false;
         return null;
@@ -245,7 +246,7 @@ public final class CharListLDT extends LDT {
 
 
     @Override
-    public Type getType(JTerm t) {
+    public @Nullable Type getType(JTerm t) {
         assert false;
         return null;
     }

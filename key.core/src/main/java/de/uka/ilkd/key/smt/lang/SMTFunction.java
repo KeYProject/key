@@ -6,6 +6,7 @@ package de.uka.ilkd.key.smt.lang;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -130,16 +131,22 @@ public class SMTFunction {
             return false;
         }
 
-        if (!this.id.equals(f.id)) {
+        final String thisId = Objects.requireNonNull(this.id, "id");
+        final List<SMTSort> thisDomainSorts =
+            Objects.requireNonNull(this.domainSorts, "domainSorts");
+        final List<SMTSort> otherDomainSorts =
+            Objects.requireNonNull(f.domainSorts, "domainSorts");
+
+        if (!thisId.equals(f.id)) {
             return false;
         }
 
-        if (this.domainSorts.size() != f.domainSorts.size()) {
+        if (thisDomainSorts.size() != otherDomainSorts.size()) {
             return false;
         }
 
-        for (int i = 0; i < this.domainSorts.size(); i++) {
-            if (!this.domainSorts.get(i).equals(f.domainSorts.get(i))) {
+        for (int i = 0; i < thisDomainSorts.size(); i++) {
+            if (!thisDomainSorts.get(i).equals(otherDomainSorts.get(i))) {
                 return false;
             }
         }
@@ -168,11 +175,11 @@ public class SMTFunction {
 
     @Override
     public int hashCode() {
-        int ret = id.hashCode();
+        int ret = Objects.requireNonNull(id, "id").hashCode();
         int base = 10;
         int i = 1;
 
-        for (SMTSort sort : domainSorts) {
+        for (SMTSort sort : Objects.requireNonNull(domainSorts, "domainSorts")) {
             ret = ret + sort.getId().hashCode() * base ^ i;
             i++;
         }
@@ -185,10 +192,11 @@ public class SMTFunction {
 
         buff.append("(declare-fun ").append(id).append(" ").append("(");
         // if (domainSorts == null) return "domainSorts is null";
-        for (SMTSort s : domainSorts) {
+        for (SMTSort s : Objects.requireNonNull(domainSorts, "domainSorts")) {
             buff.append(s.getTopLevel().getId()).append(" ");
         }
-        buff.append(")" + " ").append(imageSort.getTopLevel().getId()).append(")");
+        buff.append(")" + " ").append(Objects.requireNonNull(imageSort, "imageSort")
+                .getTopLevel().getId()).append(")");
 
         return buff.toString();
 

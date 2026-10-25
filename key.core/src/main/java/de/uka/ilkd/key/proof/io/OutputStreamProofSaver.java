@@ -790,11 +790,11 @@ public class OutputStreamProofSaver {
         return printer.result();
     }
 
-    public static String printTerm(JTerm t, Services serv) {
+    public static String printTerm(JTerm t, @Nullable Services serv) {
         return printTerm(t, serv, false);
     }
 
-    public static String printTerm(JTerm t, Services serv, boolean shortAttrNotation) {
+    public static String printTerm(JTerm t, @Nullable Services serv, boolean shortAttrNotation) {
         final LogicPrinter logicPrinter = createLogicPrinter(serv, shortAttrNotation);
         logicPrinter.printTerm(t);
         return logicPrinter.result();

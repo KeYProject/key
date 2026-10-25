@@ -25,18 +25,19 @@ public class FieldReference extends VariableReference
      */
     protected final @Nullable ReferencePrefix prefix;
 
-    public FieldReference(ProgramVariable pv, ReferencePrefix prefix) {
+    public FieldReference(ProgramVariable pv, @Nullable ReferencePrefix prefix) {
         super(Objects.requireNonNull(pv));
         this.prefix = constructPrefix(prefix, pv);
     }
 
     public FieldReference(PositionInfo pi, List<Comment> c, ProgramVariable variable,
-            ReferencePrefix prefix) {
+            @Nullable ReferencePrefix prefix) {
         super(pi, c, variable);
         this.prefix = constructPrefix(prefix, getProgramVariable());
     }
 
-    public FieldReference(ProgramVariable pv, ReferencePrefix prefix, @Nullable PositionInfo pi) {
+    public FieldReference(ProgramVariable pv, @Nullable ReferencePrefix prefix,
+            @Nullable PositionInfo pi) {
         super(pv, pi);
         this.prefix = constructPrefix(prefix, getProgramVariable());
     }
