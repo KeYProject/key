@@ -26,9 +26,13 @@ import org.key_project.isabelletranslation.gui.IsabelleProgressDialog;
 import org.key_project.isabelletranslation.gui.IsabelleProgressModel;
 import org.key_project.isabelletranslation.gui.IsabelleProofApplyUserAction;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Updates the {@link IsabelleProgressDialog} for a given {@link IsabelleLauncher}.
  */
+@NullMarked
 public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherListener {
     /**
      * The format used to display the remaining time for solver instances.
@@ -426,7 +430,7 @@ public class IsabelleLauncherProgressDialogMediator implements IsabelleLauncherL
     private void waiting(IsabelleSolver solver) {
     }
 
-    private IsabelleSolver getSolver(int column, int row) {
+    private @Nullable IsabelleSolver getSolver(int column, int row) {
         // This needs to be changed, if different kinds of Isabelle solvers are supported
         return solvers.stream().filter(s -> (s.getSolverIndex() == row)).findFirst().orElse(null);
     }

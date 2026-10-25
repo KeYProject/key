@@ -11,12 +11,14 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Action to translate all open goals.
  */
+@NullMarked
 public class IsabelleTranslateAllAction extends MainWindowAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleTranslateAllAction.class);
 

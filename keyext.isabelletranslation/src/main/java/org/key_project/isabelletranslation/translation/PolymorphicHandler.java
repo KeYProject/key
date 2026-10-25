@@ -14,14 +14,18 @@ import de.uka.ilkd.key.logic.op.IfThenElse;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This handles translation of equals and if-then-else
  */
+@NullMarked
 public class PolymorphicHandler implements IsabelleHandler {
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
-            Properties handlerSnippets,
+            @Nullable Properties handlerSnippets,
             String[] handlerOptions) {
     }
 

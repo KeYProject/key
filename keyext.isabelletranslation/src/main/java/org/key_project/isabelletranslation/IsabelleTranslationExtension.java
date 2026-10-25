@@ -21,12 +21,14 @@ import org.key_project.isabelletranslation.gui.controller.IsabelleTranslateAllAc
 import org.key_project.isabelletranslation.gui.controller.IsabelleTranslationAction;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Extension class for Isabelle translation
  */
 @KeYGuiExtension.Info(name = "Isabelle Translation", optional = true,
     experimental = false)
+@NullMarked
 public class IsabelleTranslationExtension implements KeYGuiExtension, KeYGuiExtension.Settings,
         KeYGuiExtension.ContextMenu, KeYGuiExtension.Startup {
     @Override

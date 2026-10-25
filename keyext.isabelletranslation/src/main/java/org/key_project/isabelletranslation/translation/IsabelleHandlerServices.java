@@ -17,6 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.uka.ilkd.key.java.Services;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,7 @@ import org.slf4j.LoggerFactory;
  * @author Alicia Appelhagen (load handlers from handler names array instead of ServiceLoader)
  * @author Nils Buchholz (adaptation for Isabelle translation)
  */
+@NullMarked
 public class IsabelleHandlerServices {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleHandlerServices.class);
@@ -49,7 +52,7 @@ public class IsabelleHandlerServices {
     /**
      * Singleton instance
      */
-    private static IsabelleHandlerServices theInstance;
+    private static @Nullable IsabelleHandlerServices theInstance;
 
     /**
      * A map from template handler objects to their smt2 snippets.
@@ -207,7 +210,7 @@ public class IsabelleHandlerServices {
      * @return freshly created property object, null if the resource does not exist
      * @throws IOException may be thrown during reading of the resource
      */
-    private static Properties loadSnippets(Class<?> aClass) throws IOException {
+    private static @Nullable Properties loadSnippets(Class<?> aClass) throws IOException {
         String resourceName = aClass.getSimpleName() + ".preamble.xml";
         URL resource = aClass.getResource(resourceName);
         if (resource != null) {

@@ -13,16 +13,20 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Handles the translation of LogicVariables.
  */
+@NullMarked
 public class LogicalVariableHandler implements IsabelleHandler {
 
     static final String VAR_POSTFIX = UninterpretedSymbolsHandler.POSTFIX;
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
-            Properties handlerSnippets, String[] handlerOptions) {
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
 
     }
 
