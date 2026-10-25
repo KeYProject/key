@@ -46,33 +46,57 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
         this.block = block;
     }
 
+    private static BlockContract.Variables requireVariables(
+            BlockContract.@Nullable Variables variables) {
+        if (variables == null) {
+            throw new NullPointerException(
+                "No variables of the block contract for the well-definedness check.");
+        }
+        return variables;
+    }
+
+    private static OriginalVariables requireOrigVars(BlockContract.@Nullable Variables variables) {
+        return requireVariables(variables).toOrigVars();
+    }
+
     /**
-     * Creates a contract to check well-definedness of a block contract
+     * Creates a contract to check well-definedness of a block contract.
      *
      * @param block the block belonging to the block contract
-     * @param variables the variables of the block contract
+     * @param variables the variables of the block contract, may be {@code null}
      * @param params the parameters of the block
      * @param services the services instance
+     *        <p>
+     *        The setter invocations below happen while {@code this} is still under construction;
+     *        they
+     *        are safe since all involved methods are final, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public BlockWellDefinedness(BlockContract block, BlockContract.@Nullable Variables variables,
             ImmutableSet<LocationVariable> params, Services services) {
         super(block.getName(), block.getBlock().getStartPosition().line(), block.getMethod(),
-            variables.toOrigVars().add(convertParams(params)), Type.BLOCK_CONTRACT, services);
+            requireOrigVars(variables).add(convertParams(params)), Type.BLOCK_CONTRACT, services);
         assert block != null;
+        final BlockContract.Variables vars = requireVariables(variables);
         final LocationVariable h = getHeap();
         this.block = block;
-        setRequires(block.getPrecondition(h, variables, services));
+        setRequires(block.getPrecondition(h, vars, services));
         setModifiable(block.hasModifiableClause(h) ? block.getModifiable(h) : TB.strictlyNothing(),
             services);
-        setEnsures(block.getPostcondition(h, variables, services));
+        setEnsures(block.getPostcondition(h, vars, services));
     }
 
     @Override
     public BlockWellDefinedness map(UnaryOperator<JTerm> op, Services services) {
+        final JTerm accessible = getAccessible();
+        final JTerm mby = getMby();
+        final JTerm represents = getRepresents();
         return new BlockWellDefinedness(getName(), id(), type(), getTarget(), getHeap(),
             getOrigVars(), getRequires().map(op), op.apply(getModifiable()),
-            op.apply(getAccessible()), getEnsures().map(op), op.apply(getMby()),
-            op.apply(getRepresents()), block.map(op, services), services.getTermBuilder());
+            accessible == null ? null : op.apply(accessible), getEnsures().map(op),
+            mby == null ? null : op.apply(mby),
+            represents == null ? null : op.apply(represents), block.map(op, services),
+            services.getTermBuilder());
     }
 
     @Override
@@ -115,7 +139,7 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     }
 
     @Override
-    public ModifierKind getVisibility() {
+    public @Nullable ModifierKind getVisibility() {
         return block.getVisibility();
     }
 
