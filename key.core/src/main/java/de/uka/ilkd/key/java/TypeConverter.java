@@ -528,13 +528,11 @@ public final class TypeConverter {
             return Objects.requireNonNull(
                 services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ),
                 "no KeYJavaType for \\seq");
-        } else if (type1.equals(Objects.requireNonNull(
-            services.getJavaInfo().getKeYJavaType("java.lang.String"),
-            "no KeYJavaType for java.lang.String"))) {
+        } else if (Objects.equals(type1,
+            services.getJavaInfo().getKeYJavaType("java.lang.String"))) {
             return type1;
-        } else if (type2.equals(Objects.requireNonNull(
-            services.getJavaInfo().getKeYJavaType("java.lang.String"),
-            "no KeYJavaType for java.lang.String"))) {
+        } else if (Objects.equals(type2,
+            services.getJavaInfo().getKeYJavaType("java.lang.String"))) {
             return type2;
         } else if ((t2 == PrimitiveType.JAVA_FLOAT)
                 && (t1 == PrimitiveType.JAVA_BYTE || t1 == PrimitiveType.JAVA_SHORT

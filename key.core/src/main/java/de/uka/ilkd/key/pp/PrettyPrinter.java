@@ -540,10 +540,11 @@ public class PrettyPrinter implements Visitor {
         if (type == null) {
             layouter.print("unknown");
         } else if (type instanceof ArrayDeclaration arr) {
-            performActionOnType(Objects.requireNonNull(
-                Objects.requireNonNull(arr.getBaseType().getKeYJavaType(),
-                    "array base type has no KeY Java type").getJavaType(),
-                "array base type has no Java type"));
+            // main passes the base Java type through to performActionOnType even when
+            // absent; null is printed as "unknown". Only a missing KeYJavaType itself
+            // (which main would dereference) is treated as an error here.
+            performActionOnType(Objects.requireNonNull(arr.getBaseType().getKeYJavaType(),
+                "array base type has no KeY Java type").getJavaType());
             layouter.print("[]");
         } else {
             layouter.print(type.getFullName());
