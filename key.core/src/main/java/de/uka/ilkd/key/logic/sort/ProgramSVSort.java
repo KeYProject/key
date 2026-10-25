@@ -269,7 +269,8 @@ public abstract class ProgramSVSort extends SortImpl {
         return true;
     }
 
-    public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
+    public boolean canStandFor(ProgramElement check, @Nullable ExecutionContext ec,
+            Services services) {
         return canStandFor(check, services);
     }
 
@@ -1010,7 +1011,8 @@ public abstract class ProgramSVSort extends SortImpl {
 
         /* Will only match on String variables */
         @Override
-        public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
+        public boolean canStandFor(ProgramElement check, @Nullable ExecutionContext ec,
+                Services services) {
             if (!super.canStandFor(check, ec, services)) {
                 return false;
             }
@@ -1040,7 +1042,8 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
+        public boolean canStandFor(ProgramElement check, @Nullable ExecutionContext ec,
+                Services services) {
             if (!super.canStandFor(check, ec, services)) {
                 return false;
             }
@@ -1073,7 +1076,8 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
+        public boolean canStandFor(ProgramElement check, @Nullable ExecutionContext ec,
+                Services services) {
             if (!super.canStandFor(check, ec, services)) {
                 return false;
             }
@@ -1104,7 +1108,8 @@ public abstract class ProgramSVSort extends SortImpl {
             this.forbidden_types = forbidden_types;
         }
 
-        public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
+        public boolean canStandFor(ProgramElement check, @Nullable ExecutionContext ec,
+                Services services) {
             if (!super.canStandFor(check, ec, services)) {
                 return false;
             }
@@ -1135,7 +1140,8 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
+        public boolean canStandFor(ProgramElement check, @Nullable ExecutionContext ec,
+                Services services) {
             if (!super.canStandFor(check, ec, services)) {
                 return false;
             }
@@ -1315,7 +1321,8 @@ public abstract class ProgramSVSort extends SortImpl {
         return null;
     }
 
-    static KeYJavaType getKeYJavaType(ProgramElement pe, ExecutionContext ec, Services services) {
+    static KeYJavaType getKeYJavaType(ProgramElement pe, @Nullable ExecutionContext ec,
+            Services services) {
         return services.getTypeConverter().getKeYJavaType((Expression) pe, ec);
     }
 
