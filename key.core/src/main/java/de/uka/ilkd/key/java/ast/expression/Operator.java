@@ -15,6 +15,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Operator base class.
@@ -223,6 +224,6 @@ public abstract class Operator extends JavaNonTerminalProgramElement
             + services.getTypeConverter().getKeYJavaType(this, ec).getName() + ")";
     }
 
-    public abstract KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec);
+    public abstract KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec);
 
 }

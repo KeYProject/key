@@ -84,7 +84,7 @@ public final class UnaryOperator extends Operator
 
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         final TypeConverter tc = javaServ.getTypeConverter();
 
         try {

@@ -225,7 +225,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
         return getKeYJavaType();
     }
 
-    public @Nullable KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         return getKeYJavaType();
     }
 

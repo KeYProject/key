@@ -660,7 +660,9 @@ public final class TypeConverter {
      * evaluated
      *
      * @param e the Expression whose type has to be retrieved
-     * @param ec the ExecutionContext of expression <tt>e</tt>
+     * @param ec the ExecutionContext of expression <tt>e</tt>, if any; expressions that do not
+     *        depend on a context (e.g. variables with declared types) resolve their own type when
+     *        no context is available
      * @return the KeYJavaType of expression <tt>e</tt>
      */
     public KeYJavaType getKeYJavaType(Expression e, @Nullable ExecutionContext ec) {
@@ -670,10 +672,7 @@ public final class TypeConverter {
                         .getKeYJavaType(),
                 "no KeYJavaType for the type reference in the execution context");
         }
-        return Objects.requireNonNull(
-            e.getKeYJavaType(services, Objects.requireNonNull(ec,
-                "no execution context to determine type of " + e)),
-            "no KeYJavaType for " + e);
+        return Objects.requireNonNull(e.getKeYJavaType(services, ec), "no KeYJavaType for " + e);
     }
 
 

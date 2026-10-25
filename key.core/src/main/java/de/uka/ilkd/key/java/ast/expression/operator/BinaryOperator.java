@@ -71,7 +71,7 @@ public final class BinaryOperator extends Operator
         return INFIX;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         final TypeConverter tc = javaServ.getTypeConverter();
         if (kind.isBoolean()) {
             return javaServ.getTypeConverter().getBooleanType();

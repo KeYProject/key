@@ -94,12 +94,13 @@ public abstract sealed
      * @param javaServ
      *        the Services offering access to the Java model
      * @param ec
-     *        the ExecutionContext in which the expression is evaluated
+     *        the ExecutionContext in which the expression is evaluated (may be {@code null}, the
+     *        literal's type is independent of the context)
      * @return the literal's type
      */
     @Override
     public @Nullable KeYJavaType getKeYJavaType(Services javaServ,
-            ExecutionContext ec) {
+            @Nullable ExecutionContext ec) {
         return getKeYJavaType(javaServ);
     }
 

@@ -109,7 +109,7 @@ public class VariableNameProposer implements InstantiationProposer {
     protected static String createBaseNameProposalBasedOnCorrespondence(TacletApp p_app,
             SchemaVariable p_var, Services services) {
         final String result;
-        final SchemaVariable v = p_app.taclet().getNameCorrespondent(p_var, services);
+        final @Nullable SchemaVariable v = p_app.taclet().getNameCorrespondent(p_var, services);
         if (v != null && p_app.instantiations().isInstantiated(v)) {
 
             final Object inst = p_app.instantiations().getInstantiation(v);

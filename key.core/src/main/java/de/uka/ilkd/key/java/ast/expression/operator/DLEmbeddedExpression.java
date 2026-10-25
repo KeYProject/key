@@ -69,7 +69,7 @@ public class DLEmbeddedExpression extends Operator {
      * de.uka.ilkd.key.java.reference.ExecutionContext)
      */
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
 
         Sort sort = functionSymbol.sort();
 

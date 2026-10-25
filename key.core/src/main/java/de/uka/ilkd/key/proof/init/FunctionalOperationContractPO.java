@@ -242,16 +242,24 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                     ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
                 } else {
                     ft = tb.frame(tb.var(heap), heapToAtPre,
-                        getContract().getFreeModifiable(heap, selfVar, paramVars, services));
+                        Objects.requireNonNull(
+                            getContract().getFreeModifiable(heap, selfVar, paramVars, services),
+                            "no free modifiable clause for heap: " + heap));
                 }
             } else {
                 if (!getContract().hasFreeModifiable(heap)) {
                     ft = tb.frame(tb.var(heap), heapToAtPre,
-                        getContract().getModifiable(heap, selfVar, paramVars, services));
+                        Objects.requireNonNull(
+                            getContract().getModifiable(heap, selfVar, paramVars, services),
+                            "no modifiable clause for heap: " + heap));
                 } else {
                     ft = tb.frame(tb.var(heap), heapToAtPre, tb.union(
-                        getContract().getModifiable(heap, selfVar, paramVars, services),
-                        getContract().getFreeModifiable(heap, selfVar, paramVars, services)));
+                        Objects.requireNonNull(
+                            getContract().getModifiable(heap, selfVar, paramVars, services),
+                            "no modifiable clause for heap: " + heap),
+                        Objects.requireNonNull(
+                            getContract().getFreeModifiable(heap, selfVar, paramVars, services),
+                            "no free modifiable clause for heap: " + heap)));
                 }
             }
 

@@ -89,10 +89,10 @@ public final class UnaryAssignment extends Operator
      * retrieves the type of the assignment expression
      *
      * @param javaServ the Services offering access to the Java model
-     * @param ec the ExecutionContext in which the expression is evaluated
+     * @param ec the ExecutionContext in which the expression is evaluated (may be {@code null})
      * @return the type of the assignment expression
      */
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         // Expression.getKeYJavaType is honestly @Nullable, but the operand of a type-checked
         // assignment always resolves (TypeConverter requires it), and Operator's abstract
         // contract here is @NonNull, so narrow at the deref.
