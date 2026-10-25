@@ -25,14 +25,10 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.jml.JmlSpec;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
-
-import org.jspecify.annotations.Nullable;
 
 /**
  * A statement indicating a merge point.
@@ -44,8 +40,6 @@ public class MergePointStatement extends JavaStatement
 
     // Those are used for JML to JavaDL conversions
     protected final IProgramVariable identifier;
-
-    private final @Nullable JmlSpec context;
 
     /**
      * The merge contracts belonging to this merge point, attached to the node; former
@@ -74,32 +68,19 @@ public class MergePointStatement extends JavaStatement
         this.mergeContracts = DefaultImmutableSet.nil();
     }
 
-    @Override
-    public ImmutableList<JmlSpec> getAttachedJml() {
-        return context == null ? ImmutableList.nil() : ImmutableList.of(context);
-    }
-
     public MergePointStatement(
-            PositionInfo pi, List<Comment> c, @Nullable JmlSpec context,
-            IProgramVariable identifier) {
+            PositionInfo pi, List<Comment> c, IProgramVariable identifier) {
         super(pi, c);
         this.identifier = identifier;
-        this.context = context;
     }
 
     public MergePointStatement(IProgramVariable indexPV) {
-        this(null, null, null, indexPV);
+        this(null, null, indexPV);
     }
 
     public MergePointStatement(ExtList children) {
         super(children);
         identifier = Objects.requireNonNull(children.get(IProgramVariable.class));
-        // comments = children.get(Comment[].class);
-        this.context = null;
-    }
-
-    public @Nullable JmlSpec getContext() {
-        return context;
     }
 
     /*

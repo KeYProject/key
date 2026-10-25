@@ -19,7 +19,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.prover.rules.matcher.vm.ProgramChildrenMatcher;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -55,7 +54,7 @@ public class ContextStatementBlock extends StatementBlock {
             PositionInfo pi, List<Comment> c,
             ImmutableArray<? extends Statement> body,
             IExecutionContext execContext) {
-        super(pi, c, body, ImmutableList.nil());
+        super(pi, c, body);
         this.executionContext = execContext;
     }
 

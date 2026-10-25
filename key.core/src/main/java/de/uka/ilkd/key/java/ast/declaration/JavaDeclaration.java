@@ -23,11 +23,9 @@ import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.Declaration;
 import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.PositionInfo;
-import de.uka.ilkd.key.speclang.jml.JmlSpec;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -39,9 +37,6 @@ import org.jspecify.annotations.Nullable;
 
 public abstract class JavaDeclaration extends JavaNonTerminalProgramElement implements Declaration {
 
-    protected final ImmutableList<JmlSpec> attachedJml;
-
-
     /**
      * Modifiers.
      *
@@ -52,28 +47,26 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
     protected final ImmutableArray<Modifier> modArray;
 
     public JavaDeclaration(PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<Modifier> modArray,
-            ImmutableList<JmlSpec> attachedJml) {
+            @NonNull ImmutableArray<Modifier> modArray) {
         super(pi, comments);
         this.modArray = modArray;
-        this.attachedJml = attachedJml;
     }
 
     /**
      * Java declaration.
      */
     public JavaDeclaration() {
-        this(null, null, new ImmutableArray<>(), ImmutableList.nil());
+        this(null, null, new ImmutableArray<>());
     }
 
 
     public JavaDeclaration(Modifier[] mods) {
-        this(null, null, new ImmutableArray<>(mods), ImmutableList.nil());
+        this(null, null, new ImmutableArray<>(mods));
     }
 
 
     public JavaDeclaration(ImmutableArray<Modifier> mods) {
-        this(null, null, mods, ImmutableList.nil());
+        this(null, null, mods);
     }
 
 
@@ -88,8 +81,6 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
     public JavaDeclaration(ExtList children) {
         super(children);
         modArray = new ImmutableArray<>(children.collect(Modifier.class));
-        this.attachedJml =
-            ImmutableList.fromList(List.of(children.collect(JmlSpec.class)));
     }
 
 
@@ -114,11 +105,6 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
         return modArray;
     }
 
-
-    @Override
-    public ImmutableList<JmlSpec> getAttachedJml() {
-        return attachedJml;
-    }
 
     public boolean containsModifier(ModifierKind type) {
         int s = modArray.size();

@@ -7,8 +7,6 @@ package de.uka.ilkd.key.java;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
-import de.uka.ilkd.key.speclang.jml.JmlSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 import de.uka.ilkd.key.speclang.njml.JmlParserBaseVisitor;
@@ -17,10 +15,6 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
 
 import com.github.javaparser.ast.Modifier;
-import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.body.BodyDeclaration;
-import com.github.javaparser.ast.body.ConstructorDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.printer.DefaultPrettyPrinterVisitor;
 import com.github.javaparser.printer.configuration.PrinterConfiguration;
 import com.google.common.base.Strings;
@@ -57,47 +51,6 @@ public class SpecialJavaPrinter extends DefaultPrettyPrinterVisitor {
         } else {
             super.visit(n, arg);
         }
-    }
-
-    @Override
-    public void visit(MethodDeclaration n, Void arg) {
-        print(TransformationPipelineServices.getSpec(n));
-        super.visit(n, arg);
-    }
-
-    @Override
-    public void visit(ConstructorDeclaration n, Void arg) {
-        print(TransformationPipelineServices.getSpec(n));
-        super.visit(n, arg);
-    }
-
-    @Override
-    protected void printCompactClassMembers(NodeList<BodyDeclaration<?>> members, Void arg) {
-        print(TransformationPipelineServices.getClassSpec(members.getParentNode().get()));
-        super.printCompactClassMembers(members, arg);
-    }
-
-    @Override
-    protected void printMembers(NodeList<BodyDeclaration<?>> members, Void arg) {
-        print(TransformationPipelineServices.getClassSpec(members.getParentNode().get()));
-        super.printMembers(members, arg);
-    }
-
-
-    private void print(List<JmlSpec> spec) {
-        for (var construct : spec) {
-            print(construct);
-        }
-    }
-
-    private void print(JmlSpec construct) {
-        var text = construct.node().toString();
-        if (text == null || text.isBlank()) {
-            return;
-        }
-        printer.print("/*@ ");
-        printer.print(text);
-        printer.println("*/");
     }
 
     private void print(ImmutableList<JMLModifier> modifiers,
