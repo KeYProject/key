@@ -19,9 +19,13 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Translator for Isabelle.
  */
+@NullMarked
 public class IsabelleTranslator {
     /**
      * Line ending to use in translations
@@ -35,7 +39,7 @@ public class IsabelleTranslator {
     /**
      * The null sort
      */
-    private final Sort nullSort;
+    private final @Nullable Sort nullSort;
 
     public IsabelleTranslator(Services services) {
         this.services = services;

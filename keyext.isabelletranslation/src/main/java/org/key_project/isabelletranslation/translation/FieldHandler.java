@@ -23,12 +23,15 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class handles the translation of field values.
  *
  * @author Nils Buchholz
  */
+@NullMarked
 public class FieldHandler implements IsabelleHandler {
     /**
      * The predefined fields.
@@ -38,11 +41,11 @@ public class FieldHandler implements IsabelleHandler {
     /**
      * The Field sort.
      */
-    private Sort fieldSort;
+    private @Nullable Sort fieldSort;
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
-            Properties handlerSnippets, String[] handlerOptions) throws IOException {
+            @Nullable Properties handlerSnippets, String[] handlerOptions) throws IOException {
         fieldSort = services.getNamespaces().sorts().lookup("Field");
         predefinedFields.add("created");
 

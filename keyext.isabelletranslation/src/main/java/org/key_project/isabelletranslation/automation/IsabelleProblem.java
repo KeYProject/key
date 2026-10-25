@@ -13,6 +13,8 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.isabelletranslation.IsabelleTranslationSettings;
 import org.key_project.isabelletranslation.translation.IllegalFormulaException;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Nils Buchholz
  */
+@NullMarked
 public class IsabelleProblem {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleProblem.class);
 
@@ -33,12 +36,12 @@ public class IsabelleProblem {
     /**
      * Content of the preamble theory
      */
-    private final String preamble;
+    private final @Nullable String preamble;
 
     /**
      * Content of the translation theory
      */
-    private final String translation;
+    private final @Nullable String translation;
 
     /**
      * Name of the problem. Contains the serialNr of the associated goal
@@ -49,7 +52,7 @@ public class IsabelleProblem {
     /**
      * Exception encountered during translation
      */
-    private final IllegalFormulaException exception;
+    private final @Nullable IllegalFormulaException exception;
 
     /**
      * Creates a new problem for the given goal.
@@ -88,7 +91,7 @@ public class IsabelleProblem {
      *
      * @return content of translation theory
      */
-    public String getTranslation() {
+    public @Nullable String getTranslation() {
         return translation;
     }
 
@@ -97,7 +100,7 @@ public class IsabelleProblem {
      *
      * @return content of preamble theory
      */
-    public String getPreamble() {
+    public @Nullable String getPreamble() {
         return preamble;
     }
 
@@ -137,7 +140,7 @@ public class IsabelleProblem {
         return translation != null || preamble != null;
     }
 
-    public IllegalFormulaException getTranslationException() {
+    public @Nullable IllegalFormulaException getTranslationException() {
         return exception;
     }
 }

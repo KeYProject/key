@@ -14,16 +14,20 @@ import de.uka.ilkd.key.java.Services;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Handles translation of seqDef function.
  */
+@NullMarked
 public class SeqDefHandler implements IsabelleHandler {
 
     private final Map<Operator, String> supportedOperators = new HashMap<>();
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
-            Properties handlerSnippets, String[] handlerOptions) throws IOException {
+            @Nullable Properties handlerSnippets, String[] handlerOptions) throws IOException {
         supportedOperators.put(services.getTypeConverter().getSeqLDT().getSeqDef(), "SeqDef");
     }
 

@@ -6,9 +6,12 @@ package org.key_project.isabelletranslation.automation;
 
 import java.util.Collection;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Interface for listener classes for the {@link IsabelleLauncher}
  */
+@NullMarked
 public interface IsabelleLauncherListener {
     /**
      * Called when the launcher has stopped (both successfully and due to interruptions etc.).

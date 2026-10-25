@@ -15,11 +15,15 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class handles the translation of the bounded sum function.
  *
  * @author Nils Buchholz
  */
+@NullMarked
 public class BSumHandler implements IsabelleHandler {
     /**
      * Map of the operators supported by this handler and their respective translation.
@@ -28,7 +32,7 @@ public class BSumHandler implements IsabelleHandler {
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
-            Properties handlerSnippets, String[] handlerOptions) throws IOException {
+            @Nullable Properties handlerSnippets, String[] handlerOptions) throws IOException {
         supportedOperators.clear();
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
 

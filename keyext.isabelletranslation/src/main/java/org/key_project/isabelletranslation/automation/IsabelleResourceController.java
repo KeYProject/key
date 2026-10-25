@@ -21,6 +21,7 @@ import de.unruh.isabelle.pure.Implicits;
 import de.unruh.isabelle.pure.Position;
 import de.unruh.isabelle.pure.Theory;
 import de.unruh.isabelle.pure.TheoryHeader;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.collection.immutable.List;
@@ -32,6 +33,7 @@ import scala.collection.immutable.List;
  * The Isabelle instances are bundled with a {@link Theory} into a {@link IsabelleResource} for this
  * purpose.
  */
+@NullMarked
 public class IsabelleResourceController {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleResourceController.class);
     /**
