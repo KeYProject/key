@@ -12,6 +12,8 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY;
 import static de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo.INF_FLOW_CHECK_TRUE;
 
@@ -19,6 +21,7 @@ import static de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo.INF_FLOW_CH
  *
  * @author christoph
  */
+@NullMarked
 public interface InfFlowCompositePO extends InfFlowPO {
     AbstractInfFlowPO getChildPO();
 

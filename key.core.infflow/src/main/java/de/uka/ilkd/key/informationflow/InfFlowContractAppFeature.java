@@ -39,8 +39,10 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 
+@NullMarked
 public class InfFlowContractAppFeature implements Feature {
 
     public static final Feature INSTANCE = new InfFlowContractAppFeature();

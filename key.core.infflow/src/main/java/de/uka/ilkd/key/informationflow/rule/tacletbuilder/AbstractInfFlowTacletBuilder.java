@@ -26,6 +26,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -34,6 +36,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author christoph
  */
+@NullMarked
 abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
     /**
@@ -61,6 +64,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     }
 
 
+    @Nullable
     JTerm createTermSV(JTerm t, String schemaPrefix, Services services) {
         if (t == null) {
             return null;
@@ -73,6 +77,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     }
 
 
+    @Nullable
     VariableSV createVariableSV(QuantifiableVariable v, String schemaPrefix,
             Services services) {
         if (v == null) {

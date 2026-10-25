@@ -29,6 +29,8 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Builds the rule which inserts information flow contract applications.
@@ -36,6 +38,7 @@ import org.key_project.util.collection.Pair;
  *
  * @author christoph
  */
+@NullMarked
 abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletBuilder {
 
     private static final String SCHEMA_PREFIX = "sv_";

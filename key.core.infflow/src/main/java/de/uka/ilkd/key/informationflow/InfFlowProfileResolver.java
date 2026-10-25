@@ -7,6 +7,9 @@ package de.uka.ilkd.key.informationflow;
 import de.uka.ilkd.key.proof.init.DefaultProfileResolver;
 import de.uka.ilkd.key.proof.init.Profile;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class InfFlowProfileResolver implements DefaultProfileResolver {
     @Override
     public String getProfileName() {

@@ -23,6 +23,8 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Generate term "self != null".
@@ -30,6 +32,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author christoph
  */
+@NullMarked
 abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
     @Override
