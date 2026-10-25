@@ -72,7 +72,7 @@ public abstract class AbstractTestGenerator {
         this.originalProof = originalProof;
     }
 
-    public void generateTestCases(final StopRequest stopRequest, final TGReporter log)
+    public void generateTestCases(final @Nullable StopRequest stopRequest, final TGReporter log)
             throws InterruptedException {
         TestGenerationSettings settings = TestGenerationSettings.getInstance();
 
@@ -278,8 +278,9 @@ public abstract class AbstractTestGenerator {
      * @return the new proof with the specified root node
      * @throws ProofInputException exception for proof input
      */
-    private Proof createProofForTestingNoDuplicate(Node node, List<Proof> otherProofs,
-            boolean removePostCondition) throws ProofInputException {
+    private @Nullable Proof createProofForTestingNoDuplicate(Node node,
+            @Nullable List<Proof> otherProofs, boolean removePostCondition)
+            throws ProofInputException {
         final Proof oldProof = node.proof();
         final Sequent oldSequent = node.sequent();
         Sequent newSequent = JavaDLSequentKit.getInstance().getEmptySequent();
