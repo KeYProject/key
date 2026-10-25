@@ -22,11 +22,15 @@ import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Status line button to indicate whether cached goals are present.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class ReferenceSearchButton extends JButton implements ActionListener, KeYSelectionListener {
     /**
      * Color used for the label if a reference is found.
@@ -90,7 +94,7 @@ public class ReferenceSearchButton extends JButton implements ActionListener, Ke
      *
      * @param p the currently selected proof
      */
-    public void updateState(Proof p) {
+    public void updateState(@Nullable Proof p) {
         if (SingleCoreFeatureGate.isActive()) {
             setText("Proof Caching");
             setForeground(null);

@@ -14,6 +14,8 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
 
 import org.key_project.util.java.SwingUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@NullMarked
 public class ReferenceSearchDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
@@ -34,15 +37,15 @@ public class ReferenceSearchDialog extends JDialog {
     /**
      * Button to copy the relevant proof steps.
      */
-    private JButton applyButton;
+    private @Nullable JButton applyButton;
     /**
      * Button to close the dialog.
      */
-    private JButton closeDialog;
+    private @Nullable JButton closeDialog;
     /**
      * Scroll pane listing the open goals and the results of running each SMT solver on them.
      */
-    private JScrollPane scrollPane;
+    private @Nullable JScrollPane scrollPane;
     /**
      * Overall progress of the search / copy.
      */

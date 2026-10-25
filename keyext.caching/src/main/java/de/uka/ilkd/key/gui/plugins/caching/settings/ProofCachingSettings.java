@@ -6,11 +6,14 @@ package de.uka.ilkd.key.gui.plugins.caching.settings;
 
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Settings for the proof caching functionality.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class ProofCachingSettings extends AbstractPropertiesSettings {
     public static final String DISPOSE_COPY = "Copy steps into new proof";
     public static final String DISPOSE_REOPEN = "Reopen proof";
