@@ -26,6 +26,7 @@ import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (7/27/25)
  */
+@NullMarked
 public class WdProfile extends JavaProfile {
     private static final Logger LOGGER = LoggerFactory.getLogger(WdProfile.class);
 

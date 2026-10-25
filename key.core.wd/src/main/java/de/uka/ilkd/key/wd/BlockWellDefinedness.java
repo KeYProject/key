@@ -20,11 +20,15 @@ import de.uka.ilkd.key.speclang.Contract;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A contract for checking the well-definedness of a jml block contract.
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public class BlockWellDefinedness extends StatementWellDefinedness {
 
     /**
@@ -34,7 +38,8 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
 
     private BlockWellDefinedness(String name, int id, Type type, IObserverFunction target,
             LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
-            JTerm accessible, Condition ensures, JTerm mby, JTerm rep, BlockContract block,
+            @Nullable JTerm accessible, Condition ensures, @Nullable JTerm mby, @Nullable JTerm rep,
+            BlockContract block,
             TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
@@ -49,7 +54,7 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
      * @param params the parameters of the block
      * @param services the services instance
      */
-    public BlockWellDefinedness(BlockContract block, BlockContract.Variables variables,
+    public BlockWellDefinedness(BlockContract block, BlockContract.@Nullable Variables variables,
             ImmutableSet<LocationVariable> params, Services services) {
         super(block.getName(), block.getBlock().getStartPosition().line(), block.getMethod(),
             variables.toOrigVars().add(convertParams(params)), Type.BLOCK_CONTRACT, services);

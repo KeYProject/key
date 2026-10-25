@@ -22,26 +22,32 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A contract for checking the well-definedness of a specification for a class invariant.
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public final class ClassWellDefinedness extends WellDefinednessCheck {
 
     private final ClassInvariant inv;
 
     private ClassWellDefinedness(String name, int id, Type type, IObserverFunction target,
             LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
-            JTerm accessible, Condition ensures, JTerm mby, JTerm rep, ClassInvariant inv,
+            @Nullable JTerm accessible, Condition ensures, @Nullable JTerm mby, @Nullable JTerm rep,
+            ClassInvariant inv,
             TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
         this.inv = inv;
     }
 
-    public ClassWellDefinedness(ClassInvariant inv, IObserverFunction target, JTerm accessible,
-            JTerm mby, Services services) {
+    public ClassWellDefinedness(ClassInvariant inv, IObserverFunction target,
+            @Nullable JTerm accessible,
+            @Nullable JTerm mby, Services services) {
         super(inv.getKJT().getFullName() + "." + "JML class invariant", 0, target,
             inv.getOrigVars(), Type.CLASS_INVARIANT, services);
         assert inv != null;
@@ -62,6 +68,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
+    @Nullable
     Function generateMbyAtPreFunc(Services services) {
         return null;
     }
@@ -166,12 +173,12 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public JTerm getGlobalDefs() {
+    public @Nullable JTerm getGlobalDefs() {
         return null;
     }
 
     @Override
-    public JTerm getAxiom() {
+    public @Nullable JTerm getAxiom() {
         return null;
     }
 }
