@@ -230,7 +230,6 @@ class LambdaSideEffect {
 
     public void $init() {
         super.$init();
-        super.$init();
     }
 
     static private void $clprepare() {

@@ -388,6 +388,5 @@ class LambdaMethodRef {
 
     public void $init() {
         super.$init();
-        super.$init();
     }
 }
