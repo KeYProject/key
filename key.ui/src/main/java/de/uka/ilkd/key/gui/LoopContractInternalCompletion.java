@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopContract;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NullMarked;
@@ -48,19 +49,35 @@ public class LoopContractInternalCompletion implements InteractiveRuleApplicatio
             }
         }
         final Services services = goal.proof().getServices();
-        final Instantiation instantiation = LoopContractInternalRule.INSTANCE
-                .instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
+
+        PosInOccurrence pio = application.posInOccurrence();
+        if (pio == null) {
+            // an interactive loop-contract rule app always carries a position
+            throw new NullPointerException("No position in occurrence available.");
+        }
+        final Instantiation instantiation =
+            LoopContractInternalRule.INSTANCE.instantiate((JTerm) pio.subTerm(), goal);
+        if (instantiation == null) {
+            // the rule always instantiates the application position
+            throw new NullPointerException("No instantiation available.");
+        }
         final ImmutableSet<LoopContract> contracts =
-            LoopContractInternalRule.INSTANCE.getApplicableContracts(instantiation, goal, services);
+            LoopContractInternalRule.INSTANCE
+                    .getApplicableContracts(instantiation, goal, services);
         final AuxiliaryContractConfigurator<LoopContract> configurator =
             new AuxiliaryContractConfigurator<>("Loop Contract Configurator",
                 new LoopContractSelectionPanel(services, true), mainWindow, services,
                 contracts.toArray(new LoopContract[contracts.size()]),
                 "Contracts for Block: " + instantiation.statement());
         if (configurator.wasSuccessful()) {
+            LoopContract loopContract = configurator.getContract();
+            if (loopContract == null) {
+                // a successful configuration always leaves a selected contract
+                throw new NullPointerException("No loop contract selected.");
+            }
             final List<LocationVariable> heaps =
                 HeapContext.getModifiableHeaps(services, instantiation.isTransactional());
-            result.update(instantiation.statement(), configurator.getContract(), heaps);
+            result.update(instantiation.statement(), loopContract, heaps);
         }
         return result;
     }

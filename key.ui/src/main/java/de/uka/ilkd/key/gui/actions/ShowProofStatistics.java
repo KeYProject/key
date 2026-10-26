@@ -37,6 +37,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,9 +57,17 @@ public class ShowProofStatistics extends MainWindowAction {
      * The proof to show statistics for. May be null if the currently selected proof
      * is to be shown.
      */
-    private final Proof proof;
+    private final @Nullable Proof proof;
 
-    public ShowProofStatistics(MainWindow mainWindow, Proof proof) {
+    /**
+     * The action-configuration calls and the {@code enableWhenProofLoaded(this)} registration
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since the listener only reacts to later selection events,
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
+    public ShowProofStatistics(MainWindow mainWindow, @Nullable Proof proof) {
         super(mainWindow);
         setName("Show Proof Statistics");
         setIcon(IconFactory.statistics(16));
@@ -399,6 +408,9 @@ public class ShowProofStatistics extends MainWindowAction {
             int result = fileChooser.showSaveDialog(this);
             if (result == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
+                if (file == null) {
+                    throw new NullPointerException("No file selected in the file chooser.");
+                }
                 try (BufferedWriter writer =
                     new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file),
                         StandardCharsets.UTF_8))) {
@@ -422,8 +434,14 @@ public class ShowProofStatistics extends MainWindowAction {
             ToolTipManager.sharedInstance().registerComponent(this);
         }
 
+        /**
+         * {@code JComponent.getToolTipText(MouseEvent)} may legitimately return {@code null} per
+         * its Javadoc contract; the annotated JDK shipped with the nullness checker declares a
+         * non-null return type, so the {@code @Nullable} override needs a scoped suppression.
+         */
+        @SuppressWarnings("nullness:override.return.invalid")
         @Override
-        public String getToolTipText(MouseEvent evt) {
+        public @Nullable String getToolTipText(MouseEvent evt) {
             int pos = viewToModel2D(evt.getPoint());
             if (pos >= 0) {
                 HTMLDocument hdoc = (HTMLDocument) getDocument();

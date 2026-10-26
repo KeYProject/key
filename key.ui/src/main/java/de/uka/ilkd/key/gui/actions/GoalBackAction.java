@@ -118,8 +118,10 @@ public final class GoalBackAction extends MainWindowAction {
         String appliedRule = "";
         if (longName && getMediator() != null) {
             final Goal goal = findNewestGoal(getMediator().getSelectedNode());
-            if (goal != null && goal.node() != null && goal.node().parent() != null) {
-                RuleApp app = goal.node().parent().getAppliedRuleApp();
+            Node parentNode = goal != null ? goal.node() : null;
+            parentNode = parentNode != null ? parentNode.parent() : null;
+            if (parentNode != null) {
+                RuleApp app = parentNode.getAppliedRuleApp();
                 if (app != null) {
                     appliedRule = " (" + app.rule().displayName() + ")";
                 }

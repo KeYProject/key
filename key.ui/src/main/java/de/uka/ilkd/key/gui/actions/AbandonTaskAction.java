@@ -23,6 +23,14 @@ public final class AbandonTaskAction extends MainWindowAction {
 
     private final @Nullable Proof proof;
 
+    /**
+     * The action-configuration calls and the {@code enableWhenProofLoaded(this)} registration
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since the listener only reacts to later selection events,
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public AbandonTaskAction(MainWindow mainWindow, @Nullable Proof proof) {
         super(mainWindow);
         setName("Abandon Proof");
@@ -42,7 +50,11 @@ public final class AbandonTaskAction extends MainWindowAction {
                 getMediator().getUI().getProofControl().stopAutoMode();
             }
             if (proof == null) {
-                getMediator().getSelectedProof().dispose();
+                Proof selectedProof = getMediator().getSelectedProof();
+                if (selectedProof == null) {
+                    throw new NullPointerException("No proof selected to abandon.");
+                }
+                selectedProof.dispose();
             } else {
                 proof.dispose();
             }

@@ -17,6 +17,7 @@ import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem;
 import de.uka.ilkd.key.gui.prooftree.ProofTreePopupFactory;
 import de.uka.ilkd.key.gui.smt.SolverListener;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -24,6 +25,7 @@ import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.join.JoinIsApplicable;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
 import de.uka.ilkd.key.rule.*;
@@ -82,7 +84,14 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
     /**
      * Creates an empty menu.
+     * <p>
+     * The menu leaves the {@code mediator} and the rule-clutter fields unset by design; the
+     * checker flags the missing field initializations (they would otherwise be initialized by
+     * the other constructor) and the {@code initClutterRules} call on the receiver while it is
+     * still under initialization (EISOP initialization check), suppressed with scoped keys.
      */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     CurrentGoalViewMenu() {
         initClutterRules();
     }
@@ -96,7 +105,13 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * @param noFindList with all applicable noFindTaclets
      * @param builtInList with all applicable BuiltInRules
      * @param pos the PosInSequent
+     * <p>
+     * The checker cannot see that {@code initClutterRules} and {@code createMenu} initialize
+     * the remaining fields and assemble the menu while the receiver is still under
+     * initialization (EISOP initialization check), suppressed with scoped keys.
      */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     CurrentGoalViewMenu(CurrentGoalView sequentView, ImmutableList<TacletApp> findList,
             ImmutableList<TacletApp> rewriteList, ImmutableList<TacletApp> noFindList,
             ImmutableList<BuiltInRule> builtInList, PosInSequent pos) {
@@ -159,7 +174,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         ImmutableList<TacletApp> toAdd = sort(find, comp);
         boolean rulesAvailable = !find.isEmpty();
 
-        if (getPos() != null && getPos().isSequent()) {
+        PosInSequent pos = getPos();
+        if (pos != null && pos.isSequent()) {
             rulesAvailable |= !noFind.isEmpty();
             toAdd = toAdd.prepend(noFind);
         }
@@ -174,7 +190,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         createDelayedCutJoinMenu();
         createMergeRuleMenu();
 
-        if (getPos() != null && getPos().isSequent()) {
+        if (pos != null && pos.isSequent()) {
             createSMTMenu();
         }
         createFocussedAutoModeMenu();
@@ -186,8 +202,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         addSeparator();
         addClipboardItem();
 
-        if (getPos() != null) {
-            PosInOccurrence occ = getPos().getPosInOccurrence();
+        if (pos != null) {
+            PosInOccurrence occ = pos.getPosInOccurrence();
             if (occ != null && occ.posInTerm() != null) {
                 JTerm t = (JTerm) occ.subTerm();
                 createAbbrevSection(t);
@@ -211,7 +227,17 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     private void addMacroMenu() {
-        ProofMacroMenu menu = new ProofMacroMenu(mediator, getPos().getPosInOccurrence());
+        PosInSequent pos = getPos();
+        if (pos == null) {
+            // the menu is only built while a position is exercised; the previous code crashed
+            // with an NPE here
+            return;
+        }
+        PosInOccurrence pio = pos.getPosInOccurrence();
+        if (pio == null) {
+            return;
+        }
+        ProofMacroMenu menu = new ProofMacroMenu(mediator, pio);
         if (!menu.isEmpty()) {
             add(menu);
         }
@@ -233,10 +259,25 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
     private void createDelayedCutJoinMenu() {
         if (FeatureSettings.isFeatureActivated(ProofTreePopupFactory.FEATURE_DELAY_CUT)) {
-            List<ProspectivePartner> partner = JoinIsApplicable.INSTANCE
-                    .isApplicable(mediator.getSelectedGoal(), getPos().getPosInOccurrence());
+            Goal selectedGoal = mediator.getSelectedGoal();
+            PosInSequent pos = getPos();
+            if (selectedGoal == null || pos == null) {
+                // the menu is only built while a goal is selected and a position is exercised;
+                // the previous code crashed with an NPE here
+                return;
+            }
+            PosInOccurrence pio = pos.getPosInOccurrence();
+            if (pio == null) {
+                return;
+            }
+            List<ProspectivePartner> partner =
+                JoinIsApplicable.INSTANCE.isApplicable(selectedGoal, pio);
             if (!partner.isEmpty()) {
-                JMenuItem item = new JoinMenuItem(partner, mediator.getSelectedProof(), mediator);
+                Proof proof = mediator.getSelectedProof();
+                if (proof == null) {
+                    return;
+                }
+                JMenuItem item = new JoinMenuItem(partner, proof, mediator);
                 add(item);
             }
         }
@@ -247,10 +288,19 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * nodes.
      */
     private void createMergeRuleMenu() {
-        if (MergeRule.isOfAdmissibleForm(mediator.getSelectedGoal(), getPos().getPosInOccurrence(),
-            true)) {
-            JMenuItem item = new MergeRuleMenuItem(mediator.getSelectedGoal(),
-                getPos().getPosInOccurrence(), mediator);
+        Goal selectedGoal = mediator.getSelectedGoal();
+        PosInSequent pos = getPos();
+        if (selectedGoal == null || pos == null) {
+            // the menu is only built while a goal is selected and a position is exercised; the
+            // previous code crashed with an NPE here
+            return;
+        }
+        PosInOccurrence pio = pos.getPosInOccurrence();
+        if (pio == null) {
+            return;
+        }
+        if (MergeRule.isOfAdmissibleForm(selectedGoal, pio, true)) {
+            JMenuItem item = new MergeRuleMenuItem(selectedGoal, pio, mediator);
             add(item);
         }
     }
@@ -477,6 +527,12 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     private class FocussedRuleApplicationAction extends KeyAction {
+        /**
+         * The action configures itself with {@code setName}/{@code setTooltip} while the
+         * receiver is still under initialization (EISOP initialization check), suppressed with
+         * a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public FocussedRuleApplicationAction() {
             setName("Apply rules automatically here");
             setTooltip("<html>Initiates and restricts automatic rule applications on the "
@@ -487,8 +543,19 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            new FocussedAutoModeUserAction(mediator, mediator.getSelectedProof(),
-                getPos().getPosInOccurrence()).actionPerformed(e);
+            Proof proof = mediator.getSelectedProof();
+            PosInSequent pos = getPos();
+            if (proof == null || pos == null) {
+                // the action is only reachable while a proof is loaded and a position is
+                // exercised; the previous code crashed with an NPE here
+                throw new NullPointerException(
+                    "No proof or position for focused rule application.");
+            }
+            PosInOccurrence pio = pos.getPosInOccurrence();
+            if (pio == null) {
+                return;
+            }
+            new FocussedAutoModeUserAction(mediator, proof, pio).actionPerformed(e);
         }
     }
 
@@ -564,8 +631,10 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                         "A decision should have been made on a higher level ( " + s1 + "<->" + s2
                             + ")");
                 }
-                int v1 = map1.get(s1);
-                int v2 = map2.get(s2);
+                // the keys are taken from these maps' own entry sets, so the values are always
+                // present; getOrDefault keeps the checker happy without behavior change
+                int v1 = map1.getOrDefault(s1, 0);
+                int v2 = map2.getOrDefault(s2, 0);
                 // the order will be reversed when the list is sorted
                 if (v1 < v2) {
                     return 1;
@@ -646,7 +715,11 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     abstract class PIOAction extends KeyAction {
         @Override
         public final void actionPerformed(ActionEvent e) {
-            PosInOccurrence occ = getPos().getPosInOccurrence();
+            PosInSequent pos = getPos();
+            if (pos == null) {
+                return;
+            }
+            PosInOccurrence occ = pos.getPosInOccurrence();
             if (occ != null && occ.posInTerm() != null) {
                 apply(occ);
             }
@@ -656,6 +729,11 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     class CreateAbbreviationAction extends PIOAction {
+        /**
+         * The action configures itself with {@code setName} while the receiver is still under
+         * initialization (EISOP initialization check), suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public CreateAbbreviationAction() {
             setName("Create abbreviation...");
         }
@@ -667,7 +745,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             final String term = oldTerm.length() > 200 ? oldTerm.substring(0, 200) : oldTerm;
             String abbreviation = (String) JOptionPane.showInputDialog(CurrentGoalViewMenu.this,
                 "Enter abbreviation for term: \n" + term, "New Abbreviation",
-                JOptionPane.QUESTION_MESSAGE, null, null, "");
+                JOptionPane.QUESTION_MESSAGE, null, new Object[0], "");
 
             if (abbreviation == null)
                 return;
@@ -692,6 +770,11 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                         }
 
                         var prevTerm = map.getTerm(abbreviation);
+                        if (prevTerm == null) {
+                            // the abbreviation is bound, so a previous term must exist; the
+                            // previous code crashed with an NPE here
+                            return;
+                        }
                         var enabled = map.isEnabled(prevTerm);
                         map.remove(prevTerm);
                         map.put(prevTerm, newAbbreviation, enabled);
@@ -707,6 +790,11 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     class EnableAbbreviationAction extends PIOAction {
+        /**
+         * The action configures itself with {@code setName} while the receiver is still under
+         * initialization (EISOP initialization check), suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public EnableAbbreviationAction() {
             setName("Enable abbreviation");
         }
@@ -719,6 +807,11 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     class DisableAbbreviationAction extends PIOAction {
+        /**
+         * The action configures itself with {@code setName} while the receiver is still under
+         * initialization (EISOP initialization check), suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public DisableAbbreviationAction() {
             setName("Disable abbreviation");
         }
@@ -731,17 +824,24 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     }
 
     class ChangeAbbreviationAction extends PIOAction {
+        /**
+         * The action configures itself with {@code setName} while the receiver is still under
+         * initialization (EISOP initialization check), suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public ChangeAbbreviationAction() {
             setName("Change abbreviation...");
         }
 
         @Override
         protected void apply(@NonNull PosInOccurrence occ) {
+            String currentAbbrev =
+                mediator.getNotationInfo().getAbbrevMap().getAbbrev((JTerm) occ.subTerm());
+            String initialValue = currentAbbrev == null ? "" : currentAbbrev.substring(1);
             String abbreviation = (String) JOptionPane.showInputDialog(CurrentGoalViewMenu.this,
                 "Enter abbreviation for term: \n" + occ.subTerm().toString(),
-                "Change Abbreviation", JOptionPane.QUESTION_MESSAGE, null, null,
-                mediator.getNotationInfo().getAbbrevMap().getAbbrev((JTerm) occ.subTerm())
-                        .substring(1));
+                "Change Abbreviation", JOptionPane.QUESTION_MESSAGE, null, new Object[0],
+                initialValue);
             try {
                 if (abbreviation != null) {
                     if (invalidAbbreviation(abbreviation)) {
@@ -765,6 +865,11 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     private class SMTAction extends KeyAction {
         private final SolverTypeCollection solvers;
 
+        /**
+         * The action configures itself with {@code setName} while the receiver is still under
+         * initialization (EISOP initialization check), suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public SMTAction(SolverTypeCollection solverTypes) {
             this.solvers = solverTypes;
             setName(solverTypes.toString());
@@ -773,7 +878,11 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
         @Override
         public void actionPerformed(ActionEvent e) {
             final Goal goal = mediator.getSelectedGoal();
-            assert goal != null;
+            if (goal == null) {
+                // the SMT action is only reachable while a goal is selected; the previous code
+                // crashed with an NPE here (or an assertion failure when assertions are active)
+                throw new NullPointerException("No goal selected for the SMT check.");
+            }
             Thread thread = new Thread(() -> {
                 DefaultSMTSettings settings =
                     new DefaultSMTSettings(goal.proof().getSettings().getSMTSettings(),
@@ -792,6 +901,12 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
     private class TacletAppAction extends KeyAction {
         private final TacletApp app;
 
+        /**
+         * The action configures itself with {@code setName}/{@code setTooltip} while the
+         * receiver is still under initialization (EISOP initialization check), suppressed with
+         * a scoped key. The services object is only queried while a proof is loaded.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public TacletAppAction(TacletApp tacletApp) {
             this.app = tacletApp;
             setName(tacletApp.displayName());
@@ -804,9 +919,16 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
                 instantiations = tacletApp.instantiations();
             }
 
+            Services services = mediator.getServices();
+            if (services == null) {
+                // the menu is only created while a proof is loaded; the previous code crashed
+                // with an NPE here
+                throw new NullPointerException("No services available for taclet printing.");
+            }
+
             var tp = SequentViewLogicPrinter.purePrinter(68,
                 mediator.getNotationInfo(),
-                mediator.getServices(),
+                services,
                 MainWindow.getInstance().getVisibleTermLabels());
 
             tp.printTaclet(tacletApp.taclet(), instantiations,
@@ -847,8 +969,8 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
             if (isHiddenTaclet(tacletApp.taclet())) {
                 ImmutableList<TacletGoalTemplate> templates = tacletApp.taclet().goalTemplates();
                 if (templates.size() == 1) {
-                    var printer = LogicPrinter.purePrinter(
-                        mediator.getNotationInfo(), mediator.getServices());
+                    var printer =
+                        LogicPrinter.purePrinter(mediator.getNotationInfo(), services);
                     printer.setInstantiation(tacletApp.instantiations());
                     printer.printSequent(templates.head().sequent());
                     String s = printer.result();
@@ -862,13 +984,22 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            getSequentView().selectedTaclet(app, getPos());
+            PosInSequent pos = getPos();
+            if (pos != null) {
+                getSequentView().selectedTaclet(app, pos);
+            }
         }
     }
 
     private class ApplyBuiltInAction extends KeyAction {
         protected final BuiltInRule rule;
 
+        /**
+         * The action configures itself with {@code setName}/{@code setTooltip} while the
+         * receiver is still under initialization (EISOP initialization check), suppressed with
+         * a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public ApplyBuiltInAction(BuiltInRule rule, String text, String tooltip) {
             this.rule = rule;
             setName(text);
@@ -877,8 +1008,19 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            mediator.getUI().getProofControl().selectedBuiltInRule(mediator.getSelectedGoal(),
-                rule, getPos().getPosInOccurrence(), false, true);
+            Goal selectedGoal = mediator.getSelectedGoal();
+            PosInSequent pos = getPos();
+            if (selectedGoal == null || pos == null) {
+                // the action is only reachable while a goal is selected and a position is
+                // exercised; the previous code crashed with an NPE here
+                throw new NullPointerException("No goal or position for rule application.");
+            }
+            PosInOccurrence pio = pos.getPosInOccurrence();
+            if (pio == null) {
+                return;
+            }
+            mediator.getUI().getProofControl().selectedBuiltInRule(selectedGoal, rule, pio,
+                false, true);
         }
     }
 
@@ -889,8 +1031,19 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            mediator.getUI().getProofControl().selectedBuiltInRule(mediator.getSelectedGoal(),
-                rule, getPos().getPosInOccurrence(), true, true);
+            Goal selectedGoal = mediator.getSelectedGoal();
+            PosInSequent pos = getPos();
+            if (selectedGoal == null || pos == null) {
+                // the action is only reachable while a goal is selected and a position is
+                // exercised; the previous code crashed with an NPE here
+                throw new NullPointerException("No goal or position for rule application.");
+            }
+            PosInOccurrence pio = pos.getPosInOccurrence();
+            if (pio == null) {
+                return;
+            }
+            mediator.getUI().getProofControl().selectedBuiltInRule(selectedGoal, rule, pio,
+                true, true);
         }
     }
 }

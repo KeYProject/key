@@ -188,7 +188,13 @@ public final class SwingUtil {
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
         Dimension dim = new Dimension(table.getPreferredSize());
-        dim.width += (Integer) UIManager.get("ScrollBar.width") + 2;
+        Integer scrollBarWidth = (Integer) UIManager.get("ScrollBar.width");
+        if (scrollBarWidth == null) {
+            // the active look-and-feel normally installs a scroll bar width; fall back to the
+            // swing default of 15 so a missing entry cannot crash the layout
+            scrollBarWidth = 15;
+        }
+        dim.width += scrollBarWidth + 2;
         dim.height = scrollPane.getPreferredSize().height;
         scrollPane.setPreferredSize(dim);
 

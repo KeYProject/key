@@ -17,6 +17,7 @@ import javax.swing.text.Highlighter.HighlightPainter;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.utilities.LexerHighlighter;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -69,6 +70,15 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
         this(node.proof(), node, node.getAppliedRuleApp(), node.sequent(), mainWindow);
     }
 
+    /**
+     * The ctor wires the proof-disposed listener, the view listener and the printer while the
+     * receiver is still under initialization (EISOP initialization check); the listeners only
+     * fire after the view has been constructed and {@code posTable} is computed by
+     * {@link #printSequent()} before it is used, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid", "nullness:argument.type.incompatible",
+        "nullness:assignment.type.incompatible" })
     public InnerNodeView(Proof proof, Node node, @Nullable RuleApp ruleApp,
             Sequent sequent,
             MainWindow mainWindow) {
@@ -80,9 +90,13 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
 
         filter = new IdentitySequentPrintFilter();
         getFilter().setSequent(sequent);
-        setLogicPrinter(
-            SequentViewLogicPrinter.positionPrinter(mainWindow.getMediator().getNotationInfo(),
-                mainWindow.getMediator().getServices(), getVisibleTermLabels()));
+        Services services = mainWindow.getMediator().getServices();
+        if (services == null) {
+            // the mediator of a displayed proof always provides services
+            throw new NullPointerException("No services available.");
+        }
+        setLogicPrinter(SequentViewLogicPrinter.positionPrinter(
+            mainWindow.getMediator().getNotationInfo(), services, getVisibleTermLabels()));
         setSelectionColor(SELECTION_COLOR.get());
         setBackground(INACTIVE_BACKGROUND_COLOR);
     }
@@ -99,8 +113,9 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
             // This seems to make cause the find one to be painted
             // over the if one.
 
-            if (app.posInOccurrence() != null) {
-                highlightPos(app.posInOccurrence(), RULEAPP_HIGHLIGHTER);
+            PosInOccurrence pos = app.posInOccurrence();
+            if (pos != null) {
+                highlightPos(pos, RULEAPP_HIGHLIGHTER);
             }
 
             if (app instanceof TacletApp tacletApp) {
@@ -143,9 +158,14 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
              * For the moment, we do not store all formulas as ifInstantiations, since that would
              * clutter saved proofs very much.
              */
-            for (int i = 0; i < node.sequent().size(); i++) {
+            Node sequentNode = node;
+            if (sequentNode == null) {
+                // the node of this view is disposed together with the proof
+                throw new NullPointerException("No node of the inner node view.");
+            }
+            for (int i = 0; i < sequentNode.sequent().size(); i++) {
                 PosInOccurrence pio =
-                    PosInOccurrence.findInSequent(node.sequent(),
+                    PosInOccurrence.findInSequent(sequentNode.sequent(),
                         i + 1,
                         PosInTerm.getTopLevel());
                 highlightPos(pio, IF_FORMULA_HIGHLIGHTER);
@@ -232,8 +252,18 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
         removeMouseListener(listener);
 
         setLineWidth(computeLineWidth());
-        updateSequent(node);
-        posTable = getInitialPositionTable();
+        Node sequentNode = node;
+        if (sequentNode == null) {
+            // the view is only printed while its node is still live
+            throw new NullPointerException("No node of the inner node view.");
+        }
+        updateSequent(sequentNode);
+        InitialPositionTable table = getInitialPositionTable();
+        if (table == null) {
+            // the position table is built for the printer set in the constructor
+            throw new NullPointerException("No initial position table.");
+        }
+        posTable = table;
 
         if (ruleApp != null) {
             highlightRuleAppPosition(ruleApp);

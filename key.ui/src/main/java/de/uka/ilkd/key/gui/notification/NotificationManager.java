@@ -53,7 +53,13 @@ public class NotificationManager {
 
     /**
      * creates an instance of the notification manager
+     *
+     * <p>
+     * The manager installs its default notification while the receiver is still under
+     * initialization (EISOP initialization check); the setter only configures the manager and
+     * the notification is dispatched after construction, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public NotificationManager(KeYMediator mediator, JFrame comp) {
         notificationListener = new NotificationListener();
         // This method delegates the request only to the UserInterfaceControl

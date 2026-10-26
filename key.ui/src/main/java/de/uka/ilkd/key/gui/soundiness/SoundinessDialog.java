@@ -24,9 +24,15 @@ public class SoundinessDialog extends JDialog {
     /**
      * Creates a new soundiness dialog for the given proof.
      *
+     * <p>
+     * The dialog is laid out by {@link #initUI(Proof)} while the receiver is still under
+     * initialization (EISOP initialization check); the layout only materializes once the dialog is
+     * shown after construction, suppressed with a scoped key.
+     *
      * @param owner The parent frame
      * @param proof The proof to analyze
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SoundinessDialog(Frame owner, Proof proof) {
         super(owner, "Soundiness Report: " + proof.name(), true);
         initUI(proof);
@@ -58,6 +64,16 @@ public class SoundinessDialog extends JDialog {
         setLocationRelativeTo(getOwner());
     }
 
+    /**
+     * Creates the button panel with the copy-to-clipboard action.
+     *
+     * <p>
+     * Copying to the system clipboard hands over ownership to the platform, expressed by a
+     * {@code null} clipboard owner; the JDK clipboard API declares a non-null owner while
+     * {@code null} is the documented value to request no ownership callback, suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private JPanel createButtonPanel(String html) {
         JPanel panel = new JPanel();
         panel.setBorder(new EmptyBorder(10, 10, 10, 10));

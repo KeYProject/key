@@ -44,6 +44,10 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
 
         final MergeRuleBuiltInRuleApp mergeApp = (MergeRuleBuiltInRuleApp) app;
         final PosInOccurrence pio = mergeApp.posInOccurrence();
+        if (pio == null) {
+            // the merge rule is only applicable at a concrete position
+            return null;
+        }
 
         final ImmutableList<MergePartner> candidates =
             MergeRule.findPotentialMergePartners(goal, pio);
@@ -74,7 +78,11 @@ public class MergeRuleCompletion implements InteractiveRuleApplicationCompletion
             new MergeRuleBuiltInRuleApp((MergeRule) app.rule(), pio);
         result.setMergePartners(chosenCandidates);
         result.setConcreteRule(chosenRule);
-        result.setDistinguishingFormula(chosenDistForm);
+        if (chosenDistForm != null) {
+            // a null distinguishing formula selects the automatic generation, which is the
+            // default of a freshly created rule application
+            result.setDistinguishingFormula(chosenDistForm);
+        }
         result.setMergeNode(goal.node());
 
         return result;

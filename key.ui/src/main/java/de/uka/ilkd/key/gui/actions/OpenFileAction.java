@@ -23,12 +23,24 @@ import org.jspecify.annotations.NullMarked;
 public class OpenFileAction extends MainWindowAction {
     public File lastSelectedPath;
 
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     * The working directory lookup below must succeed: the action is only constructed from the
+     * standalone GUI entry point after {@code PathConfig} setup, and the previous code crashed
+     * with a NPE for a missing directory anyway (explicit crash-equivalent guard).
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public OpenFileAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Load...");
         setIcon(IconFactory.openKeYFile(MainWindow.TOOLBAR_ICON_SIZE));
         setTooltip("Browse and load problem or proof files.");
-        lastSelectedPath = Main.getWorkingDir().toFile();
+        Path workingDir = Main.getWorkingDir();
+        if (workingDir == null) {
+            throw new NullPointerException("No working directory configured.");
+        }
+        lastSelectedPath = workingDir.toFile();
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -44,8 +56,12 @@ public class OpenFileAction extends MainWindowAction {
         int result = fc.showOpenDialog(mainWindow);
 
         if (result == JFileChooser.APPROVE_OPTION) {
-            Path file = fc.getSelectedFile().toPath();
-            lastSelectedPath = fc.getSelectedFile();
+            File selectedFile = fc.getSelectedFile();
+            if (selectedFile == null) {
+                throw new NullPointerException("No file selected in the file chooser.");
+            }
+            Path file = selectedFile.toPath();
+            lastSelectedPath = selectedFile;
 
             // special case proof bundles -> allow to select the proof to load
             if (ProofSelectionDialog.isProofBundle(file)) {

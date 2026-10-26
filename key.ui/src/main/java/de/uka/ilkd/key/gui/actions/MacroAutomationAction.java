@@ -11,6 +11,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.useractions.ProofMacroUserAction;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 
 import org.jspecify.annotations.NullMarked;
@@ -40,6 +41,11 @@ public class MacroAutomationAction extends AutoModeAction {
      * @param macro the proof macro to execute
      * @param icon the icon displayed on the action button
      */
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public MacroAutomationAction(MainWindow mainWindow, ProofMacro macro, Icon icon) {
         super(mainWindow, icon);
         this.macro = macro;
@@ -55,8 +61,11 @@ public class MacroAutomationAction extends AutoModeAction {
             proofControl.stopAutoMode();
         } else {
             if ((e.getModifiers() & ActionEvent.SHIFT_MASK) != 0) {
-                new ProofMacroUserAction(mediator, macro, mediator.getSelectedProof().root(), null)
-                        .actionPerformed(e);
+                Proof proof = mediator.getSelectedProof();
+                if (proof == null) {
+                    throw new NullPointerException("No proof selected for whole-proof macro.");
+                }
+                new ProofMacroUserAction(mediator, macro, proof.root(), null).actionPerformed(e);
             } else {
                 new ProofMacroUserAction(mediator, macro, null).actionPerformed(e);
             }

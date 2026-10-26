@@ -23,6 +23,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
@@ -93,6 +94,10 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                     List<?> files =
                         (List<?>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
                     for (Object file : files) {
+                        if (file == null) {
+                            // a java file list never contains null entries
+                            throw new NullPointerException("No file available.");
+                        }
                         File f = (File) file;
                         MainWindow.getInstance().loadProblem(f.toPath());
                     }
@@ -138,23 +143,41 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         }
 
         final Services services = seqView.getMediator().getServices();
+        if (services == null) {
+            // a drag-and-drop gesture only happens while a proof with services is loaded
+            throw new NullPointerException("No proof services available.");
+        }
+        PosInOccurrence sourcePio = sourcePos.getPosInOccurrence();
+        if (sourcePio == null) {
+            // a non-sequent position always carries its occurrence
+            throw new NullPointerException("No source position in occurrence available.");
+        }
+        PosInOccurrence targetPio = targetPos.getPosInOccurrence();
+        if (targetPio == null) {
+            // a non-sequent position always carries its occurrence
+            throw new NullPointerException("No target position in occurrence available.");
+        }
 
         ImmutableList<PosTacletApp> applicableApps =
             getAllApplicableApps(sourcePos, targetPos, services);
 
         if (applicableApps.isEmpty() && !targetPos.isSequent()
-                && targetPos.getPosInOccurrence().posInTerm() != PosInTerm.getTopLevel()) {
+                && targetPio.posInTerm() != PosInTerm.getTopLevel()) {
             // if no applicable taclet is found we relax the target position a bit
+            PosInOccurrence up = targetPio.up();
+            if (up == null) {
+                // the target is only relaxed to an enclosing occurrence when one exists
+                throw new NullPointerException("No enclosing position available.");
+            }
             applicableApps = getAllApplicableApps(sourcePos,
-                PosInSequent.createCfmaPos(targetPos.getPosInOccurrence().up()), services);
+                PosInSequent.createCfmaPos(up), services);
         }
 
         // in case of an equal source and target position the selection list is shown
         // even if only one rule is applicable in order to avoid an accidental
         // rule application of replace_known_* rules and entering
         // the hell of non-confluence...
-        final boolean equalTargetPosition =
-            sourcePos.getPosInOccurrence().equals(targetPos.getPosInOccurrence());
+        final boolean equalTargetPosition = sourcePio.equals(targetPio);
 
         if (!equalTargetPosition && applicableApps.size() == 1) {
             execute(applicableApps.head());
@@ -183,7 +206,12 @@ public class DragNDropInstantiator extends DropTargetAdapter {
      */
     private ImmutableList<PosTacletApp> getAllApplicableApps(final PosInSequent sourcePos,
             final PosInSequent targetPos, final Services services) {
-        final Sequent sequent = seqView.getMediator().getSelectedGoal().sequent();
+        Goal goal = seqView.getMediator().getSelectedGoal();
+        if (goal == null) {
+            // taclet application requires a focused goal
+            throw new NullPointerException("No selected goal available.");
+        }
+        final Sequent sequent = goal.sequent();
 
         ImmutableList<PosTacletApp> applicableApps = ImmutableList.nil();
         if (targetPos.isSequent()) {
@@ -294,15 +322,23 @@ public class DragNDropInstantiator extends DropTargetAdapter {
 
         // if in replaceWithMode only apps that contain at least one replacewith
         // are collected. Otherwise, only those without a replacewith.
-        for (final TacletApp app : r.getUI().getProofControl().getFindTaclet(r.getSelectedGoal(),
-            findPos.getPosInOccurrence())) {
+        Goal goal = r.getSelectedGoal();
+        if (goal == null) {
+            // taclet search requires a focused goal
+            throw new NullPointerException("No selected goal available.");
+        }
+        PosInOccurrence pio = findPos.getPosInOccurrence();
+        if (pio == null) {
+            // a non-sequent find position always carries its occurrence
+            throw new NullPointerException("No find position in occurrence available.");
+        }
+        for (final TacletApp app : r.getUI().getProofControl().getFindTaclet(goal, pio)) {
             if (filter.satisfiesFilterCondition(app.taclet())) {
                 allTacletsAtFindPosition = allTacletsAtFindPosition.prepend(app);
             }
         }
 
-        return addPositionInformation(allTacletsAtFindPosition, findPos.getPosInOccurrence(),
-            services);
+        return addPositionInformation(allTacletsAtFindPosition, pio, services);
     }
 
     /**
@@ -322,8 +358,14 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         for (TacletApp tacletApp : tacletApps) {
             TacletApp app = tacletApp;
             if (app instanceof NoPosTacletApp) {
-                app = PosTacletApp.createPosTacletApp((FindTaclet) app.taclet(),
-                    app.matchConditions(), findPos, services);
+                PosTacletApp posApp =
+                    PosTacletApp.createPosTacletApp((FindTaclet) app.taclet(),
+                        app.matchConditions(), findPos, services);
+                if (posApp == null) {
+                    // a positioned app can always be created for a matched taclet
+                    throw new NullPointerException("No positioned taclet app available.");
+                }
+                app = posApp;
             }
             applicableApps = applicableApps.prepend((PosTacletApp) app);
         }
@@ -456,7 +498,12 @@ public class DragNDropInstantiator extends DropTargetAdapter {
             return;
         }
         final KeYMediator mediator = seqView.getMediator();
-        mediator.getUI().getProofControl().applyInteractive(app, mediator.getSelectedGoal());
+        Goal goal = mediator.getSelectedGoal();
+        if (goal == null) {
+            // applying a taclet requires a focused goal
+            throw new NullPointerException("No selected goal available.");
+        }
+        mediator.getUI().getProofControl().applyInteractive(app, goal);
     }
 
     /**

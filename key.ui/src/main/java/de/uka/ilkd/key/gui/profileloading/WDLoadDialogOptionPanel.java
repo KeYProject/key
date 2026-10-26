@@ -69,7 +69,12 @@ public class WDLoadDialogOptionPanel implements KeYGuiExtension, KeYGuiExtension
                 """;
 
         public WDLoadDialogOptionPanelImpl() {
-            lblHeader.setFont(lblHeader.getFont().deriveFont(Font.BOLD));
+            Font font = lblHeader.getFont();
+            if (font == null) {
+                // a realized label always carries a font
+                throw new NullPointerException("No label font available.");
+            }
+            lblHeader.setFont(font.deriveFont(Font.BOLD));
 
             rdbWDL.setToolTipText(DESCRIPTION_L_WD_SEMANTIC);
             rdbWDD.setToolTipText(DESCRIPTION_D_WD_SEMANTIC);

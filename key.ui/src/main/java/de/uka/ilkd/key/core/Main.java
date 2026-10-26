@@ -60,7 +60,7 @@ import picocli.CommandLine.Parameters;
 @NullMarked
 public final class Main implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
-    private static Path workingDir;
+    private static @Nullable Path workingDir;
 
     // @Option(names = "--help", description = "display this text")
     // private boolean showHelp = false;
@@ -249,7 +249,11 @@ public final class Main implements Callable<Integer> {
         Debug.ENABLE_DEBUG = debug;
 
         // weigl: the configuration folder is not fixed anymore since v3.0
-        LOGGER.info("The configuration folder is here {}", PathConfig.currentPaths.keyConfigDir);
+        PathConfig.KeyPaths currentPaths = PathConfig.currentPaths;
+        if (currentPaths == null) {
+            throw new NullPointerException("KeY key paths are not set up.");
+        }
+        LOGGER.info("The configuration folder is here {}", currentPaths.keyConfigDir);
 
         try {
             // weigl: You can set assertion status via the system class loader,
@@ -359,9 +363,10 @@ public final class Main implements Callable<Integer> {
             }
         }
 
-        if (macro != null) {
+        String macroName = macro;
+        if (macroName != null) {
             for (ProofMacro m : ClassLoaderUtil.loadServices(ProofMacro.class)) {
-                if (macro.equals(m.getClass().getSimpleName())) {
+                if (macroName.equals(m.getClass().getSimpleName())) {
                     // memorize macro for later
                     try {
                         autoMacro = m.getClass().getDeclaredConstructor().newInstance();
@@ -377,7 +382,7 @@ public final class Main implements Callable<Integer> {
                     break;
                 }
             }
-            if (macro.isEmpty() || autoMacro instanceof SkipMacro) {
+            if (macroName.isEmpty() || autoMacro instanceof SkipMacro) {
                 LOGGER.warn("No automatic proof macro specified.");
             }
         }
@@ -407,11 +412,16 @@ public final class Main implements Callable<Integer> {
     }
 
     private void logInformation() {
-        LOGGER.debug("Java Version: {}", System.getProperty("java.version"));
-        LOGGER.debug("Java Runtime: {}", System.getProperty("java.specification.version"));
-        LOGGER.debug("Java VM: {}", System.getProperty("java.vm"));
-        LOGGER.debug("OS: {}", System.getProperty("java.os"));
-        LOGGER.debug("Hardware: {}", System.getProperty("java.hw"));
+        String javaVersion = System.getProperty("java.version");
+        LOGGER.debug("Java Version: {}", javaVersion == null ? "null" : javaVersion);
+        String javaSpecificationVersion = System.getProperty("java.specification.version");
+        LOGGER.debug("Java Runtime: {}", javaSpecificationVersion == null ? "null" : javaSpecificationVersion);
+        String javaVm = System.getProperty("java.vm");
+        LOGGER.debug("Java VM: {}", javaVm == null ? "null" : javaVm);
+        String javaOs = System.getProperty("java.os");
+        LOGGER.debug("OS: {}", javaOs == null ? "null" : javaOs);
+        String javaHw = System.getProperty("java.hw");
+        LOGGER.debug("Hardware: {}", javaHw == null ? "null" : javaHw);
         Runtime rt = Runtime.getRuntime();
         LOGGER.info("Memory: total {} MB, max {} MB, free {} MB",
             rt.totalMemory() / 1048576.0,
@@ -492,8 +502,13 @@ public final class Main implements Callable<Integer> {
     }
 
     public static void ensureExamplesAvailable() {
-        Path examplesDir =
-            getExamplesDir() == null ? ExampleChooser.lookForExamples() : getExamplesDir();
+        Path examplesDir = getExamplesDir();
+        if (examplesDir == null) {
+            examplesDir = ExampleChooser.lookForExamples();
+        }
+        if (examplesDir == null) {
+            throw new NullPointerException("No examples directory found.");
+        }
         if (!Files.exists(examplesDir)) {
             examplesDir = setupExamples();
         }
@@ -569,7 +584,7 @@ public final class Main implements Callable<Integer> {
         }
     }
 
-    private static Path EXAMPLE_DIR = null;
+    private static @Nullable Path EXAMPLE_DIR = null;
 
     public static @Nullable Path getExamplesDir() {
         return EXAMPLE_DIR;

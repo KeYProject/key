@@ -14,6 +14,8 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
+import org.key_project.prover.sequent.PosInOccurrence;
+
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -33,12 +35,29 @@ import org.slf4j.LoggerFactory;
 public class PosInSequentTransferable implements Transferable {
     private static final Logger LOGGER = LoggerFactory.getLogger(PosInSequentTransferable.class);
 
-    public static DataFlavor POS_IN_SEQUENT_TRANSFER;
-    static {
+    /**
+     * The transfer flavor for the platform-local sequent objects. See
+     * {@link #createTransferFlavor()} for the fallback when the platform-local mime type is
+     * unavailable.
+     */
+    public static DataFlavor POS_IN_SEQUENT_TRANSFER = createTransferFlavor();
+
+    /**
+     * Creates the transfer flavor for the platform-local sequent objects.
+     *
+     * <p>
+     * The platform-local mime type is a hard-coded JDK constant that is normally always
+     * available; if it is ever not, the string flavor is returned so that the flavor field is
+     * never {@code null}.
+     *
+     * @return the created transfer flavor
+     */
+    private static DataFlavor createTransferFlavor() {
         try {
-            POS_IN_SEQUENT_TRANSFER = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType);
+            return new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType);
         } catch (ClassNotFoundException e) {
             LOGGER.info("POS_IN_SEQUENT_TRANSFER not supported, using string flavor behaviour", e);
+            return DataFlavor.stringFlavor;
         }
     }
 
@@ -49,16 +68,27 @@ public class PosInSequentTransferable implements Transferable {
     private String stringSelection;
 
     /**
-     * creates an instance of this transferable
+     * Creates an instance of this transferable.
+     *
+     * <p>
+     * The string selection is only computed for term positions; the EISOP initialization check
+     * cannot see that the field is only ever read for term transfers, so the conditionally
+     * initialized field is suppressed with a scoped key.
      *
      * @param pis the PosInSequent to be transfered (string flavor only supported if pis denotes a
      *        term or formula, not the complete sequent)
      */
+    @SuppressWarnings("nullness:initialization.fields.uninitialized")
     public PosInSequentTransferable(PosInSequent pis, Services serv) {
         this.pis = pis;
         if (!pis.isSequent()) {
+            PosInOccurrence pio = pis.getPosInOccurrence();
+            if (pio == null) {
+                // a non-sequent position always carries a term position
+                throw new NullPointerException("No position in sequent available.");
+            }
             this.stringSelection =
-                ProofSaver.printTerm((JTerm) pis.getPosInOccurrence().subTerm(), serv);
+                ProofSaver.printTerm((JTerm) pio.subTerm(), serv);
         }
     }
 
@@ -88,8 +118,14 @@ public class PosInSequentTransferable implements Transferable {
      * return data is of kind {@link PosInSequent}. If the flavor equals
      * {@link DataFlavor#stringFlavor} the highlighted term is returned as parsable string.
      *
+     * <p>
+     * An unsupported request (including a {@code null} flavor) is reported through the
+     * exception; the exception constructor declares a non-null flavor while a {@code null}
+     * request is per definition unsupported, suppressed with a scoped key.
+     *
      * @throws UnsupportedFlavorException if the flavor is not supported
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public Object getTransferData(@Nullable DataFlavor flavor)
             throws UnsupportedFlavorException, IOException {
         if (flavor != null) {

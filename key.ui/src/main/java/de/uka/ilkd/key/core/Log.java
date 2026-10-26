@@ -77,7 +77,11 @@ public class Log {
     }
 
     private static void cleanOldLogFiles() {
-        var logDir = PathConfig.currentPaths.logDirectory;
+        PathConfig.KeyPaths currentPaths = PathConfig.currentPaths;
+        if (currentPaths == null) {
+            throw new NullPointerException("KeY key paths are not set up.");
+        }
+        var logDir = currentPaths.logDirectory;
         if (!Files.exists(logDir)) {
             return;
         }

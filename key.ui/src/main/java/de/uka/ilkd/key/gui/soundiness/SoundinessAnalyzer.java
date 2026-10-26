@@ -14,6 +14,7 @@ import de.uka.ilkd.key.gui.settings.TacletOptionsSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
+import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
@@ -292,10 +293,15 @@ public final class SoundinessAnalyzer {
     }
 
     private static DependencyStats analyzeDependencies(Proof proof) {
-        ProofStatus proofStatus = proof.mgt().getStatus();
+        ProofCorrectnessMgt mgt = proof.mgt();
+        if (mgt == null) {
+            // a proof that is analyzed for soundness always carries a correctness manager
+            throw new NullPointerException("No proof management available.");
+        }
+        ProofStatus proofStatus = mgt.getStatus();
         List<Contract> closed = new ArrayList<>();
         List<Contract> open = new ArrayList<>();
-        ImmutableSet<Contract> dependencies = proof.mgt().getUsedContracts();
+        ImmutableSet<Contract> dependencies = mgt.getUsedContracts();
 
         // for each dependency try to find a proof (in the same environment/specRepo)
         // Careful: Environment is modeled via SpecificationRepository, not via proof.getEnv()!
@@ -305,7 +311,7 @@ public final class SoundinessAnalyzer {
 
         for (Contract dep : dependencies) {
             List<Proof> prfs = specRepo.getProofs(dep).stream().toList();
-            boolean allClosed = prfs.stream().allMatch(pr -> pr.mgt().getStatus() == CLOSED);
+            boolean allClosed = prfs.stream().allMatch(pr -> isClosed(pr));
             if (!prfs.isEmpty() && allClosed) {
                 closed.add(dep);
             } else {
@@ -313,6 +319,15 @@ public final class SoundinessAnalyzer {
             }
         }
         return new DependencyStats(proofStatus, closed, open);
+    }
+
+    private static boolean isClosed(Proof proof) {
+        ProofCorrectnessMgt mgt = proof.mgt();
+        if (mgt == null) {
+            // a proof that is analyzed for soundness always carries a correctness manager
+            throw new NullPointerException("No proof management available.");
+        }
+        return mgt.getStatus() == CLOSED;
     }
 
     private static String escapeHtml(@Nullable String text) {
@@ -416,7 +431,7 @@ public final class SoundinessAnalyzer {
         return entries;
     }
 
-    private static String getPlainEnglishImpact(String choice) {
+    private static @Nullable String getPlainEnglishImpact(String choice) {
         return switch (choice) {
             case "runtimeExceptions:ignore" ->
                 "Assumes no null pointer, divide-by-zero, or array bounds errors occur";

@@ -8,6 +8,8 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.LayoutManager;
+import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -81,6 +83,12 @@ public class LoadUserTacletsDialog extends JPanel {
         private @Nullable JTextField fileField;
         private final @Nullable String title;
 
+        /**
+         * The box configures its border and child components via the lazy getters while the
+         * receiver is still under initialization (EISOP initialization check); the effects only
+         * take place after construction completes, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public UserTacletFileBox(@Nullable String title) {
 
             super(BoxLayout.Y_AXIS);
@@ -113,7 +121,12 @@ public class LoadUserTacletsDialog extends JPanel {
                 setMaximumWidth(chooseFileButton,
                     getRemoveAxiomFileButton().getPreferredSize().width);
                 chooseFileButton.addActionListener(e -> {
-                    Path file = chooseFiles(title);
+                    String currentTitle = title;
+                    if (currentTitle == null) {
+                        // the file box is only ever created with a title
+                        throw new NullPointerException("No title for the file chooser.");
+                    }
+                    Path file = chooseFiles(currentTitle);
                     if (file != null) {
                         fileHasBeenChosen();
                         setChosenFile(file);
@@ -131,7 +144,7 @@ public class LoadUserTacletsDialog extends JPanel {
 
         public void setChosenFile(Path file) {
             chosenFile = file;
-            getFileField().setText(chosenFile.toString());
+            getFileField().setText(file.toString());
         }
 
         public @Nullable Path getChosenFile() {
@@ -168,7 +181,14 @@ public class LoadUserTacletsDialog extends JPanel {
      * Creates a new dialog for loading user-defined taclets
      *
      * @param mode either {@link Mode#PROVE} or {@link Mode#LOAD}
+     * <p>
+     * The dialog configures its layout, borders and child panels via the lazy getters while the
+     * receiver is still under initialization (EISOP initialization check) and passes itself to
+     * {@code BoxLayout} as container; the effects only take place after construction completes,
+     * suppressed with scoped keys.
      */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public LoadUserTacletsDialog(Mode mode) {
 
         this.mode = mode;
@@ -195,24 +215,25 @@ public class LoadUserTacletsDialog extends JPanel {
     }
 
     public @Nullable Path getFileForTaclets() {
-        return userTacletFileBox.getChosenFile();
+        UserTacletFileBox box = getUserTacletFileBox();
+        return box.getChosenFile();
     }
 
     private JCheckBox getLemmaCheckBox() {
         if (lemmaCheckbox == null) {
-            lemmaCheckbox = new JCheckBox("Generate proof obligations for taclets");
-            lemmaCheckbox.setSelected(true);
-            lemmaCheckbox.addActionListener(e -> {
+            JCheckBox checkbox = new JCheckBox("Generate proof obligations for taclets");
+            checkbox.setSelected(true);
+            checkbox.addActionListener(e -> {
 
                 InfoDialog infoDialog = new InfoDialog();
-                if (!lemmaCheckbox.isSelected()) {
-                    lemmaCheckbox.setSelected(true);
+                if (!checkbox.isSelected()) {
+                    checkbox.setSelected(true);
                     boolean showDialogUsingAxioms = ProofIndependentSettings.DEFAULT_INSTANCE
                             .getLemmaGeneratorSettings().isShowingDialogUsingAxioms();
                     if (!showDialogUsingAxioms
                             || infoDialog.showDialog(INFO_TEXT, LoadUserTacletsDialog.this)) {
                         changedToNotSelected();
-                        lemmaCheckbox.setSelected(false);
+                        checkbox.setSelected(false);
                         ProofIndependentSettings.DEFAULT_INSTANCE.getLemmaGeneratorSettings()
                                 .setShowDialogUsingAxioms(
                                     showDialogUsingAxioms && infoDialog.showThisDialogNextTime());
@@ -221,6 +242,7 @@ public class LoadUserTacletsDialog extends JPanel {
                     changedToSelected();
                 }
             });
+            lemmaCheckbox = checkbox;
         }
         return lemmaCheckbox;
     }
@@ -230,8 +252,17 @@ public class LoadUserTacletsDialog extends JPanel {
         getRemoveAxiomFileButton().setEnabled(val);
         getAxiomsList().setEnabled(val);
 
-        CardLayout cl = (CardLayout) getCardPanel().getLayout();
-        cl.show(getCardPanel(), Boolean.toString(val));
+        JPanel panel = getCardPanel();
+        if (panel == null) {
+            // the card panel is always available when the axiom panel is enabled
+            throw new NullPointerException("No card panel available.");
+        }
+        LayoutManager layoutManager = panel.getLayout();
+        if (!(layoutManager instanceof CardLayout cl)) {
+            // the axiom file area is always laid out with a card layout
+            throw new NullPointerException("No card layout available.");
+        }
+        cl.show(panel, Boolean.toString(val));
     }
 
     private void changedToSelected() {
@@ -262,18 +293,18 @@ public class LoadUserTacletsDialog extends JPanel {
 
     private JDialog getHelpWindow() {
         if (helpWindow == null) {
-            helpWindow = dialog != null ? new JDialog(dialog) : new JDialog();
+            JDialog window = dialog != null ? new JDialog(dialog) : new JDialog();
 
             JTextArea textArea = new JTextArea(HELP_TEXT);
             textArea.setWrapStyleWord(true);
             textArea.setLineWrap(true);
             textArea.setEditable(false);
-            helpWindow.getContentPane().add(new JScrollPane(textArea));
-            helpWindow.setMinimumSize(new Dimension(400, 200));
-            helpWindow.setTitle("Help");
-            helpWindow.pack();
-            helpWindow.setLocationRelativeTo(MainWindow.getInstance());
-
+            window.getContentPane().add(new JScrollPane(textArea));
+            window.setMinimumSize(new Dimension(400, 200));
+            window.setTitle("Help");
+            window.pack();
+            window.setLocationRelativeTo(MainWindow.getInstance());
+            helpWindow = window;
         }
         return helpWindow;
     }
@@ -294,7 +325,12 @@ public class LoadUserTacletsDialog extends JPanel {
         fileChooser.setFileFilter(KeYFileChooser.KEY_FILTER);
         if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             // user pressed OK button
-            return fileChooser.getSelectedFile().toPath();
+            File selectedFile = fileChooser.getSelectedFile();
+            if (selectedFile == null) {
+                // the dialog was approved without selecting a file
+                return null;
+            }
+            return selectedFile.toPath();
         } else {
             // user pressed Cancel button
             return null;
@@ -367,25 +403,26 @@ public class LoadUserTacletsDialog extends JPanel {
 
     private JPanel getJustificationBox() {
         if (justificationPanel == null) {
-            justificationPanel = new JPanel();
-            justificationPanel.setLayout(new BoxLayout(justificationPanel, BoxLayout.Y_AXIS));
-            justificationPanel.setBorder(BorderFactory.createTitledBorder("Prove taclets"));
+            JPanel panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            panel.setBorder(BorderFactory.createTitledBorder("Prove taclets"));
 
             Box box = Box.createHorizontalBox();
             box.add(getLemmaCheckBox());
             box.add(Box.createHorizontalGlue());
-            justificationPanel.add(box);
-            justificationPanel.add(Box.createVerticalStrut(10));
+            panel.add(box);
+            panel.add(Box.createVerticalStrut(10));
 
-            justificationPanel.add(getCardPanel());
+            panel.add(getCardPanel());
+            justificationPanel = panel;
         }
         return justificationPanel;
     }
 
     private JPanel getCardPanel() {
         if (cardPanel == null) {
-            cardPanel = new JPanel(new CardLayout());
-            cardPanel.add(getAxiomFilePanel(), "true");
+            JPanel panel = new JPanel(new CardLayout());
+            panel.add(getAxiomFilePanel(), "true");
 
             JPanel warning = new JPanel();
             warning.setLayout(new BoxLayout(warning, BoxLayout.Y_AXIS));
@@ -394,7 +431,8 @@ public class LoadUserTacletsDialog extends JPanel {
             warning.add(Box.createVerticalStrut(10));
             warning.add(redLabel("Loading of unproved taclets may jeopardise"));
             warning.add(redLabel("the correctness of your own proofs."));
-            cardPanel.add(warning, "false");
+            panel.add(warning, "false");
+            cardPanel = panel;
         }
         return cardPanel;
     }
@@ -432,14 +470,14 @@ public class LoadUserTacletsDialog extends JPanel {
 
     private JDialog getDialog() {
         if (dialog == null) {
-            dialog = new JDialog(MainWindow.getInstance());
+            JDialog win = new JDialog(MainWindow.getInstance());
             if (mode == Mode.LOAD) {
-                dialog.setTitle("Load user-defined taclets into proof");
+                win.setTitle("Load user-defined taclets into proof");
             } else if (mode == Mode.PROVE) {
-                dialog.setTitle("Prove user-defined taclets");
+                win.setTitle("Prove user-defined taclets");
             }
-            dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            Container pane = dialog.getContentPane();
+            win.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            Container pane = win.getContentPane();
 
             pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
 
@@ -455,22 +493,24 @@ public class LoadUserTacletsDialog extends JPanel {
             buttonPane.add(Box.createHorizontalStrut(5));
             buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             pane.add(buttonPane);
-            dialog.pack();
-            dialog.setLocationRelativeTo(MainWindow.getInstance());
+            win.pack();
+            win.setLocationRelativeTo(MainWindow.getInstance());
+            dialog = win;
         }
         return dialog;
     }
 
     private JButton getOkButton() {
         if (okButton == null) {
-            okButton = new JButton("OK");
+            JButton button = new JButton("OK");
             Dimension dim = getCancelButton().getPreferredSize();
-            okButton.setEnabled(false);
-            okButton.setPreferredSize(dim);
-            okButton.addActionListener(e -> {
+            button.setEnabled(false);
+            button.setPreferredSize(dim);
+            button.addActionListener(e -> {
                 getDialog().dispose();
                 closedByOkButton = true;
             });
+            okButton = button;
         }
         return okButton;
     }

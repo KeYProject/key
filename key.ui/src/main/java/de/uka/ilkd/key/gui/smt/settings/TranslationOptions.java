@@ -81,6 +81,12 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
     private final JSpinner maxField;
     private @Nullable ProofDependentSMTSettings settings;
 
+    /**
+     * The panel configures its header, description, check boxes, separator and number fields
+     * while the receiver is still under initialization (EISOP initialization check); the
+     * effects only take place after construction completes, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public TranslationOptions() {
         setHeaderText(getDescription());
         useExplicitTypeHierachy = createUseExplicitTypeHierachy();
@@ -111,25 +117,61 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
 
     protected JCheckBox createUseExplicitTypeHierachy() {
         return addCheckBox("Use an explicit type hierarchy.", infoUseExplicitTypeHierarchy, false,
-            e -> settings.setUseExplicitTypeHierarchy(useExplicitTypeHierachy.isSelected()));
+            e -> updateUseExplicitTypeHierarchy());
     }
 
     protected JCheckBox createNullInstantiation() {
         return addCheckBox("Instantiate hierarchy assumptions if possible (recommended).",
             infoUseNullInstantiation, false,
-            e -> settings.setUseNullInstantiation(useNullInstantiation.isSelected()));
+            e -> updateUseNullInstantiation());
     }
 
     protected JCheckBox createBuiltInUniqueness() {
         return addCheckBox("Use built-in mechanism for uniqueness if possible.",
             infoUseBuiltInUniqueness, false,
-            e -> settings.setUseBuiltInUniqueness(useBuiltInUniqueness.isSelected()));
+            e -> updateUseBuiltInUniqueness());
     }
 
     protected JCheckBox createUIMultiplication() {
         return addCheckBox("Use uninterpreted multiplication if necessary.",
             infoUseUIMultiplication, false,
-            e -> settings.setUseUIMultiplication(useUIMultiplication.isSelected()));
+            e -> updateUseUIMultiplication());
+    }
+
+    private void updateUseExplicitTypeHierarchy() {
+        ProofDependentSMTSettings current = settings;
+        if (current == null) {
+            // the check boxes are only enabled while settings are available
+            throw new NullPointerException("No SMT settings to update.");
+        }
+        current.setUseExplicitTypeHierarchy(useExplicitTypeHierachy.isSelected());
+    }
+
+    private void updateUseNullInstantiation() {
+        ProofDependentSMTSettings current = settings;
+        if (current == null) {
+            // the check boxes are only enabled while settings are available
+            throw new NullPointerException("No SMT settings to update.");
+        }
+        current.setUseNullInstantiation(useNullInstantiation.isSelected());
+    }
+
+    private void updateUseBuiltInUniqueness() {
+        ProofDependentSMTSettings current = settings;
+        if (current == null) {
+            // the check boxes are only enabled while settings are available
+            throw new NullPointerException("No SMT settings to update.");
+        }
+        current.setUseBuiltInUniqueness(useBuiltInUniqueness.isSelected());
+    }
+
+    private void updateUseUIMultiplication() {
+        ProofDependentSMTSettings current = settings;
+        if (current == null) {
+            // the check boxes are only enabled while settings are available
+            throw new NullPointerException("No SMT settings to update.");
+        }
+        current.setUseUIMultiplication(useUIMultiplication.isSelected());
     }
 
     protected JSpinner createMaxField() {
@@ -147,7 +189,12 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
             } catch (Throwable ex) {
                 maxField.setForeground(Color.RED);
             }
-            settings.setMaxInteger(result);
+            ProofDependentSMTSettings current = settings;
+            if (current == null) {
+                // the number fields are only enabled while settings are available
+                throw new NullPointerException("No SMT settings to update.");
+            }
+            current.setMaxInteger(result);
         });
         max.setValue(Integer.MAX_VALUE);
         return max;
@@ -155,12 +202,24 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
 
     protected JSpinner createMinField() {
         return addNumberField("Minimum", Integer.MIN_VALUE, Integer.MAX_VALUE, 1, "",
-            val -> settings.setMinInteger(val.longValue()));
+            val -> {
+                ProofDependentSMTSettings current = settings;
+                if (current == null) {
+                    // the number fields are only enabled while settings are available
+                    throw new NullPointerException("No SMT settings to update.");
+                }
+                current.setMinInteger(val.longValue());
+            });
     }
 
     protected JCheckBox createConstantsForIntegers() {
         return addCheckBox("Active", infoUseConstantsForIntegers, false, e -> {
-            settings.setUseConstantsForIntegers(useConstantsForIntegers.isSelected());
+            ProofDependentSMTSettings current = settings;
+            if (current == null) {
+                // the check boxes are only enabled while settings are available
+                throw new NullPointerException("No SMT settings to update.");
+            }
+            current.setUseConstantsForIntegers(useConstantsForIntegers.isSelected());
             maxField.setEnabled(useConstantsForIntegers.isSelected());
             minField.setEnabled(useConstantsForIntegers.isSelected());
         });
@@ -180,6 +239,11 @@ class TranslationOptions extends SettingsPanel implements SettingsProvider {
     @Override
     public void applySettings(MainWindow window) {
         ProofDependentSMTSettings current = SettingsManager.getSmtPdSettings(window);
-        current.copy(settings);// transfer settings
+        ProofDependentSMTSettings toCopy = settings;
+        if (toCopy == null) {
+            // the settings are always loaded into the panel before they can be applied
+            throw new NullPointerException("No SMT settings to apply.");
+        }
+        current.copy(toCopy);// transfer settings
     }
 }

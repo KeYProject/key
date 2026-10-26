@@ -34,6 +34,14 @@ public abstract class MainWindowAction extends KeyAction {
 
     protected final MainWindow mainWindow;
 
+    /**
+     * The key-stroke registration below operates on {@code this} and passes {@code this} to the
+     * {@link KeyStrokeManager} while the receiver is still under initialization (EISOP
+     * initialization check); safe here because the manager only records the mapping and never
+     * fires callbacks during construction, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     protected MainWindowAction(MainWindow mainWindow) {
         assert mainWindow != null;
         this.mainWindow = mainWindow;
@@ -41,6 +49,13 @@ public abstract class MainWindowAction extends KeyAction {
         KeyStrokeManager.registerAction(this);
     }
 
+    /**
+     * The listener registration and the enable-state computation below operate on {@code this}
+     * while the receiver is still under initialization (EISOP initialization check); safe here
+     * because the listener only reacts to later selection events, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     protected MainWindowAction(MainWindow mainWindow, boolean onlyActiveWhenProofAvailable) {
         this(mainWindow);
         if (onlyActiveWhenProofAvailable) {

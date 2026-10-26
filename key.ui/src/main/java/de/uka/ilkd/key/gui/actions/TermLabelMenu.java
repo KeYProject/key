@@ -26,6 +26,7 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This menu can be used to toggle TermLabel visibility for the SequentView.
@@ -47,10 +48,22 @@ public class TermLabelMenu extends JMenu {
 
     /**
      * Observes changes on {@link #visibleTermLabels}.
+     * <p>
+     * The bound method reference binds {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since the listener only ever fires
+     * after construction completes, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:methodref.receiver.bound.invalid")
     private final TermLabelVisibilityManagerListener termLabelVisibilityManagerListener =
         this::handleVisibleLabelsChanged;
 
+    /**
+     * The menu-configuration calls, the listener registration and the {@link #rebuildMenu()} call
+     * below operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since these configure the local menu and the listeners
+     * only react to later events, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public TermLabelMenu(final MainWindow mainWindow) {
         this.mainWindow = mainWindow;
         setText(TERM_LABEL_MENU);
@@ -188,6 +201,12 @@ public class TermLabelMenu extends JMenu {
          */
         private static final long serialVersionUID = 8766949321781919880L;
 
+        /**
+         * The action-configuration setters below operate on {@code this} while the receiver is
+         * still under initialization (EISOP initialization check); safe here, suppressed with a
+         * scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         private DisplayLabelsCheckBox(MainWindow mainWindow) {
             super(mainWindow, LABEL, true);
             setTooltip(TOOL_TIP);
@@ -223,8 +242,16 @@ public class TermLabelMenu extends JMenu {
         private final Name labelName;
 
         // This String is used as ToolTipText in case the CheckBox is enabled.
-        private String enabledToolTipText;
+        private @Nullable String enabledToolTipText = null;
 
+        /**
+         * The action-configuration calls and the preference handling below operate on
+         * {@code this} while the receiver is still under initialization (EISOP initialization
+         * check); safe here since these configure the local check box only, suppressed with
+         * scoped keys.
+         */
+        @SuppressWarnings({ "nullness:method.invocation.invalid",
+            "nullness:argument.type.incompatible" })
         TermLabelCheckBox(Name labelName) {
             super(mainWindow, labelName.toString(), true);
             this.labelName = labelName;
@@ -249,13 +276,19 @@ public class TermLabelMenu extends JMenu {
         }
 
         private void setItalicFont() {
-            setFont(getFont().deriveFont(Font.ITALIC));
+            Font font = getFont();
+            if (font != null) {
+                setFont(font.deriveFont(Font.ITALIC));
+            }
             setEnabledToolTipText(
                 "Term label " + labelName + " does not occur in the current sequent.");
         }
 
         private void setBoldFont() {
-            setFont(getFont().deriveFont(Font.BOLD));
+            Font font = getFont();
+            if (font != null) {
+                setFont(font.deriveFont(Font.BOLD));
+            }
             setEnabledToolTipText("Click to toggle visibility for term label " + labelName + ".");
         }
 
@@ -272,7 +305,13 @@ public class TermLabelMenu extends JMenu {
          */
         private void updateToolTipText() {
             if (isEnabled()) {
-                setToolTipText(enabledToolTipText);
+                String text = enabledToolTipText;
+                // {@code enabledToolTipText} is only ever {@code null} before the first
+                // {@link #setEnabledToolTipText} call; show the disabled hint in that impossible
+                // intermediate state.
+                setToolTipText(text == null
+                    ? "You turned off visibility for all term labels. This checkbox is disabled."
+                    : text);
             } else {
                 setToolTipText("You turned off visibility for all term labels. "
                     + "This checkbox is disabled.");

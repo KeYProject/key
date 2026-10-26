@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -169,21 +170,22 @@ public final class IconFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IconFactory.class);
 
-    private static final Image keyHole = getImage("images/ekey-mono.gif");
-    private static final Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
-    private static final Image keyCachedClosed = getImage("images/closed-cached.png");
-    private static final Image keyHoleInteractive = getImage("images/keyinteractive.gif");
-    private static final Image keyHoleLinked = getImage("images/keylinked.gif");
-    private static final Image keyLogo = getImage("images/key-color.png");
-    private static final Image keyLogoShadow = getImage("images/key-shadow.png");
+    private static final Image keyHole = requireImage("images/ekey-mono.gif");
+    private static final Image keyHoleAlmostClosed = requireImage("images/ekey-brackets.gif");
+    private static final Image keyCachedClosed = requireImage("images/closed-cached.png");
+    private static final Image keyHoleInteractive = requireImage("images/keyinteractive.gif");
+    private static final Image keyHoleLinked = requireImage("images/keylinked.gif");
+    private static final Image keyLogo = requireImage("images/key-color.png");
+    private static final Image keyLogoShadow = requireImage("images/key-shadow.png");
     // The following should be updated with every major version step.
-    private static final Image keyVersionLogo = getImage("images/key-shadow-3.0.png");
-    private static final Image keyLogoSmall = getImage("images/key-color-icon-square.gif");
-    private static final Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
+    private static final Image keyVersionLogo = requireImage("images/key-shadow-3.0.png");
+    private static final Image keyLogoSmall = requireImage("images/key-color-icon-square.gif");
+    private static final Image oneStepSimplifier =
+        requireImage("images/toolbar/oneStepSimplifier.png");
 
-    private static final Image junit = getImage("images/toolbar/junit_logo.png");
-    private static final Image jml = getImage("images/toolbar/jml.png");
-    private static final Image uml = getImage("images/toolbar/uml.png");
+    private static final Image junit = requireImage("images/toolbar/junit_logo.png");
+    private static final Image jml = requireImage("images/toolbar/jml.png");
+    private static final Image uml = requireImage("images/toolbar/uml.png");
 
     // private static Image expandGoals = getImage("images/toolbar/expandGoals.png");
     // private static Image scriptAppLogo = getImage("images/scriptAppLogo.png");
@@ -212,6 +214,21 @@ public final class IconFactory {
     }
 
     /**
+     * Returns the image for the given resource or fails if the resource is missing.
+     *
+     * @param name the name of the image resource
+     * @return the loaded image; the resource is bundled with the application
+     */
+    private static Image requireImage(String name) {
+        Image image = getImage(name);
+        if (image == null) {
+            // the image resources are bundled with the application
+            throw new NullPointerException("Missing image resource " + name);
+        }
+        return image;
+    }
+
+    /**
      * Creates an icon from an image contained in a resource.
      *
      * @param filename String the name of the file to search (only relative pathname to the path of
@@ -231,8 +248,18 @@ public final class IconFactory {
         }
     }
 
+    /**
+     * Scales the given image to the given dimensions if needed.
+     *
+     * <p>
+     * Querying the observed dimensions with a {@code null} observer requests the size without
+     * tracking an observer; the JDK accepts {@code null} here, while the checker's swing model
+     * declares a non-null observer, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private static ImageIcon scaleIcon(Image im, int x, int y) {
-        if (im.getWidth(null) == x && im.getHeight(null) == y) {
+        if (im.getWidth((ImageObserver) null) == x
+                && im.getHeight((ImageObserver) null) == y) {
             return new ImageIcon(im);
         }
         Image scaledim = im.getScaledInstance(x, y, Image.SCALE_SMOOTH);
@@ -403,6 +430,15 @@ public final class IconFactory {
         return iconWithOverlay(baseIcon, letter);
     }
 
+    /**
+     * Draws the given base icon into a buffered image and overlays the given letter.
+     *
+     * <p>
+     * Painting the icon without a component observer only affects asynchronous image loading,
+     * which is irrelevant for the already-loaded base icons; the checker's swing model declares a
+     * non-null component, so the deliberate {@code null} is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static Icon iconWithOverlay(Icon baseIcon, @Nullable String letter) {
         BufferedImage image =
             new BufferedImage(
@@ -414,7 +450,7 @@ public final class IconFactory {
             RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
         // Draw base icon
-        baseIcon.paintIcon(null, g2d, TOOLBAR_EXTRA_WIDTH, 0);
+        baseIcon.paintIcon((Component) null, g2d, TOOLBAR_EXTRA_WIDTH, 0);
 
         if (letter == null) {
             return new ImageIcon(image);

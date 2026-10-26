@@ -34,11 +34,17 @@ public class MergeRuleMenuItem extends JMenuItem {
     /**
      * Creates a new menu item for the join rule.
      *
+     * <p>
+     * The item sets its text and action while the receiver is still under initialization (EISOP
+     * initialization check); the action only fires once the item is displayed after construction,
+     * suppressed with a scoped key.
+     *
      * @param goal The selected goal.
      * @param pio The position the join shall be applied to (symbolic state / program counter
      *        formula).
      * @param mediator The KeY mediator.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public MergeRuleMenuItem(final Goal goal, final PosInOccurrence pio,
             final KeYMediator mediator) {
         final Services services = goal.proof().getServices();
@@ -105,8 +111,14 @@ public class MergeRuleMenuItem extends JMenuItem {
     }
 
     private void signalError(final Throwable e, final KeYMediator mediator) {
+        String message = e.getMessage();
+        if (message == null) {
+            // the failure is reported with its type name when no message is available
+            message = e.getClass().getSimpleName();
+        }
+        final String reported = message;
         SwingUtilities
-                .invokeLater(() -> mediator.notify(new ExceptionFailureEvent(e.getMessage(), e)));
+                .invokeLater(() -> mediator.notify(new ExceptionFailureEvent(reported, e)));
     }
 
     @Override

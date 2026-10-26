@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.gui.extension.impl;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
@@ -78,7 +79,12 @@ public class ParallelProverStatusIndicator
      * sizing it for the widest possible label.
      */
     private void fixSize() {
-        FontMetrics fm = button.getFontMetrics(button.getFont());
+        Font font = button.getFont();
+        if (font == null) {
+            // a realized button always carries a font
+            throw new NullPointerException("No button font available.");
+        }
+        FontMetrics fm = button.getFontMetrics(font);
         Insets in = button.getInsets();
         int w = fm.stringWidth("MT " + cores() + "x") + in.left + in.right + 12;
         int h = fm.getHeight() + in.top + in.bottom + 4;

@@ -34,10 +34,21 @@ public class MinimizeInteraction extends KeYMenuCheckBox {
      * <p>
      * Such changes can occur in the Eclipse context when settings are changed in for instance the
      * KeYIDE.
+     *
+     * The bound method reference binds {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since the listener only ever fires
+     * after construction completes, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:methodref.receiver.bound.invalid")
     private final PropertyChangeListener generalSettingsListener =
         this::handleGeneralSettingsChanged;
 
+    /**
+     * The action-configuration calls and the listener registration below operate on {@code this}
+     * while the receiver is still under initialization (EISOP initialization check); safe here
+     * since these configure the local action only, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public MinimizeInteraction(MainWindow mainWindow) {
         super(mainWindow, NAME);
         this.mainWindow = mainWindow;

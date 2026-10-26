@@ -53,7 +53,7 @@ public final class ExampleChooser extends JDialog {
     /**
      * This class is a singleton class and this its only instance.
      */
-    private static ExampleChooser instance;
+    private static @Nullable ExampleChooser instance;
 
     private final JTree exampleList;
     private final JButton loadButton;
@@ -75,6 +75,16 @@ public final class ExampleChooser extends JDialog {
     // constructors
     // -------------------------------------------------------------------------
 
+    /**
+     * Creates the example chooser dialog.
+     *
+     * <p>
+     * The dialog builds its list, description pane and buttons and shows itself while the
+     * receiver is still under initialization (EISOP initialization check); the listeners only
+     * fire once the dialog is displayed at the end of construction, suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private ExampleChooser(Path examplesDir) {
         super(MainWindow.getInstance(), "Load Example", true);
         assert examplesDir != null;
@@ -233,7 +243,16 @@ public final class ExampleChooser extends JDialog {
                         addTab(fileAsString.substring(p), "Proof Obligation", false);
                     }
                     for (Path file : example.getAdditionalFiles()) {
-                        addTab(fileAsString(file), file.getFileName().toString(), false);
+                        if (file == null) {
+                            // an examples' additional-file list never contains null entries
+                            throw new NullPointerException("No additional file available.");
+                        }
+                        Path fileName = file.getFileName();
+                        if (fileName == null) {
+                            // a file in an example directory always has a name
+                            throw new NullPointerException("No file name available.");
+                        }
+                        addTab(fileAsString(file), fileName.toString(), false);
                     }
                     loadButton.setEnabled(true);
                     loadProofButton.setEnabled(example.hasProof());
@@ -254,7 +273,12 @@ public final class ExampleChooser extends JDialog {
     private void addTab(String string, String name, boolean wrap) {
         JTextArea area = new JTextArea();
         area.setText(string);
-        area.setFont(new Font(Font.MONOSPACED, Font.PLAIN, area.getFont().getSize()));
+        Font font = area.getFont();
+        if (font == null) {
+            // a newly created text area is never realized without a font
+            throw new NullPointerException("No area font available.");
+        }
+        area.setFont(new Font(Font.MONOSPACED, Font.PLAIN, font.getSize()));
         area.setCaretPosition(0);
         area.setEditable(false);
         area.setWrapStyleWord(true);

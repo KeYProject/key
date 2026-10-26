@@ -265,8 +265,13 @@ public final class KeYGuiExtensionFacade {
 
     public static <T> List<Action> getContextMenuItems(ContextMenuKind<T> kind,
             @Nullable T underlyingObject, KeYMediator mediator) {
+        if (underlyingObject == null) {
+            // the registered context menu extensions all act on the requested object; a
+            // position-less request (e.g. no mouse position over the sequent) has no content
+            return Collections.emptyList();
+        }
         return getContextMenuExtensions().stream()
-                .flatMap(it -> it.getContextActions(mediator, kind, underlyingObject).stream())
+                .flatMap(it -> it.<T>getContextActions(mediator, kind, underlyingObject).stream())
                 .collect(Collectors.toList());
     }
 
@@ -278,10 +283,47 @@ public final class KeYGuiExtensionFacade {
         return menu;
     }
 
+    /**
+     * Loads all registered extensions into the extension list.
+     *
+     * <p>
+     * The diamond constructor call {@code new Extension<>(...)} on a
+     * {@code Class<? extends KeYGuiExtension>} identifier crashes this EISOP fork's capture
+     * conversion (BugInCF, reportable only as a top-level error), so the wildcard is erased by
+     * {@link #providerClass(ServiceLoader.Provider)} before the extension handle is built.
+     */
     private static void loadExtensions() {
         extensions = ServiceLoader.load(KeYGuiExtension.class).stream()
-                .map(ServiceLoader.Provider::type).filter(KeYGuiExtensionFacade::isNotForbidden)
-                .distinct().map(Extension::new).sorted().collect(Collectors.toList());
+                .map(KeYGuiExtensionFacade::providerClass)
+                .filter(KeYGuiExtensionFacade::isNotForbidden)
+                .distinct().map(KeYGuiExtensionFacade::toExtension).sorted()
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the concrete class of the given service provider.
+     *
+     * <p>
+     * The wildcard is erased to keep the stream element type free of wildcard captures;
+     * constructing {@code Extension} from a captured {@code Class<? extends KeYGuiExtension>}
+     * crashes the capture conversion of this EISOP fork (BugInCF, reportable only as a top-level
+     * error), while method references on non-wildcard types are inferred soundly. The conversion
+     * is unchecked because the provider is loaded for the {@code KeYGuiExtension} service type.
+     */
+    @SuppressWarnings("unchecked")
+    private static Class<KeYGuiExtension> providerClass(
+            ServiceLoader.Provider<KeYGuiExtension> provider) {
+        return (Class<KeYGuiExtension>) provider.type();
+    }
+
+    /**
+     * Wraps the given extension class into an extension handle.
+     *
+     * @param clazz the extension class
+     * @return the extension handle
+     */
+    private static Extension<KeYGuiExtension> toExtension(Class<KeYGuiExtension> clazz) {
+        return new Extension<>(clazz);
     }
 
     /**
@@ -296,7 +338,16 @@ public final class KeYGuiExtensionFacade {
     }
 
     private static <T> List<T> getExtensionInstances(Class<T> c) {
-        return getExtensionsStream(c).map(Extension::getInstance).collect(Collectors.toList());
+        List<T> result = new ArrayList<>();
+        for (Extension<T> extension : getExtensionsStream(c).collect(Collectors.toList())) {
+            @Nullable T instance = extension.getInstance();
+            if (instance == null) {
+                // a failing reflection-based instantiation contributes no instance
+                continue;
+            }
+            result.add(instance);
+        }
+        return result;
     }
 
     /**
@@ -358,7 +409,14 @@ public final class KeYGuiExtensionFacade {
      * @param mediator
      * @param component
      * @param componentId
+     *
+     *         <p>
+     *         The keyboard values are taken from the {@link Action} value table, whose values the
+     *         checker models as {@code @UnknownInitialization} although they are fully initialized
+     *         when the action is installed; the swing model's non-null parameters are satisfied
+     *         with the values read from the table, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static void installKeyboardShortcuts(KeYMediator mediator, JComponent component,
             String componentId) {
         Stream<Action> provider = getKeyboardShortcuts(mediator, componentId, component);

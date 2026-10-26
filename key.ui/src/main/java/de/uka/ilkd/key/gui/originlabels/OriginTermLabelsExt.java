@@ -139,6 +139,15 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
         /** The visualizer shown by this action. */
         private final NodeInfoVisualizer vis;
 
+        /**
+         * Creates the open-visualizer action.
+         *
+         * <p>
+         * The action sets its name, menu path and icon while the receiver is still under
+         * initialization (EISOP initialization check); all of them only materialize once the
+         * action is displayed after construction, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         private OpenVisualizerAction(NodeInfoVisualizer vis) {
             setName(vis.getLongName());
             setMenuPath("Windows");

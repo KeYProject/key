@@ -141,7 +141,10 @@ public final class ProofTreePopupFactory {
         menu.addSeparator();
 
         menu.add(new SubtreeStatistics(ctx));
-        menu.add(new SequentViewDock.OpenCurrentNodeAction(ctx.window, ctx.invokedNode));
+        Node invokedNode = ctx.invokedNode;
+        if (invokedNode != null) {
+            menu.add(new SequentViewDock.OpenCurrentNodeAction(ctx.window, invokedNode));
+        }
     }
 
     public static JPopupMenu create(ProofTreeView view, TreePath selectedPath) {
@@ -151,8 +154,11 @@ public final class ProofTreePopupFactory {
         initMenu(menu, context);
 
         menu.addSeparator();
-        KeYGuiExtensionFacade.addContextMenuItems(ContextMenuKind.PROOF_TREE, menu,
-            context.invokedNode, context.mediator);
+        Node invokedNode = context.invokedNode;
+        if (invokedNode != null) {
+            KeYGuiExtensionFacade.addContextMenuItems(ContextMenuKind.PROOF_TREE, menu,
+                invokedNode, context.mediator);
+        }
 
         if (menu.getComponent(menu.getComponentCount() - 1) instanceof JPopupMenu.Separator) {
             menu.remove(menu.getComponentCount() - 1);
@@ -173,6 +179,12 @@ public final class ProofTreePopupFactory {
      * (branch.isDescendant(tp)) { delegateView.makeVisible(tp); } } }
      */
 
+    /**
+     * Mutable context describing the popup invocation. All fields are assigned by
+     * {@link ProofTreePopupFactory#createContext(ProofTreeView, TreePath)} immediately after
+     * construction; the EISOP initialization check flags the fields as uninitialized at the
+     * default constructor, suppressed with a scoped key.
+     */
     public static class ProofTreeContext {
         @Nullable
         GUIProofTreeModel delegateModel;
@@ -185,9 +197,18 @@ public final class ProofTreePopupFactory {
         Node invokedNode;
         TreePath path, branch;
         JTree delegateView;
+
+        @SuppressWarnings("nullness:initialization.fields.uninitialized")
+        public ProofTreeContext() {
+        }
     }
 
     static class SubtreeStatistics extends ProofTreeAction {
+        /**
+         * The action configures itself with {@code setName} while the receiver is still under
+         * initialization (EISOP initialization check), suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         protected SubtreeStatistics(ProofTreeContext context) {
             super(context);
             setName("Show Subtree Statistics");
@@ -202,13 +223,21 @@ public final class ProofTreePopupFactory {
                             "If you wish to see the statistics "
                                 + "for a proof you have to load one first"));
             } else {
-                new ShowProofStatistics.Window(MainWindow.getInstance(), context.invokedNode)
-                        .setVisible(true);
+                Node invokedNode = context.invokedNode;
+                if (invokedNode != null) {
+                    new ShowProofStatistics.Window(MainWindow.getInstance(), invokedNode)
+                            .setVisible(true);
+                }
             }
         }
     }
 
     static class CollapseOtherBranches extends ProofTreeAction {
+        /**
+         * The action configures itself with {@code setName} while the receiver is still under
+         * initialization (EISOP initialization check), suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         protected CollapseOtherBranches(ProofTreeContext context) {
             super(context);
             setName("Collapse Other Branches");
@@ -221,6 +250,12 @@ public final class ProofTreePopupFactory {
     }
 
     static class ExpandGoalsBelow extends ProofTreeAction {
+        /**
+         * The action configures itself with {@code setName}/{@code setIcon} while the receiver
+         * is still under initialization (EISOP initialization check), suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         protected ExpandGoalsBelow(ProofTreeContext context) {
             super(context);
             setName("Expand Goals Only Below");
@@ -229,15 +264,22 @@ public final class ProofTreePopupFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            Proof proof = context.proof;
+            GUIProofTreeModel model = context.delegateModel;
+            if (proof == null || model == null) {
+                // the action is only usable on a loaded proof tree; the previous code crashed
+                // with an NPE here
+                return;
+            }
             // collapse all below
             ProofTreeExpansionState.collapseAllBelow(context.delegateView, context.branch);
 
             // expand goals below
-            Iterator<Goal> it = context.proof.openGoals().iterator();
+            Iterator<Goal> it = proof.openGoals().iterator();
             Node n;
             while (it.hasNext()) {
                 n = it.next().node();
-                GUIAbstractTreeNode node = context.delegateModel.getProofTreeNode(n);
+                GUIAbstractTreeNode node = model.getProofTreeNode(n);
                 if (node == null) {
                     break;
                 }
@@ -252,6 +294,12 @@ public final class ProofTreePopupFactory {
     }
 
     static class ExpandAllBelow extends ProofTreeAction {
+        /**
+         * The action configures itself with {@code setName}/{@code setIcon} while the receiver
+         * is still under initialization (EISOP initialization check), suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public ExpandAllBelow(ProofTreeContext context) {
             super(context);
             setName("Expand All Below");
@@ -267,6 +315,12 @@ public final class ProofTreePopupFactory {
     }
 
     static class CollapseBelow extends ProofTreeAction {
+        /**
+         * The action configures itself with {@code setName}/{@code setIcon} while the receiver
+         * is still under initialization (EISOP initialization check), suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public CollapseBelow(ProofTreeContext context) {
             super(context);
             setName("Collapse Below");
@@ -280,6 +334,12 @@ public final class ProofTreePopupFactory {
     }
 
     static class PrevSibling extends ProofTreeAction {
+        /**
+         * The action configures itself with {@code setName}/{@code setIcon} while the receiver
+         * is still under initialization (EISOP initialization check), suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public PrevSibling(ProofTreeContext context) {
             super(context);
             setName("Previous Sibling");
@@ -293,12 +353,15 @@ public final class ProofTreePopupFactory {
             if (parent == null) {
                 return;
             }
-            Object sibling = context.delegateModel.getChild(parent,
-                context.delegateModel.getIndexOfChild(parent, node) - 1);
+            GUIProofTreeModel model = context.delegateModel;
+            if (model == null) {
+                return;
+            }
+            Object sibling = model.getChild(parent, model.getIndexOfChild(parent, node) - 1);
             if (!(sibling instanceof GUIBranchNode)) {
-                int index = context.delegateModel.getIndexOfChild(parent, node);
+                int index = model.getIndexOfChild(parent, node);
                 for (int i = parent.getChildCount(); i > index; i--) {
-                    sibling = context.delegateModel.getChild(parent, i);
+                    sibling = model.getChild(parent, i);
                     if (sibling instanceof GUIBranchNode) {
                         break;
                     }
@@ -315,6 +378,12 @@ public final class ProofTreePopupFactory {
     }
 
     static class NextSibling extends ProofTreeAction {
+        /**
+         * The action configures itself with {@code setName}/{@code setIcon} while the receiver
+         * is still under initialization (EISOP initialization check), suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public NextSibling(ProofTreeContext context) {
             super(context);
             setName("Next Sibling");
@@ -328,12 +397,15 @@ public final class ProofTreePopupFactory {
             if (parent == null) {
                 return;
             }
-            Object sibling = context.delegateModel.getChild(parent,
-                context.delegateModel.getIndexOfChild(parent, node) + 1);
+            GUIProofTreeModel model = context.delegateModel;
+            if (model == null) {
+                return;
+            }
+            Object sibling = model.getChild(parent, model.getIndexOfChild(parent, node) + 1);
             if (!(sibling instanceof GUIBranchNode)) {
-                int index = context.delegateModel.getIndexOfChild(parent, node);
+                int index = model.getIndexOfChild(parent, node);
                 for (int i = 0; i < index; i++) {
-                    sibling = context.delegateModel.getChild(parent, i);
+                    sibling = model.getChild(parent, i);
                     if (sibling instanceof GUIBranchNode) {
                         break;
                     }
@@ -350,6 +422,12 @@ public final class ProofTreePopupFactory {
     }
 
     static class Notes extends ProofTreeAction {
+        /**
+         * The action configures itself with {@code setName}/{@code setIcon} while the receiver
+         * is still under initialization (EISOP initialization check), suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public Notes(ProofTreeContext context) {
             super(context);
             setName("Set bookmark/Annotate ...");
@@ -360,40 +438,53 @@ public final class ProofTreePopupFactory {
         public void actionPerformed(ActionEvent e) {
             // display a dialog to attach text to the node
             final Icon editIcon = IconFactory.editFile(20);
-            String origNotes = context.invokedNode.getNodeInfo().getNotes();
+            Node invokedNode = context.invokedNode;
+            if (invokedNode == null) {
+                // the action is only reachable from a real proof node; the previous code
+                // crashed with an NPE here
+                return;
+            }
+            String origNotes = invokedNode.getNodeInfo().getNotes();
             if (origNotes == null || origNotes.isBlank()) {
-                origNotes = "Bookmark %d".formatted(context.invokedNode.serialNr());
+                origNotes = "Bookmark %d".formatted(invokedNode.serialNr());
             }
             final String newNotes = (String) JOptionPane.showInputDialog(context.proofTreeView,
-                null, "Annotate this proof node", JOptionPane.PLAIN_MESSAGE, editIcon, null,
-                origNotes);
+                null, "Annotate this proof node", JOptionPane.PLAIN_MESSAGE, editIcon,
+                new Object[0], origNotes);
             if (newNotes != null) {
                 if (newNotes.length() == 0) {
-                    context.invokedNode.getNodeInfo().setNotes(null);
+                    invokedNode.getNodeInfo().setNotes(null);
                 } else {
-                    context.invokedNode.getNodeInfo().setNotes(newNotes);
+                    invokedNode.getNodeInfo().setNotes(newNotes);
                 }
             }
         }
     }
 
     static class Prune extends ProofTreeAction {
+        /**
+         * The action configures itself with {@code setName}/{@code setIcon}/{@code setEnabled}
+         * while the receiver is still under initialization (EISOP initialization check),
+         * suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public Prune(ProofTreeContext context) {
             super(context);
             setName("Prune Proof");
             setIcon(IconFactory.pruneLogo(ICON_SIZE));
             setEnabled(false);
-            if (context.proof != null) {
-                // disable pruning for goals and disable it for closed subtrees if the command line
-                // option "--no-pruning-closed" is set (saves memory)
-                if (!context.proof.isOpenGoal(context.invokedNode)
-                        && !context.proof.isClosedGoal(context.invokedNode)
-                        && (context.proof.getSubtreeGoals(context.invokedNode).size() > 0
-                                || (!GeneralSettings.noPruningClosed && context.proof
-                                        .getClosedSubtreeGoals(context.invokedNode).size() > 0))) {
+            Node invokedNode = context.invokedNode;
+            Proof proof = context.proof;
+            if (proof != null && invokedNode != null) {
+                // disable pruning for goals and disable it for closed subtrees if the command
+                // line option "--no-pruning-closed" is set (saves memory)
+                if (!proof.isOpenGoal(invokedNode) && !proof.isClosedGoal(invokedNode)
+                        && (proof.getSubtreeGoals(invokedNode).size() > 0
+                                || (!GeneralSettings.noPruningClosed
+                                    && proof.getClosedSubtreeGoals(invokedNode).size() > 0))) {
                     setEnabled(true);
                 }
-                if (context.invokedNode.lookup(ClosedBy.class) != null) {
+                if (invokedNode.lookup(ClosedBy.class) != null) {
                     setEnabled(true);
                 }
             }
@@ -401,36 +492,52 @@ public final class ProofTreePopupFactory {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            context.delegateModel.setAttentive(false);
-            context.mediator.setBack(context.invokedNode);
-            context.delegateModel.updateTree(null);
-            context.delegateModel.setAttentive(true);
-            context.proofTreeView.makeNodeVisible(context.invokedNode);
+            GUIProofTreeModel model = context.delegateModel;
+            Node invokedNode = context.invokedNode;
+            if (model == null || invokedNode == null) {
+                return;
+            }
+            model.setAttentive(false);
+            context.mediator.setBack(invokedNode);
+            model.updateTree(null);
+            model.setAttentive(true);
+            context.proofTreeView.makeNodeVisible(invokedNode);
         }
     }
 
     static class DelayedCut extends ProofTreeAction {
         private static final long serialVersionUID = 2264044175802298829L;
 
+        /**
+         * The action configures itself with {@code setName}/{@code setEnabled} while the
+         * receiver is still under initialization (EISOP initialization check), suppressed with a
+         * scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public DelayedCut(ProofTreeContext context) {
             super(context);
             setName("Delayed Cut");
             setEnabled(false);
-            if (context.proof != null) {
-                if (!context.invokedNode.leaf()
-                        && context.proof.getSubtreeGoals(context.invokedNode).size() > 0) {
-                    setEnabled(true);
-                }
+            Node invokedNode = context.invokedNode;
+            Proof proof = context.proof;
+            if (proof != null && invokedNode != null && !invokedNode.leaf()
+                    && proof.getSubtreeGoals(invokedNode).size() > 0) {
+                setEnabled(true);
             }
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            context.delegateModel.setAttentive(false);
-            if (processDelayedCut(context.invokedNode)) {
-                context.delegateModel.updateTree(null);
+            GUIProofTreeModel model = context.delegateModel;
+            Node invokedNode = context.invokedNode;
+            if (model == null || invokedNode == null) {
+                return;
             }
-            context.delegateModel.setAttentive(true);
+            model.setAttentive(false);
+            if (processDelayedCut(invokedNode)) {
+                model.updateTree(null);
+            }
+            model.setAttentive(true);
             context.proofTreeView.makeNodeVisible(context.mediator.getSelectedNode());
         }
 
@@ -438,6 +545,11 @@ public final class ProofTreePopupFactory {
             KeYMediator mediator = context.mediator;
             if (mediator.ensureProofLoaded()) {
                 final Proof proof = mediator.getSelectedProof();
+                if (proof == null) {
+                    // the proof loading was confirmed, yet no proof is selected; the previous
+                    // code crashed with an NPE here
+                    throw new NullPointerException("No proof selected for the delayed cut.");
+                }
                 final String result =
                     CheckedUserInput.showAsDialog("Cut Formula", "Please supply a formula:", null,
                         "",
@@ -453,6 +565,11 @@ public final class ProofTreePopupFactory {
 
                 JTerm formula =
                     InspectorForDecisionPredicates.translate(proof.getServices(), result);
+                if (formula == null) {
+                    // the validated formula could not be translated; the previous code crashed
+                    // with an NPE here
+                    throw new NullPointerException("Failed to translate the cut formula.");
+                }
 
                 DelayedCutProcessor processor = new DelayedCutProcessor(proof, invokedNode,
                     formula,
@@ -524,6 +641,12 @@ public final class ProofTreePopupFactory {
     static class RunStrategyOnNode extends ProofTreeAction {
         private static final long serialVersionUID = -7028621462695539683L;
 
+        /**
+         * The action configures itself with {@code setName}/{@code setIcon}/{@code setEnabled}
+         * while the receiver is still under initialization (EISOP initialization check),
+         * suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         protected RunStrategyOnNode(ProofTreeContext context) {
             super(context);
             setName("Apply Strategy");
@@ -540,7 +663,15 @@ public final class ProofTreePopupFactory {
          */
         @Override
         public void actionPerformed(ActionEvent e) {
-            new RunStrategyOnNodeUserAction(context.mediator, context.proof, context.invokedNode)
+            Proof proof = context.proof;
+            Node invokedNode = context.invokedNode;
+            if (proof == null || invokedNode == null) {
+                // the action is only enabled while a proof is loaded and a node is invoked; the
+                // previous code crashed with an NPE here
+                throw new NullPointerException(
+                    "No proof or invoked node for strategy application.");
+            }
+            new RunStrategyOnNodeUserAction(context.mediator, proof, invokedNode)
                     .actionPerformed(e);
         }
     }
@@ -576,7 +707,12 @@ public final class ProofTreePopupFactory {
          */
         @Override
         public Iterable<Goal> getGoalList() {
-            return context.proof.getSubtreeGoals(context.invokedNode);
+            Proof proof = context.proof;
+            Node invokedNode = context.invokedNode;
+            if (proof == null || invokedNode == null) {
+                return List.of();
+            }
+            return proof.getSubtreeGoals(invokedNode);
         }
 
         /**
@@ -586,11 +722,15 @@ public final class ProofTreePopupFactory {
         @Override
         public void actionPerformed(ActionEvent e) {
             var selectedNode = context.proofTreeView.getSelectedNode();
-            context.delegateModel.setBatchGoalStateChange(true, null);
+            GUIProofTreeModel model = context.delegateModel;
+            if (model == null) {
+                return;
+            }
+            model.setBatchGoalStateChange(true, null);
             super.actionPerformed(e);
             List<Node> goals = new ArrayList<>();
             getGoalList().forEach(x -> goals.add(x.node()));
-            context.delegateModel.setBatchGoalStateChange(false, goals);
+            model.setBatchGoalStateChange(false, goals);
             // make sure the node is selected again
             if (selectedNode != null) {
                 context.proofTreeView.makeNodeVisible(selectedNode);

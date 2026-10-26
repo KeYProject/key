@@ -70,13 +70,14 @@ public class KeYSelectionModel {
         goalIsValid = false;
         proof = p;
         primary.setProof(p, previousProof);
-        if (proof != null) {
-            if (proof.openGoals().isEmpty()) {
-                selectedNode = proof.root().leavesIterator().next();
-                selectedSequent = selectedNode.sequent();
-                selectedRuleApp = selectedNode.getAppliedRuleApp();
+        if (p != null) {
+            if (p.openGoals().isEmpty()) {
+                Node root = p.root();
+                selectedNode = root == null ? null : root.leavesIterator().next();
+                selectedSequent = selectedNode == null ? null : selectedNode.sequent();
+                selectedRuleApp = selectedNode == null ? null : selectedNode.getAppliedRuleApp();
             } else {
-                final Goal g = proof.openGoals().iterator().next();
+                final Goal g = p.openGoals().iterator().next();
                 goalIsValid = true;
                 selectedNode = g.node();
                 selectedSequent = selectedNode.sequent();
@@ -209,7 +210,11 @@ public class KeYSelectionModel {
             return null;
         }
         if (!goalIsValid) {
-            selectedGoal = proof.getOpenGoal(selectedNode);
+            Node node = selectedNode;
+            if (node == null) {
+                return null;
+            }
+            selectedGoal = proof.getOpenGoal(node);
             goalIsValid = true;
         }
         return selectedGoal;
@@ -240,12 +245,23 @@ public class KeYSelectionModel {
         private @Nullable Iterator<Goal> goalIt;
         private @Nullable Iterator<Node> nodeIt;
 
+        /**
+         * The {@code findNext} call below operates on {@code this} while the receiver is still
+         * under initialization (EISOP initialization check); safe here since the constructor
+         * fields are assigned as the iterator walks the (already-set) outer selection state and
+         * all accesses go through {@link #findNext}, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public DefaultSelectionIterator() {
             findNext();
         }
 
         private void findNext() {
             nextOne = null;
+            Proof p = proof;
+            if (p == null) {
+                throw new NullPointerException("No proof selected for default selection.");
+            }
             while (nextOne == null) {
                 switch (currentPos) {
                     case POS_START -> {
@@ -259,13 +275,13 @@ public class KeYSelectionModel {
                     case POS_LEAVES -> {
                         if (nodeIt == null || !nodeIt.hasNext()) {
                             currentPos = POS_GOAL_LIST;
-                            if (!proof.openGoals().isEmpty()) {
-                                goalIt = proof.openGoals().iterator();
+                            if (!p.openGoals().isEmpty()) {
+                                goalIt = p.openGoals().iterator();
                             } else {
                                 goalIt = null;
                             }
                         } else {
-                            nextOne = proof.getOpenGoal(nodeIt.next());
+                            nextOne = p.getOpenGoal(nodeIt.next());
                         }
                     }
                     case POS_GOAL_LIST -> {
@@ -283,6 +299,9 @@ public class KeYSelectionModel {
         @Override
         public Goal next() {
             Goal res = nextOne;
+            if (res == null) {
+                throw new NullPointerException("Default selection iterator has no next goal.");
+            }
             findNext();
             return res;
         }
@@ -317,7 +336,17 @@ public class KeYSelectionModel {
         if (g != null) {
             setSelectedGoal(g);
         } else {
-            setSelectedNode(proof.root().leavesIterator().next());
+            Proof p = proof;
+            if (p == null) {
+                throw new NullPointerException("No proof selected for default selection.");
+            }
+            Node root = p.root();
+            if (root == null) {
+                // a loaded proof always has a root; a missing root is an inconsistent state in
+                // which the previous code crashed with an NPE
+                throw new NullPointerException("Proof without a root node for default selection.");
+            }
+            setSelectedNode(root.leavesIterator().next());
         }
     }
 

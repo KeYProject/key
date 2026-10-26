@@ -36,6 +36,16 @@ import org.jspecify.annotations.Nullable;
 public abstract class SettingsPanel extends SimpleSettingsPanel {
     private static final long serialVersionUID = 3465371513326517504L;
 
+    /**
+     * Creates the panel and configures the three-column grid.
+     *
+     * <p>
+     * The grid insets leave the top, left and bottom margins at their layout default by passing
+     * {@code null}, which the layout library treats as "no explicit inset"; the library stub
+     * declares non-null parameters, so the deliberate {@code null}s are suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     protected SettingsPanel() {
         pCenter.setLayout(new MigLayout(
             // set up rows:
@@ -171,7 +181,10 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
                 result = fileChooser.showOpenDialog((Component) e.getSource());
             }
             if (result == JFileChooser.APPROVE_OPTION) {
-                textField.setText(fileChooser.getSelectedFile().getAbsolutePath());
+                File selectedFile = fileChooser.getSelectedFile();
+                if (selectedFile != null) {
+                    textField.setText(selectedFile.getAbsolutePath());
+                }
             }
         });
         pCenter.add(box);
@@ -213,7 +226,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
             }
         });
         if (info != null && !info.isEmpty()) {
-            pCenter.add(new JLabel(title));
+            pCenter.add(new JLabel(title == null ? "" : title));
             pCenter.add(comboBox);
             JLabel infoButton = createHelpLabel(info);
             pCenter.add(infoButton, new CC().wrap());
@@ -322,6 +335,10 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         JPanel items = new JPanel(new GridLayout(alternatives.size(), 1));
         ButtonGroup bg = new ButtonGroup();
         for (Object alt : alternatives) {
+            if (alt == null) {
+                // a radio-button list never contains null entries
+                throw new NullPointerException("No alternative available.");
+            }
             JRadioButton radioButton = new JRadioButton(alt.toString());
             radioButton.putClientProperty("object", alt);
             bg.add(radioButton);

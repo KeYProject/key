@@ -21,6 +21,15 @@ class TrafficLight extends JPanel {
     private boolean isGreen = true;
     private final int diameter;
 
+    /**
+     * Creates the traffic light.
+     *
+     * <p>
+     * The light sizes itself and sets its border while the receiver is still under initialization
+     * (EISOP initialization check); both only take effect once the light is displayed after
+     * construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public TrafficLight(int diameter) {
         super();
         this.diameter = diameter;

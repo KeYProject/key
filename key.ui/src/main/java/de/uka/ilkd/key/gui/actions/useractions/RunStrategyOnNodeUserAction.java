@@ -47,6 +47,13 @@ public class RunStrategyOnNodeUserAction extends ProofModifyingUserAction {
     protected void apply() {
         Goal invokedGoal = proof.getOpenGoal(invokedNode);
         KeYMediator r = mediator;
+        Proof selectedProof = r.getSelectedProof();
+        if (selectedProof == null) {
+            // The action is only invoked on the selected proof; a missing selection here is a
+            // concurrent state change in which the previous code crashed with an NPE in the
+            // proof control.
+            throw new NullPointerException("No proof selected for the strategy run.");
+        }
         // is the node a goal?
         if (invokedGoal == null) {
             ImmutableList<Goal> enabledGoals =
@@ -54,13 +61,13 @@ public class RunStrategyOnNodeUserAction extends ProofModifyingUserAction {
             // This method delegates the request only to the UserInterfaceControl
             // which implements the functionality.
             // No functionality is allowed in this method body!
-            mediator.getUI().getProofControl().startAutoMode(r.getSelectedProof(),
+            mediator.getUI().getProofControl().startAutoMode(selectedProof,
                 enabledGoals);
         } else {
             // This method delegates the request only to the UserInterfaceControl
             // which implements the functionality.
             // No functionality is allowed in this method body!
-            mediator.getUI().getProofControl().startAutoMode(r.getSelectedProof(),
+            mediator.getUI().getProofControl().startAutoMode(selectedProof,
                 ImmutableList.<Goal>singleton(invokedGoal));
         }
     }

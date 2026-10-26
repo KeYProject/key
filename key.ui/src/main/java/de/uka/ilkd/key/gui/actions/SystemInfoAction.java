@@ -24,6 +24,11 @@ public class SystemInfoAction extends MainWindowAction {
     private static final int TEXT_ROWS = 20;
     private static final int TEXT_COLS = 60;
 
+    /**
+     * The action-configuration setter is called on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SystemInfoAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("System Info");
@@ -98,7 +103,13 @@ public class SystemInfoAction extends MainWindowAction {
         for (Object o : props.keySet()) {
             sb.append(o);
             sb.append("=\"");
-            sb.append(props.get(o));
+            // A {@code null} key cannot occur in the system properties or environment map; the
+            // lookup below requires a non-null key, guarded by the {@code null}-skip above the
+            // case that contradicts the map's contract.
+            if (o != null) {
+                Object value = props.get(o);
+                sb.append(value == null ? "null" : value);
+            }
             sb.append("\"\n");
         }
     }

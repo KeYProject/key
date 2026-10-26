@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.init.DefaultProfileResolver;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
+import de.uka.ilkd.key.settings.PathConfig.KeyPaths;
 
 import com.google.common.html.HtmlEscapers;
 import org.jspecify.annotations.NullMarked;
@@ -84,10 +85,14 @@ public class RecentFileMenu {
     /// Loads entries from the current default configuration folder.
     /// @see PathConfig.KeyPaths#recentFileStorage
     public void loadEntries() {
-        if (Files.exists(PathConfig.currentPaths.recentFileStorage)) {
-            loadFrom(PathConfig.currentPaths.recentFileStorage);
+        KeyPaths current = PathConfig.currentPaths;
+        if (current != null && Files.exists(current.recentFileStorage)) {
+            loadFrom(current.recentFileStorage);
         } else {
-            loadFrom(PathConfig.previousPaths.recentFileStorage);
+            KeyPaths previous = PathConfig.previousPaths;
+            if (previous != null) {
+                loadFrom(previous.recentFileStorage);
+            }
         }
     }
 
@@ -230,8 +235,7 @@ public class RecentFileMenu {
     /**
      * @return the absolute path to the most recently opened file (maybe null)
      */
-    @Nullable
-    public String getMostRecent() {
+    public @Nullable String getMostRecent() {
         return mostRecentFile != null ? mostRecentFile.getAbsolutePath() : null;
     }
 
@@ -245,7 +249,7 @@ public class RecentFileMenu {
             actions.add(action);
         }
 
-        var seq = map.keySet().stream().toList();
+        var seq = map.keySet().stream().map(Object::toString).toList();
         var names = ShortUniqueFileNames.makeUniqueNames(seq);
         for (int i = 0; i < seq.size(); i++) {
             map.put(seq.get(i), names[i].getName());
@@ -281,7 +285,12 @@ public class RecentFileMenu {
     }
 
     public void save() {
-        store(PathConfig.currentPaths.recentFileStorage);
+        KeyPaths current = PathConfig.currentPaths;
+        if (current == null) {
+            // the path configuration is always initialized before the recent files are stored
+            throw new NullPointerException("No current path configuration available.");
+        }
+        store(current.recentFileStorage);
     }
 
     public List<RecentFileEntry> getEntries() {
@@ -313,10 +322,23 @@ public class RecentFileMenu {
         }
 
         public RecentFileEntry(Configuration options) {
-            this(Objects.requireNonNull(options.getString(KEY_PATH)),
+            this(requirePath(options),
                 options.getString(KEY_PROFILE),
                 options.getBool(KEY_LOAD_SINGLE_JAVA, false),
                 options.getTable(KEY_OPTIONS));
+        }
+
+        /**
+         * @param options the stored configuration of the entry
+         * @return the stored path of the entry
+         */
+        private static String requirePath(Configuration options) {
+            String path = options.getString(KEY_PATH);
+            if (path == null) {
+                // a stored recent-file entry always carries a path
+                throw new NullPointerException("No recent-file path available.");
+            }
+            return path;
         }
 
         public Configuration asConfiguration() {
@@ -354,7 +376,7 @@ public class RecentFileMenu {
         }
 
         @Override
-        public final boolean equals(Object o) {
+        public final boolean equals(@Nullable Object o) {
             if (!(o instanceof RecentFileEntry that))
                 return false;
 
@@ -377,6 +399,12 @@ public class RecentFileMenu {
     private class RecentFileAction extends KeyAction {
         private final RecentFileEntry fileEntry;
 
+        /**
+         * The action-configuration setters are called on {@code this} while the receiver is still
+         * under initialization (EISOP initialization check); safe here, suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public RecentFileAction(RecentFileEntry fileEntry) {
             this.fileEntry = fileEntry;
             setName(fileEntry.getAbsolutePath());

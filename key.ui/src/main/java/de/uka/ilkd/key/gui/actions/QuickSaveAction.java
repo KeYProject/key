@@ -40,6 +40,14 @@ public final class QuickSaveAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      */
+    /**
+     * The action-configuration calls and the {@code enableWhenProofLoaded(this)} registration
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since the listener only reacts to later selection events,
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public QuickSaveAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Quicksave");
@@ -55,7 +63,10 @@ public final class QuickSaveAction extends MainWindowAction {
     public static void quickSave(MainWindow mainWindow) {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             final String filename = QUICK_SAVE_PATH;
-            final Proof proof = mainWindow.getMediator().getSelectedProof();
+            Proof proof = mainWindow.getMediator().getSelectedProof();
+            if (proof == null) {
+                throw new NullPointerException("No proof selected for quick save.");
+            }
 
             String status = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
 

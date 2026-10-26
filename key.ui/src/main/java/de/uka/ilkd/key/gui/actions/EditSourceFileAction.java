@@ -83,6 +83,11 @@ public class EditSourceFileAction extends KeyAction {
      * @param parent the parent
      * @param exception the exception
      */
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public EditSourceFileAction(final Window parent, final @Nullable Throwable exception) {
         setName("Edit File");
         setIcon(IconFactory.editFile(16));
@@ -101,6 +106,11 @@ public class EditSourceFileAction extends KeyAction {
      * @param location the location to open and place the caret at
      * @param message the message to show next to the source
      */
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public EditSourceFileAction(final Window parent, final @Nullable Location location,
             final @Nullable String message) {
         setName("Edit File");
@@ -204,9 +214,9 @@ public class EditSourceFileAction extends KeyAction {
         return textPane;
     }
 
-    private static Path tryGetFile(@Nullable URI sourceURL) {
+    private static @Nullable Path tryGetFile(@Nullable URI sourceURL) {
         Path sourceFile = null;
-        if (sourceURL != null && sourceURL.getScheme().equals("file")) {
+        if (sourceURL != null && "file".equals(sourceURL.getScheme())) {
             sourceFile = Paths.get(sourceURL);
         }
         return sourceFile;

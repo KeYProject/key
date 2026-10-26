@@ -40,8 +40,14 @@ public class StateChangeListener implements InteractionListener {
     /**
      * Construct and register a new state change listener.
      *
+     * <p>
+     * The listener registers itself with the proof control while the receiver is still under
+     * initialization (EISOP initialization check); the control only invokes the listener after
+     * construction completes, suppressed with a scoped key.
+     *
      * @param mediator mediator
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     StateChangeListener(KeYMediator mediator) {
         this.mediator = mediator;
         mediator.getUI().getProofControl().addInteractionListener(this);

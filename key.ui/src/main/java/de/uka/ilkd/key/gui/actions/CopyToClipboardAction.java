@@ -24,6 +24,11 @@ public class CopyToClipboardAction extends MainWindowAction {
 
     private static final long serialVersionUID = -6193181877353785015L;
 
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public CopyToClipboardAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Copy to clipboard");
