@@ -181,11 +181,14 @@ public class LoadUserTacletsDialog extends JPanel {
      * Creates a new dialog for loading user-defined taclets
      *
      * @param mode either {@link Mode#PROVE} or {@link Mode#LOAD}
-     * <p>
-     * The dialog configures its layout, borders and child panels via the lazy getters while the
-     * receiver is still under initialization (EISOP initialization check) and passes itself to
-     * {@code BoxLayout} as container; the effects only take place after construction completes,
-     * suppressed with scoped keys.
+     *        <p>
+     *        The dialog configures its layout, borders and child panels via the lazy getters while
+     *        the
+     *        receiver is still under initialization (EISOP initialization check) and passes itself
+     *        to
+     *        {@code BoxLayout} as container; the effects only take place after construction
+     *        completes,
+     *        suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:method.invocation.invalid",
         "nullness:argument.type.incompatible" })

@@ -161,10 +161,12 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
             String key = modelShortcuts.actionName.get(i);
             KeyStroke ks = keystrokes.get(i);
             KeyStrokeManager.getSettings().setKeyStroke(key, ks, true);
-            @Nullable Action action = modelShortcuts.actions.get(i);
+            @Nullable
+            Action action = modelShortcuts.actions.get(i);
             if (action != null) {
                 action.putValue(Action.ACCELERATOR_KEY, ks);
-            }        }
+            }
+        }
     }
 
     private static class ShortcutsTableModel extends AbstractTableModel {

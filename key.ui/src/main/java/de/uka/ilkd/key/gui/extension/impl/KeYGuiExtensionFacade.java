@@ -340,7 +340,8 @@ public final class KeYGuiExtensionFacade {
     private static <T> List<T> getExtensionInstances(Class<T> c) {
         List<T> result = new ArrayList<>();
         for (Extension<T> extension : getExtensionsStream(c).collect(Collectors.toList())) {
-            @Nullable T instance = extension.getInstance();
+            @Nullable
+            T instance = extension.getInstance();
             if (instance == null) {
                 // a failing reflection-based instantiation contributes no instance
                 continue;
@@ -410,11 +411,11 @@ public final class KeYGuiExtensionFacade {
      * @param component
      * @param componentId
      *
-     *         <p>
-     *         The keyboard values are taken from the {@link Action} value table, whose values the
-     *         checker models as {@code @UnknownInitialization} although they are fully initialized
-     *         when the action is installed; the swing model's non-null parameters are satisfied
-     *         with the values read from the table, suppressed with a scoped key.
+     *        <p>
+     *        The keyboard values are taken from the {@link Action} value table, whose values the
+     *        checker models as {@code @UnknownInitialization} although they are fully initialized
+     *        when the action is installed; the swing model's non-null parameters are satisfied
+     *        with the values read from the table, suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:argument.type.incompatible")
     public static void installKeyboardShortcuts(KeYMediator mediator, JComponent component,

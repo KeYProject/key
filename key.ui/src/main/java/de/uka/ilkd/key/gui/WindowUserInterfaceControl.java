@@ -582,13 +582,13 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param proofList the created proofs, or {@code null} if none were created.
      * @param result the replay result, or {@code null} if nothing was replayed.
      *
-     *         <p>
-     *         The parameters must be nullable because the {@code UserInterfaceControl} contract
-     *         allows loading procedures without proofs. The super implementation only dereferences
-     *         the container when a proof list is present, in which case the loader always provided
-     *         it (see {@code AbstractProblemLoader.load}), and it ignores the replay result
-     *         entirely; the checker cannot see those two facts, so the argument passing is
-     *         suppressed with a scoped key.
+     *        <p>
+     *        The parameters must be nullable because the {@code UserInterfaceControl} contract
+     *        allows loading procedures without proofs. The super implementation only dereferences
+     *        the container when a proof list is present, in which case the loader always provided
+     *        it (see {@code AbstractProblemLoader.load}), and it ignores the replay result
+     *        entirely; the checker cannot see those two facts, so the argument passing is
+     *        suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:argument.type.incompatible")
     @Override

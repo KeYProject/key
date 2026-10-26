@@ -310,8 +310,8 @@ public class TermLabelMenu extends JMenu {
                 // {@link #setEnabledToolTipText} call; show the disabled hint in that impossible
                 // intermediate state.
                 setToolTipText(text == null
-                    ? "You turned off visibility for all term labels. This checkbox is disabled."
-                    : text);
+                        ? "You turned off visibility for all term labels. This checkbox is disabled."
+                        : text);
             } else {
                 setToolTipText("You turned off visibility for all term labels. "
                     + "This checkbox is disabled.");

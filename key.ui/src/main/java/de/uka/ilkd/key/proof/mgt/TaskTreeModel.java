@@ -47,8 +47,10 @@ public class TaskTreeModel extends DefaultTreeModel {
     }
 
     public synchronized void removeTask(TaskTreeNode p) {
-        @Nullable Proof[] allProofs = p.allProofs();
-        for (@Nullable Proof allProof : allProofs) {
+        @Nullable
+        Proof[] allProofs = p.allProofs();
+        for (@Nullable
+        Proof allProof : allProofs) {
             if (allProof == null) {
                 // a task node's proof list never contains null entries
                 throw new NullPointerException("No proof available.");

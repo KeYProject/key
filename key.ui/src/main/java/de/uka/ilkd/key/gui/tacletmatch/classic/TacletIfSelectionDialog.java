@@ -83,21 +83,22 @@ public class TacletIfSelectionDialog extends JPanel {
         for (int i = 0; i < model.ifChoiceModelCount(); i++) {
             final JPanel p = new JPanel();
             p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
-            String ifFmaText = ProofSaver.printAnything(model.ifFma(i), model.proof().getServices());
+            String ifFmaText =
+                ProofSaver.printAnything(model.ifFma(i), model.proof().getServices());
             if (ifFmaText == null) {
                 // the default printer always renders representable objects
                 ifFmaText = "";
             }
             JLabel label = new JLabel(ifFmaText) {
-                    /**
-                     *
-                     */
-                    private static final long serialVersionUID = -6925345438533627265L;
+                /**
+                 *
+                 */
+                private static final long serialVersionUID = -6925345438533627265L;
 
-                    public java.awt.Dimension getPreferredSize() {
-                        return new java.awt.Dimension(100, 10);
-                    }
-                };
+                public java.awt.Dimension getPreferredSize() {
+                    return new java.awt.Dimension(100, 10);
+                }
+            };
             p.add(label);
             JComboBox<AssumesFormulaInstantiation> ifChoice =
                 new JComboBox<>(model.ifChoiceModel(i)) {

@@ -103,10 +103,10 @@ public class SourceHighlightDocument extends DefaultStyledDocument {
      *
      * @param lexer the lexer to use
      *
-     *         <p>
-     *         The document applies editor properties and registers its listener while the
-     *         receiver is still under initialization (EISOP initialization check); both only
-     *         take effect after construction completes, suppressed with a scoped key.
+     *        <p>
+     *        The document applies editor properties and registers its listener while the
+     *        receiver is still under initialization (EISOP initialization check); both only
+     *        take effect after construction completes, suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:method.invocation.invalid")
     public SourceHighlightDocument(EditorLexer lexer) {

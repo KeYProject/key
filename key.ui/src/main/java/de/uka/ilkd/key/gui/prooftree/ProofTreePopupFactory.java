@@ -481,7 +481,7 @@ public final class ProofTreePopupFactory {
                 if (!proof.isOpenGoal(invokedNode) && !proof.isClosedGoal(invokedNode)
                         && (proof.getSubtreeGoals(invokedNode).size() > 0
                                 || (!GeneralSettings.noPruningClosed
-                                    && proof.getClosedSubtreeGoals(invokedNode).size() > 0))) {
+                                        && proof.getClosedSubtreeGoals(invokedNode).size() > 0))) {
                     setEnabled(true);
                 }
                 if (invokedNode.lookup(ClosedBy.class) != null) {

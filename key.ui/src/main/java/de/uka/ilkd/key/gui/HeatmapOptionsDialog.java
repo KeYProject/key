@@ -374,10 +374,13 @@ public class HeatmapOptionsDialog extends JDialog {
          * @param s the description
          * @param title title of the dialog
          * @param owner the parent window
-         * <p>
-         * The dialog configures itself with title, content pane, pack, visibility and keyboard
-         * calls while the receiver is still under initialization (EISOP initialization check);
-         * the effects only take place after construction completes, suppressed with a scoped key.
+         *        <p>
+         *        The dialog configures itself with title, content pane, pack, visibility and
+         *        keyboard
+         *        calls while the receiver is still under initialization (EISOP initialization
+         *        check);
+         *        the effects only take place after construction completes, suppressed with a scoped
+         *        key.
          */
         @SuppressWarnings("nullness:method.invocation.invalid")
         public InfoDialog(String title, String s, final JDialog owner) {

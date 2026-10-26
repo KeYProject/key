@@ -29,10 +29,10 @@ public class ToggleTermOriginTrackingAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      *
-     *         <p>
-     *         The action names itself, binds its icon and accelerator while the receiver is still
-     *         under initialization (EISOP initialization check); the settings only materialize
-     *         once the action is displayed after construction, suppressed with a scoped key.
+     *        <p>
+     *        The action names itself, binds its icon and accelerator while the receiver is still
+     *        under initialization (EISOP initialization check); the settings only materialize
+     *        once the action is displayed after construction, suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:method.invocation.invalid")
     public ToggleTermOriginTrackingAction(MainWindow mainWindow) {

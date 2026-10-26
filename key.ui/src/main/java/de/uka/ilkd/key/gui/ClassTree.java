@@ -272,7 +272,7 @@ public class ClassTree extends JTree {
             return !(javaType instanceof ClassDeclaration
                     || javaType instanceof InterfaceDeclaration)
                     || (javaType instanceof TypeDeclaration td && td.isLibraryClass()
-                        && skipLibraryClasses);
+                            && skipLibraryClasses);
         });
 
         // sort classes alphabetically

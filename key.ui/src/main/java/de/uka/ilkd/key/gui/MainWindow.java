@@ -1864,7 +1864,8 @@ public final class MainWindow extends JFrame {
         }
 
         private void dispatchForCurrentComponent(MouseEvent e) {
-            @Nullable Component target = currentComponent;
+            @Nullable
+            Component target = currentComponent;
             if (target == null) {
                 // no live component is currently tracked under the glass pane
                 return;

@@ -1845,7 +1845,7 @@ public enum MaterialDesignRegular implements IconFont {
             if (stream == null) {
                 // the font is bundled with the application
                 throw new NullPointerException(
-                "Missing font resource /fonts/MaterialIcons-Regular.ttf");
+                    "Missing font resource /fonts/MaterialIcons-Regular.ttf");
             }
             font = Font.createFont(Font.TRUETYPE_FONT, stream);
         }

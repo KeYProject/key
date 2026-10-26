@@ -105,10 +105,10 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * @param noFindList with all applicable noFindTaclets
      * @param builtInList with all applicable BuiltInRules
      * @param pos the PosInSequent
-     * <p>
-     * The checker cannot see that {@code initClutterRules} and {@code createMenu} initialize
-     * the remaining fields and assemble the menu while the receiver is still under
-     * initialization (EISOP initialization check), suppressed with scoped keys.
+     *        <p>
+     *        The checker cannot see that {@code initClutterRules} and {@code createMenu} initialize
+     *        the remaining fields and assemble the menu while the receiver is still under
+     *        initialization (EISOP initialization check), suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
         "nullness:method.invocation.invalid" })

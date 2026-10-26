@@ -68,10 +68,10 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
      *
      * @param mediator mediator
      *
-     *         <p>
-     *         The history registers itself while the receiver is still under initialization (EISOP
-     *         initialization check); the listener only fires after construction completes,
-     *         suppressed with a scoped key.
+     *        <p>
+     *        The history registers itself while the receiver is still under initialization (EISOP
+     *        initialization check); the listener only fires after construction completes,
+     *        suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:argument.type.incompatible")
     public SelectionHistory(KeYMediator mediator) {

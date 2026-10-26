@@ -58,13 +58,13 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      * creates a viewer for a sequent
      *
      * @param mainWindow the MainWindow allowing access to the current system status
-     * <p>
-     * The view configures itself with colors, listeners, drag'n'drop support and mediator
-     * registration while the receiver is still under initialization (EISOP initialization
-     * check) and passes itself to the mouse listener, the drag gesture recognizer, the
-     * {@link DragNDropInstantiator} and the {@link DropTarget}; the listener instance is
-     * correspondingly typed by the checker while only used after construction completes,
-     * suppressed with scoped keys.
+     *        <p>
+     *        The view configures itself with colors, listeners, drag'n'drop support and mediator
+     *        registration while the receiver is still under initialization (EISOP initialization
+     *        check) and passes itself to the mouse listener, the drag gesture recognizer, the
+     *        {@link DragNDropInstantiator} and the {@link DropTarget}; the listener instance is
+     *        correspondingly typed by the checker while only used after construction completes,
+     *        suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:method.invocation.invalid",
         "nullness:argument.type.incompatible", "nullness:assignment.type.incompatible" })

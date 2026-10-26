@@ -39,10 +39,10 @@ public final class MainFrame extends JPanel {
      *
      * @param component the view to display, or {@code null} to clear the frame.
      *
-     *         <p>
-     *         Clearing the frame passes {@code null} to {@link JScrollPane#setViewportView},
-     *         which clears the viewport at run time; the JDK declares a non-null argument, so
-     *         the deliberate {@code null} is suppressed with a scoped key.
+     *        <p>
+     *        Clearing the frame passes {@code null} to {@link JScrollPane#setViewportView},
+     *        which clears the viewport at run time; the JDK declares a non-null argument, so
+     *        the deliberate {@code null} is suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:argument.type.incompatible")
     public void setSequentView(@Nullable SequentView component) {
