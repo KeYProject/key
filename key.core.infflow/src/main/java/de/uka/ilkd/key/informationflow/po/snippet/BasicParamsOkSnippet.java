@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.informationflow.ProofObligationVars;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -28,17 +29,25 @@ class BasicParamsOkSnippet implements FactoryMethod {
                 throw new UnsupportedOperationException(
                     "Tried to produce " + "PARAMS_OK for a term " + "which is no ProgramVariable.");
             }
-            paramsOK = d.tb.and(paramsOK,
-                d.tb.reachableValue(poVars.pre.heap, param, pv.getKeYJavaType()));
+            paramsOK = d.tb.and(paramsOK, d.tb.reachableValue(poVars.pre.heap, param,
+                requireKeYJavaType(pv)));
         }
         if (poVars.pre.guard != null) {
             if (!(poVars.pre.guard.op() instanceof ProgramVariable pv)) {
                 throw new UnsupportedOperationException(
                     "Tried to produce " + "PARAMS_OK for a term " + "which is no ProgramVariable.");
             }
-            paramsOK = d.tb.and(paramsOK,
-                d.tb.reachableValue(poVars.pre.heap, poVars.pre.guard, pv.getKeYJavaType()));
+            paramsOK = d.tb.and(paramsOK, d.tb.reachableValue(poVars.pre.heap, poVars.pre.guard,
+                requireKeYJavaType(pv)));
         }
         return paramsOK;
+    }
+
+    private static KeYJavaType requireKeYJavaType(ProgramVariable pv) {
+        final KeYJavaType kjt = pv.getKeYJavaType();
+        if (kjt == null) {
+            throw new NullPointerException("No KeYJavaType for the variable " + pv + ".");
+        }
+        return kjt;
     }
 }

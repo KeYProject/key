@@ -20,12 +20,13 @@ class BasicPostconditionSnippet extends ReplaceAndRegisterMethod implements Fact
     @Override
     public JTerm produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        if (d.get(BasicSnippetData.Key.POSTCONDITION) == null) {
+        final Object postObj = d.get(BasicSnippetData.Key.POSTCONDITION);
+        if (postObj == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "postcondition for a contract without postcondition.");
         }
         assert JTerm.class.equals(BasicSnippetData.Key.POSTCONDITION.getType());
-        JTerm origPost = (JTerm) d.get(BasicSnippetData.Key.POSTCONDITION);
+        final JTerm origPost = (JTerm) postObj;
         return replace(origPost, d.origVars, poVars.post, d.tb);
     }
 }

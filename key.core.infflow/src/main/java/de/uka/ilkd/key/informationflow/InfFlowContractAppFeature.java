@@ -91,6 +91,10 @@ public class InfFlowContractAppFeature implements Feature {
                 return false;
             }
             final PosInOccurrence oldPio = cmp.posInOccurrence();
+            if (oldPio == null) {
+                throw new NullPointerException(
+                    "No position in occurrence in the compared rule application.");
+            }
             if (!comparePio(newPio, oldPio)) {
                 return false;
             }
@@ -98,17 +102,15 @@ public class InfFlowContractAppFeature implements Feature {
 
 
         // compare the if-sequent instantiations
-        if (newApp.assumesFormulaInstantiations() == null
-                || cmp.assumesFormulaInstantiations() == null) {
-            if (newApp.assumesFormulaInstantiations() != null
-                    || cmp.assumesFormulaInstantiations() != null) {
+        final var newAssumes = newApp.assumesFormulaInstantiations();
+        final var cmpAssumes = cmp.assumesFormulaInstantiations();
+        if (newAssumes == null || cmpAssumes == null) {
+            if (newAssumes != null || cmpAssumes != null) {
                 return false;
             }
         } else {
-            final Iterator<AssumesFormulaInstantiation> it0 =
-                newApp.assumesFormulaInstantiations().iterator();
-            final Iterator<AssumesFormulaInstantiation> it1 =
-                cmp.assumesFormulaInstantiations().iterator();
+            final Iterator<AssumesFormulaInstantiation> it0 = newAssumes.iterator();
+            final Iterator<AssumesFormulaInstantiation> it1 = cmpAssumes.iterator();
 
             while (it0.hasNext()) {
                 // this test should be improved
@@ -163,13 +165,15 @@ public class InfFlowContractAppFeature implements Feature {
     protected boolean duplicateFindTaclet(TacletApp app,
             PosInOccurrence pos, ProofGoal<?> goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
-        assert !app.assumesFormulaInstantiations().isEmpty()
-                : "Featureis only applicable to rules with at least one assumes.";
+        final var assumes = app.assumesFormulaInstantiations();
+        if (assumes == null || assumes.isEmpty()) {
+            throw new AssertionError(
+                "Feature is only applicable to rules with at least one assumes.");
+        }
 
         final SequentFormula focusFor = pos.sequentFormula();
         final boolean antec = pos.isInAntec();
-        final SequentFormula assumesFor =
-            app.assumesFormulaInstantiations().iterator().next().getSequentFormula();
+        final SequentFormula assumesFor = assumes.iterator().next().getSequentFormula();
 
         // assumtion has to occour before the find-term in the sequent in order
         // to avoid duplicated applications
@@ -184,6 +188,10 @@ public class InfFlowContractAppFeature implements Feature {
         int i = 0;
         while (!node.root()) {
             final Node par = node.parent();
+            if (par == null) {
+                throw new NullPointerException(
+                    "No parent node while searching for duplicate rule applications.");
+            }
 
             ++i;
             if (i > 100) {
@@ -201,7 +209,12 @@ public class InfFlowContractAppFeature implements Feature {
                 }
             }
 
-            if (sameApplication(par.getAppliedRuleApp(), app, pos)) {
+            final RuleApp parRuleApp = par.getAppliedRuleApp();
+            if (parRuleApp == null) {
+                throw new NullPointerException("No applied rule app on the parent node while "
+                    + "searching for duplicate rule applications.");
+            }
+            if (sameApplication(parRuleApp, app, pos)) {
                 return true;
             }
 
@@ -223,8 +236,8 @@ public class InfFlowContractAppFeature implements Feature {
             return NumberRuleAppCost.getZeroCost();
         }
 
-        if (!isInfFlowProof((Proof) goal.proof()) || app.assumesFormulaInstantiations() == null
-                || app.assumesFormulaInstantiations().isEmpty()
+        final var assumes = app.assumesFormulaInstantiations();
+        if (!isInfFlowProof((Proof) goal.proof()) || assumes == null || assumes.isEmpty()
                 || duplicateFindTaclet(app, pos, goal)) {
             return TopRuleAppCost.INSTANCE;
         }
@@ -232,8 +245,7 @@ public class InfFlowContractAppFeature implements Feature {
         // only relate the n-th called method in execution A with the n-th
         // called method in execution B automatically
         final SequentFormula focusFor = pos.sequentFormula();
-        final SequentFormula assumesFor =
-            app.assumesFormulaInstantiations().iterator().next().getSequentFormula();
+        final SequentFormula assumesFor = assumes.iterator().next().getSequentFormula();
 
         ArrayList<SequentFormula> relatesTerms = getRelatesTerms(goal);
         final int numOfContractAppls = relatesTerms.size() / 2;
