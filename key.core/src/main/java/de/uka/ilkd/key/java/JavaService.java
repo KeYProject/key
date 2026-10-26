@@ -629,7 +629,13 @@ public class JavaService {
         programFactory.setBootClasses(bootClasses);
         LOGGER.debug("Finished parsing internal classes");
 
-        transformModel(bootClasses);
+        // The java.util.function stubs are pure SAM types resolved during lambda/method-reference
+        // desugaring; they are never instantiated or allocated. Skipping the model-preparation
+        // pass keeps them free of the injected synthetic abstract `$allocate()` method (interfaces
+        // cannot be allocated), which would otherwise give them a second abstract method and
+        // break JavaParser's functional-interface detection when resolving lambda targets.
+        transformModel(
+            bootClasses.stream().filter(cu -> !isResolutionOnlyBootStub(cu)).toList());
         // Process java.lang.Object first (needed to construct array classes like int[]
         var object = bootClasses.stream()
                 .filter(b -> b.getPrimaryType()
@@ -672,6 +678,24 @@ public class JavaService {
                 .collect(Collectors.toList());
         KeYJavaPipeline pipeline = KeYJavaPipeline.createDefault(createPipelineServices(cUnits));
         pipeline.apply();
+    }
+
+    /**
+     * Whether the given boot compilation unit serves only as a resolution target and must be
+     * excluded from the model-preparation pass in {@link #parseBootClasspath(FileRepo)}.
+     * <p>
+     * The JDK functional-interface stubs under {@code java.util.function} are resolved by
+     * JavaParser while desugaring lambdas and method references; they have no contracts and are
+     * never instantiated. Skipping the pass keeps them free of the injected synthetic abstract
+     * {@code $allocate()} method (interfaces cannot be allocated). With that method present, these
+     * interfaces would expose two abstract methods and no longer be recognized as functional
+     * interfaces, breaking the resolution of lambda target types.
+     */
+    private static boolean isResolutionOnlyBootStub(CompilationUnit cu) {
+        return cu.getPrimaryType()
+                .map(t -> t.getFullyQualifiedName().orElse(""))
+                .map(qn -> qn.startsWith("java.util.function."))
+                .orElse(false);
     }
 
 

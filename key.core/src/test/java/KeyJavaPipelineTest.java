@@ -68,11 +68,6 @@ class KeyJavaPipelineTest {
         js.parseSpecialClasses();
 
         final var jp = js.getProgramFactory().createJavaParser();
-        // JavaRedux (the default boot classpath) contains only the proof-relevant
-        // stubs; make the real JDK classes available for symbol resolution so that
-        // e.g. @java.lang.FunctionalInterface or java.util.Objects resolve.
-        js.getProgramFactory().addTypeSolver(
-            new com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver());
         try (var files = Files.list(inputFolder)) {
             var cu = new ArrayList<CompilationUnit>();
             files.forEach(it -> {
