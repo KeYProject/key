@@ -7,8 +7,10 @@ package de.uka.ilkd.key.gui;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
@@ -43,8 +45,9 @@ class ShortUniqueFileNamesTest {
         Random random = new Random(42);
 
         // Test that insertion order does not matter
-        var paths = new ArrayList<>(pathsToName.keySet()); // weigl: enforce array list for
-                                                           // efficient shuffle.
+        Set<String> pathKeys = new HashSet<>(pathsToName.keySet());
+        var paths = new ArrayList<>(pathKeys); // weigl: enforce array list for
+                                               // efficient shuffle.
 
         for (int i = 0; i < 1000; ++i) {
             Collections.shuffle(paths, random);
