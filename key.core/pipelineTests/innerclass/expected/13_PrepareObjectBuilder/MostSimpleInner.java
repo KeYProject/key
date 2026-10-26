@@ -27,7 +27,6 @@ public class MostSimpleInner {
 
         public void $init() {
             super.$init();
-            super.$init();
         }
 
         static private void $clprepare() {
@@ -104,7 +103,6 @@ public class MostSimpleInner {
     }
 
     public void $init() {
-        super.$init();
         super.$init();
     }
 

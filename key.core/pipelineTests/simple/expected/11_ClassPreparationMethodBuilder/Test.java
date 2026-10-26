@@ -36,13 +36,7 @@ public class Test {
     public Test() {
     }
 
-    private void $objectInitializer0() {
-        memberVar = 42;
-    }
-
     public void $init() {
-        super.$init();
-        $objectInitializer0();
         super.$init();
         $objectInitializer0();
     }
@@ -86,13 +80,7 @@ public class SubClass extends Test {
     public SubClass() {
     }
 
-    private void $objectInitializer0() {
-        memberVar = 41;
-    }
-
     public void $init() {
-        super.$init();
-        $objectInitializer0();
         super.$init();
         $objectInitializer0();
     }

@@ -149,7 +149,6 @@ public class OuterClass {
 
     public void $init() {
         super.$init();
-        super.$init();
     }
 
     static private void $clprepare() {
