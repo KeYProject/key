@@ -52,11 +52,19 @@ public class FinishAuxiliaryMethodComputationMacro extends AbstractFinishAuxilia
 
         final ProofOblInput poForProof =
             proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-        final Goal initiatingGoal = ((SymbolicExecutionPO) poForProof).getInitiatingGoal();
+        if (!(poForProof instanceof SymbolicExecutionPO symbExecPO)) {
+            throw new NullPointerException("No symbolic execution proof obligation for "
+                + "the auxiliary proof.");
+        }
+        final Goal initiatingGoal = symbExecPO.getInitiatingGoal();
         final InfFlowProof initiatingProof = (InfFlowProof) initiatingGoal.proof();
         final Services services = initiatingProof.getServices();
-        final InfFlowContractPO ifPO = (InfFlowContractPO) services.getSpecificationRepository()
+        final ProofOblInput poInput = services.getSpecificationRepository()
                 .getProofOblInput(initiatingProof);
+        if (!(poInput instanceof InfFlowContractPO ifPO)) {
+            throw new NullPointerException("No information flow contract proof obligation for "
+                + "the initiating proof.");
+        }
         final IFProofObligationVars ifVars = ifPO.getIFVars().labelHeapAtPreAsAnonHeapFunc();
         final InformationFlowContract ifContract = ifPO.getContract();
 

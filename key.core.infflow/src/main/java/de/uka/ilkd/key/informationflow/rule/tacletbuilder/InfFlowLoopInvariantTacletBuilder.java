@@ -17,6 +17,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -26,9 +27,9 @@ import org.jspecify.annotations.NullMarked;
 public final class InfFlowLoopInvariantTacletBuilder
         extends AbstractInfFlowContractAppTacletBuilder {
 
-    private LoopSpecification loopinvariant;
-    private ExecutionContext executionContext;
-    private JTerm guard;
+    private @Nullable LoopSpecification loopinvariant;
+    private @Nullable ExecutionContext executionContext;
+    private @Nullable JTerm guard;
 
     public InfFlowLoopInvariantTacletBuilder(final Services services) {
         super(services);
@@ -51,27 +52,27 @@ public final class InfFlowLoopInvariantTacletBuilder
 
     @Override
     Name generateName() {
-        return MiscTools.toValidTacletName(USE_IF + loopinvariant.getUniqueName());
+        return MiscTools.toValidTacletName(USE_IF + requireLoopInvariant().getUniqueName());
     }
 
     @Override
     JTerm generateSchemaAssumes(ProofObligationVars schemaDataAssumes, Services services) {
-        BasicPOSnippetFactory fAssumes = POSnippetFactory.getBasicFactory(loopinvariant,
-            schemaDataAssumes, executionContext, guard, services);
+        BasicPOSnippetFactory fAssumes = POSnippetFactory.getBasicFactory(requireLoopInvariant(),
+            schemaDataAssumes, requireExecutionContext(), requireGuard(), services);
         return fAssumes.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
     }
 
     @Override
     JTerm generateSchemaFind(ProofObligationVars schemaDataFind, Services services) {
-        BasicPOSnippetFactory fFind = POSnippetFactory.getBasicFactory(loopinvariant,
-            schemaDataFind, executionContext, guard, services);
+        BasicPOSnippetFactory fFind = POSnippetFactory.getBasicFactory(requireLoopInvariant(),
+            schemaDataFind, requireExecutionContext(), requireGuard(), services);
         return fFind.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
     }
 
     @Override
     JTerm getContractApplPred(ProofObligationVars appData) {
-        BasicPOSnippetFactory f = POSnippetFactory.getBasicFactory(loopinvariant, appData,
-            executionContext, guard, services);
+        BasicPOSnippetFactory f = POSnippetFactory.getBasicFactory(requireLoopInvariant(),
+            appData, requireExecutionContext(), requireGuard(), services);
         return f.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
     }
 
@@ -80,13 +81,48 @@ public final class InfFlowLoopInvariantTacletBuilder
     JTerm buildContractApplications(ProofObligationVars contAppData,
             ProofObligationVars contAppData2, Services services) {
         LoopSpecification ifContract =
-            services.getSpecificationRepository().getLoopSpec(loopinvariant.getLoop());
+            services.getSpecificationRepository().getLoopSpec(requireLoopInvariant().getLoop());
+        if (ifContract == null) {
+            throw new NullPointerException(
+                "No matching loop specification for the loop invariant "
+                    + requireLoopInvariant().getUniqueName() + ".");
+        }
 
         InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(ifContract, contAppData,
-            contAppData2, executionContext, guard, services);
+            contAppData2, requireExecutionContext(), requireGuard(), services);
         JTerm contractApplication =
             f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_LOOP_INVARIANT_APPL);
 
         return contractApplication;
+    }
+
+
+    private LoopSpecification requireLoopInvariant() {
+        final LoopSpecification loop = loopinvariant;
+        if (loop == null) {
+            throw new NullPointerException(
+                "No loop invariant for building the information flow loop invariant taclet.");
+        }
+        return loop;
+    }
+
+
+    private ExecutionContext requireExecutionContext() {
+        final ExecutionContext context = executionContext;
+        if (context == null) {
+            throw new NullPointerException(
+                "No execution context for building the information flow loop invariant taclet.");
+        }
+        return context;
+    }
+
+
+    private JTerm requireGuard() {
+        final JTerm g = guard;
+        if (g == null) {
+            throw new NullPointerException(
+                "No guard for building the information flow loop invariant taclet.");
+        }
+        return g;
     }
 }

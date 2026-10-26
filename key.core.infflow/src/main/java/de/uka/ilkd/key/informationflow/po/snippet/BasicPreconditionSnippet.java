@@ -19,12 +19,13 @@ class BasicPreconditionSnippet extends ReplaceAndRegisterMethod implements Facto
     @Override
     public JTerm produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        if (d.get(BasicSnippetData.Key.PRECONDITION) == null) {
+        final Object preObj = d.get(BasicSnippetData.Key.PRECONDITION);
+        if (preObj == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "precondition for a contract without precondition.");
         }
         assert JTerm.class.equals(BasicSnippetData.Key.PRECONDITION.getType());
-        JTerm origPre = (JTerm) d.get(BasicSnippetData.Key.PRECONDITION);
+        final JTerm origPre = (JTerm) preObj;
         return replace(origPre, d.origVars, poVars.pre, d.tb);
     }
 }

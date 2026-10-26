@@ -298,6 +298,9 @@ public class InfFlowProofSymbols {
         while (n == null && i < 1000) {
             n = ns.lookup(s + "_" + i);
         }
+        if (n == null) {
+            throw new NullPointerException("No such program variable " + s + ".");
+        }
         assert n instanceof ProgramVariable;
         return (ProgramVariable) n;
     }

@@ -100,6 +100,10 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor {
         StrategyInfoUndoMethod undo = strategyInfos -> {
             ImmutableList<JTerm> applFormulas1 =
                 strategyInfos.get(INF_FLOW_CONTRACT_APPL_PROPERTY);
+            if (applFormulas1 == null) {
+                throw new NullPointerException(
+                    "No stored contract application formulas to undo for the goal " + goal + ".");
+            }
             strategyInfos.put(INF_FLOW_CONTRACT_APPL_PROPERTY,
                 applFormulas1.removeAll(applFormula));
         };

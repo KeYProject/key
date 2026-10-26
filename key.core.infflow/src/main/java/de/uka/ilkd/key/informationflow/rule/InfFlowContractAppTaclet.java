@@ -11,6 +11,7 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.rules.TacletAnnotation;
@@ -68,6 +69,19 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
             choices, surviveSymbExec, tacletAnnotations);
     }
 
+    /**
+     * The abstract declaration in the prover Taclet root declares
+     * {@code createAndInitializeExecutor} with an {@code @UnderInitialization}
+     * receiver, while the intermediate RewriteTaclet override (which is not
+     * annotated) has an initialized implicit receiver. An explicit receiver on
+     * this override cannot satisfy both: javac requires the concrete class
+     * receiver (making EISOP report a mismatch with the initialized
+     * intermediate), while an inherited default receiver mismatches the
+     * under-initialized root declaration. The executor is constructed and
+     * assigned exactly like RewriteTaclet does after all fields the executor
+     * reads are set, so the receiver state carries no nullness risk.
+     */
+    @SuppressWarnings("nullness:override.receiver.invalid")
     @Override
     protected void createAndInitializeExecutor() {
         executor = new InfFlowContractAppTacletExecutor(this);
@@ -75,8 +89,18 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
 
     @Override
     public @NonNull InfFlowContractAppTaclet setName(@NonNull String s) {
+        final ApplicationRestriction restriction = applicationRestriction();
+        if (restriction == null) {
+            throw new NullPointerException(
+                "No application restriction for renaming the information flow contract taclet.");
+        }
+        final JTerm findTerm = (JTerm) find;
+        if (findTerm == null) {
+            throw new NullPointerException(
+                "No find part for renaming the information flow contract taclet.");
+        }
         final TacletApplPart applPart =
-            new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
+            new TacletApplPart(assumesSequent(), restriction, varsNew(),
                 varsNotFreeIn(),
                 varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs =
@@ -84,7 +108,7 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
 
         return new InfFlowContractAppTaclet(new Name(s), applPart,
             goalTemplates(), getRuleSets(),
-            attrs, (JTerm) find, prefixMap,
+            attrs, findTerm, prefixMap,
             choices, getSurviveSymbExec(),
             tacletAnnotations);
     }

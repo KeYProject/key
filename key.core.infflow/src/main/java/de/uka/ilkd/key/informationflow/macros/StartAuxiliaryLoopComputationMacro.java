@@ -17,8 +17,10 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.prover.engine.ProverTaskListener;
@@ -57,8 +59,12 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
             @Nullable PosInOccurrence posInOcc) {
-        if (posInOcc == null || goals == null || goals.isEmpty() || goals.head().node() == null
-                || goals.head().node().parent() == null) {
+        if (posInOcc == null || goals == null || goals.isEmpty()) {
+            return false;
+        }
+        final Goal goal = goals.head();
+        final Node parent = goal.node().parent();
+        if (parent == null) {
             return false;
         }
 
@@ -68,7 +74,7 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         }
         final Services services = proof.getServices();
 
-        RuleApp app = goals.head().node().parent().getAppliedRuleApp();
+        RuleApp app = parent.getAppliedRuleApp();
         if (!(app instanceof InfFlowLoopInvariantBuiltInRuleApp loopInvRuleApp)) {
             return false;
         }
@@ -93,14 +99,28 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
             ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
             @Nullable ProverTaskListener listener)
             throws Exception {
-        final var loopInvRuleApp =
-            (InfFlowLoopInvariantBuiltInRuleApp) goals.head().node().parent()
-                    .getAppliedRuleApp();
+        final Node parent = goals.head().node().parent();
+        if (parent == null) {
+            throw new NullPointerException("No parent node of the goal.");
+        }
+        final RuleApp ruleApp = parent.getAppliedRuleApp();
+        if (ruleApp == null) {
+            throw new NullPointerException("No applied rule app on the parent node.");
+        }
+        final var loopInvRuleApp = (InfFlowLoopInvariantBuiltInRuleApp) ruleApp;
 
-        final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
+        final ProofEnvironment env = proof.getEnv();
+        if (env == null) {
+            throw new NullPointerException("No proof environment.");
+        }
+        final InitConfig initConfig = env.getInitConfigForEnvironment();
 
         final LoopSpecification loopInv = loopInvRuleApp.getSpec();
         final IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
+        if (ifVars == null) {
+            throw new NullPointerException("No information flow proof obligation variables for "
+                + "the rule application.");
+        }
         final ExecutionContext executionContext = loopInvRuleApp.getExecutionContext();
         final JTerm guardTerm = loopInvRuleApp.getGuard();
 

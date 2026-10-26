@@ -122,13 +122,14 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
             // and
             // - we are in the branch where we have to show the left hand side
             // of the implication
-            if (goal.node().parent() != null && goal.node().parent().parent() != null) {
-                Node parent = goal.node().parent();
+            Node parent = goal.node().parent();
+            final Node grandparent = parent == null ? null : parent.parent();
+            if (parent != null && grandparent != null) {
                 return getAppRuleName(parent).equals(IMP_LEFT_RULENAME)
-                        && getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX)
+                        && getAppRuleName(grandparent).startsWith(INF_FLOW_RULENAME_PREFIX)
                         && parent.child(0) == goal.node()
                         || getAppRuleName(parent).equals(DOUBLE_IMP_LEFT_RULENAME)
-                                && getAppRuleName(parent.parent()).startsWith(
+                                && getAppRuleName(grandparent).startsWith(
                                     INF_FLOW_RULENAME_PREFIX)
                                 && parent.child(2) != goal.node();
             }
@@ -138,6 +139,9 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
         private String getAppRuleName(Node parent) {
             RuleApp parentRuleApp = parent.getAppliedRuleApp();
+            if (parentRuleApp == null) {
+                throw new NullPointerException("No applied rule app for the node.");
+            }
             String parentRuleName = parentRuleApp.rule().name().toString();
             return parentRuleName;
         }
