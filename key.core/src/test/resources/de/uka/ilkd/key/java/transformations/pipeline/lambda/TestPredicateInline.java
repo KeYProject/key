@@ -38,7 +38,12 @@ class A {
         }
 
         static <T> Predicate<T> isEqual(Object var0) {
-            return null == var0 ? Objects::isNull : (var1) -> {
+            if (var0 == null) {
+                return (var1) -> {
+                    return var1 == null;
+                };
+            }
+            return (var1) -> {
                 return var0.equals(var1);
             };
         }
