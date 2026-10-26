@@ -53,13 +53,15 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
                 : "Something is wrong with the catch variable";
 
         ImmutableList<JTerm> posts = ImmutableList.nil();
-        if (poVars.post.self != null) {
+        if (poVars.post.self != null && poVars.pre.self != null) {
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
         }
-        if (poVars.post.result != null) {
+        if (poVars.post.result != null && poVars.pre.result != null) {
             posts = posts.append(d.tb.equals(poVars.post.result, poVars.pre.result));
         }
-        posts = posts.append(d.tb.equals(poVars.post.exception, poVars.pre.exception));
+        if (poVars.post.exception != null && poVars.pre.exception != null) {
+            posts = posts.append(d.tb.equals(poVars.post.exception, poVars.pre.exception));
+        }
         posts = posts.append(d.tb.equals(poVars.post.heap, d.tb.getBaseHeap()));
         return buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
     }
@@ -76,7 +78,12 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
 
 
         // create java block
-        final JavaBlock jb = buildJavaBlock(d, vs.formalParams,
+        final ImmutableList<JTerm> formalParams = vs.formalParams;
+        if (formalParams == null) {
+            throw new NullPointerException(
+                "No formal parameter terms for the symbolic execution block.");
+        }
+        final JavaBlock jb = buildJavaBlock(d, formalParams,
             vs.pre.self != null ? vs.pre.self.op(ProgramVariable.class) : null,
             vs.pre.result != null ? vs.pre.result.op(ProgramVariable.class) : null,
             vs.pre.exception != null ? vs.pre.exception.op(ProgramVariable.class) : null,
@@ -94,7 +101,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
 
         // create update
         JTerm update = tb.skip();
-        Iterator<JTerm> formalParamIt = vs.formalParams.iterator();
+        Iterator<JTerm> formalParamIt = formalParams.iterator();
         Iterator<JTerm> paramIt = vs.pre.localVars.iterator();
         while (formalParamIt.hasNext()) {
             JTerm formalParam = formalParamIt.next();
@@ -123,25 +130,38 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
             new ImmutableArray<>(formalParVars);
         final StatementBlock sb;
         if (pm.isConstructor()) {
-            assert selfVar != null;
-            assert resultVar == null;
+            if (selfVar == null) {
+                throw new NullPointerException(
+                    "No self variable for a constructor's symbolic execution block.");
+            }
+            assert resultVar == null : "Constructor snippets must not bind a result variable.";
             final Expression[] formalArray2 =
                 formalArray.toArray(new Expression[formalArray.size()]);
             KeYJavaType forClass = (KeYJavaType) d.get(BasicSnippetData.Key.FOR_CLASS);
+            if (forClass == null) {
+                throw new NullPointerException(
+                    "No target type for a constructor's symbolic execution block.");
+            }
             final New n = new New(formalArray2, new TypeRef(forClass), null);
             final Assignment ca = new BinaryAssignment(selfVar, n);
             sb = new StatementBlock(ca);
         } else {
             final MethodBodyStatement call =
-                new MethodBodyStatement(pm, selfVar, resultVar, formalArray);
+                buildMethodBodyStatement(pm, selfVar, resultVar, formalArray);
             sb = new StatementBlock(call);
         }
 
         // type of the variable for the try statement
         final KeYJavaType eType = javaInfo.getTypeByClassName("java.lang.Throwable");
+        if (eType == null) {
+            throw new NullPointerException("No type for java.lang.Throwable.");
+        }
         final TypeReference excTypeRef = javaInfo.createTypeReference(eType);
 
         // create try statement
+        if (exceptionVar == null) {
+            throw new NullPointerException("No exception variable for the try statement.");
+        }
         final Assignment nullStat = new BinaryAssignment(exceptionVar, NullLiteral.NULL);
         final VariableSpecification eSpec = new VariableSpecification(eVar);
         final ParameterDeclaration excDecl =
@@ -153,6 +173,21 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
 
         // create java block
         return JavaBlock.createJavaBlock(sb2);
+    }
+
+    /**
+     * Creates the method body statement for a non-constructor method call. The
+     * context ({@code newContext}) and result ({@code res}) are deliberately
+     * {@code null} for static and void methods respectively; the
+     * {@code MethodBodyStatement} constructor tolerates this (neither is
+     * dereferenced before being assigned, matching its usage throughout
+     * key.core), but its parameters are not nullness annotated.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private static MethodBodyStatement buildMethodBodyStatement(IProgramMethod method,
+            @Nullable ProgramVariable newContext, @Nullable ProgramVariable res,
+            ImmutableArray<Expression> args) {
+        return new MethodBodyStatement(method, newContext, res, args);
     }
 
 

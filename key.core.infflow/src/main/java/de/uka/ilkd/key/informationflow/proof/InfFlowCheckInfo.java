@@ -25,7 +25,10 @@ public class InfFlowCheckInfo {
         new Properties.Property<>(Boolean.class, "information flow check property");
 
     public static void set(Goal goal, final boolean checkForInfFlow) {
-        final boolean oldValue = goal.getStrategyInfo(INF_FLOW_CHECK_PROPERTY);
+        final Boolean oldValue = goal.getStrategyInfo(INF_FLOW_CHECK_PROPERTY);
+        if (oldValue == null) {
+            throw new NullPointerException("No previous information flow check property.");
+        }
         StrategyInfoUndoMethod undo =
             strategyInfos -> strategyInfos.put(INF_FLOW_CHECK_PROPERTY, oldValue);
         goal.addStrategyInfo(INF_FLOW_CHECK_PROPERTY, checkForInfFlow, undo);
@@ -33,7 +36,11 @@ public class InfFlowCheckInfo {
     }
 
     public static boolean get(Goal goal) {
-        return goal.getStrategyInfo(INF_FLOW_CHECK_PROPERTY);
+        final Boolean value = goal.getStrategyInfo(INF_FLOW_CHECK_PROPERTY);
+        if (value == null) {
+            throw new NullPointerException("No information flow check property.");
+        }
+        return value;
     }
 
     public static boolean isInfFlow(Goal goal) {
@@ -45,10 +52,11 @@ public class InfFlowCheckInfo {
 
         // For loaded proofs, InfFlowCheckInfo is not correct without the following
         // boolean isLoadedIF = false; //stratProps.getProperty(ifStrat).equals(ifTrue);
-        return (goal.getStrategyInfo(ifProp) != null && goal.getStrategyInfo(ifProp))/*
-                                                                                      * ||
-                                                                                      * isLoadedIF
-                                                                                      */;
+        final Boolean value = goal.getStrategyInfo(ifProp);
+        return value != null && value;
+        /*
+         * || isLoadedIF
+         */
     }
 
     public static void addInfFlow(StrategyProperties props) {

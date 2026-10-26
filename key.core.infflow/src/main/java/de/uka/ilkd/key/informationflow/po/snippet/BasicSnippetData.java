@@ -60,13 +60,32 @@ public class BasicSnippetData {
     /**
      * Unified contract content.
      */
-    private final EnumMap<Key, Object> contractContents = new EnumMap<>(Key.class) {
-        @Override
-        public Object put(Key key, @Nullable Object value) {
-            assert value == null || key.getType().isInstance(value);
-            return super.put(key, value);
+    private final ContractContents contractContents = new ContractContents();
+
+    /**
+     * Enum map whose {@code put} method accepts {@code null} values for
+     * clauses which are absent from a contract (e.g. the measured-by
+     * clause). Clients which read a key handle the {@code null} value
+     * accordingly.
+     */
+    private static final class ContractContents extends EnumMap<Key, Object> {
+        private static final long serialVersionUID = 1L;
+
+        ContractContents() {
+            super(Key.class);
         }
-    };
+
+        /**
+         * Stores the (possibly absent) contract clause. A {@code null} value
+         * deliberately denotes an absent clause; the map is never read
+         * without a preceding null check for the corresponding key.
+         */
+        @SuppressWarnings("nullness:argument.type.incompatible")
+        void putNullable(Key key, @Nullable Object value) {
+            assert value == null || key.getType().isInstance(value);
+            super.put(key, value);
+        }
+    }
 
 
     /**
@@ -123,16 +142,18 @@ public class BasicSnippetData {
         this.services = services;
         this.tb = services.getTermBuilder();
 
-        contractContents.put(Key.TARGET_METHOD, contract.getTarget());
-        contractContents.put(Key.FOR_CLASS, contract.getKJT());
-        contractContents.put(Key.PRECONDITION, contract.getPre());
-        contractContents.put(Key.POSTCONDITION, contract.getPost());
-        contractContents.put(Key.MODIFIABLE, contract.getModifiable());
-        contractContents.put(Key.MEASURED_BY, contract.getMby());
-        contractContents.put(Key.MODALITY, contract.getModalityKind());
+        contractContents.putNullable(Key.TARGET_METHOD, contract.getTarget());
+        contractContents.putNullable(Key.FOR_CLASS, contract.getKJT());
+        contractContents.putNullable(Key.PRECONDITION, contract.getPre());
+        contractContents.putNullable(Key.POSTCONDITION, contract.getPost());
+        contractContents.putNullable(Key.MODIFIABLE, contract.getModifiable());
+        contractContents.putNullable(Key.MEASURED_BY, contract.getMby());
+        contractContents.putNullable(Key.MODALITY, contract.getModalityKind());
 
         final JTerm heap = tb.getBaseHeap();
-        origVars = new StateVars(contract.getSelf(), contract.getParams(), contract.getResult(),
+        final ImmutableList<JTerm> params = requireParams(contract.getParams(),
+            contract.getTarget().getUniqueName());
+        origVars = new StateVars(contract.getSelf(), params, contract.getResult(),
             contract.getExc(), heap);
     }
 
@@ -142,14 +163,14 @@ public class BasicSnippetData {
         this.services = services;
         this.tb = services.getTermBuilder();
 
-        contractContents.put(Key.TARGET_METHOD, invariant.getTarget());
-        contractContents.put(Key.FOR_CLASS, invariant.getKJT());
-        contractContents.put(Key.EXECUTION_CONTEXT, context);
-        contractContents.put(Key.LOOP_INVARIANT, invariant);
-        contractContents.put(Key.LOOP_INVARIANT_TERM, invariant.getInvariant(services));
-        contractContents.put(Key.MODIFIABLE, invariant.getModifiable());
-        contractContents.put(Key.MODALITY, JModality.JavaModalityKind.BOX);
-        contractContents.put(Key.INF_FLOW_SPECS, invariant.getInfFlowSpecs(services));
+        contractContents.putNullable(Key.TARGET_METHOD, invariant.getTarget());
+        contractContents.putNullable(Key.FOR_CLASS, invariant.getKJT());
+        contractContents.putNullable(Key.EXECUTION_CONTEXT, context);
+        contractContents.putNullable(Key.LOOP_INVARIANT, invariant);
+        contractContents.putNullable(Key.LOOP_INVARIANT_TERM, invariant.getInvariant(services));
+        contractContents.putNullable(Key.MODIFIABLE, invariant.getModifiable());
+        contractContents.putNullable(Key.MODALITY, JModality.JavaModalityKind.BOX);
+        contractContents.putNullable(Key.INF_FLOW_SPECS, invariant.getInfFlowSpecs(services));
 
         // add guard term to information flow specs (necessary for soundness)
         // and add the modified specs to the table
@@ -162,15 +183,15 @@ public class BasicSnippetData {
                 new InfFlowSpec(modifiedPreExps, modifiedPostExps, infFlowSpec.newObjects);
             modifiedSpecs = modifiedSpecs.append(modifiedSpec);
         }
-        contractContents.put(Key.INF_FLOW_SPECS, modifiedSpecs);
+        contractContents.putNullable(Key.INF_FLOW_SPECS, modifiedSpecs);
 
         final JTerm heap = tb.getBaseHeap();
         final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(invariant.getLoop(), services);
         final ImmutableSet<LocationVariable> localOutVariables =
             MiscTools.getLocalOuts(invariant.getLoop(), services);
-        final ImmutableList<JTerm> localInTerms = toTermList(localInVariables);
-        final ImmutableList<JTerm> localOutTerms = toTermList(localOutVariables);
+        final ImmutableList<JTerm> localInTerms = toTermList(localInVariables, tb);
+        final ImmutableList<JTerm> localOutTerms = toTermList(localOutVariables, tb);
         final ImmutableList<JTerm> localInsWithoutOutDuplicates =
             MiscTools.filterOutDuplicates(localInTerms, localOutTerms);
         final ImmutableList<JTerm> localVarsTerms =
@@ -185,18 +206,20 @@ public class BasicSnippetData {
         this.services = services;
         this.tb = services.getTermBuilder();
 
-        contractContents.put(Key.TARGET_METHOD, contract.getTarget());
-        contractContents.put(Key.FOR_CLASS, contract.getKJT());
-        contractContents.put(Key.PRECONDITION, contract.getPre());
-        contractContents.put(Key.FREE_PRECONDITION, contract.getFreePre());
-        contractContents.put(Key.MODIFIABLE, contract.getModifiable());
-        contractContents.put(Key.DEPENDENS, contract.getDep());
-        contractContents.put(Key.MEASURED_BY, contract.getMby());
-        contractContents.put(Key.MODALITY, contract.getModalityKind());
-        contractContents.put(Key.INF_FLOW_SPECS, contract.getInfFlowSpecs());
+        contractContents.putNullable(Key.TARGET_METHOD, contract.getTarget());
+        contractContents.putNullable(Key.FOR_CLASS, contract.getKJT());
+        contractContents.putNullable(Key.PRECONDITION, contract.getPre());
+        contractContents.putNullable(Key.FREE_PRECONDITION, contract.getFreePre());
+        contractContents.putNullable(Key.MODIFIABLE, contract.getModifiable());
+        contractContents.putNullable(Key.DEPENDENS, contract.getDep());
+        contractContents.putNullable(Key.MEASURED_BY, contract.getMby());
+        contractContents.putNullable(Key.MODALITY, contract.getModalityKind());
+        contractContents.putNullable(Key.INF_FLOW_SPECS, contract.getInfFlowSpecs());
 
         final JTerm heap = tb.getBaseHeap();
-        origVars = new StateVars(contract.getSelf(), contract.getParams(), contract.getResult(),
+        final ImmutableList<JTerm> params = requireParams(contract.getParams(),
+            contract.getTarget().getUniqueName());
+        origVars = new StateVars(contract.getSelf(), params, contract.getResult(),
             contract.getExc(), heap);
     }
 
@@ -206,19 +229,19 @@ public class BasicSnippetData {
         this.services = services;
         this.tb = services.getTermBuilder();
 
-        contractContents.put(Key.TARGET_METHOD, contract.getTarget());
-        contractContents.put(Key.FOR_CLASS, contract.getKJT());
-        contractContents.put(Key.TARGET_BLOCK, contract.getBlock());
-        contractContents.put(Key.BLOCK_VARS, contract.getVariables());
-        contractContents.put(Key.BLOCK_SELF, contract.getInstantiationSelfTerm(services));
-        contractContents.put(Key.PRECONDITION, contract.getPre(services));
-        contractContents.put(Key.POSTCONDITION, contract.getPost(services));
-        contractContents.put(Key.MODIFIABLE, contract.getModifiable(services));
-        contractContents.put(Key.MODALITY, contract.getModalityKind());
-        contractContents.put(Key.INF_FLOW_SPECS, contract.getInfFlowSpecs());
+        contractContents.putNullable(Key.TARGET_METHOD, contract.getTarget());
+        contractContents.putNullable(Key.FOR_CLASS, contract.getKJT());
+        contractContents.putNullable(Key.TARGET_BLOCK, contract.getBlock());
+        contractContents.putNullable(Key.BLOCK_VARS, contract.getVariables());
+        contractContents.putNullable(Key.BLOCK_SELF, contract.getInstantiationSelfTerm(services));
+        contractContents.putNullable(Key.PRECONDITION, contract.getPre(services));
+        contractContents.putNullable(Key.POSTCONDITION, contract.getPost(services));
+        contractContents.putNullable(Key.MODIFIABLE, contract.getModifiable(services));
+        contractContents.putNullable(Key.MODALITY, contract.getModalityKind());
+        contractContents.putNullable(Key.INF_FLOW_SPECS, contract.getInfFlowSpecs());
         List<Label> labels = contract.getLabels();
-        contractContents.put(Key.LABELS, labels.toArray(new Label[0]));
-        contractContents.put(Key.EXECUTION_CONTEXT, context);
+        contractContents.putNullable(Key.LABELS, labels.toArray(new Label[0]));
+        contractContents.putNullable(Key.EXECUTION_CONTEXT, context);
 
         final JTerm heap = tb.getBaseHeap();
         BlockContract.Terms vars = contract.getVariablesAsTerms(services);
@@ -226,8 +249,8 @@ public class BasicSnippetData {
             MiscTools.getLocalIns(contract.getBlock(), services);
         final ImmutableSet<LocationVariable> localOutVariables =
             MiscTools.getLocalOuts(contract.getBlock(), services);
-        final ImmutableList<JTerm> localInTerms = toTermList(localInVariables);
-        final ImmutableList<JTerm> localOutTerms = toTermList(localOutVariables);
+        final ImmutableList<JTerm> localInTerms = toTermList(localInVariables, tb);
+        final ImmutableList<JTerm> localOutTerms = toTermList(localOutVariables, tb);
         final ImmutableList<JTerm> localInsWithoutOutDuplicates =
             MiscTools.filterOutDuplicates(localInTerms, localOutTerms);
         final ImmutableList<JTerm> localVarsTerms =
@@ -237,12 +260,23 @@ public class BasicSnippetData {
     }
 
 
-    private ImmutableList<JTerm> toTermList(ImmutableSet<LocationVariable> vars) {
+    private static ImmutableList<JTerm> toTermList(Iterable<LocationVariable> vars,
+            TermBuilder tb) {
         ImmutableList<JTerm> result = ImmutableList.nil();
         for (ProgramVariable v : vars) {
             result = result.append(tb.var(v));
         }
         return result;
+    }
+
+
+    private static ImmutableList<JTerm> requireParams(@Nullable ImmutableList<JTerm> params,
+            String contractName) {
+        if (params == null) {
+            throw new NullPointerException("No parameter terms for the contract " + contractName
+                + ".");
+        }
+        return params;
     }
 
 

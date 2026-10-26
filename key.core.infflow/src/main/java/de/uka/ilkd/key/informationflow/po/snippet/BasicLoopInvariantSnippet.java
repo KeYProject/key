@@ -15,12 +15,13 @@ public class BasicLoopInvariantSnippet extends ReplaceAndRegisterMethod implemen
     @Override
     public JTerm produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        if (d.get(BasicSnippetData.Key.LOOP_INVARIANT) == null) {
+        final Object loopInvObj = d.get(BasicSnippetData.Key.LOOP_INVARIANT_TERM);
+        if (loopInvObj == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "loop invariant for a loop without invariant.");
         }
         assert JTerm.class.equals(BasicSnippetData.Key.LOOP_INVARIANT_TERM.getType());
-        JTerm origLoopInv = (JTerm) d.get(BasicSnippetData.Key.LOOP_INVARIANT_TERM);
+        final JTerm origLoopInv = (JTerm) loopInvObj;
         return replace(origLoopInv, d.origVars, poVars.pre, d.tb);
     }
 

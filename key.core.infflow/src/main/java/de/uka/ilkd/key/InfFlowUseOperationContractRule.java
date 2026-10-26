@@ -57,8 +57,16 @@ public class InfFlowUseOperationContractRule extends UseOperationContractRule
         protected JTerm getFinalPreTerm() {
             // termination has already been shown in the functional proof,
             // thus we do not need to show it again in information flow proofs.
-            return tb.applySequential(new JTerm[] { inst.u(), atPreUpdates },
-                tb.and(new JTerm[] { pre, reachableState }));
+            final JTerm atPre = atPreUpdates;
+            if (atPre == null) {
+                throw new NullPointerException("No at-pre updates of the rule application.");
+            }
+            final JTerm reachable = reachableState;
+            if (reachable == null) {
+                throw new NullPointerException("No reachable state term of the rule application.");
+            }
+            return tb.applySequential(new JTerm[] { inst.u(), atPre },
+                tb.and(new JTerm[] { pre, reachable }));
         }
 
         private void applyInfFlow(Goal goal) {
@@ -93,7 +101,11 @@ public class InfFlowUseOperationContractRule extends UseOperationContractRule
             InfFlowMethodContractTacletBuilder ifContractBuilder =
                 new InfFlowMethodContractTacletBuilder(services);
             ifContractBuilder.setContract(contract);
-            ifContractBuilder.setContextUpdate(atPreUpdates, inst.u());
+            final JTerm atPre = atPreUpdates;
+            if (atPre == null) {
+                throw new NullPointerException("No at-pre updates of the rule application.");
+            }
+            ifContractBuilder.setContextUpdate(atPre, inst.u());
             ifContractBuilder.setProofObligationVars(poVars);
 
             JTerm contractApplPredTerm = ifContractBuilder.buildContractApplPredTerm();
@@ -107,7 +119,11 @@ public class InfFlowUseOperationContractRule extends UseOperationContractRule
             // information flow proofs might get easier if we add the (proved)
             // method contract precondition as an assumption to the post goal
             // (in case the precondition cannot be proved easily)
-            goal.addFormula(new SequentFormula(finalPreTerm), true, false);
+            final JTerm finalPre = finalPreTerm;
+            if (finalPre == null) {
+                throw new NullPointerException("No final pre term of the rule application.");
+            }
+            goal.addFormula(new SequentFormula(finalPre), true, false);
             final InfFlowProof proof = (InfFlowProof) goal.proof();
             proof.addIFSymbol(contractApplPredTerm);
             proof.addIFSymbol(informationFlowContractApp);

@@ -35,6 +35,10 @@ class BasicSelfExactTypeSnippet implements FactoryMethod {
         JTerm result = d.tb.tt();
         if (forClass != null) {
             final Sort contractSort = forClass.getSort();
+            if (contractSort == null) {
+                throw new NullPointerException(
+                    "No sort for the type " + forClass.getName() + ".");
+            }
             result = (poVars.pre.self == null || pm.isConstructor()) ? d.tb.tt()
                     : d.tb.exactInstance(contractSort, poVars.pre.self);
         } else if (d.get(BasicSnippetData.Key.LOOP_INVARIANT_TERM) != null) {

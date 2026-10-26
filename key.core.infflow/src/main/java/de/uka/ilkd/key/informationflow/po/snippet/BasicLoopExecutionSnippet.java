@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.expression.BinaryAssignment;
+import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JTerm;
@@ -34,11 +35,11 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
     public JTerm produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
         ImmutableList<JTerm> posts = ImmutableList.nil();
-        if (poVars.post.self != null) {
+        if (poVars.post.self != null && poVars.pre.self != null) {
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
         }
 
-        if (poVars.pre.guard != null) {
+        if (poVars.pre.guard != null && poVars.post.guard != null && d.origVars.guard != null) {
             final JavaBlock guardJb = buildJavaBlock(d).second;
             posts =
                 posts.append(d.tb.box(guardJb, d.tb.equals(poVars.post.guard, d.origVars.guard)));
@@ -59,13 +60,13 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
 
     private JTerm buildProgramTerm(BasicSnippetData d, ProofObligationVars vs, JTerm postTerm,
             TermBuilder tb) {
-        if (d.get(BasicSnippetData.Key.MODALITY) == null) {
+        final Object modalityObj = d.get(BasicSnippetData.Key.MODALITY);
+        if (modalityObj == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "program-term for a loop without modality.");
         }
         // create java block
-        JModality.JavaModalityKind kind =
-            (JModality.JavaModalityKind) d.get(BasicSnippetData.Key.MODALITY);
+        final JModality.JavaModalityKind kind = (JModality.JavaModalityKind) modalityObj;
         final Pair<JavaBlock, JavaBlock> jb = buildJavaBlock(d);
 
         // create program term
@@ -75,9 +76,19 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         } else {
             symbExecMod = JModality.JavaModalityKind.BOX;
         }
-        final JTerm guardPreTrueTerm = d.tb.equals(vs.pre.guard, d.tb.TRUE());
-        final JTerm guardPreFalseTerm = d.tb.equals(vs.pre.guard, d.tb.FALSE());
-        final JTerm guardPreEqTerm = d.tb.equals(d.origVars.guard, vs.pre.guard);
+        final JTerm guardPre = vs.pre.guard;
+        if (guardPre == null) {
+            throw new NullPointerException(
+                "No pre-state guard term for the loop symbolic execution block.");
+        }
+        final JTerm origGuard = d.origVars.guard;
+        if (origGuard == null) {
+            throw new NullPointerException(
+                "No original guard term for the loop symbolic execution block.");
+        }
+        final JTerm guardPreTrueTerm = d.tb.equals(guardPre, d.tb.TRUE());
+        final JTerm guardPreFalseTerm = d.tb.equals(guardPre, d.tb.FALSE());
+        final JTerm guardPreEqTerm = d.tb.equals(origGuard, guardPre);
         final JTerm bodyTerm = tb.prog(symbExecMod, jb.first, postTerm);
         final JTerm guardTrueBody = d.tb.imp(guardPreTrueTerm, bodyTerm);
         final JTerm guardFalseBody = d.tb.imp(guardPreFalseTerm, postTerm);
@@ -93,7 +104,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
             JTerm paramUpdate = d.tb.elementary(origParamIt.next(), paramIt.next());
             update = tb.parallel(update, paramUpdate);
         }
-        if (vs.post.self != null) {
+        if (vs.post.self != null && vs.pre.self != null && d.origVars.self != null) {
             JTerm selfUpdate = d.tb.elementary(d.origVars.self, vs.pre.self);
             update = tb.parallel(selfUpdate, update);
         }
@@ -102,16 +113,33 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
 
     private Pair<JavaBlock, JavaBlock> buildJavaBlock(BasicSnippetData d) {
         ExecutionContext context = (ExecutionContext) d.get(BasicSnippetData.Key.EXECUTION_CONTEXT);
+        if (context == null) {
+            throw new NullPointerException(
+                "No execution context for the loop symbolic execution block.");
+        }
 
         // create loop call
         LoopSpecification inv = (LoopSpecification) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
+        if (inv == null) {
+            throw new NullPointerException(
+                "No loop invariant for the loop symbolic execution block.");
+        }
         StatementBlock sb = (StatementBlock) inv.getLoop().getBody();
 
+        final JTerm origGuard = d.origVars.guard;
+        if (origGuard == null) {
+            throw new NullPointerException(
+                "No original guard term for the loop symbolic execution block.");
+        }
+        final Expression guardExpr = inv.getLoop().getGuardExpression();
+        if (guardExpr == null) {
+            throw new NullPointerException(
+                "No guard expression for the loop symbolic execution block.");
+        }
         final Assignment guardVarDecl =
-            new BinaryAssignment(COPY, (LocationVariable) d.origVars.guard.op(),
-                inv.getLoop().getGuardExpression());
-        final Statement guardVarMethodFrame = context == null ? guardVarDecl
-                : new MethodFrame(null, context, new StatementBlock(guardVarDecl));
+            new BinaryAssignment(COPY, (LocationVariable) origGuard.op(), guardExpr);
+        final Statement guardVarMethodFrame = new MethodFrame(null, context,
+            new StatementBlock(guardVarDecl));
 
         // create java block
         final JavaBlock guardJb =

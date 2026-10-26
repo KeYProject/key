@@ -150,12 +150,22 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     @Override
     public InformationFlowContract map(UnaryOperator<JTerm> op, Services services) {
         return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
-            op.apply(origPre), op.apply(origFreePre), op.apply(origMby), op.apply(origModifiable),
+            op.apply(origPre), op.apply(origFreePre), mapTerm(op, origMby),
+            op.apply(origModifiable),
             hasRealModifiableClause, origSelf,
-            origParams.stream().map(op).collect(ImmutableList.collector()), op.apply(origResult),
-            op.apply(origExc), op.apply(origAtPre), op.apply(origDep),
+            origParams.stream().map(op).collect(ImmutableList.collector()), mapTerm(op, origResult),
+            mapTerm(op, origExc), op.apply(origAtPre), op.apply(origDep),
             origInfFlowSpecs.stream().map(spec -> spec.map(op)).collect(ImmutableList.collector()),
             toBeSaved, id);
+    }
+
+    /**
+     * Maps a possibly-absent term through the given operator, preserving
+     * {@code null} (a missing clause) instead of invoking the operator on it.
+     * {@link UnaryOperator#apply} does not accept {@code null} arguments.
+     */
+    private static @Nullable JTerm mapTerm(UnaryOperator<JTerm> op, @Nullable JTerm term) {
+        return term == null ? null : op.apply(term);
     }
 
     @Override
@@ -539,7 +549,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                 && origParams.equals(ifc.getParams())
                 && (origResult != null ? origResult.equals(ifc.getResult())
                         : ifc.getResult() == null)
-                && origExc.equals(ifc.getExc()) && origAtPre.equals(ifc.getAtPre())
+                && (origExc != null ? origExc.equals(ifc.getExc()) : ifc.getExc() == null)
+                && origAtPre.equals(ifc.getAtPre())
                 && id == ifc.id() && toBeSaved == ifc.toBeSaved() && origDep.equals(ifc.getDep())
                 && origInfFlowSpecs.equals(ifc.getInfFlowSpecs());
     }
@@ -644,7 +655,15 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
 
+    /**
+     * Deliberately returns {@code null}: information flow contracts do not
+     * track the original variables of a represented functional contract.
+     * The base {@link Contract#getOrigVars()} is not nullness-annotated and
+     * cannot be widened from this module; no information-flow consumer
+     * dereferences the result.
+     */
     @Override
+    @SuppressWarnings("nullness:override.return.invalid")
     public @Nullable OriginalVariables getOrigVars() {
         // TODO Auto-generated method stub
         return null;

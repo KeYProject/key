@@ -56,6 +56,20 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
         }
     }
 
+    /**
+     * Stores the applicable position found for a node in the cache. A
+     * {@code null} {@code applicableAt} deliberately marks "no applicable
+     * position exists for this node"; the cache is only read via
+     * {@link Map#get} guarded by a null check, so a stored {@code null} is
+     * handled by every reader. The {@code Map} is not nullness-annotated in
+     * key.core, which cannot be changed from this module.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private static void cacheApplicablePosition(Map<Node, PosInOccurrence> cache, Node node,
+            @Nullable PosInOccurrence applicableAt) {
+        cache.put(node, applicableAt);
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -100,7 +114,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                                 PosInTerm.getTopLevel());
                         PosInOccurrence applicableAt =
                             getApplicablePosInOcc(proof, goal, searchPos, macro);
-                        applicableOnNodeAtPos.put(goal.node(), applicableAt);
+                        cacheApplicablePosition(applicableOnNodeAtPos, goal.node(), applicableAt);
                     }
                 }
             }
