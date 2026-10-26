@@ -54,7 +54,6 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.*;
 
 import com.github.javaparser.ast.key.KeyTransactionStmt;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
