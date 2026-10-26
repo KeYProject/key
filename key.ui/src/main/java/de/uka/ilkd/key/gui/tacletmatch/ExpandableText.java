@@ -36,6 +36,15 @@ public class ExpandableText extends JPanel {
         this(text, DEFAULT_LIMIT);
     }
 
+    /**
+     * Creates an expandable text display.
+     *
+     * <p>
+     * The display styles itself and sets up the expand toggle while the receiver is still under
+     * initialization (EISOP initialization check); the layout and content only materialize once
+     * the display is shown after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ExpandableText(@Nullable String text, int limit) {
         this.full = text == null ? "" : text;
         this.limit = limit;

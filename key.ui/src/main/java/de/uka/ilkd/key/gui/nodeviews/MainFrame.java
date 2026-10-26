@@ -34,6 +34,17 @@ public final class MainFrame extends JPanel {
     private @Nullable SequentView sequentView;
     private boolean showTacletInfo = false;
 
+    /**
+     * Sets the sequent view displayed in this frame.
+     *
+     * @param component the view to display, or {@code null} to clear the frame.
+     *
+     *         <p>
+     *         Clearing the frame passes {@code null} to {@link JScrollPane#setViewportView},
+     *         which clears the viewport at run time; the JDK declares a non-null argument, so
+     *         the deliberate {@code null} is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public void setSequentView(@Nullable SequentView component) {
         SequentView oldSequentView = sequentView;
         sequentView = component;
@@ -44,7 +55,8 @@ public final class MainFrame extends JPanel {
 
             setShowTacletInfo(showTacletInfo);
         } else {
-            scrollPane.setViewportView(component);
+            // passing null clears the viewport, which renders an empty scroll pane
+            scrollPane.setViewportView((Component) null);
         }
 
         if (oldSequentView != null) {

@@ -35,6 +35,15 @@ public class ResponsiveSplit extends JPanel {
     /** current layout (null until first laid out): true = split, false = tabs */
     private @Nullable Boolean wide;
 
+    /**
+     * Creates a responsive split view.
+     *
+     * <p>
+     * The view registers its resize listener and lays out its initial state while the receiver is
+     * still under initialization (EISOP initialization check); the layout only materializes once
+     * the view is shown after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ResponsiveSplit(JComponent left, String leftTitle, JComponent right, String rightTitle) {
         super(new BorderLayout());
         this.left = left;

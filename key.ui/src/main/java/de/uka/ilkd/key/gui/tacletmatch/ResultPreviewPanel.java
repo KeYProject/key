@@ -41,6 +41,15 @@ public class ResultPreviewPanel extends JPanel {
     private final JPanel body = new JPanel();
     private @Nullable Timer debounce;
 
+    /**
+     * Creates the result preview panel.
+     *
+     * <p>
+     * The panel styles itself and computes the initial preview while the receiver is still under
+     * initialization (EISOP initialization check); the layout and preview only materialize once
+     * the panel is shown after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ResultPreviewPanel(TacletInstantiationModel model, KeYMediator mediator, Goal goal) {
         this.model = model;
         this.mediator = mediator;
@@ -201,7 +210,12 @@ public class ResultPreviewPanel extends JPanel {
         p.setOpaque(false);
         JLabel m = new JLabel(marker);
         m.setForeground(color);
-        m.setFont(m.getFont().deriveFont(Font.BOLD));
+        Font font = m.getFont();
+        if (font == null) {
+            // a realized label always carries a font
+            throw new NullPointerException("No label font available.");
+        }
+        m.setFont(font.deriveFont(Font.BOLD));
         m.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 0));
         p.add(m, BorderLayout.WEST);
         p.add(new ExpandableText(TmPrint.term(mediator, f.formula())), BorderLayout.CENTER);

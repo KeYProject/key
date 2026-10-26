@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.fonticons;
 
 import java.awt.*;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -93,7 +94,11 @@ public enum Entypo implements IconFont {
     }
 
     public Font getFont() throws IOException, FontFormatException {
-        return Font.createFont(Font.TRUETYPE_FONT,
-            Entypo.class.getResourceAsStream("/fonts/entypo.ttf"));
+        InputStream stream = Entypo.class.getResourceAsStream("/fonts/entypo.ttf");
+        if (stream == null) {
+            // the font is bundled with the application
+            throw new NullPointerException("Missing font resource /fonts/entypo.ttf");
+        }
+        return Font.createFont(Font.TRUETYPE_FONT, stream);
     }
 }

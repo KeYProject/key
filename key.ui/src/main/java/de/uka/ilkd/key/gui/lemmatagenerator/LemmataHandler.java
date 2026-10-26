@@ -65,8 +65,18 @@ public class LemmataHandler implements TacletFilter {
         println(options.toString());
 
         Path file = options.getPathOfRuleFile();
+        if (file == null) {
+            // generating lemmas requires a rule file; fail explicitly instead of crashing later
+            throw new IOException("No rule file configured (--jr-rules).");
+        }
         Collection<Path> filesForAxioms = createFilesForAxioms(options.getFilesForAxioms());
 
+        /*
+         * The lemma generation runs as a batch job without interactive progress display, so no
+         * progress monitor is passed; the initializer declares a non-null monitor while the
+         * batch mode accepts a null monitor for quiet operation, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:argument.type.incompatible")
         final ProblemInitializer problemInitializer =
             new ProblemInitializer(null, new Services(profile), new Listener());
 

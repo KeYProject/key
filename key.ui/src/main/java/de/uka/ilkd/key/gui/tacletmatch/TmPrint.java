@@ -63,6 +63,10 @@ final class TmPrint {
      */
     static Positioned termWithPositions(KeYMediator mediator, Term t) {
         Services services = mediator.getServices();
+        if (services == null) {
+            // the mediator always carries services when a term is displayed
+            throw new NullPointerException("No services available.");
+        }
         NotationInfo ni = new NotationInfo();
         SequentViewLogicPrinter p =
             SequentViewLogicPrinter.positionPrinter(ni, services, NO_LABELS);
@@ -89,11 +93,25 @@ final class TmPrint {
         if (o instanceof Term t) {
             return term(mediator, t);
         }
-        return ProofSaver.printAnything(o, mediator.getServices());
+        Services services = mediator.getServices();
+        if (services == null) {
+            // the mediator always carries services when an instantiation is displayed
+            throw new NullPointerException("No services available.");
+        }
+        String printed = ProofSaver.printAnything(o, services);
+        if (printed == null) {
+            // the default printer always renders representable objects
+            throw new NullPointerException("No printable representation available.");
+        }
+        return printed;
     }
 
     private static SequentViewLogicPrinter printer(KeYMediator mediator) {
         Services services = mediator.getServices();
+        if (services == null) {
+            // the mediator always carries services when a term is displayed
+            throw new NullPointerException("No services available.");
+        }
         NotationInfo ni = new NotationInfo();
         SequentViewLogicPrinter p = SequentViewLogicPrinter.purePrinter(ni, services, NO_LABELS);
         ni.refresh(services, mediator.getNotationInfo().isPrettySyntax(), false, false);

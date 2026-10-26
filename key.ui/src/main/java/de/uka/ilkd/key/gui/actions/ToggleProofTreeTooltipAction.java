@@ -33,6 +33,12 @@ public class ToggleProofTreeTooltipAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      */
+    /**
+     * The action-configuration calls and the listener registration below operate on {@code this}
+     * while the receiver is still under initialization (EISOP initialization check); safe here
+     * since these configure the local action only, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ToggleProofTreeTooltipAction(MainWindow mainWindow) {
         super(mainWindow);
         setName(NAME);

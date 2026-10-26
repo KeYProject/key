@@ -64,8 +64,20 @@ public class TacletMatchDialog extends ApplyTacletDialog {
     private @Nullable JTabbedPane alternatives;
 
     /** single-line footer status (icon + message) */
-    private JLabel statusLabel;
+    private @Nullable JLabel statusLabel;
 
+    /**
+     * Creates the taclet match dialog.
+     *
+     * <p>
+     * The dialog names, lays out, packs and positions itself while the receiver is still under
+     * initialization (EISOP initialization check), and passes the under-construction receiver
+     * to the main window's preference loader; the settings only take effect once the dialog is
+     * shown at the end of construction, suppressed with scoped keys. The status label is
+     * created lazily by {@link #createFooter()} and guarded on every read.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public TacletMatchDialog(MainWindow parent, TacletInstantiationModel[] model, Goal goal,
             KeYMediator mediator) {
         super(parent, model, mediator);
@@ -146,6 +158,10 @@ public class TacletMatchDialog extends ApplyTacletDialog {
     /** the usable bounds (minus taskbar/menubar insets) of the screen the main window is on. */
     private static Rectangle usableScreen(Window on) {
         GraphicsConfiguration gc = on.getGraphicsConfiguration();
+        if (gc == null) {
+            // a visible window always has a graphics configuration
+            throw new NullPointerException("No graphics configuration available.");
+        }
         Rectangle b = gc.getBounds();
         Insets in = Toolkit.getDefaultToolkit().getScreenInsets(gc);
         return new Rectangle(b.x + in.left, b.y + in.top,
@@ -292,6 +308,17 @@ public class TacletMatchDialog extends ApplyTacletDialog {
         }
     }
 
+    /**
+     * Sets the status line of the dialog.
+     *
+     * @param s the status text, or {@code null}/{@code empty} to clear the status.
+     *
+     *         <p>
+     *         Clearing the status also removes the icon, which is what the JDK's
+     *         {@link JLabel#setIcon(Icon)} reports as a {@code null} argument; a cleared icon is
+     *         deliberate, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     protected void setStatus(String s) {
         if (statusLabel == null) {

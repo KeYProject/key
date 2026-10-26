@@ -13,6 +13,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.OneStepSimplifier.Protocol;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 
+import org.key_project.prover.sequent.PosInOccurrence;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -20,7 +22,8 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 class GUIProofTreeNode extends GUIAbstractTreeNode {
 
-    private @Nullable GUIAbstractTreeNode[] children;
+    /** Children of this node; {@code null} until they have been computed. */
+    private GUIAbstractTreeNode @Nullable [] children;
 
     public GUIProofTreeNode(GUIProofTreeModel tree, Node node) {
         super(tree, node);
@@ -28,26 +31,48 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
 
     public TreeNode getChildAt(int childIndex) {
         ensureChildrenArray();
-        return children[childIndex];
+        GUIAbstractTreeNode[] childArray = children;
+        if (childArray == null) {
+            // ensureChildrenArray always establishes the children array
+            throw new NullPointerException("No children array available.");
+        }
+        return childArray[childIndex];
     }
 
     public int getChildCount() {
         ensureChildrenArray();
-        return children.length;
+        GUIAbstractTreeNode[] childArray = children;
+        if (childArray == null) {
+            // ensureChildrenArray always establishes the children array
+            throw new NullPointerException("No children array available.");
+        }
+        return childArray.length;
     }
 
+    /**
+     * Returns the parent of this node.
+     *
+     * <p>
+     * The JDK declares a non-null return, although a node whose wrapped proof node was collected
+     * reports {@code null}; the swing tree only ever holds live nodes, so this is not reached on
+     * the happy path, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     @Override
-    public @Nullable TreeNode getParent() {
-        if (parent != null) {
-            return parent;
+    public TreeNode getParent() {
+        TreeNode parentNode = parent;
+        if (parentNode != null) {
+            return parentNode;
         }
         // more complicated general case
         Node n = getNode();
         if (n == null) {
-            return null;
+            return (TreeNode) null;
         }
-        while (n.parent() != null && findChild(n.parent()) != null) {
-            n = n.parent();
+        Node next = n.parent();
+        while (next != null && findChild(next) != null) {
+            n = next;
+            next = n.parent();
         }
         return findBranch(n);
     }
@@ -81,12 +106,18 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
                     && node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp ruleApp) {
                 Protocol protocol = ruleApp.getProtocol();
                 if (protocol != null) {
-                    children = new GUIAbstractTreeNode[protocol.size()];
-                    for (int i = 0; i < children.length; i++) {
-                        children[i] =
+                    PosInOccurrence pio = ruleApp.posInOccurrence();
+                    if (pio == null) {
+                        // a one-step-simplification rule app always carries its position
+                        throw new NullPointerException("No position in occurrence available.");
+                    }
+                    GUIAbstractTreeNode[] childArray = new GUIAbstractTreeNode[protocol.size()];
+                    children = childArray;
+                    for (int i = 0; i < childArray.length; i++) {
+                        childArray[i] =
                             new GUIOneStepChildTreeNode(getProofTreeModel(), this, protocol.get(i),
-                                node.sequent().formulaNumberInSequent(ruleApp.posInOccurrence()));
-                        children[i].setParent(this);
+                                node.sequent().formulaNumberInSequent(pio));
+                        childArray[i].setParent(this);
                     }
                     return;
                 }

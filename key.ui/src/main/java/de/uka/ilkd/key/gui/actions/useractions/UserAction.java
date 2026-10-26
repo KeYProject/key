@@ -11,6 +11,7 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.proof.Proof;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Abstract concept of an action performed by the user.
@@ -65,7 +66,7 @@ public abstract class UserAction extends KeyAction {
     public abstract boolean canUndo();
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(@Nullable ActionEvent e) {
         mediator.fireActionPerformed(this);
         apply();
     }

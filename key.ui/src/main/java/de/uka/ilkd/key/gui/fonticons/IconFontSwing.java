@@ -43,12 +43,14 @@ public final class IconFontSwing {
     }
 
     /**
+     * Builds a rotated variant of the given image.
      *
-     * @param iconCode
-     * @param size
-     * @param color
-     * @return
+     * <p>
+     * Drawing without an image observer only affects asynchronous image loading, which is
+     * irrelevant for the already-rendered icon image; the checker's swing model declares a
+     * non-null observer, so the deliberate {@code null} is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static Image buildImage(IconFont iconCode, float size, Color color, double rotation) {
         Image img = buildImage(iconCode, size, color);
         BufferedImage newImage =

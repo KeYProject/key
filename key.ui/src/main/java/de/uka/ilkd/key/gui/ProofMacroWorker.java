@@ -81,7 +81,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
      * was
      * cancelled before it started). Used to release the automode re-entrancy guard.
      */
-    private Runnable onTerminated;
+    private @Nullable Runnable onTerminated;
 
     /**
      * Instantiates a new proof macro worker.
@@ -145,7 +145,12 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
             signalTerminated();
         }
 
-        return info;
+        ProofMacroFinishedInfo result = info;
+        if (result == null) {
+            // every macro either returns a result or throws before this point
+            throw new IllegalStateException("No proof macro result available.");
+        }
+        return result;
     }
 
     @Override
@@ -157,13 +162,17 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
     protected void done() {
         synchronized (macro) {
             mediator.removeInterruptedListener(this);
-            if (!isCancelled() && exception != null) { // user cancelled task is fine, we do not
-                                                       // report this
+            Exception macroException = exception;
+            if (!isCancelled() && macroException != null) { // user cancelled task is fine, we do
+                                                            // not report this
                 // This should actually never happen.
-                LOGGER.error("", exception);
-                IssueDialog.showExceptionDialog(MainWindow.getInstance(), exception);
+                LOGGER.error("", macroException);
+                IssueDialog.showExceptionDialog(MainWindow.getInstance(), macroException);
             }
-            mediator.getUI().taskFinished(info);
+            ProofMacroFinishedInfo macroInfo = info;
+            if (macroInfo != null) {
+                mediator.getUI().taskFinished(macroInfo);
+            }
 
             mediator.setInteractive(true);
             mediator.startInterface(true);
@@ -179,6 +188,22 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
         }
     }
 
+    /**
+     * Notifies the registered listeners about a finished macro.
+     *
+     * @param node the node the macro was started at
+     * @param macro the executed macro
+     * @param posInOcc the position the macro was started at, or {@code null} when no subterm was
+     *        selected
+     * @param info the macro result, or {@code null} when the macro was interrupted before
+     *        producing one
+     *
+     *         <p>
+     *         The listeners ignore the position and result of an interrupted macro, so the
+     *         deliberate {@code null}s are passed on although the interface declares non-null
+     *         parameters, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     protected void emitProofMacroFinished(Node node, ProofMacro macro,
             @Nullable PosInOccurrence posInOcc,
             @Nullable ProofMacroFinishedInfo info) {
@@ -199,6 +224,10 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
      */
     private void selectOpenGoalBelow() {
         Node selectedNode = mediator.getSelectedNode();
+        if (selectedNode == null) {
+            // only select a goal when a node is actually selected
+            return;
+        }
         for (Goal g : selectedNode.proof().openEnabledGoals()) {
             Node n = g.node();
             while (n != null) {

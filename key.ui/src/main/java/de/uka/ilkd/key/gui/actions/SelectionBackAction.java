@@ -33,6 +33,11 @@ public class SelectionBackAction extends MainWindowAction
      * @param mainWindow the main window
      * @param history selection history
      */
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SelectionBackAction(MainWindow mainWindow, SelectionHistory history) {
         super(mainWindow);
         this.history = history;

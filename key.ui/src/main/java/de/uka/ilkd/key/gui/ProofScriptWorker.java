@@ -53,6 +53,17 @@ public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScript
         "Running Script ...", ModalityType.MODELESS);
     private final JTextArea logArea = new JTextArea();
 
+    /**
+     * Forwards engine messages to the SwingWorker publish channel.
+     *
+     * <p>
+     * The observer is only handed to the engine after construction (via
+     * {@link ProofScriptEngine#setCommandMonitor(Consumer)} inside {@link #doInBackground()}), so
+     * it never fires while the worker is still under initialization; the EISOP initialization
+     * check nevertheless analyzes the field initializer's method reference under initialization,
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:methodref.receiver.bound.invalid")
     private final Consumer<ProofScriptEngine.Message> observer = this::publish;
 
     /**
@@ -82,7 +93,12 @@ public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScript
     @Override
     protected @Nullable Object doInBackground() throws Exception {
         try {
-            engine = new ProofScriptEngine(mediator.getSelectedProof());
+            Proof proof = mediator.getSelectedProof();
+            if (proof == null) {
+                // executing a script requires an open proof
+                throw new NullPointerException("No proof selected.");
+            }
+            engine = new ProofScriptEngine(proof);
             engine.setInitiallySelectedGoal(initiallySelectedGoal);
             engine.setCommandMonitor(observer);
             engine.execute(mediator.getUI(), script);
@@ -110,6 +126,15 @@ public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScript
         monitor.setLocationRelativeTo(MainWindow.getInstance());
     }
 
+    /**
+     * Appends the chunks produced by the script engine to the log area.
+     *
+     * <p>
+     * Inserting without special attributes passes {@code null} as the attribute set, which the
+     * document treats as "use the current attributes"; the JDK declares a non-null parameter, so
+     * the deliberate {@code null} is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     protected void process(List<ProofScriptEngine.Message> chunks) {
         Document doc = logArea.getDocument();
@@ -141,9 +166,13 @@ public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScript
      * initiate the GUI stuff and relay to superclass
      */
     public void init() {
-        mediator.initiateAutoMode(initiallySelectedGoal != null ? initiallySelectedGoal.proof()
-                : mediator.getSelectedProof(),
-            true, false);
+        Proof proof = initiallySelectedGoal != null ? initiallySelectedGoal.proof()
+                : mediator.getSelectedProof();
+        if (proof == null) {
+            // the auto mode requires the proof it is started on
+            throw new NullPointerException("No proof selected.");
+        }
+        mediator.initiateAutoMode(proof, true, false);
         mediator.addInterruptedListener(this);
         makeDialog();
         monitor.setVisible(true);
@@ -169,6 +198,10 @@ public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScript
 
         final Proof proof = initiallySelectedGoal != null ? initiallySelectedGoal.proof()
                 : mediator.getSelectedProof();
+        if (proof == null) {
+            // the mode is finished on the proof it was started on
+            throw new NullPointerException("No proof selected.");
+        }
         mediator.finishAutoMode(proof, true, true, this::selectGoalOrNode);
     }
 

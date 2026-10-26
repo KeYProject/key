@@ -20,6 +20,9 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.prover.impl.AutoProvers;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -69,7 +72,7 @@ public class MediatorProofControl extends AbstractProofControl {
      */
     @Override
     public boolean selectedTaclet(Taclet taclet, Goal goal,
-            PosInOccurrence pos) {
+            @Nullable PosInOccurrence pos) {
         boolean result = super.selectedTaclet(taclet, goal, pos);
         if (!result) {
             ui.notify(new GeneralFailureEvent("Taclet application failed." + taclet.name()));
@@ -91,7 +94,8 @@ public class MediatorProofControl extends AbstractProofControl {
      * {@inheritDoc}
      */
     @Override
-    public void startAutoMode(Proof proof, ImmutableList<Goal> goals, ProverTaskListener ptl) {
+    public void startAutoMode(Proof proof, ImmutableList<Goal> goals,
+            @Nullable ProverTaskListener ptl) {
         if (proof.isErroneous()) {
             // The proof was marked erroneous by a failing essential proof listener; it may be
             // inconsistent, so refuse a new run. Saving the proof for a later reload is still fine.
@@ -107,9 +111,10 @@ public class MediatorProofControl extends AbstractProofControl {
         if (!autoModeActive.compareAndSet(false, true)) {
             return; // a run is still active or winding down; do not overlap it
         }
-        worker = new AutoModeWorker(proof, goals, ptl);
+        AutoModeWorker newWorker = new AutoModeWorker(proof, goals, ptl);
+        worker = newWorker;
         ui.getMediator().initiateAutoMode(proof, true, false);
-        worker.execute();
+        newWorker.execute();
     }
 
     /**
@@ -200,17 +205,26 @@ public class MediatorProofControl extends AbstractProofControl {
             // selected -- single-core or multi-core. Historically this was hardcoded to
             // ApplyStrategy
             // only because no alternative engine existed.
+            InitConfig initConfig = proof.getInitConfig();
+            if (initConfig == null) {
+                // legacy proofs may lack an init config; in that state the previous code crashed
+                // with an NPE here
+                throw new NullPointerException("Proof has no init config for auto mode.");
+            }
+            Profile profile = initConfig.getProfile();
+            if (profile == null) {
+                throw new NullPointerException("Proof has no profile for auto mode.");
+            }
             this.applyStrategy = AutoProvers.create(
-                proof.getInitConfig().getProfile().<Proof, Goal>getSelectedGoalChooserBuilder()
-                        .create(),
-                proof.getInitConfig().getProfile());
+                profile.<Proof, Goal>getSelectedGoalChooserBuilder().create(), profile);
             if (ptl != null) {
                 applyStrategy.addProverTaskObserver(ptl);
             }
             applyStrategy.addProverTaskObserver(getDefaultProverTaskListener());
 
-            if (ui.getMediator().getAutoSaver() != null) {
-                applyStrategy.addProverTaskObserver(ui.getMediator().getAutoSaver());
+            AutoSaver saver = ui.getMediator().getAutoSaver();
+            if (saver != null) {
+                applyStrategy.addProverTaskObserver(saver);
             }
         }
 
@@ -243,9 +257,11 @@ public class MediatorProofControl extends AbstractProofControl {
                 // finished (the prover holds its own monitor for the whole run); this guard just
                 // avoids an EDT NullPointerException in the narrow assignment race.
                 if (info != null) {
-                    emitInteractiveAutoMode(initialGoals, proof, info);
-                    if (info.getException() != null) {
-                        notifyException(info.getException());
+                    ProofSearchInformation<Proof, Goal> runInfo = info;
+                    emitInteractiveAutoMode(initialGoals, proof, runInfo);
+                    Throwable runException = runInfo.getException();
+                    if (runException != null) {
+                        notifyException(runException);
                     }
                 }
             }

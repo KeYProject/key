@@ -17,8 +17,15 @@ public class ExtensionSettings extends AbstractPropertiesSettings {
     private static final String NAME = "Extensions";
     public static final String KEY_DISABLED = "disabled";
     /**
-     * Class names of disabled extensions.
+     * Creates the extension settings.
+     *
+     * <p>
+     * The disabled-extension property entry is created while the receiver is still under
+     * initialization (EISOP initialization check); the receiver is a settings {@code PropertyEntry}
+     * container and the entry is required for the settings to work at all, suppressed with a
+     * scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private final PropertyEntry<Set<String>> forbiddenClasses =
         createStringSetProperty(KEY_DISABLED, "");
 

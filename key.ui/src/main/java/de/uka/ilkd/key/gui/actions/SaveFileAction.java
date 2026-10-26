@@ -23,6 +23,14 @@ public final class SaveFileAction extends MainWindowAction {
      */
     private static final long serialVersionUID = -5479654127272775831L;
 
+    /**
+     * The action-configuration calls and the {@code enableWhenProofLoaded(this)} registration
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since the listener only reacts to later selection events,
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public SaveFileAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Save...");
@@ -35,6 +43,11 @@ public final class SaveFileAction extends MainWindowAction {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             // Try to save back to file where proof was initially loaded from
             final Proof selectedProof = mainWindow.getMediator().getSelectedProof();
+            if (selectedProof == null) {
+                // A proof is ensured to be loaded above; a {@code null} here is a concurrent
+                // state change, crash-equivalent to the previous NPE in the saver.
+                throw new NullPointerException("No proof loaded to save.");
+            }
             mainWindow.getUserInterface().saveProof(selectedProof, ".proof");
         } else {
             mainWindow.popupWarning("No proof.", "Oops...");

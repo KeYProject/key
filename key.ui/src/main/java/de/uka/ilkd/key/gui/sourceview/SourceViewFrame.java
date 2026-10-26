@@ -41,7 +41,13 @@ public class SourceViewFrame extends JSplitPane {
      * Creates a new {@code SourceViewFrame}
      *
      * @param mainWindow the main window.
+     *
+     *         <p>
+     *         The ctor configures the split pane while the receiver is still under initialization
+     *         (EISOP initialization check); all configuration is finished before the frame is
+     *         shown, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SourceViewFrame(MainWindow mainWindow) {
         super(VERTICAL_SPLIT);
 
@@ -120,7 +126,9 @@ public class SourceViewFrame extends JSplitPane {
         tabbedPane.setTabComponentAt(tabbedPane.indexOfComponent(component),
             new ClosableTabComponent(component.getName(), closeAction));
 
-        tabbedPane.setToolTipTextAt(tabbedPane.indexOfComponent(component), toolTipText);
+        if (toolTipText != null) {
+            tabbedPane.setToolTipTextAt(tabbedPane.indexOfComponent(component), toolTipText);
+        }
 
         if (!tabbedPaneShown) {
             showTabbedPane();

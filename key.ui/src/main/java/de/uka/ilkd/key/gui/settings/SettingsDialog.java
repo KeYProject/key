@@ -38,6 +38,14 @@ public class SettingsDialog extends JDialog {
     private final Action actionApply = new ApplyAction();
     private List<SettingsProvider> providers;
 
+    /**
+     * The ctor lays out the dialog and creates its UI while the receiver is still under
+     * initialization (EISOP initialization check); the providers are set later via
+     * {@link #setSettingsProvider(List)} before the dialog is shown, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid", "nullness:assignment.type.incompatible",
+        "nullness:argument.type.incompatible" })
     public SettingsDialog(MainWindow owner) {
         super(owner, Dialog.ModalityType.TOOLKIT_MODAL);
         setTitle("Settings");
@@ -113,6 +121,12 @@ public class SettingsDialog extends JDialog {
     private class CancelAction extends KeyAction {
         private static final long serialVersionUID = -7590820300477946158L;
 
+        /**
+         * The action-configuration setters are called on {@code this} while the receiver is still
+         * under initialization (EISOP initialization check); safe here, suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public CancelAction() {
             setName("Cancel");
         }
@@ -126,6 +140,12 @@ public class SettingsDialog extends JDialog {
     private class AcceptAction extends KeyAction {
         private static final long serialVersionUID = -4975054687458772222L;
 
+        /**
+         * The action-configuration setters are called on {@code this} while the receiver is still
+         * under initialization (EISOP initialization check); safe here, suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public AcceptAction() {
             setName("OK");
         }
@@ -139,6 +159,12 @@ public class SettingsDialog extends JDialog {
     private class ApplyAction extends KeyAction {
         private static final long serialVersionUID = 3732950785908678379L;
 
+        /**
+         * The action-configuration setters are called on {@code this} while the receiver is still
+         * under initialization (EISOP initialization check); safe here, suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public ApplyAction() {
             setName("Apply");
         }

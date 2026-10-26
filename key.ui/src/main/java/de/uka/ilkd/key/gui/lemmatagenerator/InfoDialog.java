@@ -30,17 +30,30 @@ public class InfoDialog {
     }
 
     public boolean showThisDialogNextTime() {
-        return !showAgainBox.isSelected();
+        JCheckBox box = showAgainBox;
+        if (box == null) {
+            // only asked after the dialog was actually shown
+            throw new NullPointerException("No show-again checkbox available.");
+        }
+        return !box.isSelected();
     }
 
     private Box getBox() {
-        if (box == null) {
-            box = Box.createVerticalBox();
-            box.add(getInfoText());
-            box.add(getShowAgainBox());
-            getInfoText().setBackground(box.getBackground());
+        Box result = box;
+        if (result == null) {
+            Box created = Box.createVerticalBox();
+            if (created == null) {
+                // a newly created vertical box is never null
+                throw new NullPointerException("No vertical box available.");
+            }
+            created.add(getInfoText());
+            created.add(getShowAgainBox());
+            JTextPane text = getInfoText();
+            text.setBackground(created.getBackground());
+            box = created;
+            result = created;
         }
-        return box;
+        return result;
     }
 
     private JTextPane getInfoText() {

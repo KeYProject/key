@@ -107,8 +107,17 @@ public class KeYMediator {
 
     /**
      * creates the KeYMediator with a reference to the application's main frame and the current
-     * proof settings
+     * proof settings.
+     * <p>
+     * The {@link KeYSelectionModel} constructor is called on {@code this} while the receiver is
+     * still under initialization (EISOP initialization check); safe here since the given
+     * {@code ui} is a fully-constructed parameter and {@code keySelectionModel} is assigned
+     * before the listener registration below. The {@link #registerProofLoadListener} call also
+     * operates on {@code this} before construction has finished, but the registered listener only
+     * ever fires after construction completes, suppressed with scoped keys.
      */
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:assignment.type.incompatible", "nullness:method.invocation.invalid" })
     public KeYMediator(AbstractMediatorUserInterfaceControl ui) {
         this.ui = ui;
 
@@ -190,6 +199,9 @@ public class KeYMediator {
             final Proof proof = goal.proof();
             finishSetBack(proof);
             Node node = goal.node() == proof.root() ? goal.node() : goal.node().parent();
+            if (node == null) {
+                throw new NullPointerException("Selected goal has no parent node to select.");
+            }
             keySelectionModel.setSelectedNode(node);
         }
     }
@@ -239,11 +251,26 @@ public class KeYMediator {
             newProof.addProofTreeListener(proofTreeListener);
             newProof.addRuleAppListener(proofListener);
         }
-        if (getAutoSaver() != null) {
-            getAutoSaver().setProof(newProof);
+        AutoSaver saver = getAutoSaver();
+        if (saver != null) {
+            setAutoSaverProof(saver, newProof);
         }
 
-        OneStepSimplifier.refreshOSS(newProof);
+        if (newProof != null) {
+            OneStepSimplifier.refreshOSS(newProof);
+        }
+    }
+
+    /**
+     * Deliberate null: passing a null proof detaches the auto-saver when the current proof is
+     * closed. The legacy {@link AutoSaver#setProof} parameter is annotated {@code @NonNull}, but
+     * the field it assigns is {@code @Nullable} and a null field means "no proof to save"; the
+     * {@code @NonNull} is only a caller-side contract this mediator historically violates on the
+     * unload path, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private static void setAutoSaverProof(AutoSaver saver, @Nullable Proof newProof) {
+        saver.setProof(newProof);
     }
 
     /**
@@ -252,8 +279,9 @@ public class KeYMediator {
      * @param steps an int setting the limit
      */
     public void setMaxAutomaticSteps(int steps) {
-        if (getSelectedProof() != null) {
-            getSelectedProof().getSettings().getStrategySettings().setMaxSteps(steps);
+        Proof selectedProof = getSelectedProof();
+        if (selectedProof != null) {
+            selectedProof.getSettings().getStrategySettings().setMaxSteps(steps);
         }
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(steps);
     }
@@ -264,8 +292,9 @@ public class KeYMediator {
      * @return the maximum number of rule applications allowed in automatic mode
      */
     public int getMaxAutomaticSteps() {
-        if (getSelectedProof() != null) {
-            return getSelectedProof().getSettings().getStrategySettings().getMaxSteps();
+        Proof selectedProof = getSelectedProof();
+        if (selectedProof != null) {
+            return selectedProof.getSettings().getStrategySettings().getMaxSteps();
         } else {
             return ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getMaxSteps();
         }
@@ -476,11 +505,12 @@ public class KeYMediator {
      * @param b true iff interactive mode is to be turned on
      */
     public void setInteractive(boolean b) {
-        if (getSelectedProof() != null) {
+        Proof selectedProof = getSelectedProof();
+        if (selectedProof != null) {
             if (b) {
-                getSelectedProof().setRuleAppIndexToInteractiveMode();
+                selectedProof.setRuleAppIndexToInteractiveMode();
             } else {
-                getSelectedProof().setRuleAppIndexToAutoMode();
+                selectedProof.setRuleAppIndexToAutoMode();
             }
         }
     }
@@ -641,7 +671,8 @@ public class KeYMediator {
         @Override
         public void proofClosed(ProofTreeEvent e) {
             Proof p = e.getSource();
-            assert p.name().equals(getSelectedProof().name());
+            Proof selectedProof = getSelectedProof();
+            assert selectedProof != null && p.name().equals(selectedProof.name());
             assert p.closed();
             KeYMediator.this.notify(new ProofClosedNotificationEvent(e.getSource()));
         }
@@ -653,8 +684,16 @@ public class KeYMediator {
         @Override
         public void proofPruned(final ProofTreeEvent e) {
             SwingUtilities.invokeLater(() -> {
-                if (!e.getSource().find(getSelectedNode())) {
-                    keySelectionModel.setSelectedNode(e.getNode());
+                Node selectedNode = getSelectedNode();
+                if (selectedNode == null) {
+                    throw new NullPointerException("No node selected in pruned proof.");
+                }
+                if (!e.getSource().find(selectedNode)) {
+                    Node prunedNode = e.getNode();
+                    if (prunedNode == null) {
+                        throw new NullPointerException("Pruned proof has no node to select.");
+                    }
+                    keySelectionModel.setSelectedNode(prunedNode);
                 }
             });
             OneStepSimplifier.refreshOSS(e.getSource());
@@ -760,8 +799,9 @@ public class KeYMediator {
      * @return the time in ms after which automatic rule application stops
      */
     public long getAutomaticApplicationTimeout() {
-        if (getSelectedProof() != null) {
-            return getSelectedProof().getSettings().getStrategySettings().getTimeout();
+        Proof selectedProof = getSelectedProof();
+        if (selectedProof != null) {
+            return selectedProof.getSettings().getStrategySettings().getTimeout();
         } else {
             return ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getTimeout();
         }
@@ -773,8 +813,9 @@ public class KeYMediator {
      * @param timeout a long specifying the timeout time in ms
      */
     public void setAutomaticApplicationTimeout(long timeout) {
-        if (getSelectedProof() != null) {
-            getSelectedProof().getSettings().getStrategySettings().setTimeout(timeout);
+        Proof selectedProof = getSelectedProof();
+        if (selectedProof != null) {
+            selectedProof.getSettings().getStrategySettings().setTimeout(timeout);
         }
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
     }

@@ -13,6 +13,15 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class ExceptionFailureNotification extends NotificationTask {
 
+    /**
+     * Creates the exception-failure notification task.
+     *
+     * <p>
+     * The task registers its notification action while the receiver is still under initialization
+     * (EISOP initialization check); the action only fires once the task is executed after
+     * construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ExceptionFailureNotification(Frame parentComponent) {
         addNotificationAction(new ExceptionFailureNotificationDialog(parentComponent));
     }

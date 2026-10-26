@@ -16,6 +16,11 @@ public class MenuSendFeedackAction extends MainWindowAction {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The action-configuration setter is called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public MenuSendFeedackAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Send Feedback...");

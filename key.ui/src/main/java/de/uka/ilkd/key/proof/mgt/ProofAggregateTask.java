@@ -48,7 +48,17 @@ public class ProofAggregateTask extends DefaultMutableTreeNode implements TaskTr
     }
 
     public ProofEnvironment getProofEnv() {
-        return proofs[0].proof().getEnv();
+        Proof proof = proofs[0].proof();
+        if (proof == null) {
+            // a task tree always carries a proof for its outermost entry
+            throw new NullPointerException("No proof available for the task.");
+        }
+        ProofEnvironment env = proof.getEnv();
+        if (env == null) {
+            // a proof created by a loader always carries its environment
+            throw new NullPointerException("No proof environment available.");
+        }
+        return env;
     }
 
     public ProofAggregate getProofList() {

@@ -47,6 +47,15 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
     private final ItemFilter<TacletInfo> filterForMovingTaclets =
         itemData -> !itemData.isNotSupported() && !itemData.isAlreadyInUse();
 
+    /**
+     * Creates the taclet selection dialog for the main window.
+     *
+     * <p>
+     * The dialog configures its title, layout and size while the receiver is still under
+     * initialization (EISOP initialization check); the settings only take effect when the
+     * dialog is shown after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public LemmaSelectionDialog() {
         super(MainWindow.getInstance());
         this.setTitle("Taclet Selection");
@@ -71,11 +80,12 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
     }
 
     private JCheckBox getShowSupported() {
-        if (showSupported == null) {
-            showSupported = new JCheckBox("Show only supported taclets.");
-            showSupported.setSelected(true);
-            showSupported.addActionListener(e -> {
-                if (showSupported.isSelected()) {
+        JCheckBox box = showSupported;
+        if (box == null) {
+            JCheckBox newBox = new JCheckBox("Show only supported taclets.");
+            newBox.setSelected(true);
+            newBox.addActionListener(e -> {
+                if (newBox.isSelected()) {
                     getTacletChooser().addFilter(showOnlySupportedTaclets);
 
                 } else {
@@ -84,8 +94,10 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
                 }
 
             });
+            showSupported = newBox;
+            box = newBox;
         }
-        return showSupported;
+        return box;
     }
 
     private JPanel getButtonPanel() {

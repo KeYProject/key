@@ -34,6 +34,11 @@ public class ExitMainAction extends MainWindowAction {
      */
     private static final long serialVersionUID = 5881706859613947592L;
 
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ExitMainAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Exit");

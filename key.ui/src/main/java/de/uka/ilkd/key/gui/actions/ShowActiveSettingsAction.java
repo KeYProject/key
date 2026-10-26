@@ -15,6 +15,7 @@ import javax.swing.tree.TreePath;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.smt.OptionContentNode;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 
@@ -25,6 +26,11 @@ import org.jspecify.annotations.NullMarked;
  */
 @NullMarked
 public class ShowActiveSettingsAction extends MainWindowAction {
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ShowActiveSettingsAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Show All Active Settings");
@@ -37,9 +43,10 @@ public class ShowActiveSettingsAction extends MainWindowAction {
     }
 
     private ViewSettingsDialog showDialog() {
-        ProofSettings settings =
-            (getMediator().getSelectedProof() == null) ? null
-                    : getMediator().getSelectedProof().getSettings();
+        Proof selectedProof = getMediator().getSelectedProof();
+        // {@code settings} may be {@code null} when no proof is loaded; the tree model handles a
+        // {@code null} proof settings object (see {@link SettingsTreeModel#generateTree()}).
+        ProofSettings settings = selectedProof == null ? null : selectedProof.getSettings();
         SettingsTreeModel model =
             new SettingsTreeModel(settings, ProofIndependentSettings.DEFAULT_INSTANCE);
         ViewSettingsDialog dialog = new ViewSettingsDialog(model, model.getStartComponent());
@@ -53,6 +60,9 @@ public class ShowActiveSettingsAction extends MainWindowAction {
         ViewSettingsDialog dialog = showDialog();
         SettingsTreeModel model = (SettingsTreeModel) dialog.optionTree.getModel();
         var item = model.getTacletOptionsItem();
+        if (item == null) {
+            throw new NullPointerException("Taclet options item is not part of the settings tree.");
+        }
         dialog.optionTree.setSelectionPath(new TreePath(item.getPath()));
     }
 
@@ -62,6 +72,13 @@ public class ShowActiveSettingsAction extends MainWindowAction {
     private class ViewSettingsDialog extends JDialog {
         private final JTree optionTree = new JTree();
 
+        /**
+         * The {@code JDialog} configuration calls below operate on {@code this} while the receiver
+         * is still under initialization (EISOP initialization check); safe here because the
+         * dialog is only shown after construction completes ({@link #setVisible(boolean)} is
+         * called by the caller), suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public ViewSettingsDialog(TreeModel model, JComponent startComponent) {
             super(mainWindow);
 
@@ -88,7 +105,11 @@ public class ShowActiveSettingsAction extends MainWindowAction {
             cp.add(announce, BorderLayout.NORTH);
             optionTree.setModel(model);
 
-            optionTree.getParent().setMinimumSize(optionTree.getPreferredSize());
+            Container parent = optionTree.getParent();
+            if (parent == null) {
+                throw new NullPointerException("Option tree is not attached to a container.");
+            }
+            parent.setMinimumSize(optionTree.getPreferredSize());
             cp.setPreferredSize(computePreferredSize(model, optionTree));
             this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
             setIconImage(IconFactory.keyLogo());

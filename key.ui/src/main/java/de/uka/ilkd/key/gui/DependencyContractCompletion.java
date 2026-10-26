@@ -39,10 +39,21 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
         cApp = cApp.tryToInstantiateContract(services);
 
-        final List<PosInOccurrence> steps = UseDependencyContractRule
-                .getSteps(cApp.getHeapContext(), cApp.posInOccurrence(), goal.sequent(), services);
+        List<LocationVariable> heapContext = cApp.getHeapContext();
+        if (heapContext == null) {
+            // the rule always resolves a heap context for instantiated contract apps
+            throw new NullPointerException("No heap context available.");
+        }
+        PosInOccurrence posInOccurrence = cApp.posInOccurrence();
+        if (posInOccurrence == null) {
+            // an operation-contract rule app always carries a position
+            throw new NullPointerException("No position in occurrence available.");
+        }
+
+        final List<PosInOccurrence> steps = UseDependencyContractRule.getSteps(heapContext,
+            posInOccurrence, goal.sequent(), services);
         PosInOccurrence step =
-            letUserChooseStep(cApp.getHeapContext(), steps, forced, services);
+            letUserChooseStep(heapContext, steps, forced, services);
         if (step == null) {
             return null;
         }

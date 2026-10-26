@@ -7,6 +7,7 @@ package de.uka.ilkd.key.gui;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import javax.swing.border.Border;
 
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -35,6 +36,13 @@ class MainStatusLine extends JPanel {
     private final JLabel lblStatusText = new JLabel();
     private final JProgressBar progressBar = new JProgressBar();
 
+    /**
+     * The ctor lays out the status line while the receiver is still under initialization (EISOP
+     * initialization check); all components are configured before the line is shown, suppressed
+     * with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     MainStatusLine(String initialText, Font font) {
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
@@ -45,8 +53,11 @@ class MainStatusLine extends JPanel {
 
         lblStatusText.setText(initialText);
         lblStatusText.setIcon(IconFactory.keyLogo(35, 20));
-        lblStatusText.setBorder(BorderFactory.createCompoundBorder(lblStatusText.getBorder(),
-            BorderFactory.createEmptyBorder(0, 10, 0, 0)));
+        Border inside = BorderFactory.createEmptyBorder(0, 10, 0, 0);
+        Border outside = lblStatusText.getBorder();
+        lblStatusText.setBorder(// a label without a border is equivalent to a compound of an
+            // empty border, so render the inner border directly in that case
+            outside == null ? inside : BorderFactory.createCompoundBorder(outside, inside));
 
         // add(Box.createHorizontalGlue());
         add(lblStatusText);

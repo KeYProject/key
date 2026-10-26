@@ -54,6 +54,13 @@ class ItemChooser<T> extends JPanel {
 
     static private final Dimension MAX = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
+    /**
+     * The panel configures its layout, size and content panel while the receiver is still under
+     * initialization (EISOP initialization check) and passes itself to {@link BoxLayout}; the
+     * effects only take place after construction completes, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     ItemChooser(String searchTitle) {
         this.searchTitle = searchTitle;
         this.setMaximumSize(MAX);
@@ -84,15 +91,15 @@ class ItemChooser<T> extends JPanel {
 
     private JPanel getMiddlePanel() {
         if (middlePanel == null) {
-            middlePanel = new JPanel();
-            middlePanel.setLayout(new BoxLayout(middlePanel, BoxLayout.Y_AXIS));
-            middlePanel.add(getLeftButton());
-            middlePanel.add(Box.createVerticalStrut(10));
-            middlePanel.add(getRightButton());
+            JPanel panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            panel.add(getLeftButton());
+            panel.add(Box.createVerticalStrut(10));
+            panel.add(getRightButton());
             Dimension dim = getLeftButton().getPreferredSize();
             dim.height = dim.height + 10 + getRightButton().getPreferredSize().height;
-            middlePanel.setMaximumSize(dim);
-
+            panel.setMaximumSize(dim);
+            middlePanel = panel;
         }
         return middlePanel;
     }
@@ -251,11 +258,19 @@ class SelectionPanel<T> extends JPanel {
         return scrollPane;
     }
 
+    /**
+     * The panel creates its filter, layout, scroll pane, search field and borders while the
+     * receiver is still under initialization (EISOP initialization check) and passes itself to
+     * {@link BoxLayout}; the effects only take place after construction completes, suppressed
+     * with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public SelectionPanel(String title, String searchTitle, Side side,
             List<ItemFilter<T>> filters) {
         this.side = side;
         this.userFilters = filters;
-        createFilter();
+        this.filter = createFilter();
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(getScrollPane());
         this.add(Box.createVerticalStrut(5));
@@ -272,8 +287,8 @@ class SelectionPanel<T> extends JPanel {
 
     private JTextField getTextField() {
         if (textField == null) {
-            textField = new JTextField();
-            textField.getDocument().addDocumentListener(new DocumentListener() {
+            JTextField field = new JTextField();
+            field.getDocument().addDocumentListener(new DocumentListener() {
 
                 @Override
                 public void removeUpdate(DocumentEvent e) {
@@ -286,6 +301,7 @@ class SelectionPanel<T> extends JPanel {
                 @Override
                 public void changedUpdate(DocumentEvent arg0) {}
             });
+            textField = field;
         }
         return textField;
     }
@@ -301,7 +317,12 @@ class SelectionPanel<T> extends JPanel {
     }
 
     private void search() {
-        findPattern = textField.getText().toLowerCase();
+        JTextField field = textField;
+        if (field == null) {
+            // the search field is always created before any document events occur
+            throw new NullPointerException("No search field available.");
+        }
+        findPattern = field.getText().toLowerCase();
         update();
 
     }
@@ -313,8 +334,12 @@ class SelectionPanel<T> extends JPanel {
             setModel(model);
 
         }
-
-        return list;
+        JTable current = list;
+        if (current == null) {
+            // the table is created above and never cleared
+            throw new NullPointerException("No table available.");
+        }
+        return current;
     }
 
     DefaultTableModel getModel() {
@@ -347,8 +372,8 @@ class SelectionPanel<T> extends JPanel {
         getList().getSelectionModel().setSelectionInterval(anchor, lead);
     }
 
-    void createFilter() {
-        filter = new RowFilter<>() {
+    private RowFilter<ItemModel, Integer> createFilter() {
+        return new RowFilter<>() {
 
             @Override
             public boolean include(
@@ -415,6 +440,12 @@ class SelectionPanel<T> extends JPanel {
 class ItemModel extends DefaultTableModel {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The model adds its column while the receiver is still under initialization (EISOP
+     * initialization check); the effect only takes place after construction completes,
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     ItemModel(String columnName) {
         this.addColumn(columnName);
 

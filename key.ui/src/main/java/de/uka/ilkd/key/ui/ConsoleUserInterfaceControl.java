@@ -90,17 +90,31 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      */
     public boolean allProofsSuccessful = true;
 
+    /**
+     * The console UI creates its mediator while the receiver is still under initialization
+     * (EISOP initialization check) and passes itself to the {@link KeYMediator} constructor;
+     * the mediator only observes the UI after construction completes, suppressed with scoped
+     * keys.
+     */
+    @SuppressWarnings({ "nullness:assignment.type.incompatible",
+        "nullness:argument.type.incompatible" })
     public ConsoleUserInterfaceControl(boolean loadOnly) {
         this.mediator = new KeYMediator(this);
         this.loadOnly = loadOnly;
     }
 
-    private void printResults(final int openGoals, TaskFinishedInfo info, final Object result2) {
+    private void printResults(final int openGoals, TaskFinishedInfo info,
+            @Nullable Object result2) {
         LOGGER.info("]"); // end progress bar
         LOGGER.info("[ DONE  ... rule application ]");
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("\n== Proof {} ==", (openGoals > 0 ? "open" : "closed"));
-            final Statistics stat = ((Proof) info.getProof()).getStatistics();
+            Proof proof = (Proof) info.getProof();
+            if (proof == null) {
+                // the statistics are only printed for a loaded proof
+                throw new NullPointerException("No proof for statistics.");
+            }
+            final Statistics stat = proof.getStatistics();
             LOGGER.debug("Proof steps: {}", stat.nodes);
             LOGGER.debug("Branches: {}", stat.branches);
             LOGGER.debug("Automode Time: {} ms", stat.autoModeTimeInMillis);
@@ -121,7 +135,17 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
          */
         assert keyProblemFile != null : "Unexcpected null pointer. Trying to"
             + " save a proof but no corresponding key problem file is " + "available.";
-        allProofsSuccessful &= saveProof(result2, (Proof) info.getProof(), keyProblemFile);
+        Proof proof = (Proof) info.getProof();
+        if (proof == null) {
+            // a proof is always saved once its task has finished
+            throw new NullPointerException("No proof to save.");
+        }
+        Path currentKeyFile = keyProblemFile;
+        if (currentKeyFile == null) {
+            // a proof is only saved when a key problem file was loaded
+            throw new NullPointerException("No key problem file for saving the proof.");
+        }
+        allProofsSuccessful &= saveProof(result2, proof, currentKeyFile);
         /*
          * We "delete" the value of keyProblemFile at this point by assigning null to it. That way
          * we prevent KeY from saving another proof (that belongs to another key problem file) for a
@@ -154,12 +178,14 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             }
         } else if (info.getSource() instanceof ProblemLoader) {
             if (result != null) {
+                String keyProblemFileText =
+                    keyProblemFile == null ? "null" : keyProblemFile.toString();
                 if (result instanceof Throwable thrown) {
-                    LOGGER.error("Loading {} failed:\n{}", keyProblemFile,
+                    LOGGER.error("Loading {} failed:\n{}", keyProblemFileText,
                         formatLoadError(thrown));
                     LOGGER.debug("Exception: ", thrown);
                 } else {
-                    LOGGER.error("Loading {} failed: {}", keyProblemFile, result);
+                    LOGGER.error("Loading {} failed: {}", keyProblemFileText, result);
                 }
                 System.exit(-1);
             }
@@ -240,8 +266,13 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     @Override
     public void registerProofAggregate(ProofAggregate pa) {
         super.registerProofAggregate(pa);
-        mediator.getSelectionModel().setSelectedProof(pa.getFirstProof());
-        proofStack = proofStack.prepend(pa.getFirstProof());
+        Proof firstProof = pa.getFirstProof();
+        if (firstProof == null) {
+            // a registered proof aggregate always contains at least one proof
+            throw new NullPointerException("No first proof in the aggregate.");
+        }
+        mediator.getSelectionModel().setSelectedProof(firstProof);
+        proofStack = proofStack.prepend(firstProof);
     }
 
     void finish(Proof proof) {
@@ -409,7 +440,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
+    public @Nullable IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal,
+            boolean forced) {
         return AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, forced);
     }
 
@@ -429,7 +461,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
      * @param keyProblemFile the key problem file
      * @return true, if successful
      */
-    public static boolean saveProof(Object result, Proof proof, Path keyProblemFile) {
+    public static boolean saveProof(@Nullable Object result, Proof proof, Path keyProblemFile) {
         if (result instanceof Throwable) {
             throw new RuntimeException("Error in batchmode.", (Throwable) result);
         }
@@ -472,7 +504,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
     }
 
     @Override
-    public @Nullable TermLabelVisibilityManager getTermLabelVisibilityManager() {
-        return null;
+    public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+        // the console UI does not maintain visible term labels; an empty manager is returned
+        return new TermLabelVisibilityManager();
     }
 }

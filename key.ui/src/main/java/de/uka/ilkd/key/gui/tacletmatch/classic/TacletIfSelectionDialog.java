@@ -39,10 +39,16 @@ public class TacletIfSelectionDialog extends JPanel {
     private final TacletMatchCompletionDialog owner;
 
     /**
-     * creates a new dialog
+     * Creates the if-selection dialog.
+     *
+     * <p>
+     * The dialog lays out its input panel and shows itself while the receiver is still under
+     * initialization (EISOP initialization check); both only take effect once the dialog is
+     * displayed after construction, suppressed with a scoped key.
      *
      * @param model the model to be displayed
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public TacletIfSelectionDialog(TacletInstantiationModel model,
             TacletMatchCompletionDialog owner) {
 
@@ -77,8 +83,12 @@ public class TacletIfSelectionDialog extends JPanel {
         for (int i = 0; i < model.ifChoiceModelCount(); i++) {
             final JPanel p = new JPanel();
             p.setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
-            JLabel label =
-                new JLabel(ProofSaver.printAnything(model.ifFma(i), model.proof().getServices())) {
+            String ifFmaText = ProofSaver.printAnything(model.ifFma(i), model.proof().getServices());
+            if (ifFmaText == null) {
+                // the default printer always renders representable objects
+                ifFmaText = "";
+            }
+            JLabel label = new JLabel(ifFmaText) {
                     /**
                      *
                      */

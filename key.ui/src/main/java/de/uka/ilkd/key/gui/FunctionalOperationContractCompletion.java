@@ -10,8 +10,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule.Instantiation;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NullMarked;
@@ -34,8 +36,17 @@ public class FunctionalOperationContractCompletion implements InteractiveRuleApp
             }
         }
 
-        Instantiation inst = UseOperationContractRule
-                .computeInstantiation((JTerm) app.posInOccurrence().subTerm(), services);
+        PosInOccurrence pio = app.posInOccurrence();
+        if (pio == null) {
+            // an operation-contract rule app always carries a position
+            throw new NullPointerException("No position in occurrence available.");
+        }
+        Instantiation inst =
+            UseOperationContractRule.computeInstantiation((JTerm) pio.subTerm(), services);
+        if (inst == null) {
+            // the rule always computes an instantiation for the application position
+            throw new NullPointerException("No instantiation available.");
+        }
 
         ImmutableSet<FunctionalOperationContract> contracts =
             UseOperationContractRule.getApplicableContracts(inst, services);
@@ -47,8 +58,13 @@ public class FunctionalOperationContractCompletion implements InteractiveRuleApp
             contractsArr, "Contracts for " + inst.pm().getName(), true);
 
         if (cc.wasSuccessful()) {
-            return ((UseOperationContractRule) app.rule()).createApp(app.posInOccurrence())
-                    .setContract(cc.getContract());
+            Contract contract = cc.getContract();
+            if (contract == null) {
+                // a successful configuration always leaves a selected contract
+                throw new NullPointerException("No contract selected.");
+            }
+            return ((UseOperationContractRule) app.rule())
+                    .createApp(pio).setContract(contract);
         }
         return app;
     }
