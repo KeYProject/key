@@ -236,8 +236,6 @@ class LambdaContract {
     public void $init() {
         super.$init();
         this.cap = 100;
-        super.$init();
-        this.cap = 100;
     }
 
     static private void $clprepare() {
