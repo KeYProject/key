@@ -27,7 +27,6 @@ public class MostSimpleInner {
 
         public void $init() {
             super.$init();
-            super.$init();
         }
     }
 
@@ -55,7 +54,6 @@ public class MostSimpleInner {
     }
 
     public void $init() {
-        super.$init();
         super.$init();
     }
 }
