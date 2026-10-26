@@ -8,11 +8,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.loader.JavaParserFactory;
 import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
+import de.uka.ilkd.key.nparser.NamespaceBuilder;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 
 import com.github.javaparser.ParseResult;
@@ -23,7 +25,6 @@ import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.stmt.LocalClassDeclarationStmt;
-import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -53,11 +54,16 @@ class LambdaReplacerTest {
         try (InputStream in = LambdaReplacerTest.class.getResourceAsStream(FIXTURES + fileName)) {
             String src = new String(in.readAllBytes(), StandardCharsets.UTF_8);
             Services services = new Services(JavaProfile.getDefaultProfile());
-            JavaParserFactory factory = new JavaParserFactory(services);
-            // Resolves JDK types such as java.util.Objects used by the fixtures; once JavaRedux
-            // provides the missing stubs this can be dropped (see PR review thread on
-            // KeyJavaPipelineTest#createPipelineTest).
-            factory.addTypeSolver(new ReflectionTypeSolver());
+            // Register the primitive sorts the boot-stub conversion needs, then activate the
+            // JavaRedux boot stubs so that the JDK types referenced by the fixtures
+            // (java.util.Objects, java.util.function.Predicate, Integer and the
+            // @java.lang.FunctionalInterface marker) resolve through the factory's type solver.
+            NamespaceBuilder nb = new NamespaceBuilder(services.getNamespaces());
+            nb.addSort("boolean").addSort("int").addSort("Seq").addSort("LocSet").addSort("double")
+                    .addSort("float");
+            var js = services.activateJava(null, Collections.emptyList(), null);
+            js.parseSpecialClasses();
+            JavaParserFactory factory = js.getProgramFactory();
             ParseResult<CompilationUnit> result =
                 factory.parseCompilationUnit(new StringReader(src));
             assertThat(result.isSuccessful())
