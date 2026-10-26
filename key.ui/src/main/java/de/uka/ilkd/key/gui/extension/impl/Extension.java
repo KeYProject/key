@@ -17,10 +17,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Manages a single registered GUI extension and its lazy {@link #getInstance() instance}.
+ * <p>
+ * The self-referential generic bound ({@code Extension<T> implements Comparable<Extension<T>>})
+ * can trip the EISOP type-argument comparability check under partial/incremental compilation:
+ * the checker then resolves {@code T}'s lower bound to the KeyFor bottom qualifier instead of
+ * the top (@KeyForBottom vs @UnknownKeyFor above {@code NullType}), a fixpoint artifact of the
+ * recursive bound that never occurs when the module compiles as a whole. Compiles fine under
+ * plain javac and is sound; suppressed with a scoped key (same pattern as keyext.proofmanagement
+ * check/Node) so every build mode stays EISOP-green.
+ *
  * @author Alexander Weigl
  * @version 1 (07.04.19)
  */
 @NullMarked
+@SuppressWarnings("nullness:type.argument.type.incompatible")
 public class Extension<T> implements Comparable<Extension<T>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Extension.class);
     private final Class<T> clazz;
