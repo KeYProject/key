@@ -616,16 +616,23 @@ record JmlDocSanitizer(Set<String> enabledKeys) {
         return toSanitizedString(s.getBuffer());
     }
 
+    /**
+     * Serializes the given JML docs to comment text.
+     * <p>
+     * Parsed {@link JmlDoc}s carry a token range whose begin token holds the whole comment text
+     * at its original source position; the position is emulated so that downstream parse errors
+     * are reported at the right line/column ({@code JMLParserExceptionTest} relies on it).
+     * Content-constructed docs (e.g. created by the lambda contract conversion) have no token
+     * range and can only be emitted flatly.
+     *
+     * @param jmlDocs the JML docs to serialize
+     * @param emulateGlobalPosition whether to pad output lines so tokens keep their source position
+     * @return the sanitized comment text
+     */
     public String asString(NodeList<JmlDoc> jmlDocs, boolean emulateGlobalPosition) {
-        // Parsed JmlDocs carry a token range whose begin token holds the whole comment text
-        // at its original source position; this position is emulated so that downstream
-        // parse errors are reported at the right line/column (JMLParserExceptionTest relies
-        // on it). Content-constructed JmlDocs (e.g. created by the lambda contract
-        // conversion) have no token range and can only be emitted flatly.
         if (jmlDocs.isEmpty())
             return "";
-        if (emulateGlobalPosition && jmlDocs.stream()
-                .allMatch(it -> it.getTokenRange().isPresent())) {
+        if (emulateGlobalPosition && hasTokenRanges(jmlDocs)) {
             final var tokenList = jmlDocs.stream().map(JmlDoc::getTokenRange)
                     .map(it -> it.get().getBegin())
                     .toList();
@@ -637,6 +644,15 @@ record JmlDocSanitizer(Set<String> enabledKeys) {
             s.append(doc.getContent());
         }
         return toSanitizedString(s.getBuffer());
+    }
+
+    /**
+     * Whether every doc carries a token range, i.e. stems from the parser and can be emitted at
+     * its original source position. The guard also protects a mixed list (parsed plus
+     * content-constructed docs) from a missing range.
+     */
+    private static boolean hasTokenRanges(NodeList<JmlDoc> jmlDocs) {
+        return jmlDocs.stream().allMatch(it -> it.getTokenRange().isPresent());
     }
 
     public String toSanitizedString(StringBuilder s) {
