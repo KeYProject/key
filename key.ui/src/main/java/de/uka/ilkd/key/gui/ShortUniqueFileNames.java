@@ -125,11 +125,11 @@ public final class ShortUniqueFileNames {
          *
          * @param path the full path
          *
-         *         <p>
-         *         The substring name is derived by {@link #makeNameLonger()}, which is invoked
-         *         unconditionally and always shortens the name from the full path; the EISOP
-         *         initialization check cannot see the assignment inside the delegated call, so
-         *         both the field and the delegated call are suppressed with scoped keys.
+         *        <p>
+         *        The substring name is derived by {@link #makeNameLonger()}, which is invoked
+         *        unconditionally and always shortens the name from the full path; the EISOP
+         *        initialization check cannot see the assignment inside the delegated call, so
+         *        both the field and the delegated call are suppressed with scoped keys.
          */
         @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
             "nullness:method.invocation.invalid" })

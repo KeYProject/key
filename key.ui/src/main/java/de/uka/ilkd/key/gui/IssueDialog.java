@@ -242,10 +242,10 @@ public final class IssueDialog extends JDialog {
      * @param critical criticality of the issue
      * @param throwable exception to show (may be null)
      *
-     *         <p>
-     *         The dialog configures its close operation and layout while the receiver is still
-     *         under initialization (EISOP initialization check); both only take effect once the
-     *         dialog is shown after construction, suppressed with a scoped key.
+     *        <p>
+     *        The dialog configures its close operation and layout while the receiver is still
+     *        under initialization (EISOP initialization check); both only take effect once the
+     *        dialog is shown after construction, suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:method.invocation.invalid")
     IssueDialog(Window owner, String title, String head, Set<PositionedIssueString> warnings,

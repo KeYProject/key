@@ -101,7 +101,8 @@ public class HelpFacade {
      * @param path
      */
     public static void openHelp(Component path) {
-        @Nullable Component current = path;
+        @Nullable
+        Component current = path;
         while (current != null) {
             if (openHelpOfClass(current.getClass())) {
                 break;

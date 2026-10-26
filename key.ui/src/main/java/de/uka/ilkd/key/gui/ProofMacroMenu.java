@@ -79,12 +79,12 @@ public class ProofMacroMenu extends JMenu {
      * @param mediator the mediator of the current proof.
      * @param posInOcc the pos in occurrence, can be <code>null</code> if not available.
      *
-     *         <p>
-     *         The ctor builds the menu items while the receiver is still under initialization
-     *         (EISOP initialization check); the feature listener only fires later and the newly
-     *         built items are added to the fully constructed menu, suppressed with a scoped key.
-     *         The receiver is also handed to the mediator for proof-dependent enabling, which only
-     *         takes effect once the menu is constructed, also under initialization.
+     *        <p>
+     *        The ctor builds the menu items while the receiver is still under initialization
+     *        (EISOP initialization check); the feature listener only fires later and the newly
+     *        built items are added to the fully constructed menu, suppressed with a scoped key.
+     *        The receiver is also handed to the mediator for proof-dependent enabling, which only
+     *        takes effect once the menu is constructed, also under initialization.
      */
     @SuppressWarnings({ "nullness:method.invocation.invalid",
         "nullness:argument.type.incompatible" })

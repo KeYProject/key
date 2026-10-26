@@ -889,14 +889,17 @@ public final class SourceView extends JComponent {
                  */
                 if (label != null) {
                     if (label.equals("Invariant Initially Valid")
-                        || label.equals("Invariant Preserved and Used") // for loop scope invariant
-                        || label.equals("Body Preserves Invariant") || label.equals("Use Case")
-                        || label.equals("Show Axiom Satisfiability") || label.startsWith("Pre (")
-                        || label.startsWith("Exceptional Post (") // exceptional postcondition
-                        || label.startsWith("Post (") // postcondition of a method
-                        || label.contains("Normal Execution") || label.contains("Null Reference")
-                        || label.contains("Index Out of Bounds") || label.contains("Validity")
-                        || label.contains("Precondition") || label.contains("Usage")) {
+                            || label.equals("Invariant Preserved and Used") // for loop scope
+                                                                            // invariant
+                            || label.equals("Body Preserves Invariant") || label.equals("Use Case")
+                            || label.equals("Show Axiom Satisfiability")
+                            || label.startsWith("Pre (")
+                            || label.startsWith("Exceptional Post (") // exceptional postcondition
+                            || label.startsWith("Post (") // postcondition of a method
+                            || label.contains("Normal Execution")
+                            || label.contains("Null Reference")
+                            || label.contains("Index Out of Bounds") || label.contains("Validity")
+                            || label.contains("Precondition") || label.contains("Usage")) {
                         return label;
                     }
                 }

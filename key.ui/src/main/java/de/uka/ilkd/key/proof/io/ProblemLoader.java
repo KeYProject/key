@@ -131,39 +131,39 @@ public final class ProblemLoader extends AbstractProblemLoader {
         final SwingWorker<@Nullable Throwable, Void> worker =
             new SwingWorker<@Nullable Throwable, Void>() {
 
-            private long runTime;
+                private long runTime;
 
-            @Override
-            protected @Nullable Throwable doInBackground() {
-                long currentTime = System.currentTimeMillis();
-                final Throwable message = doWork();
-                runTime = System.currentTimeMillis() - currentTime;
-                return message;
-            }
+                @Override
+                protected @Nullable Throwable doInBackground() {
+                    long currentTime = System.currentTimeMillis();
+                    final Throwable message = doWork();
+                    runTime = System.currentTimeMillis() - currentTime;
+                    return message;
+                }
 
-            @Override
-            protected void done() {
-                Throwable message = null;
-                try {
-                    message = get();
-                } catch (final Throwable exception) {
-                    // catch exception if something has been thrown in the meantime
-                    message = exception;
-                } finally {
-                    mediator.startInterface(true);
-                    if (message != null) {
-                        final String errorMessage = "Failed to load "
-                            + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
-                        mediator.notify(new ExceptionFailureEvent(errorMessage, message));
-                        mediator.getUI().reportStatus(this, errorMessage);
-                    }
-                    fireTaskFinished(runTime, message);
-                    if (mediator.getSelectedProof() != null) {
-                        mediator.getSelectionModel().defaultSelection();
+                @Override
+                protected void done() {
+                    Throwable message = null;
+                    try {
+                        message = get();
+                    } catch (final Throwable exception) {
+                        // catch exception if something has been thrown in the meantime
+                        message = exception;
+                    } finally {
+                        mediator.startInterface(true);
+                        if (message != null) {
+                            final String errorMessage = "Failed to load "
+                                + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
+                            mediator.notify(new ExceptionFailureEvent(errorMessage, message));
+                            mediator.getUI().reportStatus(this, errorMessage);
+                        }
+                        fireTaskFinished(runTime, message);
+                        if (mediator.getSelectedProof() != null) {
+                            mediator.getSelectionModel().defaultSelection();
+                        }
                     }
                 }
-            }
-        };
+            };
 
         mediator.stopInterface(true);
         fireTaskStarted();

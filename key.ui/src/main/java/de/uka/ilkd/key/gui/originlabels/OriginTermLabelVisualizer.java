@@ -212,10 +212,11 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
      * @param node the node representing the proof state for which the term's origins shall be
      *        visualized.
      * @param services services.
-     * <p>
-     * The constructor leaves {@code view}, {@code tree} and {@code nodeLinkButton} unset until
-     * the private init methods run and configures visible components while the receiver is
-     * still under initialization (EISOP initialization check), suppressed with scoped keys.
+     *        <p>
+     *        The constructor leaves {@code view}, {@code tree} and {@code nodeLinkButton} unset
+     *        until
+     *        the private init methods run and configures visible components while the receiver is
+     *        still under initialization (EISOP initialization check), suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
         "nullness:method.invocation.invalid" })

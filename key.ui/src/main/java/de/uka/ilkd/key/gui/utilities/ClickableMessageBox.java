@@ -78,11 +78,11 @@ public class ClickableMessageBox extends JTextPane {
      * @param message the message text.
      * @param color the message color.
      *
-     *         <p>
-     *         A {@code null} item is stored in the index-aligned entry list but never delivered
-     *         (only non-null items get a hyperlink); the layout call passes a {@code null}
-     *         insert tag so the editor kit infers the tag from the HTML itself. Both deliberate
-     *         {@code null}s are suppressed with a scoped key.
+     *        <p>
+     *        A {@code null} item is stored in the index-aligned entry list but never delivered
+     *        (only non-null items get a hyperlink); the layout call passes a {@code null}
+     *        insert tag so the editor kit infers the tag from the HTML itself. Both deliberate
+     *        {@code null}s are suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:argument.type.incompatible")
     public void add(@Nullable Object item, String message, Color color) {
