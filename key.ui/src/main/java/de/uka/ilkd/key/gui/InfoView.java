@@ -194,7 +194,8 @@ public class InfoView extends JSplitPane implements TabPanel {
                 final Object lastSelectedPathComponent = infoTree.getLastSelectedPathComponent();
                 if (lastSelectedPathComponent instanceof InfoNodeFactory.InfoTreeNode node
                         && e.isPopupTrigger()) {
-                    @Nullable Object selected = node.getUserObject();
+                    @Nullable
+                    Object selected = node.getUserObject();
                     if (selected == null) {
                         // no user object is attached to the node, so no menu items apply
                         return;
@@ -261,10 +262,10 @@ public class InfoView extends JSplitPane implements TabPanel {
      *
      * @param g the newly selected goal, or {@code null} to clear the tree.
      *
-     *         <p>
-     *         Clearing the tree installs a {@link DefaultTreeModel} with a {@code null} root,
-     *         which renders an empty tree at run time; the JDK declares a non-null root
-     *         parameter, so the deliberate {@code null} is suppressed with a scoped key.
+     *        <p>
+     *        Clearing the tree installs a {@link DefaultTreeModel} with a {@code null} root,
+     *        which renders an empty tree at run time; the JDK declares a non-null root
+     *        parameter, so the deliberate {@code null} is suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:argument.type.incompatible")
     private void updateModel(@Nullable Goal g) {

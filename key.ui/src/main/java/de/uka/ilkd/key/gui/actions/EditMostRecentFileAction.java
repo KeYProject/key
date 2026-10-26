@@ -53,6 +53,7 @@ public final class EditMostRecentFileAction extends MainWindowAction
             mainWindow.getMediator().addKeYSelectionListener(this);
         }
     }
+
     public void actionPerformed(ActionEvent e) {
         if (mainWindow.getRecentFiles() != null
                 && mainWindow.getRecentFiles().getMostRecent() != null) {

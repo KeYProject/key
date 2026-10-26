@@ -128,11 +128,11 @@ public class DockingHelper {
      * @param mainWindow main window
      * @param panel class name of the panel to show
      *
-     *         <p>
-     *         A {@code null} focus component requests the docking framework to focus the dockable
-     *         without selecting a specific child component; the deliberate {@code null} for the
-     *         non-null parameter of the framework's {@link DefaultFocusRequest} is suppressed with
-     *         a scoped key.
+     *        <p>
+     *        A {@code null} focus component requests the docking framework to focus the dockable
+     *        without selecting a specific child component; the deliberate {@code null} for the
+     *        non-null parameter of the framework's {@link DefaultFocusRequest} is suppressed with
+     *        a scoped key.
      */
     @SuppressWarnings("nullness:argument.type.incompatible")
     public static void focus(MainWindow mainWindow, Class<?> panel) {

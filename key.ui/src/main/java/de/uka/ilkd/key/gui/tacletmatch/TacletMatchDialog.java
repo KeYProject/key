@@ -313,10 +313,10 @@ public class TacletMatchDialog extends ApplyTacletDialog {
      *
      * @param s the status text, or {@code null}/{@code empty} to clear the status.
      *
-     *         <p>
-     *         Clearing the status also removes the icon, which is what the JDK's
-     *         {@link JLabel#setIcon(Icon)} reports as a {@code null} argument; a cleared icon is
-     *         deliberate, suppressed with a scoped key.
+     *        <p>
+     *        Clearing the status also removes the icon, which is what the JDK's
+     *        {@link JLabel#setIcon(Icon)} reports as a {@code null} argument; a cleared icon is
+     *        deliberate, suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:argument.type.incompatible")
     @Override

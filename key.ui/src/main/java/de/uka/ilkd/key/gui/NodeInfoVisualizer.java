@@ -60,10 +60,10 @@ public abstract class NodeInfoVisualizer extends JComponent
      * @param longName the visualizer's long name.
      * @param shortName the visualizer's short name.
      *
-     *         <p>
-     *         The visualizer is registered while the receiver is still under initialization (EISOP
-     *         initialization check); registration only stores the reference, everything else
-     *         happens after construction, suppressed with a scoped key.
+     *        <p>
+     *        The visualizer is registered while the receiver is still under initialization (EISOP
+     *        initialization check); registration only stores the reference, everything else
+     *        happens after construction, suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:argument.type.incompatible")
     protected NodeInfoVisualizer(Node node, String longName, String shortName) {

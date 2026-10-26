@@ -195,16 +195,21 @@ public class ProofTreeView extends JPanel implements TabPanel {
      *
      * @param m the mediator
      *
-     * The {@code this}-configuration calls, the listener registrations and the extension-keyboard
-     * installation below happen while the receiver is still under initialization (EISOP
-     * initialization check); safe here since all registered listeners and extensions only react
-     * to events after construction completes. The cell-renderer and search-panel arguments are
-     * similarly bound to {@code this} before it is fully initialized and the renderer argument
-     * stays {@code null} only when {@code JTree}'s built-in renderer (always a
-     * {@link DefaultTreeCellRenderer}) was already replaced, which the constructor never does,
-     * suppressed with scoped keys. The {@code mediator} field is assigned inside
-     * {@link #setMediator(KeYMediator)} which the checker cannot track back into this
-     * constructor, so the uninitialized-field check is suppressed as well.
+     *        The {@code this}-configuration calls, the listener registrations and the
+     *        extension-keyboard
+     *        installation below happen while the receiver is still under initialization (EISOP
+     *        initialization check); safe here since all registered listeners and extensions only
+     *        react
+     *        to events after construction completes. The cell-renderer and search-panel arguments
+     *        are
+     *        similarly bound to {@code this} before it is fully initialized and the renderer
+     *        argument
+     *        stays {@code null} only when {@code JTree}'s built-in renderer (always a
+     *        {@link DefaultTreeCellRenderer}) was already replaced, which the constructor never
+     *        does,
+     *        suppressed with scoped keys. The {@code mediator} field is assigned inside
+     *        {@link #setMediator(KeYMediator)} which the checker cannot track back into this
+     *        constructor, so the uninitialized-field check is suppressed as well.
      */
     @SuppressWarnings({ "nullness:method.invocation.invalid",
         "nullness:argument.type.incompatible", "nullness:assignment.type.incompatible",

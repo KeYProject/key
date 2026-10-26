@@ -57,11 +57,14 @@ public class ChoiceSelector extends JDialog {
      *
      * @param mainWindow the parent window (dialog is centered on this)
      * @param settings the currently selected settings
-     * <p>
-     * The dialog configures and displays itself while the receiver is still under initialization
-     * (EISOP initialization check); the category, choice and explanation fields are initialized
-     * by {@link #layoutChoiceSelector()} before the dialog is shown whenever the dialog is not
-     * immediately disposed due to missing options, suppressed with scoped keys.
+     *        <p>
+     *        The dialog configures and displays itself while the receiver is still under
+     *        initialization
+     *        (EISOP initialization check); the category, choice and explanation fields are
+     *        initialized
+     *        by {@link #layoutChoiceSelector()} before the dialog is shown whenever the dialog is
+     *        not
+     *        immediately disposed due to missing options, suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
         "nullness:method.invocation.invalid", "nullness:argument.type.incompatible" })

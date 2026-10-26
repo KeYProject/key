@@ -142,9 +142,11 @@ public class TaskTree extends JPanel {
     public synchronized void removeTask(TaskTreeNode tn) {
         model.removeTask(tn);
         mediator.notify(new AbandonTaskEvent());
-        @Nullable Proof[] proofs = tn.allProofs();
+        @Nullable
+        Proof[] proofs = tn.allProofs();
         List<Proof> proofsNonNull = new ArrayList<>(proofs.length);
-        for (@Nullable Proof proof : proofs) {
+        for (@Nullable
+        Proof proof : proofs) {
             if (proof == null) {
                 // a task node's proof list never contains null entries
                 throw new NullPointerException("No proof available.");
@@ -159,7 +161,7 @@ public class TaskTree extends JPanel {
             proofsNonNull.add(proof);
         }
         MainWindow.getInstance().getProofTreeView()
-            .removeProofs(proofsNonNull.toArray(new Proof[0]));
+                .removeProofs(proofsNonNull.toArray(new Proof[0]));
         // go to some other node, take the last leaf.
         TreePath path = delegateView.getPathForRow(delegateView.getRowCount() - 1);
 
