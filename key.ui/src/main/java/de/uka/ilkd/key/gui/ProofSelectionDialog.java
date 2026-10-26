@@ -59,16 +59,25 @@ public final class ProofSelectionDialog extends JDialog {
 
     /**
      * The path of the proof to load (relative to the root of the proof bundle, so actually just the
-     * filename of the proof file inside the bundle).
+     * filename of the proof file inside the bundle); {@code null} until the user confirms a
+     * selection (or cancels the dialog).
      */
-    private Path proofToLoad;
+    private @Nullable Path proofToLoad;
 
     /**
      * Creates a new ProofSelectionDialog for the given proof
      *
      * @param bundlePath the path of the proof bundle to load
      * @throws IOException if the proof bundle can not be read
+     *
+     *         <p>
+     *         The ctor lays out the dialog and wires the buttons while the receiver is still under
+     *         initialization (EISOP initialization check); the buttons only fire after the dialog
+     *         has been shown and {@code proofToLoad} is only set by them, suppressed with scoped
+     *         keys.
      */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     private ProofSelectionDialog(Path bundlePath) throws IOException {
         super(MainWindow.getInstance(), "Choose proof to load", true);
 
@@ -180,8 +189,13 @@ public final class ProofSelectionDialog extends JDialog {
         if (m.matches() && m.groupCount() == 5) {
             String className = m.group(1);
             String method = m.group(3);
-            String type = m.group(4).toLowerCase();
+            String type = m.group(4);
             String num = m.group(5);
+            if (type == null) {
+                // the pattern matched, hence its (non-optional) groups are present
+                throw new NullPointerException("No match for the proof-name pattern.");
+            }
+            type = type.toLowerCase();
 
             // type is either "normal", "exceptional", or empty
             if (type.contains("normal")) {
@@ -202,9 +216,10 @@ public final class ProofSelectionDialog extends JDialog {
      * Shows the dialog with the given path and returns the filename of the proof to load.
      *
      * @param bundlePath the path of the proof bundle
-     * @return the filename of the proof to load
+     * @return the filename of the proof to load, or {@code null} if the dialog was cancelled or
+     *         the bundle could not be read
      */
-    private static Path showDialog(Path bundlePath) {
+    private static @Nullable Path showDialog(Path bundlePath) {
         Path proofPath = null;
         try {
             ProofSelectionDialog dialog = new ProofSelectionDialog(bundlePath);

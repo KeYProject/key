@@ -19,6 +19,11 @@ public class ToolTipOptionsAction extends MainWindowAction {
      */
     private static final long serialVersionUID = -360744615149278733L;
 
+    /**
+     * The action-configuration setter is called on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ToolTipOptionsAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("ToolTip Options");

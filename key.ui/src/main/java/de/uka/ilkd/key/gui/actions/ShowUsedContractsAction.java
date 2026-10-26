@@ -10,8 +10,10 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class ShowUsedContractsAction extends MainWindowAction {
@@ -21,9 +23,17 @@ public class ShowUsedContractsAction extends MainWindowAction {
      */
     private static final long serialVersionUID = 2680058046414747256L;
 
-    private final Proof proof;
+    private final @Nullable Proof proof;
 
-    public ShowUsedContractsAction(MainWindow mainWindow, Proof proof) {
+    /**
+     * The action-configuration calls and the {@code enableWhenProofLoaded(this)} registration
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since the listener only reacts to later selection events,
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
+    public ShowUsedContractsAction(MainWindow mainWindow, @Nullable Proof proof) {
         super(mainWindow);
         setName("Show Used Contracts");
 
@@ -44,8 +54,13 @@ public class ShowUsedContractsAction extends MainWindowAction {
                 "If you wish to see the used contracts "
                     + "for a proof you have to load one first"));
         } else {
-            ProofManagementDialog.showInstance(getMediator().getSelectedProof().getInitConfig(),
-                getMediator().getSelectedProof());
+            InitConfig initConfig = currentProof.getInitConfig();
+            if (initConfig == null) {
+                // a loaded proof always carries its init config; a missing one is an
+                // inconsistent state in which the previous code crashed with an NPE
+                throw new NullPointerException("Proof has no init config.");
+            }
+            ProofManagementDialog.showInstance(initConfig, currentProof);
         }
     }
 

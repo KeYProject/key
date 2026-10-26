@@ -16,6 +16,7 @@ import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
@@ -55,7 +56,11 @@ public class MacroKeyBinding extends AbstractAction {
             }
         }
 
-        if (macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
+        Node selectedNode = mediator.getSelectedNode();
+        if (selectedNode == null) {
+            throw new NullPointerException("No node selected for macro invocation.");
+        }
+        if (macro.canApplyTo(selectedNode, posInOcc)) {
             new ProofMacroUserAction(mediator, macro, posInOcc).actionPerformed(e);
         }
     }

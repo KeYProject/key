@@ -34,9 +34,18 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class ExtensionManager extends SettingsPanel implements SettingsProvider {
     private static final ExtensionSettings EXTENSION_SETTINGS = new ExtensionSettings();
-    private HashMap<JCheckBox, Extension<?>> map;
+    private HashMap<JCheckBox, Extension<?>> map = new HashMap<>();
     private String keywords = "";
 
+    /**
+     * Creates the extension settings panel.
+     *
+     * <p>
+     * The panel sets its header texts and rebuilds its extension list while the receiver is still
+     * under initialization (EISOP initialization check); the settings only materialize once the
+     * panel is shown after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ExtensionManager() {
         setHeaderText("Extension Settings");
         setSubHeaderText("Settings will be applied on next restart");
@@ -76,15 +85,22 @@ public class ExtensionManager extends SettingsPanel implements SettingsProvider 
                     map.put(box, it);
 
                     keywords += box.getText();
-                    pCenter.add(
-                        new JLabel(
-                            it.isExperimental() ? IconFactory.EXPERIMENTAL_EXTENSION.get() : null),
-                        new CC().newline());
+
+                    JLabel experimentalLabel = new JLabel();
+                    if (it.isExperimental()) {
+                        experimentalLabel.setIcon(IconFactory.EXPERIMENTAL_EXTENSION.get());
+                    }
+                    pCenter.add(experimentalLabel, new CC().newline());
                     pCenter.add(box);
 
                     JLabel lblProvides = new JLabel(getSupportLabel(it));
                     keywords += lblProvides.getText();
-                    lblProvides.setFont(lblProvides.getFont().deriveFont(Font.ITALIC));
+                    Font providesFont = lblProvides.getFont();
+                    if (providesFont == null) {
+                        // a newly created label is never realized without a font
+                        throw new NullPointerException("No label font available.");
+                    }
+                    lblProvides.setFont(providesFont.deriveFont(Font.ITALIC));
                     pCenter.add(new JLabel(), new CC().newline());
                     pCenter.add(lblProvides);
 

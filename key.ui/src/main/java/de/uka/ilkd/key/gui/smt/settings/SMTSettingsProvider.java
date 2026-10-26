@@ -122,6 +122,14 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
     private transient ProofIndependentSMTSettings settings;
     private final transient List<SettingsProvider> children = new ArrayList<>();
 
+    /**
+     * The ctor builds all fields and registers the child providers while the receiver is still
+     * under initialization (EISOP initialization check); the settings are loaded later via
+     * {@link #setSmtSettings(ProofIndependentSMTSettings)} before the panel is displayed,
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:initialization.fields.uninitialized" })
     public SMTSettingsProvider() {
         saveToFilePanel = getSaveToFilePanel();
         progressModeBox = getProgressModeBox();

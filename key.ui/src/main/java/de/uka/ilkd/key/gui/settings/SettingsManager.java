@@ -168,6 +168,15 @@ public class SettingsManager {
     }
 
     public static class ShowSettingsAction extends MainWindowAction {
+        /**
+         * Creates the show-settings action.
+         *
+         * <p>
+         * The action sets its name and icon while the receiver is still under initialization
+         * (EISOP initialization check); both only materialize once the action is displayed after
+         * construction, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public ShowSettingsAction(MainWindow mainWindow) {
             super(mainWindow);
             setName("Settings");

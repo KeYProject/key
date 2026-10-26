@@ -89,7 +89,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
             }
         };
 
-        proof.openGoals().forEach(g -> g.addGoalListener(goalListener));
+        p.openGoals().forEach(g -> g.addGoalListener(goalListener));
     }
 
     /**
@@ -145,7 +145,10 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
          */
         @Override
         public void proofPruned(ProofTreeEvent e) {
-            updateTree(getProofTreeNode(pruningInProcess));
+            Node nodeToPrune = pruningInProcess;
+            if (nodeToPrune != null) {
+                updateTree(getProofTreeNode(nodeToPrune));
+            }
             pruningInProcess = null;
         }
 
@@ -320,18 +323,32 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      *
      * @param parent a node in the tree, obtained from this data source
      * @return the child of {@code parent} at index {@code index}
+     *
+     *         <p>
+     *         The JDK declares a non-null return, although a filter miss or a stale child index
+     *         yields {@code null} at run time. The swing tree only asks for children at indices
+     *         below {@link #getChildCount(Object)}, so the {@code null} case is never reached on
+     *         the happy path; the return type is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:return.type.incompatible")
     @Override
-    public synchronized @Nullable Object getChild(Object parent, int index) {
+    public synchronized Object getChild(Object parent, int index) {
         if (bypassNodeFilter()) {
             TreeNode guiParent = (TreeNode) parent;
             if (guiParent.getChildCount() > index) {
-                return guiParent.getChildAt(index);
+                return (Object) guiParent.getChildAt(index);
             }
         } else {
-            return activeNodeFilter.getChild(parent, index);
+            NodeFilter filter = activeNodeFilter;
+            if (filter != null) {
+                Object child = filter.getChild(parent, index);
+                if (child == null) {
+                    return (Object) null;
+                }
+                return child;
+            }
         }
-        return null;
+        return (Object) null;
     }
 
     /**
@@ -357,7 +374,12 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
         if (bypassNodeFilter()) {
             return ((TreeNode) parent).getChildCount();
         } else {
-            return activeNodeFilter.getChildCount(parent);
+            NodeFilter filter = activeNodeFilter;
+            if (filter == null) {
+                // the by-pass test guarantees an active filter in this branch
+                throw new NullPointerException("No active node filter available.");
+            }
+            return filter.getChildCount(parent);
         }
     }
 
@@ -379,7 +401,12 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
                 }
             }
         } else {
-            return activeNodeFilter.getIndexOfChild(parent, child);
+            NodeFilter filter = activeNodeFilter;
+            if (filter == null) {
+                // the by-pass test guarantees an active filter in this branch
+                throw new NullPointerException("No active node filter available.");
+            }
+            return filter.getIndexOfChild(parent, child);
         }
         return -1;
     }
@@ -388,10 +415,26 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      * Returns the root of the tree. Returns null only if the tree has no nodes.
      *
      * @return the root of the tree
+     *
+     *         <p>
+     *         The JDK declares a non-null return, although a model detached from its proof has no
+     *         root and yields {@code null} at run time; the swing tree renders such a model
+     *         without nodes. The {@code null} case is suppressed with a scoped key, while the
+     *         loaded-proof case guards the root node before passing it on, because a loaded proof
+     *         always has a root.
      */
+    @SuppressWarnings("nullness:return.type.incompatible")
     @Override
-    public synchronized @Nullable Object getRoot() {
-        return proof == null ? null : getBranchNode(proof.root(), "Proof Tree");
+    public synchronized Object getRoot() {
+        if (proof == null) {
+            return (Object) null;
+        }
+        Node root = proof.root();
+        if (root == null) {
+            // a loaded proof always has a root node
+            throw new NullPointerException("No root node available.");
+        }
+        return getBranchNode(root, "Proof Tree");
     }
 
     /**
@@ -445,8 +488,11 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
 
         // If possible, redraw only a certain subtree
         // starting from the lowermost parent of trn that is not hidden
-        while (trn != null && trn != getRoot()
-                && ProofTreeViewFilter.hiddenByGlobalFilters(trn.getNode())) {
+        while (trn != null && trn != getRoot()) {
+            Node trnNode = trn.getNode();
+            if (trnNode == null || !ProofTreeViewFilter.hiddenByGlobalFilters(trnNode)) {
+                break;
+            }
             trn = (GUIAbstractTreeNode) trn.getParent();
         }
 
@@ -461,7 +507,12 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
         flushCaches(trn);
         // also flush the current node, it might be an OSS conceiving children in this step
         trn.flushCache();
-        TreeNode[] path = ((GUIAbstractTreeNode) trn.getParent()).getPath();
+        GUIAbstractTreeNode parentNode = (GUIAbstractTreeNode) trn.getParent();
+        if (parentNode == null) {
+            // a non-root node of the display tree always has a parent
+            throw new NullPointerException("No parent of the tree node.");
+        }
+        TreeNode[] path = parentNode.getPath();
         fireTreeStructureChanged(path);
     }
 
@@ -475,6 +526,10 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
 
     private void flushCaches(TreeNode trn) {
         Node n = ((GUIAbstractTreeNode) trn).getNode();
+        if (n == null) {
+            // a displayed node always refers back to its proof node
+            throw new NullPointerException("No proof node available.");
+        }
         while (true) {
             final Node p = n.parent();
             if (p == null || ((GUIAbstractTreeNode) trn).findChild(p) == null) {

@@ -154,8 +154,14 @@ public class SendFeedbackAction extends AbstractAction {
 
         @Override
         byte[] retrieveFileData() throws Exception {
-            File mostRecentFile = new File(
-                MainWindow.getInstance().getRecentFiles().getMostRecent());
+            String mostRecent = MainWindow.getInstance().getRecentFiles().getMostRecent();
+            if (mostRecent == null) {
+                // Only enabled when a most-recent file exists; a {@code null} here is a
+                // concurrent state change, crash-equivalent to the previous {@code null} into the
+                // {@code File} constructor.
+                throw new NullPointerException("No recently opened file to send.");
+            }
+            File mostRecentFile = new File(mostRecent);
             return Files.readAllBytes(mostRecentFile.toPath());
         }
 
@@ -208,6 +214,11 @@ public class SendFeedbackAction extends AbstractAction {
         byte[] retrieveFileData() {
             KeYMediator mediator = MainWindow.getInstance().getMediator();
             Goal goal = mediator.getSelectedGoal();
+            if (goal == null) {
+                // Only enabled while a goal is selected (see {@link #isEnabled()}); a {@code null}
+                // here is a concurrent state change, crash-equivalent to the previous NPE.
+                throw new NullPointerException("No goal selected to send.");
+            }
             return goal.toString().getBytes(StandardCharsets.UTF_8);
         }
 
@@ -231,6 +242,12 @@ public class SendFeedbackAction extends AbstractAction {
         byte[] retrieveFileData() throws IOException {
             KeYMediator mediator = MainWindow.getInstance().getMediator();
             Proof proof = mediator.getSelectedProof();
+            if (proof == null) {
+                // Only enabled while a proof is loaded (see {@link #isEnabled()}); a {@code null}
+                // here is a concurrent state change, crash-equivalent to the previous NPE in the
+                // saver.
+                throw new NullPointerException("No proof loaded to send.");
+            }
             OutputStreamProofSaver saver = new OutputStreamProofSaver(proof);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             saver.save(Paths.get(".").toAbsolutePath(), stream);
@@ -272,7 +289,13 @@ public class SendFeedbackAction extends AbstractAction {
 
         @Override
         byte[] retrieveFileData() {
-            return serializeStackTrace(throwable).getBytes(StandardCharsets.UTF_8);
+            Throwable t = throwable;
+            if (t == null) {
+                // Only enabled when the exception is set (see {@link #isEnabled()}); a {@code
+                // null} here is impossible, guarded for the checker.
+                throw new NullPointerException("No stack trace to send.");
+            }
+            return serializeStackTrace(t).getBytes(StandardCharsets.UTF_8);
         }
     }
 
@@ -303,9 +326,20 @@ public class SendFeedbackAction extends AbstractAction {
              * default charset) and then writing back to byte[] (using default charset again).
              * However, this way it is a very concise and easy to read.
              */
-            Location url = ExceptionTools.getLocation(throwable);
+            Throwable t = throwable;
+            if (t == null) {
+                // Only enabled when the exception is set (see {@link #isEnabled()}); a {@code
+                // null} here is impossible, guarded for the checker.
+                throw new NullPointerException("No exception source file to send.");
+            }
+            Location url = ExceptionTools.getLocation(t);
             if (url != null) {
                 String content = IOUtil.readFrom(url.fileUri());
+                if (content == null) {
+                    // {@code readFrom} fails to read the resource; the previous code crashed in
+                    // {@code getBytes} on such input, keep that behavior.
+                    throw new IOException("Could not read the exception source file.");
+                }
                 return content.getBytes(Charset.defaultCharset());
             }
             return new byte[0];
@@ -321,7 +355,7 @@ public class SendFeedbackAction extends AbstractAction {
         boolean isEnabled() {
             try {
                 Proof proof = MainWindow.getInstance().getMediator().getSelectedProof();
-                File javaSourceLocation = getJavaSourceLocation(proof).toFile();
+                Path javaSourceLocation = proof != null ? getJavaSourceLocation(proof) : null;
                 return javaSourceLocation != null;
             } catch (Exception e) {
                 return false;
@@ -342,7 +376,18 @@ public class SendFeedbackAction extends AbstractAction {
         @Override
         void appendDataToZipOutputStream(ZipOutputStream stream) throws IOException {
             Proof proof = MainWindow.getInstance().getMediator().getSelectedProof();
+            if (proof == null) {
+                // Only enabled while a proof is loaded (see {@link #isEnabled()}); a {@code null}
+                // here is a concurrent state change, crash-equivalent to the previous NPE.
+                throw new NullPointerException("No proof loaded to send its Java sources.");
+            }
             Path javaSourceLocation = getJavaSourceLocation(proof);
+            if (javaSourceLocation == null) {
+                // No Java source location is attached to the proof (see {@link
+                // #getJavaSourceLocation}); sending nothing mirrors the previous NPE-free
+                // behavior of an empty source section.
+                return;
+            }
             List<Path> javaFiles = getJavaFilesRecursively(javaSourceLocation);
             for (Path f : javaFiles) {
                 stream.putNextEntry(
@@ -369,11 +414,15 @@ public class SendFeedbackAction extends AbstractAction {
             });
             int answer = jfc.showSaveDialog(parent);
             if (answer == JFileChooser.APPROVE_OPTION) {
-                saveMetaDataToFile(jfc.getSelectedFile(), message);
+                File selectedFile = jfc.getSelectedFile();
+                if (selectedFile == null) {
+                    throw new NullPointerException("No file selected in the file chooser.");
+                }
+                saveMetaDataToFile(selectedFile, message);
                 JOptionPane.showMessageDialog(parent,
                     String.format("Your message has been saved to the file %s.\n"
                         + "If you want to report a bug, you can enclose this file in an\n"
-                        + "e-mail to " + FEEDBACK_RECIPIENT + ".", jfc.getSelectedFile()));
+                        + "e-mail to " + FEEDBACK_RECIPIENT + ".", selectedFile));
             }
         } catch (Exception e) {
             LOGGER.error("", e);
@@ -457,6 +506,11 @@ public class SendFeedbackAction extends AbstractAction {
         this(parent, null);
     }
 
+    /**
+     * The action-configuration setter is called on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SendFeedbackAction(final Window parent, final @Nullable Throwable exception) {
         this.parent = parent;
         putValue(NAME, "Send feedback...");

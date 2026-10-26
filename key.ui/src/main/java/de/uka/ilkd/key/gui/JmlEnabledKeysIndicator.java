@@ -27,6 +27,15 @@ public class JmlEnabledKeysIndicator implements KeYGuiExtension, KeYGuiExtension
         ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
     private final JLabel lblIndicator = new JLabel();
 
+    /**
+     * Creates the JML enabled-keys status line indicator.
+     *
+     * <p>
+     * The indicator updates itself and registers its property listener while the receiver is
+     * still under initialization (EISOP initialization check); the update only fills the label
+     * once the status line shows it after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public JmlEnabledKeysIndicator() {
         lblIndicator.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         lblIndicator.setToolTipText("Currently enabled keys for tool-specific JML annotations");

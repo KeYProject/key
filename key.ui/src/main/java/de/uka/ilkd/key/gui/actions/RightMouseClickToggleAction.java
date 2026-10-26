@@ -19,6 +19,11 @@ public class RightMouseClickToggleAction extends MainWindowAction {
      */
     private static final long serialVersionUID = 1299838459448346807L;
 
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public RightMouseClickToggleAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Right Click for Proof Macros");

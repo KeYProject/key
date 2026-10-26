@@ -33,9 +33,14 @@ public class LoggerStartupListener extends ContextAwareBase
     public void start() {
         if (started)
             return;
+        PathConfig.KeyPaths currentPaths = PathConfig.currentPaths;
+        if (currentPaths == null) {
+            // the log directory is only defined once the configuration paths are known
+            throw new NullPointerException("No configuration paths available.");
+        }
         Context context = getContext();
         context.putProperty("LOG_DIR",
-            PathConfig.currentPaths.logDirectory.toAbsolutePath().toString());
+            currentPaths.logDirectory.toAbsolutePath().toString());
         started = true;
     }
 

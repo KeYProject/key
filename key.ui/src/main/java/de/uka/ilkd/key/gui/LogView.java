@@ -66,8 +66,13 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
         @Override
         public void run() {
             try (final WatchService watchService = FileSystems.getDefault().newWatchService()) {
-                var watchKey =
-                    file.getParent().register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+                Path watchDirectory = file.getParent();
+                if (watchDirectory == null) {
+                    // the watched file always resides in a directory
+                    throw new NullPointerException("No parent directory of the watched file.");
+                }
+                var watchKey = watchDirectory.register(watchService,
+                    StandardWatchEventKinds.ENTRY_MODIFY);
                 while (!Thread.interrupted()) {
                     final WatchKey wk = watchService.take();
                     for (WatchEvent<?> event : wk.pollEvents()) {
@@ -87,6 +92,12 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
     }
 
     private static class ShowLogAction extends KeyAction {
+        /**
+         * The action-configuration setters are called on {@code this} while the receiver is still
+         * under initialization (EISOP initialization check); safe here, suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public ShowLogAction() {
             setTooltip("Show log");
             setIcon(BOOK.get(16));
@@ -169,6 +180,14 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
 
         private final Path logFile = Log.getCurrentLogFile();
 
+        /**
+         * The ctor wires the filters and the file watcher while the receiver is still under
+         * initialization (EISOP initialization check); the watcher thread only starts when the
+         * view is shown and the refresh-callback only fires afterwards, suppressed with scoped
+         * keys.
+         */
+        @SuppressWarnings({ "nullness:method.invocation.invalid",
+            "nullness:methodref.receiver.bound.invalid", "nullness:argument.type.incompatible" })
         public LogViewPane() {
             setLayout(new BorderLayout());
 
@@ -202,8 +221,13 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
             scrPane.setViewportView(txtView);
             add(scrPane, BorderLayout.CENTER);
 
+            Path logFileParent = logFile.getParent();
+            if (logFileParent == null) {
+                // the log file always resides in a directory
+                throw new NullPointerException("No parent directory of the log file.");
+            }
             FileWatcherService fileWatcherService =
-                new FileWatcherService(logFile.getParent(), this::refresh);
+                new FileWatcherService(logFileParent, this::refresh);
             fileWatcherServiceThread = new Thread(fileWatcherService);
             refresh();
 
@@ -302,6 +326,12 @@ public class LogView implements KeYGuiExtension, KeYGuiExtension.StatusLine {
     static class OpenLogExternalAction extends KeyAction {
         private static final Logger LOGGER = LoggerFactory.getLogger(OpenLogExternalAction.class);
 
+        /**
+         * The action-configuration setters are called on {@code this} while the receiver is still
+         * under initialization (EISOP initialization check); safe here, suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public OpenLogExternalAction() {
             setName("Open log externally");
             lookupAcceleratorKey();

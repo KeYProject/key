@@ -8,6 +8,7 @@ import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
+import java.util.Map;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -59,7 +60,7 @@ public class TextLineNumber extends JPanel
     private int lastHeight;
     private int lastLine;
 
-    private @Nullable HashMap<String, FontMetrics> fonts;
+    private @Nullable Map<String, FontMetrics> fonts;
 
     /**
      * Create a line number component for a text component. This minimum display width will be based
@@ -78,6 +79,13 @@ public class TextLineNumber extends JPanel
      * @param minimumDisplayDigits the number of digits used to calculate the minimum width of the
      *        component
      */
+    /**
+     * The ctor configures the component and registers it as listener of the text component while
+     * the receiver is still under initialization (EISOP initialization check); the listeners only
+     * fire after construction completes, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public TextLineNumber(JTextComponent component, int minimumDisplayDigits) {
         this.component = component;
 
@@ -191,7 +199,12 @@ public class TextLineNumber extends JPanel
 
         if (lastDigits != digits) {
             lastDigits = digits;
-            FontMetrics fontMetrics = getFontMetrics(getFont());
+            Font font = getFont();
+            if (font == null) {
+                // the component always obtains its font from the look and feel
+                throw new NullPointerException("No font available.");
+            }
+            FontMetrics fontMetrics = getFontMetrics(font);
             int width = fontMetrics.charWidth('0') * digits;
             Insets insets = getInsets();
             int preferredWidth = insets.left + insets.right + width;
@@ -217,7 +230,17 @@ public class TextLineNumber extends JPanel
 
         // Determine the width of the space available to draw the line number
 
-        FontMetrics fontMetrics = component.getFontMetrics(component.getFont());
+        Font font = component.getFont();
+        if (font == null) {
+            // the text component always obtains its font from the look and feel
+            throw new NullPointerException("No font available.");
+        }
+        FontMetrics fontMetrics = component.getFontMetrics(font);
+        Color foreground = getForeground();
+        if (foreground == null) {
+            // the component always carries a foreground color
+            throw new NullPointerException("No foreground color available.");
+        }
         Insets insets = getInsets();
         int availableWidth = getSize().width - insets.left - insets.right;
 
@@ -229,7 +252,7 @@ public class TextLineNumber extends JPanel
 
         while (rowStartOffset <= endOffset) {
             try {
-                g.setColor(getForeground());
+                g.setColor(foreground);
 
                 // Get the line number as a string and then determine the
                 // "X" and "Y" offsets for drawing the string.
@@ -295,8 +318,10 @@ public class TextLineNumber extends JPanel
             descent = fontMetrics.getDescent();
         } else {
             // We need to check all the attributes for font changes
-            if (fonts == null) {
-                fonts = new HashMap<>();
+            Map<String, FontMetrics> currentFonts = fonts;
+            if (currentFonts == null) {
+                currentFonts = new HashMap<>();
+                fonts = currentFonts;
             }
 
             Element root = component.getDocument().getDefaultRootElement();
@@ -310,12 +335,12 @@ public class TextLineNumber extends JPanel
                 Integer fontSize = (Integer) as.getAttribute(StyleConstants.FontSize);
                 String key = fontFamily + fontSize;
 
-                FontMetrics fm = fonts.get(key);
+                FontMetrics fm = currentFonts.get(key);
 
                 if (fm == null) {
                     Font font = new Font(fontFamily, Font.PLAIN, fontSize);
                     fm = component.getFontMetrics(font);
-                    fonts.put(key, fm);
+                    currentFonts.put(key, fm);
                 }
 
                 descent = Math.max(descent, fm.getDescent());

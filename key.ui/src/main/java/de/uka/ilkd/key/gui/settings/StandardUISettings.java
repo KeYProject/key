@@ -85,6 +85,12 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     private final JTextArea txtClutterRuleSets;
     private final JComboBox<String> notificationAfterMacro;
 
+    /**
+     * The panel configures itself with header, separator and component-factory calls while the
+     * receiver is still under initialization (EISOP initialization check); the effects only
+     * take place after construction completes, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public StandardUISettings() {
         setHeaderText(getDescription());
 

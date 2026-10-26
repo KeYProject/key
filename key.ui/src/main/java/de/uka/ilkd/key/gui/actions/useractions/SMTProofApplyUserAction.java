@@ -69,9 +69,12 @@ public class SMTProofApplyUserAction extends UserAction {
         // only close each solved goal once
         for (SolverListener.InternSMTProblem problem : smtProblems) {
             Goal goal = problem.getProblem().getGoal();
-            if (goalsClosed.contains(goal)
-                    || problem.getSolver().getFinalResult()
-                            .isValid() != SMTSolverResult.ThreeValuedTruth.VALID) {
+            SMTSolverResult finalResult = problem.getSolver().getFinalResult();
+            if (goal == null || finalResult == null
+                    || goalsClosed.contains(goal)
+                    || finalResult.isValid() != SMTSolverResult.ThreeValuedTruth.VALID) {
+                // A {@code null} goal or result is a solver state in which the previous code
+                // crashed with an NPE; skip such problems instead.
                 continue;
             }
             goalsClosed.add(goal);
@@ -97,7 +100,12 @@ public class SMTProofApplyUserAction extends UserAction {
         for (Node n : originalProofNodes) {
             proof.pruneProof(n);
         }
-        mediator.getSelectionModel().setSelectedNode(originalSelectedNode);
+        // A node is always selected while a proof is open; {@code originalSelectedNode} may only
+        // be {@code null} in a concurrent state change in which the previous code crashed with an
+        // NPE inside the selection model.
+        if (originalSelectedNode != null) {
+            mediator.getSelectionModel().setSelectedNode(originalSelectedNode);
+        }
     }
 
     @Override

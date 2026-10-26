@@ -13,6 +13,7 @@ import javax.swing.border.TitledBorder;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
@@ -83,8 +84,14 @@ public abstract class ApplyTacletDialog extends de.uka.ilkd.key.gui.ApplyTacletD
         Taclet taclet = model[0].taclet();
         StringBuilder tacletSB = new StringBuilder();
 
+        Services services = mediator.getServices();
+        if (services == null) {
+            // a running interaction always carries services
+            throw new NullPointerException("No services available.");
+        }
+
         SequentViewLogicPrinter tp = SequentViewLogicPrinter.purePrinter(68, new NotationInfo(),
-            mediator.getServices(), MainWindow.getInstance().getVisibleTermLabels());
+            services, MainWindow.getInstance().getVisibleTermLabels());
 
         tp.printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),

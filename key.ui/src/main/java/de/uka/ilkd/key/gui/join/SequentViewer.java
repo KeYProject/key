@@ -20,6 +20,15 @@ public class SequentViewer extends JTextPane {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Creates the sequent viewer.
+     *
+     * <p>
+     * The viewer makes itself read-only while the receiver is still under initialization (EISOP
+     * initialization check); the editable state only materializes once the viewer is displayed
+     * after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SequentViewer() {
         setEditable(false);
         // this.add(new JScrollPane(getTextArea()));

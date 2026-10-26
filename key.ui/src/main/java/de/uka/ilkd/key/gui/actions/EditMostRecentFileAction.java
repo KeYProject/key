@@ -30,6 +30,12 @@ public final class EditMostRecentFileAction extends MainWindowAction
 
     private static final long serialVersionUID = -6214327707255790570L;
 
+    /**
+     * The action-configuration calls and the listener registration below operate on {@code this}
+     * while the receiver is still under initialization (EISOP initialization check); safe here
+     * since these configure the local action only, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public EditMostRecentFileAction(MainWindow mainWindow) {
         super(mainWindow);
 
@@ -47,7 +53,6 @@ public final class EditMostRecentFileAction extends MainWindowAction
             mainWindow.getMediator().addKeYSelectionListener(this);
         }
     }
-
     public void actionPerformed(ActionEvent e) {
         if (mainWindow.getRecentFiles() != null
                 && mainWindow.getRecentFiles().getMostRecent() != null) {
@@ -57,8 +62,9 @@ public final class EditMostRecentFileAction extends MainWindowAction
                 try {
                     EditFileActionHandler.getInstance().workWithFile(f);
                 } catch (Exception exc) {
+                    String message = exc.getMessage();
                     LOGGER.error("Error opening file in external application: {}",
-                        exc.getMessage());
+                        message == null ? "null" : message);
                 }
             }
         }

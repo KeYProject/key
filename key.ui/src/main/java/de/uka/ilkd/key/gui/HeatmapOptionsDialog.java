@@ -97,12 +97,24 @@ public class HeatmapOptionsDialog extends JDialog {
 
     /**
      * Opens a dialog for choosing if and how to display heatmap highlighting.
+     * <p>
+     * The dialog configures itself with layout, keyboard, button and pack calls while the
+     * receiver is still under initialization (EISOP initialization check) and passes itself to
+     * {@link #setupRadioPanel} as parent; the effects only take place after construction
+     * completes, suppressed with scoped keys.
      */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public HeatmapOptionsDialog() {
         super(MainWindow.getInstance(), "Heatmap Options", true);
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridBagLayout());
+        Color panelBackground = panel.getBackground();
+        if (panelBackground == null) {
+            // a Swing panel always has a background color from the look and feel
+            throw new NullPointerException("No background color for the options panel.");
+        }
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(10, 5, 10, 5);
 
@@ -139,8 +151,8 @@ public class HeatmapOptionsDialog extends JDialog {
         getRootPane().registerKeyboardAction(e -> dispose(),
             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-        JPanel radioBoxes = setupRadioPanel(radioButtons, panel.getBackground(), this);
-        JPanel spPanel = setupSpinnerPanel(valueSpinner, panel.getBackground());
+        JPanel radioBoxes = setupRadioPanel(radioButtons, panelBackground, this);
+        JPanel spPanel = setupSpinnerPanel(valueSpinner, panelBackground);
         JPanel buttonPanel = setupButtonPanel(okButton, cancelButton);
 
         c.gridy = 0;
@@ -148,7 +160,7 @@ public class HeatmapOptionsDialog extends JDialog {
         l.setLineWrap(true);
         l.setWrapStyleWord(true);
         l.setEditable(false);
-        l.setBackground(panel.getBackground());
+        l.setBackground(panelBackground);
         panel.add(l, c);
         c.gridy++;
         panel.add(radioBoxes, c);
@@ -362,7 +374,12 @@ public class HeatmapOptionsDialog extends JDialog {
          * @param s the description
          * @param title title of the dialog
          * @param owner the parent window
+         * <p>
+         * The dialog configures itself with title, content pane, pack, visibility and keyboard
+         * calls while the receiver is still under initialization (EISOP initialization check);
+         * the effects only take place after construction completes, suppressed with a scoped key.
          */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public InfoDialog(String title, String s, final JDialog owner) {
             super(owner);
             this.setTitle(title);

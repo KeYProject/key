@@ -34,10 +34,18 @@ public class ViewSelector extends JDialog {
     private JCheckBox showUninstantiatedTacletCB;
 
     /**
-     * creates a new ViewSelector
+     * Creates a new ViewSelector.
      *
      * @param parent The parent widget of this ViewSelector
+     *
+     *         <p>
+     *         The input fields are created by {@link #layoutViewSelector()}, which is invoked
+     *         unconditionally from this constructor; the EISOP initialization check cannot see the
+     *         assignments inside the delegated method, so both the fields and the delegated calls
+     *         are suppressed with scoped keys.
      */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     public ViewSelector(JFrame parent) {
         super(parent, "Maximum line number for tooltips", true);
         layoutViewSelector();
@@ -183,6 +191,15 @@ public class ViewSelector extends JDialog {
          */
         private static final long serialVersionUID = 5578481785681533620L;
 
+        /**
+         * Creates a numeric input field with the given initial value.
+         *
+         * <p>
+         * The field initializes its text while the receiver is still under initialization (EISOP
+         * initialization check); the text only materializes once the field is displayed after
+         * construction, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public NumberInputField(int number, int cols) {
             super(cols);
             setText(String.valueOf(number));

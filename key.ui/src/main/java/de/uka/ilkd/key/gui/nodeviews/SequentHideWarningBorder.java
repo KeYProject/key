@@ -52,9 +52,15 @@ public class SequentHideWarningBorder extends TitledBorder {
     /**
      * Instantiates a new sequent border.
      *
+     * <p>
+     * The border measures its original insets while the receiver is still under initialization
+     * (EISOP initialization check); the measured height only materializes once the border is
+     * used for painting after construction, suppressed with a scoped key.
+     *
      * @param title the title to display
      * @param sequentView the sequent view which will be wrapped by the component
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SequentHideWarningBorder(String title, SequentView sequentView) {
         super(title);
         this.sequentView = sequentView;

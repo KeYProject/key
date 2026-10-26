@@ -46,8 +46,10 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofJavaSourceCollection;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
@@ -142,9 +144,9 @@ public final class SourceView extends JComponent {
     private final TabbedPane tabPane = new TabbedPane();
 
     /**
-     * Currently selected file.
+     * Currently selected file, or {@code null} if no tab is selected.
      */
-    private URI selectedFile = null;
+    private @Nullable URI selectedFile;
 
     /**
      * The status bar for displaying information about the current proof branch.
@@ -172,10 +174,11 @@ public final class SourceView extends JComponent {
         tabPane.setBorder(new TitledBorder(NO_SOURCE));
 
         tabPane.addChangeListener(e -> {
-            if (tabPane.getSelectedTab() == null) {
+            Tab selectedTab = tabPane.getSelectedTab();
+            if (selectedTab == null) {
                 selectedFile = null;
             } else {
-                selectedFile = tabPane.getSelectedTab().absoluteFileName;
+                selectedFile = selectedTab.absoluteFileName;
             }
 
             // Mark tabs that contain highlights.
@@ -189,8 +192,13 @@ public final class SourceView extends JComponent {
         sourceStatusBar.setBackground(Color.gray);
 
         // add extra height to make the status bar more noticeable
+        Font statusFont = sourceStatusBar.getFont();
+        if (statusFont == null) {
+            // the status bar always inherits a font from the look and feel
+            throw new NullPointerException("No font for the source status bar.");
+        }
         sourceStatusBar.setPreferredSize(
-            new Dimension(0, getFontMetrics(sourceStatusBar.getFont()).getHeight() + 6));
+            new Dimension(0, getFontMetrics(statusFont).getHeight() + 6));
         sourceStatusBar.setHorizontalAlignment(SwingConstants.CENTER);
 
         setLayout(new BorderLayout());
@@ -225,7 +233,7 @@ public final class SourceView extends JComponent {
             }
         });
 
-        KeYGuiExtensionFacade.installKeyboardShortcuts(null, this,
+        KeYGuiExtensionFacade.installKeyboardShortcuts(mainWindow.getMediator(), this,
             KeYGuiExtension.KeyboardShortcuts.SOURCE_VIEW);
 
     }
@@ -234,22 +242,25 @@ public final class SourceView extends JComponent {
         if (proof != null && proof.lookup(ProofJavaSourceCollection.class) == null) {
             final var sources = new ProofJavaSourceCollection();
             proof.register(sources, ProofJavaSourceCollection.class);
-            proof.root().sequent().forEach(formula -> {
-                OriginTermLabel originLabel =
-                    (OriginTermLabel) ((JTerm) formula.formula()).getLabel(OriginTermLabel.NAME);
-                if (originLabel != null) {
-                    if (originLabel.getOrigin() instanceof OriginTermLabel.FileOrigin) {
-                        ((OriginTermLabel.FileOrigin) originLabel.getOrigin())
-                                .getFileName()
-                                .ifPresent(sources::addRelevantFile);
-                    }
+            Node root = proof.root();
+            if (root != null) {
+                root.sequent().forEach(formula -> {
+                    OriginTermLabel originLabel = (OriginTermLabel) ((JTerm) formula.formula())
+                            .getLabel(OriginTermLabel.NAME);
+                    if (originLabel != null) {
+                        if (originLabel.getOrigin() instanceof OriginTermLabel.FileOrigin) {
+                            ((OriginTermLabel.FileOrigin) originLabel.getOrigin())
+                                    .getFileName()
+                                    .ifPresent(sources::addRelevantFile);
+                        }
 
-                    originLabel.getSubtermOrigins().stream()
-                            .filter(o -> o instanceof OriginTermLabel.FileOrigin)
-                            .map(o -> (OriginTermLabel.FileOrigin) o)
-                            .forEach(o -> o.getFileName().ifPresent(sources::addRelevantFile));
-                }
-            });
+                        originLabel.getSubtermOrigins().stream()
+                                .filter(o -> o instanceof OriginTermLabel.FileOrigin)
+                                .map(o -> (OriginTermLabel.FileOrigin) o)
+                                .forEach(o -> o.getFileName().ifPresent(sources::addRelevantFile));
+                    }
+                });
+            }
         }
 
     }
@@ -302,11 +313,8 @@ public final class SourceView extends JComponent {
             throw new BadLocationException("Not a valid line number for " + fileURI, line);
         }
 
-        if (!tab.highlights.containsKey(line)) {
-            tab.highlights.put(line, new TreeSet<>(Collections.reverseOrder()));
-        }
-
-        SortedSet<Highlight> highlights = tab.highlights.get(line);
+        SortedSet<Highlight> highlights =
+            tab.highlights.computeIfAbsent(line, k -> new TreeSet<>(Collections.reverseOrder()));
 
         Highlight highlight = new Highlight(fileURI, line, color, level);
         highlights.add(highlight);
@@ -389,27 +397,26 @@ public final class SourceView extends JComponent {
 
         Tab tab = tabs.get(fileURI);
 
-        if (tab == null || !tab.highlights.containsKey(oldLine)
-                || !tab.highlights.get(oldLine).contains(highlight)) {
+        if (tab == null) {
+            throw new IllegalArgumentException("highlight");
+        }
+        SortedSet<Highlight> oldHighlights = tab.highlights.get(oldLine);
+        if (oldHighlights == null || !oldHighlights.contains(highlight)) {
             throw new IllegalArgumentException("highlight");
         }
 
         tab.removeHighlights(oldLine);
-        tab.highlights.get(oldLine).remove(highlight);
+        oldHighlights.remove(highlight);
         tab.applyHighlights(oldLine);
 
-        if (tab.highlights.get(oldLine).isEmpty()) {
+        if (oldHighlights.isEmpty()) {
             tab.highlights.remove(oldLine);
         }
 
         highlight.line = newLine;
         highlight.setTag(null);
 
-        if (!tab.highlights.containsKey(newLine)) {
-            tab.highlights.put(newLine, new TreeSet<>());
-        }
-
-        tab.highlights.get(newLine).add(highlight);
+        tab.highlights.computeIfAbsent(newLine, k -> new TreeSet<>()).add(highlight);
         tab.removeHighlights(newLine);
         tab.applyHighlights(newLine);
     }
@@ -430,11 +437,11 @@ public final class SourceView extends JComponent {
 
         tab.removeHighlights(highlight.getLine());
 
-        boolean result = tab.highlights.containsKey(highlight.getLine())
-                && tab.highlights.get(highlight.getLine()).remove(highlight);
+        SortedSet<Highlight> set = tab.highlights.get(highlight.getLine());
+        boolean result = set != null && set.remove(highlight);
         highlight.setTag(null);
 
-        if (result && tab.highlights.get(highlight.getLine()).isEmpty()) {
+        if (result && set != null && set.isEmpty()) {
             tab.highlights.remove(highlight.getLine());
         } else {
             try {
@@ -550,7 +557,14 @@ public final class SourceView extends JComponent {
      * @return true iff the point is on a highlight
      */
     private boolean isHighlighted(Point point) {
-        Tab tab = tabs.get(selectedFile);
+        URI currentFile = selectedFile;
+        if (currentFile == null) {
+            return false;
+        }
+        Tab tab = tabs.get(currentFile);
+        if (tab == null) {
+            return false;
+        }
         int pos = tab.textPane.viewToModel2D(point);
         int line = tab.posToLine(pos);
 
@@ -589,7 +603,9 @@ public final class SourceView extends JComponent {
             if (!fileURIs.contains(fileURI)) {
                 Tab tab = tabs.get(fileURI);
                 it.remove();
-                tabPane.remove(tab);
+                if (tab != null) {
+                    tabPane.remove(tab);
+                }
             }
         }
 
@@ -616,7 +632,18 @@ public final class SourceView extends JComponent {
             return false;
         } else {
             // try to load the file via the FileRepo
-            FileRepo repo = proof.getInitConfig().getFileRepo();
+            InitConfig initConfig = proof.getInitConfig();
+            if (initConfig == null) {
+                // a loaded proof always has an initial configuration; the previous code crashed
+                // with an NPE here
+                throw new IOException("No initial configuration for proof: " + fileURI);
+            }
+            FileRepo repo = initConfig.getFileRepo();
+            if (repo == null) {
+                // a loaded proof always has a file repository; the previous code crashed with
+                // an NPE here
+                throw new IOException("No file repository for proof: " + fileURI);
+            }
             try (InputStream is = repo.getInputStream(fileURI.toURL())) {
                 if (is != null) {
                     Tab tab = new Tab(fileURI, is);
@@ -663,24 +690,32 @@ public final class SourceView extends JComponent {
             addFiles();
         }
 
+        LinkedList<Pair<Node, PositionInfo>> currentLines = lines;
+        if (currentLines == null) {
+            currentLines = new LinkedList<>();
+        }
         tabs.values().forEach(Tab::paintSymbExHighlights);
 
         if (tabPane.getTabCount() > 0) {
             tabPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 
             // activate the tab with the most recent file
-            PositionInfo p = lines.isEmpty() ? null : lines.getFirst().second;
+            PositionInfo p = currentLines.isEmpty() ? null : currentLines.getFirst().second;
             if (p != null) {
-                Tab t = tabs.get(p.getURI().orElse(null));
-                if (t != null) {
-                    String s = t.simpleFileName;
-                    for (int i = 0; i < tabPane.getTabCount(); i++) {
-                        if (tabPane.getTitleAt(i).equals(s)) {
-                            tabPane.setSelectedIndex(i);
+                URI fileURI = p.getURI().orElse(null);
+                if (fileURI != null) {
+                    Tab t = tabs.get(fileURI);
+                    if (t != null) {
+                        String s = t.simpleFileName;
+                        for (int i = 0; i < tabPane.getTabCount(); i++) {
+                            if (tabPane.getTitleAt(i).equals(s)) {
+                                tabPane.setSelectedIndex(i);
 
-                            // scroll to most recent highlight
-                            int line = lines.getFirst().second.getEndPosition().line();
-                            t.scrollToLine(line);
+                                // scroll to most recent highlight
+                                int line =
+                                    currentLines.getFirst().second.getEndPosition().line();
+                                t.scrollToLine(line);
+                            }
                         }
                     }
                 }
@@ -699,8 +734,14 @@ public final class SourceView extends JComponent {
         if (pos != null && !pos.equals(PositionInfo.UNDEFINED) && pos.startEndValid()
                 && pos.getURI().isPresent()) {
             list.addLast(new Pair<>(node, pos));
-            node.proof().lookup(ProofJavaSourceCollection.class)
-                    .addRelevantFile(pos.getURI().get());
+            Proof proof = node.proof();
+            if (proof != null) {
+                ProofJavaSourceCollection sources =
+                    proof.lookup(ProofJavaSourceCollection.class);
+                if (sources != null) {
+                    sources.addRelevantFile(pos.getURI().get());
+                }
+            }
         }
     }
 
@@ -807,7 +848,7 @@ public final class SourceView extends JComponent {
      * @return a new PositionInfo starting at the minimum of all the contained positions and ending
      *         at the maximum position
      */
-    private static PositionInfo joinPositionsRec(SourceElement se) {
+    private static @Nullable PositionInfo joinPositionsRec(SourceElement se) {
         if (se instanceof NonTerminalProgramElement ntpe) {
             // TODO: additional elements, e.g. code inside if
             if (se instanceof If || se instanceof Then || se instanceof Else) {
@@ -840,12 +881,14 @@ public final class SourceView extends JComponent {
      */
     private static String collectPathInformation(@Nullable Node node) {
         while (node != null) {
-            if (node.getNodeInfo() != null && node.getNodeInfo().getBranchLabel() != null) {
-                String label = node.getNodeInfo().getBranchLabel();
+            NodeInfo nodeInfo = node.getNodeInfo();
+            if (nodeInfo != null) {
+                String label = nodeInfo.getBranchLabel();
                 /*
                  * Are there other interesting labels? Please feel free to add them here.
                  */
-                if (label.equals("Invariant Initially Valid")
+                if (label != null) {
+                    if (label.equals("Invariant Initially Valid")
                         || label.equals("Invariant Preserved and Used") // for loop scope invariant
                         || label.equals("Body Preserves Invariant") || label.equals("Use Case")
                         || label.equals("Show Axiom Satisfiability") || label.startsWith("Pre (")
@@ -854,7 +897,8 @@ public final class SourceView extends JComponent {
                         || label.contains("Normal Execution") || label.contains("Null Reference")
                         || label.contains("Index Out of Bounds") || label.contains("Validity")
                         || label.contains("Precondition") || label.contains("Usage")) {
-                    return label;
+                        return label;
+                    }
                 }
             }
             node = node.parent();
@@ -941,6 +985,14 @@ public final class SourceView extends JComponent {
         private final SourceHighlightDocument doc =
             new SourceHighlightDocument(new JavaJMLEditorLexer());
 
+        /**
+         * The tab assigns {@code lineInformation} via {@code initLineInfo()} and configures the
+         * scroll pane while the receiver is still under initialization (EISOP initialization
+         * check); the effects only take place after construction completes, suppressed with
+         * scoped keys.
+         */
+        @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+            "nullness:method.invocation.invalid" })
         private Tab(URI fileURI, InputStream stream) {
             this.absoluteFileName = fileURI;
             this.simpleFileName = extractFileName(fileURI);
@@ -1100,8 +1152,9 @@ public final class SourceView extends JComponent {
             }
 
             for (Highlight highlight : set) {
-                if (highlight.getTag() != null) {
-                    textPane.getHighlighter().removeHighlight(highlight.getTag());
+                Object tag = highlight.getTag();
+                if (tag != null) {
+                    textPane.getHighlighter().removeHighlight(tag);
                     highlight.setTag(null);
                 }
             }
@@ -1139,15 +1192,16 @@ public final class SourceView extends JComponent {
 
             symbExHighlights.clear();
 
-            if (lines == null) {
+            LinkedList<Pair<Node, PositionInfo>> currentLines = lines;
+            if (currentLines == null) {
                 return;
             }
 
             try {
                 int mostRecentLine = -1;
 
-                for (int i = 0; i < lines.size(); i++) {
-                    Pair<Node, PositionInfo> l = lines.get(i);
+                for (int i = 0; i < currentLines.size(); i++) {
+                    Pair<Node, PositionInfo> l = currentLines.get(i);
 
                     if (absoluteFileName.equals(l.second.getURI().orElse(null))) {
                         int line = l.second.getStartPosition().line();
@@ -1300,13 +1354,13 @@ public final class SourceView extends JComponent {
 
         /**
          *
-         * @param tag the new tag wrapped by this object.
+         * @param tag the new tag wrapped by this object, or {@code null} to remove the tag
          *
          * @see Highlighter#addHighlight(int, int, HighlightPainter)
          * @see Highlighter#changeHighlight(Object, int, int)
          * @see Highlighter#removeHighlight(Object)
          */
-        private void setTag(Object tag) {
+        private void setTag(@Nullable Object tag) {
             if (tag == null) {
                 TAGS.remove(this);
             } else {
@@ -1316,13 +1370,13 @@ public final class SourceView extends JComponent {
 
         /**
          *
-         * @return the tag wrapped by this object.
+         * @return the tag wrapped by this object, or {@code null} if no tag is stored
          *
          * @see Highlighter#addHighlight(int, int, HighlightPainter)
          * @see Highlighter#changeHighlight(Object, int, int)
          * @see Highlighter#removeHighlight(Object)
          */
-        private Object getTag() {
+        private @Nullable Object getTag() {
             return TAGS.get(this);
         }
 
@@ -1404,11 +1458,14 @@ public final class SourceView extends JComponent {
                 }
                 // jump in proof tree (get corresponding node from list)
                 Node n = null;
-                for (Pair<Node, PositionInfo> p : lines) {
-                    if (p.second.getStartPosition().line() == line + 1
-                            && fileURI.equals(p.second.getURI().orElse(null))) {
-                        n = p.first;
-                        break;
+                LinkedList<Pair<Node, PositionInfo>> currentLines = lines;
+                if (currentLines != null) {
+                    for (Pair<Node, PositionInfo> p : currentLines) {
+                        if (p.second.getStartPosition().line() == line + 1
+                                && fileURI.equals(p.second.getURI().orElse(null))) {
+                            n = p.first;
+                            break;
+                        }
                     }
                 }
 

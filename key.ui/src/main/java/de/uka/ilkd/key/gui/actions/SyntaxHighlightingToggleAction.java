@@ -22,10 +22,21 @@ public class SyntaxHighlightingToggleAction extends MainWindowAction {
 
     /**
      * Listens for changes on {@code ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()}.
+     *
+     * The bound method reference binds {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since the listener only ever fires
+     * after construction completes, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:methodref.receiver.bound.invalid")
     private final PropertyChangeListener syntaxHighlightingListener =
         this::handleViewSettingsChanged;
 
+    /**
+     * The action-configuration calls and the listener registration below operate on {@code this}
+     * while the receiver is still under initialization (EISOP initialization check); safe here
+     * since these configure the local action only, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SyntaxHighlightingToggleAction(MainWindow window) {
         super(window);
         setName("Use Syntax Highlighting");

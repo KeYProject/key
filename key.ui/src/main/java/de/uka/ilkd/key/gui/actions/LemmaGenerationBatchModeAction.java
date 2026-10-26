@@ -41,6 +41,12 @@ public class LemmaGenerationBatchModeAction extends MainWindowAction {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The action-configuration calls below operate on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here since these configure the local
+     * action only, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public LemmaGenerationBatchModeAction(MainWindow mainWindow) {
         super(mainWindow);
         setTooltip("Show information about proving taclets by using the batch mode.");

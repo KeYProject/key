@@ -83,7 +83,12 @@ public class Example {
 
     public Example(Path file) throws IOException {
         this.exampleFile = file;
-        this.directory = file.getParent();
+        Path parent = file.getParent();
+        if (parent == null) {
+            // an example file always sits inside its example directory
+            throw new NullPointerException("No example directory available.");
+        }
+        this.directory = parent;
         this.properties = new Properties();
         StringBuilder sb = new StringBuilder();
         extractDescription(file, sb, properties);
@@ -103,7 +108,12 @@ public class Example {
     }
 
     public String getName() {
-        return properties.getProperty(KEY_NAME, directory.getFileName().toString());
+        Path fileName = directory.getFileName();
+        if (fileName == null) {
+            // an example directory always has a name
+            throw new NullPointerException("No example directory name available.");
+        }
+        return properties.getProperty(KEY_NAME, fileName.toString());
     }
 
     public String getDescription() {
@@ -118,7 +128,12 @@ public class Example {
         var result = new ArrayList<Path>();
         int i = 1;
         while (properties.containsKey(ADDITIONAL_FILE_PREFIX + i)) {
-            result.add(directory.resolve(properties.getProperty(ADDITIONAL_FILE_PREFIX + i)));
+            String name = properties.getProperty(ADDITIONAL_FILE_PREFIX + i);
+            if (name == null) {
+                // the containing check guarantees the property is set
+                throw new NullPointerException("No additional file name available.");
+            }
+            result.add(directory.resolve(name));
             i++;
         }
         return result;
@@ -128,7 +143,12 @@ public class Example {
         var result = new ArrayList<Path>();
         int i = 1;
         while (properties.containsKey(EXPORT_FILE_PREFIX + i)) {
-            result.add(directory.resolve(properties.getProperty(EXPORT_FILE_PREFIX + i)));
+            String name = properties.getProperty(EXPORT_FILE_PREFIX + i);
+            if (name == null) {
+                // the containing check guarantees the property is set
+                throw new NullPointerException("No export file name available.");
+            }
+            result.add(directory.resolve(name));
             i++;
         }
         return result;
@@ -156,7 +176,12 @@ public class Example {
         }
         Enumeration<?> en = root.children();
         while (en.hasMoreElements()) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) en.nextElement();
+            Object child = en.nextElement();
+            if (child == null) {
+                // a tree's child enumeration never yields null
+                throw new NullPointerException("No tree child available.");
+            }
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) child;
             if (node.getUserObject().equals(path[from])) {
                 return findChild(node, path, from + 1);
             }

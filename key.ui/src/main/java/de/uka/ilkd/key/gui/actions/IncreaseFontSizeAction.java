@@ -27,6 +27,13 @@ public class IncreaseFontSizeAction extends MainWindowAction implements ConfigCh
      *
      * @param mainWindow the main window
      */
+    /**
+     * The action-configuration setters and the {@link Config} listener registration below operate
+     * on {@code this} while the receiver is still under initialization (EISOP initialization
+     * check); safe here since these configure the local action only, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public IncreaseFontSizeAction(MainWindow mainWindow) {
         super(mainWindow);
 

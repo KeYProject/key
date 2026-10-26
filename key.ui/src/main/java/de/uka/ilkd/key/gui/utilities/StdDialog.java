@@ -40,6 +40,12 @@ public class StdDialog extends JDialog {
         this(title, null, strut, helpButton);
     }
 
+    /**
+     * The ctor lays out the dialog while the receiver is still under initialization (EISOP
+     * initialization check); the components are only used after construction completes,
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public StdDialog(String title, @Nullable JComponent content, int strut, boolean helpButton) {
         this.setTitle(title);
         this.setModal(true);

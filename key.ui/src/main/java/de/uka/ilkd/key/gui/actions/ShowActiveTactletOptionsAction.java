@@ -22,6 +22,11 @@ public class ShowActiveTactletOptionsAction extends MainWindowAction {
     private static final long serialVersionUID = -7012564698194718532L;
     private final ShowActiveSettingsAction action;
 
+    /**
+     * The action-configuration setter is called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ShowActiveTactletOptionsAction(MainWindow mainWindow, ShowActiveSettingsAction action) {
         super(mainWindow);
         setName("Show Active Taclet Options");

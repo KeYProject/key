@@ -28,7 +28,6 @@ import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -52,8 +51,17 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     // to make the "No Proof Loaded" header invisible when a proof is loaded
     private JLabel noProofLoadedHeader;
 
-    private Proof loadedProof = null;
+    /** the proof loaded as the reference for the option comparison, if any */
+    private @Nullable Proof loadedProof;
 
+    /**
+     * The ctor configures the header text, head layout and choice settings while the receiver is
+     * still under initialization (EISOP initialization check); the fields are initialized by
+     * {@link #setChoiceSettings(ChoiceSettings)} and {@link #layoutHead()} before the panel is
+     * displayed, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:initialization.fields.uninitialized" })
     public TacletOptionsSettings() {
         setHeaderText(getDescription());
         pCenter.setLayout(new MigLayout(new LC().fillX(), new AC().fill().grow().gap("3mm")));
@@ -75,24 +83,28 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * @return The explanation for the given category.
      */
     public static String getExplanation(String category) {
+        Properties map;
         synchronized (TacletOptionsSettings.class) {
-            if (explanationMap == null) {
-                explanationMap = new Properties();
+            Properties current = explanationMap;
+            if (current == null) {
+                current = new Properties();
+                explanationMap = current;
                 InputStream is =
                     TacletOptionsSettings.class.getResourceAsStream(EXPLANATIONS_RESOURCE);
                 try {
                     if (is == null) {
                         throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found");
                     }
-                    explanationMap.loadFromXML(is);
+                    current.loadFromXML(is);
                 } catch (InvalidPropertiesFormatException e) {
                     LOGGER.error("Cannot load help message in rule view (malformed XML).", e);
                 } catch (IOException e) {
                     LOGGER.error("Cannot load help messages in rule view.", e);
                 }
             }
+            map = current;
         }
-        String result = explanationMap.getProperty(category);
+        String result = map.getProperty(category);
         if (result == null) {
             result = "No explanation for " + category + " available.";
         }
@@ -185,14 +197,15 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
     }
 
     protected void layoutHead() {
-        this.noProofLoadedHeader = new JLabel("No Proof loaded. Taclet options may not be parsed.");
-        noProofLoadedHeader.setIcon(IconFactory.WARNING_INCOMPLETE.get());
-        noProofLoadedHeader.setFont(noProofLoadedHeader.getFont().deriveFont(14f));
-        pNorth.add(noProofLoadedHeader);
+        JLabel header = new JLabel("No Proof loaded. Taclet options may not be parsed.");
+        header.setIcon(IconFactory.WARNING_INCOMPLETE.get());
+        header.setFont(deriveFont(header, 14f));
+        this.noProofLoadedHeader = header;
+        pNorth.add(header);
 
         JLabel lblHead2 = new JLabel("Taclet options will take effect only on new proofs.");
         lblHead2.setIcon(IconFactory.WARNING_INCOMPLETE.get());
-        lblHead2.setFont(lblHead2.getFont().deriveFont(14f));
+        lblHead2.setFont(deriveFont(lblHead2, 14f));
         pNorth.add(lblHead2);
     }
 
@@ -239,11 +252,15 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
         explanationArea.setWrapStyleWord(true);
         explanationArea.setText(explanation.trim());
         explanationArea.setCaretPosition(0);
-        explanationArea.setBackground(toNonUIColor(getBackground()));
+        Color background = getBackground();
+        if (background == null) {
+            // the panel always carries a background color
+            throw new NullPointerException("No background color available.");
+        }
+        explanationArea.setBackground(toNonUIColor(background));
         return explanationArea;
     }
 
-    @NonNull
     private JPanel createCollapsableTitlePane(JComponent title, JComponent child) {
         JPanel p = new JPanel(new BorderLayout());
         JPanel north = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -301,7 +318,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
 
     private JLabel createTitleRow(String cat, @Nullable ChoiceEntry entry) {
         JLabel lbl = new JLabel(createCatTitleText(cat, entry));
-        lbl.setFont(lbl.getFont().deriveFont(14f));
+        lbl.setFont(deriveFont(lbl, 14f));
 
         // we want to display a warning if the current choice differs from the loaded proof
         checkForDifferingOptions(lbl, cat, entry);
@@ -325,10 +342,16 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * Checks if the current choice {@code entry} differs from the loaded proof and sets the icon to
      * show a warning if necessary.
      *
+     * <p>
+     * Clearing the warning icon is expressed as setting the label's icon to {@code null}; the
+     * swing model declares a non-null icon parameter while the implementation accepts {@code null}
+     * to clear the icon, suppressed with a scoped key.
+     *
      * @param lbl The label to set the icon on
      * @param cat The category of the choice
      * @param entry The current choice
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private void checkForDifferingOptions(JLabel lbl, String cat, @Nullable ChoiceEntry entry) {
         if (loadedProof != null) {
             String choiceOfLoadedProof =
@@ -343,7 +366,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
                         + "The loaded proof uses: " + choiceOfLoadedProof + "</html>");
 
             } else {
-                lbl.setIcon(null);
+                lbl.setIcon((Icon) null);
                 lbl.setToolTipText(null);
             }
         }
@@ -552,6 +575,22 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
             checkForDifferingOptions(title, category, choice);
             title.repaint();
         }
+    }
+
+    /**
+     * Derives a font for the given label at the given size.
+     *
+     * @param label the label whose font is derived
+     * @param size the new size
+     * @return the derived font
+     */
+    private static Font deriveFont(JLabel label, float size) {
+        Font font = label.getFont();
+        if (font == null) {
+            // a label always obtains its font from the installed look and feel
+            throw new NullPointerException("No font available.");
+        }
+        return font.deriveFont(size);
     }
 
     /**

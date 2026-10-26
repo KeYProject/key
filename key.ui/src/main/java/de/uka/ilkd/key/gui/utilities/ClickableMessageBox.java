@@ -36,6 +36,15 @@ public class ClickableMessageBox extends JTextPane {
     private final HTMLEditorKit kit = new HTMLEditorKit();
     private final HTMLDocument doc = new HTMLDocument();
 
+    /**
+     * Creates the message box.
+     *
+     * <p>
+     * The box installs its editor kit, document and hyperlink listener while the receiver is
+     * still under initialization (EISOP initialization check); the listener only fires once the
+     * box is displayed, after construction completes, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ClickableMessageBox() {
         this.setEditorKit(kit);
         this.setDocument(doc);
@@ -61,6 +70,21 @@ public class ClickableMessageBox extends JTextPane {
         listeners.add(listener);
     }
 
+    /**
+     * Adds a message to the box, optionally as a clickable link.
+     *
+     * @param item the object to notify listeners about when the message is clicked, or
+     *        {@code null} if the message is plain text without a link.
+     * @param message the message text.
+     * @param color the message color.
+     *
+     *         <p>
+     *         A {@code null} item is stored in the index-aligned entry list but never delivered
+     *         (only non-null items get a hyperlink); the layout call passes a {@code null}
+     *         insert tag so the editor kit infers the tag from the HTML itself. Both deliberate
+     *         {@code null}s are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public void add(@Nullable Object item, String message, Color color) {
         try {
             if (item != null) {

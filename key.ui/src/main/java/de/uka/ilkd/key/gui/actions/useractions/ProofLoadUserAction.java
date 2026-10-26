@@ -35,7 +35,9 @@ public class ProofLoadUserAction extends UserAction {
 
     @Override
     public String name() {
-        return "Load: " + proofLoaded.name();
+        // {@code proofLoaded} becomes {@code null} after {@link #undo()}; in that (impossible for
+        // a live action) state the previous code crashed with an NPE.
+        return "Load: " + (proofLoaded == null ? "?" : proofLoaded.name());
     }
 
     @Override
@@ -44,12 +46,15 @@ public class ProofLoadUserAction extends UserAction {
 
     @Override
     public void undo() {
-        proofLoaded.dispose();
-        proofLoaded = null;
+        if (proofLoaded != null) {
+            proofLoaded.dispose();
+            proofLoaded = null;
+        }
     }
 
     @Override
     public boolean canUndo() {
-        return !proofLoaded.isDisposed();
+        // {@code proofLoaded} is only {@code null} after an undo, which cannot be undone again.
+        return proofLoaded != null && !proofLoaded.isDisposed();
     }
 }

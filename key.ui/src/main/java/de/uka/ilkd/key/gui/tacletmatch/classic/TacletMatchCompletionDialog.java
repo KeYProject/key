@@ -75,6 +75,15 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
     private final MainWindow mainWindow;
 
+    /**
+     * The dialog configures itself with title, layout, status, preference and visibility calls
+     * while the receiver is still under initialization (EISOP initialization check) and passes
+     * itself to {@link MainWindow#loadPreferences} as component; the effects only take place
+     * after construction completes, suppressed with scoped keys. The {@code alternatives} and
+     * {@code tablePane} fields are bound by the private layout methods.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid", "nullness:argument.type.incompatible" })
     public TacletMatchCompletionDialog(MainWindow parent, TacletInstantiationModel[] model,
             Goal goal, KeYMediator mediator) {
         super(parent, model, mediator);
@@ -189,7 +198,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                 dataTable[i].setIfSelectionPanel(ifSelection);
                 tabContent.add(ifSelection);
             }
-            alternatives.addTab("Alt " + i, null, tabContent, "Instantiations Alternatives");
+            alternatives.addTab("Alt " + i, tabContent);
+            alternatives.setToolTipTextAt(i, "Instantiations Alternatives");
         }
 
         panel.add(alternatives);
@@ -211,7 +221,10 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
     private void pushAllInputToModel(int i) {
         if (dataTable[i].hasIfSelectionPanel()) {
-            dataTable[i].getIfSelectionPanel().pushAllInputToModel();
+            TacletIfSelectionDialog ifSelection = dataTable[i].getIfSelectionPanel();
+            if (ifSelection != null) {
+                ifSelection.pushAllInputToModel();
+            }
         }
         if (dataTable[i].isEditing()) {
             dataTable[i].getCellEditor().stopCellEditing();
@@ -274,11 +287,14 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         public ButtonListener() {
         }
 
-        private void errorPositionKnown(String errorMessage, int row, int col,
+        private void errorPositionKnown(@Nullable String errorMessage, int row, int col,
                 boolean inIfSequent) {
 
             if (inIfSequent) {
-                dataTable[current()].getIfSelectionPanel().requestFocusAt(row, col);
+                TacletIfSelectionDialog ifSelection = dataTable[current()].getIfSelectionPanel();
+                if (ifSelection != null) {
+                    ifSelection.requestFocusAt(row, col);
+                }
             } else {
                 // select table cell where the error occured
                 // ALL THIS DOES NOT REALLY WORK!!! BUT WHY???
@@ -363,6 +379,15 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
          */
         private @Nullable TacletIfSelectionDialog ifSelectionPanel;
 
+        /**
+         * The table registers itself with the model, configures editors and installs the
+         * drag-and-drop support while the receiver is still under initialization (EISOP
+         * initialization check) and passes itself to the drop target, resizer and to
+         * {@code addModelChangeListener}; the effects only take place after construction
+         * completes, suppressed with scoped keys.
+         */
+        @SuppressWarnings({ "nullness:method.invocation.invalid",
+            "nullness:argument.type.incompatible" })
         private DataTable(TacletMatchCompletionDialog owner, int modelNr, KeYMediator mediator) {
 
             super(owner.model[modelNr].tableModel());
@@ -531,6 +556,12 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             final JPanel editPanel;
             final JTextArea textarea;
 
+            /**
+             * The editor configures itself with the click-count and drop-target calls while the
+             * receiver is still under initialization (EISOP initialization check); the effects
+             * only take place after construction completes, suppressed with a scoped key.
+             */
+            @SuppressWarnings("nullness:method.invocation.invalid")
             public InputEditor(JTextArea ta) {
                 super(new JCheckBox()); // Unfortunately, the constructor
                 // expects a check box, combo box,
@@ -674,7 +705,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             private static final long serialVersionUID = -7270236368657110379L;
             final JTextArea ta = new JTextArea("nothing");
 
-            public Component getTableCellRendererComponent(JTable table, Object obj,
+            public Component getTableCellRendererComponent(JTable table, @Nullable Object obj,
                     boolean isSelected, boolean hasFocus, int row, int column) {
                 if (obj == null) {
                     obj = "";
@@ -697,6 +728,10 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         final NotationInfo ni = new NotationInfo();
 
         Services services = mediator.getServices();
+        if (services == null) {
+            // the term view is only printed while a proof is loaded
+            throw new NullPointerException("No services available for printing.");
+        }
         final JTerm t = TermLabelManager.removeIrrelevantLabels(term, services);
         LogicPrinter p = LogicPrinter.purePrinter(ni, services);
         boolean pretty = mediator.getNotationInfo().isPrettySyntax();

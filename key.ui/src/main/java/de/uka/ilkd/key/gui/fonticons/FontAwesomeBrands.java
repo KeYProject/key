@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.fonticons;
 
 import java.awt.*;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -131,8 +132,14 @@ public enum FontAwesomeBrands implements IconFont {
     @Override
     public Font getFont() throws IOException, FontFormatException {
         if (font == null) {
-            font = Font.createFont(Font.TRUETYPE_FONT,
-                getClass().getResourceAsStream("/fonts/Font Awesome 6 Brands-Regular-400.otf"));
+            InputStream stream =
+                getClass().getResourceAsStream("/fonts/Font Awesome 6 Brands-Regular-400.otf");
+            if (stream == null) {
+                // the font is bundled with the application
+                throw new NullPointerException(
+                    "Missing font resource /fonts/Font Awesome 6 Brands-Regular-400.otf");
+            }
+            font = Font.createFont(Font.TRUETYPE_FONT, stream);
         }
         return font;
     }

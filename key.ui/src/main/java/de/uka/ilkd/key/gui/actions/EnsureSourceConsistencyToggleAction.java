@@ -28,6 +28,11 @@ public class EnsureSourceConsistencyToggleAction extends MainWindowAction {
      *
      * @param mainWindow the main window of the program
      */
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public EnsureSourceConsistencyToggleAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Ensure Source Consistency");

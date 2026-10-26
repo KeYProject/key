@@ -22,6 +22,7 @@ import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.proof.Proof;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class ShowKnownTypesAction extends MainWindowAction {
@@ -31,9 +32,17 @@ public class ShowKnownTypesAction extends MainWindowAction {
      */
     private static final long serialVersionUID = 4368162229726580799L;
 
-    private final Proof proof;
+    private final @Nullable Proof proof;
 
-    public ShowKnownTypesAction(MainWindow mainWindow, Proof proof) {
+    /**
+     * The action-configuration calls and the {@code enableWhenProofLoaded(this)} registration
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since the listener only reacts to later selection events,
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
+    public ShowKnownTypesAction(MainWindow mainWindow, @Nullable Proof proof) {
         super(mainWindow);
         setName("Show Known Types");
 

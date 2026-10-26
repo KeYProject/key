@@ -65,6 +65,11 @@ public final class SaveBundleAction extends MainWindowAction {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             // Try to save back to file where proof was initially loaded from
             final Proof selectedProof = mainWindow.getMediator().getSelectedProof();
+            if (selectedProof == null) {
+                // A proof is ensured to be loaded above; a {@code null} here is a concurrent
+                // state change, crash-equivalent to the previous NPE in the saver.
+                throw new NullPointerException("No proof loaded to save.");
+            }
             mainWindow.getUserInterface().saveProofBundle(selectedProof);
         } else {
             mainWindow.popupWarning("No proof.", "Oops...");

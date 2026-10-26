@@ -31,6 +31,17 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
     private final JTable tblColors = new JTable();
     private ColorSettingsTableModel modelColor;
 
+    /**
+     * Creates the color settings panel.
+     *
+     * <p>
+     * The table model is built lazily by {@link #getPanel(MainWindow)}, which the settings
+     * framework always calls before {@link #applySettings(MainWindow)}; the EISOP initialization
+     * check can therefore not verify the model field, and the header texts are set while the
+     * receiver is still under initialization, both suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     public ColorSettingsProvider() {
         super();
         setHeaderText(getDescription());
@@ -177,6 +188,15 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
 
 @NullMarked
 class HexColorCellEditor extends DefaultCellEditor {
+    /**
+     * Creates an editor editing a hex color in the given text field.
+     *
+     * <p>
+     * The field's action and document listeners are registered while the receiver is still under
+     * initialization (EISOP initialization check); they only fire once the editor is used in the
+     * table, by which time construction has completed, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     HexColorCellEditor(JTextField textField) {
         super(textField);
 

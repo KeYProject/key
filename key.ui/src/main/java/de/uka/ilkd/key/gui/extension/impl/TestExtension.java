@@ -102,6 +102,15 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
     }
 
     private static class TestAction extends KeyAction {
+        /**
+         * Creates the test action.
+         *
+         * <p>
+         * The action names itself, binds its icon and accelerator while the receiver is still
+         * under initialization (EISOP initialization check); the settings only materialize once
+         * the action is displayed after construction, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public TestAction() {
             setName("Test");
             setMenuPath("Test.Test.Test");

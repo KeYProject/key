@@ -33,7 +33,16 @@ public class DynamicCMenu extends CDecorateableAction<DynamicCMenu.Action> {
      * constructor
      *
      * @param supplier the supplier
+     *
+     *         <p>
+     *         The action is created without a backing {@link CAction} ({@code null}, replaced
+     *         immediately via {@link #init(Action)}), and the under-construction receiver is
+     *         passed to the inner action while still under initialization (EISOP initialization
+     *         check); both only take effect once construction completes, suppressed with scoped
+     *         keys.
      */
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:method.invocation.invalid" })
     public DynamicCMenu(Supplier<CMenu> supplier) {
         super(null);
         this.init(new Action(this, supplier));
@@ -45,7 +54,13 @@ public class DynamicCMenu extends CDecorateableAction<DynamicCMenu.Action> {
      * @param text the text of this action
      * @param icon the icon of this action
      * @param supplier the supplier
+     *
+     *         <p>
+     *         The action names itself and sets its icon while the receiver is still under
+     *         initialization (EISOP initialization check); both only materialize once the action
+     *         is shown after construction, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public DynamicCMenu(String text, Icon icon, Supplier<CMenu> supplier) {
         this(supplier);
         this.setText(text);
@@ -77,6 +92,17 @@ public class DynamicCMenu extends CDecorateableAction<DynamicCMenu.Action> {
             return supplier.get().intern().getMenu(dockable);
         }
 
+        /**
+         * Creates the view for this action in the given target.
+         *
+         * <p>
+         * The docking framework declares the type parameter of {@link ViewTarget} with a nullable
+         * bound, while this override keeps the unbounded default; the differences in the nullness
+         * bound (which the docking framework never observes at runtime) are suppressed with a
+         * scoped key.
+         */
+        @Override
+        @SuppressWarnings("nullness:override.param.invalid")
         public <V> V createView(ViewTarget<V> target, ActionViewConverter converter,
                 Dockable dockable) {
             return converter.createView(ActionType.MENU, this, target, dockable);

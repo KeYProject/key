@@ -56,7 +56,7 @@ public class ProofScriptFromFileAction extends AbstractAction {
             Proof currentProof = mediator.getSelectedProof();
             if (currentProof != null) {
                 Path currentFile = currentProof.getProofFile();
-                if (currentFile != null) {
+                if (currentFile != null && currentFile.getParent() != null) {
                     dir = currentFile.getParent();
                 }
             }
@@ -71,7 +71,16 @@ public class ProofScriptFromFileAction extends AbstractAction {
             int res = fc.showOpenDialog(mainWindow);
             if (res == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fc.getSelectedFile();
-                lastDirectory = selectedFile.getParentFile().toPath();
+                if (selectedFile == null) {
+                    throw new NullPointerException("No file selected in the file chooser.");
+                }
+                File parentFile = selectedFile.getParentFile();
+                if (parentFile == null) {
+                    // The file chooser always selects an existing file whose parent directory
+                    // exists; keep the previous NPE behavior for impossible relative files.
+                    throw new NullPointerException("The selected file has no parent directory.");
+                }
+                lastDirectory = parentFile.toPath();
                 var script = ParsingFacade.parseScript(selectedFile.toPath());
                 ProofScriptWorker psw = new ProofScriptWorker(mediator, script);
                 psw.init();

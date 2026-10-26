@@ -78,7 +78,16 @@ public class ProofMacroMenu extends JMenu {
      *
      * @param mediator the mediator of the current proof.
      * @param posInOcc the pos in occurrence, can be <code>null</code> if not available.
+     *
+     *         <p>
+     *         The ctor builds the menu items while the receiver is still under initialization
+     *         (EISOP initialization check); the feature listener only fires later and the newly
+     *         built items are added to the fully constructed menu, suppressed with a scoped key.
+     *         The receiver is also handed to the mediator for proof-dependent enabling, which only
+     *         takes effect once the menu is constructed, also under initialization.
      */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public ProofMacroMenu(KeYMediator mediator,
             @Nullable PosInOccurrence posInOcc) {
         super("Strategy Macros");
@@ -91,12 +100,14 @@ public class ProofMacroMenu extends JMenu {
         final ImmutableList<Goal> goals =
             node == null ? null : node.proof().getSubtreeEnabledGoals(node);
         for (ProofMacro macro : REGISTERED_MACROS) {
-            boolean applicable = goals != null && macro.canApplyTo(node.proof(), goals, posInOcc);
+            boolean applicable =
+                goals != null && node != null && macro.canApplyTo(node.proof(), goals, posInOcc);
 
             if (applicable) {
                 JMenuItem menuItem = createMenuItem(macro, mediator, posInOcc);
                 String category = macro.getCategory();
-                submenus.computeIfAbsent(category, x -> new ArrayList<>()).add(menuItem);
+                submenus.computeIfAbsent(category == null ? "" : category,
+                    x -> new ArrayList<>()).add(menuItem);
                 count++;
             }
         }

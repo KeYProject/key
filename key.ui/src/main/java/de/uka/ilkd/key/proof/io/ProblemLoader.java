@@ -41,8 +41,16 @@ public final class ProblemLoader extends AbstractProblemLoader {
 
     private final KeYMediator mediator;
 
-    public ProblemLoader(Path file, List<Path> classPath, Path bootClassPath, List<Path> includes,
-            Profile profileOfNewProofs, boolean forceNewProfileOfNewProofs, KeYMediator mediator,
+    /**
+     * The legacy {@link AbstractProblemLoader} declares its {@code poPropertiesToForce} parameter
+     * {@code @NonNull}, but forcing problem options is optional and the existing callers pass a
+     * possibly-{@code null} value, which the loader tolerates (it only consults the properties
+     * when forcing is requested), suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    public ProblemLoader(Path file, @Nullable List<Path> classPath, @Nullable Path bootClassPath,
+            @Nullable List<Path> includes, Profile profileOfNewProofs,
+            boolean forceNewProfileOfNewProofs, KeYMediator mediator,
             boolean askUiToSelectAProofObligationIfNotDefinedByLoadedFile,
             @Nullable Properties poPropertiesToForce, @Nullable ProverTaskListener ptl) {
         super(file, classPath, bootClassPath, includes, profileOfNewProofs,
@@ -66,8 +74,9 @@ public final class ProblemLoader extends AbstractProblemLoader {
 
         long runTime = System.currentTimeMillis() - currentTime;
         if (message != null) {
+            var envInput = getEnvInput();
             final String errorMessage = "Failed to load "
-                + (getEnvInput() == null ? "problem/proof" : getEnvInput().name());
+                + (envInput == null ? "problem/proof" : envInput.name());
             mediator.notify(new ExceptionFailureEvent(errorMessage, message));
             mediator.getUI().reportStatus(this, errorMessage);
         }
@@ -91,10 +100,12 @@ public final class ProblemLoader extends AbstractProblemLoader {
 
     private void fireTaskFinished(long runningTime, final @Nullable Throwable message) {
         if (ptl != null) {
+            // {@code getProof()} returns a possibly-null value whose nullness refinement does not
+            // survive repeated calls; work on a local copy
+            var proof = getProof();
             final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, message,
-                getProof(), runningTime, (getProof() != null ? getProof().countNodes() : 0),
-                (getProof() != null ? getProof().countBranches() - getProof().openGoals().size()
-                        : 0));
+                proof, runningTime, (proof != null ? proof.countNodes() : 0),
+                (proof != null ? proof.countBranches() - proof.openGoals().size() : 0));
             ptl.taskFinished(tfi);
         }
     }
@@ -117,7 +128,8 @@ public final class ProblemLoader extends AbstractProblemLoader {
      * {@link ProverTaskListener#taskFinished(TaskFinishedInfo)} on the registered listener.
      */
     public void runAsynchronously() {
-        final SwingWorker<@Nullable Throwable, Void> worker = new SwingWorker<>() {
+        final SwingWorker<@Nullable Throwable, Void> worker =
+            new SwingWorker<@Nullable Throwable, Void>() {
 
             private long runTime;
 

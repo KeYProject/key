@@ -32,11 +32,17 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     private final TacletApp connectedTo;
 
     /**
-     * creates TacletMenuItem attached to a Taclet
+     * Creates TacletMenuItem attached to a Taclet.
+     *
+     * <p>
+     * The item computes and applies its tooltip and display text while the receiver is still
+     * under initialization (EISOP initialization check); both only materialize once the item is
+     * displayed after construction, suppressed with a scoped key.
      *
      * @param connectedTo the TacletApp that is represented by the item
      * @param notationInfo the NotationInfo used to print terms
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public DefaultTacletMenuItem(TacletApp connectedTo, NotationInfo notationInfo,
             Services services) {
         super(connectedTo.taclet().displayName());

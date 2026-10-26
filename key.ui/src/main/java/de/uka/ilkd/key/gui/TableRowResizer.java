@@ -29,6 +29,15 @@ public class TableRowResizer extends MouseInputAdapter {
     private Cursor otherCursor = resizeCursor;
     private final JTable table;
 
+    /**
+     * Creates the row resizer and attaches it to the table.
+     *
+     * <p>
+     * The resizer registers itself as a mouse listener on the table while the receiver is still
+     * under initialization (EISOP initialization check); the listeners only fire once the table
+     * is shown after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public TableRowResizer(JTable table) {
         this.table = table;
         table.addMouseListener(this);

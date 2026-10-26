@@ -21,6 +21,15 @@ class SequentViewPanel extends JPanel {
 
     private static final long serialVersionUID = -4052156449188977483L;
 
+    /**
+     * Creates the layout for the given sequent view.
+     *
+     * <p>
+     * The panel styles itself and wraps the sequent view while the receiver is still under
+     * initialization (EISOP initialization check); the layout only materializes once the panel
+     * is shown after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     protected SequentViewPanel(SequentView sequentView) {
 
         setLayout(new GridBagLayout());

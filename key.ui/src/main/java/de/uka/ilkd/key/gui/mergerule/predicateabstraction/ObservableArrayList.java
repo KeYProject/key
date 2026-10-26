@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An observable {@link ArrayList}; poor reimplementation of the JavaFX class.
@@ -77,7 +78,7 @@ public class ObservableArrayList<E> extends ArrayList<E> {
     }
 
     @Override
-    public boolean remove(Object o) {
+    public boolean remove(@Nullable Object o) {
         boolean result = super.remove(o);
         informListeners();
         return result;
