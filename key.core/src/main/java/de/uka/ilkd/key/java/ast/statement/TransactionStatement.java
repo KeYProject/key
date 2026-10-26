@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import com.github.javaparser.ast.key.KeyTransactionStmt;
-
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
