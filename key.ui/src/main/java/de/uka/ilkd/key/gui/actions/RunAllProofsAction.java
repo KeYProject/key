@@ -98,11 +98,22 @@ public class RunAllProofsAction extends MainWindowAction {
         }
     }
 
+    /**
+     * The action-configuration calls in this constructor operate on {@code this} while the
+     * receiver is still under initialization (EISOP initialization check); safe here, suppressed
+     * with a scoped key. The examples directory lookup must succeed: this action runs the
+     * pre-defined example proofs and is only constructed after {@code PathConfig} setup.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public RunAllProofsAction(MainWindow mainWindow) {
         super(mainWindow);
 
         Main.ensureExamplesAvailable();
-        exampleDir = Main.getExamplesDir();
+        Path examplesDir = Main.getExamplesDir();
+        if (examplesDir == null) {
+            throw new NullPointerException("No examples directory configured.");
+        }
+        exampleDir = examplesDir;
 
         try {
             files = loadFiles();
@@ -116,6 +127,13 @@ public class RunAllProofsAction extends MainWindowAction {
             "Open and run a pre-defined set of proofs for GUI testing. Enabled with KeY debug flag");
     }
 
+    /**
+     * The problem loader is created with deliberately {@code null} class path, boot class path
+     * and includes: a {@code null} value selects the defaults (empty/classpath-based) per
+     * {@code JavaModel}/{@code SLEnvInput} semantics, as used by all other problem-loading entry
+     * points; the legacy parameters are annotated {@code @NonNull}, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     public void actionPerformed(ActionEvent e) {
         WindowUserInterfaceControl ui = mainWindow.getUserInterface();
@@ -136,12 +154,18 @@ public class RunAllProofsAction extends MainWindowAction {
                 KeYMediator r = getMediator();
                 Proof proof = r.getSelectedProof();
                 MediatorProofControl control = ui.getProofControl();
-                if (control.isAutoModeSupported(proof)) {
+                // {@code getSelectedProof()} may be {@code null} (no proof loaded); the proof
+                // control rejects a {@code null} proof anyway, so skip the auto-mode start.
+                if (proof != null && control.isAutoModeSupported(proof)) {
                     control.startAutoMode(proof, proof.openEnabledGoals());
                     control.waitWhileAutoMode();
                 }
-                LOGGER.info("Finish: ({}) {}", getMediator().getSelectedProof().closed(), absFile);
-                getMediator().getSelectedProof().dispose();
+                Proof selectedProof = getMediator().getSelectedProof();
+                if (selectedProof == null) {
+                    throw new NullPointerException("No proof selected after loading.");
+                }
+                LOGGER.info("Finish: ({}) {}", selectedProof.closed(), absFile);
+                selectedProof.dispose();
             }
             LOGGER.info("==== RUN ALL PROOFS FINISHED ==== ");
         };

@@ -222,10 +222,16 @@ public abstract class ProofTreeViewFilter {
                 return true;
             }
 
+            Node guiNode = node.getNode();
+            if (guiNode == null) {
+                // a tree node always wraps a proof node; the original code dereferences it
+                throw new NullPointerException("No proof node available.");
+            }
+
             // count if child is inlined because of a hidden subtree
             for (ProofTreeViewFilter filter : ALL_GLOBAL_FILTERS) {
                 if (filter.isActive() && !(parent.getChildAt(pos + 1) instanceof GUIBranchNode)
-                        && node.getNode().childrenCount() != 1) {
+                        && guiNode.childrenCount() != 1) {
                     return true;
                 }
             }
@@ -253,6 +259,10 @@ public abstract class ProofTreeViewFilter {
         @Override
         public boolean showSubtree(Node node) {
             Node parent = node.parent();
+            if (parent == null) {
+                // only the root node has no parent, which is always shown
+                return true;
+            }
             return node.equals(parent.child(parent.childrenCount() - 1));
         }
     }
@@ -261,7 +271,12 @@ public abstract class ProofTreeViewFilter {
 
         @Override
         protected boolean countChild(GUIProofTreeNode node, TreeNode parent, int pos) {
-            if (node.getNode().getNodeInfo().getInteractiveRuleApplication()) {
+            Node guiNode = node.getNode();
+            if (guiNode == null) {
+                // a tree node always wraps a proof node; the original code dereferences it
+                throw new NullPointerException("No proof node available.");
+            }
+            if (guiNode.getNodeInfo().getInteractiveRuleApplication()) {
                 return true;
             }
 
@@ -272,7 +287,7 @@ public abstract class ProofTreeViewFilter {
             // count if child is inlined because of a hidden subtree
             for (ProofTreeViewFilter filter : ALL_GLOBAL_FILTERS) {
                 if (filter.isActive() && !(parent.getChildAt(pos + 1) instanceof GUIBranchNode)
-                        && node.getNode().childrenCount() != 1) {
+                        && guiNode.childrenCount() != 1) {
                     return true;
                 }
             }

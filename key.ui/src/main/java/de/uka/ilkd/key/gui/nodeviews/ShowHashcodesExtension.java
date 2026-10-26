@@ -12,6 +12,8 @@ import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.pp.PosInSequent;
 
+import org.key_project.prover.sequent.PosInOccurrence;
+
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -36,7 +38,12 @@ public class ShowHashcodesExtension implements KeYGuiExtension, KeYGuiExtension.
 
         String result = "";
 
-        final var term = pos.getPosInOccurrence().subTerm();
+        PosInOccurrence pio = pos.getPosInOccurrence();
+        if (pio == null) {
+            // a non-sequent position always carries its occurrence
+            throw new NullPointerException("No position in occurrence available.");
+        }
+        final var term = pio.subTerm();
         result += "<b>Operator Hash:</b> " + term.op().hashCode();
 
         if (term.op() instanceof ElementaryUpdate) {

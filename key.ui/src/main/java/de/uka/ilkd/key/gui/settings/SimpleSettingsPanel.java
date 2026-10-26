@@ -63,7 +63,12 @@ public class SimpleSettingsPanel extends JPanel {
         // pNorth.setBackground(Color.WHITE);
         pNorth.setOpaque(true);
 
-        lblHead.setFont(lblHead.getFont().deriveFont(16f).deriveFont(Font.BOLD));
+        Font headFont = lblHead.getFont();
+        if (headFont == null) {
+            // a realized label always has a font
+            throw new NullPointerException("No header font available.");
+        }
+        lblHead.setFont(headFont.deriveFont(16f).deriveFont(Font.BOLD));
         pNorth.add(lblHead);
         pNorth.add(lblSubhead);
         pNorth.add(new JSeparator());
@@ -89,10 +94,13 @@ public class SimpleSettingsPanel extends JPanel {
         }
     }
 
-    protected void markComponentAsErrornous(JComponent component, String error) {
+    protected void markComponentAsErrornous(JComponent component, @Nullable String error) {
         component.putClientProperty(SAVED_BACKGROUND_COLOR, component.getBackground());
         component.setBackground(COLOR_ERROR.get());
-        component.setToolTipText(error);
+        if (error != null) {
+            // a null message keeps any previously set tool tip; only the background marks the error
+            component.setToolTipText(error);
+        }
     }
 
     protected JCheckBox createCheckBox(String title, boolean value,
@@ -215,7 +223,12 @@ public class SimpleSettingsPanel extends JPanel {
         }
 
         JLabel infoButton = new JLabel(s);
-        infoButton.setFont(infoButton.getFont().deriveFont(10f));
+        Font infoFont = infoButton.getFont();
+        if (infoFont == null) {
+            // a newly created label is never realized without a font
+            throw new NullPointerException("No label font available.");
+        }
+        infoButton.setFont(infoFont.deriveFont(10f));
         infoButton.setBackground(Color.orange);
         return infoButton;
     }
@@ -248,8 +261,11 @@ public class SimpleSettingsPanel extends JPanel {
                 }
                 demarkComponentAsErrornous(model);
             } catch (Exception ex) {
-                LOGGER.error(ex.getMessage());
-                markComponentAsErrornous(model, ex.getMessage());
+                String message = ex.getMessage();
+                if (message != null) {
+                    LOGGER.error(message);
+                }
+                markComponentAsErrornous(model, message);
             }
         }
     }

@@ -15,6 +15,7 @@ import de.uka.ilkd.key.gui.smt.OptionContentNode;
 import de.uka.ilkd.key.settings.*;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A swing model for {@link ShowActiveSettingsAction}.
@@ -24,11 +25,18 @@ import org.jspecify.annotations.NullMarked;
 
 @NullMarked
 public class SettingsTreeModel extends DefaultTreeModel {
-    private final ProofSettings proofSettings;
+    private final @Nullable ProofSettings proofSettings;
     private final ProofIndependentSettings independentSettings;
-    private DefaultMutableTreeNode tacletOptionsItem;
+    private @Nullable DefaultMutableTreeNode tacletOptionsItem;
 
-    public SettingsTreeModel(ProofSettings proofSettings,
+    /**
+     * The tree generation below operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since it only configures the local
+     * tree model, suppressed with a scoped key. The proof settings may be {@code null} when no
+     * proof is loaded; {@link #generateTree()} renders a placeholder node in that case.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
+    public SettingsTreeModel(@Nullable ProofSettings proofSettings,
             ProofIndependentSettings independentSettings) {
         super(new DefaultMutableTreeNode("All Settings"));
 
@@ -110,9 +118,10 @@ public class SettingsTreeModel extends DefaultTreeModel {
         var names = value.keys().stream().sorted().toList();
 
         for (String name : names) {
-            var v = value.get(name);
+            Object v = value.get(name);
 
             if (v instanceof Collection || v instanceof Map || v instanceof Configuration) {
+                // {@code instanceof} implies non-null {@code v}, refining it for the recursion.
                 var newChild = new DefaultMutableTreeNode(name);
                 parent.add(newChild);
                 configurationTable(newChild, v);
@@ -124,6 +133,10 @@ public class SettingsTreeModel extends DefaultTreeModel {
 
     private void configurationTable(DefaultMutableTreeNode parent, Collection<?> values) {
         for (var value : values) {
+            if (value == null) {
+                // the settings tree never contains null entries
+                throw new NullPointerException("No configuration entry available.");
+            }
             configurationTable(parent, value);
         }
     }
@@ -132,7 +145,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
         return new OptionContentNode(title, generateScrollPane(text));
     }
 
-    public DefaultMutableTreeNode getTacletOptionsItem() {
+    public @Nullable DefaultMutableTreeNode getTacletOptionsItem() {
         return tacletOptionsItem;
     }
 }

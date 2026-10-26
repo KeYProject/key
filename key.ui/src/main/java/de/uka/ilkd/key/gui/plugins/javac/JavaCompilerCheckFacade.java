@@ -26,6 +26,7 @@ import org.key_project.util.parsing.Position;
 import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,10 +62,20 @@ public class JavaCompilerCheckFacade {
             var settings = new JavacSettings();
             settings.readSettings(params);
 
+            String bootClassPathValue = params.getString("bootClassPath");
+            if (bootClassPathValue == null) {
+                // the calling process always provides the boot class path
+                throw new NullPointerException("No boot class path available.");
+            }
+            String javaPathValue = params.getString("javaPath");
+            if (javaPathValue == null) {
+                // the calling process always provides the java path
+                throw new NullPointerException("No java path available.");
+            }
             List<PositionedIssueString> result = check(
-                Paths.get(params.getString("bootClassPath")),
+                Paths.get(bootClassPathValue),
                 params.getStringList("classPath").stream().map(Paths::get).toList(),
-                Paths.get(params.getString("javaPath")), settings).get();
+                Paths.get(javaPathValue), settings).get();
 
             var out = new Configuration();
             out.set("messages",
@@ -95,6 +106,11 @@ public class JavaCompilerCheckFacade {
      * initiates the compilation check on the target Java source (the Java program to be verified)
      * in a separate process (with another java runtime)
      *
+     * <p>
+     * A diagnostic without a file reports a {@code null} file URI, which is materialized as the
+     * location's {@code null} URI; the location model declares a non-null URI while a missing
+     * file is the documented value for source-less diagnostics, suppressed with a scoped key.
+     *
      * @param bootClassPath the {@link Path} referring to the path containing the core Java classes
      * @param classPath the {@link List} of {@link Path}s referring to the directory that make up
      *        the target Java programs classpath
@@ -103,8 +119,9 @@ public class JavaCompilerCheckFacade {
      *        should be called with
      * @return future providing the list of diagnostics
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static @NonNull CompletableFuture<List<PositionedIssueString>> checkExternally(
-            Path bootClassPath, List<Path> classPath, Path javaPath,
+            @Nullable Path bootClassPath, List<Path> classPath, Path javaPath,
             JavacSettings settings) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
             LOGGER.info("Javac check is disabled by system property -PKEY_JAVAC_DISABLE");
@@ -148,22 +165,45 @@ public class JavaCompilerCheckFacade {
                     Configuration.load(CharStreams.fromStream(process.getErrorStream()));
                 process.waitFor();
 
-                return messages.getList("messages").stream()
+                List<?> messageObjects = messages.getList("messages");
+                if (messageObjects == null) {
+                    // the checked process always reports its diagnostic messages
+                    throw new NullPointerException("No messages available.");
+                }
+                return messageObjects.stream()
                         .map(msgObj -> {
                             Configuration msg = (Configuration) msgObj;
+                            if (msg == null) {
+                                // the reported message list contains only configurations
+                                throw new NullPointerException("No message configuration available.");
+                            }
+                            String issueText = msg.getString("message");
+                            if (issueText == null) {
+                                // each reported message carries a text
+                                throw new NullPointerException("No message text available.");
+                            }
+                            String additionalInfo = msg.getString("additionalInfo");
+                            if (additionalInfo == null) {
+                                // each reported message carries additional info
+                                throw new NullPointerException("No additional info available.");
+                            }
+                            String kindString = msg.getString("kind");
+                            if (kindString == null) {
+                                // each reported message carries a kind
+                                throw new NullPointerException("No message kind available.");
+                            }
+                            String fileUriValue = msg.getString("fileUri");
                             return new PositionedIssueString(
-                                msg.getString("message"),
+                                issueText,
                                 new Location(
-                                    msg.exists("fileUri")
-                                            ? URI.create(msg.getString("fileUri"))
-                                            : null,
+                                    fileUriValue == null ? (URI) null : URI.create(fileUriValue),
                                     msg.getInt("line") == -1 || msg.getInt("column") == -1
                                             ? Position.UNDEFINED
                                             : Position.newOneBased(
                                                 msg.getInt("line"),
                                                 msg.getInt("column"))),
-                                msg.getString("additionalInfo"),
-                                PositionedIssueString.Kind.valueOf(msg.getString("kind")));
+                                additionalInfo,
+                                PositionedIssueString.Kind.valueOf(kindString));
                         }).toList();
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
@@ -174,6 +214,11 @@ public class JavaCompilerCheckFacade {
     /**
      * initiates the compilation check on the target Java source (the Java program to be verified)
      *
+     * <p>
+     * A diagnostic without a file reports a {@code null} file URI, which is materialized as the
+     * location's {@code null} URI; the location model declares a non-null URI while a missing
+     * file is the documented value for source-less diagnostics, suppressed with a scoped key.
+     *
      * @param bootClassPath the {@link Path} referring to the path containing the core Java classes
      * @param classPath the {@link List} of {@link Path}s referring to the directory that make up
      *        the target Java programs classpath
@@ -182,8 +227,9 @@ public class JavaCompilerCheckFacade {
      *        should be called with
      * @return future providing the list of diagnostics
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static @NonNull CompletableFuture<List<PositionedIssueString>> check(
-            Path bootClassPath, List<Path> classPath, Path javaPath,
+            @Nullable Path bootClassPath, List<Path> classPath, Path javaPath,
             JavacSettings settings) {
         if (Boolean.getBoolean("KEY_JAVAC_DISABLE")) {
             LOGGER.info("Javac check is disabled by system property -PKEY_JAVAC_DISABLE");
@@ -254,7 +300,10 @@ public class JavaCompilerCheckFacade {
         if (Files.isDirectory(javaPath)) {
             try (var s = Files.walk(javaPath)) {
                 s.filter(f -> !Files.isDirectory(f))
-                        .filter(f -> f.getFileName().toString().endsWith(".java"))
+                        .filter(f -> {
+                            Path fileName = f.getFileName();
+                            return fileName != null && fileName.toString().endsWith(".java");
+                        })
                         .forEachOrdered(files::add);
             } catch (IOException e) {
                 LOGGER.info("", e);
@@ -285,7 +334,7 @@ public class JavaCompilerCheckFacade {
                     it.getMessage(Locale.ENGLISH),
                     new Location(
                         it.getSource() == null
-                                ? null
+                                ? (URI) null
                                 : fileManager.asPath(it.getSource()).toFile().toPath().toUri(),
                         it.getPosition() != Diagnostic.NOPOS
                                 ? Position.newOneBased((int) it.getLineNumber(),
@@ -476,8 +525,8 @@ class JavaFileManagerDelegate implements StandardJavaFileManager {
     }
 
     @Override
-    public <S> ServiceLoader<S> getServiceLoader(Location location, Class<S> service)
-            throws IOException {
+    public <S extends @Nullable Object> ServiceLoader<S> getServiceLoader(Location location,
+            Class<S> service) throws IOException {
         return fileManager.getServiceLoader(location, service);
     }
 

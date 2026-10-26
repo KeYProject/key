@@ -70,7 +70,7 @@ public final class KeyStrokeManager {
      * @return nullable
      * @see KeyStrokeSettings
      */
-    public static KeyStroke get(String key, KeyStroke defaultValue) {
+    public static @Nullable KeyStroke get(String key, @Nullable KeyStroke defaultValue) {
         KeyStroke ks = KeyStrokeSettings.getInstance().getKeyStroke(key, defaultValue);
         KeyStrokeSettings.getInstance().setKeyStroke(key, ks, false);
         return ks;
@@ -83,7 +83,7 @@ public final class KeyStrokeManager {
      * @param defaultValue
      * @return
      */
-    public static KeyStroke get(Object action, String defaultValue) {
+    public static @Nullable KeyStroke get(Object action, String defaultValue) {
         return get(action, KeyStroke.getKeyStroke(defaultValue));
     }
 
@@ -94,7 +94,7 @@ public final class KeyStrokeManager {
      * @param defaultValue
      * @return
      */
-    public static KeyStroke get(Object action, KeyStroke defaultValue) {
+    public static @Nullable KeyStroke get(Object action, @Nullable KeyStroke defaultValue) {
         return get(action.getClass().getName(), defaultValue);
     }
 
@@ -105,7 +105,7 @@ public final class KeyStrokeManager {
      * @param action
      * @return
      */
-    public static KeyStroke get(Object action) {
+    public static @Nullable KeyStroke get(Object action) {
         return get(action, (KeyStroke) null);
     }
 
@@ -114,7 +114,7 @@ public final class KeyStrokeManager {
      * @return
      * @see #lookupAndOverride(Action, String)
      */
-    public static KeyStroke lookupAndOverride(Action action) {
+    public static @Nullable KeyStroke lookupAndOverride(Action action) {
         return lookupAndOverride(action, action.getClass().getName());
     }
 
@@ -128,10 +128,12 @@ public final class KeyStrokeManager {
      * @param key
      * @return
      */
-    public static KeyStroke lookupAndOverride(Action action, String key) {
+    public static @Nullable KeyStroke lookupAndOverride(Action action, String key) {
         KeyStroke def = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
         KeyStroke found = get(key, def);
-        action.putValue(Action.ACCELERATOR_KEY, found);
+        if (found != null) {
+            action.putValue(Action.ACCELERATOR_KEY, found);
+        }
         registerAction(action);
         return found;
     }

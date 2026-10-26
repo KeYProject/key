@@ -36,6 +36,7 @@ import de.uka.ilkd.key.ui.MediatorProofControl;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -60,7 +61,11 @@ import org.slf4j.LoggerFactory;
     optional = true)
 @NullMarked
 public class KeyboardTacletExtension implements KeYGuiExtension, KeYGuiExtension.LeftPanel {
-    private KeyboardTacletPanel panel;
+    /**
+     * The panel is bound by {@link #getPanels(MainWindow, KeYMediator)} after the selection
+     * listener is registered; before that it is {@code null}.
+     */
+    private @Nullable KeyboardTacletPanel panel;
 
     @Override
     public @NonNull Collection<TabPanel> getPanels(@NonNull MainWindow window,
@@ -68,7 +73,10 @@ public class KeyboardTacletExtension implements KeYGuiExtension, KeYGuiExtension
         mediator.addKeYSelectionListener(new KeYSelectionListener() {
             @Override
             public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
-                panel.setGoal(mediator.getSelectedGoal());
+                KeyboardTacletPanel currentPanel = panel;
+                if (currentPanel != null) {
+                    currentPanel.setGoal(mediator.getSelectedGoal());
+                }
             }
         });
 
@@ -103,14 +111,33 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     private @Nullable KeyboardTacletModel model;
     private final Box pCenter = new Box(BoxLayout.Y_AXIS);
     private @Nullable Goal lastGoal;
+    /**
+     * The listener invokes {@link #updateCurrentPrefix()} and {@link #relayout()} when a
+     * property change fires; the checker flags the calls on the receiver while the field is
+     * being initialized (EISOP initialization check), suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private final PropertyChangeListener updateListener = (f) -> {
         updateCurrentPrefix();
         relayout();
     };
 
+    /**
+     * The panel configures itself with layout, listener and model calls while the receiver is
+     * still under initialization (EISOP initialization check); the effects only take place
+     * after construction completes or are deferred into listeners, suppressed with a scoped
+     * key. The services object is only queried while a proof is loaded.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public KeyboardTacletPanel(MainWindow mainWindow) {
         this.mainWindow = mainWindow;
-        this.services = mainWindow.getMediator().getServices();
+        Services services = mainWindow.getMediator().getServices();
+        if (services == null) {
+            // the panel is only created while a proof is loaded; the previous code crashed
+            // with an NPE here
+            throw new NullPointerException("No services available.");
+        }
+        this.services = services;
         // txtInput.setEditable(false);
         setLayout(new BorderLayout());
         JPanel pNorth = new JPanel(new MigLayout("fillX"));
@@ -164,10 +191,11 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     }
 
     private void checkForApplicability() {
-        if (model != null) {
-            model.setCurrentPrefix(txtInput.getText());
+        KeyboardTacletModel currentModel = model;
+        if (currentModel != null) {
+            currentModel.setCurrentPrefix(txtInput.getText());
             if (isDirectMode()) {
-                Optional<RuleApp> app = model.getSelectedTacletsApp();
+                Optional<RuleApp> app = currentModel.getSelectedTacletsApp();
                 app.ifPresent(this::applyRule);
             }
         }
@@ -183,16 +211,22 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
 
     private void applyRule(RuleApp ruleApp) {
         MediatorProofControl pc = mainWindow.getMediator().getUI().getProofControl();
+        Goal goal = lastGoal;
+        if (goal == null) {
+            // a rule can only be applied while a goal is selected; the previous code crashed
+            // with an NPE here
+            throw new NullPointerException("No goal selected for the rule application.");
+        }
         if (!ruleApp.complete()) {
             try {
                 TacletApp tacletApp = (TacletApp) ruleApp;
                 ImmutableSet<TacletApp> seq = ImmutableSet.singleton(tacletApp);
-                pc.selectedTaclet(seq, lastGoal);
+                pc.selectedTaclet(seq, goal);
             } catch (ClassCastException ignored) {
 
             }
         } else {
-            pc.applyInteractive(ruleApp, lastGoal);
+            pc.applyInteractive(ruleApp, goal);
         }
         mainWindow.setStatusLine("Taclet applied!");
         SwingUtilities.invokeLater(() -> txtInput.setText(""));
@@ -219,25 +253,32 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
      */
     private void relayout() {
         pCenter.removeAll();
-        if (model == null || !actionActivate.isSelected()) {
+        KeyboardTacletModel currentModel = model;
+        if (currentModel == null || !actionActivate.isSelected()) {
             return;
         }
 
-        Collection<String> names = model.getPrefixTable().keySet();
+        Collection<String> names = currentModel.getPrefixTable().keySet();
         for (String prefix : names) {
-            if (!prefix.startsWith(model.getCurrentPrefix())) {
+            if (!prefix.startsWith(currentModel.getCurrentPrefix())) {
                 continue;
             }
             Box box = new Box(BoxLayout.X_AXIS);
-            String name = model.getPrefixTable().get(prefix);
+            String name = currentModel.getPrefixTable().get(prefix);
+            if (name == null) {
+                continue;
+            }
             int pLength = prefix.length();
             JLabel lblName = new JLabel(
                 String.format("<html><u>%s</u>%s</html>", prefix, name.substring(pLength)));
             box.add(lblName);
 
             int i = 0;
-            for (RuleApp tacletApp : model.getTaclets().get(name)) {
-                box.add(new JLabel(String.valueOf(++i)));// new JLabel(tacletApp.toString()));
+            List<RuleApp> apps = currentModel.getTaclets().get(name);
+            if (apps != null) {
+                for (RuleApp tacletApp : apps) {
+                    box.add(new JLabel(String.valueOf(++i)));// new JLabel(tacletApp.toString()));
+                }
             }
             pCenter.add(box);
         }
@@ -248,7 +289,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         pCenter.repaint();
     }
 
-    public KeyboardTacletModel getModel() {
+    public @Nullable KeyboardTacletModel getModel() {
         return model;
     }
 
@@ -282,7 +323,8 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
             return;
         }
 
-        if (lastGoal == null) {
+        Goal goal = lastGoal;
+        if (goal == null) {
             pCenter.removeAll();
             pCenter.add(new JLabel("Could not get the current goal"));
             pCenter.add(new JLabel("Is a proof loaded?"));
@@ -306,15 +348,18 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
                 }
             };
             try {
-                ImmutableList<NoPosTacletApp> t =
-                    lastGoal.ruleAppIndex().getFindTaclet(filter, pos.getPosInOccurrence());
-                t.forEach(taclets::add);
+                PosInOccurrence pio = pos.getPosInOccurrence();
+                if (pio != null) {
+                    ImmutableList<NoPosTacletApp> t =
+                        goal.ruleAppIndex().getFindTaclet(filter, pio);
+                    t.forEach(taclets::add);
+                }
             } catch (NullPointerException e) {
                 LOGGER.debug("NPE", e);
             }
         } else {
-            taclets = lastGoal.getAllBuiltInRuleApps();
-            taclets.addAll(lastGoal.getAllTacletApps(services));
+            taclets = goal.getAllBuiltInRuleApps();
+            taclets.addAll(goal.getAllTacletApps(services));
         }
         LOGGER.debug("Found {} taclets\n", taclets.size());
 
@@ -337,6 +382,12 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     }
 
     private class ActivateAction extends KeyAction {
+        /**
+         * The action configures itself with {@code setName}/{@code setSelected} while the
+         * receiver is still under initialization (EISOP initialization check), suppressed with
+         * a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public ActivateAction() {
             setName("Active");
             setSelected(false);
@@ -350,6 +401,12 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
 
     private class FilterMouseAction extends KeyAction {
 
+        /**
+         * The action configures itself with {@code setSelected}/{@code setName} while the
+         * receiver is still under initialization (EISOP initialization check), suppressed with
+         * a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public FilterMouseAction() {
             setSelected(true);
             setName("Filter taclets by mouse position");
@@ -362,6 +419,12 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     }
 
     private static class DirectModeAction extends KeyAction {
+        /**
+         * The action configures itself with {@code setName}/{@code setSelected} while the
+         * receiver is still under initialization (EISOP initialization check), suppressed with
+         * a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public DirectModeAction() {
             setName("Apply directly on unique match.");
             setSelected(true);
@@ -374,6 +437,12 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     }
 
     private class OnlyCompleteTacletsAction extends KeyAction {
+        /**
+         * The action configures itself with {@code setName}/{@code setSelected} while the
+         * receiver is still under initialization (EISOP initialization check), suppressed with
+         * a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public OnlyCompleteTacletsAction() {
             setName("Show only completed taclets");
             setSelected(false);
@@ -397,11 +466,25 @@ class KeyboardTacletModel {
     public static final String PROP_CURRENT_POS = "currentPos";
     private final Map<String, List<RuleApp>> taclets;
     private final Map<String, String> prefixTable;
+    /**
+     * The support object is constructed with the receiver as its source while the receiver is
+     * still under initialization (EISOP initialization check); the source reference is only
+     * used to fire later events, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     private String currentPrefix;
     private int currentPos;
 
+    /**
+     * The constructor copies the taclets, resets the prefix/position state via
+     * {@code reset()} and registers itself with a {@code PropertyChangeSupport} while the
+     * receiver is still under initialization (EISOP initialization check); the effects only
+     * take place after construction completes, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid", "nullness:assignment.type.incompatible" })
     KeyboardTacletModel(List<RuleApp> taclets) {
         reset();
         this.taclets = new HashMap<>();
@@ -494,9 +577,12 @@ class KeyboardTacletModel {
     }
 
     public Optional<RuleApp> getSelectedTacletsApp() {
-        List<RuleApp> t = taclets.get(prefixTable.get(currentPrefix));
-        if (t != null && t.size() == 1 || (currentPos >= 0 && currentPos <= taclets.size())) {
-            assert t != null;
+        String prefix = prefixTable.get(currentPrefix);
+        if (prefix == null) {
+            return Optional.empty();
+        }
+        List<RuleApp> t = taclets.get(prefix);
+        if (t != null && (t.size() == 1 || (currentPos >= 0 && currentPos <= taclets.size()))) {
             return Optional.of(t.get(Math.max(0, currentPos)));
         }
         return Optional.empty();
@@ -506,7 +592,13 @@ class KeyboardTacletModel {
         for (String prefix : getPrefixTable().keySet()) {
             if (prefix.startsWith(currentPrefix)) {
                 String tacletName = prefixTable.get(prefix);
+                if (tacletName == null) {
+                    return Optional.empty();
+                }
                 List<RuleApp> apps = taclets.get(tacletName);
+                if (apps == null || apps.isEmpty()) {
+                    return Optional.empty();
+                }
                 return Optional.of(apps.get(0));
             }
         }

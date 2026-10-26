@@ -35,6 +35,14 @@ public abstract class ApplyTacletDialog extends JDialog {
 
     protected final TacletInstantiationModel[] model;
 
+    /**
+     * The window configuration below operates on {@code this} while it is still under
+     * initialization (EISOP initialization check): the {@code this}-passing and listener/root
+     * pane setup calls only take effect after construction completes, suppressed with scoped
+     * keys.
+     */
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:method.invocation.invalid" })
     protected ApplyTacletDialog(Frame parent, TacletInstantiationModel[] model,
             KeYMediator mediator) {
 

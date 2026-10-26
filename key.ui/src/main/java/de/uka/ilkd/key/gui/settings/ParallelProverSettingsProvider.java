@@ -49,6 +49,16 @@ public class ParallelProverSettingsProvider extends SettingsPanel implements Set
     private final JCheckBox chkEnabled;
     private final JSpinner spThreads;
 
+    /**
+     * Creates the provider and builds its controls.
+     *
+     * <p>
+     * The header, the separators and all input controls are configured while the receiver is
+     * still under initialization (EISOP initialization check); the checkbox action only fires
+     * once the panel is displayed, by which time construction has completed, suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ParallelProverSettingsProvider() {
         setHeaderText(getDescription());
 

@@ -11,10 +11,13 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
@@ -56,12 +59,16 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
                 boolean macroActive = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
                         .isRightClickMacro();
                 if (mediator != null && mousePos != null) {
+                    PosInOccurrence pio = mousePos.getPosInOccurrence();
+                    Goal goal = mediator.getSelectedGoal();
                     if (me.isShiftDown()) {
-                        mediator.getUI().getProofControl().startFocussedAutoMode(
-                            mousePos.getPosInOccurrence(), mediator.getSelectedGoal());
+                        if (pio == null || goal == null) {
+                            // a focused auto mode needs the clicked term and a selected goal
+                            throw new NullPointerException("No occurrence or goal available.");
+                        }
+                        mediator.getUI().getProofControl().startFocussedAutoMode(pio, goal);
                     } else if (macroActive && SwingUtilities.isRightMouseButton(me)) {
-                        ProofMacroMenu macroMenu =
-                            new ProofMacroMenu(mediator, mousePos.getPosInOccurrence());
+                        ProofMacroMenu macroMenu = new ProofMacroMenu(mediator, pio);
                         if (macroMenu.isEmpty()) {
                             macroMenu.add(new JLabel("No strategies available"));
                         }
@@ -69,20 +76,21 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
                         popupMenu.setLabel("Strategy Macros");
                         popupMenu.show(getSequentView(), me.getX() - 5, me.getY() - 5);
                     } else if (!me.isControlDown() && SwingUtilities.isLeftMouseButton(me)) {
+                        if (pio == null || goal == null) {
+                            // the taclet hint collection needs the clicked term and a selected
+                            // goal
+                            throw new NullPointerException("No occurrence or goal available.");
+                        }
                         // done before collecting the taclets because initialising
                         // built in rules may have side effects on the set of applicable
                         // taclets
                         final ImmutableList<BuiltInRule> builtInRules =
-                            mediator.getUI().getProofControl().getBuiltInRule(
-                                mediator.getSelectedGoal(), mousePos.getPosInOccurrence());
+                            mediator.getUI().getProofControl().getBuiltInRule(goal, pio);
 
                         menu = new CurrentGoalViewMenu(getSequentView(),
-                            mediator.getUI().getProofControl().getFindTaclet(
-                                mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
-                            mediator.getUI().getProofControl().getRewriteTaclet(
-                                mediator.getSelectedGoal(), mousePos.getPosInOccurrence()),
-                            mediator.getUI().getProofControl().getNoFindTaclet(
-                                mediator.getSelectedGoal()),
+                            mediator.getUI().getProofControl().getFindTaclet(goal, pio),
+                            mediator.getUI().getProofControl().getRewriteTaclet(goal, pio),
+                            mediator.getUI().getProofControl().getNoFindTaclet(goal),
                             builtInRules, mousePos);
 
                         showPopup(me, menu);
@@ -133,8 +141,13 @@ final class CurrentGoalViewListener extends SequentViewListener<CurrentGoalView>
 
         if (localMousePos != null) {
             try {
+                Services services = mediator.getServices();
+                if (services == null) {
+                    // a mediator always carries its services while the GUI is running
+                    throw new NullPointerException("No services available.");
+                }
                 getSequentView().getDragSource().startDrag(dgEvent, DragSource.DefaultCopyDrop,
-                    new PosInSequentTransferable(localMousePos, mediator.getServices()),
+                    new PosInSequentTransferable(localMousePos, services),
                     new DragSourceAdapter() {
                         @Override
                         public void dragDropEnd(DragSourceDropEvent event) {

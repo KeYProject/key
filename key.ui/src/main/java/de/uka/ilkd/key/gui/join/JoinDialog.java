@@ -16,6 +16,7 @@ import de.uka.ilkd.key.gui.utilities.ClickableMessageBox;
 import de.uka.ilkd.key.gui.utilities.InspectorForFormulas;
 import de.uka.ilkd.key.gui.utilities.StdDialog;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.Node;
@@ -40,6 +41,12 @@ public class JoinDialog extends StdDialog {
     private static final long serialVersionUID = 1L;
     private final ContentPanel content;
 
+    /**
+     * The dialog creates its content panel while the receiver is still under initialization
+     * (EISOP initialization check); the panel's OK-button listener only fires after the dialog has
+     * been shown, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public JoinDialog(List<ProspectivePartner> partnerList, Proof proof,
             PredicateEstimator estimator, Services services) {
         super("Joining", 5, false);
@@ -81,8 +88,13 @@ public class JoinDialog extends StdDialog {
             public ContentItem(ProspectivePartner partner, Services services, boolean applicable) {
                 super();
                 this.partner = partner;
-                this.inspector = new InspectorForDecisionPredicates(services,
-                    partner.getCommonParent(), DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT,
+                Node commonParent = partner.getCommonParent();
+                if (commonParent == null) {
+                    // partners are only offered after their common parent has been determined
+                    throw new NullPointerException("No common parent for the partner.");
+                }
+                this.inspector = new InspectorForDecisionPredicates(services, commonParent,
+                    DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT,
                     DelayedCutProcessor.getApplicationChecks());
                 this.applicable = applicable;
             }
@@ -110,16 +122,23 @@ public class JoinDialog extends StdDialog {
             }
 
             public String getPredicate(Proof proof) {
-                if (partner.getCommonPredicate() == null) {
+                JTerm common = partner.getCommonPredicate();
+                if (common == null) {
                     return "";
                 }
                 LogicPrinter printer =
                     LogicPrinter.purePrinter(new NotationInfo(), proof.getServices());
-                printer.printTerm(partner.getCommonPredicate());
+                printer.printTerm(common);
                 return printer.result();
             }
         }
 
+        /**
+         * The ctor builds the content while the receiver is still under initialization (EISOP
+         * initialization check); the input listener only fires after the panel has been laid out,
+         * suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public ContentPanel(List<ProspectivePartner> partnerList, final Proof proof,
                 PredicateEstimator estimator, final CheckedUserInputListener listener,
                 Services services) {
@@ -131,8 +150,12 @@ public class JoinDialog extends StdDialog {
 
             getPredicateInput().addListener((input, valid, reason) -> {
                 if (valid) {
-                    getSelectedPartner().setCommonPredicate(
-                        InspectorForFormulas.translate(proof.getServices(), input));
+                    JTerm predicate = InspectorForFormulas.translate(proof.getServices(), input);
+                    if (predicate == null) {
+                        // a valid input always translates to a predicate
+                        throw new NullPointerException("Input could not be translated.");
+                    }
+                    getSelectedPartner().setCommonPredicate(predicate);
                     listener.userInputChanged(input, getSelectedItem().isApplicable(), reason);
                 } else {
                     listener.userInputChanged(input, false, reason);
@@ -180,7 +203,7 @@ public class JoinDialog extends StdDialog {
             if (index < 0 || index > getChoiceList().getModel().getSize()) {
                 return;
             }
-            ContentItem item = choiceList.getModel().getElementAt(index);
+            ContentItem item = getChoiceList().getModel().getElementAt(index);
             getSequentViewer2().setSequent(item.getSequent(), proof.getServices());
 
             getPredicateInput().setInput(item.getPredicate(proof));
@@ -262,11 +285,17 @@ public class JoinDialog extends StdDialog {
 
             if (infoBoxPane == null) {
 
-                infoBoxPane = new JScrollPane(getInfoBox());
-                infoBoxPane.setBorder(BorderFactory.createTitledBorder("Details"));
-                int height = getInfoBox().getFontMetrics(getInfoBox().getFont()).getHeight() * 4;
-                infoBoxPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
-                infoBoxPane.setPreferredSize(new Dimension(0, height));
+                JScrollPane pane = new JScrollPane(getInfoBox());
+                pane.setBorder(BorderFactory.createTitledBorder("Details"));
+                Font font = getInfoBox().getFont();
+                if (font == null) {
+                    // an info box always obtains its font from the look and feel
+                    throw new NullPointerException("No font available.");
+                }
+                int height = getInfoBox().getFontMetrics(font).getHeight() * 4;
+                pane.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+                pane.setPreferredSize(new Dimension(0, height));
+                infoBoxPane = pane;
             }
             return infoBoxPane;
         }
@@ -301,11 +330,12 @@ public class JoinDialog extends StdDialog {
 
         private JList<ContentItem> getChoiceList() {
             if (choiceList == null) {
-                choiceList = new JList<>();
-                choiceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-                choiceList.setPreferredSize(new Dimension(100, 300));
-                choiceList.addListSelectionListener(
-                    e -> selectionChanged(choiceList.getSelectedIndex()));
+                JList<ContentItem> list = new JList<>();
+                list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+                list.setPreferredSize(new Dimension(100, 300));
+                list.addListSelectionListener(
+                    e -> selectionChanged(list.getSelectedIndex()));
+                choiceList = list;
             }
             return choiceList;
         }

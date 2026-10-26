@@ -63,6 +63,13 @@ public class CheckedUserInput extends JPanel {
 
     }
 
+    /**
+     * The ctor builds the panel and its children while the receiver is still under initialization
+     * (EISOP initialization check); the document listener of the input field only fires after
+     * construction completes, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public CheckedUserInput(CheckedUserInputInspector inspector, boolean showInformation) {
         this.inspector = inspector;
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -136,8 +143,8 @@ public class CheckedUserInput extends JPanel {
 
     private JTextPane getInputFieldForFormula() {
         if (inputFieldForFormula == null) {
-            inputFieldForFormula = new JTextPane();
-            inputFieldForFormula.getDocument().addDocumentListener(new DocumentListener() {
+            JTextPane pane = new JTextPane();
+            pane.getDocument().addDocumentListener(new DocumentListener() {
 
                 @Override
                 public void removeUpdate(DocumentEvent e) {
@@ -156,13 +163,13 @@ public class CheckedUserInput extends JPanel {
 
                 }
             });
-
+            inputFieldForFormula = pane;
         }
         return inputFieldForFormula;
     }
 
     private void checkInput() {
-        String text = inputFieldForFormula.getText();
+        String text = getInputFieldForFormula().getText();
         String result = inspector.check(text);
         setValid(result);
         for (CheckedUserInputListener listener : listeners) {

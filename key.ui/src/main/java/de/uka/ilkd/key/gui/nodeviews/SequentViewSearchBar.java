@@ -63,9 +63,28 @@ public class SequentViewSearchBar extends SearchBar {
     private JCheckBox regExpCheckBox;
     private JComboBox<SearchMode> searchModeBox;
 
+    /**
+     * Creates the search bar for the given sequent view.
+     *
+     * <p>
+     * The check-box and mode selection are created later in {@link #createUI()}, which is invoked
+     * from the {@link SearchBar} superclass constructor before {@code this} is fully initialized
+     * (EISOP initialization check on the uninitialized fields), suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:initialization.fields.uninitialized")
     public SequentViewSearchBar(SequentView sequentView) {
         this.sequentView = sequentView;
         searchResults = new ArrayList<>();
+    }
+
+    private SequentViewLogicPrinter requireLogicPrinter() {
+        SequentViewLogicPrinter logicPrinter = sequentView.getLogicPrinter();
+        if (logicPrinter == null) {
+            // a sequent view always carries its logic printer while the search bar is in use;
+            // the original code dereferenced the printer directly
+            throw new NullPointerException("No logic printer available.");
+        }
+        return logicPrinter;
     }
 
     public void setSequentView(SequentView sequentView) {
@@ -108,12 +127,12 @@ public class SequentViewSearchBar extends SearchBar {
                 switch ((SearchMode) Objects.requireNonNull(searchModeBox.getSelectedItem())) {
                     case HIDE -> {
                         sequentView.setFilter(new HideSequentPrintFilter(
-                            sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
+                            requireLogicPrinter(), regExpCheckBox.isSelected()), false);
                         search();
                     }
                     case REGROUP -> {
                         sequentView.setFilter(new RegroupSequentPrintFilter(
-                            sequentView.getLogicPrinter(), regExpCheckBox.isSelected()), false);
+                            requireLogicPrinter(), regExpCheckBox.isSelected()), false);
                         search();
                     }
                     case HIGHLIGHT -> {
@@ -175,7 +194,7 @@ public class SequentViewSearchBar extends SearchBar {
         clearSearchResults();
 
         if (sequentView.getFilter() instanceof SearchSequentPrintFilter searchSequentPrintFilter) {
-            searchSequentPrintFilter.setLogicPrinter(sequentView.getLogicPrinter());
+            searchSequentPrintFilter.setLogicPrinter(requireLogicPrinter());
             searchSequentPrintFilter.setSearchString(searchField.getText());
         }
 

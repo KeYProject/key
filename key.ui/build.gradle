@@ -13,6 +13,32 @@ plugins {
     alias(libs.plugins.shadow)
 }
 
+checkerFramework {
+    if(System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        extraJavacArgs = [
+                "-AonlyDefs=^de\\.uka\\.ilkd\\.key|^org\\.key_project\\.util",
+                "-Xmaxerrs", "10000",
+                "-AstubNoWarnIfNotFound",
+                "-Werror",
+                "-Aversion",
+        ]
+    }
+}
+
+// The NullnessChecker runs inside the forked javac worker, which defaults to a
+// 512m heap and runs out of memory on key.ui's large source set. Give it a
+// real heap whenever nullness checking is enabled (also required by CI's
+// CodeQuality run).
+tasks.withType(JavaCompile).configureEach {
+    if(System.getProperty("ENABLE_NULLNESS")) {
+        options.fork = true
+        options.forkOptions.memoryMaximumSize = "4g"
+    }
+}
+
 description = "User interface for the deductive verification of Java programs"
 
 dependencies {

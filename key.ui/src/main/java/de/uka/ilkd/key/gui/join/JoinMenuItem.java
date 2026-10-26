@@ -32,6 +32,15 @@ public class JoinMenuItem extends JMenuItem {
 
     private static final long serialVersionUID = -2602116358650063634L;
 
+    /**
+     * Creates the join menu item.
+     *
+     * <p>
+     * The item sets its text and action while the receiver is still under initialization (EISOP
+     * initialization check); the action only fires once the item is displayed after construction,
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public JoinMenuItem(final List<ProspectivePartner> partner, final Proof proof,
             final KeYMediator mediator) {
         super();

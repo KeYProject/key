@@ -61,7 +61,13 @@ public class JavacSettingsProvider extends SettingsPanel implements SettingsProv
 
     /**
      * Construct a new settings provider.
+     *
+     * <p>
+     * The panel fills its header, description and input widgets while the receiver is still
+     * under initialization (EISOP initialization check); all of them only materialize once the
+     * panel is shown after construction, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public JavacSettingsProvider() {
         pCenter.add(new JLabel(INTRO_LABEL), new CC().span().alignX("left"));
         useProcessors = addCheckBox(

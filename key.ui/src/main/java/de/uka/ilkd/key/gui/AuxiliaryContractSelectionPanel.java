@@ -37,6 +37,12 @@ public abstract class AuxiliaryContractSelectionPanel<T extends AuxiliaryContrac
     protected final JList<T> contractList;
     private final TitledBorder border;
 
+    /**
+     * The {@link BoxLayout} constructor receives {@code this} while the panel is still under
+     * initialization (EISOP initialization check); the layout is only computed when the panel is
+     * displayed, i.e. after construction completes, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     protected AuxiliaryContractSelectionPanel(final Services services,
             final boolean multipleSelection) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));

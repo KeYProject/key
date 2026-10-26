@@ -82,11 +82,28 @@ public class AssumesSelectionPanel extends JPanel {
 
     private boolean manualMode;
 
+    /**
+     * Creates the assumes-selection panel for the given model.
+     *
+     * <p>
+     * The panel binds its services, lays itself out and builds its cards while the receiver is
+     * still under initialization (EISOP initialization check), including passing the
+     * under-construction receiver to its own {@link BoxLayout}; the effects only take place
+     * after construction completes, and the mediator always provides services while the panel
+     * is in use, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public AssumesSelectionPanel(TacletInstantiationModel model, KeYMediator mediator,
             Runnable onChange) {
         this.model = model;
         this.mediator = mediator;
-        this.services = mediator.getServices();
+        Services svcs = mediator.getServices();
+        if (svcs == null) {
+            // the panel is only created while a proof with services is loaded
+            throw new NullPointerException("No proof services available.");
+        }
+        this.services = svcs;
         this.onChange = onChange;
 
         Sequent assumes = model.application().taclet().assumesSequent();
@@ -351,7 +368,12 @@ public class AssumesSelectionPanel extends JPanel {
 
     private void applyManual(int index, SequentFormula sf) {
         choices[index].setSelectedItem(sentinels[index]);
-        model.setManualInput(index, ProofSaver.printAnything(sf.formula(), services));
+        String printed = ProofSaver.printAnything(sf.formula(), services);
+        if (printed == null) {
+            // printing a formula always yields text
+            throw new NullPointerException("No printed assumes formula.");
+        }
+        model.setManualInput(index, printed);
     }
 
     private void clearManual() {
@@ -446,14 +468,18 @@ public class AssumesSelectionPanel extends JPanel {
         private static final long serialVersionUID = 1L;
 
         @Override
-        public Component getListCellRendererComponent(JList<?> l, Object value, int index,
-                boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<?> l, @Nullable Object value,
+                int index, boolean isSelected, boolean cellHasFocus) {
             JLabel c = (JLabel) super.getListCellRendererComponent(l, value, index, isSelected,
                 cellHasFocus);
-            // flatten a possibly multi-line, wrapped formula to one line so the whole thing shows
-            // (up to the abbreviation limit) instead of just its first wrapped segment
-            c.setText(TmText.collapseToLine(text((AssumesFormulaInstantiation) value),
-                ABBREV_LIMIT));
+            if (value instanceof AssumesFormulaInstantiation candidate) {
+                // flatten a possibly multi-line, wrapped formula to one line so the whole thing
+                // shows (up to the abbreviation limit) instead of just its first wrapped segment
+                c.setText(TmText.collapseToLine(text(candidate), ABBREV_LIMIT));
+            } else {
+                // the list only contains candidate instantiations
+                throw new NullPointerException("No candidate instantiation available.");
+            }
             c.setFont(TmStyle.mono(c));
             return c;
         }

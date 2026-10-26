@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.swing.*;
@@ -41,6 +42,11 @@ public class CreateGithubIssueAction extends MainWindowAction {
     public static final IconProvider ICON_GITHUB =
         new IconFontProvider(FontAwesomeBrands.GITHUB);
 
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public CreateGithubIssueAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Create Github Issue");
@@ -83,8 +89,9 @@ public class CreateGithubIssueAction extends MainWindowAction {
                 try (final var walker = Files.walk(javaSourceLocation)) {
                     java = walker.map(it -> {
                         try {
-                            if (it.getFileName().toString().endsWith(".java")) {
-                                return "* " + it.getFileName() + "\n```\n" + Files.readString(it)
+                            Path fileName = it.getFileName();
+                            if (fileName != null && fileName.toString().endsWith(".java")) {
+                                return "* " + fileName + "\n```\n" + Files.readString(it)
                                     + "```\n";
                             }
                         } catch (IOException e) {

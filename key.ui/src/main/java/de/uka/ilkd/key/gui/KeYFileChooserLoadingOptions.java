@@ -53,6 +53,15 @@ public class KeYFileChooserLoadingOptions extends JPanel {
 
     private KeYGuiExtension.@Nullable OptionPanel currentOptionPanel = null;
 
+    /**
+     * Creates the loading options panel for the selected file chooser.
+     *
+     * <p>
+     * The panel registers its profile listener and queries the current profile info while the
+     * receiver is still under initialization (EISOP initialization check); both only matter once
+     * the panel is shown after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public KeYFileChooserLoadingOptions(KeYFileChooser chooser) {
         setLayout(new MigLayout(new LC().fillX().wrapAfter(3).maxWidth("400"),
             new AC().growPrio(10, 1).align("right", 0)));
@@ -106,8 +115,9 @@ public class KeYFileChooserLoadingOptions extends JPanel {
             lblProfileInfo.setText("");
         } else {
             lblProfileInfo.setText(selectedItem.description());
-            if (additionalOptionPanels.containsKey(selectedItem.profile)) {
-                currentOptionPanel = additionalOptionPanels.get(selectedItem.profile);
+            Profile profile = selectedItem.profile();
+            if (profile != null && additionalOptionPanels.containsKey(profile)) {
+                currentOptionPanel = additionalOptionPanels.get(profile);
                 currentOptionPanel.install(this);
             }
         }

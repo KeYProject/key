@@ -15,6 +15,7 @@ import javax.swing.event.ListSelectionListener;
 import de.uka.ilkd.key.informationflow.impl.InformationFlowContractImpl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.DependencyContractImpl;
 import de.uka.ilkd.key.util.LinkedHashMap;
@@ -64,7 +65,15 @@ public class ContractSelectionPanel extends JPanel {
 
     /**
      * Creates a contract selection panel containing the specified contracts.
+     *
+     * <p>
+     * The panel lays itself out, builds its scroll pane and list while the receiver is still under
+     * initialization (EISOP initialization check), including passing the under-construction
+     * receiver to its own {@link BoxLayout}; the effects only take place after construction
+     * completes, suppressed with scoped keys.
      */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public ContractSelectionPanel(Services services, boolean multipleSelection) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.services = services;
@@ -200,7 +209,8 @@ public class ContractSelectionPanel extends JPanel {
         ImmutableSet<Proof> proofs = services.getSpecificationRepository().getProofs(c);
 
         for (Proof proof : proofs) {
-            if (proof.mgt().getStatus().getProofClosed()) {
+            ProofCorrectnessMgt proofManagement = proof.mgt();
+            if (proofManagement != null && proofManagement.getStatus().getProofClosed()) {
                 return proof;
             }
         }
@@ -231,7 +241,7 @@ public class ContractSelectionPanel extends JPanel {
         this.grayOutAuxiliaryContracts = grayOutAuxiliaryContracts;
     }
 
-    public void setContracts(@Nullable Contract[] contracts, @Nullable String title) {
+    public void setContracts(Contract @Nullable [] contracts, @Nullable String title) {
         if (contracts == null || contracts.length == 0) {
             this.contracts = new Contract[0];
             contractList.setListData(this.contracts);

@@ -364,6 +364,10 @@ public class HTMLSyntaxHighlighter {
         StringBuilder sb = new StringBuilder();
         boolean loopEntered = false;
         for (Object str : strings) {
+            if (str == null) {
+                // the strings to concatenate never contain null entries
+                throw new NullPointerException("No string available.");
+            }
             sb.append(strTransformer.transform(str));
             sb.append(delim);
             loopEntered = true;

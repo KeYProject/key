@@ -22,6 +22,14 @@ public class SearchPreviousAction extends MainWindowAction {
     private static final long serialVersionUID = -9002009635814787502L;
     private final SequentViewSearchBar searchBar;
 
+    /**
+     * The action-configuration calls and the {@code enableWhenProofLoaded(this)} registration
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since the listener only reacts to later selection events,
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public SearchPreviousAction(MainWindow mainWindow, SequentViewSearchBar searchBar) {
         super(mainWindow);
         setName("Find Previous Occurrence");

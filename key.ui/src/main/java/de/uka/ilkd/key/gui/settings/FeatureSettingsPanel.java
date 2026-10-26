@@ -22,6 +22,15 @@ import org.jspecify.annotations.NullMarked;
 public class FeatureSettingsPanel extends SettingsPanel implements SettingsProvider {
     private final Map<FeatureSettings.Feature, JCheckBox> checkboxes = new IdentityHashMap<>();
 
+    /**
+     * Creates the feature flags settings panel.
+     *
+     * <p>
+     * The panel sets its header texts while the receiver is still under initialization (EISOP
+     * initialization check); the texts only materialize once the panel is shown after
+     * construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public FeatureSettingsPanel() {
         setHeaderText("Feature Flags");
         setSubHeaderText("Activate or Deactivate specific experimental features in KeY.");

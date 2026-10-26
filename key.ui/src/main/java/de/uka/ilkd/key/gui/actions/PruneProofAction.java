@@ -113,6 +113,10 @@ public final class PruneProofAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        getMediator().setBack(getMediator().getSelectedNode());
+        Node selectedNode = getMediator().getSelectedNode();
+        if (selectedNode == null) {
+            throw new NullPointerException("No node selected to prune.");
+        }
+        getMediator().setBack(selectedNode);
     }
 }

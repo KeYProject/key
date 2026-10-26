@@ -41,6 +41,15 @@ public class TacletTranslationOptions extends SettingsPanel implements SettingsP
     private final JTextField fileChooserPanel;
     private final JSpinner maxNumberOfGenerics;
 
+    /**
+     * Creates the taclet translation options panel.
+     *
+     * <p>
+     * The panel sets its header and builds its input widgets while the receiver is still under
+     * initialization (EISOP initialization check); the widgets only materialize once the panel
+     * is shown after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public TacletTranslationOptions() {
         setHeaderText("Taclet Translation Options for SMT");
         fileChooserPanel = createFileChooserPanel();

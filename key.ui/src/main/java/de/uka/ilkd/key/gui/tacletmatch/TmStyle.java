@@ -32,7 +32,13 @@ final class TmStyle {
 
     /** a monospaced font for logic/term text, slightly larger than the component's default. */
     static Font mono(@Nullable Component c) {
-        int size = (c != null && c.getFont() != null) ? c.getFont().getSize() : 12;
+        int size = 12;
+        if (c != null) {
+            Font font = c.getFont();
+            if (font != null) {
+                size = font.getSize();
+            }
+        }
         return new Font(Font.MONOSPACED, Font.PLAIN, size + FONT_BUMP);
     }
 

@@ -131,7 +131,13 @@ public final class IssueDialog extends JDialog {
      * Reacts to selection events to the "Show details" checkbox (fold/unfold stacktrace). Performs
      * some calculations to make the dialog only expand/collapse the stacktrace panel, but keep the
      * rest of the dialog looking the same as before.
+     *
+     * <p>
+     * The listener only fires when the checkbox is toggled in the shown dialog, after construction
+     * has completed; the EISOP initialization check nevertheless analyzes the field initializer
+     * under initialization, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private final transient ItemListener detailsBoxListener = e -> {
         int width = getWidth();
         int height = getHeight();
@@ -235,7 +241,13 @@ public final class IssueDialog extends JDialog {
      * @param warnings warnings to show
      * @param critical criticality of the issue
      * @param throwable exception to show (may be null)
+     *
+     *         <p>
+     *         The dialog configures its close operation and layout while the receiver is still
+     *         under initialization (EISOP initialization check); both only take effect once the
+     *         dialog is shown after construction, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     IssueDialog(Window owner, String title, String head, Set<PositionedIssueString> warnings,
             boolean critical, @Nullable Throwable throwable) {
         super(owner, title, ModalityType.APPLICATION_MODAL);

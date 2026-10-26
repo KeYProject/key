@@ -23,6 +23,14 @@ public class SearchModeChangeAction extends MainWindowAction {
     private final SequentViewSearchBar searchBar;
     private final SequentViewSearchBar.SearchMode mode;
 
+    /**
+     * The action-configuration calls and the {@code enableWhenProofLoaded(this)} registration
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since the listener only reacts to later selection events,
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public SearchModeChangeAction(MainWindow mainWindow, SequentViewSearchBar searchBar,
             SequentViewSearchBar.SearchMode mode) {
         super(mainWindow);

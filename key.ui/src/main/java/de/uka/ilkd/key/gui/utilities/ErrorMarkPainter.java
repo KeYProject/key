@@ -85,7 +85,12 @@ public class ErrorMarkPainter implements Highlighter.HighlightPainter {
 
     /** Width of the fixed one-character mark used for zero-width / end-of-line positions. */
     private static int caretWidth(JTextComponent c) {
-        FontMetrics fm = c.getFontMetrics(c.getFont());
+        Font font = c.getFont();
+        if (font == null) {
+            // a realized component always carries a font
+            throw new NullPointerException("No component font available.");
+        }
+        FontMetrics fm = c.getFontMetrics(font);
         return Math.max(fm.charWidth(' '), 5);
     }
 }

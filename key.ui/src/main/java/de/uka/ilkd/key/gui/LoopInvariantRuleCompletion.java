@@ -6,9 +6,11 @@ package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.speclang.LoopSpecImpl;
@@ -40,22 +42,24 @@ public class LoopInvariantRuleCompletion implements InteractiveRuleApplicationCo
 
         // leading update?
         JTerm progPost = loopApp.programTerm();
+        if (progPost == null) {
+            // a loop-invariant rule app always carries the loop's program term
+            throw new NullPointerException("No program term available.");
+        }
         final While loop = loopApp.getLoopStatement();
 
         LoopSpecification inv = loopApp.getSpec();
         if (inv == null) { // no invariant present, get it interactively
             MethodFrame mf = JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services);
-            inv = new LoopSpecImpl(loop, mf == null ? null : mf.getProgramMethod(),
-                mf == null || mf.getProgramMethod() == null ? null
-                        : mf.getProgramMethod().getContainerType(),
-                mf == null ? null
-                        : MiscTools.getSelfTerm(
-                            JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services),
-                            services),
-                null);
+            inv = newDefaultSpec(loop, mf, services);
+            var heapContext = loopApp.getHeapContext();
+            if (heapContext == null) {
+                // the invariant dialog enables its heap tabs from this list
+                throw new NullPointerException("No heap context available.");
+            }
             try {
                 inv = InvariantConfigurator.getInstance().getLoopInvariant(inv, services, false,
-                    loopApp.getHeapContext());
+                    heapContext);
             } catch (RuleAbortException e) {
                 return null;
             }
@@ -65,9 +69,14 @@ public class LoopInvariantRuleCompletion implements InteractiveRuleApplicationCo
             // Check if a variant is required
             if (!forced || !loopApp.invariantAvailable() || requiresVariant) {
                 // get invariant or variant interactively
+                var heapContext = loopApp.getHeapContext();
+                if (heapContext == null) {
+                    // the invariant dialog enables its heap tabs from this list
+                    throw new NullPointerException("No heap context available.");
+                }
                 try {
                     inv = InvariantConfigurator.getInstance().getLoopInvariant(inv, services,
-                        requiresVariant, loopApp.getHeapContext());
+                        requiresVariant, heapContext);
                 } catch (RuleAbortException e) {
                     return null;
                 }
@@ -80,6 +89,25 @@ public class LoopInvariantRuleCompletion implements InteractiveRuleApplicationCo
         }
 
         return inv == null ? null : loopApp.setLoopInvariant(inv);
+    }
+
+    /**
+     * Creates the default loop specification used to open the interactive invariant editor.
+     *
+     * <p>
+     * A loop without an enclosing method has no method context, so {@code pm}, {@code kjt} and
+     * {@code selfTerm} are passed as {@code null}; {@link LoopSpecImpl} tolerates a missing
+     * method context for a freshly created skeleton invariant (the interactive editor only
+     * fills it in once a method is chosen), while the constructor declares non-null parameters,
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private static LoopSpecification newDefaultSpec(While loop, @Nullable MethodFrame mf,
+            Services services) {
+        IProgramMethod pm = mf == null ? null : mf.getProgramMethod();
+        KeYJavaType kjt = pm == null ? null : pm.getContainerType();
+        JTerm selfTerm = mf == null ? null : MiscTools.getSelfTerm(mf, services);
+        return new LoopSpecImpl(loop, pm, kjt, selfTerm, null);
     }
 
     @Override

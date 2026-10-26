@@ -646,7 +646,7 @@ public class diff_match_patch {
      *         prefix of text2, the suffix of text2 and the common middle. Or null if there was no
      *         match.
      */
-    protected String[] diff_halfMatch(String text1, String text2) {
+    protected String @Nullable [] diff_halfMatch(String text1, String text2) {
         if (Diff_Timeout <= 0) {
             // Don't risk returning a non-optimal diff if we have unlimited time.
             return null;
@@ -673,6 +673,11 @@ public class diff_match_patch {
             hm = hm1[4].length() > hm2[4].length() ? hm1 : hm2;
         }
 
+        if (hm == null) {
+            // one half-match always exists when the two-way test above did not bail out
+            throw new NullPointerException("No half-match data available.");
+        }
+
         // A half-match was found, sort out the return data.
         if (text1.length() > text2.length()) {
             return hm;
@@ -693,7 +698,7 @@ public class diff_match_patch {
      *         the prefix of shorttext, the suffix of shorttext and the common middle. Or null if
      *         there was no match.
      */
-    private String[] diff_halfMatchI(String longtext, String shorttext, int i) {
+    private String @Nullable [] diff_halfMatchI(String longtext, String shorttext, int i) {
         // Start with a 1/4 length substring at position i as a seed.
         String seed = longtext.substring(i, i + longtext.length() / 4);
         int j = -1;
@@ -826,7 +831,7 @@ public class diff_match_patch {
                 thisDiff = pointer.next();
             }
         }
-        while (thisDiff != null) {
+        while (thisDiff != null && prevDiff != null) {
             if (prevDiff.operation == Operation.DELETE && thisDiff.operation == Operation.INSERT) {
                 String deletion = prevDiff.text;
                 String insertion = thisDiff.text;
@@ -886,7 +891,7 @@ public class diff_match_patch {
         Diff thisDiff = pointer.hasNext() ? pointer.next() : null;
         Diff nextDiff = pointer.hasNext() ? pointer.next() : null;
         // Intentionally ignore the first and last element (don't need checking).
-        while (nextDiff != null) {
+        while (nextDiff != null && prevDiff != null && thisDiff != null) {
             if (prevDiff.operation == Operation.EQUAL && nextDiff.operation == Operation.EQUAL) {
                 // This is a single edit surrounded by equalities.
                 equality1 = prevDiff.text;
@@ -1222,7 +1227,7 @@ public class diff_match_patch {
         thisDiff = pointer.hasNext() ? pointer.next() : null;
         Diff nextDiff = pointer.hasNext() ? pointer.next() : null;
         // Intentionally ignore the first and last element (don't need checking).
-        while (nextDiff != null) {
+        while (nextDiff != null && prevDiff != null && thisDiff != null) {
             if (prevDiff.operation == Operation.EQUAL && nextDiff.operation == Operation.EQUAL) {
                 // This is a single edit surrounded by equalities.
                 if (thisDiff.text.endsWith(prevDiff.text)) {
@@ -1598,7 +1603,12 @@ public class diff_match_patch {
                     // Out of range.
                     charMatch = 0;
                 } else {
-                    charMatch = s.get(text.charAt(j - 1));
+                    Integer match = s.get(text.charAt(j - 1));
+                    if (match == null) {
+                        // the character is present in the map, so its value is too
+                        throw new NullPointerException("No value for the checked character.");
+                    }
+                    charMatch = match;
                 }
                 if (d == 0) {
                     // First pass: exact match.
@@ -1668,7 +1678,12 @@ public class diff_match_patch {
         }
         int i = 0;
         for (char c : char_pattern) {
-            s.put(c, s.get(c) | (1 << (pattern.length() - i - 1)));
+            Integer bitmask = s.get(c);
+            if (bitmask == null) {
+                // every pattern character was registered with a bitmask above
+                throw new NullPointerException("No bitmask for the pattern character.");
+            }
+            s.put(c, bitmask | (1 << (pattern.length() - i - 1)));
             i++;
         }
         return s;
@@ -2191,28 +2206,36 @@ public class diff_match_patch {
             if (!m.matches()) {
                 throw new IllegalArgumentException("Invalid patch string: " + text.getFirst());
             }
+            String group1 = m.group(1);
+            String group2 = m.group(2);
+            String group3 = m.group(3);
+            String group4 = m.group(4);
+            if (group1 == null || group2 == null || group3 == null || group4 == null) {
+                // the patch header regex has four mandatory capturing groups
+                throw new NullPointerException("Incomplete patch header.");
+            }
             patch = new Patch();
             patches.add(patch);
-            patch.start1 = Integer.parseInt(m.group(1));
-            if (m.group(2).length() == 0) {
+            patch.start1 = Integer.parseInt(group1);
+            if (group2.length() == 0) {
                 patch.start1--;
                 patch.length1 = 1;
-            } else if (m.group(2).equals("0")) {
+            } else if (group2.equals("0")) {
                 patch.length1 = 0;
             } else {
                 patch.start1--;
-                patch.length1 = Integer.parseInt(m.group(2));
+                patch.length1 = Integer.parseInt(group2);
             }
 
-            patch.start2 = Integer.parseInt(m.group(3));
-            if (m.group(4).length() == 0) {
+            patch.start2 = Integer.parseInt(group3);
+            if (group4.length() == 0) {
                 patch.start2--;
                 patch.length2 = 1;
-            } else if (m.group(4).equals("0")) {
+            } else if (group4.equals("0")) {
                 patch.length2 = 0;
             } else {
                 patch.start2--;
-                patch.length2 = Integer.parseInt(m.group(4));
+                patch.length2 = Integer.parseInt(group4);
             }
             text.removeFirst();
 

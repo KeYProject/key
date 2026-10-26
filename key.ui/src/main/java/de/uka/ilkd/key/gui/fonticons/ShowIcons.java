@@ -22,6 +22,15 @@ public class ShowIcons extends JFrame {
     private final JPanel search = new JPanel();
     private final ArrayList<JLabel> icons = new ArrayList<>();
 
+    /**
+     * Creates the icon browser window.
+     *
+     * <p>
+     * The window configures its title, layout and size and builds its icon lists while the
+     * receiver is still under initialization (EISOP initialization check); all of it only
+     * takes effect when the window is shown after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ShowIcons() {
         setTitle("ShowIcons");
         setLayout(new BorderLayout());

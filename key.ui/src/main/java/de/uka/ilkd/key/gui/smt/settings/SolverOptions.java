@@ -37,6 +37,12 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
     private final JTextField solverInstalled;
     private final JSpinner solverTimeout;
 
+    /**
+     * The ctor builds all fields while the receiver is still under initialization (EISOP
+     * initialization check); the components are only used after construction completes,
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SolverOptions(SolverType solverType) {
         this.setName(solverType.getName());
         this.solverType = solverType;
@@ -152,6 +158,10 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
             final String versionString;
             try {
                 versionString = solverType.getRawVersion();
+                if (versionString == null) {
+                    // the solver is installed, hence its version can be queried
+                    throw new NullPointerException("No solver version available.");
+                }
                 info = versionInfo(info, versionString);
             } catch (RuntimeException re) {
                 // this case occurs for instance if the user can see e.g. z3 but doesn't have
@@ -198,8 +208,12 @@ class SolverOptions extends SettingsPanel implements SettingsProvider {
         final boolean installed = solverType.isInstalled(true);
         String info = installed ? "yes" : "no";
         if (installed) {
-            final String versionString = solverType.getRawVersion();
-            info = versionInfo(info, versionString);
+            String rawVersion = solverType.getRawVersion();
+            if (rawVersion == null) {
+                // the solver is installed, hence its version can be queried
+                throw new NullPointerException("No solver version available.");
+            }
+            info = versionInfo(info, rawVersion);
         }
         solverInstalled.setText(info);
     }

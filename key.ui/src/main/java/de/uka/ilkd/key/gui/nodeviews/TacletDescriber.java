@@ -8,6 +8,7 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
@@ -142,9 +143,14 @@ class TacletDescriber {
         if (app != null) {
             s.append("The following rule was applied on this node: \n\n");
             if (app.rule() instanceof de.uka.ilkd.key.rule.Taclet taclet) {
+                Services services = mediator.getServices();
+                if (services == null) {
+                    // the mediator always carries services when a rule description is requested
+                    throw new NullPointerException("No services available.");
+                }
                 SequentViewLogicPrinter logicPrinter =
                     SequentViewLogicPrinter.purePrinter(width, mediator.getNotationInfo(),
-                        mediator.getServices(), getVisibleTermLabels());
+                        services, getVisibleTermLabels());
                 logicPrinter.printTaclet(taclet);
                 s.append(logicPrinter.result());
             } else {

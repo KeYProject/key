@@ -37,8 +37,11 @@ public final class ThreadUtilities {
                 LOGGER.debug("", e);
             } catch (InvocationTargetException ite) {
                 Throwable targetExc = ite.getTargetException();
-                LOGGER.debug("", targetExc);
                 LOGGER.debug("", ite);
+                if (targetExc != null) {
+                    // invocation target exceptions always carry the wrapped failure
+                    LOGGER.debug("", targetExc);
+                }
             }
         }
     }
@@ -65,6 +68,10 @@ public final class ThreadUtilities {
      */
     public static @Nullable Thread[] getThreads() {
         ThreadGroup rootGroup = Thread.currentThread().getThreadGroup();
+        if (rootGroup == null) {
+            // only a dead thread lacks a thread group; the caller is live
+            throw new NullPointerException("No thread group available.");
+        }
         ThreadGroup parentGroup;
         while ((parentGroup = rootGroup.getParent()) != null) {
             rootGroup = parentGroup;

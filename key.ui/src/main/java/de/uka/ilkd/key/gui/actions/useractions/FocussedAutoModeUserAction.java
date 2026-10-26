@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.gui.actions.useractions;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -42,7 +43,14 @@ public class FocussedAutoModeUserAction extends ProofModifyingUserAction {
 
     @Override
     protected void apply() {
+        Goal selectedGoal = mediator.getSelectedGoal();
+        if (selectedGoal == null) {
+            // Focussed auto mode requires a goal; the action is only invoked while a goal is
+            // selected, a {@code null} goal here is a concurrent state change in which the
+            // previous code crashed with an NPE in the proof control.
+            throw new NullPointerException("No goal selected for focussed auto mode.");
+        }
         mediator.getUI().getProofControl().startFocussedAutoMode(
-            focus, mediator.getSelectedGoal());
+            focus, selectedGoal);
     }
 }

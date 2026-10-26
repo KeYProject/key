@@ -38,9 +38,22 @@ class GUIBranchNode extends GUIAbstractTreeNode {
         childrenCache = new ArrayList<>();
     }
 
+    /**
+     * @return the children cache, which {@link #fillChildrenCache(boolean)} (without dry run)
+     *         always establishes before children are added.
+     */
+    private ArrayList<TreeNode> requireChildrenCache() {
+        ArrayList<TreeNode> cache = childrenCache;
+        if (cache == null) {
+            // fillChildrenCache(false) initializes the cache before any node is added
+            throw new NullPointerException("No children cache available.");
+        }
+        return cache;
+    }
+
     public TreeNode getChildAt(int childIndex) {
         fillChildrenCache(false);
-        return childrenCache.get(childIndex);
+        return requireChildrenCache().get(childIndex);
     }
 
     /**
@@ -75,7 +88,7 @@ class GUIBranchNode extends GUIAbstractTreeNode {
                 if (!dryRun) {
                     var newNode = getProofTreeModel().getProofTreeNode(n);
                     newNode.setParent(this);
-                    childrenCache.add(newNode);
+                    requireChildrenCache().add(newNode);
                 }
             }
             List<Node> nextN = findChild(n);
@@ -94,7 +107,7 @@ class GUIBranchNode extends GUIAbstractTreeNode {
                         if (!dryRun) {
                             var branchNode = findBranch(node);
                             branchNode.setParent(this);
-                            childrenCache.add(branchNode);
+                            requireChildrenCache().add(branchNode);
                         }
                     }
                     continue;
@@ -111,7 +124,7 @@ class GUIBranchNode extends GUIAbstractTreeNode {
                 if (!dryRun) {
                     var branchNode = findBranch(n.child(i));
                     branchNode.setParent(this);
-                    childrenCache.add(branchNode);
+                    requireChildrenCache().add(branchNode);
                 }
             }
         }

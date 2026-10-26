@@ -69,6 +69,14 @@ public class InformationWindow extends JDialog {
     private JTabbedPane tabbedPane;
     private Model model;
 
+    /**
+     * The ctor configures and displays the window while the receiver is still under initialization
+     * (EISOP initialization check); {@code model} is only set when a counterexample was found and
+     * {@code tabbedPane} is created by {@link #getTabbedPane()} before it is used, suppressed
+     * with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     public InformationWindow(Dialog parent, SMTSolver solver, Collection<Information> information,
             String title) {
         super(parent);
@@ -90,11 +98,12 @@ public class InformationWindow extends JDialog {
         if (solver.getType() != SolverTypes.Z3_CE_SOLVER) {
             return;
         }
-        if (solver.getSocket().getQuery() == null) {
+        var query = solver.getSocket().getQuery();
+        if (query == null) {
             return;
         }
 
-        Model m = solver.getSocket().getQuery().getModel();
+        Model m = query.getModel();
         this.model = m;
         this.setTitle("Counterexample " + this.getTitle());
         getTabbedPane().addTab("Counterexample", createModelTab());

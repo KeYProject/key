@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NullMarked;
@@ -48,20 +49,38 @@ public class BlockContractInternalCompletion implements InteractiveRuleApplicati
             }
         }
         final Services services = goal.proof().getServices();
-        final Instantiation instantiation = BlockContractInternalRule.INSTANCE
-                .instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
+
+        PosInOccurrence pio = application.posInOccurrence();
+        if (pio == null) {
+            // an interactive block-contract rule app always carries a position
+            throw new NullPointerException("No position in occurrence available.");
+        }
+        final Instantiation instantiation =
+            BlockContractInternalRule.INSTANCE.instantiate((JTerm) pio.subTerm(), goal);
+        if (instantiation == null) {
+            // the rule always instantiates the application position
+            throw new NullPointerException("No instantiation available.");
+        }
         final ImmutableSet<BlockContract> contracts =
             BlockContractInternalRule.getApplicableContracts(instantiation, goal, services);
+        if (contracts == null) {
+            // every block statement has at least the block contract of its program block
+            throw new NullPointerException("No applicable contracts available.");
+        }
         final AuxiliaryContractConfigurator<BlockContract> configurator =
             new AuxiliaryContractConfigurator<>("Block Contract Configurator",
                 new BlockContractSelectionPanel(services, true), mainWindow, services,
                 contracts.toArray(new BlockContract[contracts.size()]),
                 "Contracts for Block: " + instantiation.statement());
         if (configurator.wasSuccessful()) {
+            BlockContract blockContract = configurator.getContract();
+            if (blockContract == null) {
+                // a successful configuration always leaves a selected contract
+                throw new NullPointerException("No block contract selected.");
+            }
             final List<LocationVariable> heaps =
                 HeapContext.getModifiableHeaps(services, instantiation.isTransactional());
-            result.update(instantiation.statement(), configurator.getContract(),
-                heaps);
+            result.update(instantiation.statement(), blockContract, heaps);
         }
         return result;
     }

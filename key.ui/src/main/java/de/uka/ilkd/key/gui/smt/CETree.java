@@ -15,6 +15,7 @@ import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.smt.model.*;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NullMarked;
@@ -40,6 +41,17 @@ public class CETree {
      */
     private final Model model;
 
+    /**
+     * Creates the counter-example tree for the given SMT model.
+     *
+     * <p>
+     * The tree is initialized by {@link #initTree()} while the receiver is still under
+     * initialization (EISOP initialization check); the EISOP initialization check cannot see the
+     * assignment inside the delegated call, so both the field and the delegated call are
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     public CETree(Model model) {
         super();
         this.model = model;
@@ -161,7 +173,8 @@ public class CETree {
     }
 
     public static String computeSortName(ObjectVal ov) {
-        return ov.getSort() == null ? "java.lang.Object" : ov.getSort().name().toString();
+        Sort sort = ov.getSort();
+        return sort == null ? "java.lang.Object" : sort.name().toString();
     }
 
     public static List<Pair<String, String>> computeObjectProperties(ObjectVal ov,

@@ -57,7 +57,14 @@ public class ChoiceSelector extends JDialog {
      *
      * @param mainWindow the parent window (dialog is centered on this)
      * @param settings the currently selected settings
+     * <p>
+     * The dialog configures and displays itself while the receiver is still under initialization
+     * (EISOP initialization check); the category, choice and explanation fields are initialized
+     * by {@link #layoutChoiceSelector()} before the dialog is shown whenever the dialog is not
+     * immediately disposed due to missing options, suppressed with scoped keys.
      */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid", "nullness:argument.type.incompatible" })
     public ChoiceSelector(JFrame mainWindow, ChoiceSettings settings) {
         super(mainWindow, "Taclet Base Configuration", true);
         this.settings = settings;
@@ -102,7 +109,12 @@ public class ChoiceSelector extends JDialog {
         {
             choiceList = new JList<>();
             choiceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            choiceList.setSelectedValue(category2DefaultChoice.get(cats[0]), true);
+            String defaultChoice = category2DefaultChoice.get(cats[0]);
+            if (defaultChoice == null) {
+                // every category is configured with a default choice
+                throw new NullPointerException("No default choice for the first category.");
+            }
+            choiceList.setSelectedValue(defaultChoice, true);
             choiceList.addListSelectionListener(e -> {
                 ChoiceEntry selectedValue = choiceList.getSelectedValue();
                 if (selectedValue != null) {
@@ -188,10 +200,19 @@ public class ChoiceSelector extends JDialog {
      */
     private void setChoiceList() {
         String selection = catList.getSelectedValue();
-        ChoiceEntry[] choices = createChoiceEntries(category2Choices.get(selection));
+        ChoiceEntry @Nullable [] choices = createChoiceEntries(category2Choices.get(selection));
+        if (choices == null) {
+            // a selected category always provides its registered choices
+            choices = new ChoiceEntry[0];
+        }
         choiceList.setListData(choices);
         ChoiceEntry selectedChoice = findChoice(choices, category2DefaultChoice.get(selection));
-        choiceList.setSelectedValue(selectedChoice, false);
+        if (selectedChoice == null) {
+            // selecting a value not contained in the list clears the selection
+            choiceList.clearSelection();
+        } else {
+            choiceList.setSelectedValue(selectedChoice, false);
+        }
         explanationArea.setBorder(BorderFactory.createTitledBorder(selection));
         explanationArea.setText(getExplanation(selection));
         explanationArea.setCaretPosition(0);
@@ -210,21 +231,25 @@ public class ChoiceSelector extends JDialog {
      * @return The explanation for the given category.
      */
     public static String getExplanation(String category) {
+        Properties map;
         synchronized (ChoiceSelector.class) {
-            if (explanationMap == null) {
-                explanationMap = new Properties();
+            Properties current = explanationMap;
+            if (current == null) {
+                current = new Properties();
+                explanationMap = current;
                 InputStream is = ChoiceSelector.class.getResourceAsStream(EXPLANATIONS_RESOURCE);
                 try {
                     if (is == null) {
                         throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found");
                     }
-                    explanationMap.loadFromXML(is);
+                    current.loadFromXML(is);
                 } catch (IOException e) {
                     LOGGER.warn("Cannot load help message in rule view.", e);
                 }
             }
+            map = current;
         }
-        String result = explanationMap.getProperty(category);
+        String result = map.getProperty(category);
         if (result == null) {
             result = "No explanation for " + category + " available.";
         }
@@ -287,8 +312,9 @@ public class ChoiceSelector extends JDialog {
      * @return The found {@link ChoiceEntry} for the given choice or {@code null} otherwise.
      */
     public static @Nullable ChoiceEntry findChoice(@Nullable ChoiceEntry[] choices,
-            @Nullable final String choice) {
-        return ArrayUtil.search(choices, element -> element.choice().equals(choice));
+            final @Nullable String choice) {
+        return ArrayUtil.search(choices,
+            element -> element != null && element.choice().equals(choice));
     }
 
     /**
@@ -297,7 +323,7 @@ public class ChoiceSelector extends JDialog {
      * @param choices The choices.
      * @return The created {@link ChoiceEntry}s.
      */
-    public static @Nullable ChoiceEntry[] createChoiceEntries(@Nullable Set<String> choices) {
+    public static ChoiceEntry @Nullable [] createChoiceEntries(@Nullable Set<String> choices) {
         if (choices != null) {
             ChoiceEntry[] entries = new ChoiceEntry[choices.size()];
             int i = 0;
@@ -392,7 +418,7 @@ public class ChoiceSelector extends JDialog {
          * @return The optionally information.
          */
         @Override
-        public String information() {
+        public @Nullable String information() {
             return information;
         }
 
@@ -400,7 +426,7 @@ public class ChoiceSelector extends JDialog {
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@Nullable Object obj) {
             if (obj instanceof ChoiceEntry(String choice1, boolean unsound1, boolean incomplete1, String information1)) {
                 return choice.equals(choice1) && incomplete == incomplete1
                         && unsound == unsound1

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.fonticons;
 
 import java.awt.*;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -265,11 +266,28 @@ public enum FontAwesomeSolid implements IconFont {
         unicode = c;
     }
 
+    /**
+     * Returns the font of this icon set, loaded lazily from the bundled resource.
+     *
+     * <p>
+     * The stream returned by the class-loading chain is initialized by construction, but EISOP
+     * models it as {@code @UnknownInitialization} in this large enum (the JDK stub annotates only
+     * the nullness of {@code Class.getResourceAsStream}); the {@code null} guard above already
+     * excludes a missing resource, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     public Font getFont() throws IOException, FontFormatException {
         if (font == null) {
-            font = Font.createFont(Font.TRUETYPE_FONT,
-                getClass().getResourceAsStream("/fonts/Font Awesome 6 Free-Solid-900.otf"));
+            InputStream stream = FontAwesomeSolid.class
+                    .getResourceAsStream("/fonts/Font Awesome 6 Free-Solid-900.otf");
+            if (stream == null) {
+                // the solid font is bundled with KeY; a missing resource is an inconsistent
+                // state in which the original code failed with a NullPointerException
+                throw new NullPointerException(
+                    "Missing font resource /fonts/Font Awesome 6 Free-Solid-900.otf");
+            }
+            font = Font.createFont(Font.TRUETYPE_FONT, stream);
         }
         return font;
     }
