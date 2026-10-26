@@ -49,7 +49,7 @@ public class RecentFileMenu {
      */
     private static final int MAX_RECENT_FILES = 8;
 
-    private final MainWindow mainWindow;
+    private final @Nullable MainWindow mainWindow;
 
     /**
      * this is the maximal number of recent files.
@@ -73,13 +73,28 @@ public class RecentFileMenu {
      *
      * @param mediator Key mediator
      */
-    public RecentFileMenu(final MainWindow mediator) {
+    public RecentFileMenu(final @Nullable MainWindow mediator) {
         this.mainWindow = mediator;
         this.menu = new JMenu("Recent Files");
         this.maxNumberOfEntries = MAX_RECENT_FILES;
 
         // menu.setEnabled(menu.getItemCount() != 0);
         menu.setIcon(IconFactory.recentFiles(16));
+    }
+
+    /**
+     * Returns the owning main window.
+     *
+     * @return the main window this menu belongs to
+     * @throws NullPointerException if the menu was constructed without a window (unit tests); a
+     *         load action is only reachable from a real window, so this guard mirrors the previous
+     *         implicit NPE on such an invocation
+     */
+    private MainWindow requireMainWindow() {
+        if (mainWindow == null) {
+            throw new NullPointerException("No main window for the recent-file action.");
+        }
+        return mainWindow;
     }
 
     /// Loads entries from the current default configuration folder.
@@ -422,7 +437,7 @@ public class RecentFileMenu {
                 if (proofPath == null) {
                     // canceled by user!
                 } else {
-                    mainWindow.loadProofFromBundle(file, proofPath);
+                    requireMainWindow().loadProofFromBundle(file, proofPath);
                 }
             } else {
                 String profileName = fileEntry.profile;
@@ -446,7 +461,7 @@ public class RecentFileMenu {
                 var profile = selectedProfile.orElse(null);
                 var additionalProfileOptions = fileEntry.additionalOption;
 
-                mainWindow.loadProblem(file, pl -> {
+                requireMainWindow().loadProblem(file, pl -> {
                     if (profile != null) {
                         pl.setProfileOfNewProofs(profile);
                         pl.setAdditionalProfileOptions(additionalProfileOptions);

@@ -5,8 +5,10 @@
 package de.uka.ilkd.key.gui;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +33,8 @@ public class KeyboardTacletTest {
         assertEquals(3, KeyboardTacletModel.getClashFreePrefix("impLeft", keywords));
 
         Map<String, String> table = KeyboardTacletModel.buildPrefixTable(keywords);
-        List<String> prefixes = table.keySet().stream().sorted().toList();
+        Set<String> tableKeys = new HashSet<>(table.keySet());
+        List<String> prefixes = tableKeys.stream().sorted().toList();
         assertEquals("[andL, andR, cut, cut_, i]", prefixes.toString());
     }
 }

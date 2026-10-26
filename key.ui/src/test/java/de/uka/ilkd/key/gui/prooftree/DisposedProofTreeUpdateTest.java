@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.gui.prooftree;
 
 import java.nio.file.Path;
-import java.util.Objects;
 import javax.swing.tree.TreeNode;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -29,8 +28,26 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * of this kind surface instead of being rendered silently.
  */
 public class DisposedProofTreeUpdateTest {
-    private static final Path exampleDir =
-        Objects.requireNonNull(FindResources.getExampleDirectory());
+    private static final Path exampleDir = requireExampleDirectory();
+
+    private static Path requireExampleDirectory() {
+        Path dir = FindResources.getExampleDirectory();
+        if (dir == null) {
+            // the example directory must be checked out for these tests to run
+            throw new NullPointerException("No example directory available.");
+        }
+        return dir;
+    }
+
+    private static Proof requireProof(KeYEnvironment<DefaultUserInterfaceControl> env,
+            String label) {
+        Proof proof = env.getLoadedProof();
+        if (proof == null) {
+            throw new NullPointerException("No loaded proof for " + label + ".");
+        }
+        return proof;
+    }
+
     private static final String EXAMPLE_PROOF =
         "standard_key/BookExamples/10UsingKeY/andCommutes.proof";
 
@@ -38,10 +55,10 @@ public class DisposedProofTreeUpdateTest {
     void updatingWithNodeOfForeignDisposedProofFailsFast() throws Exception {
         KeYEnvironment<DefaultUserInterfaceControl> env =
             KeYEnvironment.load(exampleDir.resolve(EXAMPLE_PROOF));
-        Proof displayed = env.getLoadedProof();
+        Proof displayed = requireProof(env, "env");
         KeYEnvironment<DefaultUserInterfaceControl> env2 =
             KeYEnvironment.load(exampleDir.resolve(EXAMPLE_PROOF));
-        Proof foreign = env2.getLoadedProof();
+        Proof foreign = requireProof(env2, "env2");
 
         GUIProofTreeModel model = new GUIProofTreeModel(displayed);
         forceExpand((TreeNode) model.getRoot());
