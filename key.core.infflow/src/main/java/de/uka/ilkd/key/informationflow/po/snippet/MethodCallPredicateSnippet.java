@@ -15,6 +15,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -27,10 +28,11 @@ import org.jspecify.annotations.NullMarked;
 class MethodCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
 
     @Override
-    String generatePredicateName(IProgramMethod pm, StatementBlock block,
-            LoopSpecification loopInv) {
+    String generatePredicateName(@Nullable IProgramMethod pm, @Nullable StatementBlock block,
+            @Nullable LoopSpecification loopInv) {
+        final IProgramMethod method = requirePm(pm);
         final String nameString =
-            MiscTools.toValidTacletName("RELATED_BY_" + pm.getUniqueName()).toString();
+            MiscTools.toValidTacletName("RELATED_BY_" + method.getUniqueName()).toString();
         return nameString;
     }
 

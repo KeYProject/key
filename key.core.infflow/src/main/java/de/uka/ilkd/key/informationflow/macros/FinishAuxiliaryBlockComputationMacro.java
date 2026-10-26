@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
@@ -42,10 +43,11 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-            if (poForProof instanceof BlockExecutionPO) {
-                final Goal initiatingGoal = ((BlockExecutionPO) poForProof).getInitiatingGoal();
-                if (initiatingGoal.node().parent() != null) {
-                    final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
+            if (poForProof instanceof BlockExecutionPO blockPO) {
+                final Goal initiatingGoal = blockPO.getInitiatingGoal();
+                final Node parent = initiatingGoal.node().parent();
+                if (parent != null) {
+                    final RuleApp app = parent.getAppliedRuleApp();
                     return app instanceof BlockContractInternalBuiltInRuleApp;
                 }
             }
@@ -64,19 +66,35 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
 
         // must be BlockExecutionPO otherwise canApplyTo would not have been true
         // and we assume that before calling this method, the applicability of the macro was checked
-
-        final Goal initiatingGoal = ((BlockExecutionPO) poForProof).getInitiatingGoal();
+        if (!(poForProof instanceof BlockExecutionPO blockPO)) {
+            throw new NullPointerException(
+                "No block execution proof obligation for the auxiliary proof.");
+        }
+        final Goal initiatingGoal = blockPO.getInitiatingGoal();
         final InfFlowProof initiatingProof = (InfFlowProof) initiatingGoal.proof();
         final Services services = initiatingProof.getServices();
 
         // initiating goal must not be root and it is the result of a block contract application
         // otherwise the applicable check would have already failed
         // and we assume that before calling this method, the applicability of the macro was checked
-        final RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
-
+        final Node parent = initiatingGoal.node().parent();
+        if (parent == null) {
+            throw new NullPointerException("No parent node of the initiating goal.");
+        }
+        final RuleApp app = parent.getAppliedRuleApp();
+        if (app == null) {
+            throw new NullPointerException("No applied rule app on the parent node.");
+        }
         final var blockRuleApp = (InfFlowBlockContractInternalBuiltInRuleApp) app;
         final BlockContract contract = blockRuleApp.getContract();
+        if (contract == null) {
+            throw new NullPointerException("No block contract for the rule application.");
+        }
         IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
+        if (ifVars == null) {
+            throw new NullPointerException("No information flow proof obligation variables for "
+                + "the rule application.");
+        }
         ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
 
         mergeNamespaces(initiatingProof, proof);

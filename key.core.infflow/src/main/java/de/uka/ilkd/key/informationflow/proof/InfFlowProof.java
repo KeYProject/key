@@ -139,10 +139,18 @@ public class InfFlowProof extends Proof {
     public void addSideProof(InfFlowProof proof) {
         assert proof != null;
         if (proof.hasSideProofs()) {
+            final SideProofStatistics proofStats = proof.sideProofStatistics;
+            if (proofStats == null) {
+                throw new NullPointerException("No side proof statistics of the side proof.");
+            }
             if (this.hasSideProofs()) {
-                sideProofStatistics = sideProofStatistics.add(proof.sideProofStatistics);
+                final SideProofStatistics myStats = sideProofStatistics;
+                if (myStats == null) {
+                    throw new NullPointerException("No side proof statistics of this proof.");
+                }
+                sideProofStatistics = myStats.add(proofStats);
             } else {
-                sideProofStatistics = SideProofStatistics.create(proof.sideProofStatistics);
+                sideProofStatistics = SideProofStatistics.create(proofStats);
             }
             proof.sideProofStatistics = null;
         }
@@ -152,7 +160,11 @@ public class InfFlowProof extends Proof {
     private void addSideProofStatistics(Statistics stat) {
         assert stat != null;
         if (this.hasSideProofs()) {
-            sideProofStatistics = sideProofStatistics.add(stat);
+            final SideProofStatistics myStats = sideProofStatistics;
+            if (myStats == null) {
+                throw new NullPointerException("No side proof statistics of this proof.");
+            }
+            sideProofStatistics = myStats.add(stat);
         } else {
             sideProofStatistics = SideProofStatistics.create(stat);
         }

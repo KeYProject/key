@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -70,10 +71,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
     public LoopInvExecutionPO(InitConfig initConfig, LoopSpecification loopInv,
             ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context,
             JTerm guardTerm) {
-        super(initConfig,
-            ContractFactory.generateContractName(loopInv.getName(), loopInv.getKJT(),
-                loopInv.getTarget(), loopInv.getTarget().getContainerType(),
-                loopInv.getLoop().getStartPosition().line()));
+        super(initConfig, buildContractName(loopInv));
         this.loopInvariant = loopInv;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
@@ -81,14 +79,41 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
         this.guardTerm = guardTerm;
 
         // consistency check
-        assert preAndPostExpressionsEqual()
+        assert preAndPostExpressionsEqual(loopInv, environmentServices)
                 : "Information flow loop invariant malformed. Pre expressions"
                     + "do not match post expressions.";
     }
 
+    /**
+     * Builds the name of this proof obligation from the loop invariant. The
+     * container type of the target method is only available at run time
+     * (hence the null guard), so the name cannot be computed inline in the
+     * {@code super(...)} call.
+     */
+    private static String buildContractName(LoopSpecification loopInv) {
+        final IProgramMethod target = loopInv.getTarget();
+        if (target == null) {
+            throw new NullPointerException(
+                "No target method for the loop invariant of the proof obligation.");
+        }
+        final KeYJavaType containerType = target.getContainerType();
+        if (containerType == null) {
+            throw new NullPointerException(
+                "No container type for the target method of the loop invariant.");
+        }
+        return ContractFactory.generateContractName(loopInv.getName(), loopInv.getKJT(),
+            target, containerType, loopInv.getLoop().getStartPosition().line());
+    }
 
-    private boolean preAndPostExpressionsEqual() {
-        for (InfFlowSpec infFlowSpec : loopInvariant.getInfFlowSpecs(environmentServices)) {
+    /**
+     * Checks that the pre and post expressions of all information flow
+     * specifications of the loop invariant coincide. Static because it is
+     * invoked from the constructor, where instance methods may not be called
+     * on the {@code @UnderInitialization} receiver.
+     */
+    private static boolean preAndPostExpressionsEqual(LoopSpecification loopInvariant,
+            Services services) {
+        for (InfFlowSpec infFlowSpec : loopInvariant.getInfFlowSpecs(services)) {
             if (infFlowSpec.preExpressions == infFlowSpec.postExpressions) {
                 return false;
             }
@@ -100,6 +125,10 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
     @Override
     public void readProblem() throws ProofInputException {
         postInit();
+        final TermBuilder tb = this.tb;
+        if (tb == null) {
+            throw new NullPointerException("Term builder not initialized.");
+        }
 
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory = POSnippetFactory.getBasicFactory(loopInvariant,
@@ -118,8 +147,12 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
         Proof initiatingProof = initiatingGoal.proof();
         if (initiatingProof != null) {
             // proof is not loaded
-            final AbstractOperationPO initiatingPO =
-                (AbstractOperationPO) specRepos.getProofOblInput(initiatingProof);
+            final ProofOblInput po = specRepos.getProofOblInput(initiatingProof);
+            if (po == null) {
+                throw new NullPointerException(
+                    "No proof obligation input for the initiating proof.");
+            }
+            final AbstractOperationPO initiatingPO = (AbstractOperationPO) po;
             taclets = initiatingPO.getInitialTaclets();
         }
     }
@@ -150,7 +183,12 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
 
     @Override
     protected IProgramMethod getProgramMethod() {
-        return loopInvariant.getTarget();
+        final IProgramMethod target = loopInvariant.getTarget();
+        if (target == null) {
+            throw new NullPointerException(
+                "No target method for the loop invariant of the proof obligation.");
+        }
+        return target;
     }
 
     @Override
@@ -223,7 +261,15 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
         infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
     }
 
+    /**
+     * Deliberately returns {@code null}: information flow contracts do not
+     * have global defs. {@link AbstractOperationPO} declares a non-null
+     * return type although its only caller,
+     * {@code createApplyGlobalUpdateTerm}, explicitly null-tolerates the
+     * result; the base signature cannot be widened from this module.
+     */
     @Override
+    @SuppressWarnings("nullness:override.return.invalid")
     protected @Nullable JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm,
             @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Services services) {
@@ -239,9 +285,12 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
         Services initiatingServices = initiatingProof.getServices();
         ProofOblInput initiatingPO =
             initiatingServices.getSpecificationRepository().getProofOblInput(initiatingProof);
-        assert initiatingPO instanceof AbstractInfFlowPO : "Information flow auxiliary "
-            + "proof started from within non-information flow proof!?!";
-        return (AbstractInfFlowPO) initiatingPO;
+        if (initiatingPO instanceof AbstractInfFlowPO infFlowPO) {
+            return infFlowPO;
+        } else {
+            throw new NullPointerException("Information flow auxiliary proof started from "
+                + "within a non-information flow proof.");
+        }
     }
 
 

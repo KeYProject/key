@@ -47,8 +47,8 @@ abstract class ReplaceAndRegisterMethod {
     final JTerm replace(JTerm term, StateVars origVars, StateVars poVars, TermBuilder tb) {
         LinkedHashMap<JTerm, JTerm> map = new LinkedHashMap<>();
 
-        Iterator<JTerm> origVarsIt;
-        Iterator<JTerm> poVarsIt;
+        Iterator<@Nullable JTerm> origVarsIt;
+        Iterator<@Nullable JTerm> poVarsIt;
         assert origVars.paddedTermList.size() == poVars.paddedTermList.size();
         origVarsIt = origVars.paddedTermList.iterator();
         poVarsIt = poVars.paddedTermList.iterator();
@@ -66,7 +66,11 @@ abstract class ReplaceAndRegisterMethod {
             }
         }
         OpReplacer or = new OpReplacer(map, tb.tf());
-        return or.replace(term);
+        final JTerm result = or.replace(term);
+        if (result == null) {
+            throw new NullPointerException("Term replacement produced no term for " + term + ".");
+        }
+        return result;
     }
 
 
@@ -111,6 +115,10 @@ abstract class ReplaceAndRegisterMethod {
 
     final JTerm replace(JTerm term, JTerm @Nullable [] origVars, JTerm @Nullable [] poVars,
             TermBuilder tb) {
+        if (origVars == null || poVars == null) {
+            throw new NullPointerException(
+                "No original or replacement variables for the term replacement.");
+        }
         LinkedHashMap<JTerm, JTerm> map = new LinkedHashMap<>();
 
         assert origVars.length == poVars.length;
@@ -125,7 +133,11 @@ abstract class ReplaceAndRegisterMethod {
 
         OpReplacer or = new OpReplacer(map, tb.tf());
 
-        return or.replace(term);
+        final JTerm result = or.replace(term);
+        if (result == null) {
+            throw new NullPointerException("Term replacement produced no term for " + term + ".");
+        }
+        return result;
     }
 
 
@@ -161,7 +173,12 @@ abstract class ReplaceAndRegisterMethod {
         final OpReplacer op =
             new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
         term = TermLabelManager.removeIrrelevantLabels(term, services.getTermFactory());
-        return op.replace(term);
+        final JTerm result = op.replace(term);
+        if (result == null) {
+            throw new NullPointerException(
+                "Quantifiable variable replacement produced no term for " + term + ".");
+        }
+        return result;
     }
 
     static Set<QuantifiableVariable> collectQuantifiableVariables(JTerm term) {

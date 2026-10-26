@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.informationflow;
 
 import java.nio.file.Path;
-import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -39,7 +38,11 @@ public class InfFlowProfileLoadingTest {
         + "object.AmtoftBanerjee(object.AmtoftBanerjee__m_1()).Non-interference contract.0.m.key";
 
     private static Path exampleFile() {
-        return Objects.requireNonNull(FindResources.getExampleDirectory()).resolve(EXAMPLE);
+        final Path exampleDir = FindResources.getExampleDirectory();
+        if (exampleDir == null) {
+            throw new NullPointerException("No example directory found.");
+        }
+        return exampleDir.resolve(EXAMPLE);
     }
 
     /**
@@ -51,8 +54,12 @@ public class InfFlowProfileLoadingTest {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(
             AbstractProfile.getDefaultProfile(), exampleFile(), null, null, null, false);
         try {
+            final Proof proof = env.getLoadedProof();
+            if (proof == null) {
+                throw new NullPointerException("No loaded proof.");
+            }
             assertEquals(JavaInfFlowProfile.PROFILE_ID,
-                env.getLoadedProof().getServices().getProfile().ident(),
+                proof.getServices().getProfile().ident(),
                 "the file's \\profile declaration must win over an unforced profile");
         } finally {
             env.dispose();
@@ -68,8 +75,12 @@ public class InfFlowProfileLoadingTest {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(
             AbstractProfile.getDefaultProfile(), exampleFile(), null, null, null, true);
         try {
+            final Proof proof = env.getLoadedProof();
+            if (proof == null) {
+                throw new NullPointerException("No loaded proof.");
+            }
             assertEquals(AbstractProfile.getDefaultProfile().ident(),
-                env.getLoadedProof().getServices().getProfile().ident(),
+                proof.getServices().getProfile().ident(),
                 "a forced profile must override the file's \\profile declaration");
         } finally {
             env.dispose();
@@ -86,8 +97,15 @@ public class InfFlowProfileLoadingTest {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(
             AbstractProfile.getDefaultProfile(), exampleFile(), null, null, null, false);
         try {
-            Proof proof = env.getLoadedProof();
-            KeyAst.ProofScript script = env.getProofScript();
+            final Proof proof = env.getLoadedProof();
+            if (proof == null) {
+                throw new NullPointerException("No loaded proof.");
+            }
+            final KeyAst.ProofScript script = env.getProofScript();
+            if (script == null) {
+                throw new NullPointerException(
+                    "expected embedded \\proofScript in .m.key file");
+            }
             assertNotNull(script, "expected embedded \\proofScript in .m.key file");
 
             new ProofScriptEngine(proof).execute(env.getUi(), script);

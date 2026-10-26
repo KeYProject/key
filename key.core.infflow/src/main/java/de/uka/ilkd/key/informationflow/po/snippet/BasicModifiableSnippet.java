@@ -20,12 +20,13 @@ class BasicModifiableSnippet extends ReplaceAndRegisterMethod implements Factory
     @Override
     public JTerm produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        if (d.get(BasicSnippetData.Key.MODIFIABLE) == null) {
+        final Object modifiableObj = d.get(BasicSnippetData.Key.MODIFIABLE);
+        if (modifiableObj == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "modifiable-term for a contract without modifiable.");
         }
         assert JTerm.class.equals(BasicSnippetData.Key.MODIFIABLE.getType());
-        JTerm origModifiable = (JTerm) d.get(BasicSnippetData.Key.MODIFIABLE);
+        final JTerm origModifiable = (JTerm) modifiableObj;
         return replace(origModifiable, d.origVars, poVars.pre, d.tb);
     }
 }

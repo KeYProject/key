@@ -37,7 +37,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
     public JTerm produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
         ImmutableList<JTerm> posts = ImmutableList.nil();
-        if (poVars.post.self != null) {
+        if (poVars.post.self != null && poVars.pre.self != null) {
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
         }
         Iterator<JTerm> localVars = d.origVars.localVars.iterator();
@@ -45,7 +45,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
         while (localVars.hasNext()) {
             posts = posts.append(d.tb.equals(localPostVars.next(), localVars.next()));
         }
-        if (poVars.post.result != null) {
+        if (poVars.post.result != null && poVars.pre.result != null) {
             posts = posts.append(d.tb.equals(poVars.post.result, poVars.pre.result));
         }
         if (poVars.pre.exception != null && poVars.post.exception != null) {
@@ -58,14 +58,14 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
 
     private JTerm buildProgramTerm(BasicSnippetData d, ProofObligationVars vs, JTerm postTerm,
             TermBuilder tb) {
-        if (d.get(BasicSnippetData.Key.MODALITY) == null) {
+        final Object modalityObj = d.get(BasicSnippetData.Key.MODALITY);
+        if (modalityObj == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "program-term for a " + "contract without modality.");
         }
 
         // create java block
-        JModality.JavaModalityKind kind =
-            (JModality.JavaModalityKind) d.get(BasicSnippetData.Key.MODALITY);
+        final JModality.JavaModalityKind kind = (JModality.JavaModalityKind) modalityObj;
         final JavaBlock jb = buildJavaBlock(d, vs);
 
         // create program term
@@ -85,8 +85,13 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
             JTerm paramUpdate = d.tb.elementary(origParamIt.next(), paramIt.next());
             update = tb.parallel(update, paramUpdate);
         }
-        if (vs.post.self != null) {
-            final JTerm selfTerm = (JTerm) d.get(BasicSnippetData.Key.BLOCK_SELF);
+        if (vs.post.self != null && vs.pre.self != null) {
+            final Object blockSelfObj = d.get(BasicSnippetData.Key.BLOCK_SELF);
+            if (blockSelfObj == null) {
+                throw new NullPointerException(
+                    "No self term of the transformed block contract.");
+            }
+            final JTerm selfTerm = (JTerm) blockSelfObj;
             final JTerm selfUpdate = d.tb.elementary(selfTerm, vs.pre.self);
             update = tb.parallel(selfUpdate, update);
         }
@@ -97,15 +102,32 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
     private JavaBlock buildJavaBlock(BasicSnippetData d, ProofObligationVars poVars) {
         final ExecutionContext context =
             (ExecutionContext) d.get(BasicSnippetData.Key.EXECUTION_CONTEXT);
+        if (context == null) {
+            throw new NullPointerException(
+                "No execution context for the block symbolic execution block.");
+        }
         final ProgramVariable exceptionParameter =
             poVars.exceptionParameter.op(ProgramVariable.class);
 
         // create block call
-        final Label[] labelsArray = (Label[]) d.get(BasicSnippetData.Key.LABELS);
+        final Object labelsObj = d.get(BasicSnippetData.Key.LABELS);
+        if (labelsObj == null) {
+            throw new NullPointerException("No labels for the block symbolic execution block.");
+        }
+        final Label[] labelsArray = (Label[]) labelsObj;
         final ImmutableArray<Label> labels = new ImmutableArray<>(labelsArray);
-        final AuxiliaryContract.Variables variables =
-            (AuxiliaryContract.Variables) d.get(BasicSnippetData.Key.BLOCK_VARS);
-        final StatementBlock block = (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
+        final Object variablesObj = d.get(BasicSnippetData.Key.BLOCK_VARS);
+        if (variablesObj == null) {
+            throw new NullPointerException(
+                "No block contract variables for the block symbolic execution block.");
+        }
+        final AuxiliaryContract.Variables variables = (AuxiliaryContract.Variables) variablesObj;
+        final Object blockObj = d.get(BasicSnippetData.Key.TARGET_BLOCK);
+        if (blockObj == null) {
+            throw new NullPointerException(
+                "No target block for the block symbolic execution block.");
+        }
+        final StatementBlock block = (StatementBlock) blockObj;
         final StatementBlock sb = new AuxiliaryContractBuilders.ValidityProgramConstructor(labels,
             block, variables, exceptionParameter, d.services).construct();
         final Statement s = new MethodFrame(null, context, sb);
