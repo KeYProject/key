@@ -28,10 +28,10 @@ public class ToggleOriginHighlightAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      *
-     *         <p>
-     *         The action configures itself and its settings listener while the receiver is still
-     *         under initialization (EISOP initialization check); the listener only fires once
-     *         the action is displayed after construction, suppressed with a scoped key.
+     *        <p>
+     *        The action configures itself and its settings listener while the receiver is still
+     *        under initialization (EISOP initialization check); the listener only fires once
+     *        the action is displayed after construction, suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:method.invocation.invalid")
     public ToggleOriginHighlightAction(MainWindow mainWindow) {

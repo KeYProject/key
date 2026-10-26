@@ -11,8 +11,8 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 
-import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;

@@ -38,11 +38,11 @@ public class ViewSelector extends JDialog {
      *
      * @param parent The parent widget of this ViewSelector
      *
-     *         <p>
-     *         The input fields are created by {@link #layoutViewSelector()}, which is invoked
-     *         unconditionally from this constructor; the EISOP initialization check cannot see the
-     *         assignments inside the delegated method, so both the fields and the delegated calls
-     *         are suppressed with scoped keys.
+     *        <p>
+     *        The input fields are created by {@link #layoutViewSelector()}, which is invoked
+     *        unconditionally from this constructor; the EISOP initialization check cannot see the
+     *        assignments inside the delegated method, so both the fields and the delegated calls
+     *        are suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
         "nullness:method.invocation.invalid" })

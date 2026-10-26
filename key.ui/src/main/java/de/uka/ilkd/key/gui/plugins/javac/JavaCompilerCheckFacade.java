@@ -175,7 +175,8 @@ public class JavaCompilerCheckFacade {
                             Configuration msg = (Configuration) msgObj;
                             if (msg == null) {
                                 // the reported message list contains only configurations
-                                throw new NullPointerException("No message configuration available.");
+                                throw new NullPointerException(
+                                    "No message configuration available.");
                             }
                             String issueText = msg.getString("message");
                             if (issueText == null) {

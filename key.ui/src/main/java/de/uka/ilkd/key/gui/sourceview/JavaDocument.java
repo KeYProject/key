@@ -279,10 +279,10 @@ public class JavaDocument extends DefaultStyledDocument {
      * Creates a new JavaDocument and sets the syntax highlighting styles (as in eclipse default
      * settings).
      *
-     *         <p>
-     *         The ctor applies the styles and registers the listener while the receiver is still
-     *         under initialization (EISOP initialization check); all style updates are re-applied
-     *         when the settings change after construction, suppressed with a scoped key.
+     * <p>
+     * The ctor applies the styles and registers the listener while the receiver is still
+     * under initialization (EISOP initialization check); all style updates are re-applied
+     * when the settings change after construction, suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:method.invocation.invalid")
     public JavaDocument() {

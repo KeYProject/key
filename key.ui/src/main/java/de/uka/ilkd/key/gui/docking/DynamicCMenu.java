@@ -34,12 +34,12 @@ public class DynamicCMenu extends CDecorateableAction<DynamicCMenu.Action> {
      *
      * @param supplier the supplier
      *
-     *         <p>
-     *         The action is created without a backing {@link CAction} ({@code null}, replaced
-     *         immediately via {@link #init(Action)}), and the under-construction receiver is
-     *         passed to the inner action while still under initialization (EISOP initialization
-     *         check); both only take effect once construction completes, suppressed with scoped
-     *         keys.
+     *        <p>
+     *        The action is created without a backing {@link CAction} ({@code null}, replaced
+     *        immediately via {@link #init(Action)}), and the under-construction receiver is
+     *        passed to the inner action while still under initialization (EISOP initialization
+     *        check); both only take effect once construction completes, suppressed with scoped
+     *        keys.
      */
     @SuppressWarnings({ "nullness:argument.type.incompatible",
         "nullness:method.invocation.invalid" })
@@ -55,10 +55,10 @@ public class DynamicCMenu extends CDecorateableAction<DynamicCMenu.Action> {
      * @param icon the icon of this action
      * @param supplier the supplier
      *
-     *         <p>
-     *         The action names itself and sets its icon while the receiver is still under
-     *         initialization (EISOP initialization check); both only materialize once the action
-     *         is shown after construction, suppressed with a scoped key.
+     *        <p>
+     *        The action names itself and sets its icon while the receiver is still under
+     *        initialization (EISOP initialization check); both only materialize once the action
+     *        is shown after construction, suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:method.invocation.invalid")
     public DynamicCMenu(String text, Icon icon, Supplier<CMenu> supplier) {

@@ -631,7 +631,8 @@ public abstract class SequentView extends JEditorPane {
         }
     }
 
-    @Nullable Range getUserSelectionHighlightRange() {
+    @Nullable
+    Range getUserSelectionHighlightRange() {
         return userSelectionHighlightRange;
     }
 

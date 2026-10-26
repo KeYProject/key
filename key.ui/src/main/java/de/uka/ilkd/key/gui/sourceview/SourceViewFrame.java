@@ -42,10 +42,10 @@ public class SourceViewFrame extends JSplitPane {
      *
      * @param mainWindow the main window.
      *
-     *         <p>
-     *         The ctor configures the split pane while the receiver is still under initialization
-     *         (EISOP initialization check); all configuration is finished before the frame is
-     *         shown, suppressed with a scoped key.
+     *        <p>
+     *        The ctor configures the split pane while the receiver is still under initialization
+     *        (EISOP initialization check); all configuration is finished before the frame is
+     *        shown, suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:method.invocation.invalid")
     public SourceViewFrame(MainWindow mainWindow) {

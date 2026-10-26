@@ -38,11 +38,11 @@ public class ShowOriginAction extends MainWindowAction {
      *
      * @param pos the position of the term whose origin shall be shown.
      *
-     *         <p>
-     *         The action names itself, binds its settings listener and accelerator while the
-     *         receiver is still under initialization (EISOP initialization check); the listener
-     *         only fires once the action is displayed after construction, suppressed with a
-     *         scoped key.
+     *        <p>
+     *        The action names itself, binds its settings listener and accelerator while the
+     *        receiver is still under initialization (EISOP initialization check); the listener
+     *        only fires once the action is displayed after construction, suppressed with a
+     *        scoped key.
      */
     @SuppressWarnings("nullness:method.invocation.invalid")
     public ShowOriginAction(@Nullable PosInSequent pos) {

@@ -415,7 +415,8 @@ public final class Main implements Callable<Integer> {
         String javaVersion = System.getProperty("java.version");
         LOGGER.debug("Java Version: {}", javaVersion == null ? "null" : javaVersion);
         String javaSpecificationVersion = System.getProperty("java.specification.version");
-        LOGGER.debug("Java Runtime: {}", javaSpecificationVersion == null ? "null" : javaSpecificationVersion);
+        LOGGER.debug("Java Runtime: {}",
+            javaSpecificationVersion == null ? "null" : javaSpecificationVersion);
         String javaVm = System.getProperty("java.vm");
         LOGGER.debug("Java VM: {}", javaVm == null ? "null" : javaVm);
         String javaOs = System.getProperty("java.os");

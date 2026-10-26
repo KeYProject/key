@@ -112,11 +112,14 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * @param rows the number of rows >= 0
      * @param columns the number of columns >= 0
      * @exception IllegalArgumentException if the rows or columns arguments are negative.
-     * <p>
-     * The text area delegates a possibly {@code null} model and text to {@link JTextArea}, which
-     * accepts {@code null} for both per the Swing contract, and configures itself and its
-     * highlighting while the receiver is still under initialization (EISOP initialization
-     * check); suppressed with scoped keys.
+     *            <p>
+     *            The text area delegates a possibly {@code null} model and text to
+     *            {@link JTextArea}, which
+     *            accepts {@code null} for both per the Swing contract, and configures itself and
+     *            its
+     *            highlighting while the receiver is still under initialization (EISOP
+     *            initialization
+     *            check); suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:method.invocation.invalid",
         "nullness:argument.type.incompatible" })
@@ -131,11 +134,13 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * arguments (null, 0, 0).
      *
      * @param doc the model to use
-     * <p>
-     * The text area delegates a possibly {@code null} model to {@link JTextArea}, which accepts
-     * {@code null} per the Swing contract, and configures itself and its highlighting while the
-     * receiver is still under initialization (EISOP initialization check); suppressed with
-     * scoped keys.
+     *        <p>
+     *        The text area delegates a possibly {@code null} model to {@link JTextArea}, which
+     *        accepts
+     *        {@code null} per the Swing contract, and configures itself and its highlighting while
+     *        the
+     *        receiver is still under initialization (EISOP initialization check); suppressed with
+     *        scoped keys.
      */
     @SuppressWarnings({ "nullness:method.invocation.invalid",
         "nullness:argument.type.incompatible" })
@@ -151,9 +156,10 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * @param rows the number of rows >= 0
      * @param columns the number of columns >= 0
      * @exception IllegalArgumentException if the rows or columns arguments are negative.
-     * <p>
-     * The text area configures itself and its highlighting while the receiver is still under
-     * initialization (EISOP initialization check); suppressed with a scoped key.
+     *            <p>
+     *            The text area configures itself and its highlighting while the receiver is still
+     *            under
+     *            initialization (EISOP initialization check); suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:method.invocation.invalid")
     public BracketMatchingTextArea(int rows, int columns) {
@@ -169,11 +175,14 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * @param rows the number of rows >= 0
      * @param columns the number of columns >= 0
      * @exception IllegalArgumentException if the rows or columns arguments are negative.
-     * <p>
-     * The text area delegates a possibly {@code null} text to {@link JTextArea}, which accepts
-     * {@code null} per the Swing contract, and configures itself and its highlighting while the
-     * receiver is still under initialization (EISOP initialization check); suppressed with
-     * scoped keys.
+     *            <p>
+     *            The text area delegates a possibly {@code null} text to {@link JTextArea}, which
+     *            accepts
+     *            {@code null} per the Swing contract, and configures itself and its highlighting
+     *            while the
+     *            receiver is still under initialization (EISOP initialization check); suppressed
+     *            with
+     *            scoped keys.
      */
     @SuppressWarnings({ "nullness:method.invocation.invalid",
         "nullness:argument.type.incompatible" })
@@ -187,11 +196,13 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * rows/columns are set to 0.
      *
      * @param text the text to be displayed, or null
-     * <p>
-     * The text area delegates a possibly {@code null} text to {@link JTextArea}, which accepts
-     * {@code null} per the Swing contract, and configures itself and its highlighting while the
-     * receiver is still under initialization (EISOP initialization check); suppressed with
-     * scoped keys.
+     *        <p>
+     *        The text area delegates a possibly {@code null} text to {@link JTextArea}, which
+     *        accepts
+     *        {@code null} per the Swing contract, and configures itself and its highlighting while
+     *        the
+     *        receiver is still under initialization (EISOP initialization check); suppressed with
+     *        scoped keys.
      */
     @SuppressWarnings({ "nullness:method.invocation.invalid",
         "nullness:argument.type.incompatible" })
