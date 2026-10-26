@@ -13,13 +13,15 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.MatchConditions;
 
+import org.key_project.util.collection.ImmutableList;
+
 
 public class SchemaTypeReference extends TypeReferenceImp implements AbstractProgramElement {
 
     private final String fullName;
 
     public SchemaTypeReference(ProgramElementName name, int dimension, ReferencePrefix prefix) {
-        super(name, dimension, prefix);
+        super(name, ImmutableList.of(), dimension, prefix);
         final StringBuilder sb = new StringBuilder();
 
         // as no inner classes prefix must be package reference
