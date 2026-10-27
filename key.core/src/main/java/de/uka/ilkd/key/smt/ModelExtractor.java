@@ -1036,7 +1036,7 @@ public class ModelExtractor {
                 long intBound = (long) Math.pow(2, types.getSettings().getIntBound());
 
                 if (result >= intBound / 2) {
-                    result -= intBound;
+                    result = (int) (result - intBound);
                 }
 
 
@@ -1060,7 +1060,7 @@ public class ModelExtractor {
                 long intBound = (long) Math.pow(2, types.getSettings().getIntBound());
 
                 if (result >= intBound / 2) {
-                    result -= intBound;
+                    result = (int) (result - intBound);
                 }
 
 
