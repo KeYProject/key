@@ -30,6 +30,8 @@ import org.jspecify.annotations.NonNull;
  * ({@link AntecTaclet}), to the succedent ({@link SuccTaclet}) or to an arbitrary term that matches
  * the find part somewhere in the sequent ({@link RewriteTaclet}).
  */
+@SuppressWarnings({ "unchecked", "rawtypes" }) // inherits the deliberately raw getExecutor(), see
+                                               // Taclet
 public abstract class FindTaclet extends Taclet {
     /** Set of schema variables of the assumes sequent and the (optional) find expression/sequent */
     private ImmutableSet<SchemaVariable> assumesAndFindSchemaVariables = null;

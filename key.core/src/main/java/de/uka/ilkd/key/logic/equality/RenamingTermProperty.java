@@ -56,6 +56,7 @@ public class RenamingTermProperty implements Property<Term> {
      * @param <V> is not needed for this equality check
      */
     @Override
+    @SuppressWarnings("unchecked") // the varargs array is not used by this property at all
     public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
         if (term2 == term1) {
             return true;

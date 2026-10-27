@@ -94,6 +94,8 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
         return getRewriteTaclet();
     }
 
+    @SuppressWarnings("unchecked") // the cloned map preserves HashMap<TacletGoalTemplate,
+    // ChoiceExpr>; the clone() API only exposes Object
     @Override
     public RewriteTacletBuilder<T> copy() {
         var rb = new RewriteTacletBuilder<T>().setFind((JTerm) getFind());

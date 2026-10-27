@@ -26,7 +26,10 @@ public abstract class Modality extends AbstractSortedOperator {
     /// @return The kind of the modality.
     /// @param <K> Restricts the expected type of the kind.
     public final <K extends Kind> K kind() {
-        return (K) kind;
+        @SuppressWarnings("unchecked") // the stored Kind is always an instance of the requested
+                                       // subtype
+        K result = (K) kind;
+        return result;
     }
 
     /// The program contained in this modality.

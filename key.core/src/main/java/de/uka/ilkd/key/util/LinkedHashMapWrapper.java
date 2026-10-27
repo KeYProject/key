@@ -276,6 +276,8 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
         }
 
         @Override
+        @SuppressWarnings("unchecked") // property equality erases the key type; the wrapped keys
+        // are of the same K as this wrapper was created with
         public boolean equals(Object obj) {
             if (obj instanceof ElementWrapper<?> other) {
                 return property.equalsModThisProperty(key, (K) other.key);

@@ -54,6 +54,7 @@ public abstract class AbstractLDT implements Named {
     ///
     /// @param funcName the String with the name of the function to look up
     /// @return the added function (for convenience reasons)
+    @SuppressWarnings("unchecked") // the name lookup always yields the requested subtype F
     protected final <F extends Function> F addFunction(TermServices services, String funcName) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = funcNS.lookup(new Name(funcName));
