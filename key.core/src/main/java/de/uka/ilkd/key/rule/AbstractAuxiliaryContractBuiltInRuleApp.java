@@ -32,7 +32,7 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp<T extends BuiltInR
 
     /**
      * @see #getHeapContext()
-     *      FIXME weigl: should this not be {@link ImmutableList}?
+     *      FIXME weigl: should this not be {@code ImmutableList}?
      */
     protected @Nullable List<LocationVariable> heaps;
 

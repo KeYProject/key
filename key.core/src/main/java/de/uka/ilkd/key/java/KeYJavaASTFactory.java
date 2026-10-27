@@ -302,7 +302,8 @@ public abstract class KeYJavaASTFactory {
      *
      * @param left the left operand {@link Expression}
      * @param right the right operand <code>Expression</code>
-     * @return a new {@link LogicalAnd} of <code>left</code> and <code>right</code>
+     * @return a new {@link BinaryOperator} of kind {@link BinaryOperatorKind#LOGICAL_AND} for
+     *         <code>left</code> and <code>right</code>
      */
     public static BinaryOperator logicalAndOperator(final Expression left, final Expression right) {
         return new BinaryOperator(BinaryOperatorKind.LOGICAL_AND, left, right);
@@ -317,7 +318,8 @@ public abstract class KeYJavaASTFactory {
      *
      * @param left the left operand {@link Expression}
      * @param right the right operand {@link Expression}
-     * @return a new {@link LogicalOr} of <code>left</code> and <code>right</code>
+     * @return a new {@link BinaryOperator} of kind {@link BinaryOperatorKind#LOGICAL_OR} for
+     *         <code>left</code> and <code>right</code>
      */
     public static BinaryOperator logicalOrOperator(final Expression left, final Expression right) {
         return new BinaryOperator(BinaryOperatorKind.LOGICAL_OR, left, right);
@@ -690,7 +692,8 @@ public abstract class KeYJavaASTFactory {
      * </pre>
      *
      * @param expression the {@link Expression} to be compared against <code>null</code>
-     * @return a new {@link Equals} that compares <code>expression</code> against <code>null</code>
+     * @return a new {@link BinaryOperator} of kind {@link BinaryOperatorKind#EQUALS} that compares
+     *         <code>expression</code> against <code>null</code>
      */
     public static BinaryOperator equalsNullOperator(final Expression expression) {
         return equalsOperator(expression, NullLiteral.NULL);
@@ -705,7 +708,8 @@ public abstract class KeYJavaASTFactory {
      *
      * @param left the left operand {@link Expression}
      * @param right the right operand <code>Expression</code>
-     * @return a new {@link Equals} of <code>left</code> and <code>right</code>
+     * @return a new {@link BinaryOperator} of kind {@link BinaryOperatorKind#EQUALS} for
+     *         <code>left</code> and <code>right</code>
      */
     public static BinaryOperator equalsOperator(final Expression left, final Expression right) {
         return new BinaryOperator(BinaryOperatorKind.EQUALS, left, right);
@@ -719,7 +723,8 @@ public abstract class KeYJavaASTFactory {
      * </pre>
      *
      * @param operands the operands {@link ExtList}
-     * @return a new {@link Equals} of <code>operands</code>
+     * @return a new {@link BinaryOperator} of kind {@link BinaryOperatorKind#EQUALS} connecting
+     *         <code>operands</code>
      */
     public static BinaryOperator equalsOperator(final ExtList operands) {
         return new BinaryOperator(BinaryOperatorKind.EQUALS, operands);
@@ -1089,7 +1094,8 @@ public abstract class KeYJavaASTFactory {
      *
      * @param left the left operand {@link Expression}
      * @param right the right operand {@link Expression}
-     * @return a new {@link LessThan} that compares <code>left</code> less than <code>right</code>
+     * @return a new {@link BinaryOperator} of kind {@link BinaryOperatorKind#LESS_THAN} that
+     *         compares <code>left</code> less than <code>right</code>
      */
     public static BinaryOperator lessThanOperator(final Expression left, final Expression right) {
         return new BinaryOperator(BinaryOperatorKind.LESS_THAN, left, right);
@@ -1103,7 +1109,8 @@ public abstract class KeYJavaASTFactory {
      * </pre>
      *
      * @param expression the left operand {@link Expression}
-     * @return a new {@link LessThan} that compares <code>expression</code> less than <code>0</code>
+     * @return a new {@link BinaryOperator} of kind {@link BinaryOperatorKind#LESS_THAN} that
+     *         compares <code>expression</code> less than <code>0</code>
      */
     public static BinaryOperator lessThanZeroOperator(final Expression expression) {
         final IntLiteral zeroLiteral = zeroLiteral();
@@ -1316,7 +1323,7 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link BinaryAssignment} of <code>array</code> element at <code>index</code> to
      *         <code>variable</code>
      */
-    public static Assignment assignArrayField(final ProgramVariable variable,
+    public static Assignment<?> assignArrayField(final ProgramVariable variable,
             final ReferencePrefix array, final Expression index) {
         final ArrayReference element = arrayFieldAccess(array, index);
 
@@ -2140,7 +2147,8 @@ public abstract class KeYJavaASTFactory {
      * </pre>
      *
      * @param operands the operands {@link ExtList}
-     * @return a new {@link NotEquals} of <code>operands</code>
+     * @return a new {@link BinaryOperator} of kind {@link BinaryOperatorKind#NOT_EQUALS} connecting
+     *         <code>operands</code>
      */
     public static BinaryOperator notEqualsOperator(final ExtList operands) {
         return new BinaryOperator(BinaryOperatorKind.NOT_EQUALS, operands);

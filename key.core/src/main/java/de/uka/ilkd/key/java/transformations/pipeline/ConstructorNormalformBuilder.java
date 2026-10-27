@@ -37,7 +37,7 @@ import org.jspecify.annotations.Nullable;
 /**
  * Transforms the constructors of the given class to their
  * normalform. The constructor normalform can then be accessed via a
- * methodcall <code>&lt;init&gt;<cons_args)</code>. The visibility of
+ * methodcall <code>&lt;init&gt;(cons_args)</code>. The visibility of
  * the normalform is the same as for the original constructor.
  */
 public class ConstructorNormalformBuilder extends JavaTransformerAbstract {

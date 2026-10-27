@@ -61,9 +61,9 @@ import org.slf4j.LoggerFactory;
  * <li>if the message contains a stacktrace, it is optionally displayed</li>
  * </ul>
  *
- * @implNote The given PositionedStrings are assumed to have <b>1-based line and column numbers</b>,
- *           since this conforms to 1) the line numbers shown in the dialog and 2) the usual
- *           representation in text editors.
+ * Note: The given PositionedStrings are assumed to have <b>1-based line and column numbers</b>,
+ * since this conforms to 1) the line numbers shown in the dialog and 2) the usual
+ * representation in text editors.
  *
  * @author Alexander Weigl
  * @author Wolfram Pfeifer: adaptations for also showing exceptions, making it the single dialog for
