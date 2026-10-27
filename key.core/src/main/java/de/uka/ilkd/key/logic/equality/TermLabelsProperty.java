@@ -45,6 +45,8 @@ public class TermLabelsProperty implements Property<Term> {
      * @param <V> is not needed for this equality check
      */
     @Override
+    @SuppressWarnings({ "varargs", "unchecked" }) // the V... parameter is unused; no array content
+    // is ever read, so no heap pollution can occur
     public <V> boolean equalsModThisProperty(Term term1, Term term2, V... v) {
         if (term2 == term1) {
             return true;
