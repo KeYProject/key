@@ -50,6 +50,8 @@ class TestCopyingReplayer {
     }
 
     @Test
+    @SuppressWarnings("try") // KeYEnvironment.close() declares 'throws Exception' (could throw
+    // InterruptedException); the t-w-r close of both resources is fine here
     void testJavaProof() throws Exception {
         GeneralSettings.noPruningClosed = false;
 
