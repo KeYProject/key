@@ -14,13 +14,13 @@ import java.lang.annotation.Target;
  * This annotation marks key-value arguments in proof scripts parameter classes.
  * In contrast to a [Flag], an option receives an arbitrary value.
  *
- * ## Usage Example
- * ```java
+ * <h2>Usage Example</h2>
+ * <pre>{@code
  * class Parameters {
  *   @Option("solver")
  *   String solver = "z3";
  * }
- * ```
+ * }</pre>
  *
  * @author Alexander Weigl
  * @version 1
