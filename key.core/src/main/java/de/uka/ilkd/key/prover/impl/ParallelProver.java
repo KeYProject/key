@@ -362,6 +362,8 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
      * @param perTaskSteps the budget each goal is assigned, or {@code 0} when the
      *        step budget applies to all as a whole
      */
+    @SuppressWarnings("try") // the binding is deliberately unused: suspending the listeners is the
+    // whole point and close() restores them, so the resource is a pure scoping handle
     private ApplyStrategyInfo<Proof, Goal> runParallel(ImmutableList<Goal> goals,
             int perTaskSteps) {
         final long startTime = System.currentTimeMillis();
