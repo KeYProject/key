@@ -865,6 +865,6 @@ public final class OneStepSimplifier implements BuiltInRule {
                   update_apply,
                   update_join,
                   elimQuantifier
-                  """;
+                """;
     }
 }

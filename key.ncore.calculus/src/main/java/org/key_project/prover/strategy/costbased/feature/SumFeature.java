@@ -50,7 +50,6 @@ public class SumFeature implements Feature {
         }
     }
 
-    @SafeVarargs
     public static <Goal extends ProofGoal<@NonNull Goal>> Feature createSum(
             Feature... fs) {
         assert fs.length != 0 : "Cannot compute the sum of zero features";
