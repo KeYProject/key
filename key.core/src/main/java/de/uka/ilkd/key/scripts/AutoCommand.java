@@ -236,10 +236,10 @@ public class AutoCommand extends AbstractCommand {
         @Option(value = "arithmetic")
         @Documentation("""
                 Specify the arithmetic strategy to handle division and modulo operations:
-                - *`basic`*: Basic arithmetic support:
+                - *`basic`: Basic arithmetic support:
                   - Simplification of polynomial expressions
                   - Computation of Gröbner Bases for polynomials in the antecedent
-                  - (Partial) Omega procedure for handling linear inequations</li>" + "</ul>"
+                  - (Partial) Omega procedure for handling linear inequations
                 - *`defOps`*: Automatically expand defined symbols like: `/`, `%`, `jdiv`, `jmod` ..., `int_RANGE`, ...
                 In addition, inequations are multiplied with each other where the product is bounded by an existing
                 inequation (restricted such that termination is guaranteed).
