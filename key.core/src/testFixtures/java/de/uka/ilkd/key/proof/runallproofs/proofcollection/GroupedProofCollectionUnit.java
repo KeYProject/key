@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestUnit;
 public class GroupedProofCollectionUnit extends ProofCollectionUnit {
     private static final long serialVersionUID = 1L;
     private final String groupName;
+    @SuppressWarnings("serial") // runtime ArrayList is serializable
     private final List<TestFile> testFiles;
     private final ProofCollectionSettings settings;
 

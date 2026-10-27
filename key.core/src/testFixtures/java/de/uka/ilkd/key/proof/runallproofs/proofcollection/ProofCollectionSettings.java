@@ -59,6 +59,7 @@ public class ProofCollectionSettings implements Serializable {
     /**
      * String {@link Map} containing all settings entries.
      */
+    @SuppressWarnings("serial") // runtime map (LinkedHashMap/HashMap) is serializable
     private final Map<String, String> settingsMap;
 
     /**
