@@ -333,56 +333,56 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     /**
      * Returns the block contracts applying to this block.
      */
-    public ImmutableSet<BlockContract> getBlockContracts() {
+    public synchronized ImmutableSet<BlockContract> getBlockContracts() {
         return blockContracts;
     }
 
     /**
      * Replaces the set of block contracts attaching to this block.
      */
-    public void setBlockContracts(ImmutableSet<BlockContract> contracts) {
+    public synchronized void setBlockContracts(ImmutableSet<BlockContract> contracts) {
         this.blockContracts = contracts == null ? DefaultImmutableSet.nil() : contracts;
     }
 
     /**
      * Registers the given block contract on this block.
      */
-    public void addBlockContract(BlockContract contract) {
+    public synchronized void addBlockContract(BlockContract contract) {
         this.blockContracts = this.blockContracts.add(contract);
     }
 
     /**
      * Removes the given block contract from this block.
      */
-    public void removeBlockContract(BlockContract contract) {
+    public synchronized void removeBlockContract(BlockContract contract) {
         this.blockContracts = this.blockContracts.remove(contract);
     }
 
     /**
      * Returns the loop contracts applying to this block.
      */
-    public ImmutableSet<LoopContract> getLoopContracts() {
+    public synchronized ImmutableSet<LoopContract> getLoopContracts() {
         return loopContracts;
     }
 
     /**
      * Replaces the set of loop contracts attaching to this block.
      */
-    public void setLoopContracts(ImmutableSet<LoopContract> contracts) {
+    public synchronized void setLoopContracts(ImmutableSet<LoopContract> contracts) {
         this.loopContracts = contracts == null ? DefaultImmutableSet.nil() : contracts;
     }
 
     /**
      * Registers the given loop contract on this block.
      */
-    public void addLoopContract(LoopContract contract) {
+    public synchronized void addLoopContract(LoopContract contract) {
         this.loopContracts = this.loopContracts.add(contract);
     }
 
     /**
      * Removes the given loop contract from this block.
      */
-    public void removeLoopContract(LoopContract contract) {
+    public synchronized void removeLoopContract(LoopContract contract) {
         this.loopContracts = this.loopContracts.remove(contract);
     }
 }

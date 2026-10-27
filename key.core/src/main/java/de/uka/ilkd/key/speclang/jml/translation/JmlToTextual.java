@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
@@ -81,6 +82,15 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
 public final class JmlToTextual {
     private static final Logger LOGGER = LoggerFactory.getLogger(JmlToTextual.class);
 
+    /**
+     * Clause types whose loss is a documented, accepted gap (see JML_MAPPING.md). Any clause
+     * type <em>not</em> on this list that fails to translate aborts the load with a loud error
+     * instead of being silently skipped, so that a weakened contract is never proven. Starts
+     * empty; entries are added only when triaging shows the construct is genuinely unsupported
+     * and its loss is acceptable.
+     */
+    private static final Set<Class<? extends JmlClause>> KNOWN_GAPS = Set.of();
+
     private static final Map<Modifier.DefaultKeyword, JMLModifier> JML_MODIFIERS;
 
     static {
@@ -119,12 +129,19 @@ public final class JmlToTextual {
      * loop specification.
      */
     public static TextualJMLLoopSpec toLoopSpec(JmlContract contract) {
+        JmlSideEffectChecker.check(contract);
         TextualJMLLoopSpec loopSpec = new TextualJMLLoopSpec(mapModifiers(contract.getModifiers()));
         for (JmlClause clause : contract.getClauses()) {
             try {
                 handleLoopSpecClause(loopSpec, clause);
             } catch (RuntimeException e) {
-                LOGGER.warn("Skipping unsupported loop specification clause: {}", e.getMessage());
+                if (!KNOWN_GAPS.contains(clause.getClass())) {
+                    LOGGER.error("Cannot translate loop specification clause '{}': {}",
+                        clause, e.getMessage());
+                    throw e;
+                }
+                LOGGER.warn("Skipping unsupported loop specification clause (known gap, "
+                    + "allow-listed): {}", e.getMessage());
             }
         }
         return loopSpec;
@@ -132,6 +149,7 @@ public final class JmlToTextual {
 
     public static TextualJMLClassInv toClassInv(JmlClassExprDeclaration decl) {
         checkKind(decl, JmlBodyClauseKind.INVARIANT, JmlBodyClauseKind.INVARIANT_FREE);
+        JmlSideEffectChecker.check(decl);
         boolean free = decl.getKind() == JmlBodyClauseKind.INVARIANT_FREE;
         var ctx = parse(JmlParser::class_invariant,
             (free ? "invariant_free " : "invariant ") + decl.getInvariant() + ";");
@@ -140,6 +158,7 @@ public final class JmlToTextual {
 
     public static TextualJMLInitially toInitially(JmlClassExprDeclaration decl) {
         checkKind(decl, JmlBodyClauseKind.INITIALLY);
+        JmlSideEffectChecker.check(decl);
         var ctx = parse(JmlParser::initially_clause, "initially " + decl.getInvariant() + ";");
         return new TextualJMLInitially(mapModifiers(decl.getModifiers()),
             new LabeledParserRuleContext(ctx));
@@ -147,15 +166,17 @@ public final class JmlToTextual {
 
     public static TextualJMLClassAxiom toClassAxiom(JmlClassExprDeclaration decl) {
         if (decl.getKind() != JmlBodyClauseKind.AXIOM) {
-            LOGGER.warn("Skipping unsupported class level construct: {}", decl.getKind());
-            return null;
+            throw new IllegalArgumentException(
+                "Unsupported class level construct kind: " + decl.getKind());
         }
+        JmlSideEffectChecker.check(decl);
         var ctx = parse(JmlParser::class_axiom, "axiom " + decl.getInvariant() + ";");
         return new TextualJMLClassAxiom(mapModifiers(decl.getModifiers()),
             new LabeledParserRuleContext(ctx));
     }
 
     public static TextualJMLRepresents toRepresents(JmlRepresentsDeclaration decl) {
+        JmlSideEffectChecker.check(decl);
         var ctx = parse(JmlParser::represents_clause,
             "represents " + decl.getName() + " = " + decl.getExpr() + ";");
         return new TextualJMLRepresents(mapModifiers(decl.getModifiers()),
@@ -163,6 +184,7 @@ public final class JmlToTextual {
     }
 
     public static TextualJMLDepends toDepends(JmlClassAccessibleDeclaration decl) {
+        JmlSideEffectChecker.check(decl);
         StringBuilder text = new StringBuilder("accessible ");
         text.append(decl.getVariable()).append(": ");
         text.append(exprList(decl.getExpressions()));
@@ -236,6 +258,7 @@ public final class JmlToTextual {
     // -------------------------------------------------------------------------
 
     private static TextualJMLSpecCase toSpecCase(JmlContract contract) {
+        JmlSideEffectChecker.check(contract);
         TextualJMLSpecCase specCase = new TextualJMLSpecCase(mapModifiers(contract.getModifiers()),
             mapBehavior(contract.getBehavior()));
         contract.getName().ifPresent(n -> specCase.addName(n.getIdentifier()));
@@ -247,7 +270,14 @@ public final class JmlToTextual {
             try {
                 handleContractClause(specCase, clause, loop);
             } catch (RuntimeException e) {
-                LOGGER.warn("Skipping unsupported contract clause: {}", e.getMessage());
+                if (!KNOWN_GAPS.contains(clause.getClass())) {
+                    LOGGER.error("Cannot translate contract clause '{}': {}", clause,
+                        e.getMessage());
+                    throw e;
+                }
+                LOGGER.warn(
+                    "Skipping unsupported contract clause (known gap, allow-listed): {}",
+                    e.getMessage());
             }
         }
         return specCase;
@@ -380,8 +410,14 @@ public final class JmlToTextual {
 
     private static void handleSignalsClause(TextualJMLSpecCase specCase, JmlSignalsClause clause) {
         var param = clause.getParameter();
+        // JMLtk synthesizes the binder name `\exception` when the source omits it
+        // (`signals (E) formula;`). KeY's grammar declares the binder optional, so the
+        // synthesized name must not be re-printed.
+        String head = "\\exception".equals(param.getNameAsString())
+                ? param.getType().asString()
+                : param.getType() + " " + param.getName();
         var ctx = parse(JmlParser::signals_clause,
-            "signals (" + param.getType() + " " + param.getName() + ")" +
+            "signals (" + head + ")" +
                 (clause.getExpression() == null ? "" : " " + clause.getExpression()) + ";");
         specCase.addClause(SIGNALS, LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
             OriginTermLabel.SpecType.SIGNALS, true));
@@ -398,17 +434,22 @@ public final class JmlToTextual {
 
     private static void handleInfFlowClause(TextualJMLSpecCase specCase, JmlInfFlowClause clause,
             boolean loopContract) {
-        String determined = infFlowList(clause.getExpressions());
+        String text = infFlowText(clause);
         switch (clause.getKind()) {
-            case SEPARATES, LOOP_SEPARATES -> {
-                String text = "separates " + determined + infFlowTail(clause);
+            case SEPARATES -> {
                 var ctx = parse(JmlParser::separates_clause, text);
                 specCase.addClause(INFORMATION_FLOW, new LabeledParserRuleContext(ctx));
             }
+            case LOOP_SEPARATES -> {
+                var ctx = parse(JmlParser::loop_separates_clause, text);
+                specCase.addClause(INFORMATION_FLOW, new LabeledParserRuleContext(ctx));
+            }
             case DETERMINES -> {
-                String text = "determines " + determined + " \\by " + infFlowBy(clause)
-                    + infFlowTail(clause);
                 var ctx = parse(JmlParser::determines_clause, text);
+                specCase.addClause(INFORMATION_FLOW, new LabeledParserRuleContext(ctx));
+            }
+            case LOOP_DETERMINES -> {
+                var ctx = parse(JmlParser::loop_determines_clause, text);
                 specCase.addClause(INFORMATION_FLOW, new LabeledParserRuleContext(ctx));
             }
             default -> throw new IllegalArgumentException(
@@ -416,20 +457,68 @@ public final class JmlToTextual {
         }
     }
 
-    private static String infFlowBy(JmlInfFlowClause clause) {
-        if (clause.getBy().isEmpty()) {
-            return "\\itself";
+    /**
+     * Serializes a JMLtk information flow clause back to KeY's JML grammar, appending the
+     * terminating semicolon that every other clause handler also emits.
+     * <p>
+     * JMLtk's {@link JmlInfFlowClause} getters are shifted relative to their names (see the
+     * generated parser production): {@code getBy()} holds the expressions after the clause
+     * keyword, {@code getDeclassifies()} the expressions after {@code \by}, {@code getErases()}
+     * those after an explicit {@code \declassifies}, {@code getExpressions()} those after an
+     * explicit {@code \erases} and {@code getNewObjects()} those after {@code \new_objects}.
+     * KeY's determines/separates grammar lays the sections out in exactly that order, so the
+     * clause round-trips verbatim.
+     */
+    private static String infFlowText(JmlInfFlowClause clause) {
+        StringBuilder text = new StringBuilder();
+        switch (clause.getKind()) {
+            case DETERMINES -> text.append("determines ").append(infFlowList(clause.getBy()))
+                    .append(" \\by ").append(infFlowBy(clause));
+            case SEPARATES -> text.append("separates ").append(infFlowList(clause.getBy()));
+            case LOOP_DETERMINES -> {
+                requireNoDeclassifyErase(clause);
+                text.append("loop_determines ").append(infFlowList(clause.getBy()))
+                        .append(" \\by \\itself");
+            }
+            case LOOP_SEPARATES -> {
+                requireNoDeclassifyErase(clause);
+                text.append("loop_separates ").append(infFlowList(clause.getBy()));
+            }
+            default -> throw new IllegalArgumentException(
+                "Unsupported information flow clause kind: " + clause.getKind());
         }
-        return exprList(clause.getBy());
+        text.append(infFlowTail(clause));
+        return text.append(';').toString();
+    }
+
+    /**
+     * KeY's {@code loop_determines}/{@code loop_separates} grammar permits only a
+     * {@code \new_objects} tail; a {@code \declassifies}/{@code \erases} section cannot be
+     * represented and must not be silently dropped.
+     */
+    private static void requireNoDeclassifyErase(JmlInfFlowClause clause) {
+        if (!clause.getErases().isEmpty() || !clause.getExpressions().isEmpty()) {
+            throw new IllegalArgumentException(
+                "KeY's " + clause.getKind()
+                    + " cannot express a \\declassifies/\\erases section: " + clause);
+        }
+    }
+
+    private static String infFlowBy(JmlInfFlowClause clause) {
+        // JMLtk's getDeclassifies() holds the expressions after `\by`.
+        NodeList<Expression> by = clause.getDeclassifies();
+        return by.isEmpty() ? "\\itself" : exprList(by);
     }
 
     private static String infFlowTail(JmlInfFlowClause clause) {
         StringBuilder text = new StringBuilder();
-        if (!clause.getDeclassifies().isEmpty()) {
-            text.append(" \\declassifies ").append(exprList(clause.getDeclassifies()));
-        }
         if (!clause.getErases().isEmpty()) {
-            text.append(" \\erases ").append(exprList(clause.getErases()));
+            // JMLtk: expressions after an explicit `\declassifies`
+            text.append(" \\declassifies ").append(exprList(clause.getErases()));
+        }
+        if (!clause.getExpressions().isEmpty()) {
+            // JMLtk: expressions after an explicit `\erases`
+            text.append(" \\erases ").append(exprList(clause.getExpressions()));
         }
         if (!clause.getNewObjects().isEmpty()) {
             text.append(" \\new_objects ").append(exprList(clause.getNewObjects()));
@@ -499,27 +588,27 @@ public final class JmlToTextual {
                     "Unsupported loop specification clause kind: " + multi.getKind());
             }
         } else if (clause instanceof JmlInfFlowClause infFlow) {
+            String text = infFlowText(infFlow);
             switch (infFlow.getKind()) {
                 case DETERMINES -> {
-                    String text = "determines " + infFlowList(infFlow.getExpressions()) + " \\by "
-                        + infFlowBy(infFlow) + infFlowTail(infFlow);
                     var ctx = parse(JmlParser::determines_clause, text);
                     loopSpec.addClause(TextualJMLLoopSpec.ClauseHd.INFORMATION_FLOW,
                         HeapLDT.BASE_HEAP_NAME, new LabeledParserRuleContext(ctx));
                 }
-                case SEPARATES, LOOP_SEPARATES -> {
-                    String text = "separates " + infFlowList(infFlow.getExpressions())
-                        + infFlowTail(infFlow);
+                case LOOP_DETERMINES -> {
+                    var ctx = parse(JmlParser::loop_determines_clause, text);
+                    loopSpec.addClause(TextualJMLLoopSpec.ClauseHd.INFORMATION_FLOW,
+                        HeapLDT.BASE_HEAP_NAME, new LabeledParserRuleContext(ctx));
+                }
+                case SEPARATES -> {
                     var ctx = parse(JmlParser::separates_clause, text);
                     loopSpec.addClause(TextualJMLLoopSpec.ClauseHd.INFORMATION_FLOW,
                         new LabeledParserRuleContext(ctx));
                 }
-                case LOOP_DETERMINES -> {
-                    String text = "loop_determines " + infFlowList(infFlow.getExpressions())
-                        + " \\by \\itself" + newObjectsTail(infFlow);
-                    var ctx = parse(JmlParser::loop_determines_clause, text);
+                case LOOP_SEPARATES -> {
+                    var ctx = parse(JmlParser::loop_separates_clause, text);
                     loopSpec.addClause(TextualJMLLoopSpec.ClauseHd.INFORMATION_FLOW,
-                        HeapLDT.BASE_HEAP_NAME, new LabeledParserRuleContext(ctx));
+                        new LabeledParserRuleContext(ctx));
                 }
                 default -> throw new IllegalArgumentException(
                     "Unsupported loop specification clause kind: " + infFlow.getKind());
@@ -528,13 +617,6 @@ public final class JmlToTextual {
             throw new IllegalArgumentException("Unsupported loop specification clause: "
                 + clause.getClass().getSimpleName() + " " + clause);
         }
-    }
-
-    private static String newObjectsTail(JmlInfFlowClause clause) {
-        if (clause.getNewObjects().isEmpty()) {
-            return "";
-        }
-        return " \\new_objects " + exprList(clause.getNewObjects());
     }
 
     // -------------------------------------------------------------------------

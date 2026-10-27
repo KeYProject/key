@@ -470,14 +470,14 @@ public abstract class LoopStatement extends JavaStatement
     /**
      * Returns the loop invariant attached to this loop, or {@code null} if none.
      */
-    public @Nullable LoopSpecification getLoopInvariant() {
+    public synchronized @Nullable LoopSpecification getLoopInvariant() {
         return loopInvariant;
     }
 
     /**
      * Attaches the given loop invariant to this loop, replacing any previous one.
      */
-    public void setLoopInvariant(@Nullable LoopSpecification inv) {
+    public synchronized void setLoopInvariant(@Nullable LoopSpecification inv) {
         this.loopInvariant = inv;
     }
 
@@ -498,28 +498,28 @@ public abstract class LoopStatement extends JavaStatement
     /**
      * Returns the loop contracts applying to this loop itself.
      */
-    public ImmutableSet<LoopContract> getLoopContracts() {
+    public synchronized ImmutableSet<LoopContract> getLoopContracts() {
         return loopContracts;
     }
 
     /**
      * Replaces the set of loop contracts attaching to this loop.
      */
-    public void setLoopContracts(ImmutableSet<LoopContract> contracts) {
+    public synchronized void setLoopContracts(ImmutableSet<LoopContract> contracts) {
         this.loopContracts = contracts == null ? DefaultImmutableSet.nil() : contracts;
     }
 
     /**
      * Registers the given loop contract on this loop.
      */
-    public void addLoopContract(LoopContract contract) {
+    public synchronized void addLoopContract(LoopContract contract) {
         this.loopContracts = this.loopContracts.add(contract);
     }
 
     /**
      * Removes the given loop contract from this loop.
      */
-    public void removeLoopContract(LoopContract contract) {
+    public synchronized void removeLoopContract(LoopContract contract) {
         this.loopContracts = this.loopContracts.remove(contract);
     }
 

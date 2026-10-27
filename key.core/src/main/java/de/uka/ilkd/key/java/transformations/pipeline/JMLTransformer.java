@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.Set;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
@@ -88,6 +89,23 @@ public final class JMLTransformer extends JavaTransformerAbstract {
     public static final DataKey<JmlClassLevelDeclaration<?>> KEY_JML_WRAPPER = new DataKey<>() {
     };
 
+    /**
+     * Class level "field-like" JML clauses that JMLtk represents as {@link JmlFieldDeclaration}
+     * whose inner {@code FieldDeclaration} carries the keyword as a bogus type. The datagroup
+     * family is not supported by KeY; unwrapping it would silently install a spurious field, so
+     * these are rejected loudly. {@code repr} is the historical shorthand of
+     * {@code represents}-style declarations and likewise must not become a field.
+     */
+    private static final Set<String> DATAGROUP_FAMILY = Set.of(
+        "datagroup", "in_group", "maps_into", "monitors_for",
+        "readable_if", "writable_if", "mapped_by", "repr");
+
+    /**
+     * Legacy, deprecated class level clauses that are accepted as drops ("deprecated crap").
+     * They are removed without leaving a spurious field behind and without a guard.
+     */
+    private static final Set<String> LEGACY_DROPPED_TAGS = Set.of(
+        "captures", "duration", "working_space");
 
     /**
      * Creates a transformation that adds JML specific elements, for example
@@ -151,10 +169,34 @@ public final class JMLTransformer extends JavaTransformerAbstract {
                     replaceMember(td, methodDecl, method);
                 }
                 // Ghost/model field declarations: unwrap and remember the wrapper.
+                //
+                // JMLtk also models the class level "field-like" clauses (datagroup family and
+                // the legacy captures/duration/working_space) as JmlFieldDeclaration with the
+                // keyword as a bogus type. None of them is a field; unwrapping would turn them
+                // into spurious Java fields. The datagroup family is rejected loudly, the
+                // legacy clauses are accepted drops.
                 case JmlFieldDeclaration fieldDecl -> {
-                    var decl = fieldDecl.getDecl();
-                    decl.setData(KEY_JML_WRAPPER, fieldDecl);
-                    replaceMember(td, fieldDecl, decl);
+                    String tag = fieldDecl.getDecl().getVariables().isEmpty() ? ""
+                            : fieldDecl.getDecl().getVariables().get(0).getType().asString();
+                    if (DATAGROUP_FAMILY.contains(tag)) {
+                        throw new IllegalArgumentException(
+                            "JML '" + tag + "' clauses (datagroup family) are not supported by "
+                                + "KeY and must not silently become spurious fields; remove or "
+                                + "migrate the clause"
+                                + fieldDecl.getRange().map(r -> " at line " + r.begin.line)
+                                        .orElse(""));
+                    }
+                    if (LEGACY_DROPPED_TAGS.contains(tag)) {
+                        // Accepted drops: deprecated legacy clauses without a KeY counterpart.
+                        LOGGER.debug("Dropping legacy JML '{}' clause{}", tag,
+                            fieldDecl.getRange().map(r -> " at line " + r.begin.line)
+                                    .orElse(""));
+                        fieldDecl.remove();
+                    } else {
+                        var decl = fieldDecl.getDecl();
+                        decl.setData(KEY_JML_WRAPPER, fieldDecl);
+                        replaceMember(td, fieldDecl, decl);
+                    }
                 }
                 // Class level specifications: invariants, initially clauses, axioms,
                 // represents clauses and accessible-clauses. They stay on the JMLtk type and

@@ -39,6 +39,7 @@ import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
+import de.uka.ilkd.key.speclang.jml.translation.JmlSideEffectChecker;
 import de.uka.ilkd.key.speclang.njml.JmlFacade;
 import de.uka.ilkd.key.speclang.njml.JmlLexer;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
@@ -64,6 +65,7 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.jml.body.JmlClassLevelDeclaration;
 import com.github.javaparser.ast.jml.body.JmlFieldDeclaration;
 import com.github.javaparser.ast.jml.body.JmlMethodDeclaration;
+import com.github.javaparser.ast.jml.proof.JmlProofStmt;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt.JmlStmtKind;
 import com.github.javaparser.ast.key.*;
@@ -790,6 +792,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         PositionInfo pi = createPositionInfo(n);
         return switch (n.getKind()) {
             case JmlStmtKind.ASSERT, JmlStmtKind.ASSUME -> {
+                // Assertion conditions must be side-effect free; reject assignments,
+                // increments/decrements and object/array creation structurally instead of
+                // relying on the re-parse (which would fail late or, worse, silently).
+                JmlSideEffectChecker.check(n.getExpression());
                 // Re-parse the JML expression text against KeY's own JML grammar so that the
                 // JML term translation (JMLSpecFactory) can process it.
                 JmlLexer lexer = JmlFacade.createLexer(n.getExpression().toString());
@@ -801,7 +807,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 TextualJMLAssertStatement.Kind kind = n.getKind() == JmlStmtKind.ASSERT
                         ? TextualJMLAssertStatement.Kind.ASSERT
                         : TextualJMLAssertStatement.Kind.ASSUME;
-                yield new JmlAssert(kind, null, condition, null, pi);
+                yield new JmlAssert(kind, null, condition, toProofScript(n), pi);
             }
             case JmlStmtKind.SET -> {
                 JmlParser parser = JmlFacade.createParser(JmlFacade.createLexer(
@@ -812,6 +818,33 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             }
             default -> throw new IllegalStateException("Unexpected value: " + n.getKind());
         };
+    }
+
+    /**
+     * Re-parses the proof script of a JML assertion (`assert e \by { ... }`) from the JMLtk AST
+     * against KeY's own JML grammar, or returns {@code null} if the statement carries no script.
+     * <p>
+     * JMLtk stores the script as a {@link NodeList} of {@link JmlProofStmt}s; the text is
+     * reconstructed from their rendering so that the downstream proof-script machinery
+     * ({@link de.uka.ilkd.key.macros.ApplyScriptsMacro}) can process it. A script JMLtk was able to
+     * parse but KeY cannot is rejected loudly instead of being silently dropped.
+     */
+    private static KeyAst.@Nullable JMLProofScript toProofScript(JmlExpressionStmt stmt) {
+        var script = stmt.getScript();
+        if (script.isEmpty() || script.get().isEmpty()) {
+            return null;
+        }
+        StringBuilder text = new StringBuilder("\\by { ");
+        for (JmlProofStmt proofStmt : script.get()) {
+            text.append(proofStmt).append(' ');
+        }
+        text.append('}');
+        JmlLexer lexer = JmlFacade.createLexer(text.toString());
+        lexer._mode = JmlLexer.expr;
+        JmlParser parser = JmlFacade.createParser(lexer);
+        var ctx = parser.assertionProof();
+        parser.getErrorReporter().throwException();
+        return KeyAst.JMLProofScript.fromContext(ctx);
     }
 
     @Override

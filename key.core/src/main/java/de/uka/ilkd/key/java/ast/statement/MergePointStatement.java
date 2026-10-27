@@ -44,28 +44,45 @@ public class MergePointStatement extends JavaStatement
     /**
      * The merge contracts belonging to this merge point, attached to the node; former
      * {@code mergeContracts} map.
+     * <p>
+     * Accessors are {@code synchronized}: the former map was a
+     * {@code Collections.synchronizedMap} because the set is mutated by meta-construct
+     * transforms (e.g. {@code IntroAtPreDefsOp}) during the parallel prover's lock-free
+     * {@code computeRuleApp} phase while rule application (e.g. {@code MergeRuleBuiltInRuleApp})
+     * reads it concurrently.
      */
     private ImmutableSet<MergeContract> mergeContracts = DefaultImmutableSet.nil();
 
     /**
      * Returns the merge contracts belonging to this merge point.
      */
-    public ImmutableSet<MergeContract> getMergeContracts() {
+    public synchronized ImmutableSet<MergeContract> getMergeContracts() {
         return mergeContracts;
     }
 
     /**
      * Registers the given merge contract on this merge point.
      */
-    public void addMergeContract(MergeContract contract) {
+    public synchronized void addMergeContract(MergeContract contract) {
         this.mergeContracts = this.mergeContracts.add(contract);
     }
 
     /**
      * Deletes all merge contracts registered on this merge point.
      */
-    public void removeMergeContracts() {
+    public synchronized void removeMergeContracts() {
         this.mergeContracts = DefaultImmutableSet.nil();
+    }
+
+    /**
+     * Atomically replaces the merge contracts registered on this merge point with the given
+     * set. Equivalent to {@link #removeMergeContracts()} followed by adding every contract of
+     * {@code contracts}, but performed under one lock so that concurrent readers (parallel
+     * prover rule application via {@code MergeRuleBuiltInRuleApp}) never observe the
+     * intermediate empty set.
+     */
+    public synchronized void setMergeContracts(ImmutableSet<MergeContract> contracts) {
+        this.mergeContracts = contracts == null ? DefaultImmutableSet.nil() : contracts;
     }
 
     public MergePointStatement(
