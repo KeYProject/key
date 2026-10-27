@@ -65,6 +65,7 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.jml.body.JmlClassLevelDeclaration;
 import com.github.javaparser.ast.jml.body.JmlFieldDeclaration;
 import com.github.javaparser.ast.jml.body.JmlMethodDeclaration;
+import com.github.javaparser.ast.jml.doc.JmlDocStmt;
 import com.github.javaparser.ast.jml.proof.JmlProofStmt;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt.JmlStmtKind;
@@ -845,6 +846,51 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var ctx = parser.assertionProof();
         parser.getErrorReporter().throwException();
         return KeyAst.JMLProofScript.fromContext(ctx);
+    }
+
+    /**
+     * Translates a leftover raw JML comment block that the {@code JMLTransformer} re-parsed
+     * against KeY's own JML grammar ({@link MarkerStatementHelper#KEY_JML_FALLBACK}): merge
+     * point statements, {@code set} statements and {@code assert}/{@code assume} statements with
+     * KeY proof scripts or obtain clauses, which JMLtk cannot parse.
+     */
+    @Override
+    public Object visit(JmlDocStmt n, Void arg) {
+        var element = n.getData(MarkerStatementHelper.KEY_JML_FALLBACK);
+        if (element == null) {
+            // Unmarked leftovers are removed by the JmlDocRemoval pipeline step; reaching this
+            // point indicates a pipeline ordering problem.
+            throw new IllegalArgumentException("JmlDocStmt without a re-parsed method level "
+                + "element reached the converter: " + n);
+        }
+        PositionInfo pi = createPositionInfo(n);
+        List<Comment> c = createComments(n);
+        if (element instanceof JmlParser.Merge_point_statementContext mergePoint) {
+            // Same translation as for a JMLtk KeyMergePointStmt: the concrete merge procedure
+            // and parameters are re-derived by the JMLSpecExtractor from the parse tree.
+            var loc = new LocationVariable(
+                services.getVariableNamer().getTemporaryNameProposal("x"),
+                services.getNamespaces().sorts().lookup("boolean"));
+            return addToMapping(n, new MergePointStatement(pi, c, loc));
+        } else if (element instanceof JmlParser.Set_statementContext set) {
+            return addToMapping(n, new SetStatement(new KeyAst.SetStatementContext(set), pi));
+        } else if (element instanceof JmlParser.Assert_statementContext asrt) {
+            KeyAst.Expression condition;
+            if (asrt.UNREACHABLE() != null) {
+                condition = new KeyAst.Expression(
+                    (JmlParser.ExpressionContext) JmlFacade.parseExpr("false"));
+            } else {
+                condition = new KeyAst.Expression(asrt.expression());
+            }
+            String label = asrt.label != null ? asrt.label.getText() : null;
+            return addToMapping(n, new JmlAssert(TextualJMLAssertStatement.Kind.ASSERT, label,
+                condition, KeyAst.JMLProofScript.fromContext(asrt.assertionProof()), pi));
+        } else if (element instanceof JmlParser.Assume_statementContext assume) {
+            return addToMapping(n, new JmlAssert(TextualJMLAssertStatement.Kind.ASSUME, null,
+                new KeyAst.Expression(assume.expression()), null, pi));
+        }
+        throw new IllegalStateException(
+            "Unsupported re-parsed method level element: " + element.getClass());
     }
 
     @Override
@@ -1805,6 +1851,18 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
         ImmutableArray<Expression> args = map(arguments);
 
+        if (name.equals("\\seq")) {
+            // \seq() is the empty sequence, \seq(e1, ..., en) the sequence literal
+            // [e1, ..., en]. Mirror TermBuilder.seq: left-fold concatenation of singleton
+            // sequences, starting from the empty sequence.
+            Expression result = EmptySeqLiteral.INSTANCE;
+            for (Expression elem : args) {
+                result = new LogicFunctionalOperator(pi, c, SeqConcat, result,
+                    new LogicFunctionalOperator(pi, c, SeqSingleton, elem));
+            }
+            return result;
+        }
+
         var fn = switch (name) {
             case "\\all_objects" -> AllObjects;
             case "\\all_fields" -> AllFields;
@@ -1892,7 +1950,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 services.getNamespaces().sorts().lookup("boolean"));
             return addToMapping(n, new MergePointStatement(pi, c, loc));
         } else {
-            return accept(n.getExpr());
+            IProgramVariable expr = accept(n.getExpr());
+            return new MergePointStatement(pi, c, expr);
         }
     }
 

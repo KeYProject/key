@@ -4,9 +4,11 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.transformations;
 
+
 import com.github.javaparser.ast.DataKey;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt;
 import com.github.javaparser.ast.key.KeyMergePointStmt;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * Helper class for marking {@code assert}/{@code assume}/{@code set} statements and merge points
@@ -44,5 +46,14 @@ public class MarkerStatementHelper {
      * Marks a {@link KeyMergePointStmt} as the KeY-specific merge point statement.
      */
     public static final DataKey<KeyMergePointStmt> KEY_MERGE_POINT = new DataKey<>() {
+    };
+
+    /**
+     * Marks a {@link com.github.javaparser.ast.jml.doc.JmlDocStmt} whose raw JML comment content
+     * was re-parsed with KeY's own JML grammar because JMLtk could not parse it. The value is the
+     * single {@code methodlevel_element} parse tree of that comment. Upstream statements that
+     * JMLtk already converted produce no such marker (the leftover is then simply removed).
+     */
+    public static final DataKey<ParserRuleContext> KEY_JML_FALLBACK = new DataKey<>() {
     };
 }
