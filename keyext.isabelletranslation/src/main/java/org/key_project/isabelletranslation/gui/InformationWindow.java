@@ -25,6 +25,7 @@ import org.key_project.util.java.StringUtil;
  * Adaptation of {@link de.uka.ilkd.key.gui.smt.InformationWindow} for Isabelle solvers
  */
 public class InformationWindow extends JDialog {
+
     public record Information(String title, String content, String solver) {
     }
 
