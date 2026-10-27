@@ -1598,6 +1598,17 @@ public class JMLSpecFactory {
         return createJMLMergeContracts(method, mps, ctx, Location.UNDEFINED);
     }
 
+    /**
+     * Creates the merge contracts for a merge point statement whose text was re-parsed with KeY's
+     * own JML grammar (the JMLtk front-end leaves {@code merge_point} comments unparsed; the
+     * {@code JMLTransformer} fallback parses them with {@link JmlParser}).
+     */
+    public ImmutableSet<MergeContract> createJMLMergeContracts(final IProgramMethod method,
+            final MergePointStatement mps, final JmlParser.Merge_point_statementContext ctx)
+            throws SLTranslationException {
+        return createJMLMergeContracts(method, mps, ctx, Location.UNDEFINED);
+    }
+
     private ImmutableSet<MergeContract> createJMLMergeContracts(final IProgramMethod method,
             final MergePointStatement mps, final JmlParser.Merge_point_statementContext ctx,
             final Location location) throws SLTranslationException {

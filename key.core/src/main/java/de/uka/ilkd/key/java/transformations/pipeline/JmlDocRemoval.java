@@ -6,6 +6,8 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 
 import java.util.regex.Pattern;
 
+import de.uka.ilkd.key.java.transformations.MarkerStatementHelper;
+
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.jml.doc.*;
@@ -60,9 +62,14 @@ public class JmlDocRemoval extends JavaTransformerAbstract {
                 }
             }
 
-            if (it instanceof JmlDocStmt ||
-                    it instanceof JmlDocType ||
-                    it instanceof JmlDocDeclaration) {
+            if (it instanceof JmlDocStmt docStmt) {
+                // Leftovers re-parsed by the JMLTransformer fallback (merge points, proof
+                // scripts, ...) are kept; the JP2KeYConverter translates them. Untouched
+                // leftovers are plain drops.
+                if (!docStmt.containsData(MarkerStatementHelper.KEY_JML_FALLBACK)) {
+                    it.remove();
+                }
+            } else if (it instanceof JmlDocType || it instanceof JmlDocDeclaration) {
                 it.remove();
             }
         });

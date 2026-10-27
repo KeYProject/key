@@ -6,14 +6,18 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.jml.pretranslation.JMLModifier;
+import de.uka.ilkd.key.speclang.njml.JmlFacade;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.DataKey;
 import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.CallableDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
@@ -24,21 +28,27 @@ import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.jml.body.JmlClassLevelDeclaration;
 import com.github.javaparser.ast.jml.body.JmlFieldDeclaration;
 import com.github.javaparser.ast.jml.body.JmlMethodDeclaration;
+import com.github.javaparser.ast.jml.doc.JmlDoc;
+import com.github.javaparser.ast.jml.doc.JmlDocStmt;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt.JmlStmtKind;
 import com.github.javaparser.ast.jml.stmt.JmlGhostStmt;
+import com.github.javaparser.ast.key.KeyLoopScopeBlockStmt;
 import com.github.javaparser.ast.key.KeyMergePointStmt;
 import com.github.javaparser.ast.nodeTypes.NodeWithBody;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.LabeledStmt;
 import com.github.javaparser.ast.stmt.Statement;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.KEY_ASSERT;
 import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.KEY_ASSIGN;
+import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.KEY_JML_FALLBACK;
 import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.KEY_MERGE_POINT;
 
 /// JMLTransformer translates the JML annotation comments into the JML AST that is attached to
@@ -269,8 +279,206 @@ public final class JMLTransformer extends JavaTransformerAbstract {
                 markExpressionStatement(expr);
             } else if (inner instanceof KeyMergePointStmt mergePoint) {
                 mergePoint.setData(KEY_MERGE_POINT, mergePoint);
+            } else if (inner instanceof JmlDocStmt docStmt) {
+                transformFallbackJmlDocStmt(block, stmt, docStmt);
             }
         }
+    }
+
+    /**
+     * Re-parses a leftover raw JML comment block ({@link JmlDocStmt}) that JMLtk could not turn
+     * into typed JML AST nodes with KeY's own JML grammar and marks the successfully parsed
+     * statement elements for the {@link de.uka.ilkd.key.java.loader.JP2KeYConverter} via
+     * {@link MarkerStatementHelper#KEY_JML_FALLBACK}.
+     * <p>
+     * JMLtk groups adjacent JML comments into one {@code JmlDocStmt} and converts them
+     * all-or-nothing: if every statement of the group could be parsed, the converted statements
+     * are emitted as following siblings whose source range lies inside the group's range and the
+     * {@code JmlDocStmt} is pure duplication; if any statement fails, nothing is converted and
+     * the group's comments all remain in the {@code JmlDocStmt}. Groups of the first kind are
+     * left untouched (and removed by {@link JmlDocRemoval}). Groups of the second kind are
+     * re-parsed here: their comments are re-lexed against KeY's own grammar (adjacent lines like
+     * {@code //@ merge_point} + {@code //@ merge_proc "X";} form a single statement) and the
+     * group is split into one {@code JmlDocStmt} per supported statement element, each marked
+     * with its parse tree. Elements JMLtk would have converted anyway ({@code set},
+     * {@code assert}/{@code assume} without a proof script) are kept since JMLtk did not convert
+     * them in a failing group. Statements JMLtk and KeY's grammar both cannot handle stay
+     * unmarked and are dropped by {@link JmlDocRemoval}, as before.
+     *
+     * @param block the block containing the leftover comment
+     * @param stmt the leftover statement itself (possibly wrapped in labels)
+     * @param docStmt the leftover raw comment block
+     */
+    private static void transformFallbackJmlDocStmt(BlockStmt block, Statement stmt,
+            JmlDocStmt docStmt) {
+        NodeList<Statement> stmts = block.getStatements();
+        int idx = stmts.indexOf(stmt);
+        if (idx < 0) {
+            return;
+        }
+        // Skip leftover duplication of a group JMLtk already converted: a converted JML
+        // statement that follows the leftover and lies within its source range.
+        var range = docStmt.getRange().orElse(null);
+        if (range != null) {
+            for (int i = idx + 1; i < stmts.size(); i++) {
+                Statement s = stmts.get(i);
+                if (isConvertedJmlStatement(s)
+                        && s.getRange().map(range::overlapsWith).orElse(false)) {
+                    return;
+                }
+            }
+        }
+        // Re-parse the raw comments with KeY's own JML grammar.
+        List<ParserRuleContext> elements =
+            parseFallbackElements(docStmt);
+        if (elements.isEmpty()) {
+            return;
+        }
+        // Split the leftover into one JmlDocStmt per parsed element so that the converter sees
+        // exactly one statement per element, at the position of the original comment group.
+        List<JmlDocStmt> replacements = new ArrayList<>(elements.size());
+        for (var element : elements) {
+            var single = new JmlDocStmt(new NodeList<>(new JmlDoc(element.getText())));
+            docStmt.getRange().ifPresent(single::setRange);
+            single.setData(KEY_JML_FALLBACK, element);
+            replacements.add(single);
+        }
+        stmts.set(idx, replacements.get(0));
+        for (int i = 1; i < replacements.size(); i++) {
+            stmts.add(idx + i, replacements.get(i));
+        }
+    }
+
+    /**
+     * Re-parses the comments of the given leftover with KeY's JML grammar. The comments are
+     * concatenated (adjacent {@code //@} lines form single statements, e.g. {@code merge_point}
+     * + {@code merge_proc "X";}) and parsed as a whole; if that fails, every comment is parsed
+     * individually and unparseable comments are dropped. Returns the supported statement
+     * elements in source order.
+     */
+    private static List<ParserRuleContext> parseFallbackElements(
+            JmlDocStmt docStmt) {
+        StringBuilder joined = new StringBuilder();
+        for (JmlDoc doc : docStmt.getJmlComments()) {
+            String text = normalizeJmlDocContent(doc);
+            if (!text.isBlank()) {
+                joined.append(text).append('\n');
+            }
+        }
+        if (joined.isEmpty()) {
+            return List.of();
+        }
+        List<ParserRuleContext> elements =
+            parseMethodlevelElements(joined.toString());
+        if (!elements.isEmpty()) {
+            return elements;
+        }
+        List<ParserRuleContext> result = new ArrayList<>();
+        for (JmlDoc doc : docStmt.getJmlComments()) {
+            String content = normalizeJmlDocContent(doc);
+            if (!content.isBlank()) {
+                result.addAll(parseMethodlevelElements(content));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Parses the given JML content as a method level comment with KeY's grammar and returns the
+     * supported statement contexts in source order. Unsupported elements (e.g.
+     * {@code loop_invariant} clauses) are skipped: they have no KeY statement counterpart here
+     * and are dropped, as they were before this fallback existed.
+     */
+    private static List<ParserRuleContext> parseMethodlevelElements(String content) {
+        try {
+            var parser = JmlFacade.createParser(JmlFacade.createLexer(content));
+            var ctx = parser.methodlevel_comment();
+            parser.getErrorReporter().throwException();
+            List<ParserRuleContext> elements = new ArrayList<>();
+            for (var element : ctx.methodlevel_element()) {
+                var sub = supportedFallbackElementOrNull(element);
+                if (sub != null) {
+                    elements.add(sub);
+                }
+            }
+            return elements;
+        } catch (RuntimeException e) {
+            return List.of();
+        }
+    }
+
+    /**
+     * Returns the specific statement context of the given method level element if the fallback
+     * can translate it into a KeY statement, {@code null} otherwise. The supported kinds are
+     * exactly the constructs JMLtk leaves unparsed: KeY extension statements ({@code merge_point}
+     * family) and statements with proof scripts or obtain clauses.
+     */
+    private static @Nullable ParserRuleContext supportedFallbackElementOrNull(
+            JmlParser.Methodlevel_elementContext element) {
+        var merge = element.merge_point_statement();
+        if (merge != null) {
+            return merge;
+        }
+        var set = element.set_statement();
+        if (set != null) {
+            return set;
+        }
+        var asrt = element.assert_statement();
+        if (asrt != null) {
+            return asrt;
+        }
+        var assume = element.assume_statement();
+        if (assume != null) {
+            return assume;
+        }
+        return null;
+    }
+
+    /**
+     * Returns whether the given statement was produced by JMLtk's typed JML parsing (as opposed
+     * to a plain Java statement or another leftover {@link JmlDocStmt}).
+     */
+    private static boolean isConvertedJmlStatement(Statement s) {
+        if (s instanceof JmlDocStmt) {
+            return false;
+        }
+        String pkg = s.getClass().getPackageName();
+        return pkg.startsWith("com.github.javaparser.ast.jml.stmt")
+                || s instanceof KeyMergePointStmt
+                || s instanceof KeyLoopScopeBlockStmt;
+    }
+
+    /**
+     * Strips the JML comment markers from the given raw comment content so that the remaining
+     * text can be fed to KeY's JML grammar: a {@code /*@ ... *&#47;} block or {@code //@} lines.
+     */
+    private static String normalizeJmlDocContent(JmlDoc doc) {
+        String content = doc.getContent().strip();
+        if (content.startsWith("/*")) {
+            int at = content.indexOf('@');
+            if (at >= 0) {
+                content = content.substring(at + 1);
+            }
+            if (content.endsWith("*/")) {
+                content = content.substring(0, content.length() - 2);
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String line : content.split("\n")) {
+            String l = line.strip();
+            if (l.startsWith("//")) {
+                int at = l.indexOf('@');
+                if (at >= 0) {
+                    l = l.substring(at + 1).stripLeading();
+                }
+            } else if (l.startsWith("*") && !l.startsWith("*/")) {
+                l = l.substring(1).stripLeading();
+            }
+            if (!l.isBlank()) {
+                sb.append(l).append('\n');
+            }
+        }
+        return sb.toString();
     }
 
     private void transformIf(IfStmt ifStmt) {

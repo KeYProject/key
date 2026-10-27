@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
+import de.uka.ilkd.key.java.transformations.MarkerStatementHelper;
 import de.uka.ilkd.key.ldt.FinalHeapResolution;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -34,6 +35,7 @@ import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.JmlToTextual;
 import de.uka.ilkd.key.speclang.njml.JmlFacade;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
@@ -50,6 +52,7 @@ import com.github.javaparser.ast.jml.body.JmlMethodDeclaration;
 import com.github.javaparser.ast.jml.body.JmlRepresentsDeclaration;
 import com.github.javaparser.ast.jml.clauses.ContractType;
 import com.github.javaparser.ast.jml.clauses.JmlContract;
+import com.github.javaparser.ast.jml.doc.JmlDocStmt;
 import com.github.javaparser.ast.key.KeyMergePointStmt;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.Nullable;
@@ -376,9 +379,19 @@ public final class JMLSpecExtractor implements SpecExtractor {
             MergePointStatement mps, ImmutableList<LocationVariable> methodParams)
             throws SLTranslationException {
         // Resolve the JMLtk KeyMergePointStmt through the mapping: it carries the merge point
-        // expression from which the textual merge contract is re-derived.
-        if (mapping().nodeFromKeY(mps) instanceof KeyMergePointStmt kms) {
+        // expression from which the textual merge contract is re-derived. For merge points that
+        // JMLtk left unparsed, the JMLTransformer fallback re-parsed the comment with KeY's own
+        // JML grammar and attached the parse tree to the leftover JmlDocStmt.
+        Node jmlNode = mapping().nodeFromKeY(mps);
+        if (jmlNode instanceof KeyMergePointStmt kms) {
             return jsf.createJMLMergeContracts(method, mps, kms);
+        } else if (jmlNode instanceof JmlDocStmt jds
+                && jds.containsData(MarkerStatementHelper.KEY_JML_FALLBACK)) {
+            if (jds.getData(
+                MarkerStatementHelper.KEY_JML_FALLBACK) instanceof JmlParser.Merge_point_statementContext ctx) {
+                return jsf.createJMLMergeContracts(method, mps, ctx);
+            }
+            return DefaultImmutableSet.nil();
         }
         return ImmutableSet.empty();
     }
