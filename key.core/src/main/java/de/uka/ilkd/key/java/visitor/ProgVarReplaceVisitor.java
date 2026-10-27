@@ -276,17 +276,28 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     @Override
     public void performActionOnMergeContract(MergeContract oldContract) {
         MergePointStatement mps = oldContract.getMergePointStatement();
-        mps.removeMergeContracts();
-        mps.addMergeContract(createNewMergeContract(oldContract, mps, false));
+        // Atomic replacement: the former removeMergeContracts() + addMergeContract() sequence
+        // left a window in which concurrent readers (parallel prover) could observe an empty
+        // merge contract set.
+        mps.setMergeContracts(
+            ImmutableSet.singleton(createNewMergeContract(oldContract, mps, false)));
     }
 
     @Override
     protected void performActionOnMergeContract(MergePointStatement oldMps,
             MergePointStatement newMps) {
         ImmutableSet<MergeContract> oldContracts = oldMps.getMergeContracts();
-        oldMps.removeMergeContracts();
+        ImmutableSet<MergeContract> newContracts = DefaultImmutableSet.nil();
         for (MergeContract c : oldContracts) {
-            newMps.addMergeContract(createNewMergeContract(c, newMps, !oldMps.equals(newMps)));
+            newContracts = newContracts
+                    .add(createNewMergeContract(c, newMps, !oldMps.equals(newMps)));
+        }
+        if (oldMps == newMps) {
+            // same node: replace in one atomic step so readers never observe an empty set
+            newMps.setMergeContracts(newContracts);
+        } else {
+            oldMps.removeMergeContracts();
+            newMps.setMergeContracts(newContracts);
         }
     }
 

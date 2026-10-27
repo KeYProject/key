@@ -1,6 +1,8 @@
 // This test uses method resolution to return BigIntMarker or IntMarker from the accept model method
 // Test failure is indicated by method resolution failing
-// (former `/*@ spec_bigint_math @*/` pragma removed: not accepted by JMLtk)
+// Class-level spec math mode pragma: drives the math mode for the whole class (in particular
+// Test.accept(1 + 2).isBigint() resolves to accept(\bigint) in BIGINT mode).
+/*@ spec_bigint_math @*/
 public class Test {
 	public static class BigIntMarker {
 		public boolean isBigint() {

@@ -172,10 +172,13 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             if (spec instanceof PredicateAbstractionMergeContract pamc) {
                 final MergePointStatement mps = spec.getMergePointStatement();
                 addNeededVariables(pamc.getAtPres().keySet());
-                mps.removeMergeContracts();
-                mps.addMergeContract(new PredicateAbstractionMergeContract(mps, atPres,
-                    pamc.getKJT(), pamc.getLatticeTypeName(),
-                    pamc.getAbstractionPredicates(atPres, services)));
+                // Set the single re-bound contract atomically: the former removeMergeContracts()
+                // + addMergeContract() sequence left a window in which the parallel prover's
+                // MergeRuleBuiltInRuleApp could observe an empty merge contract set.
+                mps.setMergeContracts(ImmutableSet.singleton(
+                    new PredicateAbstractionMergeContract(mps, atPres,
+                        pamc.getKJT(), pamc.getLatticeTypeName(),
+                        pamc.getAbstractionPredicates(atPres, services))));
             }
         }
 
