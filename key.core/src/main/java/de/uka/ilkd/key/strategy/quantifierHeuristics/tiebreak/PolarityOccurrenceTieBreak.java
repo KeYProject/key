@@ -192,6 +192,16 @@ abstract class PolarityOccurrenceTieBreak implements QuantifierInstantiationTieB
         return polarity + FROZEN_BASE;
     }
 
+    /**
+     * The operator summary of a sequent formula, computed once per formula and cached. The walk
+     * pairs each subterm with its polarity relative to the formula root, following the rules of the
+     * taclet application restrictions: the root is proving ({@code +1}), a negation and the left
+     * side of an implication flip, conjunction, disjunction, the right side of an implication and
+     * the branches of a conditional keep, everything else (equivalences, quantifiers, modalities)
+     * is
+     * neutral. The polarity is frozen when the walk enters an atom. State encoding: polarity+1 for
+     * the formula layer, polarity+4 once frozen.
+     */
     static OccInfo occInfo(SequentFormula cf, Services services) {
         final Map<SequentFormula, Object> cache = services.getCaches().getFormulaOccurrenceCache();
         final Object hit = cache.get(cf);
