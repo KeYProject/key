@@ -55,7 +55,7 @@ public class ZipFileCollection implements FileCollection, AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         zipFile.close();
     }
 

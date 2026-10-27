@@ -47,7 +47,10 @@ public class DataRecordingTable implements AutoCloseable {
     private final PrintWriter w;
 
     @Override
-    public void close() throws Exception {
+    public void close() {
+        // PrintWriter.close() declares no checked exception, so 'throws Exception' (which javac
+        // treated as "could throw InterruptedException") was unnecessary; keeping it tripped the
+        // 'try' lint at every try-with-resources use site.
         w.close();
     }
 
