@@ -67,6 +67,7 @@ public class Filenames {
     }
 
 
+    @SuppressWarnings("cast") // the explicit cast is required by the nullness checker
     private static String[] removeDotDot(String[] a) {
         String[] newa = new String[a.length];
         int k = 0;
