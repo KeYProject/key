@@ -118,15 +118,6 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
     }
 
     /**
-     * Whether the term's top operator is one the polynomial decomposition takes apart. Besides the
-     * sum and product this covers difference and negation, which the proof search rewrites into
-     * them.
-     *
-     * @param t a term
-     * @param integerLDT the integer theory operators
-     * @return whether the top operator carries polynomial structure
-     */
-    /**
      * Solves {@code pattern = instance} for the single variable the pattern is affine in.
      *
      * A trigger array index is typically written relative to an offset, as {@code base + t}, while
@@ -202,6 +193,15 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
         return result;
     }
 
+    /**
+     * Whether the term's top operator is one the polynomial decomposition takes apart. Besides the
+     * sum and product this covers difference and negation, which the proof search rewrites into
+     * them.
+     *
+     * @param t a term
+     * @param integerLDT the integer theory operators
+     * @return whether the top operator carries polynomial structure
+     */
     private static boolean hasPolynomialStructure(JTerm t, IntegerLDT integerLDT) {
         final Operator op = t.op();
         return op == integerLDT.getAdd() || op == integerLDT.getMul()
