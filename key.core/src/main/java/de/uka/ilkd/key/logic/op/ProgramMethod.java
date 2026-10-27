@@ -269,6 +269,11 @@ public final class ProgramMethod extends ObserverFunction
         return method == ipm.getMethodDeclaration();
     }
 
+    @Override
+    public int hashCode() {
+        return method.hashCode();
+    }
+
     @Deprecated
     public KeYJavaType getKJT() {
         return returnType;

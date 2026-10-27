@@ -1082,5 +1082,10 @@ public abstract class SequentView extends JEditorPane {
             }
             return false;
         }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(age, pio);
+        }
     }
 }
