@@ -49,7 +49,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
      * Converts a {@link Serializable} object into a byte array and stores it in a file at given
      * location.
      */
-    private static void writeObject(Path path, Serializable s) throws IOException {
+    private static void writeSerializedObject(Path path, Serializable s) throws IOException {
 
         try (ObjectOutputStream objectOutputStream =
             new ObjectOutputStream(Files.newOutputStream(path))) {
@@ -60,7 +60,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
     /**
      * Converts contents of a file back into an object.
      */
-    private static <S> S readObject(Path path, Class<S> type)
+    private static <S> S readSerializedObject(Path path, Class<S> type)
             throws IOException, ClassNotFoundException {
         try (ObjectInputStream objectInputStream =
             new ObjectInputStream(Files.newInputStream(path))) {
@@ -91,7 +91,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
         }
         ProofCollectionSettings settings = testFiles.get(0).getSettings();
 
-        writeObject(getLocationOfSerializedTestFiles(pathToTempDir),
+        writeSerializedObject(getLocationOfSerializedTestFiles(pathToTempDir),
             testFiles.toArray(new TestFile[0]));
 
         ProcessBuilder pb =
@@ -148,7 +148,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
          */
         Path exceptionFile = getLocationOfSerializedException(pathToTempDir);
         if (exceptionFile.toFile().exists()) {
-            Throwable t = readObject(exceptionFile, Throwable.class);
+            Throwable t = readSerializedObject(exceptionFile, Throwable.class);
             fail("Subprocess returned exception", t);
         }
 
@@ -158,7 +158,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
         Path testResultsFile = getLocationOfSerializedTestResults(pathToTempDir);
         assertTrue(testResultsFile.toFile().exists(),
             "File containing serialized test results not present.");
-        TestResult[] array = readObject(testResultsFile, TestResult[].class);
+        TestResult[] array = readSerializedObject(testResultsFile, TestResult[].class);
 
         return Arrays.asList(array);
     }
@@ -176,7 +176,8 @@ public abstract class ForkedTestFileRunner implements Serializable {
         boolean error = false;
         try {
             TestFile[] testFiles =
-                readObject(getLocationOfSerializedTestFiles(tempDirectory), TestFile[].class);
+                readSerializedObject(getLocationOfSerializedTestFiles(tempDirectory),
+                    TestFile[].class);
             installTimeoutWatchdog(testFiles[0].getSettings(), tempDirectory);
             ArrayList<TestResult> testResults = new ArrayList<>();
             for (TestFile testFile : testFiles) {
@@ -187,17 +188,17 @@ public abstract class ForkedTestFileRunner implements Serializable {
                     LOGGER.warn("Run failed", e);
                 }
             }
-            writeObject(getLocationOfSerializedTestResults(tempDirectory),
+            writeSerializedObject(getLocationOfSerializedTestResults(tempDirectory),
                 testResults.toArray(new TestResult[0]));
         } catch (Throwable t) {
             try {
-                writeObject(getLocationOfSerializedException(tempDirectory), t);
+                writeSerializedObject(getLocationOfSerializedException(tempDirectory), t);
             } catch (NotSerializableException e) {
                 // There are cases when exceptions refer to objects that cannot be serialized ...
                 // then save the stacktrace at least
                 Exception subst = new Exception(t.getMessage());
                 subst.setStackTrace(t.getStackTrace());
-                writeObject(getLocationOfSerializedException(tempDirectory), subst);
+                writeSerializedObject(getLocationOfSerializedException(tempDirectory), subst);
             }
         }
 
@@ -250,7 +251,7 @@ public abstract class ForkedTestFileRunner implements Serializable {
                     sleep(timeout * 1000L);
                     InterruptedException ex =
                         new InterruptedException("forkTimeout (" + timeout + "sec.) elapsed");
-                    writeObject(getLocationOfSerializedException(tempDirectory), ex);
+                    writeSerializedObject(getLocationOfSerializedException(tempDirectory), ex);
                     // TODO consider something other than 0 here
                     if (verbose) {
                         LOGGER.info("Process timed out");
