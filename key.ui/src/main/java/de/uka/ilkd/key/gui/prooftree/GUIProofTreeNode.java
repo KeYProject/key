@@ -3,9 +3,6 @@
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.prooftree;
-/**
- * this class implements a TreeModel that can be displayed using the JTree class framework
- */
 
 import javax.swing.tree.TreeNode;
 
@@ -15,6 +12,9 @@ import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 
 import org.jspecify.annotations.NonNull;
 
+/**
+ * this class implements a TreeModel that can be displayed using the JTree class framework
+ */
 class GUIProofTreeNode extends GUIAbstractTreeNode {
 
     private GUIAbstractTreeNode[] children;

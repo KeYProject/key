@@ -83,7 +83,7 @@ public class HeatmapOptionsDialog extends JDialog {
             + "according to their position in the list,"
             + " with the most recent term receiving the strongest highlight." };
 
-    /** Error message on invalid textfield input */ // Not needed atm
+    /* Error message on invalid textfield input */ // Not needed atm
     // private static final String INPUT_ERROR_MESSAGE = "Please enter a number bwetween 1 and
     // 1000";
 
