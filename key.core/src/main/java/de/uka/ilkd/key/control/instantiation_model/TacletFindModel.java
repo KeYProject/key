@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.control.instantiation_model;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
@@ -17,8 +16,8 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.nparser.JavaKeYParser;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.nparser.ParsingFacade;
-import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.IdDeclaration;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.*;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
@@ -185,8 +185,14 @@ public class TacletFindModel extends AbstractTableModel {
         NamespaceSet copy = nss.copy();
         copy.setVariables(varNS);
         copy.setFunctions(functNS);
-        JTerm result =
-            new DefaultTermParser().parse(new StringReader(s), null, services, copy, scm);
+        KeyIO keyIO = new KeyIO(services, copy);
+        keyIO.setAbbrevMap(scm);
+        final JTerm result;
+        try {
+            result = keyIO.parseExpression(CharStreams.fromString(s));
+        } catch (BuildingException e) {
+            throw new ParserException(e.getMessage(), null).initCause(e);
+        }
         // Validate the user-entered instantiation (e.g. reject generic sorts, see issue #3409). The
         // set of checks lives in UserInputValidator. Unlike the (batch-parsed) \problem and JML
         // boundaries, this field is validated live on every keystroke and its message is rendered
@@ -205,7 +211,7 @@ public class TacletFindModel extends AbstractTableModel {
      */
     private IdDeclaration parseIdDeclaration(String s) throws ParserException {
         JavaKeYParser.Id_declarationContext ctx =
-            ParsingFacade.parseIdDeclaration(CharStreams.fromString(s));
+            ParsingFacade.createParser(CharStreams.fromString(s)).id_declaration();
         Sort sort =
             ctx.s != null ? services.getNamespaces().lookupSortOrAlias(ctx.s.getText()) : null;
         return new IdDeclaration(ctx.id.getText(), sort);

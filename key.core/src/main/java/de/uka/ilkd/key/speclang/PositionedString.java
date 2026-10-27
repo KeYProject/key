@@ -49,7 +49,7 @@ public class PositionedString {
      * Returns true, if the position information contains a file name.
      */
     public boolean hasFilename() {
-        return location.getFileURI().isPresent();
+        return location.getFileUri() != null;
     }
 
     public PositionedString prepend(String text) {
@@ -59,7 +59,7 @@ public class PositionedString {
 
     public String toString() {
         return text + " ("
-            + (location.getFileURI().isPresent() ? location.getFileURI().get() + ", " : "")
+            + (location.getFileUri() != null ? location.getFileUri() + ", " : "")
             + location.getPosition() + ")";
     }
 

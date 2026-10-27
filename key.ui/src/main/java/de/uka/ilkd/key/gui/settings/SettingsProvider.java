@@ -76,9 +76,7 @@ public interface SettingsProvider {
      * An icon for this settings for the {@link JTree}.
      *
      * @return nullable
-     * @deprecated unused currently
      */
-    @Deprecated
     default Icon getIcon() {
         return null;
     }

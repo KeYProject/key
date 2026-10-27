@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util.mergerule;
 
-import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,7 +19,6 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.nparser.KeyIO;
-import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -50,6 +48,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
 
+import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1312,9 +1311,13 @@ public class MergeRuleUtils {
     public static AbstractionPredicate parsePredicate(String input,
             ArrayList<Pair<Sort, Name>> registeredPlaceholders, NamespaceSet localNamespaces,
             Services services) throws ParserException {
-        DefaultTermParser parser = new DefaultTermParser();
-        JTerm formula = parser.parse(new StringReader(input), JavaDLTheory.FORMULA, services,
-            localNamespaces, services.getProof().abbreviations());
+        KeyIO keyIO = new KeyIO(services, localNamespaces);
+        keyIO.setAbbrevMap(services.getProof().abbreviations());
+        JTerm formula = keyIO.parseExpression(CharStreams.fromString(input));
+        if (!formula.sort().extendsTrans(JavaDLTheory.FORMULA)) {
+            throw new ParserException("Expected sort " + JavaDLTheory.FORMULA
+                + ", but parser returns sort " + formula.sort() + ".", null);
+        }
 
         ImmutableSet<LocationVariable> containedLocVars =
             getLocationVariables(formula, services);

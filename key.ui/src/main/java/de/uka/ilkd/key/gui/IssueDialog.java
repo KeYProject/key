@@ -6,12 +6,12 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -390,8 +390,9 @@ public final class IssueDialog extends JDialog {
                         if (href != null) {
                             try {
                                 textPane.fireHyperlinkUpdate(new HyperlinkEvent(textPane,
-                                    HyperlinkEvent.EventType.ACTIVATED, new URL(href)));
-                            } catch (MalformedURLException exc) {
+                                    HyperlinkEvent.EventType.ACTIVATED,
+                                    URI.create(href).toURL()));
+                            } catch (MalformedURLException | IllegalArgumentException exc) {
                                 LOGGER.warn("Failed to update hyperlink", exc);
                             }
                         }
@@ -485,7 +486,8 @@ public final class IssueDialog extends JDialog {
      */
     private static Element getHyperlinkElement(MouseEvent event) {
         JEditorPane editor = (JEditorPane) event.getSource();
-        int pos = editor.getUI().viewToModel(editor, event.getPoint());
+        Point2D p = event.getPoint();
+        int pos = editor.viewToModel2D(p);
         if (pos >= 0 && editor.getDocument() instanceof HTMLDocument hdoc) {
             Element elem = hdoc.getCharacterElement(pos);
             if (elem.getAttributes().getAttribute(HTML.Tag.A) != null) {
@@ -674,11 +676,11 @@ public final class IssueDialog extends JDialog {
         // itself only when the issue carries a usable file location.
         btnEditFile.setAction(new EditSourceFileAction(this, location, issue.getText()));
 
-        if (location.getFileURI().isEmpty()) {
+        if (location.getFileUri() == null) {
             fTextField.setVisible(false);
             txtSource.setText("[SOURCE COULD NOT BE LOADED]");
         } else {
-            URI uri = location.getFileURI().get();
+            URI uri = location.getFileUri();
             if (uri.getScheme() == null) {
                 uri = URI.create("file:" + uri.getPath());
             }
@@ -759,7 +761,7 @@ public final class IssueDialog extends JDialog {
     }
 
     private void addHighlights(DefaultHighlighter dh, URI url) {
-        warnings.stream().filter(ps -> ps.getLocation().getFileURI().equals(Optional.of(url)))
+        warnings.stream().filter(ps -> Objects.equals(ps.getLocation().getFileUri(), url))
                 .forEach(ps -> addHighlights(dh, ps));
     }
 
