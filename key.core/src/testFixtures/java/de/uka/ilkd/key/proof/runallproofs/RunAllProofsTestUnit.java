@@ -35,6 +35,7 @@ public final class RunAllProofsTestUnit implements Serializable {
     private final String testName;
 
     private final ProofCollectionSettings settings;
+    @SuppressWarnings("serial") // runtime list (ArrayList/SingletonList) is serializable
     private final List<TestFile> testFiles;
     private final boolean ungrouped;
 
