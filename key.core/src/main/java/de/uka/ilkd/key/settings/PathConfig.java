@@ -90,7 +90,7 @@ public final class PathConfig {
     }
 
     public static final class KeyPaths {
-        /// Directory where to find the KeY configuration files.
+        // Directory where to find the KeY configuration files.
         // public Path baseKeyConfigDir;
 
         /// Directory where to find the KeY configuration files.
