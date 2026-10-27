@@ -102,8 +102,9 @@ public class ProofSettings {
      */
     public ProofSettings(ProofSettings toCopy) {
         this();
-        Properties result = new Properties();
+        Configuration result = new Configuration();
         lastLoadedProperties = toCopy.lastLoadedProperties;
+        lastLoadedConfiguration = toCopy.lastLoadedConfiguration;
         for (Settings s : toCopy.settings) {
             s.writeSettings(result);
         }

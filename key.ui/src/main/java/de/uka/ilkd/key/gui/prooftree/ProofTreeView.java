@@ -271,9 +271,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
         delegateView.setUI(new CacheLessMetalTreeUI());
 
         delegateView.getInputMap(WHEN_FOCUSED).getParent()
-                .remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_MASK));
+                .remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK));
         delegateView.getInputMap(WHEN_FOCUSED).getParent()
-                .remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_MASK));
+                .remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK));
 
         delegateView.setInvokesStopCellEditing(true);
         delegateView.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
