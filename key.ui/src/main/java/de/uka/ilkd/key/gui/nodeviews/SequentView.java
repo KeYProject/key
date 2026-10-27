@@ -761,8 +761,8 @@ public abstract class SequentView extends JEditorPane {
                 for (int j = 0; j < max_age && j < sortedArray.length; ++j) {
                     if (sortedArray[j].equals(entry)) {
                         Color color = computeColorForAge(max_age, j);
-                        ImmutableList<Integer> list = (ImmutableList<Integer>) ImmutableList
-                                .<Integer>nil().prepend(0).append(i);
+                        ImmutableList<Integer> list = ImmutableList.<Integer>nil().prepend(0)
+                                .append(i);
                         Range r = ipt.rangeForPath(list);
                         // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView.
                         // rangeForPath ist schuld
@@ -780,8 +780,7 @@ public abstract class SequentView extends JEditorPane {
                     form, max_age + 2);
                 if (age < max_age) {
                     Color color = computeColorForAge(max_age, age);
-                    ImmutableList<Integer> list = (ImmutableList<Integer>) ImmutableList
-                            .<Integer>nil().prepend(0).append(i);
+                    ImmutableList<Integer> list = ImmutableList.<Integer>nil().prepend(0).append(i);
                     Range r = ipt.rangeForPath(list);
                     // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath
                     // ist schuld
