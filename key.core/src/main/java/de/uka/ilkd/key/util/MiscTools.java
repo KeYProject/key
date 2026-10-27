@@ -46,8 +46,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.Filenames;
-import org.key_project.util.Strings;
 import org.key_project.util.collection.*;
+import org.key_project.util.java.StringUtil;
 
 import org.jspecify.annotations.Nullable;
 
@@ -398,7 +398,7 @@ public final class MiscTools {
      * @return the answer to the question specified above
      */
     public static boolean containsWholeWord(String s, String word) {
-        return Strings.containsWholeWord(s, word);
+        return StringUtil.containsWholeWord(s, word);
     }
 
     /**
@@ -406,7 +406,7 @@ public final class MiscTools {
      * reference manual.
      */
     public static boolean isJMLComment(String comment) {
-        return Strings.isJMLComment(comment);
+        return StringUtil.isJMLComment(comment);
     }
 
     /**
@@ -800,7 +800,14 @@ public final class MiscTools {
         switch (scheme) {
             case "URL" -> {
                 // schemeSpecPart actually contains a URL again
-                return new URL(schemeSpecPart);
+                try {
+                    return URI.create(schemeSpecPart).toURL();
+                } catch (IllegalArgumentException e) {
+                    MalformedURLException me =
+                        new MalformedURLException(schemeSpecPart + " is not a valid URL");
+                    me.initCause(e);
+                    throw me;
+                }
             }
             case "ARCHIVE" -> {
                 // format: "ARCHIVE:<filename>?<itemname>"
@@ -839,7 +846,14 @@ public final class MiscTools {
                 }
                 // otherwise call URL constructor
                 // if this also fails, there is an unknown protocol -> MalformedURLException
-                return new URL(input);
+                try {
+                    return URI.create(input).toURL();
+                } catch (IllegalArgumentException e) {
+                    MalformedURLException me =
+                        new MalformedURLException(input + " is not a valid URL");
+                    me.initCause(e);
+                    throw me;
+                }
             }
         }
     }

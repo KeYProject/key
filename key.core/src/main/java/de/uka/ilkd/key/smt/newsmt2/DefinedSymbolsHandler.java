@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
@@ -13,19 +12,22 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandler.SymbolIntroducer;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.BooleanProperty;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
+
+import org.antlr.v4.runtime.CharStreams;
 
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
@@ -235,7 +237,6 @@ public class DefinedSymbolsHandler implements SMTHandler {
         String snipName = name + DL_SUFFIX;
         String dl = snippets.getProperty(snipName);
         do {
-            DefaultTermParser tp = new DefaultTermParser();
             try {
                 NamespaceSet nss = services.getNamespaces().copy();
                 Services localServices = services.getOverlay(nss);
@@ -243,11 +244,15 @@ public class DefinedSymbolsHandler implements SMTHandler {
                 // Since the SMT machines run in parallel, this may cause
                 // ConcurrentModificationExceptions. To avoid such exceptions,
                 // a wrapper services object is used.
-                Term axiom =
-                    tp.parse(new StringReader(dl), JavaDLTheory.FORMULA, localServices, nss,
-                        new AbbrevMap());
+                KeyIO keyIO = new KeyIO(localServices, nss);
+                keyIO.setAbbrevMap(new AbbrevMap());
+                Term axiom = keyIO.parseExpression(CharStreams.fromString(dl));
+                if (!axiom.sort().extendsTrans(JavaDLTheory.FORMULA)) {
+                    throw new ParserException("Expected sort " + JavaDLTheory.FORMULA
+                        + ", but parser returns sort " + axiom.sort() + ".", null);
+                }
                 trans.addAxiom(SExprs.assertion(trans.translate(axiom)));
-            } catch (ParserException e) {
+            } catch (ParserException | BuildingException e) {
                 throw new SMTTranslationException("Error while translating snippet " + snipName, e);
             }
             snipName = name + DL_SUFFIX + "." + cnt;

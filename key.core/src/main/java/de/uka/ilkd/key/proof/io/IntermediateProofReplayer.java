@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.io;
 
-import java.io.StringReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,7 +17,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
@@ -51,6 +50,7 @@ import de.uka.ilkd.key.util.Levensthein;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionStateWithProgCnt;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
@@ -71,6 +71,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1000,13 +1001,19 @@ public class IntermediateProofReplayer {
      */
     public static JTerm parseTerm(String value, Proof proof, Namespace<QuantifiableVariable> varNS,
             Namespace<IProgramVariable> progVarNS, Namespace<Function> functNS) {
+        NamespaceSet nss = new NamespaceSet();
+        nss.setVariables(varNS);
+        nss.setFunctions(functNS);
+        nss.setSorts(proof.getNamespaces().sorts());
+        nss.setSortAliases(proof.getNamespaces().sortAliases());
+        nss.setParametricSorts(proof.getNamespaces().parametricSorts());
+        nss.setParametricFunctions(proof.getNamespaces().parametricFunctions());
+        nss.setProgramVariables(progVarNS);
         try {
-            return new DefaultTermParser().parse(new StringReader(value), null, proof.getServices(),
-                varNS, functNS, proof.getNamespaces().sorts(), proof.getNamespaces().sortAliases(),
-                proof.getNamespaces().parametricSorts(),
-                proof.getNamespaces().parametricFunctions(),
-                progVarNS, new AbbrevMap());
-        } catch (ParserException e) {
+            KeyIO keyIO = new KeyIO(proof.getServices(), nss);
+            keyIO.setAbbrevMap(new AbbrevMap());
+            return keyIO.parseExpression(CharStreams.fromString(value));
+        } catch (ParserException | BuildingException e) {
             throw new RuntimeException("Error while parsing the value \"" + value + "\".", e);
         }
     }

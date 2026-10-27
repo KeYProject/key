@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.gui.sourceview;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
@@ -220,8 +221,8 @@ public class TextLineNumber extends JPanel
         // Determine the rows to draw within the clipped bounds.
 
         Rectangle clip = g.getClipBounds();
-        int rowStartOffset = component.viewToModel(new Point(0, clip.y));
-        int endOffset = component.viewToModel(new Point(0, clip.y + clip.height));
+        int rowStartOffset = component.viewToModel2D(new Point(0, clip.y));
+        int endOffset = component.viewToModel2D(new Point(0, clip.y + clip.height));
 
         while (rowStartOffset <= endOffset) {
             try {
@@ -278,15 +279,15 @@ public class TextLineNumber extends JPanel
             throws BadLocationException {
         // Get the bounding rectangle of the row
 
-        Rectangle r = component.modelToView(rowStartOffset);
+        Rectangle2D r = component.modelToView2D(rowStartOffset);
         int lineHeight = fontMetrics.getHeight();
-        int y = r.y + r.height;
+        int y = (int) r.getY() + (int) r.getHeight();
         int descent = 0;
 
         // The text needs to be positioned above the bottom of the bounding
         // rectangle based on the descent of the font(s) contained on the row.
 
-        if (r.height == lineHeight) {
+        if ((int) r.getHeight() == lineHeight) {
             // default font is being used
             descent = fontMetrics.getDescent();
         } else {
@@ -369,12 +370,12 @@ public class TextLineNumber extends JPanel
         SwingUtilities.invokeLater(() -> {
             try {
                 int endPos = component.getDocument().getLength();
-                Rectangle rect = component.modelToView(endPos);
+                Rectangle2D rect = component.modelToView2D(endPos);
 
-                if (rect != null && rect.y != lastHeight) {
+                if (rect != null && (int) rect.getY() != lastHeight) {
                     setPreferredWidth();
                     repaint();
-                    lastHeight = rect.y;
+                    lastHeight = (int) rect.getY();
                 }
             } catch (BadLocationException ex) {
                 /* nothing to do */ }

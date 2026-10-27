@@ -5,7 +5,7 @@
 package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.*;
-import javax.swing.plaf.TextUI;
+import java.awt.geom.Rectangle2D;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
@@ -46,15 +46,15 @@ public class ErrorMarkPainter implements Highlighter.HighlightPainter {
             return;
         }
         try {
-            TextUI mapper = c.getUI();
-            Rectangle p0 = mapper.modelToView(c, offs0);
-            int x0 = p0.x;
+            Rectangle2D p0 = c.modelToView2D(offs0);
+            int x0 = (int) p0.getX();
             int x1;
             if (offs1 > offs0) {
-                Rectangle p1 = mapper.modelToView(c, offs1);
+                Rectangle2D p1 = c.modelToView2D(offs1);
                 // same line and to the right: use the real extent; otherwise (range crossed a line
                 // break, e.g. the span reached an end-of-line) fall back to a fixed width.
-                x1 = (p1.y == p0.y && p1.x > p0.x) ? p1.x : x0 + caretWidth(c);
+                x1 = ((int) p1.getY() == (int) p0.getY() && (int) p1.getX() > x0) ? (int) p1.getX()
+                        : x0 + caretWidth(c);
             } else {
                 // zero-width insertion point: a fixed one-character mark
                 x1 = x0 + caretWidth(c);
@@ -62,14 +62,14 @@ public class ErrorMarkPainter implements Highlighter.HighlightPainter {
             int width = Math.max(1, x1 - x0);
 
             g.setColor(fillColor);
-            g.fillRect(x0, p0.y, width, p0.height);
+            g.fillRect(x0, (int) p0.getY(), width, (int) p0.getHeight());
 
             g.setColor(lineColor);
             if (g instanceof Graphics2D g2) {
                 g2.setStroke(new BasicStroke(1f));
             }
             int two = squiggleSize * 2;
-            int y = p0.y + p0.height - squiggleSize;
+            int y = (int) p0.getY() + (int) p0.getHeight() - squiggleSize;
             for (int x = x0; x <= x1 - two; x += two) {
                 g.drawArc(x, y, squiggleSize, squiggleSize, 180, -180);
                 g.drawArc(x + squiggleSize, y, squiggleSize, squiggleSize, -180, 180);

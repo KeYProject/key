@@ -63,8 +63,9 @@ public final class JmlFacade {
      * is changed accordingly.
      */
     public static @NonNull JmlLexer createLexer(@NonNull PositionedString ps) {
+        URI fileUri = ps.getLocation().getFileUri();
         CharStream result = CharStreams.fromString(ps.text,
-            ps.getLocation().getFileURI().map(URI::toString).orElse(null));
+            fileUri != null ? fileUri.toString() : null);
         JmlLexer lexer = createLexer(result);
         Position pos = ps.getLocation().getPosition();
         if (!pos.isNegative()) {

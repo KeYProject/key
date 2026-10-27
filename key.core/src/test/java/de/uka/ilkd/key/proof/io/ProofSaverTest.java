@@ -31,7 +31,8 @@ class ProofSaverTest {
         Sequent seq = loader.parseFile().loadProblem().getProblem();
         final InitConfig initConfig =
             new InitConfig(new Services(AbstractProfile.getDefaultProfile()));
-        Proof proof = new Proof("test", seq, null, initConfig, null);
+        Proof proof = new Proof("test", seq, null, initConfig.createTacletIndex(),
+            initConfig.createBuiltInRuleIndex(), initConfig);
         Path file = Files.createTempFile("proofSaveTest", ".key");
         String status = new ProofSaver(proof, file).save();
         assertNull(status);
