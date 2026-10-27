@@ -61,6 +61,8 @@ public class ParserMessageTest {
         return data;
     }
 
+    // uses the deprecated Location#getFileURI() accessor of the legacy location API
+    @SuppressWarnings("deprecation")
     public ParserMessageTest(Path sourceDir) throws Exception {
         // retrieve the Java file contained in the given source directory:
 

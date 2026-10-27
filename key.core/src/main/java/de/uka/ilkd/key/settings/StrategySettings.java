@@ -105,6 +105,8 @@ public class StrategySettings extends AbstractSettings {
      *
      * @see de.uka.ilkd.key.gui.Settings#readSettings(java.util.Properties)
      */
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
+    @SuppressWarnings("deprecation")
     public void readSettings(Properties props) {
         String numString = props.getProperty("[" + CATEGORY + "]" + STEPS_KEY);
         String strategyString = props.getProperty("[" + CATEGORY + "]" + STRATEGY_KEY);
@@ -160,6 +162,8 @@ public class StrategySettings extends AbstractSettings {
      *
      * @see de.uka.ilkd.key.gui.Settings#writeSettings(java.util.Properties)
      */
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
+    @SuppressWarnings("deprecation")
     public void writeSettings(Properties props) {
         if (getStrategy() == null) {
             // It would be better to return the name of the default factory defined by the profile

@@ -65,6 +65,9 @@ public class MediatorProofControl extends AbstractProofControl {
      * {@inheritDoc}
      */
     @Override
+    // GeneralFailureEvent is deprecated in favor of IssueDialog, but switching would change
+    // the UI notification behavior for failed taclet applications.
+    @SuppressWarnings("deprecation")
     public boolean selectedTaclet(Taclet taclet, Goal goal,
             PosInOccurrence pos) {
         boolean result = super.selectedTaclet(taclet, goal, pos);

@@ -238,6 +238,8 @@ public class TestTerm {
      * Tests {@link TermImpl#containsJavaBlockRecursive()}.
      */
     @Test
+    // builds subterms with the deprecated ImmutableArray term-argument container
+    @SuppressWarnings("deprecation")
     public void testIsContainsJavaBlockRecursive() {
         JTerm noJB = tf.createTerm(Junctor.TRUE);
         JTerm noJBWithChild = tf.createTerm(Junctor.NOT, noJB);

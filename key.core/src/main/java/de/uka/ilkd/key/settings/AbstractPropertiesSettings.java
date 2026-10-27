@@ -88,6 +88,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         return properties != null;
     }
 
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
+    @SuppressWarnings("deprecation")
     @Override
     public void readSettings(Properties props) {
         propertyEntries.forEach(it -> {
@@ -98,6 +100,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         });
     }
 
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
+    @SuppressWarnings("deprecation")
     @Override
     public void writeSettings(Properties props) {
         for (PropertyEntry<?> entry : propertyEntries) {

@@ -188,6 +188,8 @@ public class TestTermParser extends AbstractTestTermParser {
     }
 
     @Test
+    // builds the substitution term with the deprecated ImmutableArray variable container
+    @SuppressWarnings("deprecation")
     public void test8() throws Exception {
         /* A bit like test7, but for a substitution term */
         // String s = "{\\subst elem xs; head(xs)} cons(xs,ys)"; weigl: not well-typed

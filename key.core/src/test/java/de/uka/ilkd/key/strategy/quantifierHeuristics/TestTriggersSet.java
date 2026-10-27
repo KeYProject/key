@@ -109,6 +109,7 @@ public class TestTriggersSet {
     }
 
     @BeforeEach
+    @SuppressWarnings("deprecation") // Proof.add and NamespaceSet ctor are deprecated
     public void setUp() {
         // sort
         r = new SortImpl(new Name("r"));
@@ -217,6 +218,7 @@ public class TestTriggersSet {
 
     }
 
+    @SuppressWarnings("deprecation") // NamespaceSet ctor is deprecated
     private JTerm parseTerm(String termstr) {
         return TacletForTests.parseTerm(termstr,
             new NamespaceSet(variables, functions, sorts, new Namespace<>(), new Namespace<>(),

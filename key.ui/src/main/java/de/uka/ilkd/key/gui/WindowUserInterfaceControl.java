@@ -406,6 +406,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param fileExtension the respective file extension
      * @return the saved proof as a file
      */
+    // GeneralFailureEvent is deprecated; the successor IssueDialog would bypass the configurable
+    // notification pipeline (NotificationManager/tasks), so keep the notification event here.
+    @SuppressWarnings("deprecation")
     public Path saveProof(Proof proof, String fileExtension) {
         final MainWindow mainWindow = MainWindow.getInstance();
         final KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose filename to save proof");
@@ -447,6 +450,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      *
      * @param proof the proof to save
      */
+    // GeneralFailureEvent is deprecated; the successor IssueDialog would bypass the configurable
+    // notification pipeline (NotificationManager/tasks), so keep the notification event here.
+    @SuppressWarnings("deprecation")
     public void saveProofBundle(Proof proof) {
         final MainWindow mainWindow = MainWindow.getInstance();
         final KeYFileChooser fileChooser =

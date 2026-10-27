@@ -187,6 +187,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
      *
      * @param m the mediator
      */
+    // InputEvent.CTRL_MASK is deprecated in favour of CTRL_DOWN_MASK, but switching the modifier
+    // set changes KeyStroke matching for these pre-existing bindings.
+    @SuppressWarnings("deprecation")
     public ProofTreeView(KeYMediator m) {
         proofListener = new GUIProofTreeProofListener();
         guiListener = new GUIProofTreeGUIListener();
