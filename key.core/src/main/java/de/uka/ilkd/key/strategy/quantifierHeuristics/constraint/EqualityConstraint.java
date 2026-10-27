@@ -92,9 +92,9 @@ public class EqualityConstraint implements Constraint {
 
     @Override
     protected synchronized Object clone() {
-        EqualityConstraint res = new EqualityConstraint((HashMap<Metavariable, JTerm>) map.clone());
-        res.instantiationCache = instantiationCache == null ? null
-                : (HashMap<Metavariable, JTerm>) instantiationCache.clone();
+        EqualityConstraint res = new EqualityConstraint(new HashMap<>(map));
+        res.instantiationCache =
+            instantiationCache == null ? null : new HashMap<>(instantiationCache);
         return res;
     }
 
@@ -580,7 +580,7 @@ public class EqualityConstraint implements Constraint {
         if (modifyThis) {
             return this;
         }
-        return new EqualityConstraint((HashMap<Metavariable, JTerm>) map.clone());
+        return new EqualityConstraint(new HashMap<>(map));
     }
 
     /**

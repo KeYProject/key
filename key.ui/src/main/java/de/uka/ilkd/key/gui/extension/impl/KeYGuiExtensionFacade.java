@@ -241,7 +241,7 @@ public final class KeYGuiExtensionFacade {
      * @param mediator the KeY mediator
      * @return populated context menu
      */
-    public static JPopupMenu createContextMenu(ContextMenuKind kind, Object underlyingObject,
+    public static <T> JPopupMenu createContextMenu(ContextMenuKind<T> kind, T underlyingObject,
             KeYMediator mediator) {
         JPopupMenu menu = new JPopupMenu();
         if (underlyingObject instanceof Proof proof) {
