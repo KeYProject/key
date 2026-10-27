@@ -123,7 +123,7 @@ public final class CostReuse {
         final ConditionalEligibility cached = cache.get(taclet);
         if (cached instanceof ConditionalEligibility c &&
                 c.strategy() == strategy) { // cached result only valid if strategy did not change
-            return c.verdict() == INELIGIBLE ? null : (Eligibility) c.verdict();
+            return c.verdict() == INELIGIBLE ? null : c.verdict();
         }
         final Eligibility res = classify(disp, taclet);
         cache.put(taclet, new ConditionalEligibility(strategy, res == null ? INELIGIBLE : res));
