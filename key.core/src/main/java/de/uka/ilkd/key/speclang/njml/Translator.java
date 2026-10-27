@@ -289,6 +289,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
 
+    @SuppressWarnings("unchecked") // the parser visitor returns Object; T is the caller-chosen
+    // target type of the appended element
     private <T> ImmutableList<T> append(ImmutableList<T> by, ParserRuleContext ctx) {
         return by.append((T) accept(ctx));
     }
@@ -335,6 +337,8 @@ class Translator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
+    @SuppressWarnings("unchecked") // the visitor API is untyped; the store-ref list is built as
+    // Iterable<JTerm> by visitStoreRefList
     public Object visitStoreRefIntersect(JmlParser.StoreRefIntersectContext ctx) {
         return tb.intersect((Iterable<JTerm>) requireNonNull(accept(ctx.storeRefList())));
     }

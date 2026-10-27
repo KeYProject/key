@@ -70,6 +70,7 @@ public final class ArrayUtil {
         return result;
     }
 
+    @SuppressWarnings("unchecked") // component type is obtained reflectively from the array
     private static <T extends @Nullable Object> Class<? extends T> getComponentType(T[] array) {
         Class<? extends Object[]> arrayClass = array.getClass();
         assert arrayClass.isArray() : "@AssumeAssertion(nullness): This is always the case";
@@ -206,7 +207,8 @@ public final class ArrayUtil {
      * @param toRemove The element to remove.
      * @return A copy of the array without the element toRemove.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "cast" })
+    // the explicit (T[]) cast on the toArray result is required by the nullness checker
     public static <T extends @Nullable Object> T @NonNull [] remove(@Nullable T @NonNull [] array,
             T toRemove) {
         List<@Nullable T> result = new LinkedList<>();

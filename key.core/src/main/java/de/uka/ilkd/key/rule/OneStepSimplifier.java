@@ -226,7 +226,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
 
     /** A fresh, empty per-worker not-simplifiable cache (one {@link LRU} map per rule set). */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" }) // raw LRU[] array creation + unchecked cast
     private static ThreadLocal<LRU<JTerm, JTerm>[]> newNotSimplifiableCaches() {
         return ThreadLocal.withInitial(() -> {
             final LRU<JTerm, JTerm>[] caches = (LRU<JTerm, JTerm>[]) new LRU[ruleSets.size()];
@@ -666,6 +666,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
 
     @Override
+    @SuppressWarnings("unchecked") // assumesInsts() returns a raw ImmutableList
     public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
 
         assert ruleApp instanceof OneStepSimplifierRuleApp

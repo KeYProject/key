@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 
 public class PerfScope {
     private static final Logger LOGGER = LoggerFactory.getLogger(PerfScope.class);
+    @SuppressWarnings({ "unchecked", "rawtypes" }) // generic array creation requires the raw Pair
+    // array type; the element type Pair<String, AtomicLong> is fixed by the initializer
     private static final Pair<String, AtomicLong>[] PERF_COUNTERS = new Pair[] {
         new Pair<>("JavaCardDLStrategy approve", JavaCardDLStrategy.PERF_APPROVE),
         new Pair<>("JavaCardDLStrategy instantiate", JavaCardDLStrategy.PERF_INSTANTIATE),

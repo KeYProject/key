@@ -742,7 +742,8 @@ public class TacletGenerator {
     }
 
 
-    @SuppressWarnings("unused")
+    @SuppressWarnings({ "unused", "unchecked", "varargs" }) // the parameterized pair varargs are
+    // only enumerated, never stored or exposed, so no heap pollution can occur
     private TermAndBoundVarPair createSchemaTerm(JTerm term, TermServices services,
             Pair<LocationVariable, JOperatorSV>... varPairs) {
         ImmutableList<LocationVariable> progVars = ImmutableList.nil();

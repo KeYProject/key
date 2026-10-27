@@ -305,16 +305,18 @@ public abstract class StaticFeatureCollection {
         return TermConstructionProjection.create(op, subTerms);
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" }) // building a generic array is inherently
+                                                   // unchecked
     protected static ProjectionToTerm<Goal> opTerm(Operator op,
             ProjectionToTerm<Goal> subTerm) {
-        // noinspection unchecked
         return opTerm(op, new ProjectionToTerm[] { subTerm });
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" }) // building a generic array is inherently
+                                                   // unchecked
     protected static ProjectionToTerm<Goal> opTerm(Operator op,
             ProjectionToTerm<Goal> subTerm0,
             ProjectionToTerm<Goal> subTerm1) {
-        // noinspection unchecked
         return opTerm(op, new ProjectionToTerm[] { subTerm0, subTerm1 });
     }
 

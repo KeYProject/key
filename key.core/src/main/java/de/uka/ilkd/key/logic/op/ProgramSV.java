@@ -257,6 +257,8 @@ public final class ProgramSV extends JOperatorSV
      * @return the updated match conditions including mapping <code>var</code> to <code>list</code>
      *         or null if some variable condition would be hurt by the mapping
      */
+    @SuppressWarnings("unchecked") // the stored instantiation was put with this schema variable's
+    // element type; the runtime element type of insts cannot be checked statically
     private MatchConditions addProgramInstantiation(ImmutableList<ProgramElement> list,
             MatchConditions matchCond,
             Services services) {

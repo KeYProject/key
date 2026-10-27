@@ -108,6 +108,7 @@ public class IsabelleHandlerServices {
         Collection<IsabelleHandler> result = new LinkedList<>();
         for (String name : handlerNames) {
             try {
+                @SuppressWarnings("unchecked") // class name comes from our own handler registry
                 Class<IsabelleHandler> handlerClass = (Class<IsabelleHandler>) Class.forName(name);
                 if (findHandler(handlerClass, result)) {
                     continue;

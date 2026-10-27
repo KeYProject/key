@@ -43,6 +43,8 @@ public class QuantifierHandler implements SMTHandler {
     }
 
     @Override
+    @SuppressWarnings("unchecked") // the bound-variable list cast relies on the quantifier term's
+    // invariant that boundVars() contains QuantifiableVariable elements
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         term = collectQuantifications(term);
 
@@ -96,6 +98,8 @@ public class QuantifierHandler implements SMTHandler {
         term.subs().forEach(x -> collectTriggers(x, triggers));
     }
 
+    @SuppressWarnings("unchecked") // boundVars() is guaranteed to contain QuantifiableVariable
+    // elements by the quantifier invariant
     private Term collectQuantifications(Term term) {
         final var type = term.op();
         assert type == Quantifier.ALL || type == Quantifier.EX;

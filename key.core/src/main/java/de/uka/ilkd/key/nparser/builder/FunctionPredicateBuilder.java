@@ -49,6 +49,9 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
     }
 
     @Override
+    @SuppressWarnings("unchecked") // mapMapOf's parameterized varargs (List<? extends
+    // RuleContext>...) trigger a generic-array-creation warning that cannot be silenced at the
+    // helper (protected, non-final => no @SafeVarargs)
     public Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         mapMapOf(ctx.pred_decls(), ctx.func_decls(), ctx.transform_decls(), ctx.datatype_decls());
         return null;

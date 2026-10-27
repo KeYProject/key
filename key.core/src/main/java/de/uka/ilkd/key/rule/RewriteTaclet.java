@@ -37,6 +37,8 @@ import org.jspecify.annotations.NonNull;
  * matter where it occurs. The only constraint to be fulfilled is that the term matches the
  * structure described by the term of the find-part.
  */
+@SuppressWarnings({ "unchecked", "rawtypes" }) // inherits the deliberately raw getExecutor(), see
+                                               // Taclet
 public class RewriteTaclet extends FindTaclet {
 
     /**

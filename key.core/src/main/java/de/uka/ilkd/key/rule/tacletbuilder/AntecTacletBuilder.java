@@ -96,6 +96,8 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet> {
         return t;
     }
 
+    @SuppressWarnings("unchecked") // the cloned map preserves HashMap<TacletGoalTemplate,
+    // ChoiceExpr>; the clone() API only exposes Object
     @Override
     public AntecTacletBuilder copy() {
         var rb = new AntecTacletBuilder().setFind((Sequent) getFind());
