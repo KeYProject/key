@@ -31,8 +31,8 @@ public class LoopInvariantRuleCompletion implements InteractiveRuleApplicationCo
         // fixing #1090: Local variables must be accessible
         services = services.getOverlay(goal.getLocalNamespaces());
 
-        LoopInvariantBuiltInRuleApp loopApp =
-            ((LoopInvariantBuiltInRuleApp) app).tryToInstantiate(goal);
+        LoopInvariantBuiltInRuleApp<?> loopApp =
+            ((LoopInvariantBuiltInRuleApp<?>) app).tryToInstantiate(goal);
 
         // leading update?
         JTerm progPost = loopApp.programTerm();

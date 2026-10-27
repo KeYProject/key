@@ -272,7 +272,7 @@ public class TransformationPipelineServices {
     public NodeList<Statement> getInitializers(ClassOrInterfaceDeclaration cd) {
         NodeList<Statement> result = new NodeList<>();
         int objectInitializerCount = 0;
-        for (BodyDeclaration<?> member : cd.getMembers().toArray(new BodyDeclaration[0])) {
+        for (BodyDeclaration<?> member : cd.getMembers().toArray(new BodyDeclaration<?>[0])) {
             if (member instanceof InitializerDeclaration init &&
                     !init.isStatic()) {
                 String name =

@@ -127,7 +127,7 @@ public class PrepareObjectBuilder extends JavaTransformerAbstract {
      *        <code>&lt;prepare&gt;</code> is created
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
-    public MethodDeclaration createMethod(TypeDeclaration type) {
+    public MethodDeclaration createMethod(TypeDeclaration<?> type) {
         NodeList<Modifier> modifiers =
             new NodeList<Modifier>(new Modifier(Modifier.DefaultKeyword.PROTECTED));
         MethodDeclaration md = new MethodDeclaration(modifiers,

@@ -33,8 +33,8 @@ public class BlockContractExternalCompletion implements InteractiveRuleApplicati
     @Override
     public IBuiltInRuleApp complete(final IBuiltInRuleApp application, final Goal goal,
             final boolean force) {
-        BlockContractExternalBuiltInRuleApp result =
-            (BlockContractExternalBuiltInRuleApp) application;
+        BlockContractExternalBuiltInRuleApp<?> result =
+            (BlockContractExternalBuiltInRuleApp<?>) application;
         if (!result.complete() && result.cannotComplete(goal)) {
             return result;
         }
