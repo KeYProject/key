@@ -78,7 +78,7 @@ public final class SwingUtil {
         for (int i = 0; i < container.getComponentCount(); i++) {
             var c = container.getComponent(i);
             if (c.getClass().equals(classToFind)) {
-                return (T) c;
+                return classToFind.cast(c);
             } else if (c instanceof Container) {
                 var f = findComponent((Container) c, classToFind);
                 if (f != null) {
@@ -109,7 +109,7 @@ public final class SwingUtil {
             }
 
             if (classToFind.isAssignableFrom(c.getClass())) {
-                l.add((T) c);
+                l.add(classToFind.cast(c));
             } else if (c instanceof Container) {
                 var f = findAllComponents((Container) c, classToFind);
                 l.addAll(f);
@@ -129,7 +129,7 @@ public final class SwingUtil {
                                 newQ.add((JMenu) item);
                             }
                             if (classToFind.isAssignableFrom(item.getClass())) {
-                                l.add((T) item);
+                                l.add(classToFind.cast(item));
                             }
                         }
                     }

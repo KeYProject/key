@@ -33,8 +33,8 @@ public class LoopContractInternalCompletion implements InteractiveRuleApplicatio
     @Override
     public IBuiltInRuleApp complete(final IBuiltInRuleApp application, final Goal goal,
             final boolean force) {
-        LoopContractInternalBuiltInRuleApp result =
-            (LoopContractInternalBuiltInRuleApp) application;
+        LoopContractInternalBuiltInRuleApp<?> result =
+            (LoopContractInternalBuiltInRuleApp<?>) application;
         if (!result.complete() && result.cannotComplete(goal)) {
             return result;
         }

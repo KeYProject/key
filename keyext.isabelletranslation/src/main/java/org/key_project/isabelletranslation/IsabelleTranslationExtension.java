@@ -56,8 +56,8 @@ public class IsabelleTranslationExtension implements KeYGuiExtension, KeYGuiExte
     };
 
     @Override
-    public @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
-            @NonNull ContextMenuKind kind, @NonNull Object underlyingObject) {
+    public <T> @NonNull List<Action> getContextActions(@NonNull KeYMediator mediator,
+            @NonNull ContextMenuKind<T> kind, @NonNull T underlyingObject) {
         return adapter.getContextActions(mediator, kind, underlyingObject);
     }
 
