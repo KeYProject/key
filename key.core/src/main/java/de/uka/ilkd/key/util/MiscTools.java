@@ -46,8 +46,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.Filenames;
-import org.key_project.util.Strings;
 import org.key_project.util.collection.*;
+import org.key_project.util.java.StringUtil;
 
 import org.jspecify.annotations.Nullable;
 
@@ -398,7 +398,7 @@ public final class MiscTools {
      * @return the answer to the question specified above
      */
     public static boolean containsWholeWord(String s, String word) {
-        return Strings.containsWholeWord(s, word);
+        return StringUtil.containsWholeWord(s, word);
     }
 
     /**
@@ -406,7 +406,7 @@ public final class MiscTools {
      * reference manual.
      */
     public static boolean isJMLComment(String comment) {
-        return Strings.isJMLComment(comment);
+        return StringUtil.isJMLComment(comment);
     }
 
     /**
@@ -785,6 +785,9 @@ public final class MiscTools {
      * @throws MalformedURLException if the string can not be converted to URL because of an unknown
      *         protocol or illegal format
      */
+    // the lenient URL constructor is kept for the URL and default cases: it accepts Windows
+    // paths (with backslashes) that the strict URI parser rejects
+    @SuppressWarnings("deprecation")
     public static URL parseURL(final String input) throws MalformedURLException {
         if (input == null) {
             throw new NullPointerException("No URL can be created from null!");

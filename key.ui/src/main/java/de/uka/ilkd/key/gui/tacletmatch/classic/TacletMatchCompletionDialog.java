@@ -607,7 +607,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
                                 if (droppedString != null) {
 
-                                    int pos = textarea.viewToModel(event.getLocation());
+                                    int pos = textarea.viewToModel2D(event.getLocation());
                                     textarea.insert(droppedString, pos);
                                 }
                                 event.getDropTargetContext().dropComplete(true);
@@ -622,7 +622,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                             try {
                                 String droppedString =
                                     (String) transferable.getTransferData(DataFlavor.stringFlavor);
-                                int pos = textarea.viewToModel(event.getLocation());
+                                int pos = textarea.viewToModel2D(event.getLocation());
                                 textarea.insert(droppedString, pos);
                                 event.getDropTargetContext().dropComplete(true);
                             } catch (UnsupportedFlavorException | IOException e) {

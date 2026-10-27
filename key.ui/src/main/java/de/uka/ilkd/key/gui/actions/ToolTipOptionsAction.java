@@ -7,7 +7,7 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.configuration.ViewSelector;
+import de.uka.ilkd.key.gui.settings.SettingsManager;
 
 public class ToolTipOptionsAction extends MainWindowAction {
 
@@ -23,7 +23,7 @@ public class ToolTipOptionsAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        ViewSelector vselector = new ViewSelector(mainWindow);
-        vselector.setVisible(true);
+        SettingsManager.getInstance().showSettingsDialog(mainWindow,
+            SettingsManager.STANDARD_UI_SETTINGS);
     }
 }

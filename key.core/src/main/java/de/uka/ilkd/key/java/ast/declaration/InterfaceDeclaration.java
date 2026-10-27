@@ -51,6 +51,8 @@ public class InterfaceDeclaration extends TypeDeclaration {
     }
 
     public InterfaceDeclaration() {
+        super(null, null, new ImmutableArray<>(), null, null, null, false, false,
+            ImmutableList.nil());
         extending = null;
     }
 
