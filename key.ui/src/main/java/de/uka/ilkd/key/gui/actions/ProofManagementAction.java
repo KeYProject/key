@@ -59,6 +59,9 @@ public final class ProofManagementAction extends MainWindowAction {
         showProofManagement();
     }
 
+    // GeneralFailureEvent is deprecated; the successor IssueDialog would bypass the configurable
+    // notification pipeline (NotificationManager/tasks), so keep the notification event here.
+    @SuppressWarnings("deprecation")
     private void showProofManagement() {
         if (getMediator().getSelectedProof() == null) {
             mainWindow.notify(new GeneralFailureEvent("Please load a proof first"));

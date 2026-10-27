@@ -375,6 +375,7 @@ public final class OneStepSimplifier implements BuiltInRule {
      *
      * @param protocol
      */
+    @SuppressWarnings("deprecation") // TermLabelManager.instantiateLabels returns ImmutableArray
     private JTerm replaceKnownHelper(
             Map<TermReplacementKey, PosInOccurrence> map, JTerm in,
             boolean inAntecedent,
