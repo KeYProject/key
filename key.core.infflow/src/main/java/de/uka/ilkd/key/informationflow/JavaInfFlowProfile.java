@@ -15,6 +15,8 @@ import org.key_project.util.collection.ImmutableList;
 /**
  * This profile sets up KeY for verification of JavaCard programs.
  */
+@SuppressWarnings("unchecked") // AbstractProfile's concrete overrides of Profile's generic
+                               // goal-chooser-builder methods are flagged as unchecked here
 public class JavaInfFlowProfile extends JavaProfile {
     public static final String NAME = "Java InfFlow Profile";
     public static final String PROFILE_ID = "java-infflow";

@@ -79,11 +79,13 @@ public class DirectedGraph<V, E extends GraphEdge> implements Graph<V, E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked") // edges are only created with vertices of type V (see addEdge)
     public V getEdgeSource(E edge) {
         return (V) edge.getSource();
     }
 
     @Override
+    @SuppressWarnings("unchecked") // edges are only created with vertices of type V (see addEdge)
     public V getEdgeTarget(E edge) {
         return (V) edge.getTarget();
     }

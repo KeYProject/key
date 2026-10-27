@@ -23,6 +23,9 @@ import org.jspecify.annotations.NullMarked;
  * @version 1 (8/7/25)
  */
 @NullMarked
+@SuppressWarnings("unchecked") // createApp(String) is a non-generic override of the interface's
+                               // generic method; the AbstractExternalSolverRuleApp casts below are
+                               // unchecked by design
 public class IsabelleRule implements ExternalSolverRule {
     public static final IsabelleRule INSTANCE = new IsabelleRule();
 

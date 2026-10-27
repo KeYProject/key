@@ -204,7 +204,8 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
 
     /** Fresh, empty not-simplifiable caches, one per rule set. */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" }) // raw GenerationalCache[] array creation +
+                                                   // unchecked cast
     private static GenerationalCache<JTerm, JTerm>[] newNotSimplifiableCaches() {
         final GenerationalCache<JTerm, JTerm>[] caches =
             (GenerationalCache<JTerm, JTerm>[]) new GenerationalCache[ruleSets.size()];
@@ -639,6 +640,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
 
     @Override
+    @SuppressWarnings("unchecked") // assumesInsts() returns a raw ImmutableList
     public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
 
         assert ruleApp instanceof OneStepSimplifierRuleApp
