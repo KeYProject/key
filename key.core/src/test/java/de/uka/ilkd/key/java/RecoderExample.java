@@ -62,6 +62,8 @@ public class RecoderExample {
      * @param prg
      *        the Statementblock to be transformed
      */
+    // the legacy ImmutableArray type (as returned by getBody()) is used on purpose
+    @SuppressWarnings("deprecation")
     public StatementBlock transform(StatementBlock prg) {
         ExtList newBody = new ExtList();
 

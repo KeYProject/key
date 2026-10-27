@@ -1754,6 +1754,9 @@ public final class MainWindow extends JFrame {
             return false;
         }
 
+        // getModifiers() is deliberately kept: getModifiersEx() would freeze the stop button
+        // while the modal state is active (see comment on the call below).
+        @SuppressWarnings("deprecation")
         private void dispatchForCurrentComponent(MouseEvent e) {
             Point glassPanePoint = e.getPoint();
             Point componentPoint =

@@ -320,6 +320,7 @@ public class JavaService {
      * @param repo the repo to use for reading
      * @return a list of KeY structured compilation units.
      */
+    @SuppressWarnings("deprecation") // JavaLogger.print is deprecated; used for AST diagnostics
     public List<de.uka.ilkd.key.java.ast.CompilationUnit> readCompilationUnits(
             Path parent,
             Collection<Path> files, FileRepo repo)
