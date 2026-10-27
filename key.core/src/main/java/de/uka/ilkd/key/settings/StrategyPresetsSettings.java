@@ -60,12 +60,12 @@ public class StrategyPresetsSettings extends AbstractSettings {
      */
     public record StrategyPreset(String name, int maxSteps, StrategyProperties properties) {
         public StrategyPreset {
-            properties = (StrategyProperties) properties.clone();
+            properties = properties.clone();
         }
 
         @Override
         public StrategyProperties properties() {
-            return (StrategyProperties) properties.clone();
+            return properties.clone();
         }
     }
 

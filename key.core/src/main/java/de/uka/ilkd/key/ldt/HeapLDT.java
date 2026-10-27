@@ -262,7 +262,7 @@ public final class HeapLDT extends LDT {
     public @NonNull ParametricFunctionInstance getFinal(@NonNull Sort instanceSort,
             @NonNull Services services) {
         return ParametricFunctionInstance.get(finalFunction,
-            ImmutableList.of(new GenericArgument(instanceSort)), (Services) services);
+            ImmutableList.of(new GenericArgument(instanceSort)), services);
     }
 
     /**

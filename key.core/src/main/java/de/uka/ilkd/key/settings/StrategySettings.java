@@ -232,7 +232,7 @@ public class StrategySettings extends AbstractSettings {
      * returns a shallow copy of the strategy properties
      */
     public StrategyProperties getActiveStrategyProperties() {
-        return (StrategyProperties) strategyProperties.clone();
+        return strategyProperties.clone();
     }
 
     /**
@@ -251,7 +251,7 @@ public class StrategySettings extends AbstractSettings {
      */
     public void setActiveStrategyProperties(StrategyProperties p) {
         var old = this.strategyProperties;
-        this.strategyProperties = (StrategyProperties) p.clone();
+        this.strategyProperties = p.clone();
         firePropertyChange(PROP_STRATEGY_PROPERTIES, old, this.strategyProperties);
     }
 

@@ -64,7 +64,7 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
             StrategyProperties properties) {
         super(proof);
         strategies.addAll(componentStrategies);
-        this.strategyProperties = (StrategyProperties) properties.clone();
+        this.strategyProperties = properties.clone();
         this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
 
         responsibleStrategyCache = new ResponsibleStrategyCache(strategies);

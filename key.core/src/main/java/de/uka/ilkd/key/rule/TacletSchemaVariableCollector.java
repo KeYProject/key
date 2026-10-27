@@ -111,7 +111,7 @@ public class TacletSchemaVariableCollector implements DefaultVisitor {
             varList = varList.prepend((SchemaVariable) op);
         }
 
-        for (TermLabel label : ((JTerm) visited).getLabels()) {
+        for (TermLabel label : visited.getLabels()) {
             if (label instanceof TermLabelSV) {
                 varList = varList.prepend((SchemaVariable) label);
             }
