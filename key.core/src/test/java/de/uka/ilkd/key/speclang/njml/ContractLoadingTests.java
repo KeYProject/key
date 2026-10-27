@@ -17,7 +17,6 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,12 +59,13 @@ public class ContractLoadingTests {
     }
 
     /**
-     * Disabled: the fixtures rely on `spec_*_math` JML modifiers (class-level
-     * spec_java_math and method-level spec_bigint_math). JMLtk does not accept
-     * these tokens, so the files cannot be parsed by the new front-end.
-     * TODO(parity): re-express math modes in a JMLtk-compatible way.
+     * The fixtures rely on class-level {@code spec_java_math}/{@code spec_bigint_math} JML
+     * pragmas (JMLtk parses them as JML modifiers, KeY maps them to {@code ModifierKind}
+     * {@code JML_SPEC_*}, and {@code JMLInfoExtractor} turns them into the spec math mode),
+     * on model methods with inline {@code spec_*_math} modifiers, and on method-level JML
+     * modifier pragmas. The math mode drives overload resolution of
+     * {@code Test.accept(1 + 2)} between {@code accept(int)} and {@code accept(\bigint)}.
      */
-    @Disabled
     @Test
     public void specMathJavaMathTest() throws ProblemLoaderException {
         final Path javaFile =
@@ -75,7 +75,6 @@ public class ContractLoadingTests {
         Assertions.assertFalse(file.getProofContracts().isEmpty());
     }
 
-    @Disabled("See specMathJavaMathTest: spec_*_math modifiers are not accepted by JMLtk")
     @Test
     public void specMathBigintMathTest() throws ProblemLoaderException {
         final Path javaFile =
