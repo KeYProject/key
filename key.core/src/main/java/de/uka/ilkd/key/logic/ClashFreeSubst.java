@@ -86,7 +86,8 @@ public class ClashFreeSubst {
     private JTerm applyOnSubterms(JTerm t) {
         final int arity = t.arity();
         final JTerm[] newSubterms = new JTerm[arity];
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({ "unchecked", "rawtypes" }) // raw new ImmutableArray[...] array +
+                                                       // unchecked cast
         final ImmutableArray<QuantifiableVariable>[] newBoundVars = new ImmutableArray[arity];
         for (int i = 0; i < arity; i++) {
             applyOnSubterm(t, i, newSubterms, newBoundVars);

@@ -67,6 +67,8 @@ public class SeqDefHandler implements SMTHandler {
     }
 
     @Override
+    @SuppressWarnings("unchecked") // the translation state is a heterogeneous map; the entry
+    // created for SEQDEF_MAP is always a Map<Term, SExpr>
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         var op = term.op();
 

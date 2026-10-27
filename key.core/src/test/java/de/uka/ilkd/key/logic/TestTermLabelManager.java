@@ -590,6 +590,8 @@ public class TestTermLabelManager {
         assertSame(manager, managerAgain);
     }
 
+    // the anonymous JavaProfile below overrides the generic Profile hook methods with raw types
+    @SuppressWarnings("unchecked")
     protected InitConfig createTestServices(final TermLabelPolicy applicationTermPolicy,
             final TermLabelPolicy modalityTermPolicy, final ChildTermLabelPolicy directChildPolicy,
             final ChildTermLabelPolicy childAndGrandchildPolicy, final TermLabelUpdate update,
@@ -844,6 +846,9 @@ public class TestTermLabelManager {
         }
     }
 
+    // raw-type handling of the generic Rule interface; getExecutor() overrides
+    // <G>RuleExecutor<G>getExecutor() with a concrete goal type
+    @SuppressWarnings("unchecked")
     private static class DummyRule implements Rule {
         private final String name;
 

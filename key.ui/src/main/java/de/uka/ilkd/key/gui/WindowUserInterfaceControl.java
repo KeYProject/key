@@ -176,6 +176,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         SwingUtilities.invokeLater(() -> taskFinishedInternal(info));
     }
 
+    // info.getResult() is only an ApplyStrategyInfo for ProverCore sources; cast is safe here.
+    @SuppressWarnings("unchecked")
     private void taskFinishedInternal(TaskFinishedInfo info) {
         if (info != null && info.getSource() instanceof ProverCore) {
             if (!isAtLeastOneMacroRunning()) {

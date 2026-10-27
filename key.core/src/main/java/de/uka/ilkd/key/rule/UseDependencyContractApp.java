@@ -34,6 +34,7 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
         this(builtInRule, pio, ImmutableList.nil(), instantiation, step);
     }
 
+    @SuppressWarnings("unchecked") // the type parameter T is only used for the raw super call
     public UseDependencyContractApp(UseDependencyContractRule rule, PosInOccurrence pio,
             ImmutableList<PosInOccurrence> ifInsts, Contract contract,
             PosInOccurrence step) {

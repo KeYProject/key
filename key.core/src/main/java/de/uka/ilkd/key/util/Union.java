@@ -96,6 +96,7 @@ public record Union<A, B>(Object value, boolean isFirst) {
      *
      * @return the stored value, may be null
      */
+    @SuppressWarnings("unchecked") // the stored value is an A iff isFirst, tested above
     public A getFirst() {
         if (isFirst) {
             return (A) value;
@@ -111,6 +112,7 @@ public record Union<A, B>(Object value, boolean isFirst) {
      *
      * @return the stored value, may be null
      */
+    @SuppressWarnings("unchecked") // the stored value is a B iff !isFirst, tested above
     public B getSecond() {
         if (!isFirst) {
             return (B) value;
@@ -127,6 +129,7 @@ public record Union<A, B>(Object value, boolean isFirst) {
      * @param <C> the result type of function
      * @return a fresh union object
      */
+    @SuppressWarnings("unchecked") // the value is untouched; only the type parameter changes
     public <C> Union<C, B> mapFirst(Function<A, C> function) {
         if (isFirst()) {
             return fromFirst(function.apply(getFirst()));
@@ -143,6 +146,7 @@ public record Union<A, B>(Object value, boolean isFirst) {
      * @param <C> the result type of function
      * @return a fresh union object
      */
+    @SuppressWarnings("unchecked") // the value is untouched; only the type parameter changes
     public <C> Union<A, C> mapSecond(Function<B, C> function) {
         if (isSecond()) {
             return fromSecond(function.apply(getSecond()));

@@ -26,6 +26,8 @@ public class ImplicitCastNecessary<Goal extends ProofGoal<@NonNull Goal>> extend
     }
 
     @Override
+    @SuppressWarnings("unchecked") // the goal is the class-bound Goal; the feature's G type
+    // parameter is a proof-goal subtype used for interface compatibility
     protected <G extends ProofGoal<@NonNull G>> boolean filter(RuleApp app, PosInOccurrence pos,
             G goal, MutableState mState) {
         assert pos != null && pos.depth() >= 1;

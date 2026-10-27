@@ -41,6 +41,7 @@ public class LetFeature<Goal extends ProofGoal<@NonNull Goal>> implements Featur
     }
 
     @Override
+    @SuppressWarnings("unchecked") // G is used only through the erasure ProofGoal here
     public <G extends @NonNull ProofGoal<G>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, G goal,
             MutableState mState) {

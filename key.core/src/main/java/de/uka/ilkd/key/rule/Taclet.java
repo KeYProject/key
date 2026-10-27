@@ -77,6 +77,12 @@ import org.jspecify.annotations.NonNull;
  * {@link TacletApp TacletApp}
  * </p>
  */
+// The non-generic executor override (see getExecutor()) necessarily deviates from the generic
+// Rule.getExecutor() contract: callers chain getExecutor().apply(...) and rely on the raw
+// RuleExecutor type (inference through the chain fails with a generic signature, e.g. in
+// TestApplyTaclet). Method-scope suppression cannot silence unchecked-override warnings, so the
+// unchecked/rawtypes warnings are suppressed at class level.
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public abstract class Taclet extends org.key_project.prover.rules.Taclet implements Rule {
     /**
      * This map contains (a, b) if there is a substitution {b a} somewhere in this taclet

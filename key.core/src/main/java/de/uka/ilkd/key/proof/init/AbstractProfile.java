@@ -27,6 +27,10 @@ import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
 
+// AbstractProfile specializes Profile's generically-declared goal-chooser builders to
+// Proof/Goal; the resulting unchecked-override warnings cannot be suppressed on the methods
+// (see the analogous note on Taclet), hence the class-level suppression.
+@SuppressWarnings("unchecked")
 public abstract class AbstractProfile implements Profile {
     /**
      * The default profile which is used if no profile is defined in custom problem files (loaded

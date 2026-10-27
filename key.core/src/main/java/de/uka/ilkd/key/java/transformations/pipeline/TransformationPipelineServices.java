@@ -300,6 +300,8 @@ public class TransformationPipelineServices {
         return result;
     }
 
+    @SuppressWarnings("unchecked") // Node.clone() erases the element type; N is the caller-chosen
+    // element type and cannot be verified statically
     public static <N extends Node> NodeList<N> cloneList(NodeList<N> list) {
         if (list == null) {
             return null;

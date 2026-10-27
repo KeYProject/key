@@ -96,6 +96,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return doLookup(n, lookups);
     }
 
+    @SuppressWarnings("unchecked") // the namespace lookup is untyped; T is the caller-chosen
+    // target type and enforced by the try/catch ClassCastException below
     protected <T> T doLookup(Name n, Namespace<?>... lookups) {
         for (Namespace<?> lookup : lookups) {
             Object l;

@@ -40,6 +40,8 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * class tests the apply methods in Taclet
  */
+@SuppressWarnings("unchecked") // pervasive: every test method calls the raw TacletExecutor
+                               // returned by Taclet#getExecutor()/TacletApp#rule()
 public class TestApplyTaclet {
 
     final static String[] strs = {

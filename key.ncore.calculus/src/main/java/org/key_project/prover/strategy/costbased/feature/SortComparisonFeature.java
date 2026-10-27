@@ -37,6 +37,7 @@ public class SortComparisonFeature<Goal extends ProofGoal<@NonNull Goal>>
     }
 
     @Override
+    @SuppressWarnings("unchecked") // G is used only through the erasure ProofGoal here
     protected <G extends ProofGoal<@NonNull G>> boolean filter(RuleApp app, PosInOccurrence pos,
             G goal, MutableState mState) {
         final Term term1 = s1.toTerm(app, pos, (Goal) goal, mState);
