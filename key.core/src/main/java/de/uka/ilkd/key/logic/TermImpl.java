@@ -472,6 +472,8 @@ class TermImpl implements JTerm {
     }
 
     @Override
+    @SuppressWarnings({ "varargs", "unchecked" }) // the V... parameter is unused and never
+    // dereferenced, so no heap pollution can occur from the parameterized vararg
     public <V> boolean equalsModProperty(Object o, Property<? super JTerm> property, V... v) {
         if (!(o instanceof JTerm other)) {
             return false;
