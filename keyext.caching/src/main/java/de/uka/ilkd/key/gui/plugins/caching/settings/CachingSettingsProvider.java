@@ -65,6 +65,7 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
     /**
      * Construct a new settings provider.
      */
+    // Swing glue: builds the settings panel during construction; benign.
     public CachingSettingsProvider() {
         setHeaderText("Proof Caching Options");
 
