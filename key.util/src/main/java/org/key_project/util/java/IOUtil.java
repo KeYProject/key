@@ -741,6 +741,9 @@ public final class IOUtil {
         }
     }
 
+    // The 5-arg URL constructor (with a custom URLStreamHandler) has no non-deprecated
+    // equivalent: URI.toURL() cannot attach a custom handler for the "memory:" protocol.
+    @SuppressWarnings("deprecation")
     public static URL makeMemoryURL(String data) {
         try {
             return new URL("memory", "", 0, String.format("/%x", System.identityHashCode(data)),
@@ -881,6 +884,10 @@ public final class IOUtil {
      * @param resourceLocation either a URL or a file name
      * @throws IOException if file could not be opened
      */
+    // Kept on URL(String) instead of URI-based code: on malformed input the old constructor
+    // throws MalformedURLException (caught below to fall back to a file stream), while an
+    // URI-based rewrite would throw IllegalArgumentException instead and change the fallback.
+    @SuppressWarnings("deprecation")
     public static InputStream openStream(String resourceLocation) throws IOException {
         // Removed Jar file handling:
         // Did not work and URL already handles it

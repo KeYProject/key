@@ -259,6 +259,8 @@ public abstract class SequentView extends JEditorPane {
      * Dispose this SequentView.
      * Before calling this method, the view should be removed from the UI.
      */
+    // GeneralFailureEvent remains in use here (its successor IssueDialog has a different API)
+    @SuppressWarnings("deprecation")
     public void dispose() {
         try {
             unregisterListener();
@@ -429,6 +431,9 @@ public abstract class SequentView extends JEditorPane {
      * one given by viewToModel, subtract it from the given x value, and get the character at the
      * new position. That is the correct one.
      */
+    // viewToModel() is deprecated, but its replacement viewToModel2 changes the return semantics
+    // the code below relies on (see the note above about inter-character spaces).
+    @SuppressWarnings("deprecation")
     public int correctedViewToModel(Point p) {
         String seqText = getText();
         int cursorPosition = viewToModel(p);

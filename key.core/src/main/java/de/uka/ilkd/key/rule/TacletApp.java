@@ -946,6 +946,7 @@ public abstract class TacletApp implements RuleApp {
      *        program model
      * @return a list of tacletapps with the found if formula instantiations
      */
+    @SuppressWarnings("deprecation") // assume-formula instantiations reference deprecated elements
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
             ImmutableList<SequentFormula> ruleSuccTail,
             ImmutableList<SequentFormula> ruleAntecTail,

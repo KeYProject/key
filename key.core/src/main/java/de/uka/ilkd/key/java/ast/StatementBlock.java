@@ -29,6 +29,8 @@ import org.jspecify.annotations.Nullable;
 /**
  * Statement block. taken from COMPOST and changed to achieve an immutable structure
  */
+@SuppressWarnings("deprecation") // statement body/prefix API is bound to the deprecated
+                                 // ImmutableArray
 public class StatementBlock extends JavaStatement implements StatementContainer,
         TypeDeclarationContainer, VariableScope, TypeScope, ProgramPrefix {
 

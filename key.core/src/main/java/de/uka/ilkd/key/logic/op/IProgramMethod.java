@@ -73,9 +73,11 @@ public interface IProgramMethod
 
     int getParameterDeclarationCount();
 
+    @SuppressWarnings("deprecation") // getParameters() declaration references deprecated elements
     ImmutableList<ParameterDeclaration> getParameters();
 
     // Methods from OberverFunction, TODO Create interface for ObersverFunction
+    @SuppressWarnings("deprecation") // getParamTypes() declaration references deprecated elements
     ImmutableList<KeYJavaType> getParamTypes();
 
     /**

@@ -32,6 +32,7 @@ import org.jspecify.annotations.NonNull;
 public class DLEmbeddedExpression extends Operator {
     private final JFunction functionSymbol;
 
+    @SuppressWarnings("deprecation") // ctor parameter bound to the deprecated ImmutableArray
     public DLEmbeddedExpression(
             PositionInfo pi, List<Comment> comments, JFunction functionSymbol,
             @NonNull ImmutableList<Expression> children) {

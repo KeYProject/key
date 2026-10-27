@@ -846,6 +846,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         // label modality if required
         if (addSymbolicExecutionLabel) {
+            // Symbolic-execution term-label counter remains on Services only via the deprecated
+            // getCounter; it is slated for removal together with the symbolic_execution package
+            // (see
+            // Services.getCounter javadoc).
+            @SuppressWarnings("deprecation")
             int labelID = services.getCounter(SymbolicExecutionTermLabel.PROOF_COUNTER_NAME)
                     .getCountPlusPlus();
             programTerm = tb.label(programTerm, new SymbolicExecutionTermLabel(labelID));

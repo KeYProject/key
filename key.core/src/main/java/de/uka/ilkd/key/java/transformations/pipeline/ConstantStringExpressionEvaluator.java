@@ -745,6 +745,9 @@ public class ConstantStringExpressionEvaluator extends JavaTransformerAbstract {
         }
 
         @Override
+        // KeyRangeExpression is deprecated in the javaparser fork, but the override is
+        // required by the visitor interface.
+        @SuppressWarnings("deprecation")
         public void visit(KeyRangeExpression n, Object arg) {
             super.visit(n, arg);
             defaultAction(n, arg);

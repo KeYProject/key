@@ -197,6 +197,8 @@ public class StrategyPresetsSettings extends AbstractSettings {
      * {@link Properties} format cannot represent a list of presets and is intentionally not
      * supported here.
      */
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
+    @SuppressWarnings("deprecation")
     @Override
     public void readSettings(Properties props) {
         // intentionally empty: see class documentation
@@ -207,6 +209,8 @@ public class StrategyPresetsSettings extends AbstractSettings {
      * {@link Properties} format cannot represent a list of presets and is intentionally not
      * supported here.
      */
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
+    @SuppressWarnings("deprecation")
     @Override
     public void writeSettings(Properties props) {
         // intentionally empty: see class documentation

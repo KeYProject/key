@@ -48,6 +48,9 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Martin Hentschel
  */
+// The TermLabelManager API under test still hands around the deprecated ImmutableArray
+// label container, so it is used throughout this test class on purpose.
+@SuppressWarnings("deprecation")
 public class TestTermLabelManager {
     private static InitConfig CONFIG = null;
 

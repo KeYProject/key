@@ -13,6 +13,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+@SuppressWarnings("deprecation") // clash-free substitution API binds deprecated element types
 public class ClashFreeSubst {
     protected final QuantifiableVariable v;
     protected final JTerm s;

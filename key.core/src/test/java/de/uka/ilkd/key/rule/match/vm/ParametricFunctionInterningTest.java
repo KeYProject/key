@@ -53,6 +53,8 @@ public class ParametricFunctionInterningTest {
     }
 
     /** a fresh parametric function declaration {@code name<A, ...>} without term arguments. */
+    // the declaration is built with the deprecated ImmutableArray argument container
+    @SuppressWarnings("deprecation")
     private ParametricFunctionDecl newDecl(String name, int parameterCount) {
         ImmutableList<GenericParameter> params = ImmutableList.nil();
         for (int i = parameterCount - 1; i >= 0; i--) {

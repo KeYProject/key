@@ -430,6 +430,9 @@ public class ConstantExpressionEvaluator {
         }
 
         @Override
+        // KeyRangeExpression is deprecated in the javaparser fork, but the override is
+        // required by the visitor interface.
+        @SuppressWarnings("deprecation")
         public Object visit(KeyRangeExpression n, Void arg) {
             throw new RuntimeException("unsupported expression");
 
