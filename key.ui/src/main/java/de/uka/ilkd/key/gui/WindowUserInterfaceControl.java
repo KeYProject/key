@@ -565,17 +565,25 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
 
 
-    /**
+    /*
+     * Demoted from a doc comment: it documents a commented-out method, so it must not be a
+     * javadoc comment (otherwise javac reports a dangling-doc-comment lint warning).
      * Loads the given location and returns all required references as {@link KeYEnvironment} with
      * KeY's {@link MainWindow}.
      *
      * @param location The location to load.
+     *
      * @param classPaths The class path entries to use.
+     *
      * @param bootClassPath The boot class path to use.
+     *
      * @param includes Optional includes to consider.
+     *
      * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already
-     *        visible?
+     * visible?
+     *
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
+     *
      * @throws ProblemLoaderException Occurred Exception
      */
     // public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(File location,
