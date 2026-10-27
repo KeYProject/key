@@ -69,8 +69,8 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
     }
 
     @Override
-    public List<Action> getContextActions(KeYMediator mediator, ContextMenuKind kind,
-            Object underlyingObject) {
+    public <T> List<Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind,
+            T underlyingObject) {
         if (kind == ContextMenuKind.SEQUENT_VIEW) {
             return Collections.singletonList(new ShowOriginAction((PosInSequent) underlyingObject));
         } else if (kind == ContextMenuKind.PROOF_TREE

@@ -404,7 +404,7 @@ public final class MainWindow extends JFrame {
         // https://stackoverflow.com/questions/50403677/changing-the-default-java-coffee-dock-icon-to-something-else
         try {
             Class<?> appClass = Class.forName("com.apple.eawt.Application");
-            Class<?>[] params = new Class[] { Image.class };
+            Class<?>[] params = new Class<?>[] { Image.class };
             Method getApplication = appClass.getMethod("getApplication");
             Object application = getApplication.invoke(appClass);
             Method setDockIconImage = appClass.getMethod("setDockIconImage", params);

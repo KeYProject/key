@@ -43,7 +43,8 @@ class AdditionalRulesStrategy extends FilterStrategy {
     private final List<Pair<String, RuleAppCost>> additionalRules;
     private final boolean exclusive;
 
-    public AdditionalRulesStrategy(Strategy delegate, String additionalRules, boolean exclusive) {
+    public AdditionalRulesStrategy(Strategy<Goal> delegate, String additionalRules,
+            boolean exclusive) {
         super(delegate);
         this.additionalRules = parseAddRules(additionalRules);
         this.exclusive = exclusive;

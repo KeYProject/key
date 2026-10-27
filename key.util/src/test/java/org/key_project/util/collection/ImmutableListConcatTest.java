@@ -24,7 +24,7 @@ class ImmutableListConcatTest {
         new ImmutableListArray<>(new Integer[0]), new ImmutableListList<>(List.of()));
     private final ImmutableListConcat<Integer> listEmptyEmpty = new ImmutableListConcat<>(
         listEmpty, listEmpty);
-    private final ImmutableList list123 = new ImmutableListList<Integer>(List.of(1, 2, 3));
+    private final ImmutableList<Integer> list123 = new ImmutableListList<>(List.of(1, 2, 3));
     private final ImmutableListConcat<Integer> listFirstEmpty123 =
         new ImmutableListConcat<>(listEmptyEmpty, list123);
 

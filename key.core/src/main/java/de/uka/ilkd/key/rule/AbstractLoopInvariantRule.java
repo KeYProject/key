@@ -71,7 +71,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         // Basic objects needed for rule application
         final TermBuilder tb = services.getTermBuilder();
         final TermLabelState termLabelState = new TermLabelState();
-        final LoopInvariantBuiltInRuleApp loopRuleApp = (LoopInvariantBuiltInRuleApp) ruleApp;
+        final LoopInvariantBuiltInRuleApp<?> loopRuleApp =
+            (LoopInvariantBuiltInRuleApp<?>) ruleApp;
 
         // Get the Instantiation object
         final Instantiation inst = instantiate(loopRuleApp, services);
@@ -148,7 +149,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-        return new LoopInvariantBuiltInRuleApp(this, pos, services);
+        return new LoopInvariantBuiltInRuleApp<>(this, pos, services);
     }
 
     @Override
@@ -361,7 +362,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * @throws RuleAbortException If the {@link LoopInvariantBuiltInRuleApp} does not contain a
      *         {@link LoopSpecification}.
      */
-    protected static Instantiation instantiate(final LoopInvariantBuiltInRuleApp app,
+    protected static Instantiation instantiate(final LoopInvariantBuiltInRuleApp<?> app,
             Services services) throws RuleAbortException {
         // Use the instantiation cached on this (thread-confined) rule app if it is still valid,
         // i.e.
@@ -619,7 +620,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * @param anonUpdateData Anonymizing updates for all heaps.
      */
     public record LoopInvariantInformation(Goal goal, Services services, Instantiation inst,
-            LoopInvariantBuiltInRuleApp ruleApp, ImmutableList<Goal> goals,
+            LoopInvariantBuiltInRuleApp<?> ruleApp, ImmutableList<Goal> goals,
             TermLabelState termLabelState, JTerm invTerm, JTerm variantPO,
             JTerm reachableState, JTerm anonUpdate, JTerm wellFormedAnon, JTerm uAnonInv,
             JTerm frameCondition, JTerm[] uBeforeLoopDefAnonVariant,

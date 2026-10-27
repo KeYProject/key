@@ -97,7 +97,7 @@ public class AutoCommand extends AbstractCommand {
 
         SetCommand.updateStrategySettings(state(), activeStrategyProperties);
 
-        final Strategy originalStrategy = state.getProof().getActiveStrategy();
+        final Strategy<Goal> originalStrategy = state.getProof().getActiveStrategy();
         if (arguments.additionalRules != null) {
             state.getProof().setActiveStrategy(
                 new AdditionalRulesStrategy(originalStrategy, arguments.additionalRules, false));
@@ -167,7 +167,7 @@ public class AutoCommand extends AbstractCommand {
      * @throws ScriptException
      */
     private void setupFocussedBreakpointStrategy(final String maybeMatchesRegEx,
-            final String breakpointArg, final Goal goal, final ProverCore proverCore,
+            final String breakpointArg, final Goal goal, final ProverCore<Proof, Goal> proverCore,
             final Services services) throws ScriptException {
         final var focus =
             MacroCommand.extractMatchingPio(goal.node().sequent(), maybeMatchesRegEx, services);

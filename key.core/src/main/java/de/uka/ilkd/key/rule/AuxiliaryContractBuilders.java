@@ -1168,7 +1168,7 @@ public final class AuxiliaryContractBuilders {
          * @param services services.
          * @param rule the rule being applied.
          */
-        public GoalsConfigurator(final AbstractAuxiliaryContractBuiltInRuleApp application,
+        public GoalsConfigurator(final AbstractAuxiliaryContractBuiltInRuleApp<?> application,
                 final TermLabelState termLabelState, final Instantiation instantiation,
                 final List<Label> labels, final AuxiliaryContract.Variables variables,
                 final PosInOccurrence occurrence,

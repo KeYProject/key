@@ -54,7 +54,7 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
         return super.complete() && step != null;
     }
 
-    private UseDependencyContractApp computeStep(Goal goal, Services services) {
+    private UseDependencyContractApp<T> computeStep(Goal goal, Services services) {
         assert this.step == null;
         final List<PosInOccurrence> steps = UseDependencyContractRule
                 .getSteps(this.getHeapContext(), this.posInOccurrence(), goal.sequent(), services);
@@ -122,7 +122,7 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
         if (complete()) {
             return this;
         }
-        UseDependencyContractApp app = this;
+        UseDependencyContractApp<T> app = this;
 
         final Services services = goal.proof().getServices();
 
@@ -134,7 +134,7 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
         return app;
     }
 
-    public UseDependencyContractApp tryToInstantiateContract(final Services services) {
+    public UseDependencyContractApp<T> tryToInstantiateContract(final Services services) {
         final var focus = posInOccurrence().subTerm();
         if (!(focus.op() instanceof IObserverFunction target))
         // TODO: find more appropriate exception
@@ -160,7 +160,7 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
             UseDependencyContractRule.getApplicableContracts(services, kjt, target);
 
         if (!contracts.isEmpty()) {
-            UseDependencyContractApp r = setContract(contracts.iterator().next());
+            UseDependencyContractApp<T> r = setContract(contracts.iterator().next());
             if (r.getHeapContext() == null) {
                 r.heapContext = HeapContext.getModifiableHeaps(services, false);
             }
@@ -183,7 +183,7 @@ public class UseDependencyContractApp<T extends UseDependencyContractRule>
 
 
     @Override
-    public UseDependencyContractApp setAssumesInsts(
+    public UseDependencyContractApp<T> setAssumesInsts(
             ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;

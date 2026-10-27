@@ -110,7 +110,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
 
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-        return new DefaultBuiltInRuleApp(this, pos);
+        return new DefaultBuiltInRuleApp<>(this, pos);
     }
 
     @Override
@@ -356,7 +356,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
 
         // active statement must be reading model field
         final SourceElement activeStatement = JavaTools.getActiveStatement(mainFml.javaBlock());
-        if (!(activeStatement instanceof Assignment ca
+        if (!(activeStatement instanceof Assignment<?> ca
                 && ca.getKind() == BinaryAssignment.BinaryAssignmentKind.COPY)) {
             return null;
         }

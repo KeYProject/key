@@ -909,11 +909,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
             sb2 = tryBlock;
         } else {
             // create try statement
-            final Assignment nullStat = new BinaryAssignment(COPY, exceptionVar, NullLiteral.NULL);
+            final Assignment<?> nullStat =
+                new BinaryAssignment(COPY, exceptionVar, NullLiteral.NULL);
             final VariableSpecification eSpec = new VariableSpecification(eVar);
             final ParameterDeclaration excDecl =
                 new ParameterDeclaration(new Modifier[0], excTypeRef, eSpec, false);
-            final Assignment assignStat = new BinaryAssignment(COPY, exceptionVar, eVar);
+            final Assignment<?> assignStat = new BinaryAssignment(COPY, exceptionVar, eVar);
             final Catch catchStat =
                 new Catch(excDecl, catchBlock == null ? new StatementBlock(assignStat)
                         : new StatementBlock(assignStat, catchBlock));

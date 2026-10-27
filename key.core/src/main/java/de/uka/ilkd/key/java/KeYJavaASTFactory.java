@@ -46,14 +46,14 @@ public abstract class KeYJavaASTFactory {
     /**
      * creates an assignment <code> lhs:=rhs </code>
      */
-    public static Assignment assign(Expression lhs, Expression rhs) {
+    public static Assignment<?> assign(Expression lhs, Expression rhs) {
         return new BinaryAssignment(COPY, lhs, rhs);
     }
 
     /**
      * creates an assignment <code> lhs:=rhs </code>
      */
-    public static Assignment assign(Expression lhs, Expression rhs, PositionInfo posInfo) {
+    public static Assignment<?> assign(Expression lhs, Expression rhs, PositionInfo posInfo) {
         return assign(COPY, new ExtList(new Object[] { lhs, rhs, posInfo }));
     }
 
@@ -63,7 +63,7 @@ public abstract class KeYJavaASTFactory {
      * @param parameters the assignment parameters (variable, expression) as {@link ExtList}
      * @return a new {@link BinaryAssignment} as defined by <code>parameters</code>
      */
-    public static Assignment assign(final ExtList parameters) {
+    public static Assignment<?> assign(final ExtList parameters) {
         return new BinaryAssignment(COPY, parameters);
     }
 
@@ -73,7 +73,7 @@ public abstract class KeYJavaASTFactory {
      * @param parameters the assignment parameters (variable, expression) as {@link ExtList}
      * @return a new {@link BinaryAssignment} as defined by <code>parameters</code>
      */
-    public static Assignment assign(final AssignmentKind assignOp, final ExtList parameters) {
+    public static Assignment<?> assign(final AssignmentKind assignOp, final ExtList parameters) {
         if (assignOp instanceof UnaryAssignment.UnaryAssignmentKind kind) {
             return new UnaryAssignment(kind, parameters);
         } else if (assignOp instanceof BinaryAssignmentKind kind) {
