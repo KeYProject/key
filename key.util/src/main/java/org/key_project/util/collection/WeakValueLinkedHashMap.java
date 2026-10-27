@@ -146,6 +146,12 @@ public class WeakValueLinkedHashMap<K, V> {
             return Objects.equals(get(), weakVal.get());
         }
 
+        @Override
+        public int hashCode() {
+            // consistent with equals(), which only compares the referenced values
+            return Objects.hashCode(get());
+        }
+
     }
 
 }
