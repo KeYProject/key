@@ -1225,6 +1225,10 @@ public class ProofCollections {
         g.loadable("Java/Records/Use.key");
         g.loadable("Java/Records/Constructor.key");
 
+        // The lambda example proves the generated implementation of the functional method
+        // against the contract derived from the lambda body's JML clauses (model methods).
+        g.provable("Java/Lambdas/project.key");
+
         g = c.group("StipuLa");
         g.provable("case-studies/stipula/behavior_run_bet.key");
         g.provable("case-studies/stipula/behavior_run_bike.key");

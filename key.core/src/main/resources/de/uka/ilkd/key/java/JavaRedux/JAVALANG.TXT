@@ -16,6 +16,7 @@ java.lang.Error
 java.lang.Exception
 java.lang.ExceptionInInitializerError
 java.lang.Float
+java.lang.FunctionalInterface
 java.lang.IllegalArgumentException
 java.lang.IndexOutOfBoundsException
 java.lang.Integer
@@ -45,6 +46,7 @@ java.lang.Long
 java.lang.Boolean
 java.util.Map
 java.util.NoSuchElementException
+java.util.Objects
 java.util.Set
 java.io.FilterOutputStream
 java.io.InputStream
@@ -59,4 +61,6 @@ java.util.ListIteratorImpl
 java.util.Date
 java.util.LinkedHashMap
 java.util.LinkedList
+java.util.function.Function
+java.util.function.Predicate
 

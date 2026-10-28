@@ -27,7 +27,6 @@ the feature under test (verified by loading each and inspecting the error):
 | Example | Rejected because |
 |---|---|
 | `generics-*` (plain, bounded, wildcard, method, diamond) | converter aborts with *"Unexpected type to convert"* on the type parameter/argument |
-| `local-class` | `Unsupported element: LocalClassDeclarationStmt` |
 | `static-import` | `Unsupported element: ImportDeclaration` (the `static` import) |
 | `annotation-declaration` | `Unsupported element: AnnotationDeclaration` (the `@interface`) |
 | `lambda` | `Unsupported element: LambdaExpr` |
@@ -61,3 +60,8 @@ its surroundings.
 - "Parses" is not "soundly reasoned about": `autoboxing` and
   `try-with-resources` sit in `supported/` because they load, but KeY does not
   model them soundly (see the documentation's *Comments* column).
+- `local-class` sits in `supported/` because the transformation pipeline hoists
+  local classes into nested classes (the Csiky transform) before
+  `JP2KeYConverter` runs. `lambda` and `method-reference` stay in `rejected/`
+  for now: the desugaring does not yet cover the field-initializer form used by
+  their examples.

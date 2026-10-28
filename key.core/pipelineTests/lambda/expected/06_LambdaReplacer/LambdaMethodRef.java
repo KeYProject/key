@@ -1,0 +1,116 @@
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+class LambdaMethodRef {
+
+    static class Box {
+
+        int size;
+
+        //@ //@ requires size >= 0;
+        //@ //@ ensures this.size == size;
+
+
+        Box(int size) {
+            this.size = size;
+        }
+    }
+
+    static class Owner {
+
+        int size;
+
+        Owner(int size) {
+            this.size = size;
+        }
+
+        //@ //@ ensures \result == this.size;
+
+
+        int sizeOf() {
+            return size;
+        }
+    }
+
+    /**
+     * Functional interface with model methods; the target type of the constructor
+     * reference {@code Box::new} below (Csiky 6.2.4 "Application: Method References").
+     */
+    interface BoxFactory {
+
+        //@ //@ model boolean preCondition(Integer size);
+        //@ //@ model two_state boolean postCondition(Integer size, Box __result);
+
+
+        Box make(Integer size);
+    }
+
+    /**
+     * Target type of the unbound instance method reference {@code Owner::sizeOf}.
+     */
+    interface IntGetter {
+
+        //@ //@ model boolean preCondition(Owner owner);
+        //@ //@ model two_state boolean postCondition(Owner owner, Integer __result);
+
+
+        Integer get(Owner owner);
+    }
+
+    Predicate<Object> nullTest() {
+        final class Predicate__1 implements java.util.function.Predicate<java.lang.Object> {
+
+            public boolean test(java.lang.Object p0) {
+                return Objects.isNull(p0);
+            }
+        }
+        Predicate<Object> p = new Predicate__1();
+        return p;
+    }
+
+    Function<String, Integer> length() {
+        final class Function__1 implements java.util.function.Function<java.lang.String, java.lang.Integer> {
+
+            public java.lang.Integer apply(java.lang.String p0) {
+                return p0.length();
+            }
+        }
+        Function<String, Integer> f = new Function__1();
+        return f;
+    }
+
+    Predicate<String> bounded() {
+        String s = "abc";
+        final class Predicate__2 implements java.util.function.Predicate<java.lang.String> {
+
+            public boolean test(java.lang.String arg0) {
+                return s.isEmpty();
+            }
+        }
+        Predicate<String> p = new Predicate__2();
+        return p;
+    }
+
+    BoxFactory factory() {
+        final class BoxFactory__1 implements LambdaMethodRef.BoxFactory {
+
+            public LambdaMethodRef.Box make(java.lang.Integer p0) {
+                return new Box(p0);
+            }
+        }
+        BoxFactory f = new BoxFactory__1();
+        return f;
+    }
+
+    IntGetter unbound() {
+        final class IntGetter__1 implements LambdaMethodRef.IntGetter {
+
+            public java.lang.Integer get(LambdaMethodRef.Owner p0) {
+                return p0.sizeOf();
+            }
+        }
+        IntGetter g = new IntGetter__1();
+        return g;
+    }
+}
