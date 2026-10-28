@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -199,7 +200,7 @@ public class ClassAxiomComputer {
                     continue; // only non-private classes
                 }
                 final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
-                final LocationVariable selfVar = tb.selfVar(kjt, false);
+                final LocationVariable selfVar = tb.selfVar(new TypeRef(kjt), false);
 
                 JTerm invDef = tb.tt();
                 JTerm staticInvDef = tb.tt();
@@ -295,7 +296,8 @@ public class ClassAxiomComputer {
         ImmutableSet<ClassAxiom> result = DefaultImmutableSet.nil();
         for (KeYJavaType kjt : services.getJavaInfo().getAllKeYJavaTypes()) {
             for (IProgramMethod pm : services.getJavaInfo().getAllProgramMethods(kjt)) {
-                final LocationVariable selfVar = pm.isStatic() ? null : tb.selfVar(kjt, false);
+                final LocationVariable selfVar =
+                    pm.isStatic() ? null : tb.selfVar(new TypeRef(kjt), false);
                 if (!pm.isVoid() && pm.isModel()) {
                     pm = services.getJavaInfo().getToplevelPM(kjt, pm);
                     ImmutableList<LocationVariable> paramVars = tb.paramVars(pm, false);
