@@ -15,10 +15,10 @@ public class MostSimpleInner {
         static private boolean $classPrepared;
 
         @javax.annotation.processing.Generated()
-        static public model boolean $staticInv;
+        static public /*@ model */ boolean $staticInv;
 
         @javax.annotation.processing.Generated()
-        static public model boolean $staticInv_free;
+        static public /*@ model */ boolean $staticInv_free;
 
         public static MyInnerClass $allocate();
 
@@ -26,7 +26,6 @@ public class MostSimpleInner {
         }
 
         public void $init() {
-            super.$init();
             super.$init();
         }
     }
@@ -44,10 +43,10 @@ public class MostSimpleInner {
     static private boolean $classPrepared;
 
     @javax.annotation.processing.Generated()
-    static public model boolean $staticInv;
+    static public /*@ model */ boolean $staticInv;
 
     @javax.annotation.processing.Generated()
-    static public model boolean $staticInv_free;
+    static public /*@ model */ boolean $staticInv_free;
 
     public static MostSimpleInner $allocate();
 
@@ -55,7 +54,6 @@ public class MostSimpleInner {
     }
 
     public void $init() {
-        super.$init();
         super.$init();
     }
 }
