@@ -1,0 +1,76 @@
+name: UI verify sweep (key.ui.fx)
+
+# Full per-flag regression sweep of the JavaFX UI (WP-11 deliverable): every
+# -Dkey.fx.verify.* hook of key.ui.fx runs headlessly against real example proofs inside an
+# Xvfb display (software rendering). Maximum parallelization: ONE matrix job per flag
+# (recipes in key.ui.fx/ci/verify-sweep.sh); the themepersist save+restore pair and the
+# special runs (xdotool key dismissal, real-z3 SMT, natural-exit loadingexit) are single
+# matrix entries with multiple runs inside. Logs are uploaded per flag.
+on:
+  push:
+    branches: [ "main", "weigl/ocfx", "weigl/ocfx-wp11-endgame" ]
+    paths:
+      - "key.ui.fx/**"
+      - "keyext.caching.fx/**"
+      - "keyext.exploration.fx/**"
+      - "keyext.isabelletranslation.fx/**"
+      - "keyext.proofmanagement.fx/**"
+      - "keyext.slicing.fx/**"
+      - "keyext.ui.testgen.fx/**"
+      - ".github/workflows/ui-verify.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        flag: [ sequent, tree, goallist, notifications, docking, help, soundiness,
+                profileloading, javacsettings, termmenu, colors, shortcuts, sequentmenu,
+                dialogs, search, sequentsearch, sequentsearchmodes, treefilters,
+                tacletmatch, inputfreeze, updatehighlight, lemmaorigin, joinmerge,
+                joinmerge-gcd, proofmgmt-all, extensions, exploration, caching, prooftree,
+                slicing, testgen, heatmap, isabelle, sourceconsistency, autosave,
+                minimizeinteraction, themepersist, profileloadingdialog, smt, loadingexit,
+                proofdiff, drawer, drawerlayout, rightclickmacro ]
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup SMT solvers
+        uses: keyproject/setup-smt@v0
+        with:
+          z3Version: 4.13.0
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v6.0.1
+        with:
+          java-version: 25
+          distribution: 'corretto'
+          cache: 'gradle'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Install Xvfb, xdotool (key dismissal), graphviz (slicing DOT render)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends xvfb xdotool graphviz
+
+      - name: Run the UI verify sweep (${{ matrix.flag }})
+        run: bash key.ui.fx/ci/verify-sweep.sh ${{ matrix.flag }}
+
+      - name: Upload sweep logs (${{ matrix.flag }})
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ui-verify-${{ matrix.flag }}
+          path: |
+            build/ui-verify/*.log
+            build/ui-verify/RESULTS.md
+            build/ui-verify/failed-flags.txt
+          if-no-files-found: error
