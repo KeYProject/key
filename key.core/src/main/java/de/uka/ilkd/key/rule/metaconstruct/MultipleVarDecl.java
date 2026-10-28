@@ -23,6 +23,7 @@ import org.key_project.util.collection.ImmutableArray;
  * Replaces a declaration of multiple variables by two variable declarations where the first one
  * declares a single variable and the second one the remaining variables.
  */
+@TransformerMeta(name = "multiple-var-decl")
 public class MultipleVarDecl extends ProgramTransformer {
 
     public MultipleVarDecl(SchemaVariable sv) {

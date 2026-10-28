@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.ast.statement.For;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
+@TransformerMeta(name = "unpack")
 public class Unpack extends ProgramTransformer {
 
     /**

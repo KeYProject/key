@@ -26,6 +26,7 @@ import de.uka.ilkd.key.util.Debug;
  *
  * @author Benedikt Dreher
  */
+@TransformerMeta(name = "forInitUnfoldTransformer")
 public class ForInitUnfoldTransformer extends ProgramTransformer {
     /**
      * @param loopInit A loop initializer if called for a concrete program.

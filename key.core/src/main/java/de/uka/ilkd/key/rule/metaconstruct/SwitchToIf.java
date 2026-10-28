@@ -32,6 +32,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
  * This class is used to perform program transformations needed for the symbolic execution of a
  * switch-case statement.
  */
+@TransformerMeta(name = "switch-to-if")
 public class SwitchToIf extends ProgramTransformer {
 
 

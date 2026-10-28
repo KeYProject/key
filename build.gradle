@@ -83,7 +83,6 @@ subprojects {
         implementation(libs.slf4j.api)
         testImplementation(libs.logback.classic)
 
-
         compileOnly(libs.jspecify)
         testCompileOnly(libs.jspecify)
         compileOnly(libs.checkerframework.qual)

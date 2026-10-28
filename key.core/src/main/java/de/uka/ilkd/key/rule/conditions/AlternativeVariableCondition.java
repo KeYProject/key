@@ -22,6 +22,12 @@ public final class AlternativeVariableCondition extends VariableConditionAdapter
 
     private final VariableConditionAdapter delegate0, delegate1;
 
+    /**
+     * Instantiates a new alternative (disjunction) of two variable conditions.
+     *
+     * @param delegate0 the first of the two conditions
+     * @param delegate1 the second of the two conditions
+     */
     public AlternativeVariableCondition(VariableConditionAdapter delegate0,
             VariableConditionAdapter delegate1) {
         this.delegate0 = delegate0;

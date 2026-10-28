@@ -38,6 +38,12 @@ import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/// A term that may contain holes (wildcards) and focus or ellipsis markers, written with
+/// the placeholders `?` (term hole), `?fml` (formula hole), `?focus` (focus point) and
+/// `?find` (ellipsis). Such patterns are used by proof script commands (e.g. `rewrite`,
+/// `expand`, `focus`) to match terms and formulas of the current goal.
+///
+/// @author Alexander Weigl
 @NullMarked
 public class TermWithHoles {
 

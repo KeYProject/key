@@ -20,6 +20,7 @@ import org.key_project.logic.sort.Sort;
  * Creates an <tt>instance<Type>(..)</tt> term for the component type of the array. The component
  * type has to be a reference type.
  */
+@TransformerMeta(name = "#arrayBaseInstanceOf")
 public final class ArrayBaseInstanceOf extends AbstractTermTransformer {
 
     public ArrayBaseInstanceOf() {

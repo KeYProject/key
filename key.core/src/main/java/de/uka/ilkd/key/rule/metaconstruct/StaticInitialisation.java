@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
+@TransformerMeta(name = "static-initialisation")
 public class StaticInitialisation extends ProgramTransformer {
 
     public StaticInitialisation(Expression expr) {

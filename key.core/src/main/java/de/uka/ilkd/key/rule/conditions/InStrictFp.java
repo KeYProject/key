@@ -23,6 +23,11 @@ public final class InStrictFp extends VariableConditionAdapter {
 
     private final boolean negated;
 
+    /**
+     * Instantiates a new strict-fp condition.
+     *
+     * @param negation whether the condition is negated ({@code \not isInStrictFp})
+     */
     public InStrictFp(boolean negation) {
         this.negated = negation;
     }

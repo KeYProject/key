@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+@TransformerMeta(name = "#length-reference")
 public class ArrayLength extends ProgramTransformer {
 
     /**
