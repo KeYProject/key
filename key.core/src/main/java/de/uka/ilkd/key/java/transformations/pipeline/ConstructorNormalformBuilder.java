@@ -279,28 +279,27 @@ public class ConstructorNormalformBuilder extends JavaTransformerAbstract {
      *        the TypeDeclaration
      */
     public void apply(TypeDeclaration<?> td) {
-        if (!td.isClassOrInterfaceDeclaration())
-            return;
+        if (td instanceof ClassOrInterfaceDeclaration) {
+            var cd = (ClassOrInterfaceDeclaration) td;
+            if (cd.isInterface()) {
+                return;
+            }
+            var constructors = new ArrayList<>(td.getConstructors());
+            ConstructorDeclaration anonConstr = null;
+            if (cd.getName() == null) {
+                anonConstr = attachConstructorDecl(td);
+            }
+            if (anonConstr != null)
+                constructors.add(anonConstr);
 
-        var cd = (ClassOrInterfaceDeclaration) td;
-        if (cd.isInterface()) {
-            return;
-        }
-        var constructors = new ArrayList<>(td.getConstructors());
-        ConstructorDeclaration anonConstr = null;
-        if (cd.getName() == null) {
-            anonConstr = attachConstructorDecl(td);
-        }
-        if (anonConstr != null)
-            constructors.add(anonConstr);
+            if (constructors.isEmpty()) {
+                final ConstructorDeclaration defaultConstructor = attachDefaultConstructor(cd);
+                constructors.add(defaultConstructor);
+            }
 
-        if (constructors.isEmpty()) {
-            final ConstructorDeclaration defaultConstructor = attachDefaultConstructor(cd);
-            constructors.add(defaultConstructor);
-        }
-
-        for (ConstructorDeclaration constructor : constructors) {
-            normalform(cd, constructor);
+            for (ConstructorDeclaration constructor : constructors) {
+                normalform(cd, constructor);
+            }
         }
     }
 }
