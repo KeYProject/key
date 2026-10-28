@@ -10,7 +10,6 @@ import java.util.List;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 
@@ -18,7 +17,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.Test;
 
@@ -189,7 +188,7 @@ public class TieBreakComparatorPropertyTest {
         final Function f = new JFunction(new Name("f"), s, s);
         final JTerm plain = t(tf, f, t(tf, a));
         final JTerm labeled = tf.createTerm(f, new JTerm[] { t(tf, a) },
-            new ImmutableArray<TermLabel>(ParameterlessTermLabel.ANON_HEAP_LABEL));
+            ImmutableList.of(ParameterlessTermLabel.ANON_HEAP_LABEL));
 
         assertTrue(!plain.equals(labeled), "the label must matter for equality");
         assertEquals(plain.nameHash(), labeled.nameHash(), "nameHash must ignore labels");

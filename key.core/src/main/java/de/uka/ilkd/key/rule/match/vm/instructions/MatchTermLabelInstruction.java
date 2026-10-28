@@ -13,7 +13,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Matches the term labels of a labelled pattern term, in place (the cursor does not move; the
@@ -24,9 +24,9 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public class MatchTermLabelInstruction implements MatchInstruction {
 
-    private final ImmutableArray<TermLabel> labels;
+    private final ImmutableList<TermLabel> labels;
 
-    public MatchTermLabelInstruction(ImmutableArray<TermLabel> labels) {
+    public MatchTermLabelInstruction(ImmutableList<TermLabel> labels) {
         this.labels = labels;
     }
 
@@ -34,7 +34,7 @@ public class MatchTermLabelInstruction implements MatchInstruction {
             MatchResultInfo matchCond, LogicServices services) {
 
         final SVInstantiations svInsts = (SVInstantiations) matchCond.getInstantiations();
-        final ImmutableArray<TermLabel> inst = svInsts.getInstantiation(sv);
+        final ImmutableList<TermLabel> inst = svInsts.getInstantiation(sv);
 
         if (inst == null) {
             return matchCond.setInstantiations(

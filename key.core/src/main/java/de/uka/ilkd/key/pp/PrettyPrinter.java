@@ -31,7 +31,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -175,7 +175,7 @@ public class PrettyPrinter implements Visitor {
      *
      * @param list a program element list.
      */
-    protected void writeKeywordList(ImmutableArray<Modifier> list) {
+    protected void writeKeywordList(ImmutableList<Modifier> list) {
         for (int i = 0; i < list.size(); i++) {
             if (i != 0) {
                 layouter.brk();
@@ -189,7 +189,7 @@ public class PrettyPrinter implements Visitor {
      *
      * @param list a program element list.
      */
-    protected void writeCommaList(ImmutableArray<? extends ProgramElement> list) {
+    protected void writeCommaList(ImmutableList<? extends ProgramElement> list) {
         for (int i = 0; i < list.size(); i++) {
             if (i != 0) {
                 layouter.print(",").brk();
@@ -199,7 +199,7 @@ public class PrettyPrinter implements Visitor {
     }
 
     protected void printOperator(Operator x, String symbol) {
-        ImmutableArray<Expression> children = x.getArguments();
+        ImmutableList<Expression> children = x.getArguments();
         if (children != null) {
             layouter.beginC();
             switch (x.getArity()) {
@@ -245,7 +245,7 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
-    private void printArguments(@Nullable ImmutableArray<? extends Expression> args) {
+    private void printArguments(@Nullable ImmutableList<? extends Expression> args) {
         beginMultilineBracket();
         if (args != null) {
             writeCommaList(args);
@@ -647,7 +647,7 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnClassDeclaration(ClassDeclaration x) {
         layouter.beginC();
         layouter.beginC(0);
-        ImmutableArray<Modifier> mods = x.getModifiers();
+        ImmutableList<Modifier> mods = x.getModifiers();
         boolean hasMods = mods != null && !mods.isEmpty();
         if (hasMods) {
             writeKeywordList(mods);
@@ -679,7 +679,7 @@ public class PrettyPrinter implements Visitor {
     }
 
     private void performActionOnMemberDeclarations(
-            @Nullable ImmutableArray<MemberDeclaration> members) {
+            @Nullable ImmutableList<MemberDeclaration> members) {
         if (members != null && !members.isEmpty()) {
             beginBlock();
             for (int i = 0; i < members.size(); ++i) {
@@ -698,7 +698,7 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnInterfaceDeclaration(InterfaceDeclaration x) {
         layouter.beginC();
-        ImmutableArray<Modifier> mods = x.getModifiers();
+        ImmutableList<Modifier> mods = x.getModifiers();
         boolean hasMods = mods != null && !mods.isEmpty();
         if (hasMods) {
             writeKeywordList(mods);
@@ -733,14 +733,14 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnVariableDeclaration(@Nullable VariableDeclaration x) {
         layouter.beginI();
-        ImmutableArray<Modifier> modifiers = x.getModifiers();
+        ImmutableList<Modifier> modifiers = x.getModifiers();
         if (modifiers != null && !modifiers.isEmpty()) {
             writeKeywordList(modifiers);
             layouter.print(" ");
         }
         x.getTypeReference().visit(this);
         layouter.print(" ");
-        ImmutableArray<? extends VariableSpecification> varSpecs = x.getVariables();
+        ImmutableList<? extends VariableSpecification> varSpecs = x.getVariables();
         if (varSpecs != null) {
             writeCommaList(varSpecs);
         }
@@ -750,7 +750,7 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnMethodDeclaration(MethodDeclaration x) {
         layouter.beginC(0);
-        ImmutableArray<Modifier> mods = x.getModifiers();
+        ImmutableList<Modifier> mods = x.getModifiers();
         boolean hasMods = mods != null && !mods.isEmpty();
         if (hasMods) {
             writeKeywordList(mods);
@@ -941,7 +941,7 @@ public class PrettyPrinter implements Visitor {
         layouter.print(" ");
         beginMultilineBracket();
 
-        ImmutableArray<LoopInitializer> initializers = x.getInitializers();
+        ImmutableList<LoopInitializer> initializers = x.getInitializers();
         if (initializers != null) {
             initializers.get(0).visit(this);
         }
@@ -1066,7 +1066,7 @@ public class PrettyPrinter implements Visitor {
 
     private void printTryLike(String name,
             @Nullable StatementBlock body,
-            @Nullable ImmutableArray<Branch> branches) {
+            @Nullable ImmutableList<Branch> branches) {
         layouter.keyWord(name);
         layouter.print(" ");
         if (body != null) {
@@ -1466,7 +1466,7 @@ public class PrettyPrinter implements Visitor {
         }
     }
 
-    private void printCaseBody(@Nullable ImmutableArray<Statement> body) {
+    private void printCaseBody(@Nullable ImmutableList<Statement> body) {
         if (body != null && !body.isEmpty()) {
             for (int i = 0; i < body.size(); i++) {
                 Statement statement = body.get(i);
@@ -1549,8 +1549,8 @@ public class PrettyPrinter implements Visitor {
         } else {
             if (o instanceof ProgramElement) {
                 ((ProgramElement) o).visit(this);
-            } else if (o instanceof ImmutableArray) {
-                for (ProgramElement e : ((ImmutableArray<ProgramElement>) o)) {
+            } else if (o instanceof ImmutableList) {
+                for (ProgramElement e : ((ImmutableList<ProgramElement>) o)) {
                     e.visit(this);
                 }
             } else {

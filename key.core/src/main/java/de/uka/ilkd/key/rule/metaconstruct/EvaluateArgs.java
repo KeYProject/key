@@ -31,7 +31,7 @@ import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * TODO
@@ -93,7 +93,7 @@ public class EvaluateArgs extends ProgramTransformer {
             newCalled = mr.getReferencePrefix();
         }
 
-        ImmutableArray<? extends Expression> args = mr.getArguments();
+        ImmutableList<? extends Expression> args = mr.getArguments();
         Expression[] newArgs = new Expression[args.size()];
         for (int i = 0; i < args.size(); i++) {
             newArgs[i] = evaluate(args.get(i), evalstat, services, ec);

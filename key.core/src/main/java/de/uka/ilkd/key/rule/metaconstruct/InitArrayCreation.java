@@ -33,7 +33,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Split an array creation expression with explicit array initializer, creating a creation
@@ -84,7 +84,7 @@ public class InitArrayCreation extends InitArray {
      * @param services the Services object
      */
     private ProgramVariable[] evaluateAndCheckDimensionExpressions(LinkedList<Statement> bodyStmnts,
-            ImmutableArray<Expression> dimExpr, Services services) {
+            ImmutableList<Expression> dimExpr, Services services) {
 
         Expression checkDimensions = BooleanLiteral.FALSE;
         ProgramVariable[] pvars = new ProgramVariable[dimExpr.size()];

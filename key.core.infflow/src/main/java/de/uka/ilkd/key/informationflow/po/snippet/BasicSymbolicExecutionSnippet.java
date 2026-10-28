@@ -33,7 +33,6 @@ import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -115,8 +114,8 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
 
         // create method call
         ProgramVariable[] formalParVars = extractProgramVariables(formalPars);
-        final ImmutableArray<Expression> formalArray =
-            new ImmutableArray<>(formalParVars);
+        final ImmutableList<Expression> formalArray =
+            ImmutableList.of(formalParVars);
         final StatementBlock sb;
         if (pm.isConstructor()) {
             assert selfVar != null;

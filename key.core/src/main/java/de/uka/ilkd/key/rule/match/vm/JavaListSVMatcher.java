@@ -19,7 +19,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.compiler.ListSVMatcher;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -28,7 +28,7 @@ import org.jspecify.annotations.Nullable;
  * child may join a list schema
  * variable's run if it is admissible for the schema variable's sort
  * ({@code ProgramSVSort.canStandFor}, judged in the execution context recorded with the
- * instantiations), and the collected run is stored as an {@code ImmutableArray} of program
+ * instantiations), and the collected run is stored as an {@code ImmutableList} of program
  * elements; if the schema variable is already bound, the match instead succeeds without change
  * exactly when the existing list equals the run. (The interpreter back-end matches list schema
  * variables with {@code ProgramSV.matchListSV}; both must yield identical results.)
@@ -39,8 +39,8 @@ public final class JavaListSVMatcher implements ListSVMatcher {
     public static final JavaListSVMatcher INSTANCE = new JavaListSVMatcher();
 
     /** the instantiation of a list schema variable that matched no source children */
-    private static final ImmutableArray<ProgramElement> EMPTY_LIST_INSTANTIATION =
-        new ImmutableArray<>(new ProgramElement[0]);
+    private static final ImmutableList<ProgramElement> EMPTY_LIST_INSTANTIATION =
+        ImmutableList.of(new ProgramElement[0]);
 
     private JavaListSVMatcher() {}
 
@@ -56,11 +56,11 @@ public final class JavaListSVMatcher implements ListSVMatcher {
     @Override
     public @Nullable MatchResultInfo bindRun(SchemaVariable listSV,
             List<? extends SyntaxElement> run, MatchResultInfo mc, LogicServices services) {
-        final ImmutableArray<ProgramElement> list = run.isEmpty() ? EMPTY_LIST_INSTANTIATION
-                : new ImmutableArray<>(run.toArray(new ProgramElement[0]));
+        final ImmutableList<ProgramElement> list = run.isEmpty() ? EMPTY_LIST_INSTANTIATION
+                : ImmutableList.of(run.toArray(new ProgramElement[0]));
         final MatchConditions matchCond = (MatchConditions) mc;
         SVInstantiations insts = matchCond.getInstantiations();
-        final ImmutableArray<ProgramElement> pl = insts.getInstantiation(listSV);
+        final ImmutableList<ProgramElement> pl = insts.getInstantiation(listSV);
         if (pl != null) {
             return pl.equals(list) ? matchCond : null;
         }

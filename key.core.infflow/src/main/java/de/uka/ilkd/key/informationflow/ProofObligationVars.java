@@ -17,7 +17,6 @@ import de.uka.ilkd.key.logic.op.*;
 
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
@@ -101,13 +100,13 @@ public class ProofObligationVars {
     public ProofObligationVars labelHeapAtPreAsAnonHeapFunc() {
         if (pre.heap.op() instanceof Function
                 && !pre.heap.containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL)) {
-            ImmutableArray<TermLabel> labels = pre.heap.getLabels();
+            ImmutableList<TermLabel> labels = pre.heap.getLabels();
             TermLabel[] newLabels = new TermLabel[labels.size() + 1];
             labels.toArray(newLabels);
             newLabels[labels.size()] = ParameterlessTermLabel.ANON_HEAP_LABEL;
             StateVars newPre =
                 new StateVars(pre.self, pre.guard, pre.localVars, pre.result, pre.exception,
-                    tb.label(pre.heap, new ImmutableArray<>(newLabels)), pre.mbyAtPre);
+                    tb.label(pre.heap, ImmutableList.of(newLabels)), pre.mbyAtPre);
             return new ProofObligationVars(newPre, post, exceptionParameter, formalParams, tb);
         } else {
             return this;

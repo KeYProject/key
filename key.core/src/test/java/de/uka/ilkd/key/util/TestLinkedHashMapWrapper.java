@@ -20,7 +20,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -291,8 +291,8 @@ public class TestLinkedHashMapWrapper {
         assertEquals(2, wrappedMap2.size(), "Map should contain two elements");
 
         LinkedHashMapWrapper<JTerm, Integer> wrappedMap3 =
-            new LinkedHashMapWrapper<>(new ImmutableArray<>(tb.tt(), tb.ff(), tb.tt()),
-                new ImmutableArray<>(1, 2, 3),
+            new LinkedHashMapWrapper<>(ImmutableList.of(tb.tt(), tb.ff(), tb.tt()),
+                ImmutableList.of(1, 2, 3),
                 TERM_LABELS_PROPERTY);
         assertFalse(wrappedMap3.isEmpty(), "Map should not be empty (2)");
         assertEquals(2, wrappedMap3.size(), "Map should contain two elements, as tt is repeated");

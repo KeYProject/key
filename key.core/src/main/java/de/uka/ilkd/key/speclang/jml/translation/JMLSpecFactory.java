@@ -330,7 +330,7 @@ public class JMLSpecFactory {
             Statement s = sc.getStatementAt(i);
 
             if (s instanceof For) {
-                ImmutableArray<VariableSpecification> avs = ((For) s).getVariablesInScope();
+                ImmutableList<VariableSpecification> avs = ((For) s).getVariablesInScope();
                 for (int j = 0, n = avs.size(); j < n; j++) {
                     VariableSpecification vs = avs.get(j);
                     LocationVariable pv = (LocationVariable) vs.getProgramVariable();
@@ -341,7 +341,7 @@ public class JMLSpecFactory {
             if (s == loop) {
                 return result;
             } else if (s instanceof LocalVariableDeclaration) {
-                ImmutableArray<VariableSpecification> vars =
+                ImmutableList<VariableSpecification> vars =
                     ((LocalVariableDeclaration) s).getVariables();
                 for (int j = 0, n = vars.size(); j < n; j++) {
                     LocationVariable pv = (LocationVariable) vars.get(j).getProgramVariable();
@@ -1675,7 +1675,7 @@ public class JMLSpecFactory {
         for (int i = 0; i < statementCount; i++) {
             final Statement s = container.getStatementAt(i);
             if (s instanceof For) {
-                final ImmutableArray<VariableSpecification> variables =
+                final ImmutableList<VariableSpecification> variables =
                     ((For) s).getVariablesInScope();
                 for (int j = 0; j < variables.size(); j++) {
                     result =
@@ -1685,7 +1685,7 @@ public class JMLSpecFactory {
             if (s == statement) {
                 return result;
             } else if (s instanceof LocalVariableDeclaration) {
-                final ImmutableArray<VariableSpecification> variables =
+                final ImmutableList<VariableSpecification> variables =
                     ((LocalVariableDeclaration) s).getVariables();
                 for (int j = 0; j < variables.size(); j++) {
                     result =

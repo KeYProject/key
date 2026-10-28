@@ -32,7 +32,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import org.slf4j.Logger;
@@ -271,7 +271,7 @@ public final class TypeConverter {
         JTerm p = convertReferencePrefix(prefix, ec);
         IProgramMethod pm = mr.method(services, services.getTypeConverter().getKeYJavaType(p), ec);
         if (pm.isModel()) {
-            ImmutableArray<? extends Expression> args = mr.getArguments();
+            ImmutableList<? extends Expression> args = mr.getArguments();
             JTerm[] argTerms = new JTerm[args.size() + 2]; // heap, self,
             int index = 0;
             for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
