@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.reference;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
@@ -12,18 +14,22 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Package reference.
  *
  * @author <TT>AutoDoc</TT>
  */
+@NullMarked
 public class PackageReference extends JavaNonTerminalProgramElement
         implements TypeReferenceInfix, PackageReferenceContainer {
 
     /**
      * Prefix.
      */
-    protected final ReferencePrefix prefix;
+    protected final @Nullable ReferencePrefix prefix;
 
     /**
      * Name.
@@ -41,11 +47,11 @@ public class PackageReference extends JavaNonTerminalProgramElement
      */
     public PackageReference(ExtList children) {
         prefix = children.get(PackageReference.class);
-        name = children.get(ProgramElementName.class);
+        name = Objects.requireNonNull(children.get(ProgramElementName.class), "missing name");
         assert name != null;
     }
 
-    public PackageReference(ProgramElementName name, ReferencePrefix prefix) {
+    public PackageReference(ProgramElementName name, @Nullable ReferencePrefix prefix) {
         this.prefix = prefix;
         this.name = name;
         assert name != null;
@@ -105,7 +111,7 @@ public class PackageReference extends JavaNonTerminalProgramElement
      *
      * @return the reference prefix.
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return prefix;
     }
 
@@ -114,7 +120,7 @@ public class PackageReference extends JavaNonTerminalProgramElement
      *
      * @return the package reference.
      */
-    public PackageReference getPackageReference() {
+    public @Nullable PackageReference getPackageReference() {
         return (prefix instanceof PackageReference) ? (PackageReference) prefix : null;
     }
 
@@ -125,7 +131,7 @@ public class PackageReference extends JavaNonTerminalProgramElement
      * @return the string.
      */
     public final String getName() {
-        return (name == null) ? null : name.toString();
+        return name.toString();
     }
 
     /**

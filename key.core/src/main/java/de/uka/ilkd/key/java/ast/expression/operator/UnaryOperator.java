@@ -24,11 +24,15 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  * @author Alexander Weigl
  * @version 1 (4/12/26)
  */
+@NullMarked
 public final class UnaryOperator extends Operator
         implements ProgramElementWithKind<UnaryOperatorKind> {
     public UnaryOperator(UnaryOperatorKind kind, Expression arg) {
@@ -68,7 +72,7 @@ public final class UnaryOperator extends Operator
     }
 
     @Override
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, @Nullable MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         if (src instanceof UnaryOperator other) {
             if (this.kind.equals(other.getKind())) {
@@ -80,7 +84,7 @@ public final class UnaryOperator extends Operator
 
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         final TypeConverter tc = javaServ.getTypeConverter();
 
         try {

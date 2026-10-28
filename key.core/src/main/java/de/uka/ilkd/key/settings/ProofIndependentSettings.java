@@ -12,6 +12,8 @@ import java.util.*;
 
 import de.uka.ilkd.key.pp.NotationInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,14 +25,17 @@ import org.slf4j.LoggerFactory;
  *
  * @see Settings
  */
+@NullMarked
 public class ProofIndependentSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofIndependentSettings.class);
 
     public static final ProofIndependentSettings DEFAULT_INSTANCE;
 
     static {
-        var write = PathConfig.currentPaths.proofIndependentSettings;
-        var read = PathConfig.previousPaths.proofIndependentSettings;
+        var write = Objects.requireNonNull(PathConfig.currentPaths,
+            "KeY paths are not initialized").proofIndependentSettings;
+        var read = Objects.requireNonNull(PathConfig.previousPaths,
+            "KeY paths are not initialized").proofIndependentSettings;
 
         if (Files.exists(write)) {
             read = write;
@@ -38,8 +43,9 @@ public class ProofIndependentSettings {
 
         // change to props file, if json file does not exists
         if (!Files.exists(read)) {
-            read = read.getParent()
-                    .resolve(read.getFileName().toString().replace(".json", ".props"));
+            read = Objects.requireNonNull(read.getParent(),
+                "settings file has no parent directory").resolve(
+                    read.getFileName().toString().replace(".json", ".props"));
         }
 
         // read from the old/new place
@@ -59,14 +65,16 @@ public class ProofIndependentSettings {
     private final FeatureSettings featureSettings = new FeatureSettings();
     private final StrategyPresetsSettings strategyPresetsSettings = new StrategyPresetsSettings();
 
-    private File filename;
+    // always overwritten before any use (in the ProofIndependentSettings(File)
+    // constructor or the static initializer), so the default value is never observed
+    private File filename = new File("");
 
 
     private final List<Settings> settings = new LinkedList<>();
 
     private final PropertyChangeListener settingsListener = e -> saveSettings();
-    private Properties lastReadProperties;
-    private Configuration lastReadConfiguration;
+    private @Nullable Properties lastReadProperties;
+    private @Nullable Configuration lastReadConfiguration;
 
     private ProofIndependentSettings() {
         addSettings(smtSettings);

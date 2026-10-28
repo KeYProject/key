@@ -13,6 +13,8 @@ import de.uka.ilkd.key.proof.io.consistency.AbstractFileRepo;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class is responsible for saving (zipped) proof bundles. These bundles contain all data
  * needed for successfully reloading the proofs:
@@ -25,6 +27,7 @@ import de.uka.ilkd.key.util.MiscTools;
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class ProofBundleSaver extends ProofSaver {
 
     /**

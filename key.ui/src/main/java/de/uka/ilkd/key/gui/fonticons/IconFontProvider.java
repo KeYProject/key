@@ -7,6 +7,9 @@ package de.uka.ilkd.key.gui.fonticons;
 import java.awt.*;
 import javax.swing.*;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class IconFontProvider extends IconProvider {
     private final IconFont iconCode;
     private final Color lightModeColor;

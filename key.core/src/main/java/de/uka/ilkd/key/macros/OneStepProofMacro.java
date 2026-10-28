@@ -17,12 +17,14 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Apply a single proof step.
  *
  * @author Simon Greiner
  */
+@NullMarked
 public class OneStepProofMacro extends StrategyProofMacro {
 
     @Override

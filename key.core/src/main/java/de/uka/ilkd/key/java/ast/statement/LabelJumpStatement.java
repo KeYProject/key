@@ -16,17 +16,21 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Label jump statement.
  */
 
+@NullMarked
 public abstract class LabelJumpStatement extends JumpStatement implements NameReference {
 
     /**
      * Name.
      */
 
-    protected final Label name;
+    protected final @Nullable Label name;
 
     /**
      * Label jump statement.
@@ -71,7 +75,12 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      *
      * @return the string.
      */
-    public final String getName() {
+    // getName() returns null for unlabeled jumps (break;/continue;), which conflicts with the
+    // @NonNull contract of NamedModelElement.getName(); the super-interface cannot be widened
+    // without ripple (LabeledStatement and MethodDeclaration override it as well), so the
+    // override-mismatch check is scoped here.
+    @SuppressWarnings("NullAway")
+    public final @Nullable String getName() {
         return (name == null) ? null : name.toString();
     }
 
@@ -81,7 +90,7 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      * @return the Label label
      */
 
-    public Label getLabel() {
+    public @Nullable Label getLabel() {
         return name;
     }
 
@@ -91,7 +100,11 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
      *
      * @return the identifier.
      */
-    public ProgramElementName getProgramElementName() {
+    // returns null for labels that are not ProgramElementNames (and for unlabeled jumps), which
+    // conflicts with the @NonNull contract of NamedProgramElement.getProgramElementName(); the
+    // super-interface cannot be widened without ripple, so the check is scoped here.
+    @SuppressWarnings("NullAway")
+    public @Nullable ProgramElementName getProgramElementName() {
         if ((name instanceof ProgramElementName) || (name == null)) {
             return (ProgramElementName) name;
         }

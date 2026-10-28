@@ -18,7 +18,7 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -26,6 +26,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Benjamin Takacs
  */
+@NullMarked
 public class JmlAssert extends JavaStatement {
     /**
      * Index in the list of terms of
@@ -41,7 +42,7 @@ public class JmlAssert extends JavaStatement {
      * Temporary solution until full jml labels are there ...
      * (To be clarified if compatible still)
      */
-    private final String optLabel;
+    private final @Nullable String optLabel;
 
     /**
      * the condition in parse tree form
@@ -59,7 +60,8 @@ public class JmlAssert extends JavaStatement {
      * @param assertionProof the optional proof for an assert statement (not for assume)
      * @param positionInfo the position information for this statement
      */
-    public JmlAssert(TextualJMLAssertStatement.Kind kind, String label, KeyAst.Expression condition,
+    public JmlAssert(TextualJMLAssertStatement.Kind kind, @Nullable String label,
+            KeyAst.Expression condition,
             KeyAst.@Nullable JMLProofScript assertionProof,
             PositionInfo positionInfo) {
         super(positionInfo);
@@ -211,7 +213,7 @@ public class JmlAssert extends JavaStatement {
      *
      * @return a freshly created list of at least one term
      */
-    public @NonNull ImmutableList<JmlParser.ExpressionContext> collectTerms() {
+    public ImmutableList<JmlParser.ExpressionContext> collectTerms() {
         ImmutableList<JmlParser.ExpressionContext> result = ImmutableList.of();
         if (assertionProof != null) {
             result = result.prepend(assertionProof.collectTerms());
@@ -227,7 +229,7 @@ public class JmlAssert extends JavaStatement {
         return ImmutableList.of();
     }
 
-    public String getOptLabel() {
+    public @Nullable String getOptLabel() {
         return optLabel;
     }
 }

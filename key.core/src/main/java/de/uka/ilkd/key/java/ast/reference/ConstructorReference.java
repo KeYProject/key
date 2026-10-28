@@ -4,12 +4,15 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.reference;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Constructor reference.
  *
  * @author <TT>AutoDoc</TT>
  */
 
+@NullMarked
 public interface ConstructorReference extends MethodOrConstructorReference {
 
 

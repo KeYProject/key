@@ -33,6 +33,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -41,6 +42,7 @@ import org.jspecify.annotations.Nullable;
  * added because the Taclets allow to introduce new rules during runtime. It offers selective get
  * methods for different kinds of rules.
  */
+@NullMarked
 public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
 
     private static final Object DEFAULT_SV_KEY = new Object();
@@ -297,7 +299,7 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
      */
     protected abstract ImmutableList<NoPosTacletApp> matchTaclets(
             @NonNull ImmutableList<NoPosTacletApp> tacletApps, final RuleFilter p_filter,
-            final PosInOccurrence pos, final LogicServices services);
+            @Nullable final PosInOccurrence pos, final LogicServices services);
 
     /**
      * returns a selection from the given map with NoPosTacletApps relevant for the given program
@@ -379,10 +381,10 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
      * @param second the second list
      * @return the merged list
      */
-    private ImmutableList<NoPosTacletApp> merge(ImmutableList<NoPosTacletApp> first,
-            final ImmutableList<NoPosTacletApp> second) {
+    private ImmutableList<NoPosTacletApp> merge(@Nullable ImmutableList<NoPosTacletApp> first,
+            @Nullable final ImmutableList<NoPosTacletApp> second) {
         if (second == null) {
-            return first;
+            return Objects.requireNonNull(first, "merge called with two null lists");
         } else if (first == null) {
             return second;
         } else {
@@ -504,8 +506,13 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
      * @param name the name to lookup
      * @return the found NoPosTacletApp or null if no matching Taclet is there
      */
+    @SuppressWarnings("NullAway") // interface RuleIndex.lookup(Name) is declared non-null, but its
+                                  // javadoc documents "or null if no matching Taclet is there"
+                                  // (matching the @Nullable lookup(String) overload); widening the
+                                  // interface declaration belongs to key.ncore.calculus (out of
+                                  // scope here)
     @Override
-    public NoPosTacletApp lookup(Name name) {
+    public @Nullable NoPosTacletApp lookup(Name name) {
         return allNoPosTacletAppsStream()
                 .filter(tacletApp -> tacletApp.taclet().name().equals(name))
                 .findAny()

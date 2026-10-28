@@ -10,6 +10,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -17,6 +18,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author weigl
  */
+@NullMarked
 public abstract class AbstractPropertiesSettings extends AbstractSettings {
 
     private static final String SET_DELIMITER = ",";
@@ -182,7 +184,9 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
      */
     protected PropertyEntry<List<String>> createStringListProperty(@NonNull String key,
             @Nullable String defValue) {
-        PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key, parseStringList(defValue),
+        PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key,
+            parseStringList(Objects.requireNonNull(defValue,
+                "string list property requires a default value")),
             AbstractPropertiesSettings::parseStringList,
             AbstractPropertiesSettings::stringListToString, it -> (List<String>) it);
         propertyEntries.add(pe);
@@ -271,7 +275,17 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
             }
         }
 
+        /**
+         * Delegates to the property-specific conversion function injected by the {@code
+         * create*Property} factories. The null semantics live in that function: null passes
+         * through for {@code String}/{@code Boolean}/{@code List} properties (the caller ignores
+         * the {@code null} result) but crashes for numeric/collection ones. This matches main's
+         * behavior exactly; no single annotation can express it uniformly (widening the function
+         * type to {@code Function<@Nullable Object, T>} is rejected by NullAway, and guarding the
+         * null would turn main's null-tolerant pass-through into a fatal error).
+         */
         @Override
+        @SuppressWarnings("NullAway")
         public T fromObject(@Nullable Object o) {
             return fromObject.apply(o);
         }

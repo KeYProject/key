@@ -18,14 +18,18 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class ConsoleProofObligationSelector implements ProofObligationSelector {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(ConsoleProofObligationSelector.class);
@@ -38,6 +42,17 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
 
     protected List<Contract> contracts;
 
+    /**
+     * Creates the console proof-obligation selector.
+     *
+     * <p>
+     * The contract list is initialized by {@link #initializeContractsArray()} while the receiver
+     * is still under initialization (EISOP initialization check); the EISOP initialization check
+     * cannot see the assignment inside the delegated call, so both the field and the delegated
+     * call are suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     public ConsoleProofObligationSelector(ConsoleUserInterfaceControl ui, InitConfig initConfig) {
         this.ui = ui;
         this.mediator = ui.getMediator();
@@ -62,7 +77,6 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
         }
     }
 
-
     protected void printAvailableProofObligations() {
         LOGGER.info("Available Contracts: ");
         for (int i = 0; i < contracts.size(); i++) {
@@ -76,14 +90,17 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
         LOGGER.info(TAB + "PO:" + contracts.get(i).getDisplayName());
     }
 
-    protected ProofOblInput createPOForSelectedContract() {
+    protected @Nullable ProofOblInput createPOForSelectedContract() {
         final Contract contract = selectContract();
         LOGGER.info("Contract: " + contract);
         return contract == null ? null : contract.createProofObl(initConfig, contract);
     }
 
-    protected void findOrStartProof(ProofOblInput po) {
-
+    protected void findOrStartProof(@Nullable ProofOblInput po) {
+        if (po == null) {
+            // the proof obligation is always created before a proof is started
+            throw new NullPointerException("No proof obligation available.");
+        }
 
         Proof proof = findPreferablyClosedProof(po);
 
@@ -105,10 +122,9 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
             mediator.getSelectionModel().setSelectedProof(proof);
         }
 
-
     }
 
-    private Proof findPreferablyClosedProof(ProofOblInput po) {
+    private @Nullable Proof findPreferablyClosedProof(ProofOblInput po) {
         ImmutableSet<Proof> proofs =
             initConfig.getServices().getSpecificationRepository().getProofs(po);
 
@@ -119,7 +135,12 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
 
         // try to find closed proof
         for (Proof proof : proofs) {
-            if (proof.mgt().getStatus().getProofClosed()) {
+            ProofCorrectnessMgt mgt = proof.mgt();
+            if (mgt == null) {
+                // a proof that is managed by the repository always carries a correctness manager
+                throw new NullPointerException("No proof management available.");
+            }
+            if (mgt.getStatus().getProofClosed()) {
                 return proof;
             }
         }
@@ -135,14 +156,12 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
         return true;
     }
 
-
     private Contract selectContract() {
         printAvailableProofObligations();
 
         LOGGER.info("Choose PO, enter number between 0 and " + (contracts.size() - 1));
         int cNr = readContractNumber();
         return contracts.get(cNr);
-
 
     }
 
@@ -169,8 +188,12 @@ public class ConsoleProofObligationSelector implements ProofObligationSelector {
     private int readInt() throws NumberFormatException, IOException {
         BufferedReader br =
             new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
-        return Integer.parseInt(br.readLine());
+        String line = br.readLine();
+        if (line == null) {
+            // end of input is treated as an I/O problem by the caller
+            throw new IOException("No input line available.");
+        }
+        return Integer.parseInt(line);
     }
-
 
 }

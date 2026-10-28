@@ -23,7 +23,9 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor {
     /**
      * Strategy property which saves the list of formulas which where added by information flow
@@ -98,6 +100,10 @@ public class InfFlowContractAppTacletExecutor extends RewriteTacletExecutor {
         StrategyInfoUndoMethod undo = strategyInfos -> {
             ImmutableList<JTerm> applFormulas1 =
                 strategyInfos.get(INF_FLOW_CONTRACT_APPL_PROPERTY);
+            if (applFormulas1 == null) {
+                throw new NullPointerException(
+                    "No stored contract application formulas to undo for the goal " + goal + ".");
+            }
             strategyInfos.put(INF_FLOW_CONTRACT_APPL_PROPERTY,
                 applFormulas1.removeAll(applFormula));
         };

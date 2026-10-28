@@ -13,6 +13,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.logic.RenamingTable;
@@ -33,8 +34,10 @@ import org.key_project.util.collection.Pair;
 import org.key_project.util.lookup.Lookup;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class Node implements Iterable<Node> {
     private static final String RULE_WITHOUT_NAME = "rule without name";
 
@@ -57,15 +60,15 @@ public class Node implements Iterable<Node> {
     /**
      * The branch location of this proof node.
      */
-    private BranchLocation branchLocation = null;
+    private @Nullable BranchLocation branchLocation = null;
 
     private Sequent seq = JavaDLSequentKit.getInstance().getEmptySequent();
 
     private final ArrayList<Node> children = new ArrayList<>(1);
 
-    private RuleApp appliedRuleApp;
+    private @Nullable RuleApp appliedRuleApp;
 
-    private NameRecorder nameRecorder;
+    private @Nullable NameRecorder nameRecorder;
 
     /**
      * a linked list of the locally generated program variables. It extends the list of the parent
@@ -106,9 +109,9 @@ public class Node implements Iterable<Node> {
      */
     private int siblingNr = -1;
 
-    private ImmutableList<RenamingTable> renamings;
+    private @Nullable ImmutableList<RenamingTable> renamings;
 
-    private String cachedName = null;
+    private @Nullable String cachedName = null;
 
     private @Nullable Lookup userData = null;
 
@@ -179,7 +182,7 @@ public class Node implements Iterable<Node> {
         return proof;
     }
 
-    public void setAppliedRuleApp(RuleApp ruleApp) {
+    public void setAppliedRuleApp(@Nullable RuleApp ruleApp) {
         this.nodeInfo.updateNoteInfo();
         this.appliedRuleApp = ruleApp;
         clearNameCache();
@@ -204,7 +207,7 @@ public class Node implements Iterable<Node> {
         }
     }
 
-    public NameRecorder getNameRecorder() {
+    public @Nullable NameRecorder getNameRecorder() {
         return nameRecorder;
     }
 
@@ -216,11 +219,11 @@ public class Node implements Iterable<Node> {
         renamings = list;
     }
 
-    public ImmutableList<RenamingTable> getRenamingTable() {
+    public @Nullable ImmutableList<RenamingTable> getRenamingTable() {
         return renamings;
     }
 
-    public RuleApp getAppliedRuleApp() {
+    public @Nullable RuleApp getAppliedRuleApp() {
         return appliedRuleApp;
     }
 
@@ -299,7 +302,8 @@ public class Node implements Iterable<Node> {
             if (node.root()) {
                 return false;
             }
-            node = node.parent();
+            node = Objects.requireNonNull(node.parent(),
+                "node is not part of the same proof tree (no parent to step to)");
         }
 
         return true;
@@ -330,7 +334,8 @@ public class Node implements Iterable<Node> {
             if (n.root()) {
                 break;
             }
-            n = n.parent();
+            n = Objects.requireNonNull(n.parent(),
+                "node without parent encountered on the way to the root");
 
             if (!paths.add(other)) {
                 return other;
@@ -339,11 +344,13 @@ public class Node implements Iterable<Node> {
                 other = n;
                 break;
             }
-            other = other.parent();
+            other = Objects.requireNonNull(other.parent(),
+                "node without parent encountered on the way to the root");
         }
 
         while (!paths.contains(other)) {
-            other = other.parent();
+            other = Objects.requireNonNull(other.parent(),
+                "node without parent encountered on the way to the root");
         }
 
         return other;
@@ -648,10 +655,11 @@ public class Node implements Iterable<Node> {
      */
     public boolean sanityCheckDoubleLinks() {
         if (!root()) {
-            if (!parent().children.contains(this)) {
+            final Node par = Objects.requireNonNull(parent(), "non-root node must have a parent");
+            if (!par.children.contains(this)) {
                 return false;
             }
-            if (parent.proof() != proof()) {
+            if (par.proof() != proof()) {
                 return false;
             }
         }

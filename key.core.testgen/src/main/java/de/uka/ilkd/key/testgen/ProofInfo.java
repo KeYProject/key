@@ -4,19 +4,20 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.testgen;
 
-import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -26,6 +27,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -39,8 +41,7 @@ public record ProofInfo(Proof proof, Services services) {
     }
 
 
-    @Nullable
-    public IProgramMethod getMUT() {
+    public @Nullable IProgramMethod getMUT() {
         SpecificationRepository spec = services.getSpecificationRepository();
         IObserverFunction f = spec.getTargetOfProof(proof);
         if (f instanceof IProgramMethod pm) {
@@ -50,8 +51,7 @@ public record ProofInfo(Proof proof, Services services) {
         }
     }
 
-    @Nullable
-    public String getMUTCall() {
+    public @Nullable String getMUTCall() {
         var m = getMUT();
         if (m == null)
             return null;
@@ -61,7 +61,11 @@ public record ProofInfo(Proof proof, Services services) {
             return null;
 
         StringBuilder params = new StringBuilder();
-        for (ParameterDeclaration p : m.getParameters()) {
+        ImmutableArray<ParameterDeclaration> paramDecls = m.getParameters();
+        if (paramDecls == null) {
+            throw new NullPointerException("Method under test has no parameter list.");
+        }
+        for (ParameterDeclaration p : paramDecls) {
             for (VariableSpecification v : p.getVariables()) {
                 IProgramVariable pvar = v.getProgramVariable();
                 params.append(",").append(pvar.name());
@@ -73,36 +77,46 @@ public record ProofInfo(Proof proof, Services services) {
 
         String caller;
         if (m.isStatic()) {
-            caller = getTypeOfClassUnderTest().getName();
+            KeYJavaType classUnderTest = getTypeOfClassUnderTest();
+            if (classUnderTest == null) {
+                throw new NullPointerException("No type of class under test.");
+            }
+            caller = classUnderTest.getName();
         } else {
             caller = "self";
         }
 
-        if (m.getReturnType().equals(KeYJavaType.VOID_TYPE)) {
+        KeYJavaType returnType = m.getReturnType();
+        if (returnType == null) {
+            throw new NullPointerException("Method under test has no return type.");
+        }
+        if (returnType.equals(KeYJavaType.VOID_TYPE)) {
             return caller + "." + name + "(" + params + ");";
         } else {
-            String returnType = m.getReturnType().getFullName();
-            return returnType + " result = " + caller + "." + name + "(" + params + ");";
+            String returnTypeName = returnType.getFullName();
+            return returnTypeName + " result = " + caller + "." + name + "(" + params + ");";
         }
     }
 
-    @Nullable
-    public KeYJavaType getTypeOfClassUnderTest() {
-        if (getMUT() == null) {
+    public @Nullable KeYJavaType getTypeOfClassUnderTest() {
+        IProgramMethod mut = getMUT();
+        if (mut == null) {
             return null;
         }
-        return getMUT().getContainerType();
+        return mut.getContainerType();
     }
 
-    @Nullable
-    public KeYJavaType getReturnType() {
+    public @Nullable KeYJavaType getReturnType() {
         var mut = getMUT();
         return mut != null ? mut.getType() : null;
     }
 
     public Contract getContract() {
         ContractPO po = services.getSpecificationRepository().getPOForProof(proof);
-        return Objects.requireNonNull(po).getContract();
+        if (po == null) {
+            throw new NullPointerException("No proof obligation available for the proof.");
+        }
+        return po.getContract();
     }
 
     public JTerm getPostCondition() {
@@ -121,8 +135,16 @@ public record ProofInfo(Proof proof, Services services) {
         Contract c = getContract();
         if (c instanceof FunctionalOperationContract t) {
             OriginalVariables orig = t.getOrigVars();
-            return t.getPre(services.getTypeConverter().getHeapLDT().getHeap(), orig.self,
-                orig.params, orig.atPres, services);
+            HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+            if (heapLDT == null) {
+                throw new NullPointerException(
+                    "No heap type defined in the services type converter.");
+            }
+            JTerm pre = t.getPre(heapLDT.getHeap(), orig.self, orig.params, orig.atPres, services);
+            if (pre == null) {
+                throw new NullPointerException("No precondition available for the contract.");
+            }
+            return pre;
         }
         // no pre <==> false
         return services.getTermBuilder().ff();
@@ -130,12 +152,23 @@ public record ProofInfo(Proof proof, Services services) {
 
     public JTerm getModifiable() {
         Contract c = getContract();
-        return c.getModifiable(services.getTypeConverter().getHeapLDT().getHeap());
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        if (heapLDT == null) {
+            throw new NullPointerException("No heap type defined in the services type converter.");
+        }
+        JTerm modifiable = c.getModifiable(heapLDT.getHeap());
+        if (modifiable == null) {
+            throw new NullPointerException("No modifies clause available for the contract.");
+        }
+        return modifiable;
     }
 
     public String getCode() {
         JTerm f = getPO();
         JavaBlock block = getJavaBlock(f);
+        if (block == null) {
+            throw new NullPointerException("No Java block found in the proof obligation.");
+        }
 
         PosTableLayouter l = PosTableLayouter.pure();
         l.beginC(0);
@@ -167,6 +200,9 @@ public record ProofInfo(Proof proof, Services services) {
 
         Sort nullSort = services.getJavaInfo().getNullType().getSort();
         Sort objSort = services.getJavaInfo().getJavaLangObject().getSort();
+        if (objSort == null) {
+            throw new NullPointerException("No sort for java.lang.Object.");
+        }
         Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         Sort boolSort = services.getTypeConverter().getBooleanLDT().targetSort();
 
@@ -187,7 +223,11 @@ public record ProofInfo(Proof proof, Services services) {
     }
 
     public JTerm getPO() {
-        return (JTerm) proof.root().sequent().succedent().get(0).formula();
+        Node root = proof.root();
+        if (root == null) {
+            throw new NullPointerException("Proof has no root node.");
+        }
+        return (JTerm) root.sequent().succedent().get(0).formula();
     }
 
 
@@ -207,8 +247,12 @@ public record ProofInfo(Proof proof, Services services) {
 
     private String processUpdate(JTerm update) {
         if (update.op() instanceof ElementaryUpdate up) {
-            if (up.lhs().sort()
-                    .extendsTrans(services.getTypeConverter().getHeapLDT().targetSort())) {
+            HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+            if (heapLDT == null) {
+                throw new NullPointerException(
+                    "No heap type defined in the services type converter.");
+            }
+            if (up.lhs().sort().extendsTrans(heapLDT.targetSort())) {
                 return "";
             }
             return "   \n" + up.lhs().sort() + " " + up.lhs().toString() + " = " + update.sub(0)
@@ -221,7 +265,7 @@ public record ProofInfo(Proof proof, Services services) {
         return result.toString();
     }
 
-    public JavaBlock getJavaBlock(JTerm t) {
+    public @Nullable JavaBlock getJavaBlock(JTerm t) {
         if (t.containsJavaBlockRecursive()) {
             if (!t.javaBlock().isEmpty()) {
                 return t.javaBlock();

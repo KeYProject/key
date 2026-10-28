@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.prooftree;
 
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -15,7 +14,10 @@ import javax.swing.tree.TreeNode;
 import de.uka.ilkd.key.proof.Node;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public abstract class GUIAbstractTreeNode implements TreeNode {
 
     private final GUIProofTreeModel tree;
@@ -24,7 +26,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
     // and ProofTreeView.delegateView.lastPathComponent
     private final WeakReference<Node> noderef;
 
-    protected TreeNode parent;
+    protected @Nullable TreeNode parent;
 
     protected GUIProofTreeModel getProofTreeModel() {
         return tree;
@@ -39,17 +41,28 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
 
     public abstract int getChildCount();
 
+    /**
+     * Returns the parent of this node.
+     *
+     * <p>
+     * The JDK declares a non-null return, although the proof-tree root node has no parent and
+     * reports {@code null} (as does a node whose wrapped proof node was collected), which the
+     * swing tree tolerates as the end of the path; both cases are deliberate and suppressed
+     * with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     @Override
     public TreeNode getParent() {
+        Node node = getNode();
         if (parent == null && this != tree.getRoot()
-                && !(getNode() != null && ProofTreeViewFilter.hiddenByGlobalFilters(getNode()))) {
-            Node n = getNode();
-            if (n != null && n.proof().root() == n) {
-                return null; // TODO: why can there be another instance of the root node?
+                && !(node != null && ProofTreeViewFilter.hiddenByGlobalFilters(node))) {
+            if (node != null && node.proof().root() == node) {
+                return (TreeNode) null; // TODO: why can there be another instance of the root node?
             }
             throw new IllegalStateException("abstract tree node without parent: " + this);
         }
-        return parent;
+        TreeNode parentNode = parent;
+        return parentNode == null ? (TreeNode) null : parentNode;
     }
 
     public abstract boolean isLeaf();
@@ -74,7 +87,6 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
     public Enumeration<TreeNode> children() {
         return new ChildEnumeration();
     }
-
 
     public TreeNode[] getPath() {
         LinkedList<TreeNode> path = new LinkedList<>();
@@ -108,15 +120,18 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
             synchronized (nodeInfo) {
                 label = nodeInfo.getBranchLabel();
                 if (label == null) {
-                    label = "Case " + (p_node.parent().getChildNr(p_node) + 1);
+                    Node parentNode = p_node.parent();
+                    if (parentNode == null) {
+                        // a non-root proof node always has a parent
+                        throw new NullPointerException("No parent proof node available.");
+                    }
+                    label = "Case " + (parentNode.getChildNr(p_node) + 1);
                     nodeInfo.setBranchLabel(label);
                 }
             }
         }
         return label;
     }
-
-
 
     private class ChildEnumeration implements Enumeration<TreeNode> {
         int current = 0;
@@ -131,7 +146,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
 
     }
 
-    public Node getNode() {
+    public @Nullable Node getNode() {
         return noderef.get();
     }
 

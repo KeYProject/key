@@ -7,15 +7,19 @@ package de.uka.ilkd.key.gui.utilities;
 import java.util.Objects;
 import java.util.function.Function;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Caches a computation using a single value cache
  *
  * @param <A> arguments for the computation
  * @param <T> return type
  */
-public class Cached<A, T> {
-    private A args = null;
-    private T value = null;
+@NullMarked
+public class Cached<A extends @Nullable Object, T extends @Nullable Object> {
+    private @Nullable A args = null;
+    private @Nullable T value = null;
     private final Function<A, T> update;
 
     /**
@@ -31,9 +35,9 @@ public class Cached<A, T> {
      * Gets a possibly cached value
      *
      * @param args the arguments
-     * @return the value
+     * @return the value, or {@code null} if the cached computation produced {@code null}
      */
-    public T get(A args) {
+    public @Nullable T get(A args) {
         if (Objects.equals(args, this.args)) {
             return value;
         }

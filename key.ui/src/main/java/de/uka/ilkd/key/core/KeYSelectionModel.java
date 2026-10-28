@@ -17,9 +17,12 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.Sequent;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class KeYSelectionModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeYSelectionModel.class);
 
@@ -27,23 +30,23 @@ public class KeYSelectionModel {
     private final @NonNull KeYMediator primary;
 
     /** the proof to listen to */
-    private Proof proof;
+    private @Nullable Proof proof;
     /** if true the selectedGoal field below can be trusted */
     private boolean goalIsValid;
     /** is the selected node a goal */
-    private Goal selectedGoal;
+    private @Nullable Goal selectedGoal;
     /** the current displayed node */
-    private Node selectedNode;
+    private @Nullable Node selectedNode;
     /**
      * The currently displayed sequent. Equal to the sequent of {@link #selectedNode} unless
      * we are displaying an OSS node.
      */
-    private Sequent selectedSequent;
+    private @Nullable Sequent selectedSequent;
     /**
      * The currently displayed rule application. Equal to the rule app of {@link #selectedNode}
      * unless we are displaying an OSS node.
      */
-    private RuleApp selectedRuleApp;
+    private @Nullable RuleApp selectedRuleApp;
     /** the listeners to this model */
     private final List<KeYSelectionListener> listenerList;
 
@@ -62,18 +65,19 @@ public class KeYSelectionModel {
      *
      * @see KeYMediator#getSelectionModel()#setProof(Proof)
      */
-    public synchronized void setSelectedProof(Proof p) {
+    public synchronized void setSelectedProof(@Nullable Proof p) {
         final Proof previousProof = proof;
         goalIsValid = false;
         proof = p;
         primary.setProof(p, previousProof);
-        if (proof != null) {
-            if (proof.openGoals().isEmpty()) {
-                selectedNode = proof.root().leavesIterator().next();
-                selectedSequent = selectedNode.sequent();
-                selectedRuleApp = selectedNode.getAppliedRuleApp();
+        if (p != null) {
+            if (p.openGoals().isEmpty()) {
+                Node root = p.root();
+                selectedNode = root == null ? null : root.leavesIterator().next();
+                selectedSequent = selectedNode == null ? null : selectedNode.sequent();
+                selectedRuleApp = selectedNode == null ? null : selectedNode.getAppliedRuleApp();
             } else {
-                final Goal g = proof.openGoals().iterator().next();
+                final Goal g = p.openGoals().iterator().next();
                 goalIsValid = true;
                 selectedNode = g.node();
                 selectedSequent = selectedNode.sequent();
@@ -95,7 +99,7 @@ public class KeYSelectionModel {
      *
      * @return the proof that is selected by the user
      */
-    public Proof getSelectedProof() {
+    public @Nullable Proof getSelectedProof() {
         return proof;
     }
 
@@ -179,15 +183,15 @@ public class KeYSelectionModel {
      *
      * @return the node that is selected by the user
      */
-    public Node getSelectedNode() {
+    public @Nullable Node getSelectedNode() {
         return selectedNode;
     }
 
-    public Sequent getSelectedSequent() {
+    public @Nullable Sequent getSelectedSequent() {
         return selectedSequent;
     }
 
-    public RuleApp getSelectedRuleApp() {
+    public @Nullable RuleApp getSelectedRuleApp() {
         return selectedRuleApp;
     }
 
@@ -197,7 +201,7 @@ public class KeYSelectionModel {
      *
      * @return the selected goal, or null if there is none
      */
-    public Goal getSelectedGoal() {
+    public @Nullable Goal getSelectedGoal() {
         // Consistent with getSelectedProof()/getSelectedNode() (both nullable) and with the
         // documented "null if inner node" contract: return null - rather than throwing - when no
         // proof is loaded. Callers already null-check this method; throwing here made GUI listeners
@@ -206,7 +210,11 @@ public class KeYSelectionModel {
             return null;
         }
         if (!goalIsValid) {
-            selectedGoal = proof.getOpenGoal(selectedNode);
+            Node node = selectedNode;
+            if (node == null) {
+                return null;
+            }
+            selectedGoal = proof.getOpenGoal(node);
             goalIsValid = true;
         }
         return selectedGoal;
@@ -233,16 +241,27 @@ public class KeYSelectionModel {
         private static final int POS_GOAL_LIST = 2;
 
         private int currentPos = POS_START;
-        private Goal nextOne;
-        private Iterator<Goal> goalIt;
-        private Iterator<Node> nodeIt;
+        private @Nullable Goal nextOne;
+        private @Nullable Iterator<Goal> goalIt;
+        private @Nullable Iterator<Node> nodeIt;
 
+        /**
+         * The {@code findNext} call below operates on {@code this} while the receiver is still
+         * under initialization (EISOP initialization check); safe here since the constructor
+         * fields are assigned as the iterator walks the (already-set) outer selection state and
+         * all accesses go through {@link #findNext}, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public DefaultSelectionIterator() {
             findNext();
         }
 
         private void findNext() {
             nextOne = null;
+            Proof p = proof;
+            if (p == null) {
+                throw new NullPointerException("No proof selected for default selection.");
+            }
             while (nextOne == null) {
                 switch (currentPos) {
                     case POS_START -> {
@@ -256,13 +275,13 @@ public class KeYSelectionModel {
                     case POS_LEAVES -> {
                         if (nodeIt == null || !nodeIt.hasNext()) {
                             currentPos = POS_GOAL_LIST;
-                            if (!proof.openGoals().isEmpty()) {
-                                goalIt = proof.openGoals().iterator();
+                            if (!p.openGoals().isEmpty()) {
+                                goalIt = p.openGoals().iterator();
                             } else {
                                 goalIt = null;
                             }
                         } else {
-                            nextOne = proof.getOpenGoal(nodeIt.next());
+                            nextOne = p.getOpenGoal(nodeIt.next());
                         }
                     }
                     case POS_GOAL_LIST -> {
@@ -280,6 +299,9 @@ public class KeYSelectionModel {
         @Override
         public Goal next() {
             Goal res = nextOne;
+            if (res == null) {
+                throw new NullPointerException("Default selection iterator has no next goal.");
+            }
             findNext();
             return res;
         }
@@ -314,7 +336,17 @@ public class KeYSelectionModel {
         if (g != null) {
             setSelectedGoal(g);
         } else {
-            setSelectedNode(proof.root().leavesIterator().next());
+            Proof p = proof;
+            if (p == null) {
+                throw new NullPointerException("No proof selected for default selection.");
+            }
+            Node root = p.root();
+            if (root == null) {
+                // a loaded proof always has a root; a missing root is an inconsistent state in
+                // which the previous code crashed with an NPE
+                throw new NullPointerException("Proof without a root node for default selection.");
+            }
+            setSelectedNode(root.leavesIterator().next());
         }
     }
 
@@ -340,7 +372,7 @@ public class KeYSelectionModel {
         }
     }
 
-    public synchronized void fireSelectedNodeChanged(Node previousNode) {
+    public synchronized void fireSelectedNodeChanged(@Nullable Node previousNode) {
         synchronized (listenerList) {
             final KeYSelectionEvent<Node> selectionEvent =
                 new KeYSelectionEvent<>(this, previousNode);
@@ -350,7 +382,7 @@ public class KeYSelectionModel {
         }
     }
 
-    public synchronized void fireSelectedProofChanged(Proof previousProof) {
+    public synchronized void fireSelectedProofChanged(@Nullable Proof previousProof) {
         synchronized (listenerList) {
             LOGGER.debug("Selected Proof changed, firing...");
             final KeYSelectionEvent<Proof> selectionEvent =

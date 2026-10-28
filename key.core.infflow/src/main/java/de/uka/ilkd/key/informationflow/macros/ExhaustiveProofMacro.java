@@ -25,6 +25,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The abstract class ExhaustiveProofMacro can be used to create compound macros which either apply
  * the macro given by {@link #getProofMacro()} directly, or --if not directly applicable-- search on
@@ -33,10 +36,11 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
-    private PosInOccurrence getApplicablePosInOcc(Proof proof,
-            Goal goal, PosInOccurrence posInOcc,
+    private @Nullable PosInOccurrence getApplicablePosInOcc(Proof proof,
+            Goal goal, @Nullable PosInOccurrence posInOcc,
             ProofMacro macro) {
         if (posInOcc == null || posInOcc.subTerm() == null) {
             return null;
@@ -50,6 +54,20 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
             }
             return res;
         }
+    }
+
+    /**
+     * Stores the applicable position found for a node in the cache. A
+     * {@code null} {@code applicableAt} deliberately marks "no applicable
+     * position exists for this node"; the cache is only read via
+     * {@link Map#get} guarded by a null check, so a stored {@code null} is
+     * handled by every reader. The {@code Map} is not nullness-annotated in
+     * key.core, which cannot be changed from this module.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private static void cacheApplicablePosition(Map<Node, PosInOccurrence> cache, Node node,
+            @Nullable PosInOccurrence applicableAt) {
+        cache.put(node, applicableAt);
     }
 
     /*
@@ -75,7 +93,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         final Services services = proof.getServices();
 
         final Map<Node, PosInOccurrence> applicableOnNodeAtPos =
@@ -96,7 +114,7 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
                                 PosInTerm.getTopLevel());
                         PosInOccurrence applicableAt =
                             getApplicablePosInOcc(proof, goal, searchPos, macro);
-                        applicableOnNodeAtPos.put(goal.node(), applicableAt);
+                        cacheApplicablePosition(applicableOnNodeAtPos, goal.node(), applicableAt);
                     }
                 }
             }
@@ -108,8 +126,8 @@ public abstract class ExhaustiveProofMacro extends AbstractProofMacro {
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc,
-            ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception {
 
         final Map<Node, PosInOccurrence> applicableOnNodeAtPos =

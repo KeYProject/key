@@ -9,6 +9,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Swing highlighter that highlights the current line in a JTextComponent.
  *
@@ -17,13 +20,14 @@ import javax.swing.text.JTextComponent;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class CurrentLineHighlighter implements Highlighter {
     private static final Color DEFAULT_COLOR = new Color(0, 0, 0, 15);
 
     private final Highlighter delegate;
     private final Color color;
 
-    private JTextComponent component;
+    private @Nullable JTextComponent component;
 
     public CurrentLineHighlighter(Highlighter delegate) {
         this(delegate, DEFAULT_COLOR);
@@ -38,7 +42,7 @@ public class CurrentLineHighlighter implements Highlighter {
     public void install(JTextComponent jTextComponent) {
         delegate.install(jTextComponent);
         this.component = jTextComponent;
-        component.addCaretListener(e -> component.repaint());
+        jTextComponent.addCaretListener(e -> jTextComponent.repaint());
     }
 
     @Override
@@ -49,15 +53,16 @@ public class CurrentLineHighlighter implements Highlighter {
     @Override
     public void paint(Graphics graphics) {
         delegate.paint(graphics);
-        if (component != null) {
-            int caretPosition = component.getCaretPosition();
+        JTextComponent comp = component;
+        if (comp != null) {
+            int caretPosition = comp.getCaretPosition();
             int currentRow =
-                component.getDocument().getDefaultRootElement().getElementIndex(caretPosition);
+                comp.getDocument().getDefaultRootElement().getElementIndex(caretPosition);
             try {
-                Rectangle modelToView = component.modelToView(component.getDocument()
+                Rectangle modelToView = comp.modelToView(comp.getDocument()
                         .getDefaultRootElement().getElement(currentRow).getStartOffset());
                 graphics.setColor(color);
-                graphics.fillRect(0, modelToView.y, component.getWidth(), modelToView.height);
+                graphics.fillRect(0, modelToView.y, comp.getWidth(), modelToView.height);
             } catch (BadLocationException e) {
                 e.printStackTrace();
             }

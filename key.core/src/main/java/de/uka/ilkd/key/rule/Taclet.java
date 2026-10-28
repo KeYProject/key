@@ -32,7 +32,8 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -77,11 +78,12 @@ import org.jspecify.annotations.NonNull;
  * {@link TacletApp TacletApp}
  * </p>
  */
+@NullMarked
 public abstract class Taclet extends org.key_project.prover.rules.Taclet implements Rule {
     /**
      * This map contains (a, b) if there is a substitution {b a} somewhere in this taclet
      */
-    private ImmutableMap<@NonNull SchemaVariable, SchemaVariable> svNameCorrespondences = null;
+    private @Nullable ImmutableMap<SchemaVariable, SchemaVariable> svNameCorrespondences = null;
 
     /** Integer to cache the hashcode */
     private int hashcode = 0;
@@ -108,7 +110,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
-            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, boolean surviveSmbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, find, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
@@ -134,7 +136,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
-            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, find, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices, false,
             tacletAnnotations);
@@ -145,6 +147,9 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         this.matcher = TacletMatcherKit.getKit().createTacletMatcher(this);
     }
 
+    // All concrete subclasses assign the {@code executor} field in their overrides, so the
+    // inherited @EnsuresNonNull postcondition is mirrored here.
+    @EnsuresNonNull("executor")
     protected abstract void createAndInitializeExecutor();
 
     public RuleJustification getRuleJustification() {
@@ -189,7 +194,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
     protected abstract ImmutableSet<QuantifiableVariable> getBoundVariablesHelper();
 
     @Override
-    public @NonNull TacletExecutor getExecutor() {
+    public TacletExecutor getExecutor() {
         return executor;
     }
 
@@ -265,15 +270,18 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      * @return a schema variable that is substituted by "p" somewhere in this taclet (that is, these
      *         schema variables occur as arguments of a substitution operator)
      */
-    public SchemaVariable getNameCorrespondent(SchemaVariable p, Services services) {
+    public @Nullable SchemaVariable getNameCorrespondent(SchemaVariable p, Services services) {
         // should be synchronized
         if (svNameCorrespondences == null) {
-            final SVNameCorrespondenceCollector c =
-                new SVNameCorrespondenceCollector(services.getTypeConverter().getHeapLDT());
+            final SVNameCorrespondenceCollector c = new SVNameCorrespondenceCollector(
+                Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+                    "heap logic data type not registered"));
             c.visit(this, true);
             svNameCorrespondences = c.getCorrespondences();
         }
 
+        // The correspondence map may not contain the schema variable (the taclet has no
+        // name correspondence declared for it); callers handle an absent correspondence.
         return svNameCorrespondences.get(p);
     }
 
@@ -330,22 +338,22 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         /**
          * The optional {@link Sequent} of the add or replace part of the taclet.
          */
-        private final Sequent sequent;
+        private final @Nullable Sequent sequent;
 
         /**
          * The optional {@link SequentFormula} contained in {@link #getSequent()}.
          */
-        private final SequentFormula sequentFormula;
+        private final @Nullable SequentFormula sequentFormula;
 
         /**
          * The optional replace {@link JTerm} of the taclet.
          */
-        private final JTerm term;
+        private final @Nullable JTerm term;
 
         /**
          * The stack maintained during application of a taclet {@link JTerm}.
          */
-        private Deque<JTerm> tacletTermStack;
+        private @Nullable Deque<JTerm> tacletTermStack;
 
         /**
          * Constructor.
@@ -409,7 +417,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
          *
          * @return The optional {@link Sequent} of the add or replace part of the taclet.
          */
-        public Sequent getSequent() {
+        public @Nullable Sequent getSequent() {
             return sequent;
         }
 
@@ -418,7 +426,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
          *
          * @return The optional {@link SequentFormula} contained in {@link #getSequent()}.
          */
-        public SequentFormula getSequentFormula() {
+        public @Nullable SequentFormula getSequentFormula() {
             return sequentFormula;
         }
 
@@ -427,7 +435,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
          *
          * @return The stack maintained during application of a taclet {@link JTerm}.
          */
-        public Deque<JTerm> getTacletTermStack() {
+        public @Nullable Deque<JTerm> getTacletTermStack() {
             return tacletTermStack;
         }
 
@@ -445,7 +453,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
          *
          * @return The optional replace {@link JTerm} of the taclet.
          */
-        public JTerm getTerm() {
+        public @Nullable JTerm getTerm() {
             return term;
         }
 
@@ -516,7 +524,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
         }
     }
 
-    public abstract @NonNull Taclet setName(@NonNull String s);
+    public abstract Taclet setName(String s);
 
     StringBuffer toStringAttribs(StringBuffer sb) {
         // if (noninteractive()) sb = sb.append(" \\noninteractive");

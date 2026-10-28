@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.reference;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -14,18 +15,22 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Super reference.
  *
  */
 
+@NullMarked
 public class SuperReference extends JavaNonTerminalProgramElement implements Reference, Expression,
         ReferencePrefix, ReferenceSuffix, ExpressionContainer, TypeReferenceContainer {
 
     /**
      * Access path.
      */
-    private final ReferencePrefix prefix;
+    private final @Nullable ReferencePrefix prefix;
 
 
     /**
@@ -76,7 +81,7 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
      * @return the reference prefix.
      */
 
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return prefix;
     }
 
@@ -184,8 +189,13 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * returns the KeYJavaType
      */
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-        return javaServ.getJavaInfo().getSuperclass(ec.getTypeReference().getKeYJavaType());
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
+        final KeYJavaType contextType = Objects.requireNonNull(
+            Objects.requireNonNull(ec, "execution context required for 'super'").getTypeReference()
+                    .getKeYJavaType(),
+            "no KeYJavaType in execution context");
+        return Objects.requireNonNull(javaServ.getJavaInfo().getSuperclass(contextType),
+            "no superclass for " + contextType);
     }
 
 }

@@ -10,11 +10,14 @@ import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A "non-standard" parameter declaration of a Ccatch clause, e.g., "\Return".
  *
  * @author Dominic Steinhöfel
  */
+@NullMarked
 public abstract class CcatchNonstandardParameterDeclaration extends JavaNonTerminalProgramElement {
 
     public CcatchNonstandardParameterDeclaration(PositionInfo pi, List<Comment> c) {

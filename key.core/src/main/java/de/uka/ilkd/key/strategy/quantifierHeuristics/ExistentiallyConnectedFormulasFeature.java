@@ -13,9 +13,12 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Binary feature that return zero if two given projection term is CS-Releated.
  */
+@NullMarked
 public class ExistentiallyConnectedFormulasFeature extends BinaryTacletAppFeature {
 
     private final ProjectionToTerm<Goal> for0, for1;

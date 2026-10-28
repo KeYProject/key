@@ -82,7 +82,7 @@ public class Proof implements ProofObject<Goal>, Named {
     /**
      * the root of the proof
      */
-    private Node root;
+    private @Nullable Node root;
 
     /**
      * list with prooftree listeners of this proof attention: firing events makes use of array
@@ -122,12 +122,12 @@ public class Proof implements ProofObject<Goal>, Named {
     /**
      * the logic configuration for this proof, i.e., logic signature, rules etc.
      */
-    private InitConfig initConfig;
+    private @Nullable InitConfig initConfig;
 
     /**
      * the environment of the proof with specs and java model
      */
-    private ProofCorrectnessMgt localMgt;
+    private @Nullable ProofCorrectnessMgt localMgt;
 
     /**
      * settings valid independent of a proof
@@ -143,13 +143,13 @@ public class Proof implements ProofObject<Goal>, Named {
      * when load and save a proof with different versions of key this vector fills up with Strings
      * containing the GIT versions.
      */
-    public List<String> keyVersionLog;
+    public @Nullable List<String> keyVersionLog;
 
     private long autoModeTime = 0;
 
     private @Nullable Strategy<Goal> activeStrategy;
 
-    private PropertyChangeListener settingsListener;
+    private @Nullable PropertyChangeListener settingsListener;
 
     /**
      * Set to true if the proof has been abandoned and the dispose method has been called on this
@@ -211,7 +211,10 @@ public class Proof implements ProofObject<Goal>, Named {
 
         localMgt = new ProofCorrectnessMgt(this);
 
-        initConfig.getSettings().getStrategySettings().addPropertyChangeListener(settingsListener);
+        final ProofSettings settings =
+            Objects.requireNonNull(initConfig.getSettings(),
+                "Proof settings must be present to register the settings listener");
+        settings.getStrategySettings().addPropertyChangeListener(settingsListener);
 
         pis = ProofIndependentSettings.DEFAULT_INSTANCE;
     }
@@ -220,18 +223,29 @@ public class Proof implements ProofObject<Goal>, Named {
      * initialises the strategies
      */
     private void initStrategy() {
+        final InitConfig configuration = Objects.requireNonNull(initConfig,
+            "Cannot initialize strategies without an init configuration");
+        final ProofSettings settings =
+            Objects.requireNonNull(configuration.getSettings(),
+                "Cannot initialize strategies without proof settings");
         StrategyProperties activeStrategyProperties =
-            initConfig.getSettings().getStrategySettings().getActiveStrategyProperties();
+            settings.getStrategySettings().getActiveStrategyProperties();
 
         final Profile profile = getServices().getProfile();
 
-        final Name strategy = initConfig.getSettings().getStrategySettings().getStrategy();
-        if (profile.supportsStrategyFactory(strategy)) {
+        final Name strategy = settings.getStrategySettings().getStrategy();
+        // A null strategy is possible (settings may hold no name); like the old code (which
+        // evaluated supportsStrategyFactory(null) to false) this falls back to the default factory.
+        if (strategy != null && profile.supportsStrategyFactory(strategy)) {
             setActiveStrategy(
-                profile.getStrategyFactory(strategy).create(this, activeStrategyProperties));
+                Objects.requireNonNull(profile.getStrategyFactory(strategy),
+                    "The profile provides no strategy factory for the active strategy")
+                        .create(this, activeStrategyProperties));
         } else {
             setActiveStrategy(
-                profile.getDefaultStrategyFactory().create(this, activeStrategyProperties));
+                Objects.requireNonNull(profile.getDefaultStrategyFactory(),
+                    "The profile provides no default strategy factory")
+                        .create(this, activeStrategyProperties));
         }
     }
 
@@ -313,15 +327,19 @@ public class Proof implements ProofObject<Goal>, Named {
             // contained in a static List
         }
         // remove setting listener from settings
-        initConfig.getSettings().getStrategySettings()
-                .removePropertyChangeListener(settingsListener);
+        final InitConfig config = Objects.requireNonNull(initConfig,
+            "Cannot remove the settings listener from an already disposed proof");
+        final PropertyChangeListener listener =
+            Objects.requireNonNull(settingsListener, "No settings listener is registered");
+        Objects.requireNonNull(config.getSettings(), "The proof has no settings")
+                .getStrategySettings().removePropertyChangeListener(listener);
         // set every reference (except the name) to null
         root = null;
         env = null;
-        openGoals = null;
-        closedGoals = null;
+        openGoals = ImmutableList.nil();
+        closedGoals = ImmutableList.nil();
         problemHeader = null;
-        abbreviations = null;
+        abbreviations = new AbbrevMap();
         initConfig = null;
         localMgt = null;
         userLog = null;
@@ -360,7 +378,7 @@ public class Proof implements ProofObject<Goal>, Named {
         return problemHeader;
     }
 
-    public ProofCorrectnessMgt mgt() {
+    public @Nullable ProofCorrectnessMgt mgt() {
         return localMgt;
     }
 
@@ -382,7 +400,8 @@ public class Proof implements ProofObject<Goal>, Named {
      * returns the Services with the java service classes
      */
     public Services getServices() {
-        return initConfig.getServices();
+        return Objects.requireNonNull(initConfig,
+            "Proof.getServices() may not be called after the proof was disposed").getServices();
     }
 
     public long getAutoModeTime() {
@@ -399,7 +418,8 @@ public class Proof implements ProofObject<Goal>, Named {
      */
     public void setNamespaces(NamespaceSet ns) {
         getServices().setNamespaces(ns);
-        if (!root.leaf()) {
+        if (!Objects.requireNonNull(root, "Tried to set namespaces before the proof has a root")
+                .leaf()) {
             throw new IllegalStateException("Proof: ProgVars set too late");
         }
 
@@ -407,7 +427,7 @@ public class Proof implements ProofObject<Goal>, Named {
         fstGoal.makeLocalNamespacesFrom(ns);
     }
 
-    public ProofEnvironment getEnv() {
+    public @Nullable ProofEnvironment getEnv() {
         return env;
     }
 
@@ -420,7 +440,7 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
 
-    public Strategy<Goal> getActiveStrategy() {
+    public @Nullable Strategy<Goal> getActiveStrategy() {
         if (activeStrategy == null) {
             initStrategy();
         }
@@ -435,12 +455,14 @@ public class Proof implements ProofObject<Goal>, Named {
 
         // This could be seen as a hack; it's however important that OSS is
         // refreshed after strategy has been set, otherwise nothing will happen.
-        OneStepSimplifier.refreshOSS(root.proof());
+        OneStepSimplifier.refreshOSS(Objects.requireNonNull(root,
+            "Tried to refresh the one-step simplifier before the proof has a root").proof());
     }
 
 
     private void updateStrategyOnGoals() {
-        Strategy<Goal> ourStrategy = getActiveStrategy();
+        Strategy<Goal> ourStrategy = Objects.requireNonNull(getActiveStrategy(),
+            "Cannot update the goals without an active strategy");
 
         for (Goal goal : openGoals()) {
             goal.setGoalStrategy(ourStrategy);
@@ -460,7 +482,7 @@ public class Proof implements ProofObject<Goal>, Named {
     /**
      * returns the root node of the proof
      */
-    public Node root() {
+    public @Nullable Node root() {
         return root;
     }
 
@@ -489,7 +511,10 @@ public class Proof implements ProofObject<Goal>, Named {
 
 
     public ProofSettings getSettings() {
-        return initConfig.getSettings();
+        final InitConfig configuration = Objects.requireNonNull(initConfig,
+            "Proof.getSettings() may not be called after the proof was disposed");
+        return Objects.requireNonNull(configuration.getSettings(),
+            "The proof has no settings registered");
     }
 
     public ProofIndependentSettings getProofIndependentSettings() {
@@ -702,7 +727,8 @@ public class Proof implements ProofObject<Goal>, Named {
      */
     @Override
     public boolean closed() {
-        return root.isClosed() && openGoals.isEmpty();
+        return Objects.requireNonNull(root, "The proof does not have a root yet").isClosed()
+                && openGoals.isEmpty();
     }
 
     /**
@@ -710,7 +736,9 @@ public class Proof implements ProofObject<Goal>, Named {
      */
     public void setStepIndices() {
         int stepIndex = 0;
-        Iterator<Node> nodeIterator = this.root().subtreeIterator();
+        final Node proofRoot =
+            Objects.requireNonNull(this.root(), "Cannot set step indices without a proof root");
+        Iterator<Node> nodeIterator = proofRoot.subtreeIterator();
         while (nodeIterator.hasNext()) {
             Node node = nodeIterator.next();
             node.setStepIndex(stepIndex);
@@ -765,11 +793,12 @@ public class Proof implements ProofObject<Goal>, Named {
      * @param cuttingPoint node below which to prune
      * @return the subtrees that have been pruned.
      */
-    public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint) {
+    public synchronized @Nullable ImmutableList<Node> pruneProof(Node cuttingPoint) {
         return pruneProof(cuttingPoint, true);
     }
 
-    public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint, boolean fireChanges) {
+    public synchronized @Nullable ImmutableList<Node> pruneProof(Node cuttingPoint,
+            boolean fireChanges) {
         assert cuttingPoint.proof() == this;
         if (getOpenGoal(cuttingPoint) != null) {
             return null;
@@ -835,8 +864,10 @@ public class Proof implements ProofObject<Goal>, Named {
 
     public void traverseFromChildToParent(Node child, Node parent, ProofVisitor visitor) {
         do {
-            visitor.visit(this, child);
-            child = child.parent();
+            final Node current = Objects.requireNonNull(child,
+                "Proof tree traversal reached the root's parent; the tree has no such node");
+            visitor.visit(this, current);
+            child = current.parent();
         } while (child != parent);
     }
 
@@ -1113,7 +1144,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * retrieves number of nodes
      */
     public int countNodes() {
-        return root.countNodes();
+        return Objects.requireNonNull(root, "The proof does not have a root yet").countNodes();
     }
 
 
@@ -1140,7 +1171,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * retrieves number of branches
      */
     public int countBranches() {
-        return root.countBranches();
+        return Objects.requireNonNull(root, "The proof does not have a root yet").countBranches();
     }
 
     /**
@@ -1260,7 +1291,7 @@ public class Proof implements ProofObject<Goal>, Named {
         }
     }
 
-    public void addRuleAppListener(RuleAppListener p) {
+    public void addRuleAppListener(@Nullable RuleAppListener p) {
         if (p == null) {
             return;
         }
@@ -1269,7 +1300,7 @@ public class Proof implements ProofObject<Goal>, Named {
         }
     }
 
-    public void removeRuleAppListener(RuleAppListener p) {
+    public void removeRuleAppListener(@Nullable RuleAppListener p) {
         synchronized (ruleAppListenerList) { // TODO (DS, 2019-03-19): Is null for SET tests!?!
             ruleAppListenerList.remove(p);
         }
@@ -1421,7 +1452,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @param l The {@link ProofDisposedListener} to register.
      */
-    public void addProofDisposedListener(ProofDisposedListener l) {
+    public void addProofDisposedListener(@Nullable ProofDisposedListener l) {
         if (l != null) {
             proofDisposedListener.add(l);
         }
@@ -1433,7 +1464,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @param l The {@link ProofDisposedListener} to register.
      */
-    public void addProofDisposedListenerFirst(ProofDisposedListener l) {
+    public void addProofDisposedListenerFirst(@Nullable ProofDisposedListener l) {
         if (l != null) {
             proofDisposedListener.add(0, l);
         }
@@ -1444,7 +1475,7 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @param l The {@link ProofDisposedListener} to unregister.
      */
-    public void removeProofDisposedListener(ProofDisposedListener l) {
+    public void removeProofDisposedListener(@Nullable ProofDisposedListener l) {
         if (l != null) {
             proofDisposedListener.remove(l);
         }
@@ -1486,7 +1517,7 @@ public class Proof implements ProofObject<Goal>, Named {
         }
     }
 
-    public InitConfig getInitConfig() {
+    public @Nullable InitConfig getInitConfig() {
         return initConfig;
     }
 
@@ -1517,10 +1548,10 @@ public class Proof implements ProofObject<Goal>, Named {
      */
     public StrategyFactory getActiveStrategyFactory() {
         Name activeStrategyName = getActiveStrategy() != null ? getActiveStrategy().name() : null;
-        return activeStrategyName != null
+        return Objects.requireNonNull(activeStrategyName != null
                 ? getServices().getProfile().getStrategyFactory(activeStrategyName)
-                : getServices().getProfile().getDefaultStrategyFactory();
-
+                : getServices().getProfile().getDefaultStrategyFactory(),
+            "The profile provides no strategy factory");
     }
 
     /**
@@ -1612,7 +1643,8 @@ public class Proof implements ProofObject<Goal>, Named {
         }
         for (Goal g : todo) {
             reOpenGoal(g);
-            ClosedBy c = g.node().lookup(ClosedBy.class);
+            ClosedBy c = Objects.requireNonNull(g.node().lookup(ClosedBy.class),
+                "Expected a proof-closing reference on the cached goal");
             g.node().deregister(c, ClosedBy.class);
             try {
                 new CopyingProofReplayer(c.proof(), this).copy(c.node(), g, c.nodesToSkip());

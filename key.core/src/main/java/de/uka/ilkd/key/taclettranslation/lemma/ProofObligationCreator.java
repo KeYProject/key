@@ -25,12 +25,14 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Creates for a given set of taclets the corresponding set of proof obligation. For more
  * information see public method <code>create(...)</code>.
  *
  */
+@NullMarked
 public class ProofObligationCreator {
 
     private String createName(ProofAggregate[] singleProofs) {

@@ -4,11 +4,14 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.slicing.ui;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Simple counter to produce a sequence of numbers.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class IndexFactory {
     /**
      * Next index to return.

@@ -18,12 +18,14 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Helper class used by the JML translation. Provides methods that look for certain keywords (such
  * as "pure") in comments, and that help in desugaring such keywords.
  */
+@NullMarked
 public final class JMLInfoExtractor {
     // -------------------------------------------------------------------------
     // internal methods
@@ -311,7 +313,7 @@ public final class JMLInfoExtractor {
     /**
      * Returns the spec math mode of this type
      */
-    public static @Nullable SpecMathMode getSpecMathMode(KeYJavaType t) {
+    public static @Nullable SpecMathMode getSpecMathMode(@Nullable KeYJavaType t) {
         if (t == null || !(t.getJavaType() instanceof TypeDeclaration)) {
             return null;
         } else {

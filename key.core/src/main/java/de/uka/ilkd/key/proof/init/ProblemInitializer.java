@@ -56,22 +56,23 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+@NullMarked
 public final class ProblemInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProblemInitializer.class);
 
     private final Services services;
-    private final ProgressMonitor progMon;
+    private final @Nullable ProgressMonitor progMon;
     private final Set<EnvInput> alreadyParsed = new LinkedHashSet<>();
-    private final ProblemInitializerListener listener;
+    private final @Nullable ProblemInitializerListener listener;
     /**
      * the FileRepo responsible for consistency between source code and proofs
      */
-    private FileRepo fileRepo;
+    private @Nullable FileRepo fileRepo;
     private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
     private @Nullable Configuration additionalProfileOptions;
 
@@ -405,7 +406,7 @@ public final class ProblemInitializer {
         return initConfig;
     }
 
-    private void setUpProofHelper(ProofOblInput problem, ProofAggregate pl)
+    private void setUpProofHelper(ProofOblInput problem, @Nullable ProofAggregate pl)
             throws ProofInputException {
         if (pl == null) {
             throw new ProofInputException("No proof");
@@ -744,11 +745,11 @@ public final class ProblemInitializer {
         this.fileRepo = fileRepo;
     }
 
-    public ProblemInitializerListener getListener() {
+    public @Nullable ProblemInitializerListener getListener() {
         return listener;
     }
 
-    public ProgressMonitor getProgMon() {
+    public @Nullable ProgressMonitor getProgMon() {
         return progMon;
     }
 

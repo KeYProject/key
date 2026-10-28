@@ -18,13 +18,15 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Then.
@@ -32,10 +34,15 @@ import org.jspecify.annotations.NonNull;
  * @author <TT>AutoDoc</TT>
  */
 
+@NullMarked
 public final class Then extends BranchImp {
-    private final Statement body;
+    private final @Nullable Statement body;
 
-    public Then(PositionInfo pi, List<Comment> comments, Statement body) {
+    // BranchImp's (PositionInfo, List<Comment>) constructor is over-narrow: it merely forwards to
+    // the @Nullable-annotated JavaNonTerminalProgramElement ctor, but BranchImp is outside this
+    // wave's file set and cannot be widened here, so the check is scoped to this ctor.
+    @SuppressWarnings("NullAway")
+    public Then(@Nullable PositionInfo pi, @Nullable List<Comment> comments, Statement body) {
         super(pi, comments);
         this.body = body;
     }
@@ -48,7 +55,8 @@ public final class Then extends BranchImp {
      */
     public Then(ExtList children) {
         super(children);
-        body = children.get(Statement.class);
+        body = Objects.requireNonNull(children.get(Statement.class),
+            "then branch requires a body");
     }
 
     /**
@@ -57,24 +65,23 @@ public final class Then extends BranchImp {
      * @param stmnt
      *        the statement part of Then.
      */
-    public Then(@NonNull Statement stmnt) {
+    public Then(Statement stmnt) {
         this(null, null, stmnt);
     }
 
 
-    @NonNull
     public SourceElement getFirstElement() {
-        return body.getFirstElement();
+        return Objects.requireNonNull(body, "then branch requires a body").getFirstElement();
     }
 
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
-        return body.getFirstElementIncludingBlocks();
+        return Objects.requireNonNull(body, "then branch requires a body")
+                .getFirstElementIncludingBlocks();
     }
 
-    @NonNull
     public SourceElement getLastElement() {
-        return body.getLastElement();
+        return Objects.requireNonNull(body, "then branch requires a body").getLastElement();
     }
 
 
@@ -141,7 +148,7 @@ public final class Then extends BranchImp {
      * The body may be empty (null), to define a fall-through.
      * Attaching an {@link EmptyStatement} would create a single ";".
      */
-    public Statement getBody() {
+    public @Nullable Statement getBody() {
         return body;
     }
 

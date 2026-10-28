@@ -18,11 +18,13 @@ import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * manages the possible application of rules (RuleApps)
  */
+@NullMarked
 public final class RuleAppIndex {
 
     private final Goal goal;
@@ -40,7 +42,7 @@ public final class RuleAppIndex {
 
     private final BuiltInRuleAppIndex builtInRuleAppIndex;
 
-    private NewRuleListener ruleListener = null;
+    private @Nullable NewRuleListener ruleListener = null;
 
     /**
      * The current mode of the index: For <code>autoMode==true</code>, the index

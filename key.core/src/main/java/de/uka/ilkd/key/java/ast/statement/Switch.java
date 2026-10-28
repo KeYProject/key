@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
@@ -13,10 +14,13 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Switch.
  */
 
+@NullMarked
 public class Switch extends BranchStatement
         implements ExpressionContainer, VariableScope, TypeScope {
 
@@ -38,6 +42,10 @@ public class Switch extends BranchStatement
      * Switch.
      */
 
+    // retained for source compatibility only; a real switch always has both an expression
+    // and branches, so the null assignments violate the @NonNull field contracts - the check
+    // (as with the sibling members below) is scoped here.
+    @SuppressWarnings("NullAway")
     public Switch() {
         this.branches = null;
         this.expression = null;
@@ -50,6 +58,9 @@ public class Switch extends BranchStatement
      *        an expression.
      */
 
+    // retained for source compatibility only; a real switch always has branches - the check is
+    // scoped here.
+    @SuppressWarnings("NullAway")
     public Switch(Expression e) {
         this.branches = null;
         this.expression = e;
@@ -78,7 +89,9 @@ public class Switch extends BranchStatement
 
     public Switch(ExtList children) {
         super(children);
-        this.expression = children.get(Expression.class);
+        // a switch always has a discriminator expression; children.get may report it nullable
+        this.expression =
+            Objects.requireNonNull(children.get(Expression.class), "Switch requires an expression");
         this.branches = new ImmutableArray<>(children.collect(Branch.class));
     }
 

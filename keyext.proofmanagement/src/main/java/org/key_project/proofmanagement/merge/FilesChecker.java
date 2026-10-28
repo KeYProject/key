@@ -16,12 +16,14 @@ import java.util.*;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This class tests if all given proof is consistent w.r.t. the files contained.
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class FilesChecker {
     @FunctionalInterface
     public interface CheckedFunction<T, R> {
@@ -62,7 +64,7 @@ public class FilesChecker {
         if (bcp == null) {
             return Collections.emptyList();
         }
-        try (var files = Files.walk(pbh.getBootclasspath())) {
+        try (var files = Files.walk(bcp)) {
             return files.toList();
         }
     }

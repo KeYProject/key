@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.statement.JavaStatement;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -52,6 +53,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
@@ -74,6 +76,7 @@ import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
  *
  * @author wacker, lanzinger
  */
+@NullMarked
 public class InfFlowBlockContractInternalRule extends BlockContractInternalRule {
 
     /**
@@ -93,7 +96,7 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
 
     @Override
     public BlockContractInternalBuiltInRuleApp<? extends BlockContractInternalRule> createApp(
-            PosInOccurrence occurrence, TermServices services) {
+            @Nullable PosInOccurrence occurrence, TermServices services) {
         return new InfFlowBlockContractInternalBuiltInRuleApp(this, occurrence);
     }
 
@@ -162,8 +165,13 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
         assert validityGoal != null;
         var app = (InfFlowBlockContractInternalBuiltInRuleApp) application;
 
-        final ProgramVariable exceptionParameter =
-            createLocalVariable("e", variables.exception.getKeYJavaType(), services);
+        final ProgramVariable exceptionParameter;
+        final KeYJavaType exceptionType = variables.exception.getKeYJavaType();
+        if (exceptionType == null) {
+            throw new NullPointerException(
+                "No type for the exception parameter variable " + variables.exception + ".");
+        }
+        exceptionParameter = createLocalVariable("e", exceptionType, services);
         validityGoal.setBranchLabel("Information Flow Validity");
 
         // clear goal
@@ -201,13 +209,18 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
                 : "information flow extension is at the moment not "
                     + "compatible with the non-base-heap setting";
         // prepare information flow analysis
-        final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        if (heapLDT == null) {
+            throw new NullPointerException(
+                "No heap type defined in the services type converter.");
+        }
+        final LocationVariable baseHeap = heapLDT.getHeap();
         final TermBuilder tb = services.getTermBuilder();
         assert infFlowGoal.proof() instanceof InfFlowProof;
         final InfFlowProof proof = (InfFlowProof) infFlowGoal.proof();
 
-        final ImmutableList<JTerm> localIns = MiscTools.toTermList(localInVariables, tb);
-        final ImmutableList<JTerm> localOuts = MiscTools.toTermList(localOutVariables, tb);
+        final ImmutableList<JTerm> localIns = toTermList(localInVariables, tb);
+        final ImmutableList<JTerm> localOuts = toTermList(localOutVariables, tb);
         final ImmutableList<JTerm> localOutsAtPre = buildLocalOutsAtPre(localOuts, services);
         final ImmutableList<JTerm> localOutsAtPost = buildLocalOutsAtPost(localOuts, services);
         final ImmutableList<JTerm> localInsWithoutOutDuplicates =
@@ -219,13 +232,18 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
         final ProofObligationVars instantiationVars = generateProofObligationVariables(variables,
             exceptionParameter, baseHeap, localVarsAtPre, localVarsAtPost, services, tb);
         final IFProofObligationVars ifVars = new IFProofObligationVars(instantiationVars, services);
-        application.update(ifVars, instantiation.context());
+        final ExecutionContext execContext = instantiation.context();
+        if (execContext == null) {
+            throw new NullPointerException(
+                "No execution context for the information flow block contract application.");
+        }
+        application.update(ifVars, execContext);
 
         // generate information flow contract application predicate and associated taclet
         final InfFlowBlockContractTacletBuilder ifContractBuilder =
             new InfFlowBlockContractTacletBuilder(services);
         ifContractBuilder.setContract(contract);
-        ifContractBuilder.setExecutionContext(instantiation.context());
+        ifContractBuilder.setExecutionContext(execContext);
         ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
         ifContractBuilder.setProofObligationVars(instantiationVars);
         final JTerm contractApplTerm = ifContractBuilder.buildContractApplPredTerm();
@@ -236,7 +254,7 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
             localOutsAtPre, tb.var(baseHeap), tb);
         final JTerm infFlowPostAssumption = buildInfFlowPostAssumption(instantiationVars, localOuts,
             localOutsAtPost, tb.var(baseHeap), contractApplTerm, tb);
-        addProofObligation(infFlowGoal, proof, contract, ifVars, instantiation.context(), services);
+        addProofObligation(infFlowGoal, proof, contract, ifVars, execContext, services);
 
         proof.addIFSymbol(contractApplTerm);
         proof.addIFSymbol(informationFlowContractApp);
@@ -305,16 +323,24 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
         final boolean hasRes = variables.result != null;
         final boolean hasExc = variables.exception != null;
 
-        final JTerm heapAtPre = tb.var(variables.remembranceHeaps.get(baseHeap));
+        final LocationVariable remembranceHeap = variables.remembranceHeaps.get(baseHeap);
+        if (remembranceHeap == null) {
+            throw new NullPointerException(
+                "No remembrance heap for the base heap " + baseHeap + ".");
+        }
+        final JTerm heapAtPre = tb.var(remembranceHeap);
         final Name heapAtPostName = new Name(tb.newName("heap_After_BLOCK"));
         final JTerm heapAtPost = tb.func(new JFunction(heapAtPostName, heapAtPre.sort(), SKOLEM));
-        final JTerm selfAtPre = hasSelf ? tb.var(variables.self) : tb.NULL();
+        final JTerm selfAtPre =
+            variables.self != null ? tb.var(variables.self) : tb.NULL();
         final JTerm selfAtPost = hasSelf ? buildAfterVar(selfAtPre, "BLOCK", services) : tb.NULL();
 
-        JTerm resultAtPre = hasRes ? tb.var(variables.result) : tb.NULL();
+        final JTerm resultAtPre =
+            variables.result != null ? tb.var(variables.result) : tb.NULL();
         final JTerm resultAtPost =
             hasRes ? buildAfterVar(resultAtPre, "BLOCK", services) : tb.NULL();
-        final JTerm exceptionAtPre = hasExc ? tb.var(variables.exception) : tb.NULL();
+        final JTerm exceptionAtPre =
+            variables.exception != null ? tb.var(variables.exception) : tb.NULL();
         final JTerm exceptionAtPost =
             hasExc ? buildAfterVar(exceptionAtPre, "BLOCK", services) : tb.NULL();
 
@@ -327,6 +353,15 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
         final ProofObligationVars instantiationVars = new ProofObligationVars(instantiationPreVars,
             instantiationPostVars, tb.var(exceptionParameter), null, tb);
         return instantiationVars;
+    }
+
+    private static ImmutableList<JTerm> toTermList(Iterable<LocationVariable> pvs,
+            TermBuilder tb) {
+        ImmutableList<JTerm> result = ImmutableList.nil();
+        for (final LocationVariable pv : pvs) {
+            result = result.append(tb.var(pv));
+        }
+        return result;
     }
 
     protected static void addProofObligation(final Goal infFlowGoal, final InfFlowProof proof,
@@ -366,7 +401,7 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
      * TODO These could be moved into a separate class (like BlockContractBuilders) to allow them to
      * be reused in other classes.
      */
-    protected static @Nullable JTerm buildAfterVar(JTerm varTerm, String suffix,
+    protected static @Nullable JTerm buildAfterVar(@Nullable JTerm varTerm, String suffix,
             Services services) {
         if (varTerm == null) {
             return null;
@@ -375,6 +410,9 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
 
         final TermBuilder tb = services.getTermBuilder();
         KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
+        if (resultType == null) {
+            throw new NullPointerException("No type for the variable " + varTerm + ".");
+        }
         if (!suffix.equalsIgnoreCase("")) {
             suffix = "_" + suffix;
         }
@@ -387,10 +425,11 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
     }
 
 
-    protected static ImmutableList<JTerm> buildLocalOutsAtPre(ImmutableList<JTerm> varTerms,
+    protected static ImmutableList<JTerm> buildLocalOutsAtPre(
+            @Nullable ImmutableList<JTerm> varTerms,
             Services services) {
         if (varTerms == null || varTerms.isEmpty()) {
-            return varTerms;
+            return ImmutableList.nil();
         }
         final TermBuilder tb = services.getTermBuilder();
         ImmutableList<JTerm> renamedLocalOuts = ImmutableList.nil();
@@ -398,6 +437,9 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
             assert varTerm.op() instanceof LocationVariable;
 
             KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
+            if (resultType == null) {
+                throw new NullPointerException("No type for the variable " + varTerm + ".");
+            }
 
             String name = tb.newName(varTerm + "_Before");
             LocationVariable varAtPostVar =
@@ -409,10 +451,11 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
         return renamedLocalOuts;
     }
 
-    protected static ImmutableList<JTerm> buildLocalOutsAtPost(ImmutableList<JTerm> varTerms,
+    protected static ImmutableList<JTerm> buildLocalOutsAtPost(
+            @Nullable ImmutableList<JTerm> varTerms,
             Services services) {
         if (varTerms == null || varTerms.isEmpty()) {
-            return varTerms;
+            return ImmutableList.nil();
         }
         final TermBuilder tb = services.getTermBuilder();
         ImmutableList<JTerm> renamedLocalOuts = ImmutableList.nil();
@@ -420,6 +463,9 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
             assert varTerm.op() instanceof LocationVariable;
 
             KeYJavaType resultType = ((LocationVariable) varTerm.op()).getKeYJavaType();
+            if (resultType == null) {
+                throw new NullPointerException("No type for the variable " + varTerm + ".");
+            }
 
             String name = tb.newName(varTerm + "_After");
             LocationVariable varAtPostVar =
@@ -432,8 +478,12 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
     }
 
     protected static JTerm buildInfFlowPreAssumption(ProofObligationVars instVars,
-            ImmutableList<JTerm> localOuts, ImmutableList<JTerm> localOutsAtPre, JTerm baseHeap,
+            ImmutableList<JTerm> localOuts, @Nullable ImmutableList<JTerm> localOutsAtPre,
+            JTerm baseHeap,
             final TermBuilder tb) {
+        if (localOutsAtPre == null) {
+            throw new NullPointerException("No local-outs-at-pre terms.");
+        }
         JTerm beforeAssumptions = tb.equals(instVars.pre.heap, baseHeap);
         Iterator<JTerm> outsAtPre = localOutsAtPre.iterator();
         for (JTerm locOut : localOuts) {
@@ -443,16 +493,21 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
     }
 
     protected static JTerm buildInfFlowPostAssumption(ProofObligationVars instVars,
-            ImmutableList<JTerm> localOuts, ImmutableList<JTerm> localOutsAtPost, JTerm baseHeap,
+            ImmutableList<JTerm> localOuts, @Nullable ImmutableList<JTerm> localOutsAtPost,
+            JTerm baseHeap,
             JTerm applPredTerm, final TermBuilder tb) {
-        JTerm resultEq =
-            instVars.pre.result != null ? tb.equals(instVars.post.result, instVars.pre.result)
-                    : tb.tt();
-        JTerm exceptionEq = instVars.pre.exception != null
+        if (localOutsAtPost == null) {
+            throw new NullPointerException("No local-outs-at-post terms.");
+        }
+        JTerm resultEq = instVars.pre.result != null && instVars.post.result != null
+                ? tb.equals(instVars.post.result, instVars.pre.result)
+                : tb.tt();
+        JTerm exceptionEq = instVars.pre.exception != null && instVars.post.exception != null
                 ? tb.equals(instVars.post.exception, instVars.pre.exception)
                 : tb.tt();
-        JTerm selfEq =
-            instVars.pre.self != null ? tb.equals(instVars.post.self, instVars.pre.self) : tb.tt();
+        JTerm selfEq = instVars.pre.self != null && instVars.post.self != null
+                ? tb.equals(instVars.post.self, instVars.pre.self)
+                : tb.tt();
         JTerm afterAssumptions =
             tb.and(tb.equals(instVars.post.heap, baseHeap), selfEq, resultEq, exceptionEq);
         Iterator<JTerm> outAtPost = localOutsAtPost.iterator();
@@ -481,26 +536,35 @@ public class InfFlowBlockContractInternalRule extends BlockContractInternalRule 
 
     public static class InfFlowBlockContractInternalBuiltInRuleApp
             extends BlockContractInternalBuiltInRuleApp<InfFlowBlockContractInternalRule> {
-        protected IFProofObligationVars infFlowVars;
+        protected @Nullable IFProofObligationVars infFlowVars;
 
         public InfFlowBlockContractInternalBuiltInRuleApp(InfFlowBlockContractInternalRule rule,
-                PosInOccurrence occurrence) {
-            super(rule, occurrence);
+                @Nullable PosInOccurrence occurrence) {
+            super(rule, requireOccurrence(occurrence));
         }
 
         public InfFlowBlockContractInternalBuiltInRuleApp(InfFlowBlockContractInternalRule rule,
-                PosInOccurrence occurrence,
+                @Nullable PosInOccurrence occurrence,
                 @Nullable ImmutableList<PosInOccurrence> ifInstantiations,
                 @Nullable JavaStatement statement, @Nullable BlockContract contract,
                 @Nullable List<LocationVariable> heaps) {
-            super(rule, occurrence, ifInstantiations, statement, contract, heaps);
+            super(rule, requireOccurrence(occurrence), ifInstantiations, statement, contract,
+                heaps);
+        }
+
+        private static PosInOccurrence requireOccurrence(@Nullable PosInOccurrence occurrence) {
+            if (occurrence == null) {
+                throw new NullPointerException(
+                    "No position in occurrence for the information flow block contract rule app.");
+            }
+            return occurrence;
         }
 
         /**
          *
          * @return set of four sets of ProofObligationVars necessary for information flow proofs.
          */
-        public IFProofObligationVars getInformationFlowProofObligationVars() {
+        public @Nullable IFProofObligationVars getInformationFlowProofObligationVars() {
             return infFlowVars;
         }
 

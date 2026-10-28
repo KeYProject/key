@@ -15,11 +15,15 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class handles the translation of the bounded sum function.
  *
  * @author Nils Buchholz
  */
+@NullMarked
 public class BSumHandler implements IsabelleHandler {
     /**
      * Map of the operators supported by this handler and their respective translation.
@@ -28,7 +32,7 @@ public class BSumHandler implements IsabelleHandler {
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
-            Properties handlerSnippets, String[] handlerOptions) throws IOException {
+            @Nullable Properties handlerSnippets, String[] handlerOptions) throws IOException {
         supportedOperators.clear();
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
 
@@ -42,8 +46,12 @@ public class BSumHandler implements IsabelleHandler {
 
     @Override
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
-        StringBuilder result =
-            QuantifierHandler.makeBoundedVarRef(trans, term, supportedOperators.get(term.op()));
+        String name = supportedOperators.get(term.op());
+        if (name == null) {
+            throw new NullPointerException("No translation registered for operator "
+                + term.op().name());
+        }
+        StringBuilder result = QuantifierHandler.makeBoundedVarRef(trans, term, name);
         result.append("=");
         result.append(trans.translate(term.sub(0))).append("..<")
                 .append(trans.translate(term.sub(1))).append(". ");

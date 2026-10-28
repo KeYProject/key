@@ -19,6 +19,9 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * A UI component showing additional information about a {@link Node} in the current {@link Proof}.
@@ -26,6 +29,7 @@ import org.key_project.logic.Name;
  *
  * @author lanzinger
  */
+@NullMarked
 public abstract class NodeInfoVisualizer extends JComponent
         implements Comparable<NodeInfoVisualizer> {
     private static final long serialVersionUID = 4205276651552216532L;
@@ -41,7 +45,7 @@ public abstract class NodeInfoVisualizer extends JComponent
     private static final Set<NodeInfoVisualizerListener> listeners = new HashSet<>();
 
     /** @see #getNode() */
-    private Node node;
+    private @Nullable Node node;
 
     /** @see #getLongName() */
     private final String longName;
@@ -55,7 +59,13 @@ public abstract class NodeInfoVisualizer extends JComponent
      * @param node the node this visualizer is associated with.
      * @param longName the visualizer's long name.
      * @param shortName the visualizer's short name.
+     *
+     *        <p>
+     *        The visualizer is registered while the receiver is still under initialization (EISOP
+     *        initialization check); registration only stores the reference, everything else
+     *        happens after construction, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     protected NodeInfoVisualizer(Node node, String longName, String shortName) {
         this.node = node;
         this.longName = longName;
@@ -114,7 +124,16 @@ public abstract class NodeInfoVisualizer extends JComponent
      */
     protected static void unregister(NodeInfoVisualizer vis) {
         Node node = vis.getNode();
-        if (instances.get(node.proof().name()).get(node.serialNr()).remove(vis)) {
+        if (node == null) {
+            // the node is only cleared by dispose(), which unregisters first
+            return;
+        }
+        Map<Integer, SortedSet<NodeInfoVisualizer>> proofMap = instances.get(node.proof().name());
+        if (proofMap == null) {
+            return;
+        }
+        SortedSet<NodeInfoVisualizer> nodeSet = proofMap.get(node.serialNr());
+        if (nodeSet != null && nodeSet.remove(vis)) {
             synchronized (listeners) {
                 for (NodeInfoVisualizerListener listener : listeners) {
                     listener.visualizerUnregistered(vis);
@@ -125,6 +144,10 @@ public abstract class NodeInfoVisualizer extends JComponent
 
     private static void register(NodeInfoVisualizer vis) {
         Node node = vis.getNode();
+        if (node == null) {
+            // a visualizer is registered before its node is ever cleared
+            throw new NullPointerException("No node available.");
+        }
         int nodeNr = node.serialNr();
         Proof proof = node.proof();
         Name proofName = proof.name();
@@ -132,8 +155,17 @@ public abstract class NodeInfoVisualizer extends JComponent
         instances.putIfAbsent(proofName, new TreeMap<>());
 
         Map<Integer, SortedSet<NodeInfoVisualizer>> map = instances.get(proofName);
+        if (map == null) {
+            // the entry has just been put into the map
+            throw new NullPointerException("No proof map available.");
+        }
         map.putIfAbsent(nodeNr, new TreeSet<>());
-        map.get(nodeNr).add(vis);
+        SortedSet<NodeInfoVisualizer> nodeSet = map.get(nodeNr);
+        if (nodeSet == null) {
+            // the entry has just been put into the map
+            throw new NullPointerException("No node set available.");
+        }
+        nodeSet.add(vis);
 
         synchronized (listeners) {
             for (NodeInfoVisualizerListener listener : listeners) {
@@ -158,9 +190,10 @@ public abstract class NodeInfoVisualizer extends JComponent
 
     /**
      *
-     * @return the node this window is associated with.
+     * @return the node this window is associated with, or {@code null} once
+     *         {@link #dispose()} has released the reference.
      */
-    public final Node getNode() {
+    public final @Nullable Node getNode() {
         return node;
     }
 

@@ -39,6 +39,8 @@ import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +65,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public final class StrategySelectionView extends JPanel implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(StrategySelectionView.class);
 
@@ -80,7 +83,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
      * The {@link StrategySettingsDefinition} of {@link #FACTORY} which defines the UI controls to
      * show.
      */
-    private static final StrategySettingsDefinition DEFINITION = FACTORY.getSettingsDefinition();
+    private static final StrategySettingsDefinition DEFINITION = initializationDefinition();
 
     /**
      * The name of {@link #FACTORY}.
@@ -88,9 +91,25 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     private static final String JAVACARDDL_STRATEGY_NAME = FACTORY.name().toString();
 
     /**
+     * Resolves the {@link StrategySettingsDefinition} of the default factory used by this view.
+     *
+     * @return the settings definition of {@link #FACTORY}
+     */
+    private static StrategySettingsDefinition initializationDefinition() {
+        StrategySettingsDefinition definition = FACTORY.getSettingsDefinition();
+        if (definition == null) {
+            // the modular JavaCardDL default factory always provides a settings definition; a
+            // missing one is an inconsistent state in which the previous code crashed with an NPE
+            throw new NullPointerException(
+                "Default strategy factory provides no settings definition.");
+        }
+        return definition;
+    }
+
+    /**
      * The {@link KeYMediator} which provides the active proof.
      */
-    private KeYMediator mediator;
+    private @Nullable KeYMediator mediator;
 
     /**
      * Allows access to shown UI controls generated according to {@link #DEFINITION}.
@@ -121,7 +140,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
      * The combo box popup list, cached once the delete handler is installed, so the delete action
      * can keep the popup selection aligned with the combo box.
      */
-    private JList<?> presetPopupList;
+    private @Nullable JList<?> presetPopupList;
 
     /**
      * Width (in pixels) of the clickable delete zone drawn at the right edge of user-defined preset
@@ -156,6 +175,15 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     };
     private JButton btnGo;
 
+    /**
+     * The layout and configuration calls below operate on {@code this} while the receiver is
+     * still under initialization (EISOP initialization check), and the keyboard-shortcut
+     * installation receives the possibly-null {@link #mediator} of this fresh instance; the
+     * effects only take place after construction completes or are deferred into listeners,
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:initialization.fields.uninitialized", "nullness:argument.type.incompatible" })
     public StrategySelectionView() {
         layoutPane();
         // Keep the merge-point option in sync with the prover mode (merge is single-core only).
@@ -303,9 +331,17 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
 
         // Individual options
         if (definition instanceof OneOfStrategyPropertyDefinition oneOfDefinition) {
+            String apiKey = oneOfDefinition.getApiKey();
+            if (apiKey == null) {
+                // every editable option group is bound to a strategy-property key; without one
+                // the selection could not be persisted and the previous code crashed with an
+                // NPE on save
+                throw new NullPointerException("Strategy property definition '"
+                    + definition.getName() + "' has no API key.");
+            }
             ButtonGroup buttonGroup = new ButtonGroup();
             if (!oneOfDefinition.getValues().isEmpty()) {
-                data.addPropertyGroup(oneOfDefinition.getApiKey(), buttonGroup);
+                data.addPropertyGroup(apiKey, buttonGroup);
             }
             ++yCoord;
 
@@ -322,9 +358,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                         .getValues()) {
                     gridx += 2;
                     JRadioButton radioButton =
-                        newButton(valueDefinition.getValue(), oneOfDefinition.getApiKey(),
-                            valueDefinition.getApiValue(), true, false, factory);
-                    data.addPropertyButton(radioButton, oneOfDefinition.getApiKey());
+                        newButton(valueDefinition.getValue(), valueDefinition.getApiValue(), true,
+                            false, factory);
+                    data.addPropertyButton(radioButton, apiKey);
                     radioButton.setToolTipText(valueDefinition.getTooltip());
                     buttonGroup.add(radioButton);
                     addJavaDLOption(javaDLOptionsPanel, radioButton, javaDLOptionsLayout,
@@ -349,9 +385,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                             .getValues()) {
                         gridx += 2;
                         JRadioButton radioButton =
-                            newButton(valueDefinition.getValue(), oneOfDefinition.getApiKey(),
-                                valueDefinition.getApiValue(), true, false, factory);
-                        data.addPropertyButton(radioButton, oneOfDefinition.getApiKey());
+                            newButton(valueDefinition.getValue(), valueDefinition.getApiValue(),
+                                true, false, factory);
+                        data.addPropertyButton(radioButton, apiKey);
                         radioButton.setToolTipText(valueDefinition.getTooltip());
                         buttonGroup.add(radioButton);
                         addJavaDLOption(javaDLOptionsPanel, radioButton, javaDLOptionsLayout,
@@ -373,9 +409,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                     for (StrategyPropertyValueDefinition valueDefinition : oneOfDefinition
                             .getValues()) {
                         JRadioButton radioButton =
-                            newButton(valueDefinition.getValue(), oneOfDefinition.getApiKey(),
-                                valueDefinition.getApiValue(), true, false, factory);
-                        data.addPropertyButton(radioButton, oneOfDefinition.getApiKey());
+                            newButton(valueDefinition.getValue(), valueDefinition.getApiValue(),
+                                true, false, factory);
+                        data.addPropertyButton(radioButton, apiKey);
                         radioButton.setToolTipText(valueDefinition.getTooltip());
                         buttonGroup.add(radioButton);
                         queryAxiomPanel.add(radioButton);
@@ -400,14 +436,25 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         return yCoord;
     }
 
-    private JRadioButton newButton(String text, final String key, final String command,
-            boolean selected, boolean enabled, final StrategyFactory factory) {
+    private JRadioButton newButton(String text, final String command, boolean selected,
+            boolean enabled, final StrategyFactory factory) {
         JRadioButton result = new JRadioButton(text);
         result.addActionListener(e -> {
             predefChanged = true;
             StrategyProperties props = getProperties();
-            updateStrategySettings(
-                mediator.getSelectedProof().getActiveStrategy().name().toString(), props);
+            Proof proof = mediator == null ? null : mediator.getSelectedProof();
+            if (proof == null) {
+                // the strategy view is only editable while a proof is active; the previous
+                // code crashed with an NPE here
+                throw new NullPointerException("No proof selected for strategy change.");
+            }
+            Strategy<Goal> activeStrategy = proof.getActiveStrategy();
+            if (activeStrategy == null) {
+                // a proof always has an active strategy; its absence is an inconsistent state
+                // in which the previous code crashed with an NPE
+                throw new NullPointerException("No active strategy for the selected proof.");
+            }
+            updateStrategySettings(activeStrategy.name().toString(), props);
         });
         result.setEnabled(enabled);
         result.setActionCommand(command);
@@ -539,7 +586,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
      * @param selectName the name of the preset to select afterwards, or {@code null} to select the
      *        first entry ("Defaults")
      */
-    private void rebuildPresetCombo(String selectName) {
+    private void rebuildPresetCombo(@Nullable String selectName) {
         JComboBox<PresetEntry> combo = components.getStrategyPredefSettingsCmb();
         if (combo == null) {
             return;
@@ -560,7 +607,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
             if (toSelect == null && !entries.isEmpty()) {
                 toSelect = entries.get(0);
             }
-            combo.setSelectedItem(toSelect);
+            if (toSelect != null) {
+                combo.setSelectedItem(toSelect);
+            }
         } finally {
             adjustingPresetCombo = false;
         }
@@ -570,7 +619,8 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
      * Applies the preset currently selected in the combo box to the active proof.
      */
     private void applySelectedPreset() {
-        if (mediator == null || mediator.getSelectedProof() == null) {
+        Proof proof = mediator == null ? null : mediator.getSelectedProof();
+        if (proof == null) {
             return;
         }
         PresetEntry entry =
@@ -578,7 +628,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         if (entry == null) {
             return;
         }
-        mediator.getSelectedProof().getSettings().getStrategySettings()
+        proof.getSettings().getStrategySettings()
                 .setMaxSteps(entry.maxSteps());
         predefChanged = false;
         updateStrategySettings(JAVACARDDL_STRATEGY_NAME, entry.properties());
@@ -590,7 +640,13 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
      * unsaved manual edits are included while properties without a control keep their value.
      */
     private StrategyProperties currentStrategyProperties() {
-        StrategyProperties base = mediator.getSelectedProof().getSettings().getStrategySettings()
+        Proof proof = mediator == null ? null : mediator.getSelectedProof();
+        if (proof == null) {
+            // the callers verify that a proof is active before exporting; an absent one is an
+            // inconsistent state in which the previous code crashed with an NPE
+            throw new NullPointerException("No proof selected for strategy export.");
+        }
+        StrategyProperties base = proof.getSettings().getStrategySettings()
                 .getActiveStrategyProperties();
         StrategyProperties displayed = getProperties();
         for (String key : displayed.stringPropertyNames()) {
@@ -603,7 +659,13 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
      * @return the maximal number of rule applications currently configured for the active proof
      */
     private int currentMaxSteps() {
-        return mediator.getSelectedProof().getSettings().getStrategySettings().getMaxSteps();
+        Proof proof = mediator == null ? null : mediator.getSelectedProof();
+        if (proof == null) {
+            // the callers verify that a proof is active before exporting; an absent one is an
+            // inconsistent state in which the previous code crashed with an NPE
+            throw new NullPointerException("No proof selected for strategy export.");
+        }
+        return proof.getSettings().getStrategySettings().getMaxSteps();
     }
 
     /**
@@ -625,7 +687,10 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     private JButton createPresetMenuButton() {
         final JButton button = new JButton("⚙");
         // The gear is a Unicode glyph; enlarge it relative to the default font so it reads well.
-        button.setFont(button.getFont().deriveFont(button.getFont().getSize2D() + 6f));
+        Font font = button.getFont();
+        if (font != null) {
+            button.setFont(font.deriveFont(font.getSize2D() + 6f));
+        }
         button.setMargin(new Insets(2, 8, 2, 8));
         button.setToolTipText("Save, stash or rename presets");
         button.addActionListener(e -> showPresetMenu(button));
@@ -665,7 +730,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
             return;
         }
         Object input = JOptionPane.showInputDialog(this, "Preset name:", "Save strategy preset",
-            JOptionPane.PLAIN_MESSAGE, null, null, "");
+            JOptionPane.PLAIN_MESSAGE, null, new Object[0], "");
         if (input == null) {
             return;
         }
@@ -708,7 +773,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
             return;
         }
         Object input = JOptionPane.showInputDialog(this, "New name:", "Rename strategy preset",
-            JOptionPane.PLAIN_MESSAGE, null, null, selected.name());
+            JOptionPane.PLAIN_MESSAGE, null, new Object[0], selected.name());
         if (input == null) {
             return;
         }
@@ -732,7 +797,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         rebuildPresetCombo(newName);
     }
 
-    private void deleteUserPreset(PresetEntry entry) {
+    private void deleteUserPreset(@Nullable PresetEntry entry) {
         if (entry == null || !entry.userDefined()) {
             return;
         }
@@ -827,13 +892,14 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         });
     }
 
-    public void setMediator(KeYMediator mediator) {
+    public void setMediator(@Nullable KeYMediator mediator) {
         if (this.mediator != null) {
             this.mediator.removeKeYSelectionListener(mediatorListener);
         }
         this.mediator = mediator;
-        if (components.getMaxRuleAppSlider() != null) {
-            components.getMaxRuleAppSlider().setMediator(this.mediator);
+        MaxRuleAppSlider slider = components.getMaxRuleAppSlider();
+        if (slider != null) {
+            slider.setMediator(this.mediator);
         }
         if (this.mediator != null) {
             this.mediator.addKeYSelectionListener(mediatorListener);
@@ -843,12 +909,13 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     /**
      * performs a refresh of all elements in this tab
      */
-    public void refresh(Proof proof) {
+    public void refresh(@Nullable Proof proof) {
         if (proof == null) {
             enableAll(false);
         } else {
-            if (components.getMaxRuleAppSlider() != null) {
-                components.getMaxRuleAppSlider().refresh();
+            MaxRuleAppSlider slider = components.getMaxRuleAppSlider();
+            if (slider != null) {
+                slider.refresh();
             }
             StrategyProperties sp =
                 proof.getSettings().getStrategySettings().getActiveStrategyProperties();
@@ -895,13 +962,14 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     }
 
     private void refreshDefaultButton() {
-        if (mediator.getSelectedProof() != null) {
+        if (mediator != null && mediator.getSelectedProof() != null) {
             components.getDefaultButton().setEnabled(predefChanged);
         } else {
             components.getDefaultButton().setEnabled(false);
             components.getStrategyPredefSettingsCmb().setEnabled(false);
-            if (components.getPresetMenuButton() != null) {
-                components.getPresetMenuButton().setEnabled(false);
+            JButton presetMenuButton = components.getPresetMenuButton();
+            if (presetMenuButton != null) {
+                presetMenuButton.setEnabled(false);
             }
         }
     }
@@ -912,13 +980,15 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
      * @param enable boolean saying whether to activate or deactivate the components
      */
     private void enableAll(boolean enable) {
-        if (components.getMaxRuleAppSlider() != null) {
-            components.getMaxRuleAppSlider().setEnabled(enable);
+        MaxRuleAppSlider slider = components.getMaxRuleAppSlider();
+        if (slider != null) {
+            slider.setEnabled(enable);
         }
         components.getDefaultButton().setEnabled(enable);
         components.getStrategyPredefSettingsCmb().setEnabled(enable);
-        if (components.getPresetMenuButton() != null) {
-            components.getPresetMenuButton().setEnabled(enable);
+        JButton presetMenuButton = components.getPresetMenuButton();
+        if (presetMenuButton != null) {
+            presetMenuButton.setEnabled(enable);
         }
         for (Entry<String, List<JRadioButton>> entry : components.getPropertyButtons().entrySet()) {
             for (JRadioButton button : entry.getValue()) {
@@ -929,19 +999,27 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
 
     public Strategy<@NonNull Goal> getStrategy(String strategyName, Proof proof,
             StrategyProperties properties) {
-        if (mediator != null) {
-            for (StrategyFactory s : mediator.getProfile().supportedStrategies()) {
+        Profile profile = mediator == null ? null : mediator.getProfile();
+        StrategyFactory defaultFactory = null;
+        if (profile != null) {
+            for (StrategyFactory s : profile.supportedStrategies()) {
                 if (strategyName.equals(s.name().toString())) {
                     return s.create(proof, properties);
                 }
             }
+            defaultFactory = profile.getDefaultStrategyFactory();
             LOGGER.info("Selected Strategy '{}' not found falling back to {}", strategyName,
-                mediator.getProfile().getDefaultStrategyFactory().name());
+                defaultFactory == null ? strategyName : defaultFactory.name());
+        } else {
+            defaultFactory = proof.getServices().getProfile().getDefaultStrategyFactory();
         }
-        return mediator != null
-                ? mediator.getProfile().getDefaultStrategyFactory().create(proof, properties)
-                : proof.getServices().getProfile().getDefaultStrategyFactory().create(proof,
-                    properties);
+        if (defaultFactory == null) {
+            // a profile always provides a default strategy factory; its absence is an
+            // inconsistent state in which the previous code crashed with an NPE
+            throw new NullPointerException(
+                "No default strategy factory available for " + strategyName + ".");
+        }
+        return defaultFactory.create(proof, properties);
     }
 
     /**
@@ -974,7 +1052,12 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     }
 
     private void updateStrategySettings(String strategyName, StrategyProperties p) {
-        final Proof proof = mediator.getSelectedProof();
+        Proof proof = mediator == null ? null : mediator.getSelectedProof();
+        if (proof == null) {
+            // the strategy view can only update settings with an active proof; the previous
+            // code crashed with an NPE here
+            throw new NullPointerException("No proof selected for strategy update.");
+        }
         final Strategy<@NonNull Goal> strategy = getStrategy(strategyName, proof, p);
 
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setStrategy(strategy.name());
@@ -987,7 +1070,6 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
 
         refresh(proof);
     }
-
 
     @Override
     public String getTitle() {
@@ -1003,7 +1085,6 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
     public Icon getIcon() {
         return IconFactory.PROOF_SEARCH_STRATEGY.get(MainWindow.TAB_ICON_SIZE);
     }
-
 
     /**
      * A single entry of the preset combo box: either the built-in "Defaults", one of the profile's
@@ -1080,7 +1161,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
 
         @Override
         public Component getListCellRendererComponent(JList<? extends PresetEntry> list,
-                PresetEntry value, int index, boolean isSelected, boolean cellHasFocus) {
+                @Nullable PresetEntry value, int index, boolean isSelected, boolean cellHasFocus) {
             Color bg = isSelected ? list.getSelectionBackground() : list.getBackground();
             Color fg = isSelected ? list.getSelectionForeground() : list.getForeground();
             panel.setBackground(bg);
@@ -1095,8 +1176,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 deleteLabel.setText("✕");
                 deleteLabel.setFont(list.getFont());
                 boolean rollover = index == presetDeleteRolloverIndex;
-                deleteLabel.setForeground(
-                    rollover ? PRESET_DELETE_ACTIVE_COLOR : blend(fg, bg, 0.45f));
+                Color deleteColor =
+                    fg != null && bg != null ? blend(fg, bg, 0.45f) : PRESET_DELETE_ACTIVE_COLOR;
+                deleteLabel.setForeground(rollover ? PRESET_DELETE_ACTIVE_COLOR : deleteColor);
             } else {
                 deleteLabel.setText("");
             }
@@ -1107,8 +1189,13 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
                 separator = (prev instanceof PresetEntry pe) && !pe.userDefined();
             }
             Color sepColor = UIManager.getColor("Separator.foreground");
-            if (sepColor == null) {
+            if (sepColor == null && fg != null && bg != null) {
                 sepColor = blend(fg, bg, 0.6f);
+            }
+            if (sepColor == null) {
+                // neither a theme colour nor the cell colours are available; fall back to a
+                // fixed gray so the separator stays visible
+                sepColor = Color.GRAY;
             }
             panel.setBorder(
                 separator ? BorderFactory.createMatteBorder(1, 0, 0, 0, sepColor) : null);
@@ -1143,28 +1230,31 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         /**
          * The {@link MaxRuleAppSlider} in which the maximal number of steps is edited.
          */
-        private MaxRuleAppSlider maxRuleAppSlider;
+        private @Nullable MaxRuleAppSlider maxRuleAppSlider;
         /**
-         * The {@link JButton} which restores default values.
+         * The {@link JButton} which restores default values. Pre-initialized so that the field is
+         * definite; {@link #setDefaultButton(JButton)} replaces it during construction.
          */
-        private JButton defaultButton;
+        private JButton defaultButton = new JButton("Apply");
 
         /**
-         * The {@link JComboBox} for choosing a predefined value set.
+         * The {@link JComboBox} for choosing a predefined value set. Pre-initialized so that the
+         * field is definite; {@link #setPredefsChoiceCmb(JComboBox)} replaces it during
+         * construction.
          */
-        private JComboBox<PresetEntry> strategyPredefSettingsCmb;
+        private JComboBox<PresetEntry> strategyPredefSettingsCmb = new JComboBox<>();
 
         /**
          * The menu button offering save / stash / rename actions for presets.
          */
-        private JButton presetMenuButton;
+        private @Nullable JButton presetMenuButton;
 
         /**
          * Returns the {@link MaxRuleAppSlider} in which the maximal number of steps is edited.
          *
          * @return The {@link MaxRuleAppSlider} in which the maximal number of steps is edited.
          */
-        public MaxRuleAppSlider getMaxRuleAppSlider() {
+        public @Nullable MaxRuleAppSlider getMaxRuleAppSlider() {
             return maxRuleAppSlider;
         }
 
@@ -1239,7 +1329,7 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         /**
          * @return the menu button offering save / stash / rename actions
          */
-        public JButton getPresetMenuButton() {
+        public @Nullable JButton getPresetMenuButton() {
             return presetMenuButton;
         }
 

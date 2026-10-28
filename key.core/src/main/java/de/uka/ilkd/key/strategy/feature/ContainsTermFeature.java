@@ -19,6 +19,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -27,6 +28,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * Feature for checking if the term of the first projection contains the term of the second
  * projection.
  */
+@NullMarked
 public class ContainsTermFeature implements Feature {
 
     /** Constant that represents the boolean value true */

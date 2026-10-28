@@ -12,12 +12,17 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Shows the proof management dialog
  */
+@NullMarked
 public final class ProofManagementAction extends MainWindowAction {
 
     /**
@@ -25,6 +30,12 @@ public final class ProofManagementAction extends MainWindowAction {
      */
     private static final long serialVersionUID = 7696620742992568551L;
 
+    /**
+     * The action-configuration calls and the mediator queries below operate on {@code this} while
+     * the receiver is still under initialization (EISOP initialization check); safe here since the
+     * attached listener only reacts to later selection events, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ProofManagementAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Proof Management");
@@ -50,9 +61,12 @@ public final class ProofManagementAction extends MainWindowAction {
     }
 
     private boolean enabled() {
-        return getMediator().getSelectedProof() != null
-                && getMediator().getSelectedProof().getServices().getJavaModel() != null
-                && !getMediator().getSelectedProof().getServices().getJavaModel().isEmpty();
+        Proof proof = getMediator().getSelectedProof();
+        if (proof == null) {
+            return false;
+        }
+        JavaModel javaModel = proof.getServices().getJavaModel();
+        return javaModel != null && !javaModel.isEmpty();
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -60,11 +74,16 @@ public final class ProofManagementAction extends MainWindowAction {
     }
 
     private void showProofManagement() {
-        if (getMediator().getSelectedProof() == null) {
+        Proof proof = getMediator().getSelectedProof();
+        if (proof == null) {
             mainWindow.notify(new GeneralFailureEvent("Please load a proof first"));
         } else {
-            ProofManagementDialog.showInstance(
-                getMediator().getSelectedProof().getEnv().getInitConfigForEnvironment());
+            ProofEnvironment env = proof.getEnv();
+            if (env == null) {
+                // a loaded proof always has an environment; the original code dereferenced it
+                throw new NullPointerException("No proof environment available.");
+            }
+            ProofManagementDialog.showInstance(env.getInitConfigForEnvironment());
         }
     }
 }

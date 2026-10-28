@@ -5,7 +5,9 @@
 # Plugins
 spotless = "8.10.3"
 checkerframework-gradle = "0.6.61"
+errorprone-plugin = "5.1.1"
 maven-publish = "0.36.0"
+nullaway-plugin = "3.3.0"
 shadow = "9.6.1"
 
 # Core dependencies
@@ -13,6 +15,8 @@ slf4j = "2.0.20"
 logback = "1.6.4"
 jspecify = "1.0.1"
 eisop = "3.49.5-eisop1"
+nullaway = "0.14.3"
+errorprone = "2.49.0"
 assertj = "3.27.7"
 junit = "6.1.3"
 jackson = "2.21.7"
@@ -47,6 +51,11 @@ jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
 checkerframework-qual = { module = "io.github.eisop:checker-qual", version.ref = "eisop" }
 checkerframework-util = { module = "io.github.eisop:checker-util", version.ref = "eisop" }
 checkerframework = { module = "io.github.eisop:checker", version.ref = "eisop" }
+
+# NullAway (fast JSpecify-aware nullness checker for trials)
+nullaway = { module = "com.uber.nullaway:nullaway", version.ref = "nullaway" }
+# Error Prone (host for the NullAway checker)
+errorprone-core = { module = "com.google.errorprone:error_prone_core", version.ref = "errorprone" }
 
 # Testing
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
@@ -96,6 +105,8 @@ javaparser = ["javaparser-core", "javaparser-core-serialization", "javaparser-sy
 [plugins]
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 checkerframework = { id = "org.checkerframework", version.ref = "checkerframework-gradle" }
+errorprone = { id = "net.ltgt.errorprone", version.ref = "errorprone-plugin" }
+nullaway = { id = "net.ltgt.nullaway", version.ref = "nullaway-plugin" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 license-report = { id = "com.github.jk1.dependency-license-report", version = "3.1.4" }

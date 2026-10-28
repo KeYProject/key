@@ -12,12 +12,15 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Binary feature that returns zero iff the hyper-tableaux simplification method approves the given
  * application (which is supposed to be the application of a beta rule). Used terminology is defined
  * in Diss. by Martin Giese.
  */
+@NullMarked
 public class SimplifyBetaCandidateFeature extends AbstractBetaFeature {
 
     public final static Feature INSTANCE = new SimplifyBetaCandidateFeature();

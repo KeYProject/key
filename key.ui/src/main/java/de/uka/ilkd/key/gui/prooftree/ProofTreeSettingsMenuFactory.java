@@ -18,12 +18,14 @@ import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
 import bibliothek.gui.dock.common.action.CCheckBox;
 import bibliothek.gui.dock.common.action.CMenu;
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.gui.prooftree.ProofTreePopupFactory.ICON_SIZE;
 
 /**
  * Factory for the settings menu of the {@link ProofTreeView}.
  */
+@NullMarked
 public final class ProofTreeSettingsMenuFactory {
     private ProofTreeSettingsMenuFactory() {}
 

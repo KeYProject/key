@@ -21,12 +21,15 @@ import de.uka.ilkd.key.smt.SMTFocusResults;
 
 import org.key_project.util.java.SwingUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Dialog showing launched SMT processes and results.
  */
+@NullMarked
 public class ProgressDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
@@ -37,13 +40,13 @@ public class ProgressDialog extends JDialog {
      * Button to apply the results of running the SMT solver.
      * May close some open goals if the solver returned unsat.
      */
-    private JButton applyButton;
+    private @Nullable JButton applyButton;
     /**
      * Button to evaluate the unsat core provided by the SMT solver.
      *
      * @see SMTFocusResults
      */
-    private JButton focusButton;
+    private @Nullable JButton focusButton;
     /**
      * Button to stop the launched SMT solvers.
      */
@@ -89,6 +92,14 @@ public class ProgressDialog extends JDialog {
         void focusButtonClicked();
     }
 
+    /**
+     * The dialog configures itself with title, layout and button/progress getters while the
+     * receiver is still under initialization (EISOP initialization check); the effects only
+     * take place after construction completes, suppressed with scoped keys. The lazily created
+     * fields stay unset until their getters run.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     public ProgressDialog(ProgressModel model, ProgressDialogListener listener,
             boolean counterexample, int resolution, int progressBarMax, String[] labelTitles,
             String... titles) {
@@ -120,7 +131,6 @@ public class ProgressDialog extends JDialog {
             buttonBox.add(getApplyButton());
             buttonBox.add(Box.createHorizontalStrut(5));
         }
-
 
         GridBagConstraints constraints = new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0,
             GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(5, 5, 0, 5), 0, 0);
@@ -232,8 +242,6 @@ public class ProgressDialog extends JDialog {
         }
     }
 
-
-
     public static void main(String[] args) throws InterruptedException {
         final ProgressModel model = new ProgressModel();
         model.addColumn(new ProgressModel.TitleColumn("Summary", "1", "2", "3", "4"));
@@ -243,8 +251,25 @@ public class ProgressDialog extends JDialog {
         String[] infoLabels =
             { "Processed", "Closed: ", "Unknown: ", "Counter Example:", "Errors:" };
 
-        ProgressDialog dialog = new ProgressDialog(model, null, true, 100, 10, infoLabels, "", "Z3",
-            "Simplify", "Yices");
+        ProgressDialog dialog = new ProgressDialog(model, new ProgressDialogListener() {
+            @Override
+            public void applyButtonClicked() {}
+
+            @Override
+            public void stopButtonClicked() {}
+
+            @Override
+            public void discardButtonClicked() {}
+
+            @Override
+            public void additionalInformationChosen(Object obj) {}
+
+            @Override
+            public void focusButtonClicked() {}
+
+            @Override
+            public void infoButtonClicked(int column, int row) {}
+        }, true, 100, 10, infoLabels, "", "Z3", "Simplify", "Yices");
         dialog.setVisible(true);
         dialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -260,6 +285,7 @@ public class ProgressDialog extends JDialog {
 }
 
 
+@NullMarked
 class ProgressTable extends JTable {
 
     private static final long serialVersionUID = 1L;
@@ -268,7 +294,6 @@ class ProgressTable extends JTable {
     public interface ProgressTableListener {
         void infoButtonClicked(int column, int row);
     }
-
 
     public static class ProgressPanel extends JPanel {
         private static final long serialVersionUID = 1L;
@@ -295,8 +320,11 @@ class ProgressTable extends JTable {
                 Dimension dim = new Dimension();
                 infoButton.setMargin(new Insets(0, 0, 0, 0));
 
-                dim.height = this.getFontMetrics(this.getFont()).getHeight() + 2;
-                dim.width = dim.height * 3;
+                Font font = this.getFont();
+                if (font != null) {
+                    dim.height = this.getFontMetrics(font).getHeight() + 2;
+                    dim.width = dim.height * 3;
+                }
 
                 infoButton.setMinimumSize(dim);
                 infoButton.setPreferredSize(dim);
@@ -306,6 +334,14 @@ class ProgressTable extends JTable {
             return infoButton;
         }
 
+        /**
+         * The panel lazily creates and binds its components via the private getters while the
+         * receiver is still under initialization (EISOP initialization check) and passes
+         * itself to the {@code BoxLayout} constructor; the effects only take place after
+         * construction completes, suppressed with scoped keys.
+         */
+        @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+            "nullness:method.invocation.invalid", "nullness:argument.type.incompatible" })
         ProgressPanel() {
 
             this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -330,18 +366,12 @@ class ProgressTable extends JTable {
         }
     }
 
-
-
     private final ProgressPanel progressPanelRenderer = new ProgressPanel();
     private ProgressPanel progressPanelEditor;
-
-
 
     private class ProgressCellEditor extends AbstractCellEditor implements TableCellEditor {
 
         private static final long serialVersionUID = 1L;
-
-
 
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
@@ -354,16 +384,14 @@ class ProgressTable extends JTable {
             return getProgressPanelEditor();
         }
 
-
-
         @Override
         public Object getCellEditorValue() {
-            return null;
+            // this editor never produces a value; returning null would violate the
+            // CellEditor contract
+            return "";
         }
 
     }
-
-
 
     private void prepareProgressPanel(ProgressPanel panel, final ProcessData data) {
         panel.setValue(data.getProgress());
@@ -372,7 +400,6 @@ class ProgressTable extends JTable {
         panel.progressBar.setBackground(data.getBackgroundColor());
         panel.progressBar.setForeground(data.getForegroundColor());
         panel.progressBar.setUI(new BasicProgressBarUI() {
-
 
             @Override
             protected Color getSelectionForeground() {
@@ -384,6 +411,12 @@ class ProgressTable extends JTable {
 
     }
 
+    /**
+     * The lambda invokes {@link #prepareProgressPanel(ProgressPanel, ProcessData)} on the
+     * receiver while the field is being initialized (EISOP initialization check); the renderer
+     * is only invoked after construction completes, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private final TableCellRenderer renderer =
         (table, value, isSelected, hasFocus, row, column) -> {
             ProcessData data = (ProcessData) value;
@@ -391,12 +424,17 @@ class ProgressTable extends JTable {
             return progressPanelRenderer;
         };
 
-
     private final TableCellEditor editor = new ProgressCellEditor();
     private final Point currentEditorCell = new Point();
 
-
-
+    /**
+     * The table configures itself with renderers, editors and init calls while the receiver is
+     * still under initialization (EISOP initialization check) and forwards its possibly
+     * {@code null} font to {@code init}; the effects only take place after construction
+     * completes, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid", "nullness:argument.type.incompatible" })
     public ProgressTable(int resolution, ProgressTableListener listener, String... titles) {
         this.setDefaultRenderer(ProgressModel.ProcessColumn.class, renderer);
         this.setDefaultEditor(ProgressModel.ProcessColumn.class, editor);
@@ -412,9 +450,7 @@ class ProgressTable extends JTable {
         panel.infoButton.addActionListener(
             e -> listener.infoButtonClicked(currentEditorCell.x - 1, currentEditorCell.y));
 
-
     }
-
 
     public void setModel(ProgressModel model, String... titles) {
 
@@ -430,8 +466,6 @@ class ProgressTable extends JTable {
         for (int i = 0; i < model.getRowCount(); i++) {
             this.setRowHeight(progressPanelRenderer.getPreferredSize().height + 5);
         }
-
-
 
     }
 
@@ -459,7 +493,6 @@ class ProgressTable extends JTable {
         TableColumn col = colModel.getColumn(vColIndex);
         int width = 0;
 
-
         TableCellRenderer renderer = col.getHeaderRenderer();
         if (renderer == null) {
             renderer = table.getTableHeader().getDefaultRenderer();
@@ -467,7 +500,6 @@ class ProgressTable extends JTable {
         Component comp =
             renderer.getTableCellRendererComponent(table, col.getHeaderValue(), false, false, 0, 0);
         width = comp.getPreferredSize().width;
-
 
         for (int r = 0; r < table.getRowCount(); r++) {
             renderer = table.getCellRenderer(r, vColIndex);
@@ -481,15 +513,12 @@ class ProgressTable extends JTable {
         col.setPreferredWidth(width);
     }
 
-
-
     private ProgressPanel getProgressPanelEditor() {
         if (progressPanelEditor == null) {
             progressPanelEditor = new ProgressPanel();
         }
         return progressPanelEditor;
     }
-
 
     @Override
     public void tableChanged(TableModelEvent e) {

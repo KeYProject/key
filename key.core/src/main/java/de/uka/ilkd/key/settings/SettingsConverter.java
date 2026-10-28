@@ -12,12 +12,14 @@ import java.util.stream.Collectors;
 import org.key_project.util.Streams;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Utility class providing various methods to read properties.
  *
  * @author ?
  */
+@NullMarked
 public final class SettingsConverter {
 
     /**

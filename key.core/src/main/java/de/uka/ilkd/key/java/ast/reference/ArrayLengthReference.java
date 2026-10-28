@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.reference;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -13,12 +15,16 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Array length reference. As a length reference is int-valued, and hence it is no valid prefix. Do
  * <b>not</b> instantiate this class if you want to construct the Java expression
  * <code>a.length</code>! Use {@link JavaInfo#getArrayLength()} instead.
  */
 
+@NullMarked
 public class ArrayLengthReference extends JavaNonTerminalProgramElement
         implements Reference, Expression, ReferenceSuffix {
 
@@ -26,7 +32,7 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
     /**
      * Reference prefix. It must evaluate to an ArrayType.
      */
-    protected final ReferencePrefix prefix;
+    protected final @Nullable ReferencePrefix prefix;
 
     /**
      * Array length reference.
@@ -74,10 +80,11 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+        return Objects.requireNonNull(javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT),
+            "no KeYJavaType for int");
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         return getKeYJavaType(javaServ);
     }
 
@@ -86,7 +93,7 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
      *
      * @return the reference prefix.
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return prefix;
     }
 

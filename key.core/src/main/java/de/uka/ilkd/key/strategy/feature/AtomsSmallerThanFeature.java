@@ -16,6 +16,8 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Feature that returns zero iff each variable/atom of one monomial is smaller than all variables of
@@ -30,6 +32,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * orders whole monomials by the same ingredients.
  * </p>
  */
+@NullMarked
 @StableCost
 public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature {
 

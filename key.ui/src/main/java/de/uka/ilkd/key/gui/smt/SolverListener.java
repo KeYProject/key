@@ -23,6 +23,7 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -37,6 +38,7 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 import de.uka.ilkd.key.smt.SMTSolver.SolverState;
+import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
@@ -46,6 +48,10 @@ import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 
 import org.key_project.logic.Term;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class SolverListener implements SolverLauncherListener {
     private ProgressDialog progressDialog;
     private ProgressModel progressModel;
@@ -109,19 +115,19 @@ public class SolverListener implements SolverLauncherListener {
         }
 
         public void createInformation() {
-            if (solver.getException() != null) {
+            Throwable exception = solver.getException();
+            if (exception != null) {
 
                 StringWriter writer = new StringWriter();
 
-                solver.getException().printStackTrace(new PrintWriter(writer));
-                addInformation("Error-Message",
-                    solver.getException().toString() + "\n\n" + writer);
-
+                exception.printStackTrace(new PrintWriter(writer));
+                addInformation("Error-Message", exception.toString() + "\n\n" + writer);
 
             }
             addInformation("Solver Input", solver.getRawSolverInput());
-            if (solver.getTacletTranslation() != null) {
-                addInformation("Taclets", solver.getTacletTranslation().toString());
+            TacletSetTranslation tacletTranslation = solver.getTacletTranslation();
+            if (tacletTranslation != null) {
+                addInformation("Taclets", tacletTranslation.toString());
             }
             addInformation("Solver Output", solver.getRawSolverOutput());
 
@@ -184,7 +190,13 @@ public class SolverListener implements SolverLauncherListener {
         }
     }
 
-
+    /**
+     * The progress dialog, the progress model and the processing grid are only available after
+     * the launcher has started (see {@link #prepareDialog(Collection, Collection, SolverLauncher)})
+     * and before any further launcher event fires; the constructor cannot initialize them (EISOP
+     * initialization check), suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:initialization.fields.uninitialized")
     public SolverListener(DefaultSMTSettings settings, Proof smtProof) {
         this.settings = settings;
         this.smtProof = smtProof;
@@ -193,7 +205,6 @@ public class SolverListener implements SolverLauncherListener {
     @Override
     public void launcherStopped(SolverLauncher launcher, Collection<SMTSolver> problemSolvers) {
         timer.cancel();
-
 
         storeInformation();
         progressModel.setEditable(true);
@@ -234,12 +245,24 @@ public class SolverListener implements SolverLauncherListener {
             Set<Goal> failedToFocus = new HashSet<>();
             for (InternSMTProblem problem : problems) {
                 Goal goal = problem.problem.getGoal();
-                Node goalNode = goal.node();
-                if (focusedGoals.contains(goal)
-                        || problem.solver.getFinalResult().isValid() != ThreeValuedTruth.VALID) {
+                if (goal == null) {
+                    // an intern SMT problem always references a goal of the proof
+                    throw new NullPointerException("No goal for the SMT problem.");
+                }
+                if (focusedGoals.contains(goal)) {
                     continue; // already done
                 }
-                if (SMTFocusResults.focus(problem.problem, mediator.getServices())) {
+                SMTSolverResult finalResult = problem.solver.getFinalResult();
+                if (finalResult == null || finalResult.isValid() != ThreeValuedTruth.VALID) {
+                    continue; // already done
+                }
+                Services services = mediator.getServices();
+                if (services == null) {
+                    // focusing requires the services of the proof
+                    throw new NullPointerException("No services available for focusing.");
+                }
+                Node goalNode = goal.node();
+                if (SMTFocusResults.focus(problem.problem, services)) {
                     focusedGoals.add(goal);
                     failedToFocus.remove(goal);
 
@@ -300,9 +323,11 @@ public class SolverListener implements SolverLauncherListener {
             x++;
         }
 
-
-        boolean ce = solverTypes.contains(SolverTypes.Z3_CE_SOLVER);
-
+        boolean ce = false;
+        SolverType z3CeSolver = SolverTypes.Z3_CE_SOLVER;
+        if (z3CeSolver != null) {
+            ce = solverTypes.contains(z3CeSolver);
+        }
 
         progressDialog =
             new ProgressDialog(progressModel, new ProgressDialogListenerImpl(launcher, ce), ce,
@@ -312,8 +337,7 @@ public class SolverListener implements SolverLauncherListener {
 
     }
 
-
-    private InternSMTProblem getProblem(int col, int row) {
+    private @Nullable InternSMTProblem getProblem(int col, int row) {
         for (InternSMTProblem problem : problems) {
             if (problem.problemIndex == row && problem.solverIndex == col) {
                 return problem;
@@ -379,7 +403,6 @@ public class SolverListener implements SolverLauncherListener {
         return Math.max((float) temp / 10.0f, 0);
     }
 
-
     private boolean refreshProgessOfProblem(InternSMTProblem problem) {
         SolverState state = problem.solver.getState();
         return switch (state) {
@@ -442,15 +465,22 @@ public class SolverListener implements SolverLauncherListener {
 
         if (problem.solver.wasInterrupted()) {
             interrupted(problem);
-        } else if (problem.solver.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-
-            successfullyStopped(problem, x, y);
-        } else if (problem.solver.getFinalResult().isValid() == ThreeValuedTruth.FALSIFIABLE) {
-
-            unsuccessfullyStopped(problem, x, y);
         } else {
+            SMTSolverResult finalResult = problem.solver.getFinalResult();
+            if (finalResult == null) {
+                // a solver that ran to completion always provides a final result
+                throw new NullPointerException("No final result of the solver.");
+            }
+            if (finalResult.isValid() == ThreeValuedTruth.VALID) {
 
-            unknownStopped(x, y);
+                successfullyStopped(problem, x, y);
+            } else if (finalResult.isValid() == ThreeValuedTruth.FALSIFIABLE) {
+
+                unsuccessfullyStopped(problem, x, y);
+            } else {
+
+                unknownStopped(x, y);
+            }
         }
 
     }
@@ -485,7 +515,6 @@ public class SolverListener implements SolverLauncherListener {
         } else {
             progressModel.setText("Valid" + timeInfo, x, y);
         }
-
 
     }
 
@@ -522,12 +551,24 @@ public class SolverListener implements SolverLauncherListener {
 
     private void storeInformation(SMTProblem problem) {
         for (SMTSolver solver : problem.getSolvers()) {
-            if (settings.storeSMTTranslationToFile()) {
-                storeSMTTranslation(solver, problem.getGoal(), solver.getTranslation());
+            Goal goal = problem.getGoal();
+            if (goal == null) {
+                // an SMT problem always references a goal of the proof
+                throw new NullPointerException("No goal for the SMT problem.");
             }
-            if (settings.makesUseOfTaclets() && settings.storeTacletTranslationToFile()
-                    && solver.getTacletTranslation() != null) {
-                storeTacletTranslation(solver, problem.getGoal(), solver.getTacletTranslation());
+            if (settings.storeSMTTranslationToFile()) {
+                String translation = solver.getTranslation();
+                if (translation == null) {
+                    // the translation is always available when it is to be stored
+                    throw new NullPointerException("No SMT translation to store.");
+                }
+                storeSMTTranslation(solver, goal, translation);
+            }
+            if (settings.makesUseOfTaclets() && settings.storeTacletTranslationToFile()) {
+                TacletSetTranslation tacletTranslation = solver.getTacletTranslation();
+                if (tacletTranslation != null) {
+                    storeTacletTranslation(solver, goal, tacletTranslation);
+                }
             }
         }
     }
@@ -576,7 +617,6 @@ public class SolverListener implements SolverLauncherListener {
         return path;
     }
 
-
     public static String computeSolverTypeWarningMessage(SolverType type) {
         return ("""
                 You are using a version of %s which has not been tested for this version of KeY.
@@ -588,10 +628,8 @@ public class SolverListener implements SolverLauncherListener {
 
     private class ProgressDialogListenerImpl implements ProgressDialogListener {
 
-
         private final SolverLauncher launcher;
         private final boolean counterexample;
-
 
         public ProgressDialogListenerImpl(SolverLauncher launcher, boolean counterexample) {
             super();
@@ -602,6 +640,10 @@ public class SolverListener implements SolverLauncherListener {
         @Override
         public void infoButtonClicked(int column, int row) {
             InternSMTProblem problem = getProblem(column, row);
+            if (problem == null) {
+                // this case is entered if the columns or rows of the ProgressDialog table are moved
+                return;
+            }
             showInformation(problem);
 
         }
@@ -632,7 +674,8 @@ public class SolverListener implements SolverLauncherListener {
         public void additionalInformationChosen(Object obj) {
             if (obj instanceof String) {
                 JOptionPane.showOptionDialog(progressDialog, obj, "Warning",
-                    JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, new Object[0],
+                    null);
             } else if (obj instanceof InternSMTProblem) {
                 showInformation((InternSMTProblem) obj);
             }

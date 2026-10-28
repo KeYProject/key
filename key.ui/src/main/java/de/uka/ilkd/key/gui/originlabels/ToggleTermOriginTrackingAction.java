@@ -15,17 +15,26 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Action to toggle {@link TermLabelSettings#getUseOriginLabels()}.
  *
  * @author lanzinger
  */
+@NullMarked
 public class ToggleTermOriginTrackingAction extends MainWindowAction {
     /**
      * Create a new action.
      *
      * @param mainWindow the main window.
+     *
+     *        <p>
+     *        The action names itself, binds its icon and accelerator while the receiver is still
+     *        under initialization (EISOP initialization check); the settings only materialize
+     *        once the action is displayed after construction, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ToggleTermOriginTrackingAction(MainWindow mainWindow) {
         super(mainWindow);
 

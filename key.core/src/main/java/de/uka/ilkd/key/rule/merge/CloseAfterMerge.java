@@ -41,7 +41,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getLocationVariables;
@@ -63,6 +63,7 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.substConstantsByFres
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class CloseAfterMerge implements BuiltInRule {
 
     public static final String MERGE_GENERATE_IS_WEAKENING_GOAL_CFG =
@@ -96,7 +97,7 @@ public class CloseAfterMerge implements BuiltInRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(final Goal goal,
+    public ImmutableList<Goal> apply(final Goal goal,
             final RuleApp ruleApp) throws RuleAbortException {
         final TermLabelState termLabelState = new TermLabelState();
 

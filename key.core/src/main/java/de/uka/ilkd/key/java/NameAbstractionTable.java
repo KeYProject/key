@@ -10,6 +10,9 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.ast.SourceElement;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class is used for the equals modulo renaming method in SourceElement. The purpose of this
  * class is to abstract from names. Therefore it represents a mapping o1 x o2 -> abstractName where
@@ -17,13 +20,14 @@ import de.uka.ilkd.key.java.ast.SourceElement;
  * uses this new name for o1 and o2 instead of their real name. For this comparision a method is
  * offered so that the assigned name is not given outside.
  */
+@NullMarked
 public class NameAbstractionTable {
 
     /**
      * The order in which symbols are declared in the two terms or programs that are compared. The
      * latest declaration of a symbol will be the first matching entry in the list
      */
-    private List<SourceElement> declarations0 = null, declarations1 = null;
+    private @Nullable List<SourceElement> declarations0 = null, declarations1 = null;
 
     /**
      * adds the given two elements to the table
@@ -32,7 +36,8 @@ public class NameAbstractionTable {
      * @param pe2 SourceElement to be added
      */
     public void add(SourceElement pe1, SourceElement pe2) {
-        if (declarations0 == null) {
+        if (declarations0 == null || declarations1 == null) {
+            // the two lists are maintained together; if either is unset, (re)initialize both
             declarations0 = new LinkedList<>();
             declarations1 = new LinkedList<>();
         }
@@ -49,7 +54,7 @@ public class NameAbstractionTable {
      * @return true if the pe1 and pe2 have been assigned to the same name
      */
     public boolean sameAbstractName(SourceElement pe0, SourceElement pe1) {
-        if (declarations0 != null) {
+        if (declarations0 != null && declarations1 != null) {
             final Iterator<SourceElement> it0 = declarations0.iterator();
             final Iterator<SourceElement> it1 = declarations1.iterator();
 

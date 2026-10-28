@@ -13,6 +13,9 @@ import javax.swing.tree.TreeNode;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.SelectionMode;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Change this file if you want to change the set of taclets that can be used for external provers.
  * REMARK: Adding taclets at this point does not automatically mean that the added taclets are used
@@ -20,6 +23,7 @@ import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets.TreeItem.S
  * while translating.
  *
  */
+@NullMarked
 public final class SupportedTaclets {
 
     public static final SupportedTaclets REFERENCE = new SupportedTaclets();
@@ -75,12 +79,12 @@ public final class SupportedTaclets {
                 item.setMode(SelectionMode.all);
             }
         }
-        validateSelectionMode((TreeItem) model.getRoot());
+        validateSelectionMode((TreeItem) getTreeModel().getRoot());
     }
 
     public String[] getNamesOfSelectedTaclets() {
         List<String> list = new LinkedList<>();
-        Enumeration<?> en = ((TreeItem) model.getRoot()).breadthFirstEnumeration();
+        Enumeration<?> en = ((TreeItem) getTreeModel().getRoot()).breadthFirstEnumeration();
         while (en.hasMoreElements()) {
             TreeItem item = (TreeItem) en.nextElement();
             if (item.isLeaf() && item.isSelected()) {
@@ -95,13 +99,13 @@ public final class SupportedTaclets {
 
 
     public boolean atLeastOneTacletIsSelected() {
-        return ((TreeItem) model.getRoot()).mode == SelectionMode.all
-                || ((TreeItem) model.getRoot()).mode == SelectionMode.user;
+        return ((TreeItem) getTreeModel().getRoot()).mode == SelectionMode.all
+                || ((TreeItem) getTreeModel().getRoot()).mode == SelectionMode.user;
     }
 
 
 
-    private TreeModel model = null;
+    private @Nullable TreeModel model = null;
 
 
 
@@ -160,7 +164,7 @@ public final class SupportedTaclets {
 
     public void selectCategory(Category cat) {
         selectNothing();
-        selectCategory(cat, (TreeItem) model.getRoot());
+        selectCategory(cat, (TreeItem) getTreeModel().getRoot());
         validateSelectionModes();
     }
 

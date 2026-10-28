@@ -14,12 +14,15 @@ import org.key_project.logic.op.AbstractOperator;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * This singleton class implements a conditional operator "\ifEx iv; (phi) \then (t1) \else (t2)",
  * where iv is an integer logic variable, phi is a formula, and where t1 and t2 are terms with the
  * same sort. The variable iv is bound in phi and in t1, but not in t2.
  */
+@NullMarked
 public final class IfExThenElse extends AbstractOperator implements Operator {
 
     public static final IfExThenElse IF_EX_THEN_ELSE = new IfExThenElse();

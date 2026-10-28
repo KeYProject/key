@@ -34,15 +34,19 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Builds the rule which inserts information flow contract applications.
  *
  * @author christoph
  */
+@NullMarked
 abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTacletBuilder {
 
-    private JTerm[] contextUpdates;
-    private ProofObligationVars poVars;
+    private JTerm @Nullable [] contextUpdates;
+    private @Nullable ProofObligationVars poVars;
     static final String USE_IF = InfFlowContractAppTaclet.USE_IF;
     private static final String IF_CONTRACT_APPLICATION = "information_flow_contract_appl";
 
@@ -59,9 +63,19 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     }
 
     public JTerm buildContractApplPredTerm() {
-        ProofObligationVars appData = poVars;
+        final ProofObligationVars appData0 = poVars;
+        if (appData0 == null) {
+            throw new NullPointerException(
+                "No proof obligation variables for building the contract application predicate.");
+        }
+        final JTerm[] contextUpdates0 = contextUpdates;
+        if (contextUpdates0 == null) {
+            throw new NullPointerException(
+                "No context updates for building the contract application predicate.");
+        }
+        ProofObligationVars appData = appData0;
         JTerm contractApplPredTerm = getContractApplPred(appData);
-        for (JTerm update : contextUpdates) {
+        for (JTerm update : contextUpdates0) {
             contractApplPredTerm = apply(update, contractApplPredTerm);
         }
         return contractApplPredTerm;
@@ -74,8 +88,12 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
      * @return the taclet
      */
     public Taclet buildTaclet(Goal goal) {
-        ProofObligationVars appData = poVars;
-        return genInfFlowContractApplTaclet(goal, appData, services);
+        final ProofObligationVars appData0 = poVars;
+        if (appData0 == null) {
+            throw new NullPointerException(
+                "No proof obligation variables for building the taclet.");
+        }
+        return genInfFlowContractApplTaclet(goal, appData0, services);
     }
 
     abstract Name generateName();
@@ -114,8 +132,19 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         StringBuilder path = new StringBuilder();
         int zeroCount = 0;
 
-        while (!node.root() && node.parent().childrenCount() <= 1) {
-            node = node.parent();
+        // Skip nodes on non-branching path segments: walk upwards as long as
+        // the parent has at most one child (the parent cannot be null while
+        // the node is not the root).
+        while (!node.root()) {
+            final Node parent = node.parent();
+            if (parent == null) {
+                throw new NullPointerException(
+                    "Proof tree node without parent while walking to the next branching.");
+            }
+            if (parent.childrenCount() > 1) {
+                break;
+            }
+            node = parent;
         }
 
         // For each branching in the path, append the number of the branch in base-36
@@ -132,10 +161,23 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
             }
 
             zeroCount++;
-            node = node.parent();
+            final Node parent = node.parent();
+            if (parent == null) {
+                throw new NullPointerException(
+                    "Proof tree node without parent while walking to the root.");
+            }
+            node = parent;
 
-            while (!node.root() && node.parent().childrenCount() <= 1) {
-                node = node.parent();
+            while (!node.root()) {
+                final Node higherParent = node.parent();
+                if (higherParent == null) {
+                    throw new NullPointerException(
+                        "Proof tree node without parent while walking to the next branching.");
+                }
+                if (higherParent.childrenCount() > 1) {
+                    break;
+                }
+                node = higherParent;
             }
         }
 
@@ -182,6 +224,11 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
      */
     ProofObligationVars generateApplicationDataSVs(String schemaPrefix, ProofObligationVars appData,
             Services services) {
+        final ProofObligationVars poVars0 = poVars;
+        if (poVars0 == null) {
+            throw new NullPointerException(
+                "No proof obligation variables for the application data.");
+        }
         // generate a new schema variable for any pre variable
         JTerm selfAtPreSV = createTermSV(appData.pre.self, schemaPrefix, services);
         ImmutableList<JTerm> localVarsAtPreSVs =
@@ -189,7 +236,8 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         JTerm guardAtPreSV = createTermSV(appData.pre.guard, schemaPrefix, services);
         JTerm resAtPreSV = createTermSV(appData.pre.result, schemaPrefix, services);
         JTerm excAtPreSV = createTermSV(appData.pre.exception, schemaPrefix, services);
-        JTerm heapAtPreSV = createTermSV(appData.pre.heap, schemaPrefix, services);
+        JTerm heapAtPreSV = requireTerm(createTermSV(appData.pre.heap, schemaPrefix, services),
+            "heap-at-pre schema variable");
         JTerm mbyAtPreSV = createTermSV(appData.pre.mbyAtPre, schemaPrefix, services);
 
         // generate a new schema variable only for those post variables
@@ -207,8 +255,9 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
             if (appDataPostLocalVar == appDataPreLocalVar) {
                 localVarsAtPostSVs = localVarsAtPostSVs.append(localPreVar);
             } else {
-                localVarsAtPostSVs = localVarsAtPostSVs
-                        .append(createTermSV(appDataPostLocalVar, schemaPrefix, services));
+                localVarsAtPostSVs = localVarsAtPostSVs.append(
+                    requireTerm(createTermSV(appDataPostLocalVar, schemaPrefix, services),
+                        "local-variable schema variable"));
             }
         }
 
@@ -219,7 +268,8 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
         JTerm excAtPostSV = (appData.pre.exception == appData.post.exception ? excAtPreSV
                 : createTermSV(appData.post.exception, schemaPrefix, services));
         JTerm heapAtPostSV = (appData.pre.heap == appData.post.heap ? heapAtPreSV
-                : createTermSV(appData.post.heap, schemaPrefix, services));
+                : requireTerm(createTermSV(appData.post.heap, schemaPrefix, services),
+                    "heap-at-post schema variable"));
 
         // build state vararibale container for pre and post state
         StateVars pre = new StateVars(selfAtPreSV, guardAtPreSV, localVarsAtPreSVs, resAtPreSV,
@@ -228,7 +278,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
             excAtPostSV, heapAtPostSV, null);
 
         // return proof obligation schema variables
-        return new ProofObligationVars(pre, post, poVars.exceptionParameter, poVars.formalParams,
+        return new ProofObligationVars(pre, post, poVars0.exceptionParameter, poVars0.formalParams,
             services);
     }
 
@@ -255,9 +305,17 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
                 .putAll(collectQuantifiableVariables(replaceWithTerm, services));
         final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars,
             services.getTermFactory(), services.getProof());
-        schemaFind = or.replace(schemaFind);
-        schemaAssumes = or.replace(schemaAssumes);
-        replaceWithTerm = or.replace(replaceWithTerm);
+        final JTerm schemaFindReplaced = or.replace(schemaFind);
+        final JTerm schemaAssumesReplaced = or.replace(schemaAssumes);
+        final JTerm replaceWithTermReplaced = or.replace(replaceWithTerm);
+        if (schemaFindReplaced == null || schemaAssumesReplaced == null
+                || replaceWithTermReplaced == null) {
+            throw new NullPointerException(
+                "Quantifiable variable replacement produced no term.");
+        }
+        schemaFind = schemaFindReplaced;
+        schemaAssumes = schemaAssumesReplaced;
+        replaceWithTerm = replaceWithTermReplaced;
 
         // create sequents
         Sequent assumesSeq =
@@ -287,6 +345,13 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
     abstract JTerm buildContractApplications(ProofObligationVars contAppData,
             ProofObligationVars contAppData2, Services services);
 
+    private static JTerm requireTerm(@Nullable JTerm t, String what) {
+        if (t == null) {
+            throw new NullPointerException("No " + what + ".");
+        }
+        return t;
+    }
+
     /**
      * A normal RewriteTacletBuilder except that an InfFlowContractAppTaclet is returned instead of
      * a normal RewriteTaclet. InfFlowContractAppTaclet's are normal RewriteTaclet's except that the
@@ -303,7 +368,8 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
 
         @Override
         public InfFlowContractAppTaclet getRewriteTaclet() {
-            if (find == null) {
+            final JTerm findTerm = (JTerm) find;
+            if (findTerm == null) {
                 throw new TacletBuilder.TacletBuilderException(this, "No find part specified");
 
             }
@@ -314,7 +380,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
                 new TacletApplPart(assumesSeq, applicationRestriction, varsNew, varsNotFreeIn,
                     varsNewDependingOn,
                     variableConditions),
-                goals, ruleSets, attrs, (JTerm) find, prefixBuilder.getPrefixMap(),
+                goals, ruleSets, attrs, findTerm, prefixBuilder.getPrefixMap(),
                 choices, surviveSmbExec, tacletAnnotations);
 
         }

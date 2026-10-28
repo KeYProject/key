@@ -18,6 +18,9 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInf
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The core of the Selection-Dialog is the class SelectionPanel which extends JPanel. It contains a
  * table for presenting the taclets using special filters. The dialog owns two SelectionPanels, one
@@ -27,23 +30,32 @@ import org.key_project.util.collection.ImmutableSet;
  * additional information about on which side it should be shown (LEFT or RIGHT). The taclet
  *
  */
+@NullMarked
 public class LemmaSelectionDialog extends JDialog implements TacletFilter {
 
     private static final long serialVersionUID = 1L;
 
-    private JButton okButton;
-    private JCheckBox showSupported;
-    private JButton cancelButton;
-    private JPanel buttonPanel;
-    private JPanel contentPanel;
-    private ItemChooser<TacletInfo> tacletChooser;
+    private @Nullable JButton okButton;
+    private @Nullable JCheckBox showSupported;
+    private @Nullable JButton cancelButton;
+    private @Nullable JPanel buttonPanel;
+    private @Nullable JPanel contentPanel;
+    private @Nullable ItemChooser<TacletInfo> tacletChooser;
     private final ItemFilter<TacletInfo> showOnlySupportedTaclets =
         itemData -> !itemData.isNotSupported();
 
     private final ItemFilter<TacletInfo> filterForMovingTaclets =
         itemData -> !itemData.isNotSupported() && !itemData.isAlreadyInUse();
 
-
+    /**
+     * Creates the taclet selection dialog for the main window.
+     *
+     * <p>
+     * The dialog configures its title, layout and size while the receiver is still under
+     * initialization (EISOP initialization check); the settings only take effect when the
+     * dialog is shown after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public LemmaSelectionDialog() {
         super(MainWindow.getInstance());
         this.setTitle("Taclet Selection");
@@ -68,11 +80,12 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
     }
 
     private JCheckBox getShowSupported() {
-        if (showSupported == null) {
-            showSupported = new JCheckBox("Show only supported taclets.");
-            showSupported.setSelected(true);
-            showSupported.addActionListener(e -> {
-                if (showSupported.isSelected()) {
+        JCheckBox box = showSupported;
+        if (box == null) {
+            JCheckBox newBox = new JCheckBox("Show only supported taclets.");
+            newBox.setSelected(true);
+            newBox.addActionListener(e -> {
+                if (newBox.isSelected()) {
                     getTacletChooser().addFilter(showOnlySupportedTaclets);
 
                 } else {
@@ -81,8 +94,10 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
                 }
 
             });
+            showSupported = newBox;
+            box = newBox;
         }
-        return showSupported;
+        return box;
     }
 
     private JPanel getButtonPanel() {
@@ -120,8 +135,6 @@ public class LemmaSelectionDialog extends JDialog implements TacletFilter {
         }
         return okButton;
     }
-
-
 
     private void tacletsSelected() {
 

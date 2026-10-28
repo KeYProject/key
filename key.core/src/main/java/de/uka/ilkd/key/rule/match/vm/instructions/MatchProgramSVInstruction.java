@@ -15,6 +15,8 @@ import org.key_project.logic.LogicServices;
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
  * the schema variable already has (a program element is converted to its logic term for that
  * comparison where needed).
  */
+@NullMarked
 public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MatchProgramSVInstruction.class);
@@ -38,7 +41,8 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction {
      * match conditions are returned, otherwise <tt>null</tt>. Such an addition can fail, e.g. if
      * already a pair <tt>(this,x)</tt> exists where <tt>x!=pe</tt>
      */
-    protected MatchResultInfo addInstantiation(ProgramElement pe, MatchResultInfo matchCond,
+    protected @Nullable MatchResultInfo addInstantiation(ProgramElement pe,
+            MatchResultInfo matchCond,
             LogicServices services) {
 
         final SVInstantiations instantiations = (SVInstantiations) matchCond.getInstantiations();
@@ -72,7 +76,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction {
      * {@inheritDoc}
      */
     @Override
-    public MatchResultInfo match(ProgramElement instantiationCandidate,
+    public @Nullable MatchResultInfo match(ProgramElement instantiationCandidate,
             MatchResultInfo matchCond,
             LogicServices services) {
         final ProgramSVSort svSort = (ProgramSVSort) op.sort();
@@ -101,7 +105,7 @@ public class MatchProgramSVInstruction extends MatchSchemaVariableInstruction {
      * schema variable may occur at an expression position and then binds a term).
      */
     @Override
-    protected MatchResultInfo match(JTerm instantiationCandidate, MatchResultInfo mc,
+    protected @Nullable MatchResultInfo match(JTerm instantiationCandidate, MatchResultInfo mc,
             LogicServices services) {
         final ProgramSVSort svSort = (ProgramSVSort) op.sort();
         if (svSort.canStandFor(instantiationCandidate)) {

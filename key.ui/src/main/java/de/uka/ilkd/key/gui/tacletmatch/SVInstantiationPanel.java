@@ -42,6 +42,8 @@ import de.uka.ilkd.key.pp.PosInSequent;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +55,7 @@ import org.slf4j.LoggerFactory;
  * writes
  * its input back to the shared {@link TacletFindModel}, refreshing the dialog status on change.
  */
+@NullMarked
 public class SVInstantiationPanel extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(SVInstantiationPanel.class);
 
@@ -69,8 +72,19 @@ public class SVInstantiationPanel extends JPanel {
     private final List<Row> rows = new ArrayList<>();
 
     /** debounce for refreshing the status/preview while typing */
-    private Timer refreshTimer;
+    private @Nullable Timer refreshTimer;
 
+    /**
+     * Creates the schema-variable instantiation panel for the given model.
+     *
+     * <p>
+     * The panel lays itself out, sets its border and builds its rows while the receiver is still
+     * under initialization (EISOP initialization check), including passing the
+     * under-construction receiver to its own {@link BoxLayout}; the effects only take place
+     * after construction completes, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public SVInstantiationPanel(TacletInstantiationModel model, KeYMediator mediator,
             Runnable onChange) {
         this.tableModel = model.tableModel();
@@ -247,7 +261,16 @@ public class SVInstantiationPanel extends JPanel {
         });
     }
 
-    private static void insertAtCaret(JTextComponent field, String s) {
+    /**
+     * Inserts text at the caret position of the field.
+     *
+     * <p>
+     * Inserting without special attributes passes {@code null} as the attribute set, which the
+     * document treats as "use the current attributes"; the JDK declares a non-null parameter,
+     * so the deliberate {@code null} is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private static void insertAtCaret(JTextComponent field, @Nullable String s) {
         if (s == null) {
             return;
         }
@@ -285,6 +308,16 @@ public class SVInstantiationPanel extends JPanel {
         private final Border defaultBorder;
         private boolean expanded;
 
+        /**
+         * Creates an instantiation field.
+         *
+         * <p>
+         * The field configures its tab keys, borders, height and its toggle/edit buttons while
+         * the receiver is still under initialization (EISOP initialization check); the button
+         * actions only fire after construction completes, when the field is fully initialized,
+         * suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         SvField(String value) {
             area.setText(value);
             area.setFont(TmStyle.mono(area));
@@ -408,7 +441,12 @@ public class SVInstantiationPanel extends JPanel {
         }
 
         private void updateHeight() {
-            int rowH = area.getFontMetrics(area.getFont()).getHeight();
+            Font font = area.getFont();
+            if (font == null) {
+                // every text component has a font once it is realized
+                throw new NullPointerException("No field font available.");
+            }
+            int rowH = area.getFontMetrics(font).getHeight();
             int rows = expanded ? 5 : 1;
             Insets in = scroll.getInsets();
             scroll.setVerticalScrollBarPolicy(expanded
@@ -425,6 +463,10 @@ public class SVInstantiationPanel extends JPanel {
      */
     private String printTerm(JTerm term) {
         final Services services = mediator.getServices();
+        if (services == null) {
+            // printing a dropped term only happens while a proof with services is loaded
+            throw new NullPointerException("No proof services available.");
+        }
         final NotationInfo ni = new NotationInfo();
         final JTerm t = TermLabelManager.removeIrrelevantLabels(term, services);
         LogicPrinter p = LogicPrinter.purePrinter(ni, services);

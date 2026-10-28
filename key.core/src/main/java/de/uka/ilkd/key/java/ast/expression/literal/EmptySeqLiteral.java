@@ -12,8 +12,10 @@ import de.uka.ilkd.key.ldt.SeqLDT;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
-
+@NullMarked
 public non-sealed class EmptySeqLiteral extends Literal {
 
     public static final EmptySeqLiteral INSTANCE = new EmptySeqLiteral();
@@ -35,7 +37,7 @@ public non-sealed class EmptySeqLiteral extends Literal {
     }
 
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
     }
 

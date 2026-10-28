@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.font.GlyphVector;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,9 +17,12 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class IconFactory {
     public static final IconFontProvider QUIT = new IconFontProvider(FontAwesomeSolid.WINDOW_CLOSE);
     public static final IconFontProvider RECENT_FILES =
@@ -166,21 +170,22 @@ public final class IconFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IconFactory.class);
 
-    private static final Image keyHole = getImage("images/ekey-mono.gif");
-    private static final Image keyHoleAlmostClosed = getImage("images/ekey-brackets.gif");
-    private static final Image keyCachedClosed = getImage("images/closed-cached.png");
-    private static final Image keyHoleInteractive = getImage("images/keyinteractive.gif");
-    private static final Image keyHoleLinked = getImage("images/keylinked.gif");
-    private static final Image keyLogo = getImage("images/key-color.png");
-    private static final Image keyLogoShadow = getImage("images/key-shadow.png");
+    private static final Image keyHole = requireImage("images/ekey-mono.gif");
+    private static final Image keyHoleAlmostClosed = requireImage("images/ekey-brackets.gif");
+    private static final Image keyCachedClosed = requireImage("images/closed-cached.png");
+    private static final Image keyHoleInteractive = requireImage("images/keyinteractive.gif");
+    private static final Image keyHoleLinked = requireImage("images/keylinked.gif");
+    private static final Image keyLogo = requireImage("images/key-color.png");
+    private static final Image keyLogoShadow = requireImage("images/key-shadow.png");
     // The following should be updated with every major version step.
-    private static final Image keyVersionLogo = getImage("images/key-shadow-3.0.png");
-    private static final Image keyLogoSmall = getImage("images/key-color-icon-square.gif");
-    private static final Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png");
+    private static final Image keyVersionLogo = requireImage("images/key-shadow-3.0.png");
+    private static final Image keyLogoSmall = requireImage("images/key-color-icon-square.gif");
+    private static final Image oneStepSimplifier =
+        requireImage("images/toolbar/oneStepSimplifier.png");
 
-    private static final Image junit = getImage("images/toolbar/junit_logo.png");
-    private static final Image jml = getImage("images/toolbar/jml.png");
-    private static final Image uml = getImage("images/toolbar/uml.png");
+    private static final Image junit = requireImage("images/toolbar/junit_logo.png");
+    private static final Image jml = requireImage("images/toolbar/jml.png");
+    private static final Image uml = requireImage("images/toolbar/uml.png");
 
     // private static Image expandGoals = getImage("images/toolbar/expandGoals.png");
     // private static Image scriptAppLogo = getImage("images/scriptAppLogo.png");
@@ -203,9 +208,24 @@ public final class IconFactory {
     private IconFactory() {
     }
 
-    public static Image getImage(String s) {
+    public static @Nullable Image getImage(String s) {
         ImageIcon ii = createImageIcon(s);
         return ii != null ? ii.getImage() : null;
+    }
+
+    /**
+     * Returns the image for the given resource or fails if the resource is missing.
+     *
+     * @param name the name of the image resource
+     * @return the loaded image; the resource is bundled with the application
+     */
+    private static Image requireImage(String name) {
+        Image image = getImage(name);
+        if (image == null) {
+            // the image resources are bundled with the application
+            throw new NullPointerException("Missing image resource " + name);
+        }
+        return image;
     }
 
     /**
@@ -215,7 +235,7 @@ public final class IconFactory {
      *        this class)
      * @return the newly created image
      */
-    private static ImageIcon createImageIcon(String filename) {
+    private static @Nullable ImageIcon createImageIcon(String filename) {
         filename = "/de/uka/ilkd/key/gui/" + filename;
         URL iconURL = IconFactory.class.getResource(filename);
         if (iconURL == null) {
@@ -228,8 +248,18 @@ public final class IconFactory {
         }
     }
 
+    /**
+     * Scales the given image to the given dimensions if needed.
+     *
+     * <p>
+     * Querying the observed dimensions with a {@code null} observer requests the size without
+     * tracking an observer; the JDK accepts {@code null} here, while the checker's swing model
+     * declares a non-null observer, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private static ImageIcon scaleIcon(Image im, int x, int y) {
-        if (im.getWidth(null) == x && im.getHeight(null) == y) {
+        if (im.getWidth((ImageObserver) null) == x
+                && im.getHeight((ImageObserver) null) == y) {
             return new ImageIcon(im);
         }
         Image scaledim = im.getScaledInstance(x, y, Image.SCALE_SMOOTH);
@@ -395,12 +425,21 @@ public final class IconFactory {
      *        {@code null} for just the play button
      * @return the composite icon with letter overlay
      */
-    public static Icon automationWithOverlay(int size, String letter) {
+    public static Icon automationWithOverlay(int size, @Nullable String letter) {
         Icon baseIcon = autoModeStartLogo(size);
         return iconWithOverlay(baseIcon, letter);
     }
 
-    public static Icon iconWithOverlay(Icon baseIcon, String letter) {
+    /**
+     * Draws the given base icon into a buffered image and overlays the given letter.
+     *
+     * <p>
+     * Painting the icon without a component observer only affects asynchronous image loading,
+     * which is irrelevant for the already-loaded base icons; the checker's swing model declares a
+     * non-null component, so the deliberate {@code null} is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    public static Icon iconWithOverlay(Icon baseIcon, @Nullable String letter) {
         BufferedImage image =
             new BufferedImage(
                 baseIcon.getIconWidth() + TOOLBAR_INDICATOR_EXTRA_SPACE + 2 * TOOLBAR_EXTRA_WIDTH,
@@ -411,7 +450,7 @@ public final class IconFactory {
             RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
         // Draw base icon
-        baseIcon.paintIcon(null, g2d, TOOLBAR_EXTRA_WIDTH, 0);
+        baseIcon.paintIcon((Component) null, g2d, TOOLBAR_EXTRA_WIDTH, 0);
 
         if (letter == null) {
             return new ImageIcon(image);
@@ -575,6 +614,7 @@ public final class IconFactory {
 /**
  * @see <https://atelierbram.github.io/syntax-highlighting/atelier-schemes/dune/>
  */
+@NullMarked
 class DuneColorScheme {
     public static final Color base00 = hex("#20201d");
     public static final Color base01 = hex("#292824");

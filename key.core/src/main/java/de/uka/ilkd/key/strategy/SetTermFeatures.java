@@ -9,7 +9,10 @@ import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
 
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
+import org.jspecify.annotations.NullMarked;
+
 /// Term features for the theory of sets.
+@NullMarked
 public class SetTermFeatures extends StaticFeatureCollection {
 
     SetTermFeatures(SetLDT sets) {

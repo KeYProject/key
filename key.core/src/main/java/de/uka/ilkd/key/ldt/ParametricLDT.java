@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.ldt;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 import de.uka.ilkd.key.java.Services;
@@ -61,6 +62,6 @@ public abstract class ParametricLDT extends AbstractLDT {
      * Returns the sort associated with the LDT.
      */
     public final ParametricSortDecl targetSort() {
-        return sort;
+        return Objects.requireNonNull(sort, "no parametric sort for the LDT");
     }
 }

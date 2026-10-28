@@ -14,18 +14,22 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Meta class reference.
  *
  */
 
+@NullMarked
 public class MetaClassReference extends JavaNonTerminalProgramElement
         implements Reference, Expression, ReferencePrefix, ReferenceSuffix, TypeReferenceContainer {
 
     /**
      * Type reference.
      */
-    protected final TypeReference typeReference;
+    protected final @Nullable TypeReference typeReference;
 
     /**
      * Meta class reference.
@@ -93,7 +97,7 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
      *
      * @return the reference prefix.
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return typeReference;
     }
 
@@ -129,7 +133,7 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
      *
      * @return the type reference.
      */
-    public TypeReference getTypeReference() {
+    public @Nullable TypeReference getTypeReference() {
         return typeReference;
     }
 
@@ -158,7 +162,7 @@ public class MetaClassReference extends JavaNonTerminalProgramElement
     }
 
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         throw new IllegalStateException("Metaclass references are not supported by KeY as"
             + "'java.lang.Class' is not part of the Java Card standard");
     }

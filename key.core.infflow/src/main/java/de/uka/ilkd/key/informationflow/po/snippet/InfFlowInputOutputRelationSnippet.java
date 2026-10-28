@@ -17,26 +17,30 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Generate term "self != null".
  *
  * @author christoph
  */
+@NullMarked
 class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         implements InfFlowFactoryMethod {
     @Override
     public JTerm produce(BasicSnippetData d, ProofObligationVars poVars1,
             ProofObligationVars poVars2) throws UnsupportedOperationException {
         // get information flow specification terms
-        if (d.get(BasicSnippetData.Key.INF_FLOW_SPECS) == null) {
+        final Object infFlowSpecs = d.get(BasicSnippetData.Key.INF_FLOW_SPECS);
+        if (infFlowSpecs == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce " + "information flow relations for a contract without "
                     + "information flow specification.");
         }
         assert ImmutableList.class.equals(BasicSnippetData.Key.INF_FLOW_SPECS.getType());
         @SuppressWarnings("unchecked")
-        ImmutableList<InfFlowSpec> origInfFlowSpecs =
-            (ImmutableList<InfFlowSpec>) d.get(BasicSnippetData.Key.INF_FLOW_SPECS);
+        ImmutableList<InfFlowSpec> origInfFlowSpecs = (ImmutableList<InfFlowSpec>) infFlowSpecs;
 
         // the information-flow-specification-sequents evaluated in the pre-state
         InfFlowSpec[] infFlowSpecsAtPre1 = replace(origInfFlowSpecs, d.origVars, poVars1.pre, d.tb);
@@ -138,6 +142,11 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         final JTerm newObjsSeq2 = d.tb.seq(infFlowSpec2.newObjects);
         final Function newObjectsIso =
             d.services.getNamespaces().functions().lookup("newObjectsIsomorphic");
+        if (newObjectsIso == null) {
+            throw new NullPointerException(
+                "No function \"newObjectsIsomorphic\" for building the object sensitive "
+                    + "post relation.");
+        }
         final JTerm isoTerm =
             d.tb.func(newObjectsIso, newObjsSeq1, vs1.pre.heap, newObjsSeq2, vs2.pre.heap);
 
@@ -162,16 +171,18 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     private static class SearchVisitor implements DefaultVisitor {
 
         private boolean termFound = false;
-        private final JTerm[] searchTerms;
+        private final @Nullable JTerm[] searchTerms;
 
-        public SearchVisitor(JTerm... searchTerms) {
+        public SearchVisitor(@Nullable JTerm... searchTerms) {
             this.searchTerms = searchTerms;
         }
 
         @Override
         public void visit(Term visited) {
-            for (Term searchTerm : searchTerms) {
-                termFound = termFound || visited.equals(searchTerm);
+            for (JTerm searchTerm : searchTerms) {
+                if (searchTerm != null) {
+                    termFound = termFound || visited.equals(searchTerm);
+                }
             }
         }
     }

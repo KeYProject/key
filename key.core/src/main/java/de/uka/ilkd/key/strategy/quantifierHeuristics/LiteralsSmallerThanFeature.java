@@ -21,6 +21,10 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class LiteralsSmallerThanFeature extends SmallerThanFeature {
 
     private final ProjectionToTerm<Goal> left, right;
@@ -188,8 +192,8 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     }
 
     private class MonomialIterator implements Iterator<Term> {
-        private Term polynomial;
-        private Term nextMonomial = null;
+        private @Nullable Term polynomial;
+        private @Nullable Term nextMonomial = null;
 
         private MonomialIterator(Term polynomial) {
             this.polynomial = polynomial;

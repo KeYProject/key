@@ -10,6 +10,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A highlight painter that marks an error span with a light translucent background fill and a
  * squiggly underline in the given color.
@@ -22,6 +25,7 @@ import javax.swing.text.JTextComponent;
  *
  * @author Wolfram Pfeifer (original squiggle painter)
  */
+@NullMarked
 public class ErrorMarkPainter implements Highlighter.HighlightPainter {
     /** the color of the squiggle */
     private final Color lineColor;
@@ -41,7 +45,7 @@ public class ErrorMarkPainter implements Highlighter.HighlightPainter {
     }
 
     @Override
-    public void paint(Graphics g, int offs0, int offs1, Shape bounds, JTextComponent c) {
+    public void paint(Graphics g, int offs0, int offs1, @Nullable Shape bounds, JTextComponent c) {
         if (bounds == null) {
             return;
         }
@@ -81,7 +85,12 @@ public class ErrorMarkPainter implements Highlighter.HighlightPainter {
 
     /** Width of the fixed one-character mark used for zero-width / end-of-line positions. */
     private static int caretWidth(JTextComponent c) {
-        FontMetrics fm = c.getFontMetrics(c.getFont());
+        Font font = c.getFont();
+        if (font == null) {
+            // a realized component always carries a font
+            throw new NullPointerException("No component font available.");
+        }
+        FontMetrics fm = c.getFontMetrics(font);
         return Math.max(fm.charWidth(' '), 5);
     }
 }

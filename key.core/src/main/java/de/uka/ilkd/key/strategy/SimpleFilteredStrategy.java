@@ -20,11 +20,13 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Trivial implementation of the Strategy interface that uses only the goal time to determine the
  * cost of a RuleApp. A TacletFilter is used to filter out RuleApps.
  */
+@NullMarked
 public class SimpleFilteredStrategy implements Strategy<Goal> {
 
     private static final Name NAME = new Name("Simple ruleset");

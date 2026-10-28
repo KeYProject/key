@@ -15,16 +15,20 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Default.
  *
  */
+@NullMarked
 public class Default extends BranchImp {
 
     /**
      * Body.
      */
-    protected final ImmutableArray<Statement> body;
+    protected final @Nullable ImmutableArray<Statement> body;
 
     /**
      * Default.
@@ -123,7 +127,7 @@ public class Default extends BranchImp {
      * The body may be empty (null), to define a fall-through. Attaching an {@link EmptyStatement}
      * would create a single ";".
      */
-    public ImmutableArray<Statement> getBody() {
+    public @Nullable ImmutableArray<Statement> getBody() {
         return body;
     }
 

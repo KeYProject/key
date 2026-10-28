@@ -18,10 +18,13 @@ import org.key_project.prover.engine.GoalChooser;
 import org.key_project.prover.engine.StopCondition;
 import org.key_project.prover.engine.impl.AppliedRuleStopCondition;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+@NullMarked
 public class StrategySettings extends AbstractSettings {
     public static final Logger LOGGER = LoggerFactory.getLogger(StrategySettings.class);
 
@@ -33,7 +36,7 @@ public class StrategySettings extends AbstractSettings {
     private static final String PROP_STRATEGY_PROPERTIES = "strategyProperties";
 
 
-    private Name activeStrategy;
+    private @Nullable Name activeStrategy;
 
     /**
      * maximal number of automatic rule applications before an interaction is required
@@ -51,14 +54,14 @@ public class StrategySettings extends AbstractSettings {
      * An optional customized {@link StopCondition} which is used in an {@link ApplyStrategy}
      * instance to determine after each applied rule if more rules should be applied or not.
      */
-    private StopCondition<Goal> customApplyStrategyStopCondition;
+    private @Nullable StopCondition<Goal> customApplyStrategyStopCondition;
 
     /**
      * An optional customized {@link GoalChooser} which is used in an {@link ApplyStrategy} instance
      * to select the next {@link Goal} to apply a rule on. If no one is defined the default one of
      * the {@link ApplyStrategy}, which is defined by the user interface, is used.
      */
-    private GoalChooser<Proof, Goal> customApplyStrategyGoalChooser;
+    private @Nullable GoalChooser<Proof, Goal> customApplyStrategyGoalChooser;
 
     /**
      * returns the maximal amount of heuristics steps before a user interaction is required
@@ -85,7 +88,7 @@ public class StrategySettings extends AbstractSettings {
      *
      * @return the name of the active strategy
      */
-    public Name getStrategy() {
+    public @Nullable Name getStrategy() {
         return activeStrategy;
     }
 
@@ -161,18 +164,20 @@ public class StrategySettings extends AbstractSettings {
      * @see de.uka.ilkd.key.gui.Settings#writeSettings(java.util.Properties)
      */
     public void writeSettings(Properties props) {
-        if (getStrategy() == null) {
+        Name strategy = getStrategy();
+        if (strategy == null) {
             // It would be better to return the name of the default factory defined by the profile
             // used by the proof
             // in which this strategy settings is used or just not to save the strategy because it
             // is
             // not defined.
-            setStrategy(JavaCardDLStrategyFactory.NAME);
+            strategy = JavaCardDLStrategyFactory.NAME;
+            setStrategy(strategy);
         }
         if (maxSteps < 0) {
             setMaxSteps(10000);
         }
-        props.setProperty("[" + CATEGORY + "]" + STRATEGY_KEY, getStrategy().toString());
+        props.setProperty("[" + CATEGORY + "]" + STRATEGY_KEY, strategy.toString());
         props.setProperty("[" + CATEGORY + "]" + STEPS_KEY, String.valueOf(getMaxSteps()));
         props.setProperty("[" + CATEGORY + "]" + TIMEOUT_KEY, String.valueOf(getTimeout()));
         strategyProperties.write(props);
@@ -214,14 +219,16 @@ public class StrategySettings extends AbstractSettings {
     @Override
     public void writeSettings(Configuration props) {
         props = props.getOrCreateSection(CATEGORY);
-        if (getStrategy() == null) {
-            setStrategy(JavaCardDLStrategyFactory.NAME);
+        Name strategy = getStrategy();
+        if (strategy == null) {
+            strategy = JavaCardDLStrategyFactory.NAME;
+            setStrategy(strategy);
         }
         if (maxSteps < 0) {
             setMaxSteps(10000);
         }
 
-        props.set(STRATEGY_KEY, getStrategy().toString());
+        props.set(STRATEGY_KEY, strategy.toString());
         props.set(STEPS_KEY, getMaxSteps());
         props.set(TIMEOUT_KEY, getTimeout());
 
@@ -242,7 +249,7 @@ public class StrategySettings extends AbstractSettings {
      * @param key a strategy property key
      * @return the active value for {@code key}, or {@code null} if unset
      */
-    public String getActiveStrategyProperty(String key) {
+    public @Nullable String getActiveStrategyProperty(String key) {
         return strategyProperties.getProperty(key);
     }
 
@@ -303,7 +310,7 @@ public class StrategySettings extends AbstractSettings {
      * @return The customized {@link StopCondition} or {@code null} if the default one should be
      *         used.
      */
-    public StopCondition<Goal> getCustomApplyStrategyStopCondition() {
+    public @Nullable StopCondition<Goal> getCustomApplyStrategyStopCondition() {
         return customApplyStrategyStopCondition;
     }
 
@@ -315,7 +322,7 @@ public class StrategySettings extends AbstractSettings {
      *        {@code null} to use the default one.
      */
     public void setCustomApplyStrategyStopCondition(
-            StopCondition<Goal> customApplyStrategyStopCondition) {
+            @Nullable StopCondition<Goal> customApplyStrategyStopCondition) {
         this.customApplyStrategyStopCondition = customApplyStrategyStopCondition;
     }
 
@@ -327,7 +334,7 @@ public class StrategySettings extends AbstractSettings {
      * @return The customized {@link GoalChooser} to use or {@code null} to use the default one of
      *         the {@link ApplyStrategy}.
      */
-    public GoalChooser<Proof, Goal> getCustomApplyStrategyGoalChooser() {
+    public @Nullable GoalChooser<Proof, Goal> getCustomApplyStrategyGoalChooser() {
         return customApplyStrategyGoalChooser;
     }
 
@@ -339,7 +346,8 @@ public class StrategySettings extends AbstractSettings {
      * @param customGoalChooser The customized {@link GoalChooser} to use or {@code null} to use the
      *        default one of the {@link ApplyStrategy}.
      */
-    public void setCustomApplyStrategyGoalChooser(GoalChooser<Proof, Goal> customGoalChooser) {
+    public void setCustomApplyStrategyGoalChooser(
+            @Nullable GoalChooser<Proof, Goal> customGoalChooser) {
         this.customApplyStrategyGoalChooser = customGoalChooser;
     }
 }

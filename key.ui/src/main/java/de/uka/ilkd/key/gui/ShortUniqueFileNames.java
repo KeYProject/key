@@ -7,6 +7,8 @@ package de.uka.ilkd.key.gui;
 import java.io.File;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Algorithm to construct short unique file names for a set of paths.
  *
@@ -14,6 +16,7 @@ import java.util.List;
  *
  * @author Julian Wiesler
  */
+@NullMarked
 public final class ShortUniqueFileNames {
     private ShortUniqueFileNames() {
 
@@ -121,7 +124,15 @@ public final class ShortUniqueFileNames {
          * Constructor
          *
          * @param path the full path
+         *
+         *        <p>
+         *        The substring name is derived by {@link #makeNameLonger()}, which is invoked
+         *        unconditionally and always shortens the name from the full path; the EISOP
+         *        initialization check cannot see the assignment inside the delegated call, so
+         *        both the field and the delegated call are suppressed with scoped keys.
          */
+        @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+            "nullness:method.invocation.invalid" })
         public Name(String path) {
             this.path = path;
             this.nameStart = path.length();

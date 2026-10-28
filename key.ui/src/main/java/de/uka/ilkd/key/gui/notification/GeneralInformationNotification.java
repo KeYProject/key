@@ -8,14 +8,26 @@ import javax.swing.JFrame;
 
 import de.uka.ilkd.key.gui.notification.actions.GeneralInformationJTextPaneDisplay;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This notification task is used to inform the user about a non-error situation (e.g. statistics
  * (how many goals have been closed) etc.)
  *
  * @author bubel
  */
+@NullMarked
 public class GeneralInformationNotification extends NotificationTask {
 
+    /**
+     * Creates the general-information notification task.
+     *
+     * <p>
+     * The task registers its notification action while the receiver is still under initialization
+     * (EISOP initialization check); the action only fires once the task is executed after
+     * construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public GeneralInformationNotification(JFrame comp) {
         addNotificationAction(new GeneralInformationJTextPaneDisplay(comp));
     }

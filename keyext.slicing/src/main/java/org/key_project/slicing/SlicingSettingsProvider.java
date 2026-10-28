@@ -12,12 +12,14 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import net.miginfocom.layout.CC;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Settings for the proof slicing extension.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class SlicingSettingsProvider extends SettingsPanel implements SettingsProvider {
     /**
      * Singleton instance of the slicing settings.
@@ -65,7 +67,12 @@ public class SlicingSettingsProvider extends SettingsPanel implements SettingsPr
 
     /**
      * Construct a new settings provider.
+     * <p>
+     * The settings-widget calls below operate on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since the widget setup is purely
+     * local to this class, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SlicingSettingsProvider() {
         setHeaderText("Proof Slicing Options");
 

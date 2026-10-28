@@ -20,12 +20,16 @@ import de.uka.ilkd.key.smt.*;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * User action to apply the results of running SMT solvers.
  * Closes zero or more goals.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class SMTProofApplyUserAction extends UserAction {
     /**
      * Results of running the SMT solvers (one entry for each open goal).
@@ -40,7 +44,7 @@ public class SMTProofApplyUserAction extends UserAction {
      */
     private final Collection<Node> originalProofNodes;
 
-    private final Node originalSelectedNode;
+    private final @Nullable Node originalSelectedNode;
 
     public SMTProofApplyUserAction(KeYMediator mediator, Proof proof,
             Collection<SolverListener.InternSMTProblem> smtProblems) {
@@ -65,9 +69,12 @@ public class SMTProofApplyUserAction extends UserAction {
         // only close each solved goal once
         for (SolverListener.InternSMTProblem problem : smtProblems) {
             Goal goal = problem.getProblem().getGoal();
-            if (goalsClosed.contains(goal)
-                    || problem.getSolver().getFinalResult()
-                            .isValid() != SMTSolverResult.ThreeValuedTruth.VALID) {
+            SMTSolverResult finalResult = problem.getSolver().getFinalResult();
+            if (goal == null || finalResult == null
+                    || goalsClosed.contains(goal)
+                    || finalResult.isValid() != SMTSolverResult.ThreeValuedTruth.VALID) {
+                // A {@code null} goal or result is a solver state in which the previous code
+                // crashed with an NPE; skip such problems instead.
                 continue;
             }
             goalsClosed.add(goal);
@@ -93,7 +100,12 @@ public class SMTProofApplyUserAction extends UserAction {
         for (Node n : originalProofNodes) {
             proof.pruneProof(n);
         }
-        mediator.getSelectionModel().setSelectedNode(originalSelectedNode);
+        // A node is always selected while a proof is open; {@code originalSelectedNode} may only
+        // be {@code null} in a concurrent state change in which the previous code crashed with an
+        // NPE inside the selection model.
+        if (originalSelectedNode != null) {
+            mediator.getSelectionModel().setSelectedNode(originalSelectedNode);
+        }
     }
 
     @Override

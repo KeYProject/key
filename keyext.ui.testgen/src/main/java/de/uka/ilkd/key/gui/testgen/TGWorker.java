@@ -17,11 +17,15 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.testgen.smt.testgen.AbstractTestGenerator;
 import de.uka.ilkd.key.testgen.smt.testgen.StopRequest;
 
 import org.key_project.prover.sequent.Sequent;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * <strong>The worker must be started using method {@link TGWorker#start()} and not
@@ -31,17 +35,32 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
     private final TGInfoDialog tgInfoDialog;
     private boolean stop;
     private final MainWindowTestGenerator testGenerator;
-    private Proof originalProof;
+    private @Nullable Proof originalProof;
 
+    /**
+     * The getter calls below happen on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     * The selected proof is required: this worker is only started with a loaded proof (the
+     * explicit NPE is crash-equivalent to the pre-existing latent NPE in the auto-mode calls).
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public TGWorker(TGInfoDialog tgInfoDialog) {
         this.tgInfoDialog = tgInfoDialog;
-        this.originalProof = getMediator().getSelectedProof();
-        this.testGenerator = new MainWindowTestGenerator(getMediator(), originalProof, false);
+        Proof p = getMediator().getSelectedProof();
+        if (p == null) {
+            throw new NullPointerException("No proof selected for test generation.");
+        }
+        this.originalProof = p;
+        this.testGenerator = new MainWindowTestGenerator(getMediator(), p, false);
     }
 
     public void start() {
         final KeYMediator mediator = getMediator();
-        mediator.initiateAutoMode(originalProof, true, false);
+        Proof p = originalProof;
+        if (p == null) {
+            throw new NullPointerException("No proof selected for test generation.");
+        }
+        mediator.initiateAutoMode(p, true, false);
         mediator.addInterruptedListener(this);
         execute();
     }
@@ -57,7 +76,11 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
      */
     @Override
     public void done() {
-        getMediator().finishAutoMode(originalProof, true, true, null);
+        Proof p = originalProof;
+        if (p == null) {
+            throw new NullPointerException("No proof selected for test generation.");
+        }
+        getMediator().finishAutoMode(p, true, true, null);
         getMediator().removeInterruptedListener(this);
         originalProof = null;
     }
@@ -74,7 +97,7 @@ public class TGWorker extends SwingWorker<Void, Void> implements InterruptListen
         return MainWindow.getInstance().getMediator();
     }
 
-    public Proof getOriginalProof() {
+    public @Nullable Proof getOriginalProof() {
         return originalProof;
     }
 
@@ -140,15 +163,29 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
     protected Proof createProof(UserInterfaceControl ui, Proof oldProof, String newName,
             Sequent newSequent) throws ProofInputException {
         if (showInMainWindow) {
-            InitConfig initConfig = oldProof.getInitConfig().deepCopy();
+            InitConfig initConfig = oldProof.getInitConfig();
+            if (initConfig == null) {
+                throw new NullPointerException("Proof has no initial configuration.");
+            }
             final Proof proof = new Proof(newName, newSequent, null, initConfig.createTacletIndex(),
                 initConfig.createBuiltInRuleIndex(), initConfig.deepCopy());
-            proof.setEnv(oldProof.getEnv());
+            ProofEnvironment env = oldProof.getEnv();
+            if (env == null) {
+                throw new NullPointerException("Proof has no proof environment.");
+            }
+            proof.setEnv(env);
             proof.setNamespaces(oldProof.getNamespaces());
 
             Services services = mediator.getServices();
+            if (services == null) {
+                throw new NullPointerException("Mediator has no services.");
+            }
             SpecificationRepository spec = services.getSpecificationRepository();
-            spec.registerProof(spec.getProofOblInput(oldProof), proof);
+            ProofOblInput po = spec.getProofOblInput(oldProof);
+            if (po == null) {
+                throw new NullPointerException("No proof obligation available for the proof.");
+            }
+            spec.registerProof(po, proof);
             final ProofAggregate pa = new SingleProof(proof, "XXX");
             ui.registerProofAggregate(pa);
             return proof;

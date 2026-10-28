@@ -11,9 +11,12 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Metaoperator for computing the result of dividing one monomial by another
  */
+@NullMarked
 public final class DivideLCRMonomials extends AbstractTermTransformer {
 
     public DivideLCRMonomials() {

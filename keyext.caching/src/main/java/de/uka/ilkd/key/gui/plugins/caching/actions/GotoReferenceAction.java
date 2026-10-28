@@ -11,11 +11,14 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Action to go the referenced proof.
  *
  * @author Arne Keller
  */
+@NullMarked
 public final class GotoReferenceAction extends KeyAction {
 
     private final KeYMediator mediator;
@@ -40,7 +43,11 @@ public final class GotoReferenceAction extends KeyAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Node ref = node.lookup(ClosedBy.class).node();
+        ClosedBy c = node.lookup(ClosedBy.class);
+        if (c == null) {
+            throw new NullPointerException("No reference found for node " + node.serialNr() + ".");
+        }
+        Node ref = c.node();
         mediator.getSelectionModel().setSelectedNode(ref);
     }
 }

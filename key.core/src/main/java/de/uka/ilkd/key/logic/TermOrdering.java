@@ -6,9 +6,12 @@ package de.uka.ilkd.key.logic;
 
 import org.key_project.logic.Term;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Interface for term ordering
  */
+@NullMarked
 public interface TermOrdering {
 
     /**

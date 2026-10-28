@@ -33,6 +33,7 @@ import org.key_project.util.java.IOUtil;
 import org.key_project.util.parsing.Location;
 import org.key_project.util.parsing.Position;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ import org.slf4j.LoggerFactory;
  * @author Kai Wallisch
  * @author Wolfram Pfeifer: syntax highlighting
  */
+@NullMarked
 public class EditSourceFileAction extends KeyAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(EditSourceFileAction.class);
     /**
@@ -69,11 +71,11 @@ public class EditSourceFileAction extends KeyAction {
     /**
      * The exception (when constructed from one); {@code null} when an explicit location was given.
      */
-    private final Throwable exception;
+    private final @Nullable Throwable exception;
     /** explicit location to open at; overrides the one derived from {@link #exception} */
-    private final Location overrideLocation;
+    private final @Nullable Location overrideLocation;
     /** message to show next to the source when {@link #overrideLocation} is used */
-    private final String overrideMessage;
+    private final @Nullable String overrideMessage;
 
     /**
      * Instantiates a new edits the source file action.
@@ -81,7 +83,12 @@ public class EditSourceFileAction extends KeyAction {
      * @param parent the parent
      * @param exception the exception
      */
-    public EditSourceFileAction(final Window parent, final Throwable exception) {
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
+    public EditSourceFileAction(final Window parent, final @Nullable Throwable exception) {
         setName("Edit File");
         setIcon(IconFactory.editFile(16));
         this.parent = parent;
@@ -99,8 +106,13 @@ public class EditSourceFileAction extends KeyAction {
      * @param location the location to open and place the caret at
      * @param message the message to show next to the source
      */
-    public EditSourceFileAction(final Window parent, final Location location,
-            final String message) {
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
+    public EditSourceFileAction(final Window parent, final @Nullable Location location,
+            final @Nullable String message) {
         setName("Edit File");
         setIcon(IconFactory.editFile(16));
         this.parent = parent;
@@ -133,7 +145,7 @@ public class EditSourceFileAction extends KeyAction {
         textArea.setCaretPosition(i);
     }
 
-    private static JScrollPane createParserMessageScrollPane(final String message,
+    private static JScrollPane createParserMessageScrollPane(final @Nullable String message,
             final int columnNumber) {
         JTextArea parserMessage = new JTextArea();
         String msg = message == null ? "" : message;
@@ -202,9 +214,9 @@ public class EditSourceFileAction extends KeyAction {
         return textPane;
     }
 
-    private static Path tryGetFile(@Nullable URI sourceURL) {
+    private static @Nullable Path tryGetFile(@Nullable URI sourceURL) {
         Path sourceFile = null;
-        if (sourceURL != null && sourceURL.getScheme().equals("file")) {
+        if (sourceURL != null && "file".equals(sourceURL.getScheme())) {
             sourceFile = Paths.get(sourceURL);
         }
         return sourceFile;

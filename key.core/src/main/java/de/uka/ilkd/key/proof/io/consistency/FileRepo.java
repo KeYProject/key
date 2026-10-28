@@ -16,12 +16,16 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.io.RuleSource;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This interface provides access to files. In addition, it can be used to save a consistent zip
  * bundle containing all proof relevant files.
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public interface FileRepo extends ProofDisposedListener {
     /**
      * Provides access to a file on disk.
@@ -33,6 +37,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @throws FileNotFoundException if the file does not exist
      * @throws IOException on IO errors, e.g. if the user has no permission to read the file
      */
+    @Nullable
     InputStream getInputStream(Path path) throws FileNotFoundException, IOException;
 
     /**
@@ -45,6 +50,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @return an InputStream of the RuleSource, or <code>null</code>
      * @throws IOException on IO errors
      */
+    @Nullable
     InputStream getInputStream(RuleSource ruleSource) throws IOException;
 
     /**
@@ -57,6 +63,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @return an InputStream to the file identified by the URL, or <code>null</code>
      * @throws IOException on IO errors
      */
+    @Nullable
     InputStream getInputStream(URL url) throws IOException;
 
     /**
@@ -67,6 +74,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @return an OutputStream to the file in the FileRepo
      * @throws FileNotFoundException if a file with the given path exists
      */
+    @Nullable
     OutputStream createOutputStream(Path path) throws FileNotFoundException;
 
     /**
@@ -82,7 +90,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @param path the bootclasspath to set (the method does nothing if null is given)
      * @throws IllegalStateException if the java path is already set
      */
-    void setBootClassPath(Path path) throws IllegalStateException;
+    void setBootClassPath(@Nullable Path path) throws IllegalStateException;
 
     /**
      * Sets the classpath.
@@ -90,7 +98,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @param classPath the classpath to set (the method does nothing if null is given)
      * @throws IllegalStateException if the java path is already set
      */
-    void setClassPath(List<Path> classPath) throws IllegalStateException;
+    void setClassPath(@Nullable List<Path> classPath) throws IllegalStateException;
 
     /**
      * Sets the java path (where the source files are located).
@@ -98,7 +106,7 @@ public interface FileRepo extends ProofDisposedListener {
      * @param javaPath the java path to set (the method does nothing if null is given)
      * @throws IllegalStateException if the java path is already set
      */
-    void setJavaPath(Path javaPath) throws IllegalStateException;
+    void setJavaPath(@Nullable Path javaPath) throws IllegalStateException;
 
     /**
      * Sets the base directory of the proof, i.e. the main directory where the proof is loaded from.

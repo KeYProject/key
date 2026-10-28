@@ -23,6 +23,7 @@ import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.CharStream;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -36,6 +37,7 @@ import org.jspecify.annotations.Nullable;
  * @author Alexander Weigl
  * @version 1 (03.04.23)
  */
+@NullMarked
 public class Configuration {
     private final Map<String, Object> data;
     private final Map<String, ConfigurationMeta> meta = new HashMap<>();
@@ -118,7 +120,7 @@ public class Configuration {
 
     public <T> @NonNull T get(String name, Class<T> clazz, @NonNull T defaultValue) {
         if (exists(name, defaultValue.getClass()))
-            return clazz.cast(data.get(name));
+            return Objects.requireNonNull(clazz.cast(data.get(name)));
         else
             return defaultValue;
     }
@@ -163,7 +165,8 @@ public class Configuration {
      * @throws NullPointerException if no such value entry exists
      */
     public long getLong(String name) {
-        return get(name, Long.class);
+        return Objects.requireNonNull(get(name, Long.class),
+            "No entry in configuration: " + name);
     }
 
     /**
@@ -207,7 +210,8 @@ public class Configuration {
      * @throws NullPointerException if no such value entry exists
      */
     public double getDouble(String name) {
-        return get(name, Double.class);
+        return Objects.requireNonNull(get(name, Double.class),
+            "No entry in configuration: " + name);
     }
 
     /**
@@ -363,10 +367,11 @@ public class Configuration {
     }
 
     public Configuration getOrCreateSection(String name) {
-        return getSection(name, true);
+        return Objects.requireNonNull(getSection(name, true),
+            "Could not create configuration section: " + name);
     }
 
-    public Configuration getSection(String name, boolean createIfNotExists) {
+    public @Nullable Configuration getSection(String name, boolean createIfNotExists) {
         if (!exists(name) && createIfNotExists) {
             set(name, new Configuration());
         }
@@ -464,12 +469,12 @@ public class Configuration {
      */
     public static class ConfigurationMeta {
         /** Position of declaration within a file */
-        private Position position;
+        private @Nullable Position position;
 
         /** documentation given in the file */
-        private String documentation;
+        private @Nullable String documentation;
 
-        public Position getPosition() {
+        public @Nullable Position getPosition() {
             return position;
         }
 
@@ -477,7 +482,7 @@ public class Configuration {
             this.position = position;
         }
 
-        public String getDocumentation() {
+        public @Nullable String getDocumentation() {
             return documentation;
         }
 

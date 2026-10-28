@@ -30,6 +30,8 @@ import org.key_project.prover.rules.instantiation.ListInstantiation;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * For the loop scope rule, if a local program variable that may be altered by the loop body appears
  * in the frame condition,
@@ -43,6 +45,7 @@ import org.key_project.util.collection.*;
  * frame condition, i.e.,
  * {@code {...||i := i_before||...}}.
  */
+@NullMarked
 public class NewLocalVarsCondition implements VariableCondition {
     /**
      * A SV that will store variable declarations for the "before" version of variables.

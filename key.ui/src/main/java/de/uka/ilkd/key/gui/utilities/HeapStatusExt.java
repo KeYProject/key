@@ -18,6 +18,7 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 @KeYGuiExtension.Info(name = "Heap-Indicator",
     description = "Shows an indication of the current heap consumption in the status line of key",
     experimental = false)
+@NullMarked
 public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLine {
     @Override
     public List<JComponent> getStatusLineComponents() {
@@ -44,7 +46,6 @@ public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLin
 
         private final Action actionShowMonitoring = new ShowMonitoringAction();
 
-
         private JPopupMenu createPopupMenu() {
             var j = new JPopupMenu("Heap");
             progressBar.addMouseListener(new MouseAdapter() {
@@ -58,6 +59,15 @@ public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLin
             return j;
         }
 
+        /**
+         * Creates the heap component.
+         *
+         * <p>
+         * The component builds its popup menu and starts updating while the receiver is still
+         * under initialization (EISOP initialization check); the timer and the popup only take
+         * effect after construction completes, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public HeapStatusComponent() {
             super(BoxLayout.X_AXIS);
             add(progressBar);
@@ -95,6 +105,15 @@ public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLin
         }
 
         private static class RunGcAction extends KeyAction {
+            /**
+             * Creates the garbage-collection action.
+             *
+             * <p>
+             * The action names itself while the receiver is still under initialization (EISOP
+             * initialization check); the name only materializes after construction, suppressed
+             * with a scoped key.
+             */
+            @SuppressWarnings("nullness:method.invocation.invalid")
             RunGcAction() {
                 setName("Run Gc");
             }
@@ -115,8 +134,17 @@ public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLin
         }
 
         private class ShowMonitoringAction extends KeyAction {
-            private final String pathJConsole;
+            private final @Nullable String pathJConsole;
 
+            /**
+             * Creates the monitoring action.
+             *
+             * <p>
+             * The action configures itself while the receiver is still under initialization
+             * (EISOP initialization check); the settings only take effect after construction,
+             * suppressed with a scoped key.
+             */
+            @SuppressWarnings("nullness:method.invocation.invalid")
             ShowMonitoringAction() {
                 setName("Open JConsole");
                 pathJConsole = findJConsole();
@@ -129,10 +157,14 @@ public class HeapStatusExt implements KeYGuiExtension, KeYGuiExtension.StatusLin
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 long pid = ProcessHandle.current().pid();
-
-                LOGGER.info("Execute jconsole: {} {}", pathJConsole, pid);
+                String jconsole = pathJConsole;
+                if (jconsole == null) {
+                    // a disabled action is never executed
+                    throw new NullPointerException("No jconsole executable available.");
+                }
+                LOGGER.info("Execute jconsole: {} {}", jconsole, pid);
                 try {
-                    new ProcessBuilder().command(pathJConsole, String.valueOf(pid)).start();
+                    new ProcessBuilder().command(jconsole, String.valueOf(pid)).start();
                 } catch (IOException e) {
                     JOptionPane.showConfirmDialog(HeapStatusComponent.this, e.getMessage());
                 }

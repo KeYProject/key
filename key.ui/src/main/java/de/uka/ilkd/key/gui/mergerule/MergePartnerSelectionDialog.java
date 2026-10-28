@@ -33,12 +33,16 @@ import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * JDialog for selecting a subset of candidate goals as partners for a {@link MergeRule}
  * application.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class MergePartnerSelectionDialog extends JDialog {
 
     private static final long serialVersionUID = -1460097562546341922L;
@@ -70,32 +74,39 @@ public class MergePartnerSelectionDialog extends JDialog {
     private static final Comparator<MergePartner> GOAL_COMPARATOR =
         Comparator.comparingInt(o -> o.getGoal().node().serialNr());
 
-    private LinkedList<MergePartner> candidates = null;
-    private Services services = null;
-    private Pair<Goal, PosInOccurrence> mergeGoalPio = null;
+    private @Nullable LinkedList<MergePartner> candidates = null;
+    private @Nullable Services services = null;
+    private @Nullable Pair<Goal, PosInOccurrence> mergeGoalPio = null;
 
     /** The chosen goals. */
-    private SortedSet<MergePartner> chosenGoals = new TreeSet<>(GOAL_COMPARATOR);
+    private @Nullable SortedSet<MergePartner> chosenGoals = new TreeSet<>(GOAL_COMPARATOR);
 
     /** The chosen merge method. */
     private MergeProcedure chosenRule = MergeProcedure.getMergeProcedures().head();
 
     /** The chosen distinguishing formula */
-    private JTerm chosenDistForm = null;
+    private @Nullable JTerm chosenDistForm = null;
 
-    private JEditorPane txtPartner1 = null;
-    private JEditorPane txtPartner2 = null;
-    private JComboBox<String> cmbCandidates = null;
-    private JCheckBox cbSelectCandidate = null;
-    private ButtonGroup bgMergeMethods = null;
+    private JEditorPane txtPartner1;
+    private JEditorPane txtPartner2;
+    private JComboBox<String> cmbCandidates;
+    private JCheckBox cbSelectCandidate;
+    private ButtonGroup bgMergeMethods;
     private final JTextField txtDistForm;
 
-    private JScrollPane scrpPartner1 = null;
-    private JScrollPane scrpPartner2 = null;
+    private JScrollPane scrpPartner1;
+    private JScrollPane scrpPartner2;
 
-    private JButton okButton = null;
-    private JButton chooseAllButton = null;
+    private JButton okButton;
+    private JButton chooseAllButton;
 
+    /**
+     * The dialog configures itself with layout, content-pane and listener calls while the
+     * receiver is still under initialization (EISOP initialization check); the effects only
+     * take place after construction completes or are deferred into listeners, suppressed with
+     * a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private MergePartnerSelectionDialog() {
         super(MAIN_WINDOW_INSTANCE, "Select partner node for merge operation", true);
 
@@ -118,14 +129,6 @@ public class MergePartnerSelectionDialog extends JDialog {
         // Goal selection dropdown field and checkbox
         cmbCandidates = new JComboBox<>();
         cmbCandidates.setMaximumSize(new Dimension(Integer.MAX_VALUE, 20));
-        cmbCandidates.addItemListener(e -> {
-            MergePartner selectedCandidate = getSelectedCandidate();
-
-            setHighlightedSequentForArea(selectedCandidate.getGoal(),
-                selectedCandidate.getPio(), txtPartner2);
-
-            cbSelectCandidate.setSelected(chosenGoals.contains(selectedCandidate));
-        });
 
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -140,11 +143,30 @@ public class MergePartnerSelectionDialog extends JDialog {
 
         cbSelectCandidate = new JCheckBox();
         cbSelectCandidate.setToolTipText(CB_SELECT_CANDIDATE_HINT);
+        // the candidate-box listener is registered after the checkbox exists; it updates the
+        // checkbox from the box selection
+        cmbCandidates.addItemListener(e -> {
+            MergePartner selectedCandidate = getSelectedCandidate();
+            if (selectedCandidate != null) {
+                setHighlightedSequentForArea(selectedCandidate.getGoal(),
+                    selectedCandidate.getPio(), txtPartner2);
+            }
+            cbSelectCandidate.setSelected(chosenGoals != null && selectedCandidate != null
+                    && chosenGoals.contains(selectedCandidate));
+        });
         cbSelectCandidate.addActionListener(e -> {
+            MergePartner selectedCandidate = getSelectedCandidate();
+            if (selectedCandidate == null) {
+                return;
+            }
             if (cbSelectCandidate.isSelected()) {
-                chosenGoals.add(getSelectedCandidate());
+                if (chosenGoals != null) {
+                    chosenGoals.add(selectedCandidate);
+                }
             } else {
-                chosenGoals.remove(getSelectedCandidate());
+                if (chosenGoals != null) {
+                    chosenGoals.remove(selectedCandidate);
+                }
             }
 
             checkApplicable();
@@ -256,7 +278,9 @@ public class MergePartnerSelectionDialog extends JDialog {
         });
 
         chooseAllButton.addActionListener(e -> {
-            chosenGoals.addAll(candidates);
+            if (chosenGoals != null && candidates != null) {
+                chosenGoals.addAll(candidates);
+            }
             setVisible(false);
         });
 
@@ -301,6 +325,7 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @param candidates Potential merge candidates.
      * @param services The services object.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public MergePartnerSelectionDialog(Goal mergeGoal,
             PosInOccurrence pio,
             ImmutableList<MergePartner> candidates, Services services) {
@@ -308,14 +333,15 @@ public class MergePartnerSelectionDialog extends JDialog {
         this();
         this.services = services;
 
-        this.candidates = new LinkedList<>();
+        LinkedList<MergePartner> candidateList = new LinkedList<>();
+        this.candidates = candidateList;
         this.mergeGoalPio = new Pair<>(mergeGoal, pio);
 
         for (MergePartner candidate : candidates) {
-            int insPos = Collections.binarySearch(this.candidates, candidate, GOAL_COMPARATOR);
+            int insPos = Collections.binarySearch(candidateList, candidate, GOAL_COMPARATOR);
 
             insPos = (insPos + 1) * -1;
-            this.candidates.add(insPos, candidate);
+            candidateList.add(insPos, candidate);
         }
 
         setHighlightedSequentForArea(mergeGoal, pio, txtPartner1);
@@ -346,14 +372,22 @@ public class MergePartnerSelectionDialog extends JDialog {
             (MergeProcedureCompletion<T>) MergeProcedureCompletion
                     .getCompletionForClass(chosenRule.getClass());
 
-        return completion.complete((T) chosenRule, mergeGoalPio, chosenGoals);
+        Pair<Goal, PosInOccurrence> pio = mergeGoalPio;
+        SortedSet<MergePartner> goals = chosenGoals;
+        if (pio == null || goals == null) {
+            // the caller only retrieves the rule after the dialog confirmed the merge; a
+            // missing merge goal or an empty (cancelled) goal set is an inconsistent state in
+            // which the previous code crashed with an NPE
+            throw new NullPointerException("No merge goal or chosen goals available.");
+        }
+        return completion.complete((T) chosenRule, pio, goals);
     }
 
     /**
      * @return The chosen distinguishing formula. If null, an automatic generation of the
      *         distinguishing formula should be performed.
      */
-    public JTerm getChosenDistinguishingFormula() {
+    public @Nullable JTerm getChosenDistinguishingFormula() {
         return isSuitableDistFormula() ? chosenDistForm : null;
     }
 
@@ -365,11 +399,13 @@ public class MergePartnerSelectionDialog extends JDialog {
      *         applicable.
      */
     private boolean isApplicableForCandidates(ImmutableList<MergePartner> theCandidates) {
-        if (mergeGoalPio != null && candidates != null && chosenRule != null) {
+        Pair<Goal, PosInOccurrence> pio = mergeGoalPio;
+        Services svc = services;
+        if (pio != null && svc != null && chosenRule != null) {
             MergeRuleBuiltInRuleApp mergeRuleApp = (MergeRuleBuiltInRuleApp) MergeRule.INSTANCE
-                    .createApp(mergeGoalPio.second, services);
+                    .createApp(pio.second, svc);
 
-            mergeRuleApp.setMergeNode(mergeGoalPio.first.node());
+            mergeRuleApp.setMergeNode(pio.first.node());
             mergeRuleApp.setConcreteRule(chosenRule);
             mergeRuleApp.setMergePartners(theCandidates);
 
@@ -384,13 +420,16 @@ public class MergePartnerSelectionDialog extends JDialog {
      * chosen merge rule instance is applicable.
      */
     private void checkApplicable() {
-        okButton.setEnabled(chosenGoals.size() > 0
-                && isApplicableForCandidates(immutableListFromIterabe(chosenGoals)));
+        SortedSet<MergePartner> goals = chosenGoals;
+        LinkedList<MergePartner> cands = candidates;
+        okButton.setEnabled(goals != null && goals.size() > 0
+                && isApplicableForCandidates(immutableListFromIterabe(goals)));
 
-        chooseAllButton.setEnabled(candidates.size() > 0
-                && isApplicableForCandidates(immutableListFromIterabe(candidates)));
+        chooseAllButton.setEnabled(cands != null && cands.size() > 0
+                && isApplicableForCandidates(immutableListFromIterabe(cands)));
 
-        txtDistForm.setEnabled(candidates.size() == 1 || chosenGoals.size() == 1);
+        txtDistForm.setEnabled((cands != null && cands.size() == 1)
+                || (goals != null && goals.size() == 1));
         if (!txtDistForm.isEnabled()) {
             chosenDistForm = null;
         }
@@ -402,24 +441,36 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @return true iff the chosen "distinguishing formula" is a distinguishing formula.
      */
     private boolean isSuitableDistFormula() {
-        if (chosenDistForm == null) {
+        JTerm distForm = chosenDistForm;
+        if (distForm == null) {
+            return false;
+        }
+        Services svc = services;
+        if (svc == null) {
             return false;
         }
 
         // The formula should be provable for the first state
         // whilst its complement should be provable for the second state.
 
-        final TermBuilder tb = services.getTermBuilder();
+        final TermBuilder tb = svc.getTermBuilder();
 
-        final Goal partnerGoal = candidates.size() == 1 ? candidates.getFirst().getGoal()
-                : (chosenGoals.size() == 1 ? chosenGoals.first().getGoal() : null);
+        LinkedList<MergePartner> cands = candidates;
+        SortedSet<MergePartner> goals = chosenGoals;
+        final Goal partnerGoal = (cands != null && cands.size() == 1) ? cands.getFirst().getGoal()
+                : (goals != null && goals.size() == 1 ? goals.first().getGoal() : null);
 
         if (partnerGoal == null) {
             return false;
         }
 
-        return checkProvability(mergeGoalPio.first.sequent(), chosenDistForm, services)
-                && checkProvability(partnerGoal.sequent(), tb.not(chosenDistForm), services);
+        Pair<Goal, PosInOccurrence> pio = mergeGoalPio;
+        if (pio == null) {
+            return false;
+        }
+
+        return checkProvability(pio.first.sequent(), distForm, svc)
+                && checkProvability(partnerGoal.sequent(), tb.not(distForm), svc);
     }
 
     /**
@@ -461,7 +512,7 @@ public class MergePartnerSelectionDialog extends JDialog {
     /**
      * @return The candidate chosen at the moment (by the combo box).
      */
-    private MergePartner getSelectedCandidate() {
+    private @Nullable MergePartner getSelectedCandidate() {
         return getNthCandidate(cmbCandidates.getSelectedIndex());
     }
 
@@ -471,9 +522,13 @@ public class MergePartnerSelectionDialog extends JDialog {
      * @param n Index of the merge candidate.
      * @return The n-th candidate in the list.
      */
-    private MergePartner getNthCandidate(int n) {
+    private @Nullable MergePartner getNthCandidate(int n) {
+        LinkedList<MergePartner> cands = candidates;
+        if (cands == null) {
+            return null;
+        }
         int i = 0;
-        for (MergePartner elem : candidates) {
+        for (MergePartner elem : cands) {
             if (i == n) {
                 return elem;
             }
@@ -488,16 +543,17 @@ public class MergePartnerSelectionDialog extends JDialog {
      * text of the first candidate.
      */
     private void loadCandidates() {
-        if (candidates.size() < 1) {
+        LinkedList<MergePartner> cands = candidates;
+        if (cands == null || cands.size() < 1) {
             return;
         }
 
-        for (MergePartner candidate : candidates) {
+        for (MergePartner candidate : cands) {
             cmbCandidates.addItem("Node " + candidate.getGoal().node().serialNr());
         }
 
-        setHighlightedSequentForArea(candidates.getFirst().getGoal(),
-            candidates.getFirst().getPio(), txtPartner2);
+        setHighlightedSequentForArea(cands.getFirst().getGoal(),
+            cands.getFirst().getPio(), txtPartner2);
 
         checkApplicable();
     }
@@ -512,8 +568,14 @@ public class MergePartnerSelectionDialog extends JDialog {
      */
     private void setHighlightedSequentForArea(Goal goal,
             PosInOccurrence pio, JEditorPane area) {
+        Services svc = services;
+        if (svc == null) {
+            // a services object is always present while the dialog is usable; the previous
+            // code crashed with an NPE here
+            throw new NullPointerException("No services available for sequent printing.");
+        }
 
-        String subterm = LogicPrinter.quickPrintTerm((JTerm) pio.subTerm(), services);
+        String subterm = LogicPrinter.quickPrintTerm((JTerm) pio.subTerm(), svc);
 
         // Render subterm to highlight as a regular expression.
         // Note: Four backslashs in replacement expression will result in
@@ -526,7 +588,7 @@ public class MergePartnerSelectionDialog extends JDialog {
         }
 
         // Find a match
-        String sequent = LogicPrinter.quickPrintSequent(goal.sequent(), services);
+        String sequent = LogicPrinter.quickPrintSequent(goal.sequent(), svc);
         Pattern p = Pattern.compile(subterm);
         Matcher m = p.matcher(sequent);
 

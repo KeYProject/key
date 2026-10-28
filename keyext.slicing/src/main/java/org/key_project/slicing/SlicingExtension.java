@@ -37,6 +37,8 @@ import org.key_project.slicing.ui.ShowGraphAction;
 import org.key_project.slicing.ui.SlicingLeftPanel;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Proof slicing extension.
@@ -51,6 +53,7 @@ import org.jspecify.annotations.NonNull;
     optional = true,
     priority = 9001)
 @HelpInfo(path = "/user/ProofSlicing/")
+@NullMarked
 public class SlicingExtension implements KeYGuiExtension,
         KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Startup,
@@ -61,11 +64,11 @@ public class SlicingExtension implements KeYGuiExtension,
     /**
      * Collection of dependency trackers attached to proofs.
      */
-    public final Map<Proof, DependencyTracker> trackers = new IdentityHashMap<>();
+    public final Map<Proof, @Nullable DependencyTracker> trackers = new IdentityHashMap<>();
     /**
      * The left panel inserted into the GUI.
      */
-    private SlicingLeftPanel leftPanel = null;
+    private @Nullable SlicingLeftPanel leftPanel = null;
     /**
      * If set to true, the rule application de-duplication algorithm is automatically limited to
      * the "safe mode" for the next loaded proof.
@@ -122,7 +125,11 @@ public class SlicingExtension implements KeYGuiExtension,
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-        createTrackerForProof(e.getSource().getSelectedProof());
+        Proof selectedProof = e.getSource().getSelectedProof();
+        if (selectedProof == null) {
+            return;
+        }
+        createTrackerForProof(selectedProof);
     }
 
     @Override
@@ -160,13 +167,14 @@ public class SlicingExtension implements KeYGuiExtension,
         }
         trackers.computeIfAbsent(newProof, proof -> {
             if (proof == null) {
-                return null;
+                throw new NullPointerException("Cannot track a null proof.");
             }
             proof.addProofDisposedListener(this);
             DependencyTracker tracker = new DependencyTracker(proof);
-            if (leftPanel != null) {
-                proof.addRuleAppListener(e -> leftPanel.ruleAppliedOnProof(proof, tracker));
-                proof.addProofTreeListener(leftPanel);
+            SlicingLeftPanel panel = leftPanel;
+            if (panel != null) {
+                proof.addRuleAppListener(e -> panel.ruleAppliedOnProof(proof, tracker));
+                proof.addProofTreeListener(panel);
                 if (enableSafeModeForNextProof) {
                     SlicingSettingsProvider.getSlicingSettings()
                             .deactivateAggressiveDeduplicate(proof);

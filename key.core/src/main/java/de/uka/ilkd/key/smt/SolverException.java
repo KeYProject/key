@@ -6,9 +6,12 @@ package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Encapsulates all exceptions that have occurred while executing the solvers.
  */
+@NullMarked
 public class SolverException extends RuntimeException {
     private static final long serialVersionUID = 1L;
     private final transient Collection<SMTSolver> solvers;

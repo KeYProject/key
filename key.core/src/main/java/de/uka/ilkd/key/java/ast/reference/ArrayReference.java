@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.reference;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -16,12 +17,16 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Array reference.
  *
  * @author <TT>AutoDoc</TT>
  */
 
+@NullMarked
 public class ArrayReference extends JavaNonTerminalProgramElement implements Reference, Expression,
         ReferencePrefix, ReferenceSuffix, ExpressionContainer, TypeReferenceContainer {
 
@@ -29,13 +34,13 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Access path.
      */
-    protected final ReferencePrefix prefix;
+    protected final @Nullable ReferencePrefix prefix;
 
 
     /**
      * Inits.
      */
-    protected final ImmutableArray<Expression> inits;
+    protected final @Nullable ImmutableArray<Expression> inits;
 
 
     /**
@@ -70,8 +75,8 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      * @param accessPath
      *        a ReferencePrefix of the array reference.
      */
-    public ArrayReference(ExtList children, ReferencePrefix accessPath, PositionInfo pi) {
-        super(children, pi);
+    public ArrayReference(ExtList children, ReferencePrefix accessPath, @Nullable PositionInfo pi) {
+        super(children, pi == null ? PositionInfo.UNDEFINED : pi);
         Expression[] e = children.collect(Expression.class);
         if (e.length > 1) {
             Expression[] e1 = new Expression[e.length - 1];
@@ -194,7 +199,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      */
 
     public ReferencePrefix getReferencePrefix() {
-        return prefix;
+        return Objects.requireNonNull(prefix, "array reference has no prefix");
     }
 
     /**
@@ -241,7 +246,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      * @return the expression array wrapper.
      */
     public ImmutableArray<Expression> getDimensionExpressions() {
-        return inits;
+        return Objects.requireNonNull(inits, "array reference has no dimension expressions");
     }
 
     public SourceElement getFirstElement() {
@@ -268,9 +273,13 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
         return this;
     }
 
-    public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services services, @Nullable ExecutionContext ec) {
         final KeYJavaType arrayType =
             services.getTypeConverter().getKeYJavaType((Expression) getChildAt(0), ec);
-        return ((ArrayDeclaration) arrayType.getJavaType()).getBaseType().getKeYJavaType();
+        final ArrayDeclaration arrayDeclaration =
+            (ArrayDeclaration) Objects.requireNonNull(arrayType.getJavaType(),
+                "array type has no Java type");
+        return Objects.requireNonNull(arrayDeclaration.getBaseType().getKeYJavaType(),
+            "array base type has no KeYJavaType");
     }
 }

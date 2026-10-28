@@ -29,7 +29,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -37,6 +37,7 @@ import org.jspecify.annotations.Nullable;
  * taken from COMPOST and changed to achieve an immutable structure
  */
 
+@NullMarked
 public abstract class JavaDeclaration extends JavaNonTerminalProgramElement implements Declaration {
 
     protected final ImmutableList<TextualJMLConstruct> attachedJml;
@@ -48,11 +49,10 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * Caches the wrapper for the modifiers. The wrapper is needed to get access
      * to the array without hurting immutability.
      */
-    @NonNull
     protected final ImmutableArray<Modifier> modArray;
 
     public JavaDeclaration(PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<Modifier> modArray,
+            ImmutableArray<Modifier> modArray,
             ImmutableList<TextualJMLConstruct> attachedJml) {
         super(pi, comments);
         this.modArray = modArray;
@@ -63,17 +63,17 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
      * Java declaration.
      */
     public JavaDeclaration() {
-        this(null, null, new ImmutableArray<>(), ImmutableList.nil());
+        this(PositionInfo.UNDEFINED, List.of(), new ImmutableArray<>(), ImmutableList.nil());
     }
 
 
     public JavaDeclaration(Modifier[] mods) {
-        this(null, null, new ImmutableArray<>(mods), ImmutableList.nil());
+        this(PositionInfo.UNDEFINED, List.of(), new ImmutableArray<>(mods), ImmutableList.nil());
     }
 
 
     public JavaDeclaration(ImmutableArray<Modifier> mods) {
-        this(null, null, mods, ImmutableList.nil());
+        this(PositionInfo.UNDEFINED, List.of(), mods, ImmutableList.nil());
     }
 
 
@@ -110,7 +110,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement impl
     }
 
     @Override
-    public @NonNull ImmutableArray<Modifier> getModifiers() {
+    public ImmutableArray<Modifier> getModifiers() {
         return modArray;
     }
 

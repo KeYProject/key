@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.literal.Literal;
@@ -16,12 +17,16 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A program model element representing primitive types.
  *
  * @author AL
  * @author RN
  */
+@NullMarked
 public final class PrimitiveType implements Type {
 
     // must be first in file.
@@ -63,10 +68,10 @@ public final class PrimitiveType implements Type {
 
     public static final PrimitiveType PROGRAM_SV = new PrimitiveType("SV", null, null);
 
-    private ProgramElementName arrayElementName = null;
+    private @Nullable ProgramElementName arrayElementName = null;
 
 
-    public static PrimitiveType getPrimitiveType(String name) {
+    public static @Nullable PrimitiveType getPrimitiveType(String name) {
         if (!typeMap.containsKey(name) && name.startsWith("\\dl_")) {
             var pt = new PrimitiveType(name, null, null);
             typeMap.put(name, pt);
@@ -79,15 +84,19 @@ public final class PrimitiveType implements Type {
         return Collections.unmodifiableCollection(ldtMap.values());
     }
 
-    public static PrimitiveType getPrimitiveTypeByLDT(Name ldtName) {
+    public static @Nullable PrimitiveType getPrimitiveTypeByLDT(Name ldtName) {
         return ldtMap.get(ldtName);
     }
 
     private final String name;
-    private final Literal defaultValue;
-    private final Name ldtName;
+    private final @Nullable Literal defaultValue;
+    // ldtName is optional: PROGRAM_SV (cf. {@link #PROGRAM_SV}) and dynamically loaded "\dl_" types
+    // have no corresponding LDT; the Javadoc of {@link #getCorrespondingLDTName()} documents this.
+    private final @Nullable Name ldtName;
 
-    private PrimitiveType(String name, Literal defaultValue, Name ldtName) {
+    // defaultValue is optional: PROGRAM_SV and dynamically-loaded "\dl_" types have no default
+    // value (getDefaultValue() is @Nullable on the Type interface, as in NullType).
+    private PrimitiveType(String name, @Nullable Literal defaultValue, @Nullable Name ldtName) {
         this.defaultValue = defaultValue;
         this.name = name.intern();
         this.ldtName = ldtName;
@@ -125,7 +134,7 @@ public final class PrimitiveType implements Type {
      * @return the default value of the given type according to JLS ???4.5.5
      */
     @Override
-    public Literal getDefaultValue() {
+    public @Nullable Literal getDefaultValue() {
         return defaultValue;
     }
 
@@ -169,8 +178,8 @@ public final class PrimitiveType implements Type {
                 case "\\real" -> arrayElementName = new ProgramElementName("[R");
             }
         }
-        assert arrayElementName != null;
-        return arrayElementName;
+        return Objects.requireNonNull(arrayElementName,
+            "no array element name defined for primitive type " + name);
     }
 
     /**
@@ -193,7 +202,7 @@ public final class PrimitiveType implements Type {
      *
      * @return may be null if no name set
      */
-    public Name getCorrespondingLDTName() {
+    public @Nullable Name getCorrespondingLDTName() {
         return ldtName;
     }
 

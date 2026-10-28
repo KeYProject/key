@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -21,12 +22,14 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Method declaration.
  * taken from COMPOST and changed to achieve an immutable structure
  */
+@NullMarked
 public class MethodDeclaration extends JavaDeclaration
         implements MemberDeclaration, TypeReferenceContainer, NamedProgramElement,
         ParameterContainer, Method,
@@ -35,11 +38,11 @@ public class MethodDeclaration extends JavaDeclaration
     /**
      * The return type of the method.
      */
-    protected final TypeReference returnType;
+    protected final @Nullable TypeReference returnType;
     /**
      * In case of void return type: comments associated with the method.
      */
-    protected final Comment[] voidComments;
+    protected final Comment @Nullable [] voidComments;
     /**
      * The name of the method.
      */
@@ -52,12 +55,12 @@ public class MethodDeclaration extends JavaDeclaration
      * 'throws' part of the method. Indicates which exceptions the method may throw.
      * May be null.
      */
-    protected final Throws exceptions;
+    protected final @Nullable Throws exceptions;
     /**
      * Body of the method.
      * May be null, in which case the body is referenced in a file using {@link #posInfo}.
      */
-    protected final StatementBlock body;
+    protected final @Nullable StatementBlock body;
     /**
      * JML modifiers of the referenced method. Includes e.g. {@code pure}.
      */
@@ -90,9 +93,9 @@ public class MethodDeclaration extends JavaDeclaration
 
     public MethodDeclaration(
             PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<Modifier> modArray,
-            TypeReference returnType,
-            Comment[] voidComments, ProgramElementName name,
+            ImmutableArray<Modifier> modArray,
+            @Nullable TypeReference returnType,
+            Comment @Nullable [] voidComments, ProgramElementName name,
             ImmutableArray<ParameterDeclaration> parameters, Throws exceptions,
             StatementBlock body, boolean parentIsInterfaceDeclaration,
             ImmutableList<TextualJMLConstruct> attachedJml) {
@@ -124,11 +127,13 @@ public class MethodDeclaration extends JavaDeclaration
      *        in case of void return type: comments associated with the method
      */
     public MethodDeclaration(ExtList children, boolean parentIsInterfaceDeclaration,
-            Comment[] voidComments) {
+            Comment @Nullable [] voidComments) {
         super(children);
-        returnType = children.get(TypeReference.class);
+        returnType = Objects.requireNonNull(children.get(TypeReference.class),
+            "a method declaration requires a return type");
         this.voidComments = voidComments;
-        name = children.get(ProgramElementName.class);
+        name = Objects.requireNonNull(children.get(ProgramElementName.class),
+            "a method declaration requires a name");
         this.parameters = new ImmutableArray<>(children.collect(ParameterDeclaration.class));
         exceptions = children.get(Throws.class);
         body = children.get(StatementBlock.class);
@@ -159,11 +164,11 @@ public class MethodDeclaration extends JavaDeclaration
      */
     public MethodDeclaration(
             Modifier[] modifiers,
-            TypeReference returnType,
+            @Nullable TypeReference returnType,
             ProgramElementName name,
             ParameterDeclaration[] parameters,
-            Throws exceptions,
-            StatementBlock body,
+            @Nullable Throws exceptions,
+            @Nullable StatementBlock body,
             boolean parentIsInterfaceDeclaration) {
         this(modifiers,
             returnType,
@@ -196,11 +201,11 @@ public class MethodDeclaration extends JavaDeclaration
      */
     public MethodDeclaration(
             Modifier[] modifiers,
-            TypeReference returnType,
+            @Nullable TypeReference returnType,
             ProgramElementName name,
             ImmutableArray<ParameterDeclaration> parameters,
-            Throws exceptions,
-            StatementBlock body,
+            @Nullable Throws exceptions,
+            @Nullable StatementBlock body,
             boolean parentIsInterfaceDeclaration) {
         super(modifiers);
         this.returnType = returnType;
@@ -220,14 +225,12 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
 
-    @NonNull
     @Override
     public SourceElement getFirstElement() {
         return getChildAt(0);
     }
 
 
-    @NonNull
     @Override
     public SourceElement getLastElement() {
         return getChildAt(this.getChildCount() - 1).getLastElement();
@@ -343,7 +346,7 @@ public class MethodDeclaration extends JavaDeclaration
      *
      * @return the type reference.
      */
-    public TypeReference getTypeReference() {
+    public @Nullable TypeReference getTypeReference() {
         return returnType;
     }
 
@@ -354,14 +357,14 @@ public class MethodDeclaration extends JavaDeclaration
      *
      * @return the "void comments"
      */
-    public Comment[] getVoidComments() {
+    public Comment @Nullable [] getVoidComments() {
         return voidComments;
     }
 
 
     @Override
     public final String getName() {
-        return (name == null) ? null : name.toString();
+        return name.toString();
     }
 
 
@@ -376,12 +379,12 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
 
-    public Throws getThrown() {
+    public @Nullable Throws getThrown() {
         return exceptions;
     }
 
 
-    public StatementBlock getBody() {
+    public @Nullable StatementBlock getBody() {
         return body;
     }
 

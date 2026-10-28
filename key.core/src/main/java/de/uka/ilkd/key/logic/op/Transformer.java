@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic.op;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.TermServices;
 
@@ -14,6 +16,9 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Functions with a restricted/special rule set only applicable for the top level of the term
@@ -27,6 +32,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public class Transformer extends JFunction {
 
     public Transformer(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
@@ -77,7 +83,7 @@ public class Transformer extends JFunction {
      * @param pio A position in an occurrence of a term
      * @return true if inside a term transformer, false otherwise
      */
-    public static boolean inTransformer(PosInOccurrence pio) {
+    public static boolean inTransformer(@Nullable PosInOccurrence pio) {
         boolean trans = false;
         if (pio == null) {
             return false;
@@ -86,7 +92,8 @@ public class Transformer extends JFunction {
             PIOPathIterator it = pio.iterator();
 
             while (it.next() != -1 && !trans) {
-                final var t = it.getSubTerm();
+                final var t =
+                    Objects.requireNonNull(it.getSubTerm(), "no subterm at iterator position");
                 trans = t.op() instanceof Transformer;
             }
         }
@@ -100,13 +107,14 @@ public class Transformer extends JFunction {
      * @param pio A position in an occurrence of a term
      * @return the term transformer the position is in, null otherwise
      */
-    public static Transformer getTransformer(PosInOccurrence pio) {
+    public static @Nullable Transformer getTransformer(PosInOccurrence pio) {
         if (pio.posInTerm() != null) {
             PIOPathIterator it = pio.iterator();
             Operator op;
 
             while (it.next() != -1) {
-                final var t = it.getSubTerm();
+                final var t =
+                    Objects.requireNonNull(it.getSubTerm(), "no subterm at iterator position");
                 if (t.op() instanceof Transformer trans) {
                     return trans;
                 }

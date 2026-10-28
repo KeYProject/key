@@ -4,12 +4,17 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui;
 
+import java.awt.Font;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class MaxRuleAppSlider extends JSlider {
     /**
      *
@@ -19,9 +24,23 @@ public class MaxRuleAppSlider extends JSlider {
     private static final LinkedList<MaxRuleAppSlider> allInstances =
         new LinkedList<>();
     private final String text;
-    private KeYMediator mediator;
+    private @Nullable KeYMediator mediator;
 
-    public MaxRuleAppSlider(KeYMediator mediator, String text) {
+    /**
+     * Create a new slider. A {@code null} mediator is tolerated: the slider stores it in a
+     * nullable field and is bound later via {@link #setMediator(KeYMediator)}. The
+     * configuration calls below operate on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check), and the instance is registered in the
+     * shared {@link #allInstances} list before the constructor completes; the effects only
+     * take place after construction completes or are deferred into listeners, suppressed
+     * with scoped keys.
+     *
+     * @param mediator the mediator, or {@code null} if not bound yet
+     * @param text the label text
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
+    public MaxRuleAppSlider(@Nullable KeYMediator mediator, String text) {
         super(HORIZONTAL, 0, MAX_RULE_APPS_LOG10 * 9, 0);
         this.text = text;
 
@@ -37,7 +56,10 @@ public class MaxRuleAppSlider extends JSlider {
                     val >= 10000 ? val >= 1000000 ? (val / 1000000) + "M" : (val / 1000) + "k"
                             : +val);
             JLabel l = new JLabel(sval);
-            l.setFont(l.getFont().deriveFont(9F));
+            Font labelFont = l.getFont();
+            if (labelFont != null) {
+                l.setFont(labelFont.deriveFont(9F));
+            }
             labelTable.put(n * 9, l);
         }
 
@@ -52,9 +74,12 @@ public class MaxRuleAppSlider extends JSlider {
         // add change listener
         addChangeListener(e -> {
             int val = getPos();
-            MaxRuleAppSlider.this.mediator.setMaxAutomaticSteps(val);
-            setTitle(val);
-            updateAllSliders();
+            KeYMediator boundMediator = MaxRuleAppSlider.this.mediator;
+            if (boundMediator != null) {
+                boundMediator.setMaxAutomaticSteps(val);
+                setTitle(val);
+                updateAllSliders();
+            }
         });
 
         setTitle(0);
@@ -97,7 +122,12 @@ public class MaxRuleAppSlider extends JSlider {
         }
     }
 
-    public void setMediator(KeYMediator mediator) {
+    /**
+     * Binds this slider to a mediator, or unbinds it by passing {@code null}.
+     *
+     * @param mediator the mediator to bind, or {@code null} to unbind
+     */
+    public void setMediator(@Nullable KeYMediator mediator) {
         this.mediator = mediator;
     }
 }

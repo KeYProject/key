@@ -8,11 +8,15 @@ import java.util.Collection;
 import java.util.Optional;
 import javax.swing.*;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Utility class to generate HTML tables for UI purposes.
  *
  * @author Arne Keller
  */
+@NullMarked
 public final class HtmlFactory {
     private HtmlFactory() {
     }
@@ -40,9 +44,9 @@ public final class HtmlFactory {
     public static String generateTable(
             Collection<String> columnNames,
             boolean[] clickable,
-            Optional<String[]> alignment,
+            Optional<@Nullable String[]> alignment,
             Collection<Collection<String>> rows,
-            IndexFactory indexFactory) {
+            @Nullable IndexFactory indexFactory) {
         if (columnNames.size() != clickable.length) {
             throw new IllegalArgumentException();
         }
@@ -68,6 +72,10 @@ public final class HtmlFactory {
                 }
                 stats.append(">");
                 if (clickable[i]) {
+                    if (indexFactory == null) {
+                        throw new NullPointerException(
+                            "No index factory provided for clickable column " + i + ".");
+                    }
                     stats.append("<a href='#");
                     stats.append(i);
                     stats.append("_");

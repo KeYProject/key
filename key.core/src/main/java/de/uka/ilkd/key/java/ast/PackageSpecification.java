@@ -4,16 +4,22 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.reference.PackageReference;
 import de.uka.ilkd.key.java.ast.reference.PackageReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Package specification. taken from COMPOST and changed to achieve an immutable structure
  */
 
+@NullMarked
 public class PackageSpecification extends JavaNonTerminalProgramElement
         implements PackageReferenceContainer {
 
@@ -22,7 +28,7 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
      * Reference.
      */
 
-    protected final PackageReference reference;
+    protected final @Nullable PackageReference reference;
 
     /**
      * Package specification.
@@ -42,7 +48,7 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
 
 
     public SourceElement getLastElement() {
-        return reference;
+        return (reference == null) ? this : reference;
     }
 
 
@@ -86,7 +92,7 @@ public class PackageSpecification extends JavaNonTerminalProgramElement
      */
 
     public PackageReference getPackageReference() {
-        return reference;
+        return Objects.requireNonNull(reference, "package specification has no reference");
     }
 
     /**

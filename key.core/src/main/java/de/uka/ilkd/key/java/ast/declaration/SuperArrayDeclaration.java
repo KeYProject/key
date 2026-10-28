@@ -11,15 +11,19 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * At the moment the mere purpose of this Class is to provide an encapsulation for the length
  * attribute.
  */
+@NullMarked
 public class SuperArrayDeclaration extends TypeDeclaration {
 
-    private FieldDeclaration length = null;
+    private @Nullable FieldDeclaration length = null;
 
-    private SuperArrayDeclaration(ProgramElementName name, FieldDeclaration length) {
+    private SuperArrayDeclaration(ProgramElementName name, @Nullable FieldDeclaration length) {
         super(new Modifier[0], name, name, new MemberDeclaration[] { length }, false, false);
         this.length = length;
     }
@@ -36,7 +40,7 @@ public class SuperArrayDeclaration extends TypeDeclaration {
         return false;
     }
 
-    public FieldDeclaration length() {
+    public @Nullable FieldDeclaration length() {
         return length;
     }
 
@@ -48,7 +52,12 @@ public class SuperArrayDeclaration extends TypeDeclaration {
     }
 
 
-    public ProgramElement getChildAt(int i) {
+    // This class has no children (getChildCount() == 0) and deliberately returns null, but the
+    // base contract NonTerminalProgramElement.getChildAt(int) is @NonNull and cannot be widened
+    // without ripple across the whole AST, so the honestly-annotated override is exempted from
+    // the check.
+    @SuppressWarnings("NullAway")
+    public @Nullable ProgramElement getChildAt(int i) {
         return null;
     }
 

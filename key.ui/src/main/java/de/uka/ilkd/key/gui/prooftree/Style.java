@@ -13,23 +13,25 @@ import javax.swing.Icon;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
  * @version 1 (20.05.19)
  */
+@NullMarked
 public class Style {
-    private String text;
+    private @Nullable String text;
 
     /** the tooltip */
     public @Nullable Tooltip tooltip;
 
     /** foreground color of the node */
-    public Color foreground;
+    public @Nullable Color foreground;
 
     /** background color of the node */
-    public Color background;
+    public @Nullable Color background;
 
     /** border color of the node */
     public @Nullable Color border;
@@ -39,7 +41,12 @@ public class Style {
 
     /** the text of this node */
     public String text() {
-        return text;
+        String t = text;
+        if (t == null) {
+            // the style text is always set before it is read
+            throw new NullPointerException("No style text available.");
+        }
+        return t;
     }
 
     public void setText(String s) {
@@ -49,7 +56,7 @@ public class Style {
     /** Wrapper class for the tooltip */
     public static class Tooltip {
         /** title, can also be null and empty */
-        private String title;
+        private @Nullable String title;
 
         /** infos */
         private final ArrayList<Fragment> additionalInfo = new ArrayList<>();
@@ -57,7 +64,7 @@ public class Style {
         /**
          * @return the title
          */
-        public String getTitle() {
+        public @Nullable String getTitle() {
             return title;
         }
 

@@ -20,13 +20,15 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Type declaration. taken from COMPOST and changed to achieve an immutable structure
  */
+@NullMarked
 public abstract class TypeDeclaration extends JavaDeclaration
         implements NamedProgramElement, MemberDeclaration,
         TypeDeclarationContainer, ClassType, VariableScope, TypeScope {
@@ -60,7 +62,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
     public TypeDeclaration(
             PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<Modifier> modArray,
+            ImmutableArray<Modifier> modArray,
             ProgramElementName name, ProgramElementName fullName,
             ImmutableArray<MemberDeclaration> members, boolean parentIsInterfaceDeclaration,
             boolean isLibrary, ImmutableList<TextualJMLConstruct> jmlAttachments) {
@@ -74,6 +76,11 @@ public abstract class TypeDeclaration extends JavaDeclaration
     }
 
     @Deprecated
+    // The deprecated no-arg constructor deliberately leaves the name/fullName/members
+    // fields unset (null): it builds an "empty" declaration stub whose consumers are all
+    // null-guarded (getName/getFullName/getAllFields/getTypeDeclarationCount/...). The
+    // null assignments violate the @NonNull field contracts, so the check is scoped here.
+    @SuppressWarnings("NullAway")
     public TypeDeclaration() {
         this.name = null;
         this.fullName = null;
@@ -128,6 +135,11 @@ public abstract class TypeDeclaration extends JavaDeclaration
      *        MemberDeclaration (as members of the type), a parentIsInterfaceDeclaration (indicating
      *        if parent is interface), several Modifier (as modifiers of the type decl), Comments
      */
+    // ExtList.get(ProgramElementName.class) may be empty for anonymous classes and for
+    // declarations created directly by njml (see JP2KeYConverter), where the name is deliberately
+    // left unset; the resulting declaration is only used through null-guarded accessors, so the
+    // @NonNull parameter contract is intentionally not met at the delegation site.
+    @SuppressWarnings("NullAway")
     public TypeDeclaration(ExtList children, ProgramElementName fullName, boolean isLibrary) {
         this(children, children.get(ProgramElementName.class), fullName, isLibrary);
     }
@@ -150,6 +162,11 @@ public abstract class TypeDeclaration extends JavaDeclaration
      *
      * @return the string.
      */
+    // name/fullName may legitimately be null for anonymous classes and for the
+    // deprecated no-arg constructor's stub declarations (see the constructor above);
+    // returning null here collides with the @NonNull contract of
+    // NamedModelElement.getName(), which cannot be widened without ripple.
+    @SuppressWarnings("NullAway")
     public final String getName() {
         return (name == null) ? ((fullName == null) ? null : fullName.toString())
                 : name.toString();
@@ -194,7 +211,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * TO BE IMPLEMENTED
      */
-    public Package getPackage(Services s) {
+    public @Nullable Package getPackage(Services s) {
         LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }
@@ -207,7 +224,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * TO BE IMPLEMENTED
      */
-    public ImmutableList<ClassType> getAllSupertypes(Services services) {
+    public @Nullable ImmutableList<ClassType> getAllSupertypes(Services services) {
         LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }
@@ -215,7 +232,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * TO BE IMPLEMENTED
      */
-    public ImmutableList<Field> getFields(Services services) {
+    public @Nullable ImmutableList<Field> getFields(Services services) {
         LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }
@@ -245,7 +262,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * TO BE IMPLEMENTED
      */
-    public ImmutableList<Method> getMethods(Services services) {
+    public @Nullable ImmutableList<Method> getMethods(Services services) {
         LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }
@@ -254,7 +271,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * TO BE IMPLEMENTED
      */
-    public ImmutableList<Method> getAllMethods(Services services) {
+    public @Nullable ImmutableList<Method> getAllMethods(Services services) {
         LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }
@@ -262,7 +279,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * TO BE IMPLEMENTED
      */
-    public ImmutableList<Constructor> getConstructors(Services services) {
+    public @Nullable ImmutableList<Constructor> getConstructors(Services services) {
         LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }
@@ -270,7 +287,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * TO BE IMPLEMENTED
      */
-    public ImmutableList<ClassType> getTypes(Services services) {
+    public @Nullable ImmutableList<ClassType> getTypes(Services services) {
         LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }
@@ -278,7 +295,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * TO BE IMPLEMENTED
      */
-    public ImmutableList<ClassType> getAllTypes(Services services) {
+    public @Nullable ImmutableList<ClassType> getAllTypes(Services services) {
         LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }
@@ -302,7 +319,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     }
 
     @Override
-    public @NonNull ImmutableArray<Modifier> getModifiers() {
+    public ImmutableArray<Modifier> getModifiers() {
         return modArray;
     }
 

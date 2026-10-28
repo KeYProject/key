@@ -21,6 +21,9 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * ProgramTransformers are used to describe schematic transformations that cannot be expressed by
  * the taclet language itself. For example:
@@ -33,6 +36,7 @@ import org.key_project.util.collection.ImmutableList;
  * (Program)MetaConstructs should be used with care as they make it hard to validate (verify) rules
  * and import nearly the complete power of Java into taclets.
  */
+@NullMarked
 public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
         implements StatementContainer, Statement, Expression, TypeReference {
 
@@ -120,7 +124,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      *
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
-    public Statement getStatementAt(int index) {
+    public @Nullable Statement getStatementAt(int index) {
         if (index == 0 && body instanceof Statement) {
             return (Statement) body;
         } else if (!(body instanceof Statement)) {
@@ -155,7 +159,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
     // -------------some methods to pretend being a type reference --------
 
 
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return null;
     }
 
@@ -177,7 +181,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
         return this;
     }
 
-    public PackageReference getPackageReference() {
+    public @Nullable PackageReference getPackageReference() {
         return null;
     }
 
@@ -185,7 +189,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
         return 0;
     }
 
-    public Expression getExpressionAt(int index) {
+    public @Nullable Expression getExpressionAt(int index) {
         return null;
     }
 
@@ -213,15 +217,15 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
         return name + "( " + body + ");";
     }
 
-    public KeYJavaType getKeYJavaType() {
+    public @Nullable KeYJavaType getKeYJavaType() {
         return null;
     }
 
-    public KeYJavaType getKeYJavaType(TermServices javaServ) {
+    public @Nullable KeYJavaType getKeYJavaType(TermServices javaServ) {
         return getKeYJavaType();
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         return getKeYJavaType();
     }
 

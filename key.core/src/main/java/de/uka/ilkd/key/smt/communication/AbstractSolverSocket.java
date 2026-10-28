@@ -10,6 +10,8 @@ import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The SolverSocket class describes the communication between the KeY and the SMT solver process.
@@ -20,6 +22,7 @@ import org.jspecify.annotations.NonNull;
  * @author mihai
  * @author Wolfram Pfeifer (overhaul, removed legacy solvers)
  */
+@NullMarked
 public abstract class AbstractSolverSocket {
 
     /** Indicates that the solver has not yet sent a sat/unsat/unknown result. */
@@ -44,7 +47,7 @@ public abstract class AbstractSolverSocket {
     private final String name;
 
     /** The ModelExtractor that is to be used for CE generation (only used for CE socket). */
-    private ModelExtractor query;
+    private @Nullable ModelExtractor query;
 
     /**
      * Creates a new solver socket with given solver name and ModelExtractor.
@@ -52,16 +55,16 @@ public abstract class AbstractSolverSocket {
      * @param name the name of the solver in use
      * @param query the ModelExtractor used to extract a counterexample
      */
-    protected AbstractSolverSocket(@NonNull String name, ModelExtractor query) {
+    protected AbstractSolverSocket(@NonNull String name, @Nullable ModelExtractor query) {
         this.name = name;
         this.query = query;
     }
 
-    public ModelExtractor getQuery() {
+    public @Nullable ModelExtractor getQuery() {
         return query;
     }
 
-    public void setQuery(ModelExtractor query) {
+    public void setQuery(@Nullable ModelExtractor query) {
         this.query = query;
     }
 
@@ -99,7 +102,7 @@ public abstract class AbstractSolverSocket {
      * @return the newly created socket
      */
     public static @NonNull AbstractSolverSocket createSocket(@NonNull SolverType type,
-            ModelExtractor query) {
+            @Nullable ModelExtractor query) {
         return type.getSocket(query);
     }
 

@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.settings;
 
-
 import java.awt.*;
 import java.io.File;
 import java.util.Arrays;
@@ -19,6 +18,7 @@ import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -32,9 +32,20 @@ import org.jspecify.annotations.Nullable;
  *
  * @author weigl
  */
+@NullMarked
 public abstract class SettingsPanel extends SimpleSettingsPanel {
     private static final long serialVersionUID = 3465371513326517504L;
 
+    /**
+     * Creates the panel and configures the three-column grid.
+     *
+     * <p>
+     * The grid insets leave the top, left and bottom margins at their layout default by passing
+     * {@code null}, which the layout library treats as "no explicit inset"; the library stub
+     * declares non-null parameters, so the deliberate {@code null}s are suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     protected SettingsPanel() {
         pCenter.setLayout(new MigLayout(
             // set up rows:
@@ -72,7 +83,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @param info
      * @param components
      */
-    protected void addRowWithHelp(String info, JComponent... components) {
+    protected void addRowWithHelp(@Nullable String info, JComponent... components) {
         boolean hasInfo = info != null && !info.isEmpty();
         for (JComponent component : components) {
             component.setAlignmentX(LEFT_ALIGNMENT);
@@ -111,7 +122,6 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
 
     }
 
-
     /**
      * @param title
      * @param info
@@ -120,12 +130,11 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @return
      */
     protected JCheckBox addCheckBox(String title, String info, boolean value,
-            final Validator<Boolean> validator) {
+            final @Nullable Validator<Boolean> validator) {
         JCheckBox checkBox = createCheckBox(title, value, validator);
         addRowWithHelp(info, new JLabel(), checkBox);
         return checkBox;
     }
-
 
     /**
      * @param title
@@ -172,7 +181,10 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
                 result = fileChooser.showOpenDialog((Component) e.getSource());
             }
             if (result == JFileChooser.APPROVE_OPTION) {
-                textField.setText(fileChooser.getSelectedFile().getAbsolutePath());
+                File selectedFile = fileChooser.getSelectedFile();
+                if (selectedFile != null) {
+                    textField.setText(selectedFile.getAbsolutePath());
+                }
             }
         });
         pCenter.add(box);
@@ -199,8 +211,8 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      *        the type of the items
      * @return the combo box
      */
-    protected <T> JComboBox<T> addComboBox(String title, String info, int selectionIndex,
-            @Nullable Validator<T> validator, T... items) {
+    protected <T> JComboBox<T> addComboBox(@Nullable String title, @Nullable String info,
+            int selectionIndex, @Nullable Validator<T> validator, T... items) {
         JComboBox<T> comboBox = new JComboBox<>(items);
         comboBox.setSelectedIndex(selectionIndex);
         comboBox.addActionListener(e -> {
@@ -214,7 +226,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
             }
         });
         if (info != null && !info.isEmpty()) {
-            pCenter.add(new JLabel(title));
+            pCenter.add(new JLabel(title == null ? "" : title));
             pCenter.add(comboBox);
             JLabel infoButton = createHelpLabel(info);
             pCenter.add(infoButton, new CC().wrap());
@@ -239,21 +251,19 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         addRowWithHelp(helpText, label, component);
     }
 
-
     protected JTextArea addTextArea(String title, String text, String info,
-            final Validator<String> validator) {
+            final @Nullable Validator<String> validator) {
         JScrollPane field = createTextArea(text, validator);
         addTitledComponent(title, field, info);
         return (JTextArea) field.getViewport().getView();
     }
 
     protected JTextArea addTextAreaWithoutScroll(String title, String text, String info,
-            final Validator<String> validator) {
+            final @Nullable Validator<String> validator) {
         JTextArea field = createTextAreaWithoutScroll(text, validator);
         addTitledComponent(title, field, info);
         return field;
     }
-
 
     /**
      * @param title
@@ -268,7 +278,6 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         addTitledComponent(title, field, info);
         return field;
     }
-
 
     protected JTextField addTextField(String title, String text, String info,
             final Validator<String> validator, JComponent additionalActions) {
@@ -326,6 +335,10 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         JPanel items = new JPanel(new GridLayout(alternatives.size(), 1));
         ButtonGroup bg = new ButtonGroup();
         for (Object alt : alternatives) {
+            if (alt == null) {
+                // a radio-button list never contains null entries
+                throw new NullPointerException("No alternative available.");
+            }
             JRadioButton radioButton = new JRadioButton(alt.toString());
             radioButton.putClientProperty("object", alt);
             bg.add(radioButton);

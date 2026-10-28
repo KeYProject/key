@@ -8,15 +8,20 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Comment element of Java source code.
  */
+@NullMarked
 public class Comment extends JavaSourceElement {
 
     private final String text;
 
     public Comment() {
-        this.text = null;
+        // parameterless placeholder ctor (no in-repo callers); text defaults to the empty string
+        // instead of null so accessors treat it identically to a real comment
+        this.text = "";
     }
 
     public Comment(String text) {

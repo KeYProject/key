@@ -10,12 +10,16 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents the formula of a taclet.<br>
  * It provides methods to get the formula and its corresponding taclet.<br>
  * The setting of the formula and the taclet is dedicated to the constructor of the implementing
  * class. This ensures that the relationship between both is not changed afterwards.
  */
+@NullMarked
 public interface TacletFormula {
 
     /**
@@ -32,6 +36,7 @@ public interface TacletFormula {
      *         instantiations (e.g. the taclet has some generic sorts) the returned term is a
      *         conjunction of these instantiations.
      */
+    @Nullable
     JTerm getFormula(TermServices services);
 
     /**

@@ -19,10 +19,13 @@ import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Alexander Weigl
  * @version 1 (08.12.18)
  */
+@NullMarked
 public interface InteractionListener {
     void settingChanged(Proof proof, Settings settings, SettingType type, String message);
 

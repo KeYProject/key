@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import de.uka.ilkd.key.java.Services;
@@ -184,8 +185,8 @@ public class JavaParserFactory {
      * @author Alexander Weigl
      */
     private class DynamicTypeSolver implements TypeSolver {
-        private TypeSolver delegate;
-        private TypeSolver parent;
+        private @Nullable TypeSolver delegate;
+        private @Nullable TypeSolver parent;
 
         /**
          * rebuilds the type solver.
@@ -200,7 +201,7 @@ public class JavaParserFactory {
         }
 
         @Override
-        public TypeSolver getParent() {
+        public @Nullable TypeSolver getParent() {
             return parent;
         }
 
@@ -218,7 +219,7 @@ public class JavaParserFactory {
             if (delegate == null) {
                 rebuild();
             }
-            return delegate.tryToSolveType(name);
+            return Objects.requireNonNull(delegate, "delegated type solver").tryToSolveType(name);
         }
 
         @Override
@@ -227,12 +228,13 @@ public class JavaParserFactory {
             if (delegate == null) {
                 rebuild();
             }
-            return delegate.tryToSolveTypeInModule(qualifiedModuleName, simpleTypeName);
+            return Objects.requireNonNull(delegate, "delegated type solver")
+                    .tryToSolveTypeInModule(qualifiedModuleName, simpleTypeName);
         }
     }
 
     private static class ListTypeSolver implements TypeSolver {
-        private TypeSolver parent;
+        private @Nullable TypeSolver parent;
         private final Collection<CompilationUnit> units;
 
         private final Cache<String, SymbolReference<ResolvedReferenceTypeDeclaration>> foundTypes =
@@ -245,7 +247,7 @@ public class JavaParserFactory {
         }
 
         @Override
-        public TypeSolver getParent() {
+        public @Nullable TypeSolver getParent() {
             return parent;
         }
 
@@ -315,10 +317,10 @@ public class JavaParserFactory {
 
     private class LogicalTypeSolver implements TypeSolver {
 
-        private TypeSolver parent;
+        private @Nullable TypeSolver parent;
 
         @Override
-        public TypeSolver getParent() {
+        public @Nullable TypeSolver getParent() {
             return parent;
         }
 

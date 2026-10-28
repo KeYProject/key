@@ -13,6 +13,9 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Objects of this class represent "observer" function or predicate symbols. An observer symbol is a
@@ -23,12 +26,13 @@ import org.key_project.util.collection.ImmutableArray;
  * Observer symbols serve as the targets of contracts (i.e., as the subjects that the contracts are
  * about).
  */
+@NullMarked
 public class ObserverFunction extends JFunction implements IObserverFunction {
 
     private final KeYJavaType container;
     private final boolean isStatic;
     private final ImmutableArray<KeYJavaType> paramTypes;
-    private final KeYJavaType type;
+    private final @Nullable KeYJavaType type;
     private final int heapCount;
     private final int stateCount;
 
@@ -37,7 +41,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
     // constructors
     // -------------------------------------------------------------------------
 
-    public ObserverFunction(String baseName, Sort sort, KeYJavaType type, Sort heapSort,
+    public ObserverFunction(String baseName, Sort sort, @Nullable KeYJavaType type, Sort heapSort,
             KeYJavaType container, boolean isStatic, ImmutableArray<KeYJavaType> paramTypes,
             int heapCount, int stateCount) {
         super(createName(baseName, Objects.requireNonNull(container)), sort,
@@ -53,7 +57,9 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
     }
 
     public static ProgramElementName createName(String baseName, KeYJavaType container) {
-        return new ProgramElementName(baseName, container.getSort().toString());
+        return new ProgramElementName(baseName,
+            Objects.requireNonNull(container.getSort(), "no sort for the container type")
+                    .toString());
     }
 
 
@@ -73,13 +79,15 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
             result[offset] = heapSort;
         }
         if (!isStatic) {
-            result[offset] = container.getSort();
+            result[offset] = Objects.requireNonNull(container.getSort(),
+                "no sort for the container type");
             assert result[offset] != null : "Bad KJT: " + container;
             offset++;
         }
 
         for (int i = 0, n = paramTypes.size(); i < n; i++) {
-            result[i + offset] = paramTypes.get(i).getSort();
+            result[i + offset] = Objects.requireNonNull(paramTypes.get(i).getSort(),
+                "no sort for the parameter type");
         }
 
         return result;
@@ -96,7 +104,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
      * @see de.uka.ilkd.key.logic.op.IObserverFunction#getType()
      */
     @Override
-    public final KeYJavaType getType() {
+    public final @Nullable KeYJavaType getType() {
         return type;
     }
 

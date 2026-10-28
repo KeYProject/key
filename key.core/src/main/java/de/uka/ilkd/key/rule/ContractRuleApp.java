@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -32,7 +33,7 @@ import org.jspecify.annotations.Nullable;
  */
 @NullMarked
 public class ContractRuleApp extends AbstractContractRuleApp<UseOperationContractRule> {
-    private List<LocationVariable> heapContext;
+    private @Nullable List<LocationVariable> heapContext;
 
     ContractRuleApp(UseOperationContractRule rule, @Nullable PosInOccurrence pio) {
         this(rule, pio, null);
@@ -66,15 +67,19 @@ public class ContractRuleApp extends AbstractContractRuleApp<UseOperationContrac
             return this;
         }
         Services services = goal.proof().getServices();
+        final PosInOccurrence focusPos = Objects.requireNonNull(posInOccurrence(),
+            "no position in occurrence for the contract rule application");
         ImmutableSet<FunctionalOperationContract> contracts =
             UseOperationContractRule.getApplicableContracts(
-                UseOperationContractRule.computeInstantiation((JTerm) posInOccurrence().subTerm(),
+                UseOperationContractRule.computeInstantiation((JTerm) focusPos.subTerm(),
                     services),
                 services);
         if (contracts.size() != 1) {
             return this; // incomplete app;
         }
-        var m = ((JModality) programTerm().op()).<JModality.JavaModalityKind>kind();
+        final JTerm pt =
+            Objects.requireNonNull(programTerm(), "no program term for the rule application");
+        var m = ((JModality) pt.op()).<JModality.JavaModalityKind>kind();
         heapContext = HeapContext.getModifiableHeaps(goal.proof().getServices(), m.transaction());
         return setContract(contracts.iterator().next());
     }
@@ -85,11 +90,15 @@ public class ContractRuleApp extends AbstractContractRuleApp<UseOperationContrac
             return this;
         }
         Services services = goal.proof().getServices();
+        final PosInOccurrence focusPos = Objects.requireNonNull(posInOccurrence(),
+            "no position in occurrence for the contract rule application");
         ImmutableSet<FunctionalOperationContract> contracts =
             UseOperationContractRule.getApplicableContracts(UseOperationContractRule
-                    .computeInstantiation((JTerm) posInOccurrence().subTerm(), services),
+                    .computeInstantiation((JTerm) focusPos.subTerm(), services),
                 services);
-        var m = ((JModality) programTerm().op()).<JModality.JavaModalityKind>kind();
+        final JTerm pt =
+            Objects.requireNonNull(programTerm(), "no program term for the rule application");
+        var m = ((JModality) pt.op()).<JModality.JavaModalityKind>kind();
         heapContext = HeapContext.getModifiableHeaps(goal.proof().getServices(), m.transaction());
         final FunctionalOperationContract combinedContract =
             services.getSpecificationRepository().combineOperationContracts(contracts);
@@ -104,11 +113,11 @@ public class ContractRuleApp extends AbstractContractRuleApp<UseOperationContrac
     }
 
     @Override
-    public List<LocationVariable> getHeapContext() {
+    public @Nullable List<LocationVariable> getHeapContext() {
         return heapContext;
     }
 
-    public JTerm programTerm() {
+    public @Nullable JTerm programTerm() {
         if (posInOccurrence() != null) {
             return TermBuilder.goBelowUpdates((JTerm) posInOccurrence().subTerm());
         }
@@ -117,8 +126,11 @@ public class ContractRuleApp extends AbstractContractRuleApp<UseOperationContrac
 
     @Override
     public IObserverFunction getObserverFunction(Services services) {
-        return UseOperationContractRule.computeInstantiation((JTerm) posInOccurrence().subTerm(),
-            services).pm();
+        final PosInOccurrence focusPos = Objects.requireNonNull(posInOccurrence(),
+            "no position in occurrence for the contract rule application");
+        return Objects.requireNonNull(
+            UseOperationContractRule.computeInstantiation((JTerm) focusPos.subTerm(), services),
+            "no instantiation for the focus of the contract rule application").pm();
     }
 
 }

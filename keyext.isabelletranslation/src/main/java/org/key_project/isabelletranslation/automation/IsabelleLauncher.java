@@ -12,6 +12,8 @@ import org.key_project.isabelletranslation.IsabelleTranslationSettings;
 import org.key_project.isabelletranslation.gui.controller.IsabelleLauncherProgressDialogMediator;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +21,7 @@ import org.slf4j.LoggerFactory;
  * This class allows for the launch of automated proof searches in Isabelle for a list of isabelle
  * problems.
  */
+@NullMarked
 public class IsabelleLauncher implements IsabelleSolverListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleLauncher.class);
 
@@ -35,14 +38,16 @@ public class IsabelleLauncher implements IsabelleSolverListener {
 
     /**
      * The thread, that will be called on shutdown of KeY to ensure there are no runaway Isabelle
-     * instances or open ThreadPools
+     * instances or open ThreadPools.
+     * Only set by {@link #launch(List, int, int)}.
      */
-    private Thread shutdownResources;
+    private @Nullable Thread shutdownResources;
 
     /**
      * The ExecutorService used to call the solver instances.
+     * Only set by {@link #launch(List, int, int)}.
      */
-    private ExecutorService executorService;
+    private @Nullable ExecutorService executorService;
 
     /**
      * The list of currently running solver instances.
@@ -92,14 +97,16 @@ public class IsabelleLauncher implements IsabelleSolverListener {
         IsabelleResourceController resourceController =
             new IsabelleResourceController(instanceCount, settings);
 
-        executorService = Executors.newFixedThreadPool(instanceCount);
+        ExecutorService service = Executors.newFixedThreadPool(instanceCount);
+        executorService = service;
 
-        shutdownResources = new Thread(() -> {
-            executorService.shutdown();
+        Thread shutdownThread = new Thread(() -> {
+            service.shutdown();
             resourceController.shutdownGracefully();
             finishedSolvers.clear();
         });
-        Runtime.getRuntime().addShutdownHook(shutdownResources);
+        shutdownResources = shutdownThread;
+        Runtime.getRuntime().addShutdownHook(shutdownThread);
 
         for (int i = 0; i < problems.size(); i++) {
             IsabelleSolver solver = new IsabelleSledgehammerSolver(problems.get(i), List.of(this),
@@ -123,7 +130,7 @@ public class IsabelleLauncher implements IsabelleSolverListener {
         LOGGER.info("Setup complete, starting {} problems...", problems.size());
 
         try {
-            executorService.invokeAll(solverQueue);
+            service.invokeAll(solverQueue);
         } catch (InterruptedException e) {
             stopAll();
         } catch (RejectedExecutionException e) {
@@ -164,9 +171,13 @@ public class IsabelleLauncher implements IsabelleSolverListener {
      * Also removes the shutdown hook.
      */
     private void shutdown() {
-        Runtime.getRuntime().removeShutdownHook(shutdownResources);
-        if (shutdownResources.getState() == Thread.State.NEW) {
-            shutdownResources.start();
+        Thread resources = shutdownResources;
+        if (resources == null) {
+            throw new NullPointerException("Launcher was not started; cannot shut down.");
+        }
+        Runtime.getRuntime().removeShutdownHook(resources);
+        if (resources.getState() == Thread.State.NEW) {
+            resources.start();
         }
     }
 
@@ -189,7 +200,11 @@ public class IsabelleLauncher implements IsabelleSolverListener {
     public void stopAll() {
         shutdown();
 
-        executorService.shutdownNow();
+        ExecutorService service = executorService;
+        if (service == null) {
+            throw new NullPointerException("Launcher was not started; cannot stop all solvers.");
+        }
+        service.shutdownNow();
 
         solverQueue.forEach(IsabelleSolver::abort);
         solverQueue.clear();

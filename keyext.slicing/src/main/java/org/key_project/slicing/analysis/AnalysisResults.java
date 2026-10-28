@@ -27,12 +27,15 @@ import org.key_project.slicing.graph.GraphNode;
 import org.key_project.slicing.util.ExecutionTime;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Results of the dependency analysis algorithm.
  *
  * @see DependencyTracker#analyze(boolean, boolean)
  * @author Arne Keller
  */
+@NullMarked
 public final class AnalysisResults {
     /**
      * The analyzed proof.
@@ -170,7 +173,7 @@ public final class AnalysisResults {
         for (SequentFormula sf : semi) {
             var graphNode = dependencyGraph.getGraphNode(node.proof(), node.getBranchLocation(),
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), antec));
-            if (usefulNodes.contains(graphNode)) {
+            if (graphNode != null && usefulNodes.contains(graphNode)) {
                 semiList = semiList.prepend(sf);
             }
         }

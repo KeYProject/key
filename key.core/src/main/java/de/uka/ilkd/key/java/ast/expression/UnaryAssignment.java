@@ -22,7 +22,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-
 /**
  * An assignment is an operator with side-effects.
  */
@@ -76,7 +75,7 @@ public final class UnaryAssignment extends Operator
 
 
     @Override
-    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, @Nullable MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         if (src instanceof UnaryAssignment other) {
             if (getKind().equals(other.getKind())) {
@@ -90,11 +89,15 @@ public final class UnaryAssignment extends Operator
      * retrieves the type of the assignment expression
      *
      * @param javaServ the Services offering access to the Java model
-     * @param ec the ExecutionContext in which the expression is evaluated
+     * @param ec the ExecutionContext in which the expression is evaluated (may be {@code null})
      * @return the type of the assignment expression
      */
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-        return getExpressionAt(0).getKeYJavaType(javaServ, ec);
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
+        // Expression.getKeYJavaType is honestly @Nullable, but the operand of a type-checked
+        // assignment always resolves (TypeConverter requires it), and Operator's abstract
+        // contract here is @NonNull, so narrow at the deref.
+        return Objects.requireNonNull(getExpressionAt(0).getKeYJavaType(javaServ, ec),
+            "no KeYJavaType for the operand");
     }
 
 

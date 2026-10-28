@@ -24,6 +24,10 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public final class BinaryOperator extends Operator
         implements ProgramElementWithKind<BinaryOperatorKind> {
     private final BinaryOperatorKind kind;
@@ -67,7 +71,7 @@ public final class BinaryOperator extends Operator
         return INFIX;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         final TypeConverter tc = javaServ.getTypeConverter();
         if (kind.isBoolean()) {
             return javaServ.getTypeConverter().getBooleanType();
@@ -83,7 +87,7 @@ public final class BinaryOperator extends Operator
     }
 
     @Override
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, @Nullable MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         if (src instanceof BinaryOperator other) {
             if (this.kind.equals(other.getKind())) {

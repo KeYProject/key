@@ -21,28 +21,56 @@ import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
+@NullMarked
 public class SettingsUi extends JPanel {
     private static final long serialVersionUID = -217841876110516940L;
     private static int calculatedWidth = 0;
 
     private final JSplitPane root;
     private final JComponent westPanel;
+    /**
+     * The settings tree model, replaced by {@link #setSettingsProvider(List)} once providers are
+     * registered.
+     *
+     * <p>
+     * The initial model is built without a root node (renders an empty tree) until the providers
+     * arrive, which the {@link DefaultTreeModel} stub rejects as a non-null parameter; the
+     * deliberate {@code null} initializer is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private DefaultTreeModel treeModel = new DefaultTreeModel(null, false);
     private final JTree treeSettingsPanels = new JTree(treeModel);
     private final JTextField txtSearch = new JTextField();
     private final MainWindow mainWindow;
     private final JDialog frame;
 
+    /**
+     * Creates the settings dialog pane for the main window.
+     *
+     * <p>
+     * The pane configures its tree, builds its west panel and wires its selection listener while
+     * the receiver is still under initialization (EISOP initialization check); all of it only
+     * takes effect once the pane is displayed after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SettingsUi(MainWindow mainWindow, JDialog frame) {
         this.frame = frame;
         this.mainWindow = mainWindow;
         treeSettingsPanels.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         // TODO: scale this with the global font factor too
-        treeSettingsPanels.setFont(treeSettingsPanels.getFont().deriveFont(16.0f));
+        Font treeFont = treeSettingsPanels.getFont();
+        if (treeFont == null) {
+            // a realized tree always has a font
+            throw new NullPointerException("No tree font available.");
+        }
+        treeSettingsPanels.setFont(treeFont.deriveFont(16.0f));
         treeSettingsPanels.setCellRenderer(new DefaultTreeCellRenderer() {
             private static final long serialVersionUID = 1770380144400699946L;
 
@@ -107,7 +135,21 @@ public class SettingsUi extends JPanel {
         root.setDividerLocation(0.3d);
     }
 
-    private void setSettingsPanel(JComponent comp) {
+    /**
+     * Sets the settings panel shown in the content area.
+     *
+     * <p>
+     * Clearing the area ({@code null} panel) is expressed as removing the right component
+     * entirely; the swing split pane accepts {@code null} here, while its model declares a
+     * non-null component, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private void setSettingsPanel(@Nullable JComponent comp) {
+        if (comp == null) {
+            // an empty provider list clears the settings area without a panel
+            root.setRightComponent(null);
+            return;
+        }
         SwingUtilities.updateComponentTreeUI(comp);
         root.setRightComponent(comp);
 
@@ -189,15 +231,24 @@ public class SettingsUi extends JPanel {
 
     public void selectPanel(SettingsProvider provider) {
         SettingsTreeNode node = findNode(provider);
+        if (node == null) {
+            // every provider registered here has a tree node
+            throw new NullPointerException("No settings node for the provider.");
+        }
         TreePath path = new TreePath(treeModel.getPathToRoot(node));
         treeSettingsPanels.setSelectionPath(path);
     }
 
+    @Nullable
     SettingsTreeNode findNode(SettingsProvider provider) {
         LinkedList<SettingsTreeNode> nodes = new LinkedList<>();
         nodes.offer((SettingsTreeNode) treeModel.getRoot());
         while (!nodes.isEmpty()) {
             SettingsTreeNode cur = nodes.poll();
+            if (cur == null) {
+                // a non-empty deque always yields an element
+                throw new NullPointerException("No settings node available.");
+            }
             if (cur.provider == provider) {
                 return cur;
             }
@@ -208,8 +259,9 @@ public class SettingsUi extends JPanel {
 }
 
 
+@NullMarked
 class SettingsTreeNode implements TreeNode {
-    final SettingsProvider provider;
+    final @Nullable SettingsProvider provider;
     final List<SettingsTreeNode> children;
 
     SettingsTreeNode(SettingsProvider cur, List<SettingsProvider> providers) {
@@ -221,6 +273,15 @@ class SettingsTreeNode implements TreeNode {
         }
     }
 
+    /**
+     * Creates the root node of the settings tree.
+     *
+     * <p>
+     * The root entry has no provider of its own, deliberately passed as {@code null}; the tree
+     * renders it under the "KeY Settings" caption, while the constructor declares a non-null
+     * provider, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public SettingsTreeNode(List<SettingsProvider> providers) {
         this(null, providers);
     }
@@ -239,8 +300,17 @@ class SettingsTreeNode implements TreeNode {
         return children.size();
     }
 
+    /**
+     * Returns the parent of this node.
+     *
+     * <p>
+     * Settings tree nodes do not keep a parent link (the tree is only walked top-down), so
+     * {@code null} is always reported; the swing tree tolerates this as the end of the path,
+     * while the JDK declares a non-null return, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
-    public TreeNode getParent() {
+    public @Nullable TreeNode getParent() {
         return null;
     }
 

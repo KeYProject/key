@@ -11,6 +11,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.SingleProof;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class ProofAggregateTask extends DefaultMutableTreeNode implements TaskTreeNode {
 
     /**
@@ -44,18 +48,28 @@ public class ProofAggregateTask extends DefaultMutableTreeNode implements TaskTr
     }
 
     public ProofEnvironment getProofEnv() {
-        return proofs[0].proof().getEnv();
+        Proof proof = proofs[0].proof();
+        if (proof == null) {
+            // a task tree always carries a proof for its outermost entry
+            throw new NullPointerException("No proof available for the task.");
+        }
+        ProofEnvironment env = proof.getEnv();
+        if (env == null) {
+            // a proof created by a loader always carries its environment
+            throw new NullPointerException("No proof environment available.");
+        }
+        return env;
     }
 
     public ProofAggregate getProofList() {
         return proofList;
     }
 
-    public Proof proof() {
+    public @Nullable Proof proof() {
         return proofs[0].proof();
     }
 
-    public Proof[] allProofs() {
+    public @Nullable Proof[] allProofs() {
         return getProofList().getProofs();
     }
 

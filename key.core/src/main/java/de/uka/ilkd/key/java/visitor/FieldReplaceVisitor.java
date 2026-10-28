@@ -18,11 +18,16 @@ import de.uka.ilkd.key.pp.PrettyPrinter;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Replaces field references o.a by methodcalls o._a(). This is needed for unit test generation.
  */
+@NullMarked
 public class FieldReplaceVisitor extends CreatingASTVisitor {
 
+    @Nullable
     private ProgramElement result = null;
 
     // private KeYJavaType containingKJT=null
@@ -44,7 +49,7 @@ public class FieldReplaceVisitor extends CreatingASTVisitor {
         result = (ProgramElement) stack.peek().get(i);
     }
 
-    public ProgramElement result() {
+    public @Nullable ProgramElement result() {
         return result;
     }
 

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.informationflow.macros.StartSideProofMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SkipMacro;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
@@ -38,9 +39,10 @@ import de.uka.ilkd.key.util.ThreadUtilities;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskStartedInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Provides a basic implementation of {@link UserInterfaceControl} for user interfaces in which a
@@ -48,12 +50,20 @@ import org.slf4j.LoggerFactory;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserInterfaceControl
         implements RuleCompletionHandler, ProofEnvironmentListener, ProofDisposedListener {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(AbstractMediatorUserInterfaceControl.class);
     private boolean saveOnly = false;
 
+    /**
+     * {@code createProofControl()} is invoked on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); it only constructs the proof control bound to
+     * this instance, which is not used before construction completes, suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private final MediatorProofControl proofControl = createProofControl();
 
     private ProofMacro autoMacro = new SkipMacro();
@@ -115,8 +125,8 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      */
     public abstract void loadProofFromBundle(Path proofBundle, Path proofFilename);
 
-    public ProblemLoader getProblemLoader(Path file, List<Path> classPath, Path bootClassPath,
-            List<Path> includes, KeYMediator mediator) {
+    public ProblemLoader getProblemLoader(Path file, @Nullable List<Path> classPath,
+            @Nullable Path bootClassPath, @Nullable List<Path> includes, KeYMediator mediator) {
         final ProblemLoader pl = new ProblemLoader(file, classPath, bootClassPath, includes,
             AbstractProfile.getDefaultProfile(), false, mediator, true, null, this);
         return pl;
@@ -125,9 +135,12 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
     public boolean applyMacro() {
         assert macroChosen();
         final ProofMacro macro = getMacro();
-        if (macro.canApplyTo(getMediator().getSelectedNode(), null)) {
+        // applying a macro requires a selected node and proof (per the {@code ProofMacro}
+        // contract "the node (not {@code null})"); without them the macro cannot be applied
+        final Node selectedNode = getMediator().getSelectedNode();
+        final Proof proof = getMediator().getSelectedProof();
+        if (selectedNode != null && proof != null && macro.canApplyTo(selectedNode, null)) {
             LOGGER.debug("[ APPLY " + getMacro().getClass().getSimpleName() + " ]");
-            Proof proof = getMediator().getSelectedProof();
             ProofMacroFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
             ProverTaskListener ptl = this;
             try {
@@ -136,7 +149,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
                     new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
                 synchronized (macro) {
                     // wait for macro to terminate
-                    info = macro.applyTo(this, getMediator().getSelectedNode(), null, ptl);
+                    info = macro.applyTo(this, selectedNode, null, ptl);
                 }
             } catch (InterruptedException ex) {
                 LOGGER.debug("Proof macro has been interrupted:", ex);
@@ -159,18 +172,23 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         if (info.getMacro() instanceof StartSideProofMacro) {
             final Proof initiatingProof = (Proof) info
                     .getValueFor(StartSideProofMacro.PROOF_MACRO_FINISHED_INFO_KEY_ORIGINAL_PROOF);
-            info.getProof().addProofDisposedListener(new ProofDisposedListener() {
-                @Override
-                public void proofDisposing(final ProofDisposedEvent e) {
-                    e.getSource().removeProofDisposedListener(this);
-                    macroSideProofDisposing(info, initiatingProof, e.getSource());
-                }
+            final Proof finishedProof = info.getProof();
+            if (finishedProof != null) {
+                // a finished macro always reports its proof; a missing proof is an inconsistent
+                // state in which the previous code crashed with an NPE
+                finishedProof.addProofDisposedListener(new ProofDisposedListener() {
+                    @Override
+                    public void proofDisposing(final ProofDisposedEvent e) {
+                        e.getSource().removeProofDisposedListener(this);
+                        macroSideProofDisposing(info, initiatingProof, e.getSource());
+                    }
 
-                @Override
-                public void proofDisposed(ProofDisposedEvent e) {
-                    // Nothing to do
-                }
-            });
+                    @Override
+                    public void proofDisposed(ProofDisposedEvent e) {
+                        // Nothing to do
+                    }
+                });
+            }
             // stop interface again, because it is activated by the proof
             // change through startProver; the ProofMacroWorker will activate
             // it again at the right time.
@@ -188,7 +206,12 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
             // make everyone listen to the proof remove
             getMediator().startInterface(true);
             if (initiatingProof.closed()) {
-                getMediator().getSelectionModel().setSelectedNode(initiatingProof.root());
+                Node root = initiatingProof.root();
+                if (root != null) {
+                    // a closed proof always has a root; a missing root is an inconsistent state
+                    // in which the previous code crashed with an NPE
+                    getMediator().getSelectionModel().setSelectedNode(root);
+                }
             } else {
                 getMediator().getSelectionModel()
                         .setSelectedGoal(initiatingProof.openGoals().head());
@@ -208,19 +231,36 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         String proofName = proof.name().toString();
         proofName = MiscTools.removeFileExtension(proofName);
         final String filename = MiscTools.toValidFileName(proofName) + ".proof";
-        final Path proofFolder;
-        if (proof.getProofFile() != null) {
-            proofFolder = proof.getProofFile().getParent();
-        } else { // happens when a Java file is loaded
-            proofFolder = Main.getWorkingDir();
+        final Path proofFile = proof.getProofFile();
+        final Path toSave;
+        if (proofFile != null && proofFile.getParent() != null) {
+            toSave = proofFile.getParent().resolve(filename);
+        } else { // happens when a Java file is loaded or the file has no parent directory
+            Path workingDir = Main.getWorkingDir();
+            if (workingDir == null) {
+                // KeY always sets a working directory during startup; a missing one is an
+                // inconsistent state in which the previous code crashed with an NPE
+                throw new NullPointerException("KeY has no working directory set.");
+            }
+            toSave = workingDir.resolve(filename);
         }
-        final Path toSave = proofFolder.resolve(filename);
         final KeYResourceManager krm = KeYResourceManager.getManager();
         final ProofSaver ps = new ProofSaver(proof, toSave.toAbsolutePath(), krm.getSHA1());
         final String errorMsg = ps.save();
         if (errorMsg != null) {
-            reportException(this, null, new IOException(errorMsg));
+            reportSideProofSaveFailure(new IOException(errorMsg));
         }
+    }
+
+    /**
+     * Reports an {@link IOException} from a side-proof save attempt. There is no problem input
+     * available for such failures; {@code reportException} requires one, but the UI
+     * implementations only pass it on to logging and tolerate a {@code null}, suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private void reportSideProofSaveFailure(Exception e) {
+        reportException(this, null, e);
     }
 
     /**

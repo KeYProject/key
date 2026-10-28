@@ -80,7 +80,7 @@ import com.github.javaparser.resolution.types.ResolvedVoidType;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserVariableDeclaration;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,6 +96,7 @@ import static java.lang.String.format;
  * @author Alexander Weigl
  * @version 1 (05.03.22)
  */
+@NullMarked
 public record JP2KeYConverter(Services services, Namespace<SchemaVariable> schemaVariables) {
 
     public CompilationUnit processCompilationUnit(
@@ -119,12 +120,12 @@ public record JP2KeYConverter(Services services, Namespace<SchemaVariable> schem
 }
 
 
+@NullMarked
 class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(JP2KeYConverter.class);
     private final Services services;
     private final KeYJPMapping mapping;
     private final JP2KeYTypeConverter typeConverter;
-    @NonNull
     private final Namespace<SchemaVariable> schemaVariableNamespace;
     private final ConstantExpressionEvaluator evaluator;
     /**
@@ -136,8 +137,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     private final Map<FullVariableDeclarator, ProgramVariable> fieldSpecificationMapping =
         new LinkedHashMap<>();
 
-    JP2KeYVisitor(@NonNull Services services,
-            @NonNull Namespace<SchemaVariable> schemaVariables) {
+    JP2KeYVisitor(Services services, Namespace<SchemaVariable> schemaVariables) {
         this.services = services;
         this.mapping = services.getJavaService().getMapping();
         this.typeConverter = services.getJavaService().getTypeConverter();
@@ -155,7 +155,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             + n.getMetaModel().getTypeName() + ". Please extend the KeY-Java-Hierarchy");
     }
 
-    @NonNull
     private TypeReference requireTypeReference(Type type) {
         return accept(type);
     }
@@ -385,8 +384,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return typeConverter.addReferenceType(ref);
     }
 
-    @NonNull
-    private <T> T accept(@NonNull Node check) {
+    private <T> T accept(Node check) {
         return Objects.requireNonNull((T) check.accept(this, null));
     }
 
@@ -395,7 +393,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return check != null ? (T) accept(check) : null;
     }
 
-    private boolean parentIsInterface(@NonNull Node n) {
+    private boolean parentIsInterface(Node n) {
         if (n.getParentNode().isPresent()) {
             Node parent = n.getParentNode().get();
             if (parent instanceof ClassOrInterfaceDeclaration) {
@@ -405,7 +403,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return false;
     }
 
-    @NonNull
     private static PositionInfo createPositionInfo(Node node) {
         if (node.getRange().isEmpty()) {
             return PositionInfo.UNDEFINED;
@@ -540,7 +537,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new Continue(pi, c, name);
     }
 
-    private Label nameToLabel(@Nullable Name name) {
+    private @Nullable Label nameToLabel(@Nullable Name name) {
         if (name == null) {
             return null;
         }
@@ -751,7 +748,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return typeConverter.getKeYJavaType(rtype, false);
     }
 
-    private ClassOrInterfaceDeclaration getContainingClass(Node node) {
+    private @Nullable ClassOrInterfaceDeclaration getContainingClass(Node node) {
         if (node instanceof ClassOrInterfaceDeclaration) {
             node = node.getParentNode().orElse(null);
         }
@@ -1131,7 +1128,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         throw new IllegalArgumentException("Unexpected expression type: " + name.getClass());
     }
 
-    @NonNull
     private PackageReference translatePackageReference(Name name) {
         // Translate recursively since PackageReference and Name are ordered differently
         ProgramElementName pen = new ProgramElementName(name.getIdentifier(),
@@ -1148,7 +1144,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new PackageReference(createProgramElementName(name), inner);
     }
 
-    private @NonNull Object getKeYJavaType(ClassOrInterfaceType type) {
+    private Object getKeYJavaType(ClassOrInterfaceType type) {
         if (type.getName().asString().startsWith("#")) {
             return lookupSchemaVariable(type.asString(), type);
         }
@@ -1460,7 +1456,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      *         <code>recoderVarSpec</code>, if the variable is a compile-time constant, and
      *         <code>null</code> otherwise
      */
-    private Literal getCompileTimeConstantInitializer(FullVariableDeclarator spec) {
+    private @Nullable Literal getCompileTimeConstantInitializer(FullVariableDeclarator spec) {
         // Necessary condition: the field is static and final
         if (!spec.isFinal || !spec.isStatic) {
             return null;
@@ -2244,7 +2240,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return lookupSchemaVariable(name.asString(), name);
     }
 
-    @NonNull
     private SchemaVariable lookupSchemaVariable(String name, Node context) {
         SchemaVariable n = schemaVariableNamespace.lookup(new org.key_project.logic.Name(name));
         if (n != null) {
@@ -2258,7 +2253,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             VariableDeclarator decl, ClassOrInterfaceDeclaration container, boolean isFinal,
             boolean isStatic, boolean isModel, boolean isGhost) {
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (o == null || getClass() != o.getClass())
                 return false;
             FullVariableDeclarator that = (FullVariableDeclarator) o;

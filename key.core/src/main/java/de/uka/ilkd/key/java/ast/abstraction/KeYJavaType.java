@@ -98,7 +98,7 @@ public class KeYJavaType implements Type {
      *
      * @return the default value of the given type according to JLS Sect. 4.5.5
      */
-    public Literal getDefaultValue() {
+    public @Nullable Literal getDefaultValue() {
         if (javaType == null) {
             return null;
         }
@@ -123,10 +123,11 @@ public class KeYJavaType implements Type {
 
     public String getName() {
         if (javaType != null) {
-            return javaType.getName();
+            // any resolved java type carries a name (NamedModelElement.getName() is declared
+            // @Nullable in general, but a non-null javaType always has one)
+            return Objects.requireNonNull(javaType.getName(), "no name for type");
         } else {
-            assert sort != null;
-            return sort.name().toString();
+            return Objects.requireNonNull(sort, "no sort for type").name().toString();
         }
     }
 
@@ -152,7 +153,7 @@ public class KeYJavaType implements Type {
     }
 
 
-    public PackageReference createPackagePrefix() {
+    public @Nullable PackageReference createPackagePrefix() {
         PackageReference ref = null;
         String rest = getFullName();
         if (rest.indexOf('.') > 0) {

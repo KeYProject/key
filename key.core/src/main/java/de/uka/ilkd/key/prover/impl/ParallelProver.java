@@ -33,6 +33,7 @@ import org.key_project.prover.proof.ProofObject;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +77,7 @@ import org.slf4j.LoggerFactory;
  * and does not consult the {@link GoalChooser} it is constructed with (the constructor keeps the
  * parameter for API symmetry with {@code ApplyStrategy}).
  */
+@NullMarked
 public final class ParallelProver extends DefaultProver<Proof, Goal> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ParallelProver.class);

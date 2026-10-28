@@ -7,16 +7,20 @@ package de.uka.ilkd.key.gui.actions.useractions;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Virtual user action to undo loading a proof.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class ProofLoadUserAction extends UserAction {
     /**
      * The proof loaded in this action.
      */
-    private Proof proofLoaded;
+    private @Nullable Proof proofLoaded;
 
     /**
      * Construct a new user action of this kind.
@@ -31,7 +35,9 @@ public class ProofLoadUserAction extends UserAction {
 
     @Override
     public String name() {
-        return "Load: " + proofLoaded.name();
+        // {@code proofLoaded} becomes {@code null} after {@link #undo()}; in that (impossible for
+        // a live action) state the previous code crashed with an NPE.
+        return "Load: " + (proofLoaded == null ? "?" : proofLoaded.name());
     }
 
     @Override
@@ -40,12 +46,15 @@ public class ProofLoadUserAction extends UserAction {
 
     @Override
     public void undo() {
-        proofLoaded.dispose();
-        proofLoaded = null;
+        if (proofLoaded != null) {
+            proofLoaded.dispose();
+            proofLoaded = null;
+        }
     }
 
     @Override
     public boolean canUndo() {
-        return !proofLoaded.isDisposed();
+        // {@code proofLoaded} is only {@code null} after an undo, which cannot be undone again.
+        return proofLoaded != null && !proofLoaded.isDisposed();
     }
 }

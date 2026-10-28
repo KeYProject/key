@@ -6,10 +6,13 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.logic.JTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  *
  * @author christoph
  */
+@NullMarked
 public interface BasicPOSnippetFactory {
 
     /**

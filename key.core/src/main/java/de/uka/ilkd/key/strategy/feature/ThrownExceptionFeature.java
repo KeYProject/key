@@ -28,7 +28,10 @@ import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class ThrownExceptionFeature extends BinaryFeature {
 
     public static Feature create(String[] blockedExceptions, Services services) {
@@ -90,7 +93,7 @@ public class ThrownExceptionFeature extends BinaryFeature {
      * @param term the Term with the program at top level
      * @return the first executable statement
      */
-    private ProgramElement getFirstExecutableStatement(JTerm term) {
+    private @Nullable ProgramElement getFirstExecutableStatement(JTerm term) {
         if (term.javaBlock().isEmpty()) {
             return null;
         }

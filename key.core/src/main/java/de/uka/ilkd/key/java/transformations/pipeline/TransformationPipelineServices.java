@@ -147,7 +147,7 @@ public class TransformationPipelineServices {
      * @return the default value of the given type
      *         according to JLS Sect. 4.5.5
      */
-    public Expression getDefaultValue(Type type) {
+    public @Nullable Expression getDefaultValue(Type type) {
         if (type instanceof ReferenceType) {
             return new NullLiteralExpr();
         } else if (type instanceof PrimitiveType ptype) {
@@ -171,7 +171,7 @@ public class TransformationPipelineServices {
         return null;
     }
 
-    public ClassOrInterfaceType getType(String... names) {
+    public @Nullable ClassOrInterfaceType getType(String... names) {
         ClassOrInterfaceType type = null;
         for (String name : names) {
             type = new ClassOrInterfaceType(type, name);
@@ -179,7 +179,7 @@ public class TransformationPipelineServices {
         return type;
     }
 
-    public Name getName(String... names) {
+    public @Nullable Name getName(String... names) {
         Name type = null;
         for (String name : names) {
             type = new Name(type, name);
@@ -300,7 +300,7 @@ public class TransformationPipelineServices {
         return result;
     }
 
-    public static <N extends Node> NodeList<N> cloneList(NodeList<N> list) {
+    public static <N extends Node> @Nullable NodeList<N> cloneList(@Nullable NodeList<N> list) {
         if (list == null) {
             return null;
         }
@@ -311,7 +311,7 @@ public class TransformationPipelineServices {
         return new NodeList<>(seq);
     }
 
-    public Expression getDefaultValue(ResolvedType type) {
+    public @Nullable Expression getDefaultValue(ResolvedType type) {
         if (type.isPrimitive()) {
             var p = type.asPrimitive();
             if (p.isBoolean()) {
@@ -391,7 +391,7 @@ public class TransformationPipelineServices {
      */
     public static class TransformerCache {
         private final NodeList<CompilationUnit> cUnits = new NodeList<>();
-        private Set<TypeDeclaration<?>> classDeclarations;
+        private @Nullable Set<TypeDeclaration<?>> classDeclarations;
 
         public TransformerCache(List<CompilationUnit> cUnits) {
             this.cUnits.addAll(cUnits);
@@ -401,32 +401,38 @@ public class TransformationPipelineServices {
             if (classDeclarations == null) {
                 init();
             }
-            return classDeclarations;
+            return Objects.requireNonNull(classDeclarations,
+                "classDeclarations are initialized by init()");
         }
 
         private void init() {
+            classDeclarations = new HashSet<>();
             class FindTypes extends VoidVisitorAdapter<Void> {
                 @Override
                 public void visit(EnumDeclaration n, Void arg) {
-                    classDeclarations.add(n);
+                    Objects.requireNonNull(classDeclarations,
+                        "classDeclarations are initialized by init()").add(n);
                     super.visit(n, arg);
                 }
 
                 @Override
                 public void visit(ClassOrInterfaceDeclaration n, Void arg) {
-                    classDeclarations.add(n);
+                    Objects.requireNonNull(classDeclarations,
+                        "classDeclarations are initialized by init()").add(n);
                     super.visit(n, arg);
                 }
 
                 @Override
                 public void visit(RecordDeclaration n, Void arg) {
-                    classDeclarations.add(n);
+                    Objects.requireNonNull(classDeclarations,
+                        "classDeclarations are initialized by init()").add(n);
                     super.visit(n, arg);
                 }
 
                 @Override
                 public void visit(AnnotationDeclaration n, Void arg) {
-                    classDeclarations.add(n);
+                    Objects.requireNonNull(classDeclarations,
+                        "classDeclarations are initialized by init()").add(n);
                     super.visit(n, arg);
                 }
             }
@@ -472,7 +478,7 @@ public class TransformationPipelineServices {
         return CaptureVariableCollector.collect(n).get(n);
     }
 
-    public List<ResolvedValueDeclaration> getLocalVarsExternalToAnonClass(LambdaExpr n) {
+    public @Nullable List<ResolvedValueDeclaration> getLocalVarsExternalToAnonClass(LambdaExpr n) {
         return CaptureVariableCollector.collect(n).get(n);
     }
 

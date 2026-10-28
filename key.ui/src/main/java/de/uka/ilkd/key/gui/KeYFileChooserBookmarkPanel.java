@@ -19,6 +19,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This is a Panel used as accessory for the JFileChooser.
@@ -31,6 +32,7 @@ import org.jspecify.annotations.NonNull;
  * @author weigl
  * @see ViewSettings#getFolderBookmarks()
  */
+@NullMarked
 public class KeYFileChooserBookmarkPanel extends JPanel {
     private final @NonNull JFileChooser chooser;
 
@@ -39,7 +41,6 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
 
     private final DefaultListModel<File> bookmarks = new DefaultListModel<>();
     private final JList<File> listBookmarks = new JList<>(bookmarks);
-
 
     private final KeyAction actionAddBookmark = new AddBookmarkAction();
     private final KeyAction actionRemoveBookmark = new RemoveBookmarkAction();
@@ -50,12 +51,22 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
      *
      * @param chooser non null {@link JFileChooser}
      */
+    /**
+     * The ctor configures the panel and its children while the receiver is still under
+     * initialization (EISOP initialization check); the effects only take place after construction
+     * completes, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public KeYFileChooserBookmarkPanel(@NonNull JFileChooser chooser) {
         this.chooser = chooser;
 
         // listen for current directory of the file chooser
         chooser.addPropertyChangeListener(JFileChooser.DIRECTORY_CHANGED_PROPERTY, e -> {
             File selected = chooser.getCurrentDirectory();
+            if (selected == null) {
+                // the file chooser always has a current directory
+                throw new NullPointerException("No current directory available.");
+            }
             listBookmarks.setSelectedValue(selected, true);
         });
 
@@ -125,14 +136,15 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
 
         private String toString(File file) {
             StringBuilder sb = new StringBuilder();
+            File current = file;
             do {
-                sb.insert(0, file.getName());
-                file = file.getParentFile();
-                if (file != null) {
+                sb.insert(0, current.getName());
+                current = current.getParentFile();
+                if (current != null) {
                     sb.insert(0, '/');
                 }
-            } while (file != null && sb.length() < LIMIT);
-            if (file != null) {
+            } while (current != null && sb.length() < LIMIT);
+            if (current != null) {
                 sb.insert(0, '…');
             }
             return sb.toString();
@@ -153,6 +165,12 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
     }
 
     private class AddBookmarkAction extends KeyAction {
+        /**
+         * The action-configuration setters are called on {@code this} while the receiver is still
+         * under initialization (EISOP initialization check); safe here, suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         AddBookmarkAction() {
             setIcon(IconFactory.plus(16));
             setTooltip("Adds the current directory to the bookmarks.");
@@ -174,6 +192,12 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
     }
 
     private class AddExternalBookmarkAction extends KeyAction {
+        /**
+         * The action-configuration setters are called on {@code this} while the receiver is still
+         * under initialization (EISOP initialization check); safe here, suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         AddExternalBookmarkAction() {
             setIcon(IconFactory.PLUS_SQUARED.get(16));
             setTooltip("Opens a new file selection dialog to select a new bookmark.");
@@ -198,6 +222,10 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
             int res = fc.showOpenDialog(null);
             if (res == JFileChooser.APPROVE_OPTION) {
                 File toAdd = fc.getSelectedFile();
+                if (toAdd == null) {
+                    // a directory approval always yields a selection
+                    throw new NullPointerException("No selected file available.");
+                }
                 final int index = bookmarks.indexOf(toAdd);
                 if (index >= 0) {
                     // already in the list
@@ -210,6 +238,12 @@ public class KeYFileChooserBookmarkPanel extends JPanel {
     }
 
     private class RemoveBookmarkAction extends KeyAction {
+        /**
+         * The action-configuration setters are called on {@code this} while the receiver is still
+         * under initialization (EISOP initialization check); safe here, suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         RemoveBookmarkAction() {
             setName("");
             setIcon(IconFactory.minus(16));

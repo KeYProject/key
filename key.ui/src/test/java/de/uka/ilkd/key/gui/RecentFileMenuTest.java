@@ -20,6 +20,14 @@ import org.junit.jupiter.api.io.TempDir;
  */
 class RecentFileMenuTest {
 
+    /**
+     * The stored file does not exist, so neither menu has a most-recent file and both return
+     * {@code null}; {@link RecentFileMenu#getMostRecent()} is therefore {@code @Nullable}.
+     * AssertJ's
+     * {@code assertThat}/{@code isEqualTo} parameters are {@code @NonNull}-typed external library
+     * signatures, so the deliberate nullable values are suppressed scoped to this method.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Test
     void mostRecentFilesTempFilesAreNotReloadedIfNotExisting(@TempDir Path tmp) throws Exception {
         Path fileA = tmp.resolve("C.key");
@@ -42,6 +50,13 @@ class RecentFileMenuTest {
         Assertions.assertThat(menu2.getEntries()).isEmpty(); // <- non existing temp files
     }
 
+    /**
+     * The stored files exist, so both menus expose the same most-recent file; the value flows
+     * through {@link RecentFileMenu#getMostRecent()}, which is {@code @Nullable}. AssertJ's
+     * {@code assertThat}/{@code isEqualTo} parameters are {@code @NonNull}-typed external library
+     * signatures, so the nullable comparison is suppressed scoped to this method.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Test
     void mostRecentFilesTempFilesAreNotReloadedIfExisting(@TempDir Path tmp) throws Exception {
         Path fileA = tmp.resolve("A.key");

@@ -5,6 +5,8 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -17,11 +19,14 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * A trigger consisting of a single term. Matching it against a target term yields the substitutions
  * for the quantified variables; results are cached per target term.
  */
+@NullMarked
 class UniTrigger implements Trigger {
 
     private final Term trigger;
@@ -209,7 +214,8 @@ class UniTrigger implements Trigger {
             QuantifiableVariable var) {
         ImmutableList<QuantifiableVariable> visited = ImmutableList.nil();
         ImmutableList<Term> pending = ImmutableList.nil();
-        Term current = varMap.get(var);
+        Term current = Objects.requireNonNull(varMap.get(var),
+            "an iterated variable is always bound in the map");
 
         if (current.op() == var) {
             return false;

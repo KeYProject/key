@@ -7,7 +7,6 @@ package org.key_project.isabelletranslation.translation;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
@@ -27,6 +26,8 @@ import org.key_project.logic.sort.Sort;
 
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class handles the translation of several functions that are already defined in the preamble.
@@ -38,6 +39,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Nils Buchholz
  */
+@NullMarked
 public class DefinedSymbolsHandler implements IsabelleHandler {
     /**
      * Map of the operators supported by this handler and their respective translation.
@@ -46,20 +48,34 @@ public class DefinedSymbolsHandler implements IsabelleHandler {
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
-            Properties handlerSnippets, String[] handlerOptions) throws IOException {
+            @Nullable Properties handlerSnippets, String[] handlerOptions) throws IOException {
+        // the handlerSnippets are null if no preamble snippets file exists; without them the
+        // preamble cannot be constructed, mirroring the previous NPE on entrySet()
+        // (crash-equivalent)
+        if (handlerSnippets == null) {
+            throw new NullPointerException("No preamble snippets for DefinedSymbolsHandler");
+        }
         masterHandler.addPreamblesLocales(handlerSnippets);
         masterHandler.addPredefinedSort(JavaDLTheory.ANY, "any");
 
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        if (heapLDT == null) {
+            throw new NullPointerException("No HeapLDT found in the services");
+        }
         LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
 
         Namespace<@NonNull Sort> sorts = services.getNamespaces().sorts();
-        masterHandler.addPredefinedSort(
-            Objects.requireNonNull(sorts.lookup(new Name("java.lang.Object"))),
-            "java_lang_Object");
-        masterHandler.addPredefinedSort(Objects.requireNonNull(sorts.lookup(new Name("Null"))),
-            "Null");
+        Sort objectSort = sorts.lookup(new Name("java.lang.Object"));
+        if (objectSort == null) {
+            throw new NullPointerException("Sort 'java.lang.Object' not found in the namespaces");
+        }
+        masterHandler.addPredefinedSort(objectSort, "java_lang_Object");
+        Sort nullSort = sorts.lookup(new Name("Null"));
+        if (nullSort == null) {
+            throw new NullPointerException("Sort 'Null' not found in the namespaces");
+        }
+        masterHandler.addPredefinedSort(nullSort, "Null");
         masterHandler.addPredefinedSort(heapLDT.targetSort(), "Heap");
         masterHandler.addPredefinedSort(locSetLDT.targetSort(), "LocSet");
         masterHandler.addPredefinedSort(seqLDT.targetSort(), "Seq");
@@ -145,11 +161,20 @@ public class DefinedSymbolsHandler implements IsabelleHandler {
     @Override
     public StringBuilder handle(IsabelleMasterHandler trans, Term term) {
         if (term.op() instanceof ParametricFunctionInstance pfi) {
+            String name = supportedOperators.get(term.op());
+            if (name == null) {
+                throw new NullPointerException(
+                    "No translation registered for operator " + term.op().name());
+            }
             return ParametricFunctionHandler.getParametricFunctionRef(trans, term,
-                pfi,
-                supportedOperators.get(term.op()));
+                pfi, name);
+        }
+        String name = supportedOperators.get(term.op());
+        if (name == null) {
+            throw new NullPointerException(
+                "No translation registered for operator " + term.op().name());
         }
         return UninterpretedSymbolsHandler.getFunctionRef(trans, term, (SortedOperator) term.op(),
-            supportedOperators.get(term.op()));
+            name);
     }
 }

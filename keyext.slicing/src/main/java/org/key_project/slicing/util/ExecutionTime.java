@@ -11,11 +11,14 @@ import java.util.stream.Stream;
 
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Simple class to measure the running time of various 'activities'.
  *
  * @author Arne Keller
  */
+@NullMarked
 public final class ExecutionTime {
     /**
      * Mapping: activity name -> start time (milliseconds since unix epoch).
@@ -71,7 +74,14 @@ public final class ExecutionTime {
     public Stream<Pair<String, Long>> executionTimes() {
         return startTimes.entrySet().stream()
                 .filter(e -> endTimes.containsKey(e.getKey()))
-                .map(e -> new Pair<>(e.getKey(), endTimes.get(e.getKey()) - e.getValue()));
+                .map(e -> {
+                    Long endTime = endTimes.get(e.getKey());
+                    if (endTime == null) {
+                        throw new NullPointerException(
+                            "No end time recorded for activity " + e.getKey() + ".");
+                    }
+                    return new Pair<>(e.getKey(), endTime - e.getValue());
+                });
     }
 
     /**
@@ -82,7 +92,14 @@ public final class ExecutionTime {
     public Map<String, Long> executionTimesMap() {
         return startTimes.entrySet().stream()
                 .filter(e -> endTimes.containsKey(e.getKey()))
-                .map(e -> new Pair<>(e.getKey(), endTimes.get(e.getKey()) - e.getValue()))
+                .map(e -> {
+                    Long endTime = endTimes.get(e.getKey());
+                    if (endTime == null) {
+                        throw new NullPointerException(
+                            "No end time recorded for activity " + e.getKey() + ".");
+                    }
+                    return new Pair<>(e.getKey(), endTime - e.getValue());
+                })
                 .collect(Collectors.toUnmodifiableMap(x -> x.first, x -> x.second));
     }
 }

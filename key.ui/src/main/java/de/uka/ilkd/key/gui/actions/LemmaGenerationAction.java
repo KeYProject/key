@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.Taclet;
@@ -28,10 +29,12 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.LoaderLis
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public abstract class LemmaGenerationAction extends MainWindowAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(LemmaGenerationAction.class);
 
@@ -41,8 +44,14 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
 
     private static final long serialVersionUID = 1L;
 
-
-
+    /**
+     * The action-configuration calls and the {@code enableWhenProofLoaded(this)} registration
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since the listener only reacts to later selection events,
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     protected LemmaGenerationAction(MainWindow mainWindow) {
         super(mainWindow);
 
@@ -78,8 +87,6 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
     private abstract static class AbstractLoaderListener implements LoaderListener {
         private final MainWindow mainWindow;
 
-
-
         private AbstractLoaderListener(MainWindow mainWindow) {
             super();
             this.mainWindow = mainWindow;
@@ -112,7 +119,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             SwingUtilities.invokeLater(() -> doStopped(p, taclets, addAsAxioms));
         }
 
-        protected abstract void doStopped(ProofAggregate p, ImmutableSet<Taclet> taclets,
+        protected abstract void doStopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
                 boolean addAsAxioms);
 
         @Override
@@ -124,7 +131,6 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
     }
 
     public static class ProveKeYTaclets extends LemmaGenerationAction {
-
 
         private static final long serialVersionUID = 1L;
 
@@ -140,7 +146,6 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 new TacletLoader.KeYsTacletsLoader(mainWindow.getUserInterface(),
                     mainWindow.getUserInterface(), mainWindow.getMediator().getProfile());
 
-
             LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                 @Override
                 public void doStopped(Throwable exception) {
@@ -149,7 +154,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 }
 
                 @Override
-                public void doStopped(ProofAggregate p, ImmutableSet<Taclet> taclets,
+                public void doStopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
                         boolean addAxioms) {
                     getMediator().startInterface(true);
                     if (p != null) {
@@ -188,7 +193,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
     static public class ProveUserDefinedTaclets extends LemmaGenerationAction {
 
         private static final long serialVersionUID = 1L;
-        private LoadUserTacletsDialog chooser;
+        private @Nullable LoadUserTacletsDialog chooser;
 
         public ProveUserDefinedTaclets(MainWindow mainWindow) {
             super(mainWindow);
@@ -207,6 +212,11 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
             }
 
             final Path fileForLemmata = chooser.getFileForTaclets();
+            if (fileForLemmata == null) {
+                // No file was selected although the dialog was confirmed: the previous code
+                // crashed with a NPE in the loader, keep that behavior.
+                throw new NullPointerException("No taclet file selected.");
+            }
             final boolean loadAsLemmata = chooser.isGenerateProofObligations();
             List<Path> filesForAxioms = chooser.getFilesForAxioms();
             Profile profile = mainWindow.getMediator().getProfile();
@@ -218,8 +228,6 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 mainWindow.getUserInterface(), mainWindow.getUserInterface(), problemInitializer,
                 profile, fileForLemmata, filesForAxioms);
 
-
-
             LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                 @Override
                 public void doStopped(Throwable exception) {
@@ -229,7 +237,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 }
 
                 @Override
-                public void doStopped(ProofAggregate p, ImmutableSet<Taclet> taclets,
+                public void doStopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
                         boolean addAxioms) {
                     getMediator().startInterface(true);
                     if (p != null) {
@@ -283,18 +291,31 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 return;
             }
             final Proof proof = getMediator().getSelectedProof();
+            if (proof == null) {
+                // The action is only enabled with a loaded proof (enableWhenProofLoaded); a
+                // missing proof here is an inconsistent state, crash-equivalent to the previous
+                // NPE in the services access below.
+                throw new NullPointerException("No proof loaded for adding taclets.");
+            }
             final Path fileForLemmata = chooser.getFileForTaclets();
+            if (fileForLemmata == null) {
+                throw new NullPointerException("No taclet file selected.");
+            }
             final boolean loadAsLemmata = chooser.isGenerateProofObligations();
             List<Path> filesForAxioms = chooser.getFilesForAxioms();
             final ProblemInitializer problemInitializer =
                 new ProblemInitializer(mainWindow.getUserInterface(),
-                    new Services(proof.getServices().getProfile()), mainWindow.getUserInterface());
+                    new Services(proof.getServices().getProfile()),
+                    mainWindow.getUserInterface());
 
+            InitConfig initConfig = proof.getInitConfig();
+            if (initConfig == null) {
+                // a loaded proof always has an initial configuration
+                throw new NullPointerException("No initial configuration for proof.");
+            }
             TacletLoader tacletLoader = new TacletLoader.TacletFromFileLoader(
                 mainWindow.getUserInterface(), mainWindow.getUserInterface(), problemInitializer,
-                fileForLemmata, filesForAxioms, proof.getInitConfig().copy());
-
-
+                fileForLemmata, filesForAxioms, initConfig.copy());
 
             LoaderListener listener = new AbstractLoaderListener(mainWindow) {
                 @Override
@@ -304,7 +325,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                 }
 
                 @Override
-                public void doStopped(ProofAggregate p, ImmutableSet<Taclet> taclets,
+                public void doStopped(@Nullable ProofAggregate p, ImmutableSet<Taclet> taclets,
                         boolean addAxioms) {
                     getMediator().startInterface(true);
                     if (p != null) {

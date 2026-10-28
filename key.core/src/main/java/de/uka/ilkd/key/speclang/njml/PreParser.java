@@ -20,11 +20,13 @@ import org.key_project.util.parsing.Location;
 import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Transforms pure text comments into {@link TextualJMLConstruct}s.
  */
+@NullMarked
 public class PreParser {
     private final List<PositionedString> warnings = new ArrayList<>(8);
 
@@ -103,8 +105,8 @@ public class PreParser {
      */
     public ImmutableList<TextualJMLConstruct> parseClassLevel(String concatenatedComment,
             @Nullable URI fileName, Position pos) {
-        return parseClassLevel(
-            new PositionedString(concatenatedComment, new Location(fileName, pos)));
+        return parseClassLevel(new PositionedString(concatenatedComment,
+            fileName == null ? Location.UNDEFINED : new Location(fileName, pos)));
     }
 
     /**
@@ -122,8 +124,8 @@ public class PreParser {
      */
     public ImmutableList<TextualJMLConstruct> parseMethodLevel(String concatenatedComment,
             @Nullable URI fileName, Position position) {
-        return parseMethodLevel(
-            new PositionedString(concatenatedComment, new Location(fileName, position)));
+        return parseMethodLevel(new PositionedString(concatenatedComment,
+            fileName == null ? Location.UNDEFINED : new Location(fileName, position)));
     }
 
     /**

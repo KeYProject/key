@@ -10,15 +10,26 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 
+import org.jspecify.annotations.NullMarked;
+
 /*
  * Menu option for showing the next search result of sequent search Keyboard shortcut: F3. This
  * shortcut is set in the KeyStrokemanager
  */
+@NullMarked
 public class SearchNextAction extends MainWindowAction {
 
     private static final long serialVersionUID = -9002009635814787502L;
     private final SequentViewSearchBar searchBar;
 
+    /**
+     * The action-configuration calls and the {@code enableWhenProofLoaded(this)} registration
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since the listener only reacts to later selection events,
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public SearchNextAction(MainWindow mainWindow, SequentViewSearchBar searchBar) {
         super(mainWindow);
         setName("Find Next Occurrence");

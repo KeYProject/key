@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ast.LoopInitializer;
@@ -39,6 +40,9 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.java.ast.expression.UnaryAssignment.UnaryAssignmentKind.POST_INCREMENT;
 import static de.uka.ilkd.key.java.ast.expression.operator.BinaryOperatorKind.LESS_THAN;
 
@@ -47,6 +51,7 @@ import static de.uka.ilkd.key.java.ast.expression.operator.BinaryOperatorKind.LE
  * particular its helper method <code>&lt;createArrayHelper&gt;</code>. This class should be
  * replaced by a recoder transformation as soon as we port our array data structures to RecodeR.
  */
+@NullMarked
 public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
     public static final String IMPLICIT_ARRAY_CREATE = "$createArray";
@@ -99,7 +104,11 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
             initialized = find(PipelineConstants.IMPLICIT_INITIALIZED, implicitFields);
         }
 
-        result.addLast(assign(attribute(new ThisReference(), initialized), BooleanLiteral.FALSE));
+        result.addLast(assign(attribute(new ThisReference(),
+            Objects.requireNonNull(initialized,
+                "no field '" + PipelineConstants.IMPLICIT_INITIALIZED
+                    + "' in the object model")),
+            BooleanLiteral.FALSE));
         return result;
     }
 
@@ -166,7 +175,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      *        the IList<Field> where we have to look for the field
      * @return the program variable of the given name or null if not found
      */
-    private ProgramVariable find(String name, ImmutableList<Field> fields) {
+    private @Nullable ProgramVariable find(String name, ImmutableList<Field> fields) {
         for (Field field1 : fields) {
             Field field = field1;
             final ProgramVariable fieldVar = (ProgramVariable) field.getProgramVariable();
@@ -177,7 +186,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         return null;
     }
 
-    private ProgramVariable findInObjectFields(String name) {
+    private @Nullable ProgramVariable findInObjectFields(String name) {
         ProgramVariable var = cache.get(name);
         if (var == null && objectType.getJavaType() != null) {
             final ImmutableList<Field> objectFields = filterImplicitFields(
@@ -203,7 +212,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final Modifier[] modifiers =
             Modifier.createModifierList(ModifierKind.PRIVATE, ModifierKind.STATIC);
 
-        final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
+        final KeYJavaType arrayType = Objects.requireNonNull(
+            arrayTypeReference.getKeYJavaType(), "no KeYJavaType for array type reference");
 
         final ProgramVariable paramLength =
             new LocationVariable(new ProgramElementName("length"), integerType, true);
@@ -280,7 +290,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      */
     private StatementBlock getCreateArrayHelperBody(
             ProgramVariable length,
-            ImmutableList<Field> fields, boolean createTransient, ProgramVariable transientType) {
+            ImmutableList<Field> fields, boolean createTransient,
+            @Nullable ProgramVariable transientType) {
         assert !createTransient;
 
         final ThisReference thisRef = new ThisReference();
@@ -291,7 +302,10 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
             new ProgramElementName(PipelineConstants.IMPLICIT_OBJECT_PREPARE), null));
 
         body.add(
-            assign(attribute(thisRef, findInObjectFields(PipelineConstants.IMPLICIT_INITIALIZED)),
+            assign(attribute(thisRef,
+                Objects.requireNonNull(findInObjectFields(PipelineConstants.IMPLICIT_INITIALIZED),
+                    "no field '" + PipelineConstants.IMPLICIT_INITIALIZED
+                        + "' in the object model")),
                 BooleanLiteral.TRUE));
 
         body.add(new Return(thisRef));
@@ -306,7 +320,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
             ProgramVariable length, ImmutableList<Field> fields) {
 
         final Modifier[] modifiers = Modifier.createModifierList(ModifierKind.PRIVATE);
-        final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
+        final KeYJavaType arrayType = Objects.requireNonNull(
+            arrayTypeReference.getKeYJavaType(), "no KeYJavaType for array type reference");
 
         final MethodDeclaration md = new MethodDeclaration(modifiers, arrayTypeReference,
             new ProgramElementName(IMPLICIT_ARRAY_CREATION_HELPER), new ParameterDeclaration[0],
@@ -327,7 +342,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
         final Modifier[] modifiers =
             Modifier.createModifierList(ModifierKind.PROTECTED, ModifierKind.STATIC);
 
-        final KeYJavaType arrayType = arrayTypeReference.getKeYJavaType();
+        final KeYJavaType arrayType = Objects.requireNonNull(
+            arrayTypeReference.getKeYJavaType(), "no KeYJavaType for array type reference");
 
         final ProgramVariable paramLength =
             new LocationVariable(new ProgramElementName("length"), integerType);
@@ -350,7 +366,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      */
     private Expression getDefaultValue(Type type) {
         if (type instanceof PrimitiveType) {
-            return type.getDefaultValue();
+            return Objects.requireNonNull(type.getDefaultValue(),
+                "no default value for type " + type);
         }
         return NullLiteral.NULL;
     }

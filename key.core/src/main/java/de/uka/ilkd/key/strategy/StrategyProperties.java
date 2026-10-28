@@ -5,14 +5,18 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
 import de.uka.ilkd.key.settings.Configuration;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class StrategyProperties extends Properties {
 
     public static final String STOPMODE_OPTIONS_KEY = "STOPMODE_OPTIONS_KEY";
@@ -374,7 +378,8 @@ public final class StrategyProperties extends Properties {
             // remove this line if always satisfied. add another assignment if not.
             assert o.equals(getUniqueString(o));
         }
-        return o;
+        return Objects.requireNonNull(o,
+            "no default value registered for strategy property " + key);
     }
 
     /**
@@ -382,7 +387,7 @@ public final class StrategyProperties extends Properties {
      *        <code>stringPool</code>.
      * @return Returns the same string but possibly with a different but unique object identity.
      */
-    private static String getUniqueString(String in) {
+    private static @Nullable String getUniqueString(String in) {
         for (String id : STRING_POOL) {
             if (id.equals(in)) {
                 return id;

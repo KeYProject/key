@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
+import org.jspecify.annotations.NullMarked;
+
+
 /**
  * Costs whose meaning spans more than one component strategy — the theory-<em>combination</em>
  * constants, as opposed to the theory-internal holders ({@link FOLCost}, the integer holders,
@@ -35,6 +38,7 @@ package de.uka.ilkd.key.strategy;
  * (as for {@link org.key_project.prover.strategy.costbased.CostBand}).
  * </p>
  */
+@NullMarked
 final class CombinationCost {
     private CombinationCost() {}
 

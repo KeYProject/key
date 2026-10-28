@@ -19,6 +19,8 @@ import org.key_project.logic.Name;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import org.jspecify.annotations.NullMarked;
+
 // TODO: precise user feedback
 
 /**
@@ -27,6 +29,7 @@ import org.key_project.proofmanagement.io.ProofBundleHandler;
  * @author Jonas Krämer
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class SettingsChecker implements Checker {
 
     // TODO: it is not checked that this is a equivalence relation, but thats probably okay.
@@ -58,7 +61,11 @@ public class SettingsChecker implements Checker {
         // parse the settings of each proof file
         List<ProofSettings> proofSettings = new ArrayList<>();
         for (KeYUserProblemFile f : problemFiles) {
-            proofSettings.add(f.readPreferences());
+            ProofSettings ps = f.readPreferences();
+            if (ps == null) {
+                throw new NullPointerException("No preferences for " + f);
+            }
+            proofSettings.add(ps);
         }
 
         // actual consistency check of the settings
@@ -130,8 +137,13 @@ public class SettingsChecker implements Checker {
                     data.print(LogLevel.DEBUG, "Incompatible (additional key found)!");
                 }
                 for (String key : refChoices.keySet()) {
-                    if (!compatible(new Choice(new Name(key), refChoices.get(key)),
-                        new Choice(new Name(key), cs.get(key)))) {
+                    String refValue = refChoices.get(key);
+                    String value = cs.get(key);
+                    if (refValue == null || value == null) {
+                        throw new NullPointerException("Choice value missing for setting " + key);
+                    }
+                    if (!compatible(new Choice(new Name(key), refValue),
+                        new Choice(new Name(key), value))) {
                         // found at least one different value
 
                         // do not return directly to compare other settings too
@@ -159,11 +171,9 @@ public class SettingsChecker implements Checker {
             return true;
         }
 
-        if (choiceCompatibilityClasses.containsKey(a.name().toString())) {
-
-            for (Set<String> compatibilityClass : choiceCompatibilityClasses
-                    .get(a.name().toString())) {
-
+        Set<Set<String>> classes = choiceCompatibilityClasses.get(a.name().toString());
+        if (classes != null) {
+            for (Set<String> compatibilityClass : classes) {
                 if (compatibilityClass.contains(a.category())
                         && compatibilityClass.contains(b.category())) {
                     return true;

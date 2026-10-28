@@ -21,9 +21,10 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.WeakValueInterner;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /// Concrete sort of a parametric sort.
+@NullMarked
 public final class ParametricSortInstance extends AbstractSort implements SyntaxElement {
     /**
      * Thread-safe Interning of parametric sort instances so that equal instances are the same
@@ -93,12 +94,12 @@ public final class ParametricSortInstance extends AbstractSort implements Syntax
     }
 
     @Override
-    public @NonNull ImmutableSet<Sort> extendsSorts() {
+    public ImmutableSet<Sort> extendsSorts() {
         return extendsSorts;
     }
 
     @Override
-    public boolean extendsTrans(@NonNull Sort sort) {
+    public boolean extendsTrans(Sort sort) {
         if (sort == this)
             return true;
 
@@ -219,7 +220,7 @@ public final class ParametricSortInstance extends AbstractSort implements Syntax
     }
 
     @Override
-    public @NonNull SyntaxElement getChild(int n) {
+    public SyntaxElement getChild(int n) {
         return Objects.requireNonNull(args.get(n));
     }
 }

@@ -12,8 +12,8 @@ import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 import org.key_project.logic.Property;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-
 
 /**
  * This class is a wrapper for {@link LinkedHashMap} where the keys are elements that implement
@@ -22,6 +22,7 @@ import org.jspecify.annotations.Nullable;
  * @param <K> the type of the keys in the wrapped LinkedHashMap
  * @param <V> the type of the values in the wrapped LinkedHashMap
  */
+@NullMarked
 public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
     /*
      * Internally, the elements are wrapped so that EqualsModProperty can be used for equality

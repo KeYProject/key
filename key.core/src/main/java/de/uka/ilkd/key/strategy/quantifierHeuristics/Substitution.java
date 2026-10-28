@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ClashFreeSubst;
@@ -20,6 +21,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +30,7 @@ import org.slf4j.LoggerFactory;
  * This class decribes a substitution,which store a map(varMap) from quantifiable variable to a
  * term(instance).
  */
+@NullMarked
 public class Substitution {
     private static final Logger LOGGER = LoggerFactory.getLogger(Substitution.class);
 
@@ -58,7 +62,7 @@ public class Substitution {
         return varMap;
     }
 
-    public Term getSubstitutedTerm(QuantifiableVariable var) {
+    public @Nullable Term getSubstitutedTerm(QuantifiableVariable var) {
         return varMap.get(var);
     }
 
@@ -78,7 +82,8 @@ public class Substitution {
     public boolean isGround() {
         final Iterator<QuantifiableVariable> it = varMap.keyIterator();
         while (it.hasNext()) {
-            final Term t = getSubstitutedTerm(it.next());
+            final Term t = Objects.requireNonNull(getSubstitutedTerm(it.next()),
+                "substituted term for an iterated variable");
             if (!t.freeVars().isEmpty()) {
                 LOGGER.debug("evil free vars in term: " + t);
                 return false;
@@ -97,7 +102,8 @@ public class Substitution {
             final Sort quantifiedVarSort = var.sort();
             final Function quantifiedVarSortCast =
                 services.getJavaDLTheory().getCastSymbol(quantifiedVarSort, services);
-            Term instance = getSubstitutedTerm(var);
+            Term instance = Objects.requireNonNull(getSubstitutedTerm(var),
+                "substituted term for an iterated variable");
             if (!instance.sort().extendsTrans(quantifiedVarSort)) {
                 instance = tb.func(quantifiedVarSortCast, (JTerm) instance);
             }
@@ -191,7 +197,8 @@ public class Substitution {
         final Iterator<QuantifiableVariable> it = varMap.keyIterator();
         while (it.hasNext()) {
             final QuantifiableVariable var = it.next();
-            Term instance = getSubstitutedTerm(var);
+            Term instance = Objects.requireNonNull(getSubstitutedTerm(var),
+                "substituted term for an iterated variable");
             try {
                 t = applySubst(var, instance, t, tb);
             } catch (TermCreationException e) {

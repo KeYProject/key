@@ -8,6 +8,9 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * SMT handler properties are properties for the new modular smt handler.
  *
@@ -20,6 +23,7 @@ import de.uka.ilkd.key.java.Services;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public abstract class SMTHandlerProperty<T> {
 
     /**
@@ -62,7 +66,7 @@ public abstract class SMTHandlerProperty<T> {
      * @param s String to parse into a value
      * @return the value represented by s.
      */
-    public abstract T fromString(String s);
+    public abstract @Nullable T fromString(String s);
 
     /**
      * The default value for the stored data type in case there is no value stored
@@ -256,7 +260,7 @@ public abstract class SMTHandlerProperty<T> {
             this.enumType = enumType;
         }
 
-        public E fromString(String value) {
+        public @Nullable E fromString(String value) {
             for (E enumConstant : enumType.getEnumConstants()) {
                 if (value.equalsIgnoreCase(enumConstant.toString())) {
                     return enumConstant;

@@ -11,6 +11,7 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
@@ -20,6 +21,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +32,7 @@ import static de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo.PROPERTY_ST
 /**
  * Abstract to customize {@link AbstractPO} and {@link AbstractOperationPO}.
  */
+@NullMarked
 public abstract class AbstractInfFlowPO extends AbstractOperationPO implements InfFlowPO {
 
     protected AbstractInfFlowPO(InitConfig initConfig, String name) {
@@ -37,7 +40,7 @@ public abstract class AbstractInfFlowPO extends AbstractOperationPO implements I
     }
 
     @Override
-    public Proof createProof(String proofName, JTerm poTerm, InitConfig proofConfig) {
+    public Proof createProof(String proofName, JTerm poTerm, @Nullable InitConfig proofConfig) {
         final Proof proof = super.createProof(proofName, poTerm, proofConfig);
         StrategyInfoUndoMethod undo =
             strategyInfos -> strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true);
@@ -60,7 +63,11 @@ public abstract class AbstractInfFlowPO extends AbstractOperationPO implements I
     public void prepareSave(StrategyProperties strategyProperties, Proof proof) {
         if (!((InfFlowProof) proof).getIFSymbols().isFreshContract()) {
             strategyProperties.put(PROPERTY_STRATEGY_INF_FLOW_CHECK, INF_FLOW_CHECK_TRUE);
-            for (final SequentFormula s : proof.root().sequent().succedent().asList()) {
+            final Node root = proof.root();
+            if (root == null) {
+                throw new NullPointerException("No root node of the proof to save.");
+            }
+            for (final SequentFormula s : root.sequent().succedent().asList()) {
                 ((InfFlowProof) proof).addLabeledTotalTerm((JTerm) s.formula());
             }
         }

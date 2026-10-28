@@ -14,7 +14,7 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.resolution.declarations.AssociableToAST;
 import com.github.javaparser.resolution.declarations.ResolvedDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (05.03.22)
  */
+@NullMarked
 public class KeYJPMapping {
     public static final Logger LOGGER = LoggerFactory.getLogger(KeYJPMapping.class);
 
@@ -57,7 +58,7 @@ public class KeYJPMapping {
     /**
      * a pseudo super class for all arrays used to declare length
      */
-    private KeYJavaType superArrayType = null;
+    private @Nullable KeYJavaType superArrayType = null;
 
     private final Set<String> packageNames;
 
@@ -88,7 +89,7 @@ public class KeYJPMapping {
         this.parsingLibraries = o.parsingLibraries;
     }
 
-    public KeYJavaType resolvedTypeToKeY(ResolvedType pe, JavaService converter) {
+    public @Nullable KeYJavaType resolvedTypeToKeY(ResolvedType pe, JavaService converter) {
         return resolvedTypeToKeY(pe, false, converter);
     }
 
@@ -118,7 +119,7 @@ public class KeYJPMapping {
     public ResolvedType resolveType(KeYJavaType pe) {
         var res = typeMapRev.get(pe);
         Debug.assertTrue(res != null, "Model Element not known", pe);
-        return res;
+        return Objects.requireNonNull(res, "Model Element not known: " + pe);
     }
 
     @Nullable
@@ -177,15 +178,15 @@ public class KeYJPMapping {
         this.superArrayType = superArrayType;
     }
 
-    public KeYJavaType getSuperArrayType() {
+    public @Nullable KeYJavaType getSuperArrayType() {
         return this.superArrayType;
     }
 
-    public boolean isPackageName(@NonNull String name) {
+    public boolean isPackageName(String name) {
         return packageNames.contains(name);
     }
 
-    public void registerPackageName(@NonNull String name) {
+    public void registerPackageName(String name) {
         int onePastLastDot = 0;
         while (true) {
             int dot = name.indexOf('.', onePastLastDot);

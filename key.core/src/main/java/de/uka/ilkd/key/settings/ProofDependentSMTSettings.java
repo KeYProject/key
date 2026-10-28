@@ -9,7 +9,10 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
+import org.jspecify.annotations.NullMarked;
 
+
+@NullMarked
 public class ProofDependentSMTSettings extends AbstractSettings {
     public static final String CATEGORY = "SMTSettings";
 
@@ -42,7 +45,7 @@ public class ProofDependentSMTSettings extends AbstractSettings {
     private boolean useLegacyTranslation = false;
 
 
-    private SupportedTaclets supportedTaclets;
+    private SupportedTaclets supportedTaclets = SupportedTaclets.REFERENCE;
 
     private ProofDependentSMTSettings() {
         setSupportedTaclets(SupportedTaclets.REFERENCE);

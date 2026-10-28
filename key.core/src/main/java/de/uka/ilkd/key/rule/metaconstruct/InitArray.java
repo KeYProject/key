@@ -21,11 +21,15 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Split an array creation expression with explicit array initializer, creating a creation
  * expression with dimension expression and a list of assignments (-> Java language specification,
  * 15.10)
  */
+@NullMarked
 public abstract class InitArray extends ProgramTransformer {
 
     protected InitArray(String name, ProgramElement body) {
@@ -35,7 +39,8 @@ public abstract class InitArray extends ProgramTransformer {
     /**
      * Extract the variable initializers from the array initializer
      */
-    protected ImmutableArray<Expression> extractInitializers(NewArray p_creationExpression) {
+    protected @Nullable ImmutableArray<Expression> extractInitializers(
+            NewArray p_creationExpression) {
 
         Debug.assertTrue(p_creationExpression instanceof NewArray, "Don't know how to handle ",
             p_creationExpression);

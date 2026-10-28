@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
@@ -14,7 +15,10 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import com.github.javaparser.ast.key.KeyTransactionStmt;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class TransactionStatement extends JavaStatement {
     private final KeyTransactionStmt.TransactionType type;
 
@@ -35,8 +39,12 @@ public class TransactionStatement extends JavaStatement {
         v.performActionOnTransactionStatement(this);
     }
 
+    // a transaction statement has no program children (getChildCount() is 0); the base contract
+    // NonTerminalProgramElement.getChildAt(int) is over-narrow; honest @Nullable override per
+    // SuperArrayDeclaration precedent (wave 7).
+    @SuppressWarnings("NullAway")
     @Override
-    public ProgramElement getChildAt(int index) {
+    public @Nullable ProgramElement getChildAt(int index) {
         return null;
     }
 
@@ -64,8 +72,9 @@ public class TransactionStatement extends JavaStatement {
         return ((TransactionStatement) o).type == this.type;
     }
 
-    public MatchConditions match(SourceData source, MatchConditions conditions) {
-        if (this.equals(source.getSource())) {
+    public @Nullable MatchConditions match(SourceData source,
+            @Nullable MatchConditions conditions) {
+        if (Objects.equals(this, source.getSource())) {
             source.next();
             return conditions;
         }

@@ -10,10 +10,13 @@ import java.util.Set;
 import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author mihai
  *
  */
+@NullMarked
 public class SortCollector implements DefaultVisitor {
     /** the collected sorts */
     private final Set<Sort> sorts = new HashSet<>();

@@ -9,9 +9,12 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A schema variable which matches term labels
  */
+@NullMarked
 public final class TermLabelSV extends JOperatorSV implements TermLabel {
 
     TermLabelSV(Name name) {

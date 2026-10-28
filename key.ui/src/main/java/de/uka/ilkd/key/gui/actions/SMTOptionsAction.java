@@ -10,13 +10,20 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * creates a menu allowing to choose the external prover to be used
  */
+@NullMarked
 public class SMTOptionsAction extends MainWindowAction {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SMTOptionsAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Show SMT Solver Options");

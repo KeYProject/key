@@ -24,11 +24,15 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Variable condition that enforces a given generic sort to be instantiated with the sort of a
  * program expression a schema variable is instantiated with
  */
+@NullMarked
 public final class JavaTypeToSortCondition implements VariableCondition {
 
     private final JOperatorSV exprOrTypeSV;
@@ -57,7 +61,7 @@ public final class JavaTypeToSortCondition implements VariableCondition {
 
 
     @Override
-    public MatchResultInfo check(SchemaVariable var, SyntaxElement svSubst,
+    public @Nullable MatchResultInfo check(SchemaVariable var, SyntaxElement svSubst,
             MatchResultInfo matchCond, LogicServices services) {
         if (var != exprOrTypeSV) {
             return matchCond;

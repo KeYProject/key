@@ -14,6 +14,9 @@ import de.uka.ilkd.key.logic.op.TermLabelSV;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Subclass of {@link LogicPrinter} used in GUI. Any GUI-specific code for pretty-printing should be
@@ -21,15 +24,16 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
+@NullMarked
 public class SequentViewLogicPrinter extends LogicPrinter {
 
     /*
      * This object is used to determine the TermLabels, which will be printed out.
      */
-    private final VisibleTermLabels visibleTermLabels;
+    private final @Nullable VisibleTermLabels visibleTermLabels;
 
     protected SequentViewLogicPrinter(NotationInfo notationInfo, Services services,
-            PosTableLayouter layouter, VisibleTermLabels visibleTermLabels) {
+            PosTableLayouter layouter, @Nullable VisibleTermLabels visibleTermLabels) {
         super(notationInfo, services, layouter);
         this.visibleTermLabels = visibleTermLabels;
     }

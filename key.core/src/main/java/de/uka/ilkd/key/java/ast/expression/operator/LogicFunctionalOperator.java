@@ -26,6 +26,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.pp.PrettyPrinter.*;
@@ -35,6 +36,7 @@ import static de.uka.ilkd.key.pp.PrettyPrinter.*;
  * @author Alexander Weigl
  * @version 1 (4/12/26)
  */
+@NullMarked
 public class LogicFunctionalOperator extends Operator
         implements ProgramElementWithKind<LogicFunction> {
 
@@ -118,12 +120,12 @@ public class LogicFunctionalOperator extends Operator
     }
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         return javaServ.getJavaInfo().getPrimitiveKeYJavaType(function.returnType);
     }
 
     @Override
-    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, @Nullable MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         if (src instanceof LogicFunctionalOperator other) {
             if (getFunction().equals(other.getFunction())) {

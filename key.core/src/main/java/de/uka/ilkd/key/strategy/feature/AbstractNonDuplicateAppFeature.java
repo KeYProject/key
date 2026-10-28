@@ -25,9 +25,12 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 
+@NullMarked
 public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeature {
     protected AbstractNonDuplicateAppFeature() {}
 

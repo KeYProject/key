@@ -20,6 +20,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This class is responsible for translating the sequent of a given goal.
@@ -30,6 +31,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Nils Buchholz
  */
+@NullMarked
 public class IsabelleMasterHandler {
 
     /**
@@ -102,7 +104,15 @@ public class IsabelleMasterHandler {
      *        available handlers are used.
      * @param handlerOptions arbitrary String options for the handlers to process
      * @throws IOException if the handlers cannot be loaded
+     *         <p>
+     *         The fresh handlers are initialized with this master handler before the constructor
+     *         has
+     *         finished; their {@code init} methods only access the {@link #services} field, which
+     *         is
+     *         already assigned at this point, so passing the not yet fully initialized {@code this}
+     *         is safe. Suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public IsabelleMasterHandler(Services services, String[] handlerNames,
             String[] handlerOptions) throws IOException {
         this.services = services;
@@ -189,7 +199,11 @@ public class IsabelleMasterHandler {
     protected void addField(@NonNull Function field) {
         assert (field.sort() == services.getNamespaces().sorts().lookup("Field")
                 && field.arity() == 0);
-        newFields.add(notPredefinedFunctions.get(field));
+        StringBuilder translation = notPredefinedFunctions.get(field);
+        if (translation == null) {
+            throw new NullPointerException("No translation registered for field " + field.name());
+        }
+        newFields.add(translation);
     }
 
     /**
@@ -306,7 +320,11 @@ public class IsabelleMasterHandler {
         if (predefinedSorts.containsKey(sort)) {
             return predefinedSorts.get(sort).toString();
         }
-        return extraSorts.get(sort).toString();
+        StringBuilder translation = extraSorts.get(sort);
+        if (translation == null) {
+            throw new NullPointerException("No translation registered for sort " + sort.name());
+        }
+        return translation.toString();
     }
 
 
@@ -362,7 +380,9 @@ public class IsabelleMasterHandler {
      * @return Collection of the sorts that need to be declared in theory
      */
     Set<Sort> getExtraSorts() {
-        return extraSorts.keySet();
+        // the EISOP Map.keySet() result is annotated @KeyFor("this.extraSorts"), which is not
+        // assignable to the Set<Sort> return type, although the elements are ordinary Sort values.
+        return new HashSet<>(extraSorts.keySet());
     }
 
     /**
@@ -385,7 +405,12 @@ public class IsabelleMasterHandler {
      * @return translation of the top-most operator
      */
     StringBuilder getKnownSymbol(Term term) {
-        return notPredefinedFunctions.get(term.op());
+        StringBuilder translation = notPredefinedFunctions.get(term.op());
+        if (translation == null) {
+            throw new NullPointerException("No translation registered for symbol "
+                + term.op().name());
+        }
+        return translation;
     }
 
     /**
@@ -403,7 +428,9 @@ public class IsabelleMasterHandler {
      * @return set of predefined sorts
      */
     Set<Sort> getPredefinedSorts() {
-        return predefinedSorts.keySet();
+        // the EISOP Map.keySet() result is annotated @KeyFor("this.predefinedSorts"), which is not
+        // assignable to the Set<Sort> return type, although the elements are ordinary Sort values.
+        return new HashSet<>(predefinedSorts.keySet());
     }
 
     /**

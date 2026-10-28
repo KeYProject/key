@@ -14,13 +14,22 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import org.key_project.exploration.ExplorationModeModel;
 import org.key_project.exploration.Icons;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Alexander Weigl
  * @version 1 (22.07.19)
  */
+@NullMarked
 public class ShowInteractiveBranchesAction extends KeyAction {
     private final transient ExplorationModeModel model;
 
+    /**
+     * The setter/initializer calls below happen on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ShowInteractiveBranchesAction(ExplorationModeModel model, MainWindow mainWindow) {
         this.model = model;
         setName("Hide justification");

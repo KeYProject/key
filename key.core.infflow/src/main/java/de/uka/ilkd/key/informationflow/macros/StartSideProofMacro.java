@@ -8,6 +8,9 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public interface StartSideProofMacro extends ProofMacro {
     /**
      * Key used in {@link ProofMacroFinishedInfo} to store the original {@link Proof}.

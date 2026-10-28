@@ -12,6 +12,9 @@ import org.key_project.prover.sequent.*;
 import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class BuiltInRuleAppIndex {
 
     private final BuiltInRuleIndex index;

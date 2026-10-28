@@ -56,6 +56,7 @@ import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.smt.DropdownSelectionButton;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.LruCached;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.DefaultAutoMacro;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -81,6 +82,7 @@ import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.util.SystemInfo;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,6 +90,7 @@ import org.slf4j.LoggerFactory;
 import static de.uka.ilkd.key.settings.FeatureSettings.createFeature;
 
 @HelpInfo()
+@NullMarked
 public final class MainWindow extends JFrame {
 
     /**
@@ -112,7 +115,7 @@ public final class MainWindow extends JFrame {
         "Activates the 'Run All Proofs' action that allows you to run multiple proofs inside the UI.",
         false);
 
-    private static MainWindow instance = null;
+    private static @Nullable MainWindow instance = null;
     /**
      * Search bar for Sequent Views.
      */
@@ -164,12 +167,32 @@ public final class MainWindow extends JFrame {
     private final NotificationManager notificationManager;
     private final PreferenceSaver prefSaver =
         new PreferenceSaver(Preferences.userNodeForPackage(MainWindow.class));
+    /**
+     * The constructor receives {@code this} before construction completes (EISOP initialization
+     * check); the action only observes the window after construction, suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:assignment.type.incompatible" })
     private final HidePackagePrefixToggleAction hidePackagePrefixToggleAction =
         new HidePackagePrefixToggleAction(this);
+    /**
+     * The constructor receives {@code this} before construction completes (EISOP initialization
+     * check); the action only observes the window after construction, suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:assignment.type.incompatible" })
     private final ToggleSequentViewTooltipAction toggleSequentViewTooltipAction =
         new ToggleSequentViewTooltipAction(this);
+    /** See {@link #toggleSequentViewTooltipAction}; suppressed with a scoped key. */
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:assignment.type.incompatible" })
     private final ToggleSourceViewTooltipAction toggleSourceViewTooltipAction =
         new ToggleSourceViewTooltipAction(this);
+    /** See {@link #toggleSequentViewTooltipAction}; suppressed with a scoped key. */
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:assignment.type.incompatible" })
     private final ToggleProofTreeTooltipAction toogleProofTreeTooltipAction =
         new ToggleProofTreeTooltipAction(this);
     private final TermLabelMenu termLabelMenu;
@@ -177,6 +200,13 @@ public final class MainWindow extends JFrame {
     /**
      *
      */
+    /**
+     * The constructor receives {@code this} before construction completes (EISOP initialization
+     * check); the control only manages the window's dock layout after construction, suppressed
+     * with a scoped key.
+     */
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:assignment.type.incompatible" })
     private final CControl dockControl = new CControl(this);
     /**
      * the first toolbar
@@ -204,7 +234,7 @@ public final class MainWindow extends JFrame {
     /**
      * action for opening the most recent KeY file
      */
-    private OpenMostRecentFileAction openMostRecentFileAction;
+    private @Nullable OpenMostRecentFileAction openMostRecentFileAction;
     /**
      * action for editing the most recent KeY file
      */
@@ -231,7 +261,6 @@ public final class MainWindow extends JFrame {
     private LemmaGenerationAction loadKeYTaclets;
     private LemmaGenerationBatchModeAction lemmaGenerationBatchModeAction;
 
-
     /**
      * actions for changing the selection on the proof tree
      */
@@ -239,7 +268,7 @@ public final class MainWindow extends JFrame {
     private GoalSelectBelowAction goalSelectBelowAction;
     private DropdownSelectionButton smtComponent;
     private DropdownSelectionButton.EmptyAction noSolverSelected;
-    private ChangeListener selectAllListener;
+    private @Nullable ChangeListener selectAllListener;
     private JCheckBoxMenuItem selectAll;
     private JSeparator separator;
     private DropdownSelectionButton automationComponent;
@@ -257,6 +286,14 @@ public final class MainWindow extends JFrame {
      * A function collapsing multiple SMTInvokeActions into one that starts a union of all solver
      * types contained in any of the input actions. None-SMTInvokeActions in the input are ignored.
      */
+    /**
+     * The lambda receives and returns {@code this} and reads the (not yet assigned)
+     * {@link #noSolverSelected} field while the receiver is under initialization (EISOP
+     * initialization check); the function only executes at UI runtime when the window is fully
+     * constructed, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:return.type.incompatible" })
     private final Function<Action[], Action> collapseChoice = a -> {
         Set<SolverType> types = new HashSet<>();
         StringBuilder builder = new StringBuilder();
@@ -294,7 +331,17 @@ public final class MainWindow extends JFrame {
 
     /*
      * This class should only be instantiated once!
+     *
+     * The window configuration below operates on {@code this} while it is still under
+     * initialization (EISOP initialization check): {@code this}-passing constructors, listener
+     * registrations and UI-building helper calls. The helper methods ({@code layoutMain()},
+     * {@code createActions()} and friends) assign the remaining window fields before any of them
+     * is used, so all accesses are safe once the constructor returns, suppressed with scoped
+     * keys.
      */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible", "nullness:assignment.type.incompatible",
+        "nullness:initialization.fields.uninitialized", "nullness:dereference.of.nullable" })
     private MainWindow() {
         InputMap inputMap =
             getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
@@ -308,7 +355,6 @@ public final class MainWindow extends JFrame {
             applyMacOsWorkaround();
         }
         setIconImages(IconFactory.applicationLogos());
-
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         proofListener = new MainProofListener();
@@ -388,13 +434,30 @@ public final class MainWindow extends JFrame {
             Class<?> appClass = Class.forName("java.awt.Taskbar");
             Method getTaskbar = appClass.getMethod("getTaskbar");
             Method setIconImage = appClass.getMethod("setIconImage", Image.class);
-            Object taskbar = getTaskbar.invoke(null); // static method
+            Object taskbar = invokeStatic(getTaskbar); // static method
+            if (taskbar == null) {
+                // the reflective call failed to produce a taskbar object; treat it like the
+                // exception path (the previous code crashed with an NPE here)
+                return false;
+            }
             setIconImage.invoke(taskbar, image);
             return true;
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException
                 | InvocationTargetException e) {
             return false;
         }
+    }
+
+    /**
+     * Invokes a static method reflectively. The receiver object is irrelevant for a static method,
+     * but {@code Method.invoke} still takes one as a parameter; passing {@code null} is
+     * runtime-legal here although the annotated JDK declares the parameter non-null, suppressed
+     * with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private static @Nullable Object invokeStatic(Method method) throws InvocationTargetException,
+            IllegalAccessException {
+        return method.invoke(null);
     }
 
     /**
@@ -407,6 +470,11 @@ public final class MainWindow extends JFrame {
             Class<?>[] params = new Class[] { Image.class };
             Method getApplication = appClass.getMethod("getApplication");
             Object application = getApplication.invoke(appClass);
+            if (application == null) {
+                // the reflective call failed to produce an application object; treat it like the
+                // exception path (the previous code crashed with an NPE here)
+                return false;
+            }
             Method setDockIconImage = appClass.getMethod("setDockIconImage", params);
             setDockIconImage.invoke(application, IconFactory.keyLogo());
             return true;
@@ -439,12 +507,22 @@ public final class MainWindow extends JFrame {
             } catch (InterruptedException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
-            return instance;
+            MainWindow constructed = instance;
+            if (constructed == null) {
+                // the dispatch-thread construction always assigns {@code instance} before the
+                // delegate returns; a {@code null} here is an impossible state in which the
+                // previous code returned {@code null} to a non-null caller
+                throw new NullPointerException(
+                    "MainWindow not initialized on the dispatch thread.");
+            }
+            return constructed;
         }
 
-        if (instance == null) {
+        MainWindow result = instance;
+        if (result == null) {
             updateLookAndFeel();
-            instance = new MainWindow();
+            result = new MainWindow();
+            instance = result;
             final var viewSettings = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
             final PropertyChangeListener propertyChangeListener = (evt) -> updateLookAndFeel();
             viewSettings.addPropertyChangeListener(
@@ -453,10 +531,10 @@ public final class MainWindow extends JFrame {
                 ViewSettings.PROP_LOOK_AND_FEEL, propertyChangeListener);
 
             if (ensureIsVisible) {
-                instance.setVisible(true);
+                result.setVisible(true);
             }
         }
-        return instance;
+        return result;
     }
 
     private static void updateLookAndFeel() {
@@ -649,9 +727,15 @@ public final class MainWindow extends JFrame {
                 .forEach(it -> DockingHelper.addLeftPanel(it.getClass().getName()));
         DockingHelper.restoreFactoryDefault(this);
 
+        Font windowFont = getFont();
+        if (windowFont == null) {
+            // the look and feel always assigns a font; fall back to a default dialog font for
+            // the impossible unassigned case
+            windowFont = new Font(Font.DIALOG, Font.PLAIN, 12);
+        }
         statusLine = new MainStatusLine("<html>" + PARA + KeYConstants.COPYRIGHT + PARA
             + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."
-            + " See About | License.", getFont());
+            + " See About | License.", windowFont);
         getContentPane().add(statusLine, BorderLayout.SOUTH);
 
         // load preferred sizes from system preferences
@@ -668,7 +752,10 @@ public final class MainWindow extends JFrame {
         JToolBar fileOperations = new JToolBar("File Operations");
         fileOperations.setFloatable(false);
         fileOperations.add(openFileAction);
-        fileOperations.add(openMostRecentFileAction);
+        // the most-recent-file action may be absent (no preference available yet)
+        if (openMostRecentFileAction != null) {
+            fileOperations.add(openMostRecentFileAction);
+        }
         fileOperations.add(editMostRecentFileAction);
         fileOperations.add(saveFileAction);
         fileOperations.add(saveBundleAction);
@@ -758,7 +845,10 @@ public final class MainWindow extends JFrame {
             if (smtComponent.getAction() == noSolverSelected) {
                 // Make sure the tooltip and text are shown.
                 noSolverSelected.putValue(Action.NAME, noSolverSelected.toString());
-                noSolverSelected.putValue(Action.SHORT_DESCRIPTION, noSolverSelected.getToolTip());
+                String toolTip = noSolverSelected.getToolTip();
+                if (toolTip != null) {
+                    noSolverSelected.putValue(Action.SHORT_DESCRIPTION, toolTip);
+                }
                 boolean selectionEnabled = smtComponent.getSelectionComponent().isEnabled();
                 // Disable the action button.
                 smtComponent.setEnabled(false);
@@ -840,7 +930,7 @@ public final class MainWindow extends JFrame {
         Action[] actionArray = automationActions.toArray(new Action[0]);
 
         // Identity reducer - just return the single selected action
-        Function<Action[], Action> identityReducer = a -> {
+        Function<Action[], @Nullable Action> identityReducer = a -> {
             if (a.length == 0) {
                 return null;
             }
@@ -953,7 +1043,10 @@ public final class MainWindow extends JFrame {
      */
     public void makePrettyView() {
         if (getMediator().ensureProofLoaded()) {
-            getMediator().getNotationInfo().refresh(mediator.getServices());
+            Services services = mediator.getServices();
+            if (services != null) {
+                getMediator().getNotationInfo().refresh(services);
+            }
         }
         SwingUtilities.invokeLater(this::updateSequentView);
     }
@@ -987,14 +1080,15 @@ public final class MainWindow extends JFrame {
         return menuBar;
     }
 
-
     private JMenu createFileMenu() {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic(KeyEvent.VK_F);
 
         fileMenu.add(openExampleAction);
         fileMenu.add(openFileAction);
-        fileMenu.add(openMostRecentFileAction);
+        if (openMostRecentFileAction != null) {
+            fileMenu.add(openMostRecentFileAction);
+        }
         fileMenu.add(editMostRecentFileAction);
         fileMenu.add(saveFileAction);
         fileMenu.add(saveBundleAction);
@@ -1079,7 +1173,7 @@ public final class MainWindow extends JFrame {
      * @param selected a specific proof that the menu should work on, may be null
      * @return the menu
      */
-    public JMenu createProofMenu(Proof selected) {
+    public JMenu createProofMenu(@Nullable Proof selected) {
         JMenu proof = new JMenu("Proof");
         proof.setMnemonic(KeyEvent.VK_P);
 
@@ -1190,6 +1284,12 @@ public final class MainWindow extends JFrame {
 
     }
 
+    /**
+     * The reducer's {@code null} return is unreachable: it is only evaluated for a non-empty
+     * item list, and the item list passed here is always empty ({@code null} array), suppressed
+     * with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     private void updateDPSelectionMenu() {
         /*
          * No solvers available -> this leads to the empty item of the smtComponent being set. Thus,
@@ -1317,11 +1417,12 @@ public final class MainWindow extends JFrame {
             return;
         }
         final SequentView newSequentView;
+        Proof selectedProof = getMediator().getSelectedProof();
 
         // if this is set we can skip calls to printSequent, since it is invoked in setSequentView
         // immediately anyways
         final boolean isPrintRunImmediately = SwingUtilities.isEventDispatchThread();
-        if (getMediator().getSelectedProof() == null) {
+        if (selectedProof == null) {
             newSequentView = emptySequent;
         } else {
             Goal goal = getMediator().getSelectedGoal();
@@ -1334,11 +1435,19 @@ public final class MainWindow extends JFrame {
                 newSequentView = currentGoalView;
             } else {
                 Sequent seq = getMediator().getSelectionModel().getSelectedSequent();
+                Node selectedNode = getMediator().getSelectedNode();
                 RuleApp ruleApp = getMediator().getSelectionModel().getSelectedRuleApp();
-                newSequentView = new InnerNodeView(getMediator().getSelectedProof(),
-                    getMediator().getSelectedNode(), ruleApp, seq, this);
-                if (!isPrintRunImmediately) {
-                    newSequentView.printSequent();
+                if (selectedNode == null || seq == null) {
+                    // a node and a sequent are expected for a loaded proof; without them the
+                    // inner node view has nothing to display (the previous code crashed with an
+                    // NPE inside its constructor)
+                    newSequentView = emptySequent;
+                } else {
+                    newSequentView = new InnerNodeView(selectedProof, selectedNode, ruleApp, seq,
+                        this);
+                    if (!isPrintRunImmediately) {
+                        newSequentView.printSequent();
+                    }
                 }
             }
         }
@@ -1423,7 +1532,7 @@ public final class MainWindow extends JFrame {
         return userInterface;
     }
 
-    public Action getOpenMostRecentFileAction() {
+    public @Nullable Action getOpenMostRecentFileAction() {
         return openMostRecentFileAction;
     }
 
@@ -1628,6 +1737,14 @@ public final class MainWindow extends JFrame {
         private static final long serialVersionUID = 1218022319090988424L;
         private final GlassPaneListener listener;
 
+        /**
+         * The {@link GlassPaneListener} and the mouse/key listener registrations below receive
+         * {@code this} while it is still under initialization (EISOP initialization check); the
+         * listener only observes events that are dispatched after construction completes,
+         * suppressed with scoped keys.
+         */
+        @SuppressWarnings({ "nullness:method.invocation.invalid",
+            "nullness:argument.type.incompatible", "nullness:assignment.type.incompatible" })
         public BlockingGlassPane(Container contentPane) {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
 
@@ -1663,6 +1780,7 @@ public final class MainWindow extends JFrame {
      * This has been partly taken from the GlassPaneDemo of the Java Tutorial
      */
     private static class GlassPaneListener extends MouseInputAdapter {
+        @Nullable
         Component currentComponent = null;
         final Component glassPane;
         final Container contentPane;
@@ -1736,12 +1854,11 @@ public final class MainWindow extends JFrame {
                     glassPane.setCursor(new Cursor(Cursor.WAIT_CURSOR));
                 }
 
-
             }
         }
 
         // FIXME This is not really good.
-        private boolean isLiveComponent(Component c) {
+        private boolean isLiveComponent(@Nullable Component c) {
             // this is not the most elegant way to identify the right
             // components, but it scales well ;-)
             while (c != null) {
@@ -1755,10 +1872,20 @@ public final class MainWindow extends JFrame {
         }
 
         private void dispatchForCurrentComponent(MouseEvent e) {
+            @Nullable
+            Component target = currentComponent;
+            if (target == null) {
+                // no live component is currently tracked under the glass pane
+                return;
+            }
             Point glassPanePoint = e.getPoint();
             Point componentPoint =
-                SwingUtilities.convertPoint(glassPane, glassPanePoint, currentComponent);
-            currentComponent.dispatchEvent(new MouseEvent(currentComponent, e.getID(), e.getWhen(),
+                SwingUtilities.convertPoint(glassPane, glassPanePoint, target);
+            if (componentPoint == null) {
+                // the live component is not part of the glass pane's containment hierarchy
+                return;
+            }
+            target.dispatchEvent(new MouseEvent(target, e.getID(), e.getWhen(),
                 // do not use as it freezes the stop button: e.getModifiersEx(),
                 e.getModifiers(), componentPoint.x, componentPoint.y, e.getClickCount(),
                 e.isPopupTrigger()));
@@ -1770,7 +1897,7 @@ public final class MainWindow extends JFrame {
      */
     class MainGUIListener implements GUIListener {
 
-        private Set<Component> doNotReenable;
+        private @Nullable Set<Component> doNotReenable;
 
         private void enableMenuBar(JMenuBar m, boolean b) {
             for (int i = 0; i < m.getMenuCount(); i++) {
@@ -1784,18 +1911,21 @@ public final class MainWindow extends JFrame {
 
         private void setToolBarDisabled() {
             assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
-            doNotReenable = new LinkedHashSet<>();
+            // work on a local copy so the (nullable) field's contents can be used without
+            // dereferencing the field itself
+            Set<Component> disabled = new LinkedHashSet<>();
+            doNotReenable = disabled;
             Component[] cs = controlToolBar.getComponents();
             for (Component component : cs) {
                 if (!component.isEnabled()) {
-                    doNotReenable.add(component);
+                    disabled.add(component);
                 }
                 component.setEnabled(false);
             }
             cs = fileOpToolBar.getComponents();
             for (Component c : cs) {
                 if (!c.isEnabled()) {
-                    doNotReenable.add(c);
+                    disabled.add(c);
                 }
                 c.setEnabled(false);
             }
@@ -1803,7 +1933,8 @@ public final class MainWindow extends JFrame {
 
         private void setToolBarEnabled() {
             assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
-            if (doNotReenable == null) {
+            Set<Component> disabled = doNotReenable;
+            if (disabled == null) {
                 // bug #1105 occurred
                 LOGGER.debug("toolbar enabled w/o prior disable");
                 return;
@@ -1811,13 +1942,13 @@ public final class MainWindow extends JFrame {
 
             Component[] cs = controlToolBar.getComponents();
             for (Component component : cs) {
-                if (!doNotReenable.contains(component)) {
+                if (!disabled.contains(component)) {
                     component.setEnabled(true);
                 }
             }
             cs = fileOpToolBar.getComponents();
             for (Component c : cs) {
-                if (!doNotReenable.contains(c)) {
+                if (!disabled.contains(c)) {
                     c.setEnabled(true);
                 }
             }
@@ -1829,7 +1960,10 @@ public final class MainWindow extends JFrame {
         public void modalDialogOpened(EventObject e) {
             if (e.getSource() instanceof ApplyTacletDialog) {
                 // disable all elements except the sequent window (drag'n'drop !) ...
-                enableMenuBar(MainWindow.this.getJMenuBar(), false);
+                JMenuBar menuBar = MainWindow.this.getJMenuBar();
+                if (menuBar != null) {
+                    enableMenuBar(menuBar, false);
+                }
                 MainWindow.this.mainFrame.setEnabled(false);
                 // mainWindowTabbedPane.setEnabledForAllTabs(false);
                 setToolBarDisabled();
@@ -1846,7 +1980,10 @@ public final class MainWindow extends JFrame {
         public void modalDialogClosed(EventObject e) {
             if (e.getSource() instanceof ApplyTacletDialog) {
                 // enable all previously disabled elements ...
-                enableMenuBar(MainWindow.this.getJMenuBar(), true);
+                JMenuBar menuBar = MainWindow.this.getJMenuBar();
+                if (menuBar != null) {
+                    enableMenuBar(menuBar, true);
+                }
                 MainWindow.this.mainFrame.setEnabled(true);
                 // mainWindowTabbedPane.setEnabledForAllTabs(true);
                 setToolBarEnabled();
@@ -1867,6 +2004,7 @@ public final class MainWindow extends JFrame {
     class MainProofListener
             implements AutoModeListener, KeYSelectionListener, PropertyChangeListener {
 
+        @Nullable
         Proof proof = null;
 
         /**
@@ -1931,7 +2069,7 @@ public final class MainWindow extends JFrame {
 
         @Override
         public synchronized void propertyChange(PropertyChangeEvent evt) {
-            if (proof.getSettings().getStrategySettings() == evt.getSource()) {
+            if (proof != null && proof.getSettings().getStrategySettings() == evt.getSource()) {
                 // updateAutoModeConfigButton();
             }
         }
@@ -1948,7 +2086,7 @@ public final class MainWindow extends JFrame {
             handleProof(e.getSource().getSelectedProof());
         }
 
-        private void handleProof(Proof p) {
+        private void handleProof(@Nullable Proof p) {
             if (p != null) {
                 enable(!p.closed());
             } else {

@@ -33,12 +33,14 @@ import de.uka.ilkd.key.logic.sort.ParametricSortDecl;
 import de.uka.ilkd.key.logic.sort.SortAlias;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -54,7 +56,6 @@ import org.key_project.prover.rules.RuleApp;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -71,14 +72,12 @@ public class InfoView extends JSplitPane implements TabPanel {
     public static final Icon INFO_ICON =
         IconFactory.INFO_VIEW.get(MainWindow.TAB_ICON_SIZE);
 
-
     private final JTree infoTree = new JTree();
     private final JTextPane contentPane = createInfoArea();
     private final ProofDisposedListener proofDisposedListener;
     private final InfoNodeFactory nodeFactory = new InfoNodeFactory();
 
     private LexerHighlighter lexerHighlighter = new LexerHighlighter.KeYLexerHighlighter();
-
 
     private final KeYSelectionListener selectionListener = new KeYSelectionListener() {
         @Override
@@ -113,6 +112,16 @@ public class InfoView extends JSplitPane implements TabPanel {
     private @Nullable Node lastShownGoalNode;
     private KeYMediator mediator;
 
+    /**
+     * The split pane configures itself with divider, name, tree, component-listener and
+     * keyboard-shortcut calls while the receiver is still under initialization (EISOP
+     * initialization check) and passes itself to
+     * {@link KeYGuiExtensionFacade#installKeyboardShortcuts} as component; the effects only
+     * take place after construction completes, suppressed with scoped keys. The mediator is
+     * bound via {@link #setMediator(KeYMediator)}.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid", "nullness:argument.type.incompatible" })
     public InfoView(KeYMediator mediator) {
         super(VERTICAL_SPLIT);
 
@@ -126,7 +135,6 @@ public class InfoView extends JSplitPane implements TabPanel {
 
         // Setting a name for this causes PreferenceSaver to include this class.
         setName("infoViewPane");
-
 
         InfoNodeFactory.InfoTreeNode root = nodeFactory.create("No proof loaded",
             () -> "In this pane, the available logical rules will be displayed and/or explained.",
@@ -186,7 +194,12 @@ public class InfoView extends JSplitPane implements TabPanel {
                 final Object lastSelectedPathComponent = infoTree.getLastSelectedPathComponent();
                 if (lastSelectedPathComponent instanceof InfoNodeFactory.InfoTreeNode node
                         && e.isPopupTrigger()) {
+                    @Nullable
                     Object selected = node.getUserObject();
+                    if (selected == null) {
+                        // no user object is attached to the node, so no menu items apply
+                        return;
+                    }
                     JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
                         ContextMenuKind.INFO_TREE, selected, mediator);
                     if (menu.getComponentCount() > 0) {
@@ -199,7 +212,7 @@ public class InfoView extends JSplitPane implements TabPanel {
         infoTree.addTreeSelectionListener(e -> {
             Object node = infoTree.getLastSelectedPathComponent();
             if (node instanceof InfoNodeFactory.InfoTreeNode infoTreeNode) {
-                contentPane.setText(infoTreeNode.getDescription());
+                contentPane.setText(requireNonNullElse(infoTreeNode.getDescription(), ""));
                 lexerHighlighter.highlightPaneMarkdown(contentPane);
             } else {
                 contentPane.setText("");
@@ -229,7 +242,6 @@ public class InfoView extends JSplitPane implements TabPanel {
         mediator = m;
     }
 
-
     @Override
     public String getTitle() {
         return "Info";
@@ -245,6 +257,17 @@ public class InfoView extends JSplitPane implements TabPanel {
         return this;
     }
 
+    /**
+     * Updates the info tree for the given goal.
+     *
+     * @param g the newly selected goal, or {@code null} to clear the tree.
+     *
+     *        <p>
+     *        Clearing the tree installs a {@link DefaultTreeModel} with a {@code null} root,
+     *        which renders an empty tree at run time; the JDK declares a non-null root
+     *        parameter, so the deliberate {@code null} is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private void updateModel(@Nullable Goal g) {
         if (g == null || lastShownGoalNode != g.node()) {
             if (lastShownGoalNode != null) {
@@ -255,21 +278,21 @@ public class InfoView extends JSplitPane implements TabPanel {
                 g.proof().addProofDisposedListener(proofDisposedListener);
                 lastShownGoalNode = g.node();
             } else {
-                infoTree.setModel(null);
+                // clear the info tree; a DefaultTreeModel with a null root renders empty
+                infoTree.setModel(new DefaultTreeModel((TreeNode) null));
                 lastShownGoalNode = null;
             }
             contentPane.setText("");
         }
     }
 
-    private JTextPane createInfoArea() {
+    private static JTextPane createInfoArea() {
         JTextPane description = new JTextPane();
         description.setEditable(false);
         description.setBorder(BorderFactory.createTitledBorder(""));
         description.setCaretPosition(0);
         return description;
     }
-
 
     public static class InfoNodeFactory {
         private static final String LEMMAS = "Lemmas";
@@ -281,18 +304,22 @@ public class InfoView extends JSplitPane implements TabPanel {
         private static final String DEFAULT_FUNCTIONS_LABEL =
             "Display descriptions for documented interpreted function and predicate symbols.";
 
-
         private InfoTreeNode createInfoTreeRoot(Goal g) {
             return create("This is the root node of InfoTreeModel.It should not be visible.",
                 () -> "",
                 () -> {
                     MetaSpace docs = g.proof().getServices().getNamespaces().docs();
                     final NamespaceSet namespaces = g.getLocalNamespaces();
+                    InitConfig initConfig = g.proof().getInitConfig();
+                    if (initConfig == null) {
+                        // a loaded proof always has an initial configuration
+                        throw new NullPointerException("No initial configuration for proof.");
+                    }
                     return List.of(
                         createNodeRules(docs, g),
                         createNodeTermLabels(docs, g.proof()),
                         createNodeFunctions(docs, namespaces.functions()),
-                        createNodeTacletOptions(docs, g.proof().getInitConfig()),
+                        createNodeTacletOptions(docs, initConfig),
                         createNodeChoices(docs, namespaces.choices()),
                         createNodeRS("Parametric Functions", docs,
                             namespaces.parametricFunctions().allElements()),
@@ -329,7 +356,7 @@ public class InfoView extends JSplitPane implements TabPanel {
         }
 
         private InfoTreeNode createNodePS(MetaSpace docs,
-                @MonotonicNonNull Collection<ParametricSortDecl> sorts) {
+                Collection<ParametricSortDecl> sorts) {
             return create("Parametric Sorts", () -> "",
                 () -> sorts.stream().map(element -> create(element.name().toString(),
                     () -> "%s\n\n---\nparams:%s\n\n---\nextends: %s\n\n---\n".formatted(
@@ -380,15 +407,19 @@ public class InfoView extends JSplitPane implements TabPanel {
                     }
                     set.sort(Comparator.comparing(RuleApp::displayName));
 
+                    ProofCorrectnessMgt mgt = g.proof().mgt();
+
                     return List.of(
                         createNodeBuiltInRules(docs, g),
                         createNodeAxiom(docs,
                             set.stream().filter(it -> {
-                                RuleJustification just = g.proof().mgt().getJustification(it);
+                                RuleJustification just =
+                                    mgt == null ? null : mgt.getJustification(it);
                                 return just != null && just.isAxiomJustification();
                             }).toList()),
                         createNodeLemmas(docs, set.stream().filter(it -> {
-                            RuleJustification just = g.proof().mgt().getJustification(it);
+                            RuleJustification just =
+                                mgt == null ? null : mgt.getJustification(it);
                             return just != null && !just.isAxiomJustification();
                         })));
                 });
@@ -441,7 +472,7 @@ public class InfoView extends JSplitPane implements TabPanel {
                 () -> seq.map(it -> create(it.rule(), docs)).toList());
         }
 
-        private InfoTreeNode create(String title, Supplier<String> description) {
+        private InfoTreeNode create(String title, Supplier<@Nullable String> description) {
             return create(title, description, List::of);
         }
 
@@ -451,6 +482,9 @@ public class InfoView extends JSplitPane implements TabPanel {
                 () -> {
                     TermLabelManager mgr =
                         TermLabelManager.getTermLabelManager(proof.getServices());
+                    if (mgr == null) {
+                        return List.of();
+                    }
                     Map<Name, TermLabelFactory<?>> factories = mgr.getFactories();
 
                     ArrayList<Name> labelNames = new ArrayList<>(factories.keySet());
@@ -458,7 +492,11 @@ public class InfoView extends JSplitPane implements TabPanel {
 
                     return labelNames.stream()
                             .map(name -> create(name.toString(),
-                                () -> factories.get(name).getDocumentation()))
+                                () -> {
+                                    TermLabelFactory<?> factory = factories.get(name);
+                                    return factory == null ? ""
+                                            : requireNonNullElse(factory.getDocumentation(), "");
+                                }))
                             .toList();
                 });
         }
@@ -485,7 +523,8 @@ public class InfoView extends JSplitPane implements TabPanel {
                         Sort fnSort = fn.sort();
 
                         // flat list:
-                        Supplier<String> stringSupplier = () -> docs.findDocumentation(fn);
+                        Supplier<@Nullable String> stringSupplier =
+                            () -> docs.findDocumentation(fn);
                         flatList.add(create(fnName, stringSupplier));
 
                         // by return type
@@ -517,11 +556,11 @@ public class InfoView extends JSplitPane implements TabPanel {
                         .toList());
         }
 
-
         private InfoTreeNode create(Taclet taclet, MetaSpace metaSpace) {
             return create(taclet.name().toString(),
                 () -> {
-                    LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), null);
+                    LogicPrinter lp =
+                        new LogicPrinter(new NotationInfo(), null, PosTableLayouter.pure());
                     lp.printTaclet(taclet);
                     String doc = metaSpace.findDocumentation(taclet);
                     String origin = metaSpace.findOrigin(taclet);
@@ -543,7 +582,7 @@ public class InfoView extends JSplitPane implements TabPanel {
                 List::of);
         }
 
-        private InfoTreeNode create(String title, Supplier<String> description,
+        private InfoTreeNode create(String title, Supplier<@Nullable String> description,
                 Supplier<List<InfoTreeNode>> children) {
             return new InfoTreeNode(title, description, children);
         }
@@ -553,10 +592,10 @@ public class InfoView extends JSplitPane implements TabPanel {
             private final String title;
             private @Nullable List<InfoTreeNode> children;
             private final Supplier<List<InfoTreeNode>> childrenSupplier;
-            private TreeNode parent;
-            private Object userObject;
+            private @Nullable TreeNode parent;
+            private @Nullable Object userObject;
 
-            public InfoTreeNode(String name, Supplier<String> description,
+            public InfoTreeNode(String name, Supplier<@Nullable String> description,
                     Supplier<List<InfoTreeNode>> children) {
                 this.title = name;
                 this.description = description;
@@ -589,9 +628,18 @@ public class InfoView extends JSplitPane implements TabPanel {
                 return getChildren().size();
             }
 
+            /**
+             * Returns the parent of this node.
+             *
+             * <p>
+             * The root node has no parent and reports {@code null}, which is deliberate and
+             * tolerated by the swing tree as the end of the path; the JDK declares a non-null
+             * return, suppressed with a scoped key.
+             */
+            @SuppressWarnings("nullness:return.type.incompatible")
             @Override
             public TreeNode getParent() {
-                return parent;
+                return parent == null ? (TreeNode) null : parent;
             }
 
             @Override
@@ -614,7 +662,7 @@ public class InfoView extends JSplitPane implements TabPanel {
                 return Collections.enumeration(getChildren());
             }
 
-            public Object getUserObject() {
+            public @Nullable Object getUserObject() {
                 return userObject;
             }
 

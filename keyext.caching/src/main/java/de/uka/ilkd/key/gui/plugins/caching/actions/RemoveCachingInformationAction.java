@@ -8,14 +8,18 @@ import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Action to remove caching information on a goal closed by caching.
  *
  * @author Arne Keller
  */
+@NullMarked
 public final class RemoveCachingInformationAction extends KeyAction {
 
     /**
@@ -41,9 +45,19 @@ public final class RemoveCachingInformationAction extends KeyAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         // remove associated info
-        node.deregister(node.lookup(ClosedBy.class), ClosedBy.class);
+        ClosedBy c = node.lookup(ClosedBy.class);
+        if (c == null) {
+            throw new NullPointerException("No caching reference to remove for node "
+                + node.serialNr() + ".");
+        }
+        node.deregister(c, ClosedBy.class);
         // and re-open the goal
-        node.proof().reOpenGoal(node.proof().getClosedGoal(node));
+        Goal goal = node.proof().getClosedGoal(node);
+        if (goal == null) {
+            throw new NullPointerException("No closed goal to re-open for node "
+                + node.serialNr() + ".");
+        }
+        node.proof().reOpenGoal(goal);
         // refresh selection to ensure UI is updated
         mediator.getSelectionModel().setSelectedNode(node);
     }

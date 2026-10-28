@@ -5,12 +5,14 @@
 package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
@@ -18,6 +20,9 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * There are several types of class declarations:
@@ -58,11 +63,12 @@ import org.key_project.util.collection.ImmutableList;
  * immutable structure
  */
 
+@NullMarked
 public class ClassDeclaration extends TypeDeclaration implements Statement {
 
-    protected final Extends extending;
+    protected final @Nullable Extends extending;
 
-    protected final Implements implementing;
+    protected final @Nullable Implements implementing;
 
     protected final boolean isInnerClass;
 
@@ -204,7 +210,7 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      *
      * @return the extends.
      */
-    public Extends getExtendedTypes() {
+    public @Nullable Extends getExtendedTypes() {
         return extending;
     }
 
@@ -213,7 +219,7 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
      *
      * @return the implements.
      */
-    public Implements getImplementedTypes() {
+    public @Nullable Implements getImplementedTypes() {
         return implementing;
     }
 
@@ -254,11 +260,26 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
         ImmutableList<KeYJavaType> types = ImmutableList.nil();
         if (implementing != null) {
             for (int i = implementing.getTypeReferenceCount() - 1; i >= 0; i--) {
-                types = types.prepend(implementing.getTypeReferenceAt(i).getKeYJavaType());
+                final KeYJavaType kjt = Objects.requireNonNull(
+                    implementing.getTypeReferenceAt(i).getKeYJavaType(),
+                    "implemented type must be resolvable");
+                types = types.prepend(kjt);
             }
         }
-        if (extending != null && !extending.getSupertypes().isEmpty()) {
-            types = types.prepend(extending.getSupertypes().get(0).getKeYJavaType());
+        // `extending` is honestly @Nullable (a class may have no explicit extends clause), but it
+        // is runtime-guaranteed non-null exactly when this branch runs, so capture it in a local
+        // for the flow-sensitive check; getSupertypes() is likewise never null for an Extends node
+        // (it has no parameterless constructor).
+        final Extends ext = extending;
+        if (ext != null) {
+            final ImmutableArray<TypeReference> supertypes = Objects.requireNonNull(
+                ext.getSupertypes(), "extended type must have supertypes");
+            if (!supertypes.isEmpty()) {
+                final KeYJavaType kjt = Objects.requireNonNull(
+                    supertypes.get(0).getKeYJavaType(),
+                    "extended type must be resolvable");
+                types = types.prepend(kjt);
+            }
         }
         return types;
     }

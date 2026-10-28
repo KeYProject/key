@@ -62,6 +62,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +74,7 @@ import static org.key_project.util.java.IOUtil.safePathRelativeTo;
  *
  * @author Kai Wallisch
  */
+@NullMarked
 public class OutputStreamProofSaver {
     private static final Logger LOGGER = LoggerFactory.getLogger(OutputStreamProofSaver.class);
 
@@ -660,7 +662,7 @@ public class OutputStreamProofSaver {
     }
 
     public static String posInOccurrence2Proof(Sequent seq,
-            PosInOccurrence pos) {
+            @Nullable PosInOccurrence pos) {
         if (pos == null) {
             return "";
         }
@@ -788,21 +790,21 @@ public class OutputStreamProofSaver {
         return printer.result();
     }
 
-    public static String printTerm(JTerm t, Services serv) {
+    public static String printTerm(JTerm t, @Nullable Services serv) {
         return printTerm(t, serv, false);
     }
 
-    public static String printTerm(JTerm t, Services serv, boolean shortAttrNotation) {
+    public static String printTerm(JTerm t, @Nullable Services serv, boolean shortAttrNotation) {
         final LogicPrinter logicPrinter = createLogicPrinter(serv, shortAttrNotation);
         logicPrinter.printTerm(t);
         return logicPrinter.result();
     }
 
-    public static String printAnything(Object val, Services services) {
+    public static @Nullable String printAnything(Object val, Services services) {
         return printAnything(val, services, true);
     }
 
-    public static String printAnything(Object val, Services services,
+    public static @Nullable String printAnything(Object val, Services services,
             boolean shortAttrNotation) {
         switch (val) {
             case ProgramElement programElement -> {
@@ -831,13 +833,14 @@ public class OutputStreamProofSaver {
         }
     }
 
-    private static String printSequent(Sequent val, Services services) {
+    private static String printSequent(Sequent val, @Nullable Services services) {
         final LogicPrinter printer = createLogicPrinter(services, services == null);
         printer.printSequent(val);
         return printer.result();
     }
 
-    private static LogicPrinter createLogicPrinter(Services serv, boolean shortAttrNotation) {
+    private static LogicPrinter createLogicPrinter(@Nullable Services serv,
+            boolean shortAttrNotation) {
 
         final NotationInfo ni = new NotationInfo(false, false, false);
 

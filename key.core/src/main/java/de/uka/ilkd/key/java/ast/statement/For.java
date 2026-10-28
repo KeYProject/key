@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
@@ -17,11 +18,15 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * For.
  *
  */
 
+@NullMarked
 public class For extends LoopStatement implements VariableScope {
 
     private static final ImmutableArray<VariableSpecification> EMPTY_VARSPECS =
@@ -43,13 +48,14 @@ public class For extends LoopStatement implements VariableScope {
         super(inits, guard, updates, body);
     }
 
-    public For(ILoopInit inits, IGuard guard, IForUpdates updates, Statement body) {
+    public For(@Nullable ILoopInit inits, IGuard guard, IForUpdates updates, Statement body) {
         super(inits, guard, updates, body);
     }
 
     public For(ExtList children) {
-        super(children.get(ILoopInit.class), children.get(IGuard.class),
-            children.get(IForUpdates.class), children.get(Statement.class), children);
+        super(children.get(ILoopInit.class), Objects.requireNonNull(children.get(IGuard.class),
+            "For requires a guard"), children.get(IForUpdates.class),
+            Objects.requireNonNull(children.get(Statement.class), "For requires a body"), children);
     }
 
     public For(PositionInfo pi, List<Comment> comments, ILoopInit inits, IForUpdates updates,
@@ -82,7 +88,9 @@ public class For extends LoopStatement implements VariableScope {
 
     public ImmutableArray<VariableSpecification> getVariablesInScope() {
         if (inits != null) {
-            LoopInitializer li = inits.getInits().get(0);
+            final ImmutableArray<LoopInitializer> inits2 =
+                Objects.requireNonNull(inits.getInits(), "for-loop inits are mandatory");
+            LoopInitializer li = inits2.get(0);
             if (li instanceof LocalVariableDeclaration) {
                 return ((LocalVariableDeclaration) li).getVariables();
             }
@@ -90,9 +98,11 @@ public class For extends LoopStatement implements VariableScope {
         return EMPTY_VARSPECS;
     }
 
-    public VariableSpecification getVariableInScope(String name) {
+    public @Nullable VariableSpecification getVariableInScope(String name) {
         if (inits != null) {
-            LoopInitializer li = inits.getInits().get(0);
+            final ImmutableArray<LoopInitializer> inits2 =
+                Objects.requireNonNull(inits.getInits(), "for-loop inits are mandatory");
+            LoopInitializer li = inits2.get(0);
             if (li instanceof LocalVariableDeclaration) {
                 ImmutableArray<VariableSpecification> vars =
                     ((LocalVariableDeclaration) li).getVariables();

@@ -39,12 +39,15 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This UI component visualizes the {@link OriginTermLabel}s of a term and its sub-terms.
  *
  * @author lanzinger
  */
+@NullMarked
 public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
     private static final long serialVersionUID = -9190616436091589798L;
@@ -94,7 +97,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     private JTree tree;
 
     /** The currently highlighted position. */
-    private PosInOccurrence highlight;
+    private @Nullable PosInOccurrence highlight;
 
     /** The button for the {@link #nodeLinkAction} */
 
@@ -110,9 +113,14 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            Node node = getNode();
+            if (node == null) {
+                // the action is only usable while the visualizer still holds its node
+                throw new NullPointerException("No node available.");
+            }
             KeYMediator mediator = MainWindow.getInstance().getMediator();
 
-            if (!mediator.getSelectedProof().equals(getNode().proof())) {
+            if (!mediator.getSelectedProof().equals(node.proof())) {
                 int choice = JOptionPane.showOptionDialog(OriginTermLabelVisualizer.this,
                     "The proof containing this node is not currently selected."
                         + " Do you want to select it?",
@@ -120,26 +128,32 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                     null, null);
 
                 if (choice == 0) {
-                    mediator.getSelectionModel().setSelectedProof(getNode().proof());
+                    mediator.getSelectionModel().setSelectedProof(node.proof());
                 } else {
                     return;
                 }
             }
 
-            mediator.getSelectionModel().setSelectedNode(getNode());
+            mediator.getSelectionModel().setSelectedNode(node);
             ((DefaultSingleCDockable) MainWindow.getInstance().getDockSequent()).toFront();
         }
     };
 
     /**
      * Listens to rule application to call {@link #updateNodeLink()}.
+     * <p>
+     * The lambda invokes {@link #updateNodeLink()} on the receiver while the field is being
+     * initialized (EISOP initialization check); the listener only fires after construction
+     * completes, suppressed with a scoped key. The field is nulled in {@link #dispose()} to
+     * release the reference.
      */
-    private RuleAppListener ruleAppListener = event -> updateNodeLink();
+    @SuppressWarnings("nullness:method.invocation.invalid")
+    private @Nullable RuleAppListener ruleAppListener = event -> updateNodeLink();
 
     /**
      * Listens to changes to the proof to call {@link #updateNodeLink()}.
      */
-    private ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
+    private @Nullable ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
 
         @Override
         public void proofStructureChanged(ProofTreeEvent e) {
@@ -165,7 +179,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     /**
      * Listens to changes to the proof to call {@link #updateNodeLink()}.
      */
-    private ProofDisposedListener proofDisposedListener = new ProofDisposedListener() {
+    private @Nullable ProofDisposedListener proofDisposedListener = new ProofDisposedListener() {
 
         @Override
         public void proofDisposing(ProofDisposedEvent e) {}
@@ -176,14 +190,20 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
     };
 
-    /** services */
-    private Services services;
+    /**
+     * Services are only available while the visualizer is alive; the field is nulled in
+     * {@link #dispose()} to release the reference.
+     */
+    private @Nullable Services services;
 
     /** The position of the term being shown in this window. */
-    private PosInOccurrence termPio;
+    private @Nullable PosInOccurrence termPio;
 
-    /** The sequent containing the term being shown in this window. */
-    private Sequent sequent;
+    /**
+     * The sequent containing the term being shown in this window; nulled in {@link #dispose()}
+     * to release the reference.
+     */
+    private @Nullable Sequent sequent;
 
     /**
      * Creates a new {@link OriginTermLabelVisualizer}.
@@ -192,8 +212,16 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
      * @param node the node representing the proof state for which the term's origins shall be
      *        visualized.
      * @param services services.
+     *        <p>
+     *        The constructor leaves {@code view}, {@code tree} and {@code nodeLinkButton} unset
+     *        until
+     *        the private init methods run and configures visible components while the receiver is
+     *        still under initialization (EISOP initialization check), suppressed with scoped keys.
      */
-    public OriginTermLabelVisualizer(PosInOccurrence pos, Node node, Services services) {
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
+    public OriginTermLabelVisualizer(@Nullable PosInOccurrence pos, Node node,
+            Services services) {
         super(node,
             "Origin for node " + node.serialNr() + ": " + (pos == null ? "whole sequent"
                     : LogicPrinter.quickPrintTerm((JTerm) pos.subTerm(), services).replaceAll(
@@ -262,14 +290,30 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
     @Override
     public void dispose() {
-        if (!getNode().proof().isDisposed()) {
-            getNode().proof().removeRuleAppListener(ruleAppListener);
-            getNode().proof().removeProofTreeListener(proofTreeListener);
-            getNode().proof().removeProofDisposedListener(proofDisposedListener);
+        Node node = getNode();
+        if (node == null) {
+            // dispose is only called once, while the visualizer still holds its node
+            throw new NullPointerException("No node available.");
+        }
+        if (!node.proof().isDisposed()) {
+            RuleAppListener currentRuleAppListener = ruleAppListener;
+            if (currentRuleAppListener != null) {
+                node.proof().removeRuleAppListener(currentRuleAppListener);
+            }
+            ProofTreeListener currentProofTreeListener = proofTreeListener;
+            if (currentProofTreeListener != null) {
+                node.proof().removeProofTreeListener(currentProofTreeListener);
+            }
+            ProofDisposedListener currentProofDisposedListener = proofDisposedListener;
+            if (currentProofDisposedListener != null) {
+                node.proof().removeProofDisposedListener(currentProofDisposedListener);
+            }
         }
 
         view.removeUserSelectionHighlight();
 
+        // These fields are only nulled to release the references once the visualizer is
+        // disposed; no code path reads them afterwards.
         ruleAppListener = null;
         proofTreeListener = null;
         proofDisposedListener = null;
@@ -282,6 +326,10 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
     private void initHeadPane() {
         Node node = getNode();
+        if (node == null) {
+            // the head pane is only built while the visualizer still holds its node
+            throw new NullPointerException("No node available.");
+        }
 
         JPanel headPane = new JPanel();
         headPane.setLayout(new BoxLayout(headPane, BoxLayout.PAGE_AXIS));
@@ -303,8 +351,13 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         nodeLinkButton.setAction(nodeLinkAction);
         updateNodeLink();
 
+        ProofTreeListener currentProofTreeListener = proofTreeListener;
+        if (currentProofTreeListener == null) {
+            // initHeadPane runs before dispose() nulls the listeners
+            throw new NullPointerException("No proof tree listener available.");
+        }
         node.proof().addRuleAppListener(ruleAppListener);
-        node.proof().addProofTreeListener(proofTreeListener);
+        node.proof().addProofTreeListener(currentProofTreeListener);
         node.proof().addProofDisposedListener(proofDisposedListener);
 
         add(headPane, BorderLayout.PAGE_START);
@@ -349,7 +402,12 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     }
 
     private void initView(JSplitPane bodyPane, String borderTitle) {
-        view = new TermView(termPio, getNode(), MainWindow.getInstance());
+        Node node = getNode();
+        if (node == null) {
+            // the view is only built while the visualizer still holds its node
+            throw new NullPointerException("No node available.");
+        }
+        view = new TermView(termPio, node, MainWindow.getInstance());
 
         view.addMouseListener(new MouseAdapter() {
 
@@ -393,6 +451,10 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
     private void updateNodeLink() {
         Node node = getNode();
+        if (node == null) {
+            // the link is only updated while the visualizer still holds its node
+            throw new NullPointerException("No node available.");
+        }
 
         if (node.proof().isDisposed() || !node.proof().find(node)) {
             nodeLinkButton.setText("DELETED NODE");
@@ -410,25 +472,27 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
      * @param pio a pio on the sequent.
      * @return a pio on {@code this.termPio.subTerm()}.
      */
-    private PosInOccurrence convertPio(PosInOccurrence pio) {
-        if (termPio == null) {
+    private @Nullable PosInOccurrence convertPio(@Nullable PosInOccurrence pio) {
+        PosInOccurrence currentTermPio = termPio;
+        if (currentTermPio == null) {
             return pio;
         } else if (pio == null) {
-            return new PosInOccurrence(termPio.sequentFormula(), termPio.posInTerm(),
-                termPio.isInAntec());
+            return new PosInOccurrence(currentTermPio.sequentFormula(),
+                currentTermPio.posInTerm(), currentTermPio.isInAntec());
         } else {
-            PosInTerm completePos = termPio.posInTerm();
+            PosInTerm completePos = currentTermPio.posInTerm();
 
             org.key_project.logic.IntIterator it = pio.posInTerm().iterator();
             while (it.hasNext()) {
                 completePos = completePos.down(it.next());
             }
 
-            return new PosInOccurrence(termPio.sequentFormula(), completePos, termPio.isInAntec());
+            return new PosInOccurrence(currentTermPio.sequentFormula(), completePos,
+                currentTermPio.isInAntec());
         }
     }
 
-    private DefaultTreeModel buildModel(PosInOccurrence pos) {
+    private DefaultTreeModel buildModel(@Nullable PosInOccurrence pos) {
         TreeNode root = new TreeNode(pos);
         DefaultTreeModel result = new DefaultTreeModel(root);
         buildModel(root, pos, result);
@@ -436,13 +500,18 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     }
 
     private void buildModel(TreeNode parentNode,
-            PosInOccurrence parentPos,
+            @Nullable PosInOccurrence parentPos,
             DefaultTreeModel treeModel) {
         if (parentPos == null) {
             int index = 0;
 
-            ImmutableList<SequentFormula> children =
-                sequent.antecedent().asList();
+            Sequent currentSequent = sequent;
+            if (currentSequent == null) {
+                // the model is only built while the visualizer is alive
+                throw new NullPointerException("Visualizer has been disposed.");
+            }
+
+            ImmutableList<SequentFormula> children = currentSequent.antecedent().asList();
 
             for (SequentFormula child : children) {
                 PosInOccurrence childPos =
@@ -455,7 +524,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
                 ++index;
             }
 
-            children = sequent.succedent().asList();
+            children = currentSequent.succedent().asList();
 
             for (SequentFormula child : children) {
                 PosInOccurrence childPos =
@@ -479,11 +548,15 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
     }
 
-    private void highlightInTree(TreePath path) {
-        tree.getSelectionModel().setSelectionPath(path);
+    private void highlightInTree(@Nullable TreePath path) {
+        if (path == null) {
+            tree.getSelectionModel().clearSelection();
+        } else {
+            tree.getSelectionModel().setSelectionPath(path);
+        }
     }
 
-    private void highlightInView(PosInOccurrence pio) {
+    private void highlightInView(@Nullable PosInOccurrence pio) {
         if (pio == null) {
             view.removeUserSelectionHighlight();
             return;
@@ -500,8 +573,8 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
     }
 
-    private ImmutableList<Integer> getPosTablePath(
-            PosInOccurrence pos) {
+    private @Nullable ImmutableList<Integer> getPosTablePath(
+            @Nullable PosInOccurrence pos) {
         if (pos == null) {
             return ImmutableList.<Integer>singleton(0);
         }
@@ -511,7 +584,14 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         ImmutableList<Integer> path = posTable.pathForPosition(pos, view.getFilter());
 
         if (termPio != null) {
-            ImmutableList<Integer> prefixPath = posTable.pathForPosition(termPio, view.getFilter());
+            if (path == null) {
+                return null;
+            }
+            ImmutableList<Integer> prefixPath =
+                posTable.pathForPosition(termPio, view.getFilter());
+            if (prefixPath == null) {
+                return null;
+            }
 
             final int n = prefixPath.size();
 
@@ -528,10 +608,12 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         return path;
     }
 
-    private TreePath getTreePath(ImmutableList<Integer> posTablePath) {
+    private TreePath getTreePath(@Nullable ImmutableList<Integer> posTablePath) {
         if (termPio != null) {
-            posTablePath = posTablePath.tail().tail();
-        } else {
+            if (posTablePath != null) {
+                posTablePath = posTablePath.tail().tail();
+            }
+        } else if (posTablePath != null) {
             posTablePath = posTablePath.tail();
         }
 
@@ -549,7 +631,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         return result;
     }
 
-    private String getTooltipText(PosInOccurrence pio) {
+    private @Nullable String getTooltipText(@Nullable PosInOccurrence pio) {
         if (pio == null) {
             return null;
         }
@@ -570,13 +652,17 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         private static final long serialVersionUID = -7479404026154193661L;
 
         @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected,
-                boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            TreeNode node = (TreeNode) value;
+        public Component getTreeCellRendererComponent(JTree tree, @Nullable Object value,
+                boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            if (!(value instanceof TreeNode node)) {
+                // the tree only contains TreeNode elements; render anything else as the default
+                return super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf,
+                    row, hasFocus);
+            }
 
             PosInOccurrence pio = node.pos;
             JTerm term = node.term;
-            assert pio.subTerm().equals(term);
+            assert pio == null || pio.subTerm().equals(term);
 
             BasicTreeUI ui = (BasicTreeUI) tree.getUI();
 
@@ -587,7 +673,7 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             termTextLabel.setBackground(OriginTermLabelVisualizer.this.getBackground());
 
             JLabel originTextLabel = new JLabel();
-            Origin origin = OriginTermLabel.getOrigin(pio);
+            Origin origin = pio == null ? null : OriginTermLabel.getOrigin(pio);
 
             if (origin != null) {
                 originTextLabel.setText(getShortOriginText(origin));
@@ -617,13 +703,20 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             return origin.specType.toString();
         }
 
-        private String getShortTermText(JTerm term) {
+        private String getShortTermText(@Nullable JTerm term) {
             String text;
 
+            Sequent currentSequent = sequent;
+            Services currentServices = services;
+            if (currentSequent == null || currentServices == null) {
+                // the renderer is only used while the visualizer has not been disposed
+                throw new NullPointerException("Visualizer has been disposed.");
+            }
+
             if (term == null) {
-                text = LogicPrinter.quickPrintSequent(sequent, services);
+                text = LogicPrinter.quickPrintSequent(currentSequent, currentServices);
             } else {
-                text = LogicPrinter.quickPrintTerm(term, services);
+                text = LogicPrinter.quickPrintTerm(term, currentServices);
             }
 
             int endIndex = text.indexOf('\n');
@@ -638,11 +731,11 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
 
     private static class TreeNode extends DefaultMutableTreeNode {
         private static final long serialVersionUID = -406981141537547226L;
-        private final PosInOccurrence pos;
-        private JTerm term;
+        private final @Nullable PosInOccurrence pos;
+        private @Nullable JTerm term;
 
-        private TreeNode(PosInOccurrence pos) {
-            super(pos);
+        private TreeNode(@Nullable PosInOccurrence pos) {
+            super();
             this.pos = pos;
 
             if (pos != null) {
@@ -652,9 +745,9 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
     }
 
     private static class TermViewLogicPrinter extends SequentViewLogicPrinter {
-        private final PosInOccurrence pos;
+        private final @Nullable PosInOccurrence pos;
 
-        TermViewLogicPrinter(PosInOccurrence pos, NotationInfo ni,
+        TermViewLogicPrinter(@Nullable PosInOccurrence pos, NotationInfo ni,
                 Services services) {
             super(ni, services, PosTableLayouter.positionTable(), new TermLabelVisibilityManager());
             this.pos = pos;
@@ -665,6 +758,11 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             try {
                 ImmutableList<SequentPrintFilterEntry> antec = filter.getFilteredAntec();
                 ImmutableList<SequentPrintFilterEntry> succ = filter.getFilteredSucc();
+                if (antec == null || succ == null) {
+                    // the visualizer's printer is only invoked with a complete filter
+                    throw new NullPointerException(
+                        "Incomplete sequent filter for term view printing.");
+                }
                 layouter.markStartSub();
                 layouter.startTerm(antec.size() + succ.size());
                 layouter.beginC(1).ind();
@@ -691,18 +789,28 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         private InitialPositionTable posTable = new InitialPositionTable();
         private final Node node;
 
-        TermView(PosInOccurrence pos, Node node,
+        /**
+         * The view configures itself with printer and filter calls while the receiver is still
+         * under initialization (EISOP initialization check); the effects only take place after
+         * construction completes, suppressed with a scoped key. Services can only be {@code null}
+         * after the visualizer was disposed.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
+        TermView(@Nullable PosInOccurrence pos, Node node,
                 MainWindow mainWindow) {
             super(mainWindow);
             this.node = node;
 
             final NotationInfo ni = new NotationInfo();
-            if (services != null) {
-                ni.refresh(services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
-                    NotationInfo.DEFAULT_UNICODE_ENABLED, NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
+            Services currentServices = services;
+            if (currentServices == null) {
+                // the term view is only constructed while the visualizer is still alive
+                throw new NullPointerException("No services available for the term view.");
             }
+            ni.refresh(currentServices, NotationInfo.DEFAULT_PRETTY_SYNTAX,
+                NotationInfo.DEFAULT_UNICODE_ENABLED, NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
 
-            setLogicPrinter(new TermViewLogicPrinter(pos, ni, services));
+            setLogicPrinter(new TermViewLogicPrinter(pos, ni, currentServices));
 
             if (pos != null) {
                 setFilter(new ShowSelectedSequentPrintFilter(pos), true);
@@ -712,14 +820,23 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         }
 
         @Override
-        protected synchronized PosInSequent getPosInSequent(Point p) {
+        protected synchronized @Nullable PosInSequent getPosInSequent(@Nullable Point p) {
             PosInSequent pis = super.getPosInSequent(p);
             PosInOccurrence pio = convertPio(pis == null ? null : pis.getPosInOccurrence());
             return pio == null ? null : PosInSequent.createCfmaPos(pio);
         }
 
+        /**
+         * Returns the tool tip text for the given event.
+         *
+         * <p>
+         * No tool tip is shown when the position does not lie on a formula, reported as
+         * {@code null}; the JDK declares a non-null return although {@code null} is how
+         * {@link ToolTipManager} disables a tool tip, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:override.return.invalid")
         @Override
-        public String getToolTipText(MouseEvent event) {
+        public @Nullable String getToolTipText(MouseEvent event) {
             PosInSequent pis = getPosInSequent(event.getPoint());
 
             if (pis == null) {
@@ -733,6 +850,9 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         public void setUserSelectionHighlight(PosInSequent pis) {
             ImmutableList<Integer> path =
                 getPosTablePath(pis == null ? null : pis.getPosInOccurrence());
+            if (path == null) {
+                return;
+            }
             Range range = view.posTable.rangeForPath(path);
             range = new Range(range.start() + 1, range.end() + 1);
             pis.setBounds(range);
@@ -763,7 +883,10 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
         @Override
         public final synchronized void printSequent() {
             updateSequent(node);
-            posTable = getInitialPositionTable();
+            InitialPositionTable initialPositionTable = getInitialPositionTable();
+            if (initialPositionTable != null) {
+                posTable = initialPositionTable;
+            }
 
             updateHidingProperty();
         }

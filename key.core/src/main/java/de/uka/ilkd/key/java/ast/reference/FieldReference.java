@@ -13,35 +13,37 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
-
+@NullMarked
 public class FieldReference extends VariableReference
         implements MemberReference, ReferenceSuffix, TypeReferenceContainer {
 
     /**
      * Reference prefix.
      */
-    @NonNull
-    protected final ReferencePrefix prefix;
+    protected final @Nullable ReferencePrefix prefix;
 
-    public FieldReference(@NonNull ProgramVariable pv, ReferencePrefix prefix) {
+    public FieldReference(ProgramVariable pv, @Nullable ReferencePrefix prefix) {
         super(Objects.requireNonNull(pv));
         this.prefix = constructPrefix(prefix, pv);
     }
 
-    public FieldReference(PositionInfo pi, List<Comment> c, @NonNull ProgramVariable variable,
-            ReferencePrefix prefix) {
+    public FieldReference(PositionInfo pi, List<Comment> c, ProgramVariable variable,
+            @Nullable ReferencePrefix prefix) {
         super(pi, c, variable);
         this.prefix = constructPrefix(prefix, getProgramVariable());
     }
 
-    public FieldReference(ProgramVariable pv, ReferencePrefix prefix, PositionInfo pi) {
+    public FieldReference(ProgramVariable pv, @Nullable ReferencePrefix prefix,
+            @Nullable PositionInfo pi) {
         super(pv, pi);
         this.prefix = constructPrefix(prefix, getProgramVariable());
     }
 
-    private ReferencePrefix constructPrefix(ReferencePrefix prefix, ProgramVariable pv) {
+    private @Nullable ReferencePrefix constructPrefix(@Nullable ReferencePrefix prefix,
+            ProgramVariable pv) {
         if (prefix == null && !pv.isStatic() && pv.isMember()) {
             return new ThisReference();
         } else {
@@ -94,7 +96,7 @@ public class FieldReference extends VariableReference
      *
      * @return the reference prefix.
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return prefix;
     }
 
@@ -195,7 +197,8 @@ public class FieldReference extends VariableReference
      * are there "dots" in the prefix?
      */
     public boolean isSingleDeref() {
-        return prefix.getReferencePrefix() == null;
+        final ReferencePrefix p = Objects.requireNonNull(prefix, "no reference prefix");
+        return p.getReferencePrefix() == null;
     }
 
 }

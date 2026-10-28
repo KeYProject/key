@@ -8,9 +8,11 @@ import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -31,6 +33,7 @@ import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +47,7 @@ import static de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
  * @author bruns
  *
  */
+@NullMarked
 public class ContractFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(ContractFactory.class);
 
@@ -89,18 +93,21 @@ public class ContractFactory {
      * @return the resulting contract
      */
     public FunctionalOperationContract addPost(FunctionalOperationContract old, JTerm addedPost,
-            LocationVariable selfVar, LocationVariable resultVar, LocationVariable excVar,
-            ImmutableList<LocationVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars) {
+            @Nullable LocationVariable selfVar, @Nullable LocationVariable resultVar,
+            @Nullable LocationVariable excVar,
+            @Nullable ImmutableList<LocationVariable> paramVars,
+            @Nullable Map<LocationVariable, LocationVariable> atPreVars) {
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
+        final HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
         addedPost = replaceVariables(addedPost, selfVar, resultVar, excVar, paramVars, atPreVars,
             foci.originalSelfVar, foci.originalResultVar, foci.originalExcVar,
             foci.originalParamVars, foci.originalAtPreVars);
 
         Map<LocationVariable, JTerm> newPosts = new LinkedHashMap<>(10);
         for (LocationVariable h : foci.originalPosts.keySet()) {
-            if (h == services.getTypeConverter().getHeapLDT().getHeap()) {
+            if (h == heapLDT.getHeap()) {
                 newPosts.put(h, tb.andSC(foci.originalPosts.get(h), addedPost));
             } else {
                 newPosts.put(h, foci.originalPosts.get(h));
@@ -143,16 +150,18 @@ public class ContractFactory {
      * @return the resulting contract
      */
     public FunctionalOperationContract addPre(FunctionalOperationContract old, JTerm addedPre,
-            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars) {
+            @Nullable LocationVariable selfVar, @Nullable ImmutableList<LocationVariable> paramVars,
+            @Nullable Map<LocationVariable, LocationVariable> atPreVars) {
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
+        final HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
         addedPre = replaceVariables(addedPre, selfVar, paramVars, atPreVars, foci.originalSelfVar,
             foci.originalParamVars, foci.originalAtPreVars);
 
         Map<LocationVariable, JTerm> newPres = new LinkedHashMap<>(10);
         for (LocationVariable h : foci.originalPres.keySet()) {
-            if (h == services.getTypeConverter().getHeapLDT().getHeap()) {
+            if (h == heapLDT.getHeap()) {
                 newPres.put(h, tb.and(foci.originalPres.get(h), addedPre));
             } else {
                 newPres.put(h, foci.originalPres.get(h));
@@ -168,8 +177,7 @@ public class ContractFactory {
             foci.hasRealFreeModifiable, foci.originalSelfVar, foci.originalParamVars,
             foci.originalResultVar, foci.originalExcVar, foci.originalAtPreVars, foci.globalDefs,
             foci.id, foci.toBeSaved,
-            foci.originalModifiables
-                    .get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null,
+            foci.originalModifiables.get(heapLDT.getSavedHeap()) != null,
             services);
     }
 
@@ -195,23 +203,26 @@ public class ContractFactory {
     }
 
     public DependencyContract dep(KeYJavaType containerType, IObserverFunction pm,
-            KeYJavaType specifiedIn, Map<LocationVariable, JTerm> requires, JTerm measuredBy,
-            Map<LocationVariable, JTerm> accessibles, LocationVariable selfVar,
+            KeYJavaType specifiedIn, Map<LocationVariable, JTerm> requires,
+            @Nullable JTerm measuredBy,
+            Map<LocationVariable, JTerm> accessibles, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars, JTerm globalDefs) {
+            @Nullable Map<LocationVariable, LocationVariable> atPreVars,
+            @Nullable JTerm globalDefs) {
         assert (selfVar == null) == pm.isStatic();
         return dep("JML accessible clause", containerType, pm, specifiedIn, requires, measuredBy,
             accessibles, selfVar, paramVars, atPreVars, globalDefs);
     }
 
     public DependencyContract dep(KeYJavaType kjt, LocationVariable targetHeap,
-            TranslatedDependencyContract dep, LocationVariable selfVar) {
+            TranslatedDependencyContract dep, @Nullable LocationVariable selfVar) {
         final ImmutableList<LocationVariable> paramVars =
             tb.paramVars(dep.observerFunction(), false);
         assert (selfVar == null) == dep.observerFunction().isStatic();
+        final HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
         Map<LocationVariable, JTerm> pres = new LinkedHashMap<>();
-        pres.put(services.getTypeConverter().getHeapLDT().getHeap(),
-            selfVar == null ? tb.tt() : tb.inv(tb.var(selfVar)));
+        pres.put(heapLDT.getHeap(), selfVar == null ? tb.tt() : tb.inv(tb.var(selfVar)));
         Map<LocationVariable, JTerm> accessibles = new LinkedHashMap<>();
         for (final LocationVariable heap : HeapContext.getModifiableHeaps(services, false)) {
             if (heap == targetHeap) {
@@ -221,16 +232,19 @@ public class ContractFactory {
             }
         }
         // TODO: insert static invariant??
-        return dep(kjt, dep.observerFunction(), dep.observerFunction().getContainerType(), pres,
-            dep.mby(), accessibles,
+        return dep(kjt, dep.observerFunction(),
+            Objects.requireNonNull(dep.observerFunction().getContainerType(), "no container type"),
+            pres, dep.mby(), accessibles,
             selfVar, paramVars, null, null);
     }
 
     public DependencyContract dep(String string, KeYJavaType containerType, IObserverFunction pm,
-            KeYJavaType specifiedIn, Map<LocationVariable, JTerm> requires, JTerm measuredBy,
-            Map<LocationVariable, JTerm> accessibles, LocationVariable selfVar,
+            KeYJavaType specifiedIn, Map<LocationVariable, JTerm> requires,
+            @Nullable JTerm measuredBy,
+            Map<LocationVariable, JTerm> accessibles, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars, JTerm globalDefs) {
+            @Nullable Map<LocationVariable, LocationVariable> atPreVars,
+            @Nullable JTerm globalDefs) {
         assert (selfVar == null) == pm.isStatic();
         return new DependencyContractImpl(string, null, containerType, pm, specifiedIn, requires,
             measuredBy, accessibles, selfVar, paramVars, atPreVars, globalDefs,
@@ -268,10 +282,14 @@ public class ContractFactory {
             return null;
         }
 
-        final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-        final JTerm atPre = tb.var(progVars.atPreVars.get(baseHeap));
+        final HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
+        final LocationVariable baseHeap = heapLDT.getHeap();
+        final JTerm atPre = tb.var(Objects.requireNonNull(progVars.atPreVars.get(baseHeap),
+            "no at-pre variable for " + baseHeap));
         final JTerm self = progVars.selfVar != null ? tb.var(progVars.selfVar) : null;
-        final ImmutableList<JTerm> params = tb.var(progVars.paramVars);
+        final ImmutableList<JTerm> params =
+            tb.var(Objects.requireNonNull(progVars.paramVars, "no parameter variables"));
         final JTerm result = progVars.resultVar != null ? tb.var(progVars.resultVar) : null;
         final JTerm exc = progVars.excVar != null ? tb.var(progVars.excVar) : null;
         var info = new InformationFlowContractInfo(INFORMATION_FLOW_CONTRACT_BASENAME, forClass, pm,
@@ -362,14 +380,17 @@ public class ContractFactory {
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
             LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             boolean toBeSaved) {
-        return new FunctionalOperationContractImpl(baseName, null, kjt, pm, pm.getContainerType(),
+        final HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
+        return new FunctionalOperationContractImpl(baseName, null, kjt, pm,
+            Objects.requireNonNull(pm.getContainerType(), "no container type"),
             modalityKind, pres, freePres, mby, posts, freePosts, axioms, modifiables,
             freeModifiables, accs,
             hasModifiable,
             hasFreeModifiable, selfVar, paramVars, resultVar, excVar, atPreVars, null,
             Contract.INVALID_ID,
             toBeSaved,
-            modifiables.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null,
+            modifiables.get(heapLDT.getSavedHeap()) != null,
             services);
     }
 
@@ -401,12 +422,14 @@ public class ContractFactory {
             Map<LocationVariable, Boolean> hasModifiable,
             Map<LocationVariable, Boolean> hasFreeModifiable,
             ProgramVariableCollection pv) {
+        final HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
         return func(baseName, pm,
             terminates ? JModality.JavaModalityKind.DIA : JModality.JavaModalityKind.BOX, pres,
             freePres, mby,
             posts, freePosts, axioms, modifiables, freeModifiables, accessibles, hasModifiable,
             hasFreeModifiable, pv, false,
-            modifiables.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
+            modifiables.get(heapLDT.getSavedHeap()) != null);
     }
 
     /**
@@ -440,12 +463,16 @@ public class ContractFactory {
             Map<LocationVariable, Boolean> hasModifiable,
             Map<LocationVariable, Boolean> hasFreeModifiable,
             ProgramVariableCollection progVars, boolean toBeSaved, boolean transaction) {
-        return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm,
-            pm.getContainerType(), modalityKind, pres, freePres, mby, posts, freePosts, axioms,
+        final KeYJavaType containerType =
+            Objects.requireNonNull(pm.getContainerType(), "no container type");
+        return new FunctionalOperationContractImpl(baseName, null, containerType, pm,
+            containerType, modalityKind, pres, freePres, mby, posts, freePosts, axioms,
             modifiables,
             freeModifiables, accessibles, hasModifiable, hasFreeModifiable, progVars.selfVar,
-            progVars.paramVars,
-            progVars.resultVar, progVars.excVar, progVars.atPreVars, null, Contract.INVALID_ID,
+            Objects.requireNonNull(progVars.paramVars, "no parameter variables"),
+            progVars.resultVar, progVars.excVar,
+            Objects.requireNonNull(progVars.atPreVars, "no at-pre variables"), null,
+            Contract.INVALID_ID,
             toBeSaved, transaction, services);
     }
 
@@ -468,23 +495,28 @@ public class ContractFactory {
         return kind;
     }
 
-    private static JTerm combineMeasuredBy(JTerm mby, JTerm otherMby, LocationVariable h,
-            JTerm otherPre, Services services) {
+    private static @Nullable JTerm combineMeasuredBy(@Nullable JTerm mby, @Nullable JTerm otherMby,
+            LocationVariable h, @Nullable JTerm otherPre, Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        if (h == services.getTypeConverter().getHeapLDT().getHeap()) {
+        final HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
+        if (h == heapLDT.getHeap()) {
             // bugfix (MU)
             // if the first or the other contract do not have a
             // measured-by-clause, assume no clause at all
             if (mby == null || otherMby == null) {
                 if (mby != null) {
-                    mby = tb.ife(otherPre, mby, tb.zero());
+                    mby = tb.ife(Objects.requireNonNull(otherPre,
+                        "no precondition for the measured-by heap"), mby, tb.zero());
                 } else if (otherMby != null) {
-                    mby = tb.ife(otherPre, otherMby, tb.zero());
+                    mby = tb.ife(Objects.requireNonNull(otherPre,
+                        "no precondition for the measured-by heap"), otherMby, tb.zero());
                 } else {
                     mby = null;
                 }
             } else {
-                mby = tb.ife(otherPre, otherMby, mby);
+                mby = tb.ife(Objects.requireNonNull(otherPre,
+                    "no precondition for the measured-by heap"), otherMby, mby);
             }
         }
         return mby;
@@ -493,9 +525,11 @@ public class ContractFactory {
     private static void combineModifiable(FunctionalOperationContractImpl t,
             Map<LocationVariable, Boolean> hasModifiable, Map<LocationVariable, JTerm> modifiables,
             Map<LocationVariable, JTerm> uniformModifiable, FunctionalOperationContract other,
-            LocationVariable h, JTerm otherPre, Services services) {
+            LocationVariable h, @Nullable JTerm otherPre, Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        if (hasModifiable.get(h) || t.hasModifiable(h) || other.hasModifiable(h)) {
+        if (Objects.requireNonNull(hasModifiable.get(h), "no modifiable entry for " + h)
+                || t.hasModifiable(h)
+                || other.hasModifiable(h)) {
             hasModifiable.put(h, true);
             JTerm modifiable1 = modifiables.get(h);
             JTerm modifiable2 =
@@ -507,8 +541,9 @@ public class ContractFactory {
                 } else if (modifiable2 == null) {
                     intersectedModifiable = modifiable1;
                 } else {
-                    intersectedModifiable =
-                        tb.intersect(modifiable1, tb.ife(otherPre, modifiable2, tb.allLocs()));
+                    intersectedModifiable = tb.intersect(modifiable1,
+                        tb.ife(Objects.requireNonNull(otherPre,
+                            "no precondition for the modifiable heap"), modifiable2, tb.allLocs()));
 
                     // check if the other modifiable is the same as the one in the uniform store.
                     // To obtain meaningful results, check for equality ignoring all term labels!
@@ -536,6 +571,8 @@ public class ContractFactory {
      */
     private static JTerm mergeTermLabels(JTerm uniformModifiable, JTerm otherModifiable,
             TermBuilder tb) {
+        final OriginTermLabelFactory originFactory =
+            Objects.requireNonNull(tb.getOriginFactory(), "origin factory");
         List<TermLabel> labels = uniformModifiable.getLabels().toList();
         List<TermLabel> newLabels = new ArrayList<>(labels);
         for (TermLabel ol : otherModifiable.getLabels()) {
@@ -552,7 +589,7 @@ public class ContractFactory {
                             Set<Origin> origins = new HashSet<>();
                             origins.add(o1);
                             origins.add(o2);
-                            uol = tb.getOriginFactory().createOriginTermLabel(origins);
+                            uol = originFactory.createOriginTermLabel(origins);
                             newLabels.add(uol);
                             break;
                         }
@@ -575,7 +612,9 @@ public class ContractFactory {
             Map<LocationVariable, JTerm> deps, FunctionalOperationContract other,
             Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        final HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
+        for (LocationVariable h : heapLDT.getAllHeaps()) {
             JTerm a1 = deps.get(h);
             JTerm a2 = other.getDep(h, false, t.originalSelfVar, t.originalParamVars,
                 t.originalAtPreVars, services);
@@ -592,7 +631,7 @@ public class ContractFactory {
             }
             boolean preHeap = t.originalAtPreVars.get(h) != null;
             if (preHeap) {
-                LocationVariable hPre = t.originalAtPreVars.get(h);
+                LocationVariable hPre = Objects.requireNonNull(t.originalAtPreVars.get(h));
                 JTerm a1Pre = deps.get(hPre);
                 JTerm a2Pre = other.getDep(hPre, true, t.originalSelfVar, t.originalParamVars,
                     t.originalAtPreVars, services);
@@ -634,7 +673,7 @@ public class ContractFactory {
      */
     private FunctionalOperationContract joinWithOtherContracts(final String name,
             FunctionalOperationContractImpl t, FunctionalOperationContract[] others,
-            Map<LocationVariable, JTerm> pres, JTerm mby,
+            Map<LocationVariable, JTerm> pres, @Nullable JTerm mby,
             Map<LocationVariable, Boolean> hasModifiable,
             Map<LocationVariable, Boolean> hasFreeModifiable,
             Map<LocationVariable, JTerm> uniformModifiable,
@@ -645,12 +684,14 @@ public class ContractFactory {
             Map<LocationVariable, JTerm> modifiables,
             Map<LocationVariable, JTerm> freeModifiables,
             Map<LocationVariable, JTerm> deps, JModality.JavaModalityKind modalityKind) {
+        final HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
         for (FunctionalOperationContract other : others) {
             modalityKind = combineModalityKinds(modalityKind, other.getModalityKind());
             JTerm otherMby =
                 other.hasMby() ? other.getMby(t.originalSelfVar, t.originalParamVars, services)
                         : null;
-            for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for (LocationVariable h : heapLDT.getAllHeaps()) {
                 JTerm otherPre = other.getPre(h, t.originalSelfVar, t.originalParamVars,
                     t.originalAtPreVars, services);
                 JTerm otherPost = other.getPost(h, t.originalSelfVar, t.originalParamVars,
@@ -672,18 +713,22 @@ public class ContractFactory {
                     pres.put(h, pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
                 }
                 if (otherPost != null) {
-                    final JTerm oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
+                    final JTerm oPost = tb.imp(Objects.requireNonNull(
+                        atPreify(otherPre, t.originalAtPreVars),
+                        "no precondition for the heap of the postcondition"), otherPost);
                     posts.put(h, posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost));
                 }
                 if (otherFreePost != null) {
-                    final JTerm oFreePost =
-                        tb.imp(atPreify(otherPre, t.originalAtPreVars), otherFreePost);
+                    final JTerm oFreePost = tb.imp(Objects.requireNonNull(
+                        atPreify(otherPre, t.originalAtPreVars),
+                        "no precondition for the heap of the free postcondition"), otherFreePost);
                     freePosts.put(h,
                         freePosts.get(h) == null ? oFreePost : tb.and(freePosts.get(h), oFreePost));
                 }
                 if (otherAxiom != null) {
-                    final JTerm oAxiom =
-                        tb.imp(atPreify(otherPre, t.originalAtPreVars), otherAxiom);
+                    final JTerm oAxiom = tb.imp(Objects.requireNonNull(
+                        atPreify(otherPre, t.originalAtPreVars),
+                        "no precondition for the heap of the axiom clause"), otherAxiom);
                     axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
                 }
             }
@@ -696,7 +741,7 @@ public class ContractFactory {
          * instead of the disjunction of if-then-else expressions. (Related to an older fix by
          * Daniel Grahl for MT-1557.)
          */
-        for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for (LocationVariable h : heapLDT.getAllHeaps()) {
             if (uniformModifiable.containsKey(h)) {
                 modifiables.put(h, uniformModifiable.get(h));
             }
@@ -753,38 +798,47 @@ public class ContractFactory {
         Map<LocationVariable, Boolean> hasFreeModifiable = new LinkedHashMap<>();
         Map<LocationVariable, JTerm> posts = new LinkedHashMap<>(t.originalPosts.size());
         Map<LocationVariable, JTerm> freePosts = new LinkedHashMap<>(t.originalFreePosts.size());
-        for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        final HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
+        for (LocationVariable h : heapLDT.getAllHeaps()) {
             hasModifiable.put(h, false);
             hasFreeModifiable.put(h, false);
             JTerm oriPost = t.originalPosts.get(h);
             JTerm oriFreePost = t.originalFreePosts.get(h);
             if (oriPost != null) {
-                posts.put(h, tb.imp(atPreify(t.originalPres.get(h), t.originalAtPreVars), oriPost));
+                posts.put(h, tb.imp(Objects.requireNonNull(
+                    atPreify(t.originalPres.get(h), t.originalAtPreVars),
+                    "no precondition for the heap of the postcondition"), oriPost));
             }
             if (oriFreePost != null) {
-                freePosts.put(h,
-                    tb.imp(atPreify(t.originalFreePres.get(h), t.originalAtPreVars), oriFreePost));
+                freePosts.put(h, tb.imp(Objects.requireNonNull(
+                    atPreify(t.originalFreePres.get(h), t.originalAtPreVars),
+                    "no precondition for the heap of the free postcondition"), oriFreePost));
             }
             JTerm origModifiable = t.originalModifiables.get(h);
             if (origModifiable != null) {
-                modifiables.put(h, tb.ife(t.originalPres.get(h), origModifiable, tb.allLocs()));
+                modifiables.put(h,
+                    tb.ife(Objects.requireNonNull(t.originalPres.get(h)), origModifiable,
+                        tb.allLocs()));
                 uniformModifiable.put(h, origModifiable);
             }
             JTerm origFreeModifiable = t.originalFreeModifiables.get(h);
             if (origFreeModifiable != null) {
                 freeModifiables.put(h,
-                    tb.ife(t.originalPres.get(h), origFreeModifiable, tb.allLocs()));
+                    tb.ife(Objects.requireNonNull(t.originalPres.get(h)), origFreeModifiable,
+                        tb.allLocs()));
                 uniformFreeModifiable.put(h, origFreeModifiable);
             }
         }
 
         Map<LocationVariable, JTerm> axioms = new LinkedHashMap<>();
         if (t.originalAxioms != null) { // TODO: what about the others?
-            for (LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for (LocationVariable h : heapLDT.getAllHeaps()) {
                 JTerm oriAxiom = t.originalAxioms.get(h);
                 if (oriAxiom != null) {
-                    axioms.put(h,
-                        tb.imp(atPreify(t.originalPres.get(h), t.originalAtPreVars), oriAxiom));
+                    axioms.put(h, tb.imp(Objects.requireNonNull(
+                        atPreify(t.originalPres.get(h), t.originalAtPreVars),
+                        "no precondition for the heap of the axiom clause"), oriAxiom));
                 }
             }
         }
@@ -828,7 +882,7 @@ public class ContractFactory {
      * @param contracts the passed contracts
      * @return the union contract
      */
-    public FunctionalOperationContract union(FunctionalOperationContract... contracts) {
+    public @Nullable FunctionalOperationContract union(FunctionalOperationContract... contracts) {
         if (contracts.length == 0) {
             return null;
         }
@@ -846,28 +900,32 @@ public class ContractFactory {
 
     // PRIVATE METHODS
 
-    private static <T> void addToMap(T var, T originalVar, Map<T, T> map) {
+    private static <T> void addToMap(@Nullable T var, @Nullable T originalVar, Map<T, T> map) {
         if (var != null) {
-            map.put(var, originalVar);
+            map.put(var, Objects.requireNonNull(originalVar));
         }
     }
 
-    private JTerm atPreify(JTerm t, Map<LocationVariable, LocationVariable> atPreVars) {
+    private @Nullable JTerm atPreify(@Nullable JTerm t,
+            Map<LocationVariable, LocationVariable> atPreVars) {
         final Map<JTerm, JTerm> map = new LinkedHashMap<>(atPreVars.size());
         for (LocationVariable h : atPreVars.keySet()) {
             if (atPreVars.get(h) != null) {
                 map.put(tb.var(h), tb.var(atPreVars.get(h)));
             }
         }
+        // The replacer tolerates a null argument (mirroring the raw map accesses of the callers):
+        // a heap without a precondition clause yields a null formula here.
         return new OpReplacer(map, services.getTermFactory(), services.getProof()).replace(t);
     }
 
     /**
      * replace in original the variables used for self and parameters
      */
-    private JTerm replaceVariables(JTerm original, LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars, LocationVariable originalSelfVar,
+    private JTerm replaceVariables(JTerm original, @Nullable LocationVariable selfVar,
+            @Nullable ImmutableList<LocationVariable> paramVars,
+            @Nullable Map<LocationVariable, LocationVariable> atPreVars,
+            @Nullable LocationVariable originalSelfVar,
             ImmutableList<LocationVariable> originalParamVars,
             Map<LocationVariable, LocationVariable> originalAtPreVars) {
         return replaceVariables(original, selfVar, null, null, paramVars, atPreVars,
@@ -877,11 +935,12 @@ public class ContractFactory {
     /**
      * replace in original the variables used for self, result, exception, heap, and parameters
      */
-    private JTerm replaceVariables(JTerm original, LocationVariable selfVar,
-            LocationVariable resultVar,
-            LocationVariable excVar, ImmutableList<LocationVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars, LocationVariable originalSelfVar,
-            LocationVariable originalResultVar, LocationVariable originalExcVar,
+    private JTerm replaceVariables(JTerm original, @Nullable LocationVariable selfVar,
+            @Nullable LocationVariable resultVar,
+            @Nullable LocationVariable excVar, @Nullable ImmutableList<LocationVariable> paramVars,
+            @Nullable Map<LocationVariable, LocationVariable> atPreVars,
+            @Nullable LocationVariable originalSelfVar,
+            @Nullable LocationVariable originalResultVar, @Nullable LocationVariable originalExcVar,
             ImmutableList<LocationVariable> originalParamVars,
             Map<LocationVariable, LocationVariable> originalAtPreVars) {
         Map<Operator, Operator> map = new LinkedHashMap<>();
@@ -902,7 +961,7 @@ public class ContractFactory {
             }
         }
         OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
-        original = or.replace(original);
+        original = Objects.requireNonNull(or.replace(original), "no replacement for term");
         return original;
     }
 
@@ -914,7 +973,8 @@ public class ContractFactory {
     public static String generateDisplayName(String baseName, KeYJavaType forClass,
             IObserverFunction target, KeYJavaType specifiedIn, int myId) {
         return baseName + " " + myId + (specifiedIn.equals(forClass) ? ""
-                : " for " + specifiedIn.getJavaType().getFullName());
+                : " for " + Objects.requireNonNull(specifiedIn.getJavaType(), "no java type")
+                        .getFullName());
     }
 
     public static String generateContractName(String baseName, KeYJavaType forClass,
@@ -927,9 +987,14 @@ public class ContractFactory {
         final String methodName = target.name().toString();
         final int startIndexShortName = methodName.indexOf("::") + 2;
         final String methodShortName = methodName.substring(startIndexShortName);
-        return forClass.getJavaType().getFullName() + "[" + specifiedIn.getJavaType().getFullName()
-            + "::" + methodShortName + "(" + concatenate(",", target.getParamTypes()) + ")" + "]"
-            + "." + baseName;
+        final String forClassName =
+            Objects.requireNonNull(forClass.getJavaType(), "no java type").getFullName();
+        final String specifiedInName =
+            Objects.requireNonNull(specifiedIn.getJavaType(), "no java type").getFullName();
+        final ImmutableArray<KeYJavaType> paramTypes =
+            Objects.requireNonNull(target.getParamTypes(), "no parameter types for " + target);
+        return forClassName + "[" + specifiedInName + "::" + methodShortName + "("
+            + concatenate(",", paramTypes) + ")" + "]" + "." + baseName;
     }
 
     private static String concatenate(String delim, ImmutableArray<KeYJavaType> elems) {

@@ -14,6 +14,8 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A proof macro that attempts to automatically close provable side branch goals.
  * <p>
@@ -39,6 +41,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @see TryCloseMacro
  */
+@NullMarked
 public class TryCloseSideBranchesMacro extends TryCloseMacro {
 
     /**

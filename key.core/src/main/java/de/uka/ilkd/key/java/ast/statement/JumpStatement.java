@@ -11,11 +11,14 @@ import de.uka.ilkd.key.java.ast.PositionInfo;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Jump statement.
  *
  * @author <TT>AutoDoc</TT>
  */
+@NullMarked
 public abstract class JumpStatement extends JavaStatement {
 
     /**

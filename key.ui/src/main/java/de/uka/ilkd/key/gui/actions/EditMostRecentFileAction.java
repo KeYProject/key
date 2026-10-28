@@ -15,13 +15,14 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Opens the last opened file in an editor (well, it tries)
  */
+@NullMarked
 public final class EditMostRecentFileAction extends MainWindowAction
         implements KeYSelectionListener {
 
@@ -29,6 +30,12 @@ public final class EditMostRecentFileAction extends MainWindowAction
 
     private static final long serialVersionUID = -6214327707255790570L;
 
+    /**
+     * The action-configuration calls and the listener registration below operate on {@code this}
+     * while the receiver is still under initialization (EISOP initialization check); safe here
+     * since these configure the local action only, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public EditMostRecentFileAction(MainWindow mainWindow) {
         super(mainWindow);
 
@@ -56,8 +63,9 @@ public final class EditMostRecentFileAction extends MainWindowAction
                 try {
                     EditFileActionHandler.getInstance().workWithFile(f);
                 } catch (Exception exc) {
+                    String message = exc.getMessage();
                     LOGGER.error("Error opening file in external application: {}",
-                        exc.getMessage());
+                        message == null ? "null" : message);
                 }
             }
         }

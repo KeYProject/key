@@ -17,7 +17,9 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public abstract class FilterStrategy implements Strategy<@NonNull Goal> {
 
     private final Strategy<@NonNull Goal> delegate;

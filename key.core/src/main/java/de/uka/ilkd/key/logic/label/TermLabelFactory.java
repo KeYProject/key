@@ -8,6 +8,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.logic.TermServices;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -32,6 +33,7 @@ import org.jspecify.annotations.Nullable;
  * @author Mattias Ulbrich
  *
  */
+@NullMarked
 public interface TermLabelFactory<T extends TermLabel> {
     /**
      * Parses the arguments and produces a term label.

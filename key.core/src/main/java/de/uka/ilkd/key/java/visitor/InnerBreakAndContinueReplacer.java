@@ -20,6 +20,8 @@ import de.uka.ilkd.key.speclang.LoopContractImpl;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This replaces all breaks and continues in a loop with {@code break l}, where {@code l} is a
  * specified label. It is used in the transformation of a for loop to a while loop.
@@ -29,6 +31,7 @@ import org.key_project.util.ExtList;
  *
  * @author lanzinger
  */
+@NullMarked
 public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
     protected static final Boolean CHANGED = Boolean.TRUE;

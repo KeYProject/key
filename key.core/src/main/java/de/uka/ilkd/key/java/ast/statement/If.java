@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
@@ -12,11 +13,15 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * If.
  *
  * @author <TT>AutoDoc</TT>
  */
+@NullMarked
 public class If extends BranchStatement implements ExpressionContainer {
 
     /**
@@ -29,7 +34,7 @@ public class If extends BranchStatement implements ExpressionContainer {
      * Else branch.
      */
 
-    protected final Else elseBranch;
+    protected final @Nullable Else elseBranch;
 
     /**
      * Expression.
@@ -46,9 +51,12 @@ public class If extends BranchStatement implements ExpressionContainer {
      */
     public If(ExtList children) {
         super(children);
-        thenBranch = children.get(Then.class);
+        thenBranch = Objects.requireNonNull(children.get(Then.class),
+            "Then-branch of if-statement cannot be null.");
         elseBranch = children.get(Else.class);
-        expression = children.get(Expression.class);
+        expression =
+            Objects.requireNonNull(children.get(Expression.class),
+                "Guard of if-statement cannot be null.");
         checkValidity();
     }
 
@@ -93,7 +101,7 @@ public class If extends BranchStatement implements ExpressionContainer {
      * @param elseBranch
      *        an else.
      */
-    public If(Expression e, Then thenBranch, Else elseBranch) {
+    public If(Expression e, Then thenBranch, @Nullable Else elseBranch) {
         this.expression = e;
         this.thenBranch = thenBranch;
         this.elseBranch = elseBranch;
@@ -200,7 +208,7 @@ public class If extends BranchStatement implements ExpressionContainer {
      *
      * @return the else.
      */
-    public Else getElse() {
+    public @Nullable Else getElse() {
         return elseBranch;
     }
 

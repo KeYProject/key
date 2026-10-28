@@ -7,9 +7,12 @@ package de.uka.ilkd.key.gui.utilities;
 import java.awt.*;
 import javax.swing.*;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * FlowLayout subclass that fully supports wrapping of components.
  */
+@NullMarked
 public class WrapLayout extends FlowLayout {
     private static final long serialVersionUID = 1L;
 

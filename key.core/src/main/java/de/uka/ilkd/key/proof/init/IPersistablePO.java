@@ -14,6 +14,8 @@ import de.uka.ilkd.key.settings.Configuration;
 
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * <p>
  * This interface extends the standard proof obligation ({@link ProofOblInput}) with functionality
@@ -40,6 +42,7 @@ import org.key_project.prover.sequent.Sequent;
  * @see ProofSaver
  * @see de.uka.ilkd.key.proof.io.AbstractProblemLoader
  */
+@NullMarked
 public interface IPersistablePO extends ProofOblInput {
     /**
      * The key used to store {@link Object#getClass()}.

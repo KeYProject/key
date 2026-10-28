@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.swing.*;
@@ -22,6 +23,7 @@ import de.uka.ilkd.key.gui.fonticons.IconProvider;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.KeYConstants;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +34,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author weigl
  */
+@NullMarked
 public class CreateGithubIssueAction extends MainWindowAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateGithubIssueAction.class);
     private static final String URL = "https://github.com/keyproject/key/issues/new";
@@ -39,6 +42,11 @@ public class CreateGithubIssueAction extends MainWindowAction {
     public static final IconProvider ICON_GITHUB =
         new IconFontProvider(FontAwesomeBrands.GITHUB);
 
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public CreateGithubIssueAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Create Github Issue");
@@ -81,8 +89,9 @@ public class CreateGithubIssueAction extends MainWindowAction {
                 try (final var walker = Files.walk(javaSourceLocation)) {
                     java = walker.map(it -> {
                         try {
-                            if (it.getFileName().toString().endsWith(".java")) {
-                                return "* " + it.getFileName() + "\n```\n" + Files.readString(it)
+                            Path fileName = it.getFileName();
+                            if (fileName != null && fileName.toString().endsWith(".java")) {
+                                return "* " + fileName + "\n```\n" + Files.readString(it)
                                     + "```\n";
                             }
                         } catch (IOException e) {

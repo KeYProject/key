@@ -17,6 +17,9 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static org.key_project.logic.op.Function.FunctionKind.ORDINARY;
 
 
@@ -27,6 +30,7 @@ import static org.key_project.logic.op.Function.FunctionKind.ORDINARY;
  * <strong>As soon as {@link AbstractTermTransformer#METASORT} is generalized, this class
  * may be deleted.</strong>
  */
+@NullMarked
 public class JFunction extends Function implements Sorted, Operator {
 
     // -------------------------------------------------------------------------
@@ -49,8 +53,14 @@ public class JFunction extends Function implements Sorted, Operator {
      * @param introductionTime the introduction time of the symbol, or a
      *        {@link Function#UNRECORDED}, if none available (e.g. existed from the beginning)
      */
+    @SuppressWarnings("NullAway") // key.ncore Function#Function(Name, ImmutableArray, Sort,
+                                  // ImmutableArray, boolean, boolean, FunctionKind, int) leaves its
+                                  // whereToBind parameter unannotated although its package
+                                  // (org.key_project.logic.op) is @NullMarked, so it counts as
+                                  // @NonNull here; an honest @Nullable widening of that parameter
+                                  // is tracked as follow-up work.
     JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-            ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
+            @Nullable ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
             FunctionKind kind, int introductionTime) {
         super(name, argSorts, sort, whereToBind, isRigid, unique, kind, introductionTime);
 
@@ -61,7 +71,7 @@ public class JFunction extends Function implements Sorted, Operator {
     }
 
     public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-            ImmutableArray<Boolean> whereToBind, boolean unique) {
+            @Nullable ImmutableArray<Boolean> whereToBind, boolean unique) {
         this(name, sort, argSorts, whereToBind, unique, true, ORDINARY, UNRECORDED);
     }
 
@@ -79,12 +89,12 @@ public class JFunction extends Function implements Sorted, Operator {
      *        {@link Function#UNRECORDED}, if none available (e.g. existed from the beginning)
      */
     public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-            ImmutableArray<Boolean> whereToBind, boolean unique, FunctionKind kind,
+            @Nullable ImmutableArray<Boolean> whereToBind, boolean unique, FunctionKind kind,
             int introductionTime) {
         this(name, sort, argSorts, whereToBind, unique, true, kind, introductionTime);
     }
 
-    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind,
+    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean @Nullable [] whereToBind,
             boolean unique) {
         this(name, sort, new ImmutableArray<>(argSorts),
             whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique);
@@ -99,7 +109,7 @@ public class JFunction extends Function implements Sorted, Operator {
     }
 
     public JFunction(Name name, Sort sort, Sort... argSorts) {
-        this(name, sort, argSorts, null, false);
+        this(name, sort, new ImmutableArray<>(argSorts), null, false);
     }
 
     public JFunction(Name name, Sort sort) {

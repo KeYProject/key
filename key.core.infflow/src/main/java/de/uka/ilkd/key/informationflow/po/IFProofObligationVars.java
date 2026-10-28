@@ -13,6 +13,9 @@ import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * This class contains the set of four sets of ProofObligationVars necessary for information flow
@@ -21,6 +24,7 @@ import de.uka.ilkd.key.logic.JTerm;
  * @author christoph
  *
  */
+@NullMarked
 public class IFProofObligationVars {
 
     public final ProofObligationVars c1, c2, symbExecVars;
@@ -44,7 +48,7 @@ public class IFProofObligationVars {
         infFlowToSymbExecVarsMaps = new HashMap<>();
         infFlowToSymbExecVarsMaps.put(c1, new HashMap<>());
         infFlowToSymbExecVarsMaps.put(c2, new HashMap<>());
-        linkSymbExecVarsToCopies();
+        linkSymbExecVarsToCopies(infFlowToSymbExecVarsMaps, symbExecVars);
     }
 
 
@@ -56,15 +60,23 @@ public class IFProofObligationVars {
     }
 
 
-    private void linkSymbExecVarsToCopies() {
+    private static void linkSymbExecVarsToCopies(
+            Map<ProofObligationVars, Map<JTerm, JTerm>> infFlowToSymbExecVarsMaps,
+            ProofObligationVars symbExecVars) {
         for (ProofObligationVars ifVars : infFlowToSymbExecVarsMaps.keySet()) {
-            linkStateVarsToCopies(ifVars.pre, symbExecVars.pre, getMapFor(ifVars));
-            linkStateVarsToCopies(ifVars.post, symbExecVars.post, getMapFor(ifVars));
+            final Map<JTerm, JTerm> map = infFlowToSymbExecVarsMaps.get(ifVars);
+            if (map == null) {
+                throw new NullPointerException(
+                    "No variable map for the information flow variables " + ifVars + ".");
+            }
+            linkStateVarsToCopies(ifVars.pre, symbExecVars.pre, map);
+            linkStateVarsToCopies(ifVars.post, symbExecVars.post, map);
         }
     }
 
 
-    private void linkStateVarsToCopies(StateVars ifVars, StateVars seVars, Map<JTerm, JTerm> map) {
+    private static void linkStateVarsToCopies(StateVars ifVars, StateVars seVars,
+            Map<JTerm, JTerm> map) {
         final Iterator<JTerm> ifVarsIt = ifVars.termList.iterator();
         for (final JTerm symbTerm : seVars.termList) {
             final JTerm ifTerm;
@@ -74,13 +86,36 @@ public class IFProofObligationVars {
                 ifTerm = null;
             }
             if (symbTerm != null) {
-                map.put(symbTerm, ifTerm);
+                linkToCopy(map, symbTerm, ifTerm);
             }
         }
     }
 
 
-    public Map<JTerm, JTerm> getMapFor(ProofObligationVars vars) {
+    /**
+     * Links a symbolic execution term to its counterpart in an information flow
+     * copy.
+     *
+     * <p>
+     * The counterpart may be absent ({@code null}): some proof configurations
+     * carry a shorter term list in the copy than in the symbolic execution
+     * variables (for instance when the measured-by variable is present only in
+     * the symbolic execution copy). This is deliberate and historically
+     * recorded as a key mapped to {@code null}: the consumer
+     * {@code InfFlowProgVarRenamer} decides via {@code containsKey} whether a
+     * term has a counterpart, and a present key mapped to {@code null} is
+     * observably different from an absent key there. The map's value type
+     * cannot be widened to {@code @Nullable} because the downstream consumers
+     * in key.core declare the unannotated {@code Map<JTerm, JTerm>}.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private static void linkToCopy(Map<JTerm, JTerm> map, JTerm symbTerm,
+            @Nullable JTerm ifTerm) {
+        map.put(symbTerm, ifTerm);
+    }
+
+
+    public @Nullable Map<JTerm, JTerm> getMapFor(ProofObligationVars vars) {
         return infFlowToSymbExecVarsMaps.get(vars);
     }
 

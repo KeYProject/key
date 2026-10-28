@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
@@ -18,11 +19,10 @@ import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * Variable specification that defines a variable name. This is a part of a VariableDeclaration and
@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author AL
  */
 
+@NullMarked
 public class VariableSpecification extends JavaNonTerminalProgramElement
         implements NamedProgramElement, ExpressionContainer, Variable {
     private static final Logger LOGGER = LoggerFactory.getLogger(VariableSpecification.class);
@@ -41,7 +42,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     /**
      * Initializer.
      */
-    protected final Expression initializer;
+    protected final @Nullable Expression initializer;
 
     /**
      * Dimensions.
@@ -55,10 +56,21 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
 
     protected final IProgramVariable programVariable;
 
+    // The parameterless constructor deliberately leaves the {@code programVariable} and
+    // {@code type} fields unset (null): it builds an "empty" variable specification whose
+    // getters (see {@link #getType()}, {@link #getProgramVariable()}) are typed @NonNull by the
+    // {@link de.uka.ilkd.key.java.ast.abstraction.Variable} resp.
+    // {@link de.uka.ilkd.key.java.ast.abstraction.Field} interfaces. The null values are tolerated
+    // at runtime by every accessor of this class.
+    @SuppressWarnings("NullAway")
     public VariableSpecification() {
         this(null, 0, null, null, null);
     }
 
+    // The {@code programVariable}'s KeYJavaType is null for schema program variables (see
+    // ProgramSV.getKeYJavaType()); the resulting null {@code type} is stored by the delegate while
+    // the delegated constructor's Type parameter stays @NonNull for the regular callers.
+    @SuppressWarnings("NullAway")
     public VariableSpecification(IProgramVariable programVariable) {
         this(programVariable, programVariable.getKeYJavaType());
     }
@@ -192,7 +204,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      *
      * @return the string.
      */
-    public final String getName() {
+    public final @Nullable String getName() {
         return (programVariable == null) ? null : programVariable.name().toString();
     }
 
@@ -234,7 +246,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
      *
      * @return the expression.
      */
-    public Expression getInitializer() {
+    public @Nullable Expression getInitializer() {
         return initializer;
     }
 
@@ -247,6 +259,10 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
             "Cannot determine if " + programVariable + " is a model field");
     }
 
+    // Returns exactly whether an initializer is present (null-check on the honestly @Nullable
+    // field). The field itself can legitimately stay null after a false return, so no
+    // @EnsuresNonNull-style guarantee is (or can be) expressed here; callers must hold the
+    // result of this method before invoking getInitializer().
     public boolean hasInitializer() {
         return initializer != null;
     }
@@ -265,16 +281,14 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     }
 
     public String getFullName() {
-        return getName();
+        return Objects.requireNonNull(getName(), "name of the variable specification");
     }
 
-    @NonNull
     @Override
     public SourceElement getFirstElement() {
         return programVariable;
     }
 
-    @NonNull
     @Override
     public SourceElement getLastElement() {
         if (initializer != null) {
@@ -331,10 +345,12 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     }
 
     @Override
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, @Nullable MatchConditions matchCond) {
         final ProgramElement pe = source.getSource();
         matchCond = super.match(source, matchCond);
-        if (matchCond != null && getDimensions() != ((VariableSpecification) pe).getDimensions()) {
+        if (matchCond != null
+                && getDimensions() != ((VariableSpecification) Objects.requireNonNull(pe))
+                        .getDimensions()) {
             return null;
         }
         return matchCond;

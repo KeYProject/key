@@ -10,6 +10,7 @@ import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import javax.swing.*;
@@ -30,11 +31,14 @@ import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.mgt.BasicTask;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
+import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +46,7 @@ import org.slf4j.LoggerFactory;
  * Task tree panel, showing all currently opened proofs.
  * Usually located in the top left panel.
  */
+@NullMarked
 public class TaskTree extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskTree.class);
 
@@ -127,17 +132,36 @@ public class TaskTree extends JPanel {
         if (taskForProof instanceof BasicTask) {
             taskForProof = ((BasicTask) taskForProof).getRootTask();
         }
+        if (taskForProof == null) {
+            // the model keeps a task node for the proof that is to be removed
+            throw new NullPointerException("No task node for the proof to remove.");
+        }
         removeTask(taskForProof);
     }
 
     public synchronized void removeTask(TaskTreeNode tn) {
         model.removeTask(tn);
         mediator.notify(new AbandonTaskEvent());
-        for (int i = 0; i < tn.allProofs().length; i++) {
-            tn.allProofs()[i].removeProofTreeListener(proofTreeListener);
-            tn.allProofs()[i].mgt().removeProofListener();
+        @Nullable
+        Proof[] proofs = tn.allProofs();
+        List<Proof> proofsNonNull = new ArrayList<>(proofs.length);
+        for (@Nullable
+        Proof proof : proofs) {
+            if (proof == null) {
+                // a task node's proof list never contains null entries
+                throw new NullPointerException("No proof available.");
+            }
+            proof.removeProofTreeListener(proofTreeListener);
+            ProofCorrectnessMgt mgt = proof.mgt();
+            if (mgt == null) {
+                // every proof carries its correctness management object
+                throw new NullPointerException("No proof management available.");
+            }
+            mgt.removeProofListener();
+            proofsNonNull.add(proof);
         }
-        MainWindow.getInstance().getProofTreeView().removeProofs(tn.allProofs());
+        MainWindow.getInstance().getProofTreeView()
+                .removeProofs(proofsNonNull.toArray(new Proof[0]));
         // go to some other node, take the last leaf.
         TreePath path = delegateView.getPathForRow(delegateView.getRowCount() - 1);
 
@@ -166,7 +190,7 @@ public class TaskTree extends JPanel {
     /**
      * returns the first selected task which is instance of a task tree node
      */
-    public TaskTreeNode getSelectedTask() {
+    public @Nullable TaskTreeNode getSelectedTask() {
         TreePath path = delegateView.getSelectionModel().getSelectionPath();
         if (path != null && path.getLastPathComponent() instanceof TaskTreeNode) {
             return (TaskTreeNode) path.getLastPathComponent();
@@ -238,7 +262,7 @@ public class TaskTree extends JPanel {
      *
      * @param proof The proof to remove.
      */
-    public synchronized void removeProof(Proof proof) {
+    public synchronized void removeProof(@Nullable Proof proof) {
         if (proof != null) {
             ProofEnvironment env = proof.getEnv();
             // Search EnvNode which contains the environment of the given proof.
@@ -265,7 +289,6 @@ public class TaskTree extends JPanel {
             }
         }
     }
-
 
     /**
      * inner class implementing the mouse listener that is responsible for this gui component
@@ -303,14 +326,15 @@ public class TaskTree extends JPanel {
                 if (selPath != null && selPath.getLastPathComponent() instanceof BasicTask task) {
                     Proof p = task.proof();
                     delegateView.setSelectionPath(selPath);
-                    JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
-                        ContextMenuKind.PROOF_LIST, p, mediator);
-                    menu.show(e.getComponent(), e.getX(), e.getY());
+                    if (p != null) {
+                        JPopupMenu menu = KeYGuiExtensionFacade.createContextMenu(
+                            ContextMenuKind.PROOF_LIST, p, mediator);
+                        menu.show(e.getComponent(), e.getX(), e.getY());
+                    }
                 }
             }
         }
     }
-
 
     /**
      * a prooftree listener, so that it is known when the proof has closed
@@ -344,19 +368,26 @@ public class TaskTree extends JPanel {
         }
     } // end of prooftreelistener
 
-
     private static final class TaskTreeIconCellRenderer extends DefaultTreeCellRenderer {
         private static final Icon KEY_ICON = IconFactory.keyHole(20, 20);
         private static final Icon KEY_CLOSED_ICON = IconFactory.keyHoleClosed(20);
         private static final Icon KEY_ALMOST_CLOSED_ICON = IconFactory.keyHoleAlmostClosed(20, 20);
         private static final Icon KEY_CACHED_CLOSED_ICON = IconFactory.keyCachedClosed(20, 20);
 
-
         private TaskTreeIconCellRenderer() {
         }
 
+        /**
+         * Renders the tree cell for the given value.
+         *
+         * <p>
+         * The icon is cleared before the proof status is applied; {@code null} removes the icon
+         * at run time, while the JDK declares a non-null argument, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:argument.type.incompatible")
         @Override
-        public Component getTreeCellRendererComponent(JTree list, Object value, boolean selected,
+        public Component getTreeCellRendererComponent(JTree list, @Nullable Object value,
+                boolean selected,
                 boolean expanded, boolean leaf, int row, boolean hasFocus) {
             Object newValue;
             if (value instanceof TaskTreeNode) {
@@ -366,7 +397,7 @@ public class TaskTree extends JPanel {
             }
             super.getTreeCellRendererComponent(list, newValue, selected, expanded, leaf, row,
                 hasFocus);
-            setIcon(null);
+            setIcon((Icon) null);
             if (value instanceof TaskTreeNode) {
                 ProofStatus ps = ((TaskTreeNode) value).getStatus();
                 if (ps != null) {
@@ -393,7 +424,6 @@ public class TaskTree extends JPanel {
         }
     }
 
-
     class TaskTreeSelectionListener implements KeYSelectionListener {
         /** focused node has changed */
         public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
@@ -408,6 +438,10 @@ public class TaskTree extends JPanel {
                 return;
             }
             TaskTreeNode ttn = model.getTaskForProof(e.getSource().getSelectedProof());
+            if (ttn == null) {
+                // the model keeps a task node for every currently selected proof
+                throw new NullPointerException("No task node for the selected proof.");
+            }
             delegateView.setSelectionPath(new TreePath(ttn.getPath()));
             validate();
         }

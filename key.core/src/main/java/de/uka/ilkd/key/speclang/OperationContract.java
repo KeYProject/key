@@ -15,6 +15,10 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public interface OperationContract extends Contract {
 
     @Override
@@ -46,9 +50,11 @@ public interface OperationContract extends Contract {
      * @param selfVar the self variable.
      * @param paramVars the list of parameter variables.
      * @param services the services object.
-     * @return the modifiable clause.
+     * @return the modifiable clause, or {@code null} if the contract has no modifiable clause for
+     *         the given heap.
      */
-    JTerm getModifiable(LocationVariable heapVar, LocationVariable selfVar,
+    @Nullable
+    JTerm getModifiable(LocationVariable heapVar, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, Services services);
 
     /**
@@ -59,9 +65,11 @@ public interface OperationContract extends Contract {
      * @param selfTerm the self variable term.
      * @param paramTerms the list of parameter variable terms.
      * @param services the services object.
-     * @return the modifiable clause.
+     * @return the modifiable clause, or {@code null} if the contract has no modifiable clause for
+     *         the given heap.
      */
-    JTerm getModifiable(LocationVariable heapVar, JTerm heapTerm, JTerm selfTerm,
+    @Nullable
+    JTerm getModifiable(LocationVariable heapVar, JTerm heapTerm, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Services services);
 
     /**
@@ -71,9 +79,11 @@ public interface OperationContract extends Contract {
      * @param selfVar the self variable.
      * @param paramVars the list of parameter variables.
      * @param services the services object.
-     * @return the free modifiable clause.
+     * @return the free modifiable clause, or {@code null} if the contract has none for the given
+     *         heap.
      */
-    JTerm getFreeModifiable(LocationVariable heapVar, LocationVariable selfVar,
+    @Nullable
+    JTerm getFreeModifiable(LocationVariable heapVar, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Services services);
 
@@ -85,22 +95,28 @@ public interface OperationContract extends Contract {
      * @param selfTerm the self variable term.
      * @param paramTerms the list of parameter variable terms.
      * @param services the services object.
-     * @return the free modifiable clause.
+     * @return the free modifiable clause, or {@code null} if the contract has none for the given
+     *         heap.
      */
+    @Nullable
     JTerm getFreeModifiable(LocationVariable heapVar, JTerm heapTerm,
-            JTerm selfTerm,
+            @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms,
             Services services);
 
-    JTerm getFreePre(LocationVariable heap, LocationVariable selfVar,
+    @Nullable
+    JTerm getFreePre(LocationVariable heap, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
-    JTerm getFreePre(List<LocationVariable> heapContext, LocationVariable selfVar,
+    @Nullable
+    JTerm getFreePre(List<LocationVariable> heapContext,
+            @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
-    JTerm getFreePre(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+    @Nullable
+    JTerm getFreePre(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
             Services services);
 }

@@ -19,6 +19,9 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The array allocation operator. There are two variants for NewArray:
  * <OL>
@@ -34,6 +37,7 @@ import org.key_project.util.collection.ImmutableArray;
  * NewArray has either a list of dimension length expressions, or a single ArrayInitializer.
  */
 
+@NullMarked
 public class NewArray extends TypeOperator implements Reference, ReferencePrefix {
 
     /**
@@ -47,7 +51,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      * Array initializer.
      */
 
-    protected final ArrayInitializer arrayInitializer;
+    protected final @Nullable ArrayInitializer arrayInitializer;
 
     /**
      * the key java type of this array
@@ -91,7 +95,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      */
     public NewArray(
             Expression[] arguments, TypeReference typeRef, KeYJavaType keyJavaType,
-            ArrayInitializer init, int dimensions) {
+            @Nullable ArrayInitializer init, int dimensions) {
         super(arguments, typeRef);
         this.arrayInitializer = init;
         this.dimensions = dimensions;
@@ -158,7 +162,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      * @return the array initializer.
      */
 
-    public ArrayInitializer getArrayInitializer() {
+    public @Nullable ArrayInitializer getArrayInitializer() {
         return arrayInitializer;
     }
 
@@ -275,7 +279,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
      *
      * @author VK
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return null;
     }
 

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.statement;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.Statement;
@@ -11,16 +13,20 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Else.
  */
 
+@NullMarked
 public class Else extends BranchImp {
 
     /**
      * Body.
      */
-    protected final Statement body;
+    protected final @Nullable Statement body;
 
 
     /**
@@ -49,7 +55,7 @@ public class Else extends BranchImp {
 
 
     public SourceElement getLastElement() {
-        return body.getLastElement();
+        return Objects.requireNonNull(body, "else body must not be null").getLastElement();
     }
 
     /**
@@ -108,7 +114,7 @@ public class Else extends BranchImp {
      * The body may be empty (null), to define a fall-through. Attaching an {@link EmptyStatement}
      * would create a single ";".
      */
-    public Statement getBody() {
+    public @Nullable Statement getBody() {
         return body;
     }
 

@@ -16,12 +16,16 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Matches a generic sort of the pattern against the concrete sort found in the source (the sort
  * of a parametric function's {@link GenericArgument} or of a {@link QualifierWrapper}) by
  * recording an identity {@link GenericSortCondition} in the instantiations: the generic sort must
  * be (or already have been) instantiated with exactly that concrete sort.
  */
+@NullMarked
 public class MatchGenericSortInstruction implements MatchInstruction {
 
     private final GenericSort genericSortOfOp;
@@ -39,7 +43,8 @@ public class MatchGenericSortInstruction implements MatchInstruction {
      * @param matchConditions the {@link MatchResultInfo} accumulated so far
      * @return the resulting {@link MatchResultInfo}, or {@code null} on failure
      */
-    private MatchResultInfo matchSorts(Sort dependingSortToMatch, MatchResultInfo matchConditions,
+    private @Nullable MatchResultInfo matchSorts(Sort dependingSortToMatch,
+            MatchResultInfo matchConditions,
             LogicServices services) {
         // the source sort may itself be generic: proving a taclet correct matches schematic
         // patterns against schematic terms
@@ -58,7 +63,7 @@ public class MatchGenericSortInstruction implements MatchInstruction {
      * {@inheritDoc}
      */
     @Override
-    public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo mc,
+    public @Nullable MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo mc,
             LogicServices services) {
         if (actualElement instanceof GenericArgument(Sort sort)) {
             return matchSorts(sort, mc, services);

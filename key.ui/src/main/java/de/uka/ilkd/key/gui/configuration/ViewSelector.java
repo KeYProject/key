@@ -14,11 +14,15 @@ import javax.swing.text.PlainDocument;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @deprecated weigl, 2019-05-10: integrated into the
  *             {@link de.uka.ilkd.key.gui.settings.StandardUISettings}
  */
 @Deprecated
+@NullMarked
 public class ViewSelector extends JDialog {
 
     /**
@@ -30,10 +34,18 @@ public class ViewSelector extends JDialog {
     private JCheckBox showUninstantiatedTacletCB;
 
     /**
-     * creates a new ViewSelector
+     * Creates a new ViewSelector.
      *
      * @param parent The parent widget of this ViewSelector
+     *
+     *        <p>
+     *        The input fields are created by {@link #layoutViewSelector()}, which is invoked
+     *        unconditionally from this constructor; the EISOP initialization check cannot see the
+     *        assignments inside the delegated method, so both the fields and the delegated calls
+     *        are suppressed with scoped keys.
      */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     public ViewSelector(JFrame parent) {
         super(parent, "Maximum line number for tooltips", true);
         layoutViewSelector();
@@ -41,11 +53,9 @@ public class ViewSelector extends JDialog {
         setLocationRelativeTo(parent);
     }
 
-
     private void updateButtons() {
 
     }
-
 
     /** lays out the selector */
     protected void layoutViewSelector() {
@@ -151,8 +161,6 @@ public class ViewSelector extends JDialog {
 
     }
 
-
-
     // INNER CLASS TO READ ONLY NUMBERS FOR MAX APPs
     static class NumberDocument extends PlainDocument {
 
@@ -161,7 +169,8 @@ public class ViewSelector extends JDialog {
          */
         private static final long serialVersionUID = -5423315366275141764L;
 
-        public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+        public void insertString(int offs, @Nullable String str, AttributeSet a)
+                throws BadLocationException {
             if (str == null) {
                 return;
             }
@@ -182,6 +191,15 @@ public class ViewSelector extends JDialog {
          */
         private static final long serialVersionUID = 5578481785681533620L;
 
+        /**
+         * Creates a numeric input field with the given initial value.
+         *
+         * <p>
+         * The field initializes its text while the receiver is still under initialization (EISOP
+         * initialization check); the text only materializes once the field is displayed after
+         * construction, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public NumberInputField(int number, int cols) {
             super(cols);
             setText(String.valueOf(number));
@@ -191,7 +209,5 @@ public class ViewSelector extends JDialog {
             return new NumberDocument();
         }
     }
-
-
 
 }

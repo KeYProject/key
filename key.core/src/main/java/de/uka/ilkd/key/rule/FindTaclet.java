@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.*;
 
 import org.key_project.logic.ChoiceExpr;
@@ -20,7 +22,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 
 /**
@@ -30,9 +34,10 @@ import org.jspecify.annotations.NonNull;
  * ({@link AntecTaclet}), to the succedent ({@link SuccTaclet}) or to an arbitrary term that matches
  * the find part somewhere in the sequent ({@link RewriteTaclet}).
  */
+@NullMarked
 public abstract class FindTaclet extends Taclet {
     /** Set of schema variables of the assumes sequent and the (optional) find expression/sequent */
-    private ImmutableSet<SchemaVariable> assumesAndFindSchemaVariables = null;
+    private @Nullable ImmutableSet<SchemaVariable> assumesAndFindSchemaVariables = null;
 
     /**
      * creates a FindTaclet
@@ -54,7 +59,7 @@ public abstract class FindTaclet extends Taclet {
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, SyntaxElement find,
-            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, boolean surviveSymbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, find, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
@@ -82,7 +87,7 @@ public abstract class FindTaclet extends Taclet {
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, SyntaxElement find,
-            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices, false,
             tacletAnnotations);
@@ -126,12 +131,12 @@ public abstract class FindTaclet extends Taclet {
         if (!super.equals(o)) {
             return false;
         }
-        return find.equals(((FindTaclet) o).find);
+        return Objects.requireNonNull(find).equals(((FindTaclet) o).find);
     }
 
     /** {@inheritDoc} */
     public int hashCode() {
-        return 13 * super.hashCode() + find.hashCode();
+        return 13 * super.hashCode() + Objects.requireNonNull(find).hashCode();
     }
 
     /**

@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.Set;
 import javax.swing.text.Document;
 import javax.swing.text.PlainDocument;
+import javax.swing.text.SimpleAttributeSet;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 
@@ -36,7 +37,7 @@ public class IssueDialogMessageTest {
      */
     private static int offsetIn(String source, Location loc) throws Exception {
         Document doc = new PlainDocument();
-        doc.insertString(0, source, null);
+        doc.insertString(0, source, new SimpleAttributeSet());
         return IssueDialog.getOffsetFromLineColumn(doc, loc.getPosition());
     }
 

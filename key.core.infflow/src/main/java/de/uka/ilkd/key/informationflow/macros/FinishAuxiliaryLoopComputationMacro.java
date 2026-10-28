@@ -23,14 +23,19 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.prover.engine.ProverTaskListener;
+import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliaryComputationMacro {
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
@@ -48,20 +53,35 @@ public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliary
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener) {
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener) {
         final ProofOblInput poForProof =
             proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-        final LoopInvExecutionPO loopInvExecPO = (LoopInvExecutionPO) poForProof;
+        if (!(poForProof instanceof LoopInvExecutionPO loopInvExecPO)) {
+            throw new NullPointerException("No loop invariant execution proof obligation for "
+                + "the auxiliary proof.");
+        }
 
         final Goal initiatingGoal = loopInvExecPO.getInitiatingGoal();
         final InfFlowProof initiatingProof = (InfFlowProof) initiatingGoal.proof();
         final Services services = initiatingProof.getServices();
 
-        final var loopInvRuleApp =
-            (InfFlowLoopInvariantBuiltInRuleApp) initiatingGoal.node().parent().getAppliedRuleApp();
+        final Node parent = initiatingGoal.node().parent();
+        if (parent == null) {
+            throw new NullPointerException("No parent node of the initiating goal.");
+        }
+        final RuleApp app = parent.getAppliedRuleApp();
+        if (app == null) {
+            throw new NullPointerException("No applied rule app on the parent node.");
+        }
+        final var loopInvRuleApp = (InfFlowLoopInvariantBuiltInRuleApp) app;
         LoopSpecification loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
         loopInv = loopInv != null ? loopInv : loopInvRuleApp.getSpec();
         IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
+        if (ifVars == null) {
+            throw new NullPointerException("No information flow proof obligation variables for "
+                + "the rule application.");
+        }
         ifVars = ifVars.labelHeapAtPreAsAnonHeapFunc();
 
         mergeNamespaces(initiatingProof, proof);

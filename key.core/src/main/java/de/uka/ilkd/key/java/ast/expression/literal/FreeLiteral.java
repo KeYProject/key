@@ -29,8 +29,10 @@ import de.uka.ilkd.key.ldt.FreeLDT;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public non-sealed class FreeLiteral extends Literal {
     public final static FreeLiteral INSTANCE = new FreeLiteral(null, null);
 
@@ -45,7 +47,7 @@ public non-sealed class FreeLiteral extends Literal {
     }
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FREE_ADT);
     }
 

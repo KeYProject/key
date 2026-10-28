@@ -15,8 +15,12 @@ import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.smt.model.*;
 
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class CETree {
     /**
      * A comparator that sort ignoRiNG cASe. Used to sort labels.
@@ -37,8 +41,17 @@ public class CETree {
      */
     private final Model model;
 
-
-
+    /**
+     * Creates the counter-example tree for the given SMT model.
+     *
+     * <p>
+     * The tree is initialized by {@link #initTree()} while the receiver is still under
+     * initialization (EISOP initialization check); the EISOP initialization check cannot see the
+     * assignment inside the delegated call, so both the field and the delegated call are
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     public CETree(Model model) {
         super();
         this.model = model;
@@ -61,7 +74,6 @@ public class CETree {
     public JTree getTreeComponent() {
         return tree;
     }
-
 
     private DefaultMutableTreeNode constructTree() {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Model");
@@ -129,7 +141,6 @@ public class CETree {
             }
         }
 
-
         // Fun Values
         DefaultMutableTreeNode functionValues = new DefaultMutableTreeNode("Functions");
         object.add(functionValues);
@@ -162,7 +173,8 @@ public class CETree {
     }
 
     public static String computeSortName(ObjectVal ov) {
-        return ov.getSort() == null ? "java.lang.Object" : ov.getSort().name().toString();
+        Sort sort = ov.getSort();
+        return sort == null ? "java.lang.Object" : sort.name().toString();
     }
 
     public static List<Pair<String, String>> computeObjectProperties(ObjectVal ov,
@@ -237,7 +249,6 @@ public class CETree {
             addSequenceProperties(s, sequence);
         }
 
-
     }
 
     public static String computeSequenceName(Sequence s) {
@@ -293,14 +304,10 @@ public class CETree {
 
     private class CEMouseAdapter extends MouseAdapter {
 
-
-
         public CEMouseAdapter() {
             super();
 
         }
-
-
 
         public void mousePressed(MouseEvent e) {
             int selRow = tree.getRowForLocation(e.getX(), e.getY());
@@ -342,7 +349,6 @@ public class CETree {
                                     return;
                                 }
 
-
                                 // search for object
                                 ObjectVal val = null;
                                 for (ObjectVal o : heap.getObjects()) {
@@ -357,7 +363,6 @@ public class CETree {
                                 addObjectProperties(val, node);
 
                             }
-
 
                         } else if (value.startsWith("#l")) {
                             LocationSet locset = null;
@@ -387,12 +392,9 @@ public class CETree {
 
                             addSequenceProperties(sequence, node);
 
-
                         }
 
                         tree.expandPath(selPath);
-
-
 
                     }
 

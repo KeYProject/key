@@ -50,6 +50,8 @@ import org.key_project.slicing.util.GraphvizDotExecutor;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +61,7 @@ import org.slf4j.LoggerFactory;
  * @author Arne Keller
  */
 @HelpInfo(path = "/user/ProofSlicing/")
+@NullMarked
 public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionListener,
         ProofTreeListener {
     /**
@@ -86,79 +89,79 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
     /**
      * The proof currently shown in the KeY UI.
      */
-    private transient Proof currentProof = null;
+    private transient @Nullable Proof currentProof = null;
     /**
      * "Export as DOT" button.
      */
-    private JButton dotExport = null;
+    private JButton dotExport;
     /**
      * "Show rendering of graph" button.
      */
-    private JButton showGraphRendering = null;
+    private JButton showGraphRendering;
     /**
      * "Slice proof" button.
      */
-    private JButton sliceProof = null;
+    private JButton sliceProof;
     /**
      * "Slice proof to fixed point" button.
      */
-    private JButton sliceProofFixedPoint = null;
+    private JButton sliceProofFixedPoint;
     /**
      * "Run analysis" button.
      */
-    private JButton runAnalysis = null;
+    private JButton runAnalysis;
     /**
      * "Show rule statistics" button.
      */
-    private JButton showRuleStatistics = null;
+    private JButton showRuleStatistics;
     /**
      * Label indicating the number of dependency graph nodes.
      *
      * @see org.key_project.slicing.graph.DependencyGraph
      */
-    private JLabel graphNodes = null;
+    private JLabel graphNodes;
     /**
      * Label indicating the number of dependency graph edges.
      *
      * @see org.key_project.slicing.graph.DependencyGraph
      */
-    private JLabel graphEdges = null;
+    private JLabel graphEdges;
     /**
      * Label showing total number of steps in the analyzed proof.
      */
-    private JLabel totalSteps = null;
+    private JLabel totalSteps;
     /**
      * Label showing number of useful steps as determined by the analysis.
      */
-    private JLabel usefulSteps = null;
+    private JLabel usefulSteps;
     /**
      * Label showing total number of branches in the analyzed proof.
      */
-    private JLabel totalBranches = null;
+    private JLabel totalBranches;
     /**
      * Label showing number of useful branches as determined by the analysis.
      */
-    private JLabel usefulBranches = null;
+    private JLabel usefulBranches;
     /**
      * Checkbox to abbreviate formulas in DOT output.
      */
-    private JCheckBox abbreviateFormulas = null;
+    private JCheckBox abbreviateFormulas;
     /**
      * Checkbox to shorten chains in DOT output.
      */
-    private JCheckBox abbreviateChains = null;
+    private JCheckBox abbreviateChains;
     /**
      * Checkbox to enable the dependency analysis algorithm.
      */
-    private JCheckBox doDependencyAnalysis = null;
+    private JCheckBox doDependencyAnalysis;
     /**
      * Checkbox to enable rule de-duplication.
      */
-    private JCheckBox doDeduplicateRuleApps = null;
+    private JCheckBox doDeduplicateRuleApps;
     /**
      * Panel showing execution time of the algorithm.
      */
-    private JPanel timings = null;
+    private JPanel timings;
 
     /**
      * Number of nodes in the dependency graph.
@@ -180,10 +183,19 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
 
     /**
      * Construct a new panel for this extension.
+     * <p>
+     * The UI calls below operate on {@code this} while the receiver is still under initialization
+     * (EISOP initialization check). All widget fields are assigned in {@link #buildUI()} (and its
+     * callees), which runs before any of the registered listeners or the label-update timer can
+     * fire; the checker cannot see through those helper-method assignments (reported as
+     * {@code initialization.fields.uninitialized}) and rejects listener registration on the
+     * under-initialized receiver, so these are suppressed with scoped keys.
      *
      * @param mediator the KeY mediator
      * @param extension instance of the extension
      */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible", "nullness:initialization.fields.uninitialized" })
     public SlicingLeftPanel(KeYMediator mediator, SlicingExtension extension) {
         super();
 
@@ -202,12 +214,21 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().addPropertyChangeListener(
             GeneralSettings.PARALLEL_PROVER_ENABLED, evt -> updateUIState());
 
-        updateGraphLabelsTimer = new Timer(100, e -> {
+        Timer timer = new Timer(100, e -> {
             if (updateGraphLabels) {
                 displayGraphLabels();
-                updateGraphLabelsTimer.stop();
+                stopGraphLabelsTimer();
             }
         });
+        updateGraphLabelsTimer = timer;
+    }
+
+    /**
+     * Stop the timer that regularly updates the dependency graph statistics.
+     * Safe to call after construction; the timer field is assigned before the timer can fire.
+     */
+    private void stopGraphLabelsTimer() {
+        updateGraphLabelsTimer.stop();
     }
 
     private void buildUI() {
@@ -228,10 +249,11 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         sliceProofFixedPoint = new JButton("Slice proof to fixed point");
         sliceProofFixedPoint.addActionListener(event -> {
             if (currentProof != null) {
+                Proof proofToSlice = currentProof;
                 SliceToFixedPointDialog dialog = new SliceToFixedPointDialog(mediator,
                     MainWindow.getInstance(),
                     x -> this.analyzeProof(), this::sliceProof);
-                dialog.start(currentProof);
+                dialog.start(proofToSlice);
             }
         });
 
@@ -359,6 +381,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         if (currentProof == null) {
             return;
         }
+        Proof proofToExport = currentProof;
         KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(
             "Choose filename to save dot file");
         fileChooser.setFileFilter(KeYFileChooser.DOT_FILTER);
@@ -366,9 +389,17 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         int result = fileChooser.showSaveDialog((JComponent) event.getSource());
         if (result == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
+            if (file == null) {
+                throw new NullPointerException("No file selected for DOT export.");
+            }
+            DependencyTracker tracker = extension.trackers.get(proofToExport);
+            if (tracker == null) {
+                throw new NullPointerException(
+                    "No dependency tracker of proof " + proofToExport.name() + ".");
+            }
             try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8))) {
-                String text = extension.trackers.get(currentProof)
+                String text = tracker
                         .exportDot(abbreviateFormulas.isSelected(), abbreviateChains.isSelected());
                 writer.write(text);
             } catch (IOException e) {
@@ -394,17 +425,29 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         if (currentProof == null) {
             return;
         }
-        String text = extension.trackers.get(currentProof)
-                .exportDot(abbreviateFormulas.isSelected(), abbreviateChains.isSelected());
+        Proof proofToPreview = currentProof;
+        DependencyTracker tracker = extension.trackers.get(proofToPreview);
+        if (tracker == null) {
+            throw new NullPointerException(
+                "No dependency tracker of proof " + proofToPreview.name() + ".");
+        }
+        String text = tracker.exportDot(abbreviateFormulas.isSelected(),
+            abbreviateChains.isSelected());
         new PreviewDialog(MainWindow.getInstance(), text);
     }
 
-    private AnalysisResults analyzeProof() {
+    private @Nullable AnalysisResults analyzeProof() {
         if (currentProof == null) {
             return null;
         }
+        Proof proofToAnalyze = currentProof;
         try {
-            AnalysisResults results = extension.trackers.get(currentProof).analyze(
+            DependencyTracker tracker = extension.trackers.get(proofToAnalyze);
+            if (tracker == null) {
+                throw new NullPointerException(
+                    "No dependency tracker of proof " + proofToAnalyze.name() + ".");
+            }
+            AnalysisResults results = tracker.analyze(
                 doDependencyAnalysis.isSelected(), doDeduplicateRuleApps.isSelected());
             updateUIState();
             return results;
@@ -420,6 +463,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         if (currentProof == null) {
             return;
         }
+        Proof proofToSlice = currentProof;
         final AnalysisResults results = analyzeProof();
         if (results == null) {
             return;
@@ -432,22 +476,27 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             // slice proof with a headless LoaderControl to avoid countless UI redraws
             ProblemLoaderControl control = new DefaultUserInterfaceControl();
             SlicingProofReplayer replayer = SlicingProofReplayer
-                    .constructSlicer(control, currentProof, results, mediator.getUI());
+                    .constructSlicer(control, proofToSlice, results, mediator.getUI());
             Path proofFile;
             // first slice attempt: leave aggressive de-duplicate on
             if (results.didDeduplicateRuleApps
                     && SlicingSettingsProvider.getSlicingSettings()
-                            .getAggressiveDeduplicate(currentProof)) {
+                            .getAggressiveDeduplicate(proofToSlice)) {
                 try {
                     proofFile = replayer.slice();
                 } catch (Exception e) {
                     LOGGER.error(
                         "failed to slice using aggressive de-duplication, enabling safe mode ", e);
                     SlicingSettingsProvider.getSlicingSettings()
-                            .deactivateAggressiveDeduplicate(currentProof);
+                            .deactivateAggressiveDeduplicate(proofToSlice);
                     AnalysisResults fixedResults = analyzeProof();
+                    if (fixedResults == null) {
+                        throw new NullPointerException(
+                            "No analysis results after enabling safe mode.");
+                    }
                     proofFile = SlicingProofReplayer
-                            .constructSlicer(control, currentProof, fixedResults, mediator.getUI())
+                            .constructSlicer(control, proofToSlice, fixedResults,
+                                mediator.getUI())
                             .slice();
                 }
             } else {
@@ -457,18 +506,33 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
             // if this slicing iteration required safe mode to be activated,
             // the next slicing iteration probably also requires safe mode
             if (!SlicingSettingsProvider.getSlicingSettings()
-                    .getAggressiveDeduplicate(currentProof)) {
+                    .getAggressiveDeduplicate(proofToSlice)) {
                 extension.enableSafeModeForNextProof();
             }
             return proofFile;
         }, proofFile -> {
             // we do not use UI.loadProblem here to avoid adding the slice to the recent files
-            ProblemLoader problemLoader =
-                mediator.getUI().getProblemLoader(proofFile, null, null, null, mediator);
+            ProblemLoader problemLoader = getProblemLoader(proofFile, mediator);
             // user already knows about any warnings
             problemLoader.setIgnoreWarnings(true);
             problemLoader.runAsynchronously();
         }, this::showError).execute();
+    }
+
+    /**
+     * Load the sliced proof in the KeY UI without adding it to the recent files.
+     * Passing {@code null} for the class path, boot class path and includes is legal at runtime
+     * (the problem loader accepts these as "not specified"); the non-null parameter types of
+     * {@link de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl#getProblemLoader} cannot
+     * express this, suppressed with a scoped key.
+     *
+     * @param proofFile proof slice to load
+     * @param mediator the KeY mediator
+     * @return problem loader for the provided file
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private static ProblemLoader getProblemLoader(Path proofFile, KeYMediator mediator) {
+        return mediator.getUI().getProblemLoader(proofFile, null, null, null, mediator);
     }
 
     private void showError(Throwable e) {
@@ -487,7 +551,7 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
         timings.removeAll();
     }
 
-    private void displayResults(AnalysisResults results) {
+    private void displayResults(@Nullable AnalysisResults results) {
         if (results == null) {
             resetLabels();
             return;
@@ -539,11 +603,15 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
-        currentProof = e.getSource().getSelectedProof();
+        Proof selectedProof = e.getSource().getSelectedProof();
+        currentProof = selectedProof;
         resetLabels();
         resetGraphLabels();
         updateUIState();
-        var tracker = extension.trackers.get(currentProof);
+        if (selectedProof == null) {
+            return;
+        }
+        var tracker = extension.trackers.get(selectedProof);
         if (tracker == null) {
             return;
         }
@@ -575,7 +643,13 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
 
     @Override
     public void proofPruned(ProofTreeEvent e) {
-        ruleAppliedOnProof(e.getSource(), extension.trackers.get(e.getSource()));
+        Proof proof = e.getSource();
+        DependencyTracker tracker = extension.trackers.get(proof);
+        if (tracker == null) {
+            throw new NullPointerException(
+                "No dependency tracker of proof " + proof.name() + ".");
+        }
+        ruleAppliedOnProof(proof, tracker);
     }
 
     private void updateUIState() {

@@ -13,12 +13,16 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * User action that modifies the proof in some way.
  * On undo: prunes proof to previous collection of open goals, selects previously active node.
  *
  * @author Arne Keller
  */
+@NullMarked
 public abstract class ProofModifyingUserAction extends UserAction {
     /**
      * The open goals of the proof, before the user action is applied.
@@ -28,7 +32,7 @@ public abstract class ProofModifyingUserAction extends UserAction {
     /**
      * The node selected before the user action is performed.
      */
-    private final Node originalSelection;
+    private final @Nullable Node originalSelection;
 
     /**
      * Save the current state of the proof.
@@ -76,11 +80,20 @@ public abstract class ProofModifyingUserAction extends UserAction {
         for (Node n : originalOpenGoals) {
             n.proof().pruneProof(n);
         }
-        mediator.getSelectionModel().setSelectedNode(originalSelection);
+        // A node is always selected while a proof is open; {@code originalSelection} may only be
+        // {@code null} in a concurrent state change in which the previous code crashed with an
+        // NPE inside the selection model.
+        if (originalSelection != null) {
+            mediator.getSelectionModel().setSelectedNode(originalSelection);
+        }
     }
 
     @Override
     public boolean canUndo() {
-        return originalOpenGoals.stream().allMatch(proof::find) && proof.find(originalSelection);
+        // {@code originalSelection} is only {@code null} in a state where no node was selected,
+        // in which case the previous {@code proof.find(null)} crashed with an NPE; treat it as
+        // not undoable instead.
+        return originalSelection != null && originalOpenGoals.stream().allMatch(proof::find)
+                && proof.find(originalSelection);
     }
 }

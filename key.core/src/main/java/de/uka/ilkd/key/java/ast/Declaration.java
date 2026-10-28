@@ -8,10 +8,13 @@ import de.uka.ilkd.key.java.ast.declaration.Modifier;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Declaration. taken from COMPOST and changed to achieve an immutable structure
  */
+@NullMarked
 public interface Declaration extends NonTerminalProgramElement {
 
     /**
@@ -19,5 +22,6 @@ public interface Declaration extends NonTerminalProgramElement {
      *
      * @return the (original) list of modifiers wrapped .
      */
+    @Nullable
     ImmutableArray<Modifier> getModifiers();
 }

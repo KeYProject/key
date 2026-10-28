@@ -20,12 +20,15 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Standard implementation of the InitiallyClause interface.
  *
  * @author Daniel Bruns
  */
+@NullMarked
 public final class InitiallyClauseImpl implements InitiallyClause {
 
     /**
@@ -43,7 +46,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     /**
      * The visibility of the initially clause (null for default visibility).
      */
-    private final ModifierKind visibility;
+    private final @Nullable ModifierKind visibility;
     /**
      * The invariant from which the initially clause is derived.
      */
@@ -51,7 +54,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     /**
      * The original self variable of the receiver object.
      */
-    private final LocationVariable originalSelfVar;
+    private final @Nullable LocationVariable originalSelfVar;
     /**
      * The original specification.
      */
@@ -74,7 +77,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
      * @param originalSpec
      */
     public InitiallyClauseImpl(String name, String displayName, KeYJavaType kjt,
-            ModifierKind visibility, JTerm inv, LocationVariable selfVar,
+            @Nullable ModifierKind visibility, JTerm inv, @Nullable LocationVariable selfVar,
             LabeledParserRuleContext originalSpec) {
         assert name != null && !name.isEmpty();
         assert displayName != null && !displayName.isEmpty();
@@ -96,7 +99,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private Map<Operator, Operator> getReplaceMap(LocationVariable selfVar,
+    private Map<Operator, Operator> getReplaceMap(@Nullable LocationVariable selfVar,
             TermServices services) {
         Map<Operator, Operator> result = new LinkedHashMap<>();
 
@@ -136,7 +139,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     }
 
     @Override
-    public JTerm getClause(LocationVariable selfVar, TermServices services) {
+    public JTerm getClause(@Nullable LocationVariable selfVar, TermServices services) {
         final Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         JTerm res = or.replace(originalInv);
@@ -150,7 +153,7 @@ public final class InitiallyClauseImpl implements InitiallyClause {
     }
 
     @Override
-    public ModifierKind getVisibility() {
+    public @Nullable ModifierKind getVisibility() {
         return visibility;
     }
 

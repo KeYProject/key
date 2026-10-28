@@ -20,7 +20,9 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
 
     private SplittableQuantifiedFormulaFeature() {}

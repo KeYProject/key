@@ -43,7 +43,8 @@ import com.github.javaparser.resolution.types.ResolvedArrayType;
 import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +63,7 @@ import static de.uka.ilkd.key.java.ast.declaration.Modifier.createModifierList;
  * @since jul-07
  */
 
+@NullMarked
 public class JP2KeYTypeConverter {
     private static final Logger LOGGER = LoggerFactory.getLogger(JP2KeYTypeConverter.class);
 
@@ -70,7 +72,7 @@ public class JP2KeYTypeConverter {
      *
      * @see #initArrayMethodBuilder()
      */
-    private CreateArrayMethodBuilder arrayMethodBuilder;
+    private @Nullable CreateArrayMethodBuilder arrayMethodBuilder;
 
     private final Services services;
 
@@ -80,9 +82,9 @@ public class JP2KeYTypeConverter {
     private final KeYJPMapping jp2KeY;
     private final TypeSolver typeSolver;
 
-    private KeYJavaType __objectType;
-    private KeYJavaType __cloneableType;
-    private KeYJavaType __serializableType;
+    private @Nullable KeYJavaType __objectType;
+    private @Nullable KeYJavaType __cloneableType;
+    private @Nullable KeYJavaType __serializableType;
 
     public JP2KeYTypeConverter(Services services, TypeSolver typeSolver, KeYJPMapping jp2KeY) {
         this.jp2KeY = jp2KeY;
@@ -153,7 +155,7 @@ public class JP2KeYTypeConverter {
         return getKeYJavaType(new ReferenceTypeImpl(resolved));
     }
 
-    public KeYJavaType getKeYJavaType(String typeName, boolean forceInit) {
+    public @Nullable KeYJavaType getKeYJavaType(String typeName, boolean forceInit) {
         var resolved = typeSolver.solveType(typeName);
         return jp2KeY.resolvedTypeToKeY(new ReferenceTypeImpl(resolved), forceInit,
             services.getJavaService());
@@ -168,15 +170,15 @@ public class JP2KeYTypeConverter {
      * @param type type to be converted, may be null
      * @return a keytype.
      */
-    public @NonNull KeYJavaType getKeYJavaType(ResolvedType type) {
-        return getKeYJavaType(type, false);
+    public KeYJavaType getKeYJavaType(ResolvedType type) {
+        return Objects.requireNonNull(getKeYJavaType(type, false), "converted KeYJavaType");
     }
 
     public KeYJavaType createKeYJavaType(ReferenceTypeImpl ref) {
         return addReferenceType(ref);
     }
 
-    public @NonNull KeYJavaType getKeYJavaType(ResolvedType type, boolean cachedOnly) {
+    public @Nullable KeYJavaType getKeYJavaType(@Nullable ResolvedType type, boolean cachedOnly) {
         if (type == null) {
             throw new NullPointerException("null cannot be converted into a KJT");
         }
@@ -226,7 +228,8 @@ public class JP2KeYTypeConverter {
         // TODO javaparser why does this use typeConverter? this seems like a loop since it gets
         // initialized by this step
         var primitiveType = PrimitiveType.getPrimitiveType(type.describe());
-        var result = getTypeConverter().getKeYJavaType(primitiveType);
+        var result = getTypeConverter().getKeYJavaType(
+            Objects.requireNonNull(primitiveType, "primitive type " + description));
         var sort = result.getSort();
         if (sort == null) {
             throw new RuntimeException("Cannot assign " + description + " a primitive sort.");
@@ -237,7 +240,8 @@ public class JP2KeYTypeConverter {
     private void addNullType(ResolvedType type) {
         var sort = getSortsNamespace().lookup(NullSort.NAME);
         if (sort == null) {
-            sort = new NullSort(getObjectType().getSort());
+            sort = new NullSort(
+                Objects.requireNonNull(getObjectType().getSort(), "sort of java.lang.Object"));
         }
         if (getSortsNamespace().lookup(sort.name()) == null) {
             getSortsNamespace().add(sort);
@@ -254,8 +258,10 @@ public class JP2KeYTypeConverter {
         var kjt = getKeYJavaType(componentType);
         // I may not use JavaInfo here because the classes may not yet be cached!
         Type elemType = kjt.getJavaType();
-        var arraySort = ArraySort.getArraySort(kjt.getSort(), elemType, getObjectType().getSort(),
-            getCloneableType().getSort(), getSerializableType().getSort());
+        var arraySort = ArraySort.getArraySort(
+            Objects.requireNonNull(kjt.getSort(), "element sort"), elemType,
+            getObjectType().getSort(), getCloneableType().getSort(),
+            getSerializableType().getSort());
         var result = new KeYJavaType(arraySort);
         if (getSortsNamespace().lookup(arraySort.name()) == null) {
             getSortsNamespace().add(arraySort);
@@ -299,7 +305,7 @@ public class JP2KeYTypeConverter {
                         .ifPresent(services.getJavaService().getConverter(null)::process);
             }
         }
-        return __objectType;
+        return Objects.requireNonNull(__objectType, "java.lang.Object type not initialized");
     }
 
     public KeYJavaType addReferenceType(ResolvedReferenceType type) {
@@ -312,7 +318,9 @@ public class JP2KeYTypeConverter {
         var sort = getSortsNamespace().lookup(new Name(type.describe()));
         if (sort == null) {
             if (ref.isInterface()) {
-                sort = createObjectSort(ref, directSuperSorts(ref).add(getObjectType().getSort()));
+                sort = createObjectSort(ref,
+                    directSuperSorts(ref).add(Objects.requireNonNull(getObjectType().getSort(),
+                        "sort of java.lang.Object")));
             } else {
                 sort = createObjectSort(ref, directSuperSorts(ref));
             }
@@ -339,11 +347,13 @@ public class JP2KeYTypeConverter {
     private ImmutableSet<Sort> directSuperSorts(ResolvedReferenceTypeDeclaration classType) {
         ImmutableSet<Sort> ss = DefaultImmutableSet.nil();
         for (var s : classType.getAncestors()) {
-            ss = ss.add(getKeYJavaType(s).getSort());
+            ss = ss.add(Objects.requireNonNull(getKeYJavaType(s).getSort(),
+                "sort of ancestor type " + s.describe()));
         }
 
         if (ss.isEmpty() && !classType.isJavaLangObject()) {
-            ss = ss.add(getObjectType().getSort());
+            ss = ss.add(
+                Objects.requireNonNull(getObjectType().getSort(), "sort of java.lang.Object"));
         }
         return ss;
     }
@@ -369,7 +379,6 @@ public class JP2KeYTypeConverter {
         return new SortImpl(name, supers, isAbstract || ct.isInterface());
     }
 
-    @NonNull
     private KeYJavaType getSuperArrayType() {
         var res = jp2KeY.getSuperArrayType();
         if (res == null) {
@@ -392,13 +401,19 @@ public class JP2KeYTypeConverter {
      */
     private ArrayDeclaration createArrayType(KeYJavaType baseType, KeYJavaType arrayType) {
         var sat = getSuperArrayType();
-        final FieldDeclaration length = ((SuperArrayDeclaration) sat.getJavaType()).length();
+        final SuperArrayDeclaration superArray = (SuperArrayDeclaration) Objects
+                .requireNonNull(sat.getJavaType(), "Java type of super array");
+        final FieldDeclaration length =
+            Objects.requireNonNull(superArray.length(), "length attribute of the super array");
         final TypeReference baseTypeRef;
 
         if (baseType.getJavaType() != null) {
             baseTypeRef = new TypeRef(baseType);
         } else {
-            baseTypeRef = new TypeRef(new ProgramElementName(baseType.getSort().name().toString()),
+            baseTypeRef = new TypeRef(new ProgramElementName(Objects
+                    .requireNonNull(baseType.getSort(), "sort of array base type")
+                    .name()
+                    .toString()),
                 0, null, baseType);
         }
 
@@ -415,7 +430,6 @@ public class JP2KeYTypeConverter {
      * <p>
      * creates the field declaration for the public final integer field <code>length</code>
      */
-    @NonNull
     private KeYJavaType createSuperArrayType() {
         KeYJavaType integerType = getKeYJavaType(ResolvedPrimitiveType.INT);
 
@@ -441,14 +455,17 @@ public class JP2KeYTypeConverter {
 
         Type base = baseType.getJavaType();
         int dimension = base instanceof ArrayType ? ((ArrayType) base).getDimension() + 1 : 1;
-        TypeRef parentReference =
-            new TypeRef(new ProgramElementName(String.valueOf(parent.getSort().name())),
-                dimension, null, parent);
+        TypeRef parentReference = new TypeRef(new ProgramElementName(
+            String.valueOf(Objects.requireNonNull(parent.getSort(), "sort of array type " + parent)
+                    .name())),
+            dimension, null, parent);
 
         // add methods
         // the only situation where base can be null is in case of a
         // reference type
-        Expression defaultValue = (base != null ? base.getDefaultValue() : NullLiteral.NULL);
+        Expression defaultValue =
+            (base != null ? Objects.requireNonNullElse(base.getDefaultValue(), NullLiteral.NULL)
+                    : NullLiteral.NULL);
 
         ImmutableList<Field> fields = filterField(members);
 
@@ -457,14 +474,16 @@ public class JP2KeYTypeConverter {
         if (arrayMethodBuilder == null) {
             initArrayMethodBuilder();
         }
+        final CreateArrayMethodBuilder builder =
+            Objects.requireNonNull(arrayMethodBuilder, "implicit array method builder");
 
         final IProgramMethod prepare =
-            arrayMethodBuilder.getPrepareArrayMethod(parentReference, length, defaultValue, fields);
+            builder.getPrepareArrayMethod(parentReference, length, defaultValue, fields);
 
-        members.add(arrayMethodBuilder.getArrayInstanceAllocatorMethod(parentReference));
+        members.add(builder.getArrayInstanceAllocatorMethod(parentReference));
         members.add(prepare);
-        members.add(arrayMethodBuilder.getCreateArrayHelperMethod(parentReference, length, fields));
-        members.add(arrayMethodBuilder.getCreateArrayMethod(parentReference, prepare, fields));
+        members.add(builder.getCreateArrayHelperMethod(parentReference, length, fields));
+        members.add(builder.getCreateArrayMethod(parentReference, prepare, fields));
     }
 
     /**

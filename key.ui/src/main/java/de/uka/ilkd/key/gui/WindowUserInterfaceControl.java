@@ -22,6 +22,7 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.tacletmatch.TacletMatchDialog;
 import de.uka.ilkd.key.gui.tacletmatch.classic.TacletMatchCompletionDialog;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.nparser.KeyAst;
@@ -53,6 +54,7 @@ import org.key_project.util.collection.Pair;
 import org.key_project.util.java.SwingUtil;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +65,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceControl {
     private static final Logger LOGGER = LoggerFactory.getLogger(WindowUserInterfaceControl.class);
 
@@ -94,7 +97,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             }
         };
     }
-
 
     public void loadProblem(Path file, Consumer<ProblemLoader> configure) {
         ProblemLoader problemLoader = getProblemLoader(file, null, null, null, getMediator());
@@ -176,7 +178,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         SwingUtilities.invokeLater(() -> taskFinishedInternal(info));
     }
 
-    private void taskFinishedInternal(TaskFinishedInfo info) {
+    private void taskFinishedInternal(@Nullable TaskFinishedInfo info) {
         if (info != null && info.getSource() instanceof ProverCore) {
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
@@ -187,7 +189,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             final Proof proof = (Proof) info.getProof();
             if (proof != null && !proof.isDisposed() && !proof.closed()
                     && mainWindow.getMediator().getSelectedProof() == proof) {
-                Goal g = result.nonCloseableGoal();
+                Goal g = result == null ? null : result.nonCloseableGoal();
                 if (g == null) {
                     try {
                         g = proof.openGoals().head();
@@ -195,13 +197,15 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                         // all closed
                     }
                 }
-                mainWindow.getMediator().goalChosen(g);
-                if (inStopAtFirstUncloseableGoalMode(proof)) {
-                    // iff Stop on non-closeable Goal is selected a little
-                    // popup is generated and proof is stopped
-                    AutoDismissDialog dialog = new AutoDismissDialog(
-                        "Couldn't close Goal Nr. " + g.node().serialNr() + " automatically");
-                    dialog.show();
+                if (g != null) {
+                    mainWindow.getMediator().goalChosen(g);
+                    if (inStopAtFirstUncloseableGoalMode(proof)) {
+                        // iff Stop on non-closeable Goal is selected a little
+                        // popup is generated and proof is stopped
+                        AutoDismissDialog dialog = new AutoDismissDialog(
+                            "Couldn't close Goal Nr. " + g.node().serialNr() + " automatically");
+                        dialog.show();
+                    }
                 }
                 if (!isAtLeastOneMacroRunning()) {
                     showNotification("Automated proof search", info.toString());
@@ -236,17 +240,25 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         } else if (info != null && info.getSource() instanceof ProblemLoader problemLoader) {
             resetStatus(this);
             Throwable result = (Throwable) info.getResult();
-            if (info.getResult() != null) {
+            if (result != null) {
                 LOGGER.error("", result);
                 if (result instanceof ParseCancellationException) {
-                    result = result.getCause();
+                    Throwable cause = result.getCause();
+                    if (cause != null) {
+                        result = cause;
+                    }
                 }
                 IssueDialog.showExceptionDialog(mainWindow, result);
             } else if (getMediator().getUI().isSaveOnly()) {
                 mainWindow.displayResults("Finished Saving!");
             } else {
                 KeYMediator mediator = mainWindow.getMediator();
-                mediator.getNotationInfo().refresh(mediator.getServices());
+                Services services = mediator.getServices();
+                if (services == null) {
+                    // a successfully loaded problem always provides services
+                    throw new NullPointerException("No services available after loading.");
+                }
+                mediator.getNotationInfo().refresh(services);
                 if (problemLoader.hasProofScript()) {
                     KeyAst.ProofScript scriptAndLoc = problemLoader.getProofScript();
                     if (scriptAndLoc != null) {
@@ -350,7 +362,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     }
 
     @Override
-    public IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
+    public @Nullable IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal,
+            boolean forced) {
         if (mainWindow.getMediator().isInAutoMode()) {
             return AbstractProofControl.completeBuiltInRuleAppByDefault(app, goal, forced);
         }
@@ -372,14 +385,15 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         return mainWindow.getMediator();
     }
 
-
     /**
      * {@inheritDoc}
      */
     @Override
-    public AbstractProblemLoader load(Profile profile, Path file, List<Path> classPath,
-            Path bootClassPath, List<Path> includes, Properties poPropertiesToForce,
-            boolean forceNewProfileOfNewProofs, Consumer<Proof> callback)
+    public AbstractProblemLoader load(@Nullable Profile profile, Path file,
+            @Nullable List<Path> classPath,
+            @Nullable Path bootClassPath, @Nullable List<Path> includes,
+            @Nullable Properties poPropertiesToForce,
+            boolean forceNewProfileOfNewProofs, @Nullable Consumer<Proof> callback)
             throws ProblemLoaderException {
         if (file != null) {
             mainWindow.getRecentFiles().addRecentFile(file.toAbsolutePath().toString(), profile,
@@ -404,7 +418,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param fileExtension the respective file extension
      * @return the saved proof as a file
      */
-    public Path saveProof(Proof proof, String fileExtension) {
+    public @Nullable Path saveProof(Proof proof, String fileExtension) {
         final MainWindow mainWindow = MainWindow.getInstance();
         final KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose filename to save proof");
         fc.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
@@ -413,7 +427,12 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         final int result = fc.showSaveDialog(mainWindow, f.first.toFile(), f.second);
         Path file = null;
         if (result == JFileChooser.APPROVE_OPTION) { // saved
-            file = fc.getSelectedFile().toPath();
+            File selectedFile = fc.getSelectedFile();
+            if (selectedFile == null) {
+                // the dialog was approved without selecting a file
+                return file;
+            }
+            file = selectedFile.toPath();
             final String filename = file.toAbsolutePath().toString();
             ProofSaver saver;
             if (fc.useCompression()) {
@@ -454,7 +473,12 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         Pair<Path, String> f = fileName(proof, ".zproof");
         final int result = fileChooser.showSaveDialog(mainWindow, f.first.toFile(), f.second);
         if (result == JFileChooser.APPROVE_OPTION) {
-            final Path file = fileChooser.getSelectedFile().toPath();
+            File selectedFile = fileChooser.getSelectedFile();
+            if (selectedFile == null) {
+                // the dialog was approved without selecting a file
+                return;
+            }
+            final Path file = selectedFile.toPath();
             final ProofSaver saver = new ProofBundleSaver(proof, file);
             final String errorMsg = saver.save();
 
@@ -467,19 +491,24 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         }
     }
 
-    protected static Pair<Path, String> fileName(Proof proof, String fileExtension) {
+    protected static Pair<Path, String> fileName(@Nullable Proof proof, String fileExtension) {
         // TODO: why do we use GUI components here?
         final KeYFileChooser jFC = KeYFileChooser.getFileChooser("Choose filename to save proof");
 
         Path selectedFile = null;
-        if (proof != null) {
-            selectedFile = proof.getProofFile();
+        Proof currentProof = proof;
+        if (currentProof != null) {
+            selectedFile = currentProof.getProofFile();
         }
         // Suggest default file name if required
         final String defaultName;
         if (selectedFile == null) {
+            if (currentProof == null) {
+                // the default name is always derived from the proof's name
+                throw new NullPointerException("No proof to derive a default file name from.");
+            }
             // Remove space
-            var name = proof.name().toString();
+            var name = currentProof.name().toString();
             var prefix = "Taclet: ";
             if (name.startsWith(prefix)) {
                 name = "Taclet:" + name.substring(prefix.length());
@@ -487,16 +516,30 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             defaultName = MiscTools.toValidFileName(name) + fileExtension;
             selectedFile = new File(jFC.getCurrentDirectory(), defaultName).toPath();
         } else if (selectedFile.toString().endsWith(".proof") && fileExtension.equals(".proof")) {
-            defaultName = selectedFile.getFileName().toString();
+            Path namePath = selectedFile.getFileName();
+            if (namePath == null) {
+                // the selected proof file always has a name
+                throw new NullPointerException("No file name for the selected proof file.");
+            }
+            defaultName = namePath.toString();
         } else {
-            String proofName = proof.name().toString();
+            if (currentProof == null) {
+                // the default name is always derived from the proof's name
+                throw new NullPointerException("No proof to derive a default file name from.");
+            }
+            String proofName = currentProof.name().toString();
             if (proofName.endsWith(".key")) {
                 proofName = proofName.substring(0, proofName.lastIndexOf(".key"));
             } else if (proofName.endsWith(".proof")) {
                 proofName = proofName.substring(0, proofName.lastIndexOf(".proof"));
             }
             defaultName = MiscTools.toValidFileName(proofName) + fileExtension;
-            selectedFile = selectedFile.getParent().resolve(defaultName);
+            Path parent = selectedFile.getParent();
+            if (parent == null) {
+                // the selected proof file always resides in a directory
+                throw new NullPointerException("No parent directory for the selected proof file.");
+            }
+            selectedFile = parent.resolve(defaultName);
         }
         return new Pair<>(selectedFile, defaultName);
     }
@@ -530,9 +573,28 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         super.loadingStarted(loader);
     }
 
+    /**
+     * Notifies the environment about a finished loading process.
+     *
+     * @param loader the loader.
+     * @param poContainer the loaded proof obligations, or {@code null} if the file contains no
+     *        proof obligation.
+     * @param proofList the created proofs, or {@code null} if none were created.
+     * @param result the replay result, or {@code null} if nothing was replayed.
+     *
+     *        <p>
+     *        The parameters must be nullable because the {@code UserInterfaceControl} contract
+     *        allows loading procedures without proofs. The super implementation only dereferences
+     *        the container when a proof list is present, in which case the loader always provided
+     *        it (see {@code AbstractProblemLoader.load}), and it ignores the replay result
+     *        entirely; the checker cannot see those two facts, so the argument passing is
+     *        suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
-    public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,
-            ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
+    public void loadingFinished(AbstractProblemLoader loader,
+            @Nullable LoadedPOContainer poContainer, @Nullable ProofAggregate proofList,
+            @Nullable ReplayResult result) throws ProblemLoaderException {
         super.loadingFinished(loader, poContainer, proofList, result);
         if (proofList != null) {
             if (result != null) {
@@ -554,8 +616,6 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             ((KeYUserProblemFile) poContainer.getProofOblInput()).close();
         }
     }
-
-
 
     /**
      * Loads the given location and returns all required references as {@link KeYEnvironment} with
@@ -608,6 +668,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths,
             bootClassPath, includes, null, forceNewProfileOfNewProofs, null);
         InitConfig initConfig = loader.getInitConfig();
+        if (initConfig == null) {
+            // a successfully loaded problem always provides an initial configuration
+            throw new NullPointerException("No initial configuration for the loaded location.");
+        }
         return new KeYEnvironment<>(main.getUserInterface(), initConfig,
             loader.getProof(), loader.getProofScript(), loader.getResult());
     }

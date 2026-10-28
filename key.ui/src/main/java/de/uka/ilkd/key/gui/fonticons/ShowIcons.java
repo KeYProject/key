@@ -8,10 +8,13 @@ import java.awt.*;
 import java.util.ArrayList;
 import javax.swing.*;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Alexander Weigl
  * @version 1 (15.03.19)
  */
+@NullMarked
 public class ShowIcons extends JFrame {
     private static final long serialVersionUID = 8775474163870717215L;
     // private Box box = new Box(BoxLayout.Y_AXIS);
@@ -19,11 +22,18 @@ public class ShowIcons extends JFrame {
     private final JPanel search = new JPanel();
     private final ArrayList<JLabel> icons = new ArrayList<>();
 
-
+    /**
+     * Creates the icon browser window.
+     *
+     * <p>
+     * The window configures its title, layout and size and builds its icon lists while the
+     * receiver is still under initialization (EISOP initialization check); all of it only
+     * takes effect when the window is shown after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ShowIcons() {
         setTitle("ShowIcons");
         setLayout(new BorderLayout());
-
 
         JLabel lblSearch = new JLabel("Search:");
         JTextField txtSearch = new JTextField(25);

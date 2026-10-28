@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -26,11 +27,15 @@ import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  *
  * @author christoph
  */
+@NullMarked
 public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, InfFlowLeafPO {
 
     private final InformationFlowContract contract;
@@ -58,14 +63,28 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
         // add new information flow symbols
         // (by the way: why only formal parameters?)
-        for (JTerm formalParam : symbExecVars.formalParams) {
-            addIFSymbol(formalParam);
+        addFormalParamSymbols(infFlowSymbols, symbExecVars.formalParams);
+        addFormalParamSymbols(infFlowSymbols, ifVars.c1.formalParams);
+        addFormalParamSymbols(infFlowSymbols, ifVars.c2.formalParams);
+    }
+
+    /**
+     * Registers the formal parameter terms of the given variable assignment
+     * with the proof obligation's symbol table. This is a static helper
+     * because the constructor may not call instance methods like
+     * {@link InfFlowPO#addIFSymbol(JTerm)} on the {@code @UnderInitialization}
+     * receiver. The formal parameters are always present at this point (they
+     * are built eagerly by {@link ProofObligationVars}), hence the null
+     * guard.
+     */
+    private static void addFormalParamSymbols(InfFlowProofSymbols symbols,
+            @Nullable ImmutableList<JTerm> formalParams) {
+        if (formalParams == null) {
+            throw new NullPointerException(
+                "No formal parameter terms for the information flow proof obligation.");
         }
-        for (JTerm formalParam : ifVars.c1.formalParams) {
-            addIFSymbol(formalParam);
-        }
-        for (JTerm formalParam : ifVars.c2.formalParams) {
-            addIFSymbol(formalParam);
+        for (final JTerm formalParam : formalParams) {
+            symbols.add(formalParam);
         }
     }
 
@@ -74,6 +93,10 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
         assert proofConfig == null;
 
         final Services proofServices = postInit();
+        final TermBuilder tb = this.tb;
+        if (tb == null) {
+            throw new NullPointerException("Term builder not initialized.");
+        }
 
         // create proof obligation
         InfFlowPOSnippetFactory f =
@@ -86,13 +109,29 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
 
         // register final term, taclets and collect class axioms
         assignPOTerms(finalTerm);
-        collectClassAxioms(contract.getKJT(), proofConfig);
+        collectAxioms(contract.getKJT(), proofConfig);
 
         for (final NoPosTacletApp t : taclets) {
             if (t.taclet().name().toString().startsWith("Class_invariant_axiom")) {
                 addIFSymbol(t.taclet());
             }
         }
+    }
+
+
+    /**
+     * Collects the class axioms for the given type. The {@code proofConfig}
+     * argument is deliberately the {@code proofConfig} field, which is
+     * {@code null} in {@code readProblem()} (see the assertion at its
+     * start): the information-flow proof obligation performs no proof
+     * configuration at this stage and the base axiom registration path
+     * tolerates an absent configuration. The base {@code AbstractPO}
+     * parameter is not nullness-annotated and cannot be widened from this
+     * module.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private void collectAxioms(KeYJavaType kjt, @Nullable InitConfig proofConfig) {
+        collectClassAxioms(kjt, proofConfig);
     }
 
 
@@ -105,8 +144,19 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
     }
 
 
+    /**
+     * {@inheritDoc}
+     *
+     * Deliberately nullable: {@code null} is returned when the contract has
+     * no measured-by clause. {@link ContractPO#getMbyAtPre()} is not
+     * nullness-annotated in key.core although all realizations (including
+     * {@code DependencyContractPO}) return {@code null} for absent clauses,
+     * and none of the callers in key.core dereferences the result (all such
+     * call sites are commented out).
+     */
     @Override
-    public JTerm getMbyAtPre() {
+    @SuppressWarnings("nullness:override.return.invalid")
+    public @Nullable JTerm getMbyAtPre() {
         if (contract.hasMby()) {
             return symbExecVars.pre.mbyAtPre;
         } else {
@@ -219,8 +269,17 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
         infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
     }
 
+    /**
+     * Deliberately returns {@code null}: information flow contracts do not
+     * have global defs. {@link AbstractOperationPO} declares a non-null
+     * return type although its only caller,
+     * {@code createApplyGlobalUpdateTerm}, explicitly null-tolerates the
+     * result; the base signature cannot be widened from this module.
+     */
     @Override
-    protected JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+    @SuppressWarnings("nullness:override.return.invalid")
+    protected @Nullable JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm,
+            @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Services services) {
         // information flow contracts do not have global defs
         return null;

@@ -11,6 +11,7 @@ import java.util.*;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.JavaSourceElement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -40,11 +41,15 @@ import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.Logger;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class provides static methods to access the prover (KeY).
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public final class KeYFacade {
     // prevents from instantiating this class
     private KeYFacade() {
@@ -110,7 +115,8 @@ public final class KeYFacade {
         return line;
     }
 
-    private static CheckerData.ProofEntry findProofLine(Path proofPath, CheckerData data) {
+    private static CheckerData.@Nullable ProofEntry findProofLine(Path proofPath,
+            CheckerData data) {
         for (CheckerData.ProofEntry line : data.getProofEntries()) {
             if (line.proofFile != null && line.proofFile.equals(proofPath)) {
                 return line;
@@ -124,7 +130,7 @@ public final class KeYFacade {
 
         logger.print(LogLevel.DEBUG, "Loading proof from " + path);
         line.proofFile = path;
-        Proof[] proofs = loadProofFile(path, line);
+        Proof @Nullable [] proofs = loadProofFile(path, line);
 
         // TODO: ignore taclet proofs
         if (proofs == null || proofs.length == 0) {
@@ -142,6 +148,10 @@ public final class KeYFacade {
             new IntermediatePresentationProofFileParser(proof);
         ProblemInitializer pi = line.problemInitializer;
         KeYUserProblemFile keyFile = line.envInput;
+        if (pi == null || keyFile == null) {
+            throw new NullPointerException("Problem initializer or environment missing for "
+                + path);
+        }
         pi.tryReadProof(parser, keyFile);
 
         line.parseResult = parser.getResult();
@@ -151,7 +161,7 @@ public final class KeYFacade {
         return true;
     }
 
-    private static Proof[] loadProofFile(Path path, CheckerData.ProofEntry line)
+    private static Proof @Nullable [] loadProofFile(Path path, CheckerData.ProofEntry line)
             throws Exception {
         Profile profile = AbstractProfile.getDefaultProfile();
 
@@ -163,7 +173,11 @@ public final class KeYFacade {
 
         /////////////////// comparison to AbstractProblemLoader load
         /////////////////// createEnvInput
-        KeYUserProblemFile keyFile = new KeYUserProblemFile(path.getFileName().toString(),
+        Path fileName = path.getFileName();
+        if (fileName == null) {
+            throw new NullPointerException("Proof path has no file name: " + path);
+        }
+        KeYUserProblemFile keyFile = new KeYUserProblemFile(fileName.toString(),
             path, fileRepo, control, profile, false);
         line.envInput = keyFile; // store in CheckerData for later use (e.g. in ReplayChecker)
 
@@ -181,7 +195,10 @@ public final class KeYFacade {
         initConfig.setFileRepo(fileRepo);
 
         /////////////////// createProofObligationContainer
-        var proofObligation = keyFile.getProofObligation();
+        Configuration proofObligation = keyFile.getProofObligation();
+        if (proofObligation == null) {
+            throw new NullPointerException("Proof file has no proof obligation: " + path);
+        }
 
         // Load proof obligation settings
         proofObligation.set(IPersistablePO.PROPERTY_FILENAME, path.toString());
@@ -189,16 +206,26 @@ public final class KeYFacade {
         // more generic version (works e.g. for taclet proofs)
         IPersistablePO.LoadedPOContainer poContainer =
             createProofObligationContainer(keyFile, initConfig, proofObligation);
+        if (poContainer == null) {
+            throw new NullPointerException("No proof obligation container for " + path);
+        }
 
         ProofAggregate proofList = pi.startProver(initConfig, poContainer.getProofOblInput());
         for (Proof p : proofList.getProofs()) {
             // register proof
             initConfig.getServices().getSpecificationRepository()
                     .registerProof(poContainer.getProofOblInput(), p);
-            initConfig.getFileRepo().registerProof(p);
+            FileRepo fileRepoForProof = initConfig.getFileRepo();
+            if (fileRepoForProof == null) {
+                throw new NullPointerException("No file repository for " + path);
+            }
+            fileRepoForProof.registerProof(p);
         }
 
         Proof proof = proofList.getFirstProof();
+        if (proof == null) {
+            throw new NullPointerException("No first proof for " + path);
+        }
         SpecificationRepository specRepo = initConfig.getServices().getSpecificationRepository();
         ContractPO contractPO = specRepo.getContractPOForProof(proof);
         if (contractPO == null) {
@@ -208,7 +235,15 @@ public final class KeYFacade {
         }
         Contract contract = contractPO.getContract();
         line.contract = contract;
-        Type type = contract.getTarget().getContainerType().getJavaType();
+        KeYJavaType containerType = contract.getTarget().getContainerType();
+        if (containerType == null) {
+            throw new NullPointerException("Contract target has no container type: "
+                + contract.getName());
+        }
+        Type type = containerType.getJavaType();
+        if (type == null) {
+            throw new NullPointerException("Container type has no Java type: " + containerType);
+        }
         if (type instanceof JavaSourceElement jse) {
             line.sourceFile = jse.getPositionInfo().getURL().orElseThrow();
             String str = line.sourceFile.toString();
@@ -228,8 +263,8 @@ public final class KeYFacade {
      * @throws IOException
      *         Occurred Exception.
      */
-    private static IPersistablePO.LoadedPOContainer createProofObligationContainer(KeYFile keyFile,
-            InitConfig initConfig, Configuration properties) throws Exception {
+    private static IPersistablePO.@Nullable LoadedPOContainer createProofObligationContainer(
+            KeYFile keyFile, InitConfig initConfig, Configuration properties) throws Exception {
         final String chooseContract = keyFile.chooseContract();
         final Configuration proofObligation = keyFile.getProofObligation();
 
@@ -297,7 +332,7 @@ public final class KeYFacade {
 
         for (CheckerData.ProofEntry line : data.getProofEntries()) {
             // skip replay for proofs if not requested
-            if (proofPaths.contains(line.proofFile)) {
+            if (line.proofFile != null && proofPaths.contains(line.proofFile)) {
                 // skip proofs that have already been replayed
                 if (line.replayState == CheckerData.ReplayState.UNKNOWN) {
                     Proof proof = line.proof;
@@ -319,9 +354,30 @@ public final class KeYFacade {
         }
     }
 
-    private static ReplayResult replayProof(CheckerData.ProofEntry line, EnvInput envInput,
-            Logger logger) throws ProofInputException {
+    /**
+     * Replays the proof stored in the given entry against the (already loaded) intermediate parse
+     * result and records the outcome in {@link CheckerData.LoadingState}.
+     * <p>
+     * The {@code null} literals passed to {@link IntermediateProofReplayer} below are deliberate:
+     * its {@code loader} parameter is only used for error-reporting origin, and
+     * {@code replay}'s {@code listener}/{@code progressMonitor} parameters explicitly accept
+     * {@code null} ("may be null" per their javadoc, guarded with {@code listener != null}
+     * checks inside). The legacy unannotated parameter types cannot express this, suppressed
+     * with scoped keys.
+     *
+     * @param line the proof entry holding the proof and the intermediate parse result
+     * @param envInput the environment the proof was loaded with
+     * @param logger the logger to report progress to
+     * @return the replay result
+     * @throws ProofInputException if replaying the proof fails
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private static ReplayResult replayProof(CheckerData.ProofEntry line,
+            @Nullable EnvInput envInput, Logger logger) throws ProofInputException {
         Proof proof = line.proof;
+        if (proof == null) {
+            throw new NullPointerException("No proof to replay.");
+        }
         logger.print(LogLevel.INFO, "Starting replay of proof " + proof.name());
 
         List<Throwable> errors = new LinkedList<>();
@@ -341,6 +397,9 @@ public final class KeYFacade {
 
             // we assume that the proof has been successfully loaded!
             parserResult = line.parseResult;
+            if (parserResult == null) {
+                throw new NullPointerException("No parser result for replay of " + proof.name());
+            }
 
             // For loading, we generally turn on one step simplification to be
             // able to load proofs that used it even if the user has currently
@@ -385,11 +444,19 @@ public final class KeYFacade {
             // reset OSS
             StrategyProperties newProps = proof.getSettings().getStrategySettings()
                     .getActiveStrategyProperties();
-            newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, ossStatus);
+            String oss = ossStatus;
+            if (oss == null) {
+                throw new NullPointerException("No OSS status available for " + proof.name());
+            }
+            newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, oss);
             Strategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
 
-            result = new ReplayResult(status, errors, lastTouchedNode);
+            Node lastTouched = lastTouchedNode;
+            if (lastTouched == null) {
+                throw new NullPointerException("No last touched node for " + proof.name());
+            }
+            result = new ReplayResult(status, errors, lastTouched);
         }
 
         if (result.hasErrors()) {
@@ -399,7 +466,7 @@ public final class KeYFacade {
         } else {
             line.replayState = CheckerData.ReplayState.SUCCESS;
             // update status from UNKNOWN to OPEN/CLOSED depending on replay result
-            if (line.proof.closed()) {
+            if (proof.closed()) {
                 line.proofState = CheckerData.ProofState.CLOSED;
                 logger.print(LogLevel.INFO, "... successful (proof is closed)!");
             } else {
@@ -414,15 +481,25 @@ public final class KeYFacade {
     /**
      * Ensures that the source files contained by the bundle stored in the given CheckerData object
      * are loaded. Result is stored in CheckerData object as SLEnvInput.
+     * <p>
+     * The {@code null} classpath passed to {@link SLEnvInput} below is deliberate: when the bundle
+     * declares no classpath files, "no classpath" is expressed as {@code null}; {@link SLEnvInput}
+     * forwards it to {@code JavaModel}, which explicitly treats a {@code null} classpath as an
+     * empty one. The unannotated (non-null) parameter type cannot express this, suppressed with a
+     * scoped key.
      *
      * @param data the CheckerData object to store the results
      * @throws ProofManagementException
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static void ensureSourceLoaded(CheckerData data) throws ProofManagementException {
         data.print(LogLevel.DEBUG, "Loading Java sources ...");
         try {
             // load all contracts from source files
             ProofBundleHandler pbh = data.getPbh();
+            if (pbh == null) {
+                throw new NullPointerException("No proof bundle handler set.");
+            }
             Path src = pbh.getPath("src");
             List<Path> cp = null;
             if (!pbh.getClasspathFiles().isEmpty()) {

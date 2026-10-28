@@ -17,6 +17,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The central place to store global information for Proof Exploration.
@@ -28,6 +30,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @see ExplorationExtension
  */
+@NullMarked
 public class ExplorationModeModel {
 
     public static final String PROP_EXPLORE_MODE = "exploreModeSelected";
@@ -35,7 +38,22 @@ public class ExplorationModeModel {
 
     private final Map<Proof, AtomicInteger> taintedProofs = new WeakHashMap<>();
 
-    private final PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+    private @Nullable PropertyChangeSupport changeSupport;
+
+    /**
+     * Lazily creates the {@link PropertyChangeSupport}. The support is built on first use
+     * rather than in the field initializer so that {@code this} is fully initialized when it
+     * is passed as the source bean; otherwise the JDK bean support would be under
+     * initialization itself (EISOP initialization check).
+     */
+    private PropertyChangeSupport changeSupport() {
+        PropertyChangeSupport support = changeSupport;
+        if (support == null) {
+            support = new PropertyChangeSupport(this);
+            changeSupport = support;
+        }
+        return support;
+    }
 
     /**
      * Mode which rules to use in actions mode Default: whole application is shown
@@ -62,7 +80,7 @@ public class ExplorationModeModel {
     public void setExplorationTacletAppState(ExplorationState explorationTacletAppState) {
         boolean old = this.explorationModeSelected;
         this.explorationTacletAppState = explorationTacletAppState;
-        changeSupport.firePropertyChange(PROP_EXPLORE_TACLET_APP_STATE, old,
+        changeSupport().firePropertyChange(PROP_EXPLORE_TACLET_APP_STATE, old,
             explorationModeSelected);
     }
 
@@ -83,7 +101,7 @@ public class ExplorationModeModel {
     public void setExplorationModeSelected(boolean explorationModeSelected) {
         boolean old = this.explorationModeSelected;
         this.explorationModeSelected = explorationModeSelected;
-        changeSupport.firePropertyChange(PROP_EXPLORE_MODE, old, explorationModeSelected);
+        changeSupport().firePropertyChange(PROP_EXPLORE_MODE, old, explorationModeSelected);
     }
 
     /**
@@ -109,24 +127,27 @@ public class ExplorationModeModel {
     public void setShowInteractiveBranches(boolean showInteractiveBranches) {
         GUIProofTreeModel delegateModel =
             MainWindow.getInstance().getProofTreeView().getDelegateModel();
+        if (delegateModel == null) {
+            throw new NullPointerException("No proof tree model to apply the filter to.");
+        }
         delegateModel.setFilter(ProofTreeViewFilter.HIDE_INTERACTIVE_GOALS,
             !showInteractiveBranches);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.addPropertyChangeListener(listener);
+        changeSupport().addPropertyChangeListener(listener);
     }
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
-        changeSupport.removePropertyChangeListener(listener);
+        changeSupport().removePropertyChangeListener(listener);
     }
 
     public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        changeSupport.addPropertyChangeListener(propertyName, listener);
+        changeSupport().addPropertyChangeListener(propertyName, listener);
     }
 
     public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        changeSupport.removePropertyChangeListener(propertyName, listener);
+        changeSupport().removePropertyChangeListener(propertyName, listener);
     }
 
     /**

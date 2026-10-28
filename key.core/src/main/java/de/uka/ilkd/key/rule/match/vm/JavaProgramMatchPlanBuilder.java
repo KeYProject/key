@@ -49,6 +49,7 @@ import org.key_project.prover.rules.matcher.vm.instruction.MatchByEqualsInstruct
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.getMatchIdentityInstruction;
@@ -103,6 +104,7 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  * on the interpreter back-end the conversion falls back to the monolithic matcher. Every construct
  * expressible in the taclet language is described.
  */
+@NullMarked
 public final class JavaProgramMatchPlanBuilder {
 
     private JavaProgramMatchPlanBuilder() {}

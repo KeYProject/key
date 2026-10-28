@@ -5,7 +5,9 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Objects;
 import javax.swing.*;
@@ -15,6 +17,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import de.uka.ilkd.key.core.Main;
 
 import org.key_project.util.java.IOUtil;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extends the usual Swing file chooser by a bookmark panel and predefined filters. This class is a
@@ -28,6 +33,7 @@ import org.key_project.util.java.IOUtil;
  * @author Wolfram Pfeifer: refactoring: extend JFileChooser instead of wrapping it (avoids the need
  *         for delegating many methods)
  */
+@NullMarked
 public final class KeYFileChooser extends JFileChooser {
 
     /** default file filter for loading files */
@@ -91,16 +97,16 @@ public final class KeYFileChooser extends JFileChooser {
     public static final FileFilter PROOF_BUNDLE_FILTER =
         new FileNameExtensionFilter("proof bundles (.zproof)", "zproof");
 
-    /** The Constant for the home directory. */
-    private final static File HOME_DIR = IOUtil.getHomeDirectory();
+    /** The Constant for the home directory; {@code null} if the home directory is not available. */
+    private final static @Nullable File HOME_DIR = IOUtil.getHomeDirectory();
 
-    private static KeYFileChooser INSTANCE;
+    private static @Nullable KeYFileChooser INSTANCE;
 
     /** indicates whether the dialog is used for saving or loading */
     private boolean saveDialog;
 
     /** this is used to reset the path if the user presses the cancel button */
-    private File resetFile = null;
+    private @Nullable File resetFile = null;
 
     public KeYFileChooser(File initDir) {
         super(initDir);
@@ -121,23 +127,42 @@ public final class KeYFileChooser extends JFileChooser {
 
     public KeYFileChooserLoadingOptions addLoadingOptions() {
         var p = new KeYFileChooserLoadingOptions(this);
-        getAccessory().add(p, 0);
+        Container accessory = getAccessory();
+        if (accessory == null) {
+            // the accessory is created by the constructor of this chooser
+            throw new NullPointerException("No accessory available.");
+        }
+        accessory.add(p, 0);
         return p;
     }
 
     public KeYFileChooserBookmarkPanel addBookmarkPanel() {
         var p = new KeYFileChooserBookmarkPanel(this);
-        getAccessory().add(p);
+        Container accessory = getAccessory();
+        if (accessory == null) {
+            // the accessory is created by the constructor of this chooser
+            throw new NullPointerException("No accessory available.");
+        }
+        accessory.add(p);
         return p;
     }
 
     public boolean useCompression() {
-        return getSelectedFile().getName().endsWith(".proof.gz");
+        File selectedFile = getSelectedFile();
+        if (selectedFile == null) {
+            // the caller invokes this only after a file has been selected
+            throw new NullPointerException("No file selected.");
+        }
+        return selectedFile.getName().endsWith(".proof.gz");
     }
 
     @Override
     public void approveSelection() {
         File file = getSelectedFile();
+        if (file == null) {
+            // a file chooser always has a selection when approving
+            throw new NullPointerException("No file selected.");
+        }
         if (saveDialog && file.exists() && showOverwriteDialog(file) != JOptionPane.YES_OPTION) {
             return;
         }
@@ -149,7 +174,12 @@ public final class KeYFileChooser extends JFileChooser {
 
         if (selFile == null) {
             if (getCurrentDirectory() == null) {
-                setCurrentDirectory(HOME_DIR);
+                File homeDir = HOME_DIR;
+                if (homeDir == null) {
+                    // the home directory property is always available in KeY's environment
+                    throw new NullPointerException("No home directory available.");
+                }
+                setCurrentDirectory(homeDir);
             }
         } else if (selFile.isFile()) { // present & not dir.
             String filename = selFile.getAbsolutePath();
@@ -162,7 +192,7 @@ public final class KeYFileChooser extends JFileChooser {
     }
 
     @Override
-    public void setDialogTitle(String title) {
+    public void setDialogTitle(@Nullable String title) {
         super.setDialogTitle(Objects.requireNonNullElse(title, "Select file to load"));
     }
 
@@ -172,7 +202,7 @@ public final class KeYFileChooser extends JFileChooser {
     }
 
     @Override
-    public int showSaveDialog(Component parent) {
+    public int showSaveDialog(@Nullable Component parent) {
         return showSaveDialog(parent, null, null);
     }
 
@@ -185,7 +215,8 @@ public final class KeYFileChooser extends JFileChooser {
      * @param extension the desired file name extension (usually ".proof")
      * @return either of {@link #APPROVE_OPTION}, {@link #CANCEL_OPTION}, or {@link #ERROR_OPTION}
      */
-    public int showSaveDialog(Component parent, File originalFile, String extension) {
+    public int showSaveDialog(@Nullable Component parent, @Nullable File originalFile,
+            @Nullable String extension) {
         File selectedFile;
         if (originalFile == null) {
             selectedFile = getCurrentDirectory();
@@ -210,16 +241,22 @@ public final class KeYFileChooser extends JFileChooser {
             }
             // project structure for KeY would be the sane thing to do; avoid NPE at any cost
 
-            resetFile =
-                "src".equals(dirForExtension.getName()) && dirForExtension.getParentFile() != null
-                        ? dirForExtension.getParentFile()
-                        : selectedFile;
+            if (dirForExtension != null && "src".equals(dirForExtension.getName())
+                    && dirForExtension.getParentFile() != null) {
+                resetFile = dirForExtension.getParentFile();
+            } else {
+                resetFile = selectedFile;
+            }
 
-            selectedFile = new File(resetFile, extension);
+            File target = resetFile;
+            if (target == null) {
+                // the dialog always provides a current directory or an original file
+                throw new NullPointerException("No target directory available.");
+            }
+            selectedFile = new File(target, extension);
         } else {
             resetFile = selectedFile;
         }
-
 
         setSelectedFile(resetFile);
         setSaveDialog(true);
@@ -234,7 +271,7 @@ public final class KeYFileChooser extends JFileChooser {
      * @param selectedFile the file or directory that shall be currently selected
      * @return either of {@link #APPROVE_OPTION}, {@link #CANCEL_OPTION}, or {@link #ERROR_OPTION}
      */
-    public int showSaveDialog(Component parent, File selectedFile) {
+    public int showSaveDialog(@Nullable Component parent, @Nullable File selectedFile) {
         if (selectedFile != null) {
             if (selectedFile.isDirectory()) {
                 setSelectedFile(null);
@@ -246,7 +283,12 @@ public final class KeYFileChooser extends JFileChooser {
         }
 
         if (resetFile == null) {
-            resetFile = getCurrentDirectory();
+            File currentDirectory = getCurrentDirectory();
+            if (currentDirectory == null) {
+                // the file chooser always provides a current directory
+                throw new NullPointerException("No current directory available.");
+            }
+            resetFile = currentDirectory;
         }
 
         setSaveDialog(true);
@@ -258,22 +300,30 @@ public final class KeYFileChooser extends JFileChooser {
     }
 
     private void resetPath() {
-        assert resetFile != null;
-        if (resetFile.isDirectory()) {
+        File currentReset = resetFile;
+        if (currentReset == null) {
+            // resetFile is always assigned before the dialog is shown
+            throw new NullPointerException("No reset file available.");
+        }
+        if (currentReset.isDirectory()) {
             setSelectedFile(null);
-            setCurrentDirectory(resetFile);
+            setCurrentDirectory(currentReset);
         } else {
-            setSelectedFile(resetFile);
+            setSelectedFile(currentReset);
         }
         updateUI();
         resetFile = null;
     }
 
     @Override
-    public int showOpenDialog(Component component) {
+    public int showOpenDialog(@Nullable Component component) {
         setSaveDialog(false);
 
         final File file = getSelectedFile() != null ? getSelectedFile() : getCurrentDirectory();
+        if (file == null) {
+            // the file chooser always provides a selection or a current directory
+            throw new NullPointerException("No file available.");
+        }
         resetFile = file;
         if (file.isDirectory()) {
             setSelectedFile(null);
@@ -295,7 +345,7 @@ public final class KeYFileChooser extends JFileChooser {
     private int showOverwriteDialog(File file) {
         return JOptionPane.showOptionDialog(this,
             "File " + file.getAbsolutePath() + " already exists. Overwrite?", "Save warning",
-            JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
+            JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, new Object[0], null);
     }
 
     /**
@@ -310,7 +360,12 @@ public final class KeYFileChooser extends JFileChooser {
      */
     public static KeYFileChooser getFileChooser(String title) {
         if (INSTANCE == null) {
-            File initDir = Main.getWorkingDir().toFile();
+            Path workingDir = Main.getWorkingDir();
+            if (workingDir == null) {
+                // the command line always provides a working directory
+                throw new NullPointerException("No working directory available.");
+            }
+            File initDir = workingDir.toFile();
             INSTANCE = new KeYFileChooser(initDir);
 
             // not the best design probably: this constructor has the side effect of connecting

@@ -16,6 +16,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getNewSkolemConstantForPrefix;
 
 /**
@@ -26,6 +28,7 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getNewSkolemConstant
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class MergeTotalWeakening extends MergeProcedure implements UnparametricMergeProcedure {
 
     private static MergeTotalWeakening INSTANCE = null;

@@ -17,12 +17,14 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Variable declaration. taken from COMPOST and changed to achieve an immutable structure
  */
 
+@NullMarked
 public abstract class VariableDeclaration extends JavaDeclaration
         implements TypeReferenceContainer {
 
@@ -30,7 +32,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
      * Type reference.
      */
 
-    protected final TypeReference typeReference;
+    protected final @Nullable TypeReference typeReference;
 
     /**
      * this field stores if parent is an InterfaceDeclaration because we will be unable to walk the
@@ -155,13 +157,13 @@ public abstract class VariableDeclaration extends JavaDeclaration
      * @return the type reference.
      */
 
-    public TypeReference getTypeReference() {
+    public @Nullable TypeReference getTypeReference() {
         return typeReference;
     }
 
 
     @Override
-    public @NonNull ImmutableArray<Modifier> getModifiers() {
+    public ImmutableArray<Modifier> getModifiers() {
         return modArray;
     }
 

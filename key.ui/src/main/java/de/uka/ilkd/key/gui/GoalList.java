@@ -32,6 +32,7 @@ import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.prooftree.DisableGoal;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
@@ -43,9 +44,12 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class GoalList extends JList<Goal> implements TabPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(GoalList.class);
 
@@ -63,7 +67,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
     private final GoalListModel goalListModel;
     // clear this cache whenever some display settings are changed?
     private final WeakHashMap<Sequent, String> seqToString = new WeakHashMap<>();
-    private KeYMediator mediator;
+    private @Nullable KeYMediator mediator;
     /**
      * interactive prover listener
      */
@@ -77,6 +81,16 @@ public class GoalList extends JList<Goal> implements TabPanel {
      */
     private final GoalListGUIListener guiListener;
 
+    /**
+     * The list configures itself with selection mode, model, renderer, listeners, keyboard
+     * shortcuts and mediator registration while the receiver is still under initialization
+     * (EISOP initialization check) and passes itself to
+     * {@link KeYGuiExtensionFacade#installKeyboardShortcuts} as component; the effects only
+     * take place after construction completes, suppressed with scoped keys. The mediator is
+     * bound via {@link #setMediator(KeYMediator)}.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public GoalList(KeYMediator mediator) {
         interactiveListener = new GoalListInteractiveListener();
         selectionListener = new GoalListSelectionListener();
@@ -143,7 +157,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         }
         mediator = m;
         register();
-        selectingListModel.setProof(mediator.getSelectedProof());
+        selectingListModel.setProof(m.getSelectedProof());
     }
 
     public void updateUI() {
@@ -158,29 +172,40 @@ public class GoalList extends JList<Goal> implements TabPanel {
     }
 
     private void register() {
-        mediator.addKeYSelectionListener(selectionListener);
+        KeYMediator currentMediator = mediator;
+        if (currentMediator == null) {
+            // the mediator is always set before registration starts
+            throw new NullPointerException("No mediator to register with.");
+        }
+        currentMediator.addKeYSelectionListener(selectionListener);
         // This method delegates the request only to the UserInterfaceControl
         // which implements the functionality.
         // No functionality is allowed in this method body!
-        mediator.getUI().getProofControl().addAutoModeListener(interactiveListener);
-        mediator.addGUIListener(guiListener);
+        currentMediator.getUI().getProofControl().addAutoModeListener(interactiveListener);
+        currentMediator.addGUIListener(guiListener);
     }
 
     private void unregister() {
-        if (mediator != null) {
-            mediator.removeKeYSelectionListener(selectionListener);
+        KeYMediator currentMediator = mediator;
+        if (currentMediator != null) {
+            currentMediator.removeKeYSelectionListener(selectionListener);
             // This method delegates the request only to the UserInterfaceControl
             // which implements the functionality.
             // No functionality is allowed in this method body!
-            mediator.getUI().getProofControl().removeAutoModeListener(interactiveListener);
-            mediator.removeGUIListener(guiListener);
+            currentMediator.getUI().getProofControl().removeAutoModeListener(interactiveListener);
+            currentMediator.removeGUIListener(guiListener);
         }
     }
 
     private void goalChosen() {
         Goal goal = getSelectedValue();
         if (goal != null) {
-            mediator.goalChosen(goal);
+            KeYMediator currentMediator = mediator;
+            if (currentMediator == null) {
+                // a goal can only be chosen while a mediator is set
+                throw new NullPointerException("No mediator for choosing a goal.");
+            }
+            currentMediator.goalChosen(goal);
         }
     }
 
@@ -215,9 +240,19 @@ public class GoalList extends JList<Goal> implements TabPanel {
     private String seqToString(Sequent seq) {
         String res = seqToString.get(seq);
         if (res == null) {
+            KeYMediator currentMediator = mediator;
+            if (currentMediator == null) {
+                // printing the sequent requires the mediator
+                throw new NullPointerException("No mediator for printing the sequent.");
+            }
+            Services services = currentMediator.getServices();
+            if (services == null) {
+                // printing the sequent requires services
+                throw new NullPointerException("No services available for printing.");
+            }
             LogicPrinter sp =
-                SequentViewLogicPrinter.purePrinter(mediator.getNotationInfo(),
-                    mediator.getServices(),
+                SequentViewLogicPrinter.purePrinter(currentMediator.getNotationInfo(),
+                    services,
                     new VisibleTermLabels() {
                         @Override
                         public boolean contains(TermLabel label) {
@@ -258,7 +293,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         /**
          * the proof the model belongs to
          */
-        private Proof proof;
+        private @Nullable Proof proof;
         /**
          *
          */
@@ -275,7 +310,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         /**
          * the proof this view belongs to has changed
          */
-        private void setProof(Proof p) {
+        private void setProof(@Nullable Proof p) {
             clear();
             if (proof != null) {
                 proof.removeProofTreeListener(proofTreeListener);
@@ -292,13 +327,14 @@ public class GoalList extends JList<Goal> implements TabPanel {
          * Sets whether this object should respond to changes in the proof immediately.
          */
         private void setAttentive(boolean b) {
-            if ((b != attentive) && (proof != null) && !proof.isDisposed()) {
+            Proof currentProof = proof;
+            if ((b != attentive) && (currentProof != null) && !currentProof.isDisposed()) {
                 if (b) {
-                    proof.addProofTreeListener(proofTreeListener);
+                    currentProof.addProofTreeListener(proofTreeListener);
                     clear();
-                    add(proof.openGoals());
+                    add(currentProof.openGoals());
                 } else {
-                    proof.removeProofTreeListener(proofTreeListener);
+                    currentProof.removeProofTreeListener(proofTreeListener);
                 }
             }
             attentive = b;
@@ -389,7 +425,10 @@ public class GoalList extends JList<Goal> implements TabPanel {
                 if (pruningInProcess) {
                     return;
                 }
-                remove(e.getGoal());
+                Goal goal = e.getGoal();
+                if (goal != null) {
+                    remove(goal);
+                }
             }
 
             /**
@@ -534,7 +573,12 @@ public class GoalList extends JList<Goal> implements TabPanel {
         public void valueChanged(ListSelectionEvent e) {
             final int firstIndex = e.getFirstIndex();
             if (firstIndex >= 0 && firstIndex < GoalList.this.getModel().getSize()) {
-                if (mediator.getSelectedGoal() != GoalList.this.getSelectedValue()) {
+                KeYMediator currentMediator = mediator;
+                if (currentMediator == null) {
+                    // no goal can be chosen without a mediator
+                    return;
+                }
+                if (currentMediator.getSelectedGoal() != GoalList.this.getSelectedValue()) {
                     goalChosen();
                 }
             }
@@ -619,7 +663,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
          * of rows
          */
         private int delegateSize;
-        private Proof proof = null;
+        private @Nullable Proof proof = null;
 
         public SelectingGoalListModel(GoalListModel delegate) {
             this.delegate = delegate;
@@ -631,7 +675,8 @@ public class GoalList extends JList<Goal> implements TabPanel {
 
         public Goal getElementAt(int i) {
             if (i < 0 || i >= getSize()) {
-                return null;
+                throw new IndexOutOfBoundsException("Index " + i + " out of bounds for "
+                    + getSize() + " goals");
             }
             return delegate.getElementAt(getDelegateIndex(i));
         }
@@ -643,7 +688,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
         /**
          * the proof this view belongs to has changed; this also updates the delegate model
          */
-        protected void setProof(Proof p) {
+        protected void setProof(@Nullable Proof p) {
             delegate.removeListDataListener(delegateListener);
 
             proof = p;
@@ -804,7 +849,7 @@ public class GoalList extends JList<Goal> implements TabPanel {
             GoalList.this.setToolTipText("GOAL");
         }
 
-        public Component getListCellRendererComponent(JList<?> list, Object value, // value
+        public Component getListCellRendererComponent(JList<?> list, @Nullable Object value, // value
                 // to
                 // display
                 int index, // cell index

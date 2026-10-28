@@ -18,12 +18,14 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +34,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
@@ -164,8 +167,12 @@ public class Main {
             ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
                     .setActiveStrategyProperties(sp);
             proof.getSettings().getStrategySettings().setMaxSteps(maxSteps);
-            proof.setActiveStrategy(proof.getServices().getProfile()
-                    .getDefaultStrategyFactory().create(proof, sp));
+            StrategyFactory defaultStrategyFactory =
+                proof.getServices().getProfile().getDefaultStrategyFactory();
+            if (defaultStrategyFactory == null) {
+                throw new NullPointerException("Profile has no default strategy factory.");
+            }
+            proof.setActiveStrategy(defaultStrategyFactory.create(proof, sp));
             // Start auto mode
             env.getUi().getProofControl().startAndWaitForAutoMode(proof);
             // Show proof result

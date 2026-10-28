@@ -8,9 +8,12 @@ package de.uka.ilkd.key.java.ast.abstraction;
 
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A program model element representing array types.
  */
+@NullMarked
 public interface ArrayType extends Type {
 
     /**

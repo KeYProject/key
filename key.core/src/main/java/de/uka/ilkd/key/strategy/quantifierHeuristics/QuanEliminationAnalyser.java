@@ -13,6 +13,9 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class QuanEliminationAnalyser {
 
     /**

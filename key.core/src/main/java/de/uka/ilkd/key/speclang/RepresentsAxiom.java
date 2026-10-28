@@ -8,11 +8,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -30,18 +32,22 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A class axiom corresponding to a JML* represents clause.
  */
+@NullMarked
 public final class RepresentsAxiom extends ClassAxiom {
 
     private final String name;
     private final IObserverFunction target;
     private final KeYJavaType kjt;
-    private final ModifierKind visibility;
-    private final JTerm originalPre;
+    private final @Nullable ModifierKind visibility;
+    private final @Nullable JTerm originalPre;
     private final JTerm originalRep;
-    private final LocationVariable originalSelfVar;
+    private final @Nullable LocationVariable originalSelfVar;
     /**
      * The mapping of the pre-heaps.
      */
@@ -49,15 +55,16 @@ public final class RepresentsAxiom extends ClassAxiom {
     private final ImmutableList<LocationVariable> originalParamVars;
 
     public RepresentsAxiom(String name, IObserverFunction target, KeYJavaType kjt,
-            ModifierKind visibility, JTerm pre, JTerm rep, LocationVariable selfVar,
+            @Nullable ModifierKind visibility, @Nullable JTerm pre, JTerm rep,
+            @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars) {
         this(name, null, target, kjt, visibility, pre, rep, selfVar, paramVars, atPreVars);
     }
 
-    public RepresentsAxiom(String name, String displayName, IObserverFunction target,
-            KeYJavaType kjt, ModifierKind visibility, JTerm pre, JTerm rep,
-            LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+    public RepresentsAxiom(String name, @Nullable String displayName, IObserverFunction target,
+            KeYJavaType kjt, @Nullable ModifierKind visibility, @Nullable JTerm pre, JTerm rep,
+            @Nullable LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars) {
         assert name != null;
         assert kjt != null;
@@ -79,8 +86,8 @@ public final class RepresentsAxiom extends ClassAxiom {
     @Override
     public SpecificationElement map(UnaryOperator<JTerm> op, Services services) {
         return new RepresentsAxiom(name, displayName, target, kjt, visibility,
-            op.apply(originalPre), op.apply(originalRep), originalSelfVar, originalParamVars,
-            atPreVars);
+            originalPre != null ? op.apply(originalPre) : null, op.apply(originalRep),
+            originalSelfVar, originalParamVars, atPreVars);
     }
 
     @Override
@@ -110,18 +117,20 @@ public final class RepresentsAxiom extends ClassAxiom {
                         .equals(originalSelfVar));
     }
 
-    public JTerm getAxiom(JAbstractSortedOperator heapVar, JAbstractSortedOperator selfVar,
+    public JTerm getAxiom(JAbstractSortedOperator heapVar,
+            @Nullable JAbstractSortedOperator selfVar,
             Services services) {
         assert heapVar != null;
         // assert (selfVar == null) == target.isStatic();
-        final Map<ProgramVariable, JAbstractSortedOperator> map =
-            new LinkedHashMap<>();
-        map.put(services.getTypeConverter().getHeapLDT().getHeap(), heapVar);
+        final HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
+        final Map<ProgramVariable, JAbstractSortedOperator> map = new LinkedHashMap<>();
+        map.put(heapLDT.getHeap(), heapVar);
         if (selfVar != null) {
             map.put(originalSelfVar, selfVar);
         }
         final OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
-        return or.replace(originalRep);
+        return Objects.requireNonNull(or.replace(originalRep), "no replacement for term");
     }
 
     @Override
@@ -140,7 +149,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     }
 
     @Override
-    public ModifierKind getVisibility() {
+    public @Nullable ModifierKind getVisibility() {
         return visibility;
     }
 

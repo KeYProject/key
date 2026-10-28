@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.delayedcut;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Interface for DelayedCut listeners.
  *
@@ -11,6 +13,7 @@ package de.uka.ilkd.key.proof.delayedcut;
  * @see DelayedCutProcessor
  * @author Benjamin Niedermann
  */
+@NullMarked
 public interface DelayedCutListener {
     void eventCutting();
 

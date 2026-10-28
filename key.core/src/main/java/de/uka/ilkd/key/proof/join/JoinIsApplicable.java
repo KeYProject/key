@@ -16,6 +16,9 @@ import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
@@ -25,6 +28,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * @see JoinProcessor
  * @author Benjamin Niedermann
  */
+@NullMarked
 public class JoinIsApplicable {
     public static final JoinIsApplicable INSTANCE = new JoinIsApplicable();
 
@@ -39,7 +43,7 @@ public class JoinIsApplicable {
      *         applicable).
      */
     public List<ProspectivePartner> isApplicable(Goal goal,
-            PosInOccurrence pio) {
+            @Nullable PosInOccurrence pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return new LinkedList<>();
         }
@@ -79,7 +83,8 @@ public class JoinIsApplicable {
      * @param g2 Second goal for the join.
      * @return A ProspectivePartner object if the given goals may be joined or null otherwise.
      */
-    private ProspectivePartner areProspectivePartners(Goal g1, PosInOccurrence pio, Goal g2) {
+    private @Nullable ProspectivePartner areProspectivePartners(Goal g1, PosInOccurrence pio,
+            Goal g2) {
         JTerm referenceFormula = (JTerm) pio.subTerm();
 
         assert g1.proof().getServices() == g2.proof().getServices();

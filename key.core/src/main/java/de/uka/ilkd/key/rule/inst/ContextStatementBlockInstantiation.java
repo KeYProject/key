@@ -8,10 +8,14 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.PosInProgram;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * this class is created if the scheme given by a context term has matched to a java program. The
  * ContextStatementBlockInstantiation class stores the instantiations of the prefix and the suffix.
  */
+@NullMarked
 public class ContextStatementBlockInstantiation {
 
     /** the end position of the prefix omega */
@@ -21,7 +25,7 @@ public class ContextStatementBlockInstantiation {
     private final PosInProgram suffixStart;
 
     /** the execution context of the first active statement */
-    private final ExecutionContext activeStatementContext;
+    private final @Nullable ExecutionContext activeStatementContext;
 
     /** the whole program element this context term inst refers to */
     private final ProgramElement programElement;
@@ -35,7 +39,7 @@ public class ContextStatementBlockInstantiation {
      * @param pe the ProgramElement the context positions are related to
      */
     public ContextStatementBlockInstantiation(PosInProgram prefixEnd, PosInProgram suffixStart,
-            ExecutionContext activeStatementContext, ProgramElement pe) {
+            @Nullable ExecutionContext activeStatementContext, ProgramElement pe) {
 
         this.prefixEnd = prefixEnd;
         this.suffixStart = suffixStart;
@@ -63,7 +67,7 @@ public class ContextStatementBlockInstantiation {
      * returns the execution context of the first active statement or null if match is performed
      * outer most
      */
-    public ExecutionContext activeStatementContext() {
+    public @Nullable ExecutionContext activeStatementContext() {
         return activeStatementContext;
     }
 
@@ -97,7 +101,7 @@ public class ContextStatementBlockInstantiation {
 
     }
 
-    private boolean isDifferent(Object self, Object other) {
+    private boolean isDifferent(@Nullable Object self, @Nullable Object other) {
         if (self != null && other != null) {
             return !self.equals(other);
         } else {

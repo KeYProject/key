@@ -8,11 +8,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * An observable {@link ArrayList}; poor reimplementation of the JavaFX class.
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public class ObservableArrayList<E> extends ArrayList<E> {
     private static final long serialVersionUID = 1L;
 
@@ -74,7 +78,7 @@ public class ObservableArrayList<E> extends ArrayList<E> {
     }
 
     @Override
-    public boolean remove(Object o) {
+    public boolean remove(@Nullable Object o) {
         boolean result = super.remove(o);
         informListeners();
         return result;

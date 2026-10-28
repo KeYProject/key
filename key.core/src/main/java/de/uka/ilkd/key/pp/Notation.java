@@ -23,6 +23,8 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * class represent different kinds of concrete syntax, like prefix, infix, postfix, function style,
  * attribute style, etc.
  */
+@NullMarked
 public abstract class Notation {
     private static final Logger LOGGER = LoggerFactory.getLogger(Notation.class);
 
@@ -450,7 +453,7 @@ public abstract class Notation {
      * The standard concrete syntax for the element of operator.
      */
     public static final class ElementOfNotation extends Notation {
-        private String symbol;
+        private @Nullable String symbol;
 
         public ElementOfNotation() {
             super(130);
@@ -636,7 +639,7 @@ public abstract class Notation {
             super(120);
         }
 
-        public static String printNumberTerm(JTerm numberTerm) {
+        public static @Nullable String printNumberTerm(JTerm numberTerm) {
             JTerm t = numberTerm;
 
             // skip number symbol /as this method may be called
@@ -691,7 +694,7 @@ public abstract class Notation {
             super(120);
         }
 
-        public static String printRealTerm(JTerm realTerm) {
+        public static @Nullable String printRealTerm(JTerm realTerm) {
             if (!realTerm.op().name().equals(RealLDT.REAL_NUMBERS_NAME) || realTerm.arity() != 2) {
                 return null;
             }
@@ -731,7 +734,7 @@ public abstract class Notation {
             super(1000);
         }
 
-        private static String printCharTerm(JTerm t) {
+        private static @Nullable String printCharTerm(JTerm t) {
 
             char charVal = 0;
             int intVal = 0;
@@ -778,7 +781,7 @@ public abstract class Notation {
             super(120);
         }
 
-        public static String printFloatTerm(JTerm floatTerm) {
+        public static @Nullable String printFloatTerm(JTerm floatTerm) {
 
             if (!floatTerm.op().name().equals(FloatLDT.FLOATLIT_NAME)) {
                 return null;
@@ -828,7 +831,7 @@ public abstract class Notation {
             super(120);
         }
 
-        public static String printDoubleTerm(JTerm doubleTerm) {
+        public static @Nullable String printDoubleTerm(JTerm doubleTerm) {
 
             if (!doubleTerm.op().name().equals(DoubleLDT.DOUBLELIT_NAME)) {
                 return null;

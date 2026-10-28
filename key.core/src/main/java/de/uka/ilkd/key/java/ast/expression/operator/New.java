@@ -21,6 +21,9 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The object allocation operator. There are two variants for New:
  * <OL>
@@ -36,12 +39,13 @@ import org.key_project.util.collection.ImmutableArray;
  * from an outer instance.
  */
 
+@NullMarked
 public class New extends TypeOperator implements ConstructorReference, ExpressionStatement,
         ReferenceSuffix, TypeDeclarationContainer {
 
 
-    protected final ClassDeclaration anonymousClass;
-    protected final ReferencePrefix accessPath;
+    protected final @Nullable ClassDeclaration anonymousClass;
+    protected final @Nullable ReferencePrefix accessPath;
 
 
     /**
@@ -90,7 +94,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
      * @param rp
      *        a ReferencePrefix as access path for the constructor
      */
-    public New(Expression[] arguments, TypeReference type, ReferencePrefix rp) {
+    public New(Expression[] arguments, TypeReference type, @Nullable ReferencePrefix rp) {
         super(arguments, type);
         anonymousClass = null;
         accessPath = rp;
@@ -146,7 +150,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     }
 
 
-    public ClassDeclaration getClassDeclaration() {
+    public @Nullable ClassDeclaration getClassDeclaration() {
         return anonymousClass;
     }
 
@@ -222,7 +226,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
      * @return the reference prefix.
      */
     @Override
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return accessPath;
     }
 

@@ -7,12 +7,15 @@ package org.key_project.isabelletranslation.automation;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.isabelletranslation.IsabelleTranslationSettings;
 import org.key_project.isabelletranslation.translation.IllegalFormulaException;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +25,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Nils Buchholz
  */
+@NullMarked
 public class IsabelleProblem {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleProblem.class);
 
@@ -33,12 +37,12 @@ public class IsabelleProblem {
     /**
      * Content of the preamble theory
      */
-    private final String preamble;
+    private final @Nullable String preamble;
 
     /**
      * Content of the translation theory
      */
-    private final String translation;
+    private final @Nullable String translation;
 
     /**
      * Name of the problem. Contains the serialNr of the associated goal
@@ -49,7 +53,7 @@ public class IsabelleProblem {
     /**
      * Exception encountered during translation
      */
-    private final IllegalFormulaException exception;
+    private final @Nullable IllegalFormulaException exception;
 
     /**
      * Creates a new problem for the given goal.
@@ -88,7 +92,7 @@ public class IsabelleProblem {
      *
      * @return content of translation theory
      */
-    public String getTranslation() {
+    public @Nullable String getTranslation() {
         return translation;
     }
 
@@ -97,7 +101,7 @@ public class IsabelleProblem {
      *
      * @return content of preamble theory
      */
-    public String getPreamble() {
+    public @Nullable String getPreamble() {
         return preamble;
     }
 
@@ -121,9 +125,21 @@ public class IsabelleProblem {
         File translationFile = new File(settings.getTranslationPath() + "/Translation.thy");
         File translationPreambleFile =
             new File(settings.getTranslationPath() + "/TranslationPreamble.thy");
-        Files.createDirectories(translationFile.toPath().getParent());
-        Files.write(translationPreambleFile.toPath(), this.getPreamble().getBytes());
-        Files.write(translationFile.toPath(), this.getTranslation().getBytes());
+        Path translationDirectory = translationFile.toPath().getParent();
+        if (translationDirectory == null) {
+            throw new NullPointerException("Translation file has no parent directory.");
+        }
+        Files.createDirectories(translationDirectory);
+        String preamble = this.getPreamble();
+        if (preamble == null) {
+            throw new NullPointerException("Problem " + name + " has no preamble.");
+        }
+        String translation = this.getTranslation();
+        if (translation == null) {
+            throw new NullPointerException("Problem " + name + " has no translation.");
+        }
+        Files.write(translationPreambleFile.toPath(), preamble.getBytes());
+        Files.write(translationFile.toPath(), translation.getBytes());
         LOGGER.info("Saved to: {} and {}", translationFile.toPath(),
             translationPreambleFile.toPath());
     }
@@ -137,7 +153,7 @@ public class IsabelleProblem {
         return translation != null || preamble != null;
     }
 
-    public IllegalFormulaException getTranslationException() {
+    public @Nullable IllegalFormulaException getTranslationException() {
         return exception;
     }
 }

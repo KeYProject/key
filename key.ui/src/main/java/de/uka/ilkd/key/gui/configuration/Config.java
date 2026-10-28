@@ -12,7 +12,10 @@ import javax.swing.plaf.FontUIResource;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /** this class is used to set some default gui properties */
+@NullMarked
 public class Config {
 
     /** name of different fonts */
@@ -27,16 +30,27 @@ public class Config {
     public static final Config DEFAULT = new Config();
 
     /** The index of the current size */
-    private int sizeIndex = readSizeIndex();
-    private double sizeFactor = readSizeFactor();
+    private int sizeIndex;
+    private double sizeFactor;
 
     /** cached ConfigChange event */
-    private final ConfigChangeEvent configChangeEvent = new ConfigChangeEvent(this);
+    private final ConfigChangeEvent configChangeEvent;
 
     /** the listeners to this Config */
     private final List<ConfigChangeListener> listenerList = new ArrayList<>(5);
 
+    /**
+     * The ctor reads the initial sizes and the defaults while the receiver is still under
+     * initialization (EISOP initialization check); the reads only access the global view
+     * settings, and the change event bound to the under-construction receiver is only fired
+     * after construction completes, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible", "nullness:assignment.type.incompatible" })
     private Config() {
+        sizeIndex = readSizeIndex();
+        sizeFactor = readSizeFactor();
+        configChangeEvent = new ConfigChangeEvent(this);
         setDefaultFonts();
     }
 
@@ -92,7 +106,6 @@ public class Config {
         UIManager.put(KEY_FONT_PROOF_LIST_VIEW,
             new FontUIResource("Default", Font.PLAIN, (int) (sizeFactor * SIZES[2])));
     }
-
 
     public void addConfigChangeListener(ConfigChangeListener listener) {
         synchronized (listenerList) {

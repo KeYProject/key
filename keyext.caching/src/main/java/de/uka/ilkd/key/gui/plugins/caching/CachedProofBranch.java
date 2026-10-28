@@ -6,6 +6,8 @@ package de.uka.ilkd.key.gui.plugins.caching;
 
 import java.io.File;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Data object about a cached proof branch.
  *
@@ -13,6 +15,7 @@ import java.io.File;
  *
  * @author Arne Keller
  */
+@NullMarked
 public class CachedProofBranch {
     /**
      * File the cached proof is stored in.

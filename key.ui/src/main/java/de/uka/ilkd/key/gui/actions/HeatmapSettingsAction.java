@@ -14,21 +14,32 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Action for invoking the heatmap options dialog.
  *
  * @author jschiffl
  */
+@NullMarked
 public class HeatmapSettingsAction extends MainWindowAction {
     private static final long serialVersionUID = -6165100588113899099L;
 
-    private HeatmapOptionsDialog dialog;
+    private @Nullable HeatmapOptionsDialog dialog;
 
     /**
      * constructor
      *
      * @param mainWindow the main window of the options dialog
      */
+    /**
+     * The action-configuration calls, the mediator queries and the listener registration below
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since these configure the local action only, suppressed
+     * with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public HeatmapSettingsAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Heatmap Options");

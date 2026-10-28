@@ -7,12 +7,16 @@ package de.uka.ilkd.key.gui.tacletmatch;
 import java.awt.*;
 import javax.swing.*;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Read-only monospaced text that abbreviates long or multi-line content to a single truncated line
  * and offers a toggle to expand it to its full, wrapped form. The full text is also available as a
  * tooltip. Used for the (potentially very long) terms and formulas shown across the taclet-match
  * dialog so they neither blow up the layout nor hide information.
  */
+@NullMarked
 public class ExpandableText extends JPanel {
 
     private static final long serialVersionUID = 1L;
@@ -28,11 +32,20 @@ public class ExpandableText extends JPanel {
     private final JTextArea area = new JTextArea();
     private final JButton toggle = TmStyle.disclosure(null);
 
-    public ExpandableText(String text) {
+    public ExpandableText(@Nullable String text) {
         this(text, DEFAULT_LIMIT);
     }
 
-    public ExpandableText(String text, int limit) {
+    /**
+     * Creates an expandable text display.
+     *
+     * <p>
+     * The display styles itself and sets up the expand toggle while the receiver is still under
+     * initialization (EISOP initialization check); the layout and content only materialize once
+     * the display is shown after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
+    public ExpandableText(@Nullable String text, int limit) {
         this.full = text == null ? "" : text;
         this.limit = limit;
         // collapse genuinely long content, or anything taller than two lines, so a big term does

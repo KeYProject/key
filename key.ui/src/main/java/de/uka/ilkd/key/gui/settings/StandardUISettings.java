@@ -21,11 +21,13 @@ import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * @author Alexander Weigl
  * @version 1 (10.05.19)
  */
+@NullMarked
 public class StandardUISettings extends SettingsPanel implements SettingsProvider {
     private static final String INFO_CLUTTER_RULESET =
         "Comma separated list of rule set names, containing clutter rules.";
@@ -83,6 +85,12 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
     private final JTextArea txtClutterRuleSets;
     private final JComboBox<String> notificationAfterMacro;
 
+    /**
+     * The panel configures itself with header, separator and component-factory calls while the
+     * receiver is still under initialization (EISOP initialization check); the effects only
+     * take place after construction completes, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public StandardUISettings() {
         setHeaderText(getDescription());
 
@@ -155,7 +163,6 @@ public class StandardUISettings extends SettingsPanel implements SettingsProvide
                     default.""",
             false, emptyValidator());
     }
-
 
     @Override
     public String getDescription() {

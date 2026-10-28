@@ -11,15 +11,26 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 
+import org.jspecify.annotations.NullMarked;
+
 /*
  * Menu option for showing the sequent search bar. Keyboard shortcut: STRG+F.
  */
+@NullMarked
 public class SearchInSequentAction extends MainWindowAction {
 
     private static final long serialVersionUID = -9002009635814787502L;
 
     private final SequentViewSearchBar searchBar;
 
+    /**
+     * The action-configuration calls and the {@code enableWhenProofLoaded(this)} registration
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since the listener only reacts to later selection events,
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public SearchInSequentAction(MainWindow mainWindow, SequentViewSearchBar searchBar) {
         super(mainWindow);
         this.searchBar = searchBar;

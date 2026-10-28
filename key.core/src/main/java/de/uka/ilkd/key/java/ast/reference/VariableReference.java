@@ -28,27 +28,27 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
-
+@NullMarked
 public class VariableReference extends JavaNonTerminalProgramElement
         implements NameReference, Expression, ReferencePrefix {
 
-    @NonNull
     protected final ProgramVariable variable;
 
     public VariableReference(PositionInfo pi, List<Comment> comments,
-            @NonNull ProgramVariable variable) {
+            ProgramVariable variable) {
         super(pi, comments);
         this.variable = Objects.requireNonNull(variable);
     }
 
-    public VariableReference(@NonNull ProgramVariable variable, PositionInfo pi) {
+    public VariableReference(ProgramVariable variable, @Nullable PositionInfo pi) {
         super(pi);
         this.variable = Objects.requireNonNull(variable);
     }
 
-    public VariableReference(@NonNull ProgramVariable variable) {
+    public VariableReference(ProgramVariable variable) {
         this(variable, PositionInfo.UNDEFINED);
     }
 
@@ -86,7 +86,7 @@ public class VariableReference extends JavaNonTerminalProgramElement
     }
 
 
-    public final String getName() {
+    public final @Nullable String getName() {
         return (variable == null) ? null : variable.toString();
     }
 
@@ -95,7 +95,6 @@ public class VariableReference extends JavaNonTerminalProgramElement
         return variable;
     }
 
-    @NonNull
     public SourceElement getFirstElement() {
         return variable;
     }
@@ -117,7 +116,7 @@ public class VariableReference extends JavaNonTerminalProgramElement
      *
      * @author VK
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return null;
     }
 
@@ -131,19 +130,20 @@ public class VariableReference extends JavaNonTerminalProgramElement
      * @param javaServ
      *        the java services
      * @param ec
-     *        the execution context
+     *        the execution context (may be {@code null}; variables with declared types resolve
+     *        their own type without a context)
      * @return the KeY java type
      */
     public KeYJavaType getKeYJavaType(Services javaServ,
-            ExecutionContext ec) {
+            @Nullable ExecutionContext ec) {
+        return Objects.requireNonNull(getKeYJavaType(), "variable has no KeYJavaType");
+    }
+
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ) {
         return getKeYJavaType();
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
-        return getKeYJavaType();
-    }
-
-    public KeYJavaType getKeYJavaType() {
+    public @Nullable KeYJavaType getKeYJavaType() {
         return variable != null ? variable.getKeYJavaType() : null;
     }
 }

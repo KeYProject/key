@@ -27,6 +27,9 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class handles the instantiation of generic sorts (used for generic taclets), i.e. the class
  * tries to find a solution for the conditions on the generic sorts given by the type hierarchy and
@@ -34,6 +37,7 @@ import org.key_project.util.collection.ImmutableSet;
  *
  * this class is immutable
  */
+@NullMarked
 public final class GenericSortInstantiations {
 
     public static final GenericSortInstantiations EMPTY_INSTANTIATIONS =
@@ -111,7 +115,7 @@ public final class GenericSortInstantiations {
      *         sorts are definitely incorrect, null if the sorts could (perhaps) be made correct by
      *         choosing the right generic sort instantiations
      */
-    public Boolean checkSorts(OperatorSV sv, InstantiationEntry<?> p_entry) {
+    public @Nullable Boolean checkSorts(OperatorSV sv, InstantiationEntry<?> p_entry) {
         if (sv instanceof ProgramSV || !(p_entry.getInstantiation() instanceof JTerm term)) {
             return Boolean.TRUE;
         }
@@ -129,7 +133,7 @@ public final class GenericSortInstantiations {
         }
     }
 
-    public Boolean checkConditions(ImmutableList<GenericSortCondition> p_condition) {
+    public @Nullable Boolean checkConditions(ImmutableList<GenericSortCondition> p_condition) {
         for (var cond : p_condition) {
             var r = checkCondition(cond);
             if (r == null || !r)
@@ -143,7 +147,7 @@ public final class GenericSortInstantiations {
      *         null otherwise (this means, "p_condition" could be satisfied by create a new
      *         "GenericSortInstantiations"-object)
      */
-    public Boolean checkCondition(GenericSortCondition p_condition) {
+    public @Nullable Boolean checkCondition(GenericSortCondition p_condition) {
         Sort s = insts.get(p_condition.getGenericSort());
 
         if (s == null) {
@@ -159,7 +163,7 @@ public final class GenericSortInstantiations {
     }
 
 
-    public Sort getInstantiation(GenericSort p_gs) {
+    public @Nullable Sort getInstantiation(GenericSort p_gs) {
         return insts.get(p_gs);
     }
 
@@ -197,7 +201,7 @@ public final class GenericSortInstantiations {
         if (p_s instanceof GenericSort gs) {
             p_s = getInstantiation(gs);
             if (p_s == null) {
-                throw new GenericSortException("Generic sort is not yet instantiated", null);
+                throw new GenericSortException("Generic sort is not yet instantiated");
             }
         } else if (p_s instanceof ParametricSortInstance psi && psi.containsGenericSort()) {
             ImmutableList<GenericArgument> args = ImmutableList.nil();
@@ -205,13 +209,13 @@ public final class GenericSortInstantiations {
                 GenericArgument oa = psi.getArgs().get(i);
                 Sort realSort = getRealSort(oa.sort(), services);
                 if (realSort == null) {
-                    throw new GenericSortException("Generic sort is not yet instantiated", null);
+                    throw new GenericSortException("Generic sort is not yet instantiated");
                 }
                 args = args.prepend(new GenericArgument(realSort));
             }
             var inst = ParametricSortInstance.get(psi.getBase(), args, services);
             if (inst.containsGenericSort())
-                throw new GenericSortException("Generic sort is not yet instantiated", null);
+                throw new GenericSortException("Generic sort is not yet instantiated");
             p_s = inst;
         }
 
@@ -271,7 +275,7 @@ public final class GenericSortInstantiations {
      * @param p_conditions conditions (see above)
      * @return a solution if one could be found, null otherwise
      */
-    private static ImmutableMap<GenericSort, Sort> solveHelp(
+    private static @Nullable ImmutableMap<GenericSort, Sort> solveHelp(
             ImmutableList<GenericSort> p_remainingSorts, ImmutableMap<GenericSort, Sort> p_curRes,
             ImmutableList<GenericSortCondition> p_conditions,
             ImmutableList<GenericSort> p_pushedBack, LogicServices services) {
@@ -337,7 +341,7 @@ public final class GenericSortInstantiations {
     }
 
 
-    private static ImmutableMap<GenericSort, Sort> descend(
+    private static @Nullable ImmutableMap<GenericSort, Sort> descend(
             ImmutableList<GenericSort> p_remainingSorts, ImmutableMap<GenericSort, Sort> p_curRes,
             ImmutableList<GenericSortCondition> p_conditions,
             ImmutableList<GenericSort> p_pushedBack, GenericSort p_gs,
@@ -359,7 +363,7 @@ public final class GenericSortInstantiations {
     }
 
 
-    private static ImmutableList<Sort> chooseResults(GenericSort p_gs,
+    private static @Nullable ImmutableList<Sort> chooseResults(GenericSort p_gs,
             ImmutableList<GenericSortCondition> p_idConditions) throws FailException {
         if (!p_idConditions.isEmpty()) {
             // then the instantiation is completely determined by
@@ -424,7 +428,7 @@ public final class GenericSortInstantiations {
      * @param p_conditions conditions (see above)
      * @return a solution if one could be found, null otherwise
      */
-    private static ImmutableMap<GenericSort, Sort> solveForcedInst(
+    private static @Nullable ImmutableMap<GenericSort, Sort> solveForcedInst(
             ImmutableList<GenericSort> p_remainingSorts, ImmutableMap<GenericSort, Sort> p_curRes,
             ImmutableList<GenericSortCondition> p_conditions, LogicServices services) {
 
@@ -454,7 +458,7 @@ public final class GenericSortInstantiations {
      * @param p_curRes instantiations so far
      * @return a solution if one could be found, null otherwise
      */
-    private static ImmutableMap<GenericSort, Sort> solveForcedInstHelp(
+    private static @Nullable ImmutableMap<GenericSort, Sort> solveForcedInstHelp(
             ImmutableList<GenericSort> p_remainingSorts, ImmutableMap<GenericSort, Sort> p_curRes,
             LogicServices services) {
 

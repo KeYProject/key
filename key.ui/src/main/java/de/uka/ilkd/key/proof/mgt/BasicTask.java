@@ -10,12 +10,15 @@ import javax.swing.tree.MutableTreeNode;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Captures a node in the TaskTree which contains exactly one proof. Such a node is the only one
  * with a one to one mapping between TaskTreeNode and Proof. It may be a sub task of a more complex
  * task such as ProofListTask.
  */
+@NullMarked
 public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode {
 
     /**
@@ -33,7 +36,12 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode {
     }
 
     public String shortDescr() {
-        return proof().name().toString();
+        Proof p = proof();
+        if (p == null) {
+            // a basic task always wraps a proof; the original code dereferences it
+            throw new NullPointerException("No proof available.");
+        }
+        return p.name().toString();
     }
 
     public String toString() {
@@ -41,16 +49,26 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode {
     }
 
     public ProofEnvironment getProofEnv() {
-        return proof().getEnv();
+        Proof p = proof();
+        if (p == null) {
+            // a basic task always wraps a proof; the original code dereferences it
+            throw new NullPointerException("No proof available.");
+        }
+        ProofEnvironment env = p.getEnv();
+        if (env == null) {
+            // a proof always knows its environment; the original code returned it directly
+            throw new NullPointerException("No proof environment available.");
+        }
+        return env;
     }
 
     /* returns the single proof of this task */
-    public Proof proof() {
+    public @Nullable Proof proof() {
         return proof.getFirstProof();
     }
 
     /** returns all proofs attached to this basic task */
-    public Proof[] allProofs() {
+    public @Nullable Proof[] allProofs() {
         return new Proof[] { proof() };
     }
 
@@ -64,9 +82,18 @@ public class BasicTask extends DefaultMutableTreeNode implements TaskTreeNode {
      * proof .
      */
     public ProofStatus getStatus() {
-        return proof().mgt().getStatus();
+        Proof p = proof();
+        if (p == null) {
+            // a basic task always wraps a proof; the original code dereferences it
+            throw new NullPointerException("No proof available.");
+        }
+        ProofCorrectnessMgt mgt = p.mgt();
+        if (mgt == null) {
+            // every proof carries its correctness management object
+            throw new NullPointerException("No proof management available.");
+        }
+        return mgt.getStatus();
     }
-
 
     /** returns the upper most task this basic task belongs to. */
     public TaskTreeNode getRootTask() {

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.notification;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This interface constants used to uniquely identify KeY system events
  *
@@ -11,6 +13,7 @@ package de.uka.ilkd.key.gui.notification;
  *
  * @author bubel
  */
+@NullMarked
 public enum NotificationEventID {
 
     /** tasks notifying about proof closed events have this ID */

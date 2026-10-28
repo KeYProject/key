@@ -9,12 +9,15 @@ import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * An abstract domain element for a predicate abstraction lattice encapsulating exactly one
  * abstraction predicate.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class SimplePredicateAbstractionDomainElement
         extends AbstractPredicateAbstractionDomainElement {
 

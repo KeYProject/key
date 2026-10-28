@@ -18,6 +18,9 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
 
 /**
@@ -32,6 +35,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAM
  *
  * @author Tobias Reinhold
  */
+@NullMarked
 public class RenamingTermProperty implements Property<Term> {
     /**
      * The single instance of this property.
@@ -138,7 +142,7 @@ public class RenamingTermProperty implements Property<Term> {
      * @return <code>true</code> is returned iff the terms are equal modulo bound renaming
      */
     private boolean unifyHelp(Term t0, Term t1, ImmutableList<QuantifiableVariable> ownBoundVars,
-            ImmutableList<QuantifiableVariable> cmpBoundVars, NameAbstractionTable nat) {
+            ImmutableList<QuantifiableVariable> cmpBoundVars, @Nullable NameAbstractionTable nat) {
 
         if (t0 == t1 && ownBoundVars.equals(cmpBoundVars)) {
             return true;
@@ -215,8 +219,8 @@ public class RenamingTermProperty implements Property<Term> {
      * @return the updated {@link NameAbstractionTable} if the {@link JavaBlock}s are equal modulo
      *         renaming or {@link #FAILED} if they are not
      */
-    private static NameAbstractionTable handleJava(JavaBlock jb0, JavaBlock jb1,
-            NameAbstractionTable nat) {
+    private static @Nullable NameAbstractionTable handleJava(JavaBlock jb0, JavaBlock jb1,
+            @Nullable NameAbstractionTable nat) {
         if (!jb0.isEmpty() || !jb1.isEmpty()) {
             nat = checkNat(nat);
             if (javaBlocksNotEqualModRenaming(jb0, jb1, nat)) {
@@ -266,7 +270,7 @@ public class RenamingTermProperty implements Property<Term> {
      */
     private boolean descendRecursively(Term t0, Term t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
-            ImmutableList<QuantifiableVariable> cmpBoundVars, NameAbstractionTable nat) {
+            ImmutableList<QuantifiableVariable> cmpBoundVars, @Nullable NameAbstractionTable nat) {
 
         for (int i = 0; i < t0.arity(); i++) {
             ImmutableList<QuantifiableVariable> subOwnBoundVars = ownBoundVars;
@@ -305,7 +309,7 @@ public class RenamingTermProperty implements Property<Term> {
      * @param nat the {@link NameAbstractionTable} to check
      * @return the given {@code nat} if it is not null, a new {@link NameAbstractionTable} otherwise
      */
-    private static NameAbstractionTable checkNat(NameAbstractionTable nat) {
+    private static NameAbstractionTable checkNat(@Nullable NameAbstractionTable nat) {
         if (nat == null) {
             return new NameAbstractionTable();
         }

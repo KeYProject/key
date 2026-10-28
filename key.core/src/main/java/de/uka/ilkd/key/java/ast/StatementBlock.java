@@ -24,30 +24,29 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Position;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Statement block. taken from COMPOST and changed to achieve an immutable structure
  */
+@NullMarked
 public class StatementBlock extends JavaStatement implements StatementContainer,
         TypeDeclarationContainer, VariableScope, TypeScope, ProgramPrefix {
 
     /**
      * Body.
      */
-    @NonNull
     private final ImmutableArray<? extends Statement> body;
 
     private final int prefixLength;
 
-    @Nullable
-    private final MethodFrame innerMostMethodFrame;
+    private @Nullable MethodFrame innerMostMethodFrame;
     private final ImmutableList<TextualJMLConstruct> attachedJML;
 
     public StatementBlock(
             PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<? extends Statement> body,
+            ImmutableArray<? extends Statement> body,
             ImmutableList<TextualJMLConstruct> attachedJML) {
         super(pi, comments);
         this.body = body;
@@ -81,8 +80,8 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
             ImmutableList.fromList(Arrays.asList(children.collect(TextualJMLConstruct.class)));
     }
 
-    public StatementBlock(@NonNull ImmutableArray<? extends Statement> as) {
-        super((PositionInfo) null, null);
+    public StatementBlock(ImmutableArray<? extends Statement> as) {
+        super(PositionInfo.UNDEFINED, List.of());
         // check for non-null elements (bug fix)
         Debug.assertDeepNonNull(as, "statement block contructor");
         body = as;
@@ -163,7 +162,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      *
      * @return the statement array wrapper.
      */
-    @NonNull
     public ImmutableArray<? extends Statement> getBody() {
         return body;
     }
@@ -272,7 +270,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     }
 
 
-    @NonNull
     public SourceElement getFirstElement() {
         if (isEmpty()) {
             return this;
@@ -314,9 +311,8 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         return prefixLength;
     }
 
-    @Nullable
     @Override
-    public MethodFrame getInnerMostMethodFrame() {
+    public @Nullable MethodFrame getInnerMostMethodFrame() {
         return innerMostMethodFrame;
     }
 

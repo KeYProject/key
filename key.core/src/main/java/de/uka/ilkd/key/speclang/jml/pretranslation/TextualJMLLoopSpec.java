@@ -14,13 +14,15 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * A JML loop specification (invariant, assignable clause, decreases clause, ...) in textual form.
  */
+@NullMarked
 public final class TextualJMLLoopSpec extends TextualJMLConstruct {
-    private LabeledParserRuleContext variant = null;
+    private @Nullable LabeledParserRuleContext variant = null;
     private final ArrayList<Entry> clauses = new ArrayList<>(16);
 
     public Set<ParserRuleContext> getClauses() {
@@ -174,7 +176,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return getMap(ClauseHd.INVARIANT_FREE);
     }
 
-    public LabeledParserRuleContext getVariant() {
+    public @Nullable LabeledParserRuleContext getVariant() {
         return variant;
     }
 
@@ -210,7 +212,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
             return false;
         }
         TextualJMLLoopSpec that = (TextualJMLLoopSpec) o;
-        return variant.equals(that.variant) && clauses.equals(that.clauses);
+        return Objects.equals(variant, that.variant) && clauses.equals(that.clauses);
     }
 
     @Override
@@ -221,9 +223,9 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     static class Entry {
         final Object clauseType;
         final LabeledParserRuleContext ctx;
-        final Name heap;
+        final @Nullable Name heap;
 
-        Entry(Object clauseType, LabeledParserRuleContext ctx, Name heap) {
+        Entry(Object clauseType, LabeledParserRuleContext ctx, @Nullable Name heap) {
             this.clauseType = clauseType;
             this.ctx = ctx;
             this.heap = heap;

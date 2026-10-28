@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic.sort;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 
 import org.key_project.logic.Name;
@@ -12,13 +14,19 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Abstract base class for implementations of the Sort interface.
  */
+@NullMarked
 public class SortImpl extends AbstractSort {
-    private ImmutableSet<Sort> ext;
+    // NullSort passes a literal {@code null} through the constructor, so this field is genuinely
+    // nullable; {@link #extendsSorts()} narrows it again before dereferencing.
+    private @Nullable ImmutableSet<Sort> ext;
 
-    public SortImpl(Name name, ImmutableSet<Sort> ext, boolean isAbstract) {
+    public SortImpl(Name name, @Nullable ImmutableSet<Sort> ext, boolean isAbstract) {
         super(name, isAbstract);
         this.ext = ext;
     }
@@ -41,10 +49,13 @@ public class SortImpl extends AbstractSort {
                 || this == JavaDLTheory.ANY) {
             return DefaultImmutableSet.nil();
         } else {
-            if (ext.isEmpty()) {
-                ext = DefaultImmutableSet.<Sort>nil().add(JavaDLTheory.ANY);
+            ImmutableSet<Sort> result =
+                Objects.requireNonNull(ext, "extends sorts must not be null here");
+            if (result.isEmpty()) {
+                result = result.add(JavaDLTheory.ANY);
+                ext = result;
             }
-            return ext;
+            return result;
         }
     }
 

@@ -26,6 +26,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * This class is responsible for processing the delayed cut. The information about the cut is stored
@@ -62,6 +65,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author Benjamin Niedermann
  */
+@NullMarked
 public class DelayedCutProcessor implements Runnable {
 
     /**
@@ -101,7 +105,7 @@ public class DelayedCutProcessor implements Runnable {
         this.mode = mode;
     }
 
-    private Goal find(Proof proof, Node node) {
+    private @Nullable Goal find(Proof proof, Node node) {
         for (Goal goal : proof.openGoals()) {
             if (goal.node() == node) {
                 return goal;
@@ -279,7 +283,7 @@ public class DelayedCutProcessor implements Runnable {
      * @param app
      * @return
      */
-    private LinkedList<Goal> apply(Goal goal, RuleApp app, TermServices services) {
+    private LinkedList<Goal> apply(Goal goal, @Nullable RuleApp app, TermServices services) {
         if (app instanceof TacletApp tapp) {
             final SVInstantiations insts = tapp.instantiations();
             for (var entry : insts.getInstantiationMap()) {
@@ -304,7 +308,8 @@ public class DelayedCutProcessor implements Runnable {
         return goals;
     }
 
-    private LinkedList<Goal> apply(Node oldNode, Goal goal, RuleApp app, TermServices services) {
+    private LinkedList<Goal> apply(Node oldNode, Goal goal, @Nullable RuleApp app,
+            TermServices services) {
         try {
             return apply(goal, app, services);
         } catch (Throwable e) {
@@ -316,7 +321,7 @@ public class DelayedCutProcessor implements Runnable {
      * Based on an old rule application a new rule application is built. Mainly the position is
      * updated.
      */
-    private RuleApp createNewRuleApp(NodeGoalPair pair, Services services) {
+    private @Nullable RuleApp createNewRuleApp(NodeGoalPair pair, Services services) {
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
 
         PosInOccurrence newPos = translate(pair, services);
@@ -340,7 +345,7 @@ public class DelayedCutProcessor implements Runnable {
     }
 
     private void check(Goal goal, final RuleApp app,
-            PosInOccurrence newPos, Services services) {
+            @Nullable PosInOccurrence newPos, Services services) {
         if (newPos == null) {
             return;
         }
@@ -388,7 +393,7 @@ public class DelayedCutProcessor implements Runnable {
 
     }
 
-    private PosInOccurrence translate(NodeGoalPair pair, TermServices services) {
+    private @Nullable PosInOccurrence translate(NodeGoalPair pair, TermServices services) {
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
         if (oldRuleApp == null || oldRuleApp.posInOccurrence() == null) {
             return null;

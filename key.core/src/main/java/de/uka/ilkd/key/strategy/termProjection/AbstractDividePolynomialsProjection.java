@@ -19,6 +19,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public abstract class AbstractDividePolynomialsProjection implements ProjectionToTerm<Goal> {
     private final ProjectionToTerm<Goal> leftCoefficient, polynomial;
 

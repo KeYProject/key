@@ -13,11 +13,15 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A "\Continue *" parameter declaration of a ccatch clause.
  *
  * @author Dominic Steinhöfel
  */
+@NullMarked
 public class CcatchContinueWildcardParameterDeclaration
         extends CcatchNonstandardParameterDeclaration {
 
@@ -32,8 +36,13 @@ public class CcatchContinueWildcardParameterDeclaration
         return 0;
     }
 
+    // Returns null by design (this clause has no children). The base contract
+    // NonTerminalProgramElement.getChildAt(int) is @NonNull and cannot be widened (it ripples into
+    // key.ncore SyntaxElement.getChild(int) + ~40 overrides; wave-7 SuperArrayDeclaration
+    // precedent), so the honest @Nullable override is exempted from the check.
+    @SuppressWarnings("NullAway")
     @Override
-    public ProgramElement getChildAt(int index) {
+    public @Nullable ProgramElement getChildAt(int index) {
         return null;
     }
 

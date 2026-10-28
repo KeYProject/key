@@ -33,7 +33,9 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * A rule for JML assert/assume statements.
@@ -59,6 +61,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Benjamin Takacs
  */
+@NullMarked
 public final class JmlAssertRule implements BuiltInRule {
 
     /**
@@ -114,7 +117,7 @@ public final class JmlAssertRule implements BuiltInRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
+    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
             throws RuleAbortException {
         if (!(ruleApp instanceof JmlAssertBuiltInRuleApp)) {
             throw new IllegalArgumentException("can only apply JmlAssertBuiltInRuleApp");
@@ -139,7 +142,7 @@ public final class JmlAssertRule implements BuiltInRule {
         final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
         final JTerm self = MiscTools.getSelfTerm(frame, services);
 
-        final SpecificationRepository.JmlStatementSpec spec =
+        final SpecificationRepository.@Nullable JmlStatementSpec spec =
             services.getSpecificationRepository().getStatementSpec(jmlAssert);
 
         if (spec == null) {

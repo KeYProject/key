@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class UnknownJavaTypeException extends RuntimeException {
 
     /**

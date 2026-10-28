@@ -14,14 +14,18 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  *
  * @author christoph
  */
+@NullMarked
 public class MethodInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletBuilder {
 
-    private InformationFlowContract contract;
+    private @Nullable InformationFlowContract contract;
 
 
     public MethodInfFlowUnfoldTacletBuilder(Services services) {
@@ -36,15 +40,27 @@ public class MethodInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacle
 
     @Override
     Name getTacletName() {
-        return MiscTools.toValidTacletName(
-            UNFOLD + unfoldCounter + " of " + contract.getTarget().getUniqueName());
+        final InformationFlowContract c = requireContract();
+        return MiscTools.toValidTacletName(UNFOLD + unfoldCounter + " of " + c.getTarget()
+                .getUniqueName());
     }
 
 
     @Override
     JTerm createFindTerm(IFProofObligationVars ifVars) {
+        final InformationFlowContract c = requireContract();
         InfFlowPOSnippetFactory f =
-            POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, services);
+            POSnippetFactory.getInfFlowFactory(c, ifVars.c1, ifVars.c2, services);
         return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
+    }
+
+
+    private InformationFlowContract requireContract() {
+        final InformationFlowContract c = contract;
+        if (c == null) {
+            throw new NullPointerException(
+                "No contract for building the information flow unfold taclet.");
+        }
+        return c;
     }
 }

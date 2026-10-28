@@ -41,6 +41,7 @@ import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGe
 import org.key_project.prover.strategy.costbased.termgenerator.SubtermGenerator;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /// This strategy implements reasoning for integer arithmetics. In particular,
 /// it supports linear integer arithmetics via Gaussian elimination,
@@ -48,6 +49,7 @@ import org.jspecify.annotations.NonNull;
 /// and Gröbner basis.
 ///
 /// Do not create directly, instead use [IntegerStrategyFactory].
+@NullMarked
 public class IntegerStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
 
     /// Reads better than a bare boolean at the call sites of [#setupMultiplyInequations].

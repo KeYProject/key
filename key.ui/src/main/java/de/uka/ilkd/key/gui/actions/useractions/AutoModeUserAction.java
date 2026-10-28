@@ -7,11 +7,14 @@ package de.uka.ilkd.key.gui.actions.useractions;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * User action to start auto mode (automatic proof search).
  *
  * @author Arne Keller
  */
+@NullMarked
 public class AutoModeUserAction extends ProofModifyingUserAction {
 
     /**

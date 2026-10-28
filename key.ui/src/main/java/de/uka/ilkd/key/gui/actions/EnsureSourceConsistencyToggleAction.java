@@ -10,12 +10,15 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Toggles the flag to ensure consistency between source code and saved proof. Consistency is
  * ensured by caching the source files at first use via a FileRepo.
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class EnsureSourceConsistencyToggleAction extends MainWindowAction {
 
     private static final long serialVersionUID = -6884872135310450140L;
@@ -25,6 +28,11 @@ public class EnsureSourceConsistencyToggleAction extends MainWindowAction {
      *
      * @param mainWindow the main window of the program
      */
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public EnsureSourceConsistencyToggleAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Ensure Source Consistency");

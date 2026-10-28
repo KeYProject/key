@@ -6,12 +6,15 @@ package de.uka.ilkd.key.smt.lang;
 
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  *
  *
  * @author Aboubakr Achraf El Ghazi
  *
  */
+@NullMarked
 public class SMTTermUnaryOp extends SMTTerm {
 
     public enum Op {

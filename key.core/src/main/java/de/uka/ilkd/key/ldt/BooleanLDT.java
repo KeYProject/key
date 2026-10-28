@@ -20,11 +20,14 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class inherits from LDT and implements all method that are necessary to handle the primitive
  * type boolean.
  */
+@NullMarked
 public final class BooleanLDT extends LDT {
 
     public static final Name NAME = new Name("boolean");
@@ -108,7 +111,7 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public JTerm translateLiteral(Literal lit, Services services) {
+    public @Nullable JTerm translateLiteral(Literal lit, Services services) {
         if (lit instanceof BooleanLiteral) {
             return (((BooleanLiteral) lit).getValue() ? term_bool_true : term_bool_false);
         }
@@ -118,7 +121,7 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public Function getFunctionFor(Operator op,
+    public @Nullable Function getFunctionFor(Operator op,
             Services services,
             ExecutionContext ec) {
         assert false;
@@ -133,7 +136,7 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+    public @Nullable Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (t.op() == bool_true) {
             return BooleanLiteral.TRUE;
         } else if (t.op() == bool_false) {
@@ -146,7 +149,7 @@ public final class BooleanLDT extends LDT {
 
 
     @Override
-    public Type getType(JTerm t) {
+    public @Nullable Type getType(JTerm t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_BOOLEAN;
         } else {

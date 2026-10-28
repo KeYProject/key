@@ -20,6 +20,7 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.testgen.macros.TestGenMacro;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -31,8 +32,8 @@ public class TestgenExtension
         implements KeYGuiExtension, KeYGuiExtension.KeyboardShortcuts, KeYGuiExtension.MainMenu,
         KeYGuiExtension.Startup, KeYGuiExtension.Toolbar, KeYGuiExtension.Settings {
 
-    private TestGenerationAction actionTestGeneration;
-    private CounterExampleAction actionCounterExample;
+    private @Nullable TestGenerationAction actionTestGeneration;
+    private @Nullable CounterExampleAction actionCounterExample;
 
     private void init(MainWindow window) {
         this.actionCounterExample = new CounterExampleAction(window);
@@ -42,7 +43,12 @@ public class TestgenExtension
     @Override
     public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         init(mainWindow);
-        return Arrays.asList(actionCounterExample, actionTestGeneration);
+        TestGenerationAction tg = actionTestGeneration;
+        CounterExampleAction ce = actionCounterExample;
+        if (tg == null || ce == null) {
+            throw new NullPointerException("Test-generation actions not initialized.");
+        }
+        return Arrays.asList(ce, tg);
     }
 
     @Override
@@ -55,8 +61,13 @@ public class TestgenExtension
     @Override
     public @NonNull JToolBar getToolbar(MainWindow mainWindow) {
         JToolBar tb = new JToolBar("test generation");
-        tb.add(actionCounterExample);
-        tb.add(actionTestGeneration);
+        TestGenerationAction tg = actionTestGeneration;
+        CounterExampleAction ce = actionCounterExample;
+        if (tg == null || ce == null) {
+            throw new NullPointerException("Test-generation actions not initialized.");
+        }
+        tb.add(ce);
+        tb.add(tg);
         return tb;
     }
 

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
@@ -12,6 +13,10 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class Guard extends JavaNonTerminalProgramElement implements IGuard {
 
     final Expression expr;
@@ -21,7 +26,8 @@ public class Guard extends JavaNonTerminalProgramElement implements IGuard {
     }
 
     public Guard(ExtList children) {
-        expr = children.get(Expression.class);
+        expr = Objects.requireNonNull(children.get(Expression.class),
+            "a guard requires an expression");
     }
 
     public Guard(PositionInfo pi, List<Comment> o1, Expression expression) {
@@ -41,7 +47,12 @@ public class Guard extends JavaNonTerminalProgramElement implements IGuard {
         return (expr != null) ? 1 : 0;
     }
 
-    public ProgramElement getChildAt(int index) {
+    // a guard has at most one child (the required expression); an out-of-range index returns null,
+    // which conflicts with the @NonNull contract of NonTerminalProgramElement.getChildAt(int), but
+    // the base contract is over-narrow; honest @Nullable override per SuperArrayDeclaration
+    // precedent (wave 7).
+    @SuppressWarnings("NullAway")
+    public @Nullable ProgramElement getChildAt(int index) {
         if (index == 0) {
             return expr;
         }

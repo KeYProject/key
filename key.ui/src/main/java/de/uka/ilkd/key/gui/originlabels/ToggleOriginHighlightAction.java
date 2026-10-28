@@ -12,11 +12,14 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Action to toggle {@link ViewSettings#isHighlightOrigin()}.
  *
  * @author lanzinger
  */
+@NullMarked
 public class ToggleOriginHighlightAction extends MainWindowAction {
     private static final long serialVersionUID = 9018136291828393238L;
 
@@ -24,7 +27,13 @@ public class ToggleOriginHighlightAction extends MainWindowAction {
      * Create a new action.
      *
      * @param mainWindow the main window.
+     *
+     *        <p>
+     *        The action configures itself and its settings listener while the receiver is still
+     *        under initialization (EISOP initialization check); the listener only fires once
+     *        the action is displayed after construction, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ToggleOriginHighlightAction(MainWindow mainWindow) {
         super(mainWindow);
         setIcon(IconFactory.ORIGIN_HIGHLIGHT_ICON.get());

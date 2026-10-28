@@ -16,10 +16,13 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Local variable declaration. taken from COMPOST and changed to achieve an immutable structure
  */
 
+@NullMarked
 public class LocalVariableDeclaration extends VariableDeclaration implements LoopInitializer {
 
 
@@ -32,7 +35,11 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     /**
      * Local variable declaration.
      */
-
+    // The parameterless constructor deliberately leaves the varSpecs field unset (null): it
+    // builds an "empty" declaration stub whose consumers are all null-guarded
+    // (getChildCount/getChildAt). The null assignment violates the @NonNull field contract,
+    // so the check is scoped here.
+    @SuppressWarnings("NullAway")
     public LocalVariableDeclaration() {
         super();
         this.varSpecs = null;

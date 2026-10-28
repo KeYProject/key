@@ -14,6 +14,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class CopyReferenceResolver {
     /**
      * For each branch closed by reference to another proof,
@@ -27,9 +31,9 @@ public class CopyReferenceResolver {
      */
     public static void copyCachedGoals(
             Proof toComplete,
-            Proof referencedFrom,
-            Consumer<Integer> callbackTotal,
-            Runnable callbackBranch) {
+            @Nullable Proof referencedFrom,
+            @Nullable Consumer<Integer> callbackTotal,
+            @Nullable Runnable callbackBranch) {
         // first, ensure that all cached goals are copied over
         List<Goal> goals = toComplete.closedGoals().toList();
         List<Goal> todo = new ArrayList<>();

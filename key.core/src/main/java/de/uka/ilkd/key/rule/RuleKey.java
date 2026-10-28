@@ -8,7 +8,8 @@ import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.Rule;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Provides a unique key for taclets based on a taclet's name and its taclet options. This class is
@@ -18,12 +19,13 @@ import org.jspecify.annotations.NonNull;
  * One does not need to use this implementation (but can rely on a taclet's own
  * {@link Taclet#equals(Object)} and {@link Taclet#hashCode()} method.
  */
+@NullMarked
 public class RuleKey {
-    public final @NonNull Name name;
-    public final @NonNull ChoiceExpr choices;
+    public final Name name;
+    public final ChoiceExpr choices;
     public final Rule r;
 
-    RuleKey(@NonNull Name name, @NonNull ChoiceExpr choices, Rule r) {
+    RuleKey(Name name, ChoiceExpr choices, Rule r) {
         this.name = name;
         this.choices = choices;
         this.r = r;

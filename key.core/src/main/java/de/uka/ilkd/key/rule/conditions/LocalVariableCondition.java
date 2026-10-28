@@ -14,9 +14,12 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Ensures the given ProgramElement denotes a local variable
  */
+@NullMarked
 public final class LocalVariableCondition extends VariableConditionAdapter {
 
     private final SchemaVariable var;

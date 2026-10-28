@@ -8,6 +8,10 @@ import java.util.function.ToIntFunction;
 
 import de.uka.ilkd.key.logic.equality.EqualsModProperty;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class EqualityUtils {
 
     /**
@@ -18,7 +22,7 @@ public class EqualityUtils {
      * @return combined hashcode
      */
     public static <T> int hashCodeModPropertyOfIterable(
-            Iterable<? extends T> iter,
+            @Nullable Iterable<? extends T> iter,
             ToIntFunction<T> hasher) {
         // adapted from Arrays.hashCode
         if (iter == null) {

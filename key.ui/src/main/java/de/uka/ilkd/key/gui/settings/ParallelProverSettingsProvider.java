@@ -10,6 +10,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Settings pane to choose between the legacy single-threaded prover and the multi-core (parallel)
  * prover, and to configure the worker-thread count of the latter.
@@ -20,6 +22,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
  * elsewhere by a listener on {@link GeneralSettings#PARALLEL_PROVER_ENABLED}.
  *
  */
+@NullMarked
 public class ParallelProverSettingsProvider extends SettingsPanel implements SettingsProvider {
 
     private static final String DESCRIPTION = "Prover (Single / Multi-Core)";
@@ -46,6 +49,16 @@ public class ParallelProverSettingsProvider extends SettingsPanel implements Set
     private final JCheckBox chkEnabled;
     private final JSpinner spThreads;
 
+    /**
+     * Creates the provider and builds its controls.
+     *
+     * <p>
+     * The header, the separators and all input controls are configured while the receiver is
+     * still under initialization (EISOP initialization check); the checkbox action only fires
+     * once the panel is displayed, by which time construction has completed, suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ParallelProverSettingsProvider() {
         setHeaderText(getDescription());
 

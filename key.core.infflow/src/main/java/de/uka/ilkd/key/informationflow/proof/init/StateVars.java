@@ -24,6 +24,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
@@ -34,29 +35,32 @@ import org.jspecify.annotations.Nullable;
  * @author christoph
  *         <p/>
  */
+@NullMarked
 public class StateVars {
 
     public final ImmutableList<JTerm> termList;
 
-    public final ImmutableList<JTerm> paddedTermList;
+    /** Contains all {@link #termList} terms plus possibly <code>null</code> padding entries. */
+    public final ImmutableList<@Nullable JTerm> paddedTermList;
 
-    public final JTerm self;
+    public final @Nullable JTerm self;
 
-    public final JTerm guard;
+    public final @Nullable JTerm guard;
 
     public final ImmutableList<JTerm> localVars;
 
-    public final JTerm result;
+    public final @Nullable JTerm result;
 
-    public final JTerm exception;
+    public final @Nullable JTerm exception;
 
     public final JTerm heap;
 
-    public final JTerm mbyAtPre;
+    public final @Nullable JTerm mbyAtPre;
 
 
-    public StateVars(JTerm self, JTerm guard, ImmutableList<JTerm> localVars, JTerm result,
-            JTerm exception, JTerm heap, JTerm mbyAtPre) {
+    public StateVars(@Nullable JTerm self, @Nullable JTerm guard, ImmutableList<JTerm> localVars,
+            @Nullable JTerm result,
+            @Nullable JTerm exception, JTerm heap, @Nullable JTerm mbyAtPre) {
         this.self = self;
         this.guard = guard;
         this.localVars = localVars;
@@ -75,11 +79,13 @@ public class StateVars {
         terms = appendIfNotNull(terms, mbyAtPre);
         termList = terms;
 
-        ImmutableList<JTerm> allTerms = ImmutableList.nil();
+        ImmutableList<@Nullable JTerm> allTerms = ImmutableList.nil();
         allTerms = allTerms.append(heap);
         allTerms = allTerms.append(self);
         allTerms = allTerms.append(guard);
-        allTerms = allTerms.append(localVars);
+        for (JTerm t : localVars) {
+            allTerms = allTerms.append(t);
+        }
         allTerms = allTerms.append(result);
         allTerms = allTerms.append(exception);
         allTerms = allTerms.append(mbyAtPre);
@@ -87,13 +93,15 @@ public class StateVars {
     }
 
 
-    public StateVars(JTerm self, ImmutableList<JTerm> localVars, JTerm result, JTerm exception,
-            JTerm heap, JTerm mbyAtPre) {
+    public StateVars(@Nullable JTerm self, ImmutableList<JTerm> localVars,
+            @Nullable JTerm result, @Nullable JTerm exception,
+            JTerm heap, @Nullable JTerm mbyAtPre) {
         this(self, null, localVars, result, exception, heap, mbyAtPre);
     }
 
 
-    private ImmutableList<JTerm> appendIfNotNull(ImmutableList<JTerm> list, JTerm t) {
+    private static ImmutableList<JTerm> appendIfNotNull(ImmutableList<JTerm> list,
+            @Nullable JTerm t) {
         if (t != null) {
             return list.append(t);
         } else {
@@ -102,7 +110,7 @@ public class StateVars {
     }
 
 
-    private ImmutableList<JTerm> appendIfNotNull(ImmutableList<JTerm> list,
+    private static ImmutableList<JTerm> appendIfNotNull(ImmutableList<JTerm> list,
             ImmutableList<JTerm> list2) {
         ImmutableList<JTerm> result = list;
         for (JTerm t : list2) {
@@ -112,13 +120,15 @@ public class StateVars {
     }
 
 
-    public StateVars(JTerm self, JTerm guard, ImmutableList<JTerm> localVars, JTerm heap) {
+    public StateVars(@Nullable JTerm self, @Nullable JTerm guard, ImmutableList<JTerm> localVars,
+            JTerm heap) {
         this(self, guard, localVars, null, null, heap, null);
     }
 
 
-    public StateVars(JTerm self, JTerm guard, ImmutableList<JTerm> localVars, JTerm result,
-            JTerm exception, JTerm heap) {
+    public StateVars(@Nullable JTerm self, @Nullable JTerm guard, ImmutableList<JTerm> localVars,
+            @Nullable JTerm result,
+            @Nullable JTerm exception, JTerm heap) {
         this(self, guard, localVars, result, exception, heap, null);
     }
 
@@ -130,7 +140,7 @@ public class StateVars {
     }
 
 
-    public StateVars(JTerm self, ImmutableList<JTerm> localVars, JTerm heap) {
+    public StateVars(@Nullable JTerm self, ImmutableList<JTerm> localVars, JTerm heap) {
         this(self, localVars, null, null, heap);
     }
 
@@ -141,8 +151,16 @@ public class StateVars {
             copyVariables(orig.localVars, postfix, services),
             copyVariable(orig.result, postfix, services),
             copyVariable(orig.exception, postfix, services),
-            copyHeapSymbol(orig.heap, postfix, services),
+            requireTerm(copyHeapSymbol(orig.heap, postfix, services), "copied heap symbol"),
             copyFunction(orig.mbyAtPre, postfix, services));
+    }
+
+
+    private static JTerm requireTerm(@Nullable JTerm t, String what) {
+        if (t == null) {
+            throw new NullPointerException("No " + what + ".");
+        }
+        return t;
     }
 
 
@@ -150,26 +168,29 @@ public class StateVars {
             Services services) {
         ImmutableList<JTerm> result = ImmutableList.nil();
         for (JTerm t : ts) {
-            result = result.append(copyVariable(t, postfix, services));
+            result = result.append(
+                requireTerm(copyVariable(t, postfix, services), "copied local variable"));
         }
         return result;
     }
 
 
-    private static JTerm copyVariable(JTerm t, String postfix, Services services) {
+    private static @Nullable JTerm copyVariable(@Nullable JTerm t, String postfix,
+            Services services) {
         if (t != null) {
             final TermBuilder tb = services.getTermBuilder();
             JTerm tWithoutLables = tb.unlabel(t);
-            JTerm result =
-                newVariable(tWithoutLables, tWithoutLables.toString() + postfix, services);
-            return tb.label(result, t.getLabels());
+            JTerm result = newVariable(tWithoutLables, tWithoutLables.toString() + postfix,
+                services);
+            return tb.label(requireTerm(result, "newly created variable term"), t.getLabels());
         } else {
             return null;
         }
     }
 
 
-    private static JTerm newVariable(JTerm t, String name, Services services) {
+    private static @Nullable JTerm newVariable(@Nullable JTerm t, String name,
+            Services services) {
         if (t == null) {
             return null;
         }
@@ -186,20 +207,22 @@ public class StateVars {
     }
 
 
-    private static JTerm copyHeapSymbol(JTerm t, String postfix, Services services) {
+    private static @Nullable JTerm copyHeapSymbol(@Nullable JTerm t, String postfix,
+            Services services) {
         if (t != null) {
             final TermBuilder tb = services.getTermBuilder();
             JTerm tWithoutLables = tb.unlabel(t);
-            JTerm result =
-                newHeapSymbol(tWithoutLables, tWithoutLables.toString() + postfix, services);
-            return tb.label(result, t.getLabels());
+            JTerm result = newHeapSymbol(tWithoutLables, tWithoutLables.toString() + postfix,
+                services);
+            return tb.label(requireTerm(result, "newly created heap term"), t.getLabels());
         } else {
             return null;
         }
     }
 
 
-    private static JTerm newHeapSymbol(JTerm t, String name, Services services) {
+    private static @Nullable JTerm newHeapSymbol(@Nullable JTerm t, String name,
+            Services services) {
         if (t == null) {
             return null;
         }
@@ -217,7 +240,8 @@ public class StateVars {
     }
 
 
-    private static JTerm newFunction(JTerm t, String name, Services services) {
+    private static @Nullable JTerm newFunction(@Nullable JTerm t, String name,
+            Services services) {
         if (t == null) {
             return null;
         }
@@ -228,13 +252,14 @@ public class StateVars {
     }
 
 
-    private static JTerm copyFunction(JTerm t, String postfix, Services services) {
+    private static @Nullable JTerm copyFunction(@Nullable JTerm t, String postfix,
+            Services services) {
         if (t != null) {
             final TermBuilder tb = services.getTermBuilder();
             JTerm tWithoutLables = tb.unlabel(t);
-            JTerm result =
-                newFunction(tWithoutLables, tWithoutLables.toString() + postfix, services);
-            return tb.label(result, t.getLabels());
+            JTerm result = newFunction(tWithoutLables, tWithoutLables.toString() + postfix,
+                services);
+            return tb.label(requireTerm(result, "newly created function term"), t.getLabels());
         } else {
             return null;
         }
@@ -280,7 +305,8 @@ public class StateVars {
         JTerm exception = (origPreVars.exception == origPostVars.exception) ? preVars.exception
                 : copyVariable(origPostVars.exception, postfix, services);
         JTerm heap = (origPreVars.heap == origPostVars.heap) ? preVars.heap
-                : copyHeapSymbol(origPostVars.heap, postfix, services);
+                : requireTerm(copyHeapSymbol(origPostVars.heap, postfix, services),
+                    "copied heap symbol");
         JTerm mbyAtPre = (origPreVars.mbyAtPre == origPostVars.mbyAtPre) ? preVars.mbyAtPre
                 : copyVariable(origPostVars.mbyAtPre, postfix, services);
 
@@ -291,20 +317,27 @@ public class StateVars {
             JTerm origPreVar = origPreVarsIt.next();
             JTerm localPreVar = localPreVarsIt.next();
             JTerm localPostVar = (origPreVar == origPostVar) ? localPreVar
-                    : copyVariable(origPostVar, postfix, services);
+                    : requireTerm(copyVariable(origPostVar, postfix, services),
+                        "copied local variable");
             localPostVars = localPostVars.append(localPostVar);
         }
         return new StateVars(self, guard, localPostVars, result, exception, heap, mbyAtPre);
     }
 
 
-    private static JTerm buildSelfVar(Services services, IProgramMethod pm, KeYJavaType kjt,
+    private static @Nullable JTerm buildSelfVar(Services services, IProgramMethod pm,
+            KeYJavaType kjt,
             String postfix) {
         if (pm.isStatic()) {
             return null;
         }
         final TermBuilder tb = services.getTermBuilder();
-        JTerm selfVar = tb.var(tb.selfVar(pm, kjt, true, postfix));
+        final @Nullable LocationVariable selfVar0 = tb.selfVar(pm, kjt, true, postfix);
+        if (selfVar0 == null) {
+            throw new NullPointerException(
+                "No self variable for the non-static method " + pm + ".");
+        }
+        JTerm selfVar = tb.var(selfVar0);
         register(selfVar.op(ProgramVariable.class), services);
         return selfVar;
     }
@@ -319,12 +352,18 @@ public class StateVars {
     }
 
 
-    private static JTerm buildResultVar(IProgramMethod pm, Services services, String postfix) {
+    private static @Nullable JTerm buildResultVar(IProgramMethod pm, Services services,
+            String postfix) {
         if (pm.isVoid() || pm.isConstructor()) {
             return null;
         }
         final TermBuilder tb = services.getTermBuilder();
-        JTerm resultVar = tb.var(tb.resultVar("result" + postfix, pm, true));
+        final @Nullable LocationVariable resultVar0 = tb.resultVar("result" + postfix, pm, true);
+        if (resultVar0 == null) {
+            throw new NullPointerException(
+                "No result variable for the non-void method " + pm + ".");
+        }
+        JTerm resultVar = tb.var(resultVar0);
         register(resultVar.op(ProgramVariable.class), services);
         return resultVar;
     }
@@ -332,7 +371,11 @@ public class StateVars {
 
     private static JTerm buildHeapFunc(String postfix, ImmutableArray<TermLabel> labels,
             Services services) {
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        if (heapLDT == null) {
+            throw new NullPointerException(
+                "No heap type defined in the services type converter.");
+        }
         final TermBuilder tb = services.getTermBuilder();
         if ("".equals(postfix)) {
             return tb.getBaseHeap();
@@ -364,7 +407,7 @@ public class StateVars {
     }
 
 
-    static void register(ProgramVariable pv, Services services) {
+    static void register(@Nullable ProgramVariable pv, Services services) {
         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);
@@ -379,7 +422,7 @@ public class StateVars {
     }
 
 
-    static void register(Function f, Services services) {
+    static void register(@Nullable Function f, Services services) {
         Namespace<Function> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != JavaDLTheory.UPDATE;

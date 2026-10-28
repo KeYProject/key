@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.reference;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -14,18 +15,22 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A reference to the current object. "this" can be prefixed by a type reference (to resolve
  * ambiguities with inner classes).
  */
 
+@NullMarked
 public class ThisReference extends JavaNonTerminalProgramElement
         implements Reference, Expression, ReferencePrefix, ReferenceSuffix, TypeReferenceContainer {
 
     /**
      * Prefix.
      */
-    private final ReferencePrefix prefix;
+    private final @Nullable ReferencePrefix prefix;
 
 
     /**
@@ -108,7 +113,7 @@ public class ThisReference extends JavaNonTerminalProgramElement
      *
      * @return the reference prefix.
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return prefix;
     }
 
@@ -154,8 +159,11 @@ public class ThisReference extends JavaNonTerminalProgramElement
         return this;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-        return ec.getTypeReference().getKeYJavaType();
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
+        return Objects.requireNonNull(
+            Objects.requireNonNull(ec, "execution context required for 'this'").getTypeReference()
+                    .getKeYJavaType(),
+            "no KeYJavaType in execution context");
     }
 
 }

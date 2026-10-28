@@ -17,12 +17,15 @@ import de.uka.ilkd.key.proof.io.event.ProofSaverEvent;
 import de.uka.ilkd.key.proof.io.event.ProofSaverListener;
 import de.uka.ilkd.key.util.KeYConstants;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Saves a proof and provides useful methods for pretty printing terms or programs.
  */
+@NullMarked
 public class ProofSaver extends OutputStreamProofSaver {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofSaver.class);
 
@@ -122,7 +125,7 @@ public class ProofSaver extends OutputStreamProofSaver {
         }
     }
 
-    public String save() {
+    public @Nullable String save() {
         String errorMsg = null;
         try {
             save(file);
@@ -147,7 +150,7 @@ public class ProofSaver extends OutputStreamProofSaver {
      *
      * @param l The {@link ProofSaverListener} to add.
      */
-    public static void addProofSaverListener(ProofSaverListener l) {
+    public static void addProofSaverListener(@Nullable ProofSaverListener l) {
         if (l != null) {
             listeners.add(l);
         }
@@ -158,7 +161,7 @@ public class ProofSaver extends OutputStreamProofSaver {
      *
      * @param l The {@link ProofSaverListener} to remove.
      */
-    public static void removeProofSaverListener(ProofSaverListener l) {
+    public static void removeProofSaverListener(@Nullable ProofSaverListener l) {
         if (l != null) {
             listeners.remove(l);
         }

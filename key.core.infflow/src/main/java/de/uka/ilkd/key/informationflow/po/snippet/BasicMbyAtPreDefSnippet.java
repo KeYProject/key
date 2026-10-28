@@ -7,11 +7,14 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 import de.uka.ilkd.key.informationflow.ProofObligationVars;
 import de.uka.ilkd.key.logic.JTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Generate term "self != null".
  *
  * @author christoph
  */
+@NullMarked
 class BasicMbyAtPreDefSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
@@ -21,15 +24,21 @@ class BasicMbyAtPreDefSnippet extends ReplaceAndRegisterMethod implements Factor
             return d.tb.tt();
         }
 
-        if (d.get(BasicSnippetData.Key.MEASURED_BY) == null) {
+        final Object mbyObj = d.get(BasicSnippetData.Key.MEASURED_BY);
+        if (mbyObj == null) {
             throw new UnsupportedOperationException(
                 "Tried to produce a " + "measured_by for a contract without measured_by "
                     + "(though the contract pretends to have one).");
         }
         assert JTerm.class.equals(BasicSnippetData.Key.MEASURED_BY.getType());
-        final JTerm origMby = (JTerm) d.get(BasicSnippetData.Key.MEASURED_BY);
+        final JTerm origMby = (JTerm) mbyObj;
         final JTerm mby = replace(origMby, d.origVars, poVars.pre, d.tb);
 
-        return d.tb.equals(poVars.pre.mbyAtPre, mby);
+        final JTerm mbyAtPre = poVars.pre.mbyAtPre;
+        if (mbyAtPre == null) {
+            throw new NullPointerException(
+                "No measured-by-at-pre term although the contract has a measured-by clause.");
+        }
+        return d.tb.equals(mbyAtPre, mby);
     }
 }

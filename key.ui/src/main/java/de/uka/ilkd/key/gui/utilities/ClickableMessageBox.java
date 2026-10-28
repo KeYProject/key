@@ -12,14 +12,17 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A simple textpane that supports lines that can be clicked by the users in order to trigger
  * events. It can especially be used for messages that contain detailed information that should not
  * be showed all time, but that should be accessed by clicking on a short messages summarizing the
  * most important information.
  */
+@NullMarked
 public class ClickableMessageBox extends JTextPane {
-
 
     private static final long serialVersionUID = 7588093268080119674L;
 
@@ -33,6 +36,15 @@ public class ClickableMessageBox extends JTextPane {
     private final HTMLEditorKit kit = new HTMLEditorKit();
     private final HTMLDocument doc = new HTMLDocument();
 
+    /**
+     * Creates the message box.
+     *
+     * <p>
+     * The box installs its editor kit, document and hyperlink listener while the receiver is
+     * still under initialization (EISOP initialization check); the listener only fires once the
+     * box is displayed, after construction completes, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ClickableMessageBox() {
         this.setEditorKit(kit);
         this.setDocument(doc);
@@ -58,7 +70,22 @@ public class ClickableMessageBox extends JTextPane {
         listeners.add(listener);
     }
 
-    public void add(Object item, String message, Color color) {
+    /**
+     * Adds a message to the box, optionally as a clickable link.
+     *
+     * @param item the object to notify listeners about when the message is clicked, or
+     *        {@code null} if the message is plain text without a link.
+     * @param message the message text.
+     * @param color the message color.
+     *
+     *        <p>
+     *        A {@code null} item is stored in the index-aligned entry list but never delivered
+     *        (only non-null items get a hyperlink); the layout call passes a {@code null}
+     *        insert tag so the editor kit infers the tag from the HTML itself. Both deliberate
+     *        {@code null}s are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    public void add(@Nullable Object item, String message, Color color) {
         try {
             if (item != null) {
                 kit.insertHTML(doc, doc.getLength(),
@@ -77,6 +104,5 @@ public class ClickableMessageBox extends JTextPane {
         items.add(item);
 
     }
-
 
 }

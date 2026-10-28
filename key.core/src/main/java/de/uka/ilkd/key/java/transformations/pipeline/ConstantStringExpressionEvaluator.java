@@ -44,7 +44,9 @@ import com.github.javaparser.ast.modules.ModuleUsesDirective;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class ConstantStringExpressionEvaluator extends JavaTransformerAbstract {
 
     public ConstantStringExpressionEvaluator(TransformationPipelineServices services) {

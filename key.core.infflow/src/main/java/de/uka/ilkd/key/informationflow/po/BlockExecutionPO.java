@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -29,11 +30,15 @@ import de.uka.ilkd.key.speclang.ContractFactory;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  *
  * @author christoph
  */
+@NullMarked
 public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompositePO {
 
     private final BlockContract contract;
@@ -60,19 +65,37 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
 
     public BlockExecutionPO(InitConfig initConfig, BlockContract contract,
             ProofObligationVars symbExecVars, Goal initiatingGoal, ExecutionContext context) {
-        super(initConfig,
-            ContractFactory.generateContractName(contract.getName(), contract.getKJT(),
-                contract.getTarget(), contract.getTarget().getContainerType(),
-                contract.getBlock().getStartPosition().line()));
+        super(initConfig, buildContractName(contract));
         this.contract = contract;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
         this.context = context;
     }
 
+    /**
+     * Builds the name of this proof obligation from the contract. The
+     * container type of the target method is only available at run time
+     * (hence the null guard), so the name cannot be computed inline in the
+     * {@code super(...)} call.
+     */
+    private static String buildContractName(BlockContract contract) {
+        final KeYJavaType containerType = contract.getTarget().getContainerType();
+        if (containerType == null) {
+            throw new NullPointerException(
+                "No container type for the target method of the contract.");
+        }
+        return ContractFactory.generateContractName(contract.getName(), contract.getKJT(),
+            contract.getTarget(), containerType,
+            contract.getBlock().getStartPosition().line());
+    }
+
     @Override
     public void readProblem() throws ProofInputException {
         postInit();
+        final TermBuilder tb = this.tb;
+        if (tb == null) {
+            throw new NullPointerException("Term builder not initialized.");
+        }
 
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
@@ -92,8 +115,12 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
         final Proof initiatingProof = initiatingGoal.proof();
         if (initiatingProof != null) {
             // proof is not loaded
-            final AbstractOperationPO initiatingPO =
-                (AbstractOperationPO) specRepos.getProofOblInput(initiatingProof);
+            final ProofOblInput po = specRepos.getProofOblInput(initiatingProof);
+            if (po == null) {
+                throw new NullPointerException(
+                    "No proof obligation input for the initiating proof.");
+            }
+            final AbstractOperationPO initiatingPO = (AbstractOperationPO) po;
             taclets = initiatingPO.getInitialTaclets();
         }
     }
@@ -214,8 +241,17 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
         infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
     }
 
+    /**
+     * Deliberately returns {@code null}: information flow contracts do not
+     * have global defs. {@link AbstractOperationPO} declares a non-null
+     * return type although its only caller,
+     * {@code createApplyGlobalUpdateTerm}, explicitly null-tolerates the
+     * result; the base signature cannot be widened from this module.
+     */
     @Override
-    protected JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+    @SuppressWarnings("nullness:override.return.invalid")
+    protected @Nullable JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm,
+            @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Services services) {
         // information flow contracts do not have global defs
         return null;
@@ -229,9 +265,12 @@ public class BlockExecutionPO extends AbstractInfFlowPO implements InfFlowCompos
         Services initiatingServices = initiatingProof.getServices();
         ProofOblInput initiatingPO =
             initiatingServices.getSpecificationRepository().getProofOblInput(initiatingProof);
-        assert initiatingPO instanceof AbstractInfFlowPO : "Information flow auxiliary "
-            + "proof started from within non-information flow proof!?!";
-        return (AbstractInfFlowPO) initiatingPO;
+        if (initiatingPO instanceof AbstractInfFlowPO infFlowPO) {
+            return infFlowPO;
+        } else {
+            throw new NullPointerException("Information flow auxiliary proof started from "
+                + "within a non-information flow proof.");
+        }
     }
 
 

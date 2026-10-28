@@ -26,7 +26,8 @@ import org.key_project.logic.op.Function;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
@@ -39,6 +40,7 @@ import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
  *
  * @author wacker, lanzinger
  */
+@NullMarked
 public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
 
     /**
@@ -77,20 +79,20 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
      *
      * @return the instantiation from the last time this rule was applied.
      */
-    public abstract Instantiation getLastInstantiation();
+    public abstract @Nullable Instantiation getLastInstantiation();
 
     /**
      *
      * @return the term on which the rule was last applied.
      */
-    public abstract JTerm getLastFocusTerm();
+    public abstract @Nullable JTerm getLastFocusTerm();
 
     /**
      *
      * @param inst the last instantiation.
      * @see #getLastInstantiation()
      */
-    protected abstract void setLastInstantiation(Instantiation inst);
+    protected abstract void setLastInstantiation(@Nullable Instantiation inst);
 
     /**
      *
@@ -163,10 +165,10 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
      * @param context The execution context in which the block occurs.
      * @see AbstractAuxiliaryContractBuiltInRuleApp
      */
-    public record Instantiation(@NonNull JTerm update, @NonNull JTerm formula,
-            @NonNull JModality modality, JTerm self,
-            @NonNull JavaStatement statement,
-            ExecutionContext context) {
+    public record Instantiation(JTerm update, JTerm formula,
+            JModality modality, @Nullable JTerm self,
+            JavaStatement statement,
+            @Nullable ExecutionContext context) {
         public Instantiation {
             assert update != null;
             assert update.sort() == JavaDLTheory.UPDATE;
@@ -218,7 +220,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
          *
          * @return a new instantiation.
          */
-        public Instantiation instantiate() {
+        public @Nullable Instantiation instantiate() {
             final JTerm update = extractUpdate();
             final JTerm target = extractUpdateTarget();
             if (!(target.op() instanceof JModality modality)) {
@@ -267,7 +269,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
          * @param frame the outermost method-frame used in the formula.
          * @return the self term.
          */
-        private JTerm extractSelf(final MethodFrame frame) {
+        private @Nullable JTerm extractSelf(final @Nullable MethodFrame frame) {
             if (frame == null) {
                 return null;
             }
@@ -279,7 +281,8 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
          * @param frame the outermost method-frame used in the formula.
          * @return the execution context.
          */
-        private static ExecutionContext extractExecutionContext(final MethodFrame frame) {
+        private static @Nullable ExecutionContext extractExecutionContext(
+                final @Nullable MethodFrame frame) {
             if (frame == null) {
                 return null;
             }
@@ -291,7 +294,7 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
          * @param goal the current goal.
          * @return the first block in the java block's prefix with at least one applicable contract.
          */
-        private JavaStatement getFirstStatementInPrefixWithAtLeastOneApplicableContract(
+        private @Nullable JavaStatement getFirstStatementInPrefixWithAtLeastOneApplicableContract(
                 final JModality modality, final Goal goal) {
             SourceElement element = modality.programBlock().program().getFirstElement();
             while ((element instanceof ProgramPrefix || element instanceof CatchAllStatement)

@@ -12,11 +12,14 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Toggles the tooltips of the proof tree.
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class ToggleProofTreeTooltipAction extends MainWindowAction {
     /** This action's name. */
     public static final String NAME = "Show Tooltips in Proof Tree";
@@ -30,6 +33,12 @@ public class ToggleProofTreeTooltipAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      */
+    /**
+     * The action-configuration calls and the listener registration below operate on {@code this}
+     * while the receiver is still under initialization (EISOP initialization check); safe here
+     * since these configure the local action only, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ToggleProofTreeTooltipAction(MainWindow mainWindow) {
         super(mainWindow);
         setName(NAME);

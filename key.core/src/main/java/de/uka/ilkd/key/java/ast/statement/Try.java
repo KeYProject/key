@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -15,23 +16,25 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Try.
  *
  * @author <TT>AutoDoc</TT>
  */
+@NullMarked
 public class Try extends BranchStatement implements StatementContainer, ProgramPrefix {
 
     private final StatementBlock body;
     private final ImmutableArray<Branch> branches;
-    private final MethodFrame innerMostMethodFrame;
+    private final @Nullable MethodFrame innerMostMethodFrame;
     private final int prefixLength;
 
     public Try(PositionInfo pi, List<Comment> comments, StatementBlock body,
             ImmutableArray<Branch> branches,
-            MethodFrame innerMostMethodFrame, int prefixLength) {
+            @Nullable MethodFrame innerMostMethodFrame, int prefixLength) {
         super(pi, comments);
         this.body = body;
         this.branches = branches;
@@ -49,7 +52,8 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     public Try(StatementBlock body) {
         super(null, null);
         this.body = body;
-        this.branches = null;
+        // empty default: a try may legitimately have no catch/finally branches
+        this.branches = new ImmutableArray<>(new Branch[0]);
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -101,7 +105,8 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
 
     public Try(ExtList children) {
         super(children);
-        this.body = children.get(StatementBlock.class);
+        this.body = Objects.requireNonNull(children.get(StatementBlock.class),
+            "try statement needs a body");
         this.branches = new ImmutableArray<>(children.collect(Branch.class));
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
@@ -134,7 +139,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     }
 
     @Override
-    public MethodFrame getInnerMostMethodFrame() {
+    public @Nullable MethodFrame getInnerMostMethodFrame() {
         return innerMostMethodFrame;
     }
 
@@ -144,13 +149,11 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     }
 
 
-    @NonNull
     public SourceElement getFirstElement() {
         return body.getFirstElement();
     }
 
 
-    @NonNull
     public SourceElement getLastElement() {
         return getChildAt(this.getChildCount() - 1).getLastElement();
     }

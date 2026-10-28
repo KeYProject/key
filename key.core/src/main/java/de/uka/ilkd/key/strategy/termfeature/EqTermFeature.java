@@ -13,6 +13,8 @@ import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
@@ -22,6 +24,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * NB: it is not possible to use general <code>ProjectionToTerm</code> here, because the information
  * necessary to evaluate a <code>ProjectionToTerm</code> is not available in a term feature
  */
+@NullMarked
 public class EqTermFeature extends BinaryTermFeature {
 
     private final TermBuffer<Goal> pattern;

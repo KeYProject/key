@@ -18,6 +18,7 @@ import org.key_project.prover.strategy.DelegationBasedRuleApplicationManager;
 import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -25,6 +26,7 @@ import org.jspecify.annotations.Nullable;
  * (within a goal). The real work is delegated to a second manager (delegate pattern), this class
  * only filters rule applications
  */
+@NullMarked
 public class FocussedBreakpointRuleApplicationManager
         implements DelegationBasedRuleApplicationManager<Goal> {
 

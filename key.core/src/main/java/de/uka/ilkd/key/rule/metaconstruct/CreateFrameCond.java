@@ -21,6 +21,8 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Modality;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
@@ -32,6 +34,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public final class CreateFrameCond extends AbstractTermTransformer {
 
     public CreateFrameCond() {

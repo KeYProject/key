@@ -13,12 +13,15 @@ import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author jschiffl This filter takes a search string and regroups the sequent so that the sequent
  *         formulas matching the search are grouped around the sequent arrow, so that they can be
  *         viewed together.
  */
 
+@NullMarked
 public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
 
     /**

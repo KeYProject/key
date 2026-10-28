@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -27,6 +28,7 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.FileOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
@@ -34,6 +36,8 @@ import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +46,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
+@NullMarked
 public class SequentViewInputListener implements MouseMotionListener, MouseListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(SequentViewInputListener.class);
 
@@ -108,7 +113,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
             sequentView.highlight(me.getPoint());
         }
 
-        if (sequentView.isInUserSelectionHighlight(null)) {
+        if (isInUserSelectionHighlightAnywhere()) {
             highlightOriginInSourceView(sequentView.getPosInSequent(me.getPoint()));
         }
     }
@@ -119,9 +124,23 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
             sequentView.disableHighlights();
         }
 
-        if (sequentView.isInUserSelectionHighlight(null)) {
+        if (isInUserSelectionHighlightAnywhere()) {
             highlightOriginInSourceView(null);
         }
+    }
+
+    /**
+     * Asks the sequent view whether any user selection highlight is active.
+     *
+     * <p>
+     * This is what {@code isInUserSelectionHighlight(null)} means for {@link SequentView}: the
+     * view treats a {@code null} point as "anywhere" and reports whether a highlight exists. The
+     * JDK stub declares a non-null parameter, so the deliberate {@code null} is passed here and
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private boolean isInUserSelectionHighlightAnywhere() {
+        return sequentView.isInUserSelectionHighlight(null);
     }
 
     @Override
@@ -157,7 +176,7 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
      *
      * @param pos the position of the term whose origin should be highlighted.
      */
-    public void highlightOriginInSourceView(PosInSequent pos) {
+    public void highlightOriginInSourceView(@Nullable PosInSequent pos) {
         if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isHighlightOrigin()) {
             // Don't highlight anything and delete existing highlights.
             pos = null;
@@ -168,14 +187,18 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
         originHighlights.forEach(sourceView::removeHighlight);
         originHighlights.clear();
 
-        if (pos == null || pos.getPosInOccurrence() == null) {
+        if (pos == null) {
+            return;
+        }
+        PosInOccurrence pio = pos.getPosInOccurrence();
+        if (pio == null) {
             return;
         }
 
         FileOrigin origin;
         Set<FileOrigin> subtermOrigins;
 
-        JTerm term = (JTerm) pos.getPosInOccurrence().subTerm();
+        JTerm term = (JTerm) pio.subTerm();
         OriginTermLabel label = (OriginTermLabel) term.getLabel(OriginTermLabel.NAME);
 
         if (label == null) {
@@ -193,17 +216,21 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
 
         try {
             if (origin != null) {
-                originHighlights.addAll(
-                    sourceView.addHighlightsForJMLStatement(origin.getFileName().orElse(null),
+                URI originFileName = origin.getFileName().orElse(null);
+                if (originFileName != null) {
+                    originHighlights.addAll(sourceView.addHighlightsForJMLStatement(originFileName,
                         origin.getLine(), ORIGIN_HIGHLIGHT_COLOR.get(), 20));
+                }
             }
 
             for (FileOrigin subtermOrigin : subtermOrigins) {
-                if (!subtermOrigin.equals(origin)) {
-                    originHighlights
-                            .addAll(sourceView.addHighlightsForJMLStatement(
-                                subtermOrigin.getFileName().orElse(null),
+                if (origin == null || !subtermOrigin.equals(origin)) {
+                    URI subtermFileName = subtermOrigin.getFileName().orElse(null);
+                    if (subtermFileName != null) {
+                        originHighlights.addAll(
+                            sourceView.addHighlightsForJMLStatement(subtermFileName,
                                 subtermOrigin.getLine(), SUBTERM_ORIGIN_HIGHLIGHT_COLOR.get(), 10));
+                    }
                 }
             }
         } catch (BadLocationException | IOException e) {
@@ -235,9 +262,12 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
                     // equal string representation are still different.
                     info = operator + ", Sort: " + t.sort() + ", Hash:" + t.hashCode();
 
-                    Sequent seq =
-                        sequentView.getMainWindow().getMediator().getSelectedNode().sequent();
-                    info += ProofSaver.posInOccurrence2Proof(seq, posInOcc);
+                    Node selectedNode =
+                        sequentView.getMainWindow().getMediator().getSelectedNode();
+                    if (selectedNode != null) {
+                        Sequent seq = selectedNode.sequent();
+                        info += ProofSaver.posInOccurrence2Proof(seq, posInOcc);
+                    }
 
                     StringJoiner extensionStr = new StringJoiner(", ", ", ", "");
                     extensionStr.setEmptyValue("");

@@ -15,6 +15,9 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
 
     private final HeapLDT heapLDT;

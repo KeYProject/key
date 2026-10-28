@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.expression.operator;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -18,12 +19,16 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Instanceof.
  *
  * @author <TT>AutoDoc</TT>
  */
 
+@NullMarked
 public class Instanceof extends TypeOperator {
 
 
@@ -141,10 +146,12 @@ public class Instanceof extends TypeOperator {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN);
+        return Objects.requireNonNull(
+            javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BOOLEAN),
+            "KeYJavaType of boolean");
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         return getKeYJavaType(javaServ);
     }
 

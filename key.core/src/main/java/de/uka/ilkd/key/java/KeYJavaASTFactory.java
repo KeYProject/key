@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -34,6 +35,7 @@ import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.COPY;
@@ -41,6 +43,7 @@ import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignm
 /**
  * The KeYASTFactory helps building KeY Java AST structures.
  */
+@NullMarked
 public abstract class KeYJavaASTFactory {
 
     /**
@@ -93,8 +96,10 @@ public abstract class KeYJavaASTFactory {
      * creates a local variable declaration <code> typeRef name; </code>
      */
     public static LocalVariableDeclaration declare(ProgramElementName name, TypeReference typeRef) {
+        final KeYJavaType kjt = Objects.requireNonNull(typeRef.getKeYJavaType(),
+            "no KeYJavaType for type reference " + typeRef);
         return new LocalVariableDeclaration(typeRef,
-            new VariableSpecification(new LocationVariable(name, typeRef.getKeYJavaType())));
+            new VariableSpecification(new LocationVariable(name, kjt)));
     }
 
     /**
@@ -140,7 +145,7 @@ public abstract class KeYJavaASTFactory {
      * @return a {@link LocalVariableDeclaration} of <code>var</code> with static type
      *         <code>type</code> and initial value <code>init</code>
      */
-    public static LocalVariableDeclaration declare(IProgramVariable var, Expression init,
+    public static LocalVariableDeclaration declare(IProgramVariable var, @Nullable Expression init,
             KeYJavaType type) {
         return declare(new Modifier[0], var, init, type);
     }
@@ -222,7 +227,8 @@ public abstract class KeYJavaASTFactory {
 
     public static ParameterDeclaration parameterDeclaration(JavaInfo javaInfo, String type,
             String name) {
-        KeYJavaType kjt = javaInfo.getKeYJavaType(type);
+        final KeYJavaType kjt = Objects.requireNonNull(javaInfo.getKeYJavaType(type),
+            "no KeYJavaType for type '" + type + "'");
         return new ParameterDeclaration(new Modifier[0], javaInfo.createTypeReference(kjt),
             new VariableSpecification(localVariable(name, kjt)), false);
     }
@@ -405,7 +411,10 @@ public abstract class KeYJavaASTFactory {
     public static Catch catchClause(JavaInfo javaInfo, String param, String type,
             StatementBlock body) {
 
-        return catchClause(javaInfo, param, javaInfo.getKeYJavaType(type), body);
+        return catchClause(javaInfo, param,
+            Objects.requireNonNull(javaInfo.getKeYJavaType(type),
+                "no KeYJavaType for type '" + type + "'"),
+            body);
     }
 
     /**
@@ -1254,7 +1263,8 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link For} with initializers <code>init</code>, condition <code>guard</code>,
      *         updates <code>updates</code> and body <code>statements</code>
      */
-    public static For forLoop(final ILoopInit init, final IGuard guard, final IForUpdates updates,
+    public static For forLoop(final @Nullable ILoopInit init, final IGuard guard,
+            final IForUpdates updates,
             final Statement... statements) {
         final StatementBlock body = block(statements);
 
@@ -1361,12 +1371,14 @@ public abstract class KeYJavaASTFactory {
      * {@link IProgramVariable#getKeYJavaType()}.
      *
      * @param variable the named and typed {@link IProgramVariable} to be declared
-     * @param init the {@link Expression} <code>variable</code> is initialized with
+     * @param init the {@link Expression} <code>variable</code> is initialized with, or
+     *        <code>null</code> if it is declared without initialization
      * @return a new {@link LocalVariableDeclaration} of <code>variable</code>
      */
     public static LocalVariableDeclaration declare(final IProgramVariable variable,
-            final Expression init) {
-        final KeYJavaType type = variable.getKeYJavaType();
+            final @Nullable Expression init) {
+        final KeYJavaType type = Objects.requireNonNull(variable.getKeYJavaType(),
+            "no KeYJavaType for variable " + variable);
 
         return declare(variable, init, type);
     }
@@ -1386,7 +1398,8 @@ public abstract class KeYJavaASTFactory {
      *         <code>type</code> and initial value <code>init</code>
      */
     public static LocalVariableDeclaration declare(final Modifier modifier,
-            final IProgramVariable variable, final Expression init, final KeYJavaType type) {
+            final IProgramVariable variable, final @Nullable Expression init,
+            final KeYJavaType type) {
         final ImmutableArray<Modifier> modifiers = new ImmutableArray<>(modifier);
 
         return declare(modifiers, variable, init, type);
@@ -1407,7 +1420,8 @@ public abstract class KeYJavaASTFactory {
      *         <code>type</code> and initial value <code>init</code>
      */
     public static LocalVariableDeclaration declare(final Modifier[] modifiers,
-            final IProgramVariable variable, final Expression init, final KeYJavaType type) {
+            final IProgramVariable variable, final @Nullable Expression init,
+            final KeYJavaType type) {
         final ImmutableArray<Modifier> m = new ImmutableArray<>(modifiers);
 
         return declare(m, variable, init, type);
@@ -1428,7 +1442,8 @@ public abstract class KeYJavaASTFactory {
      *         <code>type</code> and initial value <code>init</code>
      */
     public static LocalVariableDeclaration declare(final ImmutableArray<Modifier> modifiers,
-            final IProgramVariable variable, final Expression init, final KeYJavaType type) {
+            final IProgramVariable variable, final @Nullable Expression init,
+            final KeYJavaType type) {
         final TypeRef typeRef = new TypeRef(type);
 
         return declare(modifiers, variable, init, typeRef);
@@ -1449,9 +1464,11 @@ public abstract class KeYJavaASTFactory {
      *         <code>typeRef</code> and initial value <code>init</code>
      */
     public static LocalVariableDeclaration declare(final ImmutableArray<Modifier> modifiers,
-            final IProgramVariable variable, final Expression init, final TypeReference typeRef) {
-        final VariableSpecification varSpec =
-            variableSpecification(variable, init, typeRef.getKeYJavaType());
+            final IProgramVariable variable, final @Nullable Expression init,
+            final TypeReference typeRef) {
+        final VariableSpecification varSpec = variableSpecification(variable, init,
+            Objects.requireNonNull(typeRef.getKeYJavaType(),
+                "no KeYJavaType for type reference " + typeRef));
 
         return declare(modifiers, typeRef, varSpec);
     }
@@ -1668,7 +1685,9 @@ public abstract class KeYJavaASTFactory {
     public static FieldReference fieldReference(final Services services, final String name,
             final Expression expression, final ExecutionContext context) {
         final KeYJavaType classType = expression.getKeYJavaType(services, context);
-        final ProgramVariable field = services.getJavaInfo().getAttribute(name, classType);
+        final ProgramVariable field = Objects.requireNonNull(
+            services.getJavaInfo().getAttribute(name, classType),
+            "no attribute '" + name + "' in class type " + classType);
 
         return fieldReference(new ParenthesizedExpression(expression), field);
     }
@@ -1795,7 +1814,8 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link MethodBodyStatement} for <code>classType.methodName</code> when called
      *         with <code>arguments</code> or <code>null</code> when the former is not defined
      */
-    public static MethodBodyStatement methodBody(final JavaInfo model, final ProgramVariable result,
+    public static @Nullable MethodBodyStatement methodBody(final JavaInfo model,
+            final ProgramVariable result,
             final ReferencePrefix reference, final KeYJavaType classType, final String methodName,
             final ProgramVariable[] arguments) {
         final IProgramMethod method =
@@ -1886,7 +1906,7 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link MethodFrame} that associates <code>block</code> with
      *         <code>executionContext</code>
      */
-    public static MethodFrame methodFrame(final IProgramVariable result,
+    public static MethodFrame methodFrame(final @Nullable IProgramVariable result,
             final IExecutionContext executionContext, final StatementBlock block) {
 
         return new MethodFrame(result, executionContext, block);
@@ -1903,7 +1923,7 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link MethodFrame} that associates <code>block</code> with
      *         <code>executionContext</code> and positions it at <code>position</code>
      */
-    public static MethodFrame methodFrame(final IProgramVariable result,
+    public static MethodFrame methodFrame(final @Nullable IProgramVariable result,
             final IExecutionContext executionContext, final StatementBlock block,
             final PositionInfo position) {
 
@@ -1990,7 +2010,7 @@ public abstract class KeYJavaASTFactory {
      *         <code>typeRef</code> with <code>dimensions</code> dimensions
      */
     public static NewArray newArray(final TypeReference typeRef, final int dimensions,
-            final Expression[] sizes, final ArrayInitializer initializer,
+            final Expression[] sizes, final @Nullable ArrayInitializer initializer,
             final KeYJavaType keyJavaType) {
 
         return new NewArray(sizes, typeRef, keyJavaType, initializer, dimensions);
@@ -2071,7 +2091,7 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link New} operator that allocates a new instance of
      *         <code>typeReference</code> parameterized with <code>args</code>
      */
-    public static New newOperator(final ReferencePrefix referencePrefix,
+    public static New newOperator(final @Nullable ReferencePrefix referencePrefix,
             final TypeReference typeReference, final Expression[] args) {
 
         return new New(args, typeReference, referencePrefix);
@@ -2090,7 +2110,8 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link New} operator that allocates a new instance of <code>type</code>
      *         parameterized with <code>args</code>
      */
-    public static New newOperator(final ReferencePrefix referencePrefix, final KeYJavaType type,
+    public static New newOperator(final @Nullable ReferencePrefix referencePrefix,
+            final KeYJavaType type,
             final Expression[] args) {
         final TypeReference typeRef = new TypeRef(type);
 
@@ -2108,7 +2129,8 @@ public abstract class KeYJavaASTFactory {
      * @param type the {@link KeYJavaType} to be instantiated
      * @return a new {@link New} operator that allocates a new instance of <code>type</code>
      */
-    public static New newOperator(final ReferencePrefix referencePrefix, final KeYJavaType type) {
+    public static New newOperator(final @Nullable ReferencePrefix referencePrefix,
+            final KeYJavaType type) {
         final Expression[] args = new Expression[0];
 
         return newOperator(referencePrefix, type, args);
@@ -2426,7 +2448,7 @@ public abstract class KeYJavaASTFactory {
      *         <code>type</code>, initialized to <code>initializer</code>
      */
     public static VariableSpecification variableSpecification(final IProgramVariable variable,
-            final Expression initializer, final KeYJavaType keyJavaType) {
+            final @Nullable Expression initializer, final KeYJavaType keyJavaType) {
 
         return new VariableSpecification(variable, initializer, keyJavaType);
     }
