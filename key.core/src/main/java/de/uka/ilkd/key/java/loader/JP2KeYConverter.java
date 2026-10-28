@@ -2179,8 +2179,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         boolean parentIsInterface = false;
 
         TypeDeclaration td = new AnnotationInterfaceDeclaration(
-            pi, c, modArray, name, fullName, members,
-            parentIsInterface, isLibrary, getClassSpec(n));
+            pi, c, modArray, name, fullName, members, parentIsInterface, isLibrary);
 
         kjt.setJavaType(td);
         mapping.registerType(ref, kjt);
