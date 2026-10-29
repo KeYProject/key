@@ -468,21 +468,6 @@ public class KeYMediator {
         }
     }
 
-    /**
-     * Switches interactive mode on or off.
-     *
-     * @param b true iff interactive mode is to be turned on
-     */
-    public void setInteractive(boolean b) {
-        if (getSelectedProof() != null) {
-            if (b) {
-                getSelectedProof().setRuleAppIndexToInteractiveMode();
-            } else {
-                getSelectedProof().setRuleAppIndexToAutoMode();
-            }
-        }
-    }
-
     private int goalsClosedByAutoMode = 0;
 
     public void closedAGoal() {
@@ -524,18 +509,16 @@ public class KeYMediator {
      * <ol>
      * <li>call {@code this.stopInterface(fullstop)}</li>
      * <li>call {@code getUI().getProofControl().fireAutoModeStarted(proof)}</li>
-     * <li>call {@code this.setInteractive(interactive)}</li>
      * </ol>
+     * The prover sets the rule app indices to the mode of its run (see
+     * {@link Proof#useRuleAppIndexModeForSearch()}).
      *
      * @param proof the {@link Proof} to be worked on
      * @param fullStop if a full freeze of the interface is requested
-     * @param interactive whether the needed taclet index is for interactove or automatic use
-     *        (normally false)
      */
-    public void initiateAutoMode(Proof proof, boolean fullStop, boolean interactive) {
+    public void initiateAutoMode(Proof proof, boolean fullStop) {
         stopInterface(fullStop);
         getUI().getProofControl().fireAutoModeStarted(new ProofEvent(proof));
-        setInteractive(interactive);
     }
 
     /**
@@ -543,21 +526,15 @@ public class KeYMediator {
      * <ol>
      * <li>call {@code this.startInterface(fullstop)}</li>
      * <li>call {@code getUI().getProofControl().fireAutoModeStopped(proof)}</li>
-     * <li>call {@code this.setInteractive(interactive)}</li>
      * <li>select a node/proof by running the given selector (null means the default selection is
      * used)</li>
      * </ol>
      *
      * @param proof the {@link Proof} to be worked on
      * @param fullStop if a full freeze of the interface is requested
-     * @param interactive whether the needed taclet index is for interactive or automatic use shoul
-     *        be selected
-     *        (normally true)
      * @param selection a Runnable that selects the correct node after unfreezing the interface
      */
-    public void finishAutoMode(Proof proof, boolean fullStop, boolean interactive,
-            Runnable selection) {
-        setInteractive(interactive);
+    public void finishAutoMode(Proof proof, boolean fullStop, Runnable selection) {
         startInterface(fullStop);
         getUI().getProofControl().fireAutoModeStopped(new ProofEvent(proof));
         if (selection == null) {

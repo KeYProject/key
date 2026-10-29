@@ -98,6 +98,17 @@ public class Proof implements ProofObject<Goal>, Named {
     private ImmutableList<Goal> openGoals = ImmutableList.nil();
 
     /**
+     * Mode specifying the rule app index to use. The field is read by the prover threads, hence,
+     * volatile.
+     */
+    private volatile RuleAppIndexMode ruleAppIndexMode = RuleAppIndexMode.INTERACTIVE;
+
+    /**
+     * the number of open scopes of the rule app index mode
+     */
+    private final AtomicInteger openRuleAppIndexModeScopes = new AtomicInteger();
+
+    /**
      * list with the closed goals of the proof, needed to make pruning in closed branches possible.
      * If the list needs too much memory, pruning can be disabled via the command line option
      * "--no-pruning-closed". In this case the list will not be filled.
@@ -1116,24 +1127,35 @@ public class Proof implements ProofObject<Goal>, Named {
         return root.countNodes();
     }
 
-
     /**
-     * Currently the rule app index can either operate in interactive mode (and contain applications
-     * of all existing taclets) or in automatic mode (and only contain a restricted set of taclets
-     * that can possibly be applied automated). This distinction could be replaced with a more
-     * general way to control the contents of the rule app index
+     * Returns the mode of the rule app indices of the goals of this proof.
+     *
+     * @return the mode of the rule app indices
      */
-    public void setRuleAppIndexToAutoMode() {
-        for (final Goal g : openGoals) {
-            g.ruleAppIndex().autoModeStarted();
-        }
+    public RuleAppIndexMode getRuleAppIndexMode() {
+        return ruleAppIndexMode;
     }
 
-
-    public void setRuleAppIndexToInteractiveMode() {
-        for (final Goal g : openGoals) {
-            g.ruleAppIndex().autoModeStopped();
-        }
+    /**
+     * Sets the mode of the rule app indices of the proof.
+     * It returns a closeable that restores the previous mode, hence, this method should
+     * only be called using the pattern {@code try(var mode = setRuleAppIndexMode())  ... }
+     * Closing the last open scope resets <strong>always</strong> to the interactive mode.
+     *
+     * Precaution to enable always all rules in the GUI, no matter in which order
+     * threads close the scope. In general it should never happen that two provers using a different
+     * rule application index run at the same time.
+     *
+     * @param mode the mode of the rule app indices
+     * @return the mode's scope
+     */
+    public AutoCloseable setRuleAppIndexMode(RuleAppIndexMode mode) {
+        final RuleAppIndexMode previous = ruleAppIndexMode;
+        openRuleAppIndexModeScopes.incrementAndGet();
+        ruleAppIndexMode = mode;
+        return () -> ruleAppIndexMode = openRuleAppIndexModeScopes.decrementAndGet() == 0
+                ? RuleAppIndexMode.INTERACTIVE
+                : previous;
     }
 
     /**
