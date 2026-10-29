@@ -37,7 +37,7 @@ JMLtk front-end shipped in PR #3997.
 | 9 | labeled `break`/`continue` proofs | — | `LoopScopeInvRuleTests` bench | ✘ OPEN (1 proof fails) |
 | 10 | assert-level `\by`-scripted proof replay | — | `key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof` | ✘ OPEN (2 replays fail) |
 | 11 | block-contract combination | — | `ParallelProverDeterminismTest` | ✘ OPEN — non-JML real KeY bug (pre-existing) |
-| 12 | absent clause keywords | `when`, `duration`, `working_space`, `captures`, `spec_name` | — | ✘ OPEN (grammar lacks them) |
+| 12 | absent clause keywords | `when`, `duration`, `working_space`, `captures`, and the legacy clause-name `name "..."` | — | ⚠ mostly OPEN — `name` replaced by the native `[behavior] <name>:` prefix (✔ RESOLVED) |
 | 13 | pragma-statements | `//@ nowarn;`, `//@ debug;` | — | ✘ OPEN (tokens absent) |
 | 14 | datagroup / monitor clauses | `monitors_for`, `readable_if`, `writable_if`, `in_group`, `maps_into` | probe | ⚠ silent mis-parse (`→ JmlFieldDeclaration`) |
 | 15 | `\strictly_nothing`, `\nothing`, `\everything` | — | — | ✘ OPEN (plain `NameExpr`; locset meaning must be re-added) |
@@ -221,10 +221,18 @@ public class Test { … }
 (KeY's own `JmlParser.g4` had rules for all of these; see `JML_MAPPING.md`
 Part C/D. Gaps first reported there are re-listed here with their status.)
 
-### 12. clause keywords `when`, `duration`, `working_space`, `captures`, `spec_name`  — ✘ OPEN
+### 12. clause keywords `when`, `duration`, `working_space`, `captures`, and legacy `name "..."`  — ⚠ mostly OPEN
 `when`/`duration` were already rejected by KeY's own `TextualTranslator`
-("not supported by KeY"), so the real new losses are `working_space`,
-`captures`, and clause-name (`spec_name`).
+("not supported by KeY"), so the real losses are `working_space` and
+`captures`. The clause-name (`name "..."`) is **replaced, not lost**: named
+spec cases are written in the JMLtk-native form `[behavior] <name>:` (an
+identifier prefix, e.g. `public normal_behavior CaseA: ...`), which JMLtk
+parses into `JmlContract.name`; `JmlToTextual.toSpecCase` carries it to the
+spec-case name and `JMLSpecFactory.generateName` to the operation contract
+name (fixture `testcase/speclang/njml/NameClause.java`, test
+`ContractLoadingTests.nameClauseCarriesContractName`). The legacy string form
+is still rejected loudly by `JmlDocRemoval` with a migration hint, because a
+silent drop would weaken the specification.
 
 ### 13. pragma-statements `//@ nowarn;`, `//@ debug;`  — ✘ OPEN
 Tokens absent from JMLtk.

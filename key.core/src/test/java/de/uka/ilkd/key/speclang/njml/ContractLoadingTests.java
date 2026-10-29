@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.junit.jupiter.api.Assertions;
@@ -82,5 +83,25 @@ public class ContractLoadingTests {
         Assumptions.assumeTrue(Files.exists(javaFile));
         KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
         Assertions.assertFalse(file.getProofContracts().isEmpty());
+    }
+
+    /**
+     * A named spec case in the JMLtk-native form {@code [behavior] <name>:} must carry its name
+     * through to the operation contract: JmlToTextual maps {@code JmlContract.name} to the
+     * TextualJMLSpecCase name, and JMLSpecFactory.generateName uses it as the contract's base
+     * name instead of the generated default.
+     */
+    @Test
+    public void nameClauseCarriesContractName() throws ProblemLoaderException {
+        final Path javaFile =
+            HelperClassForTests.TESTCASE_DIRECTORY.resolve("speclang/njml/NameClause.java");
+        Assumptions.assumeTrue(Files.exists(javaFile));
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
+        Assertions.assertTrue(file.getProofContracts().stream()
+                .filter(FunctionalOperationContract.class::isInstance)
+                .map(FunctionalOperationContract.class::cast)
+                .anyMatch(c -> "CaseA".equals(c.getBaseName())),
+            "expected a functional operation contract with base name 'CaseA', got: "
+                + file.getProofContracts());
     }
 }
