@@ -5,38 +5,32 @@ public final class SimpleRecord extends Record {
     private final /*@ nullable */ String name;
 
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    public final /*@ nullable */ String name() {
+    public final String name() {
         return name;
     }
 
-    /*@ public  normal_behavior 
-      @ requires true;
-      @ ensures name == this.name;
-      @ assignable this.*;
-
-      @*/
     SimpleRecord(String name) {
         this.name = name;
     }
 
-    /*@ public  normal_behavior 
-      @ requires true;
-      @ ensures ((this == o) || (o instanceof SimpleRecord && o == null && this.name == ((SimpleRecord) o).name) || (o instanceof SimpleRecord && o == null && (this.name == null? (this.name.equals(((SimpleRecord) o).name)) : (o.name == null))))<==>\result;
-      @ ensures hashCode() == o.hashCode() ==> !\result;
-      @ ensures o == null ==> !\result;
-      @ assignable \strictly_nothing;
-
-      @*/
+    /*@ public normal_behavior
+        requires true;
+        ensures ((this == o) || (o instanceof SimpleRecord && o != null && this.name == ((SimpleRecord) o).name) || (o instanceof SimpleRecord && o != null && (this.name != null ? (this.name.equals(((SimpleRecord) o).name)) : (o.name == null)))) <==> \result;
+        ensures hashCode() != o.hashCode() ==> !\result;
+        ensures o == null ==> !\result;
+        assignable \strictly_nothing;
+        
+    */
     @Override()
     @javax.annotation.processing.Generated("RecordClassBuilder")
     public final boolean equals(java.lang.Object o);
 
-    /*@ public  normal_behavior 
-      @ ensures true;
-      @ requires true;
-      @ assignable \strictly_nothing;
-
-      @*/
+    /*@ public normal_behavior
+        ensures true;
+        requires true;
+        assignable \strictly_nothing;
+        
+    */
     @Override()
     @javax.annotation.processing.Generated("RecordClassBuilder")
     public final int hashCode();
@@ -47,12 +41,6 @@ public final class SimpleRecord extends Record {
         return "SimpleRecord[" + "name=" + name + "]";
     }
 
-    /*@ public  normal_behavior 
-      @ requires true;
-      @ ensures name == this.name;
-      @ assignable this.*;
-
-      @*/
     SimpleRecord(String name) {
         this.name = name;
     }
