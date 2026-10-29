@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics.constraint;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -77,6 +78,11 @@ public final class Metavariable extends JAbstractSortedOperator
             return false;
         }
         return compareTo((Metavariable) o) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name().toString(), isTemporaryVariable);
     }
 
     /**

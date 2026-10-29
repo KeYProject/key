@@ -89,7 +89,7 @@ public final class BinaryAssignment extends Operator
     @Override
     public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
-        if (src instanceof Assignment other) {
+        if (src instanceof Assignment<?> other) {
             if (getKind().equals(other.getKind())) {
                 return super.match(source, matchCond);
             }

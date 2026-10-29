@@ -381,7 +381,7 @@ public class TestNamingInvariants {
         }
     }
 
-    /**
+    /*
      * andRight, then on the (b -> b) branch impRight and hide_left on the antecedent b. The
      * other branch stays untouched (the sibling witness).
      */

@@ -381,11 +381,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @NonNull
+    @SuppressWarnings("unchecked") // the visitor API is untyped; the caller determines the target
+    // type from the visited node
     private <T> T accept(@NonNull Node check) {
         return Objects.requireNonNull((T) check.accept(this, null));
     }
 
     @Nullable
+    @SuppressWarnings("unchecked") // see accept: the target type T is determined by the caller
     private <T> T acceptn(@Nullable Node check) {
         return check != null ? (T) accept(check) : null;
     }
@@ -705,8 +708,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             boolean isModel = fldDecl.hasModifier(JML_MODEL);
             boolean isGhost = fldDecl.hasModifier(JML_GHOST);
 
-            final FullVariableDeclarator decl = new FullVariableDeclarator(varDecl,
-                varDecl.findAncestor(ClassOrInterfaceDeclaration.class).orElse(null),
+            @SuppressWarnings("unchecked") // findAncestor takes a parameterized Class... vararg,
+            // which requires an unchecked generic array creation
+            final ClassOrInterfaceDeclaration ancestor =
+                varDecl.findAncestor(ClassOrInterfaceDeclaration.class).orElse(null);
+            final FullVariableDeclarator decl = new FullVariableDeclarator(varDecl, ancestor,
                 fldDecl.isFinal(), fldDecl.isStatic(),
                 isModel, isGhost);
             final ProgramVariable variable = getProgramVariableForFieldSpecification(decl);
@@ -810,8 +816,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             boolean isFinal = n.hasModifier(FINAL) || (isInInterface && !isInstance);
             boolean isModel = n.hasModifier(JML_MODEL);
             boolean isGhost = n.hasModifier(JML_GHOST);
-            FullVariableDeclarator decl = new FullVariableDeclarator(v,
-                v.findAncestor(ClassOrInterfaceDeclaration.class).orElse(null), isFinal, isStatic,
+            @SuppressWarnings("unchecked") // findAncestor takes a parameterized Class... vararg,
+            // which requires an unchecked generic array creation
+            final ClassOrInterfaceDeclaration ancestor =
+                v.findAncestor(ClassOrInterfaceDeclaration.class).orElse(null);
+            FullVariableDeclarator decl = new FullVariableDeclarator(v, ancestor, isFinal, isStatic,
                 isModel, isGhost);
             final FieldSpecification fs = visitFieldSpecification(decl);
             varsList.add(fs);
@@ -2192,6 +2201,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
+    // KeyRangeExpression is deprecated in the javaparser fork, but the override is
+    // required by the visitor interface.
+    @SuppressWarnings("deprecation")
     public Object visit(KeyRangeExpression n, Void arg) {
         return reportUnsupportedElement(n);
     }

@@ -19,5 +19,6 @@ public interface Declaration extends NonTerminalProgramElement {
      *
      * @return the (original) list of modifiers wrapped .
      */
+    @SuppressWarnings("deprecation") // getModifiers() declaration references deprecated elements
     ImmutableList<Modifier> getModifiers();
 }

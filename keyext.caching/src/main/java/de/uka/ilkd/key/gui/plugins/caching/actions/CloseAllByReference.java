@@ -43,6 +43,7 @@ public class CloseAllByReference extends KeyAction {
      * @param mediator the mediator
      * @param proof the proof
      */
+    // Swing glue: configures the action during construction; benign.
     public CloseAllByReference(CachingExtension cachingExtension, KeYMediator mediator,
             Proof proof) {
         this.cachingExtension = cachingExtension;

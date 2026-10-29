@@ -108,7 +108,7 @@ public class LabelCollection {
     public <S> S getFirst(Class<S> termLabelClass) {
         for (var label : labels) {
             if (termLabelClass.isInstance(label)) {
-                return (S) label;
+                return termLabelClass.cast(label);
             }
         }
         return null;

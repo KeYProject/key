@@ -357,7 +357,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         dispose();
     }
 }

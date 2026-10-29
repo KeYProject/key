@@ -846,6 +846,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         // label modality if required
         if (addSymbolicExecutionLabel) {
+            // Symbolic-execution term-label counter remains on Services only via the deprecated
+            // getCounter; it is slated for removal together with the symbolic_execution package
+            // (see
+            // Services.getCounter javadoc).
+            @SuppressWarnings("deprecation")
             int labelID = services.getCounter(SymbolicExecutionTermLabel.PROOF_COUNTER_NAME)
                     .getCountPlusPlus();
             programTerm = tb.label(programTerm, new SymbolicExecutionTermLabel(labelID));
@@ -909,11 +914,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
             sb2 = tryBlock;
         } else {
             // create try statement
-            final Assignment nullStat = new BinaryAssignment(COPY, exceptionVar, NullLiteral.NULL);
+            final Assignment<?> nullStat =
+                new BinaryAssignment(COPY, exceptionVar, NullLiteral.NULL);
             final VariableSpecification eSpec = new VariableSpecification(eVar);
             final ParameterDeclaration excDecl =
                 new ParameterDeclaration(new Modifier[0], excTypeRef, eSpec, false);
-            final Assignment assignStat = new BinaryAssignment(COPY, exceptionVar, eVar);
+            final Assignment<?> assignStat = new BinaryAssignment(COPY, exceptionVar, eVar);
             final Catch catchStat =
                 new Catch(excDecl, catchBlock == null ? new StatementBlock(assignStat)
                         : new StatementBlock(assignStat, catchBlock));

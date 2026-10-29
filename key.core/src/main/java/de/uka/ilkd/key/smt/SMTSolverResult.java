@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.smt;
 
+import java.util.Objects;
+
 /**
  * Encapsulates the result of a single solver.
  */
@@ -98,6 +100,11 @@ public class SMTSolverResult {
             return false;
         }
         return isValid == ssr.isValid;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(isValid);
     }
 
 

@@ -93,6 +93,9 @@ class TwoSidedMatching {
     }
 
     /** find a substitution in a allterm by using unification */
+    // Constraint is deprecated wholesale (quantifierHeuristics.constraint); no replacement API
+    // exists.
+    @SuppressWarnings("deprecation")
     private Substitution match(Term triggerTerm, Term targetTerm, Services services) {
         final Constraint c = Constraint.BOTTOM.unify((JTerm) targetTerm,
             (JTerm) triggerTerm, services);

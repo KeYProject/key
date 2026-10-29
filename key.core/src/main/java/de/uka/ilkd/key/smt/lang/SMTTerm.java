@@ -177,6 +177,7 @@ public abstract class SMTTerm {
         return new SMTTermCall(func, argsList);
     }
 
+    @SafeVarargs // the vararg array is only enumerated, never stored or exposed
     public static SMTTerm call(SMTFunction func, List<? extends SMTTerm>... args) {
         List<SMTTerm> argsList = new LinkedList<>();
 

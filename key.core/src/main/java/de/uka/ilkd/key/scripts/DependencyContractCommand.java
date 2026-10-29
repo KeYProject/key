@@ -97,7 +97,7 @@ public class DependencyContractCommand extends AbstractCommand {
         }
     }
 
-    private void apply(Goal goal, UseDependencyContractApp ruleApp, Parameters arguments) {
+    private void apply(Goal goal, UseDependencyContractApp<?> ruleApp, Parameters arguments) {
         JTerm on = arguments.on;
         JTerm[] subs = on.subs().toArray(new JTerm[0]);
         subs[0] = arguments.heap;

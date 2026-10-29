@@ -4,10 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.taclettranslation.lemma;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
-import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
@@ -19,36 +15,4 @@ import de.uka.ilkd.key.taclettranslation.TacletTranslator;
  */
 public interface LemmaGenerator extends TacletTranslator {
     TacletFormula translate(Taclet taclet, TermServices services);
-}
-
-
-class LemmaFormula implements TacletFormula {
-    private final Taclet taclet;
-    private final LinkedList<JTerm> formula = new LinkedList<>();
-
-    public LemmaFormula(Taclet taclet, JTerm formula) {
-        this.taclet = taclet;
-        this.formula.add(formula);
-    }
-
-    @Override
-    public Taclet getTaclet() {
-        return taclet;
-    }
-
-    @Override
-    public JTerm getFormula(TermServices services) {
-        return formula.getFirst();
-    }
-
-    @Override
-    public String getStatus() {
-        return "";
-    }
-
-    @Override
-    public Collection<JTerm> getInstantiations() {
-        return formula;
-    }
-
 }

@@ -190,7 +190,7 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule
 
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-        return new BlockContractExternalBuiltInRuleApp(this, pos);
+        return new BlockContractExternalBuiltInRuleApp<>(this, pos);
     }
 
     /// Not applicable for information, but this is excluded by using the right profile.

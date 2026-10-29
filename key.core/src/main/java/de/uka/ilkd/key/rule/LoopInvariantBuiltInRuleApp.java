@@ -134,7 +134,7 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
         Statement last =
             (skipValues || block.getStatementCount() < 2) ? null : block.getStatementAt(1);
         skipValues = skipValues || !JavaAstUtils.isCopyAssignment(last);
-        Assignment assignment = skipValues ? null : ((Assignment) last);
+        Assignment<?> assignment = skipValues ? null : ((Assignment<?>) last);
         ProgramElement lhs = skipValues ? null : assignment.getChildAt(0);
         skipValues = skipValues || !(lhs instanceof ProgramVariable);
         final JTerm valuesVar = skipValues ? null : tb.var((ProgramVariable) lhs);

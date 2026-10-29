@@ -24,10 +24,10 @@ public final class AssumesFormulaInstantiationCache {
 
     @SuppressWarnings("unchecked")
     private final Pair<Semisequent, ImmutableList<AssumesFormulaInstantiation>>[] antecCache =
-        new Pair[SIZE];
+        (Pair<Semisequent, ImmutableList<AssumesFormulaInstantiation>>[]) new Pair<?, ?>[SIZE];
     @SuppressWarnings("unchecked")
     private final Pair<Semisequent, ImmutableList<AssumesFormulaInstantiation>>[] succCache =
-        new Pair[SIZE];
+        (Pair<Semisequent, ImmutableList<AssumesFormulaInstantiation>>[]) new Pair<?, ?>[SIZE];
 
     private static int indexFor(Semisequent s) {
         return System.identityHashCode(s) & (SIZE - 1);

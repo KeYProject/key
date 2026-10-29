@@ -76,6 +76,8 @@ public class ProofMacroMenu extends JMenu {
      * @param mediator the mediator of the current proof.
      * @param posInOcc the pos in occurrence, can be <code>null</code> if not available.
      */
+    // Workaround API for the proof-macro menu (KeYMediator doc: no replacement solution found yet).
+    @SuppressWarnings("deprecation")
     public ProofMacroMenu(KeYMediator mediator,
             PosInOccurrence posInOcc) {
         super("Strategy Macros");

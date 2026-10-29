@@ -69,6 +69,7 @@ public class FocussedRuleApplicationManager
     }
 
     @Override
+    @SuppressWarnings("unchecked") // clone() returns Object; the clone is a Focussed...Manager
     public RuleApplicationManager<Goal> copy() {
         return (RuleApplicationManager<Goal>) clone();
     }

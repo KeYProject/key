@@ -80,7 +80,7 @@ public class Extension<T> implements Comparable<Extension<T>> {
     }
 
     @Override
-    public int compareTo(Extension o) {
+    public int compareTo(Extension<T> o) {
         return Integer.compare(getPriority(), o.getPriority());
     }
 

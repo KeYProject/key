@@ -148,7 +148,7 @@ public class TermTacletAppIndexCacheSet {
             new BelowProgCache(ImmutableList.nil(), cache);
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    // --------------------------------------------------------------------------
 
     /**
      * @return the cache for top-level locations in the antecedent
@@ -178,7 +178,7 @@ public class TermTacletAppIndexCacheSet {
     public boolean isRelevantTaclet(Taclet t) {
         return t instanceof FindTaclet;
     }
-    ////////////////////////////////////////////////////////////////////////////
+    // --------------------------------------------------------------------------
 
     /**
      * @return the cache for locations of the given polarity that are not below updates or programs

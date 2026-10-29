@@ -57,6 +57,9 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
     @Override
+    @SuppressWarnings("unchecked") // mapMapOf's parameterized varargs (List<? extends
+    // RuleContext>...) trigger a generic-array-creation warning that cannot be silenced at the
+    // helper (protected, non-final => no @SafeVarargs)
     public Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         mapMapOf(ctx.option_decls(), ctx.options_choice(), ctx.ruleset_decls(), ctx.sort_decls(),
             ctx.datatype_decls(),

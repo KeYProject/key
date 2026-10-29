@@ -56,6 +56,7 @@ public interface IObserverFunction extends SortedOperator, Operator {
      * Returns the parameter types of this observer symbol. "Parameters" here includes only the
      * *explicit* parameters, not the heap and the receiver object.
      */
+    @SuppressWarnings("deprecation") // getParamTypes() declaration references deprecated elements
     ImmutableList<KeYJavaType> getParamTypes();
 
 }

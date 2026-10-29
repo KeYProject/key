@@ -80,6 +80,8 @@ public class ProofDependentSMTSettings extends AbstractSettings {
     }
 
 
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
+    @SuppressWarnings("deprecation")
     @Override
     public void readSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
@@ -108,6 +110,8 @@ public class ProofDependentSMTSettings extends AbstractSettings {
             supportedTaclets.getNamesOfSelectedTaclets()));
     }
 
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
+    @SuppressWarnings("deprecation")
     @Override
     public void writeSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";

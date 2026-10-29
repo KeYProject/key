@@ -111,6 +111,18 @@ subprojects {
         options.encoding = "UTF-8"
         // Setting the release to Java 21
         options.release = 21
+        // Enable all javac lint warnings. The warnings are tagged with their category, e.g.
+        // `[deprecation]`, `[unchecked]`, `[rawtypes]`, so they can be grouped per category
+        // (see scripts/collect-warnings.py). The `[serial]` and `[this-escape]` categories are
+        // deliberately kept disabled: the serialization machinery and constructor-side `this`
+        // leaks are intentional throughout the code base, and the cleanup policy keeps
+        // `@SuppressWarnings("serial")` without a serialVersionUID rather than silencing them by
+        // global suppression on every site.
+        options.compilerArgs += ['-Xlint:all,-serial,-this-escape']
+        // javac caps its printed warnings at 100 per compilation unit by default, which silently
+        // truncates the warning inventory (see scripts/collect-warnings.py). Raise the cap far
+        // beyond any realistic count so every warning is reported.
+        options.compilerArgs += ['-Xmaxwarns', '100000']
     }
 
     tasks.withType(Javadoc).configureEach {
@@ -316,7 +328,6 @@ subprojects {
             afterEvaluate {
                 description = project.description
                 assert (project.description != null && project.description != "") : "Description of modules are required at maven-central"
-                print(project.description)
             }
             url = 'https://key-project.org/'
 

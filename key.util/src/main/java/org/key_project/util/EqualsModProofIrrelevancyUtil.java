@@ -27,6 +27,9 @@ public final class EqualsModProofIrrelevancyUtil {
      * @param b second array
      * @return whether they are equal (same length, equal elements)
      */
+    // ImmutableArray is deprecated in favor of ImmutableList; kept for callers still passing
+    // the old type (e.g. ProofIrrelevancyProperty on terms whose subs()/boundVars() are arrays).
+    @SuppressWarnings("deprecation")
     public static <T> boolean compareImmutableArrays(
             ImmutableList<T> a,
             ImmutableList<T> b,

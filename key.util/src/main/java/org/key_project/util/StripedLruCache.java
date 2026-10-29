@@ -81,14 +81,14 @@ public final class StripedLruCache<K, V> {
      * @param maxEntries the approximate total capacity (across all segments)
      * @param stripes the desired number of segments; rounded up to the next power of two, min 1
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public StripedLruCache(int maxEntries, int stripes) {
         int n = 1;
         while (n < stripes) {
             n <<= 1;
         }
         this.mask = n - 1;
-        this.segments = new EvictingMap[n];
+        this.segments = (EvictingMap<K, V>[]) new EvictingMap<?, ?>[n];
         this.locks = new Object[n];
         final int perSegment = Math.max(1, (maxEntries + n - 1) / n);
         for (int i = 0; i < n; i++) {

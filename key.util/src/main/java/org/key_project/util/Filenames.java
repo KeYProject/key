@@ -67,6 +67,7 @@ public class Filenames {
     }
 
 
+    @SuppressWarnings("cast") // the explicit cast is required by the nullness checker
     private static String[] removeDotDot(String[] a) {
         String[] newa = new String[a.length];
         int k = 0;
@@ -81,7 +82,6 @@ public class Filenames {
             newa[k++] = a[a.length - 1];
         }
         // @ assert (\forall int i; 0 <= i < k; newa[i] != null);
-        // TODO: nullness. This cast cannot be checked, can it? But there is no error message
         return (String[]) Arrays.copyOf(newa, k);
     }
 

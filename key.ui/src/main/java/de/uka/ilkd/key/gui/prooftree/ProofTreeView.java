@@ -187,6 +187,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
      *
      * @param m the mediator
      */
+    // InputEvent.CTRL_MASK is deprecated in favour of CTRL_DOWN_MASK, but switching the modifier
+    // set changes KeyStroke matching for these pre-existing bindings.
+    @SuppressWarnings("deprecation")
     public ProofTreeView(KeYMediator m) {
         proofListener = new GUIProofTreeProofListener();
         guiListener = new GUIProofTreeGUIListener();
@@ -271,9 +274,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
         delegateView.setUI(new CacheLessMetalTreeUI());
 
         delegateView.getInputMap(WHEN_FOCUSED).getParent()
-                .remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_MASK));
+                .remove(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK));
         delegateView.getInputMap(WHEN_FOCUSED).getParent()
-                .remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_MASK));
+                .remove(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK));
 
         delegateView.setInvokesStopCellEditing(true);
         delegateView.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);

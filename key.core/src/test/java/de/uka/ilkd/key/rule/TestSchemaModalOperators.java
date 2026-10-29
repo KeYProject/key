@@ -184,7 +184,7 @@ public class TestSchemaModalOperators {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         TacletApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.rule().getExecutor().apply(goal, rApp);
+        ImmutableList<Goal> goals = applyTaclet(rApp, goal);
         assertEquals(1, goals.size(),
             "There should be 1 goal for testSchemaModal1 taclet, was " + goals.size());
         Sequent seq = goals.head().sequent();
@@ -219,7 +219,7 @@ public class TestSchemaModalOperators {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         TacletApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.rule().getExecutor().apply(goal, rApp);
+        ImmutableList<Goal> goals = applyTaclet(rApp, goal);
         assertEquals(1, goals.size(),
             "There should be 1 goal for testSchemaModal2 taclet, was " + goals.size());
         Sequent seq = goals.head().sequent();
@@ -250,7 +250,7 @@ public class TestSchemaModalOperators {
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         TacletApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
-        ImmutableList<Goal> goals = rApp.rule().getExecutor().apply(goal, rApp);
+        ImmutableList<Goal> goals = applyTaclet(rApp, goal);
         assertEquals(3, goals.size(),
             "There should be 3 goals for testSchemaModal3 taclet, was " + goals.size());
         Sequent seq0 = goals.head().sequent();
@@ -279,6 +279,12 @@ public class TestSchemaModalOperators {
 
         // Debug.ENABLE_DEBUG = false;
 
+    }
+
+    @SuppressWarnings("unchecked") // rule() keeps the raw executor chain (see Taclet#getExecutor);
+                                   // the goal type is fixed here
+    private ImmutableList<Goal> applyTaclet(TacletApp rApp, Goal goal) {
+        return rApp.rule().getExecutor().apply(goal, rApp);
     }
 
     private Goal createGoal(Node n, TacletIndex tacletIndex) {

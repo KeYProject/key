@@ -371,7 +371,8 @@ public class TriggersSet {
             return registerCandidate(term, enclosing, found, services);
         }
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({ "unchecked", "rawtypes" }) // generic array creation requires the raw
+        // Set array; element types are kept consistent by expandIfThenElse
         private Set<JTerm> expandIfThenElse(JTerm term, TermServices services) {
             final Set<JTerm>[] possibleSubs = new Set[term.arity()];
             boolean changed = false;

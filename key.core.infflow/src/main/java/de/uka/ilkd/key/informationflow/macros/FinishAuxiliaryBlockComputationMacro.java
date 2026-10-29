@@ -108,7 +108,7 @@ public class FinishAuxiliaryBlockComputationMacro extends AbstractFinishAuxiliar
      * @return the created taclet
      */
     private Taclet buildBlockInfFlowUnfoldTaclet(final Services services,
-            final BlockContractInternalBuiltInRuleApp blockRuleApp, final BlockContract contract,
+            final BlockContractInternalBuiltInRuleApp<?> blockRuleApp, final BlockContract contract,
             IFProofObligationVars ifVars, final JTerm result) {
         final BlockInfFlowUnfoldTacletBuilder tacletBuilder =
             new BlockInfFlowUnfoldTacletBuilder(services);

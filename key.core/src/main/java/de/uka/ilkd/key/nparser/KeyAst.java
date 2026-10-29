@@ -200,6 +200,8 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                     + ctx.start.getTokenSource().getSourceName());
         }
 
+        @SuppressWarnings("unchecked") // the parsed configuration is a single List<Configuration>;
+        // the visitor API returns the untyped List<Object>
         public List<Configuration> asConfigurationList() {
             final var cfg = new ConfigurationBuilder();
             List<Object> res = cfg.visitCfile(ctx);

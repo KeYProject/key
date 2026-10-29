@@ -50,6 +50,7 @@ public class ContextStatementBlock extends StatementBlock {
         this.executionContext = executionContext;
     }
 
+    @SuppressWarnings("deprecation") // ctor delegates StatementBlock body, bound to ImmutableArray
     public ContextStatementBlock(
             PositionInfo pi, List<Comment> c,
             ImmutableList<? extends Statement> body,

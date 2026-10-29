@@ -50,6 +50,7 @@ public interface EqualsModProperty<T> {
      * @param <V> the type of the additional parameters needed by {@code property} for the
      *        comparison
      */
+    @SuppressWarnings("unchecked") // varargs array is forwarded to the implementing property
     <V> boolean equalsModProperty(Object o, Property<? super T> property, V... v);
 
     /**

@@ -23,7 +23,8 @@ import org.jspecify.annotations.NonNull;
  * Costs for the {@link DeleteMergePointRuleFeature}; incredibly cheap if the previous rule
  * application was
  * a {@link MergeRule} app, infinitely expensive otherwise. The alternative would be to always check
- * whether there's another {@link ProofGoal} around with the same {@link MergePointStatement} (then
+ * whether there's another {@link ProofGoal} around with the same
+ * {@link de.uka.ilkd.key.java.ast.statement.MergePointStatement} (then
  * we
  * may not delete), which is much more time intensive.
  *

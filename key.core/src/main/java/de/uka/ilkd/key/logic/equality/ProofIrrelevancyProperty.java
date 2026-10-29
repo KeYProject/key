@@ -58,6 +58,8 @@ public class ProofIrrelevancyProperty implements Property<JTerm> {
      * @param <V> is not needed for this equality check
      */
     @Override
+    @SuppressWarnings({ "varargs", "unchecked" }) // the V... parameter is unused; no array content
+    // is ever read, so no heap pollution can occur
     public <V> boolean equalsModThisProperty(JTerm term1, JTerm term2, V... v) {
         if (term2 == term1) {
             return true;

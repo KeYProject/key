@@ -214,6 +214,8 @@ public class AssumesInputTest {
     /** a throwable carrying a source location, to exercise the {@link HasLocation} branch. */
     private static final class LocatedException extends RuntimeException implements HasLocation {
         private static final long serialVersionUID = 1L;
+        // Location is not Serializable; the exception is only ever used in-memory in this test.
+        @SuppressWarnings("serial")
         private final Location location;
 
         LocatedException(String message, Location location) {

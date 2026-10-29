@@ -360,6 +360,8 @@ public class SVInstantiations
      *         no
      *         instantiation is stored
      */
+    // Inherently unchecked cast against the map-backed instantiation store.
+    @SuppressWarnings("unchecked")
     public <T> InstantiationEntry<T> getInstantiationEntry(SchemaVariable sv) {
         return (InstantiationEntry<T>) map.get(sv);
     }
@@ -614,6 +616,8 @@ public class SVInstantiations
     }
 
     @Override
+    // Inherently unchecked cast against the map-backed instantiation store.
+    @SuppressWarnings("unchecked")
     public <T> @Nullable T lookupValue(@NonNull Name name) {
         final var e = lookupEntryForSV(name);
         // e.value() cannot be null here as null instantiations are not allowed

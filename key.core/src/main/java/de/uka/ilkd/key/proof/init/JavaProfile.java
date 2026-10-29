@@ -32,6 +32,8 @@ import org.key_project.util.collection.ImmutableSet;
  * This profile sets up KeY for verification of JavaCard programs.
  *
  */
+@SuppressWarnings("unchecked") // inherits the specialized goal-chooser builders, see
+                               // AbstractProfile
 public class JavaProfile extends AbstractProfile {
     public static final String PROFILE_ID = "Java Profile";
     public static final String NAME_WITH_PERMISSIONS = "Java with Permissions Profile";

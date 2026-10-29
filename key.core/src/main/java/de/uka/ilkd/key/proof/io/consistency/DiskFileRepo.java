@@ -6,6 +6,8 @@ package de.uka.ilkd.key.proof.io.consistency;
 
 import java.io.*;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -99,7 +101,15 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
             // we have to create the URL as string:
             String entryStr = "jar:file:///" + jarCopy.toString() + "!/" + juc.getEntryName();
-            URL entryURL = new URL(entryStr);
+            URL entryURL;
+            try {
+                entryURL = URI.create(entryStr).toURL();
+            } catch (IllegalArgumentException e) {
+                MalformedURLException me =
+                    new MalformedURLException(entryStr + " is not a valid URL");
+                me.initCause(e);
+                throw me;
+            }
 
             return entryURL.openStream();
         } else {

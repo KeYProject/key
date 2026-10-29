@@ -95,7 +95,7 @@ public enum ModifierKind {
     }
 
     /**
-     * returns the more restrictive modifier: public < protected < package-private < private
+     * returns the more restrictive modifier: {@code public < protected < package-private < private}
      * TODO: as package private is modelled as null or JML_PACKAGE the returned value
      * depends on the order (a == null, b==JML_PACKAGE returns null, a and b swapped returns
      * JML_PACKAGE)

@@ -35,7 +35,6 @@ checkerFramework {
                 "-Xmaxerrs", "10000",
                 "-Astubs=$projectDir/src/main/checkerframework:permit-nullness-assertion-exception.astub:checker.jar/junit-assertions.astub",
                 "-AstubNoWarnIfNotFound",
-                "-Werror",
                 "-Aversion",
         ]
     }

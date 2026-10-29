@@ -175,7 +175,8 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     public DefaultImmutableMap<S, T> remove(S key) {
         DefaultImmutableMap<S, T> queue = this;
         @SuppressWarnings("unchecked")
-        final ImmutableMapEntry<S, T>[] stack = new ImmutableMapEntry[size()];
+        final ImmutableMapEntry<S, T>[] stack =
+            (ImmutableMapEntry<S, T>[]) new ImmutableMapEntry<?, ?>[size()];
         int counter = 0;
         while (!queue.isEmpty()) {
             final ImmutableMapEntry<S, T> e = queue.entry;
@@ -203,7 +204,8 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     public ImmutableMap<S, T> removeAll(T value) {
         DefaultImmutableMap<S, T> queue = this;
         @SuppressWarnings("unchecked")
-        final ImmutableMapEntry<S, T>[] stack = new ImmutableMapEntry[size()];
+        final ImmutableMapEntry<S, T>[] stack =
+            (ImmutableMapEntry<S, T>[]) new ImmutableMapEntry<?, ?>[size()];
         int counter = 0;
         while (!queue.isEmpty()) {
             final ImmutableMapEntry<S, T> e = queue.entry;

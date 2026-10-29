@@ -52,6 +52,7 @@ public class ApplyTFFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
     }
 
     @Override
+    @SuppressWarnings("unchecked") // G is used only through the erasure ProofGoal here
     public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, G goal,
             MutableState mState) {

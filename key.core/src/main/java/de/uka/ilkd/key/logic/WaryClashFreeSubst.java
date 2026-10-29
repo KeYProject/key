@@ -162,7 +162,8 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
         }
 
         final JTerm[] newSubterms = new JTerm[t.arity()];
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({ "unchecked", "rawtypes" }) // generic array creation requires the raw
+        // ImmutableList type; the element type is kept consistent by applyOnSubterm
         final ImmutableList<QuantifiableVariable>[] newBoundVars = new ImmutableList[t.arity()];
 
         final int targetPos = UpdateApplication.targetPos();
