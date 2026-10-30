@@ -12,7 +12,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.*;
@@ -25,9 +24,11 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
+import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.CostBand;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
@@ -42,13 +43,15 @@ import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.strategy.HeapSelectCost.*;
 import static de.uka.ilkd.key.strategy.JavaCardDLCost.*;
+import static de.uka.ilkd.key.strategy.StaticFeatureCollection.*;
 
 /// This strategy is the catch-all for Java related features that are either
 /// cross-cutting or one of the features that do not fit well into any other
 /// strategy.
 ///
 /// Do not create directly, instead use [JavaCardDLStrategyFactory].
-public class JavaCardDLStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
+public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
+        implements ComponentStrategy<Goal> {
     public static final AtomicLong PERF_COMPUTE = new AtomicLong();
     public static final AtomicLong PERF_APPROVE = new AtomicLong();
     public static final AtomicLong PERF_INSTANTIATE = new AtomicLong();
@@ -66,7 +69,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
 
     private final HeapLDT heapLDT;
 
-    private final ArithTermFeatures tf;
+    private final JavaArithTermFeatures tf;
     private final FormulaTermFeatures ff;
 
 
@@ -76,7 +79,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
 
         this.strategyProperties = strategyProperties.clone();
 
-        this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
+        this.tf = new JavaArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
 
         costComputationDispatcher = setupCostComputationF();
@@ -95,9 +98,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
 
     @Override
     public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
-        var set = new HashSet<RuleSet>();
-        set.addAll(getDispatcher(aspect).ruleSets());
-        return set;
+        return new HashSet<>(getDispatcher(aspect).ruleSets());
     }
 
     @Override
@@ -290,7 +291,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             bindRuleSet(d, "induction_var", inftyConst());
         } else {
             bindRuleSet(d, "induction_var", ifZero(
-                applyTF(instOf("uSub"), IsInductionVariable.INSTANCE), longConst(0), inftyConst()));
+                applyTF(StaticFeatureCollection.instOf("uSub"), IsInductionVariable.INSTANCE),
+                longConst(0), inftyConst()));
         }
 
         return d;
@@ -422,7 +424,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         final TermBuffer sf = new TermBuffer();
         return add(sequentContainsNoPrograms(),
             sum(sf, SequentFormulasGenerator.sequent(),
-                or(eq(sf, FocusFormulaProjection.INSTANCE),
+                or(StaticFeatureCollection.eq(sf, FocusFormulaProjection.INSTANCE),
                     not(ContainsTermFeature.create(sf, instOf("auxiliarySK"))))));
     }
 
@@ -507,8 +509,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             let(firstObject, instOf("o"), let(secondObject, instOf("o2"),
                 sum(succedentFormula, SequentFormulasGenerator.succedent(),
                     not(applyTF(succedentFormula,
-                        or(opSub(Equality.EQUALS, eq(firstObject), eq(secondObject)),
-                            opSub(Equality.EQUALS, eq(secondObject), eq(firstObject)))))))));
+                        or(opSub(Equality.EQUALS, StaticFeatureCollection.eq(firstObject),
+                            StaticFeatureCollection.eq(secondObject)),
+                            opSub(Equality.EQUALS, StaticFeatureCollection.eq(secondObject),
+                                StaticFeatureCollection.eq(firstObject)))))))));
         bindRuleSet(d, "inReachableStateImplication", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "limitObserver", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "partialInvAxiom", NonDuplicateAppModPositionFeature.INSTANCE);
@@ -553,7 +557,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
                  * the outer 'not' then ensures that the costs are infinite in the first and 0 in
                  * the latter case
                  */
-                not(sum(tb, HeapGenerator.INSTANCE, not(eq(instOf("sv_heap"), tb)))));
+                not(sum(tb, HeapGenerator.INSTANCE, not(
+                    StaticFeatureCollection.eq(StaticFeatureCollection.instOf("sv_heap"), tb)))));
 
             if (classAxiomDelayedApplication()) {
                 bindRuleSet(d, "classAxiom", add(sequentContainsNoPrograms(),
@@ -688,7 +693,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
     }
 
     @Override
-    public boolean isResponsibleFor(BuiltInRule rule) {
+    public boolean isResponsibleFor(IBuiltInRule<Goal> rule) {
         return rule instanceof QueryExpand || rule instanceof UseDependencyContractRule;
     }
 }

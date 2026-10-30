@@ -4,4 +4,6 @@
 # such an object is shared mutable state under the multi-core prover -- fix it (move per-call state
 # to the MutableState, as ForEachCP does) rather than allowlist, unless it is genuinely safe.
 
-de.uka.ilkd.key.strategy.AbstractFeatureStrategy#instantiateActive   # toggled only while the feature tree is built at strategy construction (enableInstantiate/disableInstantiate in the strategy setup); never read or written during proof search
+# toggled only while the feature tree is built at strategy construction (enableInstantiate/disableInstantiate in the strategy setup); never read or written during proof search
+org.key_project.prover.strategy.AbstractFeatureStrategy#instantiateActive
+de.uka.ilkd.key.strategy.JavaAbstractFeatureStrategy#instantiateActive

@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.definition;
 
-import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.JavaStrategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 /**
  * Instances of this factory are used to create default {@link StrategyProperties} used by a
- * {@link Strategy} defined via its {@link StrategySettingsDefinition}.
+ * {@link JavaStrategy} defined via its {@link StrategySettingsDefinition}.
  *
  * @author Martin Hentschel
  */

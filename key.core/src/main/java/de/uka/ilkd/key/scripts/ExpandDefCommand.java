@@ -21,7 +21,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
-import static de.uka.ilkd.key.proof.RuleAppIndexMode.AUTO;
+import static org.key_project.prover.indexing.RuleAppIndexMode.AUTO;
 
 /// The `expand` command applies expansion rules to definitions and class invariants.
 /// It expands occurrences of definition axioms or class invariant axioms in the current sequent.

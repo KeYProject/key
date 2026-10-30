@@ -11,15 +11,15 @@ import java.util.Optional;
 
 import de.uka.ilkd.key.macros.FilterStrategy;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.RuleAppIndexMode;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.strategy.Strategy;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.indexing.RuleAppIndexMode;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.Strategy;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
@@ -27,7 +27,7 @@ import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.Nullable;
 
-import static de.uka.ilkd.key.proof.RuleAppIndexMode.INTERACTIVE;
+import static org.key_project.prover.indexing.RuleAppIndexMode.INTERACTIVE;
 
 /// A strategy wrapper that adds or restricts rule applications based on configuration.
 /// Used by the `auto` command to customize which rules are available during automatic proof search.
@@ -46,7 +46,8 @@ class AdditionalRulesStrategy extends FilterStrategy {
     private final List<Pair<String, RuleAppCost>> additionalRules;
     private final boolean exclusive;
 
-    public AdditionalRulesStrategy(Strategy delegate, String additionalRules, boolean exclusive) {
+    public AdditionalRulesStrategy(Strategy<Goal> delegate, String additionalRules,
+            boolean exclusive) {
         super(delegate);
         this.additionalRules = parseAddRules(additionalRules);
         this.exclusive = exclusive;
