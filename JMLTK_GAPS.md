@@ -31,7 +31,7 @@ JMLtk front-end shipped in PR #3997.
 | 3 | `\seq(0)` inside a model-method body | `… : \seq_concat(b(n-1), \seq(0));` | `nparser/fix3452/fix/Issue3452Fixture.java` | ✔ RESOLVED — ⚠ was mis-attributed to JMLtk |
 | 4 | comma-separated store-ref `represents` | `//@ represents footprint = this.*, o.*;` | `key.ui/examples/heap/simple/src/MySubclass.java`, `heap/list/src/ArrayList.java` | ✘ OPEN (4 load fails) |
 | 5 | `\sum` comprehension fidelity | `ensures \result == (\sum int i; …)` | `heap/comprehensions/sum1.key`, `arrayMax.key`, `sum0.key`, `polishFlagSort.key` | ✘ OPEN (proofs don't close) |
-| 6 | record-level `/*@ nullable */` + record pipeline output | `/*@ nullable */ record MyRecord(…)` | `pipelineTests/records/**` | ⚠ REGRESSION — `KeyJavaPipelineTest` 86 red (0 on main) |
+| 6 | record-level `/*@ nullable */` + record pipeline output | `/*@ nullable */ record MyRecord(…)` | `pipelineTests/records/**` | ✔ RESOLVED — goldens regenerated for the JMLtk output; `KeyJavaPipelineTest` 142/0 |
 | 7 | `spec_*_math` class/method pragmas | `/*@ spec_java_math @*/` | `testcase/specMath/{java,bigint}/Test.java`, `testPackage/TestClass.java` | ✘ OPEN (pragmas removed, 2 tests `@Disabled`) |
 | 8 | `ensures \result = max;` (single `=`) | — | `exceptional/WrongEquals.java` | ✔ RESOLVED (guarded via `JmlSideEffectChecker`) |
 | 9 | labeled `break`/`continue` proofs | — | `LoopScopeInvRuleTests` bench | ✘ OPEN (1 proof fails) |
@@ -156,8 +156,18 @@ record SimpleRecord(/*@ nullable */ String name, …) { … }
   rejection at `pipelineTests/records/input/RecordOverwriting.java:1`); that
   parse rejection is gone at HEAD, but the golden output now diverges broadly.
   Traceability: front-end parse/print + spec attachment differences, not a
-  rebase artifact. **Action needed (either regenerate goldens deliberately or
-  restore equivalent output).**
+  rebase artifact.
+- **Resolution 2026-10-30 (HEAD `10f4bfcb9a`):** ✔ **RESOLVED — goldens
+  deliberately regenerated.** `expected/` was promoted from the fresh
+  `actual/` output (102 → 108 files, incl. the new `17_AnnotationMover`
+  stage; `actual/` remains gitignored). The semantic differences are the
+  faithful print of the current `RecordClassBuilder` template via JMLtk:
+  `hashCode() == o.hashCode() ==> !\result` → `!=` and `o == null ==> !\result`
+  → `o != null` (stages 05–16, 18; the old `==` forms came from the
+  retired `PreParser` re-serialization), removed `[[JML modifiers]]`
+  placeholder markers and inline nullable comments (01–06).
+  `KeyJavaPipelineTest` is green **142/0** (byte-exact: `expected/` equals a
+  fresh run's `actual/`, 108/108).
 
 ## 7. `spec_*_math` pragmas  — ✘ OPEN (mitigated)
 
