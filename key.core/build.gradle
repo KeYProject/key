@@ -309,8 +309,8 @@ tasks.register('generateVersionFiles') {
     inputs.files "$project.rootDir/.git/HEAD"
     outputs.files sha1, branch, versionf
 
-    def gitRevision = gitRevParse('HEAD')
-    def gitBranch = gitRevParse('--abbrev-ref HEAD')
+    def gitRevision = gitRevParse(List.of('HEAD'))
+    def gitBranch = gitRevParse(List.of('--abbrev-ref', 'HEAD'))
 
     doLast {
         sha1.text = gitRevision
@@ -321,11 +321,13 @@ tasks.register('generateVersionFiles') {
 
 // Helper function that calls "git rev-parse" to
 // find names/SHAs for commits
-static def gitRevParse(String args) {
+def gitRevParse(List<String> args) {
     try {
-        return "git rev-parse $args".execute().text.trim()
+        var cmd = new ArrayList<>(List.of("git", "rev-parse"))
+        cmd.addAll(args)
+        return providers.exec {it.commandLine(cmd) }.getStandardOutput().getAsText().get().trim()
     } catch (Exception ignored) {
-        return ""
+        return ignored.toString()
     }
 }
 
