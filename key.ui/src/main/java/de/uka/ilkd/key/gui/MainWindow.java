@@ -314,7 +314,9 @@ public final class MainWindow extends JFrame {
         proofListener = new MainProofListener();
         userInterface = new WindowUserInterfaceControl(this);
         mediator = getMainWindowMediator(userInterface);
-        KeYGuiExtensionFacade.getStartupExtensions().forEach(it -> it.preInit(this, mediator));
+        KeYGuiExtensionFacade.getStartupExtensions()
+                .stream().filter(Objects::nonNull)
+                .forEach(it -> it.preInit(this, mediator));
 
         Config.DEFAULT.setDefaultFonts();
         ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
@@ -645,8 +647,12 @@ public final class MainWindow extends JFrame {
 
         dockSourceView.setVisible(true);
 
-        KeYGuiExtensionFacade.getAllPanels(this)
+        KeYGuiExtensionFacade.getLeftPanel().stream()
+                .flatMap(it -> it.getPanels(this, mediator).stream())
                 .forEach(it -> DockingHelper.addLeftPanel(it.getClass().getName()));
+        KeYGuiExtensionFacade.getRightPanel().stream()
+                .flatMap(it -> it.getPanels(this, mediator).stream())
+                .forEach(it -> DockingHelper.addRightPanel(it.getClass().getName()));
         DockingHelper.restoreFactoryDefault(this);
 
         statusLine = new MainStatusLine("<html>" + PARA + KeYConstants.COPYRIGHT + PARA

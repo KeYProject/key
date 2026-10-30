@@ -64,6 +64,16 @@ public class DockingHelper {
     }
 
     /**
+     * Define that another panel should be on the right side (stacked as a tab with the Source
+     * view) on factory reset.
+     *
+     * @param className class name of that panel
+     */
+    public static void addRightPanel(String className) {
+        RIGHT_PANEL.add(className);
+    }
+
+    /**
      * Sets the current layout of the docking framework back to factory default.
      * <p>
      * We distinguish between four areas: left-top, left(-bottom), main, right. This methods goes
