@@ -318,6 +318,34 @@ rejected inside the jmltk dependency or are behavioral proof differences):
 | (i) | `ParallelProverDeterminismTest.sequentialAndOneWorkerProofsAreIdentical` (1) | `IllegalArgumentException: flags have to have the same size` @ `ReplacementMap.replaceFlags` via `BlockContractImpl$Combinator.combine` — a real behavioral error in block-contract combination on the `SimplifiedLinkedList.remove`-style example; pre-existing (identical at Phase-3 HEAD), NOT a slice regression, but may be a real KeY bug worth a follow-up issue. |
 | (j) | `KeyJavaPipelineTest` init (1) | `pipelineTests/records/input/RecordOverwriting.java:1` `/*@ nullable */ record MyRecord(...)` — record-declaration-level `/*@ nullable */` rejected ("Not JML construct supported" @ line 1 col 5); goldens across all 17 transform stages carry the annotation → record, don't touch. (`SimpleRecord`'s component-level `/*@ nullable */` is fine.) |
 
+**UPDATE 2026-10-30 (HEAD `10f4bfcb9a`):** this section is superseded as the
+living status record by `JMLTK_GAPS.md` (measured at `048f75d7df`, one entry
+per construct with re-verifiable fixtures). The rows above remain as recorded
+history; current per-item status lives in `JMLTK_GAPS.md`. Corrections
+measured at HEAD:
+
+- **(a)** merge family, **(b)** `JmlScriptTest`, **(f)** `TestProofStarter`:
+  **green** (2161/0 incl. `MergeRuleTests` 12, `MtMergePointTest` 1,
+  `TestTacletEquality` 2137, `JmlScriptTest` 7, `TestProofStarter` 2). The
+  `KEY_JML_FALLBACK` re-parse of leftover `//@` comments covers comment-form
+  `merge_point` and `\by`-scripted asserts (JMLTK_GAPS §1/§2).
+- **(c)** `Issue3452Test`: **green** — and **mis-attributed**: JMLtk parses
+  `\seq(0)` fine as `KeyEscapeExpression`; the error came from KeY's own
+  `JP2KeYConverter.handleSpecialFunctionInvocation` name lookup. Resolved by
+  special-casing `\seq(...)` (JMLTK_GAPS §3).
+- **(j)** `KeyJavaPipelineTest`: re-measured at HEAD as **86 failures** (not 1)
+  — the stale record goldens diverged from the JMLtk front-end output (stages
+  01–06 marker/comment forms, `==`→`!=` in generated equals specs, missing
+  `17_AnnotationMover`). The goldens were **deliberately regenerated**
+  (`expected/` 102→108 files) and the class is green **142/0** now
+  (JMLTK_GAPS §6, status flipped to resolved).
+
+Remaining recorded OPEN gaps at HEAD: **(d)** `ScDeterminismTest` (comma
+`represents` + `\sum` proofs), **(e)** `RealProofMtEquivalenceTest` (`\sum`),
+**(g)** labeled break/continue proof, **(h)** scripted-proof replays, **(i)**
+block-contract combination (= JMLTK_GAPS §4/§5/§9/§10/§11; §7/§13–§16 are
+further recorded gaps absent from the old table).
+
 IntSemantics (the 6 pragma-load failures) were the ONE fixable category —
 same class-level `code_*_math`/`spec_*_math` pragma pattern Phase 3 removed
 from `specMath`; the removal is safe because the int semantics are set by the
@@ -328,7 +356,8 @@ disabled the two specMath loads whose *entire point* was the unexpressible
 math mode; these 34 failures are distributed across 11 test classes covering
 real proof machinery, and disabling them would hide genuine gaps from CI).
 The full suite's 34-failure count is the accepted pre-existing baseline and
-must NOT grow.
+must NOT grow. (Re-measured status at HEAD, incl. the four now-green rows, is
+in the UPDATE block above; the remaining open count is 12, not 34.)
 
 ## 6. Useful references (may vanish — re-verify before trusting paths)
 
