@@ -14,10 +14,12 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
-import de.uka.ilkd.key.speclang.njml.PreParser;
+import de.uka.ilkd.key.speclang.njml.JmlFacade;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
@@ -47,14 +49,11 @@ public class ContractFactoryTest {
     /** services needed for translation */
     private Services services;
 
-    /** service for JML translation */
-    private PreParser preParser;
-
     /** context information needed for JmlIO/parser */
     private KeYJavaType testClassType;
 
     /**
-     * Creates the JavaInfo, Services, and JmlIO.
+     * Creates the JavaInfo and Services.
      */
     @BeforeEach
     public synchronized void setUp() {
@@ -64,7 +63,6 @@ public class ContractFactoryTest {
             services.setOriginFactory(new OriginTermLabelFactory());
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         }
-        preParser = new PreParser();
     }
 
     /**
@@ -76,21 +74,8 @@ public class ContractFactoryTest {
      */
     @Test
     public void testCombineEqualModifiable() throws SLTranslationException {
-        String contract = """
-                /*@ normal_behavior
-                @  requires a != 5;
-                @  ensures \\result == 3;
-                @  assignable \\nothing;
-                @
-                @ also
-                @
-                @ exceptional_behavior
-                @  requires a == 5;
-                @  assignable \\nothing;
-                @  signals (RuntimeException e) true;
-                @  signals_only RuntimeException;
-                @*/""";
-        JTerm woLabels = calculateCombinedModifiableWOLabels(contract);
+        JTerm woLabels =
+            calculateCombinedModifiableWOLabels("\\nothing", "\\nothing");
         assertEquals("empty<Pair<java.lang.Object,Field>>", woLabels.toString());
     }
 
@@ -103,21 +88,8 @@ public class ContractFactoryTest {
      */
     @Test
     public void testCombineEmptyModifiable() throws SLTranslationException {
-        String contract = """
-                /*@ normal_behavior
-                @  requires a != 5;
-                @  ensures \\result == 3;
-                @  assignable \\strictly_nothing;
-                @
-                @ also
-                @
-                @ exceptional_behavior
-                @  requires a == 5;
-                @  assignable \\nothing;
-                @  signals (RuntimeException e) true;
-                @  signals_only RuntimeException;
-                @*/""";
-        JTerm woLabels = calculateCombinedModifiableWOLabels(contract);
+        JTerm woLabels =
+            calculateCombinedModifiableWOLabels("\\strictly_nothing", "\\nothing");
         assertEquals("empty<Pair<java.lang.Object,Field>><<impl>>", woLabels.toString());
     }
 
@@ -130,21 +102,8 @@ public class ContractFactoryTest {
      */
     @Test
     public void testCombineDifferentModifiable() throws SLTranslationException {
-        String contract = """
-                /*@ normal_behavior
-                @  requires a != 5;
-                @  ensures \\result == 3;
-                @  assignable l;
-                @
-                @ also
-                @
-                @ exceptional_behavior
-                @  requires a == 5;
-                @  assignable \\nothing;
-                @  signals (RuntimeException e) true;
-                @  signals_only RuntimeException;
-                @*/""";
-        JTerm woLabels = calculateCombinedModifiableWOLabels(contract);
+        JTerm woLabels =
+            calculateCombinedModifiableWOLabels("l", "\\nothing");
         assertEquals(
             "intersect<Pair<java.lang.Object,Field>>(if-then-else(equals(a,Z(5(#))),empty<Pair<java.lang.Object,Field>>,allLocs),"
                 + "if-then-else(not(equals(a,Z(5(#)))),singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(self,testPackage.TestClass::#l)),"
@@ -153,31 +112,46 @@ public class ContractFactoryTest {
     }
 
     /**
-     * Helper for the tests: Parses the given contracts (must always be two), combines them and
-     * returns the modifiable term of the resulting combined contract (with origin labels removed).
+     * Helper for the tests: Builds two operation contracts for method {@code m} - a normal and an
+     * exceptional one with the given assignable clauses - combines them and returns the modifiable
+     * term of the resulting combined contract (with origin labels removed).
      *
-     * @param contractStr
-     *        the string containing the contracts for method m
-     * @return the combined modifiable term of the contracts in the input string, without origin
-     *         labels
+     * @param normalAssignable
+     *        the assignable clause of the normal behavior contract
+     * @param exceptionalAssignable
+     *        the assignable clause of the exceptional behavior contract
+     * @return the combined modifiable term of the contracts, without origin labels
      * @throws SLTranslationException
      *         should not be thrown
      */
-    private JTerm calculateCombinedModifiableWOLabels(String contractStr)
-            throws SLTranslationException {
+    private JTerm calculateCombinedModifiableWOLabels(String normalAssignable,
+            String exceptionalAssignable) throws SLTranslationException {
         JMLSpecFactory jsf = new JMLSpecFactory(services);
-        ImmutableList<TextualJMLConstruct> constructs = preParser.parseClassLevel(contractStr);
 
         ImmutableList<KeYJavaType> signature = ImmutableList.nil();
         signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
 
+        TextualJMLSpecCase normal =
+            new TextualJMLSpecCase(ImmutableList.nil(), Behavior.NORMAL_BEHAVIOR);
+        normal.addClause(ClauseHd.REQUIRES, JmlFacade.parseClause("requires a != 5;"));
+        normal.addClause(ClauseHd.ENSURES, JmlFacade.parseClause("ensures \\result == 3;"));
+        normal.addClause(ClauseHd.ASSIGNABLE,
+            JmlFacade.parseClause("assignable " + normalAssignable + ";"));
+
+        TextualJMLSpecCase exceptional =
+            new TextualJMLSpecCase(ImmutableList.nil(), Behavior.EXCEPTIONAL_BEHAVIOR);
+        exceptional.addClause(ClauseHd.REQUIRES, JmlFacade.parseClause("requires a == 5;"));
+        exceptional.addClause(ClauseHd.ASSIGNABLE,
+            JmlFacade.parseClause("assignable " + exceptionalAssignable + ";"));
+        exceptional.addClause(Clause.SIGNALS,
+            JmlFacade.parseClause("signals (RuntimeException e) true;"));
+        exceptional.addClause(Clause.SIGNALS_ONLY,
+            JmlFacade.parseClause("signals_only RuntimeException;"));
+
         ImmutableSet<Contract> contractSet = ImmutableSet.empty();
-        for (TextualJMLConstruct c : constructs) {
-            if (c instanceof TextualJMLSpecCase c1) {
-                contractSet = contractSet.union(jsf.createJMLOperationContracts(pm, c1));
-            }
-        }
+        contractSet = contractSet.union(jsf.createJMLOperationContracts(pm, normal));
+        contractSet = contractSet.union(jsf.createJMLOperationContracts(pm, exceptional));
         assertEquals(2, contractSet.size());
 
         FunctionalOperationContract[] cs = new FunctionalOperationContract[contractSet.size()];

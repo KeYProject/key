@@ -152,7 +152,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     public static JTerm getUninterpretedPredicate(Proof proof) {
         if (proof != null && !proof.isDisposed()) {
             ProofOblInput problem =
-                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+                proof.getServices().getProofRegistry().getProofOblInput(proof);
             if (problem instanceof AbstractOperationPO operationPO) {
                 if (operationPO.isAddUninterpretedPredicate()) {
                     return operationPO.getUninterpretedPredicate();
@@ -171,7 +171,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     public static Set<JTerm> getAdditionalUninterpretedPredicates(Proof proof) {
         if (proof != null && !proof.isDisposed()) {
             ProofOblInput problem =
-                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+                proof.getServices().getProofRegistry().getProofOblInput(proof);
             if (problem instanceof AbstractOperationPO operationPO) {
                 if (operationPO.isAddUninterpretedPredicate()) {
                     return operationPO.getAdditionalUninterpretedPredicates();
@@ -194,7 +194,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      */
     public static JTerm addUninterpretedPredicateIfRequired(Services services, JTerm term) {
         ProofOblInput problem =
-            services.getSpecificationRepository().getProofOblInput(services.getProof());
+            services.getProofRegistry().getProofOblInput(services.getProof());
         if (problem instanceof AbstractOperationPO operationPO) {
             if (operationPO.isAddUninterpretedPredicate()) {
                 term = services.getTermBuilder().and(term, operationPO.getUninterpretedPredicate());
@@ -219,7 +219,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     public static JTerm addAdditionalUninterpretedPredicateIfRequired(Services services, JTerm term,
             ImmutableList<LocationVariable> variablesToProtect, JTerm exceptionVar) {
         ProofOblInput problem =
-            services.getSpecificationRepository().getProofOblInput(services.getProof());
+            services.getProofRegistry().getProofOblInput(services.getProof());
         if (problem instanceof AbstractOperationPO operationPO) {
             if (operationPO.isAddUninterpretedPredicate()) {
                 JTerm up = operationPO.newAdditionalUninterpretedPredicate(variablesToProtect,
@@ -1029,7 +1029,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
             final IProgramMethod pm, final Services proofServices) {
         ImmutableList<FunctionalOperationContract> lookupContracts =
             ImmutableList.nil();
-        ImmutableSet<FunctionalOperationContract> cs = proofServices.getSpecificationRepository()
+        ImmutableSet<FunctionalOperationContract> cs = proofServices.getContractRegistry()
                 .getOperationContracts(getCalleeKeYJavaType(), pm);
         for (KeYJavaType superType : proofServices.getJavaInfo()
                 .getAllSupertypes(getCalleeKeYJavaType())) {

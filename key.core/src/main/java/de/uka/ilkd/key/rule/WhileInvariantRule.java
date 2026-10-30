@@ -437,7 +437,7 @@ public class WhileInvariantRule implements BuiltInRule {
 
             final ExecutionContext innermostExecutionContext = innermostMethodFrame == null ? null
                     : (ExecutionContext) innermostMethodFrame.getExecutionContext();
-            services.getSpecificationRepository().addLoopInvariant(spec);
+            spec.getLoop().setLoopInvariant(spec);
 
             // cache and return result
             return new Instantiation(u, progPost, loop, spec, selfTerm, innermostExecutionContext);

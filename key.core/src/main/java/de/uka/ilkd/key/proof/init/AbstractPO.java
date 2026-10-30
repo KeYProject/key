@@ -18,7 +18,6 @@ import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.Configuration;
@@ -43,7 +42,6 @@ public abstract class AbstractPO implements IPersistablePO {
     protected Services environmentServices;
     protected final JavaInfo javaInfo;
     protected final HeapLDT heapLDT;
-    protected final SpecificationRepository specRepos;
     protected final String name;
     protected ImmutableSet<NoPosTacletApp> taclets;
     protected JTerm[] poTerms;
@@ -73,7 +71,6 @@ public abstract class AbstractPO implements IPersistablePO {
         this.environmentServices = initConfig.getServices();
         this.javaInfo = initConfig.getServices().getJavaInfo();
         this.heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
-        this.specRepos = initConfig.getServices().getSpecificationRepository();
         this.name = name;
         taclets = DefaultImmutableSet.nil();
     }
@@ -98,12 +95,12 @@ public abstract class AbstractPO implements IPersistablePO {
     /// @see TacletPOGenerator
     protected void generateDynamicTaclets(InitConfig initConfig) {
         var generators = ServiceLoader.load(TacletPOGenerator.class);
-        generators.forEach(it -> it.generate(this, initConfig, specRepos));
+        generators.forEach(it -> it.generate(this, initConfig, environmentServices));
     }
 
 
     protected ImmutableSet<ClassAxiom> selectClassAxioms(KeYJavaType selfKJT) {
-        return specRepos.getClassAxioms(selfKJT);
+        return environmentServices.getClassAxiomComputer().getClassAxioms(selfKJT);
     }
 
 

@@ -35,7 +35,7 @@ public class FinishAuxiliaryMethodComputationMacro extends AbstractFinishAuxilia
             PosInOccurrence posInOcc) {
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
-                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+                proof.getServices().getProofRegistry().getProofOblInput(proof);
             return poForProof instanceof SymbolicExecutionPO;
         }
         return false;
@@ -46,11 +46,11 @@ public class FinishAuxiliaryMethodComputationMacro extends AbstractFinishAuxilia
             ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener) {
 
         final ProofOblInput poForProof =
-            proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+            proof.getServices().getProofRegistry().getProofOblInput(proof);
         final Goal initiatingGoal = ((SymbolicExecutionPO) poForProof).getInitiatingGoal();
         final InfFlowProof initiatingProof = (InfFlowProof) initiatingGoal.proof();
         final Services services = initiatingProof.getServices();
-        final InfFlowContractPO ifPO = (InfFlowContractPO) services.getSpecificationRepository()
+        final InfFlowContractPO ifPO = (InfFlowContractPO) services.getProofRegistry()
                 .getProofOblInput(initiatingProof);
         final IFProofObligationVars ifVars = ifPO.getIFVars().labelHeapAtPreAsAnonHeapFunc();
         final InformationFlowContract ifContract = ifPO.getContract();

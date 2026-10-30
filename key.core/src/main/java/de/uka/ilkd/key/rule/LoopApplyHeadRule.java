@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.ForToWhileTransformation;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopContractImpl;
 
@@ -93,10 +94,14 @@ public class LoopApplyHeadRule implements BuiltInRule {
         for (LoopContract c : contracts) {
             LoopContract newContract = c.replaceEnhancedForVariables(block, services);
 
-            services.getSpecificationRepository().removeLoopContract(c);
-            services.getSpecificationRepository().addLoopContract(newContract, false);
-            services.getSpecificationRepository()
-                    .addBlockContract(c.toBlockContract().setBlock(headAndBlock));
+            if (c.isOnBlock()) {
+                c.getBlock().removeLoopContract(c);
+            } else {
+                c.getLoop().removeLoopContract(c);
+            }
+            block.addLoopContract(newContract);
+            BlockContract blockContract = c.toBlockContract().setBlock(headAndBlock);
+            blockContract.getBlock().addBlockContract(blockContract);
         }
 
         Goal result = goal.split(1).head();

@@ -35,7 +35,7 @@ public class ModifiersTest {
 
                 public /*@ nullable_by_default @*/ class A {}
 
-                /*@ nullable_by_default @*/ class B {}
+                public /*@ nullable_by_default @*/ class B {}
 
                 public /*@ pure @*/ class C {}
                 """;
@@ -79,11 +79,12 @@ public class ModifiersTest {
     @Test
     public void testMethodModifiers() {
         var cu = java.readCompilationUnit(METHODS);
-        var members = cu.getDeclarations().get(0).getMembers();
-        var a = ((ProgramMethod) members.get(0)).getMethodDeclaration();
-        var modelA = ((ProgramMethod) members.get(3)).getMethodDeclaration();
-        var b = ((ProgramMethod) members.get(2)).getMethodDeclaration();
-        var modelB = ((ProgramMethod) members.get(4)).getMethodDeclaration();
+        var pm = cu.getDeclarations().get(0).getMembers().stream()
+                .filter(m -> m instanceof ProgramMethod).map(m -> (ProgramMethod) m).toList();
+        var a = pm.get(0).getMethodDeclaration();
+        var modelA = pm.get(1).getMethodDeclaration();
+        var b = pm.get(2).getMethodDeclaration();
+        var modelB = pm.get(3).getMethodDeclaration();
         var expected = new MethodDeclaration.JMLModifiers(false, false, true, null);
         assertEquals(expected, a.getJmlModifiers(), "Jml modifiers of method D::a");
         assertEquals(expected, b.getJmlModifiers(), "Jml modifiers of method D::b");

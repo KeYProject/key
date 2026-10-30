@@ -76,8 +76,7 @@ public final class InfFlowLoopInvariantTacletBuilder
     @Override
     JTerm buildContractApplications(ProofObligationVars contAppData,
             ProofObligationVars contAppData2, Services services) {
-        LoopSpecification ifContract =
-            services.getSpecificationRepository().getLoopSpec(loopinvariant.getLoop());
+        LoopSpecification ifContract = loopinvariant.getLoop().getLoopInvariant();
 
         InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(ifContract, contAppData,
             contAppData2, executionContext, guard, services);

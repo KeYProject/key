@@ -250,7 +250,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 Statement body =
                     (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
                 While newLoop = KeYJavaASTFactory.whileLoop(guard, body, x.getPositionInfo());
-                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                x.copyLoopInvariantTo(newLoop);
                 addChild(newLoop);
                 changed();
             } else {
