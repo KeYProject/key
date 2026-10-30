@@ -1,44 +1,49 @@
 @javax.annotation.processing.Generated("RecordClassBuilder")
-final class Mapping extends Record {
+final class Point3d extends Record {
 
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    private final String from;
+    private final int x;
 
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    public final String from() {
-        return from;
+    public final int x() {
+        return x;
     }
 
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    private final String to;
+    private final int y;
 
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    public final String to() {
-        return to;
+    public final int y() {
+        return y;
+    }
+
+    @javax.annotation.processing.Generated("RecordClassBuilder")
+    private final int z;
+
+    @javax.annotation.processing.Generated("RecordClassBuilder")
+    public final int z() {
+        return z;
     }
 
     /*@ public  normal_behavior 
       @ requires true;
-      @ ensures from == this.from && to == this.to;
+      @ ensures x == this.x && y == this.y && z == this.z;
       @ assignable this.*;
 
       @*/
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    public Mapping(String from, String to) {
-        {
-            // compact constructor!
-            from = "abc";
-            to = "def";
-        }
+    public Point3d(int x, int y, int z) {
         //Created by RecordClassBuilder.java:132
-        this.from = from;
+        this.x = x;
         //Created by RecordClassBuilder.java:132
-        this.to = to;
+        this.y = y;
+        //Created by RecordClassBuilder.java:132
+        this.z = z;
     }
 
     /*@ public  normal_behavior 
       @ requires true;
-      @ ensures ((this == o) || (o instanceof Mapping && o == null && this.from == ((Mapping) o).from && this.to == ((Mapping) o).to) || (o instanceof Mapping && o == null && (this.from == null? (this.from.equals(((Mapping) o).from)) : (o.from == null)) && (this.to == null? (this.to.equals(((Mapping) o).to)) : (o.to == null))))<==>\result;
+      @ ensures ((this == o) || (o instanceof Point3d && o == null && this.x == ((Point3d) o).x && this.y == ((Point3d) o).y && this.z == ((Point3d) o).z) || (o instanceof Point3d && o == null && (x == ((Point3d) o).x) && (y == ((Point3d) o).y) && (z == ((Point3d) o).z)))<==>\result;
       @ ensures hashCode() == o.hashCode() ==> !\result;
       @ ensures o == null ==> !\result;
       @ assignable \strictly_nothing;
@@ -60,8 +65,8 @@ final class Mapping extends Record {
 
     @Override()
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    public final non_null String toString() {
-        return "Mapping[" + "from=" + from + "," + "to=" + to + "]";
+    public final /*@ non_null */ String toString() {
+        return "Point3d[" + "x=" + x + "," + "y=" + y + "," + "z=" + z + "]";
     }
 
     @javax.annotation.processing.Generated()
@@ -77,24 +82,21 @@ final class Mapping extends Record {
     static private boolean $classPrepared;
 
     @javax.annotation.processing.Generated()
-    static public model boolean $staticInv;
+    static public /*@ model */ boolean $staticInv;
 
     @javax.annotation.processing.Generated()
-    static public model boolean $staticInv_free;
+    static public /*@ model */ boolean $staticInv_free;
 
-    public static Mapping $allocate();
+    public static Point3d $allocate();
 
-    public void $init(String from, String to) {
+    public void $init(int x, int y, int z) {
         super.$init();
-        {
-            // compact constructor!
-            from = "abc";
-            to = "def";
-        }
         //Created by RecordClassBuilder.java:132
-        this.from = from;
+        this.x = x;
         //Created by RecordClassBuilder.java:132
-        this.to = to;
+        this.y = y;
+        //Created by RecordClassBuilder.java:132
+        this.z = z;
     }
 
     static private void $clprepare() {
@@ -141,31 +143,35 @@ final class Mapping extends Record {
     protected void $prepare() {
         super.$prepare();
         //Created by PrepareObjectBuilder.java:95
-        this.from = null;
+        this.x = 0;
         //Created by PrepareObjectBuilder.java:95
-        this.to = null;
+        this.y = 0;
+        //Created by PrepareObjectBuilder.java:95
+        this.z = 0;
     }
 
     private void $prepareEnter() {
         super.$prepare();
         //Created by PrepareObjectBuilder.java:95
-        this.from = null;
+        this.x = 0;
         //Created by PrepareObjectBuilder.java:95
-        this.to = null;
+        this.y = 0;
+        //Created by PrepareObjectBuilder.java:95
+        this.z = 0;
     }
 
-    public Mapping $create() {
+    public Point3d $create() {
         //Created by CreateBuilder.java:58
         this.$initialized = false;
         $prepareEnter();
         return this;
     }
 
-    public static Mapping $createObject() {
-        Mapping __NEW__;
+    public static Point3d $createObject() {
+        Point3d __NEW__;
         //Created by CreateObjectBuilder.java:71
-        __NEW__ = Mapping.$allocate();
-        __NEW__.$create()@Mapping
+        __NEW__ = Point3d.$allocate();
+        __NEW__.$create()@Point3d
         return __NEW__;
     }
 }

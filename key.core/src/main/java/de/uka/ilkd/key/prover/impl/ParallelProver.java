@@ -309,7 +309,13 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         fireTaskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Strategy,
             PROCESSING_STRATEGY, -1));
 
-        final ApplyStrategyInfo<Proof, Goal> result = runParallel(goals, perTaskSteps);
+        final ApplyStrategyInfo<Proof, Goal> result;
+        try (var ignored =
+            proof.setRuleAppIndexMode(proof.getActiveStrategy().getRuleAppIndexMode())) {
+            result = runParallel(goals, perTaskSteps);
+        } catch (Exception e) { // should never be reached
+            throw new RuntimeException(e);
+        }
 
         proof.addAutoModeTime(result.getTime());
         fireTaskFinished(new DefaultTaskFinishedInfo(this, result, proof, result.getTime(),

@@ -295,6 +295,11 @@ public class ClassInitializeMethodBuilder extends JavaTransformerAbstract {
      */
     @Override
     public void apply(TypeDeclaration<?> td) {
+        if (td.isAnnotationDeclaration()) {
+            // Annotations cannot be initialized
+            return;
+        }
+
         td.addMember(createInitializeMethod(td));
     }
 }

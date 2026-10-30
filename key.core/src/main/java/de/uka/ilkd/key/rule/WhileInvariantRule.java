@@ -304,7 +304,7 @@ public class WhileInvariantRule implements BuiltInRule {
                 final String pvBeforeLoopName = tb.newName(pv.name() + "Before_LOOP");
                 final LocationVariable pvBeforeLoop =
                     new LocationVariable(new ProgramElementName(pvBeforeLoopName),
-                        pv.getKeYJavaType());
+                        pv.getTypeReference());
                 services.getNamespaces().programVariables().addSafely(pvBeforeLoop);
                 beforeLoopUpdate =
                     tb.parallel(beforeLoopUpdate, tb.elementary(pvBeforeLoop, tb.var(pv)));
@@ -608,7 +608,8 @@ public class WhileInvariantRule implements BuiltInRule {
                 final TermServices services) {
             final TermBuilder tb = services.getTermBuilder();
             final ProgramElementName guardVarName = new ProgramElementName(tb.newName("b"));
-            final LocationVariable guardVar = new LocationVariable(guardVarName, booleanKJT);
+            final LocationVariable guardVar =
+                new LocationVariable(guardVarName, new TypeRef(booleanKJT));
             services.getNamespaces().programVariables().addSafely(guardVar);
             loopRuleApp.setGuard(tb.var(guardVar));
             final VariableSpecification guardVarSpec =

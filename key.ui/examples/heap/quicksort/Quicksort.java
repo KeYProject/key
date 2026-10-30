@@ -72,7 +72,10 @@ class Quicksort {
               @   assert \dl_seqPerm(seq1, seq0) \by auto;
               @   assert \dl_seqPerm(seq2, seq0) \by auto;
               @   auto;
-              @ } */
+              @ }; */
+	    //@ assert (\forall int i; from<=i && i<to; array[i] <= array[i+1]);
+            //@ assert from > 0 ==> (\forall int x; from<=x && x<=to; array[x] > array[from-1]);
+            //@ assert to < array.length-1 ==> (\forall int x; from<=x && x<=to; array[x] <= array[to+1]);
         }
     }
 

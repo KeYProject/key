@@ -1,49 +1,27 @@
 @javax.annotation.processing.Generated("RecordClassBuilder")
-final class Point3d extends Record {
+public final class SimpleRecord extends Record {
 
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    private final int x;
+    private final /*@ nullable */ String name;
 
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    public final int x() {
-        return x;
-    }
-
-    @javax.annotation.processing.Generated("RecordClassBuilder")
-    private final int y;
-
-    @javax.annotation.processing.Generated("RecordClassBuilder")
-    public final int y() {
-        return y;
-    }
-
-    @javax.annotation.processing.Generated("RecordClassBuilder")
-    private final int z;
-
-    @javax.annotation.processing.Generated("RecordClassBuilder")
-    public final int z() {
-        return z;
+    public final /*@ nullable */ String name() {
+        return name;
     }
 
     /*@ public  normal_behavior 
       @ requires true;
-      @ ensures x == this.x && y == this.y && z == this.z;
+      @ ensures name == this.name;
       @ assignable this.*;
 
       @*/
-    @javax.annotation.processing.Generated("RecordClassBuilder")
-    public Point3d(int x, int y, int z) {
-        //Created by RecordClassBuilder.java:132
-        this.x = x;
-        //Created by RecordClassBuilder.java:132
-        this.y = y;
-        //Created by RecordClassBuilder.java:132
-        this.z = z;
+    SimpleRecord(String name) {
+        this.name = name;
     }
 
     /*@ public  normal_behavior 
       @ requires true;
-      @ ensures ((this == o) || (o instanceof Point3d && o == null && this.x == ((Point3d) o).x && this.y == ((Point3d) o).y && this.z == ((Point3d) o).z) || (o instanceof Point3d && o == null && (x == ((Point3d) o).x) && (y == ((Point3d) o).y) && (z == ((Point3d) o).z)))<==>\result;
+      @ ensures ((this == o) || (o instanceof SimpleRecord && o == null && this.name == ((SimpleRecord) o).name) || (o instanceof SimpleRecord && o == null && (this.name == null? (this.name.equals(((SimpleRecord) o).name)) : (o.name == null))))<==>\result;
       @ ensures hashCode() == o.hashCode() ==> !\result;
       @ ensures o == null ==> !\result;
       @ assignable \strictly_nothing;
@@ -65,8 +43,18 @@ final class Point3d extends Record {
 
     @Override()
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    public final non_null String toString() {
-        return "Point3d[" + "x=" + x + "," + "y=" + y + "," + "z=" + z + "]";
+    public final /*@ non_null */ String toString() {
+        return "SimpleRecord[" + "name=" + name + "]";
+    }
+
+    /*@ public  normal_behavior 
+      @ requires true;
+      @ ensures name == this.name;
+      @ assignable this.*;
+
+      @*/
+    SimpleRecord(String name) {
+        this.name = name;
     }
 
     @javax.annotation.processing.Generated()
@@ -82,21 +70,21 @@ final class Point3d extends Record {
     static private boolean $classPrepared;
 
     @javax.annotation.processing.Generated()
-    static public model boolean $staticInv;
+    static public /*@ model */ boolean $staticInv;
 
     @javax.annotation.processing.Generated()
-    static public model boolean $staticInv_free;
+    static public /*@ model */ boolean $staticInv_free;
 
-    public static Point3d $allocate();
+    public static SimpleRecord $allocate();
 
-    public void $init(int x, int y, int z) {
+    void $init(String name) {
         super.$init();
-        //Created by RecordClassBuilder.java:132
-        this.x = x;
-        //Created by RecordClassBuilder.java:132
-        this.y = y;
-        //Created by RecordClassBuilder.java:132
-        this.z = z;
+        this.name = name;
+    }
+
+    void $init(String name) {
+        super.$init();
+        this.name = name;
     }
 
     static private void $clprepare() {
@@ -143,35 +131,27 @@ final class Point3d extends Record {
     protected void $prepare() {
         super.$prepare();
         //Created by PrepareObjectBuilder.java:95
-        this.x = 0;
-        //Created by PrepareObjectBuilder.java:95
-        this.y = 0;
-        //Created by PrepareObjectBuilder.java:95
-        this.z = 0;
+        this.name = null;
     }
 
     private void $prepareEnter() {
         super.$prepare();
         //Created by PrepareObjectBuilder.java:95
-        this.x = 0;
-        //Created by PrepareObjectBuilder.java:95
-        this.y = 0;
-        //Created by PrepareObjectBuilder.java:95
-        this.z = 0;
+        this.name = null;
     }
 
-    public Point3d $create() {
+    public SimpleRecord $create() {
         //Created by CreateBuilder.java:58
         this.$initialized = false;
         $prepareEnter();
         return this;
     }
 
-    public static Point3d $createObject() {
-        Point3d __NEW__;
+    public static SimpleRecord $createObject() {
+        SimpleRecord __NEW__;
         //Created by CreateObjectBuilder.java:71
-        __NEW__ = Point3d.$allocate();
-        __NEW__.$create()@Point3d
+        __NEW__ = SimpleRecord.$allocate();
+        __NEW__.$create()@SimpleRecord
         return __NEW__;
     }
 }

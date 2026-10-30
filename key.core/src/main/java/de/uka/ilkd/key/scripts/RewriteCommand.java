@@ -30,6 +30,7 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+import static org.key_project.prover.indexing.RuleAppIndexMode.INTERACTIVE;
 
 /**
  * This class provides the command <code>rewrite</code>.
@@ -120,7 +121,6 @@ public class RewriteCommand extends AbstractCommand {
         TacletFilter filter = TacletFilter.TRUE;
         Goal g = state.getFirstOpenAutomaticGoal();
         RuleAppIndex index = g.ruleAppIndex();
-        index.autoModeStopped();
 
         ImmutableList<TacletApp> allApps = ImmutableList.nil();
 
@@ -135,7 +135,7 @@ public class RewriteCommand extends AbstractCommand {
                 }
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
-                new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services));
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services, INTERACTIVE));
         }
 
         // filter taclets that are applicable on the given formula in the succedent
@@ -147,7 +147,7 @@ public class RewriteCommand extends AbstractCommand {
                 }
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
-                new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services));
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services, INTERACTIVE));
         }
 
         return allApps;

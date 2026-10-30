@@ -8,6 +8,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.JavaStrategy;
 
+import org.key_project.prover.indexing.RuleAppIndexMode;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -57,6 +58,11 @@ public abstract class FilterStrategy implements JavaStrategy {
     public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             RuleAppCostCollector collector) {
         delegate.instantiateApp(app, pio, goal, collector);
+    }
+
+    @Override
+    public RuleAppIndexMode getRuleAppIndexMode() {
+        return delegate.getRuleAppIndexMode();
     }
 
 }

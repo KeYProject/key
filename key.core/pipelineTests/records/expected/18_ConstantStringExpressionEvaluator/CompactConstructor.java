@@ -1,27 +1,44 @@
 @javax.annotation.processing.Generated("RecordClassBuilder")
-public final class SimpleRecord extends Record {
+final class Mapping extends Record {
 
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    private final nullable String name;
+    private final String from;
 
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    public final nullable String name() {
-        return name;
+    public final String from() {
+        return from;
+    }
+
+    @javax.annotation.processing.Generated("RecordClassBuilder")
+    private final String to;
+
+    @javax.annotation.processing.Generated("RecordClassBuilder")
+    public final String to() {
+        return to;
     }
 
     /*@ public  normal_behavior 
       @ requires true;
-      @ ensures name == this.name;
+      @ ensures from == this.from && to == this.to;
       @ assignable this.*;
 
       @*/
-    SimpleRecord(String name) {
-        this.name = name;
+    @javax.annotation.processing.Generated("RecordClassBuilder")
+    public Mapping(String from, String to) {
+        {
+            // compact constructor!
+            from = "abc";
+            to = "def";
+        }
+        //Created by RecordClassBuilder.java:132
+        this.from = from;
+        //Created by RecordClassBuilder.java:132
+        this.to = to;
     }
 
     /*@ public  normal_behavior 
       @ requires true;
-      @ ensures ((this == o) || (o instanceof SimpleRecord && o == null && this.name == ((SimpleRecord) o).name) || (o instanceof SimpleRecord && o == null && (this.name == null? (this.name.equals(((SimpleRecord) o).name)) : (o.name == null))))<==>\result;
+      @ ensures ((this == o) || (o instanceof Mapping && o == null && this.from == ((Mapping) o).from && this.to == ((Mapping) o).to) || (o instanceof Mapping && o == null && (this.from == null? (this.from.equals(((Mapping) o).from)) : (o.from == null)) && (this.to == null? (this.to.equals(((Mapping) o).to)) : (o.to == null))))<==>\result;
       @ ensures hashCode() == o.hashCode() ==> !\result;
       @ ensures o == null ==> !\result;
       @ assignable \strictly_nothing;
@@ -43,18 +60,8 @@ public final class SimpleRecord extends Record {
 
     @Override()
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    public final non_null String toString() {
-        return "SimpleRecord[" + "name=" + name + "]";
-    }
-
-    /*@ public  normal_behavior 
-      @ requires true;
-      @ ensures name == this.name;
-      @ assignable this.*;
-
-      @*/
-    SimpleRecord(String name) {
-        this.name = name;
+    public final /*@ non_null */ String toString() {
+        return "Mapping[" + "from=" + from + "," + "to=" + to + "]";
     }
 
     @javax.annotation.processing.Generated()
@@ -70,21 +77,24 @@ public final class SimpleRecord extends Record {
     static private boolean $classPrepared;
 
     @javax.annotation.processing.Generated()
-    static public model boolean $staticInv;
+    static public /*@ model */ boolean $staticInv;
 
     @javax.annotation.processing.Generated()
-    static public model boolean $staticInv_free;
+    static public /*@ model */ boolean $staticInv_free;
 
-    public static SimpleRecord $allocate();
+    public static Mapping $allocate();
 
-    void $init(String name) {
+    public void $init(String from, String to) {
         super.$init();
-        this.name = name;
-    }
-
-    void $init(String name) {
-        super.$init();
-        this.name = name;
+        {
+            // compact constructor!
+            from = "abc";
+            to = "def";
+        }
+        //Created by RecordClassBuilder.java:132
+        this.from = from;
+        //Created by RecordClassBuilder.java:132
+        this.to = to;
     }
 
     static private void $clprepare() {
@@ -131,27 +141,31 @@ public final class SimpleRecord extends Record {
     protected void $prepare() {
         super.$prepare();
         //Created by PrepareObjectBuilder.java:95
-        this.name = null;
+        this.from = null;
+        //Created by PrepareObjectBuilder.java:95
+        this.to = null;
     }
 
     private void $prepareEnter() {
         super.$prepare();
         //Created by PrepareObjectBuilder.java:95
-        this.name = null;
+        this.from = null;
+        //Created by PrepareObjectBuilder.java:95
+        this.to = null;
     }
 
-    public SimpleRecord $create() {
+    public Mapping $create() {
         //Created by CreateBuilder.java:58
         this.$initialized = false;
         $prepareEnter();
         return this;
     }
 
-    public static SimpleRecord $createObject() {
-        SimpleRecord __NEW__;
+    public static Mapping $createObject() {
+        Mapping __NEW__;
         //Created by CreateObjectBuilder.java:71
-        __NEW__ = SimpleRecord.$allocate();
-        __NEW__.$create()@SimpleRecord
+        __NEW__ = Mapping.$allocate();
+        __NEW__.$create()@Mapping
         return __NEW__;
     }
 }

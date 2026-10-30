@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
@@ -1215,13 +1216,13 @@ public abstract class TacletApp implements ITacletApp {
         } else if (svSort == ProgramSVSort.VARIABLE) {
             final NewVarcond nvc = (NewVarcond) taclet.varDeclaredNew(sv);
             if (nvc != null) {
-                KeYJavaType kjt;
+                TypeReference typeRef;
                 Object o = nvc.getTypeDefiningObject();
                 if (o instanceof SchemaVariable peerSV) {
                     final TypeConverter tc = services.getTypeConverter();
                     final Object peerInst = instantiations().getInstantiation(peerSV);
                     if (peerInst instanceof TypeReference) {
-                        kjt = ((TypeReference) peerInst).getKeYJavaType();
+                        typeRef = (TypeReference) peerInst;
                     } else {
                         Expression peerInstExpr;
                         if (peerInst instanceof JTerm peerTerm) {
@@ -1229,14 +1230,14 @@ public abstract class TacletApp implements ITacletApp {
                         } else {
                             peerInstExpr = (Expression) peerInst;
                         }
-                        kjt = tc.getKeYJavaType(peerInstExpr,
-                            instantiations().getContextInstantiation().activeStatementContext());
+                        typeRef = new TypeRef(tc.getKeYJavaType(peerInstExpr,
+                            instantiations().getContextInstantiation().activeStatementContext()));
                     }
                 } else {
-                    kjt = (KeYJavaType) o;
+                    typeRef = new TypeRef((KeYJavaType) o);
                 }
-                assert kjt != null : "could not find kjt for: " + o;
-                return new LocationVariable(VariableNamer.parseName(instantiation), kjt);
+                assert typeRef != null : "could not find TypeReference for: " + o;
+                return new LocationVariable(VariableNamer.parseName(instantiation), typeRef);
             }
         }
         return null;

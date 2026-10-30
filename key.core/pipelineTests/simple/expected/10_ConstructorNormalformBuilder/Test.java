@@ -26,23 +26,17 @@ public class Test {
     static private boolean $classPrepared;
 
     @javax.annotation.processing.Generated()
-    static public model boolean $staticInv;
+    static public /*@ model */ boolean $staticInv;
 
     @javax.annotation.processing.Generated()
-    static public model boolean $staticInv_free;
+    static public /*@ model */ boolean $staticInv_free;
 
     public static Test $allocate();
 
     public Test() {
     }
 
-    private void $objectInitializer0() {
-        memberVar = 42;
-    }
-
     public void $init() {
-        super.$init();
-        $objectInitializer0();
         super.$init();
         $objectInitializer0();
     }
@@ -73,23 +67,17 @@ public class SubClass extends Test {
     static private boolean $classPrepared;
 
     @javax.annotation.processing.Generated()
-    static public model boolean $staticInv;
+    static public /*@ model */ boolean $staticInv;
 
     @javax.annotation.processing.Generated()
-    static public model boolean $staticInv_free;
+    static public /*@ model */ boolean $staticInv_free;
 
     public static SubClass $allocate();
 
     public SubClass() {
     }
 
-    private void $objectInitializer0() {
-        memberVar = 41;
-    }
-
     public void $init() {
-        super.$init();
-        $objectInitializer0();
         super.$init();
         $objectInitializer0();
     }

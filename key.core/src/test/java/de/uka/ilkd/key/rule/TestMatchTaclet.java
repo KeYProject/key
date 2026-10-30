@@ -70,7 +70,7 @@ public class TestMatchTaclet {
 
         services = TacletForTests.services();
         LocationVariable i = new LocationVariable(new ProgramElementName("i"),
-            services.getJavaInfo().getKeYJavaType("int"));
+            new TypeRef(services.getJavaInfo().getKeYJavaType("int")));
         services.getNamespaces().programVariables().add(i);
 
         TB = services.getTermBuilder();

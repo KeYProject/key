@@ -1,57 +1,6 @@
-import java.lang.Object;
+public class MostSimpleInner {
 
-public class OuterClass {
-
-    @javax.annotation.processing.Generated("RecordClassBuilder")
-    final class MyRecord extends Record {
-
-        @javax.annotation.processing.Generated("RecordClassBuilder")
-        private final String test;
-
-        @javax.annotation.processing.Generated("RecordClassBuilder")
-        public final String test() {
-            return test;
-        }
-
-        /*@ public  normal_behavior 
-          @ requires true;
-          @ ensures test == this.test;
-          @ assignable this.*;
-
-          @*/
-        @javax.annotation.processing.Generated("RecordClassBuilder")
-        public MyRecord(String test) {
-            //Created by RecordClassBuilder.java:132
-            this.test = test;
-        }
-
-        /*@ public  normal_behavior 
-          @ requires true;
-          @ ensures ((this == o) || (o instanceof MyRecord && o == null && this.test == ((MyRecord) o).test) || (o instanceof MyRecord && o == null && (this.test == null? (this.test.equals(((MyRecord) o).test)) : (o.test == null))))<==>\result;
-          @ ensures hashCode() == o.hashCode() ==> !\result;
-          @ ensures o == null ==> !\result;
-          @ assignable \strictly_nothing;
-
-          @*/
-        @Override()
-        @javax.annotation.processing.Generated("RecordClassBuilder")
-        public final boolean equals(java.lang.Object o);
-
-        /*@ public  normal_behavior 
-          @ ensures true;
-          @ requires true;
-          @ assignable \strictly_nothing;
-
-          @*/
-        @Override()
-        @javax.annotation.processing.Generated("RecordClassBuilder")
-        public final int hashCode();
-
-        @Override()
-        @javax.annotation.processing.Generated("RecordClassBuilder")
-        public final non_null String toString() {
-            return "MyRecord[" + "test=" + test + "]";
-        }
+    public static class MyInnerClass {
 
         @javax.annotation.processing.Generated()
         static private boolean $classInitializationInProgress;
@@ -65,21 +14,19 @@ public class OuterClass {
         @javax.annotation.processing.Generated()
         static private boolean $classPrepared;
 
-        private OuterClass $enclosingThis;
+        @javax.annotation.processing.Generated()
+        static public /*@ model */ boolean $staticInv;
 
         @javax.annotation.processing.Generated()
-        static public model boolean $staticInv;
+        static public /*@ model */ boolean $staticInv_free;
 
-        @javax.annotation.processing.Generated()
-        static public model boolean $staticInv_free;
+        public static MyInnerClass $allocate();
 
-        public static MyRecord $allocate();
+        public MyInnerClass() {
+        }
 
-        public void $init(String test, OuterClass $ENCLOSING_THIS) {
+        public void $init() {
             super.$init();
-            this.$enclosingThis = $ENCLOSING_THIS;
-            //Created by RecordClassBuilder.java:132
-            this.test = test;
         }
 
         static private void $clprepare() {
@@ -98,7 +45,7 @@ public class OuterClass {
                     //Created by ClassInitializeMethodBuilder.java:244
                     @($classInitializationInProgress) = true;
                     try {
-                        @(java.lang.Record.$clinit());
+                        @(java.lang.Object.$clinit());
                     }//Created by ClassInitializeMethodBuilder.java:195
                      catch (java.lang.Error err) {
                         //Created by ClassInitializeMethodBuilder.java:155
@@ -125,32 +72,24 @@ public class OuterClass {
 
         protected void $prepare() {
             super.$prepare();
-            //Created by PrepareObjectBuilder.java:95
-            this.test = null;
-            //Created by PrepareObjectBuilder.java:95
-            this.$enclosingThis = null;
         }
 
         private void $prepareEnter() {
             super.$prepare();
-            //Created by PrepareObjectBuilder.java:95
-            this.test = null;
-            //Created by PrepareObjectBuilder.java:95
-            this.$enclosingThis = null;
         }
 
-        public MyRecord $create() {
+        public MyInnerClass $create() {
             //Created by CreateBuilder.java:58
             this.$initialized = false;
             $prepareEnter();
             return this;
         }
 
-        public static MyRecord $createObject() {
-            MyRecord __NEW__;
+        public static MyInnerClass $createObject() {
+            MyInnerClass __NEW__;
             //Created by CreateObjectBuilder.java:71
-            __NEW__ = MyRecord.$allocate();
-            __NEW__.$create()@MyRecord
+            __NEW__ = MyInnerClass.$allocate();
+            __NEW__.$create()@MyInnerClass
             return __NEW__;
         }
     }
@@ -168,18 +107,17 @@ public class OuterClass {
     static private boolean $classPrepared;
 
     @javax.annotation.processing.Generated()
-    static public model boolean $staticInv;
+    static public /*@ model */ boolean $staticInv;
 
     @javax.annotation.processing.Generated()
-    static public model boolean $staticInv_free;
+    static public /*@ model */ boolean $staticInv_free;
 
-    public static OuterClass $allocate();
+    public static MostSimpleInner $allocate();
 
-    public OuterClass() {
+    public MostSimpleInner() {
     }
 
     public void $init() {
-        super.$init();
         super.$init();
     }
 
@@ -232,18 +170,18 @@ public class OuterClass {
         super.$prepare();
     }
 
-    public OuterClass $create() {
+    public MostSimpleInner $create() {
         //Created by CreateBuilder.java:58
         this.$initialized = false;
         $prepareEnter();
         return this;
     }
 
-    public static OuterClass $createObject() {
-        OuterClass __NEW__;
+    public static MostSimpleInner $createObject() {
+        MostSimpleInner __NEW__;
         //Created by CreateObjectBuilder.java:71
-        __NEW__ = OuterClass.$allocate();
-        __NEW__.$create()@OuterClass
+        __NEW__ = MostSimpleInner.$allocate();
+        __NEW__.$create()@MostSimpleInner
         return __NEW__;
     }
 }

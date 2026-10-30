@@ -5,6 +5,7 @@
 package org.key_project.prover.strategy;
 
 import org.key_project.logic.Named;
+import org.key_project.prover.indexing.RuleAppIndexMode;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
@@ -16,6 +17,11 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
 
+
+
+/**
+ * Generic interface for evaluating the cost of a RuleApp with regard to a specific strategy
+ */
 public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, Feature {
     /**
      * Evaluate the cost of a <code>RuleApp</code>. Starts a new independent computation.
@@ -38,6 +44,19 @@ public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, 
      * @return {@code true} stop, {@code false} continue on other {@link Goal}s.
      */
     boolean isStopAtFirstNonCloseableGoal();
+
+    /**
+     * Returns the mode of the rule app indices (automatic or interactive) required for the
+     * strategy.
+     * Usually (and by default) the index to be used is the automatic index
+     * {@link RuleAppIndexMode#AUTO}. Some strategies/macros require the
+     * interactive index as they apply rules without an attached heuristic.
+     *
+     * @return the mode specifying which index to use
+     */
+    default RuleAppIndexMode getRuleAppIndexMode() {
+        return RuleAppIndexMode.AUTO;
+    }
 
     /**
      * Re-Evaluate a <code>RuleApp</code>. This method is called immediately before a rule is really
