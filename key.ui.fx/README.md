@@ -134,7 +134,7 @@ verification harness sets them via `JAVA_TOOL_OPTIONS`):
 
 | Flag | What it verifies |
 |---|---|
-| `key.fx.verify.extensions` | extension SPI discovery: `discovered=9` (3 built-in + 6 keyext), `statusControls=7`, `westDrawerItems=7` |
+| `key.fx.verify.extensions` | extension SPI discovery: `discovered=18` (12 built-in + 6 keyext) with an exact-set pin (`extMissing`/`extUnexpected` empty), `statusControls` = built-ins + every `StatusLineF` contribution, `westDrawerItems=5+facadeTabs` |
 | `key.fx.verify.drawerlayout` | west drawer round trip (`west = 5 + facade left-panel tabs`) |
 | `key.fx.verify.drawer` | drawer switch/move interactions |
 | `key.fx.verify.menuparity` | menu parity counts (File 16 / Proof 24 / Options 12 / View 7 / About 5) |
@@ -166,11 +166,15 @@ stalls at the `uicontrol` modal (the seam dialog needs an XTEST Return/Escape di
 
 `extension.api.KeYGuiExtensionF` (mirror of the Swing `KeYGuiExtension`) is the JavaFX extension
 contract; capability interfaces: `MainMenuF`, `ToolbarF`, `StatusLineF`, `ContextMenuF`,
-`SettingsF`, `StartupF`, `LeftPanelF`. Providers are discovered by `ServiceLoader` through
-`KeYGuiExtensionFacadeF`.
+`TooltipF`, `TermInfoF`, `KeyboardShortcutsF`, `SettingsF`, `StartupF`, `LeftPanelF`. Providers
+are discovered by `ServiceLoader` through `KeYGuiExtensionFacadeF`.
 
 * Built-in providers in `extension/contrib`: `HeatmapF`, `ParallelProverStatusIndicatorF`,
-  `ProfileNameInStatusBarF`.
+  `ProfileNameInStatusBarF`, `SoundinessExtensionF`, `TestExtensionF`, `JavacExtensionF` (in
+  `plugins/javac`), `ShowHashcodesExtensionF`, `JmlEnabledKeysIndicatorF`, `LogViewExtensionF`,
+  `HeapStatusF`, `KeyboardTacletExtensionF`; plus `OriginTermLabelsExtF` in `originlabels`.
+  Swing's `WDLoadDialogOptionPanel` (LoadOptionPanel) and `DockingLayout` (Startup) remain
+  documented deviations of the FX UI.
 * The six keyext extensions are ported as modules and attached `runtimeOnly`:
   `keyext.caching.fx`, `keyext.exploration.fx`, `keyext.isabelletranslation.fx`,
   `keyext.slicing.fx`, `keyext.ui.testgen.fx`, `keyext.proofmanagement.fx`

@@ -3136,8 +3136,10 @@ public final class MainWindowF {
     /**
      * extension: MP9.0 — headless self test of the FX extension SPI
      * ({@code key.fx.verify.extensions}), run after the demo load like the other
-     * proof-dependent verify hooks. Asserts (a) the facade discovers the built-in extensions
-     * incl. the ported TestExtensionF, (b) the status-line controls of the facade appear in the
+     * proof-dependent verify hooks. Asserts (a) the facade discovers exactly the 18 expected
+     * providers (the 12 built-in key.ui.fx providers incl. the Swing-parity ports of the built-in
+     * key.ui extensions, and the six keyext FX providers; a deviation is reported in
+     * extMissing/extUnexpected), (b) the status-line controls of the facade appear in the
      * built status bar, (c) the Heatmap menu is a separate menu of the built menu bar,
      * (d) the SettingsManagerF registry holds the Heatmap settings provider, (e) the term-menu
      * extension section renders the disabled placeholder when <em>no position</em> is available
@@ -3163,17 +3165,42 @@ public final class MainWindowF {
 
         int discovered = KeYGuiExtensionFacadeF.discoveredCount();
         sb.append("discovered=").append(discovered);
-        // MP9.1-9.6: the six keyext FX modules register further providers, so the count is no
-        // longer fixed at 3 — the assertion is the built-in trio's presence and a sane number
+        // the provider set is pinned exactly: the twelve built-in key.ui.fx providers (the six
+        // pre-existing ones + the six Swing-parity ports of the built-in key.ui extensions) and
+        // the six keyext FX providers (runtimeOnly dependencies) — a provider dropping off the
+        // service file or the runtime classpath is reported in extMissing/extUnexpected
         List<String> classes = KeYGuiExtensionFacadeF.getExtensions().stream()
                 .map(e -> e.getClass().getName()).toList();
-        pass &= discovered >= 3
-                && discovered == classes.size()
-                && classes.contains("de.uka.ilkd.key.gui.fx.extension.contrib.HeatmapF")
-                && classes.contains(
-                    "de.uka.ilkd.key.gui.fx.extension.contrib.ParallelProverStatusIndicatorF")
-                && classes.contains(
-                    "de.uka.ilkd.key.gui.fx.extension.contrib.ProfileNameInStatusBarF");
+        List<String> expectedProviders = List.of(
+            // the built-in key.ui.fx providers
+            "de.uka.ilkd.key.gui.fx.extension.contrib.HeatmapF",
+            "de.uka.ilkd.key.gui.fx.extension.contrib.ParallelProverStatusIndicatorF",
+            "de.uka.ilkd.key.gui.fx.extension.contrib.ProfileNameInStatusBarF",
+            "de.uka.ilkd.key.gui.fx.extension.contrib.SoundinessExtensionF",
+            "de.uka.ilkd.key.gui.fx.extension.contrib.TestExtensionF",
+            "de.uka.ilkd.key.gui.fx.plugins.javac.JavacExtensionF",
+            "de.uka.ilkd.key.gui.fx.extension.contrib.ShowHashcodesExtensionF",
+            "de.uka.ilkd.key.gui.fx.extension.contrib.JmlEnabledKeysIndicatorF",
+            "de.uka.ilkd.key.gui.fx.extension.contrib.LogViewExtensionF",
+            "de.uka.ilkd.key.gui.fx.extension.contrib.HeapStatusF",
+            "de.uka.ilkd.key.gui.fx.originlabels.OriginTermLabelsExtF",
+            "de.uka.ilkd.key.gui.fx.extension.contrib.KeyboardTacletExtensionF",
+            // the keyext FX providers
+            "de.uka.ilkd.key.gui.plugins.caching.fx.CachingExtensionF",
+            "org.key_project.exploration.fx.ExplorationExtensionF",
+            "org.key_project.isabelletranslation.fx.IsabelleTranslationExtensionF",
+            "org.key_project.proofmanagement.fx.ProofManagementExtF",
+            "org.key_project.slicing.fx.SlicingExtensionF",
+            "de.uka.ilkd.key.gui.testgen.fx.TestgenExtensionF");
+        List<String> extMissing = expectedProviders.stream()
+                .filter(c -> !classes.contains(c)).toList();
+        List<String> extUnexpected = classes.stream()
+                .filter(c -> !expectedProviders.contains(c)).toList();
+        sb.append(" extMissing=").append(extMissing);
+        sb.append(" extUnexpected=").append(extUnexpected);
+        pass &= discovered == classes.size()
+                && discovered == expectedProviders.size()
+                && extMissing.isEmpty() && extUnexpected.isEmpty();
 
         List<Control> statusControls = KeYGuiExtensionFacadeF.getStatusLineControls();
         sb.append(" statusControls=").append(statusControls.size());
@@ -4325,9 +4352,9 @@ public final class MainWindowF {
             new SeparatorMenuItem(),
             // docking: named layout slots (Swing DockingLayout, menu path View > Layout)
             dockingLayout.layoutMenu(),
-            // seam: the Swing LogView is opened by a status-line extension button
-            // (ShowLogAction; no FX extension SPI yet), so the FX entry point is a View menu
-            // item (LogViewF.showInstance)
+            // seam: the Swing LogView opens from the status-line extension button
+            // (LogViewExtensionF, StatusLineF); the View-menu entry is the FX-specific second
+            // entry point — both route through the same single-instance LogViewF.showInstance
             menuItem("Log View", "de.uka.ilkd.key.gui.actions.LogViewAction",
                 this::showLogView),
             soundinessItem,

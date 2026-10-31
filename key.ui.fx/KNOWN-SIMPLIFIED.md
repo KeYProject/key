@@ -10,14 +10,14 @@ Marker counts per module:
 
 | Module | Markers |
 |---|---|
-| `key.ui.fx` (contrib extensions + SMT run UI + exit flow + input freeze) | 7 |
+| `key.ui.fx` (contrib extensions + SMT run UI + exit flow + input freeze + built-in extension ports) | 31 |
 | `keyext.caching.fx` | 10 |
 | `keyext.exploration.fx` | 9 |
 | `keyext.isabelletranslation.fx` | 4 |
 | `keyext.slicing.fx` | 16 |
 | `keyext.ui.testgen.fx` | 18 |
 | `keyext.proofmanagement.fx` | 4 |
-| **Total** | **68** |
+| **Total** | **92** |
 
 To re-derive this table at any point: `grep -rn 'KNOWN-SIMPLIFIED' */src/main */src/test`.
 
@@ -54,6 +54,40 @@ the SMT select menu, WP-7); the module-level removal plan for the Swing side is
 | `InformationWindowF.java:24` | counterexample model tree (`CETree`) with line numbers (`TextLineNumber`) and the counterexample help tab | RESOLVED (WP-7): the counterexample tabs are ported — the `CETreeF` model tree (double-click expansion of `#o`/`#l`/`#s` reference leaves, `IGNORECASE_COMPARATOR` rows), the Help tab (`CE_HELP` text) and a simple line-number gutter for the information tabs (FX has no `TextLineNumber`); the window retitles to "Counterexample ..." for the Z3 CE solver with a model (Swing InformationWindow.initModel, :88-101); asserted by `key.fx.verify.testgen` | RESOLVED (WP-7) |
 | `MainWindowF.java:3721` | exit fires the mediator shutdown event (`fireShutDown` → `GUIListener.shutDown`) | RESOLVED (WP-1): `KeYMediatorF` has the GUI-listener registry (`GUIListenerF`, `addGUIListener`/`removeGUIListener`, Swing `KeYMediator.java:306-410`) and the exit flow fires the event (`mediator.fireShutDown(new EventObject(this))`); the Swing listener's window-hiding is the `Platform.exit` of the flow | RESOLVED (WP-1) |
 | `MainWindowF.java:2659` | the glass pane covered the whole content pane and re-delivered events only to components marked `isAutoButton` (automation/stop buttons + status-line abort button) | WONT-REPLICATE (WP-1 decision): the overlay keeps covering only the views area (workspace + drawers). The menu bar/toolbar proof actions are disabled during auto mode anyway (enablement binds to `mediator.autoModeRunningProperty()`), so blocking clicks on inert controls adds no protection; the automation macro items are enabled during auto mode by Swing parity so a click stops the run (MacroAutomationAction.java:48-61) and blocking them would regress that intent; the status bar must stay live for the progress display; and the stop controls the Swing glass pane kept live are the same controls the FX toolbar keeps live | WONT-REPLICATE (WP-1) |
+
+## `key.ui.fx` — built-in extension ports (24)
+
+The six Swing built-in extensions ported as `KeYGuiExtensionF` providers (ShowHashcodes,
+JmlEnabledKeysIndicator, LogView, HeapStatus, OriginTermLabels, KeyboardTaclet); the Swing
+`WDLoadDialogOptionPanel` (LoadOptionPanel) and `DockingLayout` (Startup) remain documented
+deviations of the FX UI.
+
+| Site | Swing original | FX port | Status |
+|---|---|---|---|
+| `extension/contrib/ShowHashcodesExtensionF.java:63` | tooltip is one HTML string (`<b>`/`<br>`, ShowHashcodesExtension.java:36-44) | plain-text lines (JavaFX Tooltip renders no HTML); a non-sequent position without a `PosInOccurrence` is guarded to the empty list where Swing NPEs | WONT-REPLICATE |
+| `extension/contrib/JmlEnabledKeysIndicatorF.java:65` | label constructed in the constructor, `PropertyChangeListener` registered there (JmlEnabledKeysIndicator.java:26-31) | label created lazily inside `getStatusLineControls`, listener registered in the `StartupF.init` hook (providers must instantiate toolkit-free) | — |
+| `LogViewF.java:153` | `ShowLogAction` opens a fresh `JDialog` per click (LogView.java:95-125) | single-instance open: a repeated open raises the existing window; the status-line button (`LogViewExtensionF`) and the View-menu entry share one instance | — |
+| `extension/contrib/LogViewExtensionFTest.java:26` | — (test design) | toolkit-free tests cannot construct the button surface | — |
+| `extension/contrib/HeapStatusF.java:85` | `HeapStatusComponent` constructs its UI eagerly | control created lazily inside `getStatusLineControls` (providers instantiate toolkit-free) | — |
+| `extension/contrib/HeapStatusF.java:180` | Swing `Timer(5000, …)` fires forever | scene-scoped daemon scheduler: the 5 s refresh starts on scene attach and cancels on detach (anti-leak) | — |
+| `extension/contrib/HeapStatusF.java:239` | HTML-table tooltip (HeapStatusExt.java:89-94) | plain multi-line tooltip text | WONT-REPLICATE |
+| `extension/contrib/HeapStatusF.java:294` | "Could not find jconsole…" tooltip on the disabled menu item | disabled item + log message (JavaFX `MenuItem` has no tooltip) | WONT-REPLICATE |
+| `extension/contrib/HeapStatusF.java:320` | `JOptionPane.showConfirmDialog` on a jconsole launch failure | `Alert(ERROR)` + `showAndWait` (the Swing dialog result was never used) | — |
+| `originlabels/OriginTermLabelsExtF.java:79` | new top-level "Origin Tracking" menu (`ToggleTermOriginTrackingAction.java:40`) | the cluster nests under the built-in View menu and absorbs the former direct `OriginLabelsF.install` wiring | — |
+| `originlabels/OriginTermLabelsExtF.java:124` | a live settings property listener drives the "Show origin" enablement | build-time enablement (the FX popup is rebuilt on every show) | — |
+| `originlabels/OriginTermLabelsExtF.java:202` | HTML tooltip strings | plain text with line breaks (the single possibly-empty string shape is kept) | WONT-REPLICATE |
+| `originlabels/OriginLabelsF.java:78` | (Swing: direct wiring, no provider) | single-shot installation guard: the first caller wins, repeated calls (verify-harness menu-bar rebuilds) return empty | — |
+| `originlabels/OriginLabelsF.java:141` | flat "Hide Package Prefix" `CheckboxMenuItem` in the View menu | single-item submenu | — |
+| `originlabels/OriginLabelsF.java:144` | flat cluster with separator at the MP3a position (after Syntax Highlighting) | separator dropped; the facade appends the cluster at the end of the View menu | — |
+| `extension/contrib/KeyboardTacletExtensionF.java:36` | dock-title `CDropDownButton` "Options" with four check-style toggles (KeyboardTacletExtension.java:199-209) | panel-header check boxes (matching the Swing commented sketch :115-119; also `KeyboardTacletPanelF.java:196`) + check-style `DockTitleActionF`s via `getTitleActions()`; the check flavour renders via `DockWorkspace.createTabContextMenu` | — |
+| `extension/contrib/KeyboardTacletExtensionF.java:36` | selection listener registered inside `getPanels` (KeyboardTacletExtension.java:66-71) | listener registered in the `StartupF.init` hook; updates marshalled with `FxUtil.runLater` | — |
+| `extension/contrib/KeyboardTacletExtensionF.java:36` | the Swing tab has no icon | drawer-identity glyph `KEYBOARD_TACLET` (drawer icon convention) | — |
+| `extension/contrib/KeyboardTacletPanelF.java:55` | mouse position observed via `PROP_LAST_MOUSE_POSITION`, getter falls back to a toplevel sequent pos (SequentView.java:349-356) | `hoveredPosProperty()` is null outside the sequent → "no last mouse position" warning + all-taclets fallback (Swing: NPE caught into an empty list) | — |
+| `extension/contrib/KeyboardTacletPanelF.java:55` | key feed delivers typed characters; ESC/backspace are delivered once | control chars skipped in `KEY_TYPED` (JavaFX double-delivers ESC/backspace as pressed+typed) | — |
+| `extension/contrib/KeyboardTacletPanelF.java:199` | look&feel check box insets | cosmetic 8px gap | — |
+| `extension/contrib/KeyboardTacletPanelF.java:207` | MigLayout default gap | cosmetic 4px gap | — |
+| `extension/contrib/KeyboardTacletPanelF.java:301` | `TabPanel` title-action separator after Activate | no separator equivalent in `List<DockTitleActionF>` | — |
+| `extension/contrib/KeyboardTacletPanelF.java:445` | `Services` captured once from the mediator (KeyboardTacletExtension.java:110) | services taken from the current goal's proof on every rebuild (a proof swap cannot leak a stale services instance) | FIXED-UPSTREAM |
 
 ## `keyext.caching.fx` (10)
 
