@@ -515,9 +515,9 @@ public final class KeYGuiExtensionFacadeF {
      * for the given position (Swing {@code KeYGuiExtensionFacade.getTermInfoStrings},
      * KeYGuiExtensionFacade.java:403-406 — a flat map over the {@code KeYGuiExtension.TermInfo}
      * providers; Swing consumes the strings in {@code SequentViewInputListener} for the status
-     * line, SequentViewInputListener.java:244-253). The FX host consumption (the sequent-view
-     * hover seam feeding {@code MainWindowF.setStatusLine}) is pending; this aggregation getter
-     * mirrors the Swing facade so the providers are served once the host wires it.
+     * line, SequentViewInputListener.java:244-253). The FX host consumption is the sequent-view
+     * hover seam: {@code MainWindowF#wireSequentView} listens on the view's hovered position and
+     * feeds the composed info string to {@code MainWindowF#showTermInfoStatusLine}.
      *
      * @param mediator the mediator of the window
      * @param mousePos the position of the term whose info shall be shown

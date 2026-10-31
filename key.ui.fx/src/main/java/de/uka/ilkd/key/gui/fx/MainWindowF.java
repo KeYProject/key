@@ -24,6 +24,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
+import java.util.StringJoiner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -207,6 +208,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
@@ -964,6 +966,12 @@ public final class MainWindowF {
 
     private void wireSequentView() {
         sequentView.attach(selectionModel);
+        // termerminfo (originlabels): the hovered sequent position drives the status line (Swing
+        // SequentViewInputListener.mouseMoved, SequentViewInputListener.java:230-257: the base
+        // operator/sort/hash info, the proof position and the TermInfoF extension strings; the
+        // standard status line returns when the mouse leaves the sequent view)
+        sequentView.hoveredPosProperty().addListener(
+            (obs, oldPos, newPos) -> showTermInfoStatusLine(newPos));
         proofTreeView.attach(selectionModel);
         infoView.attach(selectionModel);
         goalListView.attach(selectionModel);
@@ -2317,6 +2325,42 @@ public final class MainWindowF {
         // MainStatusLine.reset() hides the progress panel)
         hideStatusProgress();
         updateProofStatus();
+    }
+
+    /**
+     * termerminfo (originlabels): shows the info of the hovered sequent position in the status
+     * line (Swing {@code SequentViewInputListener.mouseMoved}, SequentViewInputListener.java:
+     * 230-257): the class name of the operator, the sort and the hash code of the hovered term
+     * (the hash code is displayed "since sometimes terms with equal string representation are
+     * still different"), its position in the proof file format
+     * ({@link ProofSaver#posInOccurrence2Proof}) and the term-info strings contributed by the
+     * {@link KeYGuiExtensionF.TermInfoF} providers, joined with {@code ", "} (Swing
+     * {@code KeYGuiExtensionFacade.getTermInfoStrings}, KeYGuiExtensionFacade.java:403-406).
+     * A null or non-sequent position (or a null selected node) resets to the standard status
+     * line (Swing: {@code info == null} → {@code setStandardStatusLine}).
+     *
+     * @param pos the hovered position, {@code null} when the mouse left the sequent view
+     */
+    private void showTermInfoStatusLine(@Nullable PosInSequent pos) {
+        if (pos == null || pos.getPosInOccurrence() == null || mediator.getSelectedNode() == null) {
+            resetStatusLine();
+            return;
+        }
+        PosInOccurrence posInOcc = pos.getPosInOccurrence();
+        Term t = posInOcc.subTerm();
+        String tOpClassString = t.op().getClass().toString();
+        String operator = tOpClassString.substring(tOpClassString.lastIndexOf('.') + 1);
+        // The hash code is displayed here since sometimes terms with
+        // equal string representation are still different.
+        String info = operator + ", Sort: " + t.sort() + ", Hash:" + t.hashCode();
+
+        info += ProofSaver.posInOccurrence2Proof(mediator.getSelectedNode().sequent(), posInOcc);
+
+        StringJoiner extensionStr = new StringJoiner(", ", ", ", "");
+        extensionStr.setEmptyValue("");
+        KeYGuiExtensionFacadeF.getTermInfoStrings(mediator, pos).forEach(extensionStr::add);
+        info += extensionStr;
+        setStatusLine(info);
     }
 
     /**
@@ -4267,13 +4311,11 @@ public final class MainWindowF {
             // so a single restore entry covers every closable view)
             menuItem("Show Sequent", () -> workspace.select(dockables.get(ID_SEQUENT))),
             prettyPrint, unicode, syntaxHighlighting);
-        // lemmaorigin: begin — term labels + origin tracking view controls (Swing TermLabelMenu /
-        // HidePackagePrefixToggleAction / OriginTermLabelsExt MainMenu items)
-        // menu: MP3a — moved to the Swing position right after Syntax Highlighting
-        // (MainWindow.createViewMenu :1040-1041 appends termLabelMenu and hidePackagePrefix before
-        // the tooltip toggles), so the View menu follows the Swing order
-        view.getItems().addAll(OriginLabelsF.install(this));
-        // lemmaorigin: end
+        // lemmaorigin: the term-labels / origin-tracking View controls (Swing TermLabelMenu /
+        // HidePackagePrefixToggleAction / OriginTermLabelsExt MainMenu items) are contributed
+        // by the OriginTermLabelsExtF SPI provider (MainMenuF, menu path "View"); the facade
+        // appends the cluster after the built-in items (the former direct
+        // OriginLabelsF.install(this) wiring was removed with the SPI port)
         view.getItems().addAll(showSequentViewTooltips, showSourceViewTooltips,
             showProofTreeTooltips,
             new SeparatorMenuItem(),
