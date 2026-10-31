@@ -41,9 +41,12 @@ import org.slf4j.LoggerFactory;
 /**
  * The log viewer of the JavaFX UI — the port of the Swing {@code de.uka.ilkd.key.gui.LogView}
  * (key.ui, 325 lines). It opens a non-modal window that live-tails the current log file with
- * level/message/package filters ({@code ShowLogAction}, {@code LogView.java:88-126}; the Swing
- * status-line extension button has no FX extension SPI yet, so the FX entry point is the View
- * menu).
+ * level/message/package filters ({@code ShowLogAction}, {@code LogView.java:88-126}). The entry
+ * points are the View-menu item (the FX-specific extra wired in {@code MainWindowF}) and the
+ * {@code LogViewExtensionF} status-line button (the port of the Swing
+ * {@code KeYGuiExtension.StatusLine} extension surface, LogView.java:47-52); both open this
+ * window through {@link #showInstance}, which is single-instance so the two entry points share
+ * one view (KNOWN-SIMPLIFIED marker there).
  * <p>
  * Ported behaviors (Swing evidence):
  * <ul>
@@ -72,6 +75,13 @@ public final class LogViewF {
 
     /** the fields of one log record (logback pattern of the Swing UI) */
     private static final int FIELD_COUNT = 7;
+
+    /**
+     * The single open log-view window ({@code null} while closed) — the ownership of the
+     * singleton opened by {@link #showInstance} for the View-menu entry and the
+     * {@code LogViewExtensionF} status-line button.
+     */
+    private static @Nullable Stage openStage;
 
     private final TextArea txtView = new TextArea();
     private final CheckBox chkInfo = new CheckBox("INFO");
@@ -139,10 +149,23 @@ public final class LogViewF {
      * Opens the log view window (non-modal, 800x600, centered on the owner; Swing
      * {@code ShowLogAction.actionPerformed}, {@code LogView.java:88-126}). The file watcher is
      * started on show and stopped when the window closes.
+     * <p>
+     * KNOWN-SIMPLIFIED: single-instance open — the Swing {@code ShowLogAction} creates a fresh
+     * {@code JDialog} on every invocation (LogView.java:95-125), while the FX port keeps one
+     * log-view window: a repeated open from either entry point (the View-menu item or the
+     * {@code LogViewExtensionF} status-line button) raises the already-open window instead of
+     * opening a duplicate, so both open the same view instance.
      *
      * @param owner the owner window, may be null
      */
     public static void showInstance(Window owner) {
+        Stage open = openStage;
+        if (open != null && open.isShowing()) {
+            // KNOWN-SIMPLIFIED (see javadoc): raise the single instance instead of duplicating
+            open.toFront();
+            open.requestFocus();
+            return;
+        }
         LogViewF view = new LogViewF(resolveLogFile());
         Stage stage = new Stage();
         stage.setTitle("Log View");
@@ -150,11 +173,15 @@ public final class LogViewF {
         // pause the refresh while the window is minimized (Swing setPause on iconified)
         stage.iconifiedProperty().addListener((obs, old, iconified) -> view.setPause(iconified));
         stage.setOnCloseRequest(e -> view.dispose());
-        stage.setOnHidden(e -> view.dispose());
+        stage.setOnHidden(e -> {
+            view.dispose();
+            openStage = null;
+        });
         if (owner != null) {
             stage.setX(owner.getX() + 40);
             stage.setY(owner.getY() + 40);
         }
+        openStage = stage;
         stage.show();
         view.onShow();
     }
