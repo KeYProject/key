@@ -511,6 +511,29 @@ public final class KeYGuiExtensionFacadeF {
     }
 
     /**
+     * The term-info strings contributed by every {@link KeYGuiExtensionF.TermInfoF} provider
+     * for the given position (Swing {@code KeYGuiExtensionFacade.getTermInfoStrings},
+     * KeYGuiExtensionFacade.java:403-406 — a flat map over the {@code KeYGuiExtension.TermInfo}
+     * providers; Swing consumes the strings in {@code SequentViewInputListener} for the status
+     * line, SequentViewInputListener.java:244-253). The FX host consumption (the sequent-view
+     * hover seam feeding {@code MainWindowF.setStatusLine}) is pending; this aggregation getter
+     * mirrors the Swing facade so the providers are served once the host wires it.
+     *
+     * @param mediator the mediator of the window
+     * @param mousePos the position of the term whose info shall be shown
+     * @return non-null, emptiable list of strings
+     */
+    public static List<String> getTermInfoStrings(KeYMediatorF mediator, PosInSequent mousePos) {
+        List<String> strings = new ArrayList<>();
+        for (KeYGuiExtensionF extension : contributingExtensions()) {
+            if (extension instanceof KeYGuiExtensionF.TermInfoF termInfo) {
+                strings.addAll(termInfo.getTermInfoStrings(mediator, mousePos));
+            }
+        }
+        return strings;
+    }
+
+    /**
      * Binds the view-scoped shortcuts of every {@link KeYGuiExtensionF.KeyboardShortcutsF}
      * provider into the given view node as key-pressed event filters (P4, D36; Swing
      * {@code installKeyboardShortcuts}, KeYGuiExtensionFacade.java:361-375, which fills the
