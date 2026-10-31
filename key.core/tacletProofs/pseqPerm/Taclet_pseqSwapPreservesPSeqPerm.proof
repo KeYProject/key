@@ -1,12 +1,12 @@
 \profile "Java Profile";
 
-\settings // Proof-Settings-Config-File
-{
+\settings {
     "Choice" : {
         "JavaCard" : "JavaCard:off",
         "Strings" : "Strings:on",
         "assertions" : "assertions:safe",
         "bigint" : "bigint:on",
+        "finalFields" : "finalFields:immutable",
         "floatRules" : "floatRules:strictfpOnly",
         "initialisation" : "initialisation:disableStaticInitialisation",
         "intRules" : "intRules:arithmeticSemanticsIgnoringOF",
@@ -21,19 +21,73 @@
         "reach" : "reach:on",
         "runtimeExceptions" : "runtimeExceptions:ban",
         "sequences" : "sequences:on",
+        "soundDefaultContracts" : "soundDefaultContracts:on",
         "wdChecks" : "wdChecks:off",
         "wdOperator" : "wdOperator:L"
-     }
- }
+    },
+    "Labels" : {
+        "UseOriginLabels" : true
+    },
+    "NewSMT" : {
+        
+    },
+    "SMTSettings" : {
+        "SelectedTaclets" : [
+            
+        ],
+        "UseBuiltUniqueness" : false,
+        "explicitTypeHierarchy" : false,
+        "instantiateHierarchyAssumptions" : true,
+        "integersMaximum" : 2147483645,
+        "integersMinimum" : -2147483645,
+        "invariantForall" : false,
+        "maxGenericSorts" : 2,
+        "useConstantsForBigOrSmallIntegers" : true,
+        "useUninterpretedMultiplication" : true
+    },
+    "Strategy" : {
+        "ActiveStrategy" : "Modular JavaDL Strategy",
+        "MaximumNumberOfAutomaticApplications" : 10000,
+        "Timeout" : -1,
+        "options" : {
+            "AUTO_INDUCTION_OPTIONS_KEY" : "AUTO_INDUCTION_OFF",
+            "BLOCK_OPTIONS_KEY" : "BLOCK_CONTRACT_INTERNAL",
+            "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_FREE",
+            "DEP_OPTIONS_KEY" : "DEP_ON",
+            "HEAP_REDUCTION_OPTIONS_KEY" : "HEAP_REDUCTION_NORMAL",
+            "LOOP_OPTIONS_KEY" : "LOOP_INVARIANT",
+            "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
+            "MPS_OPTIONS_KEY" : "MPS_MERGE",
+            "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_NONE",
+            "OSS_OPTIONS_KEY" : "OSS_ON",
+            "QUANTIFIERS_OPTIONS_KEY" : "QUANTIFIERS_NON_SPLITTING_WITH_PROGS",
+            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_OFF",
+            "QUERY_NEW_OPTIONS_KEY" : "QUERY_RESTRICTED",
+            "SPLITTING_OPTIONS_KEY" : "SPLITTING_DELAYED",
+            "STOPMODE_OPTIONS_KEY" : "STOPMODE_DEFAULT",
+            "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER",
+            "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF",
+            "TRIGGERS_OPTIONS_KEY" : "TRIGGERS_BEST",
+            "USER_TACLETS_OPTIONS_KEY1" : "USER_TACLETS_OFF",
+            "USER_TACLETS_OPTIONS_KEY2" : "USER_TACLETS_OFF",
+            "USER_TACLETS_OPTIONS_KEY3" : "USER_TACLETS_OFF",
+            "VBT_PHASE" : "VBT_SYM_EX"
+        }
+    }
+} 
 
-\proofObligation // Proof-Obligation settings
+
+
+\proofObligation 
+// 
 {
     "class" : "de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput",
-    "name" : "pseqSwapPreservesSeqPerm"
- }
+    "name" : "pseqSwapPreservesPSeqPerm"
+}
 
 \proof {
 (keyLog "0" (keyUser "wolfram" ) (keyVersion "c8b5d84c8b26505e96801636fd7dcce6a7f28f5e"))
+(keyLog "1" (keyUser "daniel" ) (keyVersion "15e747134a8154c2f01109b490eccc80aa46cd4c"))
 
 (autoModeTime "0")
 
@@ -42,22 +96,22 @@
 (rule "andLeft" (formula "1"))
 (rule "andLeft" (formula "1"))
 (rule "andLeft" (formula "1"))
-(rule "seqPermDef" (formula "5") (inst "s=s") (inst "iv=iv") (userinteraction))
+(rule "pseqPermDef" (formula "5") (inst "iv=iv") (inst "s=s") (userinteraction))
 (rule "andRight" (formula "5") (userinteraction))
 (branch "Case 1"
    (rule "eqSymm" (formula "5"))
-   (rule "lenOfSwap" (formula "5") (term "0"))
+   (rule "pseqLenOfSwap" (formula "5") (term "0"))
     (builtin "One Step Simplification" (formula "5"))
    (rule "closeTrue" (formula "5"))
 )
 (branch "Case 2"
-   (rule "exRight" (formula "5") (inst "t=seqDef{int u;}(Z(0(#)),
-               seqLen(f_s),
-               \\if (u = f_x)
-                   \\then (f_y)
-                   \\else (\\if (u = f_y)
-                              \\then (f_x)
-                              \\else (u)))") (userinteraction))
+   (rule "exRight" (formula "5") (inst "t=pseqDef<int>{int u;}(Z(0(#)),
+                     pseqLen<P_E>(f_s),
+                     \\if (u = f_x)
+                         \\then (f_y)
+                         \\else (\\if (u = f_y)
+                                    \\then (f_x)
+                                    \\else (u))):PSeq<int>") (userinteraction))
    (rule "inEqSimp_ltToLeq" (formula "4"))
    (rule "inEqSimp_commuteLeq" (formula "1"))
    (rule "inEqSimp_commuteLeq" (formula "3"))
@@ -76,7 +130,7 @@
    (branch "Case 1"
       (rule "andRight" (formula "5") (userinteraction))
       (branch "Case 1"
-         (rule "lenOfSeqDef" (formula "5") (term "0"))
+         (rule "lenOfPSeqDef" (formula "5") (term "0"))
          (rule "polySimp_elimSub" (formula "5") (term "1,0"))
          (rule "mul_literals" (formula "5") (term "1,1,0"))
          (rule "add_zero_right" (formula "5") (term "1,0"))
@@ -106,24 +160,22 @@
          (rule "closeFalse" (formula "5"))
       )
       (branch "Case 2"
-         (rule "seqNPermDefReplace" (formula "5") (inst "iv=iv") (inst "jv=jv") (userinteraction))
-         (rule "allRight" (formula "5") (inst "sk=iv_0"))
+         (rule "pseqNPermDefReplace" (formula "5") (inst "iv=iv") (inst "jv=jv") (userinteraction))
+         (rule "allRight" (formula "5") (inst "sk=iv_0:int"))
          (rule "impRight" (formula "5"))
          (rule "andLeft" (formula "1"))
-         (rule "getOfSeqDef" (formula "7") (term "0,1,0"))
-         (rule "castDel" (formula "7") (term "2,0,1,0"))
-         (rule "castDel" (formula "7") (term "1,0,1,0"))
+         (rule "getOfPSeqDef" (formula "7") (term "0,1,0"))
          (rule "add_zero_right" (formula "7") (term "0,0,1,0,1,0"))
          (rule "add_zero_right" (formula "7") (term "0,0,2,1,0,1,0"))
          (rule "add_zero_right" (formula "7") (term "2,2,1,0,1,0"))
          (rule "polySimp_elimSub" (formula "7") (term "1,1,0,0,1,0"))
          (rule "times_zero_2" (formula "7") (term "1,1,1,0,0,1,0"))
          (rule "add_zero_right" (formula "7") (term "1,1,0,0,1,0"))
-         (rule "lenOfSeqDef" (formula "7") (term "1,1,0,0"))
+         (rule "lenOfPSeqDef" (formula "7") (term "1,1,0,0"))
          (rule "polySimp_elimSub" (formula "7") (term "1,1,1,0,0"))
          (rule "times_zero_2" (formula "7") (term "1,1,1,1,0,0"))
          (rule "add_zero_right" (formula "7") (term "1,1,1,0,0"))
-         (rule "lenOfSeqDef" (formula "2") (term "1"))
+         (rule "lenOfPSeqDef" (formula "2") (term "1"))
          (rule "polySimp_elimSub" (formula "2") (term "1,1"))
          (rule "mul_literals" (formula "2") (term "1,1,1"))
          (rule "add_zero_right" (formula "2") (term "1,1"))
@@ -328,16 +380,15 @@
       )
    )
    (branch "Case 2"
-      (rule "lenOfSeqDef" (formula "5") (term "1,1,0,0") (userinteraction))
-      (rule "allRight" (formula "5") (inst "sk=iv_0") (userinteraction))
+      (rule "lenOfPSeqDef" (formula "5") (term "1,1,0,0") (userinteraction))
+      (rule "allRight" (formula "5") (inst "sk=iv_0:int") (userinteraction))
       (rule "impRight" (formula "5") (userinteraction))
       (rule "andLeft" (formula "1"))
       (rule "eqSymm" (formula "7"))
       (rule "polySimp_elimSub" (formula "2") (term "1,1"))
       (rule "times_zero_2" (formula "2") (term "1,1,1"))
       (rule "add_zero_right" (formula "2") (term "1,1"))
-      (rule "getOfSeqDef" (formula "7") (term "1,0"))
-      (rule "castDel" (formula "7") (term "1,1,0"))
+      (rule "getOfPSeqDef" (formula "7") (term "1,0"))
       (rule "add_zero_right" (formula "7") (term "0,0,1,1,0"))
       (rule "add_zero_right" (formula "7") (term "2,2,1,1,0"))
       (rule "add_zero_right" (formula "7") (term "0,0,2,1,1,0"))
@@ -365,7 +416,7 @@
       (rule "inEqSimp_sepNegMonomial0" (formula "2") (term "0,0"))
       (rule "polySimp_mulLiterals" (formula "2") (term "0,0,0"))
       (rule "polySimp_elimOne" (formula "2") (term "0,0,0"))
-      (rule "getOfSwap" (formula "7") (term "0"))
+      (rule "pseqGetOfSwap" (formula "7") (term "0"))
       (rule "ifthenelse_negated" (formula "7") (term "0"))
       (rule "inEqSimp_ltToLeq" (formula "7") (term "1,0,0"))
       (rule "polySimp_mulComm0" (formula "7") (term "1,0,0,1,0,0"))
