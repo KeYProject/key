@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.util.PerfScope;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.rules.RuleApp;
@@ -109,7 +110,7 @@ public abstract class FindTacletExecutor extends TacletExecutor {
             final Goal currentGoal = goalIt.next();
             final SequentChangeInfo currentSequent = newSequentsIt.next();
 
-            var timeApply = System.nanoTime();
+            final long timeApply = PerfScope.start();
             applyReplacewith(gt, termLabelState, currentSequent, tacletApp.posInOccurrence(), mc,
                 currentGoal, tacletApp, services);
 
@@ -130,22 +131,22 @@ public abstract class FindTacletExecutor extends TacletExecutor {
             // in the new sequent
             applyAddProgVars(gt.addedProgVars(), currentSequent, currentGoal,
                 tacletApp.posInOccurrence(), services, mc);
-            PERF_APPLY.getAndAdd(System.nanoTime() - timeApply);
+            PerfScope.stop(PERF_APPLY, timeApply);
 
-            var timeTermLabels = System.nanoTime();
+            final long timeMergeLabels = PerfScope.start();
             TermLabelManager.mergeLabels(currentSequent, services);
-            timeTermLabels = System.nanoTime() - timeTermLabels;
+            PerfScope.stop(PERF_TERM_LABELS, timeMergeLabels);
 
-            var timeSetSequent = System.nanoTime();
+            final long timeSetSequent = PerfScope.start();
             currentGoal.setSequent(currentSequent);
-            PERF_SET_SEQUENT.getAndAdd(System.nanoTime() - timeSetSequent);
+            PerfScope.stop(PERF_SET_SEQUENT, timeSetSequent);
 
             currentGoal.setBranchLabel(gt.name());
 
-            timeTermLabels = System.nanoTime() + timeTermLabels;
+            final long timeRefactorLabels = PerfScope.start();
             TermLabelManager.refactorSequent(termLabelState, services, ruleApp.posInOccurrence(),
                 tacletApp.rule(), currentGoal, null, null);
-            PERF_TERM_LABELS.getAndAdd(System.nanoTime() - timeTermLabels);
+            PerfScope.stop(PERF_TERM_LABELS, timeRefactorLabels);
         }
 
         // in case the assumes sequent of the taclet did not

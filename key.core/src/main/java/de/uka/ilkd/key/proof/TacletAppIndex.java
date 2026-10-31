@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.PerfScope;
 
 import org.key_project.prover.proof.rulefilter.AndRuleFilter;
 import org.key_project.prover.proof.rulefilter.RuleFilter;
@@ -141,7 +142,7 @@ public class TacletAppIndex {
     }
 
     private void createAllFromGoal() {
-        var time = System.nanoTime();
+        final long time = PerfScope.start();
         try {
             this.seq = getNode().sequent();
 
@@ -152,7 +153,7 @@ public class TacletAppIndex {
                 new SemisequentTacletAppIndex(getSequent(), false, getServices(), tacletIndex(),
                     newRuleListener, ruleFilter, indexCaches);
         } finally {
-            PERF_CREATE_ALL.getAndAdd(System.nanoTime() - time);
+            PerfScope.stop(PERF_CREATE_ALL, time);
         }
     }
 
@@ -310,9 +311,9 @@ public class TacletAppIndex {
             // we are not up-to-date and have to rebuild everything (lazy)
             clearIndexes();
         } else {
-            var time = System.nanoTime();
+            final long time = PerfScope.start();
             updateIndices(sci);
-            PERF_UPDATE.getAndAdd(System.nanoTime() - time);
+            PerfScope.stop(PERF_UPDATE, time);
         }
     }
 
