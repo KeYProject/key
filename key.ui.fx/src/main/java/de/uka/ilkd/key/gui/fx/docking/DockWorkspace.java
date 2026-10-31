@@ -16,6 +16,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
@@ -413,9 +414,19 @@ public final class DockWorkspace {
     private ContextMenu createTabContextMenu(Dockable dockable) {
         ContextMenu menu = new ContextMenu();
         for (DockTitleActionF action : dockable.getTitleActions()) {
-            MenuItem item = new MenuItem(action.text());
-            item.setOnAction(e -> action.action().run());
-            menu.getItems().add(item);
+            Boolean selected = action.selected();
+            if (selected != null) {
+                // check-style flavour (Swing DockingHelper.createCheckBox, DockingHelper.java:
+                // 188-223): a CheckMenuItem whose state is re-read at every menu build
+                CheckMenuItem check = new CheckMenuItem(action.text());
+                check.setSelected(selected);
+                check.setOnAction(e -> action.action().run());
+                menu.getItems().add(check);
+            } else {
+                MenuItem item = new MenuItem(action.text());
+                item.setOnAction(e -> action.action().run());
+                menu.getItems().add(item);
+            }
         }
         if (!dockable.getTitleActions().isEmpty()) {
             menu.getItems().add(new SeparatorMenuItem());
