@@ -18,6 +18,8 @@ import java.util.regex.Pattern;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Button;
@@ -338,10 +340,35 @@ public class SequentViewF extends BorderPane {
     /** the term range under the mouse, {@code null} when the mouse is over empty space. */
     private Range hoveredRange;
     /**
-     * the term position under the mouse for the Ctrl+C term copy (Swing
-     * {@code CurrentGoalView.getMousePosInSequent()}).
+     * the term position under the mouse as an observable property — the FX counterpart of the
+     * Swing {@code SequentView} property {@code PROP_LAST_MOUSE_POSITION} (SequentView.java:90,
+     * fired by {@code setLastMousePosition}, SequentView.java:693-696), which the Swing
+     * KeyboardTacletPanel observes for its "filter by mouse position" rebuild
+     * (KeyboardTacletExtension.java:143-149). It is {@code null} while the mouse is outside the
+     * view or over empty space.
      */
-    private PosInSequent hoveredPos;
+    private final ObjectProperty<PosInSequent> hoveredPos = new SimpleObjectProperty<>();
+
+    /**
+     * The term position under the mouse as a readable/writable property (Swing
+     * {@code SequentView.PROP_LAST_MOUSE_POSITION}, SequentView.java:90, with the getter
+     * {@code SequentView.getLastPosInSequent}, SequentView.java:349-356).
+     */
+    public ObjectProperty<PosInSequent> hoveredPosProperty() {
+        return hoveredPos;
+    }
+
+    /**
+     * @return the term position currently under the mouse, or {@code null} when the mouse is
+     *         outside the view or over empty space (Swing counterpart
+     *         {@code SequentView.getLastPosInSequent}, SequentView.java:349-356, which returns a
+     *         toplevel {@code PosInSequent.createSequentPos()} position instead when the mouse
+     *         was outside)
+     */
+    public @Nullable PosInSequent getHoveredPos() {
+        return hoveredPos.get();
+    }
+
     // termmenu: left-click term menu (Swing SequentViewListener)
     /**
      * termmenu: the delay after closing a popup menu before another menu may be opened (Swing
@@ -625,7 +652,8 @@ public class SequentViewF extends BorderPane {
      * a term.
      */
     private void copyHoveredTermToClipboard() {
-        PosInOccurrence occ = hoveredPos == null ? null : hoveredPos.getPosInOccurrence();
+        PosInSequent hovered = hoveredPos.get();
+        PosInOccurrence occ = hovered == null ? null : hovered.getPosInOccurrence();
         if (occ != null && occ.subTerm() != null) {
             ClipboardContent content = new ClipboardContent();
             content.putString(occ.subTerm().toString().replace('\u00A0', ' '));
@@ -1455,9 +1483,9 @@ public class SequentViewF extends BorderPane {
         if (prefillPos == null) {
             return "FAIL - no single-line term position for the search prefill test";
         }
-        PosInSequent savedHovered = hoveredPos;
+        PosInSequent savedHovered = hoveredPos.get();
         boolean savedRegex = regexToggle.isSelected();
-        hoveredPos = prefillPos;
+        hoveredPos.set(prefillPos);
         String expected = getHighlightedText(prefillPos);
         showSearchBar();
         if (!expected.equals(searchField.getText())) {
@@ -1467,7 +1495,7 @@ public class SequentViewF extends BorderPane {
         regexToggle.setSelected(true);
         // the reprint of the first search invalidated the hover state (printSequent →
         // clearHover, the Swing setText behaviour) — re-arm the hover for the escape check
-        hoveredPos = prefillPos;
+        hoveredPos.set(prefillPos);
         showSearchBar();
         String escaped = expected.replaceAll("[-\\[\\]{}()*+?.,\\\\^$|#s]", "\\\\$0");
         if (!escaped.equals(searchField.getText())) {
@@ -1475,7 +1503,7 @@ public class SequentViewF extends BorderPane {
                 + searchField.getText() + "'");
         }
         regexToggle.setSelected(savedRegex);
-        hoveredPos = savedHovered;
+        hoveredPos.set(savedHovered);
         hideSearchBar();
         if (!failures.isEmpty()) {
             return "FAIL - " + String.join("; ", failures);
@@ -1606,7 +1634,7 @@ public class SequentViewF extends BorderPane {
             hoveredRange = hover;
             rebuildHoverOverlay();
         }
-        hoveredPos = pos;
+        hoveredPos.set(pos);
         updateHoverTooltip(event, pos);
     }
 
@@ -1620,7 +1648,7 @@ public class SequentViewF extends BorderPane {
 
     /** Clears the hovered term range and hides the tooltip. */
     private void clearHover() {
-        hoveredPos = null;
+        hoveredPos.set(null);
         if (hoveredRange != null) {
             hoveredRange = null;
             rebuildHoverOverlay();
@@ -2207,8 +2235,9 @@ public class SequentViewF extends BorderPane {
         // searchFor(view.getHighlightedText()) with the mouse position's term, escaped when the
         // RegExp toggle is active, SequentViewSearchBar.searchFor:220-230); a no-op when the
         // mouse is not over a term (the previously entered query is kept)
-        if (hoveredPos != null) {
-            String prefill = getHighlightedText(hoveredPos);
+        PosInSequent hovered = hoveredPos.get();
+        if (hovered != null) {
+            String prefill = getHighlightedText(hovered);
             if (regexToggle.isSelected()) {
                 prefill = prefill.replaceAll("[-\\[\\]{}()*+?.,\\\\^$|#s]", "\\\\$0");
             }

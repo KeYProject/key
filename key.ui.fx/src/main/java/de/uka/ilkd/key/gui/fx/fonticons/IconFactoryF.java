@@ -85,6 +85,10 @@ public final class IconFactoryF {
         SEARCH_REGROUP(FontAwesomeSolid.VIDEO),
         HEATMAP(FontAwesomeSolid.SHOE_PRINTS),
         PROOF_CACHING(FontAwesomeSolid.DATABASE),
+        // keyboard-taclet: the tab graphic of the KeyboardTacletExtensionF "Active Taclets" west
+        // drawer item (the Swing TabPanel has no tab icon, KeyboardTacletExtension.java:259-262;
+        // the keyboard glyph follows the drawer-identity convention of the icons above)
+        KEYBOARD_TACLET(FontAwesomeSolid.KEYBOARD),
         // WP-2 (proof-tree renderer surface, Swing ProofTreeView renderLeaf/renderNonLeaf):
         // the goal-state and marker icons of the tree cells
         GOAL_CLOSED(FontAwesomeSolid.CHECK),
