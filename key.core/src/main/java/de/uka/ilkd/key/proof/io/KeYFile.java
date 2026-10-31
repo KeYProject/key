@@ -22,7 +22,6 @@ import de.uka.ilkd.key.nparser.builder.ProblemFinder;
 import de.uka.ilkd.key.nparser.builder.TacletPBuilder;
 import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -375,12 +374,13 @@ public class KeYFile implements EnvInput {
      * @return list of parser warnings
      */
     public ImmutableSet<PositionedString> readContracts() {
-        SpecificationRepository specRepos = initConfig.getServices().getSpecificationRepository();
         ContractsAndInvariantsFinder cinvs =
             new ContractsAndInvariantsFinder(initConfig.getServices(), initConfig.namespaces());
         getParseContext().accept(cinvs);
-        specRepos.addContracts(Immutables.createSetFrom(cinvs.getContracts()));
-        specRepos.addClassInvariants(Immutables.createSetFrom(cinvs.getInvariants()));
+        initConfig.getServices().getContractRegistry()
+                .addContracts(Immutables.createSetFrom(cinvs.getContracts()));
+        initConfig.getServices().getClassAxiomComputer()
+                .addClassInvariants(Immutables.createSetFrom(cinvs.getInvariants()));
 
         return DefaultImmutableSet.nil();
     }

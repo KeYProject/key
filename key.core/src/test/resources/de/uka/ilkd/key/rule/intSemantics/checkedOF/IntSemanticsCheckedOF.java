@@ -1,5 +1,5 @@
-/*@ code_safe_math @*/        // this is ignored by KeY currently, just for documentation
-/*@ spec_bigint_math @*/      // this is the default
+// (former `/*@ code_safe_math @*/` and `/*@ spec_bigint_math @*/` class-level pragmas
+//  removed: not accepted by JMLtk; the int semantics are set via the .key settings)
 class IntSemanticsCheckedOF {
 
     // provable with overflow check taclet option, since no overflow can occur with this precondition

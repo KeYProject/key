@@ -19,7 +19,6 @@ import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
-import org.jspecify.annotations.Nullable;
 
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
 import static de.uka.ilkd.key.java.transformations.AstFactory.assign;
@@ -82,27 +81,6 @@ public class RecordClassBuilder extends JavaTransformerAbstract {
 
         var generated =
             createEquals(recordDeclaration, clazz) && createHashCode(recordDeclaration, clazz);
-
-        if (generated && false) { // weigl: disabled, further discussion required.
-            services.attachTypeSpec(clazz,
-                equalFieldsEqualRecords(recordDeclaration));
-
-            services.attachTypeSpec(clazz,
-                "public static invariant_free (\\forall %s a; a.equals(a));"
-                        .formatted(recordDeclaration.getNameAsString()));
-
-            services.attachTypeSpec(clazz,
-                "public static invariant_free (\\forall %s a,b; a.equals(b); b.equals(a));"
-                        .formatted(recordDeclaration.getNameAsString()));
-
-            services.attachTypeSpec(clazz,
-                "public static invariant_free (\\forall %s a,b,c; a.equals(b) && b.equals(c); a.equals(c));"
-                        .formatted(recordDeclaration.getNameAsString()));
-
-            services.attachTypeSpec(clazz,
-                "public static invariant_free (\\forall %s a,b; a.equals(b); a.hashCode() == b.hashCode());"
-                        .formatted(recordDeclaration.getNameAsString()));
-        }
 
         createToString(recordDeclaration, clazz);
 
@@ -280,21 +258,6 @@ public class RecordClassBuilder extends JavaTransformerAbstract {
             addGenerated(equals);
         }
         return hasNoEquals;
-    }
-
-    private static @Nullable String equalFieldsEqualRecords(RecordDeclaration recordDeclaration) {
-        if (recordDeclaration.getParameters().isEmpty()) {
-            return null;
-        }
-
-        var identityOfFields = recordDeclaration.getParameters().stream()
-                .map(Parameter::getNameAsString)
-                .map(it -> "a.%s == b.%s".formatted(it, it))
-                .collect(Collectors.joining(" && "));
-
-        return "public invariant_free (\\forall %s a,b; %s; a.equals(b));".formatted(
-            recordDeclaration.getNameAsString(),
-            identityOfFields);
     }
 
     private Expression callObjects(String method, Expression... exprs) {

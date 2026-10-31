@@ -42,11 +42,11 @@ public class ReattachLoopInvariant extends ProgramTransformer {
 
             final LoopStatement loop = (LoopStatement) activeStmt;
 
-            LoopSpecification li = services.getSpecificationRepository().getLoopSpec(loop);
+            LoopSpecification li = loop.getLoopInvariant();
 
             if (li != null) {
                 li = li.setLoop((While) pe);
-                services.getSpecificationRepository().addLoopInvariant(li);
+                ((While) pe).setLoopInvariant(li);
             }
         }
 

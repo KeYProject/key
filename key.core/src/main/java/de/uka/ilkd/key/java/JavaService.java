@@ -287,12 +287,55 @@ public class JavaService {
             throw new UnsupportedOperationException("Parser returned null value and no errors");
         }
 
-        var errors = new ArrayList<BuildingIssue>(result.getProblems().size());
-        for (Problem problem : result.getProblems()) {
+        List<Problem> problems = result.getProblems();
+        if (problems.stream().anyMatch(JavaService::isJmltkMethodLevelGap)) {
+            // JMLtk reports hard problems for method level JML comments its grammar cannot
+            // parse (KeY extension statements like merge points, proof scripts, obtain
+            // clauses, ...). The JMLTransformer re-parses exactly those leftovers with KeY's
+            // own JML grammar, so they do not constitute errors here.
+            problems = problems.stream()
+                    .filter(p -> !isJmltkMethodLevelGap(p) && !isJmltkInternalParseProblem(p))
+                    .toList();
+            if (problems.isEmpty() && result.getResult().isPresent()) {
+                if (result.getResult().get() instanceof CompilationUnit cu
+                        && !cu.containsData(Node.SYMBOL_RESOLVER_KEY)) {
+                    // The JavaParser's symbol resolver post-processor only runs on successful
+                    // parses; the tolerated leftover problems above suppressed it. Re-inject the
+                    // resolver so that later resolution requests (e.g. ImplicitFieldAdder) work.
+                    getSymbolResolver().inject(cu);
+                }
+                return result.getResult().get();
+            }
+        }
+
+        var errors = new ArrayList<BuildingIssue>(problems.size());
+        for (Problem problem : problems) {
             errors.add(buildingIssueFromProblem(source, problem));
         }
 
         throw new BuildingExceptions(errors);
+    }
+
+    /**
+     * The problem JMLtk reports for a method level JML comment that its own grammar could not
+     * parse at all (message prefix "Could not handle the JML comment.", see
+     * {@code JmlProcessor.handleJmlStatementLevel}). The comment group stays in the AST as a
+     * {@code JmlDocStmt} leftover that the {@code JMLTransformer} re-parses with KeY's grammar.
+     */
+    private static boolean isJmltkMethodLevelGap(Problem problem) {
+        return problem.getMessage().startsWith("Could not handle the JML comment.");
+    }
+
+    /**
+     * The ANTLR syntax error problems that accompany a {@link #isJmltkMethodLevelGap} gap: they
+     * stem from JMLtk's internal re-parse of the sanitized comment text (hence without a
+     * location in the source file) and are only tolerated when such a gap was reported. Problems
+     * with a proper source location are kept, as are internal re-parse problems of class level
+     * JML (which do not go through the method level gap reporting).
+     */
+    private static boolean isJmltkInternalParseProblem(Problem problem) {
+        return problem.getLocation().isEmpty()
+                && problem.getMessage().startsWith("Encountered unexpected token");
     }
 
     private ParseResult<CompilationUnit> parseCompilationUnit(Path filename,

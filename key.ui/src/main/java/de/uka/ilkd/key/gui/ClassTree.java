@@ -149,7 +149,7 @@ public class ClassTree extends JTree {
         // add all contract targets of kjt
         if (addContractTargets) {
             final ImmutableSet<IObserverFunction> targets =
-                services.getSpecificationRepository().getContractTargets(kjt);
+                services.getContractRegistry().getContractTargets(kjt);
 
             // sort targets alphabetically
             final IObserverFunction[] targetsArr =

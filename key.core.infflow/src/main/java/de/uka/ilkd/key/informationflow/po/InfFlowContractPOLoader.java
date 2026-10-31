@@ -33,7 +33,7 @@ public class InfFlowContractPOLoader implements ProofObligationLoader {
             Configuration properties) {
         final String contractName = properties.getString("contract");
         final Contract contract =
-            initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
+            initConfig.getServices().getContractRegistry().getContractByName(contractName);
         if (contract == null) {
             throw new RuntimeException("Contract not found: " + contractName);
         } else {
