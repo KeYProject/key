@@ -233,6 +233,40 @@ public interface KeYGuiExtensionF {
     }
 
     /**
+     * Term-info extension: contributes the term information strings that the host shows in the
+     * status line while the mouse moves over the sequent view (Swing
+     * {@code KeYGuiExtension.TermInfo} of the Swing module {@code key.ui} — "Extension interface
+     * for the term info string in the status line", KeYGuiExtension.java:250-268). Swing
+     * consumes the strings in {@code SequentViewInputListener} (SequentViewInputListener.java:
+     * 244-253): the strings of every provider are joined (", "-separated) and appended to the
+     * status-line text shown through {@code MainWindow.setStatusLine} — the mirrors of the
+     * {@code @see} references of the Swing original
+     * ({@code de.uka.ilkd.key.gui.nodeviews.SequentViewInputListener},
+     * {@code MainWindow#setStatusLine(String)}). The FX host consumption (the sequent-view
+     * hover seam feeding {@link MainWindowF#setStatusLine(String)}) is pending; the aggregation
+     * getter {@link de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF#getTermInfoStrings}
+     * is already in place, so the providers are served once the host wires it.
+     *
+     * @param mediator the mediator of the window
+     * @param pos the position of the term whose info shall be shown
+     * @return non-null, emptiable list of strings
+     */
+    interface TermInfoF {
+        List<String> getTermInfoStrings(KeYMediatorF mediator, PosInSequent pos);
+
+        /**
+         * The priority of this provider's term labels (Swing
+         * {@code KeYGuiExtension.TermInfo.getTermLabelPriority}, KeYGuiExtension.java:265-267);
+         * the baseline zero is the Swing default.
+         *
+         * @return the priority
+         */
+        default int getTermLabelPriority() {
+            return 0;
+        }
+    }
+
+    /**
      * Keyboard-shortcut extension: contributes additional shortcuts bound to a host view
      * (Swing {@code KeYGuiExtension.KeyboardShortcuts}, KeYGuiExtension.java:234-248, bound
      * into the Swing input maps by {@code KeYGuiExtensionFacade.installKeyboardShortcuts} for

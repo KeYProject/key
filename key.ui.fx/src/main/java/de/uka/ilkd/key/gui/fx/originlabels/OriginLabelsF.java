@@ -19,7 +19,6 @@ import de.uka.ilkd.key.core.fx.KeYSelectionListener;
 import de.uka.ilkd.key.core.fx.KeYSelectionModel;
 import de.uka.ilkd.key.gui.fx.MainWindowF;
 import de.uka.ilkd.key.gui.fx.actions.QuickSaveF;
-import de.uka.ilkd.key.gui.fx.fonticons.IconFactoryF;
 import de.uka.ilkd.key.gui.fx.nodeinfo.NodeInfoVisualizerF;
 import de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF;
 import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF;
@@ -27,6 +26,7 @@ import de.uka.ilkd.key.gui.fx.notification.NotificationManagerF.Kind;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -46,19 +46,27 @@ import org.slf4j.LoggerFactory;
  * {@link TermLabelMenuF},</li>
  * <li>{@code de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction} (View menu "Hide Package
  * Prefix"),</li>
- * <li>the "Origin Tracking" main-menu contributions of
+ * <li>the "Origin Tracking" main-menu contribution of
  * {@code de.uka.ilkd.key.gui.originlabels.OriginTermLabelsExt} (the extension's MainMenu kind):
- * "Toggle Term Origin Tracking" and "Show origin" (the latter arrives with the
- * {@code OriginTermLabelVisualizerF} window, see the originlabels package).</li>
+ * "Toggle Term Origin Tracking" (the Swing "Highlight Origins" second toggle is not ported,
+ * see the deviations below).</li>
  * </ul>
- * This class assembles the corresponding items for the FX View menu ({@link #install}) and
- * provides the development self test ({@link #verify}, {@code key.fx.verify.lemmaorigin}).
+ * This class assembles the corresponding items ({@link #install} — the legacy direct wiring of
+ * the FX View menu, {@code MainWindowF#buildViewMenu} line 4275 — and {@link #extensionMenus},
+ * the SPI-servable variant served by the provider {@code OriginTermLabelsExtF}) and provides the
+ * development self test ({@link #verify}, {@code key.fx.verify.lemmaorigin}).
+ * <p>
+ * The cluster is served through the extension SPI now: {@code OriginTermLabelsExtF}
+ * (MainMenuF, {@code getMenuPath() == "View"}) contributes the menus built here, so the
+ * host's direct {@code OriginLabelsF.install(this)} call is superseded and will be removed by
+ * the host edit. Both entry points share the single-shot installation {@link #installOnce}.
  * <p>
  * Deviations from Swing:
  * <ul>
- * <li>The FX sequent view has no term context menu yet, so "Show Origin" is a View menu item
- * instead of a context-menu action (Swing {@code ShowOriginAction} is a context-menu
- * contribution).</li>
+ * <li>"Show Origin" is a sequent context-menu contribution again (Swing parity, the Swing
+ * {@code ShowOriginAction} is a SEQUENT_VIEW context action served by
+ * {@code OriginTermLabelsExtF.ContextMenuF}); the View-menu placement of this port was the
+ * stopgap for the then-missing FX sequent context menu and is resolved.</li>
  * <li>"Toggle Term Origin Tracking" reloads via quick save + quick load
  * ({@code QuickSaveF}, the FX counterpart of Swing {@code QuickSaveAction/QuickLoadAction} used
  * by Swing's {@code ToggleTermOriginTrackingAction}). The setting is flipped <em>before</em> the
@@ -67,14 +75,32 @@ import org.slf4j.LoggerFactory;
  * <li>The "Highlight Origins" toggle is not ported: it gates the sequent→source-view origin
  * highlight ({@code SequentViewInputListener.highlightOriginInSourceView}), which has no FX
  * counterpart yet (SourceViewF lacks the highlight API).</li>
+ * <li>KNOWN-SIMPLIFIED: the installation is single-shot ({@link #installOnce}) — the first
+ * caller (the legacy View-menu wiring coexisting with the SPI provider until the host edit,
+ * then the provider alone) builds the items and wires the sequent view; repeated calls return
+ * an empty list, so menu-bar rebuilds (the verify harness) do not duplicate the cluster.</li>
  * </ul>
  */
 public final class OriginLabelsF {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OriginLabelsF.class);
 
-    /** the installed term labels submenu (for the self test), set by {@link #install}. */
+    /**
+     * the single-shot installation guard of {@link #installOnce}: the menu items and the
+     * sequent-view/selection wiring are created exactly once, shared by {@link #install} (the
+     * legacy direct View-menu wiring) and {@link #extensionMenus} (the SPI-served variant);
+     * whichever runs first wins, repeated calls return an empty list.
+     */
+    private static boolean installed;
+
+    /** the installed term labels submenu (for the self test), set by {@link #installOnce}. */
     private static TermLabelMenuF termLabelMenu;
+
+    /** the installed "Hide Package Prefix" check item, set by {@link #installOnce}. */
+    private static CheckMenuItem hidePackagePrefixItem;
+
+    /** the installed "Origin Tracking" submenu, set by {@link #installOnce}. */
+    private static Menu originTrackingMenu;
 
     private OriginLabelsF() {
     }
@@ -84,11 +110,69 @@ public final class OriginLabelsF {
      * "Origin Tracking" extension menu): the term labels submenu, the package-prefix toggle and
      * the origin-tracking submenu. Also installs the term label visibility into the sequent view
      * and observes the selection to rebuild the label items per proof.
+     * <p>
+     * This is the legacy direct wiring ({@code MainWindowF#buildViewMenu} line 4275); the
+     * SPI provider {@code OriginTermLabelsExtF} serves the same cluster through
+     * {@link #extensionMenus}, so this call is superseded and will be removed by the host edit.
      *
      * @param mainWindow the FX main window
-     * @return the items to append to the View menu
+     * @return the items to append to the View menu; empty when this class already installed its
+     *         cluster (single-shot {@link #installOnce})
      */
     public static List<MenuItem> install(MainWindowF mainWindow) {
+        if (!installOnce(mainWindow)) {
+            return List.of();
+        }
+        List<MenuItem> items = new ArrayList<>();
+        items.add(termLabelMenu);
+        items.add(hidePackagePrefixItem);
+        items.add(new SeparatorMenuItem());
+        items.add(originTrackingMenu);
+        return items;
+    }
+
+    /**
+     * The SPI-servable variant of {@link #install} for {@code OriginTermLabelsExtF.MainMenuF}:
+     * the same cluster shaped as {@link Menu} objects — the facade splices the contributed
+     * menus into the built-in View menu matched by the provider's {@code getMenuPath()}.
+     * Deviations from the flat {@link #install} shape (the JavaFX SPI contributes whole menus
+     * only):
+     * <ul>
+     * <li>KNOWN-SIMPLIFIED: the flat "Hide Package Prefix" check item becomes a single-item
+     * submenu of the same name — a JavaFX {@link CheckMenuItem} cannot be contributed through
+     * the menu-only MainMenuF surface.</li>
+     * <li>KNOWN-SIMPLIFIED: the flat separator of the View-menu cluster is dropped (the
+     * contributed menus are visually separated as menus), and the cluster lands at the end of
+     * the View menu instead of right after "Syntax Highlighting" (the facade appends provider
+     * menus after the built-in items; the MP3a Swing order applies to the legacy wiring).</li>
+     * </ul>
+     *
+     * @param mainWindow the FX main window
+     * @return the menus to contribute under the View menu; empty when this class already
+     *         installed its cluster (single-shot {@link #installOnce})
+     */
+    public static List<Menu> extensionMenus(MainWindowF mainWindow) {
+        if (!installOnce(mainWindow)) {
+            return List.of();
+        }
+        Menu hidePackagePrefixMenu = new Menu("Hide Package Prefix");
+        hidePackagePrefixMenu.getItems().add(hidePackagePrefixItem);
+        return List.of(termLabelMenu, hidePackagePrefixMenu, originTrackingMenu);
+    }
+
+    /**
+     * The shared single-shot installation: the term label visibility wiring (sequent view +
+     * selection listeners) and the three cluster items. Only the first caller performs it;
+     * later callers get {@code false} and contribute nothing.
+     *
+     * @return {@code true} if this call performed the installation
+     */
+    private static boolean installOnce(MainWindowF mainWindow) {
+        if (installed) {
+            return false;
+        }
+        installed = true;
+
         SequentViewF sequentView = mainWindow.getSequentView();
 
         // the sequent view prints through the shared visibility manager (Swing:
@@ -119,12 +203,9 @@ public final class OriginLabelsF {
         termLabelMenu.rebuildMenu(selectionModel.getSelectedProof());
         termLabelMenu.applyStyles(selectionModel.getSelectedNode());
 
-        List<MenuItem> items = new ArrayList<>();
-        items.add(termLabelMenu);
-        items.add(createHidePackagePrefixItem(mainWindow));
-        items.add(new SeparatorMenuItem());
-        items.add(createOriginTrackingMenu(mainWindow));
-        return items;
+        hidePackagePrefixItem = createHidePackagePrefixItem(mainWindow);
+        originTrackingMenu = createOriginTrackingMenu(mainWindow);
+        return true;
     }
 
     /**
@@ -132,7 +213,7 @@ public final class OriginLabelsF {
      * {@code NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX} (before the setting, like Swing, because
      * the printer construction reads the static) and the ViewSettings value, then re-prints.
      */
-    private static MenuItem createHidePackagePrefixItem(MainWindowF mainWindow) {
+    private static CheckMenuItem createHidePackagePrefixItem(MainWindowF mainWindow) {
         CheckMenuItem item = new CheckMenuItem("Hide Package Prefix");
         boolean hide = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                 .isHidePackagePrefix();
@@ -150,13 +231,15 @@ public final class OriginLabelsF {
     }
 
     /**
-     * The "Origin Tracking" submenu (Swing {@code OriginTermLabelsExt.getMainMenuActions}):
-     * "Toggle Term Origin Tracking" with the Swing reload dialog and "Show Origin", which opens
-     * the {@link OriginTermLabelVisualizerF} window for the last clicked term (in Swing the
-     * action is a sequent context-menu contribution; the FX sequent view has no context menu
-     * yet, so the item lives here).
+     * The "Origin Tracking" submenu (Swing {@code OriginTermLabelsExt.getMainMenuActions},
+     * OriginTermLabelsExt.java:63-69): "Toggle Term Origin Tracking" with the Swing reload
+     * dialog. Swing's second MainMenu action "Highlight Origins" is not ported (see the class
+     * javadoc); "Show Origin" is a Swing sequent context-menu contribution (ShowOriginAction,
+     * SEQUENT_VIEW kind) and is served by {@code OriginTermLabelsExtF.ContextMenuF} — the
+     * View-menu item of this port was the stopgap for the then-missing FX sequent context menu
+     * and is resolved.
      */
-    private static MenuItem createOriginTrackingMenu(MainWindowF mainWindow) {
+    private static Menu createOriginTrackingMenu(MainWindowF mainWindow) {
         Menu menu = new Menu("Origin Tracking");
 
         CheckMenuItem tracking = new CheckMenuItem("Toggle Term Origin Tracking");
@@ -164,33 +247,23 @@ public final class OriginLabelsF {
             ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels());
         tracking.setOnAction(e -> toggleTermOriginTracking(mainWindow, tracking));
         menu.getItems().add(tracking);
-
-        MenuItem showOrigin =
-            menuItem("Show Origin", mainWindow, IconFactoryF.Key.INFO_VIEW,
-                () -> showOrigin(mainWindow));
-        menu.getItems().add(showOrigin);
         return menu;
     }
 
-    /** Helper building a plain menu item (JavaFX MenuItem has no tooltip API). */
-    private static MenuItem menuItem(String text, MainWindowF mainWindow, IconFactoryF.Key icon,
-            Runnable action) {
-        javafx.scene.control.MenuItem item = new javafx.scene.control.MenuItem(text);
-        if (icon != null) {
-            item.setGraphic(IconFactoryF.createIcon(icon));
-        }
-        item.setOnAction(e -> action.run());
-        return item;
-    }
-
     /**
-     * The Swing {@code ShowOriginAction.actionPerformed}: opens a new origin visualizer for the
-     * selected term. The position is the last clicked term of the sequent view, walked up to a
+     * The Swing {@code ShowOriginAction.actionPerformed} (ShowOriginAction.java:50-73): opens a
+     * new origin visualizer for the given (clicked) term. The position is walked up to a
      * formula ({@code TermView} can only print sequents or formulas, not terms); with no term
      * clicked the whole sequent is shown. Enablement follows
-     * {@code TermLabelSettings.useOriginLabels}.
+     * {@code TermLabelSettings.useOriginLabels} — Swing disables the action for it
+     * (ShowOriginAction.java:43-44, mirrored by the provider's context item); the guard stays
+     * as the defensive path of the former View-menu stopgap.
+     *
+     * @param mainWindow the FX main window
+     * @param pos the clicked position ({@code null} shows the whole sequent, like the Swing
+     *        action's {@code PosInSequent.createSequentPos()} normalization)
      */
-    private static void showOrigin(MainWindowF mainWindow) {
+    static void showOrigin(MainWindowF mainWindow, PosInSequent pos) {
         boolean enabled =
             ProofIndependentSettings.DEFAULT_INSTANCE.getTermLabelSettings().getUseOriginLabels();
         if (!enabled) {
@@ -199,8 +272,6 @@ public final class OriginLabelsF {
                 Kind.WARNING);
             return;
         }
-        de.uka.ilkd.key.gui.fx.nodeviews.SequentViewF view = mainWindow.getSequentView();
-        de.uka.ilkd.key.pp.PosInSequent pos = view.getLastClickedPos();
         PosInOccurrence pio = pos == null ? null : pos.getPosInOccurrence();
         // OriginTermLabelVisualizer.TermView can only print sequents or formulas, not terms
         while (pio != null && !pio.subTerm().sort().equals(JavaDLTheory.FORMULA)) {
