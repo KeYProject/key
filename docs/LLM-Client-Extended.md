@@ -141,12 +141,14 @@ public interface ChatCompletionsClient {
 ```
 
 `DefaultChatCompletionsClient` is the production implementation (Apache HttpClient 5):
-it POSTs to `<endpoint>/openai/chat/completions` with `Authorization: Bearer <token>`, and a
+it POSTs to the chat-completions URL derived from the configured base (see `ApiUrls`:
+`<base>/openai/chat/completions` on a bare host, `<base>/chat/completions` when the base
+already ends in an API root such as `/v1`) with `Authorization: Bearer <token>`, and a
 payload containing `model`, `messages`, `tools` (+ `tool_choice=auto`), optional
 `temperature` and `max_tokens` — each switch controlled by the *send temperature* /
 *send max output tokens* settings. A throwaway HTTP client is created per call.
-`Util` provides the small helpers used by the settings dialog (`Util.httpGet` for
-`<endpoint>/openai/models`).
+`Util` provides the small helpers used by the settings dialog (`Util.httpGet` for the
+model-listing URL derived by `ApiUrls`).
 
 ## Prompt assembly
 
@@ -277,7 +279,7 @@ new tools with their approval requirement.
 
 * `LlmSettings` (singleton `INSTANCE`) stores user preferences in the `[llm]` section of the
   proof-independent settings file (`<keyConfig>/proofIndependentSettings.json`):
-  `apiEndpoint` (default `https://ki-toolbox.scc.kit.edu/v1`), `authToken`, `defaultModel`
+  `apiEndpoint` (default `https://ki-toolbox.scc.kit.edu`), `authToken`, `defaultModel`
   (`azure.gpt-4.1-mini`), `availableModels`, `systemPrompt`, `maxToolRounds` (8),
   `allowAgentQuestions`, `agentCanUseSkills`, `subagentsEnabled`, `askLlmEnabled` (true),
   `maxSubagentTurns` (8),

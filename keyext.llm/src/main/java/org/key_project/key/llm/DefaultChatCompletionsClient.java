@@ -26,12 +26,9 @@ import org.apache.hc.core5.http.io.entity.StringEntity;
  */
 public class DefaultChatCompletionsClient implements ChatCompletionsClient {
 
-    /** Suffix appended to the endpoint configured in the {@link LlmSession}. */
-    public static final String COMPLETIONS_PATH = "/openai/chat/completions";
-
     @Override
     public Map<String, Object> complete(LlmSession session, AgentRequest request) throws Exception {
-        var url = session.getApiEndpoint() + COMPLETIONS_PATH;
+        var url = ApiUrls.chatCompletions(session.getApiEndpoint());
         var http = new HttpPost(url);
         http.addHeader("Authorization", "Bearer " + session.getAuthToken());
         http.addHeader("Content-Type", "application/json");

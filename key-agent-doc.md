@@ -17,7 +17,10 @@ turns queued messages and background results into turns (see [section 11](#11-ar
 1. Open the **KeY-Agent** panel (KeY GUI, menu *Proof → LLM → Open LLM prompt*, or Ctrl+K).
 2. Open *Settings → LLM Settings* and configure a connection:
    - **API Base URL** — an OpenAI-compatible endpoint (default
-     `https://ki-toolbox.scc.kit.edu/v1`).
+     `https://ki-toolbox.scc.kit.edu`; e.g. `https://litellm.scc.kit.edu/v1` for the KIT LiteLLM
+     proxy). The concrete operation URLs (chat completions, model list) are derived from this
+     base, so both the Open WebUI (`/openai/…`) and the OpenAI/LiteLLM (`/v1/…`) conventions
+     work.
    - **Auth Token** — your API key/token.
    - **Available Models** / **Default model** — choose the model to use (`Fetch Models` reads the
      list of available models from the endpoint).
@@ -510,7 +513,7 @@ are edited in their own panels.
 ### Connection
 | Setting | Default |
 |---|---|
-| API Base URL | `https://ki-toolbox.scc.kit.edu/v1` |
+| API Base URL | `https://ki-toolbox.scc.kit.edu` |
 | Auth Token | — |
 | Default model | `azure.gpt-4.1-mini` |
 | Available models | editable list; `Fetch Models` pulls it from the endpoint |
