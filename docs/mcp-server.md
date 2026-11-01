@@ -80,6 +80,21 @@ serialized against tool calls of the GUI agent. Results are returned as MCP
 text content; failures are reported as `isError` results rather than
 crashed sessions.
 
+## Testing with the probe script
+
+A standalone, dependency-free Python probe walks through the whole protocol —
+SSE connect, `endpoint` event, `initialize` handshake, `tools/list` and an
+optional `tools/call` — and prints every exchange:
+
+```sh
+python3 scripts/mcp_sse_probe.py http://127.0.0.1:<port>/sse
+python3 scripts/mcp_sse_probe.py http://127.0.0.1:<port>/sse \
+    --token <token> --call read_file --args '{"path": "…"}'
+```
+
+It exits non-zero if the handshake or the tool list fails (e.g. a missing
+bearer token, reported as `HTTP 401`).
+
 ## Testing
 
 The status line, the settings panel and the export checkboxes are covered by
