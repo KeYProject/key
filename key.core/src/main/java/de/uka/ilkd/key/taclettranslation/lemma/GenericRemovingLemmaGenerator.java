@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.logic.sort.ProxySort;
 
+import org.key_project.logic.Name;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -84,8 +85,9 @@ public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
                 return declaredProxy;
             }
             ImmutableSet<Sort> extSorts = replaceSorts(gs.extendsSorts(), services);
-            ProxySort result = new ProxySort(gs.name(), extSorts);
+            ProxySort result = new ProxySort(new Name("P_" + gs.name()), extSorts);
             sortMap.put(gs, result);
+            services.getNamespaces().sorts().addSafely(result);
             return result;
         } else if (sort instanceof ParametricSortInstance psi && psi.containsGenericSort()) {
             List<GenericArgument> newArgs = new ArrayList<>(psi.getArgs().size());

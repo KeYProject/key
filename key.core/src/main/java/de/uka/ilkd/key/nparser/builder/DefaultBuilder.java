@@ -158,11 +158,15 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 programVariables().lookup(new ProgramElementName(varfuncName)),
                 functions().lookup(name),
                 AbstractTermTransformer.name2metaop(varfuncName),
-
             };
 
         for (Operator op : operators) {
             if (op != null) {
+                if (genericArgsCtxt != null) {
+                    semanticError(genericArgsCtxt,
+                        "The operator %s expect no generic arguments; got %s", op.name(),
+                        genericArgsCtxt.getText());
+                }
                 return op;
             }
         }
