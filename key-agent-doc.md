@@ -300,6 +300,7 @@ The built-in tool set (`KeYAgentTools`):
 | `list_proofs`       | Proof          | auto     |                | enumerate all open proofs with an identifier usable in the proof tools' `proof` parameter |
 | `list_files`        | Files          | auto     |                | bounded listing of the files of the current Java model              |
 | `read_file`         | Files          | auto     |                | read a text file of the model directory (respects size limits)      |
+| `edit_file`         | Files          | ask      |                | exact string replacement in a model text file (`old_string` must be unique unless `replace_all`) |
 | `file_info`         | Files          | auto     |                | metadata (size, last modified, kind) of a file                      |
 | `run_command`       | Shell          | ask      | ✓              | run a shell command in the model directory (blocklist + approval)   |
 | `list_taclets`      | Taclets        | auto     |                | list the taclets available for a proof (optional substring filter) |
