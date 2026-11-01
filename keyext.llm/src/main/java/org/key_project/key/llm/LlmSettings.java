@@ -127,6 +127,27 @@ public class LlmSettings extends AbstractPropertiesSettings {
     private final PropertyEntry<List<String>> skillLibraryPaths =
         createStringListProperty("skillLibraryPaths", "");
 
+    // --- mcp server ---
+    /** Whether the KeY MCP server (SSE) is currently enabled. */
+    private final PropertyEntry<Boolean> mcpServerEnabled =
+        createBooleanProperty("mcpServerEnabled", false);
+    /** The host interface the KeY MCP server binds to (default: loopback only). */
+    private final PropertyEntry<String> mcpServerHost =
+        createStringProperty("mcpServerHost", "127.0.0.1");
+    /** The port the KeY MCP server binds to; {@code 0} picks a free ephemeral port. */
+    private final PropertyEntry<Integer> mcpServerPort = createIntegerProperty("mcpServerPort", 0);
+    /**
+     * Optional static bearer token required by the KeY MCP server ({@code Authorization: Bearer
+     * <token>}); empty means no authentication.
+     */
+    private final PropertyEntry<String> mcpServerToken = createStringProperty("mcpServerToken", "");
+    /** Tools the user explicitly exports to the MCP server (overrides the default rule). */
+    private final PropertyEntry<Set<String>> mcpExportedTools =
+        createStringSetProperty("mcpExportedTools", new TreeSet<>());
+    /** Tools the user explicitly keeps out of the MCP server (overrides the default rule). */
+    private final PropertyEntry<Set<String>> mcpNotExportedTools =
+        createStringSetProperty("mcpNotExportedTools", new TreeSet<>());
+
     // --- ui ---
     private final PropertyEntry<Boolean> autoScrollOutput =
         createBooleanProperty("autoScrollOutput", true);
@@ -178,6 +199,12 @@ public class LlmSettings extends AbstractPropertiesSettings {
         setMaxBackgroundJobs(other.getMaxBackgroundJobs());
         setPromptLibraryPaths(new ArrayList<>(other.getPromptLibraryPaths()));
         setSkillLibraryPaths(new ArrayList<>(other.getSkillLibraryPaths()));
+        setMcpServerEnabled(other.getMcpServerEnabled());
+        setMcpServerHost(other.getMcpServerHost());
+        setMcpServerPort(other.getMcpServerPort());
+        setMcpServerToken(other.getMcpServerToken());
+        setMcpExportedTools(new TreeSet<>(other.getMcpExportedTools()));
+        setMcpNotExportedTools(new TreeSet<>(other.getMcpNotExportedTools()));
         setAutoScrollOutput(other.getAutoScrollOutput());
         setShowToolActivity(other.getShowToolActivity());
     }
@@ -532,6 +559,79 @@ public class LlmSettings extends AbstractPropertiesSettings {
 
     public void setSkillLibraryPaths(List<String> v) {
         skillLibraryPaths.set(v);
+    }
+
+    // --- mcp server ---
+
+    public boolean getMcpServerEnabled() {
+        return mcpServerEnabled.get();
+    }
+
+    public void setMcpServerEnabled(boolean v) {
+        this.mcpServerEnabled.set(v);
+    }
+
+    public String getMcpServerHost() {
+        return mcpServerHost.get();
+    }
+
+    public void setMcpServerHost(String v) {
+        this.mcpServerHost.set(v);
+    }
+
+    public int getMcpServerPort() {
+        return mcpServerPort.get();
+    }
+
+    public void setMcpServerPort(int v) {
+        this.mcpServerPort.set(v);
+    }
+
+    public String getMcpServerToken() {
+        return mcpServerToken.get();
+    }
+
+    public void setMcpServerToken(String v) {
+        this.mcpServerToken.set(v);
+    }
+
+    /**
+     * Tools explicitly exported to the MCP server (user override, see {@link #isExportedToMCP}).
+     */
+    public Set<String> getMcpExportedTools() {
+        return mcpExportedTools.get();
+    }
+
+    public void setMcpExportedTools(Set<String> v) {
+        this.mcpExportedTools.set(v);
+    }
+
+    /**
+     * Tools explicitly kept out of the MCP server (user override, see {@link #isExportedToMCP}).
+     */
+    public Set<String> getMcpNotExportedTools() {
+        return mcpNotExportedTools.get();
+    }
+
+    public void setMcpNotExportedTools(Set<String> v) {
+        this.mcpNotExportedTools.set(v);
+    }
+
+    /**
+     * Effective MCP-server export permission of a tool: the per-tool user overrides win, otherwise
+     * the tool's metadata default applies.
+     *
+     * @param toolName the tool name
+     * @param metadataDefault whether the tool is exported to the MCP server by default
+     */
+    public boolean isExportedToMCP(String toolName, boolean metadataDefault) {
+        if (mcpNotExportedTools.get().contains(toolName)) {
+            return false;
+        }
+        if (mcpExportedTools.get().contains(toolName)) {
+            return true;
+        }
+        return metadataDefault;
     }
 
     // --- ui ---
