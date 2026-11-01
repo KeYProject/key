@@ -1,0 +1,24 @@
+package com.github.javaparser.ast.expr;
+
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.type.Type;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+/**
+ * Re-specification of the {@code MethodCallExpr} constructors for the nullness checker. JavaParser
+ * treats both {@code scope} and {@code typeArguments} as optional: a {@code null} scope denotes a
+ * top-level call (e.g. the generated {@code super(...)} constructor-normalform invocations), and a
+ * {@code null} typeArguments list an unparameterized call. The KeY code base deliberately passes
+ * {@code null} for either when building such calls. The call name and argument list must be
+ * non-null. Widening the parameter nullness matches the library's actual behavior without any
+ * source changes.
+ */
+public class MethodCallExpr {
+
+    public MethodCallExpr(@Nullable Expression scope, @Nullable NodeList<Type> typeArguments,
+        String name, NodeList<Expression> arguments);
+
+    public MethodCallExpr(@Nullable Expression scope, @Nullable NodeList<Type> typeArguments,
+        SimpleName name, NodeList<Expression> arguments);
+}

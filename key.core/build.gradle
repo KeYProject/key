@@ -32,7 +32,50 @@ dependencies {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs << "-Ajavadoc.packages=de.uka.ilkd.key.scripts"
+    // Only pass this legacy javadoc option in non-nullness builds: it has no
+    // annotation-processor consumer, and javac warns about unrecognized -A
+    // options as soon as a processor (the EISOP NullnessChecker) is active,
+    // which -Werror then turns into a build failure.
+    if(!System.getProperty("ENABLE_NULLNESS")) {
+        options.compilerArgs << "-Ajavadoc.packages=de.uka.ilkd.key.scripts"
+    }
+}
+
+checkerFramework {
+    if(System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        // -PnullWave=<FQCN[,FQCN...]> scopes -AonlyDefs to exactly those classes
+        // (regex alternation; each alternative is prefix-matched, so a bare
+        // package name also covers its members) for fast per-wave gates:
+        // out-of-scope definitions are still compiled and their types stay
+        // visible, but their bodies are not analyzed and nothing in them is
+        // reported. Unset = module-wide scope (the CI conformance gate).
+        def wave = project.findProperty('nullWave')
+        def onlyDefs = wave != null
+                ? wave.split(',').findAll { !it.isBlank() }.collect { '^' + it.trim().tokenize('.').join('\\.') }.join('|')
+                : '^de\\.uka\\.ilkd\\.key|^org\\.key_project\\.util'
+        extraJavacArgs = [
+                "-AonlyDefs=$onlyDefs",
+                "-Astubs=$rootDir/key.util/src/main/checkerframework",
+                "-Xmaxerrs", "10000",
+                "-AstubNoWarnIfNotFound",
+                "-Werror",
+                "-Aversion",
+        ]
+    }
+}
+
+// The NullnessChecker runs inside the forked javac worker, which defaults to a
+// 512m heap and runs out of memory on key.core's very large source set. Give it
+// a real heap whenever nullness checking is enabled (also required by CI's
+// CodeQuality run); key.core is ~4x the source set of key.ui, which needed 4g.
+tasks.withType(JavaCompile).configureEach {
+    if(System.getProperty("ENABLE_NULLNESS")) {
+        options.fork = true
+        options.forkOptions.memoryMaximumSize = "6g"
+    }
 }
 
 // The target directory for JavaCC (parser generation)

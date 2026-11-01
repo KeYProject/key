@@ -20,6 +20,7 @@ checkerFramework {
         ]
         extraJavacArgs = [
                 "-AonlyDefs=^de\\.uka\\.ilkd\\.key|^org\\.key_project\\.util",
+                "-Astubs=$rootDir/key.util/src/main/checkerframework",
                 "-Xmaxerrs", "10000",
                 "-AstubNoWarnIfNotFound",
                 "-Werror",
