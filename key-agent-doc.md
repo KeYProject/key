@@ -19,8 +19,11 @@ turns queued messages and background results into turns (see [section 11](#11-ar
    - **API Base URL** — an OpenAI-compatible endpoint (default
      `https://ki-toolbox.scc.kit.edu`; e.g. `https://litellm.scc.kit.edu/v1` for the KIT LiteLLM
      proxy). The concrete operation URLs (chat completions, model list) are derived from this
-     base, so both the Open WebUI (`/openai/…`) and the OpenAI/LiteLLM (`/v1/…`) conventions
-     work.
+     base (`ApiUrls`): a bare host gets the `/openai/…` prefix (Open WebUI convention, also
+     served by LiteLLM), a base ending in an API root (`/v1`, `/api/v1`, `/openai`, `/api`)
+     gets only the operation appended. You decide the convention by the base URL you enter —
+     the settings dialog shows the two derived URLs live below the field, so you can verify
+     the choice before anything is sent.
    - **Auth Token** — your API key/token.
    - **Available Models** / **Default model** — choose the model to use (`Fetch Models` reads the
      list of available models from the endpoint).
