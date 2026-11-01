@@ -25,8 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * UI test of the {@link LlmStatusBar} status-line indicator: an actual MCP client interacts with
- * the server started through the toggle button while the endpoint label is on, and the toggle/flag
- * state is verified across the whole lifecycle including the persisted restart path.
+ * the server started through the toggle button, and the toggle/flag state is verified across the
+ * whole lifecycle including the persisted restart path; the endpoint URL is shown only while the
+ * pointer hovers over the indicator.
  */
 class LlmStatusBarUiTest {
 
@@ -63,13 +64,24 @@ class LlmStatusBarUiTest {
 
         McpUiTestHarness.onEdt(() -> toggle.doClick());
 
-        // server running, endpoint label visible, persisted flag set
+        // server running, persisted flag set; the endpoint URL is only shown on hover
         assertTrue(toggle.isSelected());
         assertTrue(serverRunning());
         assertTrue(LlmSettings.INSTANCE.getMcpServerEnabled());
         String endpoint = endpointLabel();
         assertNotNull(endpoint);
         assertTrue(endpoint.matches("http://127\\.0\\.0\\.1:\\d+/sse"), "endpoint " + endpoint);
+        assertFalse(endpointVisible(), "endpoint must stay hidden while not hovered");
+
+        hover(true);
+        assertTrue(endpointVisible(), "hovering the indicator shows the endpoint");
+        // the URL must be copyable: a selectable, read-only text field
+        var field = McpUiTestHarness.all(bar, javax.swing.JTextField.class).stream().findFirst()
+                .orElseThrow();
+        assertFalse(field.isEditable(), "the endpoint must not be editable");
+        assertEquals(endpoint, field.getText());
+        hover(false);
+        assertFalse(endpointVisible(), "leaving the indicator hides the endpoint again");
 
         McpUiTestHarness.onEdt(() -> toggle.doClick());
 
@@ -109,6 +121,7 @@ class LlmStatusBarUiTest {
 
             // the client interaction must not have disturbed the status bar
             assertTrue(toggle.isSelected());
+            hover(true);
             assertTrue(endpointVisible());
         } finally {
             client.close();
@@ -129,6 +142,11 @@ class LlmStatusBarUiTest {
         assertNotNull(endpointLabel());
     }
 
+    /** Enters or leaves the pointer over the toggle, driving the hover-only endpoint visibility. */
+    private void hover(boolean enter) {
+        McpUiTestHarness.hover(toggle, enter);
+    }
+
     private boolean serverRunning() {
         String endpoint = endpointLabel();
         if (endpoint == null) {
@@ -144,14 +162,15 @@ class LlmStatusBarUiTest {
     }
 
     private boolean endpointVisible() {
-        return McpUiTestHarness.all(bar, javax.swing.JLabel.class).stream()
+        return McpUiTestHarness.all(bar, javax.swing.text.JTextComponent.class).stream()
                 .anyMatch(
                     l -> l.isVisible() && l.getText() != null && l.getText().startsWith("http://"));
     }
 
     private String endpointLabel() {
-        return McpUiTestHarness.all(bar, javax.swing.JLabel.class).stream()
-                .map(javax.swing.JLabel::getText).filter(t -> t != null && t.startsWith("http://"))
+        return McpUiTestHarness.all(bar, javax.swing.text.JTextComponent.class).stream()
+                .map(javax.swing.text.JTextComponent::getText)
+                .filter(t -> t != null && t.startsWith("http://"))
                 .findFirst().orElse(null);
     }
 }

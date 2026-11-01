@@ -9,6 +9,7 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -46,6 +47,10 @@ public final class McpUiTestHarness {
 
     /** Runs a task on the Swing event dispatch thread and blocks until it has completed. */
     public static void onEdt(Runnable task) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            task.run();
+            return;
+        }
         try {
             SwingUtilities.invokeAndWait(task);
         } catch (InterruptedException e) {
@@ -54,6 +59,25 @@ public final class McpUiTestHarness {
         } catch (InvocationTargetException e) {
             throw new RuntimeException(e.getCause());
         }
+    }
+
+    /**
+     * Enters or leaves the pointer over the given component, driving hover-dependent behavior
+     * (e.g. the status bar's hover-only endpoint visibility).
+     */
+    public static void hover(Component c, boolean enter) {
+        onEdt(() -> {
+            var event = new MouseEvent(c,
+                enter ? MouseEvent.MOUSE_ENTERED : MouseEvent.MOUSE_EXITED,
+                System.currentTimeMillis(), 0, 5, 5, 0, false);
+            for (var l : c.getMouseListeners()) {
+                if (enter) {
+                    l.mouseEntered(event);
+                } else {
+                    l.mouseExited(event);
+                }
+            }
+        });
     }
 
     /** Resets every MCP-related setting of the global instance to a clean test state. */
