@@ -1667,6 +1667,28 @@ public final class MainWindowF {
     }
 
     /**
+     * The "Open with Loading Options…" action: one dialog collects the file/folder to load and
+     * the loading options — the profile, the additional option panels of the
+     * {@code KeYGuiExtensionF.LoadOptionPanelF} providers and the "Ignore other Java files"
+     * checkbox — in a single confirmation step. Swing parity: the Swing loading-options
+     * accessory lives <em>inside</em> the file chooser ({@code KeYFileChooserLoadingOptions},
+     * added by {@code OpenFileAction}), so the Swing chooser is also the one confirmation step;
+     * the JavaFX {@code FileChooser} has no accessory API, so the file selection moves into the
+     * dialog instead ({@code LoadingOptionsDialogF.showOpenRequest}). The existing two-step
+     * "Open File…" flow stays unchanged. The load routes through
+     * {@link #openProofFile(Path, LoadOptions)} — proof bundles open the proof-selection dialog
+     * and the collected options are ignored for them (Swing {@code OpenFileAction} returns
+     * before the options wiring for bundles).
+     */
+    private void openWithLoadingOptions() {
+        LoadingOptionsDialogF.SelectedLoad request = LoadingOptionsDialogF.showOpenRequest(stage);
+        if (request == null) {
+            return;
+        }
+        openProofFile(request.file(), request.options());
+    }
+
+    /**
      * Loads the given file and registers it in the recent files list (Swing
      * {@code WindowUserInterfaceControl.loadProblem} registers before the load starts).
      * <p>
@@ -4059,6 +4081,13 @@ public final class MainWindowF {
         MenuItem openFile = menuItem("Open File…", "de.uka.ilkd.key.gui.actions.OpenFileAction",
             IconFactoryF.Key.OPEN_KEY_FILE, this::openFileChooser);
         openFile.disableProperty().bind(mediator.autoModeRunningProperty());
+        // the FX-specific one-step variant (an extra next to the unchanged two-step flow, like
+        // "Show Sequent"): profile + option panels + file/folder selection confirmed in one
+        // dialog — Swing collects all of it in the chooser-with-accessory
+        // (KeYFileChooserLoadingOptions), the JavaFX FileChooser has no accessory API
+        MenuItem openWithOptions = menuItem("Open with Loading Options…",
+            IconFactoryF.Key.OPEN_KEY_FILE, this::openWithLoadingOptions);
+        openWithOptions.disableProperty().bind(mediator.autoModeRunningProperty());
         MenuItem reload =
             menuItem("Reload", "de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction",
                 this::reloadLastFile);
@@ -4126,6 +4155,7 @@ public final class MainWindowF {
         file.getItems().addAll(
             openExample,
             openFile,
+            openWithOptions,
             reload,
             editLastOpenedFile,
             new SeparatorMenuItem(),
@@ -4769,12 +4799,15 @@ public final class MainWindowF {
     // menu: MP5 — expected File menu entries in the FX order after the MP5 inserts (the Swing
     // {@code MainWindow.createFileMenu} :991-1031 order with the port's existing grouping:
     // example/open/reload/edit-last-opened | proof mgmt/load-taclets/Prove | save/quick |
-    // recent | exit). The three Prove submenu entries are the always-present ones; "Run All
-    // Proofs" sits behind the BULK_UI_TEST feature flag (off by default) and is therefore not
-    // part of the table.
+    // recent | exit) plus the FX-specific extra "Open with Loading Options…" — the one-step
+    // variant of Open File (Swing collects profile + option panels + file selection in the
+    // chooser-with-accessory; the JavaFX FileChooser has no accessory API). The three Prove
+    // submenu entries are the always-present ones; "Run All Proofs" sits behind the
+    // BULK_UI_TEST feature flag (off by default) and is therefore not part of the table.
     private static final String[][] FILE_MENU_EXPECTED = {
         { "Open Example…" },
         { "Open File…" },
+        { "Open with Loading Options…" },
         { "Reload" },
         { "Edit Last Opened File" },
         { "Proof Management…" },

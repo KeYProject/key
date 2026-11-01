@@ -4,23 +4,32 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.fx.profileloading;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Window;
 
@@ -50,6 +59,17 @@ import org.jspecify.annotations.Nullable;
  * load, mirroring Swing where the options cannot be confirmed without approving the chooser.
  * Like Swing (only {@code OpenFileAction} adds the accessory), the dialog is shown only in the
  * open-file flow — recent files, quick load and the demo load keep their behavior.
+ * <p>
+ * The {@code showOpenRequest} file mode inverts the composition: the file/folder selection
+ * moves <em>into</em> this dialog — an editable path field with a "Select File…" chooser (the
+ * {@code openFileChooser} filters) and a "Select Folder…" directory chooser (Swing parity:
+ * {@code KeYFileChooser} allows {@code FILES_AND_DIRECTORIES}, KeYFileChooser.java:171) — so
+ * the profile, the option panels and the file to load are confirmed in one step, like the Swing
+ * chooser-with-accessory. The typed path must exist on confirm (the Swing chooser shows its
+ * error dialog and stays open, {@code JFileChooser.approveSelection}); a blank path keeps the
+ * Load button disabled. Confirm yields a {@link SelectedLoad}, Cancel {@code null}. This mode
+ * is opened by the File menu item "Open with Loading Options…" ({@code
+ * MainWindowF.openWithLoadingOptions}) next to the unchanged two-step "Open File…" flow.
  * <p>
  * The Swing original collects the profile-specific option panels via the {@code KeYGuiExtension}
  * SPI ({@code KeYGuiExtensionFacade.createAdditionalOptionPanels()}, {@code
@@ -85,6 +105,18 @@ public final class LoadingOptionsDialogF extends javafx.stage.Stage {
     }
 
     /**
+     * The selection of the file mode ({@code showOpenRequest}): the file or folder to load and
+     * the collected loading options (Swing parity: the chooser approval returns the selected
+     * file, the accessory options are read afterwards in
+     * {@code OpenFileAction.actionPerformed:70-76}).
+     *
+     * @param file the selected file or folder to load
+     * @param options the collected loading options
+     */
+    public record SelectedLoad(Path file, LoadOptions options) {
+    }
+
+    /**
      * Combo box entry (Swing record {@code ProfileWrapper}, {@code
      * KeYFileChooserLoadingOptions.java:141-151}): name, ident, description and the profile
      * itself ({@code null} for the legacy mode).
@@ -113,6 +145,28 @@ public final class LoadingOptionsDialogF extends javafx.stage.Stage {
     /** Swing {@code lblSingleJava}. */
     private final CheckBox lblSingleJava = new CheckBox("Ignore other Java files");
 
+    /** Label of the file-mode path row ({@code showOpenRequest}). */
+    private final Label lblFile = new Label("File:");
+
+    /**
+     * Editable path field of the file-mode row (Swing: the editable filename field of the
+     * chooser).
+     */
+    private final TextField txtFile = new TextField();
+
+    /**
+     * The directory the file-mode choosers open in, remembered across dialog instances (Swing:
+     * the chooser remembers the last directory; the FX {@code openFileChooser} keeps the same
+     * state on the main window).
+     */
+    private static @Nullable Path lastSelectedDir;
+
+    /**
+     * Whether the dialog also collects the file/folder to load ({@code showOpenRequest} mode);
+     * {@code false} for the options-only mode of the open-file flow.
+     */
+    private final boolean withFileSelection;
+
     /**
      * Host of the currently installed profile option panel (Swing {@code currentOptionPanel},
      * which is added to/removed from the accessory panel on profile changes).
@@ -139,8 +193,12 @@ public final class LoadingOptionsDialogF extends javafx.stage.Stage {
     /** The dialog result; {@code null} until confirmed (Swing: chooser approved). */
     private @Nullable LoadOptions result;
 
-    private LoadingOptionsDialogF(Window owner) {
-        setTitle("Loading Options");
+    /** The file-mode result; {@code null} until confirmed (Swing: chooser approved). */
+    private @Nullable SelectedLoad selectedLoad;
+
+    private LoadingOptionsDialogF(Window owner, boolean withFileSelection) {
+        this.withFileSelection = withFileSelection;
+        setTitle(withFileSelection ? "Open with Loading Options" : "Loading Options");
         if (owner != null) {
             initOwner(owner);
         }
@@ -182,26 +240,43 @@ public final class LoadingOptionsDialogF extends javafx.stage.Stage {
         lblProfileInfo.setPrefColumnCount(1);
         lblProfileInfo.setPrefRowCount(3);
 
-        grid.add(lblProfile, 0, 0);
-        grid.add(cboProfile, 1, 0);
+        int row = withFileSelection ? 1 : 0;
+        if (withFileSelection) {
+            // showOpenRequest: the file/folder selection lives in this dialog (Swing: the
+            // options accessory is part of the chooser; the JavaFX FileChooser has no accessory
+            // API, so the chooser's file selection moves here)
+            lblFile.setLabelFor(txtFile);
+            Button btnSelectFile = new Button("Select File…");
+            btnSelectFile.setOnAction(e -> chooseFileToLoad());
+            Button btnSelectFolder = new Button("Select Folder…");
+            btnSelectFolder.setOnAction(e -> chooseFolderToLoad());
+            HBox fileRow = new HBox(8, txtFile, btnSelectFile, btnSelectFolder);
+            HBox.setHgrow(txtFile, Priority.ALWAYS);
+            grid.add(lblFile, 0, 0);
+            grid.add(fileRow, 1, 0);
+        }
+
+        grid.add(lblProfile, 0, row);
+        grid.add(cboProfile, 1, row);
         grid.add(SettingsPanelF.createHelpLabel("""
                 A Profile determines the proof environment, especially, the used built-in rules,
                 specification repository, and taclet options.
 
                 The default is "Java Profile".
-                """), 2, 0);
-        grid.add(lblProfileInfo, 1, 1, 2, 1);
+                """), 2, row);
+        grid.add(lblProfileInfo, 1, row + 1, 2, 1);
         GridPane.setHgrow(lblProfileInfo, Priority.ALWAYS);
         // reviewer request: the checkbox aligns with the editing components (column 1) instead
         // of the far-left label column
-        grid.add(lblSingleJava, 1, 2);
-        grid.add(optionPanelHost, 1, 3, 2, 1);
+        grid.add(lblSingleJava, 1, row + 2);
+        grid.add(optionPanelHost, 1, row + 3, 2, 1);
 
         updateProfileInfo();
 
         Button cancelButton = new Button("Cancel");
         cancelButton.setOnAction(e -> {
             result = null;
+            selectedLoad = null;
             close();
         });
         Button loadButton = new Button("Load");
@@ -211,17 +286,27 @@ public final class LoadingOptionsDialogF extends javafx.stage.Stage {
             Profile profile = selected == null ? null : selected.profile();
             KeYGuiExtensionF.OptionPanelF panel =
                 profile == null ? null : additionalOptionPanels.get(profile);
-            result = new LoadOptions(profile, panel == null ? null : panel.getResult(),
-                lblSingleJava.isSelected());
+            LoadOptions options =
+                new LoadOptions(profile, panel == null ? null : panel.getResult(),
+                    lblSingleJava.isSelected());
+            if (withFileSelection && !resolveSelectedLoad(options)) {
+                // Swing parity: the chooser shows its error dialog and stays open
+                return;
+            }
+            result = options;
             close();
         });
+        if (withFileSelection) {
+            // the Swing chooser keeps the approve disabled without a filename
+            loadButton.disableProperty().bind(txtFile.textProperty().isEmpty());
+        }
         ButtonBar buttonBar = new ButtonBar();
         buttonBar.getButtons().addAll(cancelButton, loadButton);
         // reviewer request: the buttons keep a distance to the frame border
         BorderPane.setMargin(buttonBar, new javafx.geometry.Insets(12));
 
         BorderPane root = new BorderPane(grid, null, null, buttonBar, null);
-        Scene scene = new Scene(root, 520, 380);
+        Scene scene = new Scene(root, 520, withFileSelection ? 420 : 380);
         ThemeManager.getInstance().manage(scene);
         // Escape cancels (Swing: the options are lost with a canceled chooser dialog)
         scene.setOnKeyPressed(e -> {
@@ -263,16 +348,104 @@ public final class LoadingOptionsDialogF extends javafx.stage.Stage {
     /**
      * Opens the dialog modally and waits for the user decision (Swing: the accessory is part of
      * the chooser dialog; the approval handling in {@code OpenFileAction.actionPerformed:70-76}
-     * corresponds to the confirmed dialog).
+     * corresponds to the confirmed dialog). Options-only mode — no file selection (used by the
+     * two-step "Open File…" flow and the {@code key.fx.verify.profileloading} /
+     * {@code profileloadingdialog} hooks).
      *
      * @param owner the owner window (the main window stage)
      * @return the selected loading options, or {@code null} if the dialog was canceled
      */
     public static @Nullable LoadOptions showOptions(Window owner) {
-        LoadingOptionsDialogF dialog = new LoadingOptionsDialogF(owner);
+        LoadingOptionsDialogF dialog = new LoadingOptionsDialogF(owner, false);
         dialog.centerOnScreen();
         dialog.showAndWait();
         return dialog.result;
+    }
+
+    /**
+     * Opens the dialog in the file mode modally and waits for the user decision (Swing: the
+     * chooser-with-accessory approval returns the selected file, the accessory options are read
+     * afterwards). Used by the File menu item "Open with Loading Options…" ({@code
+     * MainWindowF.openWithLoadingOptions}).
+     *
+     * @param owner the owner window (the main window stage)
+     * @return the selected file/folder with the loading options, or {@code null} if the dialog
+     *         was canceled
+     */
+    public static @Nullable SelectedLoad showOpenRequest(Window owner) {
+        LoadingOptionsDialogF dialog = new LoadingOptionsDialogF(owner, true);
+        dialog.centerOnScreen();
+        dialog.showAndWait();
+        return dialog.selectedLoad;
+    }
+
+    /**
+     * The "Select File…" button of the file mode: a file chooser with the filters of
+     * {@code MainWindowF.openFileChooser} (Swing {@code KeYFileChooser.DEFAULT_FILTER},
+     * KeYFileChooser.java:171) remembering the last directory.
+     */
+    private void chooseFileToLoad() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Select file to load proof or problem");
+        if (lastSelectedDir != null && Files.isDirectory(lastSelectedDir)) {
+            chooser.setInitialDirectory(lastSelectedDir.toFile());
+        }
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter(
+            "Java files, (compressed) KeY files, proof bundles, and source directories",
+            "*.java", "*.key", "*.proof", "*.proof.gz", "*.zproof"));
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All Files", "*.*"));
+        File file = chooser.showOpenDialog(this);
+        if (file != null) {
+            txtFile.setText(file.toPath().toAbsolutePath().toString());
+            if (file.getParentFile() != null) {
+                lastSelectedDir = file.getParentFile().toPath();
+            }
+        }
+    }
+
+    /**
+     * The "Select Folder…" button of the file mode: a directory chooser (Swing parity: the
+     * chooser allows {@code FILES_AND_DIRECTORIES}, KeYFileChooser.java:171 — a source
+     * directory can be loaded directly).
+     */
+    private void chooseFolderToLoad() {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Select folder to load proof or problem");
+        if (lastSelectedDir != null && Files.isDirectory(lastSelectedDir)) {
+            chooser.setInitialDirectory(lastSelectedDir.toFile());
+        }
+        File file = chooser.showDialog(this);
+        if (file != null) {
+            txtFile.setText(file.toPath().toAbsolutePath().toString());
+            lastSelectedDir = file.toPath();
+        }
+    }
+
+    /**
+     * File mode: validates the typed path and stores the {@link SelectedLoad} result. A
+     * nonexistent path rejects the confirm with an error alert and keeps the dialog open (Swing
+     * parity: the chooser rejects the approval with its error dialog,
+     * {@code JFileChooser.approveSelection}).
+     *
+     * @param options the collected loading options
+     * @return whether the confirm may proceed
+     */
+    private boolean resolveSelectedLoad(LoadOptions options) {
+        String text = txtFile.getText().trim();
+        Path path;
+        try {
+            path = Path.of(text);
+        } catch (InvalidPathException e) {
+            // an unparseable path cannot exist either — same rejection as the chooser error
+            path = null;
+        }
+        if (path == null || !Files.exists(path)) {
+            new Alert(Alert.AlertType.ERROR, "The selected file/folder does not exist:\n" + text)
+                    .showAndWait();
+            return false;
+        }
+        selectedLoad = new SelectedLoad(path, options);
+        return true;
     }
 
     /**
