@@ -7,6 +7,7 @@ package de.uka.ilkd.key.control;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Consumer;
 
@@ -151,7 +152,11 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
     }
 
     public Profile getProfile() {
-        return getInitConfig().getProfile();
+        Profile profile = getInitConfig().getProfile();
+        if (profile == null) {
+            throw new IllegalStateException("The loaded environment provides no profile");
+        }
+        return profile;
     }
 
     /**
@@ -225,7 +230,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      * Loads the given location and returns all required references as {@link KeYEnvironment}. The
      * {@code MainWindow} is not involved in the whole process.
      *
-     * @param profile The {@link Profile} to use.
+     * @param profile The {@link Profile} to use, or {@code null} to use the default profile.
      * @param location The location to load.
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
@@ -237,8 +242,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
      * @throws ProblemLoaderException Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
-            @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(@Nullable Profile profile,
+            Path location, @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
             @Nullable List<Path> includes,
             boolean forceNewProfileOfNewProofs) throws ProblemLoaderException {
         return load(profile, location, classPaths, bootClassPath, includes, null, null,
@@ -249,7 +254,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      * Loads the given location and returns all required references as {@link KeYEnvironment}. The
      * {@code MainWindow} is not involved in the whole process.
      *
-     * @param profile The {@link Profile} to use.
+     * @param profile The {@link Profile} to use, or {@code null} to use the default profile.
      * @param location The location to load.
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
@@ -265,8 +270,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
      * @throws ProblemLoaderException Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
-            @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(@Nullable Profile profile,
+            Path location, @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
             @Nullable List<Path> includes,
             @Nullable Properties poPropertiesToForce,
             @Nullable RuleCompletionHandler ruleCompletionHandler,
@@ -280,7 +285,7 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      * Loads the given location and returns all required references as {@link KeYEnvironment}. The
      * {@code MainWindow} is not involved in the whole process.
      *
-     * @param profile The {@link Profile} to use.
+     * @param profile The {@link Profile} to use, or {@code null} to use the default profile.
      * @param location The location to load.
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
@@ -296,8 +301,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
      * @throws ProblemLoaderException Occurred Exception
      */
-    public static KeYEnvironment<DefaultUserInterfaceControl> load(Profile profile, Path location,
-            @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
+    public static KeYEnvironment<DefaultUserInterfaceControl> load(@Nullable Profile profile,
+            Path location, @Nullable List<Path> classPaths, @Nullable Path bootClassPath,
             @Nullable List<Path> includes,
             @Nullable Properties poPropertiesToForce,
             @Nullable RuleCompletionHandler ruleCompletionHandler,
@@ -307,7 +312,8 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
         DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl(ruleCompletionHandler);
         AbstractProblemLoader loader = ui.load(profile, location, classPaths, bootClassPath,
             includes, poPropertiesToForce, forceNewProfileOfNewProofs, callbackProofLoaded);
-        InitConfig initConfig = loader.getInitConfig();
+        InitConfig initConfig = Objects.requireNonNull(loader.getInitConfig(),
+            "The loaded environment provides no init config");
 
         return new KeYEnvironment<>(ui, initConfig, loader.getProof(),
             loader.getProofScript(), loader.getResult());

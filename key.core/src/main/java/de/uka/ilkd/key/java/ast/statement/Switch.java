@@ -15,6 +15,7 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Switch.
@@ -34,35 +35,33 @@ public class Switch extends BranchStatement
      * Expression.
      */
 
-    protected final Expression expression;
+    protected final @Nullable Expression expression;
 
 
 
     /**
      * Switch.
+     * <p>
+     * Retained for source compatibility only; a real switch always has a discriminator
+     * expression. The absent branches are encoded as an empty array, and the missing
+     * expression stays {@code null} (see {@link #getExpression()}).
      */
-
-    // retained for source compatibility only; a real switch always has both an expression
-    // and branches, so the null assignments violate the @NonNull field contracts - the check
-    // (as with the sibling members below) is scoped here.
-    @SuppressWarnings("NullAway")
     public Switch() {
-        this.branches = null;
+        this.branches = new ImmutableArray<>(new Branch[0]);
         this.expression = null;
     }
 
     /**
      * Switch.
+     * <p>
+     * Retained for source compatibility only; a real switch always has branches, so a switch
+     * built from only its discriminator encodes the absent branches as an empty array.
      *
      * @param e
      *        an expression.
      */
-
-    // retained for source compatibility only; a real switch always has branches - the check is
-    // scoped here.
-    @SuppressWarnings("NullAway")
     public Switch(Expression e) {
-        this.branches = null;
+        this.branches = new ImmutableArray<>(new Branch[0]);
         this.expression = e;
     }
 
@@ -173,10 +172,12 @@ public class Switch extends BranchStatement
     /**
      * Get expression.
      *
-     * @return the expression.
+     * @return the expression, or {@code null} for the source-compatibility stubs created by
+     *         {@link Switch#Switch()} and {@link Switch#Switch(Expression)}, which have no
+     *         discriminator.
      */
 
-    public Expression getExpression() {
+    public @Nullable Expression getExpression() {
         return expression;
     }
 

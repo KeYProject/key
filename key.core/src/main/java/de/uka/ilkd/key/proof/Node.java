@@ -130,7 +130,17 @@ public class Node implements Iterable<Node> {
 
     /**
      * creates an empty node that is root and leaf.
+     *
+     * <p>
+     * The {@link NodeInfo} construction passes {@code this} while the node is still under
+     * initialization (constructor leak), which the EISOP nullness check flags. This is safe:
+     * {@link NodeInfo#NodeInfo(Node)} only stores the node reference and, to eagerly build its
+     * {@code SequentChangeInfo}, reads {@link #seq} via {@code node.sequent()} — a field already
+     * initialized by its field initializer before this point. No other {@code Node} state is read
+     * during this construction, so the leak is suppressed scoped on this constructor.
      */
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:assignment.type.incompatible" })
     public Node(Proof proof) {
         this.proof = proof;
         serialNr = proof.getNextNodeSerialNr();
@@ -439,6 +449,9 @@ public class Node implements Iterable<Node> {
         nodesToCheck.add(this);
         do {
             final Node n = nodesToCheck.poll();
+            if (n == null) {
+                break;
+            }
             if (n.leaf()) {
                 leaves.add(n);
             } else {
@@ -634,8 +647,9 @@ public class Node implements Iterable<Node> {
                 return cachedName;
             }
 
-            if (nodeInfo.getFirstStatementString() != null) {
-                return nodeInfo.getFirstStatementString();
+            String firstStatement = nodeInfo.getFirstStatementString();
+            if (firstStatement != null) {
+                return firstStatement;
             }
 
             cachedName = rap.displayName();

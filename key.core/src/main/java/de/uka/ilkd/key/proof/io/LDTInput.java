@@ -118,8 +118,12 @@ public class LDTInput implements EnvInput {
      * declared sorts in all rules.
      *
      * @return a list of warnings during the parsing the process
+     *         <p>
+     *         The init config of a loading problem file is present while its content is read; the
+     *         dereference of the (nullable) init config is suppressed with a scoped key.
      */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public ImmutableSet<PositionedString> read() {
         var warnings = new ArrayList<PositionedString>();
 
@@ -150,7 +154,7 @@ public class LDTInput implements EnvInput {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof LDTInput li)) {
             return false;
         }

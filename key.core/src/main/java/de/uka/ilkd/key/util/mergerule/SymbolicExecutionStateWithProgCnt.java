@@ -55,7 +55,13 @@ public record SymbolicExecutionStateWithProgCnt(JTerm symbolicState, JTerm pathC
         return new SymbolicExecutionState(symbolicState, pathCondition);
     }
 
+    /**
+     * The corresponding node of a symbolic execution state with program counter is set whenever
+     * the state is created; the dereference of the (nullable) node is suppressed with a scoped
+     * key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public String toString() {
         final Services services = getCorrespondingNode().proof().getServices();
 

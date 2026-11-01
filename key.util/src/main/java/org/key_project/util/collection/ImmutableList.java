@@ -242,8 +242,8 @@ public interface ImmutableList<T extends @Nullable Object>
     ///
     /// @param collection the iterable to reverse and prepend
     /// @return a new list with the reversed iterable's elements at the beginning
-    default ImmutableList<T> prependReverse(Iterable<T> collection) {
-        return new ImmutableListConcat<>(ImmutableList.fromList(collection).reverse(), this);
+    default ImmutableList<T> prependReverse(Iterable<? extends T> collection) {
+        return new ImmutableListConcat<>(ImmutableList.<T>fromList(collection).reverse(), this);
     }
 
     /// Prepends an array to this list.

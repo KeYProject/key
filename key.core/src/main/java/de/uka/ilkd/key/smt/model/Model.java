@@ -428,8 +428,6 @@ public class Model {
      * Transforms the values of array fields of objects from binary/hexidecimal to human readable
      * form.
      */
-    @SuppressWarnings("NullAway") // sparse array elements are legitimately null in the model;
-                                  // ObjectVal.setArrayValue tolerates null at runtime
     public void processArrayValues() {
         for (Heap h : heaps) {
             for (ObjectVal o : h.getObjects()) {
@@ -446,7 +444,9 @@ public class Model {
                 for (int i = 0; i < o.getLength(); ++i) {
                     String val = o.getArrayValue(i);
                     val = processAnyValue(val);
-                    o.setArrayValue(i, val);
+                    // every array index is answered with a non-null value by the
+                    // array-field queries (cf. ModelExtractor.processArrayQueries)
+                    o.setArrayValue(i, Objects.requireNonNull(val, "array value"));
                 }
             }
         }
@@ -460,6 +460,7 @@ public class Model {
     public void processSeqValues() {
         for (Sequence s : sequences) {
             for (int i = 0; i < s.getLength(); ++i) {
+                @Nullable
                 String val = processAnyValue(s.get(i));
                 s.set(i, val);
             }
@@ -472,7 +473,9 @@ public class Model {
      * @param original the name for which an alias is created
      * @return the alias
      */
-    private String getAliasedName(@Nullable String original) {
+    private String getAliasedName(String original) {
+        // every caller has checked reversedConstants.containsKey(original) before, so
+        // original is a real constant name and never null
         return original + "/" + reversedConstants.get(original);
     }
 
@@ -487,7 +490,8 @@ public class Model {
                 }
                 Map<String, String> newFieldValues = extractFieldValuesFor(o);
                 o.setFieldvalues(newFieldValues);
-                if (o.getSort() != null && o.getSort().name().toString().endsWith("[]")) {
+                Sort sort = o.getSort();
+                if (sort != null && sort.name().toString().endsWith("[]")) {
                     Map<Integer, String> newArrayValues = extractArrayValuesFor(o);
                     o.setArrayValues(newArrayValues);
                 }
@@ -518,8 +522,9 @@ public class Model {
                 s.setName(getAliasedName(s.getName()));
             }
             for (int i = 0; i < s.getLength(); ++i) {
-                if (reversedConstants.containsKey(s.get(i))) {
-                    s.set(i, getAliasedName(s.get(i)));
+                String entry = s.get(i);
+                if (entry != null && reversedConstants.containsKey(entry)) {
+                    s.set(i, getAliasedName(entry));
                 }
             }
         }
@@ -552,10 +557,12 @@ public class Model {
     private Map<Integer, String> extractArrayValuesFor(ObjectVal o) {
         Map<Integer, String> newArrayValues = new HashMap<>();
         for (int i = 0; i < o.getLength(); i++) {
-            if (reversedConstants.containsKey(o.getArrayValue(i))) {
-                newArrayValues.put(i, getAliasedName(o.getArrayValue(i)));
+            // every index was answered with a non-null value by the array-field queries
+            String val = o.getArrayValue(i);
+            if (val != null && reversedConstants.containsKey(val)) {
+                newArrayValues.put(i, getAliasedName(val));
             } else {
-                newArrayValues.put(i, o.getArrayValue(i));
+                newArrayValues.put(i, Objects.requireNonNull(val, "array value"));
             }
         }
         return newArrayValues;
@@ -668,7 +675,9 @@ public class Model {
         for (Heap h : heaps) {
             Set<ObjectVal> reachable = new HashSet<>();
             for (String o : objConstants) {
-                reachable.addAll(getReachableObjects(o, h));
+                // objConstants holds the names of objects actually present in the heap
+                reachable.addAll(Objects.requireNonNull(getReachableObjects(o, h),
+                    "reachable objects"));
             }
 
             h.getObjects().clear();
@@ -829,7 +838,9 @@ public class Model {
                 Map<String, String> newFieldValues = new HashMap<>();
                 for (String f : o.getFieldvalues().keySet()) {
                     String value = o.getFieldvalues().get(f);
-                    newFieldValues.put(f, processAnyValue(value));
+                    // fields are answered with non-null values by the field queries
+                    newFieldValues.put(f, Objects.requireNonNull(processAnyValue(value),
+                        "field value"));
                 }
                 o.setFieldvalues(newFieldValues);
             }

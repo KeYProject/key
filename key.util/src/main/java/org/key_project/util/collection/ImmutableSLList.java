@@ -88,7 +88,7 @@ abstract class ImmutableSLList<T extends @Nullable Object> implements ImmutableL
 
     @Override
     @SuppressWarnings("NullAway") // NullAway cannot infer nullability of Cons<S> type arguments
-    public ImmutableList<T> prependReverse(Iterable<T> collection) {
+    public ImmutableList<T> prependReverse(Iterable<? extends T> collection) {
         ImmutableSLList<T> tmp = this;
         for (T elem : collection) {
             tmp = new Cons<>(elem, tmp);

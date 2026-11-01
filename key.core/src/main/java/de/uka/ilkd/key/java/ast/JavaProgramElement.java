@@ -14,6 +14,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
 
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -79,7 +80,8 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
      * @param list
      *        the ExtList with children and comments of this node
      */
-    private Comment[] extractComments(ExtList list) {
+    private Comment[] extractComments(@UnderInitialization JavaProgramElement this,
+            ExtList list) {
         final Comment[] c = list.collect(Comment.class);
         return c == null ? NO_COMMENTS : c;
     }
@@ -117,7 +119,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }

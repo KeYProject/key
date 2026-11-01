@@ -82,7 +82,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
 
     public CompilationUnit(
             PositionInfo pi, List<Comment> c,
-            PackageSpecification accepto, ImmutableArray<Import> map,
+            @Nullable PackageSpecification accepto, ImmutableArray<Import> map,
             ImmutableArray<TypeDeclaration> map1) {
         super(pi, c);
         this.packageSpec = accepto;

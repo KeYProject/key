@@ -591,7 +591,7 @@ public class EqualityConstraint implements Constraint {
      * checks equality of constraints by subsuming relation (only equal if no new sorts need to be
      * introduced for subsumption)
      */
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         }

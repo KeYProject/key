@@ -181,7 +181,7 @@ public class OriginTermLabel implements TermLabel {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (obj instanceof OriginTermLabel other) {
             return other.origin.equals(origin) && other.subtermOrigins.equals(subtermOrigins);
         } else {
@@ -614,7 +614,7 @@ public class OriginTermLabel implements TermLabel {
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@Nullable Object obj) {
             return obj != null && obj.getClass().equals(getClass())
                     && ((Origin) obj).specType == specType;
         }
@@ -669,7 +669,7 @@ public class OriginTermLabel implements TermLabel {
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@Nullable Object obj) {
             if (this == obj) {
                 return true;
             }
@@ -762,7 +762,7 @@ public class OriginTermLabel implements TermLabel {
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@Nullable Object obj) {
             if (this == obj) {
                 return true;
             }

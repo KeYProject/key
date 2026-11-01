@@ -62,6 +62,11 @@ public abstract class SVInstantiationExceptionWithPosition extends SVInstantiati
 
     @Override
     public @Nullable Location getLocation() {
-        return new Location(null, position);
+        // These SV errors carry no file, but the position is meaningful and must be preserved:
+        // Location's fileUri component tolerates null at runtime (see the Location javadoc and
+        // the suppressions on UNDEFINED / fromToken); main constructs the location like this.
+        @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+        Location result = new Location(null, position);
+        return result;
     }
 }

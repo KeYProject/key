@@ -7,6 +7,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -29,7 +30,7 @@ public final class TextualJMLModifierList extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof TextualJMLModifierList ci)) {
             return false;
         }

@@ -34,12 +34,21 @@ public class InstantiationFileHandler {
     private static final int SAVE_COUNT = 5;
 
 
-    private static @Nullable Map<String, List<List<String>>> hm;
+    /**
+     * Lazily-initialized map from taclet name to its stored instantiation lists.
+     * A {@code null} value marks an entry that is present but not (yet) loaded from disk.
+     */
+    private static @Nullable Map<String, @Nullable List<List<String>>> hm;
 
     /// Finds the current place to store used instantiations. If there was a version change
     /// (the folder does not exist), this method tries to copy previous instantiations to
     /// the new directory silently. However, if both old and new instantiations exist, they are not
     /// merge, i.e. only the new ones are used currently.
+    /// <p>
+    /// The current and previous key configuration directories are always set when the key
+    /// settings have been loaded; the dereferences of the (nullable) configuration paths are
+    /// suppressed with a scoped key.
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private static Path getStoragePath() {
         Path cur = PathConfig.currentPaths.keyConfigDir.resolve("instantiations");
         if (Files.exists(cur)) {
@@ -78,6 +87,17 @@ public class InstantiationFileHandler {
         return cur;
     }
 
+    /**
+     * Returns whether instantiation lists have been stored for the given taclet.
+     *
+     * @param taclet The taclet to look up.
+     * @return True iff an instantiation list entry exists for the taclet.
+     *         <p>
+     *         The instantiation map is lazily created on first access; the dereference of the
+     *         (nullable)
+     *         map is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public static boolean hasInstantiationListsFor(Taclet taclet) {
         if (hm == null) {
             createHashMap();
@@ -85,6 +105,17 @@ public class InstantiationFileHandler {
         return hm.containsKey(taclet.name().toString());
     }
 
+    /**
+     * Returns the instantiation lists stored for the given taclet, creating the list lazily on
+     * first access.
+     *
+     * @param taclet The taclet to look up.
+     * @return The stored instantiation lists, or {@code null} if none are stored.
+     *         <p>
+     *         The instantiation map is lazily created on first access; the dereferences of the
+     *         (nullable) map are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public static @Nullable List<List<String>> getInstantiationListsFor(Taclet taclet) {
         if (hasInstantiationListsFor(taclet)) {
             if (hm.get(taclet.name().toString()) == null) {
@@ -95,6 +126,13 @@ public class InstantiationFileHandler {
         return null;
     }
 
+    /**
+     * Creates the instantiation map from the stored instantiation files.
+     * <p>
+     * The map and the file names of the stored instantiation files are always present here; the
+     * dereferences of the (nullable) map and file-name paths are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private static void createHashMap() {
         hm = new TreeMap<>();
         try (var stream = Files.list(INSTANTIATION_DIR)) {
@@ -105,6 +143,16 @@ public class InstantiationFileHandler {
         }
     }
 
+    /**
+     * Reads the stored instantiation list of the given taclet into the instantiation map.
+     *
+     * @param taclet The taclet whose stored instantiations are loaded.
+     *        <p>
+     *        The instantiation map is created before a list is stored into it; the dereference of
+     *        the
+     *        (nullable) map is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private static void createListFor(Taclet taclet) {
         List<List<String>> instList = new LinkedList<>();
         List<String> instantiations = new LinkedList<>();
@@ -147,6 +195,16 @@ public class InstantiationFileHandler {
         hm.put(taclet.name().toString(), instList);
     }
 
+    /**
+     * Saves the instantiation map of the given model.
+     *
+     * @param model The model whose instantiations are saved.
+     *        <p>
+     *        The instantiation map is created before a list is stored into it; the dereference of
+     *        the
+     *        (nullable) map is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public static void saveListFor(TacletInstantiationModel model) {
         Taclet taclet = model.taclet();
         TacletFindModel tableModel = model.tableModel();

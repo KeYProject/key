@@ -179,6 +179,17 @@ public class JModality extends Modality implements Operator {
         public static final JavaModalityKind TOUT_TRANSACTION =
             new JavaModalityKind(new Name("throughout_transaction"));
 
+        /**
+         * Creates a modality kind and registers it in {@link #kinds}.
+         * <p>
+         * The registration happens while the receiver is still {@code @UnderInitialization}; the
+         * put stores only the identity fields of {@code Kind} (the {@link Name} delegated to
+         * {@code super}), which are fully assigned before the put. The built-in kinds below are
+         * registered during class initialization and any reader of the map triggers and therefore
+         * blocks on the same class initializer, so a half-built kind is never observable; hence the
+         * sanctioned constructor-leak-into-registry suppression (mirrors the NAME2SORT precedent).
+         */
+        @SuppressWarnings("nullness:argument.type.incompatible")
         public JavaModalityKind(Name name) {
             super(name);
             kinds.put(name.toString(), this);

@@ -30,7 +30,7 @@ public class Guard extends JavaNonTerminalProgramElement implements IGuard {
             "a guard requires an expression");
     }
 
-    public Guard(PositionInfo pi, List<Comment> o1, Expression expression) {
+    public Guard(@Nullable PositionInfo pi, @Nullable List<Comment> o1, Expression expression) {
         super(pi, o1);
         this.expr = expression;
     }
@@ -51,7 +51,7 @@ public class Guard extends JavaNonTerminalProgramElement implements IGuard {
     // which conflicts with the @NonNull contract of NonTerminalProgramElement.getChildAt(int), but
     // the base contract is over-narrow; honest @Nullable override per SuperArrayDeclaration
     // precedent (wave 7).
-    @SuppressWarnings("NullAway")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     public @Nullable ProgramElement getChildAt(int index) {
         if (index == 0) {
             return expr;

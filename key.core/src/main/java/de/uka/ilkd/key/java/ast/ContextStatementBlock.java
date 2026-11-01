@@ -155,7 +155,18 @@ public class ContextStatementBlock extends StatementBlock {
      * @param activeStatements a matcher for the active statements, or {@code null} to use the
      *        built-in {@link #matchChildren}
      * @return the resulting match conditions, or {@code null} if matching fails
+     *         <p>
+     *         The match-condition value is re-assigned from helpers that report failure by
+     *         {@code null}; each such assignment is followed by a {@code null} check returning
+     *         {@code null}, so the transitory {@code null} never reaches a non-null position in
+     *         the correct state. The two {@code null} position arguments to
+     *         {@code SVInstantiations.add} denote "no prefix/suffix set" for a bookkeeping entry
+     *         that {@link #makeContextInfoComplete} unconditionally replaces before it is read.
+     *         Both the transitory assignments and the deliberate {@code null} arguments are
+     *         suppressed scoped on this method.
      */
+    @SuppressWarnings({ "nullness:assignment.type.incompatible",
+        "nullness:argument.type.incompatible" })
     public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond,
             @Nullable ProgramChildrenMatcher activeStatements) {
         assert getPrefixLength() > 0;
@@ -314,8 +325,11 @@ public class ContextStatementBlock extends StatementBlock {
     // positions: they denote "no prefix/suffix set" for this bookkeeping entry, which
     // {@link #makeContextInfoComplete} unconditionally replaces via
     // {@code instantiations.replace(...)} before the instantiations are ever read, so no null
-    // position leaks to a consumer.
-    @SuppressWarnings("NullAway")
+    // position leaks to a consumer. The result of {@code executionContext.match} may be null and
+    // is null-checked below; its transitory assignment to the non-null parameter is suppressed
+    // with a scoped key.
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible",
+        "nullness:argument.type.incompatible" })
     private @Nullable MatchConditions matchInnerExecutionContext(MatchConditions matchCond,
             final Services services, @Nullable ExecutionContext lastExecutionContext,
             final @Nullable ProgramPrefix prefix, int pos, final ProgramElement src) {
@@ -325,9 +339,9 @@ public class ContextStatementBlock extends StatementBlock {
         ExecutionContext innerContext = lastExecutionContext;
 
         if (innerContext == null) {
-            if (prefix != null && prefix.getInnerMostMethodFrame() != null) {
-                innerContext =
-                    (ExecutionContext) prefix.getInnerMostMethodFrame().getExecutionContext();
+            var innerMostFrame = prefix == null ? null : prefix.getInnerMostMethodFrame();
+            if (innerMostFrame != null) {
+                innerContext = (ExecutionContext) innerMostFrame.getExecutionContext();
             } else {
                 innerContext = services.getJavaInfo().getDefaultExecutionContext();
             }

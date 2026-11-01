@@ -59,7 +59,15 @@ class StdPredicateEstimator implements PredicateEstimator {
     private static final String TRUE_LABEL = "TRUE";
     private static final String CUT_LABEL = "CUT:";
 
+    /**
+     * Estimates the predicate for the given partner pair based on the branch label of its first
+     * different node.
+     * <p>
+     * The first different node is guaranteed to be present for a partner pair under evaluation; the
+     * dereference of the (nullable) node is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public Result estimate(ProspectivePartner partner, final Proof proof) {
         final Node node = getFirstDifferentNode(partner);
         String branchLabel = node.getNodeInfo().getBranchLabel();
@@ -119,7 +127,12 @@ class StdPredicateEstimator implements PredicateEstimator {
      *
      * @param partner The prospective partner object.
      * @return The next node on the path to partner.getNode(0).
+     *         <p>
+     *         Both nodes of a partner pair are always present; the dereferences of the (nullable)
+     *         nodes
+     *         assigned from the (nullable) partner accessor are suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private @Nullable Node getFirstDifferentNode(ProspectivePartner partner) {
         TreeSet<Node> set = new TreeSet<>(Comparator.comparingInt(Node::serialNr));
 

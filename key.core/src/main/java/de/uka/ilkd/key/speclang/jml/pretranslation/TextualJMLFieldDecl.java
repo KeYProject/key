@@ -9,6 +9,7 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A JML field or local variable (!) declaration (ghost or model) in textual form. For simiplicity,
@@ -42,7 +43,7 @@ public final class TextualJMLFieldDecl extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof TextualJMLFieldDecl fd)) {
             return false;
         }

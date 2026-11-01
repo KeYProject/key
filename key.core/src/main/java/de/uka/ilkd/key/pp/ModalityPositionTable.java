@@ -5,6 +5,8 @@
 package de.uka.ilkd.key.pp;
 
 
+import java.util.Objects;
+
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -29,6 +31,10 @@ public class ModalityPositionTable extends PositionTable {
 
 
     public Range getFirstStatementRange() {
-        return new Range(firstStatementRange);
+        // The range exists only after the layouter saw MARK_START/END_FIRST_STMT for a modality;
+        // its absence used to fail inside the Range copy constructor, so the copy source is
+        // asserted non-null here to keep that failure shape.
+        return new Range(Objects.requireNonNull(firstStatementRange,
+            "no first statement range recorded for this modality"));
     }
 }

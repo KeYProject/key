@@ -15,6 +15,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The abstract class DoWhileFinallyMacro can be used to create compound macros which apply the
@@ -53,7 +54,7 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         if (getCondition()) {
             return getProofMacro().canApplyTo(proof, goals, posInOcc);
         } else {
@@ -61,9 +62,20 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
         }
     }
 
+    /**
+     * The finished info of a wrapped macro may carry no proof; by construction of
+     * {@link ProofMacroFinishedInfo}, this happens exactly when the macro finished on an empty
+     * goal list (no open goals remain). In that state the while/finally restructure below
+     * terminates via {@link ProofMacro#canApplyTo}, whose implementations in this macro family
+     * decide on the goal list first and thus never dereference the absent proof; the assignment
+     * of the (nullable) proof of the wrapped info to the non-null parameter is suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         int steps = getMaxSteps(proof);

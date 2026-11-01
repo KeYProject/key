@@ -48,12 +48,14 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      * The concrete lattice type which determines how abstract elements are generated from
      * abstraction predicates.
      */
-    private Class<? extends AbstractPredicateAbstractionLattice> latticeType = null;
+    private Class<? extends AbstractPredicateAbstractionLattice> latticeType =
+        SimplePredicateAbstractionLattice.class;
 
     /**
      * Manually chosen lattice elements for program variables.
      */
-    private LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices = null;
+    private LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices =
+        new LinkedHashMap<>();
 
     /**
      * Default constructor for subclasses.
@@ -112,7 +114,7 @@ public class MergeWithPredicateAbstraction extends MergeWithLatticeAbstraction {
      * @return The corresponding {@link AbstractDomainLattice}.
      */
     public static @Nullable AbstractDomainLattice instantiateAbstractDomain(final Sort s,
-            @Nullable final List<AbstractionPredicate> applicablePredicates,
+            final @Nullable List<AbstractionPredicate> applicablePredicates,
             Class<? extends AbstractPredicateAbstractionLattice> latticeType,
             final Services services) {
 

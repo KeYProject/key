@@ -153,7 +153,9 @@ public final class ExceptionTools {
         if (result.isEmpty()) {
             // Generic case: a single message. getMessage() already unwraps the common wrappers and
             // produces the friendly text for ANTLR exceptions.
-            result.add(new PositionedString(getMessage(throwable), safeLocation(throwable)));
+            String generic = getMessage(throwable);
+            result.add(new PositionedString(generic != null ? generic : throwable.toString(),
+                safeLocation(throwable)));
         }
         result.sort((a, b) -> a.getLocation().compareTo(b.getLocation()));
         return result;

@@ -9,6 +9,7 @@ import org.key_project.logic.Name;
 import org.key_project.prover.rules.Rule;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -35,7 +36,7 @@ public class RuleKey {
         this(r.name(), (r instanceof Taclet ? ((Taclet) r).getChoices() : ChoiceExpr.TRUE), r);
     }
 
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null) {
             return false;
         }

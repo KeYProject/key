@@ -10,6 +10,7 @@ import java.util.List;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class SingleProof extends ProofAggregate {
@@ -22,7 +23,12 @@ public class SingleProof extends ProofAggregate {
         this.proof = p;
     }
 
+    /**
+     * The proof of a single proof obligation is asserted present whenever the status is read; the
+     * dereference of the (nullable) proof is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public ProofStatus getStatus() {
         return proof.mgt().getStatus();
     }
@@ -33,7 +39,7 @@ public class SingleProof extends ProofAggregate {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!super.equals(o)) {
             return false;
         }

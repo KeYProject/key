@@ -138,6 +138,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             RuleApp app = selfOrParentNode.getAppliedRuleApp();
             if (app instanceof BlockContractInternalBuiltInRuleApp blockRuleApp) {
                 if (blockRuleApp.getStatement().equals(contract.getBlock())
+                        && previousNode != null
                         && selfOrParentNode.getChildNr(previousNode) == 0) {
                     // prevent application of contract in its own check validity branch
                     // but not in other branches, e.g., do-while
@@ -182,7 +183,13 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
 
 
     @Override
-    public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
+    public boolean isApplicable(final Goal goal, final @Nullable PosInOccurrence occurrence) {
+        // a {@code null} occurrence is not an occurrence at the top level of the succedent, i.e.
+        // the same outcome {@code occursNotAtTopLevelInSuccedent} computes below; making it
+        // explicit lets the flow analysis refine the occurrence for the subsequent lookups
+        if (occurrence == null) {
+            return false;
+        }
         if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -197,7 +204,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         }
         final ImmutableSet<BlockContract> contracts =
             getApplicableContracts(instantiation, goal, goal.proof().getServices());
-        return !contracts.isEmpty();
+        return contracts != null && !contracts.isEmpty();
     }
 
     /**
@@ -245,7 +252,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         protected final static BlockContractHint USAGE_BRANCH =
             new BlockContractHint("Usage Branch");
 
-        private final ProgramVariable excVar;
+        private final @Nullable ProgramVariable excVar;
 
         private final String description;
 
@@ -267,7 +274,11 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
             return new BlockContractHint("Validity Branch", excVar);
         }
 
-        public ProgramVariable getExceptionalVariable() {
+        /**
+         * Returns the exception variable the validity branch catch clause binds, or {@code null}
+         * for the usage branch (which has no catch clause).
+         */
+        public @Nullable ProgramVariable getExceptionalVariable() {
             return excVar;
         }
 

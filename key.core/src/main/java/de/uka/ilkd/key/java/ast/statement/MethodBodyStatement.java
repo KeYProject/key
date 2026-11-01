@@ -21,6 +21,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -135,7 +136,8 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
             new MethodReference(args, method.getProgramElementName(), newContext);
     }
 
-    public MethodBodyStatement(PositionInfo pi, List<Comment> c, IProgramVariable resultVar,
+    public MethodBodyStatement(PositionInfo pi, List<Comment> c,
+            @Nullable IProgramVariable resultVar,
             TypeReference bodySource,
             MethodReference methodReference) {
         super(pi, c);
@@ -147,7 +149,9 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     }
 
 
-    private void checkOnlyProgramVarsAsArguments(ImmutableArray<? extends Expression> arguments) {
+    private void checkOnlyProgramVarsAsArguments(
+            @UnderInitialization MethodBodyStatement this,
+            ImmutableArray<? extends Expression> arguments) {
         for (int i = 0, sz = arguments.size(); i < sz; i++) {
             final Expression argument = arguments.get(i);
             if (!((argument instanceof LocationVariable locVar

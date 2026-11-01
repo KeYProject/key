@@ -23,6 +23,11 @@ public class SuperArrayDeclaration extends TypeDeclaration {
 
     private @Nullable FieldDeclaration length = null;
 
+    // The length member is nullable by design (a SuperArrayDeclaration may exist without a length
+    // field, see {@link #length()}), so the array handed to the shared TypeDeclaration constructor
+    // may contain null. That constructor is shared astral code, so the intentional null element is
+    // exempted from the check here.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private SuperArrayDeclaration(ProgramElementName name, @Nullable FieldDeclaration length) {
         super(new Modifier[0], name, name, new MemberDeclaration[] { length }, false, false);
         this.length = length;
@@ -56,7 +61,7 @@ public class SuperArrayDeclaration extends TypeDeclaration {
     // base contract NonTerminalProgramElement.getChildAt(int) is @NonNull and cannot be widened
     // without ripple across the whole AST, so the honestly-annotated override is exempted from
     // the check.
-    @SuppressWarnings("NullAway")
+    @SuppressWarnings("nullness:override.return.invalid")
     public @Nullable ProgramElement getChildAt(int i) {
         return null;
     }

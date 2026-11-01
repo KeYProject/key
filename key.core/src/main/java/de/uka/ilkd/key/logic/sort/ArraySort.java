@@ -86,7 +86,10 @@ public final class ArraySort extends SortImpl {
             }
         } else {
             for (Sort s : elemDirectSuperSorts) {
-                result = result.add(getArraySort(s, objectSort, cloneableSort, serializableSort));
+                // element type of the super sort is unknown; the 5-argument overload also
+                // tolerates the @Nullable JDK sorts (which the 4-argument one does not)
+                result =
+                    result.add(getArraySort(s, null, objectSort, cloneableSort, serializableSort));
             }
         }
 
@@ -161,11 +164,11 @@ public final class ArraySort extends SortImpl {
         return elementSort().containsGenericSort();
     }
 
-    private record SortKey(Sort elemSort, Type elemType, Sort javaLangObjectSort,
-            Sort javaLangCloneable,
-            Sort javaLangSerializable) {
+    private record SortKey(Sort elemSort, @Nullable Type elemType,
+            @Nullable Sort javaLangObjectSort, @Nullable Sort javaLangCloneable,
+            @Nullable Sort javaLangSerializable) {
         public boolean equals(@Nullable Object o) {
-            if (!(o instanceof SortKey(Sort sort, Type type, Sort langObjectSort, Sort langCloneable, Sort langSerializable))) {
+            if (!(o instanceof SortKey(Sort sort, @Nullable Type type, @Nullable Sort langObjectSort, @Nullable Sort langCloneable, @Nullable Sort langSerializable))) {
                 return false;
             }
             return elemSort == sort && elemType == type

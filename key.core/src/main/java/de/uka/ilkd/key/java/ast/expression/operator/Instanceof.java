@@ -41,12 +41,24 @@ public class Instanceof extends TypeOperator {
      *        reference.
      */
 
+    /**
+     * The arity asserts call {@link #getChildCount()} on {@code this} while the receiver is
+     * still under initialization (EISOP initialization check); safe here because the children
+     * were provided by {@code super(...)}, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public Instanceof(ExtList children) {
         super(children);
         assert this.getChildCount() == 2 : "not 2 children but " + this.getChildCount();
     }
 
 
+    /**
+     * The arity asserts call {@link #getChildCount()} on {@code this} while the receiver is
+     * still under initialization (EISOP initialization check); safe here because the children
+     * were provided by {@code super(...)}, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public Instanceof(Expression unaryChild, TypeReference typeref) {
         super(unaryChild, typeref);
         assert this.getChildCount() == 2 : "not 2 children but " + this.getChildCount();

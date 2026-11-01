@@ -107,8 +107,8 @@ public class UndeclaredProgramVariableCollector extends ProgramVariableCollector
      */
     @Override
     public void performActionOnExecutionContext(ExecutionContext x) {
-        if (x.getRuntimeInstance() instanceof IProgramVariable) {
-            declaredVariables.add((IProgramVariable) x.getRuntimeInstance());
+        if (x.getRuntimeInstance() instanceof IProgramVariable runtimeInstance) {
+            declaredVariables.add(runtimeInstance);
         }
     }
 

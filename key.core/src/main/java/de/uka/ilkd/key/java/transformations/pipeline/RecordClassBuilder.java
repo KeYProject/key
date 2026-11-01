@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.github.javaparser.StaticJavaParser;
@@ -182,7 +183,9 @@ public class RecordClassBuilder extends JavaTransformerAbstract {
                 }
             }
             concatBuilder.addStr("]");
-            toString.getBody().get().addStatement(new ReturnStmt(concatBuilder.expr));
+            toString.getBody().get().addStatement(
+                new ReturnStmt(Objects.requireNonNull(concatBuilder.expr,
+                    "toString() body is always non-empty")));
             addGenerated(toString);
         }
     }

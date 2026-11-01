@@ -22,6 +22,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.WeakValueInterner;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static org.key_project.logic.op.Function.FunctionKind.ORDINARY;
 import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
@@ -114,7 +115,7 @@ public class ParametricFunctionInstance extends JFunction {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null || getClass() != o.getClass())
             return false;
         ParametricFunctionInstance that = (ParametricFunctionInstance) o;

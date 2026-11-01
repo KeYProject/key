@@ -7,7 +7,8 @@ package de.uka.ilkd.key.parser;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public record IdDeclaration(String name, Sort sort) {
+public record IdDeclaration(String name, @Nullable Sort sort) {
 }

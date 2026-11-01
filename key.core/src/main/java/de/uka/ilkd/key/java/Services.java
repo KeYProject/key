@@ -43,8 +43,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
     /**
      * the proof
      */
-    @Nullable
-    private Proof proof;
+    private @Nullable Proof proof;
 
     /**
      * proof specific namespaces (functions, predicates, sorts, variables)
@@ -66,12 +65,19 @@ public class Services implements TermServices, LogicServices, ProofServices {
     /**
      * the information object on the Java model
      */
-    @Nullable
-    private JavaInfo javaInfo;
+    private @Nullable JavaInfo javaInfo;
 
     /**
      * variable namer for inner renaming
+     * <p>
+     * Constructing the namer around the partially constructed {@code Services} is a deliberate
+     * {@code this}-escape: the namer only holds the reference to propose fresh names later, it
+     * never reads state during construction. The EISOP initialization check treats the pass of
+     * {@code this} as possibly uninitialized and is suppressed scoped on the field and on the
+     * constructors that finish the wiring.
      */
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:assignment.type.incompatible" })
     private final VariableNamer innerVarNamer = new InnerVariableNamer(this);
 
     /**
@@ -87,8 +93,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
     /*
      * the Java model (with all paths)
      */
-    @Nullable
-    private JavaModel javaModel;
+    private @Nullable JavaModel javaModel;
 
     /**
      * Records the fresh-name proposals made while a rule is applied, so they can be stored on the
@@ -99,16 +104,18 @@ public class Services implements TermServices, LogicServices, ProofServices {
      * without {@link Services} having to know which prover is running. It is an <em>instance</em>
      * {@link ThreadLocal} (not static), so a nested side proof, which runs on its own
      * {@link Services}, keeps its own recorder. Lazily created; reset by
-     * {@link #saveNameRecorder(Node)} after each rule application.
+     * {@link #saveNameRecorder(Node)} after each rule application. The annotated JDK declares
+     * {@code ThreadLocal<@Nullable T>}, which only admits nullable type arguments; this value is
+     * never null in practice, so the difference is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:type.argument.type.incompatible")
     private ThreadLocal<NameRecorder> nameRecorder =
         ThreadLocal.withInitial(NameRecorder::new);
 
     private ITermProgramVariableCollectorFactory factory =
         TermProgramVariableCollector::new;
 
-    @Nullable
-    private OriginTermLabelFactory originFactory;
+    private @Nullable OriginTermLabelFactory originFactory;
 
     private final Profile profile;
 
@@ -118,8 +125,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
 
     private final TermBuilder termBuilderWithoutCache;
 
-    @Nullable
-    private JavaService javaService;
+    private @Nullable JavaService javaService;
 
     /**
      * creates a new Services object with a new TypeConverter and a new JavaInfo object with no
@@ -129,6 +135,19 @@ public class Services implements TermServices, LogicServices, ProofServices {
         this(profile, null, new LinkedHashMap<>(), new ServiceCaches());
     }
 
+    /**
+     * Creates the shared services infrastructure -- profile, caches, type converter and the Java
+     * model facade -- around the partially constructed {@code Services} object.
+     * <p>
+     * Handing {@code this} to the collaborators while the constructor is still running is a
+     * deliberate {@code this}-escape: each collaborator only stores the reference and accesses it
+     * after construction completes (see {@link #getProfile()}, {@link #getTypeConverter()},
+     * {@link #getJavaInfo()}, {@link #getTermBuilder()}). The EISOP initialization check rejects
+     * the mid-construction passes and assignments to the collaborators' (uninitialized-typed)
+     * results; both error families are suppressed scoped on this constructor.
+     */
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:assignment.type.incompatible" })
     private Services(Profile profile, @Nullable JavaService javaService,
             HashMap<String, Counter> counters,
             ServiceCaches caches) {
@@ -153,6 +172,18 @@ public class Services implements TermServices, LogicServices, ProofServices {
         }
     }
 
+    /**
+     * Copy constructor: shares all infrastructure of the source except the term builders, which
+     * are rebuilt around this copy.
+     * <p>
+     * Handing {@code this} to the rebuilt {@link TermBuilder} instances while the constructor is
+     * still running is a deliberate {@code this}-escape: the builders only store the reference and
+     * access it after construction completes ({@link #getTermBuilder()} is only called on fully
+     * constructed services). The EISOP initialization check rejects the mid-construction pass and
+     * the assignment of the (uninitialized-typed) builder result; suppressed scoped.
+     */
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:assignment.type.incompatible" })
     private Services(Services s) {
         this.profile = s.profile;
         this.proof = s.proof;
@@ -502,7 +533,7 @@ public class Services implements TermServices, LogicServices, ProofServices {
      * @param originFactory the {@link OriginTermLabelFactory} to use, if null is passed, origin
      *        labels should not be created
      */
-    public void setOriginFactory(OriginTermLabelFactory originFactory) {
+    public void setOriginFactory(@Nullable OriginTermLabelFactory originFactory) {
         this.originFactory = originFactory;
     }
 
@@ -546,9 +577,10 @@ public class Services implements TermServices, LogicServices, ProofServices {
 
     private JavaService activateJavaPath(Path bootClassPath,
             Collection<Path> libraryPaths, @Nullable FileRepo fileRepo) {
-        if (javaService != null && javaService.getBootClassPath().equals(bootClassPath)
-                && CollectionUtil.containsSame(javaService.getLibraryPath(), libraryPaths)) {
-            return javaService;
+        JavaService js = javaService;
+        if (js != null && js.getBootClassPath().equals(bootClassPath)
+                && CollectionUtil.containsSame(js.getLibraryPath(), libraryPaths)) {
+            return js;
         }
         LOGGER.info("activate java with {} and {}", bootClassPath, libraryPaths);
         javaService = new JavaService(this, bootClassPath, libraryPaths, fileRepo);

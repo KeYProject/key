@@ -63,7 +63,19 @@ public class NewSMTTranslationSettings extends AbstractSettings {
         return new NewSMTTranslationSettings(this);
     }
 
+    /**
+     * Reads the options from the given properties file. Only entries whose key is prefixed with
+     * {@link #PREFIX} are transferred; their values are mapped verbatim into the map.
+     * <p>
+     * The {@link Properties#getProperty} result is annotated nullable, but the key originates from
+     * {@link Properties#keySet()}, whose keys always have a value in that properties object, so a
+     * null cannot occur at runtime. The map value type stays non-null because
+     * {@link #writeSettings(Properties)} feeds {@link Properties} (which rejects null values) and
+     * {@link #getMap()} is putAll-ed into {@code Map<String, Object>} sinks; the unreachable null
+     * is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public void readSettings(Properties props) {
         for (Object k : props.keySet()) {
             String key = k.toString();
@@ -116,8 +128,7 @@ public class NewSMTTranslationSettings extends AbstractSettings {
      * @param key the key to look up
      * @return the value for the key, null if not present
      */
-    @Nullable
-    public String get(String key) {
+    public @Nullable String get(String key) {
         return map.get(key);
     }
 
@@ -128,8 +139,7 @@ public class NewSMTTranslationSettings extends AbstractSettings {
      * @param value the non-null value to set
      * @return the value that was in the map prior to the call (see {@link Map#put(Object, Object)}.
      */
-    @Nullable
-    public String put(String key, String value) {
+    public @Nullable String put(String key, String value) {
         var old = map.get(key);
         String result = map.put(Objects.requireNonNull(key), Objects.requireNonNull(value));
         firePropertyChange(key, old, value);

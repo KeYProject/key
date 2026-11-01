@@ -22,6 +22,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.WeakValueInterner;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// Concrete sort of a parametric sort.
 @NullMarked
@@ -78,7 +79,7 @@ public final class ParametricSortInstance extends AbstractSort implements Syntax
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -190,9 +191,9 @@ public final class ParametricSortInstance extends AbstractSort implements Syntax
                     newArgs.prepend(
                         new GenericArgument(psi.resolveSort(instMap, services)));
             } else if (sort instanceof GenericSort gs) {
-                newArgs = newArgs.prepend(
-                    new GenericArgument(
-                        instMap.getGenericSortInstantiations().getInstantiation(gs)));
+                newArgs = newArgs.prepend(new GenericArgument(Objects.requireNonNull(
+                    instMap.getGenericSortInstantiations().getInstantiation(gs),
+                    "generic sort is not instantiated")));
             } else {
                 newArgs = newArgs.prepend(arg);
             }

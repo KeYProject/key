@@ -15,6 +15,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class captures a proof macro which is meant to fully automise KeY proof workflow.
@@ -64,8 +65,13 @@ public class TranscendentalFloatSMTMacro extends SequentialProofMacro {
     private static class FullAutoMacro extends StrategyProofMacro {
 
         @Override
-        protected Strategy<@NonNull Goal> createStrategy(Proof proof, PosInOccurrence posInOcc) {
-            return proof.getActiveStrategy();
+        protected Strategy<@NonNull Goal> createStrategy(Proof proof,
+                @Nullable PosInOccurrence posInOcc) {
+            Strategy<Goal> active = proof.getActiveStrategy();
+            if (active == null) {
+                throw new IllegalStateException("The proof has no active strategy");
+            }
+            return active;
         }
 
         @Override

@@ -20,6 +20,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Predicts the cost of instantiating a quantified formula with a candidate term. The instantiated
@@ -334,7 +335,7 @@ public class PredictCostProver {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (!(o instanceof Clause other)) {
                 return false;
             }

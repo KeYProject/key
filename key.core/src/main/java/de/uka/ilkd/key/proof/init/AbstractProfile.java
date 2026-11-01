@@ -59,6 +59,19 @@ public abstract class AbstractProfile implements Profile {
         return result;
     }
 
+    /**
+     * The label manager is configured via {@code initTermLabelManager()} at the end of the
+     * constructor, but the possibly-overridden helper call cannot be verified by the initialization
+     * check; the difference is suppressed with a scoped key.
+     * <p>
+     * The rule/strategy/goal-chooser initialization calls ({@link #initBuiltInRules()}, {@link
+     * #getStrategyFactories()}, {@link #computeSupportedGoalChooserBuilder()}, {@link
+     * #getDefaultGoalChooserBuilder()}, {@link #initTermLabelManager()}) operate on {@code this}
+     * while the receiver is still under initialization (EISOP initialization check); safe here
+     * because each result is only assigned to its final field, suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     protected AbstractProfile(String standardRuleFilename) {
         final var ruleSource = RuleSourceFactory.fromDefaultLocation(standardRuleFilename);
         standardRules = new RuleCollection(ImmutableList.of(ruleSource), initBuiltInRules());
@@ -151,13 +164,14 @@ public abstract class AbstractProfile implements Profile {
      */
     @Override
     public void setSelectedGoalChooserBuilder(String name) {
+        final GoalChooserFactory<Proof, Goal> builder = lookupGC(name);
 
-        this.prototype = lookupGC(name);
-
-        if (this.prototype == null) {
+        if (builder == null) {
             throw new IllegalArgumentException(
                 "Goal chooser:" + name + " is not supported by this profile.");
         }
+
+        this.prototype = builder;
     }
 
     /**

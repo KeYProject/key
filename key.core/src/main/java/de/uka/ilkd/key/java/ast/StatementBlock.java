@@ -44,6 +44,14 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     private @Nullable MethodFrame innerMostMethodFrame;
     private final ImmutableList<TextualJMLConstruct> attachedJML;
 
+    /**
+     * Constructs a statement block with the given body and attached JML constructs.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public StatementBlock(
             PositionInfo pi, List<Comment> comments,
             ImmutableArray<? extends Statement> body,
@@ -66,10 +74,15 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     /**
      * Statement block.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param children
      *        an ExtList that contains the children
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public StatementBlock(ExtList children) {
         super(children);
         body = new ImmutableArray<>(children.collect(Statement.class));
@@ -80,6 +93,14 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
             ImmutableList.fromList(Arrays.asList(children.collect(TextualJMLConstruct.class)));
     }
 
+    /**
+     * Constructs a statement block over the given (deeply non-null) body.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public StatementBlock(ImmutableArray<? extends Statement> as) {
         super(PositionInfo.UNDEFINED, List.of());
         // check for non-null elements (bug fix)
@@ -111,7 +132,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }

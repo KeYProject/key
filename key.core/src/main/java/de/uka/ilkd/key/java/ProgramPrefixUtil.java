@@ -10,6 +10,10 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+/**
+ * Utility for extracting essential information from {@link ProgramPrefix} chains, such as the
+ * prefix length needed for debugging output and the innermost method frame of a program fragment.
+ */
 @NullMarked
 public class ProgramPrefixUtil {
 

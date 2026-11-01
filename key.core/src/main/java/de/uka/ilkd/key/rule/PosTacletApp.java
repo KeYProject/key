@@ -22,7 +22,7 @@ import org.key_project.prover.rules.instantiation.SVInstantiations;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -234,18 +234,26 @@ public class PosTacletApp extends TacletApp {
      * @return the PosInOccurrence
      */
     @Override
-    public @MonotonicNonNull PosInOccurrence posInOccurrence() {
+    public @NonNull PosInOccurrence posInOccurrence() {
         return pos;
     }
 
+    /**
+     * Compares this application for equality with the given object, including the occurrence
+     * position.
+     */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!super.equals(o)) {
             return false;
         }
         return ((PosTacletApp) o).posInOccurrence().equals(posInOccurrence());
     }
 
+    /**
+     * The occurrence position of a positioned application is non-null after the closure of this
+     * app.
+     */
     @Override
     public int hashCode() {
         return super.hashCode() + 13 * posInOccurrence().hashCode();

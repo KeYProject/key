@@ -140,7 +140,11 @@ class Semisequent extends org.key_project.prover.sequent.Semisequent {
          *
          * @param idx int representing the index of the element we want to have
          * @return {@link SequentFormula} found at index idx
+         *         The overridden declaration requires a non-null return type, but this
+         *         implementation may legitimately return {@code null}; the difference is suppressed
+         *         with a scoped key.
          */
+        @SuppressWarnings("nullness:override.return.invalid")
         @Override
         public @Nullable SequentFormula get(int idx) {
             return null;
@@ -148,7 +152,11 @@ class Semisequent extends org.key_project.prover.sequent.Semisequent {
 
         /**
          * @return the first SequentFormula of this Semisequent
+         *         The overridden declaration requires a non-null return type, but this
+         *         implementation may legitimately return {@code null}; the difference is suppressed
+         *         with a scoped key.
          */
+        @SuppressWarnings("nullness:override.return.invalid")
         @Override
         public @Nullable SequentFormula getFirst() {
             return null;
@@ -166,7 +174,7 @@ class Semisequent extends org.key_project.prover.sequent.Semisequent {
         }
 
         @Override
-        public boolean equals(Object other) {
+        public boolean equals(@Nullable Object other) {
             return other == this;
         }
 

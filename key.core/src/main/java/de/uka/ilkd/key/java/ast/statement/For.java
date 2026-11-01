@@ -58,13 +58,14 @@ public class For extends LoopStatement implements VariableScope {
             Objects.requireNonNull(children.get(Statement.class), "For requires a body"), children);
     }
 
-    public For(PositionInfo pi, List<Comment> comments, ILoopInit inits, IForUpdates updates,
-            IGuard guard, Statement body) {
+    public For(PositionInfo pi, List<Comment> comments, @Nullable ILoopInit inits,
+            @Nullable IForUpdates updates, IGuard guard, Statement body) {
         super(pi, comments, inits, updates, guard, body, ImmutableList.nil());
     }
 
-    public <T> For(PositionInfo pi, List<Comment> comments, ILoopInit inits, IForUpdates updates,
-            IGuard guard, Statement body, List<TextualJMLConstruct> specs) {
+    public <T> For(PositionInfo pi, List<Comment> comments, @Nullable ILoopInit inits,
+            @Nullable IForUpdates updates, IGuard guard, Statement body,
+            List<TextualJMLConstruct> specs) {
         super(pi, comments, inits, updates, guard, body, ImmutableList.fromList(specs));
     }
 

@@ -16,6 +16,12 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class BranchNodeIntermediate extends NodeIntermediate {
 
+    /**
+     * The branch title of this branch node. It is always assigned by the single constructor before
+     * the node is used; the {@code null} initializer merely marks the intermediate's pre-writing
+     * state and is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     private String branchTitle = null;
 
     public BranchNodeIntermediate(String branchTitle) {

@@ -11,14 +11,15 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class Assert extends JavaStatement implements ExpressionContainer {
 
     private final Expression condition;
-    private final Expression message;
+    private final @Nullable Expression message;
 
-    public Assert(Expression condition, Expression message, PositionInfo pos) {
+    public Assert(Expression condition, @Nullable Expression message, PositionInfo pos) {
         super(pos);
         assert condition != null;
         this.condition = condition;
@@ -59,7 +60,7 @@ public class Assert extends JavaStatement implements ExpressionContainer {
         return condition;
     }
 
-    public Expression getMessage() {
+    public @Nullable Expression getMessage() {
         return message;
     }
 }

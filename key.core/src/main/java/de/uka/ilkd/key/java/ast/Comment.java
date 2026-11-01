@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.logic.SyntaxElement;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Comment element of Java source code.
@@ -65,7 +66,7 @@ public class Comment extends JavaSourceElement {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }

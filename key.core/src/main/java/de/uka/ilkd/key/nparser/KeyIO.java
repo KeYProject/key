@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -97,7 +98,9 @@ public class KeyIO {
 
     private JTerm interpretExpression(KeyAst.Term ctx) {
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
-        visitor.setAbbrevMap(abbrevMap);
+        if (abbrevMap != null) {
+            visitor.setAbbrevMap(abbrevMap);
+        }
         if (schemaNamespace != null) {
             visitor.setSchemaVariables(schemaNamespace);
         }
@@ -117,7 +120,9 @@ public class KeyIO {
     public @NonNull Sequent parseSequent(@NonNull CharStream stream) {
         KeyAst.Seq ctx = ParsingFacade.parseSequent(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
-        visitor.setAbbrevMap(abbrevMap);
+        if (abbrevMap != null) {
+            visitor.setAbbrevMap(abbrevMap);
+        }
         if (schemaNamespace != null) {
             visitor.setSchemaVariables(schemaNamespace);
         }
@@ -283,7 +288,9 @@ public class KeyIO {
             if (resource != null) {
                 ctx = parseFiles(resource);
             } else {
-                KeyAst.File c = ParsingFacade.parseFile(content);
+                CharStream in =
+                    Objects.requireNonNull(content, "content stream must not be null");
+                KeyAst.File c = ParsingFacade.parseFile(in);
                 ctx.add(c);
             }
             long stop = System.currentTimeMillis();

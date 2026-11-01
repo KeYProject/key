@@ -47,10 +47,22 @@ public class ProofDependentSMTSettings extends AbstractSettings {
 
     private SupportedTaclets supportedTaclets = SupportedTaclets.REFERENCE;
 
+    /**
+     * The reference-taclet selection is assigned via the setter while the receiver is still
+     * under initialization (EISOP initialization check); safe here because the field it writes
+     * is only read after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private ProofDependentSMTSettings() {
         setSupportedTaclets(SupportedTaclets.REFERENCE);
     }
 
+    /**
+     * The state copy is applied via the delegate while the receiver is still under
+     * initialization (EISOP initialization check); safe here because {@link #copy} only
+     * assigns fields from the fully-constructed {@code data}, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private ProofDependentSMTSettings(ProofDependentSMTSettings data) {
         copy(data);
     }
@@ -131,25 +143,25 @@ public class ProofDependentSMTSettings extends AbstractSettings {
 
     @Override
     public void readSettings(Configuration props) {
-        props = props.getSection(CATEGORY);
+        var section = props.getSection(CATEGORY);
 
-        if (props == null)
+        if (section == null)
             return;
 
         setUseExplicitTypeHierarchy(
-            props.getBool(EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy));
-        setUseNullInstantiation(props.getBool(INSTANTIATE_NULL_PREDICATES, useNullInstantiation));
-        setUseBuiltInUniqueness(props.getBool(USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness));
-        setMaxGenericSorts(props.getInt(MAX_GENERIC_SORTS, maxGenericSorts));
+            section.getBool(EXPLICIT_TYPE_HIERARCHY, useExplicitTypeHierarchy));
+        setUseNullInstantiation(section.getBool(INSTANTIATE_NULL_PREDICATES, useNullInstantiation));
+        setUseBuiltInUniqueness(section.getBool(USE_BUILT_IN_UNIQUENESS, useBuiltInUniqueness));
+        setMaxGenericSorts(section.getInt(MAX_GENERIC_SORTS, maxGenericSorts));
         setUseUIMultiplication(
-            props.getBool(USE_UNINTERPRETED_MULTIPLICATION, useUIMultiplication));
+            section.getBool(USE_UNINTERPRETED_MULTIPLICATION, useUIMultiplication));
         setUseConstantsForIntegers(
-            props.getBool(USE_CONSTANTS_FOR_BIGSMALL_INTEGERS, useConstantsForIntegers));
-        setMaxInteger(props.getInt(INTEGERS_MAXIMUM, maxInteger));
-        setMinInteger(props.getInt(INTEGERS_MINIMUM, minInteger));
-        setInvariantForall(props.getBool(INVARIANT_FORALL, invariantForall));
+            section.getBool(USE_CONSTANTS_FOR_BIGSMALL_INTEGERS, useConstantsForIntegers));
+        setMaxInteger(section.getInt(INTEGERS_MAXIMUM, maxInteger));
+        setMinInteger(section.getInt(INTEGERS_MINIMUM, minInteger));
+        setInvariantForall(section.getBool(INVARIANT_FORALL, invariantForall));
         supportedTaclets.selectTaclets(
-            props.getStringArray(TACLET_SELECTION, supportedTaclets.getNamesOfSelectedTaclets()));
+            section.getStringArray(TACLET_SELECTION, supportedTaclets.getNamesOfSelectedTaclets()));
 
     }
 

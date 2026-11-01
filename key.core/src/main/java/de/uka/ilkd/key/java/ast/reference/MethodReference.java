@@ -62,6 +62,12 @@ public class MethodReference extends JavaNonTerminalProgramElement
         this.arguments = new ImmutableArray<>(args.collect(Expression.class));
     }
 
+    /**
+     * The {@link #checkArguments} verification operates on {@code this} while the receiver is
+     * still under initialization (EISOP initialization check); safe here because the fields it
+     * reads are assigned just above, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public MethodReference(ImmutableArray<? extends Expression> args, MethodName n,
             @Nullable ReferencePrefix p) {
         this.prefix = p;
@@ -71,6 +77,12 @@ public class MethodReference extends JavaNonTerminalProgramElement
         checkArguments();
     }
 
+    /**
+     * The {@link #checkArguments} verification operates on {@code this} while the receiver is
+     * still under initialization (EISOP initialization check); safe here because the fields it
+     * reads are assigned just above, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public MethodReference(ImmutableArray<Expression> args, MethodName n,
             @Nullable ReferencePrefix p,
             @Nullable PositionInfo pos) {

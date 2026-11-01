@@ -43,14 +43,15 @@ public class DebugKeyLexer {
 
     public DebugKeyLexer(List<File> files) {
         stream = System.out;
-        lexer = files.stream().map(it -> {
+        final List<JavaKeYLexer> lexers = new ArrayList<>(files.size());
+        for (File file : files) {
             try {
-                return ParsingFacade.createLexer(it.toPath());
+                lexers.add(ParsingFacade.createLexer(file.toPath()));
             } catch (IOException e) {
                 e.printStackTrace(stream);
             }
-            return null;
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+        }
+        lexer = lexers;
         format = DEFAULT_FORMAT;
     }
 

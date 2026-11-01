@@ -41,7 +41,8 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
      *        should match the joinNodeId fields of the corresponding partner nodes).
      * @param joinProc The name of the join procedure used during joining.
      * @param nrPartners Number of involved join partners.
-     * @param newNames New names registered in the course of the join rule application.
+     * @param newNames New names registered in the course of the join rule application; null if no
+     *        new names were registered.
      * @param distinguishingFormula The user-supplied distinguishing formula for the join.
      * @param predAbstrLatticeType The type for the used predicate abstraction lattice which
      *        determines how abstract domain elements are generated from predicates.
@@ -52,7 +53,7 @@ public class MergeAppIntermediate extends BuiltInAppIntermediate {
      *        chosen by the user
      */
     public MergeAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos, int id,
-            @Nullable String joinProc, int nrPartners, ImmutableList<Name> newNames,
+            @Nullable String joinProc, int nrPartners, @Nullable ImmutableList<Name> newNames,
             @Nullable String distinguishingFormula,
             @Nullable Class<? extends AbstractPredicateAbstractionLattice> predAbstrLatticeType,
             @Nullable String abstractionPredicates, @Nullable String userChoices) {

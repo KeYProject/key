@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -76,9 +77,21 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
         return mode;
     }
 
+    /**
+     * Checks whether the relationship between the two resolvers' sorts matches this condition's
+     * mode, provided both sorts are already resolvable.
+     * <p>
+     * {@code var} and {@code subst} are declared {@code @Nullable} because the engine invokes
+     * conditions without a matched schema variable (see {@link VariableConditionAdapter}); each
+     * {@link TypeResolver} reports such conditions as incomplete unless the referenced variable
+     * has an instantiation, in which case it routes through the instantiations map instead of the
+     * candidate arguments. Since {@code isComplete}/{@code resolveSort} still declare non-null
+     * parameters, the calls are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
-            Services services) {
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement subst,
+            SVInstantiations svInst, Services services) {
 
         if (!fst.isComplete(var, subst, svInst, services)
                 || !snd.isComplete(var, subst, svInst, services)) {
@@ -92,6 +105,17 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
     }
 
 
+    /**
+     * Checks the given sort pair against this condition's comparator mode, treating proxy sorts
+     * per their placeholder semantics.
+     * <p>
+     * Both parameters are declared {@code @Nullable} because the compared terms resolve to the
+     * {@code null} type when the corresponding term is of type {@code null}; the dereferences of
+     * the (nullable) first sort are suppressed with a scoped key. Well-formed rule applications
+     * always supply non-null sorts, so the {@code extendsTrans} arguments are guarded with
+     * {@link Objects#requireNonNull}.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private boolean checkSorts(final @Nullable Sort fstSort, final @Nullable Sort sndSort,
             final Services services) {
 
@@ -103,9 +127,10 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
             return switch (mode) {
                 case SAME -> fstSort == sndSort;
                 case NOT_SAME -> fstSort != sndSort;
-                case IS_SUBTYPE -> fstSort.extendsTrans(sndSort);
-                case STRICT_SUBTYPE -> fstSort != sndSort && fstSort.extendsTrans(sndSort);
-                case NOT_IS_SUBTYPE -> !fstSort.extendsTrans(sndSort);
+                case IS_SUBTYPE -> fstSort.extendsTrans(Objects.requireNonNull(sndSort));
+                case STRICT_SUBTYPE -> fstSort != sndSort
+                        && fstSort.extendsTrans(Objects.requireNonNull(sndSort));
+                case NOT_IS_SUBTYPE -> !fstSort.extendsTrans(Objects.requireNonNull(sndSort));
                 case DISJOINTMODULONULL -> checkDisjointness(fstSort, sndSort, services);
             };
         } else {
@@ -121,7 +146,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
                     // is the proxy sort.
                     assert proxy1;
                     for (Sort extSort : fstSort.extendsSorts()) {
-                        if (extSort.extendsTrans(sndSort)) {
+                        if (extSort.extendsTrans(Objects.requireNonNull(sndSort))) {
                             return true;
                         }
                     }
@@ -135,7 +160,8 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
                     // is the proxy sort.
                     assert proxy1;
                     for (Sort extSort : fstSort.extendsSorts()) {
-                        if (extSort != sndSort && extSort.extendsTrans(sndSort)) {
+                        if (extSort != sndSort
+                                && extSort.extendsTrans(Objects.requireNonNull(sndSort))) {
                             return true;
                         }
                     }
@@ -214,7 +240,8 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
         }
 
         // result cached?
-        Boolean result = lookupInCache(fstSort, sndSort, services.getCaches());
+        Boolean result = lookupInCache(Objects.requireNonNull(fstSort),
+            Objects.requireNonNull(sndSort), services.getCaches());
 
         // if not, compute it
         if (result == null) {

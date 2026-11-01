@@ -141,7 +141,7 @@ public class LogicFunctionalOperator extends Operator
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof LogicFunctionalOperator that))
             return false;
         if (!super.equals(o))

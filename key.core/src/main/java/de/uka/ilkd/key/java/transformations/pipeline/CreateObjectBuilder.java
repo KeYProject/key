@@ -60,7 +60,12 @@ public class CreateObjectBuilder extends JavaTransformerAbstract {
     /**
      * Creates the body of the static <code>&lt;createObject&gt;</code>
      * method.
+     * <p>
+     * The name of the emitted {@link KeyMethodBodyStatement} is optional and deliberately
+     * {@code null} here: the wrapped call's result is discarded, and the parser-generated
+     * constructor as well as the printer treat a missing name as "no result variable".
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private BlockStmt createBody(ClassOrInterfaceDeclaration recoderClass) {
         var result = new BlockStmt();
         final var thisType = services.getType(recoderClass);

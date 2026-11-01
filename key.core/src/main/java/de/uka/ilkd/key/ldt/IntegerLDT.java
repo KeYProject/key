@@ -164,6 +164,19 @@ public final class IntegerLDT extends LDT {
     // constructors
     // -------------------------------------------------------------------------
 
+    /**
+     * The constant-construction calls below (in particular {@link #makeDigit(int, TermBuilder)})
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since they only use {@code services} and the function
+     * caches that were populated earlier in this constructor, suppressed with a scoped key.
+     */
+    /**
+     * The constant-construction calls below (in particular {@link #makeDigit(int, TermBuilder)})
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since they only use {@code services} and the function
+     * caches that were populated earlier in this constructor, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public IntegerLDT(Services services) {
         super(NAME, services);
 

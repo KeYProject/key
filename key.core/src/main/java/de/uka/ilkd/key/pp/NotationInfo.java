@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
@@ -147,11 +148,26 @@ public final class NotationInfo {
     // constructors
     // -------------------------------------------------------------------------
 
+    /**
+     * The default-notation construction operates on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here because {@link
+     * #createDefaultNotation()} builds and returns the table without reading instance state,
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public NotationInfo() {
         this.notationTable = createDefaultNotation();
     }
 
-    public NotationInfo(boolean prettySyntax, boolean unicodeEnabled, boolean hidePackagePrefix) {
+    /**
+     * The default-notation construction operates on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here because {@link
+     * #createDefaultNotation()} builds and returns the table without reading instance state,
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
+    public NotationInfo(boolean prettySyntax, boolean unicodeEnabled,
+            boolean hidePackagePrefix) {
         this.notationTable = createDefaultNotation();
         this.prettySyntax = prettySyntax;
         this.unicodeEnabled = unicodeEnabled;
@@ -227,7 +243,12 @@ public final class NotationInfo {
 
     /**
      * Adds notations that can only be defined when a services object is available.
+     * <p>
+     * The heap LDT is always registered in the {@link Services} of a fully initialized KeY
+     * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the dereference
+     * is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private HashMap<Object, Notation> createPrettyNotation(Services services) {
 
         HashMap<Object, Notation> tbl = createDefaultNotation();
@@ -347,9 +368,14 @@ public final class NotationInfo {
 
     /**
      * Add notations with Unicode symbols.
+     * <p>
+     * The heap LDT is always registered in the {@link Services} of a fully initialized KeY
+     * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the dereference
+     * is suppressed with a scoped key.
      *
      * @param services
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private HashMap<Object, Notation> createUnicodeNotation(Services services) {
 
         HashMap<Object, Notation> tbl = createPrettyNotation(services);
@@ -441,9 +467,12 @@ public final class NotationInfo {
             this.notationTable = createDefaultNotation();
         }
 
-        if (services != null && services.getProof() != null) {
-            ProofSettings settings = services.getProof().getSettings();
-            finalImmutable = FinalHeapResolution.isFinalEnabled(settings);
+        if (services != null) {
+            Proof proof = services.getProof();
+            if (proof != null) {
+                ProofSettings settings = proof.getSettings();
+                finalImmutable = FinalHeapResolution.isFinalEnabled(settings);
+            }
         }
     }
 

@@ -75,6 +75,15 @@ public class ProspectivePartner {
         return commonPredicate;
     }
 
+    /**
+     * Sets the common parent node of this prospective join partner pair and derives the hide
+     * formula from its applied rule application if present.
+     * <p>
+     * A parent node's applied rule application carries a position whenever the pair's formula for
+     * hiding is derivable; the dereferences of the (nullable) applied rule app and its (nullable)
+     * position are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public void setCommonParent(Node commonParent) {
         this.commonParent = commonParent;
         if (commonParent.getAppliedRuleApp() != null

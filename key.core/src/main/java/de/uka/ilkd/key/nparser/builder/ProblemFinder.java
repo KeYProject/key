@@ -40,12 +40,22 @@ public class ProblemFinder extends ExpressionBuilder {
         super(services, nss);
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitFile(JavaKeYParser.FileContext ctx) {
         each(ctx.problem());
         return null;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable KeYJavaType visitArrayopid(JavaKeYParser.ArrayopidContext ctx) {
         return accept(ctx.typemapping());
@@ -64,8 +74,16 @@ public class ProblemFinder extends ExpressionBuilder {
      *        the parse tree
      * @return a term if {@code \problem} entry exists.
      * @throws BuildingException
-     *         if the
+     *         if the proof-obligation property file cannot be loaded.
+     *         <p>
+     *         The overridden declaration requires a non-null return type, but this implementation
+     *         may legitimately return {@code null}; the checker additionally infers a
+     *         {@code @KeyForBottom} annotation on the {@code Properties.forEach} lambda
+     *         parameters, which is not a legal location for that annotation. Both differences are
+     *         suppressed with scoped keys.
      */
+    @SuppressWarnings({ "nullness:override.return.invalid",
+        "nullness:type.invalid.annotations.on.location" })
     @Override
     public @Nullable JTerm visitProblem(JavaKeYParser.ProblemContext ctx) {
         if (ctx.CHOOSECONTRACT() != null) {
@@ -85,8 +103,8 @@ public class ProblemFinder extends ExpressionBuilder {
                     var value = stringContext.STRING_LITERAL().getText();
                     value = value.substring(1, value.length() - 1).replace("\\\\", "\\");
                     p.load(new StringReader(value));
-                    proofObligation = new Configuration();
-                    p.forEach((k, v) -> proofObligation.set(k.toString(), v.toString()));
+                    Configuration po = proofObligation = new Configuration();
+                    p.forEach((k, v) -> po.set(k.toString(), v.toString()));
                 } catch (IOException e) {
                     throw new BuildingException(ctx,
                         "Could not load the proof obligation given " +
@@ -106,6 +124,11 @@ public class ProblemFinder extends ExpressionBuilder {
         return null;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Sequent visitTermorseq(JavaKeYParser.TermorseqContext ctx) {
         var obj = super.visitTermorseq(ctx);

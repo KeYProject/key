@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class SMTTermITE extends SMTTerm {
@@ -93,7 +94,7 @@ public class SMTTermITE extends SMTTerm {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

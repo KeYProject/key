@@ -75,8 +75,10 @@ public class CopyingProofReplayer extends AbstractProofReplayer {
                 continue;
             }
             ImmutableList<Goal> newGoals = reApplyRuleApp(nextNode, nextGoal);
-            for (Goal g : newGoals) {
-                queue.addFirst(g);
+            if (newGoals != null) {
+                for (Goal g : newGoals) {
+                    queue.addFirst(g);
+                }
             }
         }
         newNode.proof().setMutedProofCloseEvents(false);

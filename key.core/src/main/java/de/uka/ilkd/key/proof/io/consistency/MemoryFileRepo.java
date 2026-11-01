@@ -22,12 +22,22 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class MemoryFileRepo extends AbstractFileRepo {
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable InputStream getInputStream(Path path) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable InputStream getInputStream(RuleSource ruleSource) {
         // TODO Auto-generated method stub

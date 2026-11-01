@@ -19,10 +19,23 @@ public class ProgramElementReplacer extends CreatingASTVisitor {
     private ProgramElement newElement;
     private boolean done;
 
+    /**
+     * The elements to replace are supplied per call to {@link #replace(ProgramElement,
+     * ProgramElement)}; the constructor cannot assign them, so the difference is suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:initialization.fields.uninitialized")
     public ProgramElementReplacer(JavaProgramElement program, Services services) {
         super(program, false, services);
     }
 
+    /**
+     * Replaces the old top-level element by the given replacement element.
+     * <p>
+     * The element to replace is present whenever a replacement is requested; the dereference of
+     * the (nullable) element is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public ProgramElement replace(ProgramElement oldElement, ProgramElement newElement) {
         this.oldElement = oldElement;
         this.newElement = newElement;
@@ -30,7 +43,11 @@ public class ProgramElementReplacer extends CreatingASTVisitor {
         stack.push(new ExtList());
         walk(root());
         ExtList el = stack.peek();
-        return el.get(ProgramElement.class);
+        ProgramElement result = el.get(ProgramElement.class);
+        if (result == null) {
+            throw new IllegalStateException("The element to replace was not found in the program");
+        }
+        return result;
     }
 
     protected void doAction(ProgramElement element) {

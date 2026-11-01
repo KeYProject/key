@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.io.RuleSource;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This FileRepo does not cache any files but writes to / reads from the original files on disk. It
@@ -65,17 +66,17 @@ public class TrivialFileRepo implements FileRepo {
     }
 
     @Override
-    public void setBootClassPath(Path path) throws IllegalStateException {
+    public void setBootClassPath(@Nullable Path path) throws IllegalStateException {
         // nothing to do here
     }
 
     @Override
-    public void setClassPath(List<Path> classPath) throws IllegalStateException {
+    public void setClassPath(@Nullable List<Path> classPath) throws IllegalStateException {
         // nothing to do here
     }
 
     @Override
-    public void setJavaPath(Path javaPath) throws IllegalStateException {
+    public void setJavaPath(@Nullable Path javaPath) throws IllegalStateException {
         // nothing to do here
     }
 

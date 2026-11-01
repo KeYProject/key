@@ -117,6 +117,14 @@ public class ContractRuleApp extends AbstractContractRuleApp<UseOperationContrac
         return heapContext;
     }
 
+    /**
+     * Returns the program term of this contract application, or {@code null} if the application
+     * carries no occurrence position.
+     * <p>
+     * The occurrence position of a closed contract application is guaranteed to carry a term; the
+     * dereference of the (nullable) position is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public @Nullable JTerm programTerm() {
         if (posInOccurrence() != null) {
             return TermBuilder.goBelowUpdates((JTerm) posInOccurrence().subTerm());

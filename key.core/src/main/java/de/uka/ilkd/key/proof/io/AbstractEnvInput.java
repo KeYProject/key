@@ -35,6 +35,11 @@ public abstract class AbstractEnvInput implements EnvInput {
     // constructors
     // -------------------------------------------------------------------------
 
+    /**
+     * The {@link InitConfig} is bound later by the loader via {@link #setInitConfig(InitConfig)}
+     * once the environment is built; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:initialization.fields.uninitialized")
     protected AbstractEnvInput(String name, @Nullable Path javaPath,
             List<Path> classPath,
             @Nullable Path bootClassPath,
@@ -106,7 +111,11 @@ public abstract class AbstractEnvInput implements EnvInput {
 
     @Override
     public Profile getProfile() {
-        return profile;
+        Profile result = profile;
+        if (result == null) {
+            throw new IllegalStateException("The input provides no profile");
+        }
+        return result;
     }
 
     public void setIgnoreOtherJavaFiles(boolean ignoreOtherJavaFiles) {

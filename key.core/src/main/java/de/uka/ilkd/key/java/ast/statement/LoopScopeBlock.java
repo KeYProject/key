@@ -50,7 +50,7 @@ public final class LoopScopeBlock extends JavaStatement
     private final int prefixLength;
 
     public LoopScopeBlock(PositionInfo pi, List<Comment> comments, IProgramVariable indexPV,
-            StatementBlock body, MethodFrame innerMostMethodFrame, int prefixLength) {
+            StatementBlock body, @Nullable MethodFrame innerMostMethodFrame, int prefixLength) {
         super(pi, comments);
         this.indexPV = indexPV;
         this.body = body;

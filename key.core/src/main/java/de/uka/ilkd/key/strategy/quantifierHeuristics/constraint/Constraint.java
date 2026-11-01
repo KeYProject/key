@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.JTerm;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Abstract constraint interface for constraints offering unification of terms and joins. There are
@@ -181,7 +182,7 @@ public interface Constraint {
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@Nullable Object obj) {
             return (obj instanceof Top);
         }
 

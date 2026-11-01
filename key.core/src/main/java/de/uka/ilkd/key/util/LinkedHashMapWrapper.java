@@ -32,7 +32,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
     /**
      * The wrapped {@link LinkedHashMap}.
      */
-    private final LinkedHashMap<ElementWrapper<K>, @Nullable V> map;
+    private final LinkedHashMap<ElementWrapper<K>, V> map;
 
     /**
      * The {@link Property} that is used for equality checks and hash codes.
@@ -57,7 +57,14 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * @param value the value corresponding to {@code key}
      * @param property the {@link Property< JTerm >} that is used internally for equality checks and
      *        hash codes
+     *
+     *        <p>
+     *        The seed insertion operates on {@code this} while the receiver is still under
+     *        initialization
+     *        (EISOP initialization check); safe here because the map was just constructed empty and
+     *        {@link #put} only stores into it, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public LinkedHashMapWrapper(K key, V value, Property<? super K> property) {
         this(property);
         put(key, value);
@@ -74,7 +81,14 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * @param values the array of values corresponding to the keys
      * @param property the {@link Property< JTerm >} that is used internally for equality checks and
      *        hash codes
+     *
+     *        <p>
+     *        The seed insertion operates on {@code this} while the receiver is still under
+     *        initialization
+     *        (EISOP initialization check); safe here because the map was just constructed empty and
+     *        {@link #putAll} only stores into it, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public LinkedHashMapWrapper(K[] keys, V[] values, Property<? super K> property) {
         this(property);
         putAll(keys, values);
@@ -91,7 +105,14 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * @param values the iterable of values corresponding to the keys
      * @param property the {@link Property< JTerm >} that is used internally for equality checks and
      *        hash codes
+     *
+     *        <p>
+     *        The seed insertion operates on {@code this} while the receiver is still under
+     *        initialization
+     *        (EISOP initialization check); safe here because the map was just constructed empty and
+     *        {@link #putAll} only stores into it, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public LinkedHashMapWrapper(Iterable<K> keys, Iterable<V> values,
             Property<? super K> property) {
         this(property);
@@ -142,12 +163,20 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
      * <p>
      * If the map previously contained a mapping for the key, the old value is replaced by the given
      * value.
+     * <p>
+     * The {@code value} argument is {@code @Nullable} on purpose: values are forwarded to the
+     * wrapping {@link LinkedHashMap}, whose generic value type {@code V} is non-null but which
+     * deliberately tolerates {@code null} values as "missing value" markers (see
+     * {@link LinkedHashMap#putAll(Object[], Object[])}). The final argument to the map is
+     * suppressed because a {@code null} value is part of this wrapper's documented contract,
+     * mirroring the map's own null-marker suppression.
      *
      * @param key the key to be inserted
      * @param value the value corresponding to {@code key}
      * @return the previous value associated with {@code key}, or {@code null} if there was no
      *         mapping for {@code key}
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public @Nullable V put(K key, @Nullable V value) {
         return map.put(wrapKey(key), value);
     }
@@ -277,7 +306,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@Nullable Object obj) {
             if (obj instanceof ElementWrapper<?> other) {
                 return property.equalsModThisProperty(key, (K) other.key);
             }
@@ -332,10 +361,23 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
             return keyIt.hasNext();
         }
 
+        /**
+         * The pair's second component may legitimately be {@code null}: this wrapper stores
+         * {@code null} as a "missing value" marker for keys without a value (see
+         * {@link #putAll(Object[], Object[])}), so the map yields a value typed
+         * {@code V extends \@Nullable Object} through the non-null-annotated accessor
+         * inherited from {@link java.util.LinkedHashMap}. The {@link Pair} constructor,
+         * however, demands a non-null value; the value argument is suppressed because a
+         * {@code null} value is part of this wrapper's documented contract (the key argument
+         * is a freshly read, provably non-null local).
+         */
+        @SuppressWarnings("nullness:argument.type.incompatible")
         @Override
         public Pair<K, V> next() {
             last = keyIt.next();
-            return new Pair<>(last.key, map.get(last));
+            // explicit type arguments required: diamond inference against Pair's
+            // @Nullable-tolerant second type parameter fails for the non-null value type V
+            return new Pair<K, V>(last.key, map.get(last));
         }
 
         @Override

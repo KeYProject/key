@@ -11,6 +11,7 @@ import java.util.Set;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents a node in the class hierarchy. Each SortNode contains a Sort and links to SortNodes
@@ -73,7 +74,7 @@ public class SortNode {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

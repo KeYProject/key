@@ -43,7 +43,7 @@ public final class JavaModel {
     public static JavaModel createJavaModel(
             @Nullable Path javaPath,
             List<Path> classPath,
-            Path bootClassPath, Includes includes, Path initialFile) {
+            Path bootClassPath, Includes includes, @Nullable Path initialFile) {
         JavaModel result;
         if (javaPath == null) {
             result = NO_MODEL;
@@ -67,7 +67,7 @@ public final class JavaModel {
     private JavaModel(Path modelDir,
             @Nullable List<Path> classPath,
             @Nullable Path bootClassPath,
-            Includes includes, Path initialFile) {
+            Includes includes, @Nullable Path initialFile) {
         this.modelDir = modelDir;
         this.modelTag = "KeY_" + (new Date()).getTime();
         this.descr = "model " + modelDir.getFileName() + "@"
@@ -117,25 +117,27 @@ public final class JavaModel {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
         final JavaModel other = (JavaModel) o;
-        if (getModelTag() == null) {
+        var tag = getModelTag();
+        if (tag == null) {
             return other.getModelTag() == null;
         } else {
-            return getModelTag().equals(other.getModelTag());
+            return tag.equals(other.getModelTag());
         }
     }
 
 
     @Override
     public int hashCode() {
-        if (getModelTag() == null) {
+        var tag = getModelTag();
+        if (tag == null) {
             return 42;
         } else {
-            return getModelTag().hashCode();
+            return tag.hashCode();
         }
     }
 

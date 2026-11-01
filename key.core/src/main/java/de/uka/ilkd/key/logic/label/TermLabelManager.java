@@ -152,7 +152,16 @@ public class TermLabelManager {
      *
      * @param configurations The {@link TermLabelConfiguration} which defines how to support each
      *        {@link TermLabel}.
+     *
+     *        <p>
+     *        The {@code analyze*} policy calls below operate on {@code this} while the receiver is
+     *        still under initialization (EISOP initialization check); safe here because the maps
+     *        they
+     *        populate are final fields initialized inline and the per-label entries they read come
+     *        from
+     *        the freshly-built {@code TermLabelConfiguration}, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public TermLabelManager(@Nullable ImmutableList<TermLabelConfiguration> configurations) {
         if (configurations != null) {
             for (TermLabelConfiguration conf : configurations) {
@@ -808,10 +817,12 @@ public class TermLabelManager {
             Set<TermLabel> newLabels, TermLabel label) {
         TermLabelPolicy policy = policies.get(label.name());
         if (policy != null) {
-            label = policy.keepLabel(state, services, applicationPosInOccurrence, applicationTerm,
-                rule, goal, hint, tacletTerm, newTerm, label);
-            if (label != null) {
-                newLabels.add(label);
+            @Nullable
+            TermLabel newLabel =
+                policy.keepLabel(state, services, applicationPosInOccurrence, applicationTerm,
+                    rule, goal, hint, tacletTerm, newTerm, label);
+            if (newLabel != null) {
+                newLabels.add(newLabel);
             }
         }
     }
@@ -1343,7 +1354,13 @@ public class TermLabelManager {
      * @param tacletTerm The optional taclet {@link JTerm}.
      * @return The root of the {@link PosInOccurrence} containing the new {@link JTerm} at the
      *         specified {@link PosInOccurrence}.
+     *         <p>
+     *         The {@code null} assigned to {@code pio} in the loop below is a sentinel to terminate
+     *         the {@code do...while} once the top level of the {@link PosInOccurrence} tree is
+     *         reached; {@code pio} itself is guaranteed non-{@code null} whenever it is
+     *         dereferenced, so the assignment is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     protected JTerm replaceTerm(TermLabelState state,
             PosInOccurrence pio, JTerm newTerm,
             TermFactory tf, Set<TermLabelRefactoring> parentRefactorings,

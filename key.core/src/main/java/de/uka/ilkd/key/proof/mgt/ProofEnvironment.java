@@ -142,7 +142,7 @@ public class ProofEnvironment {
      * returns true iff the java model equals those of the argument proof environment. TODO: extend
      * to available rules and specs.
      */
-    public boolean equals(Object cmp) {
+    public boolean equals(@Nullable Object cmp) {
         if (!(cmp instanceof ProofEnvironment pe)) {
             return false;
         }

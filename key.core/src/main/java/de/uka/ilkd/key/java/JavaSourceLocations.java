@@ -57,7 +57,11 @@ public final class JavaSourceLocations {
                 .orElse(null);
 
         var pos = n.getRange().map(it -> it.begin).orElse(null);
-        return new Location(fileUri, positionFromJP(pos));
+        // The position is meaningful even when the node is not attached to a stored compilation
+        // unit; Location's fileUri tolerates null at runtime (cf. UNDEFINED and fromToken).
+        @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+        Location result = new Location(fileUri, positionFromJP(pos));
+        return result;
     }
 
     /**

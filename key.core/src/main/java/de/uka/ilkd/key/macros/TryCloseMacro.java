@@ -21,6 +21,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The Class TryCloseMacro tries to close goals. Goals are either closed or left untouched.
@@ -121,7 +122,7 @@ public class TryCloseMacro extends AbstractProofMacro {
      * @see de.uka.ilkd.key.macros.ProofMacro#getCategory()
      */
     @Override
-    public String getCategory() {
+    public @Nullable String getCategory() {
         return null;
     }
 
@@ -141,16 +142,24 @@ public class TryCloseMacro extends AbstractProofMacro {
      */
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         return goals != null && !goals.isEmpty();
     }
 
     /*
      * Run the automation on the goal. Retreat if not successful.
+     *
+     * Returns <code>null</code> when no goal is applicable; the interface declares a non-null
+     * result, so the difference is suppressed with a scoped key. The {@code listener} argument
+     * may legitimately be <code>null</code> (no progress reports desired); the progress-bar
+     * listeners accept that too, so passing it on is suppressed with a scoped key.
      */
+    @SuppressWarnings({ "nullness:return.type.incompatible",
+        "nullness:argument.type.incompatible" })
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws InterruptedException {
         if (goals == null || goals.isEmpty()) {
             // should not happen, because in this case canApplyTo returns

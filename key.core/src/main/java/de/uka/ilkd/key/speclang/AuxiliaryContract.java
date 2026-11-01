@@ -344,7 +344,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      * @param services services.
      * @return this contract's modifiable clause on the specified heap.
      */
-    JTerm getModifiableClause(LocationVariable heapVariable, JTerm heap, JTerm self,
+    JTerm getModifiableClause(LocationVariable heapVariable, JTerm heap, @Nullable JTerm self,
             Services services);
 
     /**
@@ -388,7 +388,7 @@ public interface AuxiliaryContract extends SpecificationElement {
      *        services.
      * @return this contract's free modifiable clause on the specified heap.
      */
-    JTerm getFreeModifiableClause(LocationVariable heapVariable, JTerm heap, JTerm self,
+    JTerm getFreeModifiableClause(LocationVariable heapVariable, JTerm heap, @Nullable JTerm self,
             Services services);
 
     /**
@@ -816,7 +816,8 @@ public interface AuxiliaryContract extends SpecificationElement {
         private Map<Label, JTerm> termifyFlags(final Map<Label, LocationVariable> flags) {
             final Map<Label, JTerm> result = new LinkedHashMap<>();
             for (Map.Entry<Label, LocationVariable> flag : flags.entrySet()) {
-                result.put(flag.getKey(), termifyVariable(flag.getValue()));
+                result.put(flag.getKey(),
+                    Objects.requireNonNull(termifyVariable(flag.getValue())));
             }
             return result;
         }
@@ -832,7 +833,7 @@ public interface AuxiliaryContract extends SpecificationElement {
             for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables
                     .entrySet()) {
                 result.put(remembranceVariable.getKey(),
-                    termifyVariable(remembranceVariable.getValue()));
+                    Objects.requireNonNull(termifyVariable(remembranceVariable.getValue())));
             }
             return result;
         }
@@ -868,7 +869,7 @@ public interface AuxiliaryContract extends SpecificationElement {
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@Nullable Object obj) {
             if (this == obj) {
                 return true;
             } else if (obj == null || getClass() != obj.getClass()) {
@@ -1081,6 +1082,10 @@ public interface AuxiliaryContract extends SpecificationElement {
          * @param jumps a list of jump statements.
          * @return the label of every labeled jump statement contained in the specified list.
          */
+        // A null label denotes an unlabeled outer break/continue (see
+        // OuterBreakContinueAndReturnCollector#isJumpToOuterLabel); createFlags() maps such a label
+        // to a flag with an empty infix, so these nulls are a genuine part of the data model.
+        @SuppressWarnings("nullness:argument.type.incompatible")
         private Set<Label> collectLabels(final List<? extends LabelJumpStatement> jumps) {
             final Set<Label> result = new LinkedHashSet<>();
             for (LabelJumpStatement jump : jumps) {

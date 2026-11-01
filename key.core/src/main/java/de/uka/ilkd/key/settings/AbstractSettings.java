@@ -17,6 +17,10 @@ import org.jspecify.annotations.Nullable;
  */
 @NullMarked
 public abstract class AbstractSettings implements Settings {
+    /// The receiver is passed to the JDK {@code PropertyChangeSupport} constructor while the
+    /// enclosing object is still under initialization; the JDK class is outside our annotated
+    /// sources, so the resulting (under-initialization) value is suppressed with a scoped key.
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     protected final PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     @Override

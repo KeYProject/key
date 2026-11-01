@@ -103,7 +103,7 @@ public class BuildingException extends RuntimeException implements HasLocation {
      * @param e the causing throwable, may be null
      */
     public BuildingException(@Nullable Token t, @Nullable Position overridePosition, String message,
-            Throwable e) {
+            @Nullable Throwable e) {
         super(message + " at " + getPosition(t, overridePosition), e);
         offendingSymbol = t;
         this.overridePosition = overridePosition;

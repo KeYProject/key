@@ -14,6 +14,7 @@ import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The variable condition adapter can be used by variable conditions which can either fail or be
@@ -25,19 +26,23 @@ public abstract class VariableConditionAdapter implements VariableCondition {
     /**
      * checks if the condition for a correct instantiation is fulfilled
      *
-     * @param var the template Variable to be instantiated
+     * @param var the template Variable to be instantiated; may be {@code null} if the condition
+     *        does not refer to a matched schema variable
+     * @param instCandidate the syntax element to be assigned to {@code var}; may be {@code null}
+     *        if the condition does not refer to a matched schema variable
      * @param instMap the MatchCondition with the current matching state and in particular the
      *        SVInstantiations that are already known to be needed
      * @param services the program information object
      * @return true iff condition is fulfilled
      */
-    public abstract boolean check(SchemaVariable var, SyntaxElement instCandidate,
+    public abstract boolean check(@Nullable SchemaVariable var,
+            @Nullable SyntaxElement instCandidate,
             SVInstantiations instMap, Services services);
 
 
 
-    public final MatchResultInfo check(SchemaVariable var,
-            SyntaxElement instCandidate,
+    public final @Nullable MatchResultInfo check(@Nullable SchemaVariable var,
+            @Nullable SyntaxElement instCandidate,
             MatchResultInfo mc, LogicServices services) {
         return check(var, instCandidate, (SVInstantiations) mc.getInstantiations(),
             (Services) services) ? mc : null;

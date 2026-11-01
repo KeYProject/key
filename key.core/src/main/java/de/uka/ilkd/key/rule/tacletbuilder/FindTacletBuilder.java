@@ -56,7 +56,11 @@ public abstract class FindTacletBuilder<T extends FindTaclet> extends TacletBuil
     /*
      * Get the `find' term. This could be a term or a formula for a RewriteTaclet, but only a
      * formula for an Antec/Succ Taclet.
+     *
+     * The field is {@code @Nullable} only because builders set it incrementally; a finished builder
+     * always has a find term (the class docs require one), so the difference is suppressed.
      */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public SyntaxElement getFind() {
         return find;
     }

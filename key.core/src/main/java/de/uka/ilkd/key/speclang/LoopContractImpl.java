@@ -703,7 +703,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     }
 
     @Override
-    public @Nullable JTerm getDecreases(JTerm heap, JTerm self, Services services) {
+    public @Nullable JTerm getDecreases(JTerm heap, @Nullable JTerm self, Services services) {
         final Map<JTerm, JTerm> replacementMap = createReplacementMap(heap,
             new Terms(self, null, null, null, null, null, null, null, null, null), services);
         final OpReplacer replacer =
@@ -778,7 +778,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             final Map<LocationVariable, JTerm> newModifiableClauses,
             final Map<LocationVariable, JTerm> newFreeModifiableClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
-            final JTerm newMeasuredBy, final JTerm newDecreases) {
+            @Nullable JTerm newMeasuredBy, @Nullable JTerm newDecreases) {
         LoopContractImpl result =
             new LoopContractImpl(baseName, newBlock, labels, method, modalityKind,
                 newPreconditions, newFreePreconditions, newMeasuredBy, newPostconditions,
@@ -798,7 +798,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             final Map<LocationVariable, JTerm> newModifiableClauses,
             final Map<LocationVariable, JTerm> newFreeModifiableClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
-            final JTerm newMeasuredBy, final JTerm newDecreases) {
+            @Nullable JTerm newMeasuredBy, @Nullable JTerm newDecreases) {
         LoopContractImpl result = new LoopContractImpl(
             baseName, newLoop, labels, method, modalityKind,
             newPreconditions, newFreePreconditions, newMeasuredBy,

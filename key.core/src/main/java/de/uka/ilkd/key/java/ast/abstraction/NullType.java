@@ -124,7 +124,10 @@ public class NullType implements ClassType {
      * Returns the array of locally declared supertypes of this class type.
      *
      * @return the array of locally defined supertypes of this type.
+     *         The overridden declaration requires a non-null return type, but this implementation
+     *         may legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:override.return.invalid")
     public @Nullable ImmutableList<KeYJavaType> getSupertypes() {
         return null;
     }
@@ -155,7 +158,10 @@ public class NullType implements ClassType {
      * fields are in topological order with respect to the inheritance hierarchy.
      *
      * @return the array of visible field members of this type and its supertypes.
+     *         The overridden declaration requires a non-null return type, but this implementation
+     *         may legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:override.return.invalid")
     public @Nullable ImmutableList<Field> getAllFields(Services services) {
         return null;
     }
@@ -213,7 +219,7 @@ public class NullType implements ClassType {
         return null;
     }
 
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         return o == JAVA_NULL;
     }
 

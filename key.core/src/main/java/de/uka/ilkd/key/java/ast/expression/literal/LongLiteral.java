@@ -62,6 +62,12 @@ public class LongLiteral extends AbstractIntegerLiteral {
      */
     private final long value;
 
+    /**
+     * The literal parsed from {@code valueStr}; {@link #parseFromString} operates on
+     * {@code this} while the receiver is still under initialization (EISOP initialization
+     * check), safe here because it only writes {@code value}, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public LongLiteral(@Nullable PositionInfo pi, @Nullable List<Comment> comments,
             String valueStr) {
         super(pi, comments);
@@ -114,6 +120,19 @@ public class LongLiteral extends AbstractIntegerLiteral {
      *         if the given String does not represent a syntactically valid
      *         literal or represents a value out of long range
      */
+    /**
+     * The literal parsed from {@code valStr}; {@link #parseFromString} operates on {@code this}
+     * while the receiver is still under initialization (EISOP initialization check), safe here
+     * because it only reads its parameter and writes the return value, suppressed with a scoped
+     * key.
+     */
+    /**
+     * The literal parsed from {@code valStr}; {@link #parseFromString} operates on {@code this}
+     * while the receiver is still under initialization (EISOP initialization check), safe here
+     * because it only reads its parameter and writes the return value, suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public LongLiteral(ExtList children, String valStr) {
         super(children);
         this.value = parseFromString(valStr);

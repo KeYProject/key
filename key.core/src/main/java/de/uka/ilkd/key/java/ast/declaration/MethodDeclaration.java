@@ -91,13 +91,46 @@ public class MethodDeclaration extends JavaDeclaration
     protected final boolean parentIsInterfaceDeclaration;
 
 
+    /**
+     * Constructs a method declaration from its attributes.
+     * <p>
+     * The {@link JMLInfoExtractor#parseMethod} call receives {@code this} before the
+     * constructor has finished, leaving the receiver
+     * {@code @UnderInitialization(JavaDeclaration.class)}. The parse only reads the modifiers
+     * (already initialized by {@link JavaDeclaration}'s constructor) and writes the result to
+     * {@link #jmlModifiers}, so the call is safe and the warning is suppressed.
+     *
+     * @param pi
+     *        the position information
+     * @param comments
+     *        the comments
+     * @param modArray
+     *        the modifiers
+     * @param returnType
+     *        the return type, or {@code null} for a void method
+     * @param voidComments
+     *        comments for a void return type, or {@code null}
+     * @param name
+     *        the method name
+     * @param parameters
+     *        the method parameters
+     * @param exceptions
+     *        the {@link Throws} clause, or {@code null}
+     * @param body
+     *        the method body, or {@code null}
+     * @param parentIsInterfaceDeclaration
+     *        whether the parent is an interface declaration
+     * @param attachedJml
+     *        the attached JML constructs
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public MethodDeclaration(
             PositionInfo pi, List<Comment> comments,
             ImmutableArray<Modifier> modArray,
             @Nullable TypeReference returnType,
             Comment @Nullable [] voidComments, ProgramElementName name,
-            ImmutableArray<ParameterDeclaration> parameters, Throws exceptions,
-            StatementBlock body, boolean parentIsInterfaceDeclaration,
+            ImmutableArray<ParameterDeclaration> parameters, @Nullable Throws exceptions,
+            @Nullable StatementBlock body, boolean parentIsInterfaceDeclaration,
             ImmutableList<TextualJMLConstruct> attachedJml) {
         super(pi, comments, modArray, attachedJml);
         this.returnType = returnType;
@@ -113,6 +146,12 @@ public class MethodDeclaration extends JavaDeclaration
 
     /**
      * Method declaration.
+     * <p>
+     * The {@link JMLInfoExtractor#parseMethod} call receives {@code this} before the
+     * constructor has finished, leaving the receiver
+     * {@code @UnderInitialization(JavaDeclaration.class)}. The parse only reads the modifiers
+     * (already initialized by {@link JavaDeclaration}'s constructor) and writes the result to
+     * {@link #jmlModifiers}, so the call is safe and the warning is suppressed.
      *
      * @param children
      *        an ExtList of children. Must include: a TypeReference (as a reference to the
@@ -126,6 +165,7 @@ public class MethodDeclaration extends JavaDeclaration
      * @param voidComments
      *        in case of void return type: comments associated with the method
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public MethodDeclaration(ExtList children, boolean parentIsInterfaceDeclaration,
             Comment @Nullable [] voidComments) {
         super(children);
@@ -182,6 +222,12 @@ public class MethodDeclaration extends JavaDeclaration
 
     /**
      * Method declaration.
+     * <p>
+     * The {@link JMLInfoExtractor#parseMethod} call receives {@code this} before the
+     * constructor has finished, leaving the receiver
+     * {@code @UnderInitialization(JavaDeclaration.class)}. The parse only reads the modifiers
+     * (already initialized by {@link JavaDeclaration}'s constructor) and writes the result to
+     * {@link #jmlModifiers}, so the call is safe and the warning is suppressed.
      *
      * @param modifiers
      *        a modifier array
@@ -199,6 +245,7 @@ public class MethodDeclaration extends JavaDeclaration
      *        a boolean set true iff
      *        parent is an InterfaceDeclaration
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public MethodDeclaration(
             Modifier[] modifiers,
             @Nullable TypeReference returnType,

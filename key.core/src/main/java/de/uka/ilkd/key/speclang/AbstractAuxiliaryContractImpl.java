@@ -446,7 +446,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
     @Override
     public JTerm getModifiableClause(final LocationVariable heapVariable, final JTerm heap,
-            final JTerm self, final Services services) {
+            final @Nullable JTerm self, final Services services) {
         return getTerm(modifiableClauses.get(heapVariable), heap,
             new Terms(self, null, null, null, null, null, null, null, null, null), services);
     }
@@ -473,7 +473,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
 
     @Override
     public JTerm getFreeModifiableClause(final LocationVariable heapVariable, final JTerm heap,
-            final JTerm self, final Services services) {
+            final @Nullable JTerm self, final Services services) {
         return getTerm(
             freeModifiableClauses.get(heapVariable),
             heap,
@@ -660,7 +660,7 @@ public abstract class AbstractAuxiliaryContractImpl implements AuxiliaryContract
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         } else if (obj == null || getClass() != obj.getClass()) {

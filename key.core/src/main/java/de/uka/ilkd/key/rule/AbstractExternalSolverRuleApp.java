@@ -8,6 +8,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The rule application that is used when a goal is closed by means of an external solver. So far it
@@ -26,14 +27,15 @@ public abstract class AbstractExternalSolverRuleApp<T extends ExternalSolverRule
      * Creates a new AbstractExternalSolverRuleApp,
      *
      * @param rule the ExternalSolverRule to apply
-     * @param pio the position in the term to apply the rule to
+     * @param pio the position in the term to apply the rule to, or {@code null} for rules that are
+     *        not tied to a term position (e.g. SMT-generated rules)
      * @param unsatCore an unsat core consisting of the formulas that are needed to prove the goal
      *        (optional null)
      * @param successfulSolverName the name of the solver used to find the proof
      * @param title the title of this rule app
      */
-    protected AbstractExternalSolverRuleApp(T rule, PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> unsatCore,
+    protected AbstractExternalSolverRuleApp(T rule, @Nullable PosInOccurrence pio,
+            @Nullable ImmutableList<PosInOccurrence> unsatCore,
             String successfulSolverName, String title) {
         super(rule, pio, unsatCore);
         this.title = title;

@@ -116,7 +116,6 @@ public final class OneStepSimplifier implements BuiltInRule {
      */
     private volatile GenerationalCache<JTerm, JTerm> @Nullable [] notSimplifiableCaches;
     private volatile boolean active;
-    private volatile boolean active;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -389,13 +388,18 @@ public final class OneStepSimplifier implements BuiltInRule {
     /**
      * Helper for replaceKnown (handles recursion).
      *
+     * <p>
+     * Passing {@code null} as the {@code hint} and {@code tacletTerm} arguments of
+     * {@code TermLabelManager.instantiateLabels} violates that method's declared non-null
+     * {@code hint} parameter, but it is the intentional built-in-rule contract: replace-known
+     * steps have no specific hint and no taclet label source. An honest {@code @Nullable}
+     * widening would cascade into TermLabelManager and the TermLabelPolicy implementations and
+     * belongs to a dedicated follow-up wave, hence the scoped suppression.
+     * </p>
+     *
      * @param protocol
      */
-    @SuppressWarnings("NullAway") // null "hint"/"tacletTerm" is the intentional built-in-rule
-                                  // contract of TermLabelManager.instantiateLabels; an honest
-                                  // @Nullable widening cascades into TermLabelManager and the
-                                  // TermLabelPolicy implementations and belongs to a dedicated
-                                  // follow-up wave.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private JTerm replaceKnownHelper(
             Map<TermReplacementKey, PosInOccurrence> map, JTerm in,
             boolean inAntecedent,
@@ -852,11 +856,15 @@ public final class OneStepSimplifier implements BuiltInRule {
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof TermReplacementKey) {
-                obj = ((TermReplacementKey) obj).term;
+        public boolean equals(@Nullable Object obj) {
+            if (obj == null) {
+                return false;
             }
-            if (obj instanceof JTerm t) {
+            Object candidate = obj;
+            if (candidate instanceof TermReplacementKey) {
+                candidate = ((TermReplacementKey) candidate).term;
+            }
+            if (candidate instanceof JTerm t) {
                 return RENAMING_TERM_PROPERTY.equalsModThisProperty(term, t); // Ignore naming and
                                                                               // term
                 // labels in the way a

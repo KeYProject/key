@@ -265,13 +265,13 @@ public final class ProgramMethod extends ObserverFunction
     // getChildAt never yields a child (getChildCount()==0); honest @Nullable conflicts with the
     // @NonNull NonTerminalProgramElement base — base widening deferred to the getChildAt-base item
     // (see progress ledger)
-    @SuppressWarnings("NullAway")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     public @Nullable ProgramElement getChildAt(int i) {
         return null;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (!(obj instanceof IProgramMethod ipm)) {
             return false;
         }

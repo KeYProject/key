@@ -129,6 +129,13 @@ public class AstFactory {
         return new FieldAccessExpr(context, field);
     }
 
+    /**
+     * Marks the given node with a comment naming its originating code location.
+     * <p>
+     * The call stack always contains an element beyond the invoking frame; the dereference of the
+     * (nullable) stack frame is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public static <T extends Node> T mark(T node) {
         final var stackTrace = Thread.currentThread().getStackTrace();
         StackTraceElement cur, next = null;

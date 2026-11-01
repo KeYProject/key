@@ -158,7 +158,7 @@ public final class BinaryAssignment extends Operator
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof BinaryAssignment that))
             return false;
         if (!super.equals(o))

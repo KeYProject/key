@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.abstraction;
 
+import java.util.Objects;
+
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NullMarked;
@@ -24,8 +26,9 @@ public class DefaultConstructor implements Constructor {
 
     // ???use ProgramElementName instead of name?????
     public DefaultConstructor(ExtList children) {
-        name = children.get(String.class);
-        parentIsPublic = children.get(Boolean.class);
+        name = Objects.requireNonNull(children.get(String.class),
+            "default constructor must declare a name");
+        parentIsPublic = Boolean.TRUE.equals(children.get(Boolean.class));
     }
 
     /**

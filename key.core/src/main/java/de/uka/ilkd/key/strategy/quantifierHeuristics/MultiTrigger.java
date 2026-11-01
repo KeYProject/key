@@ -125,7 +125,7 @@ class MultiTrigger implements Trigger {
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(@Nullable Object other) {
         if (!(other instanceof MultiTrigger otherTrigger)) {
             return false;
         }

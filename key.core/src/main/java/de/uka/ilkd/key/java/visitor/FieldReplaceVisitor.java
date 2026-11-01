@@ -27,8 +27,7 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class FieldReplaceVisitor extends CreatingASTVisitor {
 
-    @Nullable
-    private ProgramElement result = null;
+    private @Nullable ProgramElement result = null;
 
     // private KeYJavaType containingKJT=null
 
@@ -41,12 +40,12 @@ public class FieldReplaceVisitor extends CreatingASTVisitor {
     public void start() {
         stack.push(new ExtList());
         walk(root());
-        final ExtList el = stack.peek();
+        final ExtList el = stack.getFirst();
         int i = 0;
         while (!(el.get(i) instanceof ProgramElement)) {
             i++;
         }
-        result = (ProgramElement) stack.peek().get(i);
+        result = (ProgramElement) stack.getFirst().get(i);
     }
 
     public @Nullable ProgramElement result() {
@@ -54,8 +53,16 @@ public class FieldReplaceVisitor extends CreatingASTVisitor {
     }
 
     @Override
+    /**
+     * Replaces the given field reference by the corresponding access-method or array-length
+     * reference.
+     * <p>
+     * The program variable of a generalized field reference is always present; the dereferences
+     * of the (nullable) program variable are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public void performActionOnFieldReference(final FieldReference x) {
-        final ExtList changeList = stack.peek();
+        final ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
         }
@@ -71,7 +78,7 @@ public class FieldReplaceVisitor extends CreatingASTVisitor {
                     addChild(new ArrayLengthReference(l));
                 } else {
                     String typeName =
-                        ((ProgramVariable) x.getChildAt(1)).getKeYJavaType().getName();
+                        x.getProgramVariable().getKeYJavaType().getName();
                     typeName = PrettyPrinter.getTypeNameForAccessMethods(typeName);
                     addChild(new MethodReference(new ExtList(),
                         new ProgramElementName("_" + shortName + typeName),
@@ -79,7 +86,7 @@ public class FieldReplaceVisitor extends CreatingASTVisitor {
                 }
             }
         } else {
-            String typeName = ((ProgramVariable) x.getChildAt(0)).getKeYJavaType().getName();
+            String typeName = x.getProgramVariable().getKeYJavaType().getName();
             typeName = PrettyPrinter.getTypeNameForAccessMethods(typeName);
             addChild(new MethodReference(new ExtList(),
                 new ProgramElementName("_"

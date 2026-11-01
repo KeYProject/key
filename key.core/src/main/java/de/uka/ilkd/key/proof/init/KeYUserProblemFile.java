@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.UserInputValidator;
@@ -83,11 +84,12 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @param file the file tp read from
      * @param fileRepo the fileRepo which will store the file
      * @param monitor the possibly <tt>null</tt> monitor for progress
-     * @param profile the KeY profile under which to load
+     * @param profile the KeY profile under which to load, or {@code null} to respect the profile
+     *        declared in the file (see {@link #getProfile()})
      * @param compressed {@code true} iff the file is compressed
      */
     public KeYUserProblemFile(String name, Path file, FileRepo fileRepo, ProgressMonitor monitor,
-            Profile profile, boolean compressed) {
+            @Nullable Profile profile, boolean compressed) {
         super(name, file, fileRepo, monitor, profile, compressed);
     }
 
@@ -95,12 +97,21 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     // public interface
     // -------------------------------------------------------------------------
 
+    /**
+     * Reads the key file, its in-code specifications, contracts and rules, accumulating warnings.
+     * <p>
+     * The init config of a fully opened problem file is asserted present below, and the settings
+     * and preference lookups in between do not change it; the dereferences of the (nullable) init
+     * config are suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public ImmutableSet<PositionedString> read() throws ProofInputException {
         if (initConfig == null) {
             throw new IllegalStateException("InitConfig not set.");
         }
-        ProofSettings settings = getPreferences();
+        ProofSettings settings = Objects.requireNonNull(getPreferences(),
+            "KeYUserProblemFile: preferences not set.");
         initConfig.setSettings(settings);
 
         ChoiceInformation ci = getParseContext().getChoices();
@@ -112,10 +123,12 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         warnings = warnings.union(super.readExtendedSignature());
 
         // read in-code specifications
+        // A user problem file declares no \include files: pass an empty list (as previously null).
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), readClassPath(), readBootClassPath(),
-            getProfile(), null);
-        slEnvInput.setInitConfig(initConfig);
-        warnings = warnings.union(slEnvInput.read());
+            getProfile(), List.of());
+        slEnvInput.setInitConfig(Objects.requireNonNull(initConfig, "InitConfig not set."));
+        warnings = warnings.union(Objects.requireNonNull(slEnvInput.read(),
+            "SLEnvInput returned no warnings."));
 
         // read contracts
         warnings = warnings.union(readContracts());
@@ -168,15 +181,25 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         return getProblemFinder().getProofObligation();
     }
 
+    /**
+     * Builds and returns the proof aggregate for this problem file.
+     * <p>
+     * The init config of a fully opened problem file is asserted present and set before the proof
+     * is constructed; the dereference of the (nullable) init config is suppressed with a scoped
+     * key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public ProofAggregate getPO() {
         assert problem != null;
         String name = name();
-        ProofSettings settings = getPreferences();
+        ProofSettings settings = Objects.requireNonNull(getPreferences(),
+            "KeYUserProblemFile: preferences not set.");
         initConfig.setSettings(settings);
         return ProofAggregate.createProofAggregate(
-            new Proof(name, problem, getParseContext().getProblemHeader(), initConfig,
-                file.file()),
+            new Proof(name, Objects.requireNonNull(problem, "No problem to prove."),
+                getParseContext().getProblemHeader(),
+                Objects.requireNonNull(initConfig, "InitConfig not set."), file.file()),
             name);
     }
 

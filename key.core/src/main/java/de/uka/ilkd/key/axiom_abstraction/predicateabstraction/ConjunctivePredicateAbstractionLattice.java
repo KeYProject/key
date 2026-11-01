@@ -17,6 +17,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.NotUniqueException;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A lattice for all predicates accepting the given sort. This lattice consists of 2^n + 1 elements,
@@ -93,7 +94,7 @@ public class ConjunctivePredicateAbstractionLattice extends AbstractPredicateAbs
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         return obj instanceof ConjunctivePredicateAbstractionLattice
                 && ((ConjunctivePredicateAbstractionLattice) obj).predicates
                         .equals(this.predicates);

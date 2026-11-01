@@ -80,7 +80,13 @@ public class ProofSettings {
 
     /**
      * the default listener to settings
+     *
+     * <p>
+     * The listener lambda calls {@link #saveSettings()} on {@code this} while the receiver is
+     * still being constructed (EISOP initialization check); safe here because the listener only
+     * fires on later property-change events, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private final PropertyChangeListener listener = e -> saveSettings();
 
     private final StrategySettings strategySettings = new StrategySettings();
@@ -96,7 +102,13 @@ public class ProofSettings {
     /**
      * create a proof settings object. When you add a new settings object, PLEASE UPDATE THE LIST
      * ABOVE AND USE THOSE CONSTANTS INSTEAD OF USING INTEGERS DIRECTLY
+     *
+     * <p>
+     * The settings registrations operate on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because each settings object is
+     * fully constructed at its declaration, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private ProofSettings() {
         addSettings(strategySettings);
         addSettings(choiceSettings);
@@ -165,7 +177,8 @@ public class ProofSettings {
     public void saveSettings() {
         try {
             if (!Files.exists(PROVER_CONFIG_FILE)) {
-                Files.createDirectories(PROVER_CONFIG_FILE.getParent());
+                Files.createDirectories(Objects.requireNonNull(PROVER_CONFIG_FILE.getParent(),
+                    "proof-settings file has no parent directory"));
             }
             try (Writer out = Files.newBufferedWriter(PROVER_CONFIG_FILE, StandardCharsets.UTF_8)) {
                 settingsToStream(out);
@@ -228,7 +241,8 @@ public class ProofSettings {
                 PROVER_CONFIG_FILE, PathConfig.DISREGARD_SETTINGS_PROPERTY);
         } else {
             var readPath = getProofSettingsReadPath();
-            var isOldFormat = readPath.getFileName().toString().endsWith(".props");
+            var readPathName = readPath.getFileName();
+            var isOldFormat = readPathName != null && readPathName.toString().endsWith(".props");
             try (var in = Files.newBufferedReader(readPath, StandardCharsets.UTF_8)) {
                 LOGGER.info("Load proof dependent settings from file {}", readPath);
                 loadDefaultJSONSettings();

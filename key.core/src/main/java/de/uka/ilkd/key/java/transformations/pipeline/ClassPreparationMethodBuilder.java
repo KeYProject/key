@@ -20,6 +20,7 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
@@ -96,7 +97,9 @@ public class ClassPreparationMethodBuilder extends JavaTransformerAbstract {
                                 new AssignExpr(
                                     new KeyPassiveExpression(
                                         new NameExpr(ident.clone())),
-                                    services.getDefaultValue(variable.getType()),
+                                    Objects.requireNonNull(
+                                        services.getDefaultValue(variable.getType()),
+                                        "no default value for static final field"),
                                     AssignExpr.Operator.ASSIGN)));
                     }
                 }

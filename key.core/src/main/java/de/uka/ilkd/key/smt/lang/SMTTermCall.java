@@ -7,8 +7,10 @@ package de.uka.ilkd.key.smt.lang;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * SMTLib supports functions as well as predicates. We only use functions and represent predicates
@@ -29,6 +31,12 @@ public class SMTTermCall extends SMTTerm {
 
 
 
+    /**
+     * Storing the under-construction {@code this} as the parent back-pointer of already-constructed
+     * children is inherent to the design; the checker cannot express the circular link, so it is
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:initialization.invalid.field.write.initialized")
     public SMTTermCall(SMTFunction func, List<SMTTerm> args) {
 
         if (func == null) {
@@ -42,6 +50,12 @@ public class SMTTermCall extends SMTTerm {
         }
     }
 
+    /**
+     * Storing the under-construction {@code this} as the parent back-pointer of already-constructed
+     * children is inherent to the design; the checker cannot express the circular link, so it is
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:initialization.invalid.field.write.initialized")
     public SMTTermCall(SMTFunction func, SMTTerm arg) {
 
         if (func == null) {
@@ -120,7 +134,11 @@ public class SMTTermCall extends SMTTerm {
     /** {@inheritDoc} */
     @Override
     public SMTSort sort() {
-        return func.getImageSort();
+        SMTSort imageSort = func.getImageSort();
+        if (imageSort == null) {
+            throw new IllegalStateException("SMT function has no image sort: " + func.getId());
+        }
+        return imageSort;
     }
 
     /** {@inheritDoc} */
@@ -134,8 +152,14 @@ public class SMTTermCall extends SMTTerm {
         return false;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The function name of a term call is set whenever the call is constructed; the dereference
+     * of the (nullable) function id is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public boolean occurs(String id) {
         if (func.getId().equals(id)) {
             return true;
@@ -202,7 +226,12 @@ public class SMTTermCall extends SMTTerm {
     @Override
     public SMTTermCall copy() {
 
-        SMTFunction f = new SMTFunction(func.getId(), func.getDomainSorts(), func.getImageSort());
+        // Copying a fully built term call means the function carries its id and sorts; the old code
+        // passed these to the SMTFunction constructor unconditionally (which dereferences them), so
+        // a null here would have failed the same way. The getters are nullable by design.
+        SMTFunction f = new SMTFunction(Objects.requireNonNull(func.getId(), "id"),
+            Objects.requireNonNull(func.getDomainSorts(), "domainSorts"),
+            Objects.requireNonNull(func.getImageSort(), "imageSort"));
 
         List<SMTTerm> newArgs = new LinkedList<>();
         for (SMTTerm t : args) {
@@ -214,7 +243,7 @@ public class SMTTermCall extends SMTTerm {
     }
 
     @Override
-    public boolean equals(Object term) {
+    public boolean equals(@Nullable Object term) {
 
         if (this == term) {
             return true;
@@ -291,7 +320,12 @@ public class SMTTermCall extends SMTTerm {
     // return true;
     // }
 
+    /**
+     * The function name of a term call is set whenever the call is constructed; the dereference
+     * of the (nullable) function id is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public int hashCode() {
         int ret = func.getId().hashCode();
         int base = 10;

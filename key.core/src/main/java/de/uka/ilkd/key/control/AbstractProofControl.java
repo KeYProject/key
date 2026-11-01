@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.java.Services;
@@ -112,7 +113,8 @@ public abstract class AbstractProofControl implements ProofControl {
     }
 
     @Override
-    public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal, PosInOccurrence pos) {
+    public ImmutableList<BuiltInRule> getBuiltInRule(Goal focusedGoal,
+            @Nullable PosInOccurrence pos) {
         ImmutableList<BuiltInRule> rules = ImmutableList.nil();
 
         for (RuleApp ruleApp : focusedGoal.ruleAppIndex()
@@ -291,8 +293,9 @@ public abstract class AbstractProofControl implements ProofControl {
      * @see {@link Proof#pruneProof(Goal)}
      */
     public void pruneTo(Goal goal) {
-        if (goal.node().parent() != null) {
-            pruneTo(goal.node().parent());
+        Node parent = goal.node().parent();
+        if (parent != null) {
+            pruneTo(parent);
         }
     }
 
@@ -363,9 +366,10 @@ public abstract class AbstractProofControl implements ProofControl {
         for (final TacletApp tA : apps) {
             origInstModels[appCounter] = createModel(tA, goal);
 
-            if (InstantiationFileHandler.hasInstantiationListsFor(tA.taclet())) {
-                for (final List<String> instantiations : InstantiationFileHandler
-                        .getInstantiationListsFor(tA.taclet())) {
+            final List<List<String>> instLists =
+                InstantiationFileHandler.getInstantiationListsFor(tA.taclet());
+            if (instLists != null) {
+                for (final List<String> instantiations : instLists) {
                     int start = tA.instantiations().size();
 
                     if (origInstModels[appCounter].tableModel().getRowCount()
@@ -634,7 +638,8 @@ public abstract class AbstractProofControl implements ProofControl {
         if (focus != null) {
             // exchange the rule app manager of that goal to filter rule apps
 
-            final RuleApplicationManager<Goal> realManager = goal.getRuleAppManager();
+            final RuleApplicationManager<Goal> realManager = Objects.requireNonNull(
+                goal.getRuleAppManager(), "A goal under focused auto mode needs an active manager");
             goal.setRuleAppManager(null);
             final RuleApplicationManager<Goal> focusManager =
                 new FocussedRuleApplicationManager(realManager, goal, focus);

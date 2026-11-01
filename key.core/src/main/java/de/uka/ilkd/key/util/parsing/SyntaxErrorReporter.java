@@ -88,8 +88,8 @@ public class SyntaxErrorReporter extends BaseErrorListener {
             SourceNames.getURIFromTokenSource(tok.getTokenSource()), stack);
 
         if (logger != null) {
-            logger.warn("[syntax-error] {}:{}:{}: {} {} ({})", se.source, line, charPositionInLine,
-                msg, tok, stack);
+            logger.warn("[syntax-error] {}:{}:{}: {} {} ({})", String.valueOf(se.source), line,
+                charPositionInLine, msg, tok, stack);
         }
         errors.add(se);
 
@@ -212,11 +212,14 @@ public class SyntaxErrorReporter extends BaseErrorListener {
          */
         public Location getLocation() {
             // charPositionInLine is 0-based
-            // A null source URI means the input has no file (e.g. standard input);
-            // Location.UNDEFINED
-            // represents exactly this case, as its fileUri component is not declared @Nullable.
-            return source == null ? Location.UNDEFINED
-                    : new Location(source, Position.fromOneZeroBased(line, charPositionInLine));
+            // A null source URI means the input has no file (e.g. parsing from a string); main
+            // constructs the Location with a null file directly, which preserves the position:
+            // error mapping anchors on the position, not on the file (Location tolerates a null
+            // fileUri at runtime, cf. UNDEFINED and fromToken).
+            @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+            Location result =
+                new Location(source, Position.fromOneZeroBased(line, charPositionInLine));
+            return result;
         }
     }
 
@@ -232,13 +235,12 @@ public class SyntaxErrorReporter extends BaseErrorListener {
             } else {
                 SyntaxError e = errors.get(0);
                 // e.charPositionInLine is 0 based!
-                // A null source URI means the input has no file (e.g. standard input);
-                // Location.UNDEFINED
-                // represents exactly this case, as its fileUri component is not declared @Nullable.
-                location =
-                    e.source == null ? Location.UNDEFINED
-                            : new Location(e.source,
-                                Position.fromOneZeroBased(e.line, e.charPositionInLine));
+                // Preserve the position even when the source has no file URI (see getLocation
+                // above); main constructs the Location with a null file directly.
+                @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+                Location firstError =
+                    new Location(e.source, Position.fromOneZeroBased(e.line, e.charPositionInLine));
+                location = firstError;
             }
         }
 
