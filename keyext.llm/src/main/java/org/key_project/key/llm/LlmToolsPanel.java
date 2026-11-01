@@ -55,9 +55,8 @@ public class LlmToolsPanel extends SettingsPanel {
         this.model = model;
 
         setHeaderText("Tools");
-        setSubHeaderText("Control which tools the KeY-Agent may call, whether they require"
-            + " approval, whether they may run in the background and whether they are exported to"
-            + " the MCP server. Disabled tools are not sent to the model at all.");
+        setSubHeaderText("Control which tools the agent may call: approval requirement,"
+            + " background use and export to the MCP server.");
 
         var sorted = tools.stream()
                 .sorted(Comparator.comparing((Tool t) -> t.category().ordinal())
@@ -90,19 +89,20 @@ public class LlmToolsPanel extends SettingsPanel {
         pCenter.add(nameLabel, new CC().alignY("top"));
 
         var description = toolDescription(tool.function().description());
-        pCenter.add(description, new CC().growX().pushX().alignY("top"));
+        pCenter.add(description, new CC().growX().pushX().alignY("top").minWidth("0"));
 
         var help = SimpleSettingsPanel.createHelpLabel(tool.function().description());
         pCenter.add(help, new CC().alignY("top").wrap());
 
-        pCenter.add(radiosPanel(tool), new CC().span(3).growX().wrap());
-        pCenter.add(checkboxesPanel(tool), new CC().span(3).growX().wrap());
+        pCenter.add(radiosPanel(tool), new CC().span(3).growX().minWidth("0").wrap());
+        pCenter.add(checkboxesPanel(tool), new CC().span(3).growX().minWidth("0").wrap());
     }
 
     /**
      * The flowing explanation of a tool. The column count caps the preferred width: a wrapping
      * JTextArea reports the width of its longest line as preferred size, which would inflate the
-     * grid and prevent the text from flowing with the dialog width.
+     * grid and prevent the text from flowing with the dialog width; the cell constraint
+     * {@code minWidth(0)} additionally lets the grid shrink below that cap.
      */
     private static JTextArea toolDescription(String text) {
         var description = new JTextArea(text);
@@ -111,7 +111,7 @@ public class LlmToolsPanel extends SettingsPanel {
         description.setOpaque(false);
         description.setLineWrap(true);
         description.setWrapStyleWord(true);
-        description.setColumns(70);
+        description.setColumns(50);
         description.setBorder(BorderFactory.createEmptyBorder());
         description.setForeground(UIManager.getColor("Label.disabledForeground"));
         return description;

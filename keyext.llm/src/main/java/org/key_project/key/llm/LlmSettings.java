@@ -543,22 +543,32 @@ public class LlmSettings extends AbstractPropertiesSettings {
 
     // --- prompt & skill libraries ---
 
+    /**
+     * Blank entries of a search path: {@link #parseStringList} yields {@code [""]} for an empty
+     * default value, and stale settings files may carry such entries; they would show up as an
+     * invisible blank row in the search-path list and hide the default-directory pseudo-entry.
+     */
+    private static List<String> withoutBlanks(@Nullable List<String> dirs) {
+        return dirs == null ? List.of()
+                : dirs.stream().filter(d -> d != null && !d.isBlank()).toList();
+    }
+
     /** The raw (unexpanded) directories of the prompt library search path; empty = default. */
     public List<String> getPromptLibraryPaths() {
-        return promptLibraryPaths.get();
+        return withoutBlanks(promptLibraryPaths.get());
     }
 
     public void setPromptLibraryPaths(List<String> v) {
-        promptLibraryPaths.set(v);
+        promptLibraryPaths.set(withoutBlanks(v));
     }
 
     /** The raw (unexpanded) directories of the skill library search path; empty = default. */
     public List<String> getSkillLibraryPaths() {
-        return skillLibraryPaths.get();
+        return withoutBlanks(skillLibraryPaths.get());
     }
 
     public void setSkillLibraryPaths(List<String> v) {
-        skillLibraryPaths.set(v);
+        skillLibraryPaths.set(withoutBlanks(v));
     }
 
     // --- mcp server ---
