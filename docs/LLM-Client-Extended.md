@@ -224,7 +224,8 @@ public interface McpToolProvider {
   which are contributed by `AgentToolProvider`s discovered through the Java `ServiceLoader`
   (service file `META-INF/services/...AgentToolProvider`; providers live in
   `org.key_project.key.llm.mcp.tools`): `get_proof_context`, `list_files`, `read_file`,
-  `file_info`, `run_command` (gated by `ShellSafetyPolicy` blocklist, timeout and output
+  `edit_file` (exact search/replace, requires approval), `file_info`, `run_command` (gated by
+  `ShellSafetyPolicy` blocklist, timeout and output
   caps), `ask_user`, `use_skill`, the delegation and self-consultation tools
   `spawn_subagent`, `get_subagent_logs`, `ask_llm` (intercepted by the agent loop; see
   `docs/subagents.md`), the proof-script tools `tryclose` and `auto`, and the
