@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.google.gson.GsonBuilder;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -76,6 +77,20 @@ public interface AgentTool {
     default Tool asTool() {
         return new Tool(new FunctionDefinition(name(), description(), parameters()), approval(),
             category(), backgroundable());
+    }
+
+    /**
+     * Converts this tool to the MCP (Model Context Protocol) tool definition, i.e. the
+     * {@link McpSchema.Tool} shape used by the MCP server ({@code keyext.llm}) and by the MCP
+     * clients. The MCP shape is derived from the tool's metadata: name, description and the
+     * parameter schema are mapped to MCP's {@code inputSchema} field.
+     */
+    default McpSchema.Tool mcpTool() {
+        var schema = parameters();
+        return McpSchema.Tool.builder(name())
+                .description(description())
+                .inputSchema(schema == null ? new java.util.LinkedHashMap<>() : schema.toMap())
+                .build();
     }
 
     /** Renders this tool as a Markdown block for the tools documentation. */
