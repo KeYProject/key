@@ -29,9 +29,11 @@ in a sandbox, and maintains a per-proof conversation.
   * `META-INF/services/org.key_project.key.llm.mcp.McpToolProvider` →
     `org.key_project.key.llm.mcp.KeYAgentToolsProvider` (consumed by `BuiltInMCPClient`)
 * Dependencies: Apache HttpClient 5 (`org.apache.httpcomponents.client5:httpclient5`),
-  Gson (`com.google.code.gson:gson`), SLF4J, and — currently declared but not yet imported —
-  the MCP SDK (`io.modelcontextprotocol.sdk:mcp` 2.0.0, a candidate for future remote
-  MCP transports; tool records use Jackson annotations that come in transitively).
+  Gson (`com.google.code.gson:gson`), SLF4J, and the MCP SDK
+  (`io.modelcontextprotocol.sdk:mcp-core` + `mcp-json-jackson2` 2.1.0, bom-managed in
+  `keyext.llm/build.gradle`). The SDK provides the protocol state of the MCP SSE server
+  (`KeYMcpSseServer`, see [`mcp-server.md`](mcp-server.md)) and of the stdio client
+  (`McpClientStdio`). It builds on Jackson 2 like the rest of the project.
 
 ## Architecture
 
@@ -233,10 +235,13 @@ public interface McpToolProvider {
   tool dumps the Markdown documentation of the whole tool set on demand. The same documentation
   is also available from a headless `main`: `KeYAgentTools [--json]` prints the Markdown
   document (or the OpenAI-format tool list).
-* `McpClientStdio` is a **reference implementation** for talking to external MCP servers
-  over stdin/stdout (JSON-RPC 2.0, protocol version 2024-11-05, 30 s timeouts). It wraps an
-  already-started `Process` (`initialize()` then `getTools()`/`callTool`), but is currently
-  used only in examples — the session's registry contains in-process clients only.
+* `McpClientStdio` is the reference client for talking to external MCP servers over
+  stdin/stdout. It wraps the SDK's `StdioClientTransport` + `McpSyncClient`: the server
+  process is spawned from a `ServerParameters` command on `initialize()`, and the SDK owns
+  the protocol state (JSON-RPC framing, version negotiation, tool discovery, tool calls).
+  Tools are returned in the OpenAI tool format (`getTools()`), results as plain text
+  (`callTool`). It is used only in examples and tests — the session's registry contains
+  in-process clients only.
 
 **Extending KeY-Agent with own tools:** implement `McpClient` (+ optional `McpToolProvider`),
 declare the provider in
