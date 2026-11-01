@@ -53,6 +53,11 @@ public class RuleSetDispatchFeature implements Feature {
      */
     private final Map<Taclet, Feature[]> featuresByTaclet = new ConcurrentHashMap<>();
 
+    /**
+     * The key view carries {@code @KeyFor} annotations on its elements which the declared return
+     * type does not; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public Set<RuleSet> ruleSets() {
         return rulesetToFeature.keySet();
     }

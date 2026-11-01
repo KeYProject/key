@@ -80,7 +80,7 @@ public class ContextStatementBlockInstantiation {
         return programElement;
     }
 
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof ContextStatementBlockInstantiation inst)) {
             return false;
         }

@@ -113,6 +113,17 @@ public abstract class AbstractTermTransformer extends JAbstractSortedOperator
         return result;
     }
 
+    /**
+     * Constructor.
+     * <p>
+     * Registers this transformer in {@link #NAME_TO_META_OP} while the receiver is still
+     * {@code @UnderInitialization}. All registrations happen during class initialization (every
+     * {@code new ...()} runs in a static field initializer of this class), and any reader of the
+     * map, such as {@link #name2metaop(String)}, triggers and therefore blocks on the same class
+     * initializer, so a half-built transformer is never observable; hence the sanctioned
+     * constructor-leak-into-registry suppression.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     protected AbstractTermTransformer(Name name, int arity, Sort sort) {
         super(name, createMetaSortArray(arity), sort, false);
         NAME_TO_META_OP.put(name.toString(), this);

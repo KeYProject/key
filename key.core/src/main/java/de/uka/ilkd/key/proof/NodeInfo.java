@@ -186,7 +186,14 @@ public class NodeInfo {
      *
      * @param ruleApp The given {@link RuleApp}.
      * @return The first statement or {@code null} if no one is provided.
+     *         <p>
+     *         The occurrence position of a positioned taclet application is guaranteed to carry a
+     *         term
+     *         when the receiver is non-null; the dereference of the (nullable) position is
+     *         suppressed
+     *         with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public static @Nullable SourceElement computeFirstStatement(
             RuleApp ruleApp) {
         SourceElement firstStatement = null;
@@ -301,7 +308,7 @@ public class NodeInfo {
      *
      * @return branch label
      */
-    public @Nullable synchronized String getBranchLabel() {
+    public synchronized @Nullable String getBranchLabel() {
         if (!branchLabelResolved) {
             branchLabel = resolveBranchLabel(
                 branchLabelSupplier != null ? branchLabelSupplier.get() : rawBranchLabel);
@@ -387,10 +394,11 @@ public class NodeInfo {
      * @return the resolved label, or {@code null}
      */
     private @Nullable String resolveBranchLabel(@Nullable String s) {
-        if (s == null || node.parent() == null) {
+        Node parent = node.parent();
+        if (s == null || parent == null) {
             return null;
         }
-        RuleApp ruleApp = node.parent().getAppliedRuleApp();
+        RuleApp ruleApp = parent.getAppliedRuleApp();
         if (ruleApp instanceof TacletApp tacletApp) {
             Pattern p = Pattern.compile("#\\w+");
             Matcher m = p.matcher(s);

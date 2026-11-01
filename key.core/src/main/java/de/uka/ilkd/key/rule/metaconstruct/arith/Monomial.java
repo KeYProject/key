@@ -21,6 +21,7 @@ import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Class for analysing and modifying monomial expressions over the integers
@@ -262,7 +263,7 @@ public class Monomial {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }

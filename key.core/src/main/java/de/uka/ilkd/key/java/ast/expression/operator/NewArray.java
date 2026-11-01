@@ -104,7 +104,8 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
     }
 
     public NewArray(PositionInfo pi, List<Comment> c, ImmutableArray<Expression> children,
-            TypeReference type, KeYJavaType keyJavaType, int dimensions, ArrayInitializer ai) {
+            TypeReference type, KeYJavaType keyJavaType, int dimensions,
+            @Nullable ArrayInitializer ai) {
         super(pi, c, children, type);
         this.keyJavaType = keyJavaType;
         this.dimensions = dimensions;

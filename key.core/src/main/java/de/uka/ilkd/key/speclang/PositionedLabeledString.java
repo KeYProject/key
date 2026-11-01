@@ -10,6 +10,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.parsing.Location;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A positionedString with labels, which can then be passed over to the translated term. For the
@@ -74,7 +75,7 @@ public class PositionedLabeledString extends PositionedString {
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof PositionedLabeledString cmp)) {
             return false;
         }

@@ -242,6 +242,16 @@ public final class StrategyProperties extends Properties {
             SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF);
     }
 
+    /**
+     * Creates strategy properties with the default option values.
+     * <p>
+     * The defaults are stored as non-null string constants, so a look-up in
+     * {@link #DEFAULT_MAP} never yields {@code null} in the correct state. Passing the
+     * (nullable-typed) look-up result to {@link Properties#put} is the same deliberate fail-fast
+     * idiom as {@link java.util.Objects#requireNonNull}: a {@code null} would abort with
+     * {@link NullPointerException} right there on the put.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public StrategyProperties() {
         put(SPLITTING_OPTIONS_KEY, DEFAULT_MAP.get(SPLITTING_OPTIONS_KEY));
         put(LOOP_OPTIONS_KEY, DEFAULT_MAP.get(LOOP_OPTIONS_KEY));
@@ -270,7 +280,10 @@ public final class StrategyProperties extends Properties {
         return USER_TACLETS_OPTIONS_KEY_BASE + i;
     }
 
-    public static String getDefaultProperty(String key) {
+    /**
+     * Returns the default value for the given key, or <code>null</code> if no default is defined.
+     */
+    public static @Nullable String getDefaultProperty(String key) {
         return DEFAULT_MAP.getProperty(key);
     }
 
@@ -376,7 +389,7 @@ public final class StrategyProperties extends Properties {
         if (o == null) {
             o = (String) DEFAULT_MAP.get(key);
             // remove this line if always satisfied. add another assignment if not.
-            assert o.equals(getUniqueString(o));
+            assert o != null && o.equals(getUniqueString(o));
         }
         return Objects.requireNonNull(o,
             "no default value registered for strategy property " + key);
@@ -429,8 +442,12 @@ public final class StrategyProperties extends Properties {
     }
 
 
+    /**
+     * Returns the property value, falling back to the default map; <code>null</code> if neither
+     * the local nor the default map contains the key (matching the JDK contract).
+     */
     @Override
-    public String getProperty(String key) {
+    public @Nullable String getProperty(String key) {
         String val = super.getProperty(key);
         if (val != null) {
             return val;
@@ -438,6 +455,17 @@ public final class StrategyProperties extends Properties {
         return DEFAULT_MAP.getProperty(key);
     }
 
+    /**
+     * Writes the current option values into the given properties object.
+     * <p>
+     * All stored options are non-null by construction (see the constructor), so reading them back
+     * with {@link Properties#get} and storing them into the target properties never yields
+     * {@code null} in the correct state. Passing the (nullable-typed) read-back results to
+     * {@link Properties#put} is the same deliberate fail-fast idiom as
+     * {@link java.util.Objects#requireNonNull}: a {@code null} would abort with
+     * {@link NullPointerException} right there on the put.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public void write(Properties p) {
         p.put(STRATEGY_PROPERTY + SPLITTING_OPTIONS_KEY, get(SPLITTING_OPTIONS_KEY));
         p.put(STRATEGY_PROPERTY + LOOP_OPTIONS_KEY, get(LOOP_OPTIONS_KEY));
@@ -481,6 +509,15 @@ public final class StrategyProperties extends Properties {
     }
 
 
+    /**
+     * Returns whether this properties object holds exactly the default option values.
+     * <p>
+     * The checker refines the entry-set generic arguments of {@link Properties#entrySet()} with a
+     * {@code @KeyFor} qualifier tied to the {@code DEFAULT_MAP} key set; assigning that set to a
+     * plain local variable declared without the qualifier is immaterial here -- every entry comes
+     * from the defaults and has a non-null key, so generic-key refinements do not apply.
+     */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     public boolean isDefault() {
         boolean result = true;
         Set<Map.Entry<Object, Object>> defaults = DEFAULT_MAP.entrySet();

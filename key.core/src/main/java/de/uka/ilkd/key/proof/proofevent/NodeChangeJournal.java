@@ -46,6 +46,12 @@ public class NodeChangeJournal implements GoalListener {
     /**
      * @param p_goal the original goal/node
      */
+    /**
+     * The change-registration call operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because {@link #node} was assigned
+     * just above, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public NodeChangeJournal(Proof p_proof, Goal p_goal) {
         proof = p_proof;
         node = p_goal.node();

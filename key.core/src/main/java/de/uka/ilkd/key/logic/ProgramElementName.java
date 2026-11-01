@@ -167,7 +167,10 @@ public class ProgramElementName extends Name
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
+        if (o == null) {
+            return false;
+        }
         return super.equals(o);
     }
 

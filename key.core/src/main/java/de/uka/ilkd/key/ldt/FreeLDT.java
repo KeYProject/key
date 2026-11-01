@@ -64,6 +64,11 @@ public final class FreeLDT extends LDT {
         return services.getTermBuilder().func(atom);
     }
 
+    /**
+     * Stub that is never reached: {@code assert false} aborts when this LDT would be used; the
+     * unreachable null return is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     @Override
     public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         assert false;
@@ -75,6 +80,11 @@ public final class FreeLDT extends LDT {
         return "atom".equals(f.name().toString());
     }
 
+    /**
+     * Stub that is never reached: {@code assert false} aborts when this LDT would be used; the
+     * unreachable null return is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     @Override
     public Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (t.op() instanceof Function && hasLiteralFunction((Function) t.op())) {
@@ -84,6 +94,11 @@ public final class FreeLDT extends LDT {
         return null;
     }
 
+    /**
+     * Stub that is never reached: {@code assert false} aborts when this LDT would be used; the
+     * unreachable null return is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     @Override
     public Type getType(JTerm t) {
         assert false;

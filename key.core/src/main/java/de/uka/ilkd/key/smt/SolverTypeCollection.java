@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Stores a set of solver types. This class can be used in order to encapsulate multiple solvers.
@@ -58,7 +59,7 @@ public class SolverTypeCollection implements Iterable<SolverType> {
 
     }
 
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof SolverTypeCollection stc)) {
             return false;
         }

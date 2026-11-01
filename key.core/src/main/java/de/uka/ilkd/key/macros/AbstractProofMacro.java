@@ -44,7 +44,7 @@ public abstract class AbstractProofMacro implements ProofMacro {
      * By default, proof macros do not support scripts, thus <code>null</code> is returned.
      */
     @Override
-    public String getScriptCommandName() {
+    public @Nullable String getScriptCommandName() {
         return null;
     }
 
@@ -65,13 +65,13 @@ public abstract class AbstractProofMacro implements ProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(Node node, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(Node node, @Nullable PosInOccurrence posInOcc) {
         return canApplyTo(node.proof(), getGoals(node), posInOcc);
     }
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Node node,
-            PosInOccurrence posInOcc, ProverTaskListener listener)
+            @Nullable PosInOccurrence posInOcc, @Nullable ProverTaskListener listener)
             throws Exception {
         return applyTo(uic, node.proof(), getGoals(node), posInOcc, listener);
     }

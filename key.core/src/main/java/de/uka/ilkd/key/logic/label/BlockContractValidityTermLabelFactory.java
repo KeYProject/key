@@ -25,7 +25,16 @@ public class BlockContractValidityTermLabelFactory
      *
      * <p>
      * This method accepts single arguments which can be parsed as a {@link String}.
+     *
+     * <p>
+     * The {@code lookup} of the parsed exception-variable name may legitimately miss the
+     * program-variable namespace, in which case it returns {@code null} and the parsed label
+     * carries no exception variable (matching the pre-nullness-annotation behavior).
+     * {@link BlockContractValidityTermLabel} keeps its {@code exceptionVariable} component
+     * non-null; the null case is suppressed here and widening the record component is tracked
+     * as follow-up work.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     public BlockContractValidityTermLabel parseInstance(@Nullable List<String> parameters,
             TermServices services) throws TermLabelException {

@@ -107,6 +107,13 @@ public class SpecialJavaPrinter extends DefaultPrettyPrinterVisitor {
         }
     }
 
+    /**
+     * Prints the given set of JML modifiers together with their dependency constructs.
+     * <p>
+     * The dependencies of a JML construct are present whenever the modifiers are printed; the
+     * dereference of the (nullable) dependency pair component is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private void print(ImmutableList<JMLModifier> modifiers,
             ImmutableList<LabeledParserRuleContext> depends) {
         printer.print("\n/*@ ");

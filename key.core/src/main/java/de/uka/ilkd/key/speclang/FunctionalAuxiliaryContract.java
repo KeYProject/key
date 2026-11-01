@@ -28,6 +28,7 @@ import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.MapUtil;
 
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -79,7 +80,22 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      *
      * @param contract a block contract.
      * @param id an ID.
+     *
+     *        <p>
+     *        The name-generation directs {@link #getKJT()} and {@link #getTarget()} on {@code this}
+     *        while the receiver is still under initialization (EISOP initialization check); safe
+     *        here because both getters only delegate to the fully-constructed {@link #contract},
+     *        suppressed with a scoped key (the {@code generateName} helper itself is
+     *        receiver-annotated).
+     *        <p>
+     *        {@code contract.setFunctionalContract(this)} leaks the receiver to the auxiliary
+     *        contract while it is still under initialization; safe because setFunctionalContract
+     *        only stores the receiver in its functional-contracts set (reading back only
+     *        {@link #id()}, assigned above; the overrides merely delegate to the same set or to the
+     *        fully-initialized loop contract).
      */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     FunctionalAuxiliaryContract(T contract, int id) {
         this.contract = contract;
         this.id = id;
@@ -88,12 +104,18 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
             contract.setFunctionalContract(this);
         }
 
+        // Hoist the getter results before the name generators run below: the lambdas are
+        // executed by the construction-time generateName call, while the receiver is still under
+        // initialization (EISOP initialization check).
+        final KeYJavaType kjt = getKJT();
+        final IProgramMethod target = getTarget();
+
         name = generateName(contract.getBaseName(),
-            str -> ContractFactory.generateContractName(str, getKJT(), getTarget(), getKJT(), id));
+            str -> ContractFactory.generateContractName(str, kjt, target, kjt, id));
         displayName = generateName(contract.getBaseName(),
-            str -> ContractFactory.generateDisplayName(str, getKJT(), getTarget(), getKJT(), id));
+            str -> ContractFactory.generateDisplayName(str, kjt, target, kjt, id));
         typeName = generateName(contract.getBaseName(),
-            str -> ContractFactory.generateContractTypeName(str, getKJT(), getTarget(), getKJT()));
+            str -> ContractFactory.generateContractTypeName(str, kjt, target, kjt));
     }
 
     /**
@@ -102,7 +124,8 @@ public abstract class FunctionalAuxiliaryContract<T extends AuxiliaryContract> i
      * @param generator a name generator.
      * @return the generated name.
      */
-    private String generateName(String baseName, UnaryOperator<String> generator) {
+    private String generateName(@UnderInitialization FunctionalAuxiliaryContract<T> this,
+            String baseName, UnaryOperator<String> generator) {
         return Arrays.stream(baseName.split(SpecificationRepository.CONTRACT_COMBINATION_MARKER))
                 .map(generator)
                 .reduce(

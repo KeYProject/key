@@ -302,7 +302,7 @@ public class ObjectVal {
      * @param o the Object to be compared to
      * @return true if this object and o have equal names
      */
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o instanceof ObjectVal ov) {
             if (ov.name == null) {
                 return name == null;

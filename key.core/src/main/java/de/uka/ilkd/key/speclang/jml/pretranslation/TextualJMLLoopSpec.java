@@ -26,7 +26,16 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     private final ArrayList<Entry> clauses = new ArrayList<>(16);
 
     public Set<ParserRuleContext> getClauses() {
-        return clauses.stream().map(it -> it.ctx.first).collect(Collectors.toSet());
+        // first is decorated @Nullable although the constructor already validated it; the guard
+        // below never triggers and keeps the collection free of nulls.
+        final Set<ParserRuleContext> result = new HashSet<>(clauses.size());
+        for (Entry it : clauses) {
+            final @Nullable ParserRuleContext clause = it.ctx.first;
+            if (clause != null) {
+                result.add(clause);
+            }
+        }
+        return result;
     }
 
     /**
@@ -204,7 +213,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

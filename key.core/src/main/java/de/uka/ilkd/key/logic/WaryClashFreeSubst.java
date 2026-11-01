@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -71,7 +73,11 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
     /**
      * Determine a set of variables that do already appear within <code>t</code> or the substituted
      * term, and whose names should not be used for free variables
+     * <p>
+     * The set of wary variables is initialized before the walk of the term below; the
+     * dereferences of the (nullable) set field are suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private void findUsedVariables(JTerm t) {
         VariableCollectVisitor vcv;
 
@@ -95,7 +101,9 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
                 // in this case one might otherwise get collisions, as the
                 // substitution might be carried out partially within the scope
                 // of the original substitution operator
-                newVar = newVarFor(getVariable(), warysvars);
+                // createVariable is only reached on the non-rigid path, where
+                // findUsedVariables has already populated warysvars
+                newVar = newVarFor(getVariable(), Objects.requireNonNull(warysvars));
             } else {
                 newVar = getVariable();
             }
@@ -180,7 +188,10 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
         final boolean addSubst = subTermChanges(t.varsBoundHere(targetPos), target);
         newSubterms[targetPos] = addSubst ? substWithNewVar(target) : target;
 
-        return tb.tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), null);
+        // use the master createTerm, which declares the labels parameter
+        // nullable (null means "no labels"); the JTerm[] overload does not
+        return tb.tf().createTerm(t.op(), new ImmutableArray<>(newSubterms),
+            getSingleArray(newBoundVars), null);
     }
 
     /**
@@ -203,7 +214,9 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      */
     private JTerm addWarySubst(JTerm t) {
         createVariable();
-        return tb.subst(WarySubstOp.SUBST, newVar, getSubstitutedTerm(), t);
+        // createVariable always assigns newVar before setting createQuantifier
+        return tb.subst(WarySubstOp.SUBST, Objects.requireNonNull(newVar),
+            getSubstitutedTerm(), t);
     }
 
     /**
@@ -211,7 +224,9 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      */
     private JTerm substWithNewVar(JTerm t) {
         createVariable();
-        final ClashFreeSubst cfs = new ClashFreeSubst(getVariable(), newVarTerm, tb);
+        // createVariable always assigns newVarTerm alongside newVar
+        final ClashFreeSubst cfs =
+            new ClashFreeSubst(getVariable(), Objects.requireNonNull(newVarTerm), tb);
         return cfs.apply(t);
     }
 }

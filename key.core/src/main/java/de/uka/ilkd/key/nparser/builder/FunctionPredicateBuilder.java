@@ -4,7 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.nparser.builder;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -47,17 +49,34 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         super(services, nss);
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitFile(JavaKeYParser.FileContext ctx) {
         return accept(ctx.decls());
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         mapMapOf(ctx.pred_decls(), ctx.func_decls(), ctx.transform_decls(), ctx.datatype_decls());
         return null;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key. The
+     * parametric sort of a declared polymorphic datatype is guaranteed to be registered (asserted
+     * on access); the dereference is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable" })
     @Override
     public @Nullable Object visitDatatype_decl(JavaKeYParser.Datatype_declContext ctx) {
         // weigl: all datatypes are free ==> functions are unique!
@@ -76,9 +95,11 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                 var param = psd.getParameters().get(i);
                 args = args.prepend(new GenericArgument(param.sort()));
             }
-            sort = ParametricSortInstance.get(psd, args, services);
+            sort = Objects.requireNonNull(ParametricSortInstance.get(psd, args, services),
+                "a datatype sort must resolve");
         } else {
-            sort = sorts().lookup(ctx.name.getText());
+            sort = Objects.requireNonNull(sorts().lookup(ctx.name.getText()),
+                "a registered datatype sort must resolve");
             genericParams = null;
         }
         for (JavaKeYParser.Datatype_constructorContext constructorContext : ctx
@@ -88,7 +109,9 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
             var argNames = constructorContext.argName;
             var doc = processDocumentation(constructorContext.doc);
             for (int i = 0; i < args.length; i++) {
-                Sort argSort = accept(constructorContext.sortId(i));
+                Sort argSort = Objects.requireNonNull(
+                    accept(constructorContext.sortId(i)),
+                    "a constructor argument sort must resolve");
                 args[i] = argSort;
                 var argName = argNames.get(i).getText();
                 SortedOperator alreadyDefinedFn = dtFnNamespace.lookup(argName);
@@ -122,7 +145,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                     dtFnNamespace.add(fn);
                 } else {
                     var fn = new ParametricFunctionDecl(new Name(argName), genericParams,
-                        new ImmutableArray<>(sort), argSort, null, false, true, false);
+                        new ImmutableArray<Sort>(sort), argSort, null, false, true, false);
                     dtPfnNamespace.add(fn);
                 }
             }
@@ -145,6 +168,13 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         return null;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key. The sort
+     * of a declared predicate parameter is guaranteed to be resolvable (asserted on access); the
+     * dereference is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable" })
     @Override
     public @Nullable Object visitPred_decl(JavaKeYParser.Pred_declContext ctx) {
         String pred_name = accept(ctx.funcpred_name());
@@ -161,8 +191,10 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
 
         assert argSorts != null;
         Name name = new Name(pred_name);
-        Boolean[] whereToBind1 =
-            whereToBind == null ? null : whereToBind.toArray(new Boolean[0]);
+        Boolean[] whereToBind1 = whereToBind == null ? null
+                : Arrays.stream(whereToBind.toArray(new Boolean[0]))
+                        .map(b -> Objects.requireNonNull(b, "a where-to-bind flag must resolve"))
+                        .toArray(Boolean[]::new);
         if (params == null) {
             if (nss.parametricFunctions().lookup(name) != null) {
                 semanticError(ctx,
@@ -177,9 +209,12 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                     "Cannot declare parametric predicate %s: Predicate already exists", name);
             }
             var d = new ParametricFunctionDecl(name, ImmutableList.fromList(params),
-                new ImmutableArray<>(argSorts),
+                new ImmutableArray<>(
+                    Objects.requireNonNull(argSorts, "the argument sorts must resolve")),
                 JavaDLTheory.FORMULA,
-                whereToBind == null ? null : new ImmutableArray<>(whereToBind1), false, true,
+                whereToBind == null ? null
+                        : new ImmutableArray<>(Objects.requireNonNull(whereToBind1)),
+                false, true,
                 false);
             nss.parametricFunctions().addSafely(d);
             return null;
@@ -195,10 +230,18 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         return null;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key. The return
+     * sort of a declared function is guaranteed to be resolvable (asserted on access); the
+     * dereference is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable" })
     @Override
     public @Nullable Object visitFunc_decl(JavaKeYParser.Func_declContext ctx) {
         boolean unique = ctx.UNIQUE() != null;
-        Sort retSort = accept(ctx.sortId());
+        Sort retSort = Objects.requireNonNull(accept(ctx.sortId()),
+            "a function sort must resolve");
         String funcName = accept(ctx.funcpred_name());
         List<GenericParameter> params = ctx.formal_sort_param_decls() == null ? null
                 : visitFormal_sort_param_decls(ctx.formal_sort_param_decls());
@@ -214,8 +257,10 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         assert funcName != null;
 
         Name name = new Name(funcName);
-        Boolean[] whereToBind1 =
-            whereToBind == null ? null : whereToBind.toArray(new Boolean[0]);
+        Boolean[] whereToBind1 = whereToBind == null ? null
+                : Arrays.stream(whereToBind.toArray(new Boolean[0]))
+                        .map(b -> Objects.requireNonNull(b, "a where-to-bind flag must resolve"))
+                        .toArray(Boolean[]::new);
         if (params == null) {
             if (nss.parametricFunctions().lookup(name) != null) {
                 semanticError(ctx,
@@ -229,8 +274,11 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
                     "Cannot declare parametric function %s: Function already exists", name);
             }
             var d = new ParametricFunctionDecl(name, ImmutableList.fromList(params),
-                new ImmutableArray<>(argSorts),
-                retSort, whereToBind == null ? null : new ImmutableArray<>(whereToBind1),
+                new ImmutableArray<>(
+                    Objects.requireNonNull(argSorts, "the argument sorts must resolve")),
+                retSort,
+                whereToBind == null ? null
+                        : new ImmutableArray<>(Objects.requireNonNull(whereToBind1)),
                 unique, true, false);
             nss.parametricFunctions().add(d);
             return null;
@@ -251,13 +299,21 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
     }
 
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitTransform_decl(JavaKeYParser.Transform_declContext ctx) {
-        Sort retSort = ctx.FORMULA() != null ? JavaDLTheory.FORMULA : accept(ctx.sortId());
+        Sort retSort = Objects.requireNonNull(
+            ctx.FORMULA() != null ? JavaDLTheory.FORMULA : accept(ctx.sortId()),
+            "a transformer sort must resolve");
         String trans_name = accept(ctx.funcpred_name());
         List<Sort> argSorts = accept(ctx.arg_sorts_or_formula());
         Transformer t =
-            new Transformer(new Name(trans_name), retSort, new ImmutableArray<>(argSorts));
+            new Transformer(new Name(trans_name), retSort, new ImmutableArray<>(
+                Objects.requireNonNull(argSorts, "the argument sorts must resolve")));
         if (lookup(t.name()) == null) {
             functions().add(t);
         }

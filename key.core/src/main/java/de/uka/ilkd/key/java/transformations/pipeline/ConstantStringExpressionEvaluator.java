@@ -54,6 +54,12 @@ public class ConstantStringExpressionEvaluator extends JavaTransformerAbstract {
     }
 
 
+    /**
+     * Runs the constant-string evaluator over the given declaration. The visitor never consults
+     * its argument, which is why {@code null} is passed deliberately; the argument nullness check
+     * of the visitor's {@code accept} is suppressed for this traversal.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private void evaluateConstantStringExpressions(Node td) {
         td.accept(new ConstantStringEvaluator(), null);
     }

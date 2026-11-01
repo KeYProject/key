@@ -11,6 +11,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Describes a branch in a proof as a series of branch choices.
@@ -158,7 +159,7 @@ public class BranchLocation {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

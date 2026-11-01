@@ -58,6 +58,12 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
     /**
      * @return The abstraction predicates for this domain element.
      */
+    /**
+     * The field is {@code @Nullable} only because the abstraction may be initialised through
+     * {@link #setPredicates(ImmutableSet)}; callers construct elements to always have predicates,
+     * so the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public ImmutableSet<AbstractionPredicate> getPredicates() {
         return predicates;
     }
@@ -69,12 +75,14 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
         this.predicates = predicates;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see de.uka.ilkd.key.logic.Named#name()
+    /**
+     * Returns the symbolic name of this domain element, derived from its predicate set.
+     * <p>
+     * The predicate set of a constructed domain element is never {@code null}; the dereferences
+     * of the (nullable) predicate set are suppressed with a scoped key.
      */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public Name name() {
         if (topElem) {
             return new Name("TOP");
@@ -108,6 +116,14 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
      * @see de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement#getDefiningAxiom
      * (de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.java.Services)
      */
+    /**
+     * The accumulator is {@code @Nullable} during the build; the early returns for the top/bottom
+     * elements guarantee that the loop below runs on a non-empty predicate set, so the result is
+     * never {@code null}; the difference is suppressed with a scoped key. The predicate set of a
+     * constructed domain element is never {@code null} either; that dereference is suppressed with
+     * a scoped key.
+     */
+    @SuppressWarnings({ "nullness:return.type.incompatible", "nullness:dereference.of.nullable" })
     @Override
     public JTerm getDefiningAxiom(JTerm varOrConst, Services services) {
         TermBuilder tb = services.getTermBuilder();
@@ -170,7 +186,7 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
     }
 
     @Override
-    public abstract boolean equals(Object obj);
+    public abstract boolean equals(@Nullable Object obj);
 
     @Override
     public abstract int hashCode();

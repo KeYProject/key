@@ -5,8 +5,10 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.consistency.AbstractFileRepo;
@@ -40,7 +42,14 @@ public class ProofBundleSaver extends ProofSaver {
         super(proof, saveFile);
     }
 
+    /**
+     * Stores the proof bundle in a ZIP archive at the given file path.
+     * <p>
+     * The init config of the proof to save is always present; the dereference of the (nullable)
+     * init config is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected void save(Path file) throws IOException {
         // get the FileRepo from the InitConfig of the Proof
         FileRepo repo = proof.getInitConfig().getFileRepo();
@@ -59,7 +68,10 @@ public class ProofBundleSaver extends ProofSaver {
 
         // save the proof file to the FileRepo (stream is closed by the save method!)
         final var path = Paths.get(proofFileName);
-        save(path.toAbsolutePath().getParent(), repo.createOutputStream(path));
+        final Path parent = path.toAbsolutePath().getParent();
+        final OutputStream out = repo.createOutputStream(path);
+        save(Objects.requireNonNull(parent, "The base path of the proof file must not be null"),
+            Objects.requireNonNull(out, "No output stream for the proof file"));
 
         // save proof bundle with the help of the FileRepo
         ((AbstractFileRepo) repo).saveProof(file);

@@ -5,12 +5,14 @@
 package de.uka.ilkd.key.macros;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.prover.impl.AutoProvers;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -73,7 +75,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      */
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         return goals != null && !goals.isEmpty();
     }
 
@@ -92,9 +94,18 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      *
      * If the automation is interrupted, report the interruption as an exception.
      */
+    /**
+     * Returns <code>null</code> when no goal is applicable; the interface declares a non-null
+     * result, so the difference is suppressed with a scoped key. The proof of the macro always
+     * carries an init config, and a real rule-app manager is created for every focused goal before
+     * it is used; the dereferences of the (nullable) init config and (nullable) rule-app manager
+     * are suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "nullness:return.type.incompatible", "nullness:dereference.of.nullable" })
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws InterruptedException {
         if (goals == null || goals.isEmpty()) {
             // should not happen, because in this case canApplyTo returns
@@ -103,14 +114,16 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         }
         List<Node> nodes = goals.stream().map(Goal::node).collect(Collectors.toList());
 
-        final GoalChooser goalChooser =
-            proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create();
+        final Profile profile = Objects.requireNonNull(
+            proof.getInitConfig().getProfile(),
+            "the proof's init config carries a profile while the macro runs");
+        final GoalChooser goalChooser = profile.getSelectedGoalChooserBuilder().create();
         // Route through the central prover selection so the macro runs on the multi-core prover
         // when it is
         // enabled, the proof's profile supports it, and the macro's strategy tolerates concurrent
         // use (see allowParallel()); otherwise the single-threaded ApplyStrategy.
         final ProverCore applyStrategy =
-            AutoProvers.create(goalChooser, proof.getInitConfig().getProfile(), allowParallel());
+            AutoProvers.create(goalChooser, profile, allowParallel());
         final ImmutableList<Goal> ignoredOpenGoals = setDifference(proof.openGoals(), goals);
 
         //
@@ -131,7 +144,9 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         }
 
         // set a new strategy.
-        Strategy<@NonNull Goal> oldStrategy = proof.getActiveStrategy();
+        Strategy<@NonNull Goal> oldStrategy = Objects.requireNonNull(
+            proof.getActiveStrategy(),
+            "the proof carries an active strategy while the macro runs");
         proof.setActiveStrategy(createStrategy(proof, posInOcc));
 
         ProofMacroFinishedInfo info;

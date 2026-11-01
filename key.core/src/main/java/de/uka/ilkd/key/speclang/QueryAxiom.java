@@ -38,6 +38,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A class axiom that connects an observer symbol representing a Java method (i.e., an object of
@@ -76,7 +77,7 @@ public final class QueryAxiom extends ClassAxiom {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null || o.getClass() != getClass()) {
             return false;
         }

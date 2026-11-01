@@ -191,7 +191,16 @@ public abstract class AbstractProblemLoader {
      *        {@link ProblemLoaderControl#selectProofObligation(InitConfig)} if no {@link Proof} is
      *        defined by the loaded proof or {@code false} otherwise which still allows to work with
      *        the loaded {@link InitConfig}.
+     *        <p>
+     *        The proof file path is optional and bound later via {@link #setProofFilename(Path)};
+     *        call sites guard the unset state, which the initialization check cannot express, so
+     *        the difference is suppressed with a scoped key. The profile registration ({@link
+     *        #setProfileOfNewProofs}) likewise operates on {@code this} while the receiver is
+     *        still under initialization, but is safe because the field it writes is only read
+     *        after construction, also suppressed.
      */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     protected AbstractProblemLoader(Path file, List<Path> classPath, Path bootClassPath,
             List<Path> includes, @Nullable Profile profileOfNewProofs,
             boolean forceNewProfileOfNewProofs,
@@ -214,14 +223,38 @@ public abstract class AbstractProblemLoader {
         this.file = file;
     }
 
+    /**
+     * Sets the optional class path entries to use.
+     * <p>
+     * A {@code null} value is legitimate and denotes an absent class path; the value is only
+     * forwarded as-is when the environment input is constructed. The field keeps its non-null type
+     * so the assignment is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     public void setClassPath(@Nullable List<Path> classPath) {
         this.classPath = classPath;
     }
 
+    /**
+     * Sets the optional boot class path.
+     * <p>
+     * A {@code null} value is legitimate and denotes an absent boot class path; the value is only
+     * forwarded as-is when the environment input is constructed. The field keeps its non-null type
+     * so the assignment is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     public void setBootClassPath(@Nullable Path bootClassPath) {
         this.bootClassPath = bootClassPath;
     }
 
+    /**
+     * Sets the global includes.
+     * <p>
+     * A {@code null} value is legitimate and denotes that no includes are declared; the value is
+     * only forwarded as-is when the environment input is constructed. The field keeps its non-null
+     * type so the assignment is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     public void setIncludes(@Nullable List<Path> includes) {
         this.includes = includes;
     }
@@ -304,7 +337,7 @@ public abstract class AbstractProblemLoader {
      * @throws IOException Occurred Exception.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    public final void load(Consumer<Proof> callbackProofLoaded) throws Exception {
+    public final void load(@Nullable Consumer<Proof> callbackProofLoaded) throws Exception {
         control.loadingStarted(this);
 
         loadEnvironment();
@@ -314,7 +347,8 @@ public abstract class AbstractProblemLoader {
         try {
             if (poContainer == null) {
                 if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
-                    selectAndLoadProof(control, initConfig);
+                    // the init config is always set by loadEnvironment() before this point
+                    selectAndLoadProof(control, Objects.requireNonNull(initConfig));
                 }
             } else {
                 proofList = createProof(poContainer);
@@ -336,7 +370,12 @@ public abstract class AbstractProblemLoader {
      * @throws ProofInputException Occurred Exception.
      * @throws IOException Occurred Exception.
      * @see AbstractProblemLoader#load()
+     *      <p>
+     *      The environment load first instantiates the environment, the problem initializer and the
+     *      init config and only then inspects their warnings; the dereferences of the corresponding
+     *      (nullable) fields are suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected void loadEnvironment() throws ProofInputException, IOException {
         FileRepo fileRepo = createFileRepo();
 
@@ -377,17 +416,18 @@ public abstract class AbstractProblemLoader {
      * @see AbstractProblemLoader#load()
      */
     protected void loadSelectedProof(LoadedPOContainer poContainer, ProofAggregate proofList,
-            Consumer<Proof> callbackProofLoaded) {
-        // try to replay first proof
-        proof = proofList.getProof(poContainer.getProofNum());
+            @Nullable Consumer<Proof> callbackProofLoaded) {
+        // try to replay first proof; the null check and all later uses go through the local `p`,
+        // as the checker does not keep the nullness refinement of the (mutable) field across calls
+        Proof p = proofList.getProof(poContainer.getProofNum());
+        proof = p;
 
-
-        if (proof != null) {
+        if (p != null) {
             if (callbackProofLoaded != null) {
-                callbackProofLoaded.accept(proof);
+                callbackProofLoaded.accept(p);
             }
-            OneStepSimplifier.refreshOSS(proof);
-            result = replayProof(proof);
+            OneStepSimplifier.refreshOSS(p);
+            result = replayProof(p);
             LOGGER.info("Replay result: {}", result.getStatus());
         }
     }
@@ -417,7 +457,12 @@ public abstract class AbstractProblemLoader {
      * @param fileRepo the FileRepo used to ensure consistency between proof and source code
      * @return The created {@link EnvInput}.
      * @throws IOException Occurred Exception.
+     *         <p>
+     *         The loaded file is a regular file or directory whose file name is never {@code null};
+     *         the
+     *         dereference of the (nullable) file-name path is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected EnvInput createEnvInput(FileRepo fileRepo) throws IOException {
 
         final String filename = file.getFileName().toString();
@@ -538,9 +583,19 @@ public abstract class AbstractProblemLoader {
      *
      * @param fileRepo the FileRepo used to ensure consistency between proof and source code
      * @return The {@link ProblemInitializer} to use.
+     *         <p>
+     *         The environment input has been instantiated before the problem initializer is
+     *         created; the
+     *         dereference of the (nullable) environment-input field is suppressed with a scoped
+     *         key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected ProblemInitializer createProblemInitializer(FileRepo fileRepo) {
-        Profile profile = enforcedProfile() != null ? profileOfNewProofs : envInput.getProfile();
+        @Nullable
+        Profile profile = enforcedProfile();
+        if (profile == null) {
+            profile = envInput.getProfile();
+        }
         ProblemInitializer pi = new ProblemInitializer(control, new Services(profile), control);
         pi.setAdditionalProfileOptions(additionalProfileOptions);
         pi.setFileRepo(fileRepo);
@@ -552,9 +607,14 @@ public abstract class AbstractProblemLoader {
      *
      * @return The created {@link InitConfig}.
      * @throws ProofInputException Occurred Exception.
+     *         <p>
+     *         The problem initializer is always set before the init config is created; the
+     *         dereference of
+     *         the (nullable) problem-initializer field is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected InitConfig createInitConfig() throws ProofInputException {
-        return problemInitializer.prepare(envInput);
+        return problemInitializer.prepare(Objects.requireNonNull(envInput));
     }
 
     /**
@@ -564,7 +624,7 @@ public abstract class AbstractProblemLoader {
      * @return The {@link LoadedPOContainer} or {@code null} if not available.
      * @throws IOException Occurred Exception.
      */
-    protected LoadedPOContainer createProofObligationContainer() throws Exception {
+    protected @Nullable LoadedPOContainer createProofObligationContainer() throws Exception {
         final String chooseContract;
         final Configuration proofObligation;
 
@@ -607,13 +667,24 @@ public abstract class AbstractProblemLoader {
             ServiceLoader.load(ProofObligationLoader.class);
         for (ProofObligationLoader poloader : loader) {
             if (poloader.handles(poClass)) {
-                return poloader.loadFrom(initConfig, proofObligation);
+                return poloader.loadFrom(Objects.requireNonNull(initConfig), proofObligation);
             }
         }
         throw new IllegalArgumentException(
             "There is no builder that can build the PO for the id " + poClass);
     }
 
+    /**
+     * Looks up the contract with the given name in the loaded init config and instantiates a
+     * proof obligation for it.
+     *
+     * @param chooseContract The name of the contract (possibly with transaction tag) to load.
+     * @return The loaded proof obligation container.
+     *         <p>
+     *         The init config is always set before a contract is looked up; the dereference of the
+     *         (nullable) init-config field is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private LoadedPOContainer loadByChosenContract(String chooseContract) {
         int proofNum = 0;
         String baseContractName;
@@ -636,7 +707,8 @@ public abstract class AbstractProblemLoader {
         if (contract == null) {
             throw new RuntimeException("Contract not found: " + baseContractName);
         } else {
-            return new LoadedPOContainer(contract.createProofObl(initConfig), proofNum);
+            return new LoadedPOContainer(
+                contract.createProofObl(Objects.requireNonNull(initConfig)), proofNum);
         }
     }
 
@@ -647,11 +719,19 @@ public abstract class AbstractProblemLoader {
      * @param poContainer The {@link LoadedPOContainer} to instantiate a {@link Proof} for.
      * @return The instantiated {@link Proof}.
      * @throws ProofInputException Occurred Exception.
+     *         <p>
+     *         The problem initializer and the init config are always set before a proof is created
+     *         and
+     *         registered; the dereferences of the corresponding (nullable) fields are suppressed
+     *         with a
+     *         scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected ProofAggregate createProof(LoadedPOContainer poContainer) throws ProofInputException {
 
         ProofAggregate proofList =
-            problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
+            problemInitializer.startProver(Objects.requireNonNull(initConfig),
+                poContainer.getProofOblInput());
 
         for (Proof p : proofList.getProofs()) {
             // register proof
@@ -677,7 +757,12 @@ public abstract class AbstractProblemLoader {
 
     /**
      * Returns a {@link ProofScriptEntry} if {@code \proofscript} is given with the problem.
+     * <p>
+     * {@link #hasProofScript()} guarantees that the environment input is a
+     * {@code KeYUserProblemFile} and thus non-null; the dereference of the (nullable)
+     * environment-input field is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public @Nullable ProofScript getProofScript() {
         if (!hasProofScript()) {
             return null;
@@ -686,6 +771,27 @@ public abstract class AbstractProblemLoader {
         return kupf.readProofScript();
     }
 
+    /**
+     * Replays the proof script contained in the loaded environment input.
+     *
+     * @param proof The proof to replay the script for.
+     * @return The result of the replay procedure.
+     *         <p>
+     *         The problem initializer is set before the replay, the environment input is guaranteed
+     *         to be
+     *         a {@code KeYUserProblemFile}, and the replay result is assigned before it is
+     *         inspected; the
+     *         dereferences are suppressed with a scoped key. The replay status and the touched
+     *         proof node are
+     *         convention-non-null read-backs (the OSS strategy value is read from and written back
+     *         to the same
+     *         properties object, and the proof root is never {@code null} after replay), so passing
+     *         their
+     *         nullable-typed values into {@code setProperty}/{@code ReplayResult} is the deliberate
+     *         fail-fast idiom; those argument errors are suppressed scoped as well.
+     */
+    @SuppressWarnings({ "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     private ReplayResult replayProof(Proof proof) {
         String status = "";
         List<Throwable> errors = new LinkedList<>();

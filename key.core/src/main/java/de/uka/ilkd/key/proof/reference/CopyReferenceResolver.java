@@ -28,7 +28,12 @@ public class CopyReferenceResolver {
      * @param referencedFrom filter, if not null copy only from that proof
      * @param callbackTotal callback that gets the total number of branches to complete
      * @param callbackBranch callback notified every time a branch has been copied
+     *        <p>
+     *        A cached goal of a reference always carries its originating proof; the dereference of
+     *        the
+     *        (nullable) proof of the cache entry is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public static void copyCachedGoals(
             Proof toComplete,
             @Nullable Proof referencedFrom,
@@ -54,7 +59,9 @@ public class CopyReferenceResolver {
         for (Goal g : todo) {
             toComplete.reOpenGoal(g);
             ClosedBy c = g.node().lookup(ClosedBy.class);
-            g.node().deregister(c, ClosedBy.class);
+            if (c != null) {
+                g.node().<ClosedBy>deregister(c, ClosedBy.class);
+            }
             try {
                 new CopyingProofReplayer(c.proof(), toComplete).copy(c.node(), g, c.nodesToSkip());
             } catch (IntermediateProofReplayer.BuiltInConstructionException e) {

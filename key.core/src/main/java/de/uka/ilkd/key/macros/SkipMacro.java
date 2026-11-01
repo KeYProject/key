@@ -13,6 +13,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This macro does nothing and is not applicable. It can be used to create compound macros, e.g. as
@@ -29,7 +30,7 @@ public class SkipMacro extends AbstractProofMacro {
     }
 
     @Override
-    public String getCategory() {
+    public @Nullable String getCategory() {
         return null;
     }
 
@@ -40,13 +41,14 @@ public class SkipMacro extends AbstractProofMacro {
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         return false;
     }
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws InterruptedException {
         // do nothing
         return new ProofMacroFinishedInfo(this, goals);

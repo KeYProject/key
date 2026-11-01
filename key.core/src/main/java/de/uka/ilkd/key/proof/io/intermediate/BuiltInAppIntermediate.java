@@ -20,8 +20,8 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class BuiltInAppIntermediate extends AppIntermediate {
 
-    private String ruleName = null;
-    private Pair<Integer, PosInTerm> posInfo = null;
+    private String ruleName;
+    private Pair<Integer, PosInTerm> posInfo;
     private @Nullable String contract = null;
     private @Nullable String modality = null;
     private @Nullable ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts = null;
@@ -62,7 +62,10 @@ public class BuiltInAppIntermediate extends AppIntermediate {
      * (non-Javadoc)
      *
      * @see de.uka.ilkd.key.proof.io.intermediate.AppIntermediate#getNewNames()
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable ImmutableList<Name> getNewNames() {
         return newNames;

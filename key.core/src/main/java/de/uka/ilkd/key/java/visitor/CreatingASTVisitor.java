@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java.visitor;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -68,7 +69,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     @Override
     public String toString() {
-        return stack.peek().toString();
+        return stack.getFirst().toString();
     }
 
     /**
@@ -84,7 +85,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     @Override
     public void performActionOnAssert(Assert x) {
-        ExtList changeList = stack.peek();
+        ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             PositionInfo pos = changeList.removeFirstOccurrence(PositionInfo.class);
@@ -94,7 +95,11 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             Expression condition = changeList.removeFirstOccurrence(Expression.class);
             Expression message = changeList.removeFirstOccurrence(Expression.class);
 
-            addChild(new Assert(condition, message, pos));
+            // A Java assert always carries a condition, and the change list always carries a
+            // PositionInfo (refilled with PositionInfo.UNDEFINED when position info is not
+            // preserved), so both are provably non-null here.
+            addChild(new Assert(Objects.requireNonNull(condition), message,
+                Objects.requireNonNull(pos)));
 
             changed();
         } else {
@@ -109,7 +114,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     @Override
     public void performActionOnStatementBlock(final StatementBlock x) {
-        ExtList changeList = stack.peek();
+        ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             if (!preservesPositionInfo) {
@@ -150,9 +155,14 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     // eee
+    // The guard and body may legitimately be absent when a sub-transformation removed them from
+    // the change list (the guard is explicitly null-tolerated above); such missing children are
+    // stored as-is by LoopStatement and remain traversable via getChildCount(). The position, by
+    // contrast, is never null here (refilled with PositionInfo.UNDEFINED when not preserved).
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     public void performActionOnWhile(While x) {
-        ExtList changeList = stack.peek();
+        ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             PositionInfo pos = changeList.removeFirstOccurrence(PositionInfo.class);
@@ -163,7 +173,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             Expression guard = g == null ? null : g.getExpression();
             Statement body = changeList.removeFirstOccurrence(Statement.class);
 
-            While newX = new While(guard, body, pos);
+            While newX = new While(guard, body, Objects.requireNonNull(pos));
             performActionOnLoopInvariant(x, newX);
             performActionOnLoopContract(x, newX);
             addChild(newX);
@@ -178,9 +188,12 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     // Bugfix in 2021: This has been made similar to the while case.
     // (without fully understanding the former)
+    // guard, updates and body may legitimately be absent when a sub-transformation removed them
+    // from the change list; missing loop parts are stored as null children by LoopStatement.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     public void performActionOnFor(final For x) {
-        ExtList changeList = stack.peek();
+        ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             PositionInfo pos = changeList.removeFirstOccurrence(PositionInfo.class);
@@ -205,9 +218,14 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     // eee
+    // The guard and body may legitimately be absent when a sub-transformation removed them from
+    // the change list (the guard is explicitly null-tolerated above); such missing children are
+    // stored as-is by LoopStatement. The position is never null here (refilled with
+    // PositionInfo.UNDEFINED when position info is not preserved).
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     public void performActionOnDo(Do x) {
-        ExtList changeList = stack.peek();
+        ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             PositionInfo pos = changeList.removeFirstOccurrence(PositionInfo.class);
@@ -218,7 +236,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             Guard g = changeList.removeFirstOccurrence(Guard.class);
             Expression guard = g == null ? null : g.getExpression();
 
-            Do newX = new Do(guard, body, pos);
+            Do newX = new Do(guard, body, Objects.requireNonNull(pos));
             performActionOnLoopInvariant(x, newX);
             addChild(newX);
 
@@ -254,9 +272,12 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     // eee
+    // A schema program variable (ProgramSV) has no KeYJavaType, so getKeYJavaType() may be null;
+    // VariableSpecification deliberately stores such a null type (see its constructor javadoc).
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     public void performActionOnVariableSpecification(VariableSpecification x) {
-        ExtList changeList = stack.peek();
+        ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             PositionInfo pi = changeList.removeFirstOccurrence(PositionInfo.class);
@@ -281,7 +302,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     // eee
     @Override
     public void performActionOnFieldReference(FieldReference x) {
-        ExtList changeList = stack.peek();
+        ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
 
@@ -318,7 +339,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     // eee
     @Override
     public void performActionOnMethodReference(MethodReference x) {
-        ExtList changeList = stack.peek();
+        ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
 
@@ -334,7 +355,12 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             }
             changeList.remove(rp);
             MethodName name = changeList.get(MethodName.class);
-            MethodReference mr = new MethodReference(changeList, name, rp, pi);
+            // A method reference always names a method (its constructor asserts this), and pos is
+            // never null here (refilled with PositionInfo.UNDEFINED when position info is not
+            // preserved).
+            MethodReference mr = new MethodReference(changeList,
+                Objects.requireNonNull(name, "method reference requires a name"), rp,
+                Objects.requireNonNull(pi));
             addChild(mr);
             changed();
         } else {
@@ -365,10 +391,14 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     // eee
+    // The case expression may legitimately be absent (an expression-less case, or the label
+    // expression removed by a sub-transformation, see the null-tolerance above); the position is
+    // never null here (refilled with PositionInfo.UNDEFINED when position info is not preserved).
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     public void performActionOnCase(Case x) {
         Expression e = null;
-        ExtList changeList = stack.peek();
+        ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             PositionInfo pi = changeList.removeFirstOccurrence(PositionInfo.class);
@@ -378,7 +408,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             if (x.getExpression() != null) {
                 e = (Expression) changeList.removeFirst();
             }
-            addChild(new Case(changeList, e, pi));
+            addChild(new Case(changeList, e, Objects.requireNonNull(pi)));
             changed();
         } else {
             doDefaultAction(x);
@@ -511,10 +541,14 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     // eee
+    // The label may legitimately be absent when a sub-transformation removed it (see the
+    // null-tolerance above); the position is never null here (refilled with
+    // PositionInfo.UNDEFINED when position info is not preserved).
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     public void performActionOnLabeledStatement(LabeledStatement x) {
         Label l = null;
-        ExtList changeList = stack.peek();
+        ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             PositionInfo pi = changeList.removeFirstOccurrence(PositionInfo.class);
@@ -528,7 +562,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             if (changeList.get(Statement.class) == null) {
                 changeList.add(new EmptyStatement());
             }
-            addChild(new LabeledStatement(changeList, l, pi));
+            addChild(new LabeledStatement(changeList, l, Objects.requireNonNull(pi)));
             changed();
         } else {
             doDefaultAction(x);
@@ -538,7 +572,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     // eee
     @Override
     public void performActionOnMethodFrame(MethodFrame x) {
-        ExtList changeList = stack.peek();
+        ExtList changeList = stack.getFirst();
         if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             PositionInfo pi = changeList.removeFirstOccurrence(PositionInfo.class); // Methodframe
@@ -549,6 +583,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             if (!preservesPositionInfo()) {
                 pi = PositionInfo.UNDEFINED;
             }
+
+            // walk() always pushes a PositionInfo first, so pi is never null here.
+            pi = Objects.requireNonNull(pi);
 
             if (x.getChildCount() == 3) {
                 addChild(new MethodFrame((IProgramVariable) changeList.get(0),
@@ -1057,7 +1094,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     protected void changed() {
-        ExtList list = stack.peek();
+        ExtList list = stack.getFirst();
         if (list.isEmpty() || list.getFirst() != CHANGED) {
             list.addFirst(CHANGED);
         }
@@ -1065,7 +1102,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     protected void addToTopOfStack(@Nullable SourceElement x) {
         if (x != null) {
-            ExtList list = stack.peek();
+            ExtList list = stack.getFirst();
             list.add(x);
         }
     }
@@ -1092,7 +1129,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         abstract ProgramElement createNewElement(ExtList changeList);
 
         public void doAction(ProgramElement x) {
-            ExtList changeList = stack.peek();
+            ExtList changeList = stack.getFirst();
             if (changeList.size() == 0) {
                 doDefaultAction(x);
                 return;

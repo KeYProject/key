@@ -185,10 +185,14 @@ public class StrategySettings extends AbstractSettings {
 
     @Override
     public void readSettings(Configuration props) {
-        props = props.getSection(CATEGORY);
-        if (props == null) {
+        // getSection may return null when the "Strategy" section is absent; assign the parameter
+        // only after the null check, since the parameter itself must stay non-null.
+        @Nullable
+        Configuration section = props.getSection(CATEGORY);
+        if (section == null) {
             return;
         }
+        props = section;
 
         try {
             setMaxSteps(props.getInt(STEPS_KEY));
@@ -196,7 +200,8 @@ public class StrategySettings extends AbstractSettings {
             LOGGER.debug("StrategySettings: failure while converting the string "
                 + "with the allowed steps of heuristics applications to int."
                 + "Use default value 1000 instead."
-                + "\nThe String that has been tried to convert was {}", props.get(STEPS_KEY));
+                + "\nThe String that has been tried to convert was {}",
+                String.valueOf(props.get(STEPS_KEY)));
         }
 
         try {
@@ -204,7 +209,8 @@ public class StrategySettings extends AbstractSettings {
         } catch (NumberFormatException | NullPointerException e) {
             LOGGER.debug("StrategySettings: failure while converting the string "
                 + "with rule application timeout. "
-                + "\nThe String that has been tried to convert was {}", props.get(TIMEOUT_KEY));
+                + "\nThe String that has been tried to convert was {}",
+                String.valueOf(props.get(TIMEOUT_KEY)));
         }
 
         // set active strategy

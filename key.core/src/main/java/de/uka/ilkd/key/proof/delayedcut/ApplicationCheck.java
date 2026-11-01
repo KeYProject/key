@@ -69,17 +69,32 @@ public interface ApplicationCheck {
             if (node != cutNode) {
                 node = cutNode;
                 clearCaches();
-                buildCaches(node);
+                buildCaches(cutNode);
             }
 
             return checkFormula(cutFormula);
         }
 
+        /**
+         * Clears the cached name cache of the currently checked cut node.
+         * <p>
+         * {@link #check(Node, JTerm)} installs the cut node before this method is invoked; the
+         * dereference of the (nullable) node field is suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:dereference.of.nullable")
         private void clearCaches() {
             names.clear();
             node.clearNameCache();
         }
 
+        /**
+         * Collects all symbols proposed by name recorders of the subtree below the given cut node.
+         * <p>
+         * Every non-leaf node of the walk carries a name recorder; the dereferences of the
+         * (nullable) polled node and of its (nullable) name recorder are suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:dereference.of.nullable")
         private void buildCaches(Node cutNode) {
             LinkedList<Node> queue = new LinkedList<>();
             queue.add(cutNode);
@@ -97,6 +112,18 @@ public interface ApplicationCheck {
             }
         }
 
+        /**
+         * Checks the given cut formula for symbols that are newly introduced in the subtree below
+         * the cut node.
+         *
+         * @param formula The cut formula to check.
+         * @return A {@code String} describing the conflict, or {@code null} if there is none.
+         *         <p>
+         *         {@link #check(Node, JTerm)} installs the cut node before this method is invoked;
+         *         the
+         *         dereferences of the (nullable) node field are suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:dereference.of.nullable")
         private @Nullable String checkFormula(JTerm formula) {
             final List<String> newSymbols = new LinkedList<>();
             formula.execPreOrder((DefaultVisitor) visited -> {
@@ -126,7 +153,14 @@ public interface ApplicationCheck {
             return buf.toString();
         }
 
+        /**
+         * Returns a textual description of this check, anchoring it at the cut node.
+         * <p>
+         * The node is installed before a check is described; the dereference of the (nullable)
+         * node field is suppressed with a scoped key.
+         */
         @Override
+        @SuppressWarnings("nullness:dereference.of.nullable")
         public String toString() {
             return "NoNewSymbolsCheck [node=" + node.serialNr() + ", names=" + names + "]";
         }

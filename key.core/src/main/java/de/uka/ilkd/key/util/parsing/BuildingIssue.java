@@ -65,15 +65,13 @@ public record BuildingIssue(String message, @Nullable Throwable cause, boolean i
             }
         }
         // A source may not resolve to a file URI (e.g. "memory:/" Java block fragments), but the
-        // position is still meaningful — the underline must anchor on the offending code, not on
-        // the surrounding token. Location's fileUri component may be null (see Location javadoc);
-        // like Location.UNDEFINED / Location.fromToken, the null file is a legitimate value.
-        return location(uri, position);
-    }
-
-    @SuppressWarnings("NullAway") // missing file URI != missing position (see Location javadoc)
-    private static Location location(@Nullable URI uri, Position position) {
-        return new Location(uri, position);
+        // position must be preserved: error mapping and highlighting anchor on the position, not
+        // on the file. Location's fileUri component is declared non-null but tolerates null at
+        // runtime (see the suppressions on UNDEFINED and fromToken); main constructs the location
+        // with a null file directly.
+        @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+        Location result = new Location(uri, position);
+        return result;
     }
 
     public PositionedString asPositionedString() {

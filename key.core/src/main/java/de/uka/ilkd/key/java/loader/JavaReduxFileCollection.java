@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.JavaService;
@@ -103,7 +104,7 @@ public class JavaReduxFileCollection implements FileCollection {
      * <p>
      * This class only supports walker for a single file type: .java
      */
-    public Walker createWalker(String extension) throws IOException {
+    public Walker createWalker(@Nullable String extension) throws IOException {
         if (!".java".equals(extension)) {
             throw new IllegalStateException("This collection can only list .java files");
         }
@@ -117,7 +118,7 @@ public class JavaReduxFileCollection implements FileCollection {
      * <p>
      * This class only supports walker for a single file type: .java
      */
-    public Walker createWalker(String[] extensions) throws IOException {
+    public Walker createWalker(@Nullable String[] extensions) throws IOException {
         if (extensions == null || extensions.length < 1 || !".java".equals(extensions[0])) {
             throw new IllegalStateException("This collection can only list .java files");
         }
@@ -126,6 +127,13 @@ public class JavaReduxFileCollection implements FileCollection {
 
     }
 
+    /**
+     * Returns the URIs of all redux Java resources of this collection.
+     * <p>
+     * The resource file of a redux Java class is always resolvable through the resource manager;
+     * the dereference of the (nullable) resource file is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public Stream<URI> getResources() {
         return resources.stream()
                 .map(it -> {
@@ -185,13 +193,24 @@ public class JavaReduxFileCollection implements FileCollection {
         public InputStream openCurrent(@Nullable FileRepo fileRepo)
                 throws IOException, NoSuchElementException {
             if (fileRepo != null) {
-                return fileRepo.getInputStream(currentURL);
+                InputStream is = fileRepo.getInputStream(Objects.requireNonNull(currentURL,
+                    "cannot find " + resourceLocation + "/" + current));
+                if (is == null) {
+                    throw new NoSuchElementException("File not stored in the file repository: "
+                        + currentURL);
+                }
+                return is;
             } else {
                 return openCurrent(); // fallback without FileRepo
             }
         }
 
+        /**
+         * The current URL of an opened redux class is set before the walker is used; the
+         * dereference of the (nullable) URL is suppressed with a scoped key.
+         */
         @Override
+        @SuppressWarnings("nullness:dereference.of.nullable")
         public Path getCurrentLocation() {
             try {
                 return Path.of(currentURL.toURI());
@@ -218,6 +237,11 @@ public class JavaReduxFileCollection implements FileCollection {
             return true;
         }
 
+        /**
+         * The overridden declaration requires a non-null return type, but this implementation may
+         * legitimately return {@code null}; the difference is suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:override.return.invalid")
         @Override
         public @Nullable String getRelativeLocation() {
             return null;

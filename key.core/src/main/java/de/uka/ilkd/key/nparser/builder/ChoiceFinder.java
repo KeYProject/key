@@ -15,6 +15,7 @@ import org.key_project.logic.Namespace;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This visitor gathers the choice information in {@link de.uka.ilkd.key.nparser.KeyAst.File} and
@@ -41,15 +42,17 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
         choiceInformation = new ChoiceInformation(choices);
     }
 
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
-    public Object visitDecls(JavaKeYParser.DeclsContext ctx) {
+    public @Nullable Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         ctx.option_decls().forEach(this::accept);
         ctx.options_choice().forEach(this::accept);
         return null;
     }
 
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
-    public Object visitChoice(JavaKeYParser.ChoiceContext ctx) {
+    public @Nullable Object visitChoice(JavaKeYParser.ChoiceContext ctx) {
         String category = ctx.category.getText();
         List<String> options = new ArrayList<>(ctx.optionDecl().size());
         ctx.optionDecl().forEach(it -> options.add(it.IDENT.getText()));
@@ -59,8 +62,12 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
         }
 
         seq().put(category, new HashSet<>(options));
-        var choices = options.stream().map(it -> new Choice(it, category)).toList();
-        choices.forEach(it -> choices().add(it));
+        var choices = new ArrayList<Choice>(options.size());
+        for (String option : options) {
+            Choice choice = new Choice(option, category);
+            choices.add(choice);
+            choices().add(choice);
+        }
         choiceInformation.setDefaultOption(category, choices.getFirst());
         return null;
     }

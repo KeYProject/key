@@ -239,13 +239,11 @@ public class InstantiateCommand extends AbstractCommand {
     public static class Parameters {
         @Documentation("The toplevel quantified formula to instantiate. Placeholder matching symbols can be used.")
         @Option(value = "formula")
-        @Nullable
-        public JTerm formula;
+        public @Nullable JTerm formula;
 
         @Documentation("The name of the bound variable to instantiate.")
         @Option(value = "var")
-        @Nullable
-        public String var;
+        public @Nullable String var;
 
         @Documentation("The occurrence number of the quantifier over 'var' in the sequent starting at 1. Default is 1.")
         @Option(value = "occ")

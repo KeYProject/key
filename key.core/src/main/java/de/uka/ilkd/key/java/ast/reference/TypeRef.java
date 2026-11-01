@@ -70,7 +70,7 @@ public class TypeRef extends TypeReferenceImp {
      * @param obj the Object to compare with
      * @return true if and only if both type references refer to the same type
      */
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (obj == this)
             return true;
         if (obj instanceof TypeRef tr) {

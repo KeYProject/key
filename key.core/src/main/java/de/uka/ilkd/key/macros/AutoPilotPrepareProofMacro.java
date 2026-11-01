@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.macros;
 
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.op.ObserverFunction;
@@ -27,6 +28,7 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
@@ -87,7 +89,10 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         private final ModalityCache modalityCache = new ModalityCache();
 
         public AutoPilotStrategy(Proof proof) {
-            this.delegate = proof.getActiveStrategy();
+            // The active strategy is configured and set before this filter wraps it; without it
+            // the filtering below would have nothing to delegate to.
+            this.delegate = Objects.requireNonNull(proof.getActiveStrategy(),
+                "the proof carries an active strategy while the macro runs");
         }
 
         @Override
@@ -160,7 +165,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy<@NonNull Goal> createStrategy(Proof proof,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         return new AutoPilotStrategy(proof);
     }
 }

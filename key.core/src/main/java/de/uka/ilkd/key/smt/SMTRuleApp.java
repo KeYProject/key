@@ -17,6 +17,7 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The rule application that is used when a goal is closed by means of an SMT solver. So far it
@@ -29,15 +30,16 @@ public class SMTRuleApp extends AbstractExternalSolverRuleApp<SMTRule> {
      * Create a new rule app without ifInsts (will be null).
      *
      * @param rule the SMTRule to apply
-     * @param pio the pos in term to apply the rule on
+     * @param pio the pos in term to apply the rule on, or {@code null} for rules that are not
+     *        tied to a term position
      * @param successfulSolverName the name of the solver that was able to close find the proof
      */
-    SMTRuleApp(SMTRule rule, PosInOccurrence pio, String successfulSolverName) {
+    SMTRuleApp(SMTRule rule, @Nullable PosInOccurrence pio, String successfulSolverName) {
         this(rule, pio, null, successfulSolverName);
     }
 
-    SMTRuleApp(SMTRule rule, PosInOccurrence pio,
-            ImmutableList<PosInOccurrence> unsatCore,
+    SMTRuleApp(SMTRule rule, @Nullable PosInOccurrence pio,
+            @Nullable ImmutableList<PosInOccurrence> unsatCore,
             String successfulSolverName) {
         super(rule, pio, unsatCore, successfulSolverName, "SMT: " + successfulSolverName);
     }

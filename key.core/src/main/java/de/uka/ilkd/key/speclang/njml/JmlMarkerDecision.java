@@ -32,6 +32,12 @@ public class JmlMarkerDecision {
      *
      * @param lexer a lexer instance which stream is used
      */
+    /**
+     * The key registration operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because it only stores the
+     * caller-provided collection, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public JmlMarkerDecision(JmlLexer lexer) {
         this.lexer = lexer;
         setEnabledKeys(

@@ -48,7 +48,7 @@ public final class TextualJMLClassInv extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof TextualJMLClassInv ci)) {
             return false;
         }

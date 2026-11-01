@@ -260,6 +260,16 @@ public abstract class ProgramSVSort extends SortImpl {
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Constructor.
+     * <p>
+     * Registers this sort in {@link #NAME2SORT} while the receiver is still
+     * {@code @UnderInitialization}. All registrations happen during class initialization (every
+     * {@code new XSort()} runs in a static field initializer), and any reader of the map triggers
+     * and therefore blocks on the same class initializer, so a half-built sort is never observable;
+     * hence the sanctioned constructor-leak-into-registry suppression.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     protected ProgramSVSort(Name name) {
         super(name, DefaultImmutableSet.nil(), false);
         NAME2SORT.put(name, this);
@@ -807,8 +817,10 @@ public abstract class ProgramSVSort extends SortImpl {
                  * if (mr.getReferencePrefix() instanceof SuperReference || mr.getReferencePrefix()
                  * instanceof TypeReference) { return false; }
                  */
-                if (mr.getReferencePrefix() != null
-                        && NONSIMPLEEXPRESSION.canStandFor(mr.getReferencePrefix(), services)) {
+                // local variable so the nullness checker refines the result of the guard below
+                // (a re-evaluated call would be assumed nullable again)
+                ReferencePrefix rp = mr.getReferencePrefix();
+                if (rp != null && NONSIMPLEEXPRESSION.canStandFor(rp, services)) {
                     return false;
                 }
                 if (mr.getArguments() == null) {

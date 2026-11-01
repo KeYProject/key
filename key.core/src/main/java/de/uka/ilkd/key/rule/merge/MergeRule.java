@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -47,6 +48,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
@@ -183,7 +185,9 @@ public class MergeRule implements BuiltInRule {
             mergedState = noClash.first;
             state = noClash.second;
 
-            mergePartnerNodesToStates.put(state.getCorrespondingNode(), state);
+            // Partner states always carry their (non-null) goal node as corresponding node.
+            mergePartnerNodesToStates.put(Objects.requireNonNull(state.getCorrespondingNode()),
+                state);
 
             MergeStateEntry mergeResult =
                 mergeStates(mergeRule, mergedState, state, thisSEState.programCounter(),
@@ -207,9 +211,12 @@ public class MergeRule implements BuiltInRule {
 
         // Close partner goals
         for (MergePartner mergePartner : mergePartners) {
+            // The state of every merge partner was stored in the map keyed by its goal's node in
+            // the merge loop above, so the entry is never absent here.
+            final SymbolicExecutionState mergePartnerState = Objects.requireNonNull(
+                mergePartnerNodesToStates.get(mergePartner.getGoal().node()));
             closeMergePartnerGoal(newGoal.node(), mergePartner.getGoal(), mergePartner.getPio(),
-                mergedState, mergePartnerNodesToStates.get(mergePartner.getGoal().node()),
-                thisSEState.programCounter(), newNames);
+                mergedState, mergePartnerState, thisSEState.programCounter(), newNames);
         }
 
         // Delete previous sequents
@@ -591,7 +598,7 @@ public class MergeRule implements BuiltInRule {
      * @return true iff a suitable top level formula for merging.
      */
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, @Nullable PosInOccurrence pio) {
         // MergeRule links several goals into one and would therefore need to lock multiple goals
         // at once. That is not yet safe under goal-level concurrency, so the rule is disabled while
         // a multi-worker parallel run is active ON THIS PROOF -- single-threaded proving is
@@ -609,12 +616,12 @@ public class MergeRule implements BuiltInRule {
      * require that phi does not contain a Java block.
      *
      * @param goal Current goal.
-     * @param pio Position of selected sequent formula.
+     * @param pio Position of selected sequent formula; {@code null} is treated as not admissible.
      * @param doMergePartnerCheck Checks for available merge partners iff this flag is set to true.
      * @return true iff a suitable top level formula for merging.
      */
     public static boolean isOfAdmissibleForm(Goal goal,
-            PosInOccurrence pio,
+            @Nullable PosInOccurrence pio,
             boolean doMergePartnerCheck) {
         // We admit top level formulas of the form \<{ ... }\> phi
         // and U \<{ ... }\> phi, where U must be an update
@@ -667,8 +674,10 @@ public class MergeRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pio, TermServices services) {
-        return new MergeRuleBuiltInRuleApp(this, pio);
+    public IBuiltInRuleApp createApp(@Nullable PosInOccurrence pio, TermServices services) {
+        // The framework only invokes createApp after isApplicable confirmed a non-null position
+        // (isApplicable(null) returns false), so the position is never actually null here.
+        return new MergeRuleBuiltInRuleApp(this, Objects.requireNonNull(pio));
     }
 
     /**
@@ -677,7 +686,12 @@ public class MergeRule implements BuiltInRule {
      * @param goal Current goal to merge.
      * @param pio Position of update-program counter formula in goal.
      * @return A list of suitable merge partners. May be empty if none exist.
+     *         <p>
+     *         The proof of a goal under merge search is present; the dereference of the (nullable)
+     *         proof
+     *         of the services is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public static ImmutableList<MergePartner> findPotentialMergePartners(Goal goal,
             PosInOccurrence pio) {
 

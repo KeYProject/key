@@ -13,6 +13,7 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NullMarked;
@@ -26,7 +27,10 @@ import org.jspecify.annotations.Nullable;
 public abstract class TextualJMLConstruct {
 
     protected final ImmutableList<JMLModifier> modifiers;
-    private Location location = Location.UNDEFINED;
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+    // initial value until the real location is assigned; Location's fileUri tolerates null
+    // (cf. UNDEFINED and fromToken); main initializes with a null file directly.
+    private Location location = new Location(null, Position.UNDEFINED);
     private boolean loopContract;
 
     /**

@@ -199,10 +199,12 @@ public final class GenericSortInstantiations {
 
     public Sort getRealSort(Sort p_s, Services services) {
         if (p_s instanceof GenericSort gs) {
-            p_s = getInstantiation(gs);
-            if (p_s == null) {
+            @Nullable
+            Sort instantiation = getInstantiation(gs);
+            if (instantiation == null) {
                 throw new GenericSortException("Generic sort is not yet instantiated");
             }
+            p_s = instantiation;
         } else if (p_s instanceof ParametricSortInstance psi && psi.containsGenericSort()) {
             ImmutableList<GenericArgument> args = ImmutableList.nil();
             for (int i = psi.getArgs().size() - 1; i >= 0; i--) {

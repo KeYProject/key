@@ -89,6 +89,13 @@ public class FinalFieldsPOExtension implements POExtension {
         return postTerm;
     }
 
+    /**
+     * The constructor's container type exists whenever a proper method declaration is present, and
+     * the heap LDT is always registered in the {@link Services} of a fully initialized KeY
+     * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the dereferences
+     * are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private List<Function> findFinalFields(IProgramMethod iconstructor, Services services) {
         Type type = iconstructor.getContainerType().getJavaType();
         assert type instanceof ClassType

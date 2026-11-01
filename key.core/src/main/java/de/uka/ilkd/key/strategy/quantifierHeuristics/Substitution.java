@@ -217,7 +217,7 @@ public class Substitution {
         return t;
     }
 
-    public boolean equals(Object arg0) {
+    public boolean equals(@Nullable Object arg0) {
         if (!(arg0 instanceof Substitution s)) {
             return false;
         }

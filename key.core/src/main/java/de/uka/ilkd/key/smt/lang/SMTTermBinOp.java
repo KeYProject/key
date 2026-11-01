@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +46,12 @@ public class SMTTermBinOp extends SMTTerm {
     private Op operator;
     private SMTTerm left, right;
 
+    /**
+     * Storing the under-construction {@code this} as the parent back-pointer of already-constructed
+     * children is inherent to the design; the checker cannot express the circular link, so it is
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:initialization.invalid.field.write.initialized")
     public SMTTermBinOp(Op operator, SMTTerm left, SMTTerm right) {
 
         this.operator = operator;
@@ -259,7 +266,7 @@ public class SMTTermBinOp extends SMTTerm {
     }
 
     @Override
-    public boolean equals(Object term) {
+    public boolean equals(@Nullable Object term) {
 
         if (this == term) {
             return true;

@@ -57,7 +57,7 @@ public interface LoopContract extends AuxiliaryContract {
      * @return this loop contract's decreases clause on the specified heap.
      */
     @Nullable
-    JTerm getDecreases(JTerm heap, JTerm self, Services services);
+    JTerm getDecreases(JTerm heap, @Nullable JTerm self, Services services);
 
     /**
      *
@@ -133,8 +133,8 @@ public interface LoopContract extends AuxiliaryContract {
             Map<LocationVariable, JTerm> newFreePostconditions,
             Map<LocationVariable, JTerm> newModifiableClauses,
             Map<LocationVariable, JTerm> newFreeModifiableClauses,
-            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, JTerm newMeasuredBy,
-            JTerm newDecreases);
+            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables,
+            @Nullable JTerm newMeasuredBy, @Nullable JTerm newDecreases);
 
     /**
      *
@@ -155,8 +155,8 @@ public interface LoopContract extends AuxiliaryContract {
             Map<LocationVariable, JTerm> newFreePostconditions,
             Map<LocationVariable, JTerm> newModifiableClauses,
             Map<LocationVariable, JTerm> newFreeModifiableClauses,
-            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, JTerm newMeasuredBy,
-            JTerm newDecreases);
+            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables,
+            @Nullable JTerm newMeasuredBy, @Nullable JTerm newDecreases);
 
     /**
      *

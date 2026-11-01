@@ -51,11 +51,16 @@ public class SynchronizedBlock extends JavaStatement
 
     /**
      * Synchronized block.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param body
      *        a statement block.
      */
 
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public SynchronizedBlock(StatementBlock body) {
         this.body = body;
         this.expression = null;
@@ -67,6 +72,10 @@ public class SynchronizedBlock extends JavaStatement
 
     /**
      * Synchronized block.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param e
      *        an expression.
@@ -74,6 +83,7 @@ public class SynchronizedBlock extends JavaStatement
      *        a statement block.
      */
 
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public SynchronizedBlock(@Nullable Expression e, StatementBlock body) {
         expression = e;
         this.body = body;
@@ -85,11 +95,16 @@ public class SynchronizedBlock extends JavaStatement
 
     /**
      * Synchronized block.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param children
      *        a list with all children
      */
 
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public SynchronizedBlock(ExtList children) {
         super(children);
         expression = children.get(Expression.class);
@@ -102,7 +117,7 @@ public class SynchronizedBlock extends JavaStatement
     }
 
     public SynchronizedBlock(PositionInfo pi, List<Comment> c, Expression expr, StatementBlock body,
-            MethodFrame innerMostMethodFrame, int prefixLength) {
+            @Nullable MethodFrame innerMostMethodFrame, int prefixLength) {
         super(pi, c);
         this.expression = expr;
         this.body = body;

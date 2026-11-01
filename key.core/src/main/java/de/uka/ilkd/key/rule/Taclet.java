@@ -142,6 +142,13 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
             tacletAnnotations);
     }
 
+    /**
+     * The base declaration {@code org.key_project.prover.rules.Taclet} allows invocation of this
+     * construction-time template method while the receiver is still {@code @UnderInitialization}
+     * (it is called from the base constructor); this override's implicit {@code @Initialized}
+     * receiver is the default, and the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.receiver.invalid")
     @EnsuresNonNull("matcher")
     protected void createAndInitializeMatcher() {
         this.matcher = TacletMatcherKit.getKit().createTacletMatcher(this);
@@ -149,6 +156,13 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
 
     // All concrete subclasses assign the {@code executor} field in their overrides, so the
     // inherited @EnsuresNonNull postcondition is mirrored here.
+    /**
+     * The base declaration {@code org.key_project.prover.rules.Taclet} allows invocation of this
+     * construction-time template method while the receiver is still {@code @UnderInitialization}
+     * (it is called from the base constructor); this override's implicit {@code @Initialized}
+     * receiver is the default, and the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.receiver.invalid")
     @EnsuresNonNull("executor")
     protected abstract void createAndInitializeExecutor();
 
@@ -203,7 +217,7 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      * <code>this</code> contain no mutually exclusive taclet options.
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }
@@ -247,7 +261,16 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
      * returns the set of schemavariables of the taclet's if-part
      *
      * @return Set of schemavariables of the if part
+     *         <p>
+     *         The field is {@code @Nullable} only because it is lazily built; once non-null it is
+     *         never
+     *         cleared, so the difference from the {@code @NonNull} result is suppressed with a
+     *         scoped key.
+     *         During the (single-threaded) lazy build, the accumulator under construction is still
+     *         {@code null} when it is extended; those dereferences are suppressed with a scoped
+     *         key.
      */
+    @SuppressWarnings({ "nullness:return.type.incompatible", "nullness:dereference.of.nullable" })
     protected ImmutableSet<SchemaVariable> getAssumesVariables() {
         // should be synchronized
         if (assumesVariables == null) {

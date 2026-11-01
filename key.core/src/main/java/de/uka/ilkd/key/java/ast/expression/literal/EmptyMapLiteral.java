@@ -28,7 +28,7 @@ public non-sealed class EmptyMapLiteral extends Literal {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         return o == this;
     }
 

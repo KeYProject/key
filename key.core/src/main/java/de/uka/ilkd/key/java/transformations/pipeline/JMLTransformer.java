@@ -397,7 +397,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
         }
     }
 
-    private void transformMethodLevelCommentsAt(BlockStmt blockStmt, URI fileName)
+    private void transformMethodLevelCommentsAt(BlockStmt blockStmt, @Nullable URI fileName)
             throws SLTranslationException {
         PreParser io = TransformationPipelineServices.getPreParser();
         var stmts = new ArrayList<>(blockStmt.getStatements());
@@ -435,8 +435,9 @@ public final class JMLTransformer extends JavaTransformerAbstract {
                 if (is.thenStmt().isBlockStmt()) {
                     transformMethodLevelCommentsAt(is.thenStmt().asBlockStmt(), fileName);
                 }
-                if (is.elseStmt() != null && is.elseStmt().isBlockStmt()) {
-                    transformMethodLevelCommentsAt(is.elseStmt().asBlockStmt(), fileName);
+                var elseStmt = is.elseStmt();
+                if (elseStmt != null && elseStmt.isBlockStmt()) {
+                    transformMethodLevelCommentsAt(elseStmt.asBlockStmt(), fileName);
                 }
             } else if (stmt instanceof NodeWithBody<?> b && b.getBody().isBlockStmt()) {
                 transformMethodLevelCommentsAt(b.getBody().asBlockStmt(), fileName);

@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -95,7 +96,8 @@ public class VariableNameProposer implements InstantiationProposer {
      * declared as skolem term SV.
      */
     private String getNameProposalForSkolemTermVariable(TacletApp p_app, SchemaVariable p_var,
-            Services services, Node undoAnchor, ImmutableList<String> previousProposals) {
+            Services services, Node undoAnchor,
+            @Nullable ImmutableList<String> previousProposals) {
         return getNameProposalForSkolemTermVariable(
             createBaseNameProposalBasedOnCorrespondence(p_app, p_var, services), services,
             undoAnchor, previousProposals);
@@ -136,8 +138,10 @@ public class VariableNameProposer implements InstantiationProposer {
 
 
     private String getNameProposalForSkolemTermVariable(String name, Services services,
-            Node undoAnchor, ImmutableList<String> previousProposals) {
+            Node undoAnchor, @Nullable ImmutableList<String> previousProposals) {
 
+        Objects.requireNonNull(previousProposals,
+            "skolem name proposals need the previous proposals of this application");
         final NamespaceSet nss = services.getNamespaces();
         Name l_name;
         final String basename = name + SKOLEMTERM_VARIABLE_NAME_POSTFIX;
@@ -207,10 +211,14 @@ public class VariableNameProposer implements InstantiationProposer {
      * @param previousProposals
      */
     private String getNameProposalForLabel(TacletApp app, SchemaVariable var, Services services,
-            Node undoAnchor, ImmutableList<String> previousProposals) {
+            Node undoAnchor, @Nullable ImmutableList<String> previousProposals) {
 
+        Objects.requireNonNull(previousProposals,
+            "label name proposals need the previous proposals of this application");
+        var contextInstantiation =
+            app.matchConditions().getInstantiations().getContextInstantiation();
         ProgramElement contextProgram =
-            app.matchConditions().getInstantiations().getContextInstantiation().program();
+            contextInstantiation == null ? null : contextInstantiation.program();
 
         if (contextProgram == null) {
             contextProgram = new StatementBlock();

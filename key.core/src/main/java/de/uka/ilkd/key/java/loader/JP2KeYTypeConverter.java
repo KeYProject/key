@@ -86,6 +86,13 @@ public class JP2KeYTypeConverter {
     private @Nullable KeYJavaType __cloneableType;
     private @Nullable KeYJavaType __serializableType;
 
+    /**
+     * The cache pre-population {@link #initializeCaches} operates on {@code this} while the
+     * receiver is still under initialization (EISOP initialization check); safe here because it
+     * only writes the {@code __*} type fields from the lookup result, suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public JP2KeYTypeConverter(Services services, TypeSolver typeSolver, KeYJPMapping jp2KeY) {
         this.jp2KeY = jp2KeY;
         this.typeSolver = typeSolver;

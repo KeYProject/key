@@ -11,6 +11,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Interface for the rules of external solvers
@@ -31,11 +32,11 @@ public interface ExternalSolverRule extends BuiltInRule {
             String successfulSolverName, ImmutableList<PosInOccurrence> unsatCore);
 
     @Override
-    IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services);
+    IBuiltInRuleApp createApp(@Nullable PosInOccurrence pos, TermServices services);
 
 
     @Override
-    default boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    default boolean isApplicable(Goal goal, @Nullable PosInOccurrence pio) {
         return false;
     }
 

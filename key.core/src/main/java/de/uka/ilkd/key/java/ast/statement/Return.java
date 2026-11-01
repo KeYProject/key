@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Return.
@@ -28,9 +29,9 @@ public class Return extends ExpressionJumpStatement {
      * Expression jump statement.
      *
      * @param expr
-     *        an Expression used to jump
+     *        an Expression used to jump, or {@code null} for a bare {@code return;}
      */
-    public Return(Expression expr) {
+    public Return(@Nullable Expression expr) {
         super(expr);
     }
 
@@ -45,7 +46,7 @@ public class Return extends ExpressionJumpStatement {
         super(children);
     }
 
-    public Return(Expression expr, PositionInfo pi, List<Comment> comments) {
+    public Return(@Nullable Expression expr, PositionInfo pi, List<Comment> comments) {
         super(expr, pi, comments);
     }
 

@@ -5,8 +5,7 @@
 package de.uka.ilkd.key.control.instantiation_model;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import javax.swing.table.AbstractTableModel;
 
 import de.uka.ilkd.key.java.Services;
@@ -79,6 +78,12 @@ public class TacletFindModel extends AbstractTableModel {
      * @param scm the abbreviation map.
      * @param goal the current goal.
      */
+    /**
+     * The entry-array construction operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since it only reads parameters and
+     * fields assigned earlier in this constructor, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public TacletFindModel(TacletApp app, Services services, NamespaceSet nss, AbbrevMap scm,
             Goal goal) {
         this.originalApp = app;
@@ -104,8 +109,16 @@ public class TacletFindModel extends AbstractTableModel {
     }
 
     /**
-     * creates a Vector with the row entries of the table
+     * creates a Vector with the row entries of the table.
+     * <p>
+     * Two intentional null flows are suppressed with scoped keys: the formatted instantiation
+     * string is declared {@code @Nullable} by {@code printAnything} although the table row only
+     * ever holds a printable value, so {@code Pair} cannot infer its non-null type argument; and
+     * the proposal for an uninstantiated row may legitimately be absent when no proposer has a
+     * suggestion, in which case the row holds a null string that callers treat as "no input".
      */
+    @SuppressWarnings({ "nullness:type.arguments.not.inferred",
+        "nullness:argument.type.incompatible" })
     private ArrayList<Pair<SchemaVariable, String>> createEntryArray(
             TacletApp tacletApp) {
         ArrayList<Pair<SchemaVariable, String>> rowVec =
@@ -130,7 +143,7 @@ public class TacletFindModel extends AbstractTableModel {
                     goal.node(), proposals);
 
                 Pair<SchemaVariable, String> pair =
-                    new Pair<>(var, proposal);
+                    new Pair<SchemaVariable, String>(var, proposal);
 
                 if (proposal != null) {
                     // A proposal is available ...
@@ -177,11 +190,16 @@ public class TacletFindModel extends AbstractTableModel {
     /**
      * parses the given string that represents the term (or formula) using the given variable
      * namespace and the given namespace for functions and default namespaces for the others
+     * <p>
+     * The sort argument of the parser is intentionally null to accept a term of any sort; the
+     * parser checks the sort only when a non-null sort is supplied, so passing the intentional
+     * null is suppressed with a scoped key.
      *
      * @param s the String to parse
      * @param varNS the variable namespace
      * @param functNS the function namespace
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private JTerm parseTerm(String s, Namespace<@NonNull QuantifiableVariable> varNS,
             Namespace<@NonNull Function> functNS) throws ParserException {
         NamespaceSet copy = nss.copy();
@@ -266,10 +284,10 @@ public class TacletFindModel extends AbstractTableModel {
             Location loc = pe.getLocation();
             if (loc != null) {
                 throw new SVInstantiationParserException(instantiation, loc.getPosition(),
-                    pe.getMessage(), false).initCause(pe);
+                    Objects.requireNonNull(pe.getMessage()), false).initCause(pe);
             } else {
                 throw new SVInstantiationParserException(instantiation, Position.UNDEFINED,
-                    pe.getMessage(), false).initCause(pe);
+                    Objects.requireNonNull(pe.getMessage()), false).initCause(pe);
             }
         }
     }
@@ -296,17 +314,18 @@ public class TacletFindModel extends AbstractTableModel {
             Location loc = pe.getLocation();
             if (loc != null) {
                 throw new SVInstantiationParserException(instantiation,
-                    loc.getPosition().offsetLine(irow), pe.getMessage(), false).initCause(pe);
+                    loc.getPosition().offsetLine(irow), Objects.requireNonNull(pe.getMessage()),
+                    false).initCause(pe);
             } else {
                 throw new SVInstantiationParserException(instantiation, createPosition(irow),
-                    pe.getMessage(), false).initCause(pe);
+                    Objects.requireNonNull(pe.getMessage()), false).initCause(pe);
             }
         }
     }
 
     private JTerm addOrigin(JTerm term) {
         return services.getTermBuilder().addLabelToAllSubs(
-            OriginTermLabel.removeOriginLabels(term, services),
+            Objects.requireNonNull(OriginTermLabel.removeOriginLabels(term, services)),
             new NodeOrigin(SpecType.USER_INTERACTION,
                 originalApp.rule().displayName(), goal.node().serialNr()));
     }
@@ -333,7 +352,7 @@ public class TacletFindModel extends AbstractTableModel {
         }
 
         if (!varNamer.isUniqueNameForSchemaVariable(instantiation, sv,
-            originalApp.posInOccurrence(), prefix)) {
+            Objects.requireNonNull(originalApp.posInOccurrence()), prefix)) {
             throw new SVInstantiationParserException(instantiation, createPosition(irow),
                 "Name is already in use.", false);
         }
@@ -352,7 +371,12 @@ public class TacletFindModel extends AbstractTableModel {
      * @return new rule app with all inserted instantiations in the variable instantiations table
      *
      * @throws SVInstantiationException if the instantiation is incorrect
+     *         The accumulator only starts from {@code @Nullable} because the original app is only
+     *         set when
+     *         the model is built; by construction it is non-null here, so the difference and the
+     *         dereferences of the accumulator are suppressed with scoped keys.
      */
+    @SuppressWarnings({ "nullness:return.type.incompatible", "nullness:dereference.of.nullable" })
     public TacletApp createTacletAppFromVarInsts() throws SVInstantiationException {
 
         final TermBuilder tb = services.getTermBuilder();
@@ -442,7 +466,8 @@ public class TacletFindModel extends AbstractTableModel {
                                 createPosition(irow));
                         } catch (IllegalInstantiationException iae) {
                             throw new SVInstantiationParserException((String) getValueAt(irow, 1),
-                                createPosition(irow), iae.getMessage(), false);
+                                createPosition(irow), Objects.requireNonNull(iae.getMessage()),
+                                false);
                         }
                     }
                 }

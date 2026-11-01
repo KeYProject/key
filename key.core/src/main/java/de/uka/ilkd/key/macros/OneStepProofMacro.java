@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.macros;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
@@ -18,6 +20,7 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Apply a single proof step.
@@ -57,8 +60,12 @@ public class OneStepProofMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy<@NonNull Goal> createStrategy(Proof proof,
-            PosInOccurrence posInOcc) {
-        return new OneStepStrategy(proof.getActiveStrategy());
+            @Nullable PosInOccurrence posInOcc) {
+        // The active strategy is configured and set before createStrategy() runs; without it
+        // the one-step strategy below would have nothing to steer rule application.
+        return new OneStepStrategy(Objects.requireNonNull(
+            proof.getActiveStrategy(),
+            "the proof carries an active strategy while the macro runs"));
     }
 
 

@@ -215,6 +215,13 @@ public class TransformationPipelineServices {
         return new ClassOrInterfaceType(null, decl.getName(), null);
     }
 
+    /**
+     * The component type of a resolved array type always materializes here: it is either an array
+     * itself, a reference type, or a primitive type, each handled by a branch above, so this
+     * method cannot return {@code null} for it. The {@code @Nullable} return type only reflects
+     * the fall-through for non-Java types.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public @Nullable Type getType(ResolvedType type) {
         if (type.isArray()) {
             // TODO weigl type.arrayLevel()

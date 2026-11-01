@@ -344,8 +344,13 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
 
         /**
          * Receive a mark and act appropriately.
+         * <p>
+         * The stack bookkeeping below is balanced: a start mark always precedes the end mark that
+         * pops the stack, so the peeked entry is present; the dereference of the (nullable) entry
+         * is suppressed with a scoped key.
          */
         @Override
+        @SuppressWarnings("nullness:dereference.of.nullable")
         public void mark(Mark pair) {
             MarkType markType = pair.type;
             int parameter = pair.parameter;

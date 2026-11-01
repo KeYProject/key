@@ -220,6 +220,14 @@ public abstract class TypeResolver {
             return result;
         }
 
+        /**
+         * Determines the sort of the container (array or heap) of the given operator, or
+         * {@code null} if no container is implied.
+         * <p>
+         * The container type of a program variable or observer function is always present; the
+         * dereferences of the (nullable) container types are suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:dereference.of.nullable")
         private @Nullable Sort getContainerSort(Operator op, TermServices services) {
             Sort result = null;
             if (op instanceof ProgramVariable) {

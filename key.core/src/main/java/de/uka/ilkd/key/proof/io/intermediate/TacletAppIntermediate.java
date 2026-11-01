@@ -22,11 +22,11 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class TacletAppIntermediate extends AppIntermediate {
 
-    private String tacletName = null;
-    private Pair<Integer, PosInTerm> posInfo = null;
+    private String tacletName;
+    private Pair<Integer, PosInTerm> posInfo;
     private @Nullable List<String> insts = null;
-    private ImmutableList<String> ifSeqFormulaList = null;
-    private ImmutableList<String> ifDirectFormulaList = null;
+    private ImmutableList<String> ifSeqFormulaList;
+    private ImmutableList<String> ifDirectFormulaList;
     private @Nullable ImmutableList<Name> newNames = null;
 
     /**
@@ -77,7 +77,10 @@ public class TacletAppIntermediate extends AppIntermediate {
      * (non-Javadoc)
      *
      * @see de.uka.ilkd.key.proof.io.intermediate.AppIntermediate#getNewNames()
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable ImmutableList<Name> getNewNames() {
         return newNames;

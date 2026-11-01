@@ -15,6 +15,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  *
@@ -30,11 +31,21 @@ public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacr
      * The macros are always started on the last active goal (in contrast to the same goal as it is
      * done in the SequentialProofMacro).
      *
+     * <p>
+     * The finished info of a wrapped macro may carry no proof; by construction of
+     * {@link ProofMacroFinishedInfo}, this happens exactly when the macro finished on an empty
+     * goal list (no open goals remain). The remaining macros are then skipped, as the
+     * {@link ProofMacro#canApplyTo} implementations of this macro family decide on the goal list
+     * first and never dereference the absent proof; the assignment of the (nullable) proof of the
+     * wrapped info to the non-null parameter is suppressed with a scoped key.
+     *
      * @throws InterruptedException if one of the wrapped macros is interrupted.
      */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, final ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            final @Nullable ProverTaskListener listener)
             throws Exception {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         for (final ProofMacro macro : getProofMacros()) {

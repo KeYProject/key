@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.control;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -40,16 +42,28 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
 
     /**
      * Constructor.
+     * <p>
+     * Suppresses initialization warnings: {@code this} is passed to the {@link DefaultProofControl}
+     * constructor while still {@code @UnderInitialization}, but that constructor only stores the
+     * received references and never invokes methods on them.
      */
+    @SuppressWarnings({ "nullness:assignment.type.incompatible",
+        "nullness:argument.type.incompatible" })
     public DefaultUserInterfaceControl() {
         proofControl = new DefaultProofControl(this, this);
     }
 
     /**
      * Constructor.
+     * <p>
+     * Suppresses initialization warnings: {@code this} is passed to the {@link DefaultProofControl}
+     * constructor while still {@code @UnderInitialization}, but that constructor only stores the
+     * received references and never invokes methods on them.
      *
      * @param customization An optional {@link RuleCompletionHandler}.
      */
+    @SuppressWarnings({ "nullness:assignment.type.incompatible",
+        "nullness:argument.type.incompatible" })
     public DefaultUserInterfaceControl(@Nullable RuleCompletionHandler customization) {
         proofControl = new DefaultProofControl(this, this, customization);
     }
@@ -71,7 +85,8 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
         // TODO: Find out why the proof has to be registered. This method should just return null
         // and do nothing.
         initConfig.getServices().getSpecificationRepository().registerProof(proofOblInput,
-            proofList.getFirstProof());
+            Objects.requireNonNull(proofList.getFirstProof(),
+                "A loaded proof aggregate always contains a first proof"));
 
         // This has to be done to prive the proofList with the environment object.
         final ProofEnvironment env = new ProofEnvironment(initConfig);

@@ -134,6 +134,13 @@ public final class GoalScheduler<T extends ProofGoal<T>> {
         }
     }
 
+    /**
+     * Offers each given goal with a fresh budget.
+     * <p>
+     * The budget map is created at the entry of this method; the dereference of the (nullable)
+     * budget map field is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public synchronized void offerAllAsTasks(Iterable<? extends T> goals, int maxSteps) {
         taskBudget = new IdentityHashMap<>();
         for (T goal : goals) {
@@ -318,7 +325,12 @@ public final class GoalScheduler<T extends ProofGoal<T>> {
      *
      * @param goal the just-processed goal to remove from the in-flight set
      * @param successors the open subgoals to make available (may be {@code null} or empty)
+     *        <p>
+     *        The budget map is present whenever a budget-based schedule is running; the dereference
+     *        of
+     *        the (nullable) budget map field is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public synchronized void completeAndOffer(T goal, @Nullable Iterable<? extends T> successors) {
         inFlight.remove(goal);
         final Budget budget = getBudgetFor(goal);

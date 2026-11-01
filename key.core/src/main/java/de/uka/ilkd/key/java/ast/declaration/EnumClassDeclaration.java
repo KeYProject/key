@@ -60,13 +60,19 @@ public class EnumClassDeclaration extends ClassDeclaration {
         // }
     }
 
-    /*
+    /**
      * find the program variable for a constant given by name.
      *
+     * <p>
      * The "<Name>::" have to be prepended to obtain the internal name. Throw IllegalStateException
      * if name is not an attribute of this. This will never happen.
      *
+     * <p>
+     * A field declaration always has a field specification and that specification a name; the
+     * dereferences of the (nullable) specification and its (nullable) name are suppressed with a
+     * scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private IProgramVariable findAttr(String fieldName) {
         String completeName = getFullName() + JavaDLFieldNames.SEPARATOR + fieldName;
         for (int i = 0; i < members.size(); i++) {
@@ -124,7 +130,11 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * @param attribute
      *        ProgramVariable to check.
      * @return true iff attribute is an enum constant.
+     *         <p>
+     *         A program variable of an enum-typed attribute always carries a KeY Java type; the
+     *         dereference of the (nullable) KeY Java type is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public static boolean isEnumConstant(IProgramVariable attribute) {
         KeYJavaType kjt = attribute.getKeYJavaType();
         Type type = kjt.getJavaType();
@@ -135,7 +145,17 @@ public class EnumClassDeclaration extends ClassDeclaration {
         }
     }
 
-    // TODO DOC
+    /**
+     * Returns the index of the given program variable amongst the enum constants of any enum type,
+     * or {@code -1} if it is not an enum constant.
+     *
+     * @param attribute ProgramVariable to look up.
+     * @return the 0-based index of the constant, or -1 if not found.
+     *         <p>
+     *         A program variable of an enum-typed attribute always carries a KeY Java type; the
+     *         dereference of the (nullable) KeY Java type is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public static int indexOf(ProgramVariable attribute) {
         KeYJavaType kjt = attribute.getKeYJavaType();
         Type type = kjt.getJavaType();

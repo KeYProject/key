@@ -76,7 +76,13 @@ public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Na
     /**
      * @return The placeholder variable and the function term that this predicate has been
      *         constructed with.
+     *         <p>
+     *         Both components are transiently {@code @Nullable} during construction and read only
+     *         after full initialisation, which the checker cannot see across the factory boundary;
+     *         {@code Pair} only admits non-null type arguments, so the type inference difference
+     *         is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:type.arguments.not.inferred")
     public Pair<LocationVariable, JTerm> getPredicateFormWithPlaceholder() {
         return new Pair<>(placeholderVariable, predicateFormWithPlaceholder);
     }
@@ -186,6 +192,15 @@ public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Na
      * @param services The services object.
      * @return A parseable String representation of this predicate.
      */
+    /**
+     * Returns this predicate's parseable string representation, including its placeholder
+     * declaration.
+     * <p>
+     * The predicate form and its placeholder variable are set whenever the predicate is fully
+     * constructed, which the parseable-string consumers rely on; the dereferences of the
+     * (nullable) form and placeholder values are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public String toParseableString(final Services services) {
         StringBuilder sb = new StringBuilder();
         Pair<LocationVariable, JTerm> predicateFormWithPlaceholder =
@@ -210,7 +225,16 @@ public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Na
      * @return The parsed {@link String}.
      * @throws ParserException If there is a syntax error.
      * @throws NameAlreadyBoundException If the given placeholder is already known to the system.
+     *         <p>
+     *         The {@code Matcher#group(int)} results for the paired groups {@code (i, i+1)} are
+     *         guaranteed
+     *         by the regular expression to have participated in the match, so they are never
+     *         {@code null}
+     *         here; the generic JDK contract of {@code Matcher} does not express that, so the
+     *         differences
+     *         are suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static List<AbstractionPredicate> fromString(final String s, final Services services,
             NamespaceSet localNamespaces) throws ParserException {
         final ArrayList<AbstractionPredicate> result = new ArrayList<>();
@@ -252,8 +276,17 @@ public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Na
         return result;
     }
 
+    /**
+     * Compares this predicate for equality with the given object, based on placeholder variable and
+     * predicate form.
+     * <p>
+     * Equality of the fully-constructed predicates implies the placeholder variable and predicate
+     * form of both predicates are present; the dereferences of the (nullable) fields of the other
+     * predicate are suppressed with a scoped key.
+     */
     @Override
-    public boolean equals(Object obj) {
+    @SuppressWarnings("nullness:dereference.of.nullable")
+    public boolean equals(@Nullable Object obj) {
         if (!(obj instanceof AbstractionPredicate otherPred)) {
             return false;
         }

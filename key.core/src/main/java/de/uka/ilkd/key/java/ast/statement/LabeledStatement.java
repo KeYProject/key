@@ -44,11 +44,16 @@ public class LabeledStatement extends JavaStatement
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param children
      *        the children of this AST element as KeY classes. May contain: a Label (as
      *        name of the label) a Statement (as body of the labeled statement) Comments
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public LabeledStatement(ExtList children, Label label, PositionInfo pos) {
         super(children, pos);
         name = label;
@@ -70,10 +75,15 @@ public class LabeledStatement extends JavaStatement
 
     /**
      * Labeled statement.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param name
      *        an identifier.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public LabeledStatement(Label name) {
         this.name = name;
         body = new EmptyStatement();
@@ -87,12 +97,17 @@ public class LabeledStatement extends JavaStatement
 
     /**
      * Labeled statement.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param id
      *        a Label.
      * @param statement
      *        a statement.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public LabeledStatement(Label id, Statement statement, PositionInfo pos) {
         super(pos);
         this.name = id;

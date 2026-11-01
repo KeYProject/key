@@ -91,7 +91,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null || o.getClass() != getClass()) {
             return false;
         }
@@ -117,6 +117,16 @@ public final class RepresentsAxiom extends ClassAxiom {
                         .equals(originalSelfVar));
     }
 
+    /**
+     * Builds the axiom term in which {@code heapVar} replaces the heap method and {@code selfVar}
+     * replaces the self variable, if any.
+     * <p>
+     * The key {@link #originalSelfVar} is nullable by declaration, but the constructor invariant
+     * {@code (selfVar == null) == target.isStatic()} guarantees that field is non-null exactly
+     * when the method's {@code selfVar} parameter is non-null. The checker cannot derive this
+     * link, so the {@code Map.put} of the key is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public JTerm getAxiom(JAbstractSortedOperator heapVar,
             @Nullable JAbstractSortedOperator selfVar,
             Services services) {

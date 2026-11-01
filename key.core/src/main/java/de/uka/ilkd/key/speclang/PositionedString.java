@@ -37,11 +37,11 @@ public class PositionedString {
         this(text, Location.fromToken(t));
     }
 
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+    // A null file name means the source has no file (e.g. standard input); Location's fileUri
+    // component tolerates null at runtime (cf. UNDEFINED and fromToken), like main's behavior.
     public PositionedString(String text, @Nullable URI fileName) {
-        // A null file name means the source has no file (e.g. standard input); Location.UNDEFINED
-        // represents exactly this case, as its fileUri component is not declared @Nullable.
-        this(text,
-            fileName == null ? Location.UNDEFINED : new Location(fileName, Position.UNDEFINED));
+        this(text, new Location(fileName, Position.UNDEFINED));
     }
 
     public PositionedString(String text) {
@@ -75,7 +75,7 @@ public class PositionedString {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

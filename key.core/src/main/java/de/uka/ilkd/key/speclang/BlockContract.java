@@ -56,7 +56,7 @@ public interface BlockContract extends AuxiliaryContract {
             Map<LocationVariable, JTerm> newModifiableClauses,
             Map<LocationVariable, JTerm> newFreeModifiableClauses,
             final ImmutableList<InfFlowSpec> newInfFlowSpecs, Variables newVariables,
-            JTerm newMeasuredBy);
+            @Nullable JTerm newMeasuredBy);
 
     /**
      * @param newKJT the type containing the new target method.

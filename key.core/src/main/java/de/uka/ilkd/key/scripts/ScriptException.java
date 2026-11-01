@@ -50,6 +50,12 @@ public class ScriptException extends Exception implements HasLocation {
         this.location = Location.UNDEFINED;
     }
 
+    /**
+     * The field is {@code @Nullable} only for the constructor accepting an optional location; all
+     * other paths set {@link Location#UNDEFINED}, so the difference is suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     @Override
     public Location getLocation() {
         return location;

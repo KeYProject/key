@@ -61,8 +61,10 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     // getters (see {@link #getType()}, {@link #getProgramVariable()}) are typed @NonNull by the
     // {@link de.uka.ilkd.key.java.ast.abstraction.Variable} resp.
     // {@link de.uka.ilkd.key.java.ast.abstraction.Field} interfaces. The null values are tolerated
-    // at runtime by every accessor of this class.
-    @SuppressWarnings("NullAway")
+    // at runtime by every accessor of this class. The delegate below may not be widened to accept
+    // them as @Nullable (the fields are final and their getters must stay @NonNull for the
+    // interfaces), so the two intentional null arguments are suppressed here.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public VariableSpecification() {
         this(null, 0, null, null, null);
     }
@@ -70,7 +72,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     // The {@code programVariable}'s KeYJavaType is null for schema program variables (see
     // ProgramSV.getKeYJavaType()); the resulting null {@code type} is stored by the delegate while
     // the delegated constructor's Type parameter stays @NonNull for the regular callers.
-    @SuppressWarnings("NullAway")
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public VariableSpecification(IProgramVariable programVariable) {
         this(programVariable, programVariable.getKeYJavaType());
     }
@@ -120,7 +122,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
         this.type = type;
     }
 
-    public VariableSpecification(PositionInfo pi, List<Comment> comments, Expression init,
+    public VariableSpecification(PositionInfo pi, List<Comment> comments, @Nullable Expression init,
             IProgramVariable programVariable, int dim, Type type) {
         super(pi, comments);
         this.programVariable = programVariable;
@@ -310,7 +312,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }

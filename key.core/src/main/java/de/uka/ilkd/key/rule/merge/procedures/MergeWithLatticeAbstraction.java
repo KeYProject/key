@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.merge.procedures;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
@@ -84,7 +85,8 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
             assert v.op() instanceof ProgramVariable;
 
             if (getUserChoices().containsKey((ProgramVariable) v.op())) {
-                mergeElem = getUserChoices().get((ProgramVariable) v.op());
+                mergeElem = Objects.requireNonNull(getUserChoices().get((ProgramVariable) v.op()),
+                    "no lattice element for a user-chosen merge variable");
 
                 sideConditions.add(
                     AbstractDomainLattice.getSideConditionForAxiom(state1, v, mergeElem, services));

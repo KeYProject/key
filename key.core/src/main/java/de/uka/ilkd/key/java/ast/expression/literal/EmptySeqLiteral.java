@@ -23,7 +23,7 @@ public non-sealed class EmptySeqLiteral extends Literal {
     private EmptySeqLiteral() {}
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         return o == this;
     }
 
