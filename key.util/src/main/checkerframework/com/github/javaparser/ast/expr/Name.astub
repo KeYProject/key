@@ -1,0 +1,15 @@
+package com.github.javaparser.ast.expr;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+/**
+ * Re-specification of the {@code Name} constructor for the nullness checker. JavaParser models a
+ * dotted name as nested {@code Name} nodes: a {@code null} qualifier denotes a top-level name
+ * (the identifier itself). The KeY code base builds qualified names in a loop whose first
+ * iteration deliberately passes {@code null} as the qualifier, which the library accepts.
+ * Widening the parameter nullness matches the library's actual behavior without source changes.
+ */
+public class Name {
+
+    public Name(@Nullable Name qualifier, String identifier);
+}
