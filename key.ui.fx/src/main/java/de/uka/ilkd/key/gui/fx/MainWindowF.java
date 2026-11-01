@@ -4294,21 +4294,27 @@ public final class MainWindowF {
                 .ifPresent(unicode::setAccelerator);
         shortcuts.register(unicode, "de.uka.ilkd.key.gui.actions.UnicodeToggleAction");
 
+        // theme: the View > Theme submenu offers the seven AtlantaFX themes (the Swing original
+        // selects the FlatLaf look and feel in the settings; the FX port surfaces the persisted
+        // choice directly in the menu). The items route through ThemeManager.setTheme like the
+        // settings panel, and switches from elsewhere update the radio selection.
         ToggleGroup themeGroup = new ToggleGroup();
-        RadioMenuItem lightTheme = new RadioMenuItem("Light Theme");
-        RadioMenuItem darkTheme = new RadioMenuItem("Dark Theme");
-        lightTheme.setToggleGroup(themeGroup);
-        darkTheme.setToggleGroup(themeGroup);
-        (ThemeManager.getInstance().getTheme().isDark() ? darkTheme : lightTheme)
-                .setSelected(true);
-        lightTheme.setOnAction(e -> setTheme(Theme.PRIMER_LIGHT));
-        darkTheme.setOnAction(e -> setTheme(Theme.PRIMER_DARK));
-        // theme switches from elsewhere (e.g. the settings dialog) update the menu radios
-        ThemeManager.getInstance().themeProperty().addListener(
-            (obs, old, theme) -> (theme.isDark() ? darkTheme : lightTheme).setSelected(true));
-
         Menu themeMenu = new Menu("Theme");
-        themeMenu.getItems().addAll(lightTheme, darkTheme);
+        for (Theme theme : Theme.values()) {
+            RadioMenuItem item = new RadioMenuItem(theme.displayName());
+            item.setToggleGroup(themeGroup);
+            item.setUserData(theme);
+            item.setSelected(ThemeManager.getInstance().getTheme() == theme);
+            item.setOnAction(e -> setTheme(theme));
+            themeMenu.getItems().add(item);
+        }
+        ThemeManager.getInstance().themeProperty().addListener((obs, old, theme) -> {
+            for (javafx.scene.control.MenuItem item : themeMenu.getItems()) {
+                if (item instanceof RadioMenuItem radio && theme == radio.getUserData()) {
+                    radio.setSelected(true);
+                }
+            }
+        });
 
         Menu fontSize = new Menu("Font Size");
         // P3b/B18: Swing order + labels of the Font Size submenu
