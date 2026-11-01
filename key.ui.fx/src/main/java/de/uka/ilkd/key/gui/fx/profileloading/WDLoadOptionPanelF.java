@@ -10,8 +10,10 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.Separator;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
+import de.uka.ilkd.key.gui.fx.extension.api.KeYGuiExtensionF;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.wd.WdProfile;
@@ -35,15 +37,20 @@ import de.uka.ilkd.key.wd.WdProfile;
  * combo box ({@code KeYFileChooserLoadingOptions.java:88-99}, install/{@code
  * WDLoadDialogOptionPanel.java:85-94}). In this port the host is {@link
  * LoadingOptionsDialogF}, the FX counterpart of {@code KeYFileChooserLoadingOptions} shown
- * before the load: it registers this panel for the WD profile in its option-panel map (the
- * Swing SPI seam, plan §6/M6, stays open) and installs/removes it on profile changes.</li>
+ * before the load: the panel implements the FX SPI capability
+ * {@link KeYGuiExtensionF.OptionPanelF} (Swing {@code KeYGuiExtension.OptionPanel}) and is
+ * contributed by the {@code WDLoadDialogOptionPanelF} provider
+ * ({@code KeYGuiExtensionF.LoadOptionPanelF}, the Swing {@code KeYGuiExtension.LoadOptionPanel}
+ * parity, registered in the service-loader file); the dialog aggregates the providers via
+ * {@code KeYGuiExtensionFacadeF.createAdditionalOptionPanels()} and installs/removes the panel
+ * of the selected profile on profile changes.</li>
  * <li>MigLayout {@code install/deinstall} becomes a plain {@link Node} ({@link VBox}) with the
  * same content: bold header, separator, "Semantics:" label, mutually exclusive radio buttons.</li>
  * <li>The radio button texts and the three tooltip descriptions are carried over verbatim
  * ({@code WDLoadDialogOptionPanel.java:35-68}).</li>
  * </ul>
  */
-public class WDLoadOptionPanelF extends VBox {
+public class WDLoadOptionPanelF extends VBox implements KeYGuiExtensionF.OptionPanelF {
 
     /** Radio button for the L (McCarthy logic) semantics (Swing {@code rdbWDL}). */
     private final RadioButton rdbWDL = new RadioButton("L");
@@ -144,6 +151,28 @@ public class WDLoadOptionPanelF extends VBox {
             configuration.set("wdOperator", "wdOperator:Y");
         }
         return configuration;
+    }
+
+    /**
+     * Swing {@code OptionPanel.install(KeYFileChooserLoadingOptions)}
+     * ({@code WDLoadDialogOptionPanel.java:85-94}): adds this panel — it is the component
+     * itself — to the given host pane.
+     */
+    @Override
+    public void install(Pane host) {
+        if (!host.getChildren().contains(this)) {
+            host.getChildren().add(this);
+        }
+    }
+
+    /**
+     * Swing {@code OptionPanel.deinstall(KeYFileChooserLoadingOptions)}
+     * ({@code WDLoadDialogOptionPanel.java:96-104}): removes this panel from the given host
+     * pane.
+     */
+    @Override
+    public void deinstall(Pane host) {
+        host.getChildren().remove(this);
     }
 
     /**

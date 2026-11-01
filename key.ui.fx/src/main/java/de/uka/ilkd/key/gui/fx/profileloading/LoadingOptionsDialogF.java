@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.gui.fx.profileloading;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -25,6 +24,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Window;
 
+import de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF;
+import de.uka.ilkd.key.gui.fx.extension.api.KeYGuiExtensionF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsPanelF;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
 import de.uka.ilkd.key.proof.init.DefaultProfileResolver;
@@ -52,12 +53,17 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * The Swing original collects the profile-specific option panels via the {@code KeYGuiExtension}
  * SPI ({@code KeYGuiExtensionFacade.createAdditionalOptionPanels()}, {@code
- * KeYFileChooserLoadingOptions.java:53-54}); the FX extension SPI does not exist yet, so the
- * panels are registered in the local {@link #additionalOptionPanels} map built from the ported
- * {@link WDLoadOptionPanelF#getProfile()} (the extension seam stays open). For the same reason
- * the profile list only contains the {@code DefaultProfileResolver} services on the
- * {@code key.ui.fx} classpath (Swing additionally offers the InfFlow profile of
- * {@code key.core.infflow}, which is not a dependency of {@code key.ui.fx}).
+ * KeYFileChooserLoadingOptions.java:53-54}); this dialog mirrors that with the FX SPI: the
+ * panels come from {@code KeYGuiExtensionFacadeF.createAdditionalOptionPanels()} (Swing
+ * {@code KeYGuiExtensionFacade.createAdditionalOptionPanels},
+ * KeYGuiExtensionFacade.java:410-418), contributed by the
+ * {@code KeYGuiExtensionF.LoadOptionPanelF} providers — currently the built-in
+ * {@link WDLoadDialogOptionPanelF} for the WD profile. On profile changes the current panel is
+ * deinstalled and the newly selected profile's panel installed (Swing parity,
+ * {@code KeYFileChooserLoadingOptions.java:96-119}). The profile list only offers the
+ * {@code DefaultProfileResolver} services on the {@code key.ui.fx} classpath (Swing additionally
+ * offers the InfFlow profile of {@code key.core.infflow}, which is not a dependency of
+ * {@code key.ui.fx}) — the documented classpath deviation.
  */
 public final class LoadingOptionsDialogF extends javafx.stage.Stage {
 
@@ -114,12 +120,21 @@ public final class LoadingOptionsDialogF extends javafx.stage.Stage {
     private final VBox optionPanelHost = new VBox();
 
     /**
-     * smalldialogs: the profile option panels. Swing fills this map via the
-     * {@code KeYGuiExtension} SPI ({@code createAdditionalOptionPanels()}); here the ported WD
-     * panel is registered directly (SPI seam open, see class javadoc).
+     * The profile option panels, aggregated from the {@code KeYGuiExtensionF.LoadOptionPanelF}
+     * providers via {@link KeYGuiExtensionFacadeF#createAdditionalOptionPanels()} (Swing:
+     * the map field of {@code KeYFileChooserLoadingOptions} filled by the same facade call,
+     * KeYFileChooserLoadingOptions.java:53-54).
      */
-    private static final Map<Profile, WDLoadOptionPanelF> additionalOptionPanels =
-        buildAdditionalOptionPanels();
+    private final Map<Profile, KeYGuiExtensionF.OptionPanelF> additionalOptionPanels =
+        KeYGuiExtensionFacadeF.createAdditionalOptionPanels();
+
+    /**
+     * The currently installed profile option panel (Swing {@code currentOptionPanel},
+     * KeYFileChooserLoadingOptions.java:56-57): deinstalled on profile changes, then the panel
+     * of the selected profile is installed. Swing does not reset the field to {@code null}
+     * after the deinstall — the components are reused to keep the temporary state.
+     */
+    private KeYGuiExtensionF.@Nullable OptionPanelF currentOptionPanel;
 
     /** The dialog result; {@code null} until confirmed (Swing: chooser approved). */
     private @Nullable LoadOptions result;
@@ -194,7 +209,8 @@ public final class LoadingOptionsDialogF extends javafx.stage.Stage {
         loadButton.setOnAction(e -> {
             ProfileWrapper selected = cboProfile.getSelectionModel().getSelectedItem();
             Profile profile = selected == null ? null : selected.profile();
-            WDLoadOptionPanelF panel = profile == null ? null : additionalOptionPanels.get(profile);
+            KeYGuiExtensionF.OptionPanelF panel =
+                profile == null ? null : additionalOptionPanels.get(profile);
             result = new LoadOptions(profile, panel == null ? null : panel.getResult(),
                 lblSingleJava.isSelected());
             close();
@@ -222,33 +238,26 @@ public final class LoadingOptionsDialogF extends javafx.stage.Stage {
      * Swing {@code updateProfileInfo} ({@code KeYFileChooserLoadingOptions.java:96-119}): shows
      * the description of the selected profile and installs the matching additional option panel
      * (Swing {@code install}/{@code deinstall} of {@code WDLoadDialogOptionPanel.java:85-104};
-     * here install/remove becomes adding/removing the panel from {@link #optionPanelHost}).
+     * here the panel installs itself into {@link #optionPanelHost} via
+     * {@code KeYGuiExtensionF.OptionPanelF}).
      */
     private void updateProfileInfo() {
-        // Swing: currentOptionPanel.deinstall(this) on profile change
-        optionPanelHost.getChildren().clear();
+        // Swing updateProfileInfo (KeYFileChooserLoadingOptions.java:103-119): the current panel
+        // is deinstalled (no nulling, no host clearing — the components are reused to keep the
+        // temporary state), then the panel of the selected profile is installed
+        if (currentOptionPanel != null) {
+            currentOptionPanel.deinstall(optionPanelHost);
+        }
         ProfileWrapper selected = cboProfile.getSelectionModel().getSelectedItem();
         if (selected == null) {
             lblProfileInfo.setText("");
         } else {
             lblProfileInfo.setText(selected.description());
-            WDLoadOptionPanelF panel = additionalOptionPanels.get(selected.profile());
-            if (panel != null) {
-                optionPanelHost.getChildren().add(panel);
+            if (additionalOptionPanels.containsKey(selected.profile())) {
+                currentOptionPanel = additionalOptionPanels.get(selected.profile());
+                currentOptionPanel.install(optionPanelHost);
             }
         }
-    }
-
-    /**
-     * Builds the profile option panel registry (Swing
-     * {@code KeYGuiExtensionFacade.createAdditionalOptionPanels()}; the FX registry is
-     * constructed from the ported {@link WDLoadOptionPanelF}, see the class javadoc).
-     */
-    private static Map<Profile, WDLoadOptionPanelF> buildAdditionalOptionPanels() {
-        Map<Profile, WDLoadOptionPanelF> map = new LinkedHashMap<>();
-        WDLoadOptionPanelF wdPanel = new WDLoadOptionPanelF();
-        map.put(wdPanel.getProfile(), wdPanel);
-        return map;
     }
 
     /**
@@ -289,7 +298,7 @@ public final class LoadingOptionsDialogF extends javafx.stage.Stage {
         if (profile == null) {
             return null;
         }
-        WDLoadOptionPanelF panel = additionalOptionPanels.get(profile);
+        KeYGuiExtensionF.OptionPanelF panel = additionalOptionPanels.get(profile);
         return panel == null ? null : panel.getResult();
     }
 
