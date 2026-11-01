@@ -139,6 +139,25 @@ public class LlmSettingsUI extends SettingsPanel {
                 Arrays.stream(s.split("\n")).map(String::strip).filter(x -> !x.isBlank())
                         .toList()));
 
+        addSeparator("MCP server");
+        addCheckBox("Enable MCP server (SSE)",
+            "Expose the KeY-Agent tool set to other processes over the Model Context Protocol"
+                + " (HTTP + Server-Sent Events). The status line shows the endpoint while the"
+                + " server runs; which tools are exported can be chosen per tool in the \"Tools\""
+                + " panel.",
+            model.getMcpServerEnabled(), model::setMcpServerEnabled);
+        addTextField("Host", model.getMcpServerHost(),
+            "The network interface to bind to. Keep 127.0.0.1 (loopback) unless clients on"
+                + " other machines must connect.",
+            model::setMcpServerHost);
+        addIntField("Port", "0 (default) picks a free ephemeral port; a fixed port is useful"
+            + " for stable client configurations.", model::getMcpServerPort,
+            model::setMcpServerPort);
+        addTextField("Auth token", model.getMcpServerToken(),
+            "Optional static bearer token that every request must carry"
+                + " (Authorization: Bearer <token>); empty means unauthenticated access.",
+            model::setMcpServerToken);
+
         addSeparator("User interface");
         addCheckBox("Auto-scroll output", "Automatically scroll to the newest messages.",
             model.getAutoScrollOutput(), model::setAutoScrollOutput);

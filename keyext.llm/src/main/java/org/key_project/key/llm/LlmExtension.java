@@ -33,11 +33,20 @@ import org.jspecify.annotations.Nullable;
 @KeYGuiExtension.Info(experimental = false, description = "LLM support for KeY")
 public class LlmExtension implements KeYGuiExtension, KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Settings, KeYGuiExtension.Startup, KeYGuiExtension.RightPanel,
-        KeYGuiExtension.MainMenu {
+        KeYGuiExtension.MainMenu, KeYGuiExtension.StatusLine {
     private KeyAction actionStartLlmPromptForCurrentProof;
     private TabPanel uiPrompt;
+    private LlmStatusBar llmStatusBar;
 
     @Override
+    public @NonNull List<JComponent> getStatusLineComponents() {
+        if (llmStatusBar == null) {
+            llmStatusBar = new LlmStatusBar();
+        }
+        llmStatusBar.maybeRestore();
+        return List.of(llmStatusBar);
+    }
+
     public @NonNull List<Action> getContextActions(
             @NonNull KeYMediator mediator, @NonNull ContextMenuKind kind,
             @NonNull Object underlyingObject) {
@@ -133,6 +142,10 @@ public class LlmExtension implements KeYGuiExtension, KeYGuiExtension.ContextMen
             target.setShellMaxOutputChars(source.getShellMaxOutputChars());
             target.setShellBlockedPatterns(
                 new java.util.ArrayList<>(source.getShellBlockedPatterns()));
+            target.setMcpServerEnabled(source.getMcpServerEnabled());
+            target.setMcpServerHost(source.getMcpServerHost());
+            target.setMcpServerPort(source.getMcpServerPort());
+            target.setMcpServerToken(source.getMcpServerToken());
             target.setAutoScrollOutput(source.getAutoScrollOutput());
             target.setShowToolActivity(source.getShowToolActivity());
         }
@@ -195,6 +208,10 @@ public class LlmExtension implements KeYGuiExtension, KeYGuiExtension.ContextMen
                     new java.util.TreeSet<>(source.getAllowedToolsWithApproval()));
                 target.setAllowedToolsWithoutApproval(
                     new java.util.TreeSet<>(source.getAllowedToolsWithoutApproval()));
+                target.setMcpExportedTools(
+                    new java.util.TreeSet<>(source.getMcpExportedTools()));
+                target.setMcpNotExportedTools(
+                    new java.util.TreeSet<>(source.getMcpNotExportedTools()));
             }
         }
     }

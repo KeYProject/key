@@ -40,8 +40,8 @@ public class LlmToolsPanel extends SettingsPanel {
 
         setHeaderText("Tools");
         setSubHeaderText("Control which tools the KeY-Agent may call, whether they require"
-            + " approval and whether they may run in the background. Disabled tools are not sent"
-            + " to the model at all.");
+            + " approval, whether they may run in the background and whether they are exported to"
+            + " the MCP server. Disabled tools are not sent to the model at all.");
 
         var mcpClient = new BuiltInMCPClient();
         var sorted = mcpClient.getAllTools().stream()
@@ -100,10 +100,20 @@ public class LlmToolsPanel extends SettingsPanel {
             + " delivered when the call finishes.");
         background.addActionListener(e -> applyBackground(name, background.isSelected()));
 
+        var export = new JCheckBox("export to MCP");
+        boolean defaultExport = model.isExportedToMCPByDefault(name,
+            tool.defaultApproval() == Tool.ApprovalRequirement.AUTO);
+        export.setSelected(model.isExportedToMCP(name, defaultExport));
+        export.setToolTipText("Expose this tool to external processes over the MCP server"
+            + " (SSE). By default the auto-approved tools are exported; an explicit choice"
+            + " overrides that default.");
+        export.addActionListener(e -> applyExport(name, export.isSelected()));
+
         var block = new JPanel(new MigLayout("insets 0, gapy 2"));
         block.add(description, "span, growx, wrap");
         block.add(radios, "span, growx");
         block.add(background, "span, growx");
+        block.add(export, "span, growx");
         return block;
     }
 
@@ -170,6 +180,23 @@ public class LlmToolsPanel extends SettingsPanel {
         } else {
             disabled.add(toolName);
             enabled.remove(toolName);
+        }
+    }
+
+    /**
+     * Writes the chosen MCP export permission into the (mutually exclusive) override sets of the
+     * working copy: checked means "always exported", unchecked "never exported". Without an
+     * explicit choice the tool follows its metadata default (shown as the initial state).
+     */
+    private void applyExport(String toolName, boolean exported) {
+        var exportedSet = model.getMcpExportedTools();
+        var notExportedSet = model.getMcpNotExportedTools();
+        if (exported) {
+            exportedSet.add(toolName);
+            notExportedSet.remove(toolName);
+        } else {
+            notExportedSet.add(toolName);
+            exportedSet.remove(toolName);
         }
     }
 
