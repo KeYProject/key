@@ -104,8 +104,8 @@ public class StandardUISettingsF extends SettingsPanelF implements SettingsProvi
         darkRadio = new RadioButton("Dark");
         lightRadio.setToggleGroup(themeGroup);
         darkRadio.setToggleGroup(themeGroup);
-        lightRadio.setUserData(Theme.LIGHT);
-        darkRadio.setUserData(Theme.DARK);
+        lightRadio.setUserData(Theme.PRIMER_LIGHT);
+        darkRadio.setUserData(Theme.PRIMER_DARK);
         addRowWithHelp(INFO_THEME, new Label("Theme:"), lightRadio, darkRadio);
         spFontSizeGlobal = addDoubleNumberField("Global font factor", 0.1, 5, 0.1, 1.0,
             INFO_FONT_FACTOR, emptyValidator());
@@ -178,7 +178,7 @@ public class StandardUISettingsF extends SettingsPanelF implements SettingsProvi
         txtClutterRules.setText(vs.clutterRules().value().replace(',', '\n'));
         txtClutterRuleSets.setText(vs.clutterRuleSets().value().replace(',', '\n'));
 
-        Toggle themeToggle = ThemeManager.getInstance().getTheme() == Theme.DARK ? darkRadio
+        Toggle themeToggle = ThemeManager.getInstance().getTheme().isDark() ? darkRadio
                 : lightRadio;
         themeToggle.setSelected(true);
 

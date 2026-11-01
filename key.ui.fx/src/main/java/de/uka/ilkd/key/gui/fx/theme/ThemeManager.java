@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.fx.theme;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.prefs.Preferences;
+import javafx.application.Application;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
@@ -16,9 +17,11 @@ import javafx.scene.Scene;
  * Applies and switches the {@link Theme} of all registered {@link Scene}s of the JavaFX UI.
  * <p>
  * Counter-part of the FlatLaf look and feel handling in {@code MainWindow.updateLookAndFeel()}
- * of the Swing module {@code key.ui}. The theme stylesheet is tracked on each scene and replaced
- * when the theme changes, so every open window (including docking float stages) follows the
- * switch.
+ * of the Swing module {@code key.ui}. Every theme is a composition of two layers: the AtlantaFX
+ * base look, applied as the user-agent stylesheet (the JVM-global {@code
+ * Application.setUserAgentStylesheet} setting, so every scene — registered or not — follows),
+ * and the KeY-specific CSS layer, tracked on each scene and replaced when the theme changes, so
+ * every open window (including docking float stages) follows the switch.
  */
 public final class ThemeManager {
 
@@ -61,23 +64,23 @@ public final class ThemeManager {
     /**
      * Determines the initial theme from the persisted user preference (WP-3: the chosen theme
      * survives a restart); the {@code key.fx.theme} system property overrides it (the one-off
-     * override of headless UI tests), and the default is light.
+     * override of headless UI tests), and the default is {@link Theme#PRIMER_LIGHT}.
      */
     private static Theme initialTheme() {
         String property = System.getProperty(THEME_PROPERTY, "");
         if (!property.isEmpty()) {
-            return Theme.DARK.name().equalsIgnoreCase(property) ? Theme.DARK : Theme.LIGHT;
+            return Theme.parse(property);
         }
         return persistedTheme();
     }
 
     /**
-     * WP-3: reads the persisted theme name; an unknown or missing entry falls back to light.
+     * WP-3: reads the persisted theme name; the legacy two-value entries
+     * ({@code LIGHT}/{@code DARK}) map to the Primer pair and an unknown or missing entry falls
+     * back to {@link Theme#PRIMER_LIGHT}.
      */
     public static Theme persistedTheme() {
-        return Theme.DARK.name().equalsIgnoreCase(PREFERENCES.get(PREF_KEY, ""))
-                ? Theme.DARK
-                : Theme.LIGHT;
+        return Theme.parse(PREFERENCES.get(PREF_KEY, ""));
     }
 
     /**
@@ -97,6 +100,13 @@ public final class ThemeManager {
     public void manage(Scene scene) {
         if (!scenes.contains(scene)) {
             scenes.add(scene);
+        }
+        if (scenes.size() == 1) {
+            // first scene registration: apply the AtlantaFX base look (user-agent stylesheet,
+            // the JVM-global Application setting) so the app starts themed; the switch through
+            // setTheme keeps it in sync afterwards
+            Application.setUserAgentStylesheet(
+                currentTheme.get().atlantaUserAgentStylesheet());
         }
         updateScene(scene);
     }
@@ -122,8 +132,10 @@ public final class ThemeManager {
 
     /**
      * Switches the theme, updates all managed scenes and persists the choice (WP-3: the chosen
-     * theme survives a restart — the View menu's Light/Dark Theme items and any other switch
-     * route through this single choke point).
+     * theme survives a restart — the View > Theme menu, the settings panel and any other switch
+     * route through this single choke point). The AtlantaFX base look is applied as the
+     * user-agent stylesheet ({@code Application.setUserAgentStylesheet}, FX thread — every call
+     * site runs there); the KeY layer is the per-scene stylesheet of {@link #updateScene}.
      *
      * @param theme the theme to activate
      */
@@ -135,6 +147,7 @@ public final class ThemeManager {
         } catch (java.util.prefs.BackingStoreException e) {
             // best effort: the theme still applies for this session
         }
+        Application.setUserAgentStylesheet(theme.atlantaUserAgentStylesheet());
         for (Scene scene : scenes) {
             updateScene(scene);
         }
