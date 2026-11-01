@@ -36,7 +36,7 @@ public class LlmSettings extends AbstractPropertiesSettings {
 
     private final PropertyEntry<String> authToken = createStringProperty("authToken", "");
     private final PropertyEntry<String> apiEndpoint =
-        createStringProperty("apiEndpoint", "https://ki-toolbox.scc.kit.edu/v1");
+        createStringProperty("apiEndpoint", "https://ki-toolbox.scc.kit.edu");
     private final PropertyEntry<String> defaultModel =
         createStringProperty("defaultModel", KeYAgentPrompts.DEFAULT_MODEL);
     private final PropertyEntry<List<String>> availableModels =
