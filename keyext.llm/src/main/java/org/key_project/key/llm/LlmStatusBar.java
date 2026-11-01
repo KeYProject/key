@@ -6,7 +6,6 @@ package org.key_project.key.llm;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
@@ -25,6 +24,10 @@ import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 
 import org.key_project.key.llm.mcp.server.KeYMcpSseServer;
+
+import net.miginfocom.layout.CC;
+import net.miginfocom.layout.LC;
+import net.miginfocom.swing.MigLayout;
 
 /**
  * Minimal status-line indicator of the KeY MCP server: a flat, borderless toggle showing the text
@@ -69,7 +72,10 @@ public class LlmStatusBar extends JPanel {
 
     /** Creates the status-line component (must happen on the Swing event dispatch thread). */
     public LlmStatusBar() {
-        super(new FlowLayout(FlowLayout.LEFT, 4, 0));
+        // baseline-aligned: the toggle and the endpoint field sit on the text baseline of the
+        // surrounding status line. Baseline alignment must be set per component (CC); on the
+        // layout (LC) it would set the row alignment, which MigLayout cannot handle.
+        super(new MigLayout(new LC().insets("0")));
         setOpaque(false);
 
         btnToggle.setFocusable(false);
@@ -81,7 +87,7 @@ public class LlmStatusBar extends JPanel {
         btnToggle.setBorder(BorderFactory.createEmptyBorder(3, 6, 3, 6));
         btnToggle.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnToggle.addActionListener(e -> toggle());
-        add(btnToggle);
+        add(btnToggle, new CC().alignY("baseline"));
 
         txtEndpoint.setVisible(false);
         txtEndpoint.setEditable(false);
@@ -98,7 +104,7 @@ public class LlmStatusBar extends JPanel {
                 copyEndpoint();
             }
         });
-        add(txtEndpoint);
+        add(txtEndpoint, new CC().alignY("baseline"));
 
         // the endpoint is hover-only: track the pointer over the whole indicator (toggle + field),
         // so moving from the toggle onto the URL keeps it visible
