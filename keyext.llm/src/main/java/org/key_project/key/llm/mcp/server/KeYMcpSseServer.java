@@ -219,21 +219,10 @@ public class KeYMcpSseServer {
      * win, otherwise a tool is exported when it runs without user approval by default.
      */
     static boolean isExported(AgentTool tool) {
-        return LlmSettings.INSTANCE.isExportedToMCP(tool.name(), isAutoApproved(tool));
-    }
-
-    private static boolean isAutoApproved(AgentTool tool) {
         var settings = LlmSettings.INSTANCE;
-        if (settings.getToolsDisabled().contains(tool.name())) {
-            return false;
-        }
-        if (settings.getAllowedToolsWithApproval().contains(tool.name())) {
-            return false;
-        }
-        if (settings.getAllowedToolsWithoutApproval().contains(tool.name())) {
-            return true;
-        }
-        return tool.approval() == Tool.ApprovalRequirement.AUTO;
+        return settings.isExportedToMCP(tool.name(),
+            settings.isExportedToMCPByDefault(tool.name(),
+                tool.approval() == Tool.ApprovalRequirement.AUTO));
     }
 
     /** Invokes a tool under the shared tool-dispatch lock and maps the outcome to an MCP result. */

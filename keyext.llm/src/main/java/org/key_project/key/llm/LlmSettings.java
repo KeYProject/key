@@ -634,6 +634,28 @@ public class LlmSettings extends AbstractPropertiesSettings {
         return metadataDefault;
     }
 
+    /**
+     * The default MCP-server export decision of a tool without any per-tool export override: it is
+     * exported when its metadata marks it as auto-approved and the approval settings do not
+     * currently ask for a confirmation. Mirrors the effective approval rule used by the agent's
+     * client, so the settings UI and the MCP server always agree.
+     *
+     * @param toolName the tool name
+     * @param metadataAutoApproved whether the tool's metadata marks it as auto-approved
+     */
+    public boolean isExportedToMCPByDefault(String toolName, boolean metadataAutoApproved) {
+        if (getToolsDisabled().contains(toolName)) {
+            return false;
+        }
+        if (getAllowedToolsWithApproval().contains(toolName)) {
+            return false;
+        }
+        if (getAllowedToolsWithoutApproval().contains(toolName)) {
+            return true;
+        }
+        return metadataAutoApproved;
+    }
+
     // --- ui ---
 
     public boolean getAutoScrollOutput() {
