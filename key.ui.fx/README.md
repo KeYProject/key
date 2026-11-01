@@ -87,6 +87,7 @@ regression-tested on a virtual display. Demo proof paths default into
 | `key.fx.demo.proofmgmt=<file.key>` | example for the proof management dialog test |
 | `key.fx.show=sequent\|prooftree` | dockable focused after the demo load |
 | `key.fx.theme=<name>` | theme override (an enum name like `NORD_DARK`, or the legacy `light`/`dark` = Primer) |
+| `key.fx.screenshot=<dir>` | theme gallery: one full-window PNG per theme + View > Theme popup + the settings dialog with the theme combo, rendered in-process via `Node.snapshot`; pass `--add-opens javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED` for the popup shot |
 | `key.fx.demo.autoprove` / `key.fx.demo.autoprove.live` / `key.fx.demo.maxsteps=n` | auto-mode behaviour, live refresh, step limit |
 | `key.fx.verify.sequent` | sequent text → `PosInOccurrence` position mapping |
 | `key.fx.verify.tree` | proof-tree structure model |
