@@ -7,11 +7,13 @@ package de.uka.ilkd.key.gui.fx.extension.api;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
+import java.util.function.Supplier;
 import javafx.scene.control.Control;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.layout.Pane;
 
 import de.uka.ilkd.key.core.fx.KeYMediatorF;
 import de.uka.ilkd.key.gui.fx.MainWindowF;
@@ -20,8 +22,11 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.settings.Configuration;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The FX-native GUI-extension SPI, counter-part of {@code de.uka.ilkd.key.gui.extension.api.
@@ -331,5 +336,68 @@ public interface KeYGuiExtensionF {
          */
         default void init(MainWindowF window, KeYMediatorF mediator) {
         }
+    }
+
+    /**
+     * Provider of UI components for additional options w.r.t. a specific profile (Swing
+     * {@code KeYGuiExtension.LoadOptionPanel}, KeYGuiExtension.java:266-279): implementing this
+     * interface requires providing an {@link OptionPanelF} and the associated {@link Profile}.
+     * <p>
+     * Lifecycle (Swing {@code LoadOptionPanel} javadoc): for each profile an {@link OptionPanelF}
+     * is constructed when the loading-options host is instantiated; <em>on selection of a
+     * profile</em>, the current option panel is deinstalled and the option panel for the selected
+     * profile is installed. The FX host is {@code LoadingOptionsDialogF} — the JavaFX
+     * {@code FileChooser} has no accessory API, so the content of the Swing accessory
+     * ({@code KeYFileChooserLoadingOptions}) lives in that modal dialog; it consumes the
+     * providers via
+     * {@link de.uka.ilkd.key.gui.fx.extension.KeYGuiExtensionFacadeF#createAdditionalOptionPanels()}.
+     * The panel construction in {@link #get()} must stay lazy (called on the FX thread only) so
+     * that the provider itself instantiates toolkit-free.
+     */
+    interface LoadOptionPanelF extends Supplier<OptionPanelF> {
+
+        /**
+         * The profile the option panel of this extension belongs to (Swing
+         * {@code LoadOptionPanel.getProfile()}, KeYGuiExtension.java:278).
+         *
+         * @return the profile
+         */
+        Profile getProfile();
+    }
+
+    /**
+     * A provider of UI components for additional options w.r.t. specific profiles (Swing
+     * {@code KeYGuiExtension.OptionPanel}, KeYGuiExtension.java:281-308). The components are
+     * installed into the panel host of the loading-options dialog; the components can be
+     * reused to keep the temporary state (Swing parity).
+     */
+    interface OptionPanelF {
+
+        /**
+         * Installs the UI components in the given host pane (Swing
+         * {@code OptionPanel.install(KeYFileChooserLoadingOptions)}, KeYGuiExtension.java:296).
+         *
+         * @param host the panel host of the loading-options dialog
+         */
+        void install(Pane host);
+
+        /**
+         * Removes all installed UI components from the given host pane (Swing
+         * {@code OptionPanel.deinstall(KeYFileChooserLoadingOptions)}, KeYGuiExtension.java:299).
+         *
+         * @param host the panel host of the loading-options dialog
+         */
+        void deinstall(Pane host);
+
+        /**
+         * An arbitrary object representing the selected option in the UI components; the object
+         * needs to be compatible with the assigned profile in {@link LoadOptionPanelF} (Swing
+         * {@code OptionPanel.getResult}, KeYGuiExtension.java:301-307, consumed by
+         * {@code Profile.prepareInitConfig(InitConfig, Object)}).
+         *
+         * @return the selected options, {@code null} if nothing is selected
+         */
+        @Nullable
+        Configuration getResult();
     }
 }

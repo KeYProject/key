@@ -7,7 +7,9 @@ package de.uka.ilkd.key.gui.fx.extension;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
@@ -27,6 +29,7 @@ import de.uka.ilkd.key.gui.fx.extension.api.KeYGuiExtensionF;
 import de.uka.ilkd.key.gui.fx.settings.SettingsProviderF;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.Profile;
 
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
@@ -531,6 +534,28 @@ public final class KeYGuiExtensionFacadeF {
             }
         }
         return strings;
+    }
+
+    /**
+     * Helper method that matches {@link Profile}s and {@link KeYGuiExtensionF.OptionPanelF}s
+     * together; the pairs are provided by the {@link KeYGuiExtensionF.LoadOptionPanelF}
+     * providers (Swing {@code KeYGuiExtensionFacade.createAdditionalOptionPanels},
+     * KeYGuiExtensionFacade.java:410-418). Consumed by {@code LoadingOptionsDialogF} — the FX
+     * counterpart of the Swing {@code KeYFileChooserLoadingOptions} accessory.
+     * <p>
+     * The returned panels are freshly constructed FX components: the getter must be called on
+     * the FX thread (Swing lifecycle: one panel per profile per chooser instantiation).
+     *
+     * @return the option panels keyed by their profile
+     */
+    public static Map<Profile, KeYGuiExtensionF.OptionPanelF> createAdditionalOptionPanels() {
+        Map<Profile, KeYGuiExtensionF.OptionPanelF> map = new HashMap<>();
+        for (KeYGuiExtensionF extension : contributingExtensions()) {
+            if (extension instanceof KeYGuiExtensionF.LoadOptionPanelF provider) {
+                map.put(provider.getProfile(), provider.get());
+            }
+        }
+        return map;
     }
 
     /**

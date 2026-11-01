@@ -3136,8 +3136,8 @@ public final class MainWindowF {
     /**
      * extension: MP9.0 — headless self test of the FX extension SPI
      * ({@code key.fx.verify.extensions}), run after the demo load like the other
-     * proof-dependent verify hooks. Asserts (a) the facade discovers exactly the 18 expected
-     * providers (the 12 built-in key.ui.fx providers incl. the Swing-parity ports of the built-in
+     * proof-dependent verify hooks. Asserts (a) the facade discovers exactly the 19 expected
+     * providers (the 13 built-in key.ui.fx providers incl. the Swing-parity ports of the built-in
      * key.ui extensions, and the six keyext FX providers; a deviation is reported in
      * extMissing/extUnexpected), (b) the status-line controls of the facade appear in the
      * built status bar, (c) the Heatmap menu is a separate menu of the built menu bar,
@@ -3165,10 +3165,11 @@ public final class MainWindowF {
 
         int discovered = KeYGuiExtensionFacadeF.discoveredCount();
         sb.append("discovered=").append(discovered);
-        // the provider set is pinned exactly: the twelve built-in key.ui.fx providers (the six
-        // pre-existing ones + the six Swing-parity ports of the built-in key.ui extensions) and
-        // the six keyext FX providers (runtimeOnly dependencies) — a provider dropping off the
-        // service file or the runtime classpath is reported in extMissing/extUnexpected
+        // the provider set is pinned exactly: the thirteen built-in key.ui.fx providers (the six
+        // pre-existing ones + the six Swing-parity ports of the built-in key.ui extensions + the
+        // WD loading-options provider) and the six keyext FX providers (runtimeOnly
+        // dependencies) — a provider dropping off the service file or the runtime classpath is
+        // reported in extMissing/extUnexpected
         List<String> classes = KeYGuiExtensionFacadeF.getExtensions().stream()
                 .map(e -> e.getClass().getName()).toList();
         List<String> expectedProviders = List.of(
@@ -3185,6 +3186,7 @@ public final class MainWindowF {
             "de.uka.ilkd.key.gui.fx.extension.contrib.HeapStatusF",
             "de.uka.ilkd.key.gui.fx.originlabels.OriginTermLabelsExtF",
             "de.uka.ilkd.key.gui.fx.extension.contrib.KeyboardTacletExtensionF",
+            "de.uka.ilkd.key.gui.fx.profileloading.WDLoadDialogOptionPanelF",
             // the keyext FX providers
             "de.uka.ilkd.key.gui.plugins.caching.fx.CachingExtensionF",
             "org.key_project.exploration.fx.ExplorationExtensionF",
