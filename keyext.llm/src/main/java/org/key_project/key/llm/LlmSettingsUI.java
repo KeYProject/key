@@ -260,7 +260,7 @@ public class LlmSettingsUI extends SettingsPanel {
                     JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            var url = baseUrl + "/openai/models";
+            var url = ApiUrls.models(baseUrl);
             setEnabled(false);
             var worker = new SwingWorker<List<String>, Void>() {
                 @Override
