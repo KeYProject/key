@@ -207,6 +207,27 @@ Pay special attention to integer overflow; check the goal sequent before choosin
 - The agent itself can activate a skill through the `use_skill` tool — this is **off by default**
   (setting *Agent may use skills*).
 
+### 5.1 Ready-made skills shipped with KeY
+
+The repository ships a curated set of skills in [`keyext.llm/skills/`](../keyext.llm/skills/);
+each one activates a coherent subset of the tool set and carries the matching workflow
+instructions:
+
+| Skill            | Scope                                                                     |
+|------------------|---------------------------------------------------------------------------|
+| `prove`          | close the open goals with the automatic tools (`tryclose` → `run_smt` → `auto` → targeted `run_macro`), read the Java model when needed |
+| `prove-surgical` | manual proof work on resistant goals — cuts, quantifier instantiation, witnesses, term rewriting, sequent hygiene, `run_script` |
+| `explore-goal`   | sandboxed "what if" experiments — probes and `fork_proof` first, explorative edits (which reframe the theorem) only with explicit consent |
+| `code-review`    | read-only review of the Java model and its specifications                  |
+| `taclet-design`  | inspect taclets and options, export rules, add/remove taclets with approval |
+| `orchestrate`    | delegate bounded work to sub-agents (`spawn_subagent`, roles, logs) and consult fresh LLM instances (`ask_llm`) instead of doing everything inline |
+| `tool-tour`      | onboarding: the agent explains its own tool set via `list_tools` and suggests a fitting skill |
+
+To use them, add the directory to the skill library search path (Settings → LLM Settings →
+Skills, right below the list — e.g. `/path/to/keyext.llm/skills`) or import the files via
+`Import...`. The skills are validated by a unit test (`ShippedSkillsTest`), which also keeps
+their `allowedTools` whitelists in sync with the built-in tool set.
+
 ---
 
 ## 6. Prompts
