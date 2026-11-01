@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.AbstractButton;
-import javax.swing.JLabel;
 
 import org.key_project.key.llm.LlmSettings;
 import org.key_project.key.llm.LlmSettingsUI;
@@ -49,7 +48,10 @@ class McpUiGuideTest {
             var toggle = McpUiTestHarness.all(bar, AbstractButton.class).stream()
                     .filter(b -> "MCP".equals(b.getText())).findFirst().orElseThrow();
             toggle.doClick();
+            // hovering shows the endpoint URL; keep it visible for the screenshot
+            McpUiTestHarness.hover(toggle, true);
             McpUiTestHarness.render(bar, outDir.resolve("mcp-statusbar-on.png"));
+            McpUiTestHarness.hover(toggle, false);
             toggle.doClick();
         });
     }
@@ -82,7 +84,7 @@ class McpUiGuideTest {
     }
 
     @Test
-    void endpointLabelIsRenderedWhileRunning() throws Exception {
+    void endpointLabelShowsOnHoverAndHidesOnLeave() throws Exception {
         // guards the on-state screenshot: the endpoint label must actually be visible
         renderOnEdt(() -> {
             McpUiTestHarness.resetSettings();
@@ -93,11 +95,19 @@ class McpUiGuideTest {
                     .filter(b -> "MCP".equals(b.getText())).findFirst().orElseThrow();
             toggle.doClick();
             try {
-                var label = McpUiTestHarness.all(bar, JLabel.class).stream()
-                        .filter(l -> l.isVisible() && l.getText() != null
+                // the endpoint URL is hover-only: hovering must reveal it
+                McpUiTestHarness.hover(toggle, true);
+                var label = McpUiTestHarness.all(bar, javax.swing.text.JTextComponent.class)
+                        .stream().filter(l -> l.isVisible() && l.getText() != null
                                 && l.getText().startsWith("http://"))
                         .findFirst().orElse(null);
-                assertTrue(label != null, "endpoint label must be visible while running");
+                assertTrue(label != null, "endpoint label must be visible while hovering");
+                McpUiTestHarness.hover(toggle, false);
+                var labelAfter = McpUiTestHarness.all(bar,
+                    javax.swing.text.JTextComponent.class).stream().filter(l -> l.isVisible())
+                        .filter(l -> l.getText() != null && l.getText().startsWith("http://"))
+                        .findFirst().orElse(null);
+                assertTrue(labelAfter == null, "endpoint label must hide when the pointer leaves");
             } finally {
                 toggle.doClick();
             }

@@ -17,8 +17,9 @@ container is required.
 
    ![MCP status-line indicator, server off](images/mcp/mcp-statusbar-off.png)
 
-2. Click it to start the server; the connectable endpoint
-   (`http://127.0.0.1:<port>/sse`) appears next to the toggle.
+2. Click it to start the server; hovering over the indicator reveals the connectable
+   endpoint (`http://127.0.0.1:<port>/sse`) as a selectable text field — select it
+   (Ctrl+C) or click it to copy the URL to the clipboard.
 
    ![MCP status-line indicator with the live endpoint](images/mcp/mcp-statusbar-on.png)
 

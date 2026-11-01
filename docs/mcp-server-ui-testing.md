@@ -46,7 +46,7 @@ Run them with:
 
 | Test class | Steps and assertions |
 |------------|----------------------|
-| `LlmStatusBarUiTest` | 1. Toggle the status-bar button on the EDT → the SSE server binds, the endpoint label (`http://127.0.0.1:<port>/sse`) becomes visible, the toggle is selected and `mcpServerEnabled` is set. 2. With the UI up, an MCP client connects, lists the exported tools (`read_file` and the auto-approved test tool present, `run_command` absent) and calls the echo tool → the reply arrives while the status bar keeps showing the endpoint. 3. Toggle off → the server stops (a socket probe on the endpoint port fails), the label hides and the flag clears. 4. `maybeRestore()` replays a persisted enabled server. |
+| `LlmStatusBarUiTest` | 1. Toggle the status-bar button on the EDT → the SSE server binds, the persisted flag `mcpServerEnabled` is set and the toggle is selected; the endpoint URL (`http://127.0.0.1:<port>/sse`) is set but hidden until the pointer hovers over the indicator (simulated mouse events), and it hides again on leave; the URL is shown in a selectable, read-only text field. 2. With the UI up, an MCP client connects, lists the exported tools (`read_file` and the auto-approved test tool present, `run_command` absent) and calls the echo tool → the reply arrives while the status bar keeps serving the endpoint. 3. Toggle off → the server stops (a socket probe on the endpoint port fails), the URL field clears and the flag clears. 4. `maybeRestore()` replays a persisted enabled server. |
 | `LlmToolsPanelExportUiTest` | With the mock tool set injected: the "export to MCP" checkboxes reflect the effective export rule (auto → checked, ask → unchecked); approval overrides recompute the default (without-approval ask tool → checked, with-approval/disabled → unchecked); explicit `mcpExportedTools`/`mcpNotExportedTools` win in both directions; clicking a checkbox writes the override set of the settings working copy; the permission radios still write the approval sets. |
 | `LlmModelsFetchUiTest` | Points the settings working copy at `MockModelsServer`, clicks "Fetch Models" and awaits (polling the model, pumping the EDT) until the mocked model ids appear in `getAvailableModels()`. |
 | `McpUiGuideTest` | Renders the documentation screenshots into `keyext.llm/build/ui-guide/` (see below) and guards that the endpoint label is visible while the server runs. |
@@ -55,8 +55,8 @@ Run them with:
 
 `McpUiGuideTest` renders:
 
-* `mcp-statusbar-off.png` — the status-line indicator, server off,
-* `mcp-statusbar-on.png` — the indicator with the live endpoint label,
+* `mcp-statusbar-off.png` — the status-line indicator, server off (red dot),
+* `mcp-statusbar-on.png` — the indicator with the endpoint shown on hover,
 * `mcp-tools-export.png` — the Tools panel with the per-tool "export to MCP" checkboxes
   (the run values show explicit overrides in both directions),
 * `mcp-server-settings.png` — the LLM settings panel including the "MCP server" section.
@@ -72,9 +72,10 @@ cp keyext.llm/build/ui-guide/*.png docs/images/mcp/
 
 For a full end-to-end check in the running application (`./gradlew key.ui:run`):
 
-1. **Status line**: start KeY → the status line shows a disabled **MCP** toggle.
-2. **Start**: click it → the toggle engages and the endpoint
-   (`http://127.0.0.1:<port>/sse`) appears next to it.
+1. **Status line**: start KeY → the status line shows a minimal **MCP** toggle with a red dot.
+2. **Start**: click it → the dot turns green and hovering over the indicator reveals the endpoint
+   (`http://127.0.0.1:<port>/sse`) as a selectable field; clicking the URL copies it to the
+   clipboard (brief "copied to clipboard" flash).
 3. **Client round trip**: point an MCP client (e.g. a Claude-Desktop-style `"url"` entry, or
    `npx @modelcontextprotocol/inspector`) at the endpoint → the client lists the exported tools
    and can invoke an auto-approved tool.
@@ -84,5 +85,6 @@ For a full end-to-end check in the running application (`./gradlew key.ui:run`):
 5. **Auth token**: set a token under *LLM Settings → MCP server*, restart the server → requests
    without `Authorization: Bearer <token>` are rejected with `401`.
 6. **Persistence**: leave the server running, close KeY, start KeY again → the server is restored
-   automatically and the endpoint label reappears.
-7. **Stop**: click the toggle → the endpoint disappears and clients can no longer connect.
+   automatically and the endpoint URL is available on hover again.
+7. **Stop**: click the toggle → the dot turns red, the URL disappears on the next hover end and
+   clients can no longer connect.
