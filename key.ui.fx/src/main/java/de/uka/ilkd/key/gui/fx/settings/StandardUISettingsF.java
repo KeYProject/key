@@ -7,12 +7,8 @@ package de.uka.ilkd.key.gui.fx.settings;
 import javafx.scene.Node;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleGroup;
 
 import de.uka.ilkd.key.gui.fx.MainWindowF;
 import de.uka.ilkd.key.gui.fx.configuration.ConfigF;
@@ -28,9 +24,9 @@ import de.uka.ilkd.key.settings.ViewSettings;
  * {@code de.uka.ilkd.key.gui.settings.StandardUISettings} of the Swing module {@code key.ui}.
  * <p>
  * It reads and writes the core {@link ViewSettings} and {@link GeneralSettings} (untouched code
- * in {@code key.core}, shared with the Swing UI). The Swing look-and-feel selector does not
- * carry over: the JavaFX UI has the two themes of the {@link ThemeManager} instead, selectable
- * here (applied immediately, like the Swing theme concept). The font size and font factor
+ * in {@code key.core}, shared with the Swing UI). The Swing look-and-feel selector carries over
+ * as the theme combo of the {@link ThemeManager} (the AtlantaFX collection, applied immediately
+ * to all open windows). The font size and font factor
  * settings are persisted like in Swing but apply to newly created views (the FX views pick the
  * fonts up at construction; a live resize facade is deferred — see the M4 report).
  * <p>
@@ -45,8 +41,8 @@ public class StandardUISettingsF extends SettingsPanelF implements SettingsProvi
     private static final String INFO_CLUTTER_RULE = "Comma separated listof clutter rules, \n"
         + "which are rules with less priority in the taclet menu";
     private static final String INFO_THEME =
-        "Light and dark theme of the JavaFX UI. The change is applied immediately to all open "
-            + "windows.";
+        "Theme of the JavaFX UI: the AtlantaFX base look (user-agent stylesheet) plus the KeY "
+            + "color layer. The change is applied immediately to all open windows.";
     private static final String INFO_FONT_SIZE =
         "Font size of the tree and sequent views. Applies to newly created views.";
     private static final String INFO_FONT_FACTOR =
@@ -65,15 +61,14 @@ public class StandardUISettingsF extends SettingsPanelF implements SettingsProvi
             In case of longer tooltips the instantiation will be suppressed.
             """;
 
-    private final ToggleGroup themeGroup = new ToggleGroup();
     /**
      * The child providers, created once: the tree, the initialization and the apply process must
      * share the same instances (a per-call creation would apply fresh, unpopulated panels).
      */
     private final java.util.List<SettingsProviderF> childProviders =
         java.util.List.of(new ColorSettingsProviderF(), new ShortcutSettingsF());
-    private RadioButton lightRadio;
-    private RadioButton darkRadio;
+    /** the theme combo (Swing {@code StandardUISettings.lookAndFeel}, the installed-LaF combo). */
+    private ComboBox<String> cboTheme;
     private Spinner<Double> spFontSizeGlobal;
     private ComboBox<String> spFontSizeTreeSequent;
     private Spinner<Integer> txtMaxTooltipLines;
@@ -100,13 +95,11 @@ public class StandardUISettingsF extends SettingsPanelF implements SettingsProvi
 
         addSeparator("General");
 
-        lightRadio = new RadioButton("Light");
-        darkRadio = new RadioButton("Dark");
-        lightRadio.setToggleGroup(themeGroup);
-        darkRadio.setToggleGroup(themeGroup);
-        lightRadio.setUserData(Theme.PRIMER_LIGHT);
-        darkRadio.setUserData(Theme.PRIMER_DARK);
-        addRowWithHelp(INFO_THEME, new Label("Theme:"), lightRadio, darkRadio);
+        // theme (Swing StandardUISettings: the lookAndFeel combo of the installed look and
+        // feels, StandardUISettings.java:50-70) — the FX themes are the AtlantaFX collection,
+        // keyed by the display names of the picker
+        cboTheme = addComboBox("Theme", INFO_THEME, java.util.Arrays.stream(Theme.values())
+                .map(Theme::displayName).toArray(String[]::new));
         spFontSizeGlobal = addDoubleNumberField("Global font factor", 0.1, 5, 0.1, 1.0,
             INFO_FONT_FACTOR, emptyValidator());
         String[] sizes = java.util.Arrays.stream(ConfigF.SIZES)
@@ -178,9 +171,7 @@ public class StandardUISettingsF extends SettingsPanelF implements SettingsProvi
         txtClutterRules.setText(vs.clutterRules().value().replace(',', '\n'));
         txtClutterRuleSets.setText(vs.clutterRuleSets().value().replace(',', '\n'));
 
-        Toggle themeToggle = ThemeManager.getInstance().getTheme().isDark() ? darkRadio
-                : lightRadio;
-        themeToggle.setSelected(true);
+        cboTheme.getSelectionModel().select(ThemeManager.getInstance().getTheme().displayName());
 
         spFontSizeGlobal.getValueFactory().setValue(vs.getUIFontSizeFactor());
         spFontSizeTreeSequent.getSelectionModel().select(vs.sizeIndex());
@@ -230,9 +221,14 @@ public class StandardUISettingsF extends SettingsPanelF implements SettingsProvi
         vs.clutterRuleSets().parseFrom(txtClutterRuleSets.getText().replace('\n', ','));
 
         // theme switch applies immediately (the Swing look and feel needs a restart instead)
-        Toggle themeToggle = themeGroup.getSelectedToggle();
-        if (themeToggle != null) {
-            ThemeManager.getInstance().setTheme((Theme) themeToggle.getUserData());
+        String selectedTheme = cboTheme.getSelectionModel().getSelectedItem();
+        if (selectedTheme != null) {
+            for (Theme theme : Theme.values()) {
+                if (theme.displayName().equals(selectedTheme)) {
+                    ThemeManager.getInstance().setTheme(theme);
+                    break;
+                }
+            }
         }
         // the Swing original additionally rescales the fonts (FontSizeFacade) and fires
         // Config.DEFAULT.fireConfigChange(); the FX views pick font changes up when they are
