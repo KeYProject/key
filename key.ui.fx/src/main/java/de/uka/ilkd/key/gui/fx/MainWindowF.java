@@ -4299,13 +4299,13 @@ public final class MainWindowF {
         RadioMenuItem darkTheme = new RadioMenuItem("Dark Theme");
         lightTheme.setToggleGroup(themeGroup);
         darkTheme.setToggleGroup(themeGroup);
-        (ThemeManager.getInstance().getTheme() == Theme.DARK ? darkTheme : lightTheme)
+        (ThemeManager.getInstance().getTheme().isDark() ? darkTheme : lightTheme)
                 .setSelected(true);
-        lightTheme.setOnAction(e -> setTheme(Theme.LIGHT));
-        darkTheme.setOnAction(e -> setTheme(Theme.DARK));
+        lightTheme.setOnAction(e -> setTheme(Theme.PRIMER_LIGHT));
+        darkTheme.setOnAction(e -> setTheme(Theme.PRIMER_DARK));
         // theme switches from elsewhere (e.g. the settings dialog) update the menu radios
         ThemeManager.getInstance().themeProperty().addListener(
-            (obs, old, theme) -> (theme == Theme.DARK ? darkTheme : lightTheme).setSelected(true));
+            (obs, old, theme) -> (theme.isDark() ? darkTheme : lightTheme).setSelected(true));
 
         Menu themeMenu = new Menu("Theme");
         themeMenu.getItems().addAll(lightTheme, darkTheme);
@@ -4955,9 +4955,9 @@ public final class MainWindowF {
     private String runThemePersistVerification(String phase) {
         ThemeManager manager = ThemeManager.getInstance();
         if ("save".equals(phase)) {
-            manager.setTheme(Theme.DARK);
-            boolean ok = manager.getTheme() == Theme.DARK
-                    && ThemeManager.persistedTheme() == Theme.DARK;
+            manager.setTheme(Theme.PRIMER_DARK);
+            boolean ok = manager.getTheme() == Theme.PRIMER_DARK
+                    && ThemeManager.persistedTheme() == Theme.PRIMER_DARK;
             return "phase=save applied=" + manager.getTheme() + " persisted="
                 + ThemeManager.persistedTheme() + (ok ? " PASS" : " FAIL");
         }
@@ -4965,10 +4965,11 @@ public final class MainWindowF {
             boolean overrideAbsent = System.getProperty(ThemeManager.THEME_PROPERTY) == null;
             Theme restored = manager.getTheme();
             Theme persisted = ThemeManager.persistedTheme();
-            boolean ok = overrideAbsent && restored == Theme.DARK && persisted == Theme.DARK;
+            boolean ok = overrideAbsent && restored == Theme.PRIMER_DARK
+                    && persisted == Theme.PRIMER_DARK;
             // leave the persisted state clean so the round trip is repeatable
-            manager.setTheme(Theme.LIGHT);
-            boolean resetOk = ThemeManager.persistedTheme() == Theme.LIGHT;
+            manager.setTheme(Theme.PRIMER_LIGHT);
+            boolean resetOk = ThemeManager.persistedTheme() == Theme.PRIMER_LIGHT;
             return "phase=restore restored=" + restored + " persisted=" + persisted + " reset="
                 + ThemeManager.persistedTheme() + (ok && resetOk ? " PASS" : " FAIL");
         }

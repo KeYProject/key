@@ -449,7 +449,7 @@ public final class ColorSettingsF {
                 continue;
             }
             Color value =
-                current == Theme.DARK ? property.getDarkValue() : property.getLightValue();
+                current.isDark() ? property.getDarkValue() : property.getLightValue();
             style.append(variable).append(": ").append(toCssHex(value)).append("; ");
         }
         root.setStyle(style.toString());
@@ -483,7 +483,7 @@ public final class ColorSettingsF {
          * @return the color of the current theme
          */
         public Color getCurrentColor() {
-            return theme.get() == Theme.DARK ? getDarkValue() : getLightValue();
+            return theme.get().isDark() ? getDarkValue() : getLightValue();
         }
 
         /**

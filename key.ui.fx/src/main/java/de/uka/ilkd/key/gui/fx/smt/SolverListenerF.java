@@ -36,7 +36,6 @@ import de.uka.ilkd.key.gui.fx.colors.ColorSettingsF;
 import de.uka.ilkd.key.gui.fx.smt.InformationWindowF.Information;
 import de.uka.ilkd.key.gui.fx.smt.ProgressDialogF.ProgressCellF;
 import de.uka.ilkd.key.gui.fx.smt.ProgressDialogF.ProgressRowF;
-import de.uka.ilkd.key.gui.fx.theme.Theme;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JTerm;
@@ -693,7 +692,7 @@ public class SolverListenerF implements SolverLauncherListener {
      *         {@code ColorSettings.ColorProperty.get()} of the active theme)
      */
     private static Color colorOf(ColorSettingsF.ColorPropertyF property) {
-        return ThemeManager.getInstance().themeProperty().get() == Theme.DARK
+        return ThemeManager.getInstance().themeProperty().get().isDark()
                 ? property.getDarkValue()
                 : property.getLightValue();
     }
