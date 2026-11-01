@@ -9,6 +9,7 @@ dependencies {
     implementation(libs.jackson.dataformat.yaml)
     implementation("org.slf4j:jcl-over-slf4j:1.7.5")
 
-    implementation platform("io.modelcontextprotocol.sdk:mcp-bom:2.0.0")
-    implementation("io.modelcontextprotocol.sdk:mcp:2.0.0")
+    implementation platform("io.modelcontextprotocol.sdk:mcp-bom:2.1.0")
+    implementation("io.modelcontextprotocol.sdk:mcp-core")
+    implementation("io.modelcontextprotocol.sdk:mcp-json-jackson2")
 }
