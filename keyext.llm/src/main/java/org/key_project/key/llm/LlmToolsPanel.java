@@ -5,6 +5,7 @@
 package org.key_project.key.llm;
 
 import java.awt.FlowLayout;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumMap;
 import javax.swing.*;
@@ -36,6 +37,19 @@ public class LlmToolsPanel extends SettingsPanel {
     private final LlmSettings model;
 
     public LlmToolsPanel(LlmSettings model) {
+        this(model, new BuiltInMCPClient().getAllTools());
+    }
+
+    /**
+     * Creates the panel for an explicit tool list. The public no-arg tool constructor fills the
+     * list from the built-in registry; this variant injects the data shown in the rows and is used
+     * by the UI-test harness (package {@code org.key_project.key.llm.uitest}) to drive the panel
+     * with a small, deterministic mock tool set.
+     *
+     * @param model the working copy of the settings edited by this panel
+     * @param tools the tools to show, one row each
+     */
+    public LlmToolsPanel(LlmSettings model, Collection<? extends Tool> tools) {
         this.model = model;
 
         setHeaderText("Tools");
@@ -43,8 +57,7 @@ public class LlmToolsPanel extends SettingsPanel {
             + " approval, whether they may run in the background and whether they are exported to"
             + " the MCP server. Disabled tools are not sent to the model at all.");
 
-        var mcpClient = new BuiltInMCPClient();
-        var sorted = mcpClient.getAllTools().stream()
+        var sorted = tools.stream()
                 .sorted(Comparator.comparing((Tool t) -> t.category().ordinal())
                         .thenComparing(t -> t.function().name()))
                 .toList();

@@ -42,9 +42,10 @@ public class LlmStatusBar extends JPanel {
 
     /**
      * Restores the persisted server state once, when the status bar has been attached. Does
-     * nothing if the MCP server was not enabled in the last session.
+     * nothing if the MCP server was not enabled in the last session. Idempotent; called by the
+     * status-line extension and by UI tests to replay a previously enabled server.
      */
-    void maybeRestore() {
+    public void maybeRestore() {
         if (restoreChecked) {
             return;
         }
