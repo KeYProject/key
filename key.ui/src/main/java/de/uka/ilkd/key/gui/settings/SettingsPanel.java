@@ -6,13 +6,19 @@ package de.uka.ilkd.key.gui.settings;
 
 
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
 
 import de.uka.ilkd.key.gui.KeYFileChooser;
+import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 
 import net.miginfocom.layout.AC;
@@ -185,18 +191,12 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     /**
      * Adds a new combobox to the panel.
      *
-     * @param title
-     *        label of the combo box
-     * @param info
-     *        help text
-     * @param selectionIndex
-     *        which item to initially select
-     * @param validator
-     *        validator
-     * @param items
-     *        the items
-     * @param <T>
-     *        the type of the items
+     * @param title label of the combo box
+     * @param info help text
+     * @param selectionIndex which item to initially select
+     * @param validator validator
+     * @param items the items
+     * @param <T> the type of the items
      * @return the combo box
      */
     protected <T> JComboBox<T> addComboBox(String title, String info, int selectionIndex,
@@ -239,6 +239,178 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
         addRowWithHelp(helpText, label, component);
     }
 
+    /// Shows a list with the given `seq` items, and arbitrary actions
+    ///
+    protected <T> JList<T> addListBox(String title,
+            String info,
+            List<T> seq,
+            KeyAction... action) {
+        var model = new DefaultListModel<T>();
+        model.addAll(seq);
+
+        JList<T> list = new JList<>(model);
+        JScrollPane field = new JScrollPane(list);
+
+        var panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        for (var keyAction : action) {
+            panel.add(new JButton(keyAction));
+        }
+
+        JLabel lblTitle = new JLabel(title);
+        lblTitle.setLabelFor(list);
+        pCenter.add(lblTitle);
+        pCenter.add(new JSeparator(JSeparator.HORIZONTAL));
+        JLabel infoButton = createHelpLabel(info);
+        pCenter.add(infoButton, new CC().wrap());
+        pCenter.add(new JLabel());
+        // the panel spans the input and help columns and terminates the row; without the wrap,
+        // every following row is shifted by one column
+        pCenter.add(panel, new CC().span(2).wrap());
+
+        return list;
+    }
+
+
+    public record Column<T, R>(String name,
+            Class<R> clazz,
+            Getter<T, R> value,
+            @Nullable Setter<T> setValue) {
+
+        public Column(String name, Class<R> clazz, Getter<T, R> value) {
+            this(name, clazz, value, null);
+        }
+
+        public interface Getter<T, R> extends Function<T, R> {
+        }
+
+        public interface Setter<T> {
+            void set(T object, Object value);
+        }
+    }
+
+    protected <T> JTable addTableBox(
+            String title, String info, List<T> seq,
+            Column<T, ?>... columns) {
+        var model = new AbstractTableModel() {
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return columns[columnIndex].clazz();
+            }
+
+            public String getColumnName(int columnIndex) {
+                return columns[columnIndex].name();
+            }
+
+            @Override
+            public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+                final T s = seq.get(rowIndex);
+                columns[columnIndex].setValue.set(s, aValue);
+                fireTableCellUpdated(rowIndex, columnIndex);
+            }
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return columns[columnIndex].setValue != null;
+            }
+
+            @Override
+            public int getRowCount() {
+                return seq.size();
+            }
+
+            @Override
+            public int getColumnCount() {
+                return columns.length;
+            }
+
+            @Override
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                return columns[columnIndex].value.apply(seq.get(rowIndex));
+            }
+        };
+
+        var list = new JTable(model);
+        JScrollPane field = new JScrollPane(list);
+        var panel = new JPanel(new MigLayout(new LC().fillX()));
+        panel.add(field, new CC().span(3).growX().wrap());
+
+        JLabel lblTitle = new JLabel(title);
+        lblTitle.setLabelFor(list);
+        pCenter.add(lblTitle);
+        pCenter.add(new JSeparator(JSeparator.HORIZONTAL));
+        JLabel infoButton = createHelpLabel(info);
+        pCenter.add(infoButton, new CC().wrap());
+        pCenter.add(new JLabel());
+        // the panel spans the input and help columns and terminates the row; without the wrap,
+        // every following row is shifted by one column
+        pCenter.add(panel, new CC().span(2).wrap());
+
+        return list;
+    }
+
+    protected <T> JList<T> addListBox(String title, String info,
+            final Validator<List<T>> validator,
+            List<T> seq, Function<String, T> converter) {
+        var model = new DefaultListModel<T>();
+        model.addAll(seq);
+
+        JList<T> list = new JList<>(model);
+
+        var txtAdd = new JTextField();
+        var btnAdd = new JButton(IconFactory.PLUS_SQUARED.get(16f));
+        var btnRemove = new JButton(IconFactory.MINUS.get(16f));
+
+        JScrollPane field = new JScrollPane(list);
+
+        // only the text field column grows; the add/remove buttons keep their size and hug the
+        // right edge
+        var panel = new JPanel(new MigLayout(new LC().fillX(), new AC().grow(1000f, 0)));
+        panel.add(field, new CC().span(3).growX().wrap());
+        panel.add(txtAdd, new CC().growX());
+        panel.add(btnAdd, new CC().gapAfter("16px"));
+        panel.add(btnRemove);
+
+        JLabel lblTitle = new JLabel(title);
+        lblTitle.setLabelFor(list);
+        pCenter.add(lblTitle);
+        pCenter.add(new JSeparator(JSeparator.HORIZONTAL));
+        JLabel infoButton = createHelpLabel(info);
+        pCenter.add(infoButton, new CC().wrap());
+        pCenter.add(new JLabel());
+        // the panel spans the input and help columns and terminates the row; without the wrap,
+        // every following row is shifted by one column
+        pCenter.add(panel, new CC().span(2).wrap());
+
+        list.addListSelectionListener(e -> {
+            try {
+                if (validator != null) {
+                    List<T> ary = Collections.list(model.elements());
+                    validator.validate(ary);
+                }
+                demarkComponentAsErrornous(list);
+            } catch (Exception ex) {
+                markComponentAsErrornous(list, ex.getMessage());
+            }
+        });
+
+        final ActionListener addItem = e -> {
+            String value = txtAdd.getText();
+            if (value != null && !value.isEmpty()) {
+                model.addElement(converter.apply(value));
+            }
+        };
+        txtAdd.addActionListener(addItem);
+        btnAdd.addActionListener(addItem);
+
+        ActionListener removeItem = e -> {
+            if (list.getSelectedIndex() != -1) {
+                model.removeElementAt(list.getSelectedIndex());
+            }
+        };
+        btnRemove.addActionListener(removeItem);
+
+        return list;
+    }
 
     protected JTextArea addTextArea(String title, String text, String info,
             final Validator<String> validator) {
@@ -288,28 +460,21 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * also determines how the default {@link javax.swing.text.NumberFormatter} used by the
      * {@link JSpinner} formats entered Strings
      * (see {@link javax.swing.text.NumberFormatter#stringToValue(String)}).
-     *
+     * <p>
      * If there are additional restrictions for the entered values, the passed validator can check
      * those. The entered values have to be of a subclass of {@link Number} (as this is a number
      * text
      * field), otherwise the {@link Validator} will fail.
      *
-     * @param title
-     *        the title of the text field
-     * @param min
-     *        the minimum value that can be entered
-     * @param max
-     *        the maximum value that can be entered
-     * @param step
-     *        the step size used when changing the entered value using the JSpinner's arrow
+     * @param title the title of the text field
+     * @param min the minimum value that can be entered
+     * @param max the maximum value that can be entered
+     * @param step the step size used when changing the entered value using the JSpinner's arrow
      *        buttons
-     * @param info
-     *        arbitrary information about the text field
-     * @param validator
-     *        a validator for checking the entered values
+     * @param info * arbitrary information about the text field
+     * @param validator a validator for checking the entered values
+     * @param <T> * the class of the minimum value
      * @return the created JSpinner
-     * @param <T>
-     *        the class of the minimum value
      */
     protected <T extends Number & Comparable<T>> JSpinner addNumberField(String title, T min,
             Comparable<T> max, Number step, String info, final Validator<Number> validator) {
@@ -357,8 +522,7 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
     /**
      * Creates an empty validator instance.
      *
-     * @param <T>
-     *        arbitrary
+     * @param <T> arbitrary
      * @return non-null
      */
     protected <T> Validator<T> emptyValidator() {

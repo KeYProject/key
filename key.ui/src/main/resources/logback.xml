@@ -20,30 +20,22 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>[%date{HH:mm:ss.SSS}] %highlight(%-5level) %cyan(%logger{0}) - %msg%ex%n</pattern>
-        </encoder>
-        <!--
-            The threshold of this filter is also selected by the command line option "verbose <int>" where
-                SILENT = 0 (completely off)
-                NORMAL = 1
-                INFO = 2
-                DEBUG = 3
-                TRACE = 4
-        -->
+            <pattern>%-10relative %-5level %-15thread %-25logger{5} %msg %ex%n</pattern>
+        </encoder>       
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
     </appender>
 
-    <root level="trace">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
     </root>
 
-    <!--
-        A logger for development, also print to CONSOLE. This logger is not restricted by any command line options.
-        You should not use this code on the master branch.
-    -->
+	<!--
+		A logger for development, also print to CONSOLE. This logger is not restricted by any command line options.
+		You should not use this code on the master branch.
+	-->
     <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>[%relative] %highlight(%-5level) %cyan(%logger{0}): %msg %n</pattern>
@@ -52,8 +44,8 @@
             <level>TRACE</level>
         </filter>
     </appender>
+
     <logger name="key.devel" level="DEBUG">
         <appender-ref ref="STDERR"/>
     </logger>
-
 </configuration>
