@@ -5,6 +5,7 @@
 package org.key_project.key.llm;
 
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -22,6 +23,7 @@ import javax.swing.event.DocumentListener;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
 
+import net.miginfocom.layout.CC;
 import org.apache.hc.client5.http.HttpResponseException;
 
 /**
@@ -49,6 +51,7 @@ public class LlmSettingsUI extends SettingsPanel {
         addSeparator("Connection");
         txtApiBaseUrl = addTextField("API Base URL", model.getApiEndpoint(), "",
             model::setApiEndpoint);
+        addUrlPreview(txtApiBaseUrl);
         txtAuthToken = addTextField("Auth Token", model.getAuthToken(), "", model::setAuthToken);
         cboDefaultModel = addComboBox("Default model", "Select the default model", 0,
             model::setDefaultModel, model.getAvailableModels().toArray(new String[0]));
@@ -163,6 +166,47 @@ public class LlmSettingsUI extends SettingsPanel {
             model.getAutoScrollOutput(), model::setAutoScrollOutput);
         addCheckBox("Show tool activity", "Show a summary of tool calls in the conversation.",
             model.getShowToolActivity(), model::setShowToolActivity);
+    }
+
+    /**
+     * Shows the URLs that {@link ApiUrls} derives from the API base URL — chat completions and
+     * model listing — directly below the field, updated on every keystroke. This lets the user
+     * check (and, by adjusting the base URL, choose) which URL convention is used before anything
+     * is sent.
+     */
+    private void addUrlPreview(JTextField baseUrlField) {
+        var preview = new JLabel();
+        preview.setFont(preview.getFont().deriveFont(Font.PLAIN,
+            Math.max(9f, preview.getFont().getSize2D() - 1f)));
+        preview.setForeground(UIManager.getColor("Label.disabledForeground"));
+        preview.setBorder(BorderFactory.createEmptyBorder(0, 2, 6, 0));
+
+        Runnable update = () -> {
+            String base = baseUrlField.getText();
+            preview.setText("<html>derived endpoints &#8594; chat completions: <code>"
+                + ApiUrls.chatCompletions(base) + "</code>, models: <code>" + ApiUrls.models(base)
+                + "</code></html>");
+        };
+        var listener = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                update.run();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                update.run();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                update.run();
+            }
+        };
+        baseUrlField.getDocument().addDocumentListener(listener);
+        update.run();
+
+        pCenter.add(preview, new CC().span(3).growX().wrap());
     }
 
     /** Adds an integer spinner bound immediately to the settings model. */

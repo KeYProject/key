@@ -5,26 +5,28 @@
 package org.key_project.key.llm;
 
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumMap;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.settings.SettingsPanel;
+import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
 
 import org.key_project.key.llm.mcp.BuiltInMCPClient;
 import org.key_project.key.llm.mcp.Tool;
 import org.key_project.key.llm.mcp.ToolCategory;
 
-import net.miginfocom.swing.MigLayout;
+import net.miginfocom.layout.CC;
 
 /**
  * Settings panel for the KeY-Agent tool permissions. It is shown as its own node ("Tools") under
  * "LLM Settings" in the settings dialog and edits a working copy of {@link LlmSettings}. Every tool
- * gets one row with a short explanation, a radio group selecting its permission (default, with
- * approval, without approval, disabled) and a checkbox whether it may run in the background; the
- * tools are grouped and sorted by their {@link ToolCategory}. {@link #getModel()} hands the copy to
- * the settings provider for applying.
+ * gets a block — the tool name on the left, its explanation flowing next to it, the permission
+ * radio group and the background/export checkboxes below, separated by a horizontal line — the
+ * tools are grouped and sorted by their {@link ToolCategory}. {@link #getModel()} hands the copy
+ * to the settings provider for applying.
  *
  * @author Alexander Weigl
  */
@@ -66,24 +68,60 @@ public class LlmToolsPanel extends SettingsPanel {
             if (tool.category() != current) {
                 current = tool.category();
                 addSeparator(current.label());
+            } else {
+                // a plain line between the tools of one category
+                pCenter.add(new JSeparator(SwingConstants.HORIZONTAL),
+                    new CC().span(3).growX().wrap());
             }
-            addTitledComponent(tool.function().name(), toolBlock(tool),
-                tool.function().description());
+            addToolRow(tool);
         }
     }
 
-    /** The row for one tool: its explanation plus the permission radio group. */
-    private JComponent toolBlock(Tool tool) {
+    /**
+     * Adds the block for one tool to the center grid: the (bold) tool name in the left column,
+     * top-aligned with its flowing explanation, and below — spanning the full width — the
+     * permission radio group and the background/export checkboxes on one line.
+     */
+    private void addToolRow(Tool tool) {
         var name = tool.function().name();
 
-        var description = new JTextArea(tool.function().description());
+        var nameLabel = new JLabel(name);
+        nameLabel.setFont(nameLabel.getFont().deriveFont(Font.BOLD));
+        pCenter.add(nameLabel, new CC().alignY("top"));
+
+        var description = toolDescription(tool.function().description());
+        pCenter.add(description, new CC().growX().pushX().alignY("top"));
+
+        var help = SimpleSettingsPanel.createHelpLabel(tool.function().description());
+        pCenter.add(help, new CC().alignY("top").wrap());
+
+        pCenter.add(radiosPanel(tool), new CC().span(3).growX().wrap());
+        pCenter.add(checkboxesPanel(tool), new CC().span(3).growX().wrap());
+    }
+
+    /**
+     * The flowing explanation of a tool. The column count caps the preferred width: a wrapping
+     * JTextArea reports the width of its longest line as preferred size, which would inflate the
+     * grid and prevent the text from flowing with the dialog width.
+     */
+    private static JTextArea toolDescription(String text) {
+        var description = new JTextArea(text);
         description.setEditable(false);
         description.setFocusable(false);
         description.setOpaque(false);
         description.setLineWrap(true);
         description.setWrapStyleWord(true);
+        description.setColumns(70);
         description.setBorder(BorderFactory.createEmptyBorder());
         description.setForeground(UIManager.getColor("Label.disabledForeground"));
+        return description;
+    }
+
+    /**
+     * The permission radio group of one tool (default, with approval, without approval, disabled).
+     */
+    private JPanel radiosPanel(Tool tool) {
+        var name = tool.function().name();
 
         var defaultLabel = tool.defaultApproval() == Tool.ApprovalRequirement.ASK
                 ? "Default (ask)"
@@ -95,16 +133,22 @@ public class LlmToolsPanel extends SettingsPanel {
         buttons.put(Permission.WITHOUT_APPROVAL, radio(group, "Without approval (always)"));
         buttons.put(Permission.DISABLED, radio(group, "Disabled"));
 
-        var radios = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
-        for (var button : buttons.values()) {
-            radios.add(button);
-        }
-
         buttons.get(currentPermission(name)).setSelected(true);
         for (var entry : buttons.entrySet()) {
             var permission = entry.getKey();
             entry.getValue().addActionListener(e -> applyPermission(name, permission));
         }
+
+        var radios = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
+        for (var button : buttons.values()) {
+            radios.add(button);
+        }
+        return radios;
+    }
+
+    /** The "may run in background" and "export to MCP" checkboxes of one tool, on one line. */
+    private JPanel checkboxesPanel(Tool tool) {
+        var name = tool.function().name();
 
         var background = new JCheckBox("may run in background");
         background.setSelected(model.isBackgroundAllowed(name, tool.backgroundable()));
@@ -122,12 +166,10 @@ public class LlmToolsPanel extends SettingsPanel {
             + " overrides that default.");
         export.addActionListener(e -> applyExport(name, export.isSelected()));
 
-        var block = new JPanel(new MigLayout("insets 0, gapy 2"));
-        block.add(description, "span, growx, wrap");
-        block.add(radios, "span, growx");
-        block.add(background, "span, growx");
-        block.add(export, "span, growx");
-        return block;
+        var checkboxes = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
+        checkboxes.add(background);
+        checkboxes.add(export);
+        return checkboxes;
     }
 
     private static JRadioButton radio(ButtonGroup group, String text) {
