@@ -39,7 +39,7 @@ array in `build.gradle`, currently 53 properties — including all demo/verify f
 other property must be passed via `JAVA_TOOL_OPTIONS`. The second table below lists exactly the
 flags that are read by `MainWindowF` but *not* on the whitelist (harness-injected only).
 
-JavaFX 25 silently drops machines without a graphical environment; for headless runs use a
+JavaFX 27 silently drops machines without a graphical environment; for headless runs use a
 virtual display (Xvnc/Xvfb), e.g. `DISPLAY=:99`, and `-Dprism.order=sw`.
 
 ### Headless verify recipe (virtual display)
@@ -86,7 +86,7 @@ regression-tested on a virtual display. Demo proof paths default into
 | `key.fx.demo.sequent2` / `key.fx.demo.sequent3` | second/third loaded proof (Loaded Proofs view test) |
 | `key.fx.demo.proofmgmt=<file.key>` | example for the proof management dialog test |
 | `key.fx.show=sequent\|prooftree` | dockable focused after the demo load |
-| `key.fx.theme=light\|dark` | theme override |
+| `key.fx.theme=<name>` | theme override (an enum name like `NORD_DARK`, or the legacy `light`/`dark` = Primer) |
 | `key.fx.demo.autoprove` / `key.fx.demo.autoprove.live` / `key.fx.demo.maxsteps=n` | auto-mode behaviour, live refresh, step limit |
 | `key.fx.verify.sequent` | sequent text → `PosInOccurrence` position mapping |
 | `key.fx.verify.tree` | proof-tree structure model |
@@ -123,7 +123,7 @@ regression-tested on a virtual display. Demo proof paths default into
 | `key.fx.verify.caching` | caching reference-search dialog (WP-4): per-goal table render + Apply wiring (stub, no real caching copy) |
 | `key.fx.verify.slicing` | slicing (WP-6): graphviz DOT image render (+ fallback), HTML statistics with sort orders, iterative fixed point, recent-files bypass |
 | `key.fx.verify.isabelle` | Isabelle solver-launch DRY-RUN (WP-8): progress dialog with fake solvers; no real Isabelle installation needed |
-| `key.fx.verify.themepersist=save\|restore` | theme persistence round trip (WP-3), two app runs — save applies + persists dark, restore asserts it is restored |
+| `key.fx.verify.themepersist=save\|restore` | theme persistence round trip (WP-3), two app runs — save applies + persists Primer Dark, restore asserts it is restored |
 | `key.fx.verify.testgen` | TestGen extension self test (WP-7): capability surface, options panel round trip, run-dialog renders, CE model tree, cooperative stop; combine with `key.fx.verify.smt` for a real z3 run |
 | `key.fx.verify.sourceconsistency` | EnsureSourceConsistency load pipeline (WP-9): `DiskFileRepo` vs `SimpleFileRepo` on the next load + source read via the repo (`key.fx.demo.sourceconsistency` overrides the example) |
 | `key.fx.verify.autosave` | AutoSave real flow (WP-9): the saver armed through `applyAutoSave` writes intermediate `.autosave` files during a capped auto-mode run |
@@ -189,17 +189,39 @@ Providers are discovered by `ServiceLoader` through `KeYGuiExtensionFacadeF`.
   `keyext.slicing.fx`, `keyext.ui.testgen.fx`, `keyext.proofmanagement.fx`
   (see the per-module READMEs).
 
+## Theming (AtlantaFX)
+
+The base look of the FX UI comes from [AtlantaFX](https://github.com/mkpaz/atlantafx) 3.0.0
+(MIT, `io.github.mkpaz:atlantafx-base`): the seven themes Primer Light/Dark, Nord Light/Dark,
+Cupertino Light/Dark and Dracula are applied as the **user-agent stylesheet**
+(`Application.setUserAgentStylesheet`, the JVM-global setting that replaces the JavaFX default
+Modena look). On top of it, the KeY CSS layer (`key-light.css` / `key-dark.css`, chosen by the
+theme's light/dark classification) applies as a per-scene stylesheet — scene stylesheets
+override user-agent stylesheets in the CSS cascade, so the `-key-*` palette variables and the
+`ColorSettingsF` user overrides keep precedence over the AtlantaFX base.
+
+`ThemeManager` (in `gui.fx.theme`) is the single choke point: it applies both layers, tracks
+every registered scene (including docking float stages), persists the choice (WP-3) and honors
+the `key.fx.theme` system property override. Legacy persisted values (`LIGHT`/`DARK` from
+before the AtlantaFX integration) map to the Primer pair. AtlantaFX's own `ThemeManager` is
+deliberately not used — it would add a second theme source of truth.
+
+Selection: View > Theme submenu (one radio item per theme, mirrors the `themeProperty`) and the
+theme combo in the settings dialog (Swing `StandardUISettings.lookAndFeel` parity, applied
+immediately — the Swing look and feel needs a restart instead).
+
 ## Tests & CI
 
-* Unit tests are deliberately **toolkit-free** (JavaFX 25 throws "Toolkit not initialized" when
+* Unit tests are deliberately **toolkit-free** (JavaFX 27 throws "Toolkit not initialized" when
   a `Control` is constructed headless): they assert the pure-Java model (e.g.
   `SequentMenuModelFTest`) and the provider/capability surface of each keyext module. The
   control-level behaviour is covered by the `key.fx.verify.*` hooks instead.
 * Per-commit gate: `./gradlew --no-daemon :key.ui.fx:spotlessApply :key.ui.fx:compileJava
   :key.ui.fx:test`.
 * CI: the FX modules are part of the `tests.yml` unit-test matrix, the `spotlessCheck` quality
-  job and the broad release-test `test` runs. The **whole build targets JDK 25** (JavaFX 25 jars
-  are class-file version 67 = JDK 23+); the CI matrices use Corretto/Temurin 25 accordingly.
+  job and the broad release-test `test` runs. The **whole build targets JDK 25** (JavaFX 27
+  requires JDK 25+: its jars are class-file version 69 = `--release 25`); the CI matrices use
+  Corretto/Temurin 25 accordingly.
 
 ## Documents
 
