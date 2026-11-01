@@ -55,7 +55,7 @@ public class Import extends JavaNonTerminalProgramElement
     // Stub used by extension points; leaves the reference unset. The {@code reference} field
     // stays @NonNull (see {@link #getReference()}) and is left null only for this degenerate
     // instance, which is not used through the getters.
-    @SuppressWarnings("NullAway")
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     public Import() {
         isMultiImport = false;
         reference = null;

@@ -57,7 +57,7 @@ public final class JavaSourceLocations {
                 .orElse(null);
 
         var pos = n.getRange().map(it -> it.begin).orElse(null);
-        return new Location(fileUri, positionFromJP(pos));
+        return fileUri != null ? new Location(fileUri, positionFromJP(pos)) : Location.UNDEFINED;
     }
 
     /**

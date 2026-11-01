@@ -485,10 +485,10 @@ public abstract class KeYJavaASTFactory {
      * return e
      * </pre>
      *
-     * @param e the return {@link Expression}
+     * @param e the return {@link Expression}, or {@code null} for a bare {@code return;}
      * @return a new {@link Return} statement with expression <code>e</code>
      */
-    public static Return returnClause(Expression e) {
+    public static Return returnClause(@Nullable Expression e) {
         return new Return(e);
     }
 
@@ -1231,8 +1231,13 @@ public abstract class KeYJavaASTFactory {
      */
     public static StatementBlock block(final List<Statement> statements) {
         final Statement[] s = new Statement[statements.size()];
+        for (int i = 0; i < statements.size(); i++) {
+            // statement lists of the AST pipeline never contain nulls (see StatementBlock's
+            // deep non-null assertion); the JDK's toArray only allows a nullable element type
+            s[i] = Objects.requireNonNull(statements.get(i));
+        }
 
-        return block(statements.toArray(s));
+        return block(s);
     }
 
     /**

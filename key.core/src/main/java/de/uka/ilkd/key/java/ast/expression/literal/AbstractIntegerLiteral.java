@@ -65,7 +65,7 @@ public abstract non-sealed class AbstractIntegerLiteral extends Literal {
     public abstract String getValueString();
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }

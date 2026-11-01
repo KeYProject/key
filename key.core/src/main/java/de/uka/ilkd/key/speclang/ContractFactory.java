@@ -300,7 +300,7 @@ public class ContractFactory {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o instanceof ContractFactory) {
             return Objects.equals(services, ((ContractFactory) o).services);
         } else {
@@ -559,7 +559,9 @@ public class ContractFactory {
                         }
                     }
                 }
-                modifiables.put(h, intersectedModifiable);
+                // the outer check guarantees that at least one of the two modifiable
+                // clauses exists, so the intersected term is non-null here
+                modifiables.put(h, Objects.requireNonNull(intersectedModifiable));
             }
         }
     }
@@ -627,7 +629,8 @@ public class ContractFactory {
                 } else {
                     na = tb.union(a1, a2);
                 }
-                deps.put(h, na);
+                // entered only when at least one of a1/a2 is non-null, so na is non-null here
+                deps.put(h, Objects.requireNonNull(na));
             }
             boolean preHeap = t.originalAtPreVars.get(h) != null;
             if (preHeap) {
@@ -644,7 +647,9 @@ public class ContractFactory {
                     } else {
                         naPre = tb.union(a1Pre, a2Pre);
                     }
-                    deps.put(hPre, naPre);
+                    // entered only when at least one of a1Pre/a2Pre is non-null, so naPre is
+                    // non-null here
+                    deps.put(hPre, Objects.requireNonNull(naPre));
                 }
             }
         }
@@ -893,7 +898,12 @@ public class ContractFactory {
                 : UNKNOWN_CONTRACT_IMPLEMENTATION;
 
         FunctionalOperationContractImpl t = (FunctionalOperationContractImpl) contracts[0];
-        FunctionalOperationContract[] others = Arrays.copyOfRange(contracts, 1, contracts.length);
+        // Arrays.copyOfRange returns a nullable-element array in the EISOP JDK; the elements of
+        // the varargs array are non-null (guaranteed by the caller contract), so copy them off
+        // with non-null element type instead. contracts.length >= 2 here (0 and 1 return above).
+        FunctionalOperationContract[] others =
+            new FunctionalOperationContract[contracts.length - 1];
+        System.arraycopy(contracts, 1, others, 0, others.length);
         assert others != null;
         return union(t, others);
     }

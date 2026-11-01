@@ -225,14 +225,14 @@ public final class JavaInfo {
     private HashMap<String, KeYJavaType> buildNameCache() {
         synchronized (cacheBuildLock) {
             // another worker may have (re)built the cache while we waited for the lock
-            if (name2KJTCache != null && kpmi.rec2key().keYTypes().size() <= nameCachedSize) {
-                return name2KJTCache;
+            var cached = name2KJTCache;
+            if (cached != null && kpmi.rec2key().keYTypes().size() <= nameCachedSize) {
+                return cached;
             }
             var types = kpmi.rec2key().keYTypes();
             var cache = new LinkedHashMap<String, KeYJavaType>();
             for (final KeYJavaType type : types) {
-                if (type.getJavaType() instanceof ArrayType) {
-                    final ArrayType at = (ArrayType) type.getJavaType();
+                if (type.getJavaType() instanceof ArrayType at) {
                     var old = cache.put(at.getFullName(), type);
                     assert old == null;
                     old = cache.put(at.getAlternativeNameRepresentation(), type);
@@ -420,8 +420,7 @@ public final class JavaInfo {
     /**
      * returns a primitive KeYJavaType matching the given typename.
      */
-    @Nullable
-    public KeYJavaType getPrimitiveKeYJavaType(String typename) {
+    public @Nullable KeYJavaType getPrimitiveKeYJavaType(String typename) {
         PrimitiveType type = PrimitiveType.getPrimitiveType(typename);
         if (type != null) {
             return getPrimitiveKeYJavaType(type);
@@ -539,12 +538,14 @@ public final class JavaInfo {
         }
         synchronized (cacheBuildLock) {
             // another worker may have (re)built the cache while we waited for the lock
-            if (sort2KJTCache != null && kpmi.rec2key().size() <= sortCachedSize) {
-                return sort2KJTCache;
+            var cached = sort2KJTCache;
+            if (cached != null && kpmi.rec2key().size() <= sortCachedSize) {
+                return cached;
             }
             var newCache = new HashMap<Sort, List<KeYJavaType>>();
             for (final KeYJavaType oKJT : kpmi.allTypes()) {
-                Sort s = oKJT.getSort();
+                // every registered type has a sort; null would NPE inside computeIfAbsent anyway
+                Sort s = Objects.requireNonNull(oKJT.getSort(), "sort of " + oKJT);
                 List<KeYJavaType> l = newCache.computeIfAbsent(s, k -> new LinkedList<>());
                 if (!l.contains(oKJT)) {
                     l.add(oKJT);
@@ -640,8 +641,7 @@ public final class JavaInfo {
         return kpmi.getProgramMethod(classType, methodName, signature, context);
     }
 
-    @Nullable
-    private IProgramMethod getProgramMethodFromPartialSignature(KeYJavaType classType,
+    private @Nullable IProgramMethod getProgramMethodFromPartialSignature(KeYJavaType classType,
             String methodName, List<List<KeYJavaType>> signature,
             ImmutableList<KeYJavaType> partialSignature, KeYJavaType context) {
         if (signature.isEmpty()) {
@@ -667,8 +667,7 @@ public final class JavaInfo {
      * KeYJavaTypes must be considered. This is the case for sort int in KeY, which has the
      * following as possible corresponding KeYJavaTypes: char, byte, short, int, long
      */
-    @Nullable
-    public IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
+    public @Nullable IProgramMethod getProgramMethod(KeYJavaType classType, String methodName,
             List<List<KeYJavaType>> signature, KeYJavaType context) {
         ImmutableList<KeYJavaType> partialSignature = ImmutableList.nil();
         return getProgramMethodFromPartialSignature(classType, methodName, signature,
@@ -688,7 +687,8 @@ public final class JavaInfo {
             ProgramVariable[] args, KeYJavaType context) {
         List<KeYJavaType> types = new ArrayList<>(args.length);
         for (ProgramVariable arg : args) {
-            types.add(arg.getKeYJavaType());
+            // every program variable is always associated with a KeYJavaType
+            types.add(Objects.requireNonNull(arg.getKeYJavaType(), "key java type of " + arg));
         }
         return getProgramMethod(classType, methodName, types, context);
     }
@@ -725,7 +725,9 @@ public final class JavaInfo {
     private List<List<KeYJavaType>> termArrayToSignature(JTerm[] args) {
         List<List<KeYJavaType>> signature = new LinkedList<>();
         for (JTerm arg : args) {
-            signature.add(lookupSort2KJTCache(arg.sort()));
+            // every well-formed term has at least one KeYJavaType registered for its sort
+            signature.add(Objects.requireNonNull(lookupSort2KJTCache(arg.sort()),
+                "no KeYJavaTypes registered for sort " + arg.sort()));
         }
         return signature;
     }
@@ -1055,10 +1057,10 @@ public final class JavaInfo {
     public @Nullable ProgramVariable getAttribute(final String name,
             @Nullable KeYJavaType classType) {
         if (classType != null) {
-            if (classType.getJavaType() instanceof ArrayDeclaration) {
+            var classJavaType = classType.getJavaType();
+            if (classJavaType instanceof ArrayDeclaration) {
                 ProgramVariable res =
-                    find(name,
-                        getFields(((ArrayDeclaration) classType.getJavaType()).getMembers()));
+                    find(name, getFields(((ArrayDeclaration) classJavaType).getMembers()));
                 if (res == null) {
                     return getAttribute(name, getJavaLangObject());
                 }
@@ -1121,9 +1123,10 @@ public final class JavaInfo {
             return result;
         }
 
-        if (type.getJavaType() instanceof ArrayType) {
+        var typeJavaType = type.getJavaType();
+        if (typeJavaType instanceof ArrayType) {
             ProgramVariable var =
-                find(programName, getFields(((ArrayDeclaration) type.getJavaType()).getMembers()));
+                find(programName, getFields(((ArrayDeclaration) typeJavaType).getMembers()));
             if (var != null) {
                 result = result.prepend(var);
             }
@@ -1323,10 +1326,17 @@ public final class JavaInfo {
      */
     public List<KeYJavaType> getAllSupertypes(KeYJavaType type) {
         if (type.getJavaType() instanceof ArrayType) {
-            return getSuperSorts(Objects.requireNonNull(type.getSort(), "sort of " + type))
-                    .stream()
-                    .map(this::getKeYJavaType)
-                    .toList();
+            // every supertype sort of an existing type resolves to a known KeYJavaType; the null
+            // guard never triggers and keeps the result free of nulls
+            final List<KeYJavaType> result = new ArrayList<>();
+            for (Sort s : getSuperSorts(
+                Objects.requireNonNull(type.getSort(), "sort of " + type))) {
+                final KeYJavaType kjt = getKeYJavaType(s);
+                if (kjt != null) {
+                    result.add(kjt);
+                }
+            }
+            return result;
         }
         return kpmi.getAllSupertypes(type);
     }
@@ -1424,6 +1434,11 @@ public final class JavaInfo {
      * Returns the special symbol <code>&lt;inv&gt;</code> which stands for the class invariant of
      * an object.
      */
+    /**
+     * The lazy-initialised backing field is {@code @Nullable} (it is only guaranteed non-null
+     * after this method returns); the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public IObserverFunction getInv() {
         // TODO: Create function when source code is parsed and register it in namespace. Return
         // only function from namespace here. No lazy creation to ensure that all proofs of the same
@@ -1450,6 +1465,11 @@ public final class JavaInfo {
      * Returns the special symbol <code>&lt;inv_free&gt;</code> which stands for the free
      * class invariant of an object.
      */
+    /**
+     * The lazy-initialised backing field is {@code @Nullable} (it is only guaranteed non-null
+     * after this method returns); the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public IObserverFunction getInvFree() {
         if (invFree == null || invFree.getHeapCount(services) != HeapContext
                 .getModifiableHeaps(services, false).size()) {

@@ -9,6 +9,7 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A JML set statement in textual form.
@@ -40,7 +41,7 @@ public final class TextualJMLSetStatement extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof TextualJMLSetStatement ss)) {
             return false;
         }

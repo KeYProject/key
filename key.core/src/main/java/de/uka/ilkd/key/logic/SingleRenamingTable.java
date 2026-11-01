@@ -62,6 +62,11 @@ public class SingleRenamingTable extends RenamingTable {
             return se != null;
         }
 
+        /**
+         * The overridden declaration requires a non-null return type, but this implementation may
+         * legitimately return {@code null}; the difference is suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:override.return.invalid")
         @Override
         public @Nullable SourceElement next() {
             final SourceElement next = se;

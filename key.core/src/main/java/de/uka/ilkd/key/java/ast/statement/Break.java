@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Break.
@@ -53,7 +54,7 @@ public class Break extends LabelJumpStatement {
         // label=(ProgramElementName)children.get(ProgramElementName.class);
     }
 
-    public Break(PositionInfo pi, List<Comment> c, Label name) {
+    public Break(PositionInfo pi, List<Comment> c, @Nullable Label name) {
         super(pi, c, name);
     }
 

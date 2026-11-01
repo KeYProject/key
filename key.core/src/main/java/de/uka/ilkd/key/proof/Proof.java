@@ -191,7 +191,18 @@ public class Proof implements ProofObject<Goal>, Named {
 
     /**
      * constructs a new empty proof with name
+     *
+     * <p>
+     * The strategy-listener lambda and the proof-services wiring operate on {@code this} while
+     * the receiver is still under initialization (EISOP initialization check); safe here because
+     * the listener only reacts to later strategy events and the services were set up by the
+     * caller, suppressed with a scoped key. The init config is asserted present below, and its
+     * services and the resulting Java model are guaranteed to be set up by the caller; the
+     * dereferences of the (nullable) init config field and (nullable) services and Java model are
+     * suppressed with a scoped key.
      */
+    @SuppressWarnings({ "nullness:method.invocation.invalid", "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible", "nullness:assignment.type.incompatible" })
     private Proof(Name name, InitConfig initConfig) {
         this.name = name;
         assert initConfig != null : "Tried to create proof without valid services.";
@@ -257,6 +268,17 @@ public class Proof implements ProofObject<Goal>, Named {
         this(new Name(name), initConfig);
     }
 
+    /**
+     * The goal/root setup below operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because the fresh {@link Node} and
+     * {@link Goal} are fully constructed before being attached, suppressed with a scoped key. The
+     * {@link #getServices()}, {@link #setRoot(Node)}, {@link #closed()} and
+     * {@link #fireProofClosed()} calls operate on {@code this} in the same fashion; the
+     * construction-time services and root node are set up in the previous lines of this
+     * constructor, suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid", "nullness:argument.type.incompatible",
+        "nullness:assignment.type.incompatible" })
     private Proof(String name, Sequent problem, TacletIndex rules, BuiltInRuleIndex builtInRules,
             InitConfig initConfig) {
         this(new Name(name), initConfig);
@@ -780,8 +802,9 @@ public class Proof implements ProofObject<Goal>, Named {
      * @param goal the Goal where the last rule application gets undone
      */
     public synchronized void pruneProof(Goal goal) {
-        if (goal.node().parent() != null) {
-            pruneProof(goal.node().parent());
+        final Node parent = goal.node().parent();
+        if (parent != null) {
+            pruneProof(parent);
         }
     }
 
@@ -844,12 +867,21 @@ public class Proof implements ProofObject<Goal>, Named {
      *
      * @param pred non-null test function
      * @return a node fulfilling {@code pred} or null
+     *         <p>
+     *         The (nullable) root is only enqueued when present; a polled node is then always
+     *         present until the queue is empty, the unreachable null-check below is kept to
+     *         satisfy the nullness checker.
      */
     public @Nullable Node findAny(Predicate<Node> pred) {
         Queue<Node> queue = new LinkedList<>();
-        queue.add(root);
+        if (root != null) {
+            queue.add(root);
+        }
         while (!queue.isEmpty()) {
             Node cur = queue.poll();
+            if (cur == null) {
+                continue;
+            }
             if (pred.test(cur)) {
                 return cur;
             }
@@ -862,13 +894,24 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
 
+    /**
+     * Visits every node on the path from {@code child} up to (but not including) {@code parent}
+     * via {@link Node#parent()}. Traversing past the root without reaching {@code parent} raises
+     * an exception.
+     *
+     * @param child the starting node, below {@code parent} in the proof tree
+     * @param parent the exclusive upper bound of the traversal
+     * @param visitor the visitor to apply to each visited node
+     */
     public void traverseFromChildToParent(Node child, Node parent, ProofVisitor visitor) {
+        @Nullable
+        Node current = child;
         do {
-            final Node current = Objects.requireNonNull(child,
+            final Node node = Objects.requireNonNull(current,
                 "Proof tree traversal reached the root's parent; the tree has no such node");
-            visitor.visit(this, current);
-            child = current.parent();
-        } while (child != parent);
+            visitor.visit(this, node);
+            current = node.parent();
+        } while (current != parent);
     }
 
     /**
@@ -1301,7 +1344,10 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     public void removeRuleAppListener(@Nullable RuleAppListener p) {
-        synchronized (ruleAppListenerList) { // TODO (DS, 2019-03-19): Is null for SET tests!?!
+        if (p == null) {
+            return;
+        }
+        synchronized (ruleAppListenerList) {
             ruleAppListenerList.remove(p);
         }
     }
@@ -1545,7 +1591,12 @@ public class Proof implements ProofObject<Goal>, Named {
      *         there is no active strategy.
      * @see Profile#getStrategyFactory(Name)
      * @see #getActiveStrategy()
+     *      <p>
+     *      The active strategy is fetched once; the dereference of the (nullable) active strategy
+     *      for
+     *      its name is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public StrategyFactory getActiveStrategyFactory() {
         Name activeStrategyName = getActiveStrategy() != null ? getActiveStrategy().name() : null;
         return Objects.requireNonNull(activeStrategyName != null

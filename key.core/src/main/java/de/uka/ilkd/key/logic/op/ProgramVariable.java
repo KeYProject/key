@@ -60,6 +60,13 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
     // the program variable denotes a field
     private final @Nullable KeYJavaType containingType;
 
+    /**
+     * Creates a new program variable. The sanity-check asserts below call {@link #sort()} on
+     * {@code this} while the receiver is still under initialization (EISOP initialization
+     * check); safe here because the sort/type fields were assigned earlier in this constructor,
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     protected ProgramVariable(ProgramElementName name, Sort s, @Nullable KeYJavaType t,
             @Nullable KeYJavaType containingType, boolean isStatic, boolean isModel,
             boolean isGhost,

@@ -498,7 +498,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     @Override
     public ImmutableSet<MergeContract> extractMergeContracts(IProgramMethod method,
-            MergePointStatement mps, ImmutableList<LocationVariable> methodParams)
+            MergePointStatement mps, @Nullable ImmutableList<LocationVariable> methodParams)
             throws SLTranslationException {
         // In cases of specifications immediately following each other (like a
         // merge_point and a block contract / loop invariant), it might happen

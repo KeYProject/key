@@ -98,8 +98,7 @@ public class KeYJPMapping {
      *
      * @param pe a recoder.ModelElement
      */
-    @Nullable
-    public KeYJavaType resolvedTypeToKeY(ResolvedType pe, boolean processOnDemand,
+    public @Nullable KeYJavaType resolvedTypeToKeY(ResolvedType pe, boolean processOnDemand,
             JavaService converter) {
         var type = typeMap.get(new ResolvedTypeWrapper(pe));
 
@@ -122,19 +121,16 @@ public class KeYJPMapping {
         return Objects.requireNonNull(res, "Model Element not known: " + pe);
     }
 
-    @Nullable
-    public ProgramElement nodeToKeY(Node rm) {
+    public @Nullable ProgramElement nodeToKeY(Node rm) {
         return map.get(rm);
     }
 
-    @Nullable
-    public ProgramElement resolvedDeclarationToKeY(ResolvedDeclaration rm) {
+    public @Nullable ProgramElement resolvedDeclarationToKeY(ResolvedDeclaration rm) {
         var ast = rm.toAst();
         return ast.map(this::nodeToKeY).orElse(null);
     }
 
-    @Nullable
-    public Node nodeFromKeY(ProgramElement el) {
+    public @Nullable Node nodeFromKeY(ProgramElement el) {
         return revMap.get(el);
     }
 
@@ -261,7 +257,7 @@ public class KeYJPMapping {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (o instanceof ResolvedTypeWrapper other) {
                 if (resolvedType.isReferenceType()) {
                     if (!other.resolvedType.isReferenceType()) {

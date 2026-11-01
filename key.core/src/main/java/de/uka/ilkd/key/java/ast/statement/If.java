@@ -49,6 +49,12 @@ public class If extends BranchStatement implements ExpressionContainer {
      *        the children of this AST element as KeY classes. May contain: Comments, a
      *        Then, an Else, an Expression (as condition of If)
      */
+    /**
+     * The {@link #checkValidity} verification operates on {@code this} while the receiver is
+     * still under initialization (EISOP initialization check); safe here because the fields it
+     * reads are assigned just above, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public If(ExtList children) {
         super(children);
         thenBranch = Objects.requireNonNull(children.get(Then.class),
@@ -60,7 +66,8 @@ public class If extends BranchStatement implements ExpressionContainer {
         checkValidity();
     }
 
-    public If(PositionInfo pi, List<Comment> c, Expression accept, Then then, Else anElse) {
+    public If(PositionInfo pi, List<Comment> c, Expression accept, Then then,
+            @Nullable Else anElse) {
         super(pi, c);
         expression = accept;
         elseBranch = anElse;
@@ -100,7 +107,14 @@ public class If extends BranchStatement implements ExpressionContainer {
      *        a then.
      * @param elseBranch
      *        an else.
+     *
+     *        <p>
+     *        The {@link #checkValidity} verification operates on {@code this} while the receiver is
+     *        still under initialization (EISOP initialization check); safe here because the fields
+     *        it
+     *        reads are assigned just above, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public If(Expression e, Then thenBranch, @Nullable Else elseBranch) {
         this.expression = e;
         this.thenBranch = thenBranch;

@@ -91,6 +91,13 @@ public class TriggersSet {
      */
     private final List<? extends TriggerSupport> supports;
 
+    /**
+     * The trigger-construction helpers below operate on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here because the fields they
+     * populate are assigned in sequence and only read after construction, suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private TriggersSet(JTerm allTerm, Services services, boolean classic) {
         this.allTerm = allTerm;
         this.classic = classic;

@@ -39,7 +39,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     // builds an "empty" declaration stub whose consumers are all null-guarded
     // (getChildCount/getChildAt). The null assignment violates the @NonNull field contract,
     // so the check is scoped here.
-    @SuppressWarnings("NullAway")
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     public LocalVariableDeclaration() {
         super();
         this.varSpecs = null;

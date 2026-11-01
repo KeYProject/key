@@ -206,7 +206,11 @@ public class NodeReplacement {
 
     /**
      * @return Modifications that have been made to node
+     *         <p>
+     *         The change list is initialized with an empty list below before it is filled; the
+     *         dereference of the (nullable) change list field is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public Iterator<NodeChange> getNodeChanges() {
         if (changes == null) {
             changes = ImmutableList.nil();

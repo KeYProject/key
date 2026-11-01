@@ -103,7 +103,7 @@ public final class BinaryOperator extends Operator
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof BinaryOperator b))
             return false;
         if (!super.equals(o))

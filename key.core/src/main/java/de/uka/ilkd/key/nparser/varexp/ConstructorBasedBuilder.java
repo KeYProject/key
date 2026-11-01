@@ -41,7 +41,14 @@ public class ConstructorBasedBuilder extends AbstractConditionBuilder {
         this.negationSupported = negationSupported;
     }
 
+    /**
+     * {@link Arrays#copyOf} is annotated in the EISOP JDK as returning a nullable-element array.
+     * The copy is freshly filled from the non-null caller arguments plus the boxed
+     * {@code negated} flag, so all its elements are non-null; the assignment is suppressed at
+     * this scope.
+     */
     @Override
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     public VariableCondition build(Object[] arguments, List<String> parameters, boolean negated) {
         if (negated && !negationSupported) {
             throw new RuntimeException(clazz.getName() + " does not support negation.");

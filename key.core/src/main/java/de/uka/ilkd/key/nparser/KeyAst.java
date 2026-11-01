@@ -143,7 +143,11 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         /// tree.
         public Includes getIncludes(Path base) {
             IncludeFinder finder = new IncludeFinder(base);
-            accept(finder);
+            // The visitor result type is {@code Void}, which the generic {@code accept} result
+            // bound cannot express; the result is unused here, so the type inference difference
+            // is suppressed with a scoped key.
+            @SuppressWarnings("nullness:type.arguments.not.inferred")
+            final Object accepted = accept(finder);
             return finder.getIncludes();
         }
 
@@ -248,7 +252,6 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             // unbound type parameter T (here Void). Void has no non-null value, so the generated
             // superclass cannot even be implemented for T = Void without returning null; the
             // override honestly declares its @Nullable result.
-            @SuppressWarnings("NullAway")
             @Override
             public @Nullable Void visitProofCmd(JmlParser.ProofCmdContext ctx) {
                 if (ctx.obtain != null) {
@@ -267,7 +270,6 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             // Same generated-superclass constraint as visitProofCmd above: the ANTLR-generated
             // JmlParserBaseVisitor declares visitExpression to return the unbound type parameter T,
             // which has no non-null value when instantiated with Void.
-            @SuppressWarnings("NullAway")
             @Override
             public @Nullable Void visitExpression(JmlParser.ExpressionContext ctx) {
                 collectedTerms = collectedTerms.prepend(ctx);
@@ -367,14 +369,20 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             return asAst(fileUri, ctx.proofScriptCommand());
         }
 
-        private static List<ScriptCommandAst> asAst(URI file,
+        private static List<ScriptCommandAst> asAst(@Nullable URI file,
                 List<JavaKeYParser.ProofScriptCommandContext> cmds) {
             return cmds.stream().map(it -> asAst(file, it)).toList();
         }
 
-        public static @NonNull ScriptBlock asAst(URI file,
+        /**
+         * Translates the given proof-script code block into a {@link ScriptBlock}. The {@code file}
+         * is only used for error reporting and may be {@code null} when the script was parsed from
+         * an in-memory source.
+         */
+        public static @NonNull ScriptBlock asAst(@Nullable URI file,
                 JavaKeYParser.ProofScriptCodeBlockContext ctx) {
-            var loc = new Location(file, Position.fromToken(ctx.start));
+            var loc = file != null ? new Location(file, Position.fromToken(ctx.start))
+                    : Location.UNDEFINED;
             final var proofScriptCommandContexts = ctx.proofScript().proofScriptCommand();
             final List<ScriptCommandAst> list =
                 proofScriptCommandContexts.stream()
@@ -383,11 +391,12 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             return new ScriptBlock(list, loc);
         }
 
-        private static @NonNull ScriptCommandAst asAst(URI file,
+        private static @NonNull ScriptCommandAst asAst(@Nullable URI file,
                 JavaKeYParser.ProofScriptCommandContext it) {
-            var loc = new Location(file, Position.fromToken(it.start));
+            var loc = file != null ? new Location(file, Position.fromToken(it.start))
+                    : Location.UNDEFINED;
             var nargs = new HashMap<String, Object>();
-            var pargs = new ArrayList<>();
+            List<Object> pargs = new ArrayList<>();
 
             if (it.proofScriptParameters() != null) {
                 for (var param : it.proofScriptParameters().proofScriptParameter()) {
@@ -441,7 +450,6 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         // Object, and the @Nullable return types of the overrides (they never produce a result)
         // necessarily conflict with the generated T = Object signatures. The check is scoped to
         // this method.
-        @SuppressWarnings("NullAway")
         public void printDefinitions(PrintWriter out) {
             ctx.accept(new JavaKeYParserBaseVisitor<Object>() {
                 @Override

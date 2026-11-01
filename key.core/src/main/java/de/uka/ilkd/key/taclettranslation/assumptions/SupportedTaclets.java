@@ -66,7 +66,8 @@ public final class SupportedTaclets {
         tacletNames.put(newNode.text, newNode);
         Enumeration<?> en = reference.children();
         while (en.hasMoreElements()) {
-            newNode.add(copy((TreeItem) en.nextElement()));
+            newNode.add(copy(Objects.requireNonNull((TreeItem) en.nextElement(),
+                "no tree item for a child node")));
 
         }
         return newNode;
@@ -87,13 +88,12 @@ public final class SupportedTaclets {
         Enumeration<?> en = ((TreeItem) getTreeModel().getRoot()).breadthFirstEnumeration();
         while (en.hasMoreElements()) {
             TreeItem item = (TreeItem) en.nextElement();
-            if (item.isLeaf() && item.isSelected()) {
+            if (item != null && item.isLeaf() && item.isSelected()) {
                 list.add(item.text);
             }
 
         }
-        String[] result = new String[list.size()];
-        return list.toArray(result);
+        return list.toArray(new String[list.size()]);
     }
 
 
@@ -137,6 +137,11 @@ public final class SupportedTaclets {
         return names;
     }
 
+    /**
+     * The key view carries {@code @KeyFor} annotations on its elements which the declared return
+     * type does not; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public Collection<String> getTacletNames() {
         return tacletNames.keySet();
     }

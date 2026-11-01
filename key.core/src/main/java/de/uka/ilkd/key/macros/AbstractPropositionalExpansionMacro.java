@@ -7,6 +7,7 @@ package de.uka.ilkd.key.macros;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -25,6 +26,7 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The Class AbstractPropositionalExpansionMacro applies purely propositional rules.
@@ -65,9 +67,13 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
 
     @Override
     protected Strategy<@NonNull Goal> createStrategy(Proof proof,
-            PosInOccurrence posInOcc) {
-        return new PropExpansionStrategy(proof.getActiveStrategy(), getAdmittedRuleNames(),
-            allowOSS());
+            @Nullable PosInOccurrence posInOcc) {
+        // The active strategy is set and stored on the proof before createStrategy() runs;
+        // without it there would be nothing to steer the propositional expansion.
+        return new PropExpansionStrategy(
+            Objects.requireNonNull(proof.getActiveStrategy(),
+                "the proof carries an active strategy while the macro runs"),
+            getAdmittedRuleNames(), allowOSS());
     }
 
     /**

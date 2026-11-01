@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,6 +43,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.clearSemisequent;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getLocationVariables;
@@ -96,7 +98,15 @@ public class CloseAfterMerge implements BuiltInRule {
         return DISPLAY_NAME;
     }
 
+    /**
+     * Applies the close-after-merge rule, linking the newly created goal to the goal of the
+     * corresponding merge node and registering the required tree listener.
+     * <p>
+     * The merged-with node has a parent whenever the close rule is applicable; the dereference of
+     * the (nullable) parent of the corresponding merge node is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public ImmutableList<Goal> apply(final Goal goal,
             final RuleApp ruleApp) throws RuleAbortException {
         final TermLabelState termLabelState = new TermLabelState();
@@ -157,7 +167,11 @@ public class CloseAfterMerge implements BuiltInRule {
             clearSemisequent(ruleIsWeakeningGoal, true);
             clearSemisequent(ruleIsWeakeningGoal, false);
             ruleIsWeakeningGoal.addFormula(new SequentFormula(isWeakeningForm), false, true);
-            TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this,
+            // Close-after-merge apps are only constructed with the merge position (cf.
+            // MergeRuleUtils.closeMergePartnerGoal); the @Nullable accessor result merely mirrors
+            // the abstract base-class storage, so the position is guarded once here.
+            final PosInOccurrence pio = Objects.requireNonNull(ruleApp.posInOccurrence());
+            TermLabelManager.refactorGoal(termLabelState, services, pio, this,
                 ruleIsWeakeningGoal, null, null);
         }
 
@@ -173,7 +187,14 @@ public class CloseAfterMerge implements BuiltInRule {
      *
      * @return The syntactic weakening formula for the instantiated
      *         {@link CloseAfterMergeRuleBuiltInRuleApp}.
+     *         <p>
+     *         The proof of the weakening goal's services is present, and the open goal for the
+     *         merge
+     *         state's node always exists when the weakening goal is generated; the dereferences of
+     *         the
+     *         (nullable) proof and (nullable) merged goal are suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private JTerm getSyntacticWeakeningFormula(CloseAfterMergeRuleBuiltInRuleApp closeApp,
             Goal isWeakeningGoal) {
         final Services services = isWeakeningGoal.proof().getServices();
@@ -206,8 +227,11 @@ public class CloseAfterMerge implements BuiltInRule {
             new JFunction(predicateSymbName, JavaDLTheory.FORMULA,
                 new ImmutableArray<>(argSorts));
 
-        final Goal mergedGoal =
-            services.getProof().getOpenGoal(closeApp.getMergeState().getCorrespondingNode());
+        // The weakening goal is only generated for complete close-after-merge apps, whose merge
+        // state always carries a corresponding node with an open goal (see the javadoc above).
+        final Goal mergedGoal = services.getProof().getOpenGoal(
+            Objects.requireNonNull(closeApp.getMergeState().getCorrespondingNode(),
+                "merge state must have a corresponding node"));
 
         isWeakeningGoal.getLocalNamespaces().functions().add(predicateSymb);
         isWeakeningGoal.getLocalNamespaces().add(mergedGoal.getLocalNamespaces());
@@ -217,6 +241,12 @@ public class CloseAfterMerge implements BuiltInRule {
         final JTerm predTerm = tb.func(predicateSymb, origQfdVarTerms.toArray(new JTerm[] {}));
 
         // Obtain set of new Skolem constants in merge state
+        // The fresh constants in closeApp.getNewNames() are introduced by the same close rule
+        // application and are therefore guaranteed to be registered in the weakening goal's
+        // namespaces; the namespace lookup is declared @Nullable, which the collector's non-null
+        // element bound cannot see through, so the type inference difference is suppressed with a
+        // scoped key.
+        @SuppressWarnings("nullness:type.arguments.not.inferred")
         HashSet<Function> newConstants = closeApp.getNewNames().stream()
                 .map(name -> isWeakeningGoal.getLocalNamespaces().functions().lookup(name))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -258,7 +288,7 @@ public class CloseAfterMerge implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, @Nullable PosInOccurrence pio) {
         return true;
     }
 
@@ -268,8 +298,11 @@ public class CloseAfterMerge implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-        return new CloseAfterMergeRuleBuiltInRuleApp(this, pos);
+    public IBuiltInRuleApp createApp(@Nullable PosInOccurrence pos, TermServices services) {
+        // Close-after-merge apps are only created through the position-carrying overload (cf.
+        // MergeRuleUtils.closeMergePartnerGoal); the @Nullable stems solely from the shared
+        // BuiltInRule contract.
+        return new CloseAfterMergeRuleBuiltInRuleApp(this, Objects.requireNonNull(pos));
     }
 
     /**

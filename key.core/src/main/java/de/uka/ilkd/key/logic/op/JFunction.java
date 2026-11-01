@@ -38,7 +38,15 @@ public class JFunction extends Function implements Sorted, Operator {
     // -------------------------------------------------------------------------
 
     /**
-     * Creates a function symbol with the specified signature and kind
+     * Creates a function symbol with the specified signature and kind.
+     *
+     * <p>
+     * A {@code null} {@code whereToBind} is the designed "no binding" marker used for all
+     * symbols that are not binders. The key.ncore {@link Function} superclass constructor
+     * leaves its {@code whereToBind} parameter unannotated although its package
+     * ({@code org.key_project.logic.op}) is {@code @NullMarked}, so it counts as
+     * {@code @NonNull} here; the warning is suppressed for that reason. An honest
+     * {@code @Nullable} widening of the superclass parameter is tracked as follow-up work.
      *
      * @param name the Name of the function symbol
      * @param sort the Sort of the function symbol
@@ -53,12 +61,7 @@ public class JFunction extends Function implements Sorted, Operator {
      * @param introductionTime the introduction time of the symbol, or a
      *        {@link Function#UNRECORDED}, if none available (e.g. existed from the beginning)
      */
-    @SuppressWarnings("NullAway") // key.ncore Function#Function(Name, ImmutableArray, Sort,
-                                  // ImmutableArray, boolean, boolean, FunctionKind, int) leaves its
-                                  // whereToBind parameter unannotated although its package
-                                  // (org.key_project.logic.op) is @NullMarked, so it counts as
-                                  // @NonNull here; an honest @Nullable widening of that parameter
-                                  // is tracked as follow-up work.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
             @Nullable ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
             FunctionKind kind, int introductionTime) {

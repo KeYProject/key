@@ -94,7 +94,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
     }
 
     @Override
-    public String getCategory() {
+    public @Nullable String getCategory() {
         return null;
     }
 
@@ -105,7 +105,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<@NonNull Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         return fallBackMacro != null && fallBackMacro.canApplyTo(proof, goals, posInOcc)
                 || goals.exists(g -> getJmlAssert(g.node()) != null);
     }
@@ -135,7 +135,9 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
          */
         JTerm resolve(Map<LocationVariable, JFunction> obtainMap, Services services) {
             OpReplacer pvr = new OpReplacer(obtainMap, services.getTermFactory());
-            JTerm result = pvr.replace(term);
+            // replace yields null only for a null input (see OpReplacer.replace); this term is a
+            // non-null record component and the obtain map holds no whole-term keys.
+            JTerm result = Objects.requireNonNull(pvr.replace(term));
             assertNoObtainVarsLeft(result, obtainMap);
             return result;
         }
@@ -156,12 +158,20 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
     }
 
     private static @Nullable JmlAssert getJmlAssert(@Nullable Node node) {
-        if (node == null || node.parent() == null) {
+        if (node == null) {
             return null;
         }
-        RuleApp ruleApp = node.parent().getAppliedRuleApp();
+        final Node parent = node.parent();
+        if (parent == null) {
+            return null;
+        }
+        RuleApp ruleApp = parent.getAppliedRuleApp();
         if (ruleApp instanceof JmlAssertBuiltInRuleApp) {
-            JTerm target = (JTerm) ruleApp.posInOccurrence().subTerm();
+            PosInOccurrence pos = ruleApp.posInOccurrence();
+            if (pos == null) {
+                return null;
+            }
+            JTerm target = (JTerm) pos.subTerm();
             if (target.op() instanceof UpdateApplication) {
                 target = UpdateApplication.getTarget(target);
             }
@@ -174,6 +184,12 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         return null;
     }
 
+    /**
+     * The applied rule at the goal is a script-created update application whose position is
+     * always present; the dereferences of the (nullable) parent node, rule application and
+     * position are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private static @Nullable OpReplacer getUpdateReplacer(Goal goal) {
         RuleApp ruleApp = goal.node().parent().getAppliedRuleApp();
         Term appliedOn = ruleApp.posInOccurrence().subTerm();
@@ -204,6 +220,12 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         }
     }
 
+    /**
+     * The applied rule at the goal is a script-created update application whose position is
+     * always present; the dereferences of the (nullable) parent node, rule application and
+     * position are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private static JavaBlock getJavaBlock(Goal goal) {
         RuleApp ruleApp = goal.node().parent().getAppliedRuleApp();
         JTerm appliedOn = (JTerm) ruleApp.posInOccurrence().subTerm();
@@ -214,9 +236,16 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
         return appliedOn.javaBlock();
     }
 
+    /**
+     * The script-macro infrastructure guarantees that a prover task listener is attached while
+     * the macro is executed; the dereferences of the (nullable) listener are suppressed with a
+     * scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception {
         ArrayList<Goal> laterGoals = new ArrayList<>(goals.size());
         for (Goal goal : goals) {
@@ -233,11 +262,20 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             listener.taskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Other,
                 "Running attached script from goal " + goal.node().serialNr(), 0));
 
-            KeyAst.JMLProofScript proofScript = jmlAssert.getAssertionProof();
+            // getJmlAssert only returns a non-null assertion after checking that the assertion
+            // proof exists (see getJmlAssert), so the proof script is always present here.
+            KeyAst.JMLProofScript proofScript =
+                Objects.requireNonNull(jmlAssert.getAssertionProof());
             Map<ParserRuleContext, JTerm> termMap =
                 getTermMap(jmlAssert, getJavaBlock(goal), proof.getServices());
             // We heavily rely on that variables have been computed before, otherwise this will
             // raise an NPE.
+            // The obtain map deliberately stores null for obtain variables until an __obtain
+            // command binds them (see makeObtainVarMap), and no JmlIO is available while a macro
+            // runs, so collectVariablesInProof(null) is the intended invocation; null JFunction
+            // values are unbound-obtain sentinels that OpReplacer leaves untouched.
+            @SuppressWarnings({ "nullness:assignment.type.incompatible",
+                "nullness:argument.type.incompatible" })
             Map<LocationVariable, JFunction> obtainMap =
                 makeObtainVarMap(jmlAssert.collectVariablesInProof(null));
             OpReplacer updateReplacer = getUpdateReplacer(goal);
@@ -307,14 +345,16 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
     private JTerm correctSelfVar(int index, JavaBlock javaBlock,
             SpecificationRepository.JmlStatementSpec spec, Services services) {
         final MethodFrame frame = JavaTools.getInnermostMethodFrame(javaBlock, services);
-        final JTerm self = MiscTools.getSelfTerm(frame, services);
+        // The java block of a method-body goal always has an innermost method frame; getSelfTerm
+        // dereferences the frame, so a null frame would have raised an NPE here regardless.
+        final JTerm self = MiscTools.getSelfTerm(Objects.requireNonNull(frame), services);
         return spec.getTerm(services, self, index);
 
     }
 
     private Map<LocationVariable, @Nullable JFunction> makeObtainVarMap(
             ImmutableList<LocationVariable> locationVariables) {
-        HashMap<LocationVariable, JFunction> result = new LinkedHashMap<>();
+        HashMap<LocationVariable, @Nullable JFunction> result = new LinkedHashMap<>();
         for (LocationVariable lv : locationVariables) {
             result.put(lv, null);
         }
@@ -409,7 +449,9 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                     value = update.replace((JTerm) value);
                 }
             }
-            named.put(argName, value);
+            // ScriptCommandAst rejects null argument values (see its javadoc); a missing map
+            // entry is the only source of null here and would break script execution anyway.
+            named.put(argName, Objects.requireNonNull(value));
         }
 
         return new ScriptCommandAst("__obtain", named, List.of(), Location.fromToken(ctx.start));
@@ -431,6 +473,9 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
                     value = update.replace((JTerm) value);
                 }
             }
+            // ScriptCommandAst rejects null argument values (see its javadoc); a missing map
+            // entry is the only source of null here and would break script execution anyway.
+            value = Objects.requireNonNull(value);
             if (value instanceof JTerm term) {
                 value = new ObtainAwareTerm(term);
             }

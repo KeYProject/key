@@ -54,6 +54,14 @@ public class MethodFrame extends JavaStatement
      * @param body
      *        a Statement containing the method body of the called method
      */
+    /**
+     * The child-count arithmetic and {@link ProgramPrefixUtil#computeEssentials} operate on
+     * {@code this} while the receiver is still under initialization (EISOP initialization
+     * check); safe here because {@link #body} was assigned just above and the prefix analysis
+     * only walks the freshly-built children, suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public MethodFrame(@Nullable IProgramVariable resultVar, IExecutionContext execContext,
             StatementBlock body) {
         this.resultVar = resultVar;
@@ -102,6 +110,14 @@ public class MethodFrame extends JavaStatement
      * @param pi the PositionInfo where the frame was parsed
      * @param c list of comments associated with the method frame
      */
+    /**
+     * The child-count arithmetic and {@link ProgramPrefixUtil#computeEssentials} operate on
+     * {@code this} while the receiver is still under initialization (EISOP initialization
+     * check); safe here because {@link #body} was assigned just above and the prefix analysis
+     * only walks the freshly-built children, suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public MethodFrame(@Nullable IProgramVariable resultVar, IExecutionContext execContext,
             StatementBlock body, PositionInfo pi, List<Comment> c) {
         super(pi, c);

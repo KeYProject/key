@@ -23,6 +23,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -95,7 +96,7 @@ class TermImpl implements JTerm {
      */
     private int hashcode = -1;
 
-    private Sort sort;
+    private @MonotonicNonNull Sort sort;
 
     /**
      * Cached renaming-invariant hashCode ({@link RenamingTermProperty#hashCodeModThisProperty}),
@@ -425,7 +426,7 @@ class TermImpl implements JTerm {
      * true iff <code>o</code> is syntactically equal to this term
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }

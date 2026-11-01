@@ -35,8 +35,7 @@ public class JavaBuildingIssue {
         return Position.fromOneZeroBased(getLine(), getColumn());
     }
 
-    @Nullable
-    public URI getPath() {
+    public @Nullable URI getPath() {
         return node.findCompilationUnit()
                 .flatMap(it -> it.getStorage()).map(it -> it.getPath().toUri()).orElse(null);
     }

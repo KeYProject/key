@@ -86,6 +86,11 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @param tb the TermBuilder to be used
      * @return an anonymizing update for the specified variables.
      */
+    /**
+     * The accumulator is {@code @Nullable} during the build; the invariants of the method guarantee
+     * a non-null result, so the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     protected static JTerm createLocalAnonUpdate(
             final ImmutableSet<LocationVariable> localOutVariables,
             final Services services, final TermBuilder tb) {
@@ -204,7 +209,13 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @param services services.
      * @param tb a term builder.
      * @return the validity formula for the contract.
+     *         <p>
+     *         A {@code null} goal is passed deliberately: a fresh proof obligation has no existing
+     *         goal to add the validity term to, which {@link GoalsConfigurator#setUpValidityGoal}
+     *         explicitly permits (it only uses the goal when it is not {@code null}); the
+     *         difference is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     protected JTerm setUpValidityTerm(final List<LocationVariable> heaps,
             Map<LocationVariable, Function> anonHeaps,
             Map<LocationVariable, Function> anonOutHeaps,
@@ -271,7 +282,24 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>
+     * The {@link #tb} term builder and the {@link #proofConfig} field are assigned by
+     * {@code postInit()} before they are used in this method (see the field declarations in
+     * {@link AbstractPO}); the dereferences are suppressed with a scoped key. The argument
+     * mismatches mirror the sibling operation POs: {@code tb} and {@code proofConfig} are provably
+     * non-null after {@code postInit()} returned, {@code selfVar} and {@code selfTerm} are
+     * legitimately {@code null} for static blocks (see {@code TermBuilder.selfVar} and the
+     * {@code createAndRegister} handling of a {@code null} self), and an exception variable
+     * created by {@code createAndRegister} always carries a declared type; the differences are
+     * suppressed with a scoped key too.
+     */
     @Override
+    @SuppressWarnings({
+        "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     public void readProblem() {
         assert proofConfig == null;
         final boolean makeNamesUnique = true;
@@ -395,7 +423,14 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * @param services services.
      * @param tb a term builder.
      * @return a goal configurator.
+     *         <p>
+     *         The configurator is built for a fresh proof obligation, not for a specific rule
+     *         application: the {@code application}, {@code occurrence} and {@code rule} arguments
+     *         are therefore deliberately {@code null}, as the validity term is built with a
+     *         {@code null} goal that never consults them; the differences are suppressed with a
+     *         scoped key.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private GoalsConfigurator setUpGoalConfigurator(final StatementBlock block,
             final ProgramVariable selfVar, final JTerm selfTerm,
             final BlockContract.Variables variables, final Services services,

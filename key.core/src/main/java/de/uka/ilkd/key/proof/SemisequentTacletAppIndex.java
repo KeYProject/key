@@ -94,7 +94,11 @@ public class SemisequentTacletAppIndex {
      * Update the index for the given formula, which is supposed to be an element of the map
      * <code>termIndices</code>, by adding the taclets that are selected by <code>filter</code>
      * Note: destructive, use only when constructing new index
+     * <p>
+     * The formula is asserted to have a term index in the map below (the method is a destructive
+     * update); the dereference of the (nullable) term index is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private void addTaclets(RuleFilter filter, SequentFormula cfma,
             Services services,
             TacletIndex tacletIndex, NewRuleListener listener) {
@@ -187,7 +191,7 @@ public class SemisequentTacletAppIndex {
             Services services, TacletIndex tacletIndex, NewRuleListener listener) {
 
         // remove original indices
-        final List<TermTacletAppIndex> oldIndices = removeFormulas(infos);
+        final List<@Nullable TermTacletAppIndex> oldIndices = removeFormulas(infos);
 
         updateTermIndices(oldIndices, infos, services, tacletIndex, listener);
     }
@@ -199,6 +203,12 @@ public class SemisequentTacletAppIndex {
      * @param antec iff true create an index for the antecedent of <code>s</code>, otherwise for the
      *        succedent
      */
+    /**
+     * The term-index construction operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because it only reads the
+     * {@link #seq} field assigned just above plus the parameters, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     SemisequentTacletAppIndex(Sequent s, boolean antec, Services services, TacletIndex tacletIndex,
             NewRuleListener listener, RuleFilter ruleFilter,
             TermTacletAppIndexCacheSet indexCaches) {
@@ -226,6 +236,12 @@ public class SemisequentTacletAppIndex {
     /**
      * Get term index for the formula to which position <code>pos</code> points
      */
+    /**
+     * The map lookup returns {@code null} only when the formula has no term index yet (a transient
+     * state during index rebuilds); callers invoke this only after populating the map, so the
+     * difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     private TermTacletAppIndex getTermIndex(PosInOccurrence pos) {
         return termIndices.get(pos.sequentFormula());
     }

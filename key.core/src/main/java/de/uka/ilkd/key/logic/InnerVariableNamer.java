@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -74,7 +76,8 @@ public class InnerVariableNamer extends VariableNamer {
 
         LocationVariable newvar = var;
         if (!newname.equals(name)) {
-            newvar = new LocationVariable(newname, var.getKeYJavaType());
+            newvar = new LocationVariable(newname,
+                Objects.requireNonNull(var.getKeYJavaType(), "type of " + var));
             map.put(var, newvar);
             renamingHistory = map;
         }

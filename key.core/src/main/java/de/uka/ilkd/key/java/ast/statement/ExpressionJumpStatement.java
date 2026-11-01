@@ -49,13 +49,14 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
      * Expression jump statement.
      *
      * @param expr
-     *        an Expression used to jump
+     *        an Expression used to jump, or {@code null} for a bare jump (e.g. {@code return;})
      */
-    protected ExpressionJumpStatement(Expression expr) {
+    protected ExpressionJumpStatement(@Nullable Expression expr) {
         expression = expr;
     }
 
-    public ExpressionJumpStatement(Expression expression, PositionInfo pi, List<Comment> comments) {
+    public ExpressionJumpStatement(@Nullable Expression expression, PositionInfo pi,
+            List<Comment> comments) {
         super(pi, comments);
         this.expression = expression;
     }

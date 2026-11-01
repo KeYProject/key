@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class SVInstantiationParserException extends SVInstantiationExceptionWithPosition {
@@ -66,8 +67,15 @@ public class SVInstantiationParserException extends SVInstantiationExceptionWith
         return getMessage();
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; and the base declaration's {@code @PolyInitialized}
+     * receiver does not match this override's implicit {@code @Initialized} receiver. Both
+     * differences are suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:override.receiver.invalid" })
     @Override
-    public SVInstantiationParserException initCause(Throwable cause) {
+    public SVInstantiationParserException initCause(@Nullable Throwable cause) {
         super.initCause(cause);
         return this;
     }

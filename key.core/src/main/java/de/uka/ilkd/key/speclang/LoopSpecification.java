@@ -205,8 +205,8 @@ public interface LoopSpecification extends SpecificationElement {
     LoopSpecification create(LoopStatement loop, IProgramMethod pm, KeYJavaType kjt,
             Map<LocationVariable, JTerm> invariants, Map<LocationVariable, JTerm> freeInvariants,
             Map<LocationVariable, JTerm> modifiable, Map<LocationVariable, JTerm> freeModifiable,
-            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, JTerm variant,
-            JTerm selfTerm, ImmutableList<JTerm> localIns, ImmutableList<JTerm> localOuts,
+            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, @Nullable JTerm variant,
+            @Nullable JTerm selfTerm, ImmutableList<JTerm> localIns, ImmutableList<JTerm> localOuts,
             Map<LocationVariable, JTerm> atPres);
 
     /**
@@ -229,8 +229,8 @@ public interface LoopSpecification extends SpecificationElement {
     LoopSpecification create(LoopStatement loop,
             Map<LocationVariable, JTerm> invariants, Map<LocationVariable, JTerm> freeInvariants,
             Map<LocationVariable, JTerm> modifiable, Map<LocationVariable, JTerm> freeModifiable,
-            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, JTerm variant,
-            JTerm selfTerm, ImmutableList<JTerm> localIns, ImmutableList<JTerm> localOuts,
+            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, @Nullable JTerm variant,
+            @Nullable JTerm selfTerm, ImmutableList<JTerm> localIns, ImmutableList<JTerm> localOuts,
             Map<LocationVariable, JTerm> atPres);
 
     /**

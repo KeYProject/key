@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -33,17 +34,17 @@ public class FieldReference extends VariableReference
     public FieldReference(PositionInfo pi, List<Comment> c, ProgramVariable variable,
             @Nullable ReferencePrefix prefix) {
         super(pi, c, variable);
-        this.prefix = constructPrefix(prefix, getProgramVariable());
+        this.prefix = constructPrefix(prefix, variable);
     }
 
     public FieldReference(ProgramVariable pv, @Nullable ReferencePrefix prefix,
             @Nullable PositionInfo pi) {
         super(pv, pi);
-        this.prefix = constructPrefix(prefix, getProgramVariable());
+        this.prefix = constructPrefix(prefix, pv);
     }
 
-    private @Nullable ReferencePrefix constructPrefix(@Nullable ReferencePrefix prefix,
-            ProgramVariable pv) {
+    private @Nullable ReferencePrefix constructPrefix(@UnderInitialization FieldReference this,
+            @Nullable ReferencePrefix prefix, ProgramVariable pv) {
         if (prefix == null && !pv.isStatic() && pv.isMember()) {
             return new ThisReference();
         } else {

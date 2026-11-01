@@ -11,6 +11,7 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -43,7 +44,7 @@ public final class TextualJMLMergePointDecl extends TextualJMLConstruct {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

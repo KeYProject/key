@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.ast.PositionInfo;
@@ -29,6 +30,7 @@ import org.key_project.util.parsing.LocatableException;
 import org.key_project.util.parsing.Location;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Validates a constructor to ensure that the executed code does not read final fields before they
@@ -174,9 +176,13 @@ class FinalFieldCodeValidator {
         }
     }
 
-    /*
+    /**
      * Constructor calls must not leak 'this' to the called constructor.
+     * <p>
+     * The type reference of a {@code new} expression always carries a KeY Java type; the
+     * dereference of the (nullable) KeY Java type is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private void validateNew(New _new) {
 
         TypeReference typeRef = _new.getTypeReference();
@@ -202,10 +208,14 @@ class FinalFieldCodeValidator {
         validateChildren(_new);
     }
 
-    /*
-     * Method calls must not leak 'this' to the called method (other than as receiver)
-     * Method calls on 'this' must be effectively final and are recursively validated.
+    /**
+     * Method calls must not leak 'this' to the called method (other than as receiver). Method
+     * calls on 'this' must be effectively final and are recursively validated.
+     * <p>
+     * The enclosing class of an effectively-final 'this' receiver always carries a Java type; the
+     * dereference of the (nullable) Java type is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private void validateMethodReference(MethodReference methodReference) {
         ReferencePrefix referencePrefix = methodReference.getReferencePrefix();
         var calledOnThis = referencePrefix == null || referencePrefix instanceof ThisReference;
@@ -244,8 +254,12 @@ class FinalFieldCodeValidator {
     private IProgramMethod findMethod(MethodReference methodReference) {
         ExecutionContext ec = new ExecutionContext(new TypeRef(enclosingClass), methodStack.peek(),
             methodReference.getReferencePrefix());
-        return methodReference.method(initConfig.getServices(),
+        IProgramMethod method = methodReference.method(initConfig.getServices(),
             methodReference.determineStaticPrefixType(initConfig.getServices(), ec), ec);
+        if (method == null) {
+            throw new IllegalStateException("Cannot resolve method reference " + methodReference);
+        }
+        return method;
     }
 
     /*
@@ -264,7 +278,10 @@ class FinalFieldCodeValidator {
         }
         if (assignee instanceof FieldReference fr) {
             // it is ok to assign to this.finalfield!
-            validateProgramElement(fr.getReferencePrefix());
+            // The prefix of an assigned field is always present: an implicit 'this' prefix is
+            // materialized by the parser, and an unqualified static-field write cannot occur in
+            // constructor code (the recursive walk required a non-null element here before).
+            validateProgramElement(Objects.requireNonNull(fr.getReferencePrefix()));
         } else {
             validateProgramElement(assignee);
         }
@@ -285,14 +302,26 @@ class FinalFieldCodeValidator {
     static class FinalViolationException extends LocatableException {
 
         public FinalViolationException(String message) {
+            // violations without a concrete code location (e.g. a missing method body)
+            // legitimately carry no syntax element
             this(message, null);
         }
 
-        public FinalViolationException(String message, SyntaxElement syntaxElement) {
+        /**
+         * @param syntaxElement the program element at fault, or {@code null} if the violation has
+         *        no concrete code location; the resulting location is undefined in that case
+         */
+        public FinalViolationException(String message, @Nullable SyntaxElement syntaxElement) {
             super(message, computeLocation(syntaxElement));
         }
 
-        private static Location computeLocation(SyntaxElement syntaxElement) {
+        /**
+         * A missing source URI (an empty {@link PositionInfo#getURI()}) is a genuine "unknown
+         * source" state for synthetic program elements without file attribution; {@link Location}
+         * documents and supports a null fileUri (see also {@link Location#UNDEFINED}).
+         */
+        @SuppressWarnings("nullness:argument.type.incompatible")
+        private static Location computeLocation(@Nullable SyntaxElement syntaxElement) {
             if (syntaxElement instanceof SourceElement sourceElement) {
                 PositionInfo posInfo = sourceElement.getPositionInfo();
                 var uri = posInfo.getURI().orElse(null);

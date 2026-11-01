@@ -309,13 +309,15 @@ public abstract class TacletBuilder<T extends Taclet> {
     public abstract TacletBuilder<T> copy();
 
     public @Nullable T getTacletWithoutInactiveGoalTemplates(Set<Choice> active) {
-        if (goal2Choices == null || goals.isEmpty()) {
+        var choices = goal2Choices;
+        if (choices == null || goals.isEmpty()) {
             return getTaclet();
         } else {
             var oldGoals = goals;
             T result;
             for (var goal : oldGoals) {
-                if (goal2Choices.get(goal) != null && !goal2Choices.get(goal).eval(active)) {
+                var choice = choices.get(goal);
+                if (choice != null && !choice.eval(active)) {
                     goals = goals.removeAll(goal);
                 }
             }

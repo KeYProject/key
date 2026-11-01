@@ -82,7 +82,7 @@ public class KeYJavaPipeline {
                 step.apply(compilationUnit);
                 long stop = System.currentTimeMillis();
                 LOGGER.debug("Processed {} on {} ms: {}",
-                    step.getClass().getSimpleName(), resource, stop - start);
+                    step.getClass().getSimpleName(), String.valueOf(resource), stop - start);
             }
         }
     }

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.visitor;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
@@ -28,8 +30,7 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public class ProgramReplaceVisitor extends CreatingASTVisitor {
 
-    @Nullable
-    private ProgramElement result = null;
+    private @Nullable ProgramElement result = null;
 
     private final SVInstantiations svinsts;
 
@@ -101,16 +102,20 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
         final ExtList changeList = stack.peek();
 
         ProgramElement body = null;
-        for (Object element : changeList) {
-            if (element instanceof SourceElement) {
-                body = (ProgramElement) element;
+        if (changeList != null) {
+            for (Object element : changeList) {
+                if (element instanceof SourceElement) {
+                    body = (ProgramElement) element;
+                }
             }
         }
 
         assert body != null : "A program transformer without program to transform?";
 
-        final ProgramElement[] transformResult = //
-            x.transform(body, services, svinsts);
+        // The assertion documents that transformers always come with a program element;
+        // requireNonNull preserves the failure mode (an NPE) if the invariant were violated.
+        final ProgramElement[] transformResult = x.transform(Objects.requireNonNull(body), services,
+            svinsts);
         if (transformResult == null) {
             /*
              * NOTE (DS, 2018-10-19): This is awkward... But there are transformers returning null

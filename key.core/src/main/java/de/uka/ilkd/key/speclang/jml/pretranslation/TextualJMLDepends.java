@@ -15,6 +15,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A JML depends / accessible clause for a model field in textual form. Note that such clauses for
@@ -53,7 +54,7 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof TextualJMLDepends a)) {
             return false;
         }

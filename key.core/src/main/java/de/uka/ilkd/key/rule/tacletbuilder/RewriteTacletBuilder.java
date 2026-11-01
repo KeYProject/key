@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 
@@ -57,7 +59,8 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
             new TacletApplPart(assumesSeq, applicationRestriction, varsNew, varsNotFreeIn,
                 varsNewDependingOn,
                 variableConditions),
-            goals, ruleSets, attrs, (JTerm) find, prefixBuilder.getPrefixMap(),
+            goals, ruleSets, attrs, (JTerm) Objects.requireNonNull(find),
+            prefixBuilder.getPrefixMap(),
             choices, surviveSmbExec, tacletAnnotations);
         return (T) t;
     }
@@ -97,7 +100,14 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
         return getRewriteTaclet();
     }
 
+    /**
+     * {@code setTrigger} receives {@code attrs.trigger()}, which is {@code null} for builders
+     * without a trigger. {@link TacletAttributes} models this "no trigger" state as
+     * {@code @Nullable} and tolerates it downstream, but {@link TacletBuilder#setTrigger} is
+     * {@code @NonNull}-typed, so the assignment is suppressed.
+     */
     @Override
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public RewriteTacletBuilder<T> copy() {
         var rb = new RewriteTacletBuilder<T>().setFind((JTerm) getFind());
         rb.setSurviveSmbExec(surviveSmbExec);
@@ -118,7 +128,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
         for (var vc : varsNewDependingOn) {
             rb.addVarsNewDependingOn(vc.first(), vc.second());
         }
-        rb.setFind((JTerm) find);
+        rb.setFind((JTerm) Objects.requireNonNull(find));
         rb.setChoices(choices);
         if (goal2Choices != null)
             rb.goal2Choices =

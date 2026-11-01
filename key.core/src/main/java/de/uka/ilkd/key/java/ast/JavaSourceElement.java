@@ -160,10 +160,13 @@ public abstract class JavaSourceElement implements SourceElement {
     }
 
     /** get the class the statement originates from */
-    @SuppressWarnings("NullAway") // PositionInfo.getParentClassURI() is honestly @Nullable, but the
-                                  // @NonNull contract is relied upon by SpecificationRepository's
-                                  // BlockContractKey/LoopContractKey keys; an honest @Nullable
-                                  // widening would ripple into those 6 call sites (out of scope)
+    @SuppressWarnings("nullness:return.type.incompatible") // PositionInfo.getParentClassURI() is
+                                                           // honestly @Nullable, but the @NonNull
+                                                           // contract is relied upon by
+                                                           // SpecificationRepository's
+                                                           // BlockContractKey/LoopContractKey keys;
+                                                           // an honest @Nullable widening would
+                                                           // ripple into those call sites
     public URI getParentClass() {
         return posInfo.getParentClassURI();
     }

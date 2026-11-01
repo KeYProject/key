@@ -49,8 +49,7 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
     protected final While loop;
 
     protected @Nullable LoopSpecification spec;
-    @Nullable
-    protected final List<LocationVariable> heapContext;
+    protected final @Nullable List<LocationVariable> heapContext;
     private @Nullable ExecutionContext executionContext;
     private @Nullable JTerm guard;
 

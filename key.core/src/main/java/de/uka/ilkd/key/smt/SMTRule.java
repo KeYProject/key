@@ -16,6 +16,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -49,13 +50,13 @@ public class SMTRule implements ExternalSolverRule {
 
 
     @Override
-    public SMTRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public SMTRuleApp createApp(@Nullable PosInOccurrence pos, TermServices services) {
         return new SMTRuleApp(this, null, "");
     }
 
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, @Nullable PosInOccurrence pio) {
         return false;
     }
 
@@ -68,10 +69,14 @@ public class SMTRule implements ExternalSolverRule {
      * @param goal the Goal on which to apply <tt>ruleApp</tt>
      * @param ruleApp the rule application to be executed
      * @return a list with an identical goal as the given <tt>goal</tt>
+     *         <p>
+     *         The init config of the goal's proof is always present; the dereferences of the
+     *         (nullable)
+     *         init config are suppressed with a scoped key.
      */
     @Override
-    @NonNull
-    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+    @SuppressWarnings("nullness:dereference.of.nullable")
+    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
         if (goal.proof().getInitConfig().getJustifInfo().getJustification(INSTANCE) == null) {
             goal.proof().getInitConfig().registerRule(INSTANCE, () -> false);
         }

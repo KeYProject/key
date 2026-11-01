@@ -160,7 +160,7 @@ public class SMTTermNumber extends SMTTerm {
     }
 
     @Override
-    public boolean equals(Object term) {
+    public boolean equals(@Nullable Object term) {
 
         if (term == null) {
             return false;

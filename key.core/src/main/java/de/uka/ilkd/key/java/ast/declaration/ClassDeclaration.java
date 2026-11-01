@@ -126,7 +126,8 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
     public ClassDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
             ProgramElementName name, ProgramElementName fullName,
             ImmutableArray<MemberDeclaration> members, boolean parentIsInterface,
-            boolean isLibrary, Extends extending, Implements implementing, boolean innerClass,
+            boolean isLibrary, @Nullable Extends extending, @Nullable Implements implementing,
+            boolean innerClass,
             boolean localClassDeclaration, boolean isAnonymousClass,
             ImmutableList<TextualJMLConstruct> spec) {
         super(pi, c, modArray, name, fullName, members, parentIsInterface, isLibrary,

@@ -63,6 +63,13 @@ public class EnumClassDeclaration extends ClassOrInterfaceDeclaration {
         enumConstants = new NodeList<>();
     }
 
+    /**
+     * The member-copying setters and helper calls operate on {@code this} while the receiver is
+     * still under initialization (EISOP initialization check); safe here because they only
+     * stage the cloned {@link EnumDeclaration} contents into mutable {@link NodeList} fields of
+     * the javaparser super type, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public EnumClassDeclaration(EnumDeclaration ed) {
         this();
 

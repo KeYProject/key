@@ -569,10 +569,14 @@ public abstract class TacletApp implements RuleApp {
      * @param previousProposals the names already proposed in this context
      * @return the proposed name, or null if the proposer cannot propose one
      */
-    @SuppressWarnings("NullAway") // the undo anchor is intentionally null; the undoAnchor
-                                  // parameter is annotated @NonNull in VariableNameProposer and
-                                  // InstantiationProposer (widening to @Nullable is out of
-                                  // scope; cf. VariableNamer#getProposal which already widens it)
+    @SuppressWarnings("nullness:argument.type.incompatible") // the undo anchor is intentionally
+                                                             // null: no undo action is recorded
+                                                             // here, and VariableNameProposer
+                                                             // never dereferences the anchor
+                                                             // (widening the parameter to
+                                                             // @Nullable is out of scope; cf.
+                                                             // VariableNamer#getProposal which
+                                                             // already widens it)
     private static @Nullable String defaultNameProposal(TacletApp app, SchemaVariable sv,
             Services services, ImmutableList<String> previousProposals) {
         return VariableNameProposer.DEFAULT.getProposal(app, sv, services, null, previousProposals);
@@ -735,7 +739,14 @@ public abstract class TacletApp implements RuleApp {
         final GenericSortCondition c = GenericSortCondition.forceInstantiation(sv.sort(), false);
         if (c != null) {
             try {
-                app = app.setInstantiation(app.instantiations().add(c, services), services);
+                // setInstantiation can legitimately return null (e.g. a created PosTacletApp may
+                // reject the instantiations); propagate that as a failed instantiation
+                final @Nullable TacletApp newApp =
+                    app.setInstantiation(app.instantiations().add(c, services), services);
+                if (newApp == null) {
+                    return null;
+                }
+                app = newApp;
             } catch (GenericSortException e) {
                 return null;
             }
@@ -1110,7 +1121,7 @@ public abstract class TacletApp implements RuleApp {
      * with equal taclets, instantiations and positions.
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }

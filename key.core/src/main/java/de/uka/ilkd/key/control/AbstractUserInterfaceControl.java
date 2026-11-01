@@ -6,6 +6,7 @@ package de.uka.ilkd.key.control;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -52,8 +53,11 @@ public abstract class AbstractUserInterfaceControl
     private final List<ProverTaskListener> proverTaskListener = new CopyOnWriteArrayList<>();
 
     /**
-     * Constructor.
+     * The listener registration operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because the listener only ever
+     * reacts to later events, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     protected AbstractUserInterfaceControl() {
         addProverTaskListener(new ProofMacroListenerAdapter());
     }
@@ -143,10 +147,16 @@ public abstract class AbstractUserInterfaceControl
     @Override
     public Proof createProof(InitConfig initConfig, ProofOblInput input)
             throws ProofInputException {
-        ProblemInitializer init = createProblemInitializer(initConfig.getProfile());
+        ProblemInitializer init = createProblemInitializer(
+            Objects.requireNonNull(initConfig.getProfile(),
+                "Proof creation requires a profile in the init config"));
         ProofAggregate proofList = init.startProver(initConfig, input);
         createProofEnvironmentAndRegisterProof(input, proofList, initConfig);
-        return proofList.getFirstProof();
+        Proof proof = proofList.getFirstProof();
+        if (proof == null) {
+            throw new IllegalStateException("Proof obligation did not produce a proof");
+        }
+        return proof;
     }
 
     /**
@@ -209,8 +219,21 @@ public abstract class AbstractUserInterfaceControl
 
     /**
      * {@inheritDoc}
+     * <p>
+     * A partially-loaded problem's proof is disposed on failure only when it was actually created
+     * (checked on the same loader); the dereferences of the (nullable) loaded proof are suppressed
+     * with a scoped key.
+     * <p>
+     * The loader's constructors accept absent values for the optional class path, boot class path,
+     * global includes, profile of new proofs and proof-obligation properties (the problem loader
+     * treats each as optional, cf. {@link AbstractProblemLoader#setClassPath} and the null-guard on
+     * its {@code poPropertiesToForce}); and the failing loader is itself {@code null} when its own
+     * construction threw. Passing these values to the loader and exception constructors is
+     * suppressed with a scoped key.
      */
     @Override
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:dereference.of.nullable" })
     public AbstractProblemLoader load(@Nullable Profile profile, Path file,
             @Nullable List<Path> classPath,
             @Nullable Path bootClassPath, @Nullable List<Path> includes,
@@ -260,15 +283,26 @@ public abstract class AbstractUserInterfaceControl
     @Override
     public void loadingStarted(AbstractProblemLoader loader) {}
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The proof list and its proof-obligation container are passed together by the loading
+     * pipeline whenever the list is non-null; the dereference of the (nullable) container is
+     * suppressed with a scoped key.
+     */
     @Override
-    public void loadingFinished(AbstractProblemLoader loader, LoadedPOContainer poContainer,
-            ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException {
+    @SuppressWarnings("nullness:dereference.of.nullable")
+    public void loadingFinished(AbstractProblemLoader loader,
+            @Nullable LoadedPOContainer poContainer,
+            @Nullable ProofAggregate proofList, @Nullable ReplayResult result)
+            throws ProblemLoaderException {
         if (proofList != null) {
             // avoid double registration at spec repos as that is done already earlier in
             // createProof
             // the UI method should just do the necessarily UI registrations
             createProofEnvironmentAndRegisterProof(poContainer.getProofOblInput(), proofList,
-                loader.getInitConfig());
+                Objects.requireNonNull(loader.getInitConfig(),
+                    "A loaded proof list implies an init config"));
         }
     }
 }

@@ -48,6 +48,12 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
 
     private @Nullable String altNameRepresentation;
 
+    /**
+     * The dimension computation operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since it only reads the
+     * {@link #children} provided by {@code super(...)}, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private ArrayDeclaration(ExtList children, TypeReference baseType, ProgramElementName name,
             KeYJavaType superType) {
         super(addLength(children, superType), name, name, false);
@@ -58,8 +64,10 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
     }
 
     private static ExtList addLength(ExtList children, KeYJavaType superType) {
-        children.add(((SuperArrayDeclaration) Objects.requireNonNull(
-            superType.getJavaType(), "no Java type for array super type")).length());
+        final SuperArrayDeclaration superArray = (SuperArrayDeclaration) Objects.requireNonNull(
+            superType.getJavaType(), "no Java type for array super type");
+        children.add(Objects.requireNonNull(superArray.length(),
+            "arrays always have a length field"));
         return children;
     }
 

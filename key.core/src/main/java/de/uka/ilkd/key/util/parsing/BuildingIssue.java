@@ -71,9 +71,8 @@ public record BuildingIssue(String message, @Nullable Throwable cause, boolean i
         return location(uri, position);
     }
 
-    @SuppressWarnings("NullAway") // missing file URI != missing position (see Location javadoc)
     private static Location location(@Nullable URI uri, Position position) {
-        return new Location(uri, position);
+        return uri != null ? new Location(uri, position) : Location.UNDEFINED;
     }
 
     public PositionedString asPositionedString() {

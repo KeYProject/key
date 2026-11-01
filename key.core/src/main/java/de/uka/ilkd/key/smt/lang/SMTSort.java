@@ -33,6 +33,15 @@ public class SMTSort {
     private @Nullable SMTFunction boundConst;
     private @Nullable SMTFunction allocatedAtoms;
 
+    /**
+     * Constructs a sort with the given name whose top-level sort is itself. Storing the
+     * still-under-construction receiver {@code this} into {@link #topLevel} while {@code this} is
+     * {@code @UnderInitialization} is safe: the field is only written here and never read before
+     * construction finishes, and the object is not published concurrently.
+     *
+     * @param name the sort's name
+     */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     public SMTSort(String name) {
         this.id = name;
         this.topLevel = this;
@@ -211,7 +220,7 @@ public class SMTSort {
 
     /** Returns true iff ((that is from type sort) and (this.id == that.id)) */
     @Override
-    public boolean equals(Object that) {
+    public boolean equals(@Nullable Object that) {
         if (this == that) {
             return true;
         }

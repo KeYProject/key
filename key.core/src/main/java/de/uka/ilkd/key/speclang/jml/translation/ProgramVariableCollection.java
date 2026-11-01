@@ -72,9 +72,9 @@ public class ProgramVariableCollection {
      * @param atPreVars a map from every variable {@code var} to {@code \old(var)}.
      * @param atPres a map from every variable {@code var} to {@code \old(var)}.
      */
-    public ProgramVariableCollection(LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+    public ProgramVariableCollection(@Nullable LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, @Nullable LocationVariable resultVar,
+            @Nullable LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             Map<LocationVariable, JTerm> atPres) {
         this(selfVar, paramVars, resultVar, excVar, atPreVars, atPres, null, null);
     }
@@ -94,9 +94,9 @@ public class ProgramVariableCollection {
      * @param atBefores a map from every variable {@code var} to {@code \before(var)} (if
      *        applicable).
      */
-    public ProgramVariableCollection(LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+    public ProgramVariableCollection(@Nullable LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, @Nullable LocationVariable resultVar,
+            @Nullable LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             Map<LocationVariable, JTerm> atPres,
             @Nullable Map<LocationVariable, LocationVariable> atBeforeVars,
             @Nullable Map<LocationVariable, JTerm> atBefores) {

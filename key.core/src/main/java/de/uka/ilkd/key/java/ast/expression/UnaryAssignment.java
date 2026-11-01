@@ -144,7 +144,7 @@ public final class UnaryAssignment extends Operator
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof UnaryAssignment that))
             return false;
         if (!super.equals(o))

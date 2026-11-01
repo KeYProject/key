@@ -7,6 +7,7 @@ package de.uka.ilkd.key.proof.io;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.zip.GZIPOutputStream;
 
 import de.uka.ilkd.key.proof.Proof;
@@ -41,7 +42,9 @@ public class GZipProofSaver extends ProofSaver {
     @Override
     protected void save(Path file) throws IOException {
         try (var out = new GZIPOutputStream(Files.newOutputStream(file))) {
-            save(file.getParent(), out);
+            Path basePath = Objects.requireNonNull(file.getParent(),
+                "The base path of the proof file must not be null");
+            save(basePath, out);
         }
     }
 }

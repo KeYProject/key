@@ -7,6 +7,7 @@ package de.uka.ilkd.key.proof.join;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.TreeSet;
 
 import de.uka.ilkd.key.java.Services;
@@ -99,12 +100,15 @@ public class JoinProcessor implements Runnable {
 
         JTerm cutFormula = createCutFormula();
 
-        DelayedCutProcessor cutProcessor = new DelayedCutProcessor(proof, partner.getCommonParent(),
-            cutFormula, DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT);
+        // The join dialog offers a pair only after its common parent has been determined.
+        DelayedCutProcessor cutProcessor = new DelayedCutProcessor(proof,
+            Objects.requireNonNull(partner.getCommonParent()), cutFormula,
+            DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT);
 
         DelayedCut cut = cutProcessor.cut();
 
-        Goal result = hide(cut.getRemainingGoal());
+        // The delayed-cut process always supplies a remaining goal for the hiding step.
+        Goal result = hide(Objects.requireNonNull(cut.getRemainingGoal()));
 
         result = simplifyUpdate(result, cut);
 
@@ -112,9 +116,12 @@ public class JoinProcessor implements Runnable {
 
         ImmutableList<Goal> list = ImmutableList.nil();
 
-        for (NodeGoalPair pair : cut.getGoalsAfterUncovering()) {
-            if (pair.node == partner.getNode(0) || pair.node == partner.getNode(1)) {
-                list = list.append(pair.goal);
+        ImmutableList<NodeGoalPair> uncovered = cut.getGoalsAfterUncovering();
+        if (uncovered != null) {
+            for (NodeGoalPair pair : uncovered) {
+                if (pair.node == partner.getNode(0) || pair.node == partner.getNode(1)) {
+                    list = list.append(pair.goal);
+                }
             }
         }
 
@@ -142,13 +149,21 @@ public class JoinProcessor implements Runnable {
         return null;
     }
 
+    /**
+     * Applies the simplify-update rule at the top of the cut formula.
+     * <p>
+     * The rule application of a complete merge cut always yields a goal list; the dereference of
+     * the (nullable) applied-goal list is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private Goal simplifyUpdate(Goal goal, DelayedCut cut) {
 
         SequentFormula sf =
             findFormula(goal.sequent(), cut.getFormula(), false);
 
-        PosInOccurrence pio =
-            new PosInOccurrence(sf, PosInTerm.getTopLevel().down(0), false);
+        // The cut formula is part of the sequent the simplify-update rule is applied to.
+        PosInOccurrence pio = new PosInOccurrence(Objects.requireNonNull(sf),
+            PosInTerm.getTopLevel().down(0), false);
         Goal result = apply(SIMPLIFY_UPDATE, goal, pio).head();
 
         return result == null ? goal : result;
@@ -182,15 +197,24 @@ public class JoinProcessor implements Runnable {
         }
         NoPosTacletApp app = apps.head();
 
-        PosTacletApp app2 = app.setPosInOccurrence(pio, services);
+        // A find-taclet application can always be positioned at its matched occurrence.
+        PosTacletApp app2 = Objects.requireNonNull(app.setPosInOccurrence(pio, services));
         return goal.apply(app2);
     }
 
+    /**
+     * Hides the partner's formula for hiding from the goal.
+     * <p>
+     * The hide rule application of a complete join partner always yields a goal list; the
+     * dereference of the (nullable) applied-goal list is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private Goal hide(Goal goal) {
-        if (partner.getFormulaForHiding() == null) {
+        SequentFormula formulaForHiding = partner.getFormulaForHiding();
+        if (formulaForHiding == null) {
             return goal;
         }
-        int index = goal.sequent().formulaNumberInSequent(false, partner.getFormulaForHiding());
+        int index = goal.sequent().formulaNumberInSequent(false, formulaForHiding);
         PosInOccurrence pio =
             PosInOccurrence.findInSequent(goal.sequent(), index,
                 PosInTerm.getTopLevel());
@@ -210,7 +234,10 @@ public class JoinProcessor implements Runnable {
         JTerm elseTerm =
             services.getTermBuilder().apply(partner.getUpdate(1), partner.getCommonFormula(), null);
 
-        return services.getTermBuilder().ife(partner.getCommonPredicate(), thenTerm, elseTerm);
+        // The join is executed only after a decision predicate has been established.
+        JTerm predicate = Objects.requireNonNull(partner.getCommonPredicate());
+
+        return services.getTermBuilder().ife(predicate, thenTerm, elseTerm);
 
     }
 
@@ -229,15 +256,16 @@ public class JoinProcessor implements Runnable {
         Collection<JTerm> gamma2 =
             computeDifference(partner.getSequent(1).antecedent(), commonGamma, null);
 
-        Collection<JTerm> constrainedGamma1 =
-            createConstrainedTerms(gamma1, partner.getCommonPredicate(), true);
-        Collection<JTerm> constrainedGamma2 = createConstrainedTerms(gamma2,
-            services.getTermBuilder().not(partner.getCommonPredicate()), true);
+        // The join is executed only after a decision predicate has been established.
+        JTerm predicate = Objects.requireNonNull(partner.getCommonPredicate());
 
-        Collection<JTerm> constrainedDelta1 =
-            createConstrainedTerms(delta1, partner.getCommonPredicate(), false);
+        Collection<JTerm> constrainedGamma1 = createConstrainedTerms(gamma1, predicate, true);
+        Collection<JTerm> constrainedGamma2 = createConstrainedTerms(gamma2,
+            services.getTermBuilder().not(predicate), true);
+
+        Collection<JTerm> constrainedDelta1 = createConstrainedTerms(delta1, predicate, false);
         Collection<JTerm> constrainedDelta2 = createConstrainedTerms(delta2,
-            services.getTermBuilder().not(partner.getCommonPredicate()), false);
+            services.getTermBuilder().not(predicate), false);
 
         JTerm phi = services.getTermBuilder().ff();
         phi = createDisjunction(phi, commonGamma, true);
@@ -287,7 +315,7 @@ public class JoinProcessor implements Runnable {
     }
 
     private Collection<JTerm> computeDifference(Semisequent s, Collection<JTerm> excludeSet,
-            JTerm exclude) {
+            @Nullable JTerm exclude) {
         LinkedList<JTerm> result = new LinkedList<>();
         for (SequentFormula sf : s) {
             if (sf.formula() != exclude && !excludeSet.contains(sf.formula())) {

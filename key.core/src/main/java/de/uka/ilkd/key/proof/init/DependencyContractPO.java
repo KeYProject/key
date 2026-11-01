@@ -54,6 +54,12 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
     // internal methods
     // -------------------------------------------------------------------------
 
+    /**
+     * The {@link #tb} term builder and the heap LDT of the proof services are assigned by
+     * {@link #postInit()} before this helper is invoked (see the field declaration); the
+     * dereferences are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private JTerm buildFreePre(List<LocationVariable> heaps, @Nullable LocationVariable selfVar,
             KeYJavaType selfKJT, ImmutableList<LocationVariable> paramVars, JTerm wellFormedHeaps,
             Services services) throws ProofInputException {
@@ -78,8 +84,9 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
         }
 
         // "MyClass::exactInstance(self) = TRUE"
-        final JTerm selfExactType =
-            selfVar == null ? tb.tt() : tb.exactInstance(selfKJT.getSort(), tb.var(selfVar));
+        // the sort of the receiver type is always set for a non-static target
+        final JTerm selfExactType = selfVar == null ? tb.tt()
+                : tb.exactInstance(Objects.requireNonNull(selfKJT.getSort()), tb.var(selfVar));
 
 
         // conjunction of...
@@ -100,14 +107,15 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
              */
             final JTerm mby = contract.getMby(selfVar, paramVars, services);
             // mbyAtPreDef = TB.equals(mbyAtPre, mby);
-            mbyAtPreDef = tb.measuredBy(mby);
+            // the hasMby() guard above guarantees a measured-by term
+            mbyAtPreDef = tb.measuredBy(Objects.requireNonNull(mby, "measured-by clause"));
         } else {
             // mbyAtPreDef = TB.tt();
             mbyAtPreDef = tb.measuredByEmpty();
         }
 
-        return tb.and(wellFormedHeaps, selfNotNull, selfCreated, selfExactType, paramsOK,
-            mbyAtPreDef);
+        return tb.and(wellFormedHeaps, selfNotNull, Objects.requireNonNull(selfCreated),
+            selfExactType, paramsOK, mbyAtPreDef);
     }
 
 
@@ -116,7 +124,19 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
     // public interface
     // -------------------------------------------------------------------------
 
+    /**
+     * The {@link #tb} term builder and the heap LDT of the proof services are set up by
+     * {@link #postInit()} at the very beginning of this method (see the field declaration in
+     * {@link AbstractPO}); the dereferences are suppressed with a scoped key. The mapping of a
+     * modifiable heap to its {@code AtPre} variable deliberately stores {@code null} entries for
+     * single-state targets (no {@code AtPre} variable exists then), and the contract translation
+     * below ignores those entries; that intentionally nullable map value is suppressed with a
+     * scoped key too.
+     */
     @Override
+    @SuppressWarnings({
+        "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     public void readProblem() throws ProofInputException {
         assert proofConfig == null;
         IObserverFunction target = contract.getTarget();
@@ -207,8 +227,12 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
             }
             // prepare update
             final boolean atPre = preHeapVars.containsValue(h);
-            final JTerm dep = getContract().getDep(atPre ? preHeapVarsReverse.get(h) : h, atPre,
-                selfVar, paramVars, preHeapVars, proofServices);
+            // a value found above is always a key of the reverse map, so the lookup cannot
+            // miss; every modifiable heap of the target carries a dependency clause
+            final LocationVariable depHeap =
+                atPre ? Objects.requireNonNull(preHeapVarsReverse.get(h)) : h;
+            final JTerm dep = Objects.requireNonNull(getContract().getDep(depHeap, atPre,
+                selfVar, paramVars, preHeapVars, proofServices));
             final JTerm changedHeap = tb.anon(tb.var(h), tb.setMinus(tb.allLocs(), dep), anonHeap);
             final JTerm u = tb.elementary(h, changedHeap);
             if (update == null) {
@@ -220,10 +244,12 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
         // translate contract
         final JTerm pre = tb.and(
-            buildFreePre(heaps, selfVar, contract.getKJT(), paramVars, wellFormedHeaps,
-                proofServices),
+            // a dependency contract always ranges over at least one modifiable heap
+            buildFreePre(heaps, selfVar, contract.getKJT(), paramVars,
+                Objects.requireNonNull(wellFormedHeaps, "no modifiable heaps"), proofServices),
             permsFor,
-            contract.getPre(heapLDT.getHeap(), selfVar, paramVars, preHeapVars, proofServices));
+            Objects.requireNonNull(contract.getPre(heapLDT.getHeap(), selfVar, paramVars,
+                preHeapVars, proofServices), "precondition of the dependency contract"));
 
         assert heaps.size() == heapCount * contract.getTarget().getStateCount();
         // prepare target term
@@ -234,7 +260,8 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
             subs[offset++] = tb.var(heap);
         }
         if (!target.isStatic()) {
-            subs[offset++] = tb.var(selfVar);
+            // selfVar is only null for static targets, which the guard above excludes
+            subs[offset++] = tb.var(Objects.requireNonNull(selfVar));
         }
         for (ProgramVariable paramVar : paramVars) {
             subs[offset++] = tb.var(paramVar);
@@ -242,13 +269,17 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
         final JTerm targetTerm = tb.func(target, subs);
 
         // build po
-        final JTerm po = tb.imp(pre, tb.equals(targetTerm, tb.apply(update, targetTerm, null)));
+        // the update accumulator is non-null: each heap above contributes one elementary update
+        final JTerm po =
+            tb.imp(pre, tb.equals(targetTerm, tb.apply(Objects.requireNonNull(update),
+                targetTerm, null)));
 
         // save in field
         assignPOTerms(po);
 
         // add axioms
-        collectClassAxioms(contract.getKJT(), proofConfig);
+        collectClassAxioms(contract.getKJT(), Objects.requireNonNull(proofConfig,
+            "proofConfig is assigned by postInit()"));
     }
 
 
@@ -276,6 +307,11 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
     }
 
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable JTerm getMbyAtPre() {
         return mbyAtPre;
@@ -283,7 +319,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof DependencyContractPO)) {
             return false;
         } else {

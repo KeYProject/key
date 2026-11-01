@@ -79,7 +79,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
     // No TypeOperator subclass calls this constructor; it produces an "empty" operator stub with
     // no type reference. The {@code typeReference} field stays @NonNull (see
     // {@link #getTypeReference()}) and is left null here only for this degenerate instance.
-    @SuppressWarnings("NullAway")
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     protected TypeOperator() {
         typeReference = null;
     }

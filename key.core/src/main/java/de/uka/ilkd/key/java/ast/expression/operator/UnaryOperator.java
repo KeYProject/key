@@ -104,7 +104,7 @@ public final class UnaryOperator extends Operator
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof UnaryOperator that))
             return false;
         if (!super.equals(o))

@@ -21,11 +21,11 @@ public final class ParserException extends RuntimeException implements HasLocati
     /* --- constructors --- */
     /**
      * @param message The error message. The message may be shown to the user and should be
-     *        appropriately formated.
+     *        appropriately formated. The message may be null if no message is available.
      * @param location The location on which the error occured. The location may be null, if the
      *        location is unknown or the error is independent of a location.
      */
-    public ParserException(String message, @Nullable Location location) {
+    public ParserException(@Nullable String message, @Nullable Location location) {
         super(message + " at " + location);
         this.location = location;
     }
@@ -41,8 +41,15 @@ public final class ParserException extends RuntimeException implements HasLocati
         return location;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; and the base declaration's {@code @PolyInitialized}
+     * receiver does not match this override's implicit {@code @Initialized} receiver. Both
+     * differences are suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:override.receiver.invalid" })
     @Override
-    public synchronized ParserException initCause(Throwable cause) {
+    public synchronized ParserException initCause(@Nullable Throwable cause) {
         super.initCause(cause);
         return this;
     }

@@ -62,6 +62,9 @@ public abstract class SVInstantiationExceptionWithPosition extends SVInstantiati
 
     @Override
     public @Nullable Location getLocation() {
-        return new Location(null, position);
+        // these SV errors carry no file; the canonical "absent source" Location is
+        // Location.UNDEFINED
+        // (whose fileUri component is null, see the Location class javadoc)
+        return Location.UNDEFINED;
     }
 }

@@ -143,8 +143,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             final KeYJavaType type = Objects.requireNonNull(
                 ((New) mr).getTypeReference().getKeYJavaType(),
                 "no KeYJavaType for the constructor type reference");
-            if (type.getJavaType() instanceof ClassDeclaration
-                    && ((ClassDeclaration) type.getJavaType()).isAnonymousClass()) {
+            if (type.getJavaType() instanceof ClassDeclaration classDeclaration
+                    && classDeclaration.isAnonymousClass()) {
                 return null;
             }
         }
@@ -758,7 +758,12 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         protected @Nullable JTerm reachableState;
         protected ImmutableList<UseOperationContractRule.AnonUpdateData> anonUpdateDatas =
             ImmutableList.nil();
-        protected final Map<LocationVariable, JTerm> modifiables;
+        /**
+         * The modifiable clause per heap; entries are {@code null} for heaps without an explicit
+         * modifiable clause (cf. {@link FunctionalOperationContract#getModifiable}), and the sole
+         * read site already null-guards with {@link Objects#requireNonNull}.
+         */
+        protected final Map<LocationVariable, @Nullable JTerm> modifiables;
         protected final @Nullable JTerm globalDefs;
         protected final JTerm originalPre;
         protected final PosInOccurrence posInOccurrence;
@@ -906,10 +911,12 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
                 "no anonymous heap assumption has been computed");
             final JTerm anonUpdateNonNull = Objects.requireNonNull(anonUpdate,
                 "no anonymous heap update has been computed");
-            postAssumption = tb.applySequential(new JTerm[] { inst.u, atPreUpdates },
+            final JTerm atPreUpdatesNn =
+                Objects.requireNonNull(atPreUpdates, "no at-pre updates have been computed");
+            postAssumption = tb.applySequential(new JTerm[] { inst.u, atPreUpdatesNn },
                 tb.and(anonAssumptionNonNull,
                     tb.apply(anonUpdateNonNull, tb.and(excNull, freePost, post), null)));
-            excPostAssumption = tb.applySequential(new JTerm[] { inst.u, atPreUpdates },
+            excPostAssumption = tb.applySequential(new JTerm[] { inst.u, atPreUpdatesNn },
                 tb.and(anonAssumptionNonNull, tb.apply(anonUpdateNonNull,
                     tb.and(tb.not(excNull), excCreated, freeExcPost, post), null)));
 
@@ -1095,7 +1102,9 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             }
             final JTerm reachableStateNn = Objects.requireNonNull(reachableState,
                 "no reachable state term has been computed");
-            finalPreTerm = tb.applySequential(new JTerm[] { inst.u, atPreUpdates },
+            final JTerm atPreUpdatesNn =
+                Objects.requireNonNull(atPreUpdates, "no at-pre updates have been computed");
+            finalPreTerm = tb.applySequential(new JTerm[] { inst.u, atPreUpdatesNn },
                 tb.and(pre, reachableStateNn, mbyOk));
             return finalPreTerm;
         }

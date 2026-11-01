@@ -29,6 +29,11 @@ import org.jspecify.annotations.Nullable;
 public class FindProblemInformation extends AbstractBuilder<Object> {
     private final @NonNull ProblemInformation information = new ProblemInformation();
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitFile(JavaKeYParser.FileContext ctx) {
         if (ctx.profile() != null) {
@@ -41,6 +46,11 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
         return null;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         information.setBootClassPath(acceptFirst(ctx.bootClassPath()));
@@ -50,6 +60,11 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
         return null;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitProblem(JavaKeYParser.ProblemContext ctx) {
         if (ctx.CHOOSECONTRACT() != null) {
@@ -71,6 +86,11 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
     }
 
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable String visitBootClassPath(JavaKeYParser.BootClassPathContext ctx) {
         String value = accept(ctx.string_value());
@@ -85,8 +105,8 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
         List<String> result = new ArrayList<>(ctx.string_value().size());
         for (var sv : ctx.string_value()) {
             String value = accept(sv);
-            result.add(value);
             if (value != null) {
+                result.add(value);
                 information.putPathLocation(value, Location.fromToken(sv.getStart()));
             }
         }
@@ -98,6 +118,11 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
         return ParsingFacade.getValueDocumentation(ctx);
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable String visitProgramSource(JavaKeYParser.ProgramSourceContext ctx) {
         return ctx.oneProgramSource() != null ? (String) accept(ctx.oneProgramSource()) : null;
@@ -108,11 +133,21 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
         return StringUtil.trim(ctx.getText(), '"');
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitProfile(JavaKeYParser.ProfileContext ctx) {
         return accept(ctx.name);
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable String visitPreferences(JavaKeYParser.PreferencesContext ctx) {
         return ctx.s != null ? (String) accept(ctx.s) : null;

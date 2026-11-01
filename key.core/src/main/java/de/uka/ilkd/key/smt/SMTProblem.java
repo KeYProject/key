@@ -65,6 +65,12 @@ public class SMTProblem {
         return solvers;
     }
 
+    /**
+     * The term conversion operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because it only reads the
+     * {@link #goal} assigned just above, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SMTProblem(Goal goal) {
         this.goal = goal;
         this.node = goal.node();
@@ -110,14 +116,15 @@ public class SMTProblem {
         SMTSolverResult valid = null;
         SMTSolverResult invalid = null;
         for (SMTSolver solver : solvers) {
-            if (solver.getFinalResult() == null) {
+            SMTSolverResult solverResult = solver.getFinalResult();
+            if (solverResult == null) {
                 // do nothing
-            } else if (solver.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-                valid = solver.getFinalResult();
-            } else if (solver.getFinalResult().isValid() == ThreeValuedTruth.FALSIFIABLE) {
-                invalid = solver.getFinalResult();
+            } else if (solverResult.isValid() == ThreeValuedTruth.VALID) {
+                valid = solverResult;
+            } else if (solverResult.isValid() == ThreeValuedTruth.FALSIFIABLE) {
+                invalid = solverResult;
             } else {
-                unknown = solver.getFinalResult();
+                unknown = solverResult;
             }
         }
         if (valid != null && invalid != null) {
@@ -138,8 +145,9 @@ public class SMTProblem {
      */
     public @Nullable SMTSolver getSuccessfulSolver() {
         for (SMTSolver solver : solvers) {
-            if (solver.getFinalResult() != null
-                    && solver.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
+            var finalResult = solver.getFinalResult();
+            if (finalResult != null
+                    && finalResult.isValid() == ThreeValuedTruth.VALID) {
                 return solver;
             }
         }

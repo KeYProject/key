@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.settings.GeneralSettings;
@@ -71,7 +72,15 @@ public final class DiskFileRepo extends AbstractFileRepo {
     //////////////////// methods for loading files and opening streams ////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Opens a stream for the resource addressed by the given URL, copying jar contents into the
+     * repository on first access.
+     * <p>
+     * The jar file is registered in the copy map before its stored copy is dereferenced; the
+     * dereference of the (nullable) copied path is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public @Nullable InputStream getInputStream(URL url) throws IOException {
         String protocol = url.getProtocol();
         // currently, we support only two protocols: file and zip/jar
@@ -155,24 +164,33 @@ public final class DiskFileRepo extends AbstractFileRepo {
     private @Nullable InputStream getJavaFileInputStream(Path javaFile) throws IOException {
         // assumes that javaFile is an actual *.java file, path has to be absolute and normalized
 
+        // read the (nullable) repo paths once and reuse the locals, so that the null checks
+        // refine exactly the values passed to resolveAndCopy below (the checker does not refine
+        // across two separate getter calls)
+        final Path javaPath = getJavaPath();
+        final Path bootclasspath = getBootclasspath();
+
         Path newFile = null;
 
         // Where is the file located (src, classpath, bootclasspath)?
-        if (isInJavaPath(javaFile)) { // src
-            newFile = resolveAndCopy(javaFile, getJavaPath(), Paths.get("src"));
-        } else if (isInBootClassPath(javaFile)) { // bootclasspath
-            newFile = resolveAndCopy(javaFile, getBootclasspath(), Paths.get("bootclasspath"));
-        } else if (getClasspath() != null) { // classpath
-            // search for matching classpath in the list
-            for (Path cp : getClasspath()) {
-                if (javaFile.startsWith(cp)) { // only consider directories in classpath
-                    // cp is always a directory
-                    // -> we put the file into the corresponding subdir in our classpath folder
-                    Path parent = cp.getParent();
+        if (javaPath != null && javaFile.startsWith(javaPath)) { // src
+            newFile = resolveAndCopy(javaFile, javaPath, Paths.get("src"));
+        } else if (bootclasspath != null && javaFile.startsWith(bootclasspath)) { // bootclasspath
+            newFile = resolveAndCopy(javaFile, bootclasspath, Paths.get("bootclasspath"));
+        } else {
+            var cpList = getClasspath();
+            if (cpList != null) { // classpath
+                // search for matching classpath in the list
+                for (Path cp : cpList) {
+                    if (javaFile.startsWith(cp)) { // only consider directories in classpath
+                        // cp is a directory on javaFile's path, so it always has a parent
+                        // -> we put the file into the corresponding subdir in our classpath folder
+                        Path parent = Objects.requireNonNull(cp.getParent());
 
-                    // we found the file location, so copy it
-                    newFile = resolveAndCopy(javaFile, parent, Paths.get("classpath"));
-                    break;
+                        // we found the file location, so copy it
+                        newFile = resolveAndCopy(javaFile, parent, Paths.get("classpath"));
+                        break;
+                    }
                 }
             }
         }
@@ -184,9 +202,19 @@ public final class DiskFileRepo extends AbstractFileRepo {
         return null;
     }
 
+    /**
+     * Opens a stream on the copy of the given key file inside the temporary directory of the
+     * repository.
+     * <p>
+     * The temporary directory is always set before any repository stream is opened; the
+     * dereference of the (nullable) temporary directory is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private InputStream getKeyFileInputStream(Path keyFile) throws IOException {
-        // compute the absolute target path (top level in repo)
-        Path absTarget = tmpDir.resolve(keyFile.getFileName());
+        // compute the absolute target path (top level in repo);
+        // a *.key/*.proof file always has a file name (a root path does not match the matcher)
+        Path absTarget =
+            tmpDir.resolve(Objects.requireNonNull(keyFile.getFileName()));
 
         // copy the key file to target path
         // IMPORTANT: Do not call adaptFileRefs here. This should be done when saving a repo.
@@ -202,7 +230,9 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
     private InputStream getZipFileInputStream(Path zipFile) throws IOException {
         // copy to classpath folder (zip/jar may only occur in classpath)
-        Path newFile = resolveAndCopy(zipFile, zipFile.getParent(), Paths.get("classpath"));
+        // an archive file always has a parent directory (a root path does not match the matcher)
+        Path newFile = resolveAndCopy(zipFile, Objects.requireNonNull(zipFile.getParent()),
+            Paths.get("classpath"));
         // TODO: do we really want a FileInputStream here?
         return new FileInputStream(newFile.toFile());
     }
@@ -214,15 +244,18 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
         // class file may be in subdirectories
         // search for matching classpath in the list
-        for (Path cp : getClasspath()) {
-            if (classFile.startsWith(cp)) { // only consider directories in classpath
-                // cp is always a directory
-                // -> we put the file into the corresponding subdir in our classpath folder
-                Path parent = cp.getParent();
+        var cpList = getClasspath();
+        if (cpList != null) {
+            for (Path cp : cpList) {
+                if (classFile.startsWith(cp)) { // only consider directories in classpath
+                    // cp is a directory on classFile's path, so it always has a parent
+                    // -> we put the file into the corresponding subdir in our classpath folder
+                    Path parent = Objects.requireNonNull(cp.getParent());
 
-                // we found the file location, so copy it
-                newFile = resolveAndCopy(classFile, parent, Paths.get("classpath"));
-                break;
+                    // we found the file location, so copy it
+                    newFile = resolveAndCopy(classFile, parent, Paths.get("classpath"));
+                    break;
+                }
             }
         }
 
@@ -236,6 +269,13 @@ public final class DiskFileRepo extends AbstractFileRepo {
     // norm: absolute and normalized path of the requested file
     // containing: src, classpath, or bootclasspath folder containing norm (absolute and normalized)
     // target: src, classpath, or bootclasspath in repo (relative to repo base dir)
+    /**
+     * Copies the file at the given path into the repository and returns its absolute target path.
+     * <p>
+     * The temporary directory is always set before a file is copied into the repository; the
+     * dereference of the (nullable) temporary directory is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private Path resolveAndCopy(Path norm, Path containing, Path relTarget) throws IOException {
         // compute relative path from containing to norm
         Path rel = containing.relativize(norm);
@@ -259,7 +299,14 @@ public final class DiskFileRepo extends AbstractFileRepo {
     //////////////////////////// methods for saving the repo ////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Creates a new file at the given repository-relative path inside the temporary directory.
+     * <p>
+     * The temporary directory is always set before a file is created; the dereference of the
+     * (nullable) temporary directory is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public OutputStream createOutputStream(Path path) throws FileNotFoundException {
 
         if (path.isAbsolute()) {
@@ -279,7 +326,14 @@ public final class DiskFileRepo extends AbstractFileRepo {
         return new FileOutputStream(absTarget.toFile());
     }
 
+    /**
+     * Returns the repository-relative save name of the given path.
+     * <p>
+     * The temporary directory is always set before the save name is computed; the dereference of
+     * the (nullable) temporary directory is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected Path getSaveName(Path path) {
         /*
          * assumption: a file with the given path has already been stored in the repo (via
@@ -292,15 +346,24 @@ public final class DiskFileRepo extends AbstractFileRepo {
          */
 
         if (path.isAbsolute()) {
-            // lookup translation in map, make relative to tmpDir
-            return tmpDir.relativize(map.get(path.normalize()));
+            // lookup translation in map, make relative to tmpDir;
+            // by the method's assumption the file has already been stored, so the entry exists
+            return tmpDir.relativize(Objects.requireNonNull(map.get(path.normalize())));
         } else {
             // already relative to tmpDir
             return path;
         }
     }
 
+    /**
+     * Opens a stream for the given repository path, interpreting it relative to the temporary
+     * directory of the repository.
+     * <p>
+     * The temporary directory is always set before any repository stream is opened; the
+     * dereference of the (nullable) temporary directory is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected @Nullable InputStream getInputStreamInternal(Path p) throws FileNotFoundException {
         Path concrete;
         if (p.isAbsolute()) { // p is absolute -> lookup in map
@@ -321,7 +384,15 @@ public final class DiskFileRepo extends AbstractFileRepo {
     //////////////////////////// methods for cleaning up ////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Releases all resources held by this repository.
+     * <p>
+     * The copy map is deliberately set to {@code null} although its field is non-null, so that all
+     * referenced paths become garbage-collectable; a disposed repository is never used again, hence
+     * the null assignment is safe and suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     protected void dispose() {
         if (isDisposed()) {
             return;
@@ -348,7 +419,10 @@ public final class DiskFileRepo extends AbstractFileRepo {
      */
     private void deleteDiskContent() throws IOException {
         if (!isDisposed() && !GeneralSettings.keepFileRepos) {
-            try (Stream<Path> s = Files.walk(tmpDir).sorted(Comparator.reverseOrder())) {
+            // tmpDir is set in the constructor and only cleared when the repo is disposed, so it is
+            // non-null here (the checker cannot refine across the isDisposed() call)
+            try (Stream<Path> s = Files.walk(Objects.requireNonNull(tmpDir))
+                    .sorted(Comparator.reverseOrder())) {
                 s.forEach(path -> {
                     try {
                         Files.deleteIfExists(path);

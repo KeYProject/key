@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.Label;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
@@ -105,8 +106,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         /*
          * if(pv.isFinal()){ return pv; }
          */
-        return LocationVariable.fromProgramVariable(pv,
-            VariableNamer.parseName(name.toString() + postFix, name.getCreationInfo()));
+        return LocationVariable.fromProgramVariable(pv, VariableNamer.parseName(
+            name.toString() + postFix, name.getCreationInfo(), new Comment[0]));
     }
 
     @Override
@@ -134,8 +135,14 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         node.visit(this);
     }
 
-    /** starts the walker */
+    /**
+     * starts the walker
+     * <p>
+     * The stack of pending replacements is non-empty whenever the walker is started; the
+     * dereference of the (nullable) top of the stack is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public void start() {
         stack.push(new ExtList());
         walk(root());
@@ -177,7 +184,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             boolean changed = false;
             JTerm[] subTerms = new JTerm[t.arity()];
             for (int i = 0, n = t.arity(); i < n; i++) {
-                subTerms[i] = replaceVariablesInTerm(t.sub(i));
+                subTerms[i] = Objects.requireNonNull(replaceVariablesInTerm(t.sub(i)));
                 changed = changed || subTerms[i] != t.sub(i);
             }
             Operator op = t.op();
@@ -198,7 +205,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         ImmutableList<JTerm> res = ImmutableList.nil();
         boolean changed = false;
         for (final JTerm term : terms) {
-            final JTerm newTerm = replaceVariablesInTerm(term);
+            final JTerm newTerm = Objects.requireNonNull(replaceVariablesInTerm(term));
             changed |= newTerm != term;
             res = res.append(newTerm);
         }
@@ -321,16 +328,16 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 }
                 if (replaceMap.containsKey(pv)) {
                     atPres.remove(pv);
-                    pv = replaceMap.get(pv);
+                    pv = Objects.requireNonNull(replaceMap.get(pv));
                 }
-                atPres.put(pv, replaceVariablesInTerm(t));
+                atPres.put(pv, Objects.requireNonNull(replaceVariablesInTerm(t)));
             }
 
             return new PredicateAbstractionMergeContract(newMps, atPres, pamc.getKJT(),
                 pamc.getLatticeTypeName(),
                 pamc.getAbstractionPredicates(saveCopy, services).stream()
-                        .map(pred -> AbstractionPredicate.create(
-                            replaceVariablesInTerm(pred.getPredicateFormWithPlaceholder().second),
+                        .map(pred -> AbstractionPredicate.create(Objects.requireNonNull(
+                            replaceVariablesInTerm(pred.getPredicateFormWithPlaceholder().second)),
                             pred.getPredicateFormWithPlaceholder().first, services))
                         .collect(
                             Collectors.toCollection(ArrayList::new)));
@@ -348,6 +355,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return oldContract;
     }
 
+    /**
+     * The heap LDT is always registered in the {@link Services} of a fully initialized KeY
+     * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the per-heap
+     * dereference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private BlockContract createNewBlockContract(final BlockContract oldContract,
             final StatementBlock newBlock, final boolean blockChanged) {
         final BlockContract.Variables newVariables =
@@ -381,12 +394,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             final JTerm newModifiable = replaceVariablesInTerm(oldModifiable);
             final JTerm newFreeModifiable = replaceVariablesInTerm(oldFreeModifiable);
 
-            newPreconditions.put(heap, newPrecondition);
-            newFreePreconditions.put(heap, newFreePrecondition);
-            newPostconditions.put(heap, newPostcondition);
-            newFreePostconditions.put(heap, newFreePostcondition);
-            newModifiableClauses.put(heap, newModifiable);
-            newFreeModifiableClauses.put(heap, newFreeModifiable);
+            newPreconditions.put(heap, Objects.requireNonNull(newPrecondition));
+            newFreePreconditions.put(heap, Objects.requireNonNull(newFreePrecondition));
+            newPostconditions.put(heap, Objects.requireNonNull(newPostcondition));
+            newFreePostconditions.put(heap, Objects.requireNonNull(newFreePostcondition));
+            newModifiableClauses.put(heap, Objects.requireNonNull(newModifiable));
+            newFreeModifiableClauses.put(heap, Objects.requireNonNull(newFreeModifiable));
 
             changed |= ((newPrecondition != oldPrecondition)
                     || (newFreePrecondition != oldFreePrecondition)
@@ -409,6 +422,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 : oldContract;
     }
 
+    /**
+     * The heap LDT is always registered in the {@link Services} of a fully initialized KeY
+     * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the per-heap
+     * dereference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private LoopContract createNewLoopContract(final LoopContract oldContract,
             final JavaStatement newStatement, final boolean blockChanged) {
         final LoopContract.Variables newVariables =
@@ -436,12 +455,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             final JTerm newModifiable = replaceVariablesInTerm(oldModifiable);
             final JTerm newFreeModifiable = replaceVariablesInTerm(oldFreeModifiable);
 
-            newPreconditions.put(heap, newPrecondition);
-            newFreePreconditions.put(heap, newFreePrecondition);
-            newPostconditions.put(heap, newPostcondition);
-            newFreePostconditions.put(heap, newFreePostcondition);
-            newModifiableClauses.put(heap, newModifiable);
-            newFreeModifiableClauses.put(heap, newFreeModifiable);
+            newPreconditions.put(heap, Objects.requireNonNull(newPrecondition));
+            newFreePreconditions.put(heap, Objects.requireNonNull(newFreePrecondition));
+            newPostconditions.put(heap, Objects.requireNonNull(newPostcondition));
+            newFreePostconditions.put(heap, Objects.requireNonNull(newFreePostcondition));
+            newModifiableClauses.put(heap, Objects.requireNonNull(newModifiable));
+            newFreeModifiableClauses.put(heap, Objects.requireNonNull(newFreeModifiable));
 
             changed |= ((newPrecondition != oldPrecondition)
                     || (newFreePrecondition != oldFreePrecondition)
@@ -480,7 +499,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return new AuxiliaryContract.Variables(replaceVariable(variables.self),
             replaceFlags(variables.breakFlags), replaceFlags(variables.continueFlags),
             replaceVariable(variables.returnFlag), replaceVariable(variables.result),
-            replaceVariable(variables.exception),
+            Objects.requireNonNull(replaceVariable(variables.exception)),
             replaceRemembranceHeaps(variables.remembranceHeaps),
             replaceRemembranceLocalVariables(variables.remembranceLocalVariables),
             replaceRemembranceHeaps(variables.outerRemembranceHeaps),
@@ -509,7 +528,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     private Map<Label, LocationVariable> replaceFlags(final Map<Label, LocationVariable> flags) {
         final Map<Label, LocationVariable> result = new LinkedHashMap<>();
         for (Map.Entry<Label, LocationVariable> flag : flags.entrySet()) {
-            result.put(flag.getKey(), replaceVariable(flag.getValue()));
+            result.put(flag.getKey(),
+                Objects.requireNonNull(replaceVariable(flag.getValue())));
         }
         return result;
     }
@@ -523,7 +543,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             // TODO Can we really safely assume that replaceVariable returns a
             // location variable?
             result.put(remembranceHeap.getKey(),
-                replaceVariable(remembranceHeap.getValue()));
+                Objects.requireNonNull(replaceVariable(remembranceHeap.getValue())));
         }
         return result;
     }
@@ -534,13 +554,19 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             new LinkedHashMap<>();
         for (Map.Entry<LocationVariable, LocationVariable> remembranceLocalVariable : remembranceLocalVariables
                 .entrySet()) {
-            result.put(replaceVariable(remembranceLocalVariable.getKey()),
-                replaceVariable(remembranceLocalVariable.getValue()));
+            result.put(Objects.requireNonNull(replaceVariable(remembranceLocalVariable.getKey())),
+                Objects.requireNonNull(replaceVariable(remembranceLocalVariable.getValue())));
         }
         return result;
     }
 
+    /**
+     * The heap LDT is always registered in the {@link Services} of a fully initialized KeY
+     * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the per-heap
+     * dereference is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public void performActionOnLoopInvariant(LoopStatement oldLoop, LoopStatement newLoop) {
         final TermBuilder tb = services.getTermBuilder();
         LoopSpecification inv = services.getSpecificationRepository().getLoopSpec(oldLoop);
@@ -559,23 +585,24 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             final JTerm m =
-                replaceVariablesInTerm(inv.getModifiable(heap, selfTerm, atPres, services));
+                Objects.requireNonNull(replaceVariablesInTerm(
+                    inv.getModifiable(heap, selfTerm, atPres, services)));
             newMods.put(heap, m);
 
-            final JTerm mf = replaceVariablesInTerm(
-                inv.getFreeModifiable(heap, selfTerm, atPres, services));
+            final JTerm mf = Objects.requireNonNull(replaceVariablesInTerm(
+                inv.getFreeModifiable(heap, selfTerm, atPres, services)));
             newFreeMods.put(heap, mf);
 
             final ImmutableList<InfFlowSpec> infFlowSpecs = replaceVariablesInTermListTriples(
                 inv.getInfFlowSpecs(heap, selfTerm, atPres, services));
             newInfFlowSpecs.put(heap, infFlowSpecs);
 
-            final JTerm i =
-                replaceVariablesInTerm(inv.getInvariant(heap, selfTerm, atPres, services));
+            final JTerm i = Objects.requireNonNull(replaceVariablesInTerm(
+                inv.getInvariant(heap, selfTerm, atPres, services)));
             newInvariants.put(heap, i);
 
-            final JTerm j =
-                replaceVariablesInTerm(inv.getFreeInvariant(heap, selfTerm, atPres, services));
+            final JTerm j = Objects.requireNonNull(replaceVariablesInTerm(
+                inv.getFreeInvariant(heap, selfTerm, atPres, services)));
             newFreeInvariants.put(heap, j);
 
         }
@@ -594,9 +621,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             }
             if (replaceMap.containsKey(pv)) {
                 atPres.remove(pv);
-                pv = replaceMap.get(pv);
+                pv = Objects.requireNonNull(replaceMap.get(pv));
             }
-            atPres.put(pv, replaceVariablesInTerm(t));
+            atPres.put(pv, Objects.requireNonNull(replaceVariablesInTerm(t)));
         }
 
         ImmutableList<JTerm> newLocalIns = tb.var(MiscTools.getLocalIns(newLoop, services));
@@ -637,17 +664,19 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
             if (replaceMap.containsKey(pv)) {
                 newAtPres.remove(pv);
-                pv = replaceMap.get(pv);
-                newAtPreVars.put(pv, atPreVars.get(e.getKey()));
+                pv = Objects.requireNonNull(replaceMap.get(pv));
+                newAtPreVars.put(pv,
+                    Objects.requireNonNull(atPreVars.get(e.getKey())));
             }
-            newAtPres.put(pv, replaceVariablesInTerm(t));
+            newAtPres.put(pv, Objects.requireNonNull(replaceVariablesInTerm(t)));
         }
         final ProgramVariableCollection newVars =
             new ProgramVariableCollection(vars.selfVar, vars.paramVars, vars.resultVar, vars.excVar,
                 newAtPreVars, newAtPres, vars.atBeforeVars, vars.atBefores);
 
 
-        var newTerms = spec.terms().map(this::replaceVariablesInTerm);
+        var newTerms =
+            spec.terms().map(t -> Objects.requireNonNull(replaceVariablesInTerm(t)));
         var newSpec = new SpecificationRepository.JmlStatementSpec(newVars, newTerms);
 
         var c = cloner.apply(x);

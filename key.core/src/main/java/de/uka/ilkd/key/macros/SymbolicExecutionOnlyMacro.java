@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -30,6 +31,7 @@ import org.key_project.util.Streams;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A proof macro that performs symbolic execution only, without applying any reasoning rules.
@@ -98,7 +100,9 @@ public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
      * Windows checkouts.
      */
     private static List<String> readLines(String resource) throws IOException {
-        return Streams.toString(SymbolicExecutionOnlyMacro.class.getResourceAsStream(resource))
+        return Streams.toString(Objects.requireNonNull(
+            SymbolicExecutionOnlyMacro.class.getResourceAsStream(resource),
+            "resource " + resource + " must be on the classpath"))
                 .lines()
                 .map(String::strip)
                 .filter(s -> !s.isEmpty())
@@ -127,10 +131,20 @@ public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy<@NonNull Goal> createStrategy(Proof proof,
-            PosInOccurrence posInOcc) {
-        return new FilterSymbexStrategy(proof.getActiveStrategy());
+            @Nullable PosInOccurrence posInOcc) {
+        return new FilterSymbexStrategy(Objects.requireNonNull(
+            proof.getActiveStrategy(),
+            "the proof carries an active strategy while the macro runs"));
     }
 
+    /**
+     * Whether the given rule application is admitted under symbolic-execution-only mode.
+     * <p>
+     * The occurrence position of an admitted rule application is guaranteed to carry a term for
+     * the special-cased rules; the dereferences of the (nullable) position are suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public static boolean isAdmittedRule(RuleApp ruleApp) {
         Rule rule = ruleApp.rule();
         String name = rule.name().toString();

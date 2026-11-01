@@ -117,8 +117,11 @@ public final class OneStepSimplifier implements BuiltInRule {
      * single-core
      * and multi-core. The multi-core case looses the cache sharing among goals but this
      * disadvantage
-     * is more than equalized by removing locking.
+     * is more than equalized by removing locking. The annotated JDK declares
+     * {@code ThreadLocal<@Nullable T>}, which only admits nullable type arguments; this value is
+     * never null in practice, so the difference is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:type.argument.type.incompatible")
     private volatile ThreadLocal<LRU<SequentFormula, Boolean>> applicabilityCache =
         newApplicabilityCache();
 
@@ -135,7 +138,10 @@ public final class OneStepSimplifier implements BuiltInRule {
     private ImmutableList<NoPosTacletApp> appsTakenOver = ImmutableList.nil();
     private volatile TacletIndex @Nullable [] indices;
     // The per-worker "irreducible term" cache (one LRU per rule set); same goal-independence and
-    // swap-on-proof-change rationale as applicabilityCache above.
+    // swap-on-proof-change rationale as applicabilityCache above. The annotated JDK declares
+    // ThreadLocal<@Nullable T>, which only admits nullable type arguments; this value is never
+    // null in practice after (re)initialisation, so the difference is suppressed with a scoped key.
+    @SuppressWarnings("nullness:type.argument.type.incompatible")
     private volatile @Nullable ThreadLocal<LRU<JTerm, JTerm>[]> notSimplifiableCaches;
     private volatile boolean active;
 
@@ -232,13 +238,24 @@ public final class OneStepSimplifier implements BuiltInRule {
     }
 
 
-    /** A fresh, empty per-worker applicability cache (one {@link LRU} map per worker thread). */
+    /**
+     * A fresh, empty per-worker applicability cache (one {@link LRU} map per worker thread). The
+     * annotated JDK declares {@code ThreadLocal<@Nullable T>}, which only admits nullable type
+     * arguments; this value is never null in practice, so the difference is suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:type.argument.type.incompatible")
     private static ThreadLocal<LRU<SequentFormula, Boolean>> newApplicabilityCache() {
         return ThreadLocal.withInitial(() -> new LRU<>(APPLICABILITY_CACHE_SIZE));
     }
 
-    /** A fresh, empty per-worker not-simplifiable cache (one {@link LRU} map per rule set). */
-    @SuppressWarnings("unchecked")
+    /**
+     * A fresh, empty per-worker not-simplifiable cache (one {@link LRU} map per rule set). The
+     * annotated JDK declares {@code ThreadLocal<@Nullable T>}, which only admits nullable type
+     * arguments; this value is never null in practice, so the difference is suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings({ "unchecked", "nullness:type.argument.type.incompatible" })
     private static ThreadLocal<LRU<JTerm, JTerm>[]> newNotSimplifiableCaches() {
         return ThreadLocal.withInitial(() -> {
             final LRU<JTerm, JTerm>[] caches = (LRU<JTerm, JTerm>[]) new LRU[ruleSets.size()];
@@ -411,13 +428,18 @@ public final class OneStepSimplifier implements BuiltInRule {
     /**
      * Helper for replaceKnown (handles recursion).
      *
+     * <p>
+     * Passing {@code null} as the {@code hint} and {@code tacletTerm} arguments of
+     * {@code TermLabelManager.instantiateLabels} violates that method's declared non-null
+     * {@code hint} parameter, but it is the intentional built-in-rule contract: replace-known
+     * steps have no specific hint and no taclet label source. An honest {@code @Nullable}
+     * widening would cascade into TermLabelManager and the TermLabelPolicy implementations and
+     * belongs to a dedicated follow-up wave, hence the scoped suppression.
+     * </p>
+     *
      * @param protocol
      */
-    @SuppressWarnings("NullAway") // null "hint"/"tacletTerm" is the intentional built-in-rule
-                                  // contract of TermLabelManager.instantiateLabels; an honest
-                                  // @Nullable widening cascades into TermLabelManager and the
-                                  // TermLabelPolicy implementations and belongs to a dedicated
-                                  // follow-up wave.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private JTerm replaceKnownHelper(
             Map<TermReplacementKey, PosInOccurrence> map, JTerm in,
             boolean inAntecedent,
@@ -875,11 +897,15 @@ public final class OneStepSimplifier implements BuiltInRule {
          * {@inheritDoc}
          */
         @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof TermReplacementKey) {
-                obj = ((TermReplacementKey) obj).term;
+        public boolean equals(@Nullable Object obj) {
+            if (obj == null) {
+                return false;
             }
-            if (obj instanceof JTerm t) {
+            Object candidate = obj;
+            if (candidate instanceof TermReplacementKey) {
+                candidate = ((TermReplacementKey) candidate).term;
+            }
+            if (candidate instanceof JTerm t) {
                 return RENAMING_TERM_PROPERTY.equalsModThisProperty(term, t); // Ignore naming and
                                                                               // term
                 // labels in the way a

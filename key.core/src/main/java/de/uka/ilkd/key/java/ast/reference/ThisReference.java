@@ -62,7 +62,7 @@ public class ThisReference extends JavaNonTerminalProgramElement
         prefix = children.get(TypeReference.class);
     }
 
-    public ThisReference(PositionInfo pi, List<Comment> c, ReferencePrefix o) {
+    public ThisReference(PositionInfo pi, List<Comment> c, @Nullable ReferencePrefix o) {
         super(pi, c);
         prefix = o;
     }

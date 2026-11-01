@@ -72,7 +72,8 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
         this.exceptions = new ImmutableArray<>(children.collect(TypeReference.class));
     }
 
-    public Throws(PositionInfo pi, List<Comment> c, ImmutableArray<TypeReference> exc) {
+    public Throws(@Nullable PositionInfo pi, @Nullable List<Comment> c,
+            ImmutableArray<TypeReference> exc) {
         super(pi, c);
         this.exceptions = exc;
     }

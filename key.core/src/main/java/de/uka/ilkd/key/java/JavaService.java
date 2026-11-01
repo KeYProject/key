@@ -116,8 +116,7 @@ public class JavaService {
      */
     private final Path bootClassPath;
 
-    @Nullable
-    private final FileRepo fileRepo;
+    private final @Nullable FileRepo fileRepo;
 
     /**
      * A list of {@link File} objects that describes the classpath to be searched
@@ -259,6 +258,14 @@ public class JavaService {
      * @param message a JavaParser message whose lead-in has already been rewritten
      * @return the message with its offending token collapsed to a single line
      */
+    /**
+     * Collapses the offending token of a JavaParser error message to a single line.
+     * <p>
+     * The token capturing group is guaranteed to match whenever {@link Matcher#find()} succeeded,
+     * which the caller guards; the dereference of the (nullable) group is suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private static String cleanFoundToken(String message) {
         // JavaParser writes the offending token as {@code unexpected "..."} (note: it can use more
         // than one space); match one-or-more spaces so the token is found and collapsed.
@@ -296,7 +303,8 @@ public class JavaService {
             @Nullable FileRepo fileRepo) throws IOException {
         Reader is;
         if (fileRepo != null) {
-            is = new InputStreamReader(fileRepo.getInputStream(filename));
+            is = new InputStreamReader(Objects.requireNonNull(fileRepo.getInputStream(filename),
+                "Cannot read compilation unit " + filename));
         } else {
             is = Files.newBufferedReader(filename);
         }
@@ -314,12 +322,12 @@ public class JavaService {
      *
      * @param parent directory ro relativize files
      * @param files the files to read
-     * @param repo the repo to use for reading
+     * @param repo the repo to use for reading, or null to read from the file system directly
      * @return a list of KeY structured compilation units.
      */
     public List<de.uka.ilkd.key.java.ast.CompilationUnit> readCompilationUnits(
             Path parent,
-            Collection<Path> files, FileRepo repo)
+            Collection<Path> files, @Nullable FileRepo repo)
             throws IOException, BuildingExceptions {
         parseSpecialClasses(repo);
         var cus = new ArrayList<CompilationUnit>(files.size());
@@ -409,7 +417,14 @@ public class JavaService {
      *
      * @param fileRepo the FileRepo that provides the InputStream to resources
      * @return the compilation units
+     *         <p>
+     *         The walked boot-classpath entries are regular source files, which always have a file
+     *         name;
+     *         the dereference of the (nullable) file name in the filtering lambda is suppressed
+     *         with a
+     *         scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private List<CompilationUnit> parseBootClasses(@Nullable FileRepo fileRepo) throws IOException {
         if (!Files.isDirectory(bootClassPath)) {
             throw new FileNotFoundException(String.format(
@@ -435,13 +450,17 @@ public class JavaService {
                 }).toList();
 
         if (compilationUnits.stream().allMatch(it -> it.second.isSuccessful())) {
-            return compilationUnits.stream()
-                    .map(it -> {
-                        var cu = it.second.getResult().get();
-                        fixupPackageDeclaration(cu, bootClassPath.relativize(it.first).toString());
-                        return cu;
-                    })
-                    .collect(Collectors.toList());
+            // A successful parse always has a result, but the fork's ParseResult is unannotated,
+            // so the Optional content is typed nullable; the null guard therefore never triggers.
+            final List<CompilationUnit> units = new ArrayList<>(compilationUnits.size());
+            for (Pair<Path, ParseResult<CompilationUnit>> it : compilationUnits) {
+                final @Nullable CompilationUnit cu = it.second.getResult().get();
+                if (cu != null) {
+                    fixupPackageDeclaration(cu, bootClassPath.relativize(it.first).toString());
+                    units.add(cu);
+                }
+            }
+            return units;
         }
 
         // Collect the problems from the compilation units that failed to parse.
@@ -720,9 +739,15 @@ public class JavaService {
 
     /**
      * creates an empty RECODER compilation unit with a temporary name.
+     * <p>
+     * A virtual compilation unit has no package or module declaration; JavaParser represents
+     * their absence as {@code null}, so the literal {@code null} constructor arguments are
+     * legitimate (they mirror the {@link com.github.javaparser.ast.CompilationUnit} default state)
+     * and the argument incompatibilities are suppressed.
      *
      * @return the new CompilationUnit
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public JPContext createEmptyContext() {
         var classContext = interactClassDecl();
         var cu = new CompilationUnit(null, new NodeList<>(), new NodeList<>(classContext), null);
@@ -733,10 +758,16 @@ public class JavaService {
     /**
      * create a new Context with a temporary name and make a list of variables
      * visible from within.
+     * <p>
+     * The virtual compilation unit has no package or module declaration; JavaParser represents
+     * their absence as {@code null}, so the literal {@code null} constructor arguments are
+     * legitimate (they mirror the {@link com.github.javaparser.ast.CompilationUnit} default state)
+     * and the argument incompatibilities are suppressed.
      *
      * @param vars a list of variables
      * @return a newly created context.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     protected JPContext createContext(Iterable<IProgramVariable> vars) {
         var classContext = interactClassDecl();
         addProgramVariablesToClassContext(classContext, vars);
@@ -761,7 +792,8 @@ public class JavaService {
             }
             names.add(var.name().toString());
 
-            if (var.getKeYJavaType() == null) {
+            var varJavaType = var.getKeYJavaType();
+            if (varJavaType == null) {
                 /// The program variable "variant" introduced to prove loop termination has sort
                 /// "any" and, hence, no type. Parsing modalities fails on branches on which the
                 /// variable exists. Therefore, it seems better to silently ignore such program
@@ -771,7 +803,7 @@ public class JavaService {
                 continue;
             }
 
-            Type javaType = var.getKeYJavaType().getJavaType();
+            Type javaType = varJavaType.getJavaType();
             if (javaType == null) {
                 continue;
             }
@@ -794,7 +826,7 @@ public class JavaService {
 
             var keyField = new de.uka.ilkd.key.java.ast.declaration.FieldDeclaration(
                 new Modifier[0],
-                new TypeRef(var.getKeYJavaType()),
+                new TypeRef(varJavaType),
                 new FieldSpecification[] { keySpec },
                 false);
 
@@ -807,8 +839,7 @@ public class JavaService {
      * <p>
      * used by addProgramVariablesToClassContext
      */
-    @Nullable
-    private VariableSpecification lookupVarSpec(IProgramVariable pv) {
+    private @Nullable VariableSpecification lookupVarSpec(IProgramVariable pv) {
         for (final Object o : mapping.elemsKeY()) {
             if ((o instanceof VariableSpecification)
                     && ((VariableSpecification) o).getProgramVariable() == pv) {

@@ -369,8 +369,8 @@ public final class LoopSpecImpl implements LoopSpecification {
             Map<LocationVariable, JTerm> invariants, Map<LocationVariable, JTerm> freeInvariants,
             Map<LocationVariable, JTerm> modifiable,
             Map<LocationVariable, JTerm> freeModifiable,
-            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, JTerm variant,
-            JTerm selfTerm, ImmutableList<JTerm> localIns, ImmutableList<JTerm> localOuts,
+            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, @Nullable JTerm variant,
+            @Nullable JTerm selfTerm, ImmutableList<JTerm> localIns, ImmutableList<JTerm> localOuts,
             Map<LocationVariable, JTerm> atPres) {
         return new LoopSpecImpl(loop, pm, kjt, invariants, freeInvariants, modifiable,
             freeModifiable, infFlowSpecs, variant, selfTerm, localIns, localOuts, atPres);
@@ -380,8 +380,8 @@ public final class LoopSpecImpl implements LoopSpecification {
     public LoopSpecification create(LoopStatement loop, Map<LocationVariable, JTerm> invariants,
             Map<LocationVariable, JTerm> freeInvariants, Map<LocationVariable, JTerm> modifiable,
             Map<LocationVariable, JTerm> freeModifiable,
-            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, JTerm variant,
-            JTerm selfTerm, ImmutableList<JTerm> localIns, ImmutableList<JTerm> localOuts,
+            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, @Nullable JTerm variant,
+            @Nullable JTerm selfTerm, ImmutableList<JTerm> localIns, ImmutableList<JTerm> localOuts,
             Map<LocationVariable, JTerm> atPres) {
         return create(loop, pm, kjt, invariants, freeInvariants, modifiable, freeModifiable,
             infFlowSpecs, variant, selfTerm, localIns, localOuts, atPres);

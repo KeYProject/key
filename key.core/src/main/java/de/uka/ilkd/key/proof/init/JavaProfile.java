@@ -107,6 +107,13 @@ public class JavaProfile extends AbstractProfile {
 
     private @Nullable OneStepSimplifier oneStepSimpilifier;
 
+    /**
+     * The {@link #setSelectedGoalChooserBuilder} call operates on {@code this} while the
+     * receiver is still under initialization (EISOP initialization check); safe here because it
+     * only selects among the factories set up by {@code super(...)}, suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     protected JavaProfile(String standardRules) {
         super(standardRules);
         setSelectedGoalChooserBuilder(DepthFirstGoalChooserFactory.NAME);

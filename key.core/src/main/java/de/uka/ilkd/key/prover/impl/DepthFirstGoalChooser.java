@@ -55,6 +55,14 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
      * protected static IList<Goal> rotateList ( IList<Goal> p_list ) { if ( p_list.isEmpty() )
      * return ImmSLList.<Goal>nil(); return p_list; }
      */
+    /**
+     * Inserts the new goals at the front of the previous goal list.
+     * <p>
+     * The goal chooser is already initialized with its proof when new goals are inserted (see
+     * {@link #init}); the dereference of the (nullable) proof field is suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected ImmutableList<Goal> insertNewGoals(ImmutableList<Goal> newGoals,
             ImmutableList<Goal> prevGoalList) {
 

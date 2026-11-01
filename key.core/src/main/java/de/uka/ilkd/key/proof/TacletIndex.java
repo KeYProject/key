@@ -86,6 +86,13 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
     /**
      * creates a new TacletIndex with the given Taclets as initial contents.
      */
+    /**
+     * The initial-taclet bulk insertion operates on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here because the index lists were
+     * all assigned just above and {@code addTaclets} only appends to them, suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     TacletIndex(Iterable<Taclet> tacletSet) {
         rwList = new CopyOnWriteIndexMap<>();
         antecList = new CopyOnWriteIndexMap<>();
@@ -299,7 +306,7 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
      */
     protected abstract ImmutableList<NoPosTacletApp> matchTaclets(
             @NonNull ImmutableList<NoPosTacletApp> tacletApps, final RuleFilter p_filter,
-            @Nullable final PosInOccurrence pos, final LogicServices services);
+            final @Nullable PosInOccurrence pos, final LogicServices services);
 
     /**
      * returns a selection from the given map with NoPosTacletApps relevant for the given program
@@ -382,7 +389,7 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
      * @return the merged list
      */
     private ImmutableList<NoPosTacletApp> merge(@Nullable ImmutableList<NoPosTacletApp> first,
-            @Nullable final ImmutableList<NoPosTacletApp> second) {
+            final @Nullable ImmutableList<NoPosTacletApp> second) {
         if (second == null) {
             return Objects.requireNonNull(first, "merge called with two null lists");
         } else if (first == null) {
@@ -506,11 +513,14 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
      * @param name the name to lookup
      * @return the found NoPosTacletApp or null if no matching Taclet is there
      */
-    @SuppressWarnings("NullAway") // interface RuleIndex.lookup(Name) is declared non-null, but its
-                                  // javadoc documents "or null if no matching Taclet is there"
-                                  // (matching the @Nullable lookup(String) overload); widening the
-                                  // interface declaration belongs to key.ncore.calculus (out of
-                                  // scope here)
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" }) // interface
+                                                                          // RuleIndex.lookup(Name)
+                                                                          // is declared non-null,
+                                                                          // but its
+    // javadoc documents "or null if no matching Taclet is there"
+    // (matching the @Nullable lookup(String) overload); widening the
+    // interface declaration belongs to key.ncore.calculus (out of
+    // scope here)
     @Override
     public @Nullable NoPosTacletApp lookup(Name name) {
         return allNoPosTacletAppsStream()
@@ -600,6 +610,12 @@ public abstract class TacletIndex implements RuleIndex<NoPosTacletApp> {
          */
         static final int[] nextChild = { 0, 1, 0, 1, 1, 1, 0 };
 
+        /**
+         * The {@link #reset()} call operates on {@code this} while the receiver is still under
+         * initialization (EISOP initialization check); safe here because it only (re)initializes
+         * the freshly-allocated arrays, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         PrefixOccurrences() {
             reset();
         }

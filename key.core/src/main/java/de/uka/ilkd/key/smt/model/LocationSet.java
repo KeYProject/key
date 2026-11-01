@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A LocationSet represents a location set in an SMT model.
@@ -86,7 +87,7 @@ public class LocationSet {
     /**
      * Location sets with equal names are equal.
      */
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o instanceof LocationSet ls) {
             return ls.name.equals(name);
         }

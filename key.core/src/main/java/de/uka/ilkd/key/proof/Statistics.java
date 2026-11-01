@@ -78,6 +78,12 @@ public class Statistics {
         this.timePerStepInMillis = timePerStepInMillis;
     }
 
+    /**
+     * The summary generation operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because all statistics fields were
+     * assigned just above, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public Statistics(List<Node> startNodes) {
         if (startNodes.isEmpty()) {
             throw new IllegalArgumentException("can't generate statistics on zero nodes");
@@ -150,6 +156,12 @@ public class Statistics {
         generateSummary(startNodes.get(0).proof());
     }
 
+    /**
+     * The summary generation operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because all statistics fields were
+     * assigned just above, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     Statistics(Node startNode) {
         final Iterator<Node> it = startNode.subtreeIterator();
 

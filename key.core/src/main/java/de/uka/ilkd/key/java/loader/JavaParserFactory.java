@@ -95,6 +95,14 @@ public class JavaParserFactory {
         typeSolver.lazyRebuild();
     }
 
+    /**
+     * Returns the parser configuration of this factory, creating and configuring it on first use.
+     * <p>
+     * The configuration field is set in the guarded block below; the flow analysis cannot see
+     * through the field assignment, hence the dereference of the (nullable) configuration is
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private ParserConfiguration getConfiguration() {
         if (config == null) {
             config = new ParserConfiguration();
@@ -200,6 +208,11 @@ public class JavaParserFactory {
             delegate = ct;
         }
 
+        /**
+         * The overridden declaration requires a non-null return type, but this implementation may
+         * legitimately return {@code null}; the difference is suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:override.return.invalid")
         @Override
         public @Nullable TypeSolver getParent() {
             return parent;
@@ -246,6 +259,11 @@ public class JavaParserFactory {
             this.units = units;
         }
 
+        /**
+         * The overridden declaration requires a non-null return type, but this implementation may
+         * legitimately return {@code null}; the difference is suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:override.return.invalid")
         @Override
         public @Nullable TypeSolver getParent() {
             return parent;
@@ -319,6 +337,11 @@ public class JavaParserFactory {
 
         private @Nullable TypeSolver parent;
 
+        /**
+         * The overridden declaration requires a non-null return type, but this implementation may
+         * legitimately return {@code null}; the difference is suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:override.return.invalid")
         @Override
         public @Nullable TypeSolver getParent() {
             return parent;

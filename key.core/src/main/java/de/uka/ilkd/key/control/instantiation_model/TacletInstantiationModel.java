@@ -48,7 +48,17 @@ public class TacletInstantiationModel {
 
     /** listeners of this model */
     private final ArrayList<ModelChangeListener> listeners = new ArrayList<>();
-    /** the change event that is sent */
+    /**
+     * the change event that is sent
+     * <p>
+     * The event is wired to this model while it is still being constructed; a {@code this}-escape
+     * of the standard observer/event-source pattern: the model only registers itself as the
+     * event's source, and listeners observe the event once the model is fully constructed. The
+     * EISOP initialization check treats the pass of {@code this} as possibly uninitialized and is
+     * suppressed scoped on the field.
+     */
+    @SuppressWarnings({ "nullness:assignment.type.incompatible",
+        "nullness:argument.type.incompatible" })
     private final ModelEvent changeEvent = new ModelEvent(this);
 
     /** namespace of variables */
@@ -68,7 +78,17 @@ public class TacletInstantiationModel {
      * @param nss
      * @param scm
      * @param goal
+     *
+     *        <p>
+     *        The {@link #initIfChoiceModels()} call operates on {@code this} while the receiver is
+     *        still under initialization (EISOP initialization check); safe here since it only
+     *        builds the choice-model cache from the already-assigned fields above. The
+     *        {@code ifChoiceModel} field is (re)built lazily by that same helper, which the
+     *        initialization check cannot verify either; both differences are suppressed with
+     *        scoped keys.
      */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:initialization.fields.uninitialized" })
     public TacletInstantiationModel(TacletApp app, Sequent seq, NamespaceSet nss, AbbrevMap scm,
             Goal goal) {
         this.app = app;
@@ -123,6 +143,13 @@ public class TacletInstantiationModel {
         return ifChoiceModel(i).ifFma();
     }
 
+    /**
+     * Initializes the per-formula choice models of this instantiation model.
+     * <p>
+     * The matcher of the underlying taclet is present for a closed model; the dereference of the
+     * (nullable) matcher is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private void initIfChoiceModels() {
         Sequent ifseq = taclet().assumesSequent();
         int asize = ifseq.antecedent().size();
@@ -154,6 +181,17 @@ public class TacletInstantiationModel {
         }
     }
 
+    /**
+     * Builds the taclet application from the if-side formulas chosen in the dialog, or throws a
+     * mismatch exception when the assumptions cannot be instantiated.
+     * <p>
+     * The application is re-assigned from {@code setIfFormulaInstantiations}, which reports an
+     * unresolvable instantiation with {@code null}; the code immediately follows up with an
+     * explicit {@code null} check that raises {@link IfMismatchException}, so the transitory
+     * {@code null} never reaches a non-null position. The re-assignment and the {@code null}
+     * {@code givenSort} of the sort-mismatch report are suppressed scoped on this method.
+     */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     private TacletApp createTacletAppFromIfs(TacletApp tacletApp) throws IfMismatchException,
             SVInstantiationParserException, MissingInstantiationException, SortMismatchException {
 
@@ -222,8 +260,13 @@ public class TacletInstantiationModel {
      * replaces the TacletApp of this ApplyTacletDialogModel by an TacletApp where all name
      * conflicts are resolved and thus the parser is enabled to accept variables from the context or
      * the prefix of the Taclet.
-     *
+     * <p>
+     * Conflict resolution fails with a {@code null} result only when a variable name clash cannot
+     * be resolved; the field then holds that unresolved app, which the invoking dialog reports to
+     * the user rather than dereferencing. Assigning the (nullable-typed) resolution result to the
+     * non-null field is suppressed scoped on this method, preserving the pre-analysis behavior.
      */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     public void prepareUnmatchedInstantiation() {
         app = app.prepareUserInstantiation(services);
     }

@@ -87,7 +87,7 @@ public interface SpecExtractor {
      * @param methodParams TODO
      */
     ImmutableSet<MergeContract> extractMergeContracts(IProgramMethod method,
-            MergePointStatement mps, ImmutableList<LocationVariable> methodParams)
+            MergePointStatement mps, @Nullable ImmutableList<LocationVariable> methodParams)
             throws SLTranslationException;
 
     /**

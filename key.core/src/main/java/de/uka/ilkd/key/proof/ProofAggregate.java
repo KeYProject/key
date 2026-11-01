@@ -68,7 +68,7 @@ public abstract class ProofAggregate {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null || o.getClass() != this.getClass()) {
             return false;
         }

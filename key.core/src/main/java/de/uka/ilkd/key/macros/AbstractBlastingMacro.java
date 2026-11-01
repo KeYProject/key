@@ -49,6 +49,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public abstract class AbstractBlastingMacro extends StrategyProofMacro {
@@ -61,8 +62,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc,
-            ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws InterruptedException {
         for (Goal goal : goals) {
             addInvariantFormula(goal);
@@ -70,6 +71,12 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         return super.applyTo(uic, proof, goals, posInOcc, listener);
     }
 
+    /**
+     * The heap LDT is always registered in the {@link Services} of a fully initialized KeY
+     * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the dereference is
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected void addInvariantFormula(Goal goal) {
         Sort nullSort = goal.proof().getServices().getTypeConverter().getHeapLDT().getNull().sort();
 
@@ -94,7 +101,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy<@NonNull Goal> createStrategy(Proof proof,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         return new SemanticsBlastingStrategy();
     }
 
@@ -107,6 +114,12 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         return false;
     }
 
+    /**
+     * The heap LDT is always registered in the {@link Services} of a fully initialized KeY
+     * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the dereference is
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private List<SequentFormula> createFormulae(Services services,
             Set<Sort> sorts) {
         List<SequentFormula> result = new LinkedList<>();
@@ -120,9 +133,11 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
         for (KeYJavaType kjt : info.getAllKeYJavaTypes()) {
 
-            Sort sort = kjt.getSort();
+            final @Nullable Sort sort = kjt.getSort();
 
-            if (!containsSubTypes(sort, sorts)) {
+            // a type without a concrete sort cannot stand in a subtype relation, so it is skipped
+            // like any other type whose sort is not one of the target sorts
+            if (sort == null || !containsSubTypes(sort, sorts)) {
                 continue;
             }
 
@@ -132,7 +147,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                 continue;
             }
 
-            LogicVariable o = new LogicVariable(new Name("o"), kjt.getSort());
+            LogicVariable o = new LogicVariable(new Name("o"), sort);
             for (ClassAxiom c : spec.getClassAxioms(kjt)) {
                 if (c instanceof RepresentsAxiom && c.getKJT().equals(kjt)) {
                     addFormulas(result, kjt, c, o, h, services);
@@ -146,7 +161,9 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
             KeYJavaType kjt, ClassAxiom c,
             LogicVariable o, LogicVariable h, Services services) {
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
-        JTerm exactInstance = tb.exactInstance(kjt.getSort(), tb.var(o));
+        // the variable was created from the (guarded) sort of the type, so its own sort is the
+        // same and is assured to be present
+        JTerm exactInstance = tb.exactInstance(o.sort(), tb.var(o));
         RepresentsAxiom ra = (RepresentsAxiom) c;
 
         try {

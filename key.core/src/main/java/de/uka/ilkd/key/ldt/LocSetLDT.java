@@ -25,6 +25,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -81,13 +82,14 @@ public final class LocSetLDT extends LDT {
                 "LocSetLDT: sort 'Field' not found")))));
     }
 
-    private Function getInstantiatedFunction(String name, Services services,
-            ImmutableList<GenericArgument> args) {
+    private Function getInstantiatedFunction(@UnderInitialization LocSetLDT this, String name,
+            Services services, ImmutableList<GenericArgument> args) {
         return ParametricFunctionInstance.get(addParametricFunction(services, name), args,
             services);
     }
 
-    private Function getInstantiatedFunction(String name, Services services) {
+    private Function getInstantiatedFunction(@UnderInitialization LocSetLDT this, String name,
+            Services services) {
         return getInstantiatedFunction(
             name,
             services,

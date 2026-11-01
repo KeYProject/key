@@ -98,7 +98,11 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
      * runs multi-core, and a single-core side proof spawned by a worker (its own proof object) is
      * unaffected by the enclosing run.
      */
-    private static final ConcurrentHashMap<ProofObject<?>, Integer> ACTIVE_MULTI_WORKER_PROOFS =
+    /**
+     * The counter value is {@code @Nullable} because {@link ConcurrentHashMap#compute(Object,
+     * java.util.function.BiFunction)} uses a {@code null} remapping result to remove an entry.
+     */
+    private static final ConcurrentHashMap<ProofObject<?>, @Nullable Integer> ACTIVE_MULTI_WORKER_PROOFS =
         new ConcurrentHashMap<>();
 
     /**
@@ -274,9 +278,9 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         final StrategySettings stratSet = (StrategySettings) strategySettings;
         int maxSteps = stratSet.getMaxSteps();
         long timeout = stratSet.getTimeout();
-        boolean stopAtFirstNonCloseableGoal = proof.getSettings().getStrategySettings()
-                .getActiveStrategyProperties().getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
-                .equals(StrategyProperties.STOPMODE_NONCLOSE);
+        boolean stopAtFirstNonCloseableGoal = StrategyProperties.STOPMODE_NONCLOSE.equals(
+            proof.getSettings().getStrategySettings().getActiveStrategyProperties()
+                    .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY));
         return start(proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal);
     }
 

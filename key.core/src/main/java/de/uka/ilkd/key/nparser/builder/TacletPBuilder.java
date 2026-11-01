@@ -88,6 +88,11 @@ public class TacletPBuilder extends ExpressionBuilder {
         this.taclet2Builder = taclet2Builder;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         mapOf(ctx.schema_var_decls());
@@ -96,6 +101,11 @@ public class TacletPBuilder extends ExpressionBuilder {
         return null;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitRulesOrAxioms(JavaKeYParser.RulesOrAxiomsContext ctx) {
         enableJavaSchemaMode();
@@ -113,6 +123,12 @@ public class TacletPBuilder extends ExpressionBuilder {
         return null;
     }
 
+    /**
+     * The sort of a modal operator schema variable is optional in the grammar and ignored by
+     * {@code SchemaVariableFactory.createModalOperatorSV}; a missing sort is legitimately
+     * {@code null}, so the difference to the factory's non-null parameter is suppressed.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     public Object visitOne_schema_modal_op_decl(JavaKeYParser.One_schema_modal_op_declContext ctx) {
         ImmutableSet<JModality.JavaModalityKind> modalities = DefaultImmutableSet.nil();
@@ -132,6 +148,11 @@ public class TacletPBuilder extends ExpressionBuilder {
         return osv;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable TacletBuilder<?> visitTriggers(JavaKeYParser.TriggersContext ctx) {
         String id = (String) ctx.id.accept(this);
@@ -142,7 +163,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         TacletBuilder<?> b = peekTBuilder();
         JTerm t = accept(ctx.t);
         List<JTerm> avoidConditions = mapOf(ctx.avoidCond);
-        b.setTrigger(new Trigger(triggerVar, t, ImmutableList.<Term>fromList(avoidConditions)));
+        b.setTrigger(new Trigger(Objects.requireNonNull(triggerVar), Objects.requireNonNull(t),
+            ImmutableList.<Term>fromList(avoidConditions)));
         return null;
     }
 
@@ -234,7 +256,7 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         TacletBuilder<?> b = createTacletBuilderFor(find, applicationRestriction, ctx);
         currentTBuilder.push(b);
-        b.setAssumesSequent(assumesSeq);
+        b.setAssumesSequent(Objects.requireNonNull(assumesSeq));
         b.setName(new Name(name));
         accept(ctx.goalspecs());
         mapOf(ctx.varexplist());
@@ -251,7 +273,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             for (var gens : ctx.modifiers().generate()) {
                 res.addAll(generateTaclets(gens, b, doc, origin));
             }
-            setSchemaVariables(schemaVariables().parent());
+            setSchemaVariables(Objects.requireNonNull(schemaVariables().parent()));
             currentTBuilder.pop();
             return res;
         } catch (RuntimeException e) {
@@ -259,9 +281,13 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
     }
 
+    /**
+     * @param doc the (optional) documentation text of the taclet; a missing documentation is
+     *        legitimately {@code null} and is stored as such.
+     */
     private List<Taclet> generateTaclets(JavaKeYParser.GenerateContext ctx,
             TacletBuilder<? extends Taclet> tb,
-            String doc, String origin) {
+            @Nullable String doc, String origin) {
         var lst = new LinkedList<Taclet>();
         int eq = 0;
         for (var gen : ctx.generator()) {
@@ -280,9 +306,14 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     /// Generate the EQ version of the taclet represented by `tb`.
     /// @param tb builder of the original taclet
+    /// @param doc the (optional) documentation text, forwarded to the generated EQ taclet
     /// @return a [TacletBuilder] for the EQ taclet
+    /// <p>
+    /// The builders, goal-to-choice mappings and taclet lookups involved in the EQ generation are
+    /// guaranteed to be present; the dereferences are suppressed with a scoped key.
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private Taclet generateEQTaclet(JavaKeYParser.EqGeneratorContext ctx,
-            TacletBuilder<? extends Taclet> tb, String doc, String origin) {
+            TacletBuilder<? extends Taclet> tb, @Nullable String doc, String origin) {
         JTerm eqTerm = accept(ctx.term());
         if (eqTerm == null) {
             semanticError(ctx.term(), "failed to build term.");
@@ -388,7 +419,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             }
         }
         fb.setTacletGoalTemplates(goalSpecs);
-        setSchemaVariables(schemaVariables().parent());
+        setSchemaVariables(Objects.requireNonNull(schemaVariables().parent()));
         Taclet eqTaclet = fb.getTaclet();
         currentTBuilder.push(fb);
         registerTaclet(ctx, eqTaclet, doc, origin);
@@ -438,10 +469,21 @@ public class TacletPBuilder extends ExpressionBuilder {
     }
 
     private TacletBuilder<?> peekTBuilder() {
-        return currentTBuilder.peek();
+        TacletBuilder<?> tb = currentTBuilder.peek();
+        if (tb == null) {
+            throw new IllegalStateException("Taclet builder stack is empty");
+        }
+        return tb;
     }
 
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key. The
+     * parametric sort of a declared datatype is guaranteed to be registered (asserted before the
+     * access); the dereference is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable" })
     @Override
     public @Nullable Object visitDatatype_decl(JavaKeYParser.Datatype_declContext ctx) {
         var genParams = ctx.formal_sort_param_decls() == null ? null
@@ -459,7 +501,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             sort = sorts().lookup(ctx.name.getText());
         }
 
-        var tbAx = createAxiomTaclet(ctx, sort);
+        var tbAx = createAxiomTaclet(ctx, Objects.requireNonNull(sort));
         registerTaclet(ctx, tbAx);
 
         var tbInd = createInductionTaclet(ctx, sort);
@@ -502,7 +544,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         for (int i = 0; i < constructor.argName.size(); i++) {
             var name = constructor.argName.get(i).getText() + "_sv";
             Sort sort = accept(constructor.argSort.get(i));
-            var sv = declareSchemaVariable(constructor, name, sort, false, false, false,
+            var sv = declareSchemaVariable(constructor, name, Objects.requireNonNull(sort),
+                false, false, false,
                 new SchemaVariableModifierSet.TermSV());
             schemaVariables[i] = sv;
             args[i] = tb.var(sv);
@@ -515,7 +558,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         tacletBuilder.setFind(tb.func(function, tb.func(consFn, args)));
         tacletBuilder.addTacletGoalTemplate(
             new RewriteTacletGoalTemplate(tb.var(schemaVariables[argIndex])));
-        tacletBuilder.addRuleSet(ruleSets().lookup(new Name("simplify")));
+        tacletBuilder.addRuleSet(Objects.requireNonNull(ruleSets().lookup(new Name("simplify"))));
 
         return tacletBuilder;
     }
@@ -539,7 +582,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         for (int i = 0; i < constructor.argName.size(); i++) {
             var name = constructor.argName.get(i).getText() + "_sv";
             Sort sort = accept(constructor.argSort.get(i));
-            var sv = declareSchemaVariable(constructor, name, sort, false, false, false,
+            var sv = declareSchemaVariable(constructor, name, Objects.requireNonNull(sort),
+                false, false, false,
                 new SchemaVariableModifierSet.TermSV());
             schemaVariables[i] = sv;
             args[i] = tb.var(sv);
@@ -559,7 +603,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(tb.var(res)));
         tacletBuilder.setApplicationRestriction(
             new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
-        tacletBuilder.addRuleSet(ruleSets().lookup(new Name("simplify")));
+        tacletBuilder.addRuleSet(Objects.requireNonNull(ruleSets().lookup(new Name("simplify"))));
 
         return tacletBuilder;
     }
@@ -571,7 +615,8 @@ public class TacletPBuilder extends ExpressionBuilder {
         var psi = (ParametricSortInstance) sort;
         var pfn = namespaces().parametricFunctions().lookup(name);
         assert pfn != null;
-        return ParametricFunctionInstance.get(pfn, psi.getArgs(), services);
+        return ParametricFunctionInstance.get(Objects.requireNonNull(pfn), psi.getArgs(),
+            services);
     }
 
     private Sort getPossiblyParametricSort(String name, Sort sort) {
@@ -581,7 +626,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         var psi = (ParametricSortInstance) sort;
         var ps = namespaces().parametricSorts().lookup(name);
         assert ps != null;
-        return ParametricSortInstance.get(ps, psi.getArgs(), services);
+        return ParametricSortInstance.get(Objects.requireNonNull(ps), psi.getArgs(), services);
     }
 
     private TacletBuilder<? extends Taclet> createInductionTaclet(
@@ -748,7 +793,7 @@ public class TacletPBuilder extends ExpressionBuilder {
             var func = getPossiblyParametricFunction(context.name.getText(), sort);
             JTerm[] args = new JTerm[context.argName.size()];
             for (int i = 0; i < args.length; i++) {
-                args[i] = variables.get(context.argName.get(i).getText());
+                args[i] = Objects.requireNonNull(variables.get(context.argName.get(i).getText()));
             }
             Sequent addedSeq = JavaDLSequentKit.createAnteSequent(ImmutableList
                     .singleton(new SequentFormula(tb.equals(tb.var(phi), tb.func(func, args)))));
@@ -759,12 +804,17 @@ public class TacletPBuilder extends ExpressionBuilder {
         return b;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitModifiers(JavaKeYParser.ModifiersContext ctx) {
         TacletBuilder<?> b = peekTBuilder();
         List<RuleSet> rs = accept(ctx.rs);
         if (!ctx.NONINTERACTIVE().isEmpty()) {
-            b.addRuleSet(ruleSets().lookup(new Name("notHumanReadable")));
+            b.addRuleSet(Objects.requireNonNull(ruleSets().lookup(new Name("notHumanReadable"))));
         }
 
         if (rs != null) {
@@ -784,6 +834,11 @@ public class TacletPBuilder extends ExpressionBuilder {
         return mapOf(ctx.varexp());
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitVarexp(JavaKeYParser.VarexpContext ctx) {
         boolean negated = ctx.NOT_() != null;
@@ -810,6 +865,13 @@ public class TacletPBuilder extends ExpressionBuilder {
         return null;
     }
 
+    /**
+     * The argument cache is filled lazily by {@link #evaluateVarcondArgument} and a slot may
+     * transiently hold {@code null} (the cache starts out all-null, a failed evaluation keeps the
+     * slot {@code null}); assigning that transient {@code null} into the non-null array slot is
+     * suppressed so that the manipulator application reports "not applicable" instead of throwing.
+     */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     private boolean applyManipulator(boolean negated, Object[] args,
             TacletBuilderCommand manipulator, List<JavaKeYParser.Varexp_argumentContext> arguments,
             List<String> parameters) {
@@ -846,6 +908,12 @@ public class TacletPBuilder extends ExpressionBuilder {
         };
     }
 
+    /**
+     * The array-sort path forwards a possibly-absent primitive Java type through {@code Pair},
+     * which only admits non-null type arguments; the pre-existing nullable component cannot be
+     * expressed, so the type inference difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:type.arguments.not.inferred")
     private Sort visitSortId(String text, ParserRuleContext ctx) {
         String primitiveName = text;
         Type t = null;
@@ -870,7 +938,7 @@ public class TacletPBuilder extends ExpressionBuilder {
         }
         Sort s = lookupSort(primitiveName);
         if (s == null) {
-            semanticError(ctx, "Could not find sort: %s", text);
+            return semanticError(ctx, "Could not find sort: %s", text);
         }
 
         if (text.contains("[")) {
@@ -892,10 +960,10 @@ public class TacletPBuilder extends ExpressionBuilder {
     public @Nullable Object buildTypeResolver(JavaKeYParser.Varexp_argumentContext ctx) {
         SchemaVariable y = accept(ctx.varId());
         if (ctx.TYPEOF() != null) {
-            return TypeResolver.createElementTypeResolver(y);
+            return TypeResolver.createElementTypeResolver(Objects.requireNonNull(y));
         }
         if (ctx.CONTAINERTYPE() != null) {
-            return TypeResolver.createContainerTypeResolver(y);
+            return TypeResolver.createContainerTypeResolver(Objects.requireNonNull(y));
         }
 
         Sort s = visitSortId(ctx.term().getText(), ctx.term());
@@ -916,6 +984,11 @@ public class TacletPBuilder extends ExpressionBuilder {
         return mapOf(ctx.goalspecwithoption());
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitGoalspecwithoption(JavaKeYParser.GoalspecwithoptionContext ctx) {
         ChoiceExpr expr = accept(ctx.option_list());
@@ -929,11 +1002,18 @@ public class TacletPBuilder extends ExpressionBuilder {
         String choice = ctx.getText();
         Choice c = choices().lookup(choice);
         if (c == null) {
-            semanticError(ctx, "Could not find choice: %s", choice);
+            return semanticError(ctx, "Could not find choice: %s", choice);
         }
         return c;
     }
 
+    /**
+     * The reduced stream's elements are effectively non-null, but the checker infers
+     * {@code @Nullable} elements from the generic {@code accept()} helper, so the
+     * {@code @NonNull}-parameter method reference {@code ChoiceExpr::and} cannot be inferred as a
+     * {@code BinaryOperator}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:methodref.param.invalid")
     @Override
     public ChoiceExpr visitOption_list(JavaKeYParser.Option_listContext ctx) {
         return ctx.option_expr().stream()
@@ -944,9 +1024,15 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public ChoiceExpr visitOption_expr_or(JavaKeYParser.Option_expr_orContext ctx) {
-        return ChoiceExpr.or(accept(ctx.option_expr(0)), accept(ctx.option_expr(1)));
+        return ChoiceExpr.or(Objects.requireNonNull(accept(ctx.option_expr(0))),
+            Objects.requireNonNull(accept(ctx.option_expr(1))));
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable ChoiceExpr visitOption_expr_paren(JavaKeYParser.Option_expr_parenContext ctx) {
         return accept(ctx.option_expr());
@@ -971,14 +1057,20 @@ public class TacletPBuilder extends ExpressionBuilder {
 
     @Override
     public ChoiceExpr visitOption_expr_not(JavaKeYParser.Option_expr_notContext ctx) {
-        return ChoiceExpr.not(accept(ctx.option_expr()));
+        return ChoiceExpr.not(Objects.requireNonNull(accept(ctx.option_expr())));
     }
 
     @Override
     public ChoiceExpr visitOption_expr_and(JavaKeYParser.Option_expr_andContext ctx) {
-        return ChoiceExpr.and(accept(ctx.option_expr(0)), accept(ctx.option_expr(1)));
+        return ChoiceExpr.and(Objects.requireNonNull(accept(ctx.option_expr(0))),
+            Objects.requireNonNull(accept(ctx.option_expr(1))));
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitGoalspec(JavaKeYParser.GoalspecContext ctx) {
         var soc = this.goalChoice;
@@ -1005,20 +1097,36 @@ public class TacletPBuilder extends ExpressionBuilder {
         if (ctx.tag != null) {
             tag = ctx.tag.getText();
         }
-        addGoalTemplate(name, rwObj, addSeq, addRList, addpv, soc, tag, ctx);
+        addGoalTemplate(name, rwObj, Objects.requireNonNull(addSeq),
+            Objects.requireNonNull(addRList), Objects.requireNonNull(addpv), soc, tag, ctx);
         return null;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitReplacewith(JavaKeYParser.ReplacewithContext ctx) {
         return accept(ctx.o);
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitAdd(JavaKeYParser.AddContext ctx) {
         return accept(ctx.s);
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitAddrules(JavaKeYParser.AddrulesContext ctx) {
         return accept(ctx.lor);
@@ -1036,7 +1144,11 @@ public class TacletPBuilder extends ExpressionBuilder {
         return ImmutableList.fromList(taclets.stream().flatMap(Collection::stream).toList());
     }
 
-    private @NonNull TacletBuilder<?> createTacletBuilderFor(Object find,
+    /**
+     * @param find the find-part of the taclet, may be {@code null} for rules without a find
+     *        (handled by the {@code case null} branch below)
+     */
+    private @NonNull TacletBuilder<?> createTacletBuilderFor(@Nullable Object find,
             ApplicationRestriction applicationRestriction,
             ParserRuleContext ctx) {
         switch (find) {
@@ -1064,16 +1176,18 @@ public class TacletPBuilder extends ExpressionBuilder {
                     semanticError(ctx, "Unknown find-sequent (perhaps null?):" + findSeq);
                 }
             }
-            default -> semanticError(ctx, "Unknown find class type: %s", find.getClass().getName());
+            default -> semanticError(ctx, "Unknown find class type: %s",
+                Objects.requireNonNull(find).getClass().getName());
         }
 
         throw new IllegalArgumentException(
-            format("Could not find a suitable TacletBuilder for {0}", find));
+            format("Could not find a suitable TacletBuilder for {0}",
+                Objects.requireNonNull(find)));
     }
 
-    private void addGoalTemplate(String id, Object rwObj, Sequent addSeq,
+    private void addGoalTemplate(@Nullable String id, @Nullable Object rwObj, Sequent addSeq,
             ImmutableList<Taclet> addRList, ImmutableSet<SchemaVariable> pvs,
-            @Nullable ChoiceExpr soc, String tag, ParserRuleContext ctx) {
+            @Nullable ChoiceExpr soc, @Nullable String tag, ParserRuleContext ctx) {
         TacletBuilder<?> b = peekTBuilder();
         TacletGoalTemplate gt = null;
         if (rwObj == null) {
@@ -1105,13 +1219,21 @@ public class TacletPBuilder extends ExpressionBuilder {
                 "Could not find a suitable goal template builder for: " + b.getClass());
         }
         gt.setName(id);
-        gt.setTag(tag);
+        if (tag != null) {
+            // the goal template's tag field defaults to null, so omitting the call is equivalent
+            gt.setTag(tag);
+        }
         b.addTacletGoalTemplate(gt);
         if (soc != null) {
             b.addGoal2ChoicesMapping(gt, soc);
         }
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable SchemaVariable visitVarId(JavaKeYParser.VarIdContext ctx) {
         String id = ctx.id.getText();
@@ -1127,6 +1249,17 @@ public class TacletPBuilder extends ExpressionBuilder {
         return v;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key. The sort
+     * of a program schema variable is guaranteed to be registered (a missing sort is reported by
+     * the surrounding null check); the dereference is suppressed with a scoped key. The sort
+     * argument is legitimately {@code null} for {@code \termLabel} schema variables, whose
+     * declaration does not name a sort (the factory never dereferences it there); the difference
+     * to the non-null parameter is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     @Override
     public @Nullable Object visitOne_schema_var_decl(JavaKeYParser.One_schema_var_declContext ctx) {
         boolean makeVariableSV = false;
@@ -1148,7 +1281,8 @@ public class TacletPBuilder extends ExpressionBuilder {
             ProgramSVSort psv = ProgramSVSort.name2sort().get(new Name(id));
             s = parameter != null ? psv.createInstance(parameter) : psv;
             if (s == null) {
-                semanticError(ctx, "Program SchemaVariable of type '%s' not found.", id);
+                semanticError(ctx, "Program SchemaVariable of type '%s' not found.",
+                    Objects.requireNonNull(id));
             }
         }
         if (ctx.FORMULA() != null) {
@@ -1198,11 +1332,16 @@ public class TacletPBuilder extends ExpressionBuilder {
 
         for (String id : Objects.requireNonNull(ids)) {
             declareSchemaVariable(ctx, id, s, makeVariableSV, makeSkolemTermSV, makeTermLabelSV,
-                mods);
+                Objects.requireNonNull(mods));
         }
         return null;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Object visitSchema_modifiers(JavaKeYParser.Schema_modifiersContext ctx) {
         SchemaVariableModifierSet mods = pop();
@@ -1251,8 +1390,8 @@ public class TacletPBuilder extends ExpressionBuilder {
                 v.name());
         }
 
-        if (schemaVariables().lookup(v.name()) != null) {
-            JOperatorSV old = (JOperatorSV) schemaVariables().lookup(v.name());
+        final JOperatorSV old = (JOperatorSV) schemaVariables().lookup(v.name());
+        if (old != null) {
             if (!old.sort().equals(v.sort())) {
                 semanticError(ctx,
                     "Schema variables clashes with previous declared schema variable: %s.",

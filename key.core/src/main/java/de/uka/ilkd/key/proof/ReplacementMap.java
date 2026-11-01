@@ -65,7 +65,7 @@ public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
      * @return a new replacement map.
      */
     static <S extends SyntaxElement, T> ReplacementMap<S, T> create(TermFactory tf,
-            @Nullable Proof proof, Map<S, T> initialMappings) {
+            @Nullable Proof proof, Map<? extends S, ? extends T> initialMappings) {
         ReplacementMap<S, T> result = create(tf, proof);
         result.putAll(initialMappings);
         return result;
@@ -145,6 +145,13 @@ public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
             return map.isEmpty();
         }
 
+        /**
+         * This wrapper map does not track key-ownership semantics, so the inherited conditional
+         * postcondition of {@link java.util.Map#containsKey} (a key reported {@code true} is
+         * {@code @KeyFor("this")}) cannot be established; the contract difference is suppressed
+         * with a scoped key.
+         */
+        @SuppressWarnings("nullness:contracts.conditional.postcondition.not.satisfied")
         @Override
         public boolean containsKey(Object key) {
             return map.containsKey(wrap(key));
@@ -160,6 +167,12 @@ public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
             return map.get(wrap(key));
         }
 
+        /**
+         * This wrapper map does not track key-ownership semantics, so the inherited
+         * {@code @KeyFor("this")} postcondition of {@link java.util.Map#put} cannot be
+         * established; the contract difference is suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:contracts.postcondition.not.satisfied")
         @Override
         public @Nullable T put(S key, T value) {
             return map.put(wrap(key), value);
@@ -180,6 +193,13 @@ public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
             map.clear();
         }
 
+        /**
+         * The key view carries {@code @KeyFor} annotations on its elements which the declared
+         * return type does not (and the supertype declaration cannot); both the override-level and
+         * the return-level check for that difference are suppressed with scoped keys.
+         */
+        @SuppressWarnings({ "nullness:override.return.invalid",
+            "nullness:return.type.incompatible" })
         @Override
         public Set<S> keySet() {
             return map.keySet();
@@ -190,6 +210,13 @@ public interface ReplacementMap<S extends SyntaxElement, T> extends Map<S, T> {
             return map.values();
         }
 
+        /**
+         * The entry view carries {@code @KeyFor} annotations on its keys which the declared
+         * return type does not (and the supertype declaration cannot); both the override-level and
+         * the return-level check for that difference are suppressed with scoped keys.
+         */
+        @SuppressWarnings({ "nullness:override.return.invalid",
+            "nullness:return.type.incompatible" })
         @Override
         public Set<Entry<S, T>> entrySet() {
             return map.entrySet();

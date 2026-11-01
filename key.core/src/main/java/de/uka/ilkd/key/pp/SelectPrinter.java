@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.pp;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
@@ -37,9 +39,13 @@ class SelectPrinter extends FieldPrinter {
         this.ni = ni;
     }
 
-    /*
-     * Print a term of the form: T::select(heap, object, field).
+    /**
+     * Prints a term of the form: {@code T::select(heap, object, field)}.
+     * <p>
+     * The base type of an array-typed field term is always present when its KeY Java type is
+     * compared; the dereference of the (nullable) base type is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public void printSelect(LogicPrinter lp, JTerm t, @Nullable JTerm tacitHeap) {
         assert t.boundVars().isEmpty();
         assert t.arity() == 3;
@@ -105,7 +111,10 @@ class SelectPrinter extends FieldPrinter {
     private boolean isFieldName(String variableName, JTerm objectTerm) {
         Sort sort = objectTerm.sort();
         JavaInfo javaInfo = services.getJavaInfo();
-        KeYJavaType kjt = javaInfo.getKeYJavaType(sort);
+        // The object term always has a Java sort whose KeYJavaType is registered in the services,
+        // so the lookup result is legitimately non-null here (mirrors FieldPrinter#isCanonicField).
+        KeYJavaType kjt = Objects.requireNonNull(javaInfo.getKeYJavaType(sort),
+            "no KeYJavaType for " + sort);
         ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(variableName, kjt);
         return pv != null;
     }
@@ -129,9 +138,13 @@ class SelectPrinter extends FieldPrinter {
         }
     }
 
-    /*
-     * Get sort of selected field.
+    /**
+     * Gets the sort of the program variable behind the given field term.
+     * <p>
+     * The attribute of the field term is always registered in the Java info of the services; the
+     * dereference of the (nullable) program variable is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private Sort getFieldSort(JTerm fieldTerm) {
         String lookup = JavaDLFieldNames.toJava(fieldTerm.op().name());
         ProgramVariable progVar = services.getJavaInfo().getAttribute(lookup);

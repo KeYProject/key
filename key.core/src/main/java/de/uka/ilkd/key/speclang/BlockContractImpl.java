@@ -70,7 +70,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             final List<Label> labels, final IProgramMethod method,
             final JModality.JavaModalityKind modalityKind,
             final Map<LocationVariable, JTerm> preconditions,
-            final Map<LocationVariable, JTerm> freePreconditions, final JTerm measuredBy,
+            final Map<LocationVariable, JTerm> freePreconditions, final @Nullable JTerm measuredBy,
             final Map<LocationVariable, JTerm> postconditions,
             final Map<LocationVariable, JTerm> freePostconditions,
             final Map<LocationVariable, JTerm> modifiableClauses,
@@ -183,7 +183,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, JTerm> newModifiableClauses,
             final Map<LocationVariable, JTerm> newFreeModifiableClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
-            JTerm newMeasuredBy) {
+            @Nullable JTerm newMeasuredBy) {
         BlockContractImpl result = new BlockContractImpl(baseName, newBlock, labels, method,
             modalityKind, newPreconditions, newFreePreconditions, newMeasuredBy, newPostconditions,
             newFreePostconditions, newModifiableClauses, newFreeModifiableClauses, newinfFlowSpecs,

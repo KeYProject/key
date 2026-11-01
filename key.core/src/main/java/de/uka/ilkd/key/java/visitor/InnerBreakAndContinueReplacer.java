@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.ArrayDeque;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -65,7 +66,12 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
      *        the label used for continue statements.
      * @param services
      *        services.
+     *        <p>
+     *        The replacement result is produced by the traversal in {@code replace()}, which runs
+     *        after construction; no meaningful initial value exists, so the difference is
+     *        suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:initialization.fields.uninitialized")
     public InnerBreakAndContinueReplacer(final StatementBlock block,
             final Iterable<Label> loopLabels, final Label breakLabel, final Label continueLabel,
             final Services services) {
@@ -99,7 +105,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         loopAndSwitchCascadeDepth = 0;
         stack.push(new ExtList());
         super.start();
-        ExtList el = stack.peek();
+        ExtList el = stack.getFirst();
         int i = (el.get(0) == CHANGED ? 1 : 0);
         result = (StatementBlock) el.get(i);
     }
@@ -132,7 +138,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
     @Override
     public String toString() {
-        return stack.peek().toString();
+        return stack.getFirst().toString();
     }
 
     @Override
@@ -186,12 +192,13 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
     @Override
     public void performActionOnWhile(final While x) {
-        final ExtList changeList = stack.peek();
+        final ExtList changeList = stack.getFirst();
         if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             Expression guard = ((Guard) changeList.removeFirst()).getExpression();
             Statement body = (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
-            While newLoop = new While(guard, body, x.getPositionInfo());
+            // A while loop always has a body; the defensive null above cannot trigger.
+            While newLoop = new While(guard, Objects.requireNonNull(body), x.getPositionInfo());
             services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
             addChild(newLoop);
             changed();
@@ -228,13 +235,16 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
     @Override
     public void performActionOnDo(final Do x) {
-        final ExtList changeList = stack.peek();
+        final ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             Statement body = changeList.removeFirstOccurrence(Statement.class);
             Guard g = changeList.removeFirstOccurrence(Guard.class);
             Expression guard = g == null ? null : g.getExpression();
-            Do newLoop = new Do(guard, body, x.getPositionInfo());
+            // A do-while loop always has a guard and a body; the defensive nulls above cannot
+            // trigger.
+            Do newLoop = new Do(Objects.requireNonNull(guard), Objects.requireNonNull(body),
+                x.getPositionInfo());
             services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
             addChild(newLoop);
             changed();
@@ -279,13 +289,16 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
     @Override
     public void performActionOnLabeledStatement(final LabeledStatement x) {
         Label l = null;
-        final ExtList changeList = stack.peek();
+        final ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             if (x.getLabel() != null) {
                 l = (Label) changeList.removeFirst();
             }
-            addChild(new LabeledStatement(changeList, l, x.getPositionInfo()));
+            // A labeled statement always carries a label ({@code LabeledStatement#getLabel} is
+            // non-null), so the defensive branch cannot leave {@code l} null.
+            addChild(new LabeledStatement(changeList, Objects.requireNonNull(l),
+                x.getPositionInfo()));
             changed();
         } else {
             doDefaultAction(x);
@@ -294,7 +307,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
     @Override
     public void performActionOnMethodFrame(final MethodFrame x) {
-        final ExtList changeList = stack.peek();
+        final ExtList changeList = stack.getFirst();
         if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             if (x.getChildCount() == 3) {
@@ -371,13 +384,15 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
     @Override
     public void performActionOnCase(final Case x) {
         Expression e = null;
-        final ExtList changeList = stack.peek();
+        final ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             if (x.getExpression() != null) {
                 e = (Expression) changeList.removeFirst();
             }
-            addChild(new Case(changeList, e, x.getPositionInfo()));
+            // A case branch always carries an expression (a default branch is a {@link Default}
+            // node), so the defensive branch cannot leave {@code e} null.
+            addChild(new Case(changeList, Objects.requireNonNull(e), x.getPositionInfo()));
             changed();
         } else {
             doDefaultAction(x);
@@ -429,7 +444,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
     }
 
     private void changed() {
-        ExtList list = stack.peek();
+        ExtList list = stack.getFirst();
         if (list.getFirst() != CHANGED) {
             list.addFirst(CHANGED);
         }
@@ -437,7 +452,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
     private void addChild(final SourceElement x) {
         stack.pop();
-        ExtList list = stack.peek();
+        ExtList list = stack.getFirst();
         list.add(x);
     }
 
@@ -451,7 +466,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
         }
 
         public void doAction(final ProgramElement x) {
-            final ExtList changeList = stack.peek();
+            final ExtList changeList = stack.getFirst();
             if (changeList.size() > 0 && changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
                 addNewChild(changeList);

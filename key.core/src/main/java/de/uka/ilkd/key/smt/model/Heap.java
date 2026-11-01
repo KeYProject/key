@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents a heap in the SMT model.
@@ -77,7 +78,7 @@ public class Heap {
     /**
      * Heaps with equal names are equal.
      */
-    public boolean equals(Object that) {
+    public boolean equals(@Nullable Object that) {
 
         if (that instanceof Heap thatHeap) {
             return thatHeap.name.equals(name);

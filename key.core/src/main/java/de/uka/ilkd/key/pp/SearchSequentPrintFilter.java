@@ -39,6 +39,16 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
     boolean regex;
 
     /**
+     * Creates a filter with the given logic printer, which is required by the concrete
+     * {@link #filterSequent()} implementations.
+     *
+     * @param lp the logic printer in use
+     */
+    protected SearchSequentPrintFilter(LogicPrinter lp) {
+        this.lp = lp;
+    }
+
+    /**
      * sets the filter's search string
      *
      * @param searchString the new search string
@@ -94,9 +104,16 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
 
     /**
      * creates a pattern with the current search string and regex option
+     * <p>
+     * The search string may not be set when the filter is created before any search was entered;
+     * the numeric overload throws on that state as it does on a malformed pattern expression (the
+     * malformed case is caught here, the {@code null} case propagates exactly as it did before the
+     * nullness analysis). Passing the (nullable-typed) search string into the numeric overload is
+     * suppressed scoped on this method.
      *
      * @return a brand new shiny pattern
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     protected @Nullable Pattern createPattern() {
         try {
             return createPattern(this.searchString, this.regex);

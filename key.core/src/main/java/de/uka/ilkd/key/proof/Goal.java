@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.AbstractExternalSolverRuleApp;
@@ -115,7 +116,16 @@ public final class Goal implements ProofGoal<Goal> {
 
     /**
      * copy constructor
+     *
+     * <p>
+     * The {@link #setRuleAppManager} call and the {@code RuleAppIndex}/{@code FormulaTagManager}
+     * construction below operate on {@code this} (or values built from it) while the receiver is
+     * still under initialization (EISOP initialization check); safe here because the strategy
+     * manager only reacts to later events and the fields are not read during construction,
+     * suppressed with a scoped key.
      */
+    @SuppressWarnings({ "nullness:method.invocation.invalid", "nullness:argument.type.incompatible",
+        "nullness:assignment.type.incompatible" })
     private Goal(Node node, RuleAppIndex ruleAppIndex,
             ImmutableList<RuleApp> appliedRuleApps,
             @Nullable FormulaTagManager tagManager, RuleApplicationManager<Goal> ruleAppManager,
@@ -132,7 +142,16 @@ public final class Goal implements ProofGoal<Goal> {
 
     /**
      * creates a new goal referencing the given node
+     *
+     * <p>
+     * The {@link #setRuleAppManager} call and the {@code RuleAppIndex}/{@code FormulaTagManager}
+     * construction below operate on {@code this} (or values built from it) while the receiver is
+     * still under initialization (EISOP initialization check); safe here because the strategy
+     * manager only reacts to later events and the fields are not read during construction,
+     * suppressed with a scoped key.
      */
+    @SuppressWarnings({ "nullness:method.invocation.invalid", "nullness:argument.type.incompatible",
+        "nullness:assignment.type.incompatible" })
     public Goal(Node node, TacletIndex tacletIndex, BuiltInRuleAppIndex builtInRuleAppIndex,
             Services services) {
         this.node = node;
@@ -190,8 +209,13 @@ public final class Goal implements ProofGoal<Goal> {
     /**
      * Associates this goal with a new rule application manager. Passing {@code null} detaches the
      * goal from any manager.
+     * <p>
+     * After the null-guard below, the flow refinement of the (nullable) manager field is reset by
+     * the intervening index updates; the dereferences of the (nullable) manager field are
+     * suppressed with a scoped key.
      */
-    @SuppressWarnings("NullAway")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     public void setRuleAppManager(@Nullable RuleApplicationManager<Goal> manager) {
         if (ruleAppManager != null) {
             ruleAppIndex.setNewRuleListener(null);
@@ -403,9 +427,9 @@ public final class Goal implements ProofGoal<Goal> {
      * TODO: Check whether it is problematic when multiple child nodes of a node are linked; in this
      * case, the linkedNode field would be overwritten.
      *
-     * @param linkedGoal The goal that this goal is linked to.
+     * @param linkedGoal The goal that this goal is linked to; {@code null} clears the link.
      */
-    public void setLinkedGoal(final Goal linkedGoal) {
+    public void setLinkedGoal(final @Nullable Goal linkedGoal) {
         this.linkedGoal = linkedGoal;
     }
 
@@ -498,10 +522,12 @@ public final class Goal implements ProofGoal<Goal> {
             NoPosTacletApp.createFixedNoPosTacletApp(rule, insts, proof().getServices());
         if (tacletApp != null) {
             addNoPosTacletApp(tacletApp);
-            if (proof().getInitConfig() != null) { // do not break everything
+            InitConfig initConfig = proof().getInitConfig();
+            if (initConfig != null) { // do not break everything
                 // because of ProofMgt
-                proof().getInitConfig().registerRuleIntroducedAtNode(tacletApp,
-                    node.parent() != null ? node.parent() : node, isAxiom);
+                final Node parent = node.parent();
+                initConfig.registerRuleIntroducedAtNode(tacletApp,
+                    parent != null ? parent : node, isAxiom);
             }
         }
     }
@@ -618,10 +644,19 @@ public final class Goal implements ProofGoal<Goal> {
         return goalList;
     }
 
-    /// Creates new nodes as children of the referenced node and apply each given
-    /// non-null goal transformer to each proof.
-    ///
-    /// @return the list of new created goals, manipulated by funcs
+    /**
+     * Creates new nodes as children of the referenced node and apply each given non-null goal
+     * transformer to each proof.
+     *
+     * @return the list of new created goals, manipulated by funcs
+     *         <p>
+     *         The consumer list was filtered for non-null elements, but the checker does not refine
+     *         the
+     *         element type of the resulting list; the dereference of the (nullable) element is
+     *         suppressed
+     *         with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public ImmutableList<Goal> splitAndTransform(List<@Nullable Consumer<Goal>> funcs) {
         final var nonNullFuncs = funcs.stream().filter(Objects::nonNull).toList();
         var n = nonNullFuncs.size();

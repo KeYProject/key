@@ -506,7 +506,7 @@ public class SVInstantiations
      * @return true if the given object and this one have the same mappings
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         final SVInstantiations cmp;
         if (!(obj instanceof SVInstantiations)) {
             return false;

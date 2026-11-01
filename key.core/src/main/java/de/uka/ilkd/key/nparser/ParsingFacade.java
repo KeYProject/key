@@ -79,7 +79,11 @@ public final class ParsingFacade {
                 throw new IOException(e);
             }
             path = path.getParent();
-            Collection<RuleSource> includes = ctx.getIncludes(path).getRuleSets();
+            // A URL without a parent path component (e.g. "file:problem.key") yields a null base;
+            // resolving includes without a base would fail inside IncludeFinder anyway, so the
+            // absent base fails fast here with the same exception shape.
+            Collection<RuleSource> includes = ctx.getIncludes(Objects.requireNonNull(path,
+                "no parent directory for " + url)).getRuleSets();
             for (RuleSource u : includes) {
                 if (!reached.contains(u.url())) {
                     queue.push(u.url());

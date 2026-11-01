@@ -62,7 +62,7 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      */
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         List<ProofMacro> macros = getProofMacros();
         if (macros.isEmpty()) {
             return false;
@@ -82,7 +82,8 @@ public abstract class SequentialProofMacro extends AbstractProofMacro {
      */
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception {
         final List<Node> initNodes = new ArrayList<>(goals.size());
         for (Goal goal : goals) {

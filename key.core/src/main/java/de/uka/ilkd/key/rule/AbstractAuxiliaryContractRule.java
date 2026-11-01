@@ -55,10 +55,12 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
 
     /**
      *
-     * @param occurrence an occurrence.
+     * @param occurrence an occurrence, may be {@code null} for the "no specific occurrence" case,
+     *        which is treated as not at the top level of the succedent
      * @return {@code true} iff the occurrence is not at the top level in the succedent.
      */
-    protected static boolean occursNotAtTopLevelInSuccedent(final PosInOccurrence occurrence) {
+    protected static boolean occursNotAtTopLevelInSuccedent(
+            final @Nullable PosInOccurrence occurrence) {
         return occurrence == null || !occurrence.isTopLevel() || occurrence.isInAntec();
     }
 

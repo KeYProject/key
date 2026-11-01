@@ -15,6 +15,7 @@ import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public final class Metavariable extends JAbstractSortedOperator
@@ -75,7 +76,7 @@ public final class Metavariable extends JAbstractSortedOperator
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof Metavariable)) {
             return false;
         }

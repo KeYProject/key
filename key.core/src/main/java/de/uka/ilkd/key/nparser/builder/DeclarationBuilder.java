@@ -30,6 +30,7 @@ import org.key_project.util.java.CollectionUtil;
 
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,16 +59,26 @@ public class DeclarationBuilder extends DefaultBuilder {
         super(services, nss);
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
-    public Object visitDecls(JavaKeYParser.DeclsContext ctx) {
+    public @Nullable Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         mapMapOf(ctx.option_decls(), ctx.options_choice(), ctx.ruleset_decls(), ctx.sort_decls(),
             ctx.datatype_decls(),
             ctx.prog_var_decls(), ctx.schema_var_decls());
         return null;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
-    public Object visitDatatype_decl(JavaKeYParser.Datatype_declContext ctx) {
+    public @Nullable Object visitDatatype_decl(JavaKeYParser.Datatype_declContext ctx) {
         var name = ctx.name.getText();
         var doc = processDocumentation(ctx.doc);
         var origin = BuilderHelpers.getPosition(ctx);
@@ -93,13 +104,23 @@ public class DeclarationBuilder extends DefaultBuilder {
         return null;
     }
 
+    /**
+     * Resolves the declared program-variable name list.
+     * <p>
+     * A declared program variable requires a KeY Java type, which the accepted (nullable) type
+     * mapping is guaranteed by the parser to carry and is enforced non-null with an explicit check
+     * below; the override may legitimately return {@code null}. Remaining nullable dereferences are
+     * suppressed with a scoped key.
+     */
     @Override
-    public Object visitProg_var_decls(JavaKeYParser.Prog_var_declsContext ctx) {
+    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable" })
+    public @Nullable Object visitProg_var_decls(JavaKeYParser.Prog_var_declsContext ctx) {
         for (int i = 0; i < ctx.simple_ident_comma_list_with_docs().size(); i++) {
             var c = ctx.simple_ident_comma_list_with_docs(i);
-            List<String> varNames = c.simple_ident_with_doc()
-                    .stream().map(it -> (String) accept(it.simple_ident())).toList();
-            KeYJavaType kjt = accept(ctx.typemapping(i));
+            List<String> varNames = c.simple_ident_with_doc().stream()
+                    .map(it -> Objects.requireNonNull((String) accept(it.simple_ident())))
+                    .toList();
+            KeYJavaType kjt = Objects.requireNonNull(accept(ctx.typemapping(i)));
             assert varNames != null;
             for (String varName : varNames) {
                 if (varName.equals("null")) {
@@ -124,8 +145,9 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
 
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
-    public Object visitChoice(JavaKeYParser.ChoiceContext ctx) {
+    public @Nullable Object visitChoice(JavaKeYParser.ChoiceContext ctx) {
         String cat = ctx.category.getText();
         String catDoc = processDocumentation(ctx.maindoc);
         docsSpace().setDocumentation(new HasMetaSpaceKey.OptionCategory(cat), catDoc);
@@ -154,14 +176,22 @@ public class DeclarationBuilder extends DefaultBuilder {
         return null;
     }
 
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
-    public Object visitSort_decls(JavaKeYParser.Sort_declsContext ctx) {
+    public @Nullable Object visitSort_decls(JavaKeYParser.Sort_declsContext ctx) {
         for (JavaKeYParser.One_sort_declContext c : ctx.one_sort_decl()) {
             c.accept(this);
         }
         return null;
     }
 
+    /**
+     * Builds a single sort declaration. The origin of an already-present (colliding) sort printed
+     * in the debug message may legitimately be {@code null} for sorts without recorded source
+     * information, so the violating argument of the nullable {@code findOrigin} result is
+     * suppressed here; the sort alias below is guarded with an explicit non-null check.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     public Object visitOne_sort_decl(JavaKeYParser.One_sort_declContext ctx) {
         List<Sort> sortOneOf = accept(ctx.sortOneOf);
@@ -185,7 +215,9 @@ public class DeclarationBuilder extends DefaultBuilder {
             if (namespaces().sortAliases().lookup(name) != null) {
                 semanticError(ctx, "A sort alias of name %s already exists", name);
             }
-            Sort aliased = accept(ctx.sortId());
+            // the referenced sort is guaranteed to be declared; otherwise visitSortId raises a
+            // semantic error, so the accepted (nullable) sort is never null here
+            Sort aliased = Objects.requireNonNull(accept(ctx.sortId()));
             var alias = new SortAlias(name, aliased);
             namespaces().sortAliases().addSafely(alias);
             return alias;
@@ -222,7 +254,9 @@ public class DeclarationBuilder extends DefaultBuilder {
                     assert s != null;
                     String doc = processDocumentation(idCtx.DOC_COMMENT());
                     String origin = BuilderHelpers.getPosition(idCtx);
-                    docsSpace().setOrigin(s, origin);
+                    // every branch above either assigns a non-null sort or raises a semantic error;
+                    // the assert is not a nullness refinement for the checker, hence requireNonNull
+                    docsSpace().setOrigin(Objects.requireNonNull(s), origin);
                     docsSpace().setDocumentation(s,
                         Stream.of(doc, sectionDoc).filter(Objects::nonNull)
                                 .collect(Collectors.joining("\n")));
@@ -245,7 +279,10 @@ public class DeclarationBuilder extends DefaultBuilder {
             assert declCtx != null : "One of the two must be present";
             List<GenericParameter> typeParams =
                 visitFormal_sort_param_decls(declCtx.formal_sort_param_decls());
-            ImmutableList<GenericParameter> params = ImmutableList.fromList(typeParams);
+            // a parametric sort declaration always carries its parameters; requireNonNull preserves
+            // the NPE that ImmutableList.fromList would raise on a null list anyway
+            ImmutableList<GenericParameter> params =
+                ImmutableList.fromList(Objects.requireNonNull(typeParams));
             var doubled = CollectionUtil.findDuplicates(params.map(GenericParameter::sort));
             if (!doubled.isEmpty()) {
                 semanticError(declCtx,
@@ -286,8 +323,9 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
 
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
-    public Object visitRuleset_decls(JavaKeYParser.Ruleset_declsContext ctx) {
+    public @Nullable Object visitRuleset_decls(JavaKeYParser.Ruleset_declsContext ctx) {
         for (JavaKeYParser.Simple_ident_with_docContext iddoc : ctx.id) {
             String id = accept(iddoc.simple_ident());
             String doc = processDocumentation(iddoc.DOC_COMMENT());
@@ -301,8 +339,9 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
 
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
-    public Object visitOptions_choice(JavaKeYParser.Options_choiceContext ctx) {
+    public @Nullable Object visitOptions_choice(JavaKeYParser.Options_choiceContext ctx) {
         return null;
     }
 

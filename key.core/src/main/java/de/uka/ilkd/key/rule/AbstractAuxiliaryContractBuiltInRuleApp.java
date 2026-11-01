@@ -50,7 +50,12 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp<T extends BuiltInR
      * @param rule the rule being applied.
      * @param occurrence the position at which the rule is applied.
      * @param ifInstantiations if instantiations.
+     *        <p>
+     *        The execution context is supplied by the concrete application builders via
+     *        {@code setExecutionContext(...)} after construction; the difference is suppressed with
+     *        a scoped key.
      */
+    @SuppressWarnings("nullness:initialization.fields.uninitialized")
     protected AbstractAuxiliaryContractBuiltInRuleApp(T rule, PosInOccurrence occurrence,
             @Nullable ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
@@ -68,6 +73,12 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp<T extends BuiltInR
      *
      * @return the statement (block or loop) which the applied contract belongs to.
      */
+    /**
+     * The statement is {@code @Nullable} until {@link #setStatement(JavaStatement)} is called by
+     * the instantiating code, so the difference from the non-null result is suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public JavaStatement getStatement() {
         return statement;
     }

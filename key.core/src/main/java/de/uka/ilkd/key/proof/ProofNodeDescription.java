@@ -22,7 +22,12 @@ public class ProofNodeDescription implements Serializable {
      *
      * @param node the current node
      * @return a String containing the path information to display
+     *         <p>
+     *         The branch label of a node is present whenever the node carries one; the dereferences
+     *         of
+     *         the (nullable) label are suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public static String collectPathInformation(@Nullable Node node) {
         while (node != null) {
             if (node.getNodeInfo() != null && node.getNodeInfo().getBranchLabel() != null) {

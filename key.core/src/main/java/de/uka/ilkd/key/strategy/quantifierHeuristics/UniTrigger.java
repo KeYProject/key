@@ -20,6 +20,7 @@ import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -151,7 +152,7 @@ class UniTrigger implements Trigger {
         return trigger;
     }
 
-    public boolean equals(Object other) {
+    public boolean equals(@Nullable Object other) {
         if (!(other instanceof UniTrigger otherTrigger)) {
             return false;
         }

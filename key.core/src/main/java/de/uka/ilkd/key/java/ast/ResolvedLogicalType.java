@@ -15,6 +15,7 @@ import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -49,7 +50,14 @@ public class ResolvedLogicalType
         return Collections.emptySet();
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The logical sort of the resolved type is present for every integral primitive type; the
+     * dereference of the (nullable) sort is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public boolean isAssignableBy(ResolvedType type) {
         if (type instanceof ResolvedPrimitiveType primitiveType) {
             if (primitiveType.isBoolean()) {
@@ -123,7 +131,7 @@ public class ResolvedLogicalType
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -138,7 +146,12 @@ public class ResolvedLogicalType
     }
 
 
+    /**
+     * The logical sort of the resolved type is present for every integral primitive type; the
+     * dereference of the (nullable) sort is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public boolean isAssignableToPrimitive(ResolvedPrimitiveType primitiveType) {
         if (primitiveType.isBoolean()) {
             return false;

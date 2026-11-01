@@ -135,6 +135,11 @@ public final class ProgramSV extends JOperatorSV
         return 0;
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable Expression getExpressionAt(int index) {
         return null;
@@ -206,7 +211,7 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public @Nullable KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         return null;
     }
 
@@ -350,14 +355,16 @@ public final class ProgramSV extends JOperatorSV
         if (instant == null || instant.equals(src)
                 || (instant instanceof JTerm && ((JTerm) instant).op().equals(src))) {
 
-            matchCond = addProgramInstantiation(
-                Objects.requireNonNull(src, "no matched program element"), matchCond, services);
+            final @Nullable MatchConditions newMatchCond = addProgramInstantiation(
+                Objects.requireNonNull(src, "no matched program element"), matchCond,
+                services);
 
-            if (matchCond == null) {
+            if (newMatchCond == null) {
                 // FAILED due to incompatibility with already found matchings
                 // (e.g. generic sorts)
                 return null;
             }
+            matchCond = newMatchCond;
         } else {
             LOGGER.debug("Match failed: Former match of "
                 + " SchemaVariable incompatible with " + " the current match.");

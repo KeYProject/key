@@ -14,6 +14,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A lattice for all predicates accepting the given sort. This lattice consists of n + 2 elements,
@@ -105,7 +106,7 @@ public class SimplePredicateAbstractionLattice extends AbstractPredicateAbstract
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         return obj instanceof SimplePredicateAbstractionLattice
                 && ((SimplePredicateAbstractionLattice) obj).predicates.equals(this.predicates);
     }

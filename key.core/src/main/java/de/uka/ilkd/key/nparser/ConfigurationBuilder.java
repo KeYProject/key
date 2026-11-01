@@ -36,6 +36,11 @@ class ConfigurationBuilder extends JavaKeYParserBaseVisitor<Object> {
         return ctx.IDENT().getText();
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable String visitCsymbol(JavaKeYParser.CsymbolContext ctx) {
         if (ctx.getText().equals("null")) {
@@ -109,8 +114,8 @@ class ConfigurationBuilder extends JavaKeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public List<Object> visitList(JavaKeYParser.ListContext ctx) {
-        var seq = new ArrayList<>(ctx.children.size());
+    public List<@Nullable Object> visitList(JavaKeYParser.ListContext ctx) {
+        var seq = new ArrayList<@Nullable Object>(ctx.children.size());
         for (JavaKeYParser.CvalueContext context : ctx.cvalue()) {
             seq.add(context.accept(this));
         }

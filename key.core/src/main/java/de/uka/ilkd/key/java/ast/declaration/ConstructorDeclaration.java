@@ -20,6 +20,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The getTypeReference method returns null - constructors do not have explicite return types. A
@@ -63,9 +64,9 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
     }
 
     public ConstructorDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> map,
-            TypeReference o, Comment[] comments, ProgramElementName name,
+            @Nullable TypeReference o, Comment @Nullable [] comments, ProgramElementName name,
             ImmutableArray<ParameterDeclaration> map1,
-            Throws exceptions, StatementBlock body, boolean parentIsInterfaceDeclaration,
+            @Nullable Throws exceptions, StatementBlock body, boolean parentIsInterfaceDeclaration,
             List<TextualJMLConstruct> specs) {
         super(pi, c, map, o, comments, name, map1, exceptions, body, parentIsInterfaceDeclaration,
             ImmutableList.fromList(specs));

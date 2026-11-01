@@ -108,7 +108,7 @@ public class New extends TypeOperator implements ConstructorReference, Expressio
     }
 
     public New(PositionInfo pi, List<Comment> c, ImmutableArray<Expression> arguments,
-            TypeReference type, ClassDeclaration anonymousClass) {
+            TypeReference type, @Nullable ClassDeclaration anonymousClass) {
         super(pi, c, arguments, type);
         this.anonymousClass = anonymousClass;
         accessPath = null;

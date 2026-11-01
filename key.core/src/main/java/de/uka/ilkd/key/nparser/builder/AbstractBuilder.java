@@ -57,11 +57,16 @@ abstract class AbstractBuilder<T> extends JavaKeYParserBaseVisitor<T> {
         return aggregate;
     }
 
-    protected <U> U peek() {
+    @SuppressWarnings("nullness:cast.unsafe") // the stack holds only caller-typed builder values
+    protected <U> @Nullable U peek() {
         return (U) (parameters == null || parameters.isEmpty() ? null : parameters.peek());
     }
 
-    protected <U> U acceptFirst(Collection<? extends RuleContext> seq) {
+    /**
+     * Accepts the first element of the given non-empty sequence; {@code null} if the sequence is
+     * empty. Falls back to {@link #accept(RuleContext)} on the first element.
+     */
+    protected <U> @Nullable U acceptFirst(Collection<? extends RuleContext> seq) {
         if (seq.isEmpty()) {
             return null;
         }
@@ -84,6 +89,15 @@ abstract class AbstractBuilder<T> extends JavaKeYParserBaseVisitor<T> {
         }
     }
 
+    /**
+     * Accepts the given rule context, pushing the arguments onto the param stack and restoring
+     * the stack depth afterwards.
+     * <p>
+     * The param stack is (re)initialized before its size is read; the flow analysis cannot see
+     * through the field assignment, hence the dereference of the (nullable) stack field is
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected <U> @Nullable U accept(@Nullable RuleContext ctx, Object... args) {
         if (parameters == null) {
             parameters = new Stack<>();
@@ -98,7 +112,11 @@ abstract class AbstractBuilder<T> extends JavaKeYParserBaseVisitor<T> {
         return t;
     }
 
-    protected <U> U oneOf(ParserRuleContext... ctxs) {
+    /**
+     * Accepts the first non-null parser rule context of the given contexts, or {@code null} if
+     * all are null.
+     */
+    protected <U> @Nullable U oneOf(ParserRuleContext... ctxs) {
         for (ParserRuleContext ctx : ctxs) {
             if (ctx != null) {
                 return (U) ctx.accept(this);
@@ -125,6 +143,7 @@ abstract class AbstractBuilder<T> extends JavaKeYParserBaseVisitor<T> {
     }
     // endregion
 
+    @SuppressWarnings("nullness:cast.unsafe") // accept() results match the caller-typed roles
     protected <T2> List<T2> mapMapOf(List<? extends RuleContext>... ctxss) {
         return Arrays.stream(ctxss).flatMap(it -> it.stream().map(a -> (T2) accept(a)))
                 .collect(Collectors.toList());
@@ -137,7 +156,7 @@ abstract class AbstractBuilder<T> extends JavaKeYParserBaseVisitor<T> {
         return buildingIssues;
     }
 
-    protected void addWarning(ParserRuleContext ctx, Exception e, String message) {
+    protected void addWarning(ParserRuleContext ctx, @Nullable Exception e, String message) {
         BuildingIssue be = BuildingIssue.createWarning(message, ctx, e);
         getBuildingIssues().add(be);
     }
@@ -155,16 +174,27 @@ abstract class AbstractBuilder<T> extends JavaKeYParserBaseVisitor<T> {
     // region error handling
 
     /**
-     * Throws a semanticError for the given ast node and message.
+     * Throws a semanticError for the given ast node and message. The ast node may be
+     * <code>null</code> when no precise source location is available. The generic return type
+     * allows the call to be used as a <code>return</code> expression on the (unreachable) paths
+     * that exit solely by throwing; the type parameter is never instantiated with a value.
+     *
+     * @param <T> any desired return type
+     * @param ctx the ast node describing the error location, may be null
      */
-    protected void semanticError(ParserRuleContext ctx, String format, Object... args) {
-        throw new BuildingException(ctx, String.format(format, args));
+    protected <T> T semanticError(@Nullable ParserRuleContext ctx, String format, Object... args) {
+        throw new BuildingException(ctx == null ? null : ctx.start, null,
+            String.format(format, args), null);
     }
 
     /**
-     * Wraps an exception into a {@link BuildingException}
+     * Wraps an exception into a {@link BuildingException}. The generic return type allows the call
+     * to be used as a <code>return</code> expression on paths that exit solely by throwing; the
+     * type parameter is never instantiated with a value.
+     *
+     * @param <T> any desired return type
      */
-    protected void throwEx(Throwable e) {
+    protected <T> T throwEx(Throwable e) {
         throw new BuildingException(e);
     }
     // endregion

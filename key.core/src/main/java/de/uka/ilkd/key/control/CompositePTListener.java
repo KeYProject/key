@@ -19,9 +19,15 @@ import org.jspecify.annotations.Nullable;
  */
 @NullMarked
 public class CompositePTListener implements ProverTaskListener {
-    private final ProverTaskListener[] listeners;
+    private final @Nullable ProverTaskListener[] listeners;
 
-    public CompositePTListener(ProverTaskListener[] l) {
+    /**
+     * Creates a composite listener over the given listeners. Null elements are tolerated and
+     * skipped by the dispatch methods.
+     *
+     * @param l the listeners to combine, possibly containing null entries
+     */
+    public CompositePTListener(@Nullable ProverTaskListener[] l) {
         this.listeners = l;
     }
 

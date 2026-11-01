@@ -12,6 +12,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Encapsulates intermediate information for constructing a close-join-partner rule application.
@@ -30,10 +31,11 @@ public class MergePartnerAppIntermediate extends BuiltInAppIntermediate {
      * @param pos Position information for the merge rule application (Symbolic State - Program
      *        Counter formula).
      * @param mergeNodeId The ID of the corresponding merge node.
-     * @param newNames New names registered in the course of partner goal closing.
+     * @param newNames New names registered in the course of partner goal closing; null if no new
+     *        names were registered.
      */
     public MergePartnerAppIntermediate(String ruleName, Pair<Integer, PosInTerm> pos,
-            int mergeNodeId, ImmutableList<Name> newNames) {
+            int mergeNodeId, @Nullable ImmutableList<Name> newNames) {
         super(ruleName, pos, null, null, null, newNames);
 
         assert ruleName.equals(CloseAfterMerge.INSTANCE.name().toString())

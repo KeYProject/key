@@ -47,7 +47,7 @@ public class ParameterDeclaration extends VariableDeclaration {
     // builds an "empty" parameter stub whose consumers all fail on it (getVariableSpecification
     // throws on the stub). Every non-default constructor requires a variable specification, so
     // the @NonNull field contract is intentionally not met only here.
-    @SuppressWarnings("NullAway")
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     public ParameterDeclaration() {
         this.varSpec = null;
         this.varArgParameter = false;

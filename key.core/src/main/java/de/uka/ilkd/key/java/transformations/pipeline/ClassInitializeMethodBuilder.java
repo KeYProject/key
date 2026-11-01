@@ -17,6 +17,7 @@
 
 package de.uka.ilkd.key.java.transformations.pipeline;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
@@ -156,7 +157,8 @@ public class ClassInitializeMethodBuilder extends JavaTransformerAbstract {
         var markErroneous = assignToPassive(PipelineConstants.IMPLICIT_CLASS_ERRONEOUS, mkTrue());
 
         Parameter param = new Parameter(
-            services.getType("java", "lang", caughtType),
+            Objects.requireNonNull(services.getType("java", "lang", caughtType),
+                "caught exception type must resolve"),
             caughtParam);
 
         catcher.add(resetInitInProgress);
@@ -198,7 +200,9 @@ public class ClassInitializeMethodBuilder extends JavaTransformerAbstract {
 
         ThrowStmt t = new ThrowStmt(
             new ObjectCreationExpr(null,
-                services.getType("java", "lang", "ExceptionInInitializerError"),
+                Objects.requireNonNull(
+                    services.getType("java", "lang", "ExceptionInInitializerError"),
+                    "initializer exception type must resolve"),
                 exceptionInInitializerArguments));
 
         catchClauses.add(createCatchClause("Throwable", "twa", t));
@@ -229,7 +233,9 @@ public class ClassInitializeMethodBuilder extends JavaTransformerAbstract {
         clErroneousBody.add(
             new ThrowStmt(
                 new ObjectCreationExpr(null,
-                    services.getType("java", "lang", "NoClassDefFoundError"),
+                    Objects.requireNonNull(
+                        services.getType("java", "lang", "NoClassDefFoundError"),
+                        "class def error type must resolve"),
                     new NodeList<>())));
 
         // IF $classErroneous : clErroneousBody : null

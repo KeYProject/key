@@ -100,7 +100,16 @@ public abstract class FindTaclet extends Taclet {
 
     /**
      * @return Set of schemavariables of the if and the (optional) find part
+     *         <p>
+     *         The field is {@code @Nullable} only because it is lazily built; once non-null it is
+     *         never
+     *         cleared, so the difference from the {@code @NonNull} result is suppressed with a
+     *         scoped key.
+     *         During the (single-threaded) lazy build, the accumulator under construction is still
+     *         {@code null} when it is extended; those dereferences are suppressed with a scoped
+     *         key.
      */
+    @SuppressWarnings({ "nullness:return.type.incompatible", "nullness:dereference.of.nullable" })
     public ImmutableSet<SchemaVariable> getAssumesAndFindVariables() {
         if (assumesAndFindSchemaVariables == null) {
             TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
@@ -127,7 +136,7 @@ public abstract class FindTaclet extends Taclet {
 
     /** {@inheritDoc} */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!super.equals(o)) {
             return false;
         }

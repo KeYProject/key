@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -45,6 +46,22 @@ public class SimpleFileRepo extends AbstractFileRepo {
         return null;
     }
 
+    /**
+     * Computes the repository-relative path of the given Java file. The {@code src},
+     * {@code bootclasspath} or {@code classpath} folder of the repository is chosen according to
+     * where the file is located; the path prefixes and parent directories involved are always
+     * present.
+     *
+     * @param javaFile The absolute path of the Java file.
+     * @return The repository-relative target path, or {@code null} if the file location could not
+     *         be mapped.
+     *         <p>
+     *         The source, classpath and bootclasspath roots of a repository are always set, and a
+     *         mapping
+     *         class-path entry is a directory; the dereferences of the (nullable) roots and the
+     *         (nullable) parent directory are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private @Nullable Path getJavaFilePath(Path javaFile) {
         // assumes that javaFile is an actual *.java file, path has to be absolute and normalized
         // return value: the path of the file relative to its proof bundle root
@@ -57,15 +74,18 @@ public class SimpleFileRepo extends AbstractFileRepo {
         } else if (isInBootClassPath(javaFile)) { // bootclasspath
             Path rel = getBootclasspath().relativize(javaFile);
             return Paths.get("bootclasspath").resolve(rel);
-        } else if (getClasspath() != null) { // classpath
-            // search for matching classpath in the list
-            for (Path cp : getClasspath()) {
-                if (javaFile.startsWith(cp)) { // only consider directories in classpath
-                    // cp is always a directory
-                    Path parent = cp.getParent();
+        } else {
+            var cpList = getClasspath();
+            if (cpList != null) { // classpath
+                // search for matching classpath in the list
+                for (Path cp : cpList) {
+                    if (javaFile.startsWith(cp)) { // only consider directories in classpath
+                        // cp is always a directory
+                        Path parent = cp.getParent();
 
-                    Path rel = parent.relativize(javaFile);
-                    return Paths.get("classpath").resolve(rel);
+                        Path rel = parent.relativize(javaFile);
+                        return Paths.get("classpath").resolve(rel);
+                    }
                 }
             }
         }
@@ -73,6 +93,13 @@ public class SimpleFileRepo extends AbstractFileRepo {
         return null;
     }
 
+    /**
+     * Computes the repository-relative path of the given KeY file.
+     * <p>
+     * The base directory of the repository is always set; the dereference of the (nullable) base
+     * directory is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private Path getKeyFilePath(Path keyFile) {
         if (keyFile.isAbsolute()) {
             // compute the relative target path (top level in repo)
@@ -85,31 +112,49 @@ public class SimpleFileRepo extends AbstractFileRepo {
 
     private Path getZipFilePath(Path zipFile) {
         // zip/jar may only occur in classpath
-        Path rel = zipFile.getFileName();
+        Path rel = Objects.requireNonNull(zipFile.getFileName());
         return Paths.get("classpath").resolve(rel);
     }
 
+    /**
+     * Computes the repository-relative path of the given class file.
+     * <p>
+     * A mapping class-path entry is a directory whose parent is always present; the dereference
+     * of the (nullable) parent directory is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private @Nullable Path getClassFilePath(Path classFile) {
         // copy to classpath folder (*.class files may only occur in classpath)
 
         // class file may be in subdirectories
         // search for matching classpath in the list
-        for (Path cp : getClasspath()) {
-            if (classFile.startsWith(cp)) { // only consider directories in classpath
-                // cp is always a directory
-                // -> we put the file into the corresponding subdir in our classpath folder
-                Path parent = cp.getParent();
+        var cpList = getClasspath();
+        if (cpList != null) {
+            for (Path cp : cpList) {
+                if (classFile.startsWith(cp)) { // only consider directories in classpath
+                    // cp is always a directory
+                    // -> we put the file into the corresponding subdir in our classpath folder
+                    Path parent = cp.getParent();
 
-                // we found the file location
-                Path rel = parent.resolve(classFile);
-                return Paths.get("classpath").resolve(rel);
+                    // we found the file location
+                    Path rel = parent.resolve(classFile);
+                    return Paths.get("classpath").resolve(rel);
+                }
             }
         }
 
         return null;
     }
 
+    /**
+     * Opens a stream for the given repository-relative path, interpreting it relative to the base
+     * directory of the repository.
+     * <p>
+     * The base directory of the repository is always set; the dereference of the (nullable) base
+     * directory is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected @Nullable InputStream getInputStreamInternal(Path p) throws FileNotFoundException {
         Path concrete;
         if (p.isAbsolute()) { // p is absolute -> directly read
@@ -166,7 +211,14 @@ public class SimpleFileRepo extends AbstractFileRepo {
         return new FileInputStream(norm.toFile());
     }
 
+    /**
+     * Stores a new file at the given repository-relative path and opens an output stream to it.
+     * <p>
+     * The base directory of the repository is always set; the dereference of the (nullable) base
+     * directory is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public OutputStream createOutputStream(Path path) throws FileNotFoundException {
         if (path.isAbsolute()) {
             // programming error!

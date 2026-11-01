@@ -88,7 +88,14 @@ public class DefaultProofControl extends AbstractProofControl {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The auto-mode thread is running whenever auto mode is active, which is checked here; the
+     * dereference of the (nullable) thread field is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public synchronized void stopAutoMode() {
         if (isInAutoMode()) {
             autoModeThread.interrupt();
@@ -178,7 +185,18 @@ public class DefaultProofControl extends AbstractProofControl {
             this.posInOcc = posInOcc;
         }
 
+        /**
+         * {@inheritDoc}
+         * <p>
+         * The finished task info may be {@code null} when the macro failed before producing a
+         * result: it is only assigned once {@link ProofMacro#applyTo} returned, yet the listener is
+         * still notified of the task's end as a best-effort cleanup. Listeners are expected to
+         * tolerate a {@code null} finished info (the GUI's finished-event handling explicitly
+         * checks for it), so the nullable argument is passed through deliberately and the warning
+         * is suppressed with a scoped key.
+         */
         @Override
+        @SuppressWarnings("nullness:argument.type.incompatible")
         public void run() {
             Proof proof = node.proof();
             ProverTaskListener ptl = getDefaultProverTaskListener();

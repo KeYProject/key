@@ -114,6 +114,9 @@ public class IntermediateProofReplayer {
     /** The problem loader, for reporting errors */
     private final AbstractProblemLoader loader;
     /** The proof object into which to load the replayed proof */
+    /// The proof is assigned in both constructors before any use; the null placeholder
+    /// initializer is suppressed with a scoped key.
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     private Proof proof = null;
 
     /** Encountered errors */
@@ -155,7 +158,8 @@ public class IntermediateProofReplayer {
         this.loader = loader;
 
         queue.addFirst(
-            new Pair<>(proof.root(), parserResult.parsedResult()));
+            new Pair<Node, NodeIntermediate>(Objects.requireNonNull(proof.root()),
+                Objects.requireNonNull(parserResult.parsedResult())));
     }
 
     /**
@@ -203,7 +207,13 @@ public class IntermediateProofReplayer {
      * @param deleteIntermediateTree indicates if the intermediate proof tree should be
      *        deleted (set to false if it shal be kept for further use)
      * @return result of the replay procedure (see {@link Result})
+     *         <p>
+     *         The invariants of the intermediate proof format guarantee that the work queue
+     *         entries, the
+     *         current goal and the intermediate rule applications are present whenever they are
+     *         accessed; the dereferences are suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public Result replay(ProblemInitializer.ProblemInitializerListener listener,
             ProgressMonitor progressMonitor, boolean deleteIntermediateTree) {
         // initialize progress monitoring
@@ -358,9 +368,10 @@ public class IntermediateProofReplayer {
                                 currNodeInterm));
                         } else {
                             try {
-                                IBuiltInRuleApp app = constructBuiltinApp(appInterm, currGoal);
+                                IBuiltInRuleApp app = constructBuiltinApp(appInterm,
+                                    Objects.requireNonNull(currGoal));
                                 if (!app.complete()) {
-                                    app = app.tryToInstantiate(currGoal);
+                                    app = app.tryToInstantiate(Objects.requireNonNull(currGoal));
                                 }
                                 currGoal.apply(app);
 
@@ -407,7 +418,13 @@ public class IntermediateProofReplayer {
      *
      * @param children Iterator of proof node children.
      * @param intermChildren List of corresponding intermediate children.
+     *        <p>
+     *        During replay every unclosed proof node corresponds to exactly one intermediate
+     *        application and has a matching open goal; the dereferences are suppressed with a
+     *        scoped
+     *        key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private void addChildren(Iterator<Node> children, LinkedList<NodeIntermediate> intermChildren) {
         int i = 0;
         while (!currGoal.node().isClosed() && children.hasNext() && intermChildren.size() > 0) {
@@ -447,7 +464,14 @@ public class IntermediateProofReplayer {
      * @param currGoal The goal on which to apply the taclet app.
      * @return The taclet application corresponding to the supplied intermediate representation.
      * @throws TacletAppConstructionException In case of an error during construction.
+     *         <p>
+     *         The initialized proof configuration and the matched taclet application are guaranteed
+     *         to
+     *         exist when a taclet application is reconstructed; the dereferences are suppressed
+     *         with a
+     *         scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private TacletApp constructTacletApp(TacletAppIntermediate currInterm, Goal currGoal)
             throws TacletAppConstructionException {
 
@@ -530,7 +554,8 @@ public class IntermediateProofReplayer {
             }
         }
 
-        ourApp = constructInsts(ourApp, currGoal, currInterm.getInsts(), services);
+        ourApp = constructInsts(Objects.requireNonNull(ourApp), currGoal, currInterm.getInsts(),
+            services);
 
         ImmutableList<AssumesFormulaInstantiation> ifFormulaList = ImmutableList.nil();
         for (String ifFormulaStr : currInterm.getIfSeqFormulaList()) {
@@ -567,12 +592,17 @@ public class IntermediateProofReplayer {
         // TODO: In certain cases, the below method call returns null and
         // induces follow-up NullPointerExceptions. This was encountered
         // in a proof of the TimSort method binarySort with several joins.
-        ourApp = ourApp.setIfFormulaInstantiations(ifFormulaList, services);
+        ourApp = ourApp.setIfFormulaInstantiations(Objects.requireNonNull(ifFormulaList),
+            services);
 
         if (!ourApp.complete()) {
             ourApp = ourApp.tryToInstantiate(proof.getServices());
         }
 
+        if (ourApp == null) {
+            throw new IllegalStateException("Rule application for " + tacletName
+                + " could not be reconstructed from the stored intermediate");
+        }
         return ourApp;
     }
 
@@ -585,7 +615,13 @@ public class IntermediateProofReplayer {
      * @throws SkipSMTRuleException If the proof has been loaded, but the SMT solvers have not been
      *         run.
      * @throws BuiltInConstructionException In case of an error during construction.
+     *         <p>
+     *         The SMT run and the if-instantiations of a built-in application are guaranteed to be
+     *         present when a built-in application is reconstructed; the dereferences of the current
+     *         goal and the nullable if-instantiation passed to the one-step simplifier (null is
+     *         tolerated there and means "no restriction") are suppressed with scoped keys.
      */
+    @SuppressWarnings({ "nullness:dereference.of.nullable", "nullness:argument.type.incompatible" })
     private IBuiltInRuleApp constructBuiltinApp(BuiltInAppIntermediate currInterm, Goal currGoal)
             throws SkipSMTRuleException, BuiltInConstructionException {
 
@@ -597,22 +633,25 @@ public class IntermediateProofReplayer {
         ImmutableList<PosInOccurrence> builtinIfInsts = null;
 
         // Load contracts, if applicable
-        if (currInterm.getContract() != null) {
+        final @Nullable String contractName = currInterm.getContract();
+        if (contractName != null) {
             currContract = proof.getServices().getSpecificationRepository()
-                    .getContractByName(currInterm.getContract());
+                    .getContractByName(contractName);
             if (currContract == null) {
                 final ProblemLoaderException e =
                     new ProblemLoaderException(loader, "Error loading proof: contract \""
-                        + currInterm.getContract() + "\" not found.");
+                        + contractName + "\" not found.");
                 reportError(ERROR_LOADING_PROOF_LINE + ", goal " + currGoal.node().serialNr()
                     + ", rule " + ruleName + NOT_APPLICABLE, e);
             }
         }
 
         // Load ifInsts, if applicable
-        if (currInterm.getBuiltInIfInsts() != null) {
+        final ImmutableList<Pair<Integer, PosInTerm>> builtinIfInstsList =
+            currInterm.getBuiltInIfInsts();
+        if (builtinIfInstsList != null) {
             builtinIfInsts = ImmutableList.nil();
-            for (final Pair<Integer, PosInTerm> ifInstP : currInterm.getBuiltInIfInsts()) {
+            for (final Pair<Integer, PosInTerm> ifInstP : builtinIfInstsList) {
                 final int currIfInstFormula = ifInstP.first;
                 final PosInTerm currIfInstPosInTerm = ifInstP.second;
 
@@ -708,10 +747,10 @@ public class IntermediateProofReplayer {
 
             if (currContract instanceof OperationContract) {
                 var rule = proof.getServices().getProfile().getUseOperationContractRule();
-                contractApp = rule.createApp(pos).setContract(currContract);
+                contractApp = rule.createApp(Objects.requireNonNull(pos)).setContract(currContract);
             } else {
                 var rule = proof.getServices().getProfile().getUseDependencyContractRule();
-                contractApp = rule.createApp(pos).setContract(currContract);
+                contractApp = rule.createApp(Objects.requireNonNull(pos)).setContract(currContract);
                 // restore "step" if needed
                 var depContractApp = ((UseDependencyContractApp<?>) contractApp);
                 if (depContractApp.step() == null) {
@@ -731,7 +770,8 @@ public class IntermediateProofReplayer {
             return ourApp;
         }
 
-        final ImmutableSet<IBuiltInRuleApp> ruleApps = collectAppsForRule(ruleName, currGoal, pos);
+        final ImmutableSet<IBuiltInRuleApp> ruleApps =
+            collectAppsForRule(ruleName, currGoal, Objects.requireNonNull(pos));
         if (ruleApps.size() != 1) {
             if (ruleApps.size() < 1) {
                 throw new BuiltInConstructionException(
@@ -765,16 +805,24 @@ public class IntermediateProofReplayer {
      *         run.
      * @throws BuiltInConstructionException In case of an error during construction of the builtin
      *         rule app.
+     *         <p>
+     *         The current proof and its open goals are guaranteed to be present when a join rule
+     *         application is instantiated; the dereferences are suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private MergeRuleBuiltInRuleApp instantiateJoinApp(final MergeAppIntermediate joinAppInterm,
             final Node currNode,
             final Set<PartnerNode> partnerNodesInfo,
             final Services services) throws SkipSMTRuleException, BuiltInConstructionException {
-        final MergeRuleBuiltInRuleApp joinApp =
-            (MergeRuleBuiltInRuleApp) constructBuiltinApp(joinAppInterm, currGoal);
-        joinApp.setConcreteRule(MergeProcedure.getProcedureByName(joinAppInterm.getJoinProc()));
+        final MergeRuleBuiltInRuleApp joinApp = (MergeRuleBuiltInRuleApp) constructBuiltinApp(
+            joinAppInterm, Objects.requireNonNull(currGoal));
+        final String joinProcName = Objects.requireNonNull(joinAppInterm.getJoinProc());
+        joinApp.setConcreteRule(
+            Objects.requireNonNull(MergeProcedure.getProcedureByName(joinProcName)));
+        final String distFormula =
+            Objects.requireNonNull(joinAppInterm.getDistinguishingFormula());
         joinApp.setDistinguishingFormula(
-            MergeRuleUtils.translateToFormula(services, joinAppInterm.getDistinguishingFormula()));
+            Objects.requireNonNull(MergeRuleUtils.translateToFormula(services, distFormula)));
 
         // Predicate abstraction join rule
         if (joinApp.getConcreteRule() instanceof MergeWithPredicateAbstractionFactory) {
@@ -784,12 +832,11 @@ public class IntermediateProofReplayer {
             // case, it is the expected behavior to create a default lattice
             // with top and bottom elements only, which is accomplished by just
             // supplying an empty list of predicates to the join procedure.
-            if (joinAppInterm.getAbstractionPredicates() != null) {
+            final @Nullable String abstrPredicates = joinAppInterm.getAbstractionPredicates();
+            if (abstrPredicates != null) {
                 try {
-                    predicates =
-                        AbstractionPredicate.fromString(joinAppInterm.getAbstractionPredicates(),
-                            services,
-                            services.getProof().getOpenGoal(currNode).getLocalNamespaces());
+                    predicates = AbstractionPredicate.fromString(abstrPredicates, services,
+                        services.getProof().getOpenGoal(currNode).getLocalNamespaces());
                 } catch (ParserException e) {
                     errors.add(e);
                 }
@@ -801,9 +848,10 @@ public class IntermediateProofReplayer {
             LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices =
                 new LinkedHashMap<>();
 
-            if (joinAppInterm.getUserChoices() != null) {
+            final @Nullable String userChoicesStr = joinAppInterm.getUserChoices();
+            if (userChoicesStr != null) {
                 final Pattern p = Pattern.compile("\\('(.+?)', `(.+?)`\\)");
-                final Matcher m = p.matcher(joinAppInterm.getUserChoices());
+                final Matcher m = p.matcher(userChoicesStr);
 
                 boolean matched = false;
                 while (m.find()) {
@@ -814,8 +862,8 @@ public class IntermediateProofReplayer {
                             + "There should always be pairs of program variables "
                             + "and abstract domain elements.";
 
-                        final String progVarStr = m.group(i);
-                        final String abstrElemStr = m.group(i + 1);
+                        final String progVarStr = Objects.requireNonNull(m.group(i));
+                        final String abstrElemStr = Objects.requireNonNull(m.group(i + 1));
 
                         // Parse the program variable
                         final Pair<Sort, Name> ph =
@@ -829,7 +877,7 @@ public class IntermediateProofReplayer {
                         // Parse the abstract domain element
                         final AbstractDomainElement elem = MergeWithPredicateAbstraction
                                 .instantiateAbstractDomain(ph.first, applicablePredicates,
-                                    latticeType, services)
+                                    Objects.requireNonNull(latticeType), services)
                                 .fromString(abstrElemStr, services);
                         final Named pv =
                             services.getNamespaces().programVariables().lookup(ph.second);
@@ -838,7 +886,7 @@ public class IntermediateProofReplayer {
                                 && ((ProgramVariable) pv).sort().equals(ph.first)
                                 : "Program variable involved in join is not known to the system";
 
-                        userChoices.put((ProgramVariable) pv, elem);
+                        userChoices.put(Objects.requireNonNull((ProgramVariable) pv), elem);
                     }
                 }
 
@@ -859,16 +907,17 @@ public class IntermediateProofReplayer {
         ImmutableList<MergePartner> joinPartners = ImmutableList.nil();
         for (PartnerNode partnerNodeInfo : partnerNodesInfo) {
 
-            SymbolicExecutionStateWithProgCnt ownSEState =
-                sequentToSETriple(currNode, joinApp.posInOccurrence(), services);
+            SymbolicExecutionStateWithProgCnt ownSEState = sequentToSETriple(currNode,
+                Objects.requireNonNull(joinApp.posInOccurrence()), services);
             var partnerSEState =
                 sequentToSETriple(partnerNodeInfo.node, partnerNodeInfo.pio, services);
 
             assert ownSEState.programCounter().equals(partnerSEState.programCounter())
                     : "Cannot merge incompatible program counters";
 
-            joinPartners = joinPartners.append(
-                new MergePartner(proof.getOpenGoal(partnerNodeInfo.node), partnerNodeInfo.pio));
+            joinPartners = joinPartners.append(new MergePartner(
+                Objects.requireNonNull(proof.getOpenGoal(partnerNodeInfo.node)),
+                partnerNodeInfo.pio));
         }
 
         joinApp.setMergeNode(currNode);
@@ -1001,7 +1050,13 @@ public class IntermediateProofReplayer {
      * @param progVarNS Program variable namespace.
      * @return The parsed term.
      * @throws ParserException In case of an error.
+     *         <p>
+     *         {@code null} is deliberately passed as the expected sort to
+     *         {@link DefaultTermParser#parse} because the proof file stores no sort constraint; the
+     *         parser itself treats {@code null} sort as "no constraint". This documented use of
+     *         {@code null} against the {@code @NonNull} parameter is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static JTerm parseTerm(String value, Proof proof, Namespace<QuantifiableVariable> varNS,
             Namespace<IProgramVariable> progVarNS, Namespace<Function> functNS) {
         try {
@@ -1037,6 +1092,12 @@ public class IntermediateProofReplayer {
      * @return An instantiated taclet application, where the schema variable has been instantiated
      *         by a logic variable of the given name.
      */
+    /**
+     * The schema variable is guaranteed to be instantiable here (it appeared in the stored proof),
+     * so {@link TacletApp#addCheckedInstantiation} never yields {@code null}; the difference is
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public static TacletApp parseSV1(TacletApp app, VariableSV sv, String value,
             Services services) {
         var colon = value.indexOf(':');
@@ -1050,7 +1111,7 @@ public class IntermediateProofReplayer {
             sort = services.getNamespaces().lookupSortOrAlias(value.substring(colon + 1));
 
         }
-        LogicVariable lv = new LogicVariable(new Name(name), sort);
+        LogicVariable lv = new LogicVariable(new Name(name), Objects.requireNonNull(sort));
         JTerm instance = services.getTermFactory().createTerm(lv);
         return app.addCheckedInstantiation(sv, instance, services, true);
     }
@@ -1067,7 +1128,13 @@ public class IntermediateProofReplayer {
      *         depending on its type, by a Skolem constant, program element, or term of the given
      *         name.
      * @see #parseSV1(TacletApp, VariableSV, String, Services)
+     *      The schema variable is guaranteed to be instantiable here (it appeared in the stored
+     *      proof),
+     *      so the instantiation helpers never yield {@code null}; the difference is suppressed with
+     *      a
+     *      scoped key.
      */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public static TacletApp parseSV2(TacletApp app, SchemaVariable sv, String value,
             Goal targetGoal) {
         final Proof p = targetGoal.proof();
@@ -1078,12 +1145,13 @@ public class IntermediateProofReplayer {
             result = app;
         } else if (sv instanceof ProgramSV psv) {
             final ProgramElement pe = app.getProgramElement(value, psv, services);
-            result = app.addCheckedInstantiation(sv, pe, services, true);
+            result = app.addCheckedInstantiation(sv, Objects.requireNonNull(pe), services, true);
         } else if (sv instanceof SkolemTermSV skolemSv) {
             result = app.createSkolemConstant(value, skolemSv, true, targetGoal);
         } else if (sv instanceof ModalOperatorSV msv) {
             result = app.addInstantiation(
-                app.instantiations().add(msv, JModality.JavaModalityKind.getKind(value), services),
+                app.instantiations().add(msv,
+                    Objects.requireNonNull(JModality.JavaModalityKind.getKind(value)), services),
                 services);
         } else {
             Namespace<QuantifiableVariable> varNS = p.getNamespaces().variables();

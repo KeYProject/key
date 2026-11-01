@@ -105,8 +105,14 @@ public class InitConfig {
         category2DefaultChoice = new TreeMap<>();
     }
 
-    /// combines the found choices in KeY files, together with the current settings.
-    /// The namespace of choices has to be filled.
+    /**
+     * Combines the found choices in KeY files, together with the current settings. The namespace
+     * of choices has to be filled.
+     * <p>
+     * The choice settings of this init config are present whenever the defaults are computed; the
+     * dereference of the (nullable) settings is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public void computeDefaults(ChoiceInformation ci) {
         if (defaultsComputed) {
             return;

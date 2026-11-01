@@ -88,8 +88,8 @@ public class SyntaxErrorReporter extends BaseErrorListener {
             SourceNames.getURIFromTokenSource(tok.getTokenSource()), stack);
 
         if (logger != null) {
-            logger.warn("[syntax-error] {}:{}:{}: {} {} ({})", se.source, line, charPositionInLine,
-                msg, tok, stack);
+            logger.warn("[syntax-error] {}:{}:{}: {} {} ({})", String.valueOf(se.source), line,
+                charPositionInLine, msg, tok, stack);
         }
         errors.add(se);
 

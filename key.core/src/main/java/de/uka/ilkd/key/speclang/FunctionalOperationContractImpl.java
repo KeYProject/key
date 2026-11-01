@@ -345,7 +345,11 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return getReplaceMap(heap, heapTerm, selfTerm, paramTerms, null, null, null, services);
     }
 
+    // The deprecated atPre argument may legitimately be null for contracts without an atPre clause
+    // (see the @Nullable atPre-related getters of the interface); the term maps below store such
+    // nulls as-is, which the replacement-map construction tolerates.
     @Deprecated
+    @SuppressWarnings("nullness:argument.type.incompatible")
     protected Map<JTerm, JTerm> getReplaceMap(LocationVariable heap, JTerm heapTerm,
             @Nullable JTerm selfTerm,
             @Nullable ImmutableList<JTerm> paramTerms, @Nullable JTerm resultTerm,
@@ -370,7 +374,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * @param atPres a map of pre-heaps to their variable terms
      * @param services the services object
      * @return the replacement map
+     *         <p>
+     *         The heap LDT is always registered in the {@link Services} of a fully initialized KeY
+     *         environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the
+     *         dereference
+     *         is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected Map<JTerm, JTerm> getReplaceMap(Map<LocationVariable, JTerm> heapTerms,
             @Nullable JTerm selfTerm,
             @Nullable ImmutableList<JTerm> paramTerms, @Nullable JTerm resultTerm,
@@ -428,11 +438,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             final HeapLDT heapLDT = Objects.requireNonNull(
                 services.getTypeConverter().getHeapLDT(), "heap LDT");
             for (LocationVariable h : heapLDT.getAllHeaps()) {
-                if (atPres.get(h) != null) {
+                final JTerm atPreTerm = atPres.get(h);
+                if (atPreTerm != null) {
                     final LocationVariable originalAtPreVar = Objects.requireNonNull(
                         originalAtPreVars.get(h), "no original atPre variable for heap: " + h);
-                    assertEqualSort(originalAtPreVar, atPres.get(h));
-                    result.put(tb.var(originalAtPreVar), atPres.get(h));
+                    assertEqualSort(originalAtPreVar, atPreTerm);
+                    result.put(tb.var(originalAtPreVar), atPreTerm);
                 }
             }
         }
@@ -704,6 +715,17 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
     }
 
+    /**
+     * Builds the plain or HTML text of the given functional contract.
+     * <p>
+     * The clause maps built below may legitimately hold {@code null} values: the contract getters
+     * (e.g. {@code getPre}, {@code getPost}, {@code getFreePost}, {@code getModifiable},
+     * {@code getRepresentsAxiom}) return {@code null} for heaps without the corresponding clause,
+     * and {@code atPres} entries may be absent for the given {@code heapContext}. The downstream
+     * text generation ({@link #getClauseText}, {@link #getModifiableText}) explicitly skips
+     * {@code null} clauses, so the resulting entries are stored as-is.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static String getText(FunctionalOperationContract contract,
             ImmutableList<JTerm> contractParams, @Nullable JTerm resultTerm,
             @Nullable JTerm contractSelf,
@@ -1057,7 +1079,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         // print contract term
         final JTerm update = tb.tf().createTerm(
-            ElementaryUpdate.getInstance(originalAtPreVars.get(baseHeap)), tb.getBaseHeap());
+            ElementaryUpdate.getInstance(Objects.requireNonNull(originalAtPreVars.get(baseHeap),
+                "no original atPre variable for heap: " + baseHeap)),
+            tb.getBaseHeap());
         final JTerm modalityTerm = tb.prog(modalityKind, jb, Objects.requireNonNull(
             originalPosts.get(baseHeap), "no postcondition for heap: " + baseHeap));
         final JTerm updateTerm =
@@ -1403,6 +1427,14 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             paramTerms, services);
     }
 
+    /**
+     * The lookup for an {@code atPre} variable may legitimately miss for heaps that have no
+     * pre-heap (cf. {@link ContractFactory}, where a missing atPre variable marks a non-pre
+     * heap); the dependency term then falls through to {@code null} via
+     * {@link OpReplacer#replace(de.uka.ilkd.key.logic.JTerm)}, which {@code getDep}'s
+     * {@code @Nullable} contract allows.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     public @Nullable JTerm getDep(LocationVariable heap, boolean atPre,
             @Nullable LocationVariable selfVar,
@@ -1414,7 +1446,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert services != null;
         Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
         if (originalSelfVar != null) {
-            map.put(originalSelfVar, selfVar);
+            // the assertion (selfVar == null) == (originalSelfVar == null) above guarantees a
+            // non-null selfVar here
+            map.put(originalSelfVar,
+                Objects.requireNonNull(selfVar, "no self variable"));
         }
         for (LocationVariable originalParamVar : originalParamVars) {
             map.put(originalParamVar, paramVars.head());
@@ -1425,8 +1460,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 services.getTypeConverter().getHeapLDT(), "heap LDT");
             for (LocationVariable h : heapLDT.getAllHeaps()) {
                 LocationVariable originalAtPreVar = originalAtPreVars.get(h);
-                if (atPreVars.get(h) != null && originalAtPreVar != null) {
-                    map.put(tb.var(atPre ? h : originalAtPreVar), tb.var(atPreVars.get(h)));
+                final LocationVariable atPreVar = atPreVars.get(h);
+                if (atPreVar != null && originalAtPreVar != null) {
+                    map.put(tb.var(atPre ? h : originalAtPreVar), tb.var(atPreVar));
                 }
             }
         }
@@ -1434,6 +1470,14 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return or.replace(originalDeps.get(atPre ? originalAtPreVars.get(heap) : heap));
     }
 
+    /**
+     * The lookup for an {@code atPre} variable may legitimately miss for heaps that have no
+     * pre-heap (cf. {@link ContractFactory}, where a missing atPre variable marks a non-pre
+     * heap); the dependency term then falls through to {@code null} via
+     * {@link OpReplacer#replace(de.uka.ilkd.key.logic.JTerm)}, which {@code getDep}'s
+     * {@code @Nullable} contract allows.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     public @Nullable JTerm getDep(LocationVariable heap, boolean atPre, JTerm heapTerm,
             @Nullable JTerm selfTerm,
@@ -1447,7 +1491,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         Map<SyntaxElement, SyntaxElement> map = new LinkedHashMap<>();
         map.put(tb.var(heap), heapTerm);
         if (originalSelfVar != null) {
-            map.put(tb.var(originalSelfVar), selfTerm);
+            // the assertion (selfTerm == null) == (originalSelfVar == null) above guarantees a
+            // non-null selfTerm here
+            map.put(tb.var(originalSelfVar),
+                Objects.requireNonNull(selfTerm, "no self term"));
         }
         for (LocationVariable originalParamVar : originalParamVars) {
             map.put(tb.var(originalParamVar), paramTerms.head());
@@ -1458,8 +1505,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 services.getTypeConverter().getHeapLDT(), "heap LDT");
             for (LocationVariable h : heapLDT.getAllHeaps()) {
                 LocationVariable originalAtPreVar = originalAtPreVars.get(h);
-                if (originalAtPreVar != null && atPres.get(h) != null) {
-                    map.put(tb.var(originalAtPreVar), atPres.get(h));
+                final JTerm atPreTerm = atPres.get(h);
+                if (originalAtPreVar != null && atPreTerm != null) {
+                    map.put(tb.var(originalAtPreVar), atPreTerm);
                 }
             }
         }

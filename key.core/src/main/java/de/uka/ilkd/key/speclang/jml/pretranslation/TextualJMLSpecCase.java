@@ -99,7 +99,16 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public Iterable<ParserRuleContext> getClauses() {
-        return clauses.stream().map(it -> it.ctx.first).collect(Collectors.toList());
+        // first is decorated @Nullable although the constructor already validated it; the guard
+        // below never triggers and keeps the collection free of nulls.
+        final List<ParserRuleContext> result = new ArrayList<>();
+        for (Entry it : clauses) {
+            final @Nullable ParserRuleContext clause = it.ctx.first;
+            if (clause != null) {
+                result.add(clause);
+            }
+        }
+        return result;
     }
 
     /**
@@ -126,7 +135,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         final LabeledParserRuleContext ctx;
         final @Nullable Name heap;
 
-        Entry(Object clauseType, LabeledParserRuleContext ctx, Name heap) {
+        Entry(Object clauseType, LabeledParserRuleContext ctx, @Nullable Name heap) {
             this.clauseType = clauseType;
             this.ctx = ctx;
             this.heap = heap;
@@ -300,7 +309,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     // endregion
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

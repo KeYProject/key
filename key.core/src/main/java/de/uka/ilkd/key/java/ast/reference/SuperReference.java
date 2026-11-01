@@ -50,7 +50,7 @@ public class SuperReference extends JavaNonTerminalProgramElement implements Ref
         this.prefix = accessPath;
     }
 
-    public SuperReference(ReferencePrefix accessPath, PositionInfo pi, List<Comment> c) {
+    public SuperReference(@Nullable ReferencePrefix accessPath, PositionInfo pi, List<Comment> c) {
         super(pi, c);
         this.prefix = accessPath;
     }

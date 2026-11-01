@@ -62,7 +62,15 @@ final class SingleThreadedTacletIndex extends TacletIndex {
 
     /**
      * {@inheritDoc}
+     *
+     * <p>
+     * The parameter {@code pos} is nullable by design: {@link TacletIndex#getNoFindTaclet} matches
+     * find-less taclets with a {@code null} position. Forwarding this nullable position into
+     * {@link NoPosTacletApp#matchFind} (non-null parameter) is intended; {@code matchFind} only
+     * dereferences the position for taclets with a find/rewrite part, which never occur in the
+     * no-find lists matched with a null position.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     protected ImmutableList<NoPosTacletApp> matchTaclets(
             @NonNull ImmutableList<NoPosTacletApp> tacletApps,

@@ -295,8 +295,8 @@ public class KeYProgModelInfo {
      * @param signature IList<KeYJavaType> representing the signature of the constructor
      * @return the most specific constructor declared in the given type
      */
-    @Nullable
-    public IProgramMethod getConstructor(KeYJavaType ct, ImmutableList<KeYJavaType> signature,
+    public @Nullable IProgramMethod getConstructor(KeYJavaType ct,
+            ImmutableList<KeYJavaType> signature,
             KeYJavaType context,
             TypeSolver typeSolver) {
         var rt = getJavaParserType(ct).asReferenceType().getTypeDeclaration();
@@ -380,6 +380,13 @@ public class KeYProgModelInfo {
 
     // TODO: copied from TransformationPipeLineServices we should have some utility class to avoid
     // copy-and-past
+    /**
+     * The component type of a resolved array type always materializes here: it is either an array
+     * itself, a reference type, or a primitive type, each handled by a branch above, so this
+     * method cannot return {@code null} for it. The {@code @Nullable} return type only reflects
+     * the fall-through for non-Java types.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public @Nullable Type getType(ResolvedType type) {
         if (type.isArray()) {
             // TODO weigl type.arrayLevel()

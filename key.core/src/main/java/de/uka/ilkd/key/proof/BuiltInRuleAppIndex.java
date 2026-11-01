@@ -13,6 +13,7 @@ import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class BuiltInRuleAppIndex {
@@ -34,8 +35,9 @@ public class BuiltInRuleAppIndex {
 
     /**
      * returns a list of built-in rules application applicable for the given goal and position
+     * (may be {@code null} for positionless rules)
      */
-    public ImmutableList<IBuiltInRuleApp> getBuiltInRule(Goal goal, PosInOccurrence pos) {
+    public ImmutableList<IBuiltInRuleApp> getBuiltInRule(Goal goal, @Nullable PosInOccurrence pos) {
 
         ImmutableList<IBuiltInRuleApp> result = ImmutableList.nil();
 
@@ -71,6 +73,19 @@ public class BuiltInRuleAppIndex {
         scanSimplificationRule(goal, newRuleListener);
     }
 
+    /**
+     * Scans the simplification rules that apply to the given goal without a concrete position.
+     * <p>
+     * The {@code null} passed as {@code PosInOccurrence} to {@link NewRuleListener#ruleAdded} is
+     * JML "no position" registration: simplification rules are whole-goal rules with no focus
+     * occurrence (mirroring the {@code null} position used for
+     * {@code isApplicable}/{@code createApp}
+     * above). The upstream {@code org.key_project.prover.strategy.NewRuleListener} interface is
+     * unmarked, so its position parameter is {@code @NonNull}-by-default; the positionless
+     * registration is a deliberate value, suppressed with a scoped key (cf. the null-marker
+     * precedent).
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private void scanSimplificationRule(Goal goal, NewRuleListener listener) {
         ImmutableList<BuiltInRule> rules = index.rules();
         if (!rules.isEmpty()) {

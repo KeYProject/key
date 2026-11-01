@@ -21,7 +21,7 @@ public non-sealed class EmptySetLiteral extends Literal {
     public static final EmptySetLiteral LOCSET = new EmptySetLiteral();
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         return o == this;
     }
 

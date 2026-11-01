@@ -7,6 +7,7 @@ package de.uka.ilkd.key.smt.lang;
 import java.util.List;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  *
@@ -27,7 +28,12 @@ public class SMTTermUnaryOp extends SMTTerm {
     /**
      * @param operator
      * @param sub
+     *        <p>
+     *        Storing the under-construction {@code this} as the parent back-pointer of the child is
+     *        inherent to the design; the checker cannot express the circular link, so it is
+     *        suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:initialization.invalid.field.write.initialized")
     public SMTTermUnaryOp(Op operator, SMTTerm sub) {
         super();
         this.operator = operator;
@@ -145,7 +151,7 @@ public class SMTTermUnaryOp extends SMTTerm {
     }
 
     @Override
-    public boolean equals(Object term) {
+    public boolean equals(@Nullable Object term) {
         if (term == null) {
             return false;
         }

@@ -47,6 +47,17 @@ public class SMTTermQuant extends SMTTerm {
     @Nullable
     List<List<SMTTerm>> pats;
 
+    /**
+     * @param quant
+     * @param bindVars
+     * @param sub
+     * @param pats
+     *        <p>
+     *        Storing the under-construction {@code this} as the parent back-pointer of
+     *        already-constructed children is inherent to the design; the checker cannot express the
+     *        circular link, so it is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:initialization.invalid.field.write.initialized")
     public SMTTermQuant(Quant quant, List<SMTTermVariable> bindVars, SMTTerm sub,
             @Nullable List<List<SMTTerm>> pats) {
         this.quant = quant;
@@ -59,6 +70,17 @@ public class SMTTermQuant extends SMTTerm {
         }
     }
 
+    /**
+     * @param quant
+     * @param bindVars
+     * @param sub
+     * @param pat
+     *        <p>
+     *        Storing the under-construction {@code this} as the parent back-pointer of
+     *        already-constructed children is inherent to the design; the checker cannot express the
+     *        circular link, so it is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:initialization.invalid.field.write.initialized")
     public SMTTermQuant(Quant quant, List<SMTTermVariable> bindVars, SMTTerm sub, SMTTerm pat) {
         this.quant = quant;
         this.bindVars = bindVars;
@@ -265,7 +287,7 @@ public class SMTTermQuant extends SMTTerm {
     }
 
     @Override
-    public boolean equals(Object term) {
+    public boolean equals(@Nullable Object term) {
         if (term == null) {
             return false;
         }

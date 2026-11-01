@@ -39,8 +39,8 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
         super(macro, goals, proof, time, appliedRules, closedGoals);
     }
 
-    ProofMacroFinishedInfo(ProofMacro macro, Goal goal, Proof proof, long time, int appliedRules,
-            int closedGoals) {
+    ProofMacroFinishedInfo(ProofMacro macro, Goal goal, @Nullable Proof proof, long time,
+            int appliedRules, int closedGoals) {
         this(macro, ImmutableList.<Goal>nil().prepend(goal), proof, time, appliedRules,
             closedGoals);
     }

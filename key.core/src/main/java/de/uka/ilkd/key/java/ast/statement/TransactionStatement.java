@@ -42,7 +42,7 @@ public class TransactionStatement extends JavaStatement {
     // a transaction statement has no program children (getChildCount() is 0); the base contract
     // NonTerminalProgramElement.getChildAt(int) is over-narrow; honest @Nullable override per
     // SuperArrayDeclaration precedent (wave 7).
-    @SuppressWarnings("NullAway")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable ProgramElement getChildAt(int index) {
         return null;
@@ -62,7 +62,7 @@ public class TransactionStatement extends JavaStatement {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }

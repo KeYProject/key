@@ -30,10 +30,19 @@ public class RegroupSequentPrintFilter extends SearchSequentPrintFilter {
      * @param regex should the search be treated as a regular expression?
      */
     public RegroupSequentPrintFilter(SequentViewLogicPrinter lp, boolean regex) {
-        this.lp = lp;
+        super(lp);
         this.regex = regex;
     }
 
+    /**
+     * Regroups the formulas of the sequent into the antecedent and succedent lists according to
+     * the configured search string or regular expression.
+     * <p>
+     * The antecedent and succedent filter lists are re-initialized before they are appended to or
+     * prepended below; the dereferences of the (nullable) list fields are suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     @Override
     protected void filterSequent() {
 

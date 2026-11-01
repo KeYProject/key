@@ -61,8 +61,7 @@ public final class TypeConverter {
     private final Map<Class<? extends AbstractLDT>, AbstractLDT> ldtsByClass = new HashMap<>();
 
     /** the heap theory, kept directly because this class itself uses it throughout */
-    @Nullable
-    private HeapLDT heapLDT = null;
+    private @Nullable HeapLDT heapLDT = null;
 
     TypeConverter(Services s) {
         this.services = s;
@@ -223,6 +222,15 @@ public final class TypeConverter {
     }
 
 
+    /**
+     * Converts the leftmost prefix of a reference into a logic term.
+     * <p>
+     * The final warning logs the class of an unrecognized prefix. For a malformed
+     * {@link VariableReference} whose program variable could not be resolved, the prefix is null
+     * and deliberately logged as "null" (slf4j renders null arguments) instead of being
+     * dereferenced, so the null-valued class argument of that call is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private JTerm convertReferencePrefix(ReferencePrefix prefix, @Nullable ExecutionContext ec) {
         if (prefix instanceof FieldReference) {
             return convertVariableReference((FieldReference) prefix, ec);
@@ -309,7 +317,8 @@ public final class TypeConverter {
                 "no enclosing 'this' attribute for " + contextType);
             final Function fieldSymbol = heapLDT.getFieldSymbolForPV(enclosingThis, services);
             result = tb.dot(enclosingThis.sort(), result, fieldSymbol);
-            context = enclosingThis.getKeYJavaType();
+            context = Objects.requireNonNull(enclosingThis.getKeYJavaType(),
+                "no enclosing type in chain to " + s);
         }
         return result;
     }
@@ -1099,7 +1108,7 @@ public final class TypeConverter {
     }
 
 
-    public boolean isIntegralType(Type t) {
+    public boolean isIntegralType(@Nullable Type t) {
         if (t instanceof KeYJavaType) {
             t = ((KeYJavaType) t).getJavaType();
         }
@@ -1109,7 +1118,7 @@ public final class TypeConverter {
     }
 
 
-    public boolean isReferenceType(Type t) {
+    public boolean isReferenceType(@Nullable Type t) {
         if (t instanceof KeYJavaType) {
             t = ((KeYJavaType) t).getJavaType();
         }
@@ -1119,7 +1128,7 @@ public final class TypeConverter {
     }
 
 
-    public boolean isNullType(Type t) {
+    public boolean isNullType(@Nullable Type t) {
         if (t instanceof KeYJavaType) {
             t = ((KeYJavaType) t).getJavaType();
         }
@@ -1127,7 +1136,7 @@ public final class TypeConverter {
     }
 
 
-    public boolean isBooleanType(Type t) {
+    public boolean isBooleanType(@Nullable Type t) {
         if (t instanceof KeYJavaType) {
             t = ((KeYJavaType) t).getJavaType();
         }

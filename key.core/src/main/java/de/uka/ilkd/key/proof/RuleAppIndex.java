@@ -240,9 +240,9 @@ public final class RuleAppIndex {
 
     /**
      * returns a list of built-in rule applications applicable for the given goal, user defined
-     * constraint and position
+     * constraint and position (may be {@code null} for positionless rules)
      */
-    public ImmutableList<IBuiltInRuleApp> getBuiltInRules(Goal g, PosInOccurrence pos) {
+    public ImmutableList<IBuiltInRuleApp> getBuiltInRules(Goal g, @Nullable PosInOccurrence pos) {
 
         return builtInRuleAppIndex().getBuiltInRule(g, pos);
     }

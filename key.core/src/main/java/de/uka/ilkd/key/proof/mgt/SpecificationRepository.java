@@ -221,6 +221,21 @@ public class SpecificationRepository {
         }
     }
 
+    /**
+     * Returns the canonical form of the given observer function w.r.t. the given type, i.e. a
+     * declaration that a fresh location for the function would obtain through the type hierarchy.
+     *
+     * @param obs The observer function to canonicalize.
+     * @param kjt The type to canonicalize against.
+     * @return The canonical form of {@code obs}.
+     *         <p>
+     *         ({@code obs} and {@code kjt} are asserted non-null, but the container type of a
+     *         program
+     *         method is not recognized as non-null by the checker; the dereference is suppressed
+     *         with a
+     *         scoped key.)
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected @Nullable IObserverFunction getCanonicalFormForKJT(IObserverFunction obs,
             KeYJavaType kjt) {
         assert obs != null;
@@ -326,7 +341,11 @@ public class SpecificationRepository {
 
     /**
      * Returns the kjt for the outer class, if the passed kjt is a member class, and null otherwise.
+     * <p>
+     * Every KeY Java type carries a Java type; the dereference of the (nullable) Java type is
+     * suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private @Nullable KeYJavaType getEnclosingKJT(KeYJavaType kjt) {
         // HACK, this should be easier
         if (kjt.getJavaType() instanceof ClassDeclaration) {
@@ -374,6 +393,16 @@ public class SpecificationRepository {
         return result;
     }
 
+    /**
+     * Prepares the given contract for registration, asserting its canonical form.
+     *
+     * @param contract The contract to prepare.
+     * @return The prepared contract.
+     *         <p>
+     *         The canonical form of a contract target is asserted present; the dereference of the
+     *         (nullable) canonical form is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private Contract prepareContract(Contract contract) {
         // sanity check
         assert getCanonicalFormForKJT(contract.getTarget(), contract.getKJT())
@@ -460,7 +489,13 @@ public class SpecificationRepository {
      * @param inv initially clause
      * @param kjt constructors of this type are added a post-condition
      * @throws SLTranslationException during contract construction from history constraint
+     *         <p>
+     *         The contract target list for the type is created before the initially-clause
+     *         contracts are
+     *         registered (asserted present on access); the dereference of the (nullable) list is
+     *         suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private void createContractsFromInitiallyClause(InitiallyClause inv, KeYJavaType kjt)
             throws SLTranslationException {
         if (!kjt.equals(inv.getKJT())) {
@@ -646,9 +681,9 @@ public class SpecificationRepository {
 
     /**
      * Returns the registered (atomic or combined) contract corresponding to the passed name, or
-     * null.
+     * null if no such contract is registered or the passed name is null or empty.
      */
-    public @Nullable Contract getContractByName(String name) {
+    public @Nullable Contract getContractByName(@Nullable String name) {
         if (name == null || name.isEmpty()) {
             return null;
         }
@@ -1509,7 +1544,12 @@ public class SpecificationRepository {
      * </p>
      *
      * @param contract the {@code BlockContract} to remove.
+     *        <p>
+     *        The key of a registered block-contract is always present in the map; the dereference
+     *        of the
+     *        (nullable) set passed to the remapping function is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public synchronized void removeBlockContract(final BlockContract contract) {
         final StatementBlock block = contract.getBlock();
         var b =
@@ -1567,7 +1607,12 @@ public class SpecificationRepository {
      * </p>
      *
      * @param contract the {@code LoopContract} to remove.
+     *        <p>
+     *        The key of a registered loop-contract is always present in the map; the dereferences
+     *        of the
+     *        (nullable) sets passed to the remapping functions are suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public synchronized void removeLoopContract(final LoopContract contract) {
         if (contract.isOnBlock()) {
             final StatementBlock block = contract.getBlock();
@@ -1762,7 +1807,9 @@ public class SpecificationRepository {
                 services);
             replacementMap.replaceRemembranceLocalVariables(
                 Objects.requireNonNullElse(vars().atBeforeVars, Map.of()),
-                Objects.requireNonNullElse(vars().atBefores, Map.of()), services);
+                Objects.requireNonNullElse(vars().atBefores,
+                    Map.<LocationVariable, JTerm>of()),
+                services);
             final OpReplacer replacer =
                 new OpReplacer(replacementMap, termFactory, services.getProof());
             return Objects.requireNonNull(replacer.replace(term), "no replacement for " + term);

@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Continue.
@@ -50,7 +51,7 @@ public class Continue extends LabelJumpStatement {
         super(children);
     }
 
-    public Continue(PositionInfo pi, List<Comment> c, Label name) {
+    public Continue(PositionInfo pi, List<Comment> c, @Nullable Label name) {
         super(pi, c, name);
     }
 

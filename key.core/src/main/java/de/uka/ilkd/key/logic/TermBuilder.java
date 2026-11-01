@@ -100,8 +100,8 @@ public class TermBuilder {
      * @throws ParserException if the given String cannot be parsed
      */
     public JTerm parseTerm(String s, NamespaceSet namespaces) throws ParserException {
-        final AbbrevMap abbr =
-            (services.getProof() == null) ? null : services.getProof().abbreviations();
+        var proof = services.getProof();
+        final AbbrevMap abbr = (proof == null) ? null : proof.abbreviations();
         final KeyIO parser = new KeyIO(services, namespaces);
         if (abbr != null) {
             parser.setAbbrevMap(abbr);
@@ -2063,10 +2063,13 @@ public class TermBuilder {
     }
 
     public JTerm reachableValue(JTerm h, JTerm t, KeYJavaType kjt) {
-        assert t.sort().extendsTrans(kjt.getSort()) || t.sort() instanceof ProgramSVSort;
-        final Sort s = t.sort() instanceof ProgramSVSort
-                ? Objects.requireNonNull(kjt.getSort(), "no type for object sort")
-                : t.sort();
+        final Sort sort = Objects.requireNonNull(t.sort(), "no sort for reachable-value term");
+        final Sort targetSort = kjt.getSort();
+        assert (targetSort != null && sort.extendsTrans(targetSort))
+                || sort instanceof ProgramSVSort;
+        final Sort s = sort instanceof ProgramSVSort
+                ? Objects.requireNonNull(targetSort, "no type for object sort")
+                : sort;
         final IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
         if (s.extendsTrans(services.getJavaInfo().objectSort())) {

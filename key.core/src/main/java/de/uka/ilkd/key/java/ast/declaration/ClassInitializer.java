@@ -171,7 +171,7 @@ public class ClassInitializer extends JavaDeclaration
     // body may be null for the parameterless stub constructor or an ExtList without a
     // StatementBlock, but SourceElement.getLastElement() is @NonNull and cannot be widened
     // without ripple, so the null-returning override is exempted from the check.
-    @SuppressWarnings("NullAway")
+    @SuppressWarnings("nullness:return.type.incompatible")
     public SourceElement getLastElement() {
         return body;
     }

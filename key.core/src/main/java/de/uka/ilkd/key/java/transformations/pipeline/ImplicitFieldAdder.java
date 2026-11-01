@@ -17,6 +17,8 @@
 
 package de.uka.ilkd.key.java.transformations.pipeline;
 
+import java.util.Objects;
+
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -26,7 +28,6 @@ import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
-
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -211,7 +212,8 @@ public class ImplicitFieldAdder extends JavaTransformerAbstract {
             // then just in one
             // strangely, the effect is not measurable for e.g. the class init. fields...
             for (final var v : vars) {
-                Type type = services.getType(v.getType());
+                Type type = Objects.requireNonNull(services.getType(v.getType()),
+                    "captured variable must have a materializable type");
                 td.addMember(createImplicitField(
                     type, // TODO weigl check for arrays&co.
                     PipelineConstants.FINAL_VAR_PREFIX + v.getName(), false, true));

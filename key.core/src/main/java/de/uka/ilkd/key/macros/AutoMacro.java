@@ -7,6 +7,7 @@ package de.uka.ilkd.key.macros;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -88,7 +89,7 @@ public class AutoMacro extends StrategyProofMacro {
     private boolean onlyHumanReadable = true;
 
     @Override
-    public String getCategory() {
+    public @Nullable String getCategory() {
         // This is only meant for proof scripting
         return null;
     }
@@ -160,9 +161,13 @@ public class AutoMacro extends StrategyProofMacro {
     }
 
     @Override
-    protected Strategy<@NonNull Goal> createStrategy(Proof proof, PosInOccurrence posInOcc) {
-        return new AutoMacroFilterStrategy(proof.getActiveStrategy(), breakpoint,
-                allowSplits, whitelist, symbexOnly, onlyHumanReadable);
+    protected Strategy<@NonNull Goal> createStrategy(Proof proof, @Nullable PosInOccurrence posInOcc) {
+        // The active strategy is set and stored on the proof before createStrategy() runs;
+        // without it the filtering below would have nothing to delegate to.
+        return new AutoMacroFilterStrategy(
+            Objects.requireNonNull(proof.getActiveStrategy(),
+                "the proof carries an active strategy while the macro runs"),
+            breakpoint, allowSplits, whitelist, symbexOnly, onlyHumanReadable);
     }
 
     private static boolean isSplittingTaclet(Rule taclet) {

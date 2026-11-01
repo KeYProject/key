@@ -6,6 +6,7 @@ package de.uka.ilkd.key.macros;
 
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.*;
@@ -84,8 +85,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc,
-            ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws InterruptedException {
         this.uic = uic;
         return super.applyTo(uic, proof, goals, posInOcc, listener);
@@ -102,14 +103,16 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
     @Override
     protected Strategy<@NonNull Goal> createStrategy(Proof proof,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         // Need to clear the data structures since no new instance of this
         // macro is created across multiple calls, so sometimes it would have
         // no effect in a successive call.
         blockElems.clear();
         alreadySeen.clear();
 
-        return new FilterSymbexStrategy(proof.getActiveStrategy());
+        // The active strategy is configured and set before createStrategy() runs; without it
+        // the symbolic execution below would have nothing to steer rule application.
+        return new FilterSymbexStrategy(Objects.requireNonNull(proof.getActiveStrategy()));
     }
 
     @Override
@@ -129,8 +132,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             Node lastNode = goal.node();
             do {
                 try {
-                    // Do single proof step
-                    new OneStepProofMacro().applyTo(uic, goal.node(), null,
+                    // The UIC is captured from the applyTo() argument for the whole run and
+                    // therefore guaranteed to be set when the post processing is reached.
+                    new OneStepProofMacro().applyTo(Objects.requireNonNull(uic), goal.node(), null,
                         DUMMY_PROVER_TASK_LISTENER); // TODO Change
                 } catch (Exception e) {
                 }
@@ -145,7 +149,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
             // Undo until a break condition is the first active statement again.
             while (!hasBreakPoint(lastNode.sequent().succedent())) {
-                lastNode = lastNode.parent();
+                // Climbing towards the root; an absent parent would equally have crashed the
+                // old code path (pruneProof(null)), so requireNonNull preserves the crash shape.
+                lastNode = Objects.requireNonNull(lastNode.parent());
                 proof.pruneProof(lastNode);
             }
 
@@ -384,8 +390,11 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
             LinkedList<StatementBlock> result = new LinkedList<>(getBodies(elem.getThen()));
 
-            if (elem.getElse() != null) {
-                result.addAll(getBodies(elem.getElse()));
+            // Hoisted into a local: the checker does not refine nullness across the two
+            // separate getElse() calls, so the null guard must be applied to the local itself.
+            Else elseElem = elem.getElse();
+            if (elseElem != null) {
+                result.addAll(getBodies(elseElem));
             }
 
             return result;
@@ -511,9 +520,11 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             ImmutableArray<Statement> caseBodies = elem.getBody();
-            for (Statement body : caseBodies) {
-                if (body instanceof StatementBlock) {
-                    result.add((StatementBlock) body);
+            if (caseBodies != null) {
+                for (Statement body : caseBodies) {
+                    if (body instanceof StatementBlock) {
+                        result.add((StatementBlock) body);
+                    }
                 }
             }
 

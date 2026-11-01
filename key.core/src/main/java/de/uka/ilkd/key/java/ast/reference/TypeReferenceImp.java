@@ -227,7 +227,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     // but the {@link MemberReference}/{@link de.uka.ilkd.key.java.ast.NamedProgramElement}
     // contract demands @NonNull here; the interfaces cannot be widened without ripple into
     // e.g. EqualityModuloProofIrrelevancy (cf. LabeledStatement#getProgramElementName()).
-    @SuppressWarnings("NullAway")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     public @Nullable ProgramElementName getProgramElementName() {
         return name;
     }

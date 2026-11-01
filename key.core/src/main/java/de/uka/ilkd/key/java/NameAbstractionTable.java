@@ -34,7 +34,16 @@ public class NameAbstractionTable {
      *
      * @param pe1 SourceElement to be added
      * @param pe2 SourceElement to be added
+     *        <p>
+     *        The element lists are maintained together; the guard below (re)initializes the list
+     *        holding
+     *        the second element whenever either is unset, so both are present. The flow analysis
+     *        cannot
+     *        see through the joint initialization, hence the dereference of the (nullable) list
+     *        field is
+     *        suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public void add(SourceElement pe1, SourceElement pe2) {
         if (declarations0 == null || declarations1 == null) {
             // the two lists are maintained together; if either is unset, (re)initialize both

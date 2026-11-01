@@ -12,6 +12,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class contains the prefix for a Taclet according to M.Gieses paper "Taclet mit
@@ -94,7 +95,7 @@ public class TacletPrefix implements org.key_project.prover.rules.TacletPrefix {
         return new TacletPrefix(prefix.remove(var), context);
     }
 
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }

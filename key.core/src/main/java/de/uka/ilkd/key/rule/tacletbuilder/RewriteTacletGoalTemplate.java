@@ -17,6 +17,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * this class inherits from TacletGoalTemplate. It is used if there is a replacewith in the
@@ -85,7 +86,7 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!super.equals(o)) {
             return false;
         }

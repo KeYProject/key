@@ -22,7 +22,7 @@ public class FileRuleSource extends RuleSource {
     /**
      * The non-<code>null</code> reference to the file from which rules are read.
      */
-    protected @NonNull final Path ruleFile;
+    protected final @NonNull Path ruleFile;
 
     private final long numberOfChars;
 

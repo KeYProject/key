@@ -931,7 +931,7 @@ public abstract class SMTTerm {
         }
 
         @Override
-        public SMTTerm forall(List<SMTTermVariable> bindVars, List<List<SMTTerm>> pats) {
+        public SMTTerm forall(List<SMTTermVariable> bindVars, @Nullable List<List<SMTTerm>> pats) {
             return this;
         }
 
@@ -1026,7 +1026,7 @@ public abstract class SMTTerm {
         }
 
         @Override
-        public SMTTerm forall(List<SMTTermVariable> bindVars, List<List<SMTTerm>> pats) {
+        public SMTTerm forall(List<SMTTermVariable> bindVars, @Nullable List<List<SMTTerm>> pats) {
             return this;
         }
 
@@ -1102,7 +1102,7 @@ public abstract class SMTTerm {
     }
 
     // // @Override
-    // public boolean equals(Object t) {
+    // public boolean equals(@Nullable Object t) {
     // return super.equals(t);
     // }
     //

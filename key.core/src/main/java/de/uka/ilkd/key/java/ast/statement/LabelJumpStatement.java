@@ -64,7 +64,7 @@ public abstract class LabelJumpStatement extends JumpStatement implements NameRe
         name = children.get(Label.class);
     }
 
-    public LabelJumpStatement(PositionInfo pi, List<Comment> c, Label name) {
+    public LabelJumpStatement(PositionInfo pi, List<Comment> c, @Nullable Label name) {
         super(pi, c);
         this.name = name;
     }

@@ -41,7 +41,11 @@ public class LexPathOrdering implements TermOrdering {
      * byte-identical results) for 1.68M comparisons on an ips4o goal at 6000 proof steps.
      * ThreadLocal because a LexPathOrdering instance is shared across parallel-prover workers;
      * the map is reused (cleared) per call, so small comparisons pay only an empty-map lookup.
+     * The annotated JDK declares {@code ThreadLocal<@Nullable T>}, which only admits nullable type
+     * arguments; this value is never null in practice, so the difference is suppressed with a
+     * scoped key.
      */
+    @SuppressWarnings("nullness:type.argument.type.incompatible")
     private final ThreadLocal<java.util.HashMap<CacheKey, CompRes>> callMemo =
         ThreadLocal.withInitial(java.util.HashMap::new);
 

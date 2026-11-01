@@ -44,18 +44,30 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     /**
      * collects all program variables occurring in the AST <tt>root</tt> using this constructor is
      * equivalent to <tt>ProggramVariableCollector(root, false)</tt>
+     * <p>
+     * The {@link #collectHeapVariables} pre-population operates on {@code this} while the
+     * receiver is still under initialization (EISOP initialization check); safe here because it
+     * only reads the {@code services} set up by {@code super(...)} and writes the collector
+     * result, suppressed with a scoped key.
      *
      * @param root
      *        the ProgramElement which is the root of the AST
      * @param services
      *        the Services object
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ProgramVariableCollector(ProgramElement root, Services services) {
         super(root, services);
         assert services != null;
         collectHeapVariables();
     }
 
+    /**
+     * The heap LDT is always registered in the {@link Services} of a fully initialized KeY
+     * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the dereference
+     * of the hoisted look-up is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected void collectHeapVariables() {
         HeapLDT ldt = services.getTypeConverter().getHeapLDT();
         for (LocationVariable heap : ldt.getAllHeaps()) {
@@ -109,7 +121,13 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         result.addAll(tpvc.result());
     }
 
+    /**
+     * The heap LDT is always registered in the {@link Services} of a fully initialized KeY
+     * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the per-heap
+     * dereferences are suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public void performActionOnLoopInvariant(LoopSpecification x) {
         TermProgramVariableCollector tpvc = services.getFactory().create(services);
         JTerm selfTerm = x.getInternalSelfTerm();
@@ -177,7 +195,13 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         result.addAll(tpvc.result());
     }
 
+    /**
+     * The heap LDT is always registered in the {@link Services} of a fully initialized KeY
+     * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the per-heap
+     * dereferences are suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public void performActionOnBlockContract(BlockContract x) {
         TermProgramVariableCollector collector = services.getFactory().create(services);
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
@@ -223,7 +247,13 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         result.addAll(collector.result());
     }
 
+    /**
+     * The heap LDT is always registered in the {@link Services} of a fully initialized KeY
+     * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the per-heap
+     * dereferences are suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public void performActionOnLoopContract(LoopContract x) {
         TermProgramVariableCollector collector = services.getFactory().create(services);
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
@@ -284,10 +314,15 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         TermProgramVariableCollector tpvc = services.getFactory().create(services);
         var spec =
             Objects.requireNonNull(services.getSpecificationRepository().getStatementSpec(x));
-        for (JTerm v : spec.vars().atPres.values()) {
+        var specVars = spec.vars();
+        for (JTerm v : specVars.atPres.values()) {
             v.execPostOrder(tpvc);
         }
-        for (JTerm v : spec.vars().atBefores.values()) {
+        // the before-vars of a JML statement are optional (see ProgramVariableCollection);
+        // treat a missing map as empty, as SpecificationRepository does
+        var atBefores = specVars.atBefores;
+        for (JTerm v : atBefores != null ? atBefores.values()
+                : Map.<LocationVariable, JTerm>of().values()) {
             v.execPostOrder(tpvc);
         }
 

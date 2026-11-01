@@ -79,7 +79,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null || this.getClass() != o.getClass()) {
             return false;
         }

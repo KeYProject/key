@@ -12,6 +12,7 @@ import java.util.List;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class CompoundProof extends ProofAggregate {
@@ -75,7 +76,7 @@ public class CompoundProof extends ProofAggregate {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!super.equals(o)) {
             return false;
         }

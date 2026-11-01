@@ -8,6 +8,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.proof.Proof;
@@ -86,8 +87,14 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         this.proof = proof;
     }
 
+    /**
+     * The parser state machine guarantees that the {@code ruleInfo} and {@code currNode} fields
+     * are set and consistent whenever {@code beginExpr} is invoked on a structural element; the
+     * dereferences of these fields (and of narrowed casts on them) are suppressed with a scoped
+     * key. The {@code unchecked} suppression covers the parser-overloaded generic containers.
+     */
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "nullness:dereference.of.nullable" })
     public void beginExpr(ProofElementID eid, String str) {
         switch (eid) {
             case BRANCH -> {
@@ -98,7 +105,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                     currNode = newNode;
                     stack.push(newNode);
                 } else {
-                    stack.push(currNode);
+                    stack.push(Objects.requireNonNull(currNode));
                     currNode.addChild(newNode);
                     currNode = newNode;
                 }
@@ -233,7 +240,14 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
 
     }
 
+    /**
+     * The parser state machine guarantees that the {@code ruleInfo} and {@code currNode} fields
+     * are set and consistent whenever {@code endExpr} is invoked on a structural element; the
+     * dereferences of these fields (and of narrowed casts on them) are suppressed with a scoped
+     * key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public void endExpr(ProofElementID eid, int lineNr) {
         switch (eid) {
             case BRANCH -> currNode = stack.pop();
@@ -258,8 +272,9 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             case ASSUMES_INST_BUILT_IN -> { // ifInst (for built in rules)
                 BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
                 builtinInfo.builtinIfInsts =
-                    builtinInfo.builtinIfInsts.append(new Pair<>(
-                        builtinInfo.currIfInstFormula, builtinInfo.currIfInstPosInTerm));
+                    builtinInfo.builtinIfInsts.append(new Pair<Integer, PosInTerm>(
+                        builtinInfo.currIfInstFormula,
+                        Objects.requireNonNull(builtinInfo.currIfInstPosInTerm)));
             }
             default -> {
             }
@@ -292,8 +307,13 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     }
 
     /**
+     * The parser state machine guarantees that {@code ruleInfo} holds a
+     * {@code TacletInformation} when a taclet application is to be constructed; the dereference
+     * of the narrowed cast is suppressed with a scoped key.
+     *
      * @return An intermediate taclet application generated from previously parsed information.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private TacletAppIntermediate constructTacletApp() {
         TacletInformation tacletInfo = (TacletInformation) ruleInfo;
         return new TacletAppIntermediate(tacletInfo.currRuleName,
@@ -303,9 +323,14 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     }
 
     /**
+     * The parser state machine guarantees that {@code ruleInfo} holds a
+     * {@code BuiltinRuleInformation} when a built-in application is to be constructed; the
+     * dereference of the narrowed cast is suppressed with a scoped key.
+     *
      * @return An intermediate built-in rule application generated from previously parsed
      *         information.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private BuiltInAppIntermediate constructBuiltInApp() {
         BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
         return switch (builtinInfo.currRuleName) {
@@ -339,9 +364,14 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     }
 
     /**
+     * The parser state machine guarantees that {@code ruleInfo} holds a
+     * {@code BuiltinRuleInformation} while if-instantiations of a built-in rule are parsed; the
+     * dereference of the narrowed cast is suppressed with a scoped key.
+     *
      * @return True iff we are currently parsing a built-in rule and are inside an if-insts sub
      *         expression.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private boolean insideBuiltinIfInsts() {
         return ruleInfo.isBuiltinInfo()
                 && ((BuiltinRuleInformation) ruleInfo).builtinIfInsts != null;

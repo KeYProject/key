@@ -24,8 +24,13 @@ public class FunctionalLoopContractPOLoader implements ProofObligationLoader {
      * @param initConfig The already load {@link InitConfig}.
      * @param properties The settings of the proof obligation to instantiate.
      * @return The instantiated proof obligation.
+     *         <p>
+     *         The contract name of a persisted loop-contract obligation is always present in its
+     *         settings; the dereferences of the (nullable) contract name are suppressed with a
+     *         scoped key.
      */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
             Configuration properties) {
         String contractName = properties.getString("contract");

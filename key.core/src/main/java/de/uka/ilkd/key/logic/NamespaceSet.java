@@ -69,7 +69,15 @@ public class NamespaceSet {
             choiceNS, programVarNS, new org.key_project.logic.MetaSpace());
     }
 
+    /**
+     * The namespace registrations below operate on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because {@link #register} only
+     * writes into the {@code namespaces} map, suppressed with a scoped key.
+     *
+     * @deprecated use one of the other constructors
+     */
     @Deprecated
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public NamespaceSet(Namespace<QuantifiableVariable> varNS,
             Namespace<Function> funcNS,
             Namespace<Sort> sortNS,

@@ -87,7 +87,11 @@ public abstract class SequentPrintFilter {
     /**
      * converts the complete original sequent into antecedent/succendent lists of print filter
      * entries.
+     * <p>
+     * The antecedent and succedent filter lists are re-initialized before they are appended to
+     * below; the dereferences of the (nullable) list fields are suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected void filterIdentity() {
         antec = ImmutableList.nil();
         Iterator<SequentFormula> it = originalSequent.antecedent().iterator();

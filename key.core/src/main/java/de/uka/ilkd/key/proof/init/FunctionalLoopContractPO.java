@@ -128,7 +128,19 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <p>
+     * The {@link #proofConfig} field is assigned by {@code postInit()} before it is used; the
+     * checker does not refine the field across the {@code postInit()} call, so the difference is
+     * suppressed with a scoped key. {@code selfVar} and {@code selfTerm} are legitimately
+     * {@code null} for loop contracts in static methods (see {@code TermBuilder.selfVar} and the
+     * {@code createAndRegister}/{@code generateSelf*} handling of a {@code null} self); the
+     * differences are suppressed with a scoped key too.
+     */
     @Override
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public void readProblem() {
         assert proofConfig == null;
         final boolean makeNamesUnique = true;
@@ -369,7 +381,14 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @param services services.
      * @param tb a term builder.
      * @return a goal configurator.
+     *         <p>
+     *         The configurator is built for a fresh proof obligation, not for a specific rule
+     *         application: the {@code application}, {@code occurrence} and {@code rule} arguments
+     *         are therefore deliberately {@code null}, as the validity term is built with a
+     *         {@code null} goal that never consults them (see {@code GoalsConfigurator}); the
+     *         differences are suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private GoalsConfigurator createGoalConfigurator(final ProgramVariable selfVar,
             final JTerm selfTerm, final BlockContract.Variables variables, final Services services,
             final TermBuilder tb) {
@@ -407,7 +426,16 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * @param services services.
      * @param tb a term builder.
      * @return the validity formula for the contract.
+     *         <p>
+     *         A {@code null} goal is passed deliberately: a fresh proof obligation has no existing
+     *         goal to add the validity term to, which is explicitly permitted by
+     *         {@link GoalsConfigurator#setUpLoopValidityGoal} (it builds a validity sequent for a
+     *         loop contract when the goal is {@code null}). The exception variable's declared type
+     *         ({@code getKeYJavaType()}) is reported as {@code @Nullable} by the checker, but the
+     *         exception variable introduced by {@code VariablesCreatorAndRegistrar} always carries
+     *         a declared type; the differences are suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private JTerm setUpValidityGoal(final JTerm selfTerm, final List<LocationVariable> heaps,
             final Map<LocationVariable, Function> anonOutHeaps,
             final BlockContract.Variables variables, final LoopContract.Variables nextVariables,

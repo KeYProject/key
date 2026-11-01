@@ -5,6 +5,8 @@
 package de.uka.ilkd.key.pp;
 
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -83,23 +85,34 @@ class FinalPrinter extends FieldPrinter {
     private boolean isFieldName(String variableName, JTerm objectTerm) {
         Sort sort = objectTerm.sort();
         JavaInfo javaInfo = services.getJavaInfo();
-        KeYJavaType kjt = javaInfo.getKeYJavaType(sort);
+        // The object term always has a Java sort whose KeYJavaType is registered in the services,
+        // so the lookup result is legitimately non-null here (mirrors FieldPrinter#isCanonicField).
+        KeYJavaType kjt = Objects.requireNonNull(javaInfo.getKeYJavaType(sort),
+            "no KeYJavaType for " + sort);
         ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(variableName, kjt);
         return pv != null;
     }
 
-    /*
-     * Get sort of selected field.
+    /**
+     * Gets the sort of the program variable behind the given field term.
+     * <p>
+     * The attribute of the field term is always registered in the Java info of the services; the
+     * dereference of the (nullable) program variable is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private Sort getFieldSort(JTerm fieldTerm) {
         String lookup = fieldTerm.op().toString().replace("$", "");
         ProgramVariable progVar = services.getJavaInfo().getAttribute(lookup);
         return progVar.sort();
     }
 
-    /*
-     * Print a static field constant.
+    /**
+     * Prints a static field constant.
+     * <p>
+     * The printer's services are set whenever it prints; the dereference of the (nullable)
+     * services is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private void printStaticJavaFieldConstant(
             LogicPrinter lp, final JTerm fieldTerm) {
         lp.layouter.startTerm(2);

@@ -51,7 +51,7 @@ public class BaseConfigCache {
     private static @Nullable InitConfig baseInputConfig;
 
     /** The digest of the classpath that was used to create the cached instance */
-    private static String baseInputConfigHash = "";
+    private static @Nullable String baseInputConfigHash = "";
 
     private BaseConfigCache() {
         // prevent instantiation
@@ -69,7 +69,10 @@ public class BaseConfigCache {
     private static void digestPath(@NonNull MessageDigest md, @NonNull Path path) {
         try {
             // just to be on the safe side: Also digest the file name
-            md.update(path.getFileName().toString().getBytes());
+            var fileName = path.getFileName();
+            if (fileName != null) {
+                md.update(fileName.toString().getBytes());
+            }
             if (Files.isDirectory(path)) {
                 try (Stream<Path> walker = Files.walk(path)) {
                     walker.sorted().forEach(it -> {
@@ -146,7 +149,7 @@ public class BaseConfigCache {
     }
 
 
-    public static boolean matchesCachedConfig(Profile profile, String inputDigest) {
+    public static boolean matchesCachedConfig(Profile profile, @Nullable String inputDigest) {
         if (baseInputConfig == null) {
             return false;
         }
@@ -182,7 +185,8 @@ public class BaseConfigCache {
      * @param config the config to cache
      * @param inputDigest the digest of the classpath of config.
      */
-    public static void setBaseInputConfig(@NonNull InitConfig config, String inputDigest) {
+    public static void setBaseInputConfig(@NonNull InitConfig config,
+            @Nullable String inputDigest) {
         baseInputConfig = config;
         baseInputConfigHash = inputDigest;
     }

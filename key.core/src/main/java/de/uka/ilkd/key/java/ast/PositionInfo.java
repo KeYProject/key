@@ -114,8 +114,9 @@ public class PositionInfo {
      */
     @Deprecated // only kept for compatibility reasons
     public @Nullable String getParentClass() {
-        if (parentClassURI != null && parentClassURI.getScheme().equals("file")) {
-            return Paths.get(parentClassURI).toString();
+        URI parent = parentClassURI;
+        if (parent != null && "file".equals(parent.getScheme())) {
+            return Paths.get(parent).toString();
         }
         return null;
     }
@@ -128,8 +129,9 @@ public class PositionInfo {
      */
     @Deprecated // only kept for compatibility reasons
     public @Nullable String getFileName() {
-        if (fileURI != null && fileURI.getScheme().equals("file")) {
-            return Paths.get(fileURI).toString();
+        URI file = fileURI;
+        if (file != null && "file".equals(file.getScheme())) {
+            return Paths.get(file).toString();
         }
         return null;
     }

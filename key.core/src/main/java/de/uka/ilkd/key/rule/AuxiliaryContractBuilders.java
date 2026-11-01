@@ -107,7 +107,7 @@ public final class AuxiliaryContractBuilders {
         /**
          * The subset of variables that have already been declared.
          */
-        private final BlockContract.Variables alreadyDeclared;
+        private final BlockContract.@Nullable Variables alreadyDeclared;
 
         /**
          * Services.
@@ -149,7 +149,7 @@ public final class AuxiliaryContractBuilders {
          */
         public ValidityProgramConstructor(final Iterable<Label> labels, final StatementBlock block,
                 final BlockContract.Variables variables, final ProgramVariable exceptionParameter,
-                final Services services, final BlockContract.Variables alreadyDeclared) {
+                final Services services, final BlockContract.@Nullable Variables alreadyDeclared) {
             this.labels = labels;
             this.block = block;
             this.variables = variables;
@@ -181,7 +181,8 @@ public final class AuxiliaryContractBuilders {
                     statements.add(KeYJavaASTFactory.assign(flag, BooleanLiteral.FALSE));
                 } else {
                     statements.add(KeYJavaASTFactory.declare(flag, BooleanLiteral.FALSE,
-                        services.getJavaInfo().getKeYJavaType("boolean")));
+                        Objects.requireNonNull(
+                            services.getJavaInfo().getKeYJavaType("boolean"))));
                 }
             }
 
@@ -190,7 +191,8 @@ public final class AuxiliaryContractBuilders {
                     statements.add(KeYJavaASTFactory.assign(flag, BooleanLiteral.FALSE));
                 } else {
                     statements.add(KeYJavaASTFactory.declare(flag, BooleanLiteral.FALSE,
-                        services.getJavaInfo().getKeYJavaType("boolean")));
+                        Objects.requireNonNull(
+                            services.getJavaInfo().getKeYJavaType("boolean"))));
                 }
             }
             if (variables.returnFlag != null) {
@@ -199,7 +201,9 @@ public final class AuxiliaryContractBuilders {
                         KeYJavaASTFactory.assign(variables.returnFlag, BooleanLiteral.FALSE));
                 } else {
                     statements.add(KeYJavaASTFactory.declare(variables.returnFlag,
-                        BooleanLiteral.FALSE, services.getJavaInfo().getKeYJavaType("boolean")));
+                        BooleanLiteral.FALSE,
+                        Objects.requireNonNull(
+                            services.getJavaInfo().getKeYJavaType("boolean"))));
                 }
             }
         }
@@ -207,13 +211,19 @@ public final class AuxiliaryContractBuilders {
         /**
          * Adds a statement that declares the result variable if necessary and set its value to the
          * default for its type.
+         * <p>
+         * The result variable and its declared type are present whenever a result is returned by
+         * the contract body; the dereferences of the (nullable) result variable and (nullable)
+         * result type are suppressed with a scoped key.
          */
+        @SuppressWarnings("nullness:dereference.of.nullable")
         private void declareResultDefault() {
             if (occursReturnAndIsReturnTypeNotVoid()) {
                 if (alreadyDeclared != null && alreadyDeclared.result != null) {
                     KeYJavaType resultType = variables.result.getKeYJavaType();
                     statements.add(
-                        KeYJavaASTFactory.assign(variables.result, resultType.getDefaultValue()));
+                        KeYJavaASTFactory.assign(variables.result,
+                            Objects.requireNonNull(resultType.getDefaultValue())));
                 } else {
                     KeYJavaType resultType = variables.result.getKeYJavaType();
                     statements.add(KeYJavaASTFactory.declare(variables.result,
@@ -239,7 +249,7 @@ public final class AuxiliaryContractBuilders {
                 statements.add(KeYJavaASTFactory.assign(variables.exception, NullLiteral.NULL));
             } else {
                 statements.add(KeYJavaASTFactory.declare(variables.exception, NullLiteral.NULL,
-                    variables.exception.getKeYJavaType()));
+                    Objects.requireNonNull(variables.exception.getKeYJavaType())));
             }
         }
 
@@ -280,9 +290,15 @@ public final class AuxiliaryContractBuilders {
          */
         private StatementBlock replaceOuterBreaksContinuesAndReturns(final StatementBlock block,
                 final Label breakOutLabel) {
-            return new OuterBreakContinueAndReturnReplacer(block, labels, breakOutLabel,
-                variables.breakFlags, variables.continueFlags, variables.returnFlag,
-                variables.result, variables.exception, services).replace();
+            // returnFlag is null exactly when the block contains no return statement (see
+            // AuxiliaryContract.VariablesCreator); the replacer only consults it when processing a
+            // return, which cannot occur in that case, so the flag is deliberately passed as-is.
+            @SuppressWarnings("nullness:argument.type.incompatible")
+            OuterBreakContinueAndReturnReplacer replacer =
+                new OuterBreakContinueAndReturnReplacer(block, labels, breakOutLabel,
+                    variables.breakFlags, variables.continueFlags, variables.returnFlag,
+                    variables.result, variables.exception, services);
+            return replacer.replace();
         }
 
         /**
@@ -295,7 +311,8 @@ public final class AuxiliaryContractBuilders {
                 final ProgramVariable exceptionParameter) {
             Catch katch = KeYJavaASTFactory.catchClause(
                 KeYJavaASTFactory.parameterDeclaration(services.getJavaInfo(),
-                    exceptionParameter.getKeYJavaType(), exceptionParameter),
+                    Objects.requireNonNull(exceptionParameter.getKeYJavaType()),
+                    exceptionParameter),
                 new StatementBlock(
                     KeYJavaASTFactory.assign(variables.exception, exceptionParameter)));
             return new Try(new StatementBlock(labeledBlock), new Branch[] { katch });
@@ -311,7 +328,7 @@ public final class AuxiliaryContractBuilders {
         /**
          * The current goal.
          */
-        private final Goal goal;
+        private final @Nullable Goal goal;
 
         /**
          * @see AuxiliaryContract#getPlaceholderVariables()
@@ -353,6 +370,12 @@ public final class AuxiliaryContractBuilders {
          *        {@code false} if we are creating a new proof obligation.
          * @return the registered variables.
          */
+        /**
+         * The program element is only consulted when building a new proof obligation
+         * (existingPO == false); the rule-application callers of this overload always build in an
+         * existing PO, so the null program element is never dereferenced.
+         */
+        @SuppressWarnings("nullness:argument.type.incompatible")
         public Variables createAndRegister(JTerm self, boolean existingPO) {
             return createAndRegister(self, existingPO, null);
         }
@@ -376,7 +399,8 @@ public final class AuxiliaryContractBuilders {
                     createAndRegisterFlags(placeholderVariables.continueFlags),
                     createAndRegisterVariable(placeholderVariables.returnFlag),
                     createAndRegisterVariable(placeholderVariables.result),
-                    createAndRegisterVariable(placeholderVariables.exception),
+                    Objects.requireNonNull(
+                        createAndRegisterVariable(placeholderVariables.exception)),
                     createAndRegisterRemembranceVariables(placeholderVariables.remembranceHeaps),
                     createAndRegisterRemembranceVariables(
                         placeholderVariables.remembranceLocalVariables),
@@ -400,7 +424,8 @@ public final class AuxiliaryContractBuilders {
                     createAndRegisterFlags(placeholderVariables.continueFlags),
                     createAndRegisterVariable(placeholderVariables.returnFlag),
                     createAndRegisterVariable(placeholderVariables.result),
-                    createAndRegisterVariable(placeholderVariables.exception),
+                    Objects.requireNonNull(
+                        createAndRegisterVariable(placeholderVariables.exception)),
                     createAndRegisterRemembranceVariables(placeholderVariables.remembranceHeaps),
                     createAndRegisterRemembranceVariables(
                         placeholderVariables.remembranceLocalVariables),
@@ -443,7 +468,8 @@ public final class AuxiliaryContractBuilders {
                 String newName =
                     services.getTermBuilder().newName(value.name() + suffix);
                 LocationVariable newValue =
-                    new LocationVariable(new ProgramElementName(newName), value.getKeYJavaType());
+                    new LocationVariable(new ProgramElementName(newName),
+                        Objects.requireNonNull(value.getKeYJavaType()));
 
                 result.put(key, newValue);
             }
@@ -460,7 +486,8 @@ public final class AuxiliaryContractBuilders {
                 final Map<Label, LocationVariable> placeholderFlags) {
             Map<Label, LocationVariable> result = new LinkedHashMap<>();
             for (Map.Entry<Label, LocationVariable> flag : placeholderFlags.entrySet()) {
-                result.put(flag.getKey(), createAndRegisterVariable(flag.getValue()));
+                result.put(flag.getKey(),
+                    Objects.requireNonNull(createAndRegisterVariable(flag.getValue())));
             }
             return result;
         }
@@ -477,7 +504,8 @@ public final class AuxiliaryContractBuilders {
             for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables
                     .entrySet()) {
                 result.put(remembranceVariable.getKey(),
-                    createAndRegisterVariable(remembranceVariable.getValue()));
+                    Objects.requireNonNull(
+                        createAndRegisterVariable(remembranceVariable.getValue())));
             }
             return result;
         }
@@ -493,7 +521,7 @@ public final class AuxiliaryContractBuilders {
                 String newName =
                     services.getTermBuilder().newName(placeholderVariable.name().toString());
                 LocationVariable newVariable = new LocationVariable(new ProgramElementName(newName),
-                    placeholderVariable.getKeYJavaType());
+                    Objects.requireNonNull(placeholderVariable.getKeYJavaType()));
 
                 if (goal != null) {
                     goal.addProgramVariable(newVariable);
@@ -579,7 +607,8 @@ public final class AuxiliaryContractBuilders {
         public JTerm buildRemembranceUpdate(final List<LocationVariable> heaps) {
             JTerm result = skip();
             for (LocationVariable heap : heaps) {
-                final JTerm update = elementary(variables.remembranceHeaps.get(heap), var(heap));
+                final JTerm update = elementary(
+                    Objects.requireNonNull(variables.remembranceHeaps.get(heap)), var(heap));
                 result = parallel(result, update);
             }
             for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : variables.remembranceLocalVariables
@@ -665,8 +694,14 @@ public final class AuxiliaryContractBuilders {
          * @param prefix a prefix for the name of the anon functions.
          * @return an anonymization update for the specified modifiable clauses and for every
          *         variable in the specified set.
+         *         <p>
+         *         A modifiable clause is present for every heap of the contract (the map is fully
+         *         populated by the caller); the dereference of the (nullable) clause is suppressed
+         *         with a
+         *         scoped key.
          */
-        public JTerm buildAnonOutUpdate(final Set<LocationVariable> vars,
+        @SuppressWarnings("nullness:dereference.of.nullable")
+        public JTerm buildAnonOutUpdate(final Set<? extends LocationVariable> vars,
                 final Map<LocationVariable, Function> anonymisationHeaps,
                 final Map<LocationVariable, JTerm> modifiableClauses, final String prefix) {
             JTerm result = buildLocalVariablesAnonUpdate(vars, prefix);
@@ -717,7 +752,7 @@ public final class AuxiliaryContractBuilders {
          * @param prefix a prefix for the name of the anonymization constants.
          * @return an anonymization update for the specified variables.
          */
-        private JTerm buildLocalVariablesAnonUpdate(Collection<LocationVariable> vars,
+        private JTerm buildLocalVariablesAnonUpdate(Collection<? extends LocationVariable> vars,
                 String prefix) {
             JTerm result = skip();
 
@@ -907,8 +942,9 @@ public final class AuxiliaryContractBuilders {
                 return tt();
             }
 
-            JTerm oldDecreases = new OpReplacer(variables.combineRemembranceVariables(),
-                services.getTermFactory(), services.getProof()).replace(decreases);
+            JTerm oldDecreases = Objects.requireNonNull(
+                new OpReplacer(variables.combineRemembranceVariables(),
+                    services.getTermFactory(), services.getProof()).replace(decreases));
 
             // The condition (decreases >= 0) is part of the precondition
             // and does not need to be repeated here.
@@ -954,23 +990,29 @@ public final class AuxiliaryContractBuilders {
             Map<LocationVariable, Map<JTerm, JTerm>> remembranceVariables =
                 constructRemembranceVariables();
             for (LocationVariable heap : heaps) {
-                final JTerm modifiableClause = modifiableClauses.get(heap);
-                final JTerm freeModifiableClause = freeModifiableClauses.get(heap);
+                // The modifiable-clause and remembrance maps are populated for every registered
+                // heap by the builders above, so the null-removing reads preserve the crash shape.
+                final JTerm modifiableClause =
+                    Objects.requireNonNull(modifiableClauses.get(heap));
+                final JTerm freeModifiableClause =
+                    Objects.requireNonNull(freeModifiableClauses.get(heap));
+                final Map<JTerm, JTerm> normalToAtPre =
+                    Objects.requireNonNull(remembranceVariables.get(heap));
                 final JTerm frameCondition;
                 if (!contract.hasModifiableClause(heap)) {
                     if (!contract.hasFreeModifiableClause(heap)) {
                         frameCondition = frameStrictlyEmpty(
-                            var(heap), remembranceVariables.get(heap));
+                            var(heap), normalToAtPre);
                     } else {
                         frameCondition =
-                            frame(var(heap), remembranceVariables.get(heap), freeModifiableClause);
+                            frame(var(heap), normalToAtPre, freeModifiableClause);
                     }
                 } else {
                     if (!contract.hasFreeModifiableClause(heap)) {
                         frameCondition = frame(
-                            var(heap), remembranceVariables.get(heap), modifiableClause);
+                            var(heap), normalToAtPre, modifiableClause);
                     } else {
-                        frameCondition = frame(var(heap), remembranceVariables.get(heap),
+                        frameCondition = frame(var(heap), normalToAtPre,
                             union(modifiableClause, freeModifiableClause));
                     }
                 }
@@ -982,7 +1024,14 @@ public final class AuxiliaryContractBuilders {
         /**
          *
          * @return a map from every variable to its remembrance variable, for every heap.
+         *         <p>
+         *         The remembrance map is populated for every registered heap before the base-heap
+         *         entry is
+         *         accessed; the dereference of the (nullable) per-heap map is suppressed with a
+         *         scoped
+         *         key.
          */
+        @SuppressWarnings("nullness:dereference.of.nullable")
         private Map<LocationVariable, Map<JTerm, JTerm>> constructRemembranceVariables() {
             Map<LocationVariable, Map<JTerm, JTerm>> result =
                 new LinkedHashMap<>();
@@ -1001,9 +1050,13 @@ public final class AuxiliaryContractBuilders {
         }
 
         /**
+         * The heap LDT is always registered in the {@link Services} of a fully initialized KeY
+         * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the
+         * dereference is suppressed with a scoped key.
          *
          * @return the base heap.
          */
+        @SuppressWarnings("nullness:dereference.of.nullable")
         private LocationVariable getBaseHeapFunction() {
             return services.getTypeConverter().getHeapLDT().getHeap();
         }
@@ -1057,6 +1110,10 @@ public final class AuxiliaryContractBuilders {
         /**
          * Builds the assumptions for the {@code self} variable
          * ({@code self != null & self.created == true & exactInstance(self)})
+         * <p>
+         * The heap LDT is always registered in the {@link Services} of a fully initialized KeY
+         * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the
+         * dereference is suppressed with a scoped key.
          *
          * @param heaps the heaps.
          * @param pm the method containg the block.
@@ -1065,6 +1122,7 @@ public final class AuxiliaryContractBuilders {
          * @param services services.
          * @return the assumptions for the {@code self} variable.
          */
+        @SuppressWarnings("nullness:dereference.of.nullable")
         public JTerm buildSelfConditions(List<LocationVariable> heaps, IProgramMethod pm,
                 KeYJavaType selfKJT, JTerm self, Services services) {
             if (self != null && !pm.isConstructor()) {
@@ -1083,9 +1141,9 @@ public final class AuxiliaryContractBuilders {
                     }
                 }
 
-                JTerm exactType = exactInstance(selfKJT.getSort(), self);
+                JTerm exactType = exactInstance(Objects.requireNonNull(selfKJT.getSort()), self);
 
-                return and(notNull, created, exactType);
+                return and(notNull, Objects.requireNonNull(created), exactType);
             } else {
                 return tt();
             }
@@ -1192,15 +1250,17 @@ public final class AuxiliaryContractBuilders {
          * @return additional program variables necessary for loop contract rules.
          */
         private static LocationVariable[] createLoopVariables(final Services services) {
+            KeYJavaType booleanKjt = Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType("boolean"));
             LocationVariable conditionVariable = AbstractAuxiliaryContractRule.createLocalVariable(
-                "cond", services.getJavaInfo().getKeYJavaType("boolean"), services);
+                "cond", booleanKjt, services);
 
             LocationVariable brokeLoopVariable = AbstractAuxiliaryContractRule.createLocalVariable(
-                "brokeLoop", services.getJavaInfo().getKeYJavaType("boolean"), services);
+                "brokeLoop", booleanKjt, services);
 
             LocationVariable continuedLoopVariable =
-                AbstractAuxiliaryContractRule.createLocalVariable("continuedLoop",
-                    services.getJavaInfo().getKeYJavaType("boolean"), services);
+                AbstractAuxiliaryContractRule.createLocalVariable("continuedLoop", booleanKjt,
+                    services);
             final LocationVariable[] loopVariables = { conditionVariable,
                 brokeLoopVariable, continuedLoopVariable };
             return loopVariables;
@@ -1361,7 +1421,7 @@ public final class AuxiliaryContractBuilders {
             newPost = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services,
                 newPost, ImmutableList.<LocationVariable>nil()
                         .prependReverse(terms.remembranceLocalVariables.keySet()),
-                terms.exception);
+                Objects.requireNonNull(terms.exception));
             if (goal != null) {
                 goal.setBranchLabel("Validity");
             }
@@ -1444,7 +1504,7 @@ public final class AuxiliaryContractBuilders {
             for (Break br : bodyBreaks) {
                 Label label = br.getLabel();
                 if (label == null || contract.getLoopLabels().contains(label)) {
-                    breakFlags.put(label, loopVariables[1]);
+                    putLabelFlag(breakFlags, label, loopVariables[1]);
                     bodyBreakFound = true;
                 }
             }
@@ -1667,14 +1727,33 @@ public final class AuxiliaryContractBuilders {
                 LocationVariable continuedLoopVariable, List<Continue> bodyContinues) {
             Map<Label, LocationVariable> continueFlags =
                 new LinkedHashMap<>(variables.continueFlags);
-            continueFlags.remove(null);
+            removeNullKey(continueFlags);
             for (Continue cont : bodyContinues) {
                 Label label = cont.getLabel();
                 if (label == null || contract.getLoopLabels().contains(label)) {
-                    continueFlags.put(label, continuedLoopVariable);
+                    putLabelFlag(continueFlags, label, continuedLoopVariable);
                 }
             }
             return continueFlags;
+        }
+
+        /**
+         * Stores the flag for a jump that may be unlabeled; the null label then keys the entry,
+         * exactly as in {@code AuxiliaryContract.VariablesCreator.createFlags}.
+         */
+        @SuppressWarnings("nullness:argument.type.incompatible")
+        private static void putLabelFlag(final Map<Label, LocationVariable> flags,
+                @Nullable Label label, final LocationVariable flag) {
+            flags.put(label, flag);
+        }
+
+        /**
+         * Drops the null-key entry that models an unlabeled continue inside the loop body; the
+         * loop's own continue flag is stored under the null key before it is filtered here.
+         */
+        @SuppressWarnings("nullness:argument.type.incompatible")
+        private static void removeNullKey(final Map<Label, LocationVariable> flags) {
+            flags.remove(null);
         }
 
         private JTerm[] createPosts(final Goal goal, final JTerm[] postconditions,
@@ -1684,7 +1763,7 @@ public final class AuxiliaryContractBuilders {
             post = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services, post,
                 ImmutableList.<LocationVariable>nil()
                         .prependReverse(terms.remembranceLocalVariables.keySet()),
-                terms.exception);
+                Objects.requireNonNull(terms.exception));
             post = TermLabelManager.refactorTerm(termLabelState, services, null, post, rule, goal,
                 AbstractAuxiliaryContractRule.NEW_POSTCONDITION_TERM_HINT, null);
 
@@ -1692,7 +1771,7 @@ public final class AuxiliaryContractBuilders {
             postNext = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(services,
                 postNext, ImmutableList.<LocationVariable>nil()
                         .prependReverse(terms.remembranceLocalVariables.keySet()),
-                terms.exception);
+                Objects.requireNonNull(terms.exception));
             postNext = TermLabelManager.refactorTerm(termLabelState, services, null, postNext, rule,
                 goal, AbstractAuxiliaryContractRule.NEW_POSTCONDITION_TERM_HINT, null);
             return new JTerm[] { post, postNext };

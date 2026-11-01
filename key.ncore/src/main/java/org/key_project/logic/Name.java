@@ -6,6 +6,7 @@ package org.key_project.logic;
 
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /// A Name object is created to represent the name of an object which usually implements the
 /// interface [Named].
@@ -20,7 +21,10 @@ public class Name implements Comparable<Name> {
     private final /* Interned */ @NonNull String nameString;
 
     /// creates a name object
-    public Name(String n) {
+    ///
+    /// @param n the string this name wraps; a {@code null} value is replaced by an internal
+    /// placeholder so that a name can always be constructed from an unclear identifier
+    public Name(@Nullable String n) {
         nameString = (n == null ? NONAME : n).intern();
     }
 

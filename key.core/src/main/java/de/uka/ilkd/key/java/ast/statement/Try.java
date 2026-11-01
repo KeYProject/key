@@ -44,11 +44,16 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
 
     /**
      * Try.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param body
      *        a statement block.
      */
 
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public Try(StatementBlock body) {
         super(null, null);
         this.body = body;
@@ -61,6 +66,10 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
 
     /**
      * Try.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param body
      *        a statement block.
@@ -68,6 +77,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
      *        a branch array.
      */
 
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public Try(StatementBlock body, Branch[] branches) {
         super(null, null);
         this.body = body;
@@ -80,6 +90,10 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
 
     /**
      * Try.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param body
      *        a statement block.
@@ -87,6 +101,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
      *        a branch array.
      */
 
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public Try(StatementBlock body, ImmutableArray<Branch> branches) {
         super(null, null);
         this.body = body;
@@ -98,11 +113,16 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
 
     /**
      * Try.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param children
      *        a list with all children
      */
 
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public Try(ExtList children) {
         super(children);
         this.body = Objects.requireNonNull(children.get(StatementBlock.class),

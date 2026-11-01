@@ -20,12 +20,16 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
- * This visitor finds all includes in the given ASTs.
+ * This visitor finds all includes in the given ASTs. It uses {@link Void} as visitor result type,
+ * which is treated as {@code @Nullable} under null-marking and therefore cannot satisfy the
+ * {@code @NonNull} bound of {@link AbstractBuilder}'s type parameter; the difference is suppressed
+ * with a scoped key.
  *
  * @author weigl
  * @see #getIncludes()
  */
 @NullMarked
+@SuppressWarnings("nullness:type.argument.type.incompatible")
 public class IncludeFinder extends AbstractBuilder<Void> {
     private final Path base;
     private final Includes includes = new Includes();

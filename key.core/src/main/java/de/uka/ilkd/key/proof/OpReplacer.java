@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -156,15 +157,19 @@ public class OpReplacer {
      * @param with the replacement sub-term.
      * @param in the term in which to perform the replacement.
      * @param tf a term factory.
-     * @param proof the currently loaded proof.
+     * @param proof the currently loaded proof (may be {@code null}).
      * @return a term with all occurences of the sub-term replaced.
      */
     public static JTerm replace(JTerm toReplace, JTerm with, JTerm in, TermFactory tf,
-            Proof proof) {
+            @Nullable Proof proof) {
         Map<JTerm, JTerm> map = new LinkedHashMap<>();
         map.put(toReplace, with);
         OpReplacer or = new OpReplacer(map, tf, proof);
-        return or.replace(in);
+        JTerm result = or.replace(in);
+        if (result == null) {
+            throw new IllegalStateException("Sub-term replacement failed");
+        }
+        return result;
     }
 
     /**
@@ -176,15 +181,19 @@ public class OpReplacer {
      * @param with the replacement sub-term.
      * @param in the terms in which to perform the replacement.
      * @param tf a term factory.
-     * @param proof the currently loaded proof.
+     * @param proof the currently loaded proof (may be {@code null}).
      * @return the terms with all occurences of the sub-term replaced.
      */
     public static ImmutableList<JTerm> replace(JTerm toReplace, JTerm with, ImmutableList<JTerm> in,
-            TermFactory tf, Proof proof) {
+            TermFactory tf, @Nullable Proof proof) {
         Map<JTerm, JTerm> map = new LinkedHashMap<>();
         map.put(toReplace, with);
         OpReplacer or = new OpReplacer(map, tf, proof);
-        return or.replace(in);
+        ImmutableList<JTerm> result = or.replace(in);
+        if (result == null) {
+            throw new IllegalStateException("Sub-term replacement failed");
+        }
+        return result;
     }
 
     /**
@@ -196,15 +205,19 @@ public class OpReplacer {
      * @param with the replacement operator.
      * @param in the term in which to perform the replacement.
      * @param tf a term factory.
-     * @param proof the currently loaded proof.
+     * @param proof the currently loaded proof (may be {@code null}).
      * @return a term with all occurences of the operator replaced.
      */
     public static JTerm replace(Operator toReplace, Operator with, JTerm in, TermFactory tf,
-            Proof proof) {
+            @Nullable Proof proof) {
         Map<Operator, Operator> map = new LinkedHashMap<>();
         map.put(toReplace, with);
         OpReplacer or = new OpReplacer(map, tf, proof);
-        return or.replace(in);
+        JTerm result = or.replace(in);
+        if (result == null) {
+            throw new IllegalStateException("Operator replacement failed");
+        }
+        return result;
     }
 
 
@@ -252,9 +265,10 @@ public class OpReplacer {
         boolean changedSubTerm = false;
         for (int i = 0; i < arity; i++) {
             JTerm subTerm = term.sub(i);
-            newSubTerms[i] = replace(subTerm);
+            final JTerm replacedSubTerm = Objects.requireNonNull(replace(subTerm));
+            newSubTerms[i] = replacedSubTerm;
 
-            if (newSubTerms[i] != subTerm) {
+            if (replacedSubTerm != subTerm) {
                 changedSubTerm = true;
             }
         }
@@ -281,7 +295,7 @@ public class OpReplacer {
     public ImmutableList<JTerm> replace(ImmutableList<JTerm> terms) {
         ImmutableList<JTerm> result = ImmutableList.nil();
         for (final JTerm term : terms) {
-            result = result.append(replace(term));
+            result = result.append(Objects.requireNonNull(replace(term)));
         }
         return result;
     }
@@ -318,7 +332,7 @@ public class OpReplacer {
     public ImmutableSet<JTerm> replace(ImmutableSet<JTerm> terms) {
         ImmutableSet<JTerm> result = DefaultImmutableSet.nil();
         for (final JTerm term : terms) {
-            result = result.add(replace(term));
+            result = result.add(Objects.requireNonNull(replace(term)));
         }
         return result;
     }
@@ -335,7 +349,7 @@ public class OpReplacer {
         Map<Operator, JTerm> result = new LinkedHashMap<>();
 
         for (Map.Entry<Operator, JTerm> entry : myMap.entrySet()) {
-            result.put(replace(entry.getKey()), replace(entry.getValue()));
+            result.put(replace(entry.getKey()), Objects.requireNonNull(replace(entry.getValue())));
         }
         return result;
     }
