@@ -41,6 +41,11 @@ dependencies {
     // Java/JML source editor with syntax highlighting (Milestone M2).
     implementation(libs.richtextfx)
 
+    // theme: AtlantaFX provides the base look of the FX UI. The seven themes are applied as the
+    // user-agent stylesheet through ThemeManager (the JVM-global Application setting), so the
+    // keyext FX modules follow without depending on this library themselves.
+    implementation(libs.atlantafx.base)
+
     implementation(libs.picocli)
 
     // logging implementation used by the slf4j facade

@@ -33,8 +33,11 @@ picocli = "4.7.7"
 docking-frames = "1.1.3p1"
 
 # JavaFX user interface (key.ui.fx)
-javafx = "25.0.4"
+javafx = "27.0.1"
 richtextfx = "0.11.7"
+# AtlantaFX 3.0.0 — CSS theme collection applied as the user-agent stylesheet
+# (requires JavaFX 27+, see the theme integration in key.ui.fx)
+atlantafx = "3.0.0"
 openjfx-plugin = "0.1.0"
 
 # Icon fonts (ikonli, kordamp.org/ikonli) — FontAwesome glyphs for the keyext FX ports
@@ -90,6 +93,7 @@ docking-frames-core = { module = "org.key-project:docking-frames-core", version.
 
 # JavaFX UI components (key.ui.fx)
 richtextfx = { module = "org.fxmisc.richtext:richtextfx", version.ref = "richtextfx" }
+atlantafx-base = { module = "io.github.mkpaz:atlantafx-base", version.ref = "atlantafx" }
 javafx-base = { module = "org.openjfx:javafx-base", version.ref = "javafx" }
 javafx-controls = { module = "org.openjfx:javafx-controls", version.ref = "javafx" }
 javafx-graphics = { module = "org.openjfx:javafx-graphics", version.ref = "javafx" }
