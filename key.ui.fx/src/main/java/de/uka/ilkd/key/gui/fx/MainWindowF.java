@@ -1402,6 +1402,13 @@ public final class MainWindowF {
             if (System.getProperty("key.fx.verify.drawerlayout") != null) {
                 runDrawerLayoutVerification(env);
             }
+            // theme gallery: key.fx.screenshot=<dir> — one full-window PNG per AtlantaFX theme,
+            // the View > Theme submenu popup and the settings dialog with the theme combo,
+            // rendered in-process via Node.snapshot (test source set, invoked reflectively)
+            if (System.getProperty("key.fx.screenshot") != null) {
+                runVerifyHarness("de.uka.ilkd.key.gui.fx.screenshot.ScreenshotVerifyF", "run",
+                    new Class<?>[] { MainWindowF.class }, this);
+            }
             if (System.getProperty("key.fx.verify.tree") != null) {
                 String report = proofTreeView.verifyTreeStructure();
                 LOGGER.info("Proof tree structure verification: {}", report);
