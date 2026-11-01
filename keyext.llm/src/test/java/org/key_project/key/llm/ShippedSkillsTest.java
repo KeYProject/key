@@ -7,6 +7,7 @@ package org.key_project.key.llm;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -15,15 +16,19 @@ import org.key_project.key.llm.mcp.AgentTool;
 import org.key_project.key.llm.mcp.KeYAgentTools;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The example skills shipped in {@code keyext.llm/skills} must be loadable by the real
- * {@link SkillLibrary}: each file parses to a skill with a valid name and description, and every
- * {@code allowedTools} entry refers to a tool of the built-in tool set.
+ * {@link SkillLibrary}: each file parses to a skill with a valid name and description, every
+ * {@code allowedTools} entry refers to a tool of the built-in tool set, and the bundled
+ * {@code /skills.zip} resource (used to seed the default skill directory) stays in sync with the
+ * source directory.
  */
 class ShippedSkillsTest {
 
@@ -77,5 +82,68 @@ class ShippedSkillsTest {
         assertTrue(markdown.startsWith("---\nname: demo-name"));
         assertTrue(markdown.contains("allowedTools:"));
         Set.of("read_file", "list_files").forEach(t -> assertTrue(markdown.contains("- " + t)));
+    }
+
+    // ------------------------------------------------------------------------ bundled archive
+
+    /** Helper collecting the shipped {@code <name>.md -> content} map from the source directory. */
+    private LinkedHashMap<String, String> sourceSkills() throws IOException {
+        var entries = new LinkedHashMap<String, String>();
+        try (Stream<Path> files = Files.list(SKILLS_DIR)) {
+            files.filter(p -> p.toString().endsWith(".md")).sorted().forEach(p -> {
+                try {
+                    entries.put(p.getFileName().toString(), Files.readString(p));
+                } catch (IOException e) {
+                    throw new IllegalStateException(e);
+                }
+            });
+        }
+        return entries;
+    }
+
+    /** The bundled /skills.zip classpath resource must equal the source directory exactly. */
+    @Test
+    void bundledSkillsZipMatchesTheSourceDirectory() throws IOException {
+        var bundled = SkillLibrary.readShippedSkills();
+        var source = sourceSkills();
+        assertFalse(source.isEmpty(), "the source skill directory must not be empty");
+        assertEquals(source, bundled,
+            "/skills.zip is out of sync with " + SKILLS_DIR.toAbsolutePath()
+                + " (run :keyext.llm:bundleSkillsZip)");
+    }
+
+    /** Seeding extracts the bundled skills into an empty default directory. */
+    @Test
+    void seedingExtractsTheBundledSkills(@TempDir Path dir) throws IOException {
+        SkillLibrary.INSTANCE.seedDefaultDirectory(dir);
+        var seeded = new LinkedHashMap<String, String>();
+        try (Stream<Path> files = Files.list(dir)) {
+            files.filter(p -> p.toString().endsWith(".md")).sorted().forEach(p -> {
+                try {
+                    seeded.put(p.getFileName().toString(), Files.readString(p));
+                } catch (IOException e) {
+                    throw new IllegalStateException(e);
+                }
+            });
+        }
+        assertEquals(sourceSkills(), seeded, "seeding must materialize every shipped skill");
+        for (String content : seeded.values()) {
+            var skill = SkillLibrary.parse(content);
+            assertNotNull(skill, "a seeded skill must parse");
+            assertTrue(SkillLibrary.INSTANCE.validate(skill) == null);
+        }
+    }
+
+    /** Seeding is a no-op when the default directory already holds skills. */
+    @Test
+    void seedingLeavesAnExistingDirectoryAlone(@TempDir Path dir) throws IOException {
+        var own = dir.resolve("mine.md");
+        Files.writeString(own, SkillLibrary.serialize(new Skill("mine", "", "body", List.of(),
+            true)));
+        SkillLibrary.INSTANCE.seedDefaultDirectory(dir);
+        try (Stream<Path> files = Files.list(dir)) {
+            assertEquals(List.of(own), files.toList(),
+                "seeding must not touch a directory that already has skills");
+        }
     }
 }

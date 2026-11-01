@@ -23,7 +23,8 @@ import org.jspecify.annotations.Nullable;
  * {@code <name>.md}. The library is looked up along a configurable <em>search path</em>: the
  * ordered list of directories returned by {@link #configuredSearchPath()} (entries may use
  * {@code ~}, {@code $(pwd)} and relative paths, see {@link #expandPath(String)}); when it is
- * empty, the default directory {@code <key-config-dir>/llm/<subDirectory()>} is used.
+ * empty, the default directory {@code <key-config-dir>/llm/<subDirectory()>} is used, into which
+ * subclasses may install shipped content on first access ({@link #ensureSeeded()}).
  * <p>
  * The search order defines the priority: if the same name exists in several directories, the
  * first occurrence wins. New entries are created in the first directory of the search path,
@@ -80,6 +81,40 @@ abstract class FileBackedLibrary<E> {
     }
 
     /**
+     * Whether {@link #ensureSeeded()} has already run (libraries are singletons, so once per JVM).
+     */
+    private boolean seeded;
+
+    /**
+     * One-time seeding of the library: when the search path is empty (only the default directory
+     * is searched), {@link #seedDefaultDirectory(Path)} may install shipped content into it.
+     * Called before the first access to the library's contents; failures are ignored (seeding is
+     * best-effort).
+     */
+    protected void ensureSeeded() {
+        if (seeded) {
+            return;
+        }
+        seeded = true;
+        if (!configuredSearchPath().isEmpty()) {
+            return; // the user manages their own directories
+        }
+        try {
+            seedDefaultDirectory(defaultDir());
+        } catch (IOException | RuntimeException e) {
+            // seeding must never break the library access
+        }
+    }
+
+    /**
+     * Seeds the given directory with shipped content; the default implementation does nothing.
+     * Only called when the search path is empty, i.e. {@code dir} is the effective default
+     * directory.
+     */
+    protected void seedDefaultDirectory(Path dir) throws IOException {
+    }
+
+    /**
      * Expands a search path entry: {@code $(pwd)} is replaced by the working directory, a
      * leading {@code ~} by the home directory, and relative paths are resolved against the
      * working directory.
@@ -109,6 +144,7 @@ abstract class FileBackedLibrary<E> {
     }
 
     public synchronized List<E> all() {
+        ensureSeeded();
         var seen = new HashSet<String>();
         var result = new ArrayList<E>();
         for (var dir : searchDirs()) {

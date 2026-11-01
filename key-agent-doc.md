@@ -229,10 +229,14 @@ instructions:
 | `orchestrate`    | delegate bounded work to sub-agents (`spawn_subagent`, roles, logs) and consult fresh LLM instances (`ask_llm`) instead of doing everything inline |
 | `tool-tour`      | onboarding: the agent explains its own tool set via `list_tools` and suggests a fitting skill |
 
-To use them, add the directory to the skill library search path (Settings → LLM Settings →
-Skills, right below the list — e.g. `/path/to/keyext.llm/skills`) or import the files via
-`Import...`. The skills are validated by a unit test (`ShippedSkillsTest`), which also keeps
-their `allowedTools` whitelists in sync with the built-in tool set.
+The skills are **installed automatically**: when the skill search path is empty (the default),
+KeY extracts the bundled skills into the default directory (`<key-config>/llm/skills`) on first
+use — nothing to configure. Deleting a seeded skill removes it for good. Alternatively you can
+point the search path (Settings → LLM Settings → Skills, right below the list) at the
+repository directory (e.g. `/path/to/keyext.llm/skills`) or import the files via `Import...`.
+The skills are validated by a unit test (`ShippedSkillsTest`), which also keeps their
+`allowedTools` whitelists in sync with the built-in tool set and the bundled `skills.zip` (the
+seed resource) in sync with the source directory.
 
 ---
 
@@ -588,9 +592,16 @@ changes. `Export...` saves the whole library as a ZIP archive of its Markdown fi
 entries with an existing name are only overwritten after you confirm, otherwise they are kept).
 Below the list the **search path** is editable: an ordered list of directories holding the
 files — the first occurrence of a name wins, new files are created in the first directory.
-Entries may use `~` (home directory), `$(pwd)` or relative paths (working directory); an empty
-list selects the default directory (see [section 10](#10-storage)). Changes are saved
-immediately.
+`Add directory...` opens a directory chooser; `Add path...` accepts arbitrary entries using
+`~` (home directory), `$(pwd)` or relative paths (working directory). When nothing is
+configured, the effective default directory is shown (and protected from removal) as a
+pseudo-entry, so the default is always visible (see [section 10](#10-storage)). Changes are
+saved immediately.
+
+The **skill library is seeded**: when the skill search path is empty and the default directory
+holds no skills yet, the skills bundled with KeY (`skills.zip`, built from
+[`keyext.llm/skills/`](../keyext.llm/skills/)) are extracted into the default directory on
+first access — see [section 5.1](#51-ready-made-skills-shipped-with-key).
 
 ---
 

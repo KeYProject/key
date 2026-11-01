@@ -304,7 +304,10 @@ new tools with their approval requirement.
   `SkillLibraryEditor`: file list, *New* creates a template file, *Edit* opens the file in the
   system editor, editable search path); records are `Prompt(name, description, template)` and
   `Skill(name, description, instructions, allowedTools, enabled)`; export/import shares the whole
-  library as a ZIP of `.md` entries (`LibraryZip`).
+  library as a ZIP of `.md` entries (`LibraryZip`). The skill library is *seeded*: when the
+  search path is empty and the default directory has no skills, the bundled classpath resource
+  `/skills.zip` (Gradle task `bundleSkillsZip`, built from `keyext.llm/skills/*.md`) is
+  extracted into `<keyConfig>/llm/skills` on first access (`FileBackedLibrary.ensureSeeded`).
 * The conversation history itself is kept per proof in memory (`LlmSession.getContext()`) and
   is not persisted.
 

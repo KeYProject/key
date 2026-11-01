@@ -41,8 +41,10 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * Below the list the library's search path is editable: an ordered list of directories holding
  * the files (first occurrence of a name wins, new files are created in the first directory).
- * Entries may use {@code ~} (home directory), {@code $(pwd)} and relative paths (working
- * directory); an empty list selects the default directory.
+ * {@code Add directory...} opens a directory chooser, {@code Add path...} allows arbitrary
+ * entries using {@code ~} (home directory), {@code $(pwd)} and relative paths (working
+ * directory); an empty list selects the default directory, which is then shown (and protected
+ * from removal) as a pseudo-entry.
  *
  * @param <E> the library element type
  * @author Alexander Weigl
@@ -56,6 +58,8 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
     private final JButton btnDelete = new JButton("Delete");
     private final DefaultListModel<String> searchPathModel = new DefaultListModel<>();
     private final JList<String> searchPathList = new JList<>(searchPathModel);
+    private final JTextArea searchPathHint = new JTextArea();
+    private final JButton btnRemoveSearchDir = new JButton("Remove");
     private int selectedIndex = -1;
 
     protected LibraryEditorPanel(String description, String subHeader) {
@@ -93,30 +97,47 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
         return b;
     }
 
-    /** The search path editor: list of directories plus add/remove and a short explanation. */
+    /**
+     * The search path editor: a list of directories (with an explicit row for the effective
+     * default directory when nothing is configured), buttons to add/remove directories and a
+     * wrapping explanation of the search semantics.
+     */
     private JComponent buildSearchPathPanel() {
-        searchPathList.setVisibleRowCount(3);
+        searchPathList.setVisibleRowCount(6);
+        searchPathList.addListSelectionListener(e -> updateRemoveSearchDirState());
+        btnRemoveSearchDir.addActionListener(e -> removeSearchDir());
 
         var buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
-        buttons.add(new JLabel("Directories (first one receives new files):"));
         buttons.add(button("Add directory...", this::addSearchDir));
-        buttons.add(button("Remove", this::removeSearchDir));
+        buttons.add(button("Add path...", this::addSearchPathEntry));
+        buttons.add(btnRemoveSearchDir);
 
-        var hint = new JLabel("Search order: \"~\" is the home directory, \"$(pwd)\" and relative"
-            + " paths are resolved against the working directory. The first occurrence of a name"
-            + " wins. Empty list = default directory: " + defaultDirectory());
-        hint.setForeground(UIManager.getColor("Label.disabledForeground"));
-        hint.setBorder(BorderFactory.createEmptyBorder(0, 10, 2, 10));
+        // a wrapping text area: a JLabel would overflow the panel with its single long line
+        searchPathHint.setEditable(false);
+        searchPathHint.setFocusable(false);
+        searchPathHint.setOpaque(false);
+        searchPathHint.setLineWrap(true);
+        searchPathHint.setWrapStyleWord(true);
+        searchPathHint.setColumns(66);
+        searchPathHint.setForeground(UIManager.getColor("Label.disabledForeground"));
+        searchPathHint.setBorder(BorderFactory.createEmptyBorder(4, 10, 4, 10));
 
         var scroll = new JScrollPane(searchPathList);
         scroll.setBorder(BorderFactory.createEmptyBorder());
 
-        var panel = new JPanel(new BorderLayout(0, 2));
+        var panel = new JPanel(new BorderLayout(0, 4));
         panel.setBorder(BorderFactory.createTitledBorder("Search path"));
         panel.add(buttons, BorderLayout.NORTH);
         panel.add(scroll, BorderLayout.CENTER);
-        panel.add(hint, BorderLayout.SOUTH);
+        panel.add(searchPathHint, BorderLayout.SOUTH);
         return panel;
+    }
+
+    /** Enables "Remove" only for a real, removable entry (not the default-directory row). */
+    private void updateRemoveSearchDirState() {
+        var dirs = searchDirs();
+        int index = searchPathList.getSelectedIndex();
+        btnRemoveSearchDir.setEnabled(!dirs.isEmpty() && index >= 0 && index < dirs.size());
     }
 
     private void updateButtonState() {
@@ -154,10 +175,32 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
         updateButtonState();
     }
 
+    /** Prefix of the pseudo-entry shown when no directory is configured. */
+    private static final String DEFAULT_DIR_PREFIX = "(default directory)  ";
+
     private void refreshSearchPath() {
         searchPathModel.clear();
-        for (var dir : searchDirs()) {
-            searchPathModel.addElement(dir);
+        var dirs = searchDirs();
+        if (dirs.isEmpty()) {
+            // the effective default directory, not removable
+            searchPathModel.addElement(DEFAULT_DIR_PREFIX + defaultDirectory());
+        }
+        dirs.forEach(searchPathModel::addElement);
+        updateRemoveSearchDirState();
+        updateSearchPathHint();
+    }
+
+    private void updateSearchPathHint() {
+        if (searchDirs().isEmpty()) {
+            searchPathHint.setText(
+                "Only the default directory is searched: " + defaultDirectory() + ".\n"
+                    + "Click \u201CAdd directory...\u201D to search your own folders as well"
+                    + " (or \u201CAdd path...\u201D for a location using ~ or $(pwd)).");
+        } else {
+            searchPathHint.setText("Search order: the first occurrence of a name wins and new"
+                + " files are created in the first directory. \u201C~\u201D is the home"
+                + " directory; \u201C$(pwd)\u201D and relative paths are resolved against the"
+                + " working directory.");
         }
     }
 
@@ -217,7 +260,23 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
 
     // ------------------------------------------------------------- search path actions
 
+    /** Opens a directory chooser and appends the chosen directory to the search path. */
     private void addSearchDir() {
+        var chooser = new JFileChooser();
+        chooser.setDialogTitle("Add " + title.toLowerCase() + " directory");
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        var dir = chooser.getSelectedFile();
+        if (dir != null) {
+            appendSearchEntry(dir.toPath().toString());
+        }
+    }
+
+    /** Manual entry for search path locations using {@code ~}, {@code $(pwd)} or relative paths. */
+    private void addSearchPathEntry() {
         var value = JOptionPane.showInputDialog(this,
             "Directory to search for " + title.toLowerCase() + ":\n"
                 + "(\"~\" = home directory, \"$(pwd)\" = working directory)",
@@ -226,9 +285,12 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
             return;
         }
         value = value.strip();
-        if (value.isEmpty()) {
-            return;
+        if (!value.isEmpty()) {
+            appendSearchEntry(value);
         }
+    }
+
+    private void appendSearchEntry(String value) {
         var dirs = new ArrayList<>(searchDirs());
         if (!dirs.contains(value)) {
             dirs.add(value);
@@ -238,11 +300,11 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
     }
 
     private void removeSearchDir() {
-        int index = searchPathList.getSelectedIndex();
-        if (index < 0) {
-            return;
-        }
         var dirs = new ArrayList<>(searchDirs());
+        int index = searchPathList.getSelectedIndex();
+        if (dirs.isEmpty() || index < 0 || index >= dirs.size()) {
+            return; // the default-directory pseudo-entry is not removable
+        }
         dirs.remove(index);
         setSearchDirs(dirs);
         reload();

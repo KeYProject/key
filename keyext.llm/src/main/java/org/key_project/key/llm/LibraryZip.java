@@ -5,6 +5,7 @@
 package org.key_project.key.llm;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,16 +41,24 @@ public final class LibraryZip {
 
     /** Reads a ZIP archive into a map of archive path -&gt; UTF-8 content (directories skipped). */
     public static Map<String, String> read(Path source) throws IOException {
+        try (var in = Files.newInputStream(source)) {
+            return read(in);
+        }
+    }
+
+    /**
+     * Reads a ZIP archive from a stream (e.g. a classpath resource) into a map of archive path
+     * -&gt; UTF-8 content (directories skipped). The stream is not closed.
+     */
+    public static Map<String, String> read(InputStream source) throws IOException {
         var result = new LinkedHashMap<String, String>();
-        try (var in = new ZipInputStream(Files.newInputStream(source))) {
-            ZipEntry entry;
-            while ((entry = in.getNextEntry()) != null) {
-                if (!entry.isDirectory()) {
-                    result.put(entry.getName(),
-                        new String(in.readAllBytes(), StandardCharsets.UTF_8));
-                }
-                in.closeEntry();
+        var zip = new ZipInputStream(source);
+        ZipEntry entry;
+        while ((entry = zip.getNextEntry()) != null) {
+            if (!entry.isDirectory()) {
+                result.put(entry.getName(), new String(zip.readAllBytes(), StandardCharsets.UTF_8));
             }
+            zip.closeEntry();
         }
         return result;
     }
