@@ -45,8 +45,8 @@ public class LlmSettingsUI extends SettingsPanel {
         model = new LlmSettings(settings);
 
         setHeaderText("LLM Settings");
-        setSubHeaderText("Connection, agent behavior, context and history budgets, file handling,"
-            + " shell security and chat appearance for the KeY-Agent.");
+        setSubHeaderText("Connection, agent behavior, budgets, file handling, shell security"
+            + " and chat appearance.");
 
         addSeparator("Connection");
         txtApiBaseUrl = addTextField("API Base URL", model.getApiEndpoint(), "",
@@ -175,7 +175,16 @@ public class LlmSettingsUI extends SettingsPanel {
      * is sent.
      */
     private void addUrlPreview(JTextField baseUrlField) {
-        var preview = new JLabel();
+        // a wrapping text area: the preview must not inflate the grid — a JLabel (or any
+        // non-wrapping component) spanning all three columns would distribute its preferred
+        // width over the spanned columns and widen the label column
+        var preview = new JTextArea();
+        preview.setEditable(false);
+        preview.setFocusable(false);
+        preview.setOpaque(false);
+        preview.setLineWrap(true);
+        preview.setWrapStyleWord(true);
+        preview.setColumns(50);
         preview.setFont(preview.getFont().deriveFont(Font.PLAIN,
             Math.max(9f, preview.getFont().getSize2D() - 1f)));
         preview.setForeground(UIManager.getColor("Label.disabledForeground"));
@@ -183,9 +192,9 @@ public class LlmSettingsUI extends SettingsPanel {
 
         Runnable update = () -> {
             String base = baseUrlField.getText();
-            preview.setText("<html>derived endpoints &#8594; chat completions: <code>"
-                + ApiUrls.chatCompletions(base) + "</code>, models: <code>" + ApiUrls.models(base)
-                + "</code></html>");
+            preview.setText(
+                "derived endpoints \u2192 chat completions: " + ApiUrls.chatCompletions(base)
+                    + ", models: " + ApiUrls.models(base));
         };
         var listener = new DocumentListener() {
             @Override
@@ -206,7 +215,7 @@ public class LlmSettingsUI extends SettingsPanel {
         baseUrlField.getDocument().addDocumentListener(listener);
         update.run();
 
-        pCenter.add(preview, new CC().span(3).growX().wrap());
+        pCenter.add(preview, new CC().span(3).growX().minWidth("0").wrap());
     }
 
     /** Adds an integer spinner bound immediately to the settings model. */

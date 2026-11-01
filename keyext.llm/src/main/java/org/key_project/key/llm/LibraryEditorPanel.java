@@ -118,7 +118,7 @@ public abstract class LibraryEditorPanel<E> extends SimpleSettingsPanel {
         searchPathHint.setOpaque(false);
         searchPathHint.setLineWrap(true);
         searchPathHint.setWrapStyleWord(true);
-        searchPathHint.setColumns(66);
+        searchPathHint.setColumns(50);
         searchPathHint.setForeground(UIManager.getColor("Label.disabledForeground"));
         searchPathHint.setBorder(BorderFactory.createEmptyBorder(4, 10, 4, 10));
 
