@@ -582,7 +582,7 @@ public class AgentLoop {
         return m;
     }
 
-    static String stringify(Object result) {
+    public static String stringify(Object result) {
         if (result == null) {
             return "(no result)";
         }
