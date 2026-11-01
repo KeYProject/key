@@ -1,9 +1,10 @@
 /*
  * Dark theme for the JavaFX UI of KeY (key.ui.fx).
  *
- * This stylesheet is applied on top of the default Modena theme. It
- * re-defines the -key-* custom properties and adjusts the standard Modena
- * look-up colors, such that both our own components and the built-in
+ * This stylesheet is the KeY layer applied on top of the AtlantaFX user-agent
+ * stylesheet (see ThemeManager). It
+ * re-defines the -key-* custom properties and adjusts the standard look-up
+ * colors, such that both our own components and the built-in
  * controls render in a dark color scheme.
  */
 .root {
@@ -1167,4 +1168,17 @@
     -fx-background-color: derive(-key-border, 30%);
     -fx-background-radius: 2;
     -fx-background-insets: 1 2 1 2;
+}
+
+/*
+ * AtlantaFX interaction override.
+ *
+ * The AtlantaFX base look fades every button to 90% opacity on hover
+ * (.button:hover of the user-agent stylesheet). The sudden whole-node fade
+ * reads as a one-frame glitch on the small icon-font glyphs (toolbar and
+ * status bar buttons), so the KeY layer pins the hover opacity to 1 — the
+ * hover feedback stays on the background colors of the AtlantaFX states.
+ */
+.button:hover {
+    -fx-opacity: 1;
 }
