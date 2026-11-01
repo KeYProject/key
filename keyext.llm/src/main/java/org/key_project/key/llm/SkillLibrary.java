@@ -4,8 +4,14 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.llm;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 
 import com.google.gson.GsonBuilder;
 import org.jspecify.annotations.Nullable;
@@ -15,11 +21,20 @@ import org.jspecify.annotations.Nullable;
  * KeY config directory). An active skill is selected on the {@link LlmSession}; its instructions
  * are appended to the system prompt and its {@code allowedTools} whitelist narrows the advertised
  * tool set.
+ * <p>
+ * The library is <em>seeded</em>: when the skill search path is empty (only the default directory
+ * {@link #defaultDir()} is searched) and that directory has no {@code .md} files yet, the skills
+ * bundled with KeY (the classpath resource {@code /skills.zip}, built from the repository
+ * directory {@code keyext.llm/skills}) are extracted into it. Deleting a seeded skill removes it
+ * for good.
  *
  * @author Alexander Weigl
  */
 public final class SkillLibrary extends FileBackedLibrary<Skill> {
     public static final SkillLibrary INSTANCE = new SkillLibrary();
+
+    /** The classpath resource holding the shipped skills ({@code <name>.md} entries). */
+    public static final String SHIPPED_SKILLS_RESOURCE = "/skills.zip";
 
     private SkillLibrary() {
     }
@@ -29,6 +44,51 @@ public final class SkillLibrary extends FileBackedLibrary<Skill> {
     @Override
     protected String subDirectory() {
         return "skills";
+    }
+
+    @Override
+    protected void seedDefaultDirectory(Path dir) throws IOException {
+        if (hasMarkdownFiles(dir)) {
+            return; // the user already has skills there
+        }
+        var entries = readShippedSkills();
+        if (entries.isEmpty()) {
+            return;
+        }
+        Files.createDirectories(dir);
+        for (var entry : entries.entrySet()) {
+            // plain file names only, defending against archive paths
+            var file = dir.resolve(Path.of(entry.getKey()).getFileName());
+            Files.writeString(file, entry.getValue(), StandardCharsets.UTF_8);
+        }
+    }
+
+    /** True when {@code dir} already holds {@code .md} files (so no seeding is needed). */
+    private static boolean hasMarkdownFiles(Path dir) throws IOException {
+        if (!Files.isDirectory(dir)) {
+            return false;
+        }
+        try (var stream = Files.list(dir)) {
+            return stream.anyMatch(p -> p.toString().toLowerCase(Locale.ROOT).endsWith(".md"));
+        }
+    }
+
+    /** The shipped skills as archive-path -&gt; Markdown content; empty when not bundled. */
+    static LinkedHashMap<String, String> readShippedSkills() {
+        try (InputStream in = SkillLibrary.class.getResourceAsStream(SHIPPED_SKILLS_RESOURCE)) {
+            if (in == null) {
+                return new LinkedHashMap<>();
+            }
+            var entries = new LinkedHashMap<String, String>();
+            LibraryZip.read(in).forEach((name, content) -> {
+                if (name.endsWith(".md")) {
+                    entries.put(name, content);
+                }
+            });
+            return entries;
+        } catch (IOException e) {
+            return new LinkedHashMap<>();
+        }
     }
 
     @Override

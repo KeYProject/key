@@ -13,3 +13,21 @@ dependencies {
     implementation("io.modelcontextprotocol.sdk:mcp-core")
     implementation("io.modelcontextprotocol.sdk:mcp-json-jackson2")
 }
+
+// Bundles the shipped skills (skills/*.md) as the classpath resource /skills.zip from which
+// SkillLibrary seeds the default skill directory on first use.
+def bundleSkillsZip = tasks.register("bundleSkillsZip", Zip) {
+    archiveFileName = "skills.zip"
+    destinationDirectory = layout.buildDirectory.dir("skills-bundle")
+    from(fileTree("skills") {
+        include "*.md"
+    })
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir bundleSkillsZip.map { it.destinationDirectory }
+        }
+    }
+}
