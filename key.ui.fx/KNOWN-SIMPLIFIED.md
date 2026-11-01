@@ -58,9 +58,10 @@ the SMT select menu, WP-7); the module-level removal plan for the Swing side is
 ## `key.ui.fx` — built-in extension ports (24)
 
 The six Swing built-in extensions ported as `KeYGuiExtensionF` providers (ShowHashcodes,
-JmlEnabledKeysIndicator, LogView, HeapStatus, OriginTermLabels, KeyboardTaclet); the Swing
-`WDLoadDialogOptionPanel` (LoadOptionPanel) and `DockingLayout` (Startup) remain documented
-deviations of the FX UI.
+JmlEnabledKeysIndicator, LogView, HeapStatus, OriginTermLabels, KeyboardTaclet) plus the
+load-option-panel SPI provider `WDLoadDialogOptionPanelF` (the Swing `WDLoadDialogOptionPanel`
+parity: `@Info(experimental = false)`, the WD profile, a fresh `WDLoadOptionPanelF` per `get()`);
+the Swing `DockingLayout` (Startup) remains a documented deviation of the FX UI.
 
 | Site | Swing original | FX port | Status |
 |---|---|---|---|

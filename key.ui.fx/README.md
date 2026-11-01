@@ -134,10 +134,10 @@ verification harness sets them via `JAVA_TOOL_OPTIONS`):
 
 | Flag | What it verifies |
 |---|---|
-| `key.fx.verify.extensions` | extension SPI discovery: `discovered=18` (12 built-in + 6 keyext) with an exact-set pin (`extMissing`/`extUnexpected` empty), `statusControls` = built-ins + every `StatusLineF` contribution, `westDrawerItems=5+facadeTabs` |
+| `key.fx.verify.extensions` | extension SPI discovery: `discovered=19` (13 built-in + 6 keyext) with an exact-set pin (`extMissing`/`extUnexpected` empty), `statusControls` = built-ins + every `StatusLineF` contribution, `westDrawerItems=5+facadeTabs` |
 | `key.fx.verify.drawerlayout` | west drawer round trip (`west = 5 + facade left-panel tabs`) |
 | `key.fx.verify.drawer` | drawer switch/move interactions |
-| `key.fx.verify.menuparity` | menu parity counts (File 16 / Proof 24 / Options 12 / View 7 / About 5) |
+| `key.fx.verify.menuparity` | menu parity counts (File 17 / Proof 24 / Options 12 / View 7 / About 5) |
 | `key.fx.verify.rightclickmacro` | right-click macro menu |
 | `key.fx.verify.proofdiff` | proof-diff frame |
 
@@ -166,15 +166,24 @@ stalls at the `uicontrol` modal (the seam dialog needs an XTEST Return/Escape di
 
 `extension.api.KeYGuiExtensionF` (mirror of the Swing `KeYGuiExtension`) is the JavaFX extension
 contract; capability interfaces: `MainMenuF`, `ToolbarF`, `StatusLineF`, `ContextMenuF`,
-`TooltipF`, `TermInfoF`, `KeyboardShortcutsF`, `SettingsF`, `StartupF`, `LeftPanelF`. Providers
-are discovered by `ServiceLoader` through `KeYGuiExtensionFacadeF`.
+`TooltipF`, `TermInfoF`, `KeyboardShortcutsF`, `SettingsF`, `StartupF`, `LeftPanelF`,
+`LoadOptionPanelF` + `OptionPanelF` (the Swing loading-options SPI: providers pair a profile
+with an option panel, aggregated by
+`KeYGuiExtensionFacadeF.createAdditionalOptionPanels()` and consumed by `LoadingOptionsDialogF`).
+Providers are discovered by `ServiceLoader` through `KeYGuiExtensionFacadeF`.
 
 * Built-in providers in `extension/contrib`: `HeatmapF`, `ParallelProverStatusIndicatorF`,
   `ProfileNameInStatusBarF`, `SoundinessExtensionF`, `TestExtensionF`, `JavacExtensionF` (in
   `plugins/javac`), `ShowHashcodesExtensionF`, `JmlEnabledKeysIndicatorF`, `LogViewExtensionF`,
-  `HeapStatusF`, `KeyboardTacletExtensionF`; plus `OriginTermLabelsExtF` in `originlabels`.
-  Swing's `WDLoadDialogOptionPanel` (LoadOptionPanel) and `DockingLayout` (Startup) remain
-  documented deviations of the FX UI.
+  `HeapStatusF`, `KeyboardTacletExtensionF`; plus `OriginTermLabelsExtF` in `originlabels` and
+  the load-option-panel provider `WDLoadDialogOptionPanelF` in `profileloading` (the Swing
+  `WDLoadDialogOptionPanel` parity). Swing's `DockingLayout` (Startup) remains a documented
+  deviation of the FX UI.
+* File > "Open with Loading Options…" opens the one-step loading dialog: profile, the
+  `LoadOptionPanelF` option panels and the file/folder selection confirmed together (Swing
+  parity: the Swing options accessory lives inside the file chooser; the JavaFX `FileChooser`
+  has no accessory API, so the file selection moves into the dialog — the unchanged two-step
+  "Open File…" flow collects the options in a second dialog).
 * The six keyext extensions are ported as modules and attached `runtimeOnly`:
   `keyext.caching.fx`, `keyext.exploration.fx`, `keyext.isabelletranslation.fx`,
   `keyext.slicing.fx`, `keyext.ui.testgen.fx`, `keyext.proofmanagement.fx`
