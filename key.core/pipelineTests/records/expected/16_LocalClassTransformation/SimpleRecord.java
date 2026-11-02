@@ -94,35 +94,35 @@ public final class SimpleRecord extends Record {
         if (!@($classInitialized)) {
             if (!@($classInitializationInProgress)) {
                 if (!@($classPrepared)) {
-                    //Created by ClassInitializeMethodBuilder.java:220
+                    //Created by ClassInitializeMethodBuilder.java:223
                     @($clprepare());
                 }
                 if (@($classErroneous)) {
                     throw new java.lang.NoClassDefFoundError();
                 }
-                //Created by ClassInitializeMethodBuilder.java:244
+                //Created by ClassInitializeMethodBuilder.java:249
                 @($classInitializationInProgress) = true;
                 try {
                     @(java.lang.Record.$clinit());
-                }//Created by ClassInitializeMethodBuilder.java:195
+                }//Created by ClassInitializeMethodBuilder.java:196
                  catch (java.lang.Error err) {
-                    //Created by ClassInitializeMethodBuilder.java:155
-                    @($classInitializationInProgress) = false;
                     //Created by ClassInitializeMethodBuilder.java:156
+                    @($classInitializationInProgress) = false;
+                    //Created by ClassInitializeMethodBuilder.java:157
                     @($classErroneous) = true;
                     throw err;
                 } catch (java.lang.Throwable twa) {
-                    //Created by ClassInitializeMethodBuilder.java:155
-                    @($classInitializationInProgress) = false;
                     //Created by ClassInitializeMethodBuilder.java:156
+                    @($classInitializationInProgress) = false;
+                    //Created by ClassInitializeMethodBuilder.java:157
                     @($classErroneous) = true;
                     throw new java.lang.ExceptionInInitializerError(twa);
                 }
-                //Created by ClassInitializeMethodBuilder.java:250
+                //Created by ClassInitializeMethodBuilder.java:255
                 @($classInitializationInProgress) = false;
-                //Created by ClassInitializeMethodBuilder.java:252
+                //Created by ClassInitializeMethodBuilder.java:257
                 @($classErroneous) = false;
-                //Created by ClassInitializeMethodBuilder.java:254
+                //Created by ClassInitializeMethodBuilder.java:259
                 @($classInitialized) = true;
             }
         }
@@ -130,18 +130,18 @@ public final class SimpleRecord extends Record {
 
     protected void $prepare() {
         super.$prepare();
-        //Created by PrepareObjectBuilder.java:95
+        //Created by PrepareObjectBuilder.java:97
         this.name = null;
     }
 
     private void $prepareEnter() {
         super.$prepare();
-        //Created by PrepareObjectBuilder.java:95
+        //Created by PrepareObjectBuilder.java:97
         this.name = null;
     }
 
     public SimpleRecord $create() {
-        //Created by CreateBuilder.java:58
+        //Created by CreateBuilder.java:60
         this.$initialized = false;
         $prepareEnter();
         return this;
@@ -149,7 +149,7 @@ public final class SimpleRecord extends Record {
 
     public static SimpleRecord $createObject() {
         SimpleRecord __NEW__;
-        //Created by CreateObjectBuilder.java:71
+        //Created by CreateObjectBuilder.java:78
         __NEW__ = SimpleRecord.$allocate();
         __NEW__.$create()@SimpleRecord
         return __NEW__;
