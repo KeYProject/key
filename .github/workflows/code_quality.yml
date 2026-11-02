@@ -9,7 +9,11 @@ on:
       - 'KeY-*'
 
 jobs:
+  # EISOP (Checker Framework NullnessChecker) hangs during compilation on CI, burning the
+  # full job timeout (~6h). Disabled for now; the operating nullness gate is NullAway
+  # (see the `nullaway` job below). Flip `if: false` -> `if: true` to restore this run.
   checkerFramework:
+    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
