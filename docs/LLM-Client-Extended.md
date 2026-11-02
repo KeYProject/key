@@ -252,6 +252,33 @@ declare the provider in
 classpath; `BuiltInMCPClient` picks it up automatically, and the Tools settings page shows the
 new tools with their approval requirement.
 
+## Tool Console
+
+*Proof → LLM → Tool Console…* opens a non-modal dialog for **manual, interactive testing of the
+agent tools** against the live environment (the open proof, the real settings) — a "Swagger UI
+in Swing". It is the manual end-to-end path that automated headless tests cannot cover, because
+most tool bodies resolve their target through the selected proof or model directory.
+
+The dialog is a thin client over `BuiltInMCPClient` (`ToolConsoleDialog`), using exactly the
+entry points of the agent loop:
+
+* a searchable tool tree grouped by `ToolCategory` with the effective approval badge
+  (`[auto]`/`[ask]`, plus `[disabled]`);
+* a description pane and argument composition in two synced modes: a generated form per
+  parameter schema (`JsonSchemaForm`: text field, checkbox, combo box for enums, one-item-per-line
+  arrays, JSON areas for objects; absent schemas fall back to a raw-JSON editor) and a raw-JSON
+  expert mode; both directions are kept in sync and conversion errors are reported inline;
+* an approval gate before every ASK-tool call (`ToolApprovalPrompt` with *Allow once* /
+  *Always allow* / *Deny*): the prompts share the chat's policy and persistence — *Always allow*
+  stores the tool via `allowWithoutApproval` and takes effect in agent sessions immediately, and
+  denied calls are never executed;
+* execution on a worker thread with the raw result in a monospaced pane, stringified exactly as
+  the model would receive it (`AgentLoop.stringify`), with a ✓/✗ badge and the duration;
+* an in-memory history of the last 20 calls; an entry reloads tool and arguments into the editor.
+
+Approvals made here carry over to the chat (and vice versa) because both read the same
+`LlmSettings`. A screenshot is rendered by `ToolConsoleUiTest` into `build/ui-guide/`.
+
 ## Threading model
 
 * All UI construction and rendering happens on the Swing EDT. `LlmPrompt` spawns one daemon
@@ -318,6 +345,7 @@ new tools with their approval requirement.
 |---|---|
 | `LlmExtension` | `KeYGuiExtension` wiring: registers settings, the `LlmPrompt` tab, the *Proof → LLM → Open LLM prompt* menu action (Ctrl+K) and the settings providers (`LLM Settings` with children `Tools`, `Prompts`, `Skills`) |
 | `LlmPrompt` | the chat panel; renders `LlmPromptModel` boxes (INPUT/OUTPUT/ERROR), hosts `AskUserBox`/`ApprovalBox`, `AutocompleteInput` (prompt input only, no separate Files tab) |
+| `ToolConsoleDialog` (+ `ToolConsoleAction`, `ToolApprovalPrompt`, `JsonSchemaForm`) | non-modal manual tool console (*Proof → LLM → Tool Console…*): schema-generated parameter forms + raw JSON, real approval dialogs shared with the chat, worker-thread execution, in-memory call history (see *Tool Console*) |
 | `LlmSettingsUI` | main settings page incl. *Fetch Models* (`SwingWorker`, timeouts in `Util`, HTTP status in the error dialog) |
 | `LlmToolsPanel` | per-tool approval/disablement table |
 | `LibraryEditorPanel` + editors | lightweight library editing: file list, template creation via *New*, external editing via *Edit*, `Delete`/`Reload`/export/import and the search path editor |
@@ -338,7 +366,8 @@ assembly), `PromptResolverTest` (markup), `LlmContextTest` (wire serialization),
 (self-consultation: fresh completion in parent and child loop, model/system override, disabled
 gate, error paths) and
 `mcp/AgentToolsTest` (modular discovery, metadata API, `list_tools` documentation, CLI
-rendering);
+rendering), `JsonSchemaFormTest` and `ToolConsoleUiTest` (the tool console: form round trips,
+tree grouping/badges, approval gating via a recording prompt, call flow, history);
 `TestMcpToolProvider` and `TestAgentToolProvider` are service-loader test fixtures.
 
 ## Author
