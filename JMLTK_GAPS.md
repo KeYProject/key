@@ -38,8 +38,8 @@ JMLtk front-end shipped in PR #3997.
 | 10 | assert-level `\by`-scripted proof replay | — | `key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof` | ✘ OPEN (2 replays fail) |
 | 11 | block-contract combination | — | `ParallelProverDeterminismTest` | ✘ OPEN — non-JML real KeY bug (pre-existing) |
 | 12 | absent clause keywords | `when`, `duration`, `working_space`, `captures`, and the legacy clause-name `name "..."` | — | ⚠ mostly OPEN — `name` replaced by the native `[behavior] <name>:` prefix (✔ RESOLVED) |
-| 13 | pragma-statements | `//@ nowarn;`, `//@ debug;` | — | ✘ OPEN (tokens absent) |
-| 14 | datagroup / monitor clauses | `monitors_for`, `readable_if`, `writable_if`, `in_group`, `maps_into` | probe | ⚠ silent mis-parse (`→ JmlFieldDeclaration`) |
+| 13 | pragma-statements | `//@ nowarn;`, `//@ debug;` | `exceptional/NowarnDebug.java`, `exceptional/NowarnDebugInMethod.java` | ⚠ pinned: class level loud (`ProofInputException`), method level dropped (fallback) |
+| 14 | datagroup / monitor clauses | `monitors_for`, `readable_if`, `writable_if`, `in_group`, `maps_into` | `exceptional/{Datagroup,MonitorsFor,ReadableIf,WritableIf,InGroup,MapsInto}.java` | ✔ RESOLVED (loud guard, no spurious fields) |
 | 15 | `\strictly_nothing`, `\nothing`, `\everything` | — | — | ✘ OPEN (plain `NameExpr`; locset meaning must be re-added) |
 | 16 | assert label *after* `assert` | `//@ assert LAB: e;` | — | ✘ OPEN (only JML-standard `LAB: assert e;`) |
 
@@ -244,18 +244,24 @@ name (fixture `testcase/speclang/njml/NameClause.java`, test
 is still rejected loudly by `JmlDocRemoval` with a migration hint, because a
 silent drop would weaken the specification.
 
-### 13. pragma-statements `//@ nowarn;`, `//@ debug;`  — ✘ OPEN
-Tokens absent from JMLtk.
+### 13. pragma-statements `//@ nowarn;`, `//@ debug;`  — ⚠ pinned (level-dependent)
+Tokens absent from JMLtk. At class level the unparseable comment surfaces loudly as a
+`ProofInputException` ("Encountered unexpected token"); at method level the leftover falls back to
+KeY's own grammar (`nowarn_pragma`/`debug_statement`) and unparseable leftovers are dropped
+silently. Status quo pinned by `exceptional/NowarnDebug.java` (class, loud) and
+`exceptional/NowarnDebugInMethod.java` (method, drop).
 
-### 14. datagroup / monitor clauses  — ⚠ silent mis-parse
+### 14. datagroup / monitor clauses  — ✔ RESOLVED (loud guard)
 ```java
 //@ monitors_for g;   // mis-parses into a spurious JmlFieldDeclaration
 //@ readable_if g;    // same
 //@ writable_if g;  in_group g;  maps_into g;  datagroup g;
 ```
-Worse than a clean reject: JMLtk fabricates a `JmlFieldDeclaration`. A guard
-rejecting/pre-filtering these before conversion is a defensible KeY-side
-follow-up.
+JMLtk fabricates a `JmlFieldDeclaration` (keyword as bogus type). The `JMLTransformer` guard
+(`DATAGROUP_FAMILY`: `datagroup`, `in_group`, `maps_into`, `monitors_for`, `readable_if`,
+`writable_if`, `mapped_by`, `repr`) rejects them loudly with an `IllegalArgumentException` instead
+of installing spurious fields; pinned per keyword by
+`exceptional/{Datagroup,MonitorsFor,ReadableIf,WritableIf,InGroup,MapsInto}.java`.
 
 ### 15. `\strictly_nothing`, `\nothing`, `\everything`  — ✘ OPEN
 No token for `\strictly_nothing`; `\nothing`/`\everything` arrive as plain
