@@ -5,10 +5,10 @@ were possible with KeY's pre-takeover JML front-end (`PreParser` /
 `TextualJML*` / `JmlParser.g4`) and are rejected, mis-parsed, or changed by the
 JMLtk front-end shipped in PR #3997.
 
-- Status below was **measured at HEAD `048f75d7df`** (rebased branch tip,
-  Oct 29 2026) by running the named test classes. It supersedes the earlier
-  historical triage in `HANDOFF.md §5.2` (which was recorded at an older
-  baseline and is stale in both directions).
+- Status below was **measured at HEAD `8fe1be5b6c`** (rebased branch tip,
+  Nov 2 2026) by running the named test classes (Appendix A). It supersedes
+  the earlier historical triage in `HANDOFF.md §5.2` (which was recorded at
+  an older baseline and is stale in both directions).
 - Every entry has a fixture path so it can be re-verified.
 
 ## Status legend
@@ -30,7 +30,7 @@ JMLtk front-end shipped in PR #3997.
 | 2 | `\by {…}` assertion-proof scripts / `obtain` | `/*@ assert x > 2 \by {…} */` | `scripts/jml/*.java`, `exceptional/AssertProofScript.java` | ✔ RESOLVED (fallback) |
 | 3 | `\seq(0)` inside a model-method body | `… : \seq_concat(b(n-1), \seq(0));` | `nparser/fix3452/fix/Issue3452Fixture.java` | ✔ RESOLVED — ⚠ was mis-attributed to JMLtk |
 | 4 | comma-separated store-ref `represents` | `//@ represents footprint = this.*, o.*;` | `key.ui/examples/heap/simple/src/MySubclass.java`, `heap/list/src/ArrayList.java` | ✘ OPEN (4 load fails) |
-| 5 | `\sum` comprehension fidelity | `ensures \result == (\sum int i; …)` | `heap/comprehensions/sum1.key`, `arrayMax.key`, `sum0.key`, `polishFlagSort.key` | ✘ OPEN (proofs don't close) |
+| 5 | `\sum` comprehension fidelity | `ensures \result == (\sum int i; …)` | `comprehensions/sum0.key`, `sum1.key`, `standard_key/java_dl/{arrayMax,polishFlagSort}.key` | ✘ OPEN (proofs don't close) |
 | 6 | record-level `/*@ nullable */` + record pipeline output | `/*@ nullable */ record MyRecord(…)` | `pipelineTests/records/**` | ✔ RESOLVED — goldens regenerated for the JMLtk output; `KeyJavaPipelineTest` 142/0 |
 | 7 | `spec_*_math` class/method pragmas | `/*@ spec_java_math @*/` | `testcase/specMath/{java,bigint}/Test.java`, `testPackage/TestClass.java` | ✘ OPEN (pragmas removed, 2 tests `@Disabled`) |
 | 8 | `ensures \result = max;` (single `=`) | — | `exceptional/WrongEquals.java` | ✔ RESOLVED (guarded via `JmlSideEffectChecker`) |
@@ -60,9 +60,10 @@ JMLtk front-end shipped in PR #3997.
 - **Status:** both forms now work. The raw `KeyMergePointStmt` is translated back
   to KeY's `MergePointStatement` in `JP2KeYConverter`, and leftover unhandled
   `//@` comments are re-parsed with KeY's `JmlParser` and attached via
-  `MarkerStatementHelper.KEY_JML_FALLBACK` (commit `edbed7177c`).
-  Measured: `MergeRuleTests` (12), `MtMergePointTest` (1), `TestTacletEquality`
-  (2137) all green.
+  `MarkerStatementHelper.KEY_JML_FALLBACK` (commit `251f945131`).
+  Measured (Appendix A at `8fe1be5b6c`): `MergeRuleTests` (12) and
+  `PredicateAbstractionLatticeTests` (3) green; `MtMergePointTest` (1) and
+  `TestTacletEquality` (2137) were green at the original measurement.
 
 ## 2. `\by {…}` assertion-proof scripts  — ✔ RESOLVED (fallback)
 
@@ -80,7 +81,7 @@ JMLtk front-end shipped in PR #3997.
   these leftovers would be dropped silently.
 - **Status:** the fallback re-parse (see #1) translates assert/assume statements
   with proof scripts and obtain clauses from the `KEY_JML_FALLBACK` parse tree.
-  Measured: `JmlScriptTest` green.
+  Measured: `JmlScriptTest` (7) green.
 
 ## 3. `\seq(0)` in a model-method body  — ✔ RESOLVED (and mis-attributed before)
 
@@ -101,7 +102,7 @@ JMLtk front-end shipped in PR #3997.
 - **Status:** resolved on the branch — `handleSpecialFunctionInvocation`
   special-cases `\seq(...)` and folds it into singleton-sequence concatenation
   mirroring `TermBuilder.seq` (`JP2KeYConverter.java:1854`, in the fallback
-  commit `edbed7177c`). Measured: `Issue3452Test` 2/2 green.
+  commit `251f945131`). Measured: `Issue3452Test` 2/2 green.
 
 ## 4. comma-separated store-ref `represents`  — ✘ OPEN
 
@@ -115,16 +116,17 @@ JMLtk front-end shipped in PR #3997.
   `represents`.
 - **After (JMLtk):** no comma-storage-ref `represents` form.
 - **Status:** OPEN. Measured: `ScDeterminismTest` load failures →
-  `heap/list/ArrayList_add.key`, `ArrayList_get_dep.key`,
-  `dependency_contracts.key`, `selection_sort.key` (4).
+  `heap/list/ArrayList_add.key`, `heap/list/ArrayList_get_dep.key`,
+  `heap/simple/dependency_contracts.key`, `heap/simple/selection_sort.key` (4).
 
 ## 5. `\sum` comprehension fidelity  — ✘ OPEN (proofs don't close)
 
 ```java
 @   ensures \result == (\sum int i; 0 <= i && i < a.length; a[i]);
 ```
-- Fixtures: `key.ui/examples/heap/comprehensions/{arrayMax,sum0,sum1}.key`,
-  `heap/standard_key/java_dl/polishFlagSort.key`; `exceptional/SumClause.java`.
+- Fixtures: `key.ui/examples/heap/comprehensions/{sum0,sum1}.key`,
+  `key.ui/examples/standard_key/java_dl/{arrayMax,polishFlagSort}.key`;
+  `exceptional/SumClause.java`.
 - **Before:** parsed and proved by KeY's own front-end.
 - **After (JMLtk):** parses, but the resulting terms don't close automode
   proofs. Measured at HEAD: `ScDeterminismTest` 3 proof failures
@@ -150,14 +152,14 @@ record SimpleRecord(/*@ nullable */ String name, …) { … }
   instead of being recategorized, and JML spec comments on synthesized record
   members are missing.
 - **Status:** ⚠ **REGRESSION uncovered 2026-10-29 — not in the recorded
-  baseline.** Measured at `048f75d7df`: **86 failures / 136 tests**
+  baseline.** Measured at `bf7048ca5d`: **86 failures / 136 tests**
   (identical at the pre-rebase tip; `main` is green). The historical triage
   recorded only 1 failure for this class (the input-level `/*@ nullable */`
   rejection at `pipelineTests/records/input/RecordOverwriting.java:1`); that
   parse rejection is gone at HEAD, but the golden output now diverges broadly.
   Traceability: front-end parse/print + spec attachment differences, not a
   rebase artifact.
-- **Resolution 2026-10-30 (HEAD `10f4bfcb9a`):** ✔ **RESOLVED — goldens
+- **Resolution 2026-10-30 (HEAD `841b999eee`):** ✔ **RESOLVED — goldens
   deliberately regenerated.** `expected/` was promoted from the fresh
   `actual/` output (102 → 108 files, incl. the new `17_AnnotationMover`
   stage; `actual/` remains gitignored). The semantic differences are the
