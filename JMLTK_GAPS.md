@@ -32,7 +32,7 @@ JMLtk front-end shipped in PR #3997.
 | 4 | comma-separated store-ref `represents` | `//@ represents footprint = this.*, o.*;` | `key.ui/examples/heap/simple/src/MySubclass.java`, `heap/list/src/ArrayList.java` | ✘ OPEN (4 load fails) |
 | 5 | `\sum` comprehension fidelity | `ensures \result == (\sum int i; …)` | `comprehensions/sum0.key`, `sum1.key`, `standard_key/java_dl/{arrayMax,polishFlagSort}.key` | ✘ OPEN (proofs don't close) |
 | 6 | record-level `/*@ nullable */` + record pipeline output | `/*@ nullable */ record MyRecord(…)` | `pipelineTests/records/**` | ✔ RESOLVED — goldens regenerated for the JMLtk output; `KeyJavaPipelineTest` 142/0 |
-| 7 | `spec_*_math` class/method pragmas | `/*@ spec_java_math @*/` | `testcase/specMath/{java,bigint}/Test.java`, `testPackage/TestClass.java` | ✘ OPEN (pragmas removed, 2 tests `@Disabled`) |
+| 7 | `spec_*_math` class/method pragmas | `/*@ spec_java_math @*/` | `testcase/specMath/{java,bigint}/Test.java`, `testPackage/TestClass.java` | ✔ RESOLVED (JML modifiers → `SpecMathMode`; `SpecMathModeTest` 2 + `ContractLoadingTests` 6 green) |
 | 8 | `ensures \result = max;` (single `=`) | — | `exceptional/WrongEquals.java` | ✔ RESOLVED (guarded via `JmlSideEffectChecker`) |
 | 9 | labeled `break`/`continue` proofs | — | `LoopScopeInvRuleTests` bench | ✘ OPEN (1 proof fails) |
 | 10 | assert-level `\by`-scripted proof replay | — | `key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof` | ✘ OPEN (2 replays fail) |
@@ -171,7 +171,7 @@ record SimpleRecord(/*@ nullable */ String name, …) { … }
   `KeyJavaPipelineTest` is green **142/0** (byte-exact: `expected/` equals a
   fresh run's `actual/`, 108/108).
 
-## 7. `spec_*_math` pragmas  — ✘ OPEN (mitigated)
+## 7. `spec_*_math` pragmas  — ✔ RESOLVED (JML modifiers → `SpecMathMode`)
 
 ```java
 /*@ spec_java_math @*/
@@ -180,12 +180,14 @@ public class Test { … }
 - Fixtures: `testcase/specMath/{java,bigint}/Test.java`,
   `testcase/speclang/testPackage/TestClass.java`.
 - **Before:** class-level math-mode pragmas drove `SpecMathMode`.
-- **After (JMLtk):** `Modifiers()` knows only `code_*_math`, `pure`,
-  `nullable_by_default`, … — `spec_*_math` is unparseable.
-- **Status:** OPEN. Pragmas were removed from the fixtures (int semantics come
-  from the `.key` `intRules` choice anyway); `TestJMLTranslator` pins
-  `.specMathMode(JAVA)`; the two specMath *load* tests are `@Disabled` (their
-  entire point was the unexpressible math mode).
+- **After (JMLtk):** JMLtk parses the pragmas as JML modifiers; there is no
+  `SpecMathMode`-specific clause or keyword.
+- **Status:** RESOLVED at `242e6eb44d` (remediation R4) — the modifier keys map
+  via `ModifierKind.JML_SPEC_*` to the type's `SpecMathMode` (`JMLInfoExtractor`),
+  for class, method-level and inline model-method modes. The fixtures keep their
+  `/*@ spec_java_math @*/` / `/*@ spec_bigint_math @*/` pragmas. Measured at
+  `8fe1be5b6c`: `SpecMathModeTest` (2) and `ContractLoadingTests` (6, incl.
+  `specMathJavaMathTest`/`specMathBigintMathTest`) all green.
 
 ## 8. single `=` in a JML expression  — ✔ RESOLVED (guarded)
 
