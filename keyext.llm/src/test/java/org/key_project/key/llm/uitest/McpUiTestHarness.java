@@ -168,7 +168,7 @@ public final class McpUiTestHarness {
     }
 
     /** Lays out the container and all its descendants (parents first). */
-    private static void layoutRecursively(Container c) {
+    public static void layoutRecursively(Container c) {
         c.doLayout();
         for (Component child : c.getComponents()) {
             if (child instanceof Container childContainer) {
