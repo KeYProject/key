@@ -35,6 +35,7 @@ public class LlmExtension implements KeYGuiExtension, KeYGuiExtension.ContextMen
         KeYGuiExtension.Settings, KeYGuiExtension.Startup, KeYGuiExtension.RightPanel,
         KeYGuiExtension.MainMenu, KeYGuiExtension.StatusLine {
     private KeyAction actionStartLlmPromptForCurrentProof;
+    private KeyAction actionToolConsole;
     private TabPanel uiPrompt;
     private LlmStatusBar llmStatusBar;
 
@@ -62,11 +63,12 @@ public class LlmExtension implements KeYGuiExtension, KeYGuiExtension.ContextMen
     public void preInit(MainWindow window, KeYMediator mediator) {
         ProofIndependentSettings.DEFAULT_INSTANCE.addSettings(LlmSettings.INSTANCE);
         actionStartLlmPromptForCurrentProof = new StartLlmPromptForCurrentProofAction(window);
+        actionToolConsole = new ToolConsoleAction(window);
     }
 
     @Override
     public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
-        return List.of(actionStartLlmPromptForCurrentProof);
+        return List.of(actionStartLlmPromptForCurrentProof, actionToolConsole);
     }
 
     @Override
