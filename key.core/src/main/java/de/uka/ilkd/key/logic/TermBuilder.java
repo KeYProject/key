@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.parser.ParserException;
@@ -2139,6 +2140,17 @@ public class TermBuilder {
 
     public JTerm seqLen(JTerm s) {
         return func(services.getTypeConverter().getSeqLDT().getSeqLen(), s);
+    }
+
+    public JTerm pseqLen(JTerm s) {
+        if (s.sort() instanceof ParametricSortInstance psi
+                && psi.getBase() == services.getTypeConverter().getPSeqLDT().targetSort()) {
+            var pfi = ParametricFunctionInstance.get(
+                services.getTypeConverter().getPSeqLDT().getPseqLen(),
+                ImmutableList.singleton(psi.getArgs().get(0)), services);
+            return func(pfi, s);
+        }
+        throw new TermCreationException("Expected a PSeq, got: " + s.sort());
     }
 
     /**

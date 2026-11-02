@@ -48,6 +48,7 @@ public abstract class ParametricLDT extends AbstractLDT {
         Map<Name, ParametricLDT> ret = new TreeMap<>();
 
         ret.put(SetLDT.NAME, new SetLDT(s));
+        ret.put(PSeqLDT.NAME, new PSeqLDT(s));
 
         return ret;
     }
