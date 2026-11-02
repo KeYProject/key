@@ -445,7 +445,10 @@ Fixtures: `key.core/src/test/resources/de/uka/ilkd/key/speclang/` (incl.
 5. Silent-mis-parse protection: `monitors_for`/`readable_if`/`writable_if`/
    `in_group`/`maps_into`/`nowarn`/`debug` tokens are absent from JMLtk and
    currently mis-parse (probe: `monitors_for` → spurious `JmlFieldDeclaration`).
-   KeY must reject or pre-filter these.
+   KeY must reject or pre-filter these. **Done (Phase 4):** `JMLTransformer`
+   guard `DATAGROUP_FAMILY` rejects the datagroup family loudly; nowarn/debug
+   pinned level-dependent (class loud, method dropped). See `JMLTK_GAPS.md`
+   §13/§14 and the `exceptional/*` fixtures.
 6. `\strictly_nothing`, `\nothing`/`\everything` are plain `NameExpr`s in
    JMLtk — their locset meaning must be re-added in KeY's term translation.
 7. Separate `.jml`/`.spec` files: parse via JMLtk with which enclosing context?

@@ -133,11 +133,16 @@ absent.
    should keep surfacing the raw `JmlDoc` text for these until the upstream
    grammar lands.
 4. **`nowarn` / `debug` pragma-statements** (`JmlParser.g4`): tokens absent.
+   **Status:** pinned level-dependent (class level loud `ProofInputException`,
+   method level dropped via fallback) — fixtures
+   `exceptional/NowarnDebug.java`, `exceptional/NowarnDebugInMethod.java`.
 5. **Datagroup / monitor clauses** (`monitors_for`, `readable_if`,
    `writable_if`, `in_group`, `maps_into`, `datagroup`): tokens absent — worse,
    a probe shows `//@ monitors_for g;` and `//@ readable_if g;` silently
    mis-parse into a spurious `JmlFieldDeclaration`. KeY must reject or
-   pre-filter these to avoid corruption.
+   pre-filter these to avoid corruption. **Status:** `JMLTransformer`
+   `DATAGROUP_FAMILY` guard rejects them loudly — fixtures
+   `exceptional/{Datagroup,MonitorsFor,ReadableIf,WritableIf,InGroup,MapsInto}.java`.
 6. **`\strictly_nothing`** (KeY's `STRICTLY_NOTHING` in assignable): no token;
    JMLtk also parses `\nothing`/`\everything` as plain `NameExpr` (kept as
    expressions — the special meaning must be re-added in KeY's term
