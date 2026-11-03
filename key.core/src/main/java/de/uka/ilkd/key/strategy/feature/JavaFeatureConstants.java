@@ -102,8 +102,8 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     public Feature createExactlyBoundedInEquationMultFeature(
             ProjectionToTerm<Goal> mult1Candidate, ProjectionToTerm<Goal> mult2Candidate,
             TermFeature targetCandidate) {
-        return new IsBoundedByInequationFeature(mult1Candidate, mult2Candidate,
-            targetCandidate);
+        return new IsBoundedByInequationFeature<>(mult1Candidate, mult2Candidate,
+            targetCandidate, JMonomial::create);
     }
 
     @Override
