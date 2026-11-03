@@ -5,6 +5,7 @@
 package org.key_project.prover.strategy;
 
 import org.key_project.ldt.IIntLdt;
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
@@ -22,5 +23,5 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
 
     Feature checkApplyEqFeature();
 
-    Feature findRightishFeature(IIntLdt numbers);
+    Feature findRightishFeature(IIntLdt numbers, Operator equals);
 }
