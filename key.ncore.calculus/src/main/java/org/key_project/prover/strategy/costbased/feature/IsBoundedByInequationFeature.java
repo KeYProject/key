@@ -2,23 +2,20 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy.feature;
+package org.key_project.prover.strategy.costbased.feature;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiFunction;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
-
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
-import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
-import org.key_project.prover.strategy.costbased.feature.VolatileCost;
 import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
@@ -32,11 +29,14 @@ import org.key_project.util.collection.ImmutableList;
  * an inequation in the sequent. Required to bound the number of cross-multiplications.
  */
 @VolatileCost
-public final class IsBoundedByInequationFeature extends BinaryTacletAppFeature<Goal> {
+public final class IsBoundedByInequationFeature<GOAL extends ProofGoal<GOAL>> extends BinaryTacletAppFeature<GOAL> {
 
-    private final ProjectionToTerm<Goal> mult1;
-    private final ProjectionToTerm<Goal> mult2;
+    private final ProjectionToTerm<GOAL> mult1;
+    private final ProjectionToTerm<GOAL> mult2;
     private final RelevantSequentFormulasGenerator inEquations;
+    // creates a monomial from a given term
+    private final BiFunction<Term, LogicServices, Monomial> monomialBuilder;
+
 
     /**
      * cached information about the variables occurring on the left side of an inequation
@@ -47,38 +47,42 @@ public final class IsBoundedByInequationFeature extends BinaryTacletAppFeature<G
             Set<Map<Term, Integer>> variables) {
     }
 
-    private final Map<Goal, InequationInfo> relations = new ConcurrentLruCache<>(200);
+    private final Map<GOAL, InequationInfo> relations = new ConcurrentLruCache<>(200);
 
     /**
      * @param mult1 the left side of the first inequation to be multiplied
      * @param mult2 the left side of the second inequation to be multiplied
      * @param inEquationFilter term feature describing the shape of the inequation
      */
-    public IsBoundedByInequationFeature(ProjectionToTerm<Goal> mult1, ProjectionToTerm<Goal> mult2,
-            TermFeature inEquationFilter) {
+    public IsBoundedByInequationFeature(ProjectionToTerm<GOAL> mult1, ProjectionToTerm<GOAL> mult2,
+                                        TermFeature inEquationFilter,
+                                        BiFunction<Term, LogicServices, Monomial> monomialBuilder) {
         this.mult1 = mult1;
         this.mult2 = mult2;
         this.inEquations = RelevantSequentFormulasGenerator.sequent(inEquationFilter);
+        this.monomialBuilder = monomialBuilder;
     }
 
     @Override
-    protected boolean filter(ITacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        final Services services = goal.proof().getServices();
-        final Monomial first = JMonomial.create(mult1.toTerm(app, pos, goal, mState), services);
-        final Monomial second = JMonomial.create(mult2.toTerm(app, pos, goal, mState), services);
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal, MutableState mState) {
+        final LogicServices services = goal.proof().getServices();
+        final Monomial first =
+            monomialBuilder.apply(mult1.toTerm(app, pos, goal, mState), services);
+        final Monomial second =
+            monomialBuilder.apply(mult2.toTerm(app, pos, goal, mState), services);
         return getInEquations(goal, mState).contains(variables(first, second));
     }
 
-    private Set<Map<Term, Integer>> getInEquations(Goal goal, MutableState mState) {
+    private Set<Map<Term, Integer>> getInEquations(GOAL goal, MutableState mState) {
         final ImmutableList<Term> selection = inEquations.selection(goal, mState);
         final InequationInfo cached = relations.get(goal);
         if (cached != null && cached.selection() == selection) {
             return cached.variables();
         }
-        final Services services = goal.proof().getServices();
+        final LogicServices services = goal.proof().getServices();
         final Set<Map<Term, Integer>> variables = new HashSet<>();
         for (Term formula : selection) {
-            variables.add(variables(JMonomial.create(formula.sub(0), services)));
+            variables.add(variables(monomialBuilder.apply(formula.sub(0), services)));
         }
         relations.put(goal, new InequationInfo(selection, variables));
         return variables;
