@@ -1001,13 +1001,14 @@ public class IntermediateProofReplayer {
      */
     public static JTerm parseTerm(String value, Proof proof, Namespace<QuantifiableVariable> varNS,
             Namespace<IProgramVariable> progVarNS, Namespace<Function> functNS) {
+        NamespaceSet proofNS = proof.getNamespaces();
         NamespaceSet nss = new NamespaceSet();
         nss.setVariables(varNS);
         nss.setFunctions(functNS);
-        nss.setSorts(proof.getNamespaces().sorts());
-        nss.setSortAliases(proof.getNamespaces().sortAliases());
-        nss.setParametricSorts(proof.getNamespaces().parametricSorts());
-        nss.setParametricFunctions(proof.getNamespaces().parametricFunctions());
+        nss.setSorts(proofNS.sorts());
+        nss.setSortAliases(proofNS.sortAliases());
+        nss.setParametricSorts(proofNS.parametricSorts());
+        nss.setParametricFunctions(proofNS.parametricFunctions());
         nss.setProgramVariables(progVarNS);
         try {
             KeyIO keyIO = new KeyIO(proof.getServices(), nss);

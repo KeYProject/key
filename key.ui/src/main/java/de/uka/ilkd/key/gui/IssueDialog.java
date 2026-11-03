@@ -6,7 +6,6 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -486,8 +485,7 @@ public final class IssueDialog extends JDialog {
      */
     private static Element getHyperlinkElement(MouseEvent event) {
         JEditorPane editor = (JEditorPane) event.getSource();
-        Point2D p = event.getPoint();
-        int pos = editor.viewToModel2D(p);
+        int pos = editor.viewToModel2D(event.getPoint());
         if (pos >= 0 && editor.getDocument() instanceof HTMLDocument hdoc) {
             Element elem = hdoc.getCharacterElement(pos);
             if (elem.getAttributes().getAttribute(HTML.Tag.A) != null) {
