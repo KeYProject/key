@@ -201,7 +201,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         bindRuleSet(d, "apply_equations",
             SumFeature.createSum(
                 add(applyTF(FocusProjection.<G>create(), tf.monomial),
-                    ScaleFeature.createScaled(fc.findRightishFeature(numbers, tf.eq),
+                    ScaleFeature.createScaled(FindRightishFeature.create(numbers, tf.eq),
                         5.0)),
                 ifZero(MatchedAssumesFeature.create(),
                     add(fc.checkApplyEqFeature(),

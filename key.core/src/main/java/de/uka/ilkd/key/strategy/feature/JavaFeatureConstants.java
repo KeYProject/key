@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.StaticFeatureCollection;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
@@ -15,18 +16,16 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationTieBreakFeatur
 import de.uka.ilkd.key.strategy.quantifierHeuristics.SplittableQuantifiedFormulaFeature;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.EqTermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.*;
 
-import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.strategy.FeatureConstants;
 import org.key_project.prover.strategy.costbased.feature.*;
-import org.key_project.prover.strategy.costbased.quantifierHeuristics.InstantiationCostScalerFeature;
 import org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
+import org.key_project.prover.strategy.costbased.termfeature.EqTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
@@ -74,11 +73,6 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     @Override
     public Feature checkApplyEqFeature() {
         return CheckApplyEqFeature.INSTANCE;
-    }
-
-    @Override
-    public Feature findRightishFeature(IIntLdt numbers, Operator equals) {
-        return FindRightishFeature.create(numbers, equals);
     }
 
     @Override
@@ -151,7 +145,7 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
 
     @Override
     public TermFeature createEqTermFeature(TermBuffer<Goal> t) {
-        return EqTermFeature.create(t);
+        return EqTermFeature.create(t, RenamingTermProperty.RENAMING_TERM_PROPERTY);
     }
 
     @Override
@@ -191,11 +185,6 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     @Override
     public Feature splittableQuantifiedFormula() {
         return SplittableQuantifiedFormulaFeature.INSTANCE;
-    }
-
-    @Override
-    public Feature instantiationCostScaler(Feature costF, Feature allowSplittingF) {
-        return InstantiationCostScalerFeature.create(costF, allowSplittingF);
     }
 
     @Override
@@ -245,7 +234,7 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
 
     @Override
     public Feature countOccurrences(ProjectionToTerm<Goal> target) {
-        return CountOccurrencesFeature.create(target);
+        return CountOccurrencesFeature.create(target, RenamingTermProperty.RENAMING_TERM_PROPERTY);
     }
 
     @Override

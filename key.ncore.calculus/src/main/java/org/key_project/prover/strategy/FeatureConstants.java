@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.strategy;
 
-import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.proof.ProofGoal;
@@ -29,8 +28,6 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
     Feature topLevelFindSucc();
 
     Feature checkApplyEqFeature();
-
-    Feature findRightishFeature(IIntLdt numbers, Operator equals);
 
     TermFeature createEliminableQuantifier();
 
@@ -87,8 +84,6 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
     Feature eqNonDuplicateAppFeature();
 
     Feature splittableQuantifiedFormula();
-
-    Feature instantiationCostScaler(Feature costF, Feature allowSplittingF);
 
     TermGenerator<G> superTermGenerator(TermFeature cond, LogicServices services);
 

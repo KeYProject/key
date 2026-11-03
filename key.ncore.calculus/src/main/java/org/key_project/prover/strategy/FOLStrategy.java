@@ -343,7 +343,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
     private void setupQuantifierInstantiation(RuleSetDispatchFeature d) {
         if (quantifierInstantiatedEnabled()) {
             final TermBuffer<G> varInst = new TermBuffer<>();
-            final Feature branchPrediction = fc.instantiationCostScaler(
+            final Feature branchPrediction = InstantiationCostScalerFeature.create(
                 fc.computeInstantiationCostOf(varInst, triggerTreatment()),
                 allowQuantifierSplitting());
 
