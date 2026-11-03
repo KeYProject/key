@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy;
 
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
@@ -16,6 +17,8 @@ import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleSet;
@@ -27,6 +30,8 @@ import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
+
+import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.strategy.StaticFeatureCollection.*;
 
@@ -167,7 +172,13 @@ public class FOLStrategy extends org.key_project.prover.strategy.FOLStrategy<Goa
 
     @Override
     protected RuleSet getHeuristic(String p_name) {
-        return proof.getNamespaces().ruleSets().lookup(p_name);
+        final NamespaceSet nss = proof.getNamespaces();
+        final Namespace<@NonNull RuleSet> ns = nss.ruleSets();
+        final RuleSet h = ns.lookup(new Name(p_name));
+
+        assert h != null : "Did not find the rule set " + p_name;
+
+        return h;
     }
 
     @Override

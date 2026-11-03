@@ -125,23 +125,6 @@ public abstract class JavaAbstractFeatureStrategy extends AbstractFeatureStrateg
         return oneOf(new Feature[] { feature0, feature1 });
     }
 
-    /// It is possible to turn off the method <code>instantiate</code>,
-    /// which can be useful in order to use the same feature definitions both for
-    /// cost computation and instantiation.
-    ///
-    /// Counts nesting depth of instantiation activation to avoid premature deactivation.
-    private short instantiateActive = 0;
-
-    protected void enableInstantiate() {
-        instantiateActive++;
-        assert instantiateActive >= 0 : "overflow occurred";
-    }
-
-    protected void disableInstantiate() {
-        instantiateActive--;
-        assert instantiateActive >= 0;
-    }
-
     protected Feature instantiate(Name sv, ProjectionToTerm<Goal> value) {
         if (instantiateActive != 0) {
             return SVInstantiationCP.create(sv, value);

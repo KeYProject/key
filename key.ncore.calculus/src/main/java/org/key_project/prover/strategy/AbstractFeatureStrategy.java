@@ -30,7 +30,7 @@ public abstract class AbstractFeatureStrategy<G extends ProofGoal<G>>
     /// cost computation and instantiation.
     ///
     /// Counts nesting depth of instantiation activation to avoid premature deactivation.
-    private short instantiateActive = 0;
+    protected short instantiateActive = 0;
 
     protected void enableInstantiate() {
         instantiateActive++;
