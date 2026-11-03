@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.feature.findprefix.Checker;
 
 /**
  * Checks, whether the position in occurrence has antecedent/succedent polarity.
@@ -17,11 +18,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
  * @author christoph
  */
 class AntecSuccPrefixChecker implements Checker {
-
     private enum Polarity {
-
         ANTECEDENT, SUCCEDENT
-
     }
 
     // checks, whether the position in occurrence has antecedent polarity
